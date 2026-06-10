@@ -1,4 +1,21 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx expo install *)",
+      "Bash(npx expo start *)",
+      "Bash(npx expo doctor)",
+      "Bash(npx expo lint)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(cat *)"
+    ]
+  },
   "enabledPlugins": {
     "expo@claude-plugins-official": true
   }

@@ -1,0 +1,7 @@
+module.exports = {
+  extends: ["expo", "prettier"],
+  rules: {
+    "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "no-console": "warn",
+  },
+};

@@ -1,29 +1,49 @@
 {
   "expo": {
-    "name": "MaratonProject",
-    "slug": "MaratonProject",
+    "name": "Maraton",
+    "slug": "maraton",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "maraton",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0A0A0F"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.maraton.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Yanlis soru fotografi eklemek icin galeri erisimi gerekli."
+      }
     },
     "android": {
+      "package": "com.maraton.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0A0A0F"
       },
       "edgeToEdgeEnabled": true
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#F5A623"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Yanlis soru fotografi eklemek icin galeri erisimi gerekli."
+        }
+      ]
+    ]
   }
 }
