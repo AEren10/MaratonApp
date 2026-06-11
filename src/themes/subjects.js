@@ -1,101 +1,23 @@
+import { TYT_DERSLER, AYT_SAY_DERSLER, AYT_EA_DERSLER, AYT_SOZ_DERSLER, YDT_DERSLER, getSubjectsForExam } from "../data/curriculum";
+
+export { getSubjectsForExam };
+
 export const EXAM_TYPES = {
   TYT: "tyt",
-  AYT_SAY: "ayt_say",
-  AYT_EA: "ayt_ea",
-  AYT_SOZ: "ayt_soz",
+  TYT_AYT: "tyt_ayt",
+  DIL: "dil",
 };
 
-export const TYT_SUBJECTS = {
-  turkce: {
-    key: "turkce",
-    label: "Turkce",
-    color: "#60A5FA",
-    icon: "book-open",
-    questionCount: 40,
-    topics: [
-      "Soz Yorumu",
-      "Dil Bilgisi",
-      "Paragraf",
-      "Anlam Bilgisi",
-      "Ses Bilgisi",
-      "Yazim Kurallari",
-      "Noktalama",
-      "Sozcukte Anlam",
-      "Cumle Yorumu",
-    ],
-  },
-  matematik: {
-    key: "matematik",
-    label: "Matematik",
-    color: "#F5A623",
-    icon: "calculator",
-    questionCount: 40,
-    topics: [
-      "Temel Kavramlar",
-      "Sayilar",
-      "Bolme-Bolunebilme",
-      "EBOB-EKOK",
-      "Rasyonel Sayilar",
-      "Basamak Kavrami",
-      "Uslu Sayilar",
-      "Koklu Sayilar",
-      "Carpanlara Ayirma",
-      "Oran-Oranti",
-      "Denklem Cozme",
-      "Esitsizlikler",
-      "Mutlak Deger",
-      "Fonksiyonlar",
-      "Polinomlar",
-      "Permutasyon-Kombinasyon",
-      "Olasilik",
-      "Istatistik",
-      "Geometri Temel",
-      "Ucgenler",
-      "Dortgenler",
-      "Cember-Daire",
-      "Katicisamlar",
-    ],
-  },
-  fen: {
-    key: "fen",
-    label: "Fen Bilimleri",
-    color: "#34D399",
-    icon: "flask",
-    questionCount: 20,
-    topics: [
-      "Fizik - Kuvvet",
-      "Fizik - Enerji",
-      "Fizik - Elektrik",
-      "Fizik - Dalgalar",
-      "Kimya - Atom",
-      "Kimya - Periyodik Tablo",
-      "Kimya - Baglar",
-      "Kimya - Tepkimeler",
-      "Biyoloji - Hucre",
-      "Biyoloji - Kalitim",
-      "Biyoloji - Ekosistem",
-    ],
-  },
-  sosyal: {
-    key: "sosyal",
-    label: "Sosyal Bilimler",
-    color: "#A78BFA",
-    icon: "globe",
-    questionCount: 20,
-    topics: [
-      "Tarih - Ilk Caglar",
-      "Tarih - Osmanli",
-      "Tarih - Inkilap",
-      "Cografya - Fiziki",
-      "Cografya - Beser",
-      "Felsefe",
-      "Din Kulturu",
-    ],
-  },
-};
+const ALL_SUBJECTS_MAP = {};
+[...TYT_DERSLER, ...AYT_SAY_DERSLER, ...AYT_EA_DERSLER, ...AYT_SOZ_DERSLER, ...YDT_DERSLER].forEach((s) => {
+  ALL_SUBJECTS_MAP[s.key] = s;
+});
 
-export const SUBJECT_LIST = Object.values(TYT_SUBJECTS);
+export const TYT_SUBJECTS = {};
+TYT_DERSLER.forEach((s) => { TYT_SUBJECTS[s.key] = s; });
 
-export const getSubjectByKey = (key) => TYT_SUBJECTS[key] || null;
+export const SUBJECT_LIST = TYT_DERSLER;
 
-export const getSubjectColor = (key) => TYT_SUBJECTS[key]?.color || "#A0A0B0";
+export const getSubjectByKey = (key) => ALL_SUBJECTS_MAP[key] || null;
+
+export const getSubjectColor = (key) => ALL_SUBJECTS_MAP[key]?.color || "#A0A0B0";

@@ -1,14 +1,18 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "../supabase/client";
+import { signOut as supaSignOut } from "../supabase/auth";
 
 const AuthContext = createContext(null);
 
+const DEV_BYPASS = false;
+
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(DEV_BYPASS ? { user: { id: "dev" } } : null);
+  const [user, setUser] = useState(DEV_BYPASS ? { id: "dev", email: "dev@test.com" } : null);
+  const [loading, setLoading] = useState(DEV_BYPASS ? false : true);
 
   useEffect(() => {
+    if (DEV_BYPASS) return;
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
@@ -25,7 +29,16 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const value = { session, user, loading };
+  const logout = useCallback(async () => {
+    if (DEV_BYPASS) {
+      setSession(null);
+      setUser(null);
+      return;
+    }
+    await supaSignOut();
+  }, []);
+
+  const value = { session, user, loading, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

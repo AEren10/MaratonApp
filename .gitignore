@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# Claude design imports
+.claude-design-import/
+.claude/
+
 # Expo
 .expo/
 dist/

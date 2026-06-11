@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from "../../themes/tokens";
+import { Icon } from "../design";
 
 export class ScreenErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -17,7 +18,7 @@ export class ScreenErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Text style={styles.emoji}>⚠️</Text>
+          <Icon name="alert" size={48} color={COLORS.dark.warning} />
           <Text style={styles.title}>Bir sorun olustu</Text>
           <Text style={styles.subtitle}>
             Bu ekranda beklenmeyen bir hata var.
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: SPACING.xxl,
   },
-  emoji: { fontSize: 48, marginBottom: SPACING.lg },
+  iconWrap: { marginBottom: SPACING.lg },
   title: {
     ...TYPOGRAPHY.subheading,
     color: COLORS.dark.textPrimary,

@@ -39,6 +39,9 @@ export const SCREENS = {
   TOPIC_CARDS: "TopicCards",
   CARD_DETAIL: "CardDetail",
 
+  // League
+  LEAGUE: "League",
+
   // Settings
   SETTINGS: "Settings",
   APPEARANCE: "Appearance",
