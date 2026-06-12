@@ -18,6 +18,7 @@ import { SubjectBars } from "./components/SubjectBars";
 import { TrendChart } from "./components/TrendChart";
 import { HistoryList } from "./components/HistoryList";
 import { TrialFilter } from "./components/TrialFilter";
+import { MoodTrend } from "./components/MoodTrend";
 
 function AnalysisSkeleton() {
   return (
@@ -200,6 +201,10 @@ export default function AnalysisScreen() {
                   onPress={handleHistoryPress}
                   onCompare={() => navigation.navigate(SCREENS.TRIAL_COMPARE)}
                 />
+              </AnimatedCard>
+
+              <AnimatedCard delay={360}>
+                <MoodTrend trials={filterTrials(trials, filter)} />
               </AnimatedCard>
             </>
           )}

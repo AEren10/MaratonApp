@@ -84,6 +84,21 @@ export default function GoalsScreen() {
           suffix="soru"
         />
 
+        <View style={styles.chipRow}>
+          {[50, 100, 150, 200].map((n) => {
+            const active = draft.dailyQuestions === n;
+            return (
+              <Pressable
+                key={n}
+                onPress={() => setDraft((d) => ({ ...d, dailyQuestions: n }))}
+                style={[styles.chip, active && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, active && styles.chipTextActive]}>{n}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
         <GoalInput
           icon="chart"
           color={C.teal}
@@ -161,6 +176,27 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   suffix: { ...TYPOGRAPHY.caption, color: C.muted },
+  chipRow: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    marginTop: -SPACING.xs,
+    marginBottom: SPACING.md,
+  },
+  chip: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: SPACING.sm,
+    backgroundColor: C.surface,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  chipActive: {
+    backgroundColor: C.amber + "20",
+    borderColor: C.amber,
+  },
+  chipText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
+  chipTextActive: { color: C.amber },
   saveBtn: {
     flexDirection: "row",
     alignItems: "center",

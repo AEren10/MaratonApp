@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { BentoCard, Icon, Chip } from "../../../components/design";
 import { C } from "../../../themes/tokens";
 import { getSubjectByKey } from "../../../themes/subjects";
+import { getTopicDifficulty } from "../../../lib/topicDifficulty";
 
 function relativeDate(iso) {
   const d = new Date(iso);
@@ -23,6 +24,7 @@ function resolveSubject(raw) {
 
 export function WrongCard({ item, onPress, onResolve }) {
   const subj = resolveSubject(item.subject);
+  const diff = !item.is_resolved ? getTopicDifficulty(item.topic) : null;
   return (
     <BentoCard
       onPress={onPress}
@@ -79,6 +81,24 @@ export function WrongCard({ item, onPress, onResolve }) {
             <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted }}>
               {relativeDate(item.created_at)}
             </Text>
+            {diff ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                  backgroundColor: diff.color + "1A",
+                  paddingHorizontal: 6,
+                  paddingVertical: 2,
+                  borderRadius: 6,
+                }}
+              >
+                <Icon name="users" size={10} color={diff.color} />
+                <Text style={{ fontSize: 10, color: diff.color, fontFamily: "Inter_600SemiBold" }}>
+                  100'de ~{diff.correctRate} doğru · -{diff.netLoss} net
+                </Text>
+              </View>
+            ) : null}
             {(item.correct_answer ?? item.correctAnswer) ? (
               <View
                 style={{

@@ -13,6 +13,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { addWrongQuestion } from "../../supabase/wrongQuestions";
 import { uploadWrongQuestionImage } from "../../supabase/storage";
+import { initialReview } from "../../lib/spacedRepetition";
+import { TopicPicker } from "./components/TopicPicker";
 
 const ANSWERS = ["A", "B", "C", "D", "E"];
 
@@ -23,6 +25,8 @@ export default function AddWrongScreen() {
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const [subject, setSubject] = useState(() => subjects[1] || subjects[0] || { key: "matematik", label: "Matematik", color: "#F5A623", icon: "hash" });
   const [topic, setTopic] = useState("");
+  const [topicSource, setTopicSource] = useState(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [note, setNote] = useState("");
   const [myAnswer, setMyAnswer] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
@@ -62,7 +66,9 @@ export default function AddWrongScreen() {
         correct_answer: correctAnswer,
         note: note.trim() || null,
         image_path: imagePath,
+        topic_source: topicSource,
         is_resolved: false,
+        ...initialReview(),
       });
       reward("question_solved", {
         count: 1,
@@ -120,7 +126,7 @@ export default function AddWrongScreen() {
             return (
               <Pressable
                 key={s.key}
-                onPress={() => setSubject(s)}
+                onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
                 style={{
                   paddingHorizontal: 12,
                   paddingVertical: 10,
@@ -149,13 +155,15 @@ export default function AddWrongScreen() {
         </View>
 
         <Label>Konu</Label>
-        <TextInput
-          value={topic}
-          onChangeText={setTopic}
-          placeholder="ör. Üslü Sayılar"
-          placeholderTextColor={C.muted}
-          style={inputStyle}
-        />
+        <Pressable
+          onPress={() => setPickerOpen(true)}
+          style={[inputStyle, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
+        >
+          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }}>
+            {topic || "Konu seç"}
+          </Text>
+          <Icon name="chevDown" size={16} color={C.muted} />
+        </Pressable>
 
         <Label>Şıklar</Label>
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -308,6 +316,12 @@ export default function AddWrongScreen() {
           </Text>
         </Pressable>
       </View>
+      <TopicPicker
+        visible={pickerOpen}
+        subject={subject}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(name, source) => { setTopic(name); setTopicSource(source); }}
+      />
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>

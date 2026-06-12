@@ -42,6 +42,11 @@ export const SCREENS = {
   // League
   LEAGUE: "League",
 
+  // Simülatör / Roadmap / SR
+  RANK_SIMULATOR: "RankSimulator",
+  ROADMAP: "Roadmap",
+  REVIEW_SESSION: "ReviewSession",
+
   // Calendar
   CALENDAR: "Calendar",
 

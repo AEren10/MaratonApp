@@ -47,6 +47,9 @@ import LeagueScreen from "../screens/league/LeagueScreen";
 import CalendarScreen from "../screens/calendar/CalendarScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
 import FriendsScreen from "../screens/social/FriendsScreen";
+import RankSimulatorScreen from "../screens/simulator/RankSimulatorScreen";
+import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
+import RoadmapScreen from "../screens/roadmap/RoadmapScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +96,9 @@ const EBLeague = withEB(LeagueScreen);
 const EBCalendar = withEB(CalendarScreen);
 const EBGoals = withEB(GoalsScreen);
 const EBFriends = withEB(FriendsScreen);
+const EBRankSimulator = withEB(RankSimulatorScreen);
+const EBReviewSession = withEB(ReviewSessionScreen);
+const EBRoadmap = withEB(RoadmapScreen);
 
 const screenOptions = {
   headerShown: false,
@@ -172,6 +178,9 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.CALENDAR} component={EBCalendar} />
       <Stack.Screen name={SCREENS.GOALS} component={EBGoals} />
       <Stack.Screen name={SCREENS.FRIENDS} component={EBFriends} />
+      <Stack.Screen name={SCREENS.RANK_SIMULATOR} component={EBRankSimulator} />
+      <Stack.Screen name={SCREENS.REVIEW_SESSION} component={EBReviewSession} />
+      <Stack.Screen name={SCREENS.ROADMAP} component={EBRoadmap} />
     </Stack.Navigator>
   );
 }

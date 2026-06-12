@@ -1,8 +1,8 @@
 import { useMemo, useState, useCallback } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
+import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { C, SPACING } from "../../themes/tokens";
+import { C, SPACING, TYPOGRAPHY } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { useAuth } from "../../contexts/AuthContext";
@@ -33,7 +33,13 @@ export default function WrongNotebookScreen() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [subject, setSubject] = useState("all");
+  const [topicFilter, setTopicFilter] = useState("all");
   const [status, setStatus] = useState("open");
+
+  const setSubjectAndReset = useCallback((s) => {
+    setSubject(s);
+    setTopicFilter("all");
+  }, []);
 
   const loadItems = useCallback(async () => {
     if (!user?.id) return;
@@ -48,11 +54,24 @@ export default function WrongNotebookScreen() {
     return items.filter((it) => {
       const subKey = typeof it.subject === "string" ? it.subject : it.subject?.key;
       if (subject !== "all" && subKey !== subject) return false;
+      if (topicFilter !== "all" && it.topic !== topicFilter) return false;
       if (status === "open" && it.is_resolved) return false;
       if (status === "resolved" && !it.is_resolved) return false;
       return true;
     });
-  }, [items, subject, status]);
+  }, [items, subject, topicFilter, status]);
+
+  // Seçili dersin kayıtlarındaki konular (yanlış sayısına göre azalan).
+  const topicOptions = useMemo(() => {
+    if (subject === "all") return [];
+    const counts = {};
+    items.forEach((it) => {
+      const subKey = typeof it.subject === "string" ? it.subject : it.subject?.key;
+      if (subKey !== subject || !it.topic) return;
+      counts[it.topic] = (counts[it.topic] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, n]) => ({ name, n }));
+  }, [items, subject]);
 
   const toggleResolve = async (id) => {
     const item = items.find((it) => it.id === id);
@@ -80,6 +99,11 @@ export default function WrongNotebookScreen() {
   const counts = useMemo(() => {
     const open = items.filter((i) => !i.is_resolved).length;
     return { open, total: items.length };
+  }, [items]);
+
+  const dueCount = useMemo(() => {
+    const now = Date.now();
+    return items.filter((i) => !i.is_resolved && i.next_review_at && new Date(i.next_review_at).getTime() <= now).length;
   }, [items]);
 
   return (
@@ -131,12 +155,61 @@ export default function WrongNotebookScreen() {
         </Pressable>
       </View>
 
+      {dueCount > 0 ? (
+        <Pressable
+          onPress={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
+          style={{
+            flexDirection: "row", alignItems: "center", gap: 8,
+            marginHorizontal: 16, marginBottom: 12,
+            backgroundColor: C.amber + "18", borderWidth: 1, borderColor: C.amber + "55",
+            borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12,
+          }}
+        >
+          <Icon name="refresh" size={18} color={C.amber} />
+          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber, flex: 1 }}>
+            Bugün tekrar ({dueCount})
+          </Text>
+          <Icon name="arrowR" size={16} color={C.amber} />
+        </Pressable>
+      ) : null}
+
       <FilterChips
         active={subject}
-        onChange={setSubject}
+        onChange={setSubjectAndReset}
         status={status}
         onStatusChange={setStatus}
       />
+
+      {topicOptions.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingBottom: 12 }}
+        >
+          {[{ name: "all", n: 0 }, ...topicOptions].map((t) => {
+            const active = topicFilter === t.name;
+            const label = t.name === "all" ? "Tüm konular" : `${t.name} (${t.n})`;
+            return (
+              <Pressable
+                key={t.name}
+                onPress={() => setTopicFilter(t.name)}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 7,
+                  borderRadius: 10,
+                  backgroundColor: active ? C.amber + "20" : C.surface,
+                  borderWidth: 1,
+                  borderColor: active ? C.amber : C.border,
+                }}
+              >
+                <Text style={{ ...TYPOGRAPHY.captionMedium, color: active ? C.amber : C.sec }}>
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      ) : null}
 
       {loading ? (
         <WrongSkeleton />

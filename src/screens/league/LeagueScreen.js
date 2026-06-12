@@ -1,64 +1,42 @@
-import { useState, useCallback, useMemo } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
+import { useState, useCallback, useMemo, useRef } from "react";
+import { View, Text, FlatList, Pressable, RefreshControl, ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { C, TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { SCREENS } from "../../constants/screens";
 import { Icon, Avatar, AnimatedCard } from "../../components/design";
-import { useAppSelector } from "../../store/hooks";
-import { selectStats, selectWeeklyXP, selectXP } from "../../store/slices/gamificationSlice";
-import { selectStreak } from "../../store/slices/studyLogSlice";
-import { selectTrials } from "../../store/slices/trialSlice";
+import { useAuth } from "../../contexts/AuthContext";
+import { getTier, getNextTier } from "../../constants/league";
+import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
+import { GroupsTab } from "./GroupsTab";
 
-const TIERS = [
-  { key: "bronz", name: "Bronz", icon: "medal", color: "#CD7F47", minXP: 0 },
-  { key: "gumus", name: "Gümüş", icon: "medal", color: "#C0C5CE", minXP: 500 },
-  { key: "altin", name: "Altın", icon: "trophy", color: "#F5A623", minXP: 2000 },
-  { key: "elmas", name: "Elmas", icon: "award", color: "#5EE7E7", minXP: 5000 },
-  { key: "obsidyen", name: "Obsidyen", icon: "crown", color: "#8B7FD6", minXP: 10000 },
-];
+const POLL_MS = 30000;
 
-function getTier(xp) {
-  for (let i = TIERS.length - 1; i >= 0; i--) {
-    if (xp >= TIERS[i].minXP) return TIERS[i];
-  }
-  return TIERS[0];
-}
-
-function getNextTier(xp) {
-  for (const t of TIERS) {
-    if (xp < t.minXP) return t;
-  }
-  return null;
-}
-
-function TierHeader({ tier, stats, xp, nextTier }) {
+function TierHeader({ tier, nextTier, myScore, myRank }) {
   return (
     <AnimatedCard delay={0}>
       <View style={s.tierCard}>
         <View style={[s.tierAccent, { backgroundColor: tier.color }]} />
         <View style={s.tierRow}>
           <Icon name={tier.icon} size={32} color={tier.color} />
-          <View style={{ marginLeft: 12 }}>
-            <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>
-              {tier.name} Lig
-            </Text>
+          <View style={{ marginLeft: 12, flex: 1 }}>
+            <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
             <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: 2 }]}>
-              Toplam {xp} XP
+              Bu hafta {myScore} XP{myRank ? ` · #${myRank}` : ""}
             </Text>
           </View>
         </View>
 
         <View style={s.statsRow}>
-          <MiniStat label="Soru" value={stats.totalQuestions || 0} color={C.amber} />
-          <MiniStat label="Deneme" value={stats.totalTrials || 0} color={C.green} />
-          <MiniStat label="Seri" value={stats.streak || 0} color={C.blue} />
+          <MiniStat label="Haftalık XP" value={myScore} color={C.amber} />
+          <MiniStat label="Sıran" value={myRank ? `#${myRank}` : "—"} color={C.blue} />
         </View>
 
         {nextTier && (
           <View style={s.promoRow}>
             <Icon name="trendUp" size={14} color={C.green} />
             <Text style={[TYPOGRAPHY.caption, { color: C.green, marginLeft: 4 }]}>
-              {nextTier.name} Lig'e {nextTier.minXP - xp} XP kaldı
+              {nextTier.name} Lig'e {nextTier.minXP - myScore} XP kaldı
             </Text>
           </View>
         )}
@@ -70,17 +48,15 @@ function TierHeader({ tier, stats, xp, nextTier }) {
 function MiniStat({ label, value, color }) {
   return (
     <View style={s.miniStat}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: C.text }}>
-        {value}
-      </Text>
+      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: C.text }}>{value}</Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>{label}</Text>
     </View>
   );
 }
 
-function LeaderboardRow({ item, index }) {
+function LeaderboardRow({ item }) {
   const isYou = item.you;
-  const medalColor = index === 0 ? "#F5A623" : index === 1 ? "#C0C5CE" : index === 2 ? "#CD7F47" : null;
+  const medalColor = item.rank === 1 ? "#F5A623" : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
 
   return (
     <View style={[s.row, isYou && s.rowYou]}>
@@ -88,17 +64,11 @@ function LeaderboardRow({ item, index }) {
         {medalColor ? (
           <Icon name="trophy" size={18} color={medalColor} />
         ) : (
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>
-            {item.rank}
-          </Text>
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{item.rank}</Text>
         )}
       </View>
 
-      <Avatar
-        init={item.name.slice(0, 2).toUpperCase()}
-        size={34}
-        color={isYou ? C.amber : undefined}
-      />
+      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={34} color={isYou ? C.amber : undefined} />
 
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text
@@ -107,86 +77,147 @@ function LeaderboardRow({ item, index }) {
             fontSize: 14,
             color: isYou ? C.amber : C.text,
           }}
+          numberOfLines={1}
         >
-          {item.name}
+          {isYou ? "Sen" : item.name || "Öğrenci"}
+        </Text>
+        <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginTop: 1 }]}>
+          {item.questions} soru · {item.trials} deneme
         </Text>
       </View>
 
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text, marginRight: 8 }}>
-        {item.q}
+      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text }}>
+        {item.weekly_xp}
       </Text>
-
-      {item.trend > 0 ? (
-        <Icon name="trendUp" size={14} color={C.green} />
-      ) : item.trend < 0 ? (
-        <Icon name="trendDown" size={14} color={C.red} />
-      ) : (
-        <Icon name="circle" size={8} color={C.muted} />
-      )}
+      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
     </View>
   );
 }
 
-function generateBotLeaderboard(userQ) {
-  const names = [
-    "Ayşe K.", "Mehmet A.", "Zeynep D.", "Can Ö.", "Elif Y.",
-    "Burak T.", "Deniz A.", "Selin K.", "Kaan M.", "Ece N.",
-    "Arda S.", "Mert B.", "Yağmur E.", "Ozan D.",
-  ];
-  const rows = names.map((name, i) => {
-    const base = Math.max(0, userQ + 200 - i * 40 + (i % 3) * 15);
-    return { rank: i + 1, name, q: base, trend: ((i * 7) % 5) - 2 };
-  });
-  rows.push({ rank: 0, name: "Sen", q: userQ, trend: 1, you: true });
-  rows.sort((a, b) => b.q - a.q);
-  rows.forEach((r, i) => { r.rank = i + 1; });
-  return rows;
+function EmptyState({ tab, onAddFriend }) {
+  if (tab === "friends") {
+    return (
+      <View style={s.empty}>
+        <Icon name="users" size={44} color={C.muted} />
+        <Text style={s.emptyTitle}>Henüz arkadaşın yok</Text>
+        <Text style={s.emptySub}>Arkadaş ekle, haftalık ligde yarışın.</Text>
+        <Pressable onPress={onAddFriend} style={s.emptyBtn}>
+          <Icon name="plus" size={16} color={C.bg} sw={2.5} />
+          <Text style={s.emptyBtnText}>Arkadaş Ekle</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  return (
+    <View style={s.empty}>
+      <Icon name="award" size={44} color={C.muted} />
+      <Text style={s.emptyTitle}>Sıralama yüklenemedi</Text>
+      <Text style={s.emptySub}>Bağlantını kontrol edip tekrar dene.</Text>
+    </View>
+  );
 }
 
 export default function LeagueScreen() {
   const navigation = useNavigation();
+  const { user } = useAuth();
+  const [tab, setTab] = useState("friends");
+  const [data, setData] = useState({ list: [], myRank: null, myScore: 0 });
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const gStats = useAppSelector(selectStats);
-  const xp = useAppSelector(selectXP);
-  const trials = useAppSelector(selectTrials);
+  const [error, setError] = useState(false);
+  const pollRef = useRef(null);
 
-  const tier = useMemo(() => getTier(xp), [xp]);
-  const nextTier = useMemo(() => getNextTier(xp), [xp]);
+  const load = useCallback(async (silent) => {
+    if (!user?.id || tab === "groups") return;
+    if (!silent) setLoading(true);
+    try {
+      const res = tab === "friends"
+        ? await fetchFriendsLeague(user.id)
+        : await fetchGlobalTop(user.id, 50);
+      setData(res);
+      setError(false);
+    } catch (e) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id, tab]);
 
-  const rows = useMemo(() => {
-    return generateBotLeaderboard(gStats.totalQuestions || 0);
-  }, [gStats.totalQuestions]);
+  // Ekran aktifken ilk yükleme + 30sn polling (grup sekmesi kendi yönetir).
+  useFocusEffect(
+    useCallback(() => {
+      load(false);
+      pollRef.current = setInterval(() => load(true), POLL_MS);
+      return () => {
+        if (pollRef.current) clearInterval(pollRef.current);
+      };
+    }, [load])
+  );
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
-  }, []);
+    try {
+      await load(true);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [load]);
+
+  const tier = useMemo(() => getTier(data.myScore), [data.myScore]);
+  const nextTier = useMemo(() => getNextTier(data.myScore), [data.myScore]);
+
+  const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={10}
-          style={s.backBtn}
-        >
+        <Pressable onPress={() => navigation.goBack()} hitSlop={10} style={s.backBtn}>
           <Icon name="chevL" size={20} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Lig</Text>
         <View style={{ width: 36 }} />
       </View>
 
-      <FlatList
-        data={rows}
-        keyExtractor={(item) => String(item.rank)}
-        ListHeaderComponent={<TierHeader tier={tier} stats={gStats} xp={xp} nextTier={nextTier} />}
-        renderItem={({ item, index }) => <LeaderboardRow item={item} index={index} />}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 2 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />
-        }
-      />
+      <View style={s.tabs}>
+        {[
+          { key: "friends", label: "Arkadaşlar" },
+          { key: "global", label: "Global" },
+          { key: "groups", label: "Gruplarım" },
+        ].map((t) => (
+          <Pressable
+            key={t.key}
+            onPress={() => setTab(t.key)}
+            style={[s.tab, tab === t.key && s.tabActive]}
+          >
+            <Text style={[s.tabText, tab === t.key && s.tabTextActive]}>{t.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {tab === "groups" ? (
+        <GroupsTab user={user} />
+      ) : loading ? (
+        <View style={s.center}>
+          <ActivityIndicator color={C.amber} size="large" />
+        </View>
+      ) : (
+        <FlatList
+          data={data.list}
+          keyExtractor={(item) => String(item.user_id)}
+          ListHeaderComponent={
+            <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} />
+          }
+          renderItem={({ item }) => <LeaderboardRow item={item} />}
+          ListEmptyComponent={
+            <EmptyState tab={error ? "global" : tab} onAddFriend={goAddFriend} />
+          }
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -210,6 +241,25 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.border,
   },
+  tabs: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    paddingHorizontal: 16,
+    marginBottom: SPACING.md,
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: SPACING.sm,
+    borderRadius: 12,
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  tabActive: { backgroundColor: C.amber + "18", borderColor: C.amber },
+  tabText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
+  tabTextActive: { color: C.amber },
+  center: { flex: 1, alignItems: "center", justifyContent: "center" },
   tierCard: {
     backgroundColor: C.surface,
     borderRadius: 24,
@@ -219,19 +269,8 @@ const s = StyleSheet.create({
     marginBottom: SPACING.lg,
     overflow: "hidden",
   },
-  tierAccent: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    opacity: 0.7,
-  },
-  tierRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: SPACING.lg,
-  },
+  tierAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, opacity: 0.7 },
+  tierRow: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg },
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -242,12 +281,7 @@ const s = StyleSheet.create({
     borderColor: C.border,
   },
   miniStat: { alignItems: "center" },
-  promoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: SPACING.sm,
-  },
+  promoRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: SPACING.sm },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -256,14 +290,20 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
-  rowYou: {
-    backgroundColor: C.amber + "14",
-    borderWidth: 1,
-    borderColor: C.amber + "40",
-  },
-  rankCol: {
-    width: 28,
+  rowYou: { backgroundColor: C.amber + "14", borderWidth: 1, borderColor: C.amber + "40" },
+  rankCol: { width: 28, alignItems: "center", marginRight: 8 },
+  empty: { alignItems: "center", paddingTop: SPACING.huge, gap: SPACING.sm },
+  emptyTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.sm },
+  emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
+  emptyBtn: {
+    flexDirection: "row",
     alignItems: "center",
-    marginRight: 8,
+    gap: SPACING.sm,
+    backgroundColor: C.amber,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    borderRadius: 999,
+    marginTop: SPACING.md,
   },
+  emptyBtnText: { ...TYPOGRAPHY.button, color: C.bg },
 });

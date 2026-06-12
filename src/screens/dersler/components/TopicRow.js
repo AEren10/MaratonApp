@@ -4,13 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
 import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
-
-const STATUS_DOT = {
-  mastered: C.green,
-  improving: C.amber,
-  neglected: C.red,
-  weak: C.red,
-};
+import { getMastery } from "../../../lib/mastery";
 
 function AccBadge({ acc }) {
   const color = acc >= 75 ? C.green : acc >= 50 ? C.amber : C.red;
@@ -54,7 +48,8 @@ function MiniBar({ pct, color }) {
 
 export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) {
   const navigation = useNavigation();
-  const dotColor = topic.status ? STATUS_DOT[topic.status] : null;
+  const mastery = getMastery({ q: topic.q, acc: topic.acc });
+  const dotColor = mastery.color;
 
   const handlePress = () => {
     const subjectInfo = { name: subject.name, color: subject.color, icon: subject.icon };

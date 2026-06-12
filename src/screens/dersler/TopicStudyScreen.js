@@ -6,6 +6,7 @@ import Svg, { Circle } from "react-native-svg";
 import { Icon } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { getMastery } from "../../lib/mastery";
 
 function StatBox({ label, value }) {
   return (
@@ -34,6 +35,7 @@ export default function TopicStudyScreen() {
   const route = useRoute();
   const { topic, subject, subtopics: paramSubtopics } = route.params;
   const mastery = topic.acc / 100;
+  const masteryLevel = getMastery({ q: topic.q, acc: topic.acc });
   const circumference = 2 * Math.PI * 40;
   const subtopics = (paramSubtopics || []).map((name, i) => ({
     name,
@@ -75,6 +77,10 @@ export default function TopicStudyScreen() {
             <Text style={s.ringText}>{topic.acc}%</Text>
           </View>
           <Text style={s.ringLabel}>Hakimiyet</Text>
+          <View style={s.masteryBadge}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: masteryLevel.color }} />
+            <Text style={[s.masteryText, { color: masteryLevel.color }]}>{masteryLevel.label}</Text>
+          </View>
         </View>
 
         <Text style={s.sectionTitle}>Alt Konular</Text>
@@ -111,6 +117,8 @@ const s = StyleSheet.create({
   ringWrapper: { alignItems: "center", marginTop: SPACING.xxl },
   ringText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
   ringLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.sm },
+  masteryBadge: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: SPACING.sm },
+  masteryText: { ...TYPOGRAPHY.captionMedium },
   sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
   subtopicRow: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm, gap: SPACING.md },
   subtopicName: { ...TYPOGRAPHY.body, color: C.text, flex: 1 },

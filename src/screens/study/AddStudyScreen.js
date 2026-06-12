@@ -15,7 +15,8 @@ import { C, SPACING } from "../../themes/tokens";
 import { SubjectPicker } from "./components/SubjectPicker";
 import { StudyForm } from "./components/StudyForm";
 import { useAppDispatch } from "../../store/hooks";
-import { addLog, setStreak } from "../../store/slices/studyLogSlice";
+import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
+import { computeStreakUpdate } from "../../lib/streakFreeze";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
@@ -82,17 +83,13 @@ export default function AddStudyScreen() {
     if (result.saved) {
       try {
         const streakData = await getStreak(user.id);
-        const lastDate = streakData?.last_study_date;
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-        let newStreak = 1;
-        if (lastDate === todayStr) {
-          newStreak = streakData.current_streak;
-        } else if (lastDate === yesterday) {
-          newStreak = (streakData.current_streak || 0) + 1;
-        }
-        const longest = Math.max(newStreak, streakData?.longest_streak || 0);
-        await updateStreak(user.id, { current_streak: newStreak, longest_streak: longest, last_study_date: todayStr });
+        const { updates, newStreak, usedFreeze, freezeCount } = computeStreakUpdate(streakData);
+        await updateStreak(user.id, updates);
         dispatch(setStreak(newStreak));
+        dispatch(setFreezeCount(freezeCount));
+        if (usedFreeze) {
+          Alert.alert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
+        }
       } catch (_) {}
     } else if (result.queued) {
       Alert.alert("Çevrimdışı", "Internet yok, kayıt bağlantı geldiğinde otomatik gönderilecek.");

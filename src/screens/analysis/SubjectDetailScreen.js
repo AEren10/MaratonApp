@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -10,6 +10,8 @@ import { ALL_SUBJECTS } from "../trial/trialTypes";
 import { TRIAL_TO_CURRICULUM } from "../trial/trialKeyMap";
 import { SCREENS } from "../../constants/screens";
 import { selectTrials } from "../../store/slices/trialSlice";
+import { useAuth } from "../../contexts/AuthContext";
+import { getWrongQuestions } from "../../supabase/wrongQuestions";
 import { TrendChart } from "./components/TrendChart";
 
 function StatBox({ label, value }) {
@@ -41,6 +43,7 @@ export default function SubjectDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const trials = useSelector(selectTrials);
+  const { user } = useAuth();
 
   // Support both old and new param shapes
   const subjectKey = route.params?.subjectKey || route.params?.subject?.key;
@@ -51,6 +54,29 @@ export default function SubjectDetailScreen() {
 
   // Map trial key → curriculum key for topics
   const curriculumKeys = TRIAL_TO_CURRICULUM[subjectKey] || [subjectKey];
+
+  // En çok yanlış yapılan 5 konu (wrong_questions'tan)
+  const [topWrongTopics, setTopWrongTopics] = useState([]);
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    getWrongQuestions(user.id)
+      .then((rows) => {
+        if (cancelled) return;
+        const counts = {};
+        (rows || []).forEach((r) => {
+          if (!curriculumKeys.includes(r.subject) || !r.topic) return;
+          counts[r.topic] = (counts[r.topic] || 0) + 1;
+        });
+        const top = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([name, n]) => ({ name, n }));
+        setTopWrongTopics(top);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id, subjectKey]);
 
   // Get history of this subject from trials
   const history = useMemo(() => {
@@ -191,6 +217,25 @@ export default function SubjectDetailScreen() {
           </>
         )}
 
+        {topWrongTopics.length > 0 && (
+          <>
+            <Text style={s.sectionTitle}>EN ÇOK YANLIŞ YAPILAN KONULAR</Text>
+            <View style={s.historyCard}>
+              {topWrongTopics.map((t, i) => (
+                <View key={t.name} style={s.wrongTopicRow}>
+                  <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted, width: 18 }]}>{i + 1}</Text>
+                  <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]} numberOfLines={1}>
+                    {t.name}
+                  </Text>
+                  <View style={s.wrongBadge}>
+                    <Text style={[TYPOGRAPHY.micro, { color: C.red }]}>{t.n} yanlış</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
         {topics.length > 0 && (
           <>
             <Text style={s.sectionTitle}>KONULAR</Text>
@@ -238,6 +283,8 @@ const s = StyleSheet.create({
     paddingVertical: SPACING.sm,
     gap: SPACING.sm,
   },
+  wrongTopicRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.sm },
+  wrongBadge: { backgroundColor: C.red + "18", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   topicRow: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm },
   topicInfo: { width: 110 },
   topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text },

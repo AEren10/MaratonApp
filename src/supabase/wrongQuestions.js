@@ -36,6 +36,33 @@ export const resolveWrongQuestion = async (id) => {
   return data;
 };
 
+// G) SR: bugün tekrarı gelen yanlışlar (next_review_at <= now, çözülmemiş).
+export const getDueWrongQuestions = async (userId) => {
+  const nowIso = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("wrong_questions")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("is_resolved", false)
+    .not("next_review_at", "is", null)
+    .lte("next_review_at", nowIso)
+    .order("next_review_at", { ascending: true });
+  if (error) throw error;
+  return data || [];
+};
+
+// SR güncellemesi (tekrar sonrası interval/ease/next_review_at).
+export const reviewWrongQuestion = async (id, updates) => {
+  const { data, error } = await supabase
+    .from("wrong_questions")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
 export const deleteWrongQuestion = async (id) => {
   const { error } = await supabase
     .from("wrong_questions")

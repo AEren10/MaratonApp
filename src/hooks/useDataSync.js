@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
-import { setTodayLogs, setStreak } from "../store/slices/studyLogSlice";
+import { setTodayLogs, setStreak, setFreezeCount } from "../store/slices/studyLogSlice";
 import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
 import { getStreak } from "../supabase/streaks";
@@ -37,6 +37,7 @@ async function loadAll(userId, dispatch) {
         field: t.field,
         branchSubject: t.branch_subject,
         name: t.name,
+        mood: t.mood,
       };
     });
     dispatch(setTrials(mapped));
@@ -44,6 +45,7 @@ async function loadAll(userId, dispatch) {
 
   if (streak.status === "fulfilled" && streak.value) {
     dispatch(setStreak(streak.value.current_streak || 0));
+    dispatch(setFreezeCount(streak.value.freeze_count ?? 1));
   }
 
   if (todayLogs.status === "fulfilled" && todayLogs.value) {

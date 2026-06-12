@@ -10,6 +10,7 @@ import {
 import { IconBox, Icon } from "../../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { TopicRow } from "./TopicRow";
+import { masteryPercent } from "../../../lib/mastery";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -48,6 +49,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
   }, []);
 
   const { name, icon, color, pct, done, total, last, topics } = subject;
+  const masteryPct = masteryPercent(topics);
 
   return (
     <View>
@@ -119,18 +121,6 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Icon name="book" size={13} color={C.muted} sw={1.5} />
-            <Text
-              style={{
-                ...TYPOGRAPHY.caption,
-                color: C.sec,
-                marginLeft: 4,
-              }}
-            >
-              {done}/{total} konu
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Icon name="clock" size={13} color={C.muted} sw={1.5} />
             <Text
               style={{
@@ -140,6 +130,25 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
               }}
             >
               {last || "Henüz çalışılmadı"}
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: masteryPct > 0 ? C.green : C.muted,
+              }}
+            />
+            <Text
+              style={{
+                ...TYPOGRAPHY.caption,
+                color: C.sec,
+                marginLeft: 4,
+              }}
+            >
+              %{masteryPct} ustalaşıldı
             </Text>
           </View>
         </View>

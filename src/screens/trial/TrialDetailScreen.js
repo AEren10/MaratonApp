@@ -1,14 +1,19 @@
-import { useCallback, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
+import { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 
 import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { selectTrials } from "../../store/slices/trialSlice";
+import { useAuth } from "../../contexts/AuthContext";
+import { getMyPercentiles } from "../../supabase/percentile";
 import { TRIAL_TYPES, ALL_SUBJECTS } from "./trialTypes";
+import { TrialReportCard } from "./components/TrialReportCard";
 
 function ScoreRing({ size = 140, stroke = 10, net, max = 120 }) {
   const pct = Math.min(net / max, 1);
@@ -32,12 +37,19 @@ function ScoreRing({ size = 140, stroke = 10, net, max = 120 }) {
   );
 }
 
-function SubjectRow({ name, color, net, max }) {
+function SubjectRow({ name, color, net, max, percentile }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
   return (
     <View style={styles.subjRow}>
       <View style={[styles.subjDot, { backgroundColor: color }]} />
-      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>{name}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{name}</Text>
+        {percentile != null ? (
+          <Text style={[TYPOGRAPHY.micro, { color: C.green, marginTop: 2 }]}>
+            %{percentile} öğrenciden iyisin
+          </Text>
+        ) : null}
+      </View>
       <View style={styles.barBg}>
         <View style={[styles.barFill, { width: `${pct * 100}%`, backgroundColor: color }]} />
       </View>
@@ -69,6 +81,16 @@ export default function TrialDetailScreen() {
   const route = useRoute();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
+  const { user } = useAuth();
+  const cardRef = useRef(null);
+  const [percentiles, setPercentiles] = useState({});
+
+  useEffect(() => {
+    if (!user?.id || user.id === "dev") return;
+    let cancelled = false;
+    getMyPercentiles().then((p) => { if (!cancelled) setPercentiles(p); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const trial = route.params?.trial;
   const sorted = useMemo(
@@ -118,6 +140,7 @@ export default function TrialDetailScreen() {
   const typeMeta = TRIAL_TYPES[latest.trialType];
 
   const bars = subjects.map((s) => ({
+    key: s.key,
     name: s.name,
     c: s.color,
     net: latest.subjects?.[s.key]?.net || 0,
@@ -135,6 +158,21 @@ export default function TrialDetailScreen() {
     };
   });
 
+  const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
+
+  const handleShare = async () => {
+    try {
+      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
+      if (!(await Sharing.isAvailableAsync())) {
+        Alert.alert("Paylaşım yok", "Bu cihazda paylaşım kullanılamıyor.");
+        return;
+      }
+      await Sharing.shareAsync(uri, { mimeType: "image/png", dialogTitle: "Deneme karneni paylaş" });
+    } catch (e) {
+      Alert.alert("Hata", "Karne oluşturulamadı, tekrar dene.");
+    }
+  };
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
@@ -145,6 +183,9 @@ export default function TrialDetailScreen() {
           Deneme Detayı
         </Text>
         <Chip color={C.surface2}>{dateStr}</Chip>
+        <Pressable onPress={handleShare} hitSlop={12} style={styles.shareBtn}>
+          <Icon name="share" size={18} color={C.amber} />
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -172,7 +213,7 @@ export default function TrialDetailScreen() {
             DERS BAZLI SONUCLAR
           </Text>
           {bars.map((b) => (
-            <SubjectRow key={b.name} name={b.name} color={b.c} net={b.net} max={b.max} />
+            <SubjectRow key={b.name} name={b.name} color={b.c} net={b.net} max={b.max} percentile={percentiles[b.key]?.percentile} />
           ))}
         </View>
 
@@ -200,6 +241,18 @@ export default function TrialDetailScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Paylaşım için ekran dışı render edilen karne */}
+      <View style={styles.offscreen} pointerEvents="none">
+        <TrialReportCard
+          ref={cardRef}
+          name={displayName}
+          typeLabel={typeMeta?.label || latest.name || "Deneme"}
+          net={net}
+          dateStr={dateStr}
+          bars={bars}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -241,5 +294,19 @@ const styles = StyleSheet.create({
   },
   emptyBox: {
     flex: 1, alignItems: "center", justifyContent: "center",
+  },
+  shareBtn: {
+    marginLeft: SPACING.sm,
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.md,
+    backgroundColor: C.amber + "18",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  offscreen: {
+    position: "absolute",
+    left: -10000,
+    top: 0,
   },
 });

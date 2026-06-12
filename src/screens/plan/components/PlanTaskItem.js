@@ -8,7 +8,7 @@ const REASON_COLORS = {
   amber: C.amber,
 };
 
-export function PlanTaskItem({ task, onToggle, onStart }) {
+export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
   const { s, topic, q, reason, rkind, done } = task;
   const reasonColor = REASON_COLORS[rkind] || C.muted;
 
@@ -22,7 +22,7 @@ export function PlanTaskItem({ task, onToggle, onStart }) {
         />
       </Pressable>
 
-      <Pressable onPress={onToggle} style={styles.middle}>
+      <Pressable onPress={onInfo || onToggle} style={styles.middle}>
         <Text style={[TYPOGRAPHY.micro, { color: s.color, textTransform: "uppercase", letterSpacing: 0.8 }]}>
           {s.name}
         </Text>

@@ -3,6 +3,7 @@ import studyLogReducer from "./slices/studyLogSlice";
 import trialReducer from "./slices/trialSlice";
 import gamificationReducer from "./slices/gamificationSlice";
 import goalsReducer from "./slices/goalsSlice";
+import planReducer from "./slices/planSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     trials: trialReducer,
     gamification: gamificationReducer,
     goals: goalsReducer,
+    plan: planReducer,
   },
 });

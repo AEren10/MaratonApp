@@ -18,6 +18,8 @@ export function calculateXP(action, data = {}) {
       return XP_REWARDS.plan_task_done;
     case "perfect_plan":
       return XP_REWARDS.perfect_plan;
+    case "daily_goal_complete":
+      return XP_REWARDS.daily_goal_complete;
     default:
       return 0;
   }

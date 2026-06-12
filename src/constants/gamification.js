@@ -9,6 +9,7 @@ export const XP_REWARDS = {
   streak_bonus_per_day: 5,
   plan_task_done: 5,
   perfect_plan: 100,
+  daily_goal_complete: 40,
 };
 
 export const LEVELS = [

@@ -6,6 +6,8 @@ const ITEMS = [
   { icon: "users", label: "Arkadaşlar", route: "Friends" },
   { icon: "calendar", label: "Takvim", route: "Calendar" },
   { icon: "target", label: "Hedeflerim", route: "Goals" },
+  { icon: "chart", label: "Net Simülatörü", route: "RankSimulator" },
+  { icon: "layers", label: "Yol Haritası", route: "Roadmap" },
   { icon: "settings", label: "Ayarlar", route: "Settings" },
   { icon: "bell", label: "Bildirimler", route: "NotificationsSettings" },
   { icon: "lock", label: "Gizlilik", route: "Privacy" },

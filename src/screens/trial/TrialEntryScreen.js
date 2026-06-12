@@ -23,6 +23,35 @@ import { saveTrialOffline } from "../../lib/offlineQueue";
 
 const EMPTY = { correct: "", wrong: "" };
 
+const MOODS = [
+  { key: "good", emoji: "😄", label: "İyi" },
+  { key: "okay", emoji: "😐", label: "Orta" },
+  { key: "bad", emoji: "😞", label: "Kötü" },
+];
+
+function MoodSelector({ value, onChange }) {
+  return (
+    <View style={styles.moodWrap}>
+      <Text style={styles.moodTitle}>Nasıl hissettin? (opsiyonel)</Text>
+      <View style={styles.moodRow}>
+        {MOODS.map((m) => {
+          const active = value === m.key;
+          return (
+            <Pressable
+              key={m.key}
+              onPress={() => onChange(active ? null : m.key)}
+              style={[styles.moodBtn, active && styles.moodBtnActive]}
+            >
+              <Text style={{ fontSize: 24 }}>{m.emoji}</Text>
+              <Text style={[styles.moodLabel, active && { color: C.amber }]}>{m.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 const today = () => {
   const d = new Date();
   return d.toLocaleDateString("tr-TR", {
@@ -40,6 +69,7 @@ export default function TrialEntryScreen() {
   const [branchSubject, setBranchSubject] = useState(null);
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState({});
+  const [mood, setMood] = useState(null);
 
   const subjects = useMemo(
     () => getSubjectsForType(trialType, branchSubject),
@@ -109,6 +139,7 @@ export default function TrialEntryScreen() {
       trialType,
       field: getFieldFromType(trialType),
       branchSubject,
+      mood,
     };
     dispatch(addTrial(localTrial));
 
@@ -122,6 +153,7 @@ export default function TrialEntryScreen() {
         field: getFieldFromType(trialType),
         branch_subject: branchSubject,
         total_net: netVal,
+        mood,
       },
       subjectsArr
     );
@@ -140,7 +172,7 @@ export default function TrialEntryScreen() {
         : "Deneme sonucun basariyla kaydedildi."
     );
     navigation.goBack();
-  }, [saving, trialType, branchSubject, subjects, values, totalNet, user, dispatch, reward, navigation]);
+  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, user, dispatch, reward, navigation]);
 
   const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
 
@@ -184,6 +216,8 @@ export default function TrialEntryScreen() {
           ))}
 
           {showSubjectInputs && <TotalCard totalNet={totalNet} />}
+
+          {showSubjectInputs && <MoodSelector value={mood} onChange={setMood} />}
 
           {showSubjectInputs && (
             <Pressable
@@ -229,6 +263,37 @@ const styles = {
   dateText: {
     ...TYPOGRAPHY.bodyMedium,
     color: C.sec,
+  },
+  moodWrap: {
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+  moodTitle: {
+    ...TYPOGRAPHY.captionMedium,
+    color: C.sec,
+    marginBottom: SPACING.sm,
+  },
+  moodRow: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+  },
+  moodBtn: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: SPACING.md,
+    backgroundColor: C.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  moodBtnActive: {
+    borderColor: C.amber,
+    backgroundColor: C.amber + "18",
+  },
+  moodLabel: {
+    ...TYPOGRAPHY.micro,
+    color: C.muted,
   },
   submitBtn: {
     flexDirection: "row",
