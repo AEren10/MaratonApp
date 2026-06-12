@@ -8,6 +8,8 @@ import { Icon, IconBox } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useAppDispatch } from "../../store/hooks";
 import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
+import { useAuth } from "../../contexts/AuthContext";
+import { updateProfile } from "../../supabase/profiles";
 
 function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
   return (
@@ -37,6 +39,7 @@ export default function GoalsScreen() {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const goals = useSelector(selectGoals);
+  const { user } = useAuth();
 
   const [draft, setDraft] = useState({
     dailyQuestions: goals.dailyQuestions,
@@ -52,12 +55,18 @@ export default function GoalsScreen() {
     });
   }, [goals.dailyQuestions, goals.weeklyTrials, goals.weeklyMinutes]);
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
     dispatch(setGoals(draft));
     saveGoalsToStorage(draft);
+    // Cihazlar arası senkron: profili güncelle (migration 008 sütunu).
+    if (user?.id && user.id !== "dev") {
+      try {
+        await updateProfile(user.id, { daily_question_goal: draft.dailyQuestions });
+      } catch (_) {}
+    }
     Alert.alert("Kaydedildi", "Hedeflerin güncellendi.");
     navigation.goBack();
-  }, [draft, dispatch, navigation]);
+  }, [draft, dispatch, navigation, user?.id]);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>

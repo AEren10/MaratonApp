@@ -3,19 +3,22 @@ import { useAuth } from "../contexts/AuthContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount } from "../store/slices/studyLogSlice";
+import { setGoals } from "../store/slices/goalsSlice";
 import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
 import { getStreak } from "../supabase/streaks";
+import { getProfile } from "../supabase/profiles";
 import { flushQueue } from "../lib/offlineQueue";
 
 async function loadAll(userId, dispatch) {
   // Try to flush any pending offline operations first
   await flushQueue().catch(() => {});
 
-  const [trials, streak, todayLogs] = await Promise.allSettled([
+  const [trials, streak, todayLogs, profile] = await Promise.allSettled([
     getTrials(userId),
     getStreak(userId),
     getStudyLogsByDate(userId, new Date().toISOString().split("T")[0]),
+    getProfile(userId),
   ]);
 
   if (trials.status === "fulfilled" && trials.value) {
@@ -58,6 +61,11 @@ async function loadAll(userId, dispatch) {
       study_date: l.study_date,
     }));
     dispatch(setTodayLogs(mapped));
+  }
+
+  // DB'deki daily_question_goal varsa AsyncStorage'ı geçersiz kıl.
+  if (profile.status === "fulfilled" && profile.value?.daily_question_goal != null) {
+    dispatch(setGoals({ dailyQuestions: profile.value.daily_question_goal }));
   }
 }
 

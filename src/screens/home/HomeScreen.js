@@ -41,6 +41,7 @@ import { QuickActions } from "./components/QuickActions";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { DailyActionCard } from "./components/DailyActionCard";
 import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
+import { ALL_SUBJECTS } from "../trial/trialTypes";
 
 const QUICK_ITEMS = [
   { icon: "edit", label: "Kaydet", c: C.amber, go: SCREENS.ADD_STUDY },
@@ -166,22 +167,10 @@ export default function HomeScreen() {
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
     const bars = Object.entries(latest.subjects || {}).slice(0, 4).map(([key, s]) => {
-      const palette = {
-        tyt_turkce: "#60A5FA",
-        tyt_matematik: "#F5A623",
-        tyt_fen: "#34D399",
-        tyt_sosyal: "#A78BFA",
-        ayt_matematik: "#F5A623",
-        ayt_fizik: "#60A5FA",
-        ayt_kimya: "#2DD4BF",
-        ayt_biyoloji: "#34D399",
-        ayt_edebiyat: "#A78BFA",
-        ayt_tarih1: "#EF4444",
-        ayt_cografya1: "#34D399",
-      };
+      const subj = ALL_SUBJECTS.find((x) => x.key === key);
       return {
-        c: palette[key] || "#F5A623",
-        v: Math.min(1, Math.max(0, (s.net || 0) / 40)),
+        c: subj?.color || C.amber,
+        v: Math.min(1, Math.max(0, (s.net || 0) / (subj?.max || 40))),
       };
     });
     return { net, trend, bars };
@@ -291,7 +280,7 @@ export default function HomeScreen() {
             </AnimatedCard>
           ) : null}
 
-          {!actionDismissed ? (
+          {!actionDismissed && (dailyAction || aiLoading) ? (
             <AnimatedCard delay={260}>
               <DailyActionCard
                 suggestion={dailyAction}
@@ -301,14 +290,14 @@ export default function HomeScreen() {
                 onLater={() => dismissAction(false)}
               />
             </AnimatedCard>
-          ) : null}
-
-          <AnimatedCard delay={300}>
-            <WeakCard
-              message={nudges.length > 0 ? nudges[0].message : (gStats.totalQuestions ? "Analiz ekranında zayıf konularını görebilirsin" : "Soru çözmeye başla, zayıf alanlarını belirleyelim")}
-              onPress={nudges.length > 0 ? () => setNudgeVisible(true) : go(SCREENS.ANALYSIS)}
-            />
-          </AnimatedCard>
+          ) : (
+            <AnimatedCard delay={300}>
+              <WeakCard
+                message={nudges.length > 0 ? nudges[0].message : (gStats.totalQuestions ? "Analiz ekranında zayıf konularını görebilirsin" : "Soru çözmeye başla, zayıf alanlarını belirleyelim")}
+                onPress={nudges.length > 0 ? () => setNudgeVisible(true) : go(SCREENS.ANALYSIS)}
+              />
+            </AnimatedCard>
+          )}
 
           <AnimatedCard delay={320}>
             <MotivCard message={getMotivMessage({ totalQuestions: gStats.totalQuestions || 0, streak, totalTrials: gStats.totalTrials || 0, xp })} onPress={go(SCREENS.ANALYSIS)} />
