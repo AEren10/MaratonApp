@@ -7,7 +7,9 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, IconBox, Chip } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { getSubjectByKey } from "../../themes/subjects";
+import { useGamification } from "../../hooks/useGamification";
 
 function InfoRow({ icon, label, value, color }) {
   return (
@@ -33,6 +35,9 @@ export default function WrongDetailScreen() {
   const route = useRoute();
   const { item: passedItem } = route.params ?? {};
   const [photoZoom, setPhotoZoom] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [localResolved, setLocalResolved] = useState(false);
+  const { reward } = useGamification();
 
   const item = passedItem || {};
   const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
@@ -112,16 +117,32 @@ export default function WrongDetailScreen() {
           </View>
         )}
 
-        {!item.is_resolved && (
+        {!item.is_resolved && !localResolved && (
           <Pressable
-            onPress={() => {
-              Alert.alert("Cozuldu", "Bu soru cozuldu olarak isaretlendi.");
-              navigation.goBack();
+            onPress={async () => {
+              if (resolving) return;
+              setResolving(true);
+              try {
+                await resolveWrongQuestion(item.id);
+                setLocalResolved(true);
+                reward("wrong_resolved", {
+                  statUpdates: [{ type: "increment", key: "wrongsResolved" }],
+                });
+                Alert.alert("Çözüldü", "Bu soru çözüldü olarak işaretlendi.");
+                navigation.goBack();
+              } catch (e) {
+                Alert.alert("Hata", e.message || "Kaydedilemedi.");
+              } finally {
+                setResolving(false);
+              }
             }}
-            style={styles.resolveBtn}
+            disabled={resolving}
+            style={[styles.resolveBtn, resolving && { opacity: 0.6 }]}
           >
-            <Icon name="checkCircle" size={20} color={C.bg} />
-            <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Cozuldu Isaretle</Text>
+            <Icon name="check" size={20} color={C.bg} />
+            <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
+              {resolving ? "İşleniyor..." : "Çözüldü İşaretle"}
+            </Text>
           </Pressable>
         )}
       </ScrollView>

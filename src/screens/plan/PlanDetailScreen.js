@@ -18,7 +18,7 @@ import { PlanTaskItem } from "./components/PlanTaskItem";
 
 export default function PlanDetailScreen() {
   const navigation = useNavigation();
-  const { examDate } = useExam();
+  const { examDate, examType, field } = useExam();
   const trials = useAppSelector(selectTrials);
   const todayLogs = useAppSelector(selectTodayLogs);
   const dailyTarget = useAppSelector(selectDailyQuestionsGoal);
@@ -36,7 +36,10 @@ export default function PlanDetailScreen() {
     return { weakAreas: wa, recentStudy: rs };
   }, [trials, todayLogs]);
 
-  const plan = useMemo(() => generateDailyPlan({ examDate, weakAreas, recentStudy, dailyTarget }), [examDate, weakAreas, recentStudy, dailyTarget]);
+  const plan = useMemo(
+    () => generateDailyPlan({ examType, field, examDate, weakAreas, recentStudy, dailyTarget }),
+    [examType, field, examDate, weakAreas, recentStudy, dailyTarget]
+  );
 
   const initialTasks = useMemo(() =>
     plan.tasks.map((t, i) => {

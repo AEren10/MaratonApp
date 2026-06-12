@@ -14,9 +14,19 @@ const EXAM_OPTIONS = [
   { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#2DD4BF" },
 ];
 
-const MONTHS = [
-  "Haziran 2026", "Haziran 2027",
-];
+function buildExamMonthOptions() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const beforeExamThisYear = now.getMonth() < 5; // before June
+  const startYear = beforeExamThisYear ? currentYear : currentYear + 1;
+  return [
+    `Haziran ${startYear}`,
+    `Haziran ${startYear + 1}`,
+    `Haziran ${startYear + 2}`,
+  ];
+}
+
+const MONTHS = buildExamMonthOptions();
 
 function ExamOption({ item, selected, onPress }) {
   const active = selected === item.id;
@@ -40,7 +50,7 @@ function ExamOption({ item, selected, onPress }) {
 export default function ExamSetupScreen() {
   const { updateExamConfig } = useExam();
   const [selectedId, setSelectedId] = useState(null);
-  const [examDate, setExamDate] = useState("Haziran 2026");
+  const [examDate, setExamDate] = useState(MONTHS[0]);
 
   const canContinue = selectedId !== null;
 
@@ -50,7 +60,8 @@ export default function ExamSetupScreen() {
       Alert.alert("Hata", "Lütfen sınav türünü seç");
       return;
     }
-    const year = examDate.includes("2027") ? 2027 : 2026;
+    const match = examDate.match(/(\d{4})/);
+    const year = match ? parseInt(match[1], 10) : new Date().getFullYear() + 1;
     const date = new Date(year, 5, 15);
     try {
       updateExamConfig(opt.examType, opt.field, date).catch(() => {});

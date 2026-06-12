@@ -3,6 +3,7 @@
     "name": "Maraton",
     "slug": "maraton",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",

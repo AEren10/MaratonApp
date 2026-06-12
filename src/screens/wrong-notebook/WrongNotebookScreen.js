@@ -1,7 +1,7 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { C, SPACING } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
@@ -66,7 +66,9 @@ export default function WrongNotebookScreen() {
     }
   };
 
-  useEffect(() => { loadItems(); }, [loadItems]);
+  useFocusEffect(useCallback(() => {
+    loadItems();
+  }, [loadItems]));
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {

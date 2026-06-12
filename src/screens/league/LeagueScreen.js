@@ -121,7 +121,7 @@ function LeaderboardRow({ item, index }) {
       ) : item.trend < 0 ? (
         <Icon name="trendDown" size={14} color={C.red} />
       ) : (
-        <Icon name="minus" size={14} color={C.muted} />
+        <Icon name="circle" size={8} color={C.muted} />
       )}
     </View>
   );

@@ -1,19 +1,20 @@
 import { differenceInDays } from "date-fns";
-import { TYT_SUBJECTS } from "../themes/subjects";
+import { getSubjectsForExam } from "../data/curriculum";
 
 /**
  * Gunluk plan olusturma algoritmasi.
  *
  * Girdiler:
+ *  - examType: 'tyt' | 'tyt_ayt' | 'ayt' | 'dil'
+ *  - field: 'sayisal' | 'ea' | 'sozel' | 'dil' | null
  *  - examDate: sinav tarihi
  *  - weakAreas: { [subjectKey]: number } (0-100 arasi basari yuzdesi)
  *  - recentStudy: { [subjectKey]: Date } (son calisma tarihi)
  *  - dailyTarget: hedef soru sayisi (varsayilan 80)
- *
- * Cikti:
- *  - tasks: [{ subject, topic, questionCount, priority, reason }]
  */
 export function generateDailyPlan({
+  examType = "tyt",
+  field = null,
   examDate,
   weakAreas = {},
   recentStudy = {},
@@ -21,10 +22,14 @@ export function generateDailyPlan({
 }) {
   const today = new Date();
   const daysLeft = examDate ? differenceInDays(examDate, today) : 180;
-  const subjects = Object.keys(TYT_SUBJECTS);
-  const scored = [];
 
-  for (const key of subjects) {
+  // Build subject pool from active exam config so AYT students see AYT subjects too.
+  const pool = getSubjectsForExam(examType, field);
+  const subjectMap = {};
+  pool.forEach((s) => { subjectMap[s.key] = s; });
+
+  const scored = [];
+  for (const key of Object.keys(subjectMap)) {
     const weakness = 100 - (weakAreas[key] ?? 50);
     const lastStudied = recentStudy[key];
     const daysSince = lastStudied
@@ -33,7 +38,6 @@ export function generateDailyPlan({
     const neglectScore = Math.min(daysSince * 3, 40);
     const urgency = daysLeft < 30 ? 20 : daysLeft < 90 ? 10 : 0;
     const totalScore = weakness * 0.5 + neglectScore + urgency;
-
     scored.push({ key, score: totalScore });
   }
 
@@ -45,7 +49,9 @@ export function generateDailyPlan({
 
   for (let i = 0; i < subjectCount && remaining > 0; i++) {
     const { key } = scored[i];
-    const subject = TYT_SUBJECTS[key];
+    const subject = subjectMap[key];
+    if (!subject) continue;
+
     const ratio = i === 0 ? 0.35 : i === 1 ? 0.3 : i === 2 ? 0.2 : 0.15;
     const count = Math.round(dailyTarget * ratio);
     const actual = Math.min(count, remaining);

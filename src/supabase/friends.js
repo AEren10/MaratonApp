@@ -12,9 +12,11 @@ export async function searchUsers(query) {
 }
 
 export async function sendFriendRequest(addresseeId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Oturum yok");
   const { data, error } = await supabase
     .from("friendships")
-    .insert({ addressee_id: addresseeId })
+    .insert({ requester_id: user.id, addressee_id: addresseeId })
     .select()
     .single();
   if (error) throw error;
