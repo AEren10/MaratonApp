@@ -262,7 +262,7 @@ export default function StudyTimerScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Pressable onPress={exit} hitSlop={12}>
-          <Icon name="x" size={22} color={C.text} />
+          <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <View style={styles.subjectBadge}>
           <View style={[styles.dot, { backgroundColor: subject.color }]} />

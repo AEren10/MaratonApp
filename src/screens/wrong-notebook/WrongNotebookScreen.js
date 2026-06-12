@@ -118,21 +118,30 @@ export default function WrongNotebookScreen() {
           alignItems: "flex-end",
         }}
       >
-        <View>
-          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.muted }}>
-            {counts.open} çözülmemiş soru
-          </Text>
-          <Text
-            style={{
-              fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 28,
-              color: C.text,
-              letterSpacing: -0.5,
-              marginTop: 2,
-            }}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            hitSlop={10}
+            style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.surface, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: C.border }}
           >
-            Yanlış Defteri
-          </Text>
+            <Icon name="arrowL" size={20} color={C.text} />
+          </Pressable>
+          <View>
+            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.muted }}>
+              {counts.open} çözülmemiş soru
+            </Text>
+            <Text
+              style={{
+                fontFamily: "SpaceGrotesk_700Bold",
+                fontSize: 26,
+                color: C.text,
+                letterSpacing: -0.5,
+                marginTop: 2,
+              }}
+            >
+              Yanlış Defteri
+            </Text>
+          </View>
         </View>
         <Pressable
           onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}

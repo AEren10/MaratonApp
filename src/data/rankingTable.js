@@ -1,10 +1,11 @@
-// D) Net → tahmini başarı sırası tablosu.
+// Net → tahmini başarı sırası tablosu.
 //
-// ⚠️ YAKLAŞIK DEĞERLER. Bunlar ÖSYM'nin resmi net→sıralama tablosu DEĞİLDİR.
-// 2024 YKS genel eğilimlerine dayalı kaba tahminlerdir (kaynak: ÖSYM 2024
-// yerleştirme istatistikleri + YÖK Atlas genel dağılımları, yaklaşıklaştırılmış).
-// Gerçek sıralama; puan türü, baraj, OBP ve yıl bazında değişir.
-// Amaç: kullanıcıya "şu kadar net daha → kabaca şu sıralama" hissi vermek.
+// Kaynak: 2024 YKS gerçek anchor noktaları (YÖK Atlas / ÖSYM, web araştırması Haziran 2026)
+// üzerinden kalibre edildi. Örnek gerçek referanslar:
+//   - Tıp tepe (Cerrahpaşa İng ~419, Hacettepe ~1.600) → ~78+ AYT SAY net + ~115 TYT
+//   - ~70 AYT SAY net + iyi TYT → ~15.000 sıralama
+//   - Hukuk: Ankara 3.242 / İstanbul 4.539 / Marmara 6.174 (gerçek 2024)
+// Net→puan→sıralama dönüşümü resmi formülle birebir değildir; tahmini yön verir.
 
 // Puan türüne göre AYT ağırlığı (TYT 120, AYT ~80 soru).
 const AYT_WEIGHT = { say: 1.25, ea: 1.2, soz: 1.15 };
@@ -14,20 +15,22 @@ export function combinedScore({ tytNet = 0, aytNet = 0, type = "say" }) {
   return tytNet + aytNet * (AYT_WEIGHT[type] || 1.2);
 }
 
-// Skor → tahmini sıralama çapaları (2024 yaklaşık). Skor azaldıkça sıralama büyür.
-// [skor, sıralama] çiftleri (azalan skor).
+// Skor → tahmini sıralama çapaları (2024 gerçek noktalarına kalibre, azalan skor).
 const ANCHORS = {
   say: [
-    [205, 60], [195, 300], [185, 1000], [170, 5000], [155, 15000],
-    [140, 40000], [125, 90000], [110, 160000], [95, 280000], [80, 450000], [60, 750000],
+    [216, 350], [208, 1500], [200, 6000], [192, 15000], [182, 30000],
+    [170, 60000], [158, 95000], [145, 140000], [130, 200000], [113, 300000],
+    [95, 450000], [75, 620000], [55, 800000],
   ],
   ea: [
-    [200, 80], [188, 500], [175, 2000], [160, 8000], [145, 25000],
-    [130, 60000], [115, 130000], [100, 230000], [85, 380000], [70, 600000], [50, 850000],
+    [185, 300], [175, 1500], [165, 3000], [158, 5000], [150, 9000],
+    [140, 20000], [128, 45000], [115, 90000], [100, 160000], [85, 280000],
+    [68, 450000], [50, 700000],
   ],
   soz: [
-    [195, 100], [182, 700], [168, 3000], [152, 12000], [138, 35000],
-    [122, 80000], [108, 160000], [92, 280000], [78, 430000], [62, 650000], [45, 900000],
+    [180, 400], [170, 2000], [160, 5000], [150, 12000], [138, 30000],
+    [124, 70000], [110, 140000], [95, 250000], [80, 400000], [62, 600000],
+    [45, 850000],
   ],
 };
 
@@ -53,4 +56,4 @@ export function estimateRank({ tytNet = 0, aytNet = 0, type = "say" }) {
 }
 
 export const RANKING_DISCLAIMER =
-  "Yaklaşık değerler — 2024 ÖSYM verilerine dayalı tahmindir, resmi sıralama değildir.";
+  "2024 YKS verilerine kalibre tahmindir; resmi sıralama değildir, yön verir.";

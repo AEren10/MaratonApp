@@ -31,10 +31,7 @@ import { XPToast } from "../../components/common/XPToast";
 import { HomeHeader } from "./components/HomeHeader";
 import { DailyGoalCard } from "./components/DailyGoalCard";
 import { PlanCard } from "./components/PlanCard";
-import { DenemeCard } from "./components/DenemeCard";
-import { StreakCard } from "./components/StreakCard";
-import { LiveCard } from "./components/LiveCard";
-import { LeagueCard } from "./components/LeagueCard";
+import { StatsBento } from "./components/StatsBento";
 import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
 import { QuickActions } from "./components/QuickActions";
@@ -244,17 +241,16 @@ export default function HomeScreen() {
           ) : null}
 
           <AnimatedCard delay={80}>
-            <View style={{ flexDirection: "row", gap: 12 }}>
-              <DenemeCard data={lastDeneme} onPress={go(SCREENS.ANALYSIS)} />
-              <StreakCard streak={streak} best={gStats.streak || streak} freezeCount={freezeCount} onPress={go(SCREENS.PROFILE)} />
-            </View>
-          </AnimatedCard>
-
-          <AnimatedCard delay={160}>
-            <View style={{ flexDirection: "row", gap: 12 }}>
-              <LeagueCard league={{ tier: xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz", xp }} onPress={go(SCREENS.LEAGUE)} />
-              <LiveCard count={0} avatars={[]} onPress={go(SCREENS.STUDY_TIMER)} />
-            </View>
+            <StatsBento
+              deneme={{ net: lastDeneme.net, trend: lastDeneme.trend }}
+              streak={{ value: streak, best: gStats.streak || streak, freezeCount }}
+              league={{ tier: xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz", xp }}
+              live={{ count: 0 }}
+              onDeneme={go(SCREENS.ANALYSIS)}
+              onStreak={go(SCREENS.PROFILE)}
+              onLeague={go(SCREENS.LEAGUE)}
+              onLive={go(SCREENS.STUDY_TIMER)}
+            />
           </AnimatedCard>
 
           <AnimatedCard delay={220}>

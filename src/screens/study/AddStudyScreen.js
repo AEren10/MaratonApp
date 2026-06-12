@@ -163,7 +163,7 @@ function Header({ onClose }) {
           borderColor: C.border,
         }}
       >
-        <Icon name="x" size={18} color={C.text} />
+        <Icon name="arrowL" size={20} color={C.text} />
       </Pressable>
       <Text
         style={{

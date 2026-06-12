@@ -107,7 +107,7 @@ export default function AddWrongScreen() {
             borderColor: C.border,
           }}
         >
-          <Icon name="x" size={18} color={C.text} />
+          <Icon name="arrowL" size={20} color={C.text} />
         </Pressable>
         <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, color: C.text }}>
           Yanlış Ekle

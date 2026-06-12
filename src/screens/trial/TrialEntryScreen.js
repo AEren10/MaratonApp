@@ -184,7 +184,7 @@ export default function TrialEntryScreen() {
       >
         <View style={styles.header}>
           <Pressable onPress={goBack} hitSlop={12}>
-            <Icon name="x" size={22} color={C.text} />
+            <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Deneme Gir</Text>
           <View style={{ width: 22 }} />

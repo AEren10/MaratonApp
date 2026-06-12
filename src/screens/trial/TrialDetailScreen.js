@@ -3,8 +3,6 @@ import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
-import { captureRef } from "react-native-view-shot";
-import * as Sharing from "expo-sharing";
 
 import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
@@ -161,6 +159,16 @@ export default function TrialDetailScreen() {
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
 
   const handleShare = async () => {
+    // Native modüller (view-shot/sharing) lazy yüklenir; Expo Go / eski build'de
+    // uygulamanın açılışını bloklamasın diye top-level import edilmez.
+    let captureRef, Sharing;
+    try {
+      ({ captureRef } = require("react-native-view-shot"));
+      Sharing = require("expo-sharing");
+    } catch (e) {
+      Alert.alert("Paylaşım kullanılamıyor", "Bu özellik için güncel uygulama derlemesi gerekiyor.");
+      return;
+    }
     try {
       const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
       if (!(await Sharing.isAvailableAsync())) {

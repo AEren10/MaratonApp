@@ -158,6 +158,10 @@ Migration numaraları: 013–016. Yeni rotalar: RankSimulator, ReviewSession, Ro
 6. `017` → xp_events + view (011'den SONRA çalışmalı; numara sırası bunu sağlar). Çalıştıktan sonra weekly_xp gerçek XP'den gelir; geçmiş XP yok, bu haftadan itibaren dolar.
 7. `018` → topic_notes.
 
+## Net→sıralama + bölüm tabloları: GERÇEK 2024 verisiyle güncellendi
+- `programs.js`: 2024 YÖK Atlas gerçek başarı sıraları (Tıp Cerrahpaşa 419, Hukuk Ankara 3.242, Bilgisayar Boğaziçi 342, Koç 122, ODTÜ ~1.200 vb.). "ort." satırları yaklaşık.
+- `rankingTable.js`: çapalar gerçek 2024 noktalarına kalibre edildi. Doğrulama: TYT115/AYT78→662 (tıp tepe ✓), 70 AYT net→~14k ✓, Hukuk EA→4.017 (gerçek 3.242 ✓).
+- Kaynak: web araştırması (YÖK Atlas/ÖSYM 2024), Haziran 2026.
+
 ## Hâlâ açık (dürüst)
-- Net→sıralama + bölüm tabloları YAKLAŞIK kalıyor: YÖK Atlas dinamik sorgu, otomatik çekilemiyor. Gerçek veri için kullanıcı tabloyu paylaşırsa programs.js/rankingTable.js'e işlenir.
 - Percentile matview REFRESH'i pg_cron ile otomatize edilmeli.

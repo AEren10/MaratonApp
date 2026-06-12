@@ -105,6 +105,9 @@ const screenOptions = {
   contentStyle: { backgroundColor: C.bg },
   animation: Platform.OS === "web" ? "none" : "slide_from_right",
   animationDuration: 240,
+  // Geri çıkış: ekranın her yerinden sağa kaydır (sadece kenar değil).
+  gestureEnabled: true,
+  fullScreenGestureEnabled: true,
 };
 
 const modalOptions = {
@@ -153,12 +156,12 @@ function AppStackInner() {
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name={SCREENS.WRONG_NOTEBOOK} component={EBWrongNotebook} />
-      <Stack.Screen name={SCREENS.ADD_WRONG} component={EBAddWrong} options={modalOptions} />
+      <Stack.Screen name={SCREENS.ADD_WRONG} component={EBAddWrong} />
       <Stack.Screen name={SCREENS.WRONG_DETAIL} component={EBWrongDetail} />
       <Stack.Screen name={SCREENS.PLAN_DETAIL} component={EBPlanDetail} />
-      <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} options={modalOptions} />
-      <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} options={modalOptions} />
-      <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} options={modalOptions} />
+      <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} />
+      <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} />
+      <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} />
       <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} />
       <Stack.Screen name={SCREENS.TRIAL_COMPARE} component={EBTrialCompare} />
       <Stack.Screen name={SCREENS.TOPIC_CARDS} component={EBTopicCards} />
