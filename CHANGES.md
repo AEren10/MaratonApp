@@ -141,7 +141,23 @@ Migration numaraları: 013–016. Yeni rotalar: RankSimulator, ReviewSession, Ro
 - **Topluluk soru bankası (UGC):** moderasyon + telif riski; ayrı sprint.
 - **RevenueCat/IAP:** önce değer sağlamlaştırma kararıyla askıda.
 
-## Sonraki turda dikkat
-- Net→sıralama ve bölüm tabloları YAKLAŞIK — gerçek YÖK Atlas verisiyle değiştirilmeli.
-- `leaderboard_weekly.weekly_xp` gerçek XP değil (soru+5×deneme proxy).
-- Percentile matview REFRESH'i otomatize edilmeli (pg_cron).
+---
+
+# EK DÜZELTMELER — Gerçek XP + Konu Notları
+
+## Gerçek weekly_xp (proxy kaldırıldı)
+- Migration `017_xp_events.sql`: `xp_events` defteri (RLS) + `leaderboard_weekly` yeniden tanımlandı → weekly_xp artık **gerçek kazanılan XP toplamı** (xp_events, haftalık). questions/trials sütunları gösterim için kaldı.
+- Yeni `supabase/xp.js` `logXP`. `useGamification.reward` her XP'de deftere yazıyor (fire-and-forget, dev hariç).
+
+## Konu Notları
+- Migration `018_topic_notes.sql`: `topic_notes (user_id, subject_key, topic_name, content)` + RLS.
+- Yeni `supabase/topicNotes.js` (get/upsert). Yeni `screens/dersler/components/TopicNoteCard.js`.
+- TopicStudyScreen'e "Konu Notum" editörü (TopicRow'a subject.key eklendi).
+
+## Manuel Supabase (ek)
+6. `017` → xp_events + view (011'den SONRA çalışmalı; numara sırası bunu sağlar). Çalıştıktan sonra weekly_xp gerçek XP'den gelir; geçmiş XP yok, bu haftadan itibaren dolar.
+7. `018` → topic_notes.
+
+## Hâlâ açık (dürüst)
+- Net→sıralama + bölüm tabloları YAKLAŞIK kalıyor: YÖK Atlas dinamik sorgu, otomatik çekilemiyor. Gerçek veri için kullanıcı tabloyu paylaşırsa programs.js/rankingTable.js'e işlenir.
+- Percentile matview REFRESH'i pg_cron ile otomatize edilmeli.

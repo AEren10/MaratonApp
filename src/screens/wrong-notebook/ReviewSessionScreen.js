@@ -7,6 +7,7 @@ import { Icon } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
+import { getWrongQuestionImageUrl } from "../../supabase/storage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
 
@@ -92,7 +93,7 @@ export default function ReviewSessionScreen() {
           })()}
 
           {current.image_path ? (
-            <Image source={{ uri: current.image_path }} style={s.image} contentFit="contain" cachePolicy="memory-disk" />
+            <Image source={{ uri: getWrongQuestionImageUrl(current.image_path) }} style={s.image} contentFit="contain" cachePolicy="memory-disk" />
           ) : (
             <View style={s.noImage}>
               <Icon name="notebook" size={32} color={C.muted} />

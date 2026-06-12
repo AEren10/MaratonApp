@@ -52,7 +52,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
   const dotColor = mastery.color;
 
   const handlePress = () => {
-    const subjectInfo = { name: subject.name, color: subject.color, icon: subject.icon };
+    const subjectInfo = { key: subject.key, name: subject.name, color: subject.color, icon: subject.icon };
     navigation.navigate(SCREENS.TOPIC_STUDY, { topic, subject: subjectInfo });
   };
 

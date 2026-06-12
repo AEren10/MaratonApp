@@ -24,7 +24,7 @@ export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
 
       <Pressable onPress={onInfo || onToggle} style={styles.middle}>
         <Text style={[TYPOGRAPHY.micro, { color: s.color, textTransform: "uppercase", letterSpacing: 0.8 }]}>
-          {s.name}
+          {s.label || s.name}
         </Text>
         <Text
           style={[TYPOGRAPHY.bodySemiBold, { color: done ? C.muted : C.text, marginTop: 2 }, done && styles.strikethrough]}

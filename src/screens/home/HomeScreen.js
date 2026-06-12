@@ -134,14 +134,19 @@ export default function HomeScreen() {
   );
 
   // Hedef ilk kez aşıldığında günde bir kez XP ödülü ver.
-  const goalRewarded = useRef(false);
+  // Ref date-keyed; geceyarısı geçince yeni gün için sıfırlanır.
+  const goalRewarded = useRef({ date: null, fired: false });
   useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    if (goalRewarded.current.date !== today) {
+      goalRewarded.current = { date: today, fired: false };
+    }
     const goal = dailyGoal > 0 ? dailyGoal : 100;
-    if (solvedToday < goal || goalRewarded.current) return;
-    const todayKey = `@daily_goal_done_${new Date().toISOString().split("T")[0]}`;
+    if (solvedToday < goal || goalRewarded.current.fired) return;
+    const todayKey = `@daily_goal_done_${today}`;
     AsyncStorage.getItem(todayKey).then((done) => {
-      if (done || goalRewarded.current) return;
-      goalRewarded.current = true;
+      if (done || goalRewarded.current.fired) return;
+      goalRewarded.current.fired = true;
       AsyncStorage.setItem(todayKey, "1");
       reward("daily_goal_complete");
     });

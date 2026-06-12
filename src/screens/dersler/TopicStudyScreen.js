@@ -7,6 +7,7 @@ import { Icon } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
+import { TopicNoteCard } from "./components/TopicNoteCard";
 
 function StatBox({ label, value }) {
   return (
@@ -82,6 +83,8 @@ export default function TopicStudyScreen() {
             <Text style={[s.masteryText, { color: masteryLevel.color }]}>{masteryLevel.label}</Text>
           </View>
         </View>
+
+        {subject.key ? <TopicNoteCard subjectKey={subject.key} topicName={topic.name} /> : null}
 
         <Text style={s.sectionTitle}>Alt Konular</Text>
         {subtopics.length > 0 ? subtopics.map((st) => (

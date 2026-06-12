@@ -10,9 +10,12 @@ import {
   selectLevel,
 } from "../store/slices/gamificationSlice";
 import { calculateXP, checkBadgeUnlocks } from "../lib/xpEngine";
+import { useAuth } from "../contexts/AuthContext";
+import { logXP } from "../supabase/xp";
 
 export function useGamification() {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const badgeIds = useAppSelector(selectBadgeIds);
   const stats = useAppSelector(selectStats);
   const level = useAppSelector(selectLevel);
@@ -26,6 +29,7 @@ export function useGamification() {
       if (amount <= 0) return;
 
       dispatch(earnXP({ amount }));
+      logXP(user?.id, amount, action); // gerçek XP defterine yaz (lig için)
       setXpToast({ visible: true, amount });
 
       const updatedStats = { ...stats, level: level.level };
@@ -48,7 +52,7 @@ export function useGamification() {
         setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
       }
     },
-    [dispatch, badgeIds, stats, level],
+    [dispatch, badgeIds, stats, level, user?.id],
   );
 
   const dismissXP = useCallback(() => setXpToast({ visible: false, amount: 0 }), []);

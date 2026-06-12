@@ -1,0 +1,66 @@
+import { useState, useEffect, useCallback } from "react";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Icon } from "../../../components/design";
+import { useAuth } from "../../../contexts/AuthContext";
+import { getTopicNote, saveTopicNote } from "../../../supabase/topicNotes";
+
+// Konuya özel kalıcı not (DB'de saklanır).
+export function TopicNoteCard({ subjectKey, topicName }) {
+  const { user } = useAuth();
+  const [note, setNote] = useState("");
+  const [saved, setSaved] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id || user.id === "dev" || !subjectKey || !topicName) return;
+    let cancelled = false;
+    getTopicNote(user.id, subjectKey, topicName)
+      .then((c) => { if (!cancelled) { setNote(c); setSaved(c); } })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id, subjectKey, topicName]);
+
+  const save = useCallback(async () => {
+    if (!user?.id || user.id === "dev") return;
+    setSaving(true);
+    try {
+      await saveTopicNote(user.id, subjectKey, topicName, note);
+      setSaved(note);
+    } catch (_) {}
+    setSaving(false);
+  }, [user?.id, subjectKey, topicName, note]);
+
+  const dirty = note !== saved;
+
+  return (
+    <View style={s.card}>
+      <View style={s.head}>
+        <Icon name="edit" size={15} color={C.amber} />
+        <Text style={s.title}>Konu Notum</Text>
+        {dirty ? (
+          <Pressable onPress={save} disabled={saving} style={s.saveBtn}>
+            <Text style={s.saveText}>{saving ? "..." : "Kaydet"}</Text>
+          </Pressable>
+        ) : null}
+      </View>
+      <TextInput
+        value={note}
+        onChangeText={setNote}
+        placeholder="Bu konuda dikkat edeceklerin, formüller, ipuçları..."
+        placeholderTextColor={C.muted}
+        multiline
+        style={s.input}
+      />
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  card: { backgroundColor: C.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.border, padding: SPACING.md, marginTop: SPACING.md },
+  head: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm },
+  title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 },
+  saveBtn: { backgroundColor: C.amber, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.md, paddingVertical: 6 },
+  saveText: { ...TYPOGRAPHY.micro, color: C.bg },
+  input: { ...TYPOGRAPHY.body, color: C.text, minHeight: 80, textAlignVertical: "top" },
+});

@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { BentoCard, Icon, Chip } from "../../../components/design";
 import { C } from "../../../themes/tokens";
 import { getSubjectByKey } from "../../../themes/subjects";
+import { getWrongQuestionImageUrl } from "../../../supabase/storage";
 import { getTopicDifficulty } from "../../../lib/topicDifficulty";
 
 function relativeDate(iso) {
@@ -143,7 +144,7 @@ export function WrongCard({ item, onPress, onResolve }) {
 
       {item.image_path || item.image ? (
         <Image
-          source={{ uri: item.image_path || item.image }}
+          source={{ uri: item.image_path ? getWrongQuestionImageUrl(item.image_path) : item.image }}
           style={{
             marginTop: 12,
             height: 120,
