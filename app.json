@@ -58,8 +58,7 @@
           "photosPermission": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
           "cameraPermission": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli."
         }
-      ],
-      "@sentry/react-native"
+      ]
     ],
     "extra": {
       "eas": {
