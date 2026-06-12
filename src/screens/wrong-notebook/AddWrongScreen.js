@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, Alert, Image, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -254,7 +255,7 @@ export default function AddWrongScreen() {
         >
           {image ? (
             <>
-              <Image source={{ uri: image }} style={{ width: "100%", height: 180, borderRadius: 14 }} resizeMode="cover" />
+              <Image source={{ uri: image }} style={{ width: "100%", height: 180, borderRadius: 14 }} contentFit="cover" cachePolicy="memory-disk" />
               <View style={{
                 position: "absolute", bottom: 8, right: 8,
                 backgroundColor: C.bg + "CC", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,

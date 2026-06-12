@@ -1,14 +1,39 @@
-import { createContext, useContext } from "react";
-import { COLORS } from "../themes/tokens";
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
+import { useColorScheme } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COLORS, paletteFor } from "../themes/tokens";
 
 const ThemeContext = createContext(null);
+const STORAGE_KEY = "@maraton:themePref";
 
 export function ThemeProvider({ children }) {
-  const theme = COLORS.dark;
+  const system = useColorScheme();
+  const [pref, setPrefState] = useState("dark");
 
-  return (
-    <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
-  );
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (raw) setPrefState(raw);
+      })
+      .catch(() => {});
+  }, []);
+
+  const scheme = pref === "system" ? (system || "dark") : pref;
+
+  const setPref = useCallback((next) => {
+    setPrefState(next);
+    AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {});
+  }, []);
+
+  const value = useMemo(() => ({
+    pref,
+    scheme,
+    setPref,
+    palette: paletteFor(scheme),
+    colors: scheme === "light" ? COLORS.light : COLORS.dark,
+  }), [pref, scheme, setPref]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export const useTheme = () => {

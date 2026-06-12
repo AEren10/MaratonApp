@@ -1,9 +1,23 @@
-import { View } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 
-export function useAnimPress(scaleTo = 0.96) {
-  const onPressIn = () => {};
-  const onPressOut = () => {};
-  const animStyle = {};
+export function useAnimPress(scaleTo = 0.97) {
+  const scale = useSharedValue(1);
 
-  return { animStyle, onPressIn, onPressOut, AnimatedView: View };
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const onPressIn = () => {
+    scale.value = withSpring(scaleTo, { damping: 18, stiffness: 320 });
+  };
+
+  const onPressOut = () => {
+    scale.value = withSpring(1, { damping: 18, stiffness: 320 });
+  };
+
+  return { animStyle, onPressIn, onPressOut, AnimatedView: Animated.View };
 }

@@ -12,6 +12,7 @@ import { ScreenErrorBoundary } from "../components/common/ScreenErrorBoundary";
 
 import { TabBar } from "./TabBar";
 import { DataSyncProvider } from "../contexts/DataSyncContext";
+import { linkingConfig } from "./linking";
 
 import HomeScreen from "../screens/home/HomeScreen";
 import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
@@ -45,6 +46,7 @@ import AboutScreen from "../screens/settings/AboutScreen";
 import LeagueScreen from "../screens/league/LeagueScreen";
 import CalendarScreen from "../screens/calendar/CalendarScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
+import FriendsScreen from "../screens/social/FriendsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -90,11 +92,19 @@ const EBAbout = withEB(AboutScreen);
 const EBLeague = withEB(LeagueScreen);
 const EBCalendar = withEB(CalendarScreen);
 const EBGoals = withEB(GoalsScreen);
+const EBFriends = withEB(FriendsScreen);
 
 const screenOptions = {
   headerShown: false,
   contentStyle: { backgroundColor: C.bg },
   animation: Platform.OS === "web" ? "none" : "slide_from_right",
+  animationDuration: 240,
+};
+
+const modalOptions = {
+  animation: Platform.OS === "web" ? "none" : "slide_from_bottom",
+  presentation: "modal",
+  animationDuration: 280,
 };
 
 function MainTabs() {
@@ -137,12 +147,12 @@ function AppStackInner() {
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name={SCREENS.WRONG_NOTEBOOK} component={EBWrongNotebook} />
-      <Stack.Screen name={SCREENS.ADD_WRONG} component={EBAddWrong} />
+      <Stack.Screen name={SCREENS.ADD_WRONG} component={EBAddWrong} options={modalOptions} />
       <Stack.Screen name={SCREENS.WRONG_DETAIL} component={EBWrongDetail} />
       <Stack.Screen name={SCREENS.PLAN_DETAIL} component={EBPlanDetail} />
-      <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} />
-      <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} />
-      <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} />
+      <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} options={modalOptions} />
+      <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} options={modalOptions} />
+      <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} options={modalOptions} />
       <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} />
       <Stack.Screen name={SCREENS.TRIAL_COMPARE} component={EBTrialCompare} />
       <Stack.Screen name={SCREENS.TOPIC_CARDS} component={EBTopicCards} />
@@ -161,6 +171,7 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.LEAGUE} component={EBLeague} />
       <Stack.Screen name={SCREENS.CALENDAR} component={EBCalendar} />
       <Stack.Screen name={SCREENS.GOALS} component={EBGoals} />
+      <Stack.Screen name={SCREENS.FRIENDS} component={EBFriends} />
     </Stack.Navigator>
   );
 }
@@ -196,5 +207,9 @@ export default function AppNavigator() {
     content = <AppStack />;
   }
 
-  return <NavigationContainer>{content}</NavigationContainer>;
+  return (
+    <NavigationContainer linking={linkingConfig}>
+      {content}
+    </NavigationContainer>
+  );
 }

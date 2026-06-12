@@ -10,6 +10,7 @@ import { ALL_SUBJECTS } from "../trial/trialTypes";
 import { TRIAL_TO_CURRICULUM } from "../trial/trialKeyMap";
 import { SCREENS } from "../../constants/screens";
 import { selectTrials } from "../../store/slices/trialSlice";
+import { TrendChart } from "./components/TrendChart";
 
 function StatBox({ label, value }) {
   return (
@@ -56,7 +57,7 @@ export default function SubjectDetailScreen() {
     return [...trials]
       .filter((t) => t.subjects?.[subjectKey])
       .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 5)
+      .slice(0, 8)
       .map((t) => ({
         date: new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
         net: t.subjects[subjectKey].net || 0,
@@ -64,6 +65,25 @@ export default function SubjectDetailScreen() {
         wrong: t.subjects[subjectKey].wrong || 0,
       }));
   }, [trials, subjectKey]);
+
+  const trendData = useMemo(() => {
+    if (history.length < 2) return { data: [], labels: [] };
+    const reversed = [...history].reverse();
+    return {
+      data: reversed.map((h) => h.net),
+      labels: reversed.map((h) => h.date),
+    };
+  }, [history]);
+
+  const accuracy = useMemo(() => {
+    const totalAnswered = (history[0]?.correct || 0) + (history[0]?.wrong || 0);
+    if (history.length === 0 || totalAnswered === 0) return null;
+    const totalC = history.reduce((s, h) => s + h.correct, 0);
+    const totalW = history.reduce((s, h) => s + h.wrong, 0);
+    const total = totalC + totalW;
+    if (total === 0) return null;
+    return Math.round((totalC / total) * 100);
+  }, [history]);
 
   const totals = useMemo(() => {
     if (!history.length) return { netAvg: 0, totalCorrect: 0, totalWrong: 0 };
@@ -131,7 +151,19 @@ export default function SubjectDetailScreen() {
           <StatBox label="Ort. Net" value={totals.netAvg} />
           <StatBox label="Doğru" value={totals.totalCorrect} />
           <StatBox label="Yanlış" value={totals.totalWrong} />
+          {accuracy !== null && <StatBox label="Başarı %" value={`${accuracy}`} />}
         </View>
+
+        {trendData.data.length >= 2 && (
+          <View style={{ marginTop: SPACING.lg }}>
+            <TrendChart
+              data={trendData.data}
+              labels={trendData.labels}
+              color={subjectColor}
+              title="Bu Derste Net Trendi"
+            />
+          </View>
+        )}
 
         {history.length > 0 && (
           <>
@@ -162,8 +194,8 @@ export default function SubjectDetailScreen() {
         {topics.length > 0 && (
           <>
             <Text style={s.sectionTitle}>KONULAR</Text>
-            {topics.slice(0, 15).map((t) => (
-              <TopicRow key={t.name} topic={t} color={subjectColor} />
+            {topics.slice(0, 15).map((t, i) => (
+              <TopicRow key={`${t.name}-${i}`} topic={t} color={subjectColor} />
             ))}
           </>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, Image, ActivityIndicator, Alert } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { Icon, Chip, Stat } from "../../../components/design";
@@ -76,7 +77,9 @@ export function ProfileHeader({ name, exam, league, countdown }) {
             <Image
               source={{ uri: avatarUri }}
               style={{ width: 88, height: 88 }}
-              resizeMode="cover"
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={200}
             />
           ) : (
             <Text

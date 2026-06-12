@@ -62,12 +62,12 @@ export async function scheduleDailyReminder(hour = 19, minute = 0) {
       content: {
         title: "Çalışma zamanı 📚",
         body: "Bugün hala bir kayıt girmedin. 15 dakika bile yeter — başla!",
-        data: { type: "daily_reminder" },
+        data: { type: "daily_reminder", url: "maraton://plan" },
       },
       trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour,
         minute,
-        repeats: true,
       },
     });
   } catch (_) {
@@ -82,12 +82,12 @@ export async function scheduleStreakRiskReminder() {
       content: {
         title: "Streak'in tehlikede 🔥",
         body: "Bugün hiç çalışma kaydetmedin. Birazcık çalış, seriyi bozma!",
-        data: { type: "streak_risk" },
+        data: { type: "streak_risk", url: "maraton://home" },
       },
       trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour: 22,
         minute: 0,
-        repeats: true,
       },
     });
   } catch (_) {

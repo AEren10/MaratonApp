@@ -48,6 +48,9 @@ export const SCREENS = {
   // Goals
   GOALS: "Goals",
 
+  // Social
+  FRIENDS: "Friends",
+
   // Settings
   SETTINGS: "Settings",
   APPEARANCE: "Appearance",

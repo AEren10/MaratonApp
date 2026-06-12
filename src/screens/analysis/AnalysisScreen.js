@@ -195,7 +195,11 @@ export default function AnalysisScreen() {
               )}
 
               <AnimatedCard delay={300}>
-                <HistoryList history={deneme.history} onPress={handleHistoryPress} />
+                <HistoryList
+                  history={deneme.history}
+                  onPress={handleHistoryPress}
+                  onCompare={() => navigation.navigate(SCREENS.TRIAL_COMPARE)}
+                />
               </AnimatedCard>
             </>
           )}

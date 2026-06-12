@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Pressable, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 import { C } from "../themes/tokens";
 import { Icon } from "../components/design";
 import { QuickActionSheet } from "../components/common/QuickActionSheet";
@@ -14,28 +20,50 @@ const TABS = [
 ];
 
 function CenterFab({ label, onPress }) {
+  const scale = useSharedValue(1);
+  const rotation = useSharedValue(0);
+
+  const fabStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
+  }));
+
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
-      <Pressable onPress={onPress}>
-        <View
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: C.amber,
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: -22,
-            shadowColor: C.amber,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.5,
-            shadowRadius: 20,
-            elevation: 12,
+      <Animated.View style={fabStyle}>
+        <Pressable
+          onPressIn={() => {
+            scale.value = withSpring(0.92, { damping: 14, stiffness: 320 });
+            rotation.value = withSpring(45, { damping: 14, stiffness: 220 });
+          }}
+          onPressOut={() => {
+            scale.value = withSpring(1, { damping: 14, stiffness: 320 });
+            rotation.value = withSpring(0, { damping: 14, stiffness: 220 });
+          }}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+            onPress();
           }}
         >
-          <Icon name="plus" size={26} color={C.bg} sw={3} />
-        </View>
-      </Pressable>
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              backgroundColor: C.amber,
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: -22,
+              shadowColor: C.amber,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.5,
+              shadowRadius: 20,
+              elevation: 12,
+            }}
+          >
+            <Icon name="plus" size={26} color={C.bg} sw={3} />
+          </View>
+        </Pressable>
+      </Animated.View>
       <Text style={{ fontFamily: "Inter_500Medium", fontSize: 10, color: C.muted, marginTop: 4 }}>
         {label}
       </Text>
@@ -44,25 +72,50 @@ function CenterFab({ label, onPress }) {
 }
 
 function TabItem({ tab, active, onPress }) {
+  const scale = useSharedValue(1);
+  const dotScale = useSharedValue(active ? 1 : 0);
+
+  useEffect(() => {
+    dotScale.value = withSpring(active ? 1 : 0, { damping: 18, stiffness: 320 });
+  }, [active, dotScale]);
+
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+  const dotStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: dotScale.value }],
+    opacity: dotScale.value,
+  }));
+
   return (
     <Pressable
-      onPress={onPress}
+      onPressIn={() => {
+        scale.value = withSpring(0.85, { damping: 14, stiffness: 360 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 14, stiffness: 360 });
+      }}
+      onPress={() => {
+        Haptics.selectionAsync().catch(() => {});
+        onPress();
+      }}
       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }}
     >
-      <View style={{ alignItems: "center" }}>
+      <Animated.View style={[{ alignItems: "center" }, iconStyle]}>
         <Icon name={tab.icon} size={22} color={active ? C.amber : C.muted} sw={active ? 2.2 : 1.8} />
-        {active && (
-          <View
-            style={{
+        <Animated.View
+          style={[
+            {
               width: 4,
               height: 4,
               borderRadius: 2,
               backgroundColor: C.amber,
               marginTop: 3,
-            }}
-          />
-        )}
-      </View>
+            },
+            dotStyle,
+          ]}
+        />
+      </Animated.View>
       <Text
         style={{
           fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",

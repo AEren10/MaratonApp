@@ -34,7 +34,7 @@ function gridLines(data) {
   return lines;
 }
 
-export function TrendChart({ data, labels }) {
+export function TrendChart({ data, labels, color = C.amber, title = "Net Trendi", compact = false }) {
   if (!data || data.length < 2) return null;
   const pts = buildPoints(data);
   const grids = gridLines(data);
@@ -43,10 +43,12 @@ export function TrendChart({ data, labels }) {
 
   return (
     <View style={{ gap: SPACING.md }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
-        <Icon name="trendUp" size={18} color={C.amber} />
-        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Net Trendi</Text>
-      </View>
+      {!compact && (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
+          <Icon name="trendUp" size={18} color={color} />
+          <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>{title}</Text>
+        </View>
+      )}
 
       <View
         style={{
@@ -60,8 +62,8 @@ export function TrendChart({ data, labels }) {
         <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
           <Defs>
             <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={C.amber} stopOpacity="0.3" />
-              <Stop offset="1" stopColor={C.amber} stopOpacity="0" />
+              <Stop offset="0" stopColor={color} stopOpacity="0.3" />
+              <Stop offset="1" stopColor={color} stopOpacity="0" />
             </LinearGradient>
           </Defs>
 
@@ -81,7 +83,7 @@ export function TrendChart({ data, labels }) {
           <Polyline
             points={polyStr}
             fill="none"
-            stroke={C.amber}
+            stroke={color}
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -89,8 +91,8 @@ export function TrendChart({ data, labels }) {
         </Svg>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING.sm }}>
-          {labels.map((l) => (
-            <Text key={l} style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{l}</Text>
+          {labels.map((l, i) => (
+            <Text key={`${l}-${i}`} style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{l}</Text>
           ))}
         </View>
       </View>

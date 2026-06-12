@@ -4,7 +4,7 @@ import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
 
 const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
-const PRIORITY_ICON = { high: "alertTriangle", medium: "bell", low: "trendUp" };
+const PRIORITY_ICON = { high: "alert", medium: "bell", low: "trendUp" };
 
 function NudgeItem({ nudge, onAction }) {
   const color = PRIORITY_COLOR[nudge.priority] || C.amber;
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
   },
   closeText: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Inter_600SemiBold",
     fontSize: 14,
     color: C.bg,
   },

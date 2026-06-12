@@ -6,7 +6,6 @@ import { Icon } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
-import { getTrials } from "../../supabase/trials";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { MonthGrid } from "./components/MonthGrid";

@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { BentoCard, Icon, Chip } from "../../../components/design";
 import { C } from "../../../themes/tokens";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -78,7 +79,7 @@ export function WrongCard({ item, onPress, onResolve }) {
             <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted }}>
               {relativeDate(item.created_at)}
             </Text>
-            {item.correctAnswer ? (
+            {(item.correct_answer ?? item.correctAnswer) ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -89,13 +90,13 @@ export function WrongCard({ item, onPress, onResolve }) {
                 <Text
                   style={{ fontSize: 11, color: C.red, fontFamily: "Inter_600SemiBold" }}
                 >
-                  {item.myAnswer}
+                  {item.my_answer ?? item.myAnswer}
                 </Text>
                 <Text style={{ fontSize: 11, color: C.muted }}>→</Text>
                 <Text
                   style={{ fontSize: 11, color: C.green, fontFamily: "Inter_600SemiBold" }}
                 >
-                  {item.correctAnswer}
+                  {item.correct_answer ?? item.correctAnswer}
                 </Text>
               </View>
             ) : null}
@@ -120,16 +121,18 @@ export function WrongCard({ item, onPress, onResolve }) {
         </Pressable>
       </View>
 
-      {item.image ? (
+      {item.image_path || item.image ? (
         <Image
-          source={{ uri: item.image }}
+          source={{ uri: item.image_path || item.image }}
           style={{
             marginTop: 12,
             height: 120,
             borderRadius: 14,
             backgroundColor: C.surface2,
           }}
-          resizeMode="cover"
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={200}
         />
       ) : null}
     </BentoCard>

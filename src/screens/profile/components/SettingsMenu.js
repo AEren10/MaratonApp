@@ -3,6 +3,7 @@ import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 
 const ITEMS = [
+  { icon: "users", label: "Arkadaşlar", route: "Friends" },
   { icon: "calendar", label: "Takvim", route: "Calendar" },
   { icon: "target", label: "Hedeflerim", route: "Goals" },
   { icon: "settings", label: "Ayarlar", route: "Settings" },

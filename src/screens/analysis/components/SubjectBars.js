@@ -1,47 +1,53 @@
-import { useEffect, useRef } from "react";
-import { View, Text, Animated, Pressable } from "react-native";
+import { useEffect } from "react";
+import { View, Text, Pressable } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withDelay,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 
 function Bar({ name, color, net, max, delay, onPress }) {
-  const anim = useRef(new Animated.Value(0)).current;
-  const pct = max > 0 ? net / max : 0;
+  const pct = max > 0 ? Math.min(net / max, 1) : 0;
+  const width = useSharedValue(0);
 
   useEffect(() => {
-    Animated.timing(anim, {
-      toValue: pct,
-      duration: 800,
+    width.value = withDelay(
       delay,
-      useNativeDriver: false,
-    }).start();
-  }, [pct]);
+      withTiming(pct, { duration: 800, easing: Easing.out(Easing.cubic) })
+    );
+  }, [pct, delay, width]);
 
-  const width = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
-  });
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${width.value * 100}%`,
+  }));
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, opacity: pressed ? 0.7 : 1 }]}>
       <Text
-        style={{ ...TYPOGRAPHY.captionMedium, color: C.sec, width: 68 }}
+        style={{ ...TYPOGRAPHY.captionMedium, color: C.sec, width: 80 }}
         numberOfLines={1}
       >
         {name}
       </Text>
 
-      <View style={{ flex: 1, height: 10, borderRadius: RADIUS.sm, backgroundColor: color + "1A" }}>
+      <View style={{ flex: 1, height: 10, borderRadius: RADIUS.sm, backgroundColor: color + "1A", overflow: "hidden" }}>
         <Animated.View
-          style={{
-            height: 10,
-            borderRadius: RADIUS.sm,
-            backgroundColor: color,
-            width,
-          }}
+          style={[
+            {
+              height: 10,
+              borderRadius: RADIUS.sm,
+              backgroundColor: color,
+            },
+            fillStyle,
+          ]}
         />
       </View>
 
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, width: 56, textAlign: "right" }}>
-        {net}/{max}
+      <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, width: 60, textAlign: "right" }}>
+        {Number(net).toFixed(1)}/{max}
       </Text>
     </Pressable>
   );

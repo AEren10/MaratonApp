@@ -103,7 +103,7 @@ function LeaderboardRow({ item, index }) {
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text
           style={{
-            fontFamily: isYou ? "Inter_700Bold" : "Inter_500Medium",
+            fontFamily: isYou ? "Inter_600SemiBold" : "Inter_500Medium",
             fontSize: 14,
             color: isYou ? C.amber : C.text,
           }}

@@ -1,24 +1,30 @@
-import { useEffect, useRef } from "react";
-import { View, Animated, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { View, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { C, SPACING, RADIUS } from "../../themes/tokens";
 
 export function SkeletonCard({ width = "100%", height = 80, rounded = RADIUS.xl }) {
-  const opacity = useRef(new Animated.Value(0.3)).current;
+  const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    const anim = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.7, duration: 800, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
-      ]),
+    opacity.value = withRepeat(
+      withTiming(0.7, { duration: 900, easing: Easing.inOut(Easing.quad) }),
+      -1,
+      true
     );
-    anim.start();
-    return () => anim.stop();
   }, [opacity]);
+
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
     <Animated.View
-      style={[styles.card, { width, height, borderRadius: rounded, opacity }]}
+      style={[styles.card, { width, height, borderRadius: rounded }, animStyle]}
     />
   );
 }

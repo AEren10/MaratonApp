@@ -2,12 +2,17 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from "../../themes/tokens";
 import { Icon } from "../design";
+import { captureError } from "../../lib/errorReporting";
 
 export class ScreenErrorBoundary extends React.Component {
   state = { hasError: false };
 
   static getDerivedStateFromError() {
     return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    captureError(error, { componentStack: info?.componentStack });
   }
 
   handleReset = () => {

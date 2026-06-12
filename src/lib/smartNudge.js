@@ -1,5 +1,6 @@
 import { differenceInDays } from "date-fns";
 import { TYT_SUBJECTS } from "../themes/subjects";
+import { ALL_SUBJECTS } from "../screens/trial/trialTypes";
 
 /**
  * Akilli uyari/oneri sistemi.
@@ -18,11 +19,17 @@ const NUDGE_TYPES = {
   IMPROVEMENT: "improvement",
 };
 
+// Gives a display label for a trial subject key (tyt_turkce → "Türkçe")
+function trialSubjectLabel(key) {
+  const found = ALL_SUBJECTS.find((s) => s.key === key);
+  return found?.name || key;
+}
+
 export function generateNudges({ recentStudy, trials, streak, weakAreas }) {
   const nudges = [];
   const today = new Date();
 
-  // 1) Ihmal edilen dersler
+  // 1) Ihmal edilen dersler — recentStudy uses curriculum keys (turkce, matematik...)
   for (const [key, lastDate] of Object.entries(recentStudy || {})) {
     const days = differenceInDays(today, new Date(lastDate));
     const subject = TYT_SUBJECTS[key];
@@ -39,33 +46,40 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas }) {
     }
   }
 
-  // 2) Net dususu
+  // 2) Net dususu — trials use trial keys (tyt_turkce, ayt_matematik...).
   if (trials && trials.length >= 2) {
     const latest = trials[0];
-    const prev = trials[1];
+    const sameTypePrev = trials.slice(1).find((t) => t.trialType === latest.trialType);
 
-    for (const key of Object.keys(TYT_SUBJECTS)) {
-      const latestNet = latest.subjects?.[key]?.net ?? 0;
-      const prevNet = prev.subjects?.[key]?.net ?? 0;
-      const drop = prevNet - latestNet;
+    if (sameTypePrev) {
+      const subjectKeys = new Set([
+        ...Object.keys(latest.subjects || {}),
+        ...Object.keys(sameTypePrev.subjects || {}),
+      ]);
 
-      if (drop >= 3) {
-        nudges.push({
-          type: NUDGE_TYPES.NET_DROP,
-          priority: drop >= 5 ? "high" : "medium",
-          subject: key,
-          message: `${TYT_SUBJECTS[key].label}'te son denemede ${drop} net dusus var.`,
-          actionLabel: "Konu Analizi",
-        });
-      }
+      for (const key of subjectKeys) {
+        const latestNet = latest.subjects?.[key]?.net ?? 0;
+        const prevNet = sameTypePrev.subjects?.[key]?.net ?? 0;
+        const drop = prevNet - latestNet;
 
-      if (latestNet - prevNet >= 5) {
-        nudges.push({
-          type: NUDGE_TYPES.IMPROVEMENT,
-          priority: "low",
-          subject: key,
-          message: `${TYT_SUBJECTS[key].label}'te +${latestNet - prevNet} net artis, harika!`,
-        });
+        if (drop >= 3) {
+          nudges.push({
+            type: NUDGE_TYPES.NET_DROP,
+            priority: drop >= 5 ? "high" : "medium",
+            subject: key,
+            message: `${trialSubjectLabel(key)}'te son denemede ${drop.toFixed(1)} net dusus var.`,
+            actionLabel: "Konu Analizi",
+          });
+        }
+
+        if (latestNet - prevNet >= 5) {
+          nudges.push({
+            type: NUDGE_TYPES.IMPROVEMENT,
+            priority: "low",
+            subject: key,
+            message: `${trialSubjectLabel(key)}'te +${(latestNet - prevNet).toFixed(1)} net artis, harika!`,
+          });
+        }
       }
     }
   }

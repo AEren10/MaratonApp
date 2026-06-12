@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import {
@@ -22,6 +23,10 @@ import AppNavigator from "./src/navigation/AppNavigator";
 import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary";
 import { ReduxHydrator } from "./src/store/hydrate";
 import { COLORS } from "./src/themes/tokens";
+import { initErrorReporting } from "./src/lib/errorReporting";
+import { useTheme } from "./src/contexts/ThemeContext";
+
+initErrorReporting();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,14 +55,24 @@ export default function App() {
           <AuthProvider>
             <ExamProvider>
               <ThemeProvider>
-                <ScreenErrorBoundary>
-                  <AppNavigator />
-                </ScreenErrorBoundary>
+                <ThemedRoot />
               </ThemeProvider>
             </ExamProvider>
           </AuthProvider>
         </SafeAreaProvider>
       </Provider>
+    </View>
+  );
+}
+
+function ThemedRoot() {
+  const { scheme, colors } = useTheme();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style={scheme === "light" ? "dark" : "light"} />
+      <ScreenErrorBoundary>
+        <AppNavigator />
+      </ScreenErrorBoundary>
     </View>
   );
 }

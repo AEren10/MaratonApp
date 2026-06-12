@@ -1,51 +1,52 @@
-import { useEffect, useRef } from "react";
-import { Text, View, Animated, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { Text, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  withSequence,
+  withDelay,
+  runOnJS,
+} from "react-native-reanimated";
 import { C } from "../../themes/tokens";
 
 export function XPToast({ amount, visible, onDone }) {
-  const translateY = useRef(new Animated.Value(60)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.7)).current;
+  const translateY = useSharedValue(60);
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.7);
 
   useEffect(() => {
     if (!visible) return;
 
-    translateY.setValue(60);
-    opacity.setValue(0);
-    scale.setValue(0.7);
+    translateY.value = 60;
+    opacity.value = 0;
+    scale.value = 0.7;
 
-    Animated.parallel([
-      Animated.spring(translateY, { toValue: -20, damping: 12, stiffness: 200, useNativeDriver: true }),
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
-        Animated.delay(1500),
-        Animated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: true }),
-      ]),
-      Animated.sequence([
-        Animated.spring(scale, { toValue: 1.1, damping: 8, stiffness: 300, useNativeDriver: true }),
-        Animated.spring(scale, { toValue: 1, damping: 14, useNativeDriver: true }),
-      ]),
-    ]).start();
+    translateY.value = withSpring(-20, { damping: 12, stiffness: 200 });
 
-    const timer = setTimeout(() => {
-      onDone?.();
-    }, 2200);
-    return () => clearTimeout(timer);
+    opacity.value = withSequence(
+      withTiming(1, { duration: 200 }),
+      withDelay(1500, withTiming(0, { duration: 400 }, () => {
+        if (onDone) runOnJS(onDone)();
+      }))
+    );
+
+    scale.value = withSequence(
+      withSpring(1.1, { damping: 8, stiffness: 300 }),
+      withSpring(1, { damping: 14 })
+    );
   }, [visible]);
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    opacity: opacity.value,
+  }));
 
   if (!visible) return null;
 
   return (
-    <Animated.View
-      style={[
-        s.container,
-        {
-          transform: [{ translateY }, { scale }],
-          opacity,
-        },
-      ]}
-      pointerEvents="none"
-    >
+    <Animated.View style={[s.container, animStyle]} pointerEvents="none">
       <Text style={s.icon}>⚡</Text>
       <Text style={s.text}>+{amount} XP</Text>
     </Animated.View>
@@ -70,8 +71,10 @@ const s = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
     zIndex: 9999,
+    left: 0,
+    right: 0,
   },
-  icon: { fontSize: 18 },
+  icon: { fontSize: 18, textAlign: "center" },
   text: {
     fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 18,

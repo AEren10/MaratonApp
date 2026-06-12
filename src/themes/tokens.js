@@ -39,7 +39,69 @@ export const COLORS = {
     green: "#34D399",
     amber: "#F5A623",
   },
+  light: {
+    background: "#FAFAFB",
+    surface: "#FFFFFF",
+    surface2: "#F2F2F5",
+    surfaceLight: "#F8F8FA",
+    card: "#FFFFFF",
+    cardHover: "#F2F2F5",
+    border: "#E2E2E8",
+    borderSoft: "rgba(0,0,0,0.06)",
+    borderLight: "#D0D0D8",
+
+    textPrimary: "#0A0A0F",
+    textSecondary: "#4A4A55",
+    textMuted: "#8A8A95",
+    textInverse: "#FFFFFF",
+
+    accent: "#F5A623",
+    accentLight: "#F5A62320",
+    accentDark: "#D4900E",
+
+    success: "#10B981",
+    successLight: "#10B98120",
+    warning: "#F59E0B",
+    warningLight: "#F59E0B20",
+    danger: "#DC2626",
+    dangerLight: "#DC262620",
+    info: "#3B82F6",
+    infoLight: "#3B82F620",
+
+    teal: "#0D9488",
+    tealLight: "#0D948820",
+    purple: "#7C3AED",
+    purpleLight: "#7C3AED20",
+    blue: "#3B82F6",
+    blueLight: "#3B82F620",
+    yellow: "#F59E0B",
+    red: "#DC2626",
+    green: "#10B981",
+    amber: "#F5A623",
+  },
 };
+
+// Returns a C-shaped palette for the given scheme
+export function paletteFor(scheme) {
+  const src = scheme === "light" ? COLORS.light : COLORS.dark;
+  return {
+    bg: src.background,
+    surface: src.surface,
+    surface2: src.surface2,
+    border: src.border,
+    borderSoft: src.borderSoft,
+    amber: src.amber,
+    green: src.green,
+    yellow: src.yellow,
+    red: src.red,
+    teal: src.teal,
+    purple: src.purple,
+    blue: src.blue,
+    text: src.textPrimary,
+    sec: src.textSecondary,
+    muted: src.textMuted,
+  };
+}
 
 // Alias for design file consistency: C.bg, C.amber, etc.
 export const C = {

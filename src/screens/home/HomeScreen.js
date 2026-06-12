@@ -16,6 +16,7 @@ import { AnimatedCard } from "../../components/design/AnimatedCard";
 
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
+import { useAISuggestions } from "../../hooks/useAISuggestions";
 import { useSync } from "../../contexts/DataSyncContext";
 import { NudgeModal } from "../../components/common/NudgeModal";
 import { getMotivMessage } from "../../lib/motivMessages";
@@ -29,6 +30,7 @@ import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
 import { QuickActions } from "./components/QuickActions";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
+import { AISuggestionsCard } from "./components/AISuggestionsCard";
 
 const QUICK_ITEMS = [
   { icon: "edit", label: "Kaydet", c: C.amber, go: SCREENS.ADD_STUDY },
@@ -67,6 +69,7 @@ export default function HomeScreen() {
 
   const nudges = useRecommendations();
   const weeklyReport = useWeeklyReport();
+  const { suggestions: aiSuggestions, loading: aiLoading } = useAISuggestions();
   const { refresh } = useSync();
   const [nudgeVisible, setNudgeVisible] = useState(false);
 
@@ -177,7 +180,19 @@ export default function HomeScreen() {
             <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
           </AnimatedCard>
 
-          <AnimatedCard delay={280}>
+          <AnimatedCard delay={260}>
+            <AISuggestionsCard
+              suggestions={aiSuggestions}
+              loading={aiLoading}
+              onItemPress={(s) => {
+                if (s.subjectKey) {
+                  navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: s.subjectKey, subjectName: s.title });
+                }
+              }}
+            />
+          </AnimatedCard>
+
+          <AnimatedCard delay={300}>
             <WeakCard
               message={nudges.length > 0 ? nudges[0].message : (gStats.totalQuestions ? "Analiz ekranında zayıf konularını görebilirsin" : "Soru çözmeye başla, zayıf alanlarını belirleyelim")}
               onPress={nudges.length > 0 ? () => setNudgeVisible(true) : go(SCREENS.ANALYSIS)}

@@ -1,6 +1,13 @@
 import { Pressable, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 import { C } from "../../themes/tokens";
+
+const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
 export function BentoCard({
   children,
@@ -12,6 +19,11 @@ export function BentoCard({
   style,
   ...rest
 }) {
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   const inner = (
     <View
       style={[
@@ -59,5 +71,15 @@ export function BentoCard({
   );
 
   if (!onPress) return wrapped;
-  return <Pressable onPress={onPress}>{wrapped}</Pressable>;
+
+  return (
+    <AnimPressable
+      onPress={onPress}
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
+      style={pressStyle}
+    >
+      {wrapped}
+    </AnimPressable>
+  );
 }

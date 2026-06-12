@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { View, Text, ScrollView, Pressable, Image, StyleSheet, Alert, Modal } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, Alert, Modal } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -67,8 +68,8 @@ export default function WrongDetailScreen() {
         </View>
 
         <View style={styles.answersRow}>
-          <AnswerBadge label="Benim cevabim" answer={item.myAnswer} color={C.red} />
-          <AnswerBadge label="Dogru cevap" answer={item.correctAnswer} color={C.green} />
+          <AnswerBadge label="Benim cevabim" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} />
+          <AnswerBadge label="Dogru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} />
         </View>
 
         <View style={styles.section}>
@@ -99,7 +100,9 @@ export default function WrongDetailScreen() {
               <Image
                 source={{ uri: imageUrl }}
                 style={styles.photo}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={200}
               />
               <View style={styles.zoomHint}>
                 <Icon name="eye" size={14} color={C.text} />
@@ -132,7 +135,8 @@ export default function WrongDetailScreen() {
             <Image
               source={{ uri: imageUrl }}
               style={styles.zoomImage}
-              resizeMode="contain"
+              contentFit="contain"
+              cachePolicy="memory-disk"
             />
           </View>
         </Modal>
