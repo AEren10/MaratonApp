@@ -11,6 +11,8 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectTodayLogs } from "../../store/slices/studyLogSlice";
+import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
+import { trialSubjectsToCurriculumWeakAreas } from "../trial/trialKeyMap";
 import { PlanHeader } from "./components/PlanHeader";
 import { PlanTaskItem } from "./components/PlanTaskItem";
 
@@ -19,16 +21,14 @@ export default function PlanDetailScreen() {
   const { examDate } = useExam();
   const trials = useAppSelector(selectTrials);
   const todayLogs = useAppSelector(selectTodayLogs);
+  const dailyTarget = useAppSelector(selectDailyQuestionsGoal);
 
   const { weakAreas, recentStudy } = useMemo(() => {
-    const wa = {};
+    let wa = {};
     const rs = {};
     if (trials.length > 0) {
       const latest = trials[0];
-      Object.entries(latest.subjects || {}).forEach(([key, s]) => {
-        const total = (s.correct || 0) + (s.wrong || 0);
-        wa[key] = total > 0 ? Math.round(((s.correct || 0) / total) * 100) : 50;
-      });
+      wa = trialSubjectsToCurriculumWeakAreas(latest.subjects);
     }
     todayLogs.forEach((l) => {
       if (l.subject && l.study_date) rs[l.subject] = l.study_date;
@@ -36,7 +36,7 @@ export default function PlanDetailScreen() {
     return { weakAreas: wa, recentStudy: rs };
   }, [trials, todayLogs]);
 
-  const plan = useMemo(() => generateDailyPlan({ examDate, weakAreas, recentStudy }), [examDate, weakAreas, recentStudy]);
+  const plan = useMemo(() => generateDailyPlan({ examDate, weakAreas, recentStudy, dailyTarget }), [examDate, weakAreas, recentStudy, dailyTarget]);
 
   const initialTasks = useMemo(() =>
     plan.tasks.map((t, i) => {

@@ -3,11 +3,13 @@ import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 
 const ITEMS = [
+  { icon: "calendar", label: "Takvim", route: "Calendar" },
+  { icon: "target", label: "Hedeflerim", route: "Goals" },
   { icon: "settings", label: "Ayarlar", route: "Settings" },
   { icon: "bell", label: "Bildirimler", route: "NotificationsSettings" },
   { icon: "lock", label: "Gizlilik", route: "Privacy" },
   { icon: "info", label: "Hakkında", route: "About" },
-  { icon: "logOut", label: "Çıkış Yap", danger: true },
+  { icon: "x", label: "Çıkış Yap", danger: true },
 ];
 
 export function SettingsMenu({ onNavigate, onLogout }) {

@@ -1,27 +1,65 @@
-import { useState, useCallback } from "react";
-import { View, Text, Pressable, Switch, StyleSheet } from "react-native";
+import { useState, useCallback, useEffect } from "react";
+import { View, Text, Pressable, Switch, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import {
+  getNotifPrefs,
+  setNotifPrefs,
+  applyNotifPrefs,
+  requestNotificationPermissions,
+} from "../../lib/notifications";
 
-const ITEMS = [
-  { key: "daily", icon: "clock", color: C.amber, label: "Gunluk Hatirlatici" },
-  { key: "trial", icon: "chart", color: C.blue, label: "Deneme Sonuclari" },
-  { key: "streak", icon: "flame", color: C.red, label: "Seri Uyarisi" },
-  { key: "news", icon: "zap", color: C.purple, label: "Yeni Ozellikler" },
+const HOUR_OPTIONS = [
+  { h: 8, label: "08:00 Sabah" },
+  { h: 13, label: "13:00 Öğlen" },
+  { h: 19, label: "19:00 Akşam" },
+  { h: 21, label: "21:00 Gece" },
 ];
-
-const DEFAULTS = { daily: true, trial: true, streak: true, news: false };
 
 export default function NotificationsSettingsScreen() {
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
-  const [values, setValues] = useState(DEFAULTS);
+  const [prefs, setPrefs] = useState(null);
+  const [busy, setBusy] = useState(false);
 
-  const toggle = (key) =>
-    setValues((prev) => ({ ...prev, [key]: !prev[key] }));
-  // TODO: save to AsyncStorage
+  useEffect(() => {
+    getNotifPrefs().then(setPrefs);
+  }, []);
+
+  const update = useCallback(
+    async (patch) => {
+      if (!prefs) return;
+      const next = { ...prefs, ...patch };
+      setPrefs(next);
+      setBusy(true);
+      try {
+        if (next.dailyReminderEnabled || next.streakRiskEnabled) {
+          const granted = await requestNotificationPermissions();
+          if (!granted) {
+            Alert.alert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
+            next.dailyReminderEnabled = false;
+            next.streakRiskEnabled = false;
+            setPrefs(next);
+          }
+        }
+        await setNotifPrefs(next);
+        await applyNotifPrefs(next);
+      } finally {
+        setBusy(false);
+      }
+    },
+    [prefs]
+  );
+
+  if (!prefs) {
+    return (
+      <SafeAreaView edges={["top"]} style={s.safe}>
+        <ActivityIndicator style={{ flex: 1 }} color={C.amber} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -34,18 +72,74 @@ export default function NotificationsSettingsScreen() {
       </View>
 
       <View style={s.list}>
-        {ITEMS.map((item) => (
-          <View key={item.key} style={s.row}>
-            <IconBox icon={item.icon} color={item.color} size={38} rounded={12} />
-            <Text style={s.label}>{item.label}</Text>
-            <Switch
-              value={values[item.key]}
-              onValueChange={() => toggle(item.key)}
-              trackColor={{ false: C.border, true: C.amber + "80" }}
-              thumbColor={values[item.key] ? C.amber : C.muted}
-            />
+        <View style={s.row}>
+          <IconBox icon="clock" color={C.amber} size={38} rounded={12} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.label}>Günlük Hatırlatıcı</Text>
+            <Text style={s.hint}>Çalışmayı unutmamak için bir hatırlatma</Text>
           </View>
-        ))}
+          <Switch
+            value={prefs.dailyReminderEnabled}
+            onValueChange={(v) => update({ dailyReminderEnabled: v })}
+            trackColor={{ false: C.border, true: C.amber + "80" }}
+            thumbColor={prefs.dailyReminderEnabled ? C.amber : C.muted}
+          />
+        </View>
+
+        {prefs.dailyReminderEnabled && (
+          <View style={s.subBox}>
+            <Text style={s.subLabel}>HATIRLATMA SAATİ</Text>
+            <View style={s.chipRow}>
+              {HOUR_OPTIONS.map((o) => {
+                const active = prefs.dailyReminderHour === o.h;
+                return (
+                  <Pressable
+                    key={o.h}
+                    onPress={() => update({ dailyReminderHour: o.h, dailyReminderMinute: 0 })}
+                    style={[
+                      s.chip,
+                      { borderColor: active ? C.amber : C.border, backgroundColor: active ? C.amber + "20" : "transparent" },
+                    ]}
+                  >
+                    <Text style={[s.chipText, { color: active ? C.amber : C.sec }]}>
+                      {o.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        <View style={s.row}>
+          <IconBox icon="flame" color={C.red} size={38} rounded={12} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.label}>Streak Uyarısı</Text>
+            <Text style={s.hint}>Streak'in tehlikedeyse gece bildirilir</Text>
+          </View>
+          <Switch
+            value={prefs.streakRiskEnabled}
+            onValueChange={(v) => update({ streakRiskEnabled: v })}
+            trackColor={{ false: C.border, true: C.amber + "80" }}
+            thumbColor={prefs.streakRiskEnabled ? C.amber : C.muted}
+          />
+        </View>
+
+        <View style={s.row}>
+          <IconBox icon="chart" color={C.blue} size={38} rounded={12} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.label}>Deneme Hatırlatıcı</Text>
+            <Text style={s.hint}>Haftada bir deneme girmen için</Text>
+          </View>
+          <Switch
+            value={prefs.trialReminderEnabled}
+            onValueChange={(v) => update({ trialReminderEnabled: v })}
+            trackColor={{ false: C.border, true: C.amber + "80" }}
+            thumbColor={prefs.trialReminderEnabled ? C.amber : C.muted}
+          />
+        </View>
+
+        {busy && <ActivityIndicator color={C.amber} style={{ marginTop: SPACING.lg }} />}
       </View>
     </SafeAreaView>
   );
@@ -64,5 +158,25 @@ const s = StyleSheet.create({
     backgroundColor: C.surface, borderRadius: RADIUS.xl,
     padding: SPACING.lg, marginBottom: SPACING.sm,
   },
-  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 },
+  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+  hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
+  subBox: {
+    backgroundColor: C.surface + "80",
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+  },
+  subLabel: {
+    ...TYPOGRAPHY.label,
+    color: C.muted,
+    marginBottom: SPACING.sm,
+  },
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.xs },
+  chip: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderWidth: 1,
+    borderRadius: 999,
+  },
+  chipText: { ...TYPOGRAPHY.captionMedium },
 });

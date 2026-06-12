@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { SUBJECTS } from "./trialSubjects";
+import { TRIAL_TYPES, ALL_SUBJECTS } from "./trialTypes";
 
 function CompareBar({ label, v1, v2, max, color }) {
   const p1 = max > 0 ? (v1 / max) * 100 : 0;
@@ -44,8 +44,15 @@ export default function TrialCompareScreen() {
   const trials = useSelector(selectTrials);
 
   const sorted = [...trials].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Pair same-type trials for fair comparison
   const newer = sorted[0];
-  const older = sorted[1] || sorted[0];
+  const older = sorted.find((t, i) => i > 0 && t.trialType === newer?.trialType) || sorted[1] || sorted[0];
+
+  const typeMeta = TRIAL_TYPES[newer?.trialType];
+  const subjects = typeMeta?.subjects ||
+    (newer?.trialType === "BRANCH" && newer?.branchSubject
+      ? ALL_SUBJECTS.filter((s) => s.key === newer.branchSubject)
+      : []);
 
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) : "—";
   const newerDate = fmtDate(newer?.date);
@@ -54,7 +61,7 @@ export default function TrialCompareScreen() {
   const olderNet = older?.totalNet || 0;
   const diff = newerNet - olderNet;
 
-  const subjectPairs = SUBJECTS.map((s) => ({
+  const subjectPairs = subjects.map((s) => ({
     name: s.name,
     c: s.color,
     v1: older?.subjects?.[s.key]?.net || 0,

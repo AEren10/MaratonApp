@@ -8,6 +8,7 @@ const initialState = {
   stats: {
     totalQuestions: 0,
     totalTrials: 0,
+    totalMinutes: 0,
     maxNet: 0,
     wrongsResolved: 0,
     perfectPlans: 0,

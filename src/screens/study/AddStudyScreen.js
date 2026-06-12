@@ -20,8 +20,8 @@ import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
-import { addStudyLog } from "../../supabase/studyLogs";
 import { getStreak, updateStreak } from "../../supabase/streaks";
+import { saveStudyLogOffline } from "../../lib/offlineQueue";
 
 const INITIAL = {
   subject: null,
@@ -68,18 +68,18 @@ export default function AddStudyScreen() {
     };
     dispatch(addLog(localLog));
 
-    try {
-      setSaving(true);
-      await addStudyLog({
-        user_id: user.id,
-        subject: form.subject,
-        topic: form.topic.trim(),
-        question_count: form.questionCount || 0,
-        correct_count: 0,
-        duration_minutes: form.duration,
-        study_date: todayStr,
-      });
+    setSaving(true);
+    const result = await saveStudyLogOffline({
+      user_id: user.id,
+      subject: form.subject,
+      topic: form.topic.trim(),
+      question_count: form.questionCount || 0,
+      correct_count: 0,
+      duration_minutes: form.duration,
+      study_date: todayStr,
+    });
 
+    if (result.saved) {
       try {
         const streakData = await getStreak(user.id);
         const lastDate = streakData?.last_study_date;
@@ -94,14 +94,16 @@ export default function AddStudyScreen() {
         await updateStreak(user.id, { current_streak: newStreak, longest_streak: longest, last_study_date: todayStr });
         dispatch(setStreak(newStreak));
       } catch (_) {}
-    } catch (e) {
-      console.warn("Supabase study log save failed:", e.message);
-    } finally {
-      setSaving(false);
+    } else if (result.queued) {
+      Alert.alert("Çevrimdışı", "Internet yok, kayıt bağlantı geldiğinde otomatik gönderilecek.");
     }
+    setSaving(false);
 
     const minutes = form.duration || 0;
-    const statUpdates = [{ type: "increment", key: "totalQuestions", value: form.questionCount || 0 }];
+    const statUpdates = [
+      { type: "increment", key: "totalQuestions", value: form.questionCount || 0 },
+      { type: "increment", key: "totalMinutes", value: minutes },
+    ];
     reward("study_log", { minutes, statUpdates });
     if (form.questionCount > 0) {
       reward("question_solved", { count: form.questionCount });

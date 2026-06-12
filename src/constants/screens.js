@@ -42,6 +42,12 @@ export const SCREENS = {
   // League
   LEAGUE: "League",
 
+  // Calendar
+  CALENDAR: "Calendar",
+
+  // Goals
+  GOALS: "Goals",
+
   // Settings
   SETTINGS: "Settings",
   APPEARANCE: "Appearance",

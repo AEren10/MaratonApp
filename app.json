@@ -8,6 +8,8 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "scheme": "maraton",
+    "description": "YKS hazırlık sürecini takip et: günlük plan, deneme analizi, yanlış defteri.",
+    "primaryColor": "#F5A623",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -16,17 +18,27 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.maraton.app",
+      "buildNumber": "1",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Yanlis soru fotografi eklemek icin galeri erisimi gerekli."
+        "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
+        "NSCameraUsageDescription": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.maraton.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A0F"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK",
+        "VIBRATE"
+      ]
     },
     "plugins": [
       "expo-font",
@@ -35,15 +47,23 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#F5A623"
+          "color": "#F5A623",
+          "sounds": []
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Yanlis soru fotografi eklemek icin galeri erisimi gerekli."
+          "photosPermission": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
+          "cameraPermission": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    },
+    "owner": ""
   }
 }

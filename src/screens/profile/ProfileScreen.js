@@ -51,10 +51,10 @@ export default function ProfileScreen() {
 
   const computedStats = useMemo(() => {
     const totalQ = gStats.totalQuestions || todayLogs.reduce((s, l) => s + (l.questionCount || 0), 0);
-    const totalMin = todayLogs.reduce((s, l) => s + (l.minutes || 0), 0);
+    const totalMin = gStats.totalMinutes || todayLogs.reduce((s, l) => s + (l.duration || 0), 0);
     const hours = Math.floor(totalMin / 60);
     const trialCount = gStats.totalTrials || trials.length;
-    const bestStreak = streak > (gStats.streak || 0) ? streak : (gStats.streak || 0);
+    const bestStreak = Math.max(streak, gStats.streak || 0);
     return [
       { v: totalQ > 999 ? `${(totalQ / 1000).toFixed(1)}k` : String(totalQ), l: "toplam soru" },
       { v: String(hours), l: "saat çalışma" },

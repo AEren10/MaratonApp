@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
@@ -7,6 +7,13 @@ import Svg, { Circle } from "react-native-svg";
 import { Icon } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
+import { useAppDispatch } from "../../store/hooks";
+import { addLog } from "../../store/slices/studyLogSlice";
+import { useGamification } from "../../hooks/useGamification";
+import { XPToast } from "../../components/common/XPToast";
+import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
+import { useAuth } from "../../contexts/AuthContext";
+import { saveStudyLogOffline } from "../../lib/offlineQueue";
 
 function TimerRing({ size = 200, stroke = 8, pct = 0, color, children }) {
   const r = (size - stroke) / 2;
@@ -41,7 +48,10 @@ const GOAL_MINUTES = 25;
 export default function StudyTimerScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { taskId, subjectKey, topicName } = route.params ?? {};
+  const dispatch = useAppDispatch();
+  const { user } = useAuth();
+  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { subjectKey, topicName } = route.params ?? {};
 
   const subject = getSubjectByKey(subjectKey || "matematik") || { key: "matematik", label: "Matematik", color: "#F5A623", icon: "hash" };
   const topic = topicName || "Çalışma";
@@ -49,6 +59,7 @@ export default function StudyTimerScreen() {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const [questions, setQuestions] = useState(0);
+  const [saving, setSaving] = useState(false);
   const interval = useRef(null);
 
   useEffect(() => {
@@ -67,15 +78,75 @@ export default function StudyTimerScreen() {
   const goalSec = GOAL_MINUTES * 60;
   const pct = Math.min(elapsed / goalSec, 1);
 
-  const finish = useCallback(() => {
+  const finish = useCallback(async () => {
+    if (saving) return;
     setRunning(false);
-    navigation.goBack();
-  }, [navigation]);
+
+    if (elapsed < 30) {
+      Alert.alert("Çok kısa", "30 saniyeden az çalışma kaydedilmez.", [
+        { text: "Tamam", onPress: () => navigation.goBack() },
+        { text: "Devam Et", style: "cancel" },
+      ]);
+      return;
+    }
+
+    const minutes = Math.max(1, Math.round(elapsed / 60));
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    dispatch(addLog({
+      id: Date.now().toString(),
+      subject: subject.key,
+      topic,
+      questionCount: questions,
+      duration: minutes,
+      study_date: todayStr,
+    }));
+
+    setSaving(true);
+    if (user?.id && user.id !== "dev") {
+      await saveStudyLogOffline({
+        user_id: user.id,
+        subject: subject.key,
+        topic,
+        question_count: questions,
+        correct_count: 0,
+        duration_minutes: minutes,
+        study_date: todayStr,
+      });
+    }
+    setSaving(false);
+
+    reward("study_log", {
+      minutes,
+      statUpdates: [
+        { type: "increment", key: "totalQuestions", value: questions },
+        { type: "increment", key: "totalMinutes", value: minutes },
+      ],
+    });
+    if (questions > 0) reward("question_solved", { count: questions });
+
+    Alert.alert(
+      "Kaydedildi",
+      `${minutes} dk • ${questions} soru`,
+      [{ text: "Tamam", onPress: () => navigation.goBack() }],
+    );
+  }, [elapsed, questions, subject, topic, user, dispatch, reward, navigation, saving]);
+
+  const exit = useCallback(() => {
+    if (elapsed >= 30) {
+      Alert.alert("Cikis", "Calismayi kaydetmeden cikmak istediginden emin misin?", [
+        { text: "Iptal", style: "cancel" },
+        { text: "Cikis", style: "destructive", onPress: () => navigation.goBack() },
+      ]);
+    } else {
+      navigation.goBack();
+    }
+  }, [elapsed, navigation]);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={exit} hitSlop={12}>
           <Icon name="x" size={22} color={C.text} />
         </Pressable>
         <View style={styles.subjectBadge}>
@@ -119,10 +190,16 @@ export default function StudyTimerScreen() {
         </View>
       </View>
 
-      <Pressable onPress={finish} style={styles.finishBtn}>
+      <Pressable
+        onPress={finish}
+        disabled={saving}
+        style={[styles.finishBtn, saving && { opacity: 0.6 }]}
+      >
         <Icon name="check" size={20} color={C.bg} />
-        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Bitir</Text>
+        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>{saving ? "Kaydediliyor..." : "Bitir ve Kaydet"}</Text>
       </Pressable>
+      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );
 }

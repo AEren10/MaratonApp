@@ -11,7 +11,7 @@ import { useExam } from "../contexts/ExamContext";
 import { ScreenErrorBoundary } from "../components/common/ScreenErrorBoundary";
 
 import { TabBar } from "./TabBar";
-import { useDataSync } from "../hooks/useDataSync";
+import { DataSyncProvider } from "../contexts/DataSyncContext";
 
 import HomeScreen from "../screens/home/HomeScreen";
 import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
@@ -43,6 +43,8 @@ import NotificationsSettingsScreen from "../screens/settings/NotificationsSettin
 import PrivacyScreen from "../screens/settings/PrivacyScreen";
 import AboutScreen from "../screens/settings/AboutScreen";
 import LeagueScreen from "../screens/league/LeagueScreen";
+import CalendarScreen from "../screens/calendar/CalendarScreen";
+import GoalsScreen from "../screens/settings/GoalsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -86,6 +88,8 @@ const EBNotificationsSettings = withEB(NotificationsSettingsScreen);
 const EBPrivacy = withEB(PrivacyScreen);
 const EBAbout = withEB(AboutScreen);
 const EBLeague = withEB(LeagueScreen);
+const EBCalendar = withEB(CalendarScreen);
+const EBGoals = withEB(GoalsScreen);
 
 const screenOptions = {
   headerShown: false,
@@ -128,8 +132,7 @@ function OnboardingStack() {
   );
 }
 
-function AppStack() {
-  useDataSync();
+function AppStackInner() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
@@ -156,7 +159,17 @@ function AppStack() {
       <Stack.Screen name={SCREENS.PRIVACY} component={EBPrivacy} />
       <Stack.Screen name={SCREENS.ABOUT} component={EBAbout} />
       <Stack.Screen name={SCREENS.LEAGUE} component={EBLeague} />
+      <Stack.Screen name={SCREENS.CALENDAR} component={EBCalendar} />
+      <Stack.Screen name={SCREENS.GOALS} component={EBGoals} />
     </Stack.Navigator>
+  );
+}
+
+function AppStack() {
+  return (
+    <DataSyncProvider>
+      <AppStackInner />
+    </DataSyncProvider>
   );
 }
 

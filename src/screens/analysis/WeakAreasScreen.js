@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { SUBJECTS } from "../trial/trialSubjects";
+import { ALL_SUBJECTS } from "../trial/trialTypes";
 import { Icon, IconBox } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 
@@ -19,13 +19,16 @@ function computeWeakTopics(trials) {
   const sorted = [...trials].sort((a, b) => new Date(b.date) - new Date(a.date));
   const recent = sorted.slice(0, 5);
   const weak = [];
-  SUBJECTS.forEach((s) => {
-    const nets = recent.map((t) => t.subjects?.[s.key]?.net || 0);
+  ALL_SUBJECTS.forEach((s) => {
+    const nets = recent
+      .map((t) => t.subjects?.[s.key]?.net)
+      .filter((n) => n !== undefined && n !== null);
+    if (nets.length === 0) return;
     const avg = nets.reduce((a, b) => a + b, 0) / nets.length;
     const pct = Math.round((avg / s.max) * 100);
     if (pct < 50) {
       weak.push({
-        name: s.name,
+        name: s.parent ? `${s.parent} ${s.name}` : s.name,
         subject: { key: s.key, name: s.name, color: s.color, icon: s.icon },
         acc: Math.max(0, pct),
         status: pct < 25 ? "weak" : "neglected",
@@ -40,7 +43,7 @@ const WeakCard = React.memo(function WeakCard({ item }) {
   return (
     <View style={[s.card, { borderLeftColor: item.subject.color }]}>
       <View style={s.cardHeader}>
-        <IconBox name={item.subject.icon} size={16} color={item.subject.color} />
+        <IconBox icon={item.subject.icon} size={28} color={item.subject.color} rounded={8} />
         <Text style={s.subjectName}>{item.subject.name}</Text>
         <Text style={[s.accBadge, { color: item.acc < 50 ? C.red : C.amber }]}>
           {item.acc}%
@@ -87,7 +90,7 @@ export default function WeakAreasScreen() {
         }
         ListEmptyComponent={
           <View style={s.empty}>
-            <Icon name="checkCircle" size={40} color={C.green} />
+            <Icon name="check" size={40} color={C.green} />
             <Text style={s.emptyText}>Zayif alan bulunamadi</Text>
           </View>
         }
@@ -101,8 +104,8 @@ const s = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   list: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
   card: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.md, borderLeftWidth: 3 },
-  cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.sm },
-  subjectName: { ...TYPOGRAPHY.captionMedium, color: C.sec, flex: 1, marginLeft: SPACING.sm },
+  cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.sm, gap: SPACING.sm },
+  subjectName: { ...TYPOGRAPHY.captionMedium, color: C.sec, flex: 1 },
   accBadge: { ...TYPOGRAPHY.bodySemiBold },
   topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.xs },
   suggestion: { ...TYPOGRAPHY.caption, color: C.sec },

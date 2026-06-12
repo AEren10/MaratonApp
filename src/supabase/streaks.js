@@ -5,8 +5,18 @@ export const getStreak = async (userId) => {
     .from("streaks")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
   if (error) throw error;
+  if (!data) {
+    // Auto-create if missing (in case trigger didn't run)
+    const { data: created, error: createErr } = await supabase
+      .from("streaks")
+      .insert({ user_id: userId, current_streak: 0, longest_streak: 0 })
+      .select()
+      .single();
+    if (createErr) throw createErr;
+    return created;
+  }
   return data;
 };
 

@@ -32,9 +32,12 @@ export default function SettingsScreen() {
       {
         text: "Gonder",
         onPress: async () => {
-          const { error } = await resetPassword(email);
-          if (error) Alert.alert("Hata", error.message);
-          else Alert.alert("Basarili", "Sifre sifirlama bağlantisi e-posta adresine gonderildi.");
+          try {
+            await resetPassword(email);
+            Alert.alert("Basarili", "Sifre sifirlama bağlantisi e-posta adresine gonderildi.");
+          } catch (e) {
+            Alert.alert("Hata", e.message || "Bağlantı kurulamadı.");
+          }
         },
       },
     ]);
@@ -74,6 +77,11 @@ export default function SettingsScreen() {
         </SettingsGroup>
 
         <SettingsGroup title="TERCIHLER">
+          <SettingsRow
+            icon="target" iconColor={C.amber}
+            label="Hedeflerim"
+            onPress={() => go(SCREENS.GOALS)}
+          />
           <SettingsRow
             icon="bell" iconColor={C.amber}
             label="Bildirimler"

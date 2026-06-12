@@ -1,0 +1,176 @@
+import { useState, useCallback, useEffect } from "react";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+
+import { Icon, IconBox } from "../../components/design";
+import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useAppDispatch } from "../../store/hooks";
+import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
+
+function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.row}>
+        <IconBox icon={icon} color={color} size={36} rounded={10} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>{label}</Text>
+          <Text style={styles.hint}>{hint}</Text>
+        </View>
+        <View style={styles.inputWrap}>
+          <TextInput
+            value={String(value)}
+            onChangeText={(t) => onChange(parseInt(t.replace(/[^0-9]/g, ""), 10) || 0)}
+            keyboardType="number-pad"
+            style={styles.input}
+            maxLength={5}
+          />
+          <Text style={styles.suffix}>{suffix}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+export default function GoalsScreen() {
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  const goals = useSelector(selectGoals);
+
+  const [draft, setDraft] = useState({
+    dailyQuestions: goals.dailyQuestions,
+    weeklyTrials: goals.weeklyTrials,
+    weeklyMinutes: goals.weeklyMinutes,
+  });
+
+  useEffect(() => {
+    setDraft({
+      dailyQuestions: goals.dailyQuestions,
+      weeklyTrials: goals.weeklyTrials,
+      weeklyMinutes: goals.weeklyMinutes,
+    });
+  }, [goals.dailyQuestions, goals.weeklyTrials, goals.weeklyMinutes]);
+
+  const save = useCallback(() => {
+    dispatch(setGoals(draft));
+    saveGoalsToStorage(draft);
+    Alert.alert("Kaydedildi", "Hedeflerin güncellendi.");
+    navigation.goBack();
+  }, [draft, dispatch, navigation]);
+
+  return (
+    <SafeAreaView edges={["top"]} style={styles.safe}>
+      <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+          <Icon name="arrowL" size={22} color={C.text} />
+        </Pressable>
+        <Text style={styles.title}>Hedeflerim</Text>
+        <View style={{ width: 22 }} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.subtitle}>
+          Hedef belirlemek odaklanmanı artırır. İstediğin zaman değiştirebilirsin.
+        </Text>
+
+        <GoalInput
+          icon="target"
+          color={C.amber}
+          label="Günlük Soru Hedefi"
+          hint="Her gün çözmen gereken soru sayısı"
+          value={draft.dailyQuestions}
+          onChange={(v) => setDraft((d) => ({ ...d, dailyQuestions: v }))}
+          suffix="soru"
+        />
+
+        <GoalInput
+          icon="chart"
+          color={C.teal}
+          label="Haftalık Deneme Hedefi"
+          hint="Her hafta girmen gereken deneme sayısı"
+          value={draft.weeklyTrials}
+          onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))}
+          suffix="adet"
+        />
+
+        <GoalInput
+          icon="clock"
+          color={C.blue}
+          label="Haftalık Çalışma Süresi"
+          hint="Toplam çalışma süresi (dakika)"
+          value={draft.weeklyMinutes}
+          onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))}
+          suffix="dk"
+        />
+
+        <Pressable
+          onPress={save}
+          style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.85 }]}
+        >
+          <Icon name="check" size={20} color={C.bg} />
+          <Text style={styles.saveText}>Kaydet</Text>
+        </Pressable>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.bg },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+  },
+  title: { ...TYPOGRAPHY.subheading, color: C.text },
+  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+  subtitle: {
+    ...TYPOGRAPHY.caption,
+    color: C.muted,
+    marginBottom: SPACING.lg,
+  },
+  card: {
+    backgroundColor: C.surface,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  row: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
+  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+  hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
+  inputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: C.surface2,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: C.border,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+  },
+  input: {
+    ...TYPOGRAPHY.bodySemiBold,
+    color: C.text,
+    minWidth: 40,
+    textAlign: "right",
+  },
+  suffix: { ...TYPOGRAPHY.caption, color: C.muted },
+  saveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: SPACING.sm,
+    backgroundColor: C.amber,
+    borderRadius: RADIUS.xl,
+    paddingVertical: SPACING.lg,
+    marginTop: SPACING.lg,
+    ...SHADOWS.amber,
+  },
+  saveText: { ...TYPOGRAPHY.button, color: C.bg },
+});

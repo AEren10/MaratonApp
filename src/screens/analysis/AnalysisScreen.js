@@ -5,7 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { SUBJECTS } from "../trial/trialSubjects";
+import { TRIAL_TYPES, ALL_SUBJECTS } from "../trial/trialTypes";
+import { useSync } from "../../contexts/DataSyncContext";
 import { C, TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { Icon } from "../../components/design";
@@ -16,36 +17,66 @@ import { LatestScore } from "./components/LatestScore";
 import { SubjectBars } from "./components/SubjectBars";
 import { TrendChart } from "./components/TrendChart";
 import { HistoryList } from "./components/HistoryList";
+import { TrialFilter } from "./components/TrialFilter";
 
 function AnalysisSkeleton() {
   return (
     <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.xl }}>
       <SkeletonCard height={28} width={80} rounded={8} />
+      <SkeletonCard height={48} />
       <SkeletonCard height={120} />
       <SkeletonCard height={160} />
       <SkeletonCard height={200} />
-      <SkeletonCard height={80} />
     </View>
   );
+}
+
+function filterTrials(trials, filter) {
+  if (filter === "ALL") return trials;
+  if (filter === "TYT") return trials.filter((t) => t.trialType === "TYT");
+  if (filter === "BRANCH") return trials.filter((t) => t.trialType === "BRANCH");
+  if (filter === "AYT") {
+    return trials.filter((t) => t.trialType && t.trialType.startsWith("AYT"));
+  }
+  return trials;
+}
+
+function subjectsForFilter(filter, latestTrial) {
+  if (filter === "TYT") return TRIAL_TYPES.TYT.subjects;
+  if (filter === "AYT" && latestTrial?.trialType) {
+    const type = TRIAL_TYPES[latestTrial.trialType];
+    if (type) return type.subjects;
+  }
+  if (filter === "BRANCH" && latestTrial?.branchSubject) {
+    return ALL_SUBJECTS.filter((s) => s.key === latestTrial.branchSubject);
+  }
+  if (filter === "ALL" && latestTrial?.trialType) {
+    const type = TRIAL_TYPES[latestTrial.trialType];
+    if (type) return type.subjects;
+  }
+  return TRIAL_TYPES.TYT.subjects;
 }
 
 export default function AnalysisScreen() {
   const navigation = useNavigation();
   const trials = useSelector(selectTrials);
+  const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const deneme = useMemo(() => {
-    if (!trials.length) {
+    const filtered = filterTrials(trials, filter);
+    if (!filtered.length) {
       return {
         latest: { net: 0, trend: 0, date: "Henüz deneme yok" },
         bars: [],
         line: [],
         lineLabels: [],
         history: [],
+        empty: true,
       };
     }
-    const sorted = [...trials].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
     const latest = sorted[0];
     const prev = sorted[1];
     const net = latest.totalNet || 0;
@@ -53,12 +84,16 @@ export default function AnalysisScreen() {
     const history = sorted.slice(0, 6).map((t, i) => {
       const prevT = sorted[i + 1];
       return {
+        id: t.id,
         date: new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
         net: t.totalNet || 0,
         trend: prevT ? (t.totalNet || 0) - (prevT.totalNet || 0) : 0,
+        trialType: t.trialType,
+        name: t.name,
       };
     });
-    const bars = SUBJECTS.map((s) => ({
+    const subjects = subjectsForFilter(filter, latest);
+    const bars = subjects.map((s) => ({
       key: s.key,
       name: s.name,
       color: s.color,
@@ -68,23 +103,34 @@ export default function AnalysisScreen() {
     const line = history.map((h) => h.net).reverse();
     const lineLabels = history.map((h) => h.date).reverse();
     return {
-      latest: { net, trend, date: new Date(latest.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) },
+      latest: {
+        net,
+        trend,
+        date: new Date(latest.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }),
+        typeLabel: TRIAL_TYPES[latest.trialType]?.label || latest.name || "Deneme",
+      },
       bars,
       line,
       lineLabels,
       history,
+      empty: false,
     };
-  }, [trials]);
+  }, [trials, filter]);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(t);
   }, []);
 
-  const onRefresh = useCallback(() => {
+  const { refresh } = useSync();
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
-  }, []);
+    try {
+      await refresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refresh]);
 
   const handleTrialEntry = () => navigation.navigate(SCREENS.TRIAL_ENTRY);
   const handleHistoryPress = (h) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: h });
@@ -106,26 +152,53 @@ export default function AnalysisScreen() {
       >
         <Text style={s.title}>Analiz</Text>
 
+        <TrialFilter value={filter} onChange={setFilter} />
+
         <View style={s.content}>
-          <AnimatedCard delay={0}>
-            <LatestScore
-              net={deneme.latest.net}
-              trend={deneme.latest.trend}
-              date={deneme.latest.date}
-            />
-          </AnimatedCard>
+          {deneme.empty ? (
+            <View style={s.emptyBox}>
+              <Icon name="chart" size={48} color={C.muted} />
+              <Text style={s.emptyTitle}>Henüz deneme yok</Text>
+              <Text style={s.emptySub}>
+                {filter === "ALL"
+                  ? "Bir deneme girince burada görünecek"
+                  : `${filter} denemesi henüz girmedin`}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <AnimatedCard delay={0}>
+                <LatestScore
+                  net={deneme.latest.net}
+                  trend={deneme.latest.trend}
+                  date={deneme.latest.date}
+                  typeLabel={deneme.latest.typeLabel}
+                />
+              </AnimatedCard>
 
-          <AnimatedCard delay={100}>
-            <SubjectBars bars={deneme.bars} onBarPress={(b) => navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: b.key, subjectName: b.name })} />
-          </AnimatedCard>
+              <AnimatedCard delay={100}>
+                <SubjectBars
+                  bars={deneme.bars}
+                  onBarPress={(b) =>
+                    navigation.navigate(SCREENS.SUBJECT_DETAIL, {
+                      subjectKey: b.key,
+                      subjectName: b.name,
+                    })
+                  }
+                />
+              </AnimatedCard>
 
-          <AnimatedCard delay={200}>
-            <TrendChart data={deneme.line} labels={deneme.lineLabels} />
-          </AnimatedCard>
+              {deneme.line.length > 1 && (
+                <AnimatedCard delay={200}>
+                  <TrendChart data={deneme.line} labels={deneme.lineLabels} />
+                </AnimatedCard>
+              )}
 
-          <AnimatedCard delay={300}>
-            <HistoryList history={deneme.history} onPress={handleHistoryPress} />
-          </AnimatedCard>
+              <AnimatedCard delay={300}>
+                <HistoryList history={deneme.history} onPress={handleHistoryPress} />
+              </AnimatedCard>
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -145,6 +218,24 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
   title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
   content: { gap: SPACING.xl },
+  emptyBox: {
+    backgroundColor: C.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: SPACING.xxl,
+    alignItems: "center",
+    gap: SPACING.sm,
+  },
+  emptyTitle: {
+    ...TYPOGRAPHY.subheading,
+    color: C.text,
+  },
+  emptySub: {
+    ...TYPOGRAPHY.caption,
+    color: C.muted,
+    textAlign: "center",
+  },
   fab: {
     position: "absolute",
     bottom: 100,

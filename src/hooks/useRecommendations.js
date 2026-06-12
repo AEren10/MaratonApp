@@ -3,6 +3,7 @@ import { useAppSelector } from "../store/hooks";
 import { selectTrials } from "../store/slices/trialSlice";
 import { selectTodayLogs, selectStreak } from "../store/slices/studyLogSlice";
 import { generateNudges } from "../lib/smartNudge";
+import { trialSubjectsToCurriculumWeakAreas } from "../screens/trial/trialKeyMap";
 
 export function useRecommendations() {
   const trials = useAppSelector(selectTrials);
@@ -15,13 +16,9 @@ export function useRecommendations() {
       if (l.subject && l.study_date) recentStudy[l.subject] = l.study_date;
     });
 
-    const weakAreas = {};
+    let weakAreas = {};
     if (trials.length > 0) {
-      const latest = trials[0];
-      Object.entries(latest.subjects || {}).forEach(([key, s]) => {
-        const total = (s.correct || 0) + (s.wrong || 0);
-        weakAreas[key] = total > 0 ? Math.round(((s.correct || 0) / total) * 100) : 50;
-      });
+      weakAreas = trialSubjectsToCurriculumWeakAreas(trials[0].subjects);
     }
 
     return generateNudges({ recentStudy, trials, streak, weakAreas });

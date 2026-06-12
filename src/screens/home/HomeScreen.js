@@ -15,6 +15,8 @@ import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
 
 import { useRecommendations } from "../../hooks/useRecommendations";
+import { useWeeklyReport } from "../../hooks/useWeeklyReport";
+import { useSync } from "../../contexts/DataSyncContext";
 import { NudgeModal } from "../../components/common/NudgeModal";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { HomeHeader } from "./components/HomeHeader";
@@ -26,6 +28,7 @@ import { LeagueCard } from "./components/LeagueCard";
 import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
 import { QuickActions } from "./components/QuickActions";
+import { WeeklyReportCard } from "./components/WeeklyReportCard";
 
 const QUICK_ITEMS = [
   { icon: "edit", label: "Kaydet", c: C.amber, go: SCREENS.ADD_STUDY },
@@ -63,6 +66,8 @@ export default function HomeScreen() {
   const xp = useSelector(selectXP);
 
   const nudges = useRecommendations();
+  const weeklyReport = useWeeklyReport();
+  const { refresh } = useSync();
   const [nudgeVisible, setNudgeVisible] = useState(false);
 
   const go = (route) => () => navigation.navigate(route);
@@ -83,13 +88,29 @@ export default function HomeScreen() {
   const lastDeneme = useMemo(() => {
     if (!trials.length) return { net: 0, trend: 0, bars: [] };
     const latest = trials[0];
-    const prev = trials[1];
+    // pair against same-type previous for fair trend
+    const prev = trials.slice(1).find((t) => t.trialType === latest.trialType);
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
-    const bars = Object.entries(latest.subjects || {}).slice(0, 4).map(([key, s]) => ({
-      c: key === "turkce" ? "#60A5FA" : key === "matematik" ? "#F5A623" : key === "fen" ? "#34D399" : "#A78BFA",
-      v: Math.min(1, Math.max(0, (s.net || 0) / 40)),
-    }));
+    const bars = Object.entries(latest.subjects || {}).slice(0, 4).map(([key, s]) => {
+      const palette = {
+        tyt_turkce: "#60A5FA",
+        tyt_matematik: "#F5A623",
+        tyt_fen: "#34D399",
+        tyt_sosyal: "#A78BFA",
+        ayt_matematik: "#F5A623",
+        ayt_fizik: "#60A5FA",
+        ayt_kimya: "#2DD4BF",
+        ayt_biyoloji: "#34D399",
+        ayt_edebiyat: "#A78BFA",
+        ayt_tarih1: "#EF4444",
+        ayt_cografya1: "#34D399",
+      };
+      return {
+        c: palette[key] || "#F5A623",
+        v: Math.min(1, Math.max(0, (s.net || 0) / 40)),
+      };
+    });
     return { net, trend, bars };
   }, [trials]);
 
@@ -98,10 +119,14 @@ export default function HomeScreen() {
     return () => clearTimeout(t);
   }, []);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
-  }, []);
+    try {
+      await refresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refresh]);
 
   if (loading) {
     return (
@@ -118,7 +143,12 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />}
       >
-        <HomeHeader name={displayName} streak={streak} onStreakPress={go(SCREENS.PROFILE)} />
+        <HomeHeader
+          name={displayName}
+          streak={streak}
+          onStreakPress={go(SCREENS.PROFILE)}
+          onCalendarPress={go(SCREENS.CALENDAR)}
+        />
 
         <View style={{ gap: 12 }}>
           <AnimatedCard delay={0}>
@@ -143,7 +173,11 @@ export default function HomeScreen() {
             </View>
           </AnimatedCard>
 
-          <AnimatedCard delay={240}>
+          <AnimatedCard delay={220}>
+            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
+          </AnimatedCard>
+
+          <AnimatedCard delay={280}>
             <WeakCard
               message={nudges.length > 0 ? nudges[0].message : (gStats.totalQuestions ? "Analiz ekranında zayıf konularını görebilirsin" : "Soru çözmeye başla, zayıf alanlarını belirleyelim")}
               onPress={nudges.length > 0 ? () => setNudgeVisible(true) : go(SCREENS.ANALYSIS)}

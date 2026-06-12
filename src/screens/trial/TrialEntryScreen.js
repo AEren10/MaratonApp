@@ -8,17 +8,18 @@ import { useNavigation } from "@react-navigation/native";
 
 import { Icon, IconBox } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
-import { SUBJECTS } from "./trialSubjects";
+import { TRIAL_TYPES, getSubjectsForType, getFieldFromType } from "./trialTypes";
 import { SubjectInput } from "./components/SubjectInput";
 import { TotalCard } from "./components/TotalCard";
+import { TrialTypeSelector } from "./components/TrialTypeSelector";
+import { BranchSubjectPicker } from "./components/BranchSubjectPicker";
 import { useAppDispatch } from "../../store/hooks";
 import { addTrial } from "../../store/slices/trialSlice";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
-import { useExam } from "../../contexts/ExamContext";
-import { addTrial as supabaseAddTrial } from "../../supabase/trials";
+import { saveTrialOffline } from "../../lib/offlineQueue";
 
 const EMPTY = { correct: "", wrong: "" };
 
@@ -33,26 +34,115 @@ export default function TrialEntryScreen() {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const { examType } = useExam();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+
+  const [trialType, setTrialType] = useState("TYT");
+  const [branchSubject, setBranchSubject] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [values, setValues] = useState(
-    Object.fromEntries(SUBJECTS.map((s) => [s.key, { ...EMPTY }]))
+  const [values, setValues] = useState({});
+
+  const subjects = useMemo(
+    () => getSubjectsForType(trialType, branchSubject),
+    [trialType, branchSubject]
   );
+
+  const handleTypeChange = useCallback((newType) => {
+    setTrialType(newType);
+    setValues({});
+    if (newType !== "BRANCH") setBranchSubject(null);
+  }, []);
+
+  const handleBranchChange = useCallback((key) => {
+    setBranchSubject(key);
+    setValues({});
+  }, []);
 
   const handleChange = useCallback((key) => (v) => {
     setValues((prev) => ({ ...prev, [key]: v }));
   }, []);
 
   const totalNet = useMemo(() => {
-    return SUBJECTS.reduce((sum, s) => {
-      const d = parseInt(values[s.key].correct, 10) || 0;
-      const y = parseInt(values[s.key].wrong, 10) || 0;
+    return subjects.reduce((sum, s) => {
+      const val = values[s.key] || EMPTY;
+      const d = parseInt(val.correct, 10) || 0;
+      const y = parseInt(val.wrong, 10) || 0;
       return sum + d - y * 0.25;
     }, 0).toFixed(2);
-  }, [values]);
+  }, [values, subjects]);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
+
+  const handleSave = useCallback(async () => {
+    if (saving) return;
+    if (trialType === "BRANCH" && !branchSubject) {
+      Alert.alert("Ders sec", "Branş denemesi için bir ders seçmelisin.");
+      return;
+    }
+
+    const subjectsMap = {};
+    const subjectsArr = [];
+    let hasAny = false;
+    subjects.forEach((s) => {
+      const val = values[s.key] || EMPTY;
+      const c = parseInt(val.correct, 10) || 0;
+      const w = parseInt(val.wrong, 10) || 0;
+      if (c || w) hasAny = true;
+      subjectsMap[s.key] = { correct: c, wrong: w, net: c - w * 0.25 };
+      subjectsArr.push({ subject: s.key, correct_count: c, wrong_count: w, empty_count: 0 });
+    });
+    if (!hasAny) {
+      Alert.alert("Bos deneme", "En az bir ders icin deger gir.");
+      return;
+    }
+
+    const netVal = parseFloat(totalNet);
+    const typeMeta = TRIAL_TYPES[trialType];
+    const trialName = trialType === "BRANCH"
+      ? `${subjects[0]?.name || "Branş"} Branş`
+      : typeMeta.label;
+
+    const localTrial = {
+      id: Date.now().toString(),
+      date: today(),
+      totalNet: netVal,
+      subjects: subjectsMap,
+      trialType,
+      field: getFieldFromType(trialType),
+      branchSubject,
+    };
+    dispatch(addTrial(localTrial));
+
+    setSaving(true);
+    const result = await saveTrialOffline(
+      {
+        user_id: user.id,
+        name: trialName,
+        trial_date: new Date().toISOString().split("T")[0],
+        exam_type: trialType,
+        field: getFieldFromType(trialType),
+        branch_subject: branchSubject,
+        total_net: netVal,
+      },
+      subjectsArr
+    );
+    setSaving(false);
+
+    reward("trial_entry", {
+      statUpdates: [
+        { type: "increment", key: "totalTrials" },
+        { type: "max", key: "maxNet", value: netVal },
+      ],
+    });
+    Alert.alert(
+      result.queued ? "Çevrimdışı kaydedildi" : "Kaydedildi",
+      result.queued
+        ? "Deneme sonucun internet geldiğinde sunucuya gönderilecek."
+        : "Deneme sonucun basariyla kaydedildi."
+    );
+    navigation.goBack();
+  }, [saving, trialType, branchSubject, subjects, values, totalNet, user, dispatch, reward, navigation]);
+
+  const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -78,59 +168,33 @@ export default function TrialEntryScreen() {
             <Text style={styles.dateText}>{today()}</Text>
           </View>
 
-          {SUBJECTS.map((s) => (
+          <TrialTypeSelector value={trialType} onChange={handleTypeChange} />
+
+          {trialType === "BRANCH" && (
+            <BranchSubjectPicker value={branchSubject} onChange={handleBranchChange} />
+          )}
+
+          {showSubjectInputs && subjects.map((s) => (
             <SubjectInput
               key={s.key}
               subject={s}
-              values={values[s.key]}
+              values={values[s.key] || EMPTY}
               onChange={handleChange(s.key)}
             />
           ))}
 
-          <TotalCard totalNet={totalNet} />
+          {showSubjectInputs && <TotalCard totalNet={totalNet} />}
 
-          <Pressable onPress={async () => {
-            if (saving) return;
-            const subjects = {};
-            const subjectsArr = [];
-            let hasAny = false;
-            SUBJECTS.forEach((s) => {
-              const c = parseInt(values[s.key].correct, 10) || 0;
-              const w = parseInt(values[s.key].wrong, 10) || 0;
-              if (c || w) hasAny = true;
-              subjects[s.key] = { correct: c, wrong: w, net: c - w * 0.25 };
-              subjectsArr.push({ subject: s.key, correct_count: c, wrong_count: w, empty_count: 0 });
-            });
-            if (!hasAny) { Alert.alert("Bos deneme", "En az bir ders icin deger gir."); return; }
-
-            const netVal = parseFloat(totalNet);
-            const localTrial = { id: Date.now().toString(), date: today(), totalNet: netVal, subjects };
-            dispatch(addTrial(localTrial));
-
-            try {
-              setSaving(true);
-              await supabaseAddTrial(
-                { user_id: user.id, name: `Deneme ${today()}`, trial_date: new Date().toISOString().split("T")[0], exam_type: (examType || "TYT").toUpperCase(), total_net: netVal },
-                subjectsArr
-              );
-            } catch (e) {
-              console.warn("Supabase trial save failed:", e.message);
-            } finally {
-              setSaving(false);
-            }
-
-            reward("trial_entry", {
-              statUpdates: [
-                { type: "increment", key: "totalTrials" },
-                { type: "max", key: "maxNet", value: netVal },
-              ],
-            });
-            Alert.alert("Kaydedildi", "Deneme sonucun basariyla kaydedildi.");
-            navigation.goBack();
-          }} style={[styles.submitBtn, saving && { opacity: 0.6 }]} disabled={saving}>
-            <Icon name="check" size={20} color={C.bg} />
-            <Text style={styles.submitText}>Kaydet</Text>
-          </Pressable>
+          {showSubjectInputs && (
+            <Pressable
+              onPress={handleSave}
+              style={[styles.submitBtn, saving && { opacity: 0.6 }]}
+              disabled={saving}
+            >
+              <Icon name="check" size={20} color={C.bg} />
+              <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Kaydet"}</Text>
+            </Pressable>
+          )}
         </ScrollView>
         <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
         <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />

@@ -20,6 +20,7 @@ import { ThemeProvider } from "./src/contexts/ThemeContext";
 import { ExamProvider } from "./src/contexts/ExamContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary";
+import { ReduxHydrator } from "./src/store/hydrate";
 import { COLORS } from "./src/themes/tokens";
 
 SplashScreen.preventAutoHideAsync();
@@ -44,6 +45,7 @@ export default function App() {
   return (
     <View style={styles.root} onLayout={onLayoutRootView}>
       <Provider store={store}>
+        <ReduxHydrator />
         <SafeAreaProvider>
           <AuthProvider>
             <ExamProvider>
