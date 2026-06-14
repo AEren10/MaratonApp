@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 
 const LogRow = React.memo(function LogRow({ item }) {
-  const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: "#A0A0B0", label: item.subject };
+  const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: "#9A9EAB", label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
   return (

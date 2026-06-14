@@ -11,8 +11,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 
 const GROUP_META = {
-  fen: { label: "Fen Bilimleri", color: "#34D399", icon: "activity" },
-  sosyal: { label: "Sosyal Bilimler", color: "#A78BFA", icon: "layers" },
+  fen: { label: "Fen Bilimleri", color: "#4ECE8E", icon: "activity" },
+  sosyal: { label: "Sosyal Bilimler", color: "#A99BF5", icon: "layers" },
 };
 
 const FEN_KEYS = ["fizik", "kimya", "biyoloji"];

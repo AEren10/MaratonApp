@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { Icon } from "./Icon";
 
-export function IconBox({ icon, color = "#F5A623", size = 38, rounded = 12, iconSize, style }) {
+export function IconBox({ icon, color = "#EBAE63", size = 38, rounded = 12, iconSize, style }) {
   return (
     <View
       style={[

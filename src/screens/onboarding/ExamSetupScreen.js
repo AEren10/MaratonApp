@@ -11,7 +11,7 @@ const EXAM_OPTIONS = [
   { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
   { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
   { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat", icon: "bookOpen", color: C.purple },
-  { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#2DD4BF" },
+  { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#46C7B0" },
 ];
 
 function buildExamMonthOptions() {

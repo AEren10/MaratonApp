@@ -20,4 +20,4 @@ export const SUBJECT_LIST = TYT_DERSLER;
 
 export const getSubjectByKey = (key) => ALL_SUBJECTS_MAP[key] || null;
 
-export const getSubjectColor = (key) => ALL_SUBJECTS_MAP[key]?.color || "#A0A0B0";
+export const getSubjectColor = (key) => ALL_SUBJECTS_MAP[key]?.color || "#9A9EAB";

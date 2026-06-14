@@ -65,7 +65,7 @@ export default function StudyTimerScreen() {
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const { subjectKey, topicName } = route.params ?? {};
 
-  const subject = getSubjectByKey(subjectKey || "matematik") || { key: "matematik", label: "Matematik", color: "#F5A623", icon: "hash" };
+  const subject = getSubjectByKey(subjectKey || "matematik") || { key: "matematik", label: "Matematik", color: "#EBAE63", icon: "hash" };
   const topic = topicName || "Çalışma";
 
   const [modeKey, setModeKey] = useState("FREE");

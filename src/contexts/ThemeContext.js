@@ -8,7 +8,7 @@ const STORAGE_KEY = "@maraton:themePref";
 
 export function ThemeProvider({ children }) {
   const system = useColorScheme();
-  const [pref, setPrefState] = useState("dark");
+  const [pref, setPrefState] = useState("system");
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)

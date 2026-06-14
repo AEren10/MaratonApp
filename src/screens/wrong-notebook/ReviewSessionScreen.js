@@ -10,19 +10,20 @@ import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQ
 import { getWrongQuestionImageUrl } from "../../supabase/storage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
+import * as haptic from "../../lib/haptics";
 
 const GRADES = [
-  { grade: 0, label: "Hatırlamıyorum", color: "#EF4444", icon: "x" },
-  { grade: 1, label: "Zorlandım", color: "#F5A623", icon: "alert" },
-  { grade: 3, label: "Biliyorum", color: "#34D399", icon: "check" },
+  { grade: 0, label: "Hatırlamıyorum", color: "#F2706E", icon: "x" },
+  { grade: 1, label: "Zorlandım", color: "#EBAE63", icon: "alert" },
+  { grade: 3, label: "Biliyorum", color: "#4ECE8E", icon: "check" },
 ];
 
 function resolveSubject(raw) {
   if (typeof raw === "string") {
     const f = getSubjectByKey(raw);
-    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: "#A0A0B0", icon: "bookOpen" };
+    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: "#9A9EAB", icon: "bookOpen" };
   }
-  return raw || { label: "?", color: "#A0A0B0", icon: "bookOpen" };
+  return raw || { label: "?", color: "#9A9EAB", icon: "bookOpen" };
 }
 
 export default function ReviewSessionScreen() {
@@ -35,7 +36,7 @@ export default function ReviewSessionScreen() {
   const [done, setDone] = useState(0);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) { setLoading(false); return; }
     getDueWrongQuestions(user.id)
       .then((rows) => setQueue(rows))
       .catch(() => {})
@@ -46,6 +47,9 @@ export default function ReviewSessionScreen() {
 
   const grade = useCallback(async (g) => {
     if (!current) return;
+    if (g >= 3) haptic.success();
+    else if (g <= 0) haptic.error();
+    else haptic.tap();
     const updates = computeNextReview(current, g);
     reviewWrongQuestion(current.id, updates).catch(() => {});
     setDone((d) => d + 1);

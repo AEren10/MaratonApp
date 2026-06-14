@@ -24,7 +24,7 @@ function Stepper({ label, value, onChange, max }) {
       <Text style={s.stepLabel}>{label}</Text>
       <View style={s.stepCtrl}>
         <Pressable onPress={() => onChange(Math.max(0, value - 1))} style={s.stepBtn}>
-          <Icon name="x" size={14} color={C.text} />
+          <Icon name="minus" size={14} color={C.text} />
         </Pressable>
         <Text style={s.stepValue}>{value.toFixed(1)}</Text>
         <Pressable onPress={() => onChange(Math.min(max, value + 1))} style={s.stepBtn}>
@@ -49,13 +49,24 @@ export default function RankSimulatorScreen() {
 
   const [tytNet, setTytNet] = useState(baseTyt);
   const [aytNet, setAytNet] = useState(baseAyt);
+  const [touched, setTouched] = useState(false);
   const [targetId, setTargetId] = useState(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+
+  // Trials async geldiğinde (kullanıcı elle oynamadıysa) netleri son denemeye senkronla.
+  useEffect(() => {
+    if (touched) return;
+    setTytNet(baseTyt);
+    setAytNet(baseAyt);
+  }, [baseTyt, baseAyt, touched]);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
     getProfile(user.id).then((p) => { if (p?.target_program_id) setTargetId(p.target_program_id); }).catch(() => {});
   }, [user?.id]);
+
+  const onTyt = (v) => { setTouched(true); setTytNet(v); };
+  const onAyt = (v) => { setTouched(true); setAytNet(v); };
 
   const baseRank = useMemo(() => estimateRank({ tytNet: baseTyt, aytNet: baseAyt, type }), [baseTyt, baseAyt, type]);
   const simRank = useMemo(() => estimateRank({ tytNet, aytNet, type }), [tytNet, aytNet, type]);
@@ -120,9 +131,9 @@ export default function RankSimulatorScreen() {
         {/* Net ayarı */}
         <Text style={s.sectionTitle}>NETLERİNİ DENE</Text>
         <View style={s.stepCard}>
-          <Stepper label="TYT toplam net" value={tytNet} onChange={setTytNet} max={120} />
-          <Stepper label="AYT toplam net" value={aytNet} onChange={setAytNet} max={80} />
-          <Pressable onPress={() => { setTytNet(baseTyt); setAytNet(baseAyt); }} style={s.resetBtn}>
+          <Stepper label="TYT toplam net" value={tytNet} onChange={onTyt} max={120} />
+          <Stepper label="AYT toplam net" value={aytNet} onChange={onAyt} max={80} />
+          <Pressable onPress={() => { setTouched(false); setTytNet(baseTyt); setAytNet(baseAyt); }} style={s.resetBtn}>
             <Icon name="refresh" size={14} color={C.sec} />
             <Text style={s.resetText}>Son denemene sıfırla</Text>
           </Pressable>

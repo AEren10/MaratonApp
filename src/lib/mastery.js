@@ -5,9 +5,9 @@
 //   yeşil (ustalaştın): >= 20 soru ve > %80 doğruluk
 
 const COLORS = {
-  mastered: "#34D399", // yeşil
-  improving: "#F5A623", // sarı/amber
-  starter: "#6B6B7B", // gri (muted)
+  mastered: "#4ECE8E", // yeşil
+  improving: "#EBAE63", // sarı/amber
+  starter: "#686C7A", // gri (muted)
 };
 
 export function getMastery({ q = 0, acc = 0 } = {}) {

@@ -18,9 +18,9 @@ function relativeDate(iso) {
 function resolveSubject(raw) {
   if (typeof raw === "string") {
     const found = getSubjectByKey(raw);
-    return found ? { ...found, short: found.label } : { key: raw, label: raw, short: raw, color: "#A0A0B0", icon: "bookOpen" };
+    return found ? { ...found, short: found.label } : { key: raw, label: raw, short: raw, color: "#9A9EAB", icon: "bookOpen" };
   }
-  return raw || { key: "?", short: "?", color: "#A0A0B0", icon: "bookOpen" };
+  return raw || { key: "?", short: "?", color: "#9A9EAB", icon: "bookOpen" };
 }
 
 export function WrongCard({ item, onPress, onResolve }) {

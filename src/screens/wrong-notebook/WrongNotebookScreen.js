@@ -11,6 +11,7 @@ import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useGamification } from "../../hooks/useGamification";
+import * as haptic from "../../lib/haptics";
 
 import { WrongCard } from "./components/WrongCard";
 import { FilterChips } from "./components/FilterChips";
@@ -80,6 +81,7 @@ export default function WrongNotebookScreen() {
       prev.map((it) => (it.id === id ? { ...it, is_resolved: !it.is_resolved } : it)),
     );
     if (!wasResolved) {
+      haptic.success();
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
       try { await resolveWrongQuestion(id); } catch {}
     }

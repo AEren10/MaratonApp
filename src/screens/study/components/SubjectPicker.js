@@ -3,10 +3,10 @@ import { IconBox } from "../../../components/design";
 import { C, SPACING } from "../../../themes/tokens";
 
 const SUBJECTS = [
-  { key: "turkce", name: "Turkce", color: "#60A5FA", icon: "bookOpen" },
-  { key: "matematik", name: "Matematik", color: "#F5A623", icon: "hash" },
-  { key: "fen", name: "Fen Bilimleri", color: "#34D399", icon: "activity" },
-  { key: "sosyal", name: "Sosyal Bilimler", color: "#A78BFA", icon: "layers" },
+  { key: "turkce", name: "Turkce", color: "#6FA8F2", icon: "bookOpen" },
+  { key: "matematik", name: "Matematik", color: "#EBAE63", icon: "hash" },
+  { key: "fen", name: "Fen Bilimleri", color: "#4ECE8E", icon: "activity" },
+  { key: "sosyal", name: "Sosyal Bilimler", color: "#A99BF5", icon: "layers" },
 ];
 
 export function SubjectPicker({ selected, onSelect }) {

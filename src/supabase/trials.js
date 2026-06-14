@@ -15,7 +15,7 @@ export const getTrialById = async (id) => {
     .from("trials")
     .select("*, trial_subjects(*)")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 };

@@ -23,7 +23,7 @@ export default function AddWrongScreen() {
   const { user } = useAuth();
   const { subjects } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
-  const [subject, setSubject] = useState(() => subjects[1] || subjects[0] || { key: "matematik", label: "Matematik", color: "#F5A623", icon: "hash" });
+  const [subject, setSubject] = useState(() => subjects[1] || subjects[0] || { key: "matematik", label: "Matematik", color: "#EBAE63", icon: "hash" });
   const [topic, setTopic] = useState("");
   const [topicSource, setTopicSource] = useState(null);
   const [pickerOpen, setPickerOpen] = useState(false);

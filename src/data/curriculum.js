@@ -5,7 +5,7 @@ export const TYT_DERSLER = [
   {
     key: "turkce",
     label: "Türkçe",
-    color: "#60A5FA",
+    color: "#6FA8F2",
     icon: "bookOpen",
     questionCount: 40,
     exam: "tyt",
@@ -32,7 +32,7 @@ export const TYT_DERSLER = [
   {
     key: "matematik",
     label: "Matematik",
-    color: "#F5A623",
+    color: "#EBAE63",
     icon: "hash",
     questionCount: 40,
     exam: "tyt",
@@ -78,7 +78,7 @@ export const TYT_DERSLER = [
   {
     key: "fizik",
     label: "Fizik",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "zap",
     questionCount: 7,
     exam: "tyt",
@@ -99,7 +99,7 @@ export const TYT_DERSLER = [
   {
     key: "kimya",
     label: "Kimya",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "flask",
     questionCount: 7,
     exam: "tyt",
@@ -117,7 +117,7 @@ export const TYT_DERSLER = [
   {
     key: "biyoloji",
     label: "Biyoloji",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "heart",
     questionCount: 6,
     exam: "tyt",
@@ -136,7 +136,7 @@ export const TYT_DERSLER = [
   {
     key: "tarih",
     label: "Tarih",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "clock",
     questionCount: 5,
     exam: "tyt",
@@ -156,7 +156,7 @@ export const TYT_DERSLER = [
   {
     key: "cografya",
     label: "Coğrafya",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "globe",
     questionCount: 5,
     exam: "tyt",
@@ -177,7 +177,7 @@ export const TYT_DERSLER = [
   {
     key: "felsefe",
     label: "Felsefe",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "layers",
     questionCount: 5,
     exam: "tyt",
@@ -193,7 +193,7 @@ export const TYT_DERSLER = [
   {
     key: "din",
     label: "Din Kültürü",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "star",
     questionCount: 5,
     exam: "tyt",
@@ -213,7 +213,7 @@ export const AYT_SAY_DERSLER = [
   {
     key: "ayt_matematik",
     label: "Matematik",
-    color: "#F5A623",
+    color: "#EBAE63",
     icon: "hash",
     questionCount: 40,
     exam: "ayt",
@@ -249,7 +249,7 @@ export const AYT_SAY_DERSLER = [
   {
     key: "ayt_fizik",
     label: "Fizik",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "zap",
     questionCount: 14,
     exam: "ayt",
@@ -274,7 +274,7 @@ export const AYT_SAY_DERSLER = [
   {
     key: "ayt_kimya",
     label: "Kimya",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "flask",
     questionCount: 13,
     exam: "ayt",
@@ -298,7 +298,7 @@ export const AYT_SAY_DERSLER = [
   {
     key: "ayt_biyoloji",
     label: "Biyoloji",
-    color: "#34D399",
+    color: "#4ECE8E",
     icon: "heart",
     questionCount: 13,
     exam: "ayt",
@@ -330,7 +330,7 @@ export const AYT_EA_DERSLER = [
   {
     key: "ayt_edebiyat",
     label: "Türk Dili ve Edebiyatı",
-    color: "#60A5FA",
+    color: "#6FA8F2",
     icon: "bookOpen",
     questionCount: 24,
     exam: "ayt",
@@ -356,7 +356,7 @@ export const AYT_EA_DERSLER = [
   {
     key: "ayt_ea_matematik",
     label: "Matematik",
-    color: "#F5A623",
+    color: "#EBAE63",
     icon: "hash",
     questionCount: 40,
     exam: "ayt",
@@ -387,7 +387,7 @@ export const AYT_EA_DERSLER = [
   {
     key: "ayt_tarih_ea",
     label: "Tarih",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "clock",
     questionCount: 10,
     exam: "ayt",
@@ -406,7 +406,7 @@ export const AYT_EA_DERSLER = [
   {
     key: "ayt_cografya_ea",
     label: "Coğrafya",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "globe",
     questionCount: 6,
     exam: "ayt",
@@ -426,7 +426,7 @@ export const AYT_SOZ_DERSLER = [
   {
     key: "ayt_edebiyat_soz",
     label: "Türk Dili ve Edebiyatı",
-    color: "#60A5FA",
+    color: "#6FA8F2",
     icon: "bookOpen",
     questionCount: 24,
     exam: "ayt",
@@ -452,7 +452,7 @@ export const AYT_SOZ_DERSLER = [
   {
     key: "ayt_tarih_soz",
     label: "Tarih",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "clock",
     questionCount: 10,
     exam: "ayt",
@@ -471,7 +471,7 @@ export const AYT_SOZ_DERSLER = [
   {
     key: "ayt_cografya_soz",
     label: "Coğrafya",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "globe",
     questionCount: 24,
     exam: "ayt",
@@ -492,7 +492,7 @@ export const AYT_SOZ_DERSLER = [
   {
     key: "ayt_felsefe_soz",
     label: "Felsefe Grubu",
-    color: "#A78BFA",
+    color: "#A99BF5",
     icon: "layers",
     questionCount: 24,
     exam: "ayt",
@@ -517,7 +517,7 @@ export const YDT_DERSLER = [
   {
     key: "ydt_ingilizce",
     label: "İngilizce",
-    color: "#2DD4BF",
+    color: "#46C7B0",
     icon: "globe",
     questionCount: 80,
     exam: "ydt",

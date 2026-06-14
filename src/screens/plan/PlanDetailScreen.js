@@ -11,6 +11,7 @@ import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectAdHocTasks } from "../../store/slices/planSlice";
 import { usePlanContext } from "../../hooks/usePlanContext";
+import * as haptic from "../../lib/haptics";
 import { PlanHeader } from "./components/PlanHeader";
 import { PlanTaskItem } from "./components/PlanTaskItem";
 import { TaskReasonSheet } from "./components/TaskReasonSheet";
@@ -41,7 +42,7 @@ export default function PlanDetailScreen() {
       const subj = getSubjectByKey(t.subject);
       return {
         id: t.id,
-        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || "#F5A623", icon: "bookOpen" },
+        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || "#EBAE63", icon: "bookOpen" },
         topic: t.topic ? `${t.subjectLabel} · ${t.topic}` : t.subjectLabel,
         topicKey: t.topic,
         q: t.questionCount,
@@ -74,7 +75,11 @@ export default function PlanDetailScreen() {
 
   const toggleTask = useCallback((id) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        if (!t.done) haptic.success();
+        return { ...t, done: !t.done };
+      })
     );
   }, []);
 

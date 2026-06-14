@@ -3,10 +3,10 @@ import { C } from "../../../themes/tokens";
 
 const FILTERS = [
   { key: "all", short: "Tümü", color: C.amber },
-  { key: "turkce", short: "Türkçe", color: "#60A5FA" },
-  { key: "matematik", short: "Mat", color: "#F5A623" },
-  { key: "fen", short: "Fen", color: "#34D399" },
-  { key: "sosyal", short: "Sosyal", color: "#A78BFA" },
+  { key: "turkce", short: "Türkçe", color: "#6FA8F2" },
+  { key: "matematik", short: "Mat", color: "#EBAE63" },
+  { key: "fen", short: "Fen", color: "#4ECE8E" },
+  { key: "sosyal", short: "Sosyal", color: "#A99BF5" },
 ];
 
 export function FilterChips({ active, onChange, status, onStatusChange }) {

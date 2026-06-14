@@ -35,11 +35,11 @@ function ruleBasedSuggestions({ weakAreas }) {
 
   if (!sorted.length) {
     return [
-      { title: "Düzenli tekrar", body: "Henüz veri yok. Bir-iki deneme gir, sana özel öneri oluşturalım.", color: "#A0A0B0" },
+      { title: "Düzenli tekrar", body: "Henüz veri yok. Bir-iki deneme gir, sana özel öneri oluşturalım.", color: "#9A9EAB" },
     ];
   }
   return sorted.map(([key, pct]) => {
-    const subj = ALL_SUBJECTS.find((s) => s.key === key) || { name: key, color: "#A0A0B0" };
+    const subj = ALL_SUBJECTS.find((s) => s.key === key) || { name: key, color: "#9A9EAB" };
     const advice =
       pct < 30 ? "Temel kavramlardan başla, video + kitap karması işe yarar."
       : pct < 50 ? "Yeni konu çalışmadan önce eski denemelerindeki yanlışlarını tekrarla."
@@ -94,7 +94,7 @@ async function callClaude(promptText) {
       return {
         title: a.baslik,
         body: a.icerik,
-        color: subj?.color || "#F5A623",
+        color: subj?.color || "#EBAE63",
         subjectKey: a.ders,
       };
     });

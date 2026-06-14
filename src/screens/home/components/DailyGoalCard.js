@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import { ProgressRing, Icon } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { C, PASTEL } from "../../../themes/tokens";
 
 // Madde 1: "Bugün kaç soru" mikro-hedef halkası.
 // solved: bugün çözülen toplam soru, goal: kullanıcı hedefi.
@@ -9,7 +9,7 @@ export function DailyGoalCard({ solved, goal, onPress }) {
   const pct = solved / safeGoal;
   const done = solved >= safeGoal;
   const remaining = Math.max(0, safeGoal - solved);
-  const ringColor = done ? C.green : C.amber;
+  const ringColor = done ? PASTEL.mint.solid : PASTEL.gold.solid;
 
   return (
     <Pressable
@@ -18,7 +18,7 @@ export function DailyGoalCard({ solved, goal, onPress }) {
         backgroundColor: C.surface,
         borderRadius: 24,
         borderWidth: 1,
-        borderColor: done ? C.green : C.border,
+        borderColor: done ? PASTEL.mint.solid : C.border,
         padding: 16,
         flexDirection: "row",
         alignItems: "center",

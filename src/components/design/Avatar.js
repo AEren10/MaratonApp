@@ -1,7 +1,7 @@
 import { View, Text, Image } from "react-native";
 import { C } from "../../themes/tokens";
 
-const PALETTE = ["#60A5FA", "#F5A623", "#34D399", "#A78BFA", "#FBBF24", "#2DD4BF"];
+const PALETTE = ["#6FA8F2", "#EBAE63", "#4ECE8E", "#A99BF5", "#F2C879", "#46C7B0"];
 
 function hashColor(text = "") {
   let sum = 0;

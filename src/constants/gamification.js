@@ -45,7 +45,7 @@ export const BADGES = [
   { id: "questions_1000", name: "Binyıldız", icon: "award", color: C.green, desc: "1000 soru çöz", condition: { type: "questions", value: 1000 } },
   { id: "trial_first", name: "İlk Deneme", icon: "chart", color: C.blue, desc: "İlk denemeni gir", condition: { type: "trials", value: 1 } },
   { id: "trial_5", name: "Deneyimli", icon: "chart", color: C.purple, desc: "5 deneme gir", condition: { type: "trials", value: 5 } },
-  { id: "trial_10", name: "Deneme Ustası", icon: "chart", color: "#2DD4BF", desc: "10 deneme gir", condition: { type: "trials", value: 10 } },
+  { id: "trial_10", name: "Deneme Ustası", icon: "chart", color: "#46C7B0", desc: "10 deneme gir", condition: { type: "trials", value: 10 } },
   { id: "net_80", name: "80+ Net", icon: "trendUp", color: C.green, desc: "Bir denemede 80+ net yap", condition: { type: "max_net", value: 80 } },
   { id: "net_100", name: "Yüzlük Net", icon: "trendUp", color: "#FFD700", desc: "Bir denemede 100+ net yap", condition: { type: "max_net", value: 100 } },
   { id: "wrong_10", name: "Hata Avcısı", icon: "notebook", color: C.red, desc: "10 yanlışı çöz", condition: { type: "wrongs_resolved", value: 10 } },
@@ -56,7 +56,7 @@ export const BADGES = [
 export const LEAGUE_TIERS = [
   { key: "bronz", name: "Bronz Lig", icon: "shield", color: "#CD7F47", minRank: 0 },
   { key: "gumus", name: "Gümüş Lig", icon: "shield", color: "#C0C5CE", minRank: 100 },
-  { key: "altin", name: "Altın Lig", icon: "shield", color: "#F5A623", minRank: 500 },
-  { key: "elmas", name: "Elmas Lig", icon: "shield", color: "#60A5FA", minRank: 2000 },
-  { key: "obsidyen", name: "Obsidyen Lig", icon: "shield", color: "#A78BFA", minRank: 5000 },
+  { key: "altin", name: "Altın Lig", icon: "shield", color: "#EBAE63", minRank: 500 },
+  { key: "elmas", name: "Elmas Lig", icon: "shield", color: "#6FA8F2", minRank: 2000 },
+  { key: "obsidyen", name: "Obsidyen Lig", icon: "shield", color: "#A99BF5", minRank: 5000 },
 ];

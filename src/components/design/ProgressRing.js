@@ -14,8 +14,8 @@ export function ProgressRing({
   size = 56,
   stroke = 6,
   value = 0,
-  color = "#F5A623",
-  trackColor = "#2A2A36",
+  color = "#EBAE63",
+  trackColor = "#282A34",
   children,
   animated = true,
 }) {

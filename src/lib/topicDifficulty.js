@@ -4,9 +4,9 @@
 // İleride topic_progress agregesi geldiğinde bu sabitler gerçek oranla değişebilir.
 
 const C = {
-  red: "#EF4444",
-  amber: "#F5A623",
-  green: "#34D399",
+  red: "#F2706E",
+  amber: "#EBAE63",
+  green: "#4ECE8E",
 };
 
 // Zorluk → ortalama doğruluk oranı (%) ve net etkisi.

@@ -2,6 +2,7 @@ import Svg, { Path, Circle, Polyline, Line, Polygon, Rect, G } from "react-nativ
 
 const ICONS = {
   zap: <Polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+  minus: <Line x1="5" y1="12" x2="19" y2="12" />,
   flame: (
     <Path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.4 0 2.5-1.1 2.5-2.5 0-3-2-4.5-2-7 0 1.5-1 3-2 4-1 .8-1.5 2-1 3.5z M12 2c0 2 1 3.5 2.5 5 2 2 3.5 4 3.5 7a6 6 0 0 1-12 0c0-1.4.4-2.6 1-3.5C9 8 9.5 5.5 9 3c1 1 2 2 3 2-.5-1.5-.5-3 0-3z" />
   ),

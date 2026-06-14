@@ -11,11 +11,14 @@ export async function listMyChallenges(userId) {
 }
 
 export async function createChallenge({ opponentId, metric, target, days = 7 }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Oturum yok");
   const today = new Date();
   const endsOn = new Date(today.getTime() + days * 86400000);
   const { data, error } = await supabase
     .from("challenges")
     .insert({
+      creator_id: user.id,
       opponent_id: opponentId,
       metric,
       target,
@@ -39,8 +42,7 @@ export async function cancelChallenge(id) {
 export async function bumpMyProgress(id, side, value) {
   // side is 'creator' or 'opponent'
   const field = side === "creator" ? "creator_progress" : "opponent_progress";
-  const { data, error } = await supabase.rpc("noop").single().then(() => ({ data: null, error: null })).catch(() => ({ data: null, error: null }));
-  // Simple non-atomic increment fallback
+  // Non-atomic increment (oku + yaz)
   const { data: existing, error: getErr } = await supabase
     .from("challenges")
     .select(field)

@@ -14,7 +14,7 @@ import { usePlanContext } from "../../hooks/usePlanContext";
 import { useAppDispatch } from "../../store/hooks";
 import { addAdHocTask } from "../../store/slices/planSlice";
 import { getSubjectByKey } from "../../themes/subjects";
-import { C, SPACING } from "../../themes/tokens";
+import { C, SPACING, PASTEL } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
@@ -29,24 +29,24 @@ import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { HomeHeader } from "./components/HomeHeader";
-import { DailyGoalCard } from "./components/DailyGoalCard";
+import { GoalHalo } from "./components/GoalHalo";
 import { PlanCard } from "./components/PlanCard";
-import { StatsBento } from "./components/StatsBento";
+import { StatBubbles } from "./components/StatBubbles";
+import { RoundActions } from "./components/RoundActions";
 import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
-import { QuickActions } from "./components/QuickActions";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { DailyActionCard } from "./components/DailyActionCard";
 import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
 import { ALL_SUBJECTS } from "../trial/trialTypes";
 
 const QUICK_ITEMS = [
-  { icon: "edit", label: "Kaydet", c: C.amber, go: SCREENS.ADD_STUDY },
-  { icon: "chart", label: "Deneme Gir", c: C.blue, go: SCREENS.TRIAL_ENTRY },
-  { icon: "camera", label: "Yanlış Ekle", c: C.red, go: SCREENS.ADD_WRONG },
-  { icon: "notebook", label: "Yanlış Defteri", c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
-  { icon: "barChart", label: "Net Simülatörü", c: C.teal, go: SCREENS.RANK_SIMULATOR },
-  { icon: "calendar", label: "Yol Haritası", c: C.green, go: SCREENS.ROADMAP },
+  { icon: "edit", label: "Kaydet", c: PASTEL.gold.solid, go: SCREENS.ADD_STUDY },
+  { icon: "chart", label: "Deneme Gir", c: PASTEL.blue.solid, go: SCREENS.TRIAL_ENTRY },
+  { icon: "camera", label: "Yanlış Ekle", c: PASTEL.rose.solid, go: SCREENS.ADD_WRONG },
+  { icon: "notebook", label: "Yanlış Defteri", c: PASTEL.violet.solid, go: SCREENS.WRONG_NOTEBOOK },
+  { icon: "barChart", label: "Net Simülatörü", c: PASTEL.sky.solid, go: SCREENS.RANK_SIMULATOR },
+  { icon: "calendar", label: "Yol Haritası", c: PASTEL.mint.solid, go: SCREENS.ROADMAP },
 ];
 
 function HomeSkeleton() {
@@ -214,15 +214,30 @@ export default function HomeScreen() {
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
-        <View style={{ gap: 12 }}>
-          <AnimatedCard delay={0}>
-            <DailyGoalCard
-              solved={solvedToday}
-              goal={dailyGoal}
-              onPress={go(SCREENS.ADD_STUDY)}
-            />
-          </AnimatedCard>
+        <GoalHalo
+          solved={solvedToday}
+          goal={dailyGoal}
+          streak={streak}
+          onPress={go(SCREENS.ADD_STUDY)}
+        />
 
+        <View style={{ marginTop: 18, marginBottom: 16 }}>
+          <StatBubbles
+            streak={streak}
+            best={gStats.streak || streak}
+            net={lastDeneme.net}
+            trend={lastDeneme.trend}
+            xp={xp}
+            tier={xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz"}
+            onStreak={go(SCREENS.PROFILE)}
+            onNet={go(SCREENS.ANALYSIS)}
+            onLeague={go(SCREENS.LEAGUE)}
+          />
+        </View>
+
+        <RoundActions items={QUICK_ITEMS} onPress={(q) => q.go && navigation.navigate(q.go)} />
+
+        <View style={{ gap: 12, marginTop: 18 }}>
           <AnimatedCard delay={40}>
             <PlanCard
               plan={plan}
@@ -239,19 +254,6 @@ export default function HomeScreen() {
               </Text>
             </Pressable>
           ) : null}
-
-          <AnimatedCard delay={80}>
-            <StatsBento
-              deneme={{ net: lastDeneme.net, trend: lastDeneme.trend }}
-              streak={{ value: streak, best: gStats.streak || streak, freezeCount }}
-              league={{ tier: xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz", xp }}
-              live={{ count: 0 }}
-              onDeneme={go(SCREENS.ANALYSIS)}
-              onStreak={go(SCREENS.PROFILE)}
-              onLeague={go(SCREENS.LEAGUE)}
-              onLive={go(SCREENS.STUDY_TIMER)}
-            />
-          </AnimatedCard>
 
           <AnimatedCard delay={220}>
             <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
@@ -304,13 +306,6 @@ export default function HomeScreen() {
             <MotivCard message={getMotivMessage({ totalQuestions: gStats.totalQuestions || 0, streak, totalTrials: gStats.totalTrials || 0, xp })} onPress={go(SCREENS.ANALYSIS)} />
           </AnimatedCard>
         </View>
-
-        <AnimatedCard delay={400} style={{ marginTop: 22 }}>
-          <QuickActions
-            items={QUICK_ITEMS}
-            onPress={(q) => q.go && navigation.navigate(q.go)}
-          />
-        </AnimatedCard>
       </ScrollView>
 
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />

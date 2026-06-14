@@ -22,7 +22,7 @@ const SLIDES = [
   },
   {
     icon: "flame",
-    color: "#EF4444",
+    color: "#F2706E",
     title: "Seri Olustur",
     desc: "Gunluk calisma serini koru, rozet kazan ve ligde yuksel.",
   },

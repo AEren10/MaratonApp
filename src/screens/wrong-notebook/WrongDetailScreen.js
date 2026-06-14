@@ -41,7 +41,7 @@ export default function WrongDetailScreen() {
 
   const item = passedItem || {};
   const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
-  const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: "#A0A0B0", icon: "bookOpen" };
+  const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: "#9A9EAB", icon: "bookOpen" };
   const imageUrl = item.image_path ? getWrongQuestionImageUrl(item.image_path) : null;
   const date = new Date(item.created_at).toLocaleDateString("tr-TR", {
     day: "numeric", month: "long", year: "numeric",
