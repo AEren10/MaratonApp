@@ -40,19 +40,6 @@ export function BentoCard({
       ]}
       {...rest}
     >
-      {accent ? (
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            backgroundColor: accent,
-            opacity: 0.6,
-          }}
-        />
-      ) : null}
       {children}
     </View>
   );

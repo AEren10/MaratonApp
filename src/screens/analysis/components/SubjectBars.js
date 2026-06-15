@@ -8,6 +8,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { GlassCard } from "../../../components/design";
 
 function Bar({ name, color, net, max, delay, onPress }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
@@ -57,12 +58,9 @@ export function SubjectBars({ bars, onBarPress }) {
   return (
     <View style={{ gap: SPACING.md }}>
       <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Ders Bazli</Text>
-      <View
+      <GlassCard
+        radius={24}
         style={{
-          backgroundColor: C.surface,
-          borderRadius: 24,
-          borderWidth: 1,
-          borderColor: C.border,
           padding: SPACING.lg,
           gap: SPACING.md,
         }}
@@ -78,7 +76,7 @@ export function SubjectBars({ bars, onBarPress }) {
             onPress={() => onBarPress?.(b)}
           />
         ))}
-      </View>
+      </GlassCard>
     </View>
   );
 }

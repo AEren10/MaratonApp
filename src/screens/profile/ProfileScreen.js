@@ -6,6 +6,8 @@ import { C } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
+import { GlowBackground, WARM_GLOW } from "../../components/design";
+import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
 import { useAppSelector } from "../../store/hooks";
 import { selectLevel, selectXP, selectBadgeIds, selectStats } from "../../store/slices/gamificationSlice";
@@ -101,7 +103,9 @@ export default function ProfileScreen() {
   }, [logout]);
 
   return (
+    <SwipeToHome>
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
@@ -140,5 +144,6 @@ export default function ProfileScreen() {
         </AnimatedCard>
       </ScrollView>
     </SafeAreaView>
+    </SwipeToHome>
   );
 }

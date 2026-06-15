@@ -14,15 +14,15 @@ function RoundAction({ item, onPress }) {
       onPress={() => { haptic.tap(); onPress(item); }}
       style={s.item}
     >
-      <Animated.View style={[s.circle, { backgroundColor: item.c + "26" }, style]}>
-        <Icon name={item.icon} size={22} color={item.c} />
+      <Animated.View style={[s.circle, { backgroundColor: item.c }, style]}>
+        <Icon name={item.icon} size={24} color="#13211B" sw={2.2} />
       </Animated.View>
       <Text style={s.label} numberOfLines={1}>{item.label}</Text>
     </Pressable>
   );
 }
 
-// Halo altı yuvarlak renkli hızlı aksiyonlar.
+// Büyük, solid renkli, birbirinden farklı hızlı aksiyonlar (basınca küçülme + haptic).
 export function RoundActions({ items, onPress }) {
   return (
     <View style={s.row}>
@@ -35,7 +35,11 @@ export function RoundActions({ items, onPress }) {
 
 const s = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between" },
-  item: { alignItems: "center", flex: 1, gap: 6 },
-  circle: { width: 52, height: 52, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  label: { ...TYPOGRAPHY.micro, color: C.sec, fontSize: 10 },
+  item: { alignItems: "center", flex: 1, gap: 8 },
+  circle: {
+    width: 62, height: 62, borderRadius: 22,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4,
+  },
+  label: { ...TYPOGRAPHY.captionMedium, color: C.sec, fontSize: 11 },
 });

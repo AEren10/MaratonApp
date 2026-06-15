@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { C, TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
-import { Icon, Avatar, AnimatedCard } from "../../components/design";
+import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
@@ -15,8 +15,7 @@ const POLL_MS = 30000;
 function TierHeader({ tier, nextTier, myScore, myRank }) {
   return (
     <AnimatedCard delay={0}>
-      <View style={s.tierCard}>
-        <View style={[s.tierAccent, { backgroundColor: tier.color }]} />
+      <GlassCard radius={24} color={tier.color} style={s.tierCard}>
         <View style={s.tierRow}>
           <Icon name={tier.icon} size={32} color={tier.color} />
           <View style={{ marginLeft: 12, flex: 1 }}>
@@ -40,7 +39,7 @@ function TierHeader({ tier, nextTier, myScore, myRank }) {
             </Text>
           </View>
         )}
-      </View>
+      </GlassCard>
     </AnimatedCard>
   );
 }
@@ -170,6 +169,7 @@ export default function LeagueScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
+      <GlowBackground blobs={WARM_GLOW} />
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={10} style={s.backBtn}>
           <Icon name="chevL" size={20} color={C.text} />
@@ -261,13 +261,8 @@ const s = StyleSheet.create({
   tabTextActive: { color: C.amber },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   tierCard: {
-    backgroundColor: C.surface,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: C.border,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
-    overflow: "hidden",
   },
   tierAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, opacity: 0.7 },
   tierRow: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg },

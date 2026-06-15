@@ -1,22 +1,11 @@
 import { View, Text, Pressable } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "../../../components/design";
+import { Icon, GlassCard } from "../../../components/design";
 import { C } from "../../../themes/tokens";
 
 export function WeakCard({ message, onPress }) {
   return (
     <Pressable onPress={onPress}>
-      <LinearGradient
-        colors={[C.red + "1A", C.surface]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          borderRadius: 24,
-          borderWidth: 1,
-          borderColor: C.red + "2E",
-          padding: 15,
-        }}
-      >
+      <GlassCard radius={24} intensity={36} style={{ padding: 15 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <View
             style={{
@@ -49,7 +38,7 @@ export function WeakCard({ message, onPress }) {
             </View>
           </View>
         </View>
-      </LinearGradient>
+      </GlassCard>
     </Pressable>
   );
 }

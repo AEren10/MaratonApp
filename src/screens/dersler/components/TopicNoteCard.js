@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { Icon } from "../../../components/design";
+import { Icon, GlassCard } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getTopicNote, saveTopicNote } from "../../../supabase/topicNotes";
 
@@ -34,7 +34,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
   const dirty = note !== saved;
 
   return (
-    <View style={s.card}>
+    <GlassCard radius={RADIUS.lg} style={s.card}>
       <View style={s.head}>
         <Icon name="edit" size={15} color={C.amber} />
         <Text style={s.title}>Konu Notum</Text>
@@ -52,12 +52,12 @@ export function TopicNoteCard({ subjectKey, topicName }) {
         multiline
         style={s.input}
       />
-    </View>
+    </GlassCard>
   );
 }
 
 const s = StyleSheet.create({
-  card: { backgroundColor: C.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.border, padding: SPACING.md, marginTop: SPACING.md },
+  card: { padding: SPACING.md, marginTop: SPACING.md },
   head: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm },
   title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 },
   saveBtn: { backgroundColor: C.amber, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.md, paddingVertical: 6 },

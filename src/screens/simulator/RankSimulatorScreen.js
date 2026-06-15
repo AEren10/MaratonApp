@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet, Modal, FlatList } from "
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -86,6 +86,7 @@ export default function RankSimulatorScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
+      <GlowBackground blobs={WARM_GLOW} />
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
@@ -96,7 +97,7 @@ export default function RankSimulatorScreen() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {/* Sıralama kartı */}
-        <View style={s.rankCard}>
+        <GlassCard radius={RADIUS.xxl} color={C.amber} style={s.rankCard}>
           <Text style={s.rankLabel}>Tahmini Sıralaman</Text>
           <View style={s.rankRow}>
             <Text style={s.rankOld}>{fmt(baseRank)}</Text>
@@ -106,10 +107,11 @@ export default function RankSimulatorScreen() {
           <Text style={s.netSummary}>
             TYT {tytNet.toFixed(1)} · AYT {aytNet.toFixed(1)} net
           </Text>
-        </View>
+        </GlassCard>
 
         {/* Hedef bölüm */}
-        <Pressable onPress={() => setPickerOpen(true)} style={s.targetCard}>
+        <Pressable onPress={() => setPickerOpen(true)} style={{ marginTop: SPACING.lg }}>
+          <GlassCard radius={RADIUS.xl} style={s.targetCard}>
           <View style={{ flex: 1 }}>
             <Text style={s.targetLabel}>HEDEF BÖLÜM</Text>
             {target ? (
@@ -126,18 +128,19 @@ export default function RankSimulatorScreen() {
             ) : null}
           </View>
           <Icon name="chevR" size={18} color={C.muted} />
+          </GlassCard>
         </Pressable>
 
         {/* Net ayarı */}
         <Text style={s.sectionTitle}>NETLERİNİ DENE</Text>
-        <View style={s.stepCard}>
+        <GlassCard radius={RADIUS.xl} style={s.stepCard}>
           <Stepper label="TYT toplam net" value={tytNet} onChange={onTyt} max={120} />
           <Stepper label="AYT toplam net" value={aytNet} onChange={onAyt} max={80} />
           <Pressable onPress={() => { setTouched(false); setTytNet(baseTyt); setAytNet(baseAyt); }} style={s.resetBtn}>
             <Icon name="refresh" size={14} color={C.sec} />
             <Text style={s.resetText}>Son denemene sıfırla</Text>
           </Pressable>
-        </View>
+        </GlassCard>
 
         <Text style={s.disclaimer}>{RANKING_DISCLAIMER}</Text>
       </ScrollView>
@@ -174,18 +177,18 @@ const s = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   title: { ...TYPOGRAPHY.subheading, color: C.text },
   scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  rankCard: { backgroundColor: C.surface, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: C.border, padding: SPACING.xl, alignItems: "center" },
+  rankCard: { padding: SPACING.xl, alignItems: "center" },
   rankLabel: { ...TYPOGRAPHY.label, color: C.muted },
   rankRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, marginTop: SPACING.sm },
   rankOld: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.muted, textDecorationLine: "line-through" },
   rankNew: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 34, color: C.amber, letterSpacing: -1 },
   netSummary: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.sm },
-  targetCard: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, padding: SPACING.lg, marginTop: SPACING.lg },
+  targetCard: { flexDirection: "row", alignItems: "center", padding: SPACING.lg },
   targetLabel: { ...TYPOGRAPHY.label, color: C.muted },
   targetName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: 2 },
   targetHint: { ...TYPOGRAPHY.caption, marginTop: 4 },
   sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
-  stepCard: { backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, padding: SPACING.lg, gap: SPACING.md },
+  stepCard: { padding: SPACING.lg, gap: SPACING.md },
   stepRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   stepLabel: { ...TYPOGRAPHY.bodyMedium, color: C.text },
   stepCtrl: { flexDirection: "row", alignItems: "center", gap: SPACING.md },

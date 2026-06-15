@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { Icon } from "../../../components/design";
+import { Icon, GlassCard } from "../../../components/design";
 
 const ITEMS = [
   { icon: "users", label: "Arkadaşlar", route: "Friends" },
@@ -17,15 +17,7 @@ const ITEMS = [
 
 export function SettingsMenu({ onNavigate, onLogout }) {
   return (
-    <View
-      style={{
-        backgroundColor: C.surface,
-        borderRadius: RADIUS.xxl,
-        borderWidth: 1,
-        borderColor: C.border,
-        overflow: "hidden",
-      }}
-    >
+    <GlassCard radius={RADIUS.xxl}>
       {ITEMS.map((item, i) => {
         const isLast = i === ITEMS.length - 1;
         const color = item.danger ? C.red : C.text;
@@ -65,6 +57,6 @@ export function SettingsMenu({ onNavigate, onLogout }) {
           </Pressable>
         );
       })}
-    </View>
+    </GlassCard>
   );
 }

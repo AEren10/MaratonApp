@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -48,7 +49,7 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <View style={styles.root} onLayout={onLayoutRootView}>
+    <GestureHandlerRootView style={styles.root} onLayout={onLayoutRootView}>
       <Provider store={store}>
         <ReduxHydrator />
         <SafeAreaProvider>
@@ -61,7 +62,7 @@ export default function App() {
           </AuthProvider>
         </SafeAreaProvider>
       </Provider>
-    </View>
+    </GestureHandlerRootView>
   );
 }
 

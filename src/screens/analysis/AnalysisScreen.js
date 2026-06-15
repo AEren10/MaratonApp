@@ -9,8 +9,9 @@ import { TRIAL_TYPES, ALL_SUBJECTS } from "../trial/trialTypes";
 import { useSync } from "../../contexts/DataSyncContext";
 import { C, TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
 
 import { LatestScore } from "./components/LatestScore";
@@ -145,7 +146,9 @@ export default function AnalysisScreen() {
   }
 
   return (
+    <SwipeToHome>
     <SafeAreaView edges={["top"]} style={s.safe}>
+      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
@@ -157,7 +160,7 @@ export default function AnalysisScreen() {
 
         <View style={s.content}>
           {deneme.empty ? (
-            <View style={s.emptyBox}>
+            <GlassCard radius={20} style={s.emptyBox}>
               <Icon name="chart" size={48} color={C.muted} />
               <Text style={s.emptyTitle}>Henüz deneme yok</Text>
               <Text style={s.emptySub}>
@@ -165,7 +168,7 @@ export default function AnalysisScreen() {
                   ? "Bir deneme girince burada görünecek"
                   : `${filter} denemesi henüz girmedin`}
               </Text>
-            </View>
+            </GlassCard>
           ) : (
             <>
               <AnimatedCard delay={0}>
@@ -219,6 +222,7 @@ export default function AnalysisScreen() {
         <Text style={s.fabText}>Deneme Gir</Text>
       </Pressable>
     </SafeAreaView>
+    </SwipeToHome>
   );
 }
 
@@ -228,10 +232,6 @@ const s = StyleSheet.create({
   title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
   content: { gap: SPACING.xl },
   emptyBox: {
-    backgroundColor: C.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: C.border,
     padding: SPACING.xxl,
     alignItems: "center",
     gap: SPACING.sm,

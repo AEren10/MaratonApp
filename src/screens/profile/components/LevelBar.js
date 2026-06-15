@@ -1,14 +1,13 @@
 import { View, Text } from "react-native";
 import { C, SPACING, RADIUS } from "../../../themes/tokens";
+import { GlassCard } from "../../../components/design";
 
 export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
   return (
-    <View
+    <GlassCard
+      radius={20}
+      color={C.amber}
       style={{
-        backgroundColor: C.surface,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: C.amber + "30",
         padding: SPACING.lg,
         marginBottom: SPACING.xxl,
       }}
@@ -59,6 +58,6 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
           Sonraki seviyeye {xpForNext - xpInLevel} XP
         </Text>
       )}
-    </View>
+    </GlassCard>
   );
 }

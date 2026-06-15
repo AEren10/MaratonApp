@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
-import { Icon, IconBox } from "../../components/design";
+import { Icon, IconBox, GlassCard } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useAppDispatch } from "../../store/hooks";
 import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
@@ -13,7 +13,7 @@ import { updateProfile } from "../../supabase/profiles";
 
 function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
   return (
-    <View style={styles.card}>
+    <GlassCard radius={RADIUS.xl} style={styles.card}>
       <View style={styles.row}>
         <IconBox icon={icon} color={color} size={36} rounded={10} />
         <View style={{ flex: 1 }}>
@@ -31,7 +31,7 @@ function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
           <Text style={styles.suffix}>{suffix}</Text>
         </View>
       </View>
-    </View>
+    </GlassCard>
   );
 }
 
@@ -157,10 +157,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   card: {
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    borderColor: C.border,
     padding: SPACING.md,
     marginBottom: SPACING.md,
   },

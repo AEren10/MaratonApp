@@ -6,7 +6,7 @@ import { C, SPACING, TYPOGRAPHY } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { useAuth } from "../../contexts/AuthContext";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
@@ -110,6 +110,7 @@ export default function WrongNotebookScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <GlowBackground blobs={WARM_GLOW} />
       <View
         style={{
           paddingHorizontal: 16,

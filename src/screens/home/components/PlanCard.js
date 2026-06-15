@@ -17,18 +17,6 @@ export function PlanCard({ plan, onPress, onStart }) {
         overflow: "hidden",
       }}
     >
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 2,
-          backgroundColor: C.amber,
-          opacity: 0.6,
-        }}
-      />
-
       <Pressable
         onPress={onPress}
         style={{

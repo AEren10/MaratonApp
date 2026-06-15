@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Trend } from "../../../components/design";
+import { Icon, Trend, GlassCard } from "../../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 
 const TYPE_BADGE = {
@@ -93,15 +93,7 @@ export function HistoryList({ history, onPress, onCompare }) {
         )}
       </View>
 
-      <View
-        style={{
-          backgroundColor: C.surface,
-          borderRadius: RADIUS.xxl,
-          borderWidth: 1,
-          borderColor: C.border,
-          overflow: "hidden",
-        }}
-      >
+      <GlassCard radius={RADIUS.xxl}>
         {history.map((h, i) => (
           <View key={h.id || h.date}>
             {i > 0 && (
@@ -110,7 +102,7 @@ export function HistoryList({ history, onPress, onCompare }) {
             <HistoryRow item={h} onPress={() => onPress?.(h)} />
           </View>
         ))}
-      </View>
+      </GlassCard>
     </View>
   );
 }

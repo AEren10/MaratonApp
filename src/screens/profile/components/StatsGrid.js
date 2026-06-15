@@ -1,7 +1,8 @@
 import { View, Text } from "react-native";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { GlassCard } from "../../../components/design";
 
-const TINTS = [C.amber + "0C", C.blue + "0C", C.green + "0C", C.purple + "0C"];
+const TINT_COLORS = [C.amber, C.blue, C.green, C.purple];
 
 export function StatsGrid({ stats }) {
   return (
@@ -14,15 +15,13 @@ export function StatsGrid({ stats }) {
       }}
     >
       {stats.map((s, i) => (
-        <View
+        <GlassCard
           key={i}
+          radius={RADIUS.xl}
+          color={TINT_COLORS[i]}
           style={{
             flex: 1,
             minWidth: "45%",
-            backgroundColor: TINTS[i] ?? C.surface,
-            borderRadius: RADIUS.xl,
-            borderWidth: 1,
-            borderColor: C.border,
             padding: SPACING.lg,
             alignItems: "center",
           }}
@@ -42,7 +41,7 @@ export function StatsGrid({ stats }) {
           <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>
             {s.l}
           </Text>
-        </View>
+        </GlassCard>
       ))}
     </View>
   );

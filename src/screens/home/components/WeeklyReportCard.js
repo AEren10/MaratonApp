@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Chip } from "../../../components/design";
+import { Icon, Chip, GlassCard } from "../../../components/design";
 import { C } from "../../../themes/tokens";
 
 function StatBlock({ value, label, color }) {
@@ -25,15 +25,7 @@ export function WeeklyReportCard({ report, onPress }) {
 
   return (
     <Pressable onPress={onPress}>
-      <View
-        style={{
-          backgroundColor: C.surface,
-          borderRadius: 24,
-          borderWidth: 1,
-          borderColor: C.border,
-          padding: 16,
-        }}
-      >
+      <GlassCard radius={24} intensity={36} style={{ padding: 16 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Icon name="calendar" size={16} color={C.blue} />
@@ -61,7 +53,7 @@ export function WeeklyReportCard({ report, onPress }) {
           <StatBlock value={report.activeDays} label="Aktif Gün" color={C.green} />
           <StatBlock value={report.trialCount} label="Deneme" color={C.purple} />
         </View>
-      </View>
+      </GlassCard>
     </Pressable>
   );
 }

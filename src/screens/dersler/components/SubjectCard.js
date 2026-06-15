@@ -7,7 +7,7 @@ import {
   UIManager,
   Platform,
 } from "react-native";
-import { IconBox, Icon } from "../../../components/design";
+import { IconBox, Icon, GlassCard } from "../../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { TopicRow } from "./TopicRow";
 import { masteryPercent } from "../../../lib/mastery";
@@ -53,27 +53,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
 
   return (
     <View>
-    <View
-      style={{
-        backgroundColor: C.surface,
-        borderRadius: RADIUS.xxl,
-        borderWidth: 1,
-        borderColor: open ? color + "40" : C.border,
-        overflow: "hidden",
-      }}
-    >
-      {/* Top accent line */}
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 2,
-          backgroundColor: color,
-          opacity: 0.5,
-        }}
-      />
+    <GlassCard color={color} radius={RADIUS.xxl} intensity={34}>
 
       <Pressable
         onPress={toggle}
@@ -168,7 +148,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
           ))}
         </View>
       ) : null}
-    </View>
+    </GlassCard>
     </View>
   );
 });

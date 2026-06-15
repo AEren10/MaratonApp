@@ -28,8 +28,10 @@ import { NudgeModal } from "../../components/common/NudgeModal";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
+import { GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
-import { GoalHalo } from "./components/GoalHalo";
+import { GoalTrack } from "./components/GoalTrack";
+import { PriorityCard } from "./components/PriorityCard";
 import { PlanCard } from "./components/PlanCard";
 import { StatBubbles } from "./components/StatBubbles";
 import { RoundActions } from "./components/RoundActions";
@@ -42,10 +44,8 @@ import { ALL_SUBJECTS } from "../trial/trialTypes";
 
 const QUICK_ITEMS = [
   { icon: "edit", label: "Kaydet", c: PASTEL.gold.solid, go: SCREENS.ADD_STUDY },
-  { icon: "chart", label: "Deneme Gir", c: PASTEL.blue.solid, go: SCREENS.TRIAL_ENTRY },
-  { icon: "camera", label: "Yanlış Ekle", c: PASTEL.rose.solid, go: SCREENS.ADD_WRONG },
-  { icon: "notebook", label: "Yanlış Defteri", c: PASTEL.violet.solid, go: SCREENS.WRONG_NOTEBOOK },
-  { icon: "barChart", label: "Net Simülatörü", c: PASTEL.sky.solid, go: SCREENS.RANK_SIMULATOR },
+  { icon: "chart", label: "Deneme", c: PASTEL.blue.solid, go: SCREENS.TRIAL_ENTRY },
+  { icon: "camera", label: "Yanlış", c: PASTEL.rose.solid, go: SCREENS.ADD_WRONG },
   { icon: "calendar", label: "Yol Haritası", c: PASTEL.mint.solid, go: SCREENS.ROADMAP },
 ];
 
@@ -202,6 +202,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
@@ -214,17 +215,15 @@ export default function HomeScreen() {
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
-        <GoalHalo
+        <GoalTrack
           solved={solvedToday}
           goal={dailyGoal}
-          streak={streak}
           onPress={go(SCREENS.ADD_STUDY)}
         />
 
-        <View style={{ marginTop: 18, marginBottom: 16 }}>
+        <View style={{ marginTop: 24, marginBottom: 24 }}>
           <StatBubbles
             streak={streak}
-            best={gStats.streak || streak}
             net={lastDeneme.net}
             trend={lastDeneme.trend}
             xp={xp}
@@ -237,51 +236,33 @@ export default function HomeScreen() {
 
         <RoundActions items={QUICK_ITEMS} onPress={(q) => q.go && navigation.navigate(q.go)} />
 
-        <View style={{ gap: 12, marginTop: 18 }}>
+        <View style={{ gap: 14, marginTop: 28 }}>
           <AnimatedCard delay={40}>
-            <PlanCard
-              plan={plan}
-              onPress={go(SCREENS.PLAN_DETAIL)}
-              onStart={go(SCREENS.PLAN_DETAIL)}
-            />
-          </AnimatedCard>
-
-          {topTask ? (
-            <Pressable onPress={go(SCREENS.PLAN_DETAIL)} style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, marginTop: -4 }}>
-              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: topTask.color || C.amber }} />
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted, flex: 1 }} numberOfLines={1}>
-                Öncelik: {topTask.topicLabel || topTask.subjectLabel} — {topTask.reason}
-              </Text>
-            </Pressable>
-          ) : null}
-
-          <AnimatedCard delay={220}>
-            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
+            <PriorityCard task={topTask} plan={plan} onStart={go(SCREENS.PLAN_DETAIL)} />
           </AnimatedCard>
 
           {planCtx.srDue > 0 ? (
-            <AnimatedCard delay={240}>
-              <Pressable
-                onPress={go(SCREENS.REVIEW_SESSION)}
-                style={{
-                  flexDirection: "row", alignItems: "center", gap: 12,
-                  backgroundColor: C.surface, borderRadius: 24,
-                  borderWidth: 1, borderColor: C.amber + "55", padding: 16,
-                }}
-              >
-                <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.amber + "1A", alignItems: "center", justifyContent: "center" }}>
-                  <Icon name="refresh" size={22} color={C.amber} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.amber, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
-                  <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.text, marginTop: 2 }}>
-                    {planCtx.srDue} yanlışın tekrar zamanı geldi
-                  </Text>
-                </View>
-                <Icon name="arrowR" size={18} color={C.amber} />
+            <AnimatedCard delay={120}>
+              <Pressable onPress={go(SCREENS.REVIEW_SESSION)}>
+                <GlassCard radius={22} intensity={36} style={{ flexDirection: "row", alignItems: "center", gap: 12, padding: 16 }}>
+                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.amber + "22", alignItems: "center", justifyContent: "center" }}>
+                    <Icon name="refresh" size={22} color={C.amber} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.amber, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
+                    <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.text, marginTop: 2 }}>
+                      {planCtx.srDue} yanlışın tekrar zamanı geldi
+                    </Text>
+                  </View>
+                  <Icon name="arrowR" size={18} color={C.amber} />
+                </GlassCard>
               </Pressable>
             </AnimatedCard>
           ) : null}
+
+          <AnimatedCard delay={200}>
+            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
+          </AnimatedCard>
 
           {!actionDismissed && (dailyAction || aiLoading) ? (
             <AnimatedCard delay={260}>
@@ -293,18 +274,11 @@ export default function HomeScreen() {
                 onLater={() => dismissAction(false)}
               />
             </AnimatedCard>
-          ) : (
+          ) : nudges.length > 0 ? (
             <AnimatedCard delay={300}>
-              <WeakCard
-                message={nudges.length > 0 ? nudges[0].message : (gStats.totalQuestions ? "Analiz ekranında zayıf konularını görebilirsin" : "Soru çözmeye başla, zayıf alanlarını belirleyelim")}
-                onPress={nudges.length > 0 ? () => setNudgeVisible(true) : go(SCREENS.ANALYSIS)}
-              />
+              <WeakCard message={nudges[0].message} onPress={() => setNudgeVisible(true)} />
             </AnimatedCard>
-          )}
-
-          <AnimatedCard delay={320}>
-            <MotivCard message={getMotivMessage({ totalQuestions: gStats.totalQuestions || 0, streak, totalTrials: gStats.totalTrials || 0, xp })} onPress={go(SCREENS.ANALYSIS)} />
-          </AnimatedCard>
+          ) : null}
         </View>
       </ScrollView>
 

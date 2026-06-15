@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { GlassCard } from "../../../components/design";
 
 // Madde 4: Son denemelerin moral (mood) trendi — emoji şerit.
 const EMOJI = { good: "😄", okay: "😐", bad: "😞" };
@@ -9,7 +10,7 @@ export function MoodTrend({ trials }) {
   if (withMood.length < 2) return null;
 
   return (
-    <View style={s.card}>
+    <GlassCard radius={RADIUS.xl} style={s.card}>
       <Text style={s.title}>Moral Trendi</Text>
       <View style={s.row}>
         {withMood.map((t, i) => (
@@ -21,16 +22,12 @@ export function MoodTrend({ trials }) {
           </View>
         ))}
       </View>
-    </View>
+    </GlassCard>
   );
 }
 
 const s = StyleSheet.create({
   card: {
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    borderColor: C.border,
     padding: SPACING.lg,
   },
   title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.md },

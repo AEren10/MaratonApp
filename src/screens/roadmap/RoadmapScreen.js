@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -15,7 +15,7 @@ import { buildRoadmap } from "../../lib/roadmapEngine";
 
 function WeekCard({ week }) {
   return (
-    <View style={[s.weekCard, week.isCurrent && s.weekCurrent]}>
+    <GlassCard radius={RADIUS.xl} color={week.isCurrent ? C.amber : undefined} style={s.weekCard}>
       <View style={s.weekHead}>
         <View style={[s.weekBadge, week.isCurrent && { backgroundColor: C.amber }]}>
           <Text style={[s.weekBadgeText, week.isCurrent && { color: C.bg }]}>{week.weekNo}</Text>
@@ -34,7 +34,7 @@ function WeekCard({ week }) {
         ))}
         {week.topics.length === 0 ? <Text style={s.empty}>Boş</Text> : null}
       </View>
-    </View>
+    </GlassCard>
   );
 }
 
@@ -72,6 +72,7 @@ export default function RoadmapScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
+      <GlowBackground blobs={WARM_GLOW} />
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
@@ -84,7 +85,7 @@ export default function RoadmapScreen() {
         <View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View>
       ) : (
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-          <View style={s.summary}>
+          <GlassCard radius={RADIUS.xl} style={s.summary}>
             <View style={s.sumItem}>
               <Text style={s.sumValue}>{roadmap.weeksLeft}</Text>
               <Text style={s.sumLabel}>hafta kaldı</Text>
@@ -99,7 +100,7 @@ export default function RoadmapScreen() {
               <Text style={[s.sumValue, { color: C.green }]}>%{masteryPct}</Text>
               <Text style={s.sumLabel}>ustalaşıldı</Text>
             </View>
-          </View>
+          </GlassCard>
 
           <Text style={s.note}>
             Her açılışta güncellenir — ustalaştığın konular düşer, kalanlar haftalara yeniden yayılır.
@@ -120,14 +121,13 @@ const s = StyleSheet.create({
   title: { ...TYPOGRAPHY.subheading, color: C.text },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  summary: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, padding: SPACING.lg },
+  summary: { flexDirection: "row", alignItems: "center", padding: SPACING.lg },
   sumItem: { flex: 1, alignItems: "center" },
   sumValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 26, color: C.text },
   sumLabel: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
   sumDivider: { width: 1, height: 36, backgroundColor: C.border },
   note: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: SPACING.md, marginBottom: SPACING.lg, lineHeight: 18 },
-  weekCard: { backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, padding: SPACING.lg, marginBottom: SPACING.md },
-  weekCurrent: { borderColor: C.amber + "66" },
+  weekCard: { padding: SPACING.lg, marginBottom: SPACING.md },
   weekHead: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.md },
   weekBadge: { width: 28, height: 28, borderRadius: 9, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" },
   weekBadgeText: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color: C.sec },

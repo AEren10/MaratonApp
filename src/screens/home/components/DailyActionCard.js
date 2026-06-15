@@ -16,7 +16,6 @@ export function DailyActionCard({ suggestion, loading, onAdd, onUnderstood, onLa
 
   return (
     <View style={[s.card, { borderColor: color + "55" }]}>
-      <View style={s.accent} />
       <View style={s.head}>
         <Icon name="zap" size={13} color={color} sw={2.5} />
         <Text style={[s.tag, { color }]}>BUGÜN İÇİN</Text>

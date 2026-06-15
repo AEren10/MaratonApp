@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import Svg, { Polyline, Line, Defs, LinearGradient, Stop, Polygon } from "react-native-svg";
 import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
-import { Icon } from "../../../components/design";
+import { Icon, GlassCard } from "../../../components/design";
 
 const W = 310;
 const H = 160;
@@ -50,15 +50,7 @@ export function TrendChart({ data, labels, color = C.amber, title = "Net Trendi"
         </View>
       )}
 
-      <View
-        style={{
-          backgroundColor: C.surface,
-          borderRadius: 24,
-          borderWidth: 1,
-          borderColor: C.border,
-          padding: SPACING.lg,
-        }}
-      >
+      <GlassCard radius={24} style={{ padding: SPACING.lg }}>
         <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
           <Defs>
             <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
@@ -95,7 +87,7 @@ export function TrendChart({ data, labels, color = C.amber, title = "Net Trendi"
             <Text key={`${l}-${i}`} style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{l}</Text>
           ))}
         </View>
-      </View>
+      </GlassCard>
     </View>
   );
 }

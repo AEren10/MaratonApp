@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { generateDailyPlan } from "../../lib/planEngine";
@@ -97,6 +97,7 @@ export default function PlanDetailScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
+      <GlowBackground blobs={WARM_GLOW} />
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />

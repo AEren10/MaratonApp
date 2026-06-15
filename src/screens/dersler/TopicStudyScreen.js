@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
-import { Icon } from "../../components/design";
+import { Icon, GlassCard } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
@@ -11,10 +11,10 @@ import { TopicNoteCard } from "./components/TopicNoteCard";
 
 function StatBox({ label, value }) {
   return (
-    <View style={s.statBox}>
+    <GlassCard radius={RADIUS.lg} style={s.statBox}>
       <Text style={s.statValue}>{value}</Text>
       <Text style={s.statLabel}>{label}</Text>
-    </View>
+    </GlassCard>
   );
 }
 
@@ -114,7 +114,7 @@ const s = StyleSheet.create({
   subjectChip: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start", borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, gap: SPACING.xs, marginTop: SPACING.sm },
   chipText: { ...TYPOGRAPHY.captionMedium },
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.xl },
-  statBox: { flex: 1, backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, alignItems: "center" },
+  statBox: { flex: 1, padding: SPACING.md, alignItems: "center" },
   statValue: { ...TYPOGRAPHY.statSmall, color: C.text },
   statLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
   ringWrapper: { alignItems: "center", marginTop: SPACING.xxl },

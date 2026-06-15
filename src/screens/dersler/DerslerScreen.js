@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { ScrollView, View, Text, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Icon } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
 import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -231,6 +231,7 @@ export default function DerslerScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: SPACING.lg,
