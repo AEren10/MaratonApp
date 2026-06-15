@@ -83,6 +83,8 @@ export default function AnalysisScreen() {
     const prev = sorted[1];
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
+    // History: hero grafiği için son 12, listede yine son 6 göster
+    const heroSlice = sorted.slice(0, 12);
     const history = sorted.slice(0, 6).map((t, i) => {
       const prevT = sorted[i + 1];
       return {
@@ -104,6 +106,15 @@ export default function AnalysisScreen() {
     }));
     const line = history.map((h) => h.net).reverse();
     const lineLabels = history.map((h) => h.date).reverse();
+    // Hero: son 12, eskiden yeniye
+    const heroLine = heroSlice
+      .slice()
+      .reverse()
+      .map((t) => t.totalNet || 0);
+    const heroLabels = heroSlice
+      .slice()
+      .reverse()
+      .map((t) => new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }));
     return {
       latest: {
         net,
@@ -114,6 +125,8 @@ export default function AnalysisScreen() {
       bars,
       line,
       lineLabels,
+      heroLine,
+      heroLabels,
       history,
       empty: false,
     };
@@ -171,7 +184,19 @@ export default function AnalysisScreen() {
             </GlassCard>
           ) : (
             <>
-              <AnimatedCard delay={0}>
+              {/* HERO: son 12 denemenin net trendi */}
+              {deneme.heroLine && deneme.heroLine.length > 1 && (
+                <AnimatedCard delay={0}>
+                  <TrendChart
+                    data={deneme.heroLine}
+                    labels={deneme.heroLabels}
+                    title="Net Trendin"
+                    color={C.purple}
+                  />
+                </AnimatedCard>
+              )}
+
+              <AnimatedCard delay={80}>
                 <LatestScore
                   net={deneme.latest.net}
                   trend={deneme.latest.trend}
@@ -180,7 +205,7 @@ export default function AnalysisScreen() {
                 />
               </AnimatedCard>
 
-              <AnimatedCard delay={100}>
+              <AnimatedCard delay={160}>
                 <SubjectBars
                   bars={deneme.bars}
                   onBarPress={(b) =>
@@ -191,12 +216,6 @@ export default function AnalysisScreen() {
                   }
                 />
               </AnimatedCard>
-
-              {deneme.line.length > 1 && (
-                <AnimatedCard delay={200}>
-                  <TrendChart data={deneme.line} labels={deneme.lineLabels} />
-                </AnimatedCard>
-              )}
 
               <AnimatedCard delay={300}>
                 <HistoryList

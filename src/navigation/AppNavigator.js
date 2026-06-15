@@ -40,6 +40,9 @@ import SubjectDetailScreen from "../screens/analysis/SubjectDetailScreen";
 import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
 import TopicStudyScreen from "../screens/dersler/TopicStudyScreen";
 import AppearanceScreen from "../screens/settings/AppearanceScreen";
+import EditProfileScreen from "../screens/settings/EditProfileScreen";
+import ChangePasswordScreen from "../screens/settings/ChangePasswordScreen";
+import EditEmailScreen from "../screens/settings/EditEmailScreen";
 import NotificationsSettingsScreen from "../screens/settings/NotificationsSettingsScreen";
 import PrivacyScreen from "../screens/settings/PrivacyScreen";
 import AboutScreen from "../screens/settings/AboutScreen";
@@ -89,6 +92,9 @@ const EBSubjectDetail = withEB(SubjectDetailScreen);
 const EBWeakAreas = withEB(WeakAreasScreen);
 const EBTopicStudy = withEB(TopicStudyScreen);
 const EBAppearance = withEB(AppearanceScreen);
+const EBEditProfile = withEB(EditProfileScreen);
+const EBChangePassword = withEB(ChangePasswordScreen);
+const EBEditEmail = withEB(EditEmailScreen);
 const EBNotificationsSettings = withEB(NotificationsSettingsScreen);
 const EBPrivacy = withEB(PrivacyScreen);
 const EBAbout = withEB(AboutScreen);
@@ -174,6 +180,9 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.WEAK_AREAS} component={EBWeakAreas} />
       <Stack.Screen name={SCREENS.TOPIC_STUDY} component={EBTopicStudy} />
       <Stack.Screen name={SCREENS.APPEARANCE} component={EBAppearance} />
+      <Stack.Screen name={SCREENS.EDIT_PROFILE} component={EBEditProfile} options={modalOptions} />
+      <Stack.Screen name={SCREENS.CHANGE_PASSWORD} component={EBChangePassword} options={modalOptions} />
+      <Stack.Screen name={SCREENS.EDIT_EMAIL} component={EBEditEmail} options={modalOptions} />
       <Stack.Screen name={SCREENS.NOTIFICATIONS_SETTINGS} component={EBNotificationsSettings} />
       <Stack.Screen name={SCREENS.PRIVACY} component={EBPrivacy} />
       <Stack.Screen name={SCREENS.ABOUT} component={EBAbout} />

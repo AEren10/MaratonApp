@@ -59,6 +59,9 @@ export const SCREENS = {
   // Settings
   SETTINGS: "Settings",
   APPEARANCE: "Appearance",
+  EDIT_PROFILE: "EditProfile",
+  CHANGE_PASSWORD: "ChangePassword",
+  EDIT_EMAIL: "EditEmail",
   NOTIFICATIONS_SETTINGS: "NotificationsSettings",
   PRIVACY: "Privacy",
   ABOUT: "About",

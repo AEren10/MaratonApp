@@ -7,8 +7,9 @@ import {
   UIManager,
   Platform,
 } from "react-native";
-import { IconBox, Icon, GlassCard } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Icon } from "../../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { TopicRow } from "./TopicRow";
 import { masteryPercent } from "../../../lib/mastery";
 
@@ -20,17 +21,18 @@ function ProgressBar({ pct, color }) {
   return (
     <View
       style={{
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: color + "20",
-        marginTop: SPACING.md,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: "rgba(255,255,255,0.5)",
+        marginTop: SPACING.lg,
+        overflow: "hidden",
       }}
     >
       <View
         style={{
           width: `${pct}%`,
-          height: 4,
-          borderRadius: 2,
+          height: 6,
+          borderRadius: 3,
           backgroundColor: color,
         }}
       />
@@ -38,7 +40,11 @@ function ProgressBar({ pct, color }) {
   );
 }
 
+// Hero card: ders kendi kimlik rengi büyük üst yarısı (soft solid), beyaz alt yarısı detay.
+// Kapalıyken yatay büyük kart, açık expand: alt kısımda topic list.
 export const SubjectCard = React.memo(function SubjectCard({ subject }) {
+  const C = useC();
+  const id = useSubjectIdentity(subject?.key);
   const [open, setOpen] = useState(false);
 
   const toggle = useCallback(() => {
@@ -48,107 +54,110 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
     setOpen((v) => !v);
   }, []);
 
-  const { name, icon, color, pct, done, total, last, topics } = subject;
+  const { name, icon, pct, done, total, last, topics } = subject;
+  const color = id?.solid || subject.color;
+  const tint  = id?.tint  || (color + "18");
+  const soft  = id?.soft  || (color + "30");
   const masteryPct = masteryPercent(topics);
 
   return (
-    <View>
-    <GlassCard color={color} radius={RADIUS.xxl} intensity={34}>
-
+    <View
+      style={{
+        borderRadius: RADIUS.xxl,
+        overflow: "hidden",
+        backgroundColor: C.surface,
+        borderWidth: 1,
+        borderColor: C.border,
+        shadowColor: "#1B1530",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 14,
+        elevation: 3,
+      }}
+    >
+      {/* Üst yarı — ders renginin tint'i */}
       <Pressable
         onPress={toggle}
         style={({ pressed }) => ({
           padding: SPACING.lg,
-          opacity: pressed ? 0.8 : 1,
+          backgroundColor: tint,
+          opacity: pressed ? 0.94 : 1,
         })}
       >
-        {/* Header row */}
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <IconBox icon={icon} color={color} size={42} rounded={14} />
+          {/* Büyük renkli ikon kart */}
+          <View style={{
+            width: 56, height: 56, borderRadius: 18,
+            backgroundColor: color,
+            alignItems: "center", justifyContent: "center",
+            shadowColor: color, shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.32, shadowRadius: 12, elevation: 4,
+          }}>
+            <Icon name={icon} size={26} color="#FFFFFF" />
+          </View>
+
           <View style={{ flex: 1, marginLeft: SPACING.md }}>
-            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
+            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 19, color: C.text, letterSpacing: -0.3 }}>
               {name}
             </Text>
-            <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 2 }}>
-              {done}/{total} konu
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 3 }}>
+              {done}/{total} konu · {last || "Henüz çalışılmadı"}
             </Text>
           </View>
-          <Text
-            style={{
-              ...TYPOGRAPHY.statSmall,
-              color,
-              marginRight: SPACING.sm,
-            }}
-          >
-            %{pct}
-          </Text>
+
+          {/* % rozet */}
+          <View style={{
+            paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
+            backgroundColor: color,
+          }}>
+            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, color: "#FFFFFF", letterSpacing: -0.2 }}>
+              %{pct}
+            </Text>
+          </View>
+
           <Icon
             name={open ? "chevUp" : "chevDown"}
             size={18}
             color={C.sec}
+            style={{ marginLeft: 8 }}
           />
         </View>
 
-        {/* Progress bar */}
         <ProgressBar pct={pct} color={color} />
 
-        {/* Stats row */}
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: SPACING.sm,
+            alignItems: "center",
+            marginTop: SPACING.md,
           }}
         >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Icon name="clock" size={13} color={C.muted} sw={1.5} />
-            <Text
-              style={{
-                ...TYPOGRAPHY.caption,
-                color: C.sec,
-                marginLeft: 4,
-              }}
-            >
-              {last || "Henüz çalışılmadı"}
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: masteryPct > 0 ? C.green : C.muted,
-              }}
-            />
-            <Text
-              style={{
-                ...TYPOGRAPHY.caption,
-                color: C.sec,
-                marginLeft: 4,
-              }}
-            >
+          <View style={{
+            flexDirection: "row", alignItems: "center", gap: 5,
+            backgroundColor: "rgba(255,255,255,0.55)",
+            paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
+          }}>
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : C.muted }} />
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.text }}>
               %{masteryPct} ustalaşıldı
             </Text>
           </View>
+
+          <Text style={{ ...TYPOGRAPHY.micro, color: color, fontFamily: "Inter_600SemiBold" }}>
+            {open ? "Kapat" : "Konuları gör →"}
+          </Text>
         </View>
       </Pressable>
 
-      {/* Expanded topics — outside the toggle Pressable */}
+      {/* Alt yarı — beyaz/surface, açıkken topic list */}
       {open && topics?.length > 0 ? (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: C.border,
-            paddingBottom: SPACING.xs,
-          }}
-        >
+        <View style={{ paddingBottom: SPACING.xs }}>
           {topics.map((t) => (
             <TopicRow key={t.name} topic={t} color={color} subject={subject} />
           ))}
         </View>
       ) : null}
-    </GlassCard>
     </View>
   );
 });
