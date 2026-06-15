@@ -215,6 +215,7 @@ export default function HomeScreen() {
         <HomeHeader
           name={displayName}
           streak={streak}
+          onProfilePress={go(SCREENS.PROFILE)}
           onStreakPress={go(SCREENS.PROFILE)}
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
