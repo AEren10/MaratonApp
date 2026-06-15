@@ -1,38 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
-import { Icon, GlassCard } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { Icon } from "../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
 import { TopicNoteCard } from "./components/TopicNoteCard";
 
-function StatBox({ label, value }) {
+function StatBox({ label, value, color, C }) {
   return (
-    <GlassCard radius={RADIUS.lg} style={s.statBox}>
-      <Text style={s.statValue}>{value}</Text>
-      <Text style={s.statLabel}>{label}</Text>
-    </GlassCard>
+    <View style={[s.statBox, { backgroundColor: color + "12", borderColor: color + "26" }]}>
+      <Text style={[s.statValue, { color: C.text }]}>{value}</Text>
+      <Text style={[s.statLabel, { color }]}>{label}</Text>
+    </View>
   );
 }
 
-function SubtopicRow({ item }) {
+function SubtopicRow({ item, C, color }) {
   return (
-    <View style={s.subtopicRow}>
+    <View style={[s.subtopicRow, { backgroundColor: C.surface, borderColor: C.border }]}>
       <Icon
-        name={item.done ? "checkCircle" : "radio"}
+        name={item.done ? "check" : "circle"}
         size={20}
-        color={item.done ? C.green : C.muted}
+        color={item.done ? color : C.muted}
+        sw={item.done ? 3 : 1.8}
       />
-      <Text style={[s.subtopicName, item.done && { color: C.sec }]}>{item.name}</Text>
+      <Text style={[
+        s.subtopicName,
+        { color: item.done ? C.muted : C.text },
+        item.done && { textDecorationLine: "line-through" },
+      ]}>
+        {item.name}
+      </Text>
     </View>
   );
 }
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
+  const C = useC();
   const route = useRoute();
   const { topic, subject, subtopics: paramSubtopics } = route.params;
   const mastery = topic.acc / 100;
@@ -43,8 +52,10 @@ export default function TopicStudyScreen() {
     done: i < Math.floor((paramSubtopics?.length || 0) * mastery),
   }));
 
+  const color = subject.color || C.purple;
+
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
@@ -55,52 +66,72 @@ export default function TopicStudyScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <View style={[s.subjectChip, { backgroundColor: subject.color + "18" }]}>
-          <Icon name={subject.icon} size={14} color={subject.color} />
-          <Text style={[s.chipText, { color: subject.color }]}>{subject.name}</Text>
+        {/* Ders chip */}
+        <View style={[s.subjectChip, { backgroundColor: color + "18", borderColor: color + "30" }]}>
+          <Icon name={subject.icon} size={14} color={color} />
+          <Text style={[s.chipText, { color }]}>{subject.name}</Text>
         </View>
 
+        {/* === Stat kartlar — her biri kimlik renkli soft === */}
         <View style={s.statsRow}>
-          <StatBox label="Toplam Soru" value={topic.q} />
-          <StatBox label="Basari Orani" value={`${topic.acc}%`} />
-          <StatBox label="Son Calisma" value={topic.last} />
+          <StatBox C={C} label="Toplam Soru" value={topic.q || 0} color={color} />
+          <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={C.amber} />
+          <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={C.blue} />
         </View>
 
+        {/* === Hakimiyet ring === */}
         <View style={s.ringWrapper}>
-          <View style={{ width: 96, height: 96, alignItems: "center", justifyContent: "center" }}>
-            <Svg width={96} height={96} style={{ position: "absolute" }}>
-              <Circle cx={48} cy={48} r={40} stroke={C.border} strokeWidth={8} fill="none" />
-              <Circle cx={48} cy={48} r={40} stroke={subject.color} strokeWidth={8} fill="none"
-                strokeLinecap="round" strokeDasharray={circumference}
-                strokeDashoffset={circumference * (1 - mastery)}
-                transform="rotate(-90 48 48)" />
+          <View style={{ width: 120, height: 120, alignItems: "center", justifyContent: "center" }}>
+            <Svg width={120} height={120} style={{ position: "absolute" }}>
+              <Circle cx={60} cy={60} r={50} stroke={color + "1A"} strokeWidth={9} fill="none" />
+              <Circle cx={60} cy={60} r={50} stroke={color} strokeWidth={9} fill="none"
+                strokeLinecap="round" strokeDasharray={2 * Math.PI * 50}
+                strokeDashoffset={2 * Math.PI * 50 * (1 - mastery)}
+                transform="rotate(-90 60 60)" />
             </Svg>
-            <Text style={s.ringText}>{topic.acc}%</Text>
+            <Text style={{
+              fontFamily: "SpaceGrotesk_700Bold",
+              fontSize: 26,
+              color: C.text,
+              letterSpacing: -0.5,
+            }}>
+              %{topic.acc || 0}
+            </Text>
           </View>
-          <Text style={s.ringLabel}>Hakimiyet</Text>
-          <View style={s.masteryBadge}>
+          <Text style={[s.ringLabel, { color: C.sec }]}>Hakimiyet</Text>
+          <View style={[s.masteryBadge, { backgroundColor: masteryLevel.color + "1A" }]}>
             <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: masteryLevel.color }} />
             <Text style={[s.masteryText, { color: masteryLevel.color }]}>{masteryLevel.label}</Text>
           </View>
         </View>
 
+        {/* Konu notu */}
         {subject.key ? <TopicNoteCard subjectKey={subject.key} topicName={topic.name} /> : null}
 
-        <Text style={s.sectionTitle}>Alt Konular</Text>
-        {subtopics.length > 0 ? subtopics.map((st) => (
-          <SubtopicRow key={st.name} item={st} />
-        )) : (
-          <Text style={[TYPOGRAPHY.caption, { color: C.muted, textAlign: "center", padding: SPACING.lg }]}>
-            Alt konu bilgisi bulunamadi
-          </Text>
-        )}
+        {/* === Alt konular === */}
+        {subtopics.length > 0 ? (
+          <>
+            <Text style={[s.sectionTitle, { color: C.muted }]}>ALT KONULAR</Text>
+            {subtopics.map((st) => (
+              <SubtopicRow key={st.name} item={st} C={C} color={color} />
+            ))}
+          </>
+        ) : null}
 
+        {/* === Çalış CTA — purple pill === */}
         <Pressable
-          onPress={() => navigation.navigate(SCREENS.STUDY_TIMER)}
-          style={({ pressed }) => [s.cta, pressed && { opacity: 0.85 }]}
+          onPress={() => navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: subject.key, topicName: topic.name })}
+          style={({ pressed }) => [
+            s.cta,
+            {
+              backgroundColor: C.purple,
+              shadowColor: C.purple,
+              opacity: pressed ? 0.92 : 1,
+            },
+          ]}
         >
-          <Icon name="play" size={18} color={C.bg} />
-          <Text style={s.ctaText}>Calis</Text>
+          <Icon name="play" size={20} color="#FFFFFF" sw={2.5} />
+          <Text style={s.ctaText}>Çalışmaya Başla</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -108,23 +139,54 @@ export default function TopicStudyScreen() {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
+  safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  subjectChip: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start", borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, gap: SPACING.xs, marginTop: SPACING.sm },
+  subjectChip: {
+    flexDirection: "row", alignItems: "center", alignSelf: "flex-start",
+    borderRadius: 999, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
+    gap: SPACING.xs, marginTop: SPACING.sm, borderWidth: 1,
+  },
   chipText: { ...TYPOGRAPHY.captionMedium },
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.xl },
-  statBox: { flex: 1, padding: SPACING.md, alignItems: "center" },
-  statValue: { ...TYPOGRAPHY.statSmall, color: C.text },
-  statLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
-  ringWrapper: { alignItems: "center", marginTop: SPACING.xxl },
-  ringText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  ringLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.sm },
-  masteryBadge: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: SPACING.sm },
+  statBox: {
+    flex: 1, padding: 14, alignItems: "center",
+    borderRadius: 18, borderWidth: 1,
+  },
+  statValue: {
+    fontFamily: "SpaceGrotesk_700Bold",
+    fontSize: 22,
+    letterSpacing: -0.4,
+  },
+  statLabel: { ...TYPOGRAPHY.caption, fontSize: 11, marginTop: 4, fontFamily: "Inter_600SemiBold" },
+  ringWrapper: { alignItems: "center", marginTop: SPACING.xxxl },
+  ringLabel: { ...TYPOGRAPHY.caption, marginTop: SPACING.md },
+  masteryBadge: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    marginTop: SPACING.sm,
+    paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 999,
+  },
   masteryText: { ...TYPOGRAPHY.captionMedium },
-  sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
-  subtopicRow: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm, gap: SPACING.md },
-  subtopicName: { ...TYPOGRAPHY.body, color: C.text, flex: 1 },
-  cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: C.amber, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxxl, gap: SPACING.sm },
-  ctaText: { ...TYPOGRAPHY.button, color: C.bg },
+  sectionTitle: { ...TYPOGRAPHY.label, marginTop: SPACING.xxl, marginBottom: SPACING.md },
+  subtopicRow: {
+    flexDirection: "row", alignItems: "center",
+    borderRadius: 14, padding: 14, marginBottom: 8,
+    gap: 12, borderWidth: 1,
+  },
+  subtopicName: { ...TYPOGRAPHY.body, flex: 1, fontSize: 14 },
+  cta: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    borderRadius: 999, paddingVertical: 17, marginTop: SPACING.xxxl,
+    gap: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.32,
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  ctaText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
 });

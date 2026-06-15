@@ -1,67 +1,45 @@
-import { useState, useCallback } from "react";
-import { ScrollView, View, Text, Pressable, Alert } from "react-native";
+import { useCallback } from "react";
+import { ScrollView, View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
-import { resetPassword } from "../../supabase/auth";
 
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
 
+// Ayarlar artık sade — Profile menüde olan kişisel öğeler burada gözükmüyor.
+// Sadece sistem-tarafı tercihler: Bildirimler, Görünüm, Gizlilik, Yardım, Hakkında.
 export default function SettingsScreen() {
   const navigation = useNavigation();
-  const { logout, user } = useAuth();
-  const [notifications, setNotifications] = useState(true);
+  const C = useC();
+  const { logout } = useAuth();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const go = useCallback((s) => navigation.navigate(s), [navigation]);
 
-  const handleEmail = useCallback(() => {
-    Alert.alert("E-posta", user?.email || "Bilinmiyor");
-  }, [user?.email]);
-
-  const handlePasswordReset = useCallback(() => {
-    const email = user?.email;
-    if (!email) return;
-    Alert.alert("Sifre Sifirlama", `${email} adresine sifre sifirlama bağlantisi gonderilsin mi?`, [
-      { text: "Iptal", style: "cancel" },
-      {
-        text: "Gonder",
-        onPress: async () => {
-          try {
-            await resetPassword(email);
-            Alert.alert("Basarili", "Sifre sifirlama bağlantisi e-posta adresine gonderildi.");
-          } catch (e) {
-            Alert.alert("Hata", e.message || "Bağlantı kurulamadı.");
-          }
-        },
-      },
-    ]);
-  }, [user?.email]);
-
   const handleHelp = useCallback(() => {
-    Alert.alert("Yardim", "Sorularin icin bize ulasabilirsin:\n\ndestek@maraton.app");
+    Alert.alert("Yardım", "Sorularını için bize ulaşabilirsin:\n\ndestek@maraton.app");
   }, []);
 
   const handleLogout = useCallback(() => {
-    Alert.alert("Cikis Yap", "Hesabindan cikis yapmak istedigin kesin mi?", [
-      { text: "Iptal", style: "cancel" },
-      { text: "Cikis Yap", style: "destructive", onPress: logout },
+    Alert.alert("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin?", [
+      { text: "İptal", style: "cancel" },
+      { text: "Çıkış Yap", style: "destructive", onPress: logout },
     ]);
   }, [logout]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={goBack} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Ayarlar</Text>
+        <Text style={[styles.headerTitle, { color: C.text }]}>Ayarlar</Text>
         <View style={{ width: 22 }} />
       </View>
 
@@ -69,52 +47,64 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Account */}
-        <SettingsGroup title="HESAP">
-          <SettingsRow icon="user" iconColor={C.blue} label="Profil Duzenle" onPress={() => go(SCREENS.PROFILE)} />
-          <SettingsRow icon="mail" iconColor={C.green} label="E-posta" onPress={handleEmail} />
-          <SettingsRow icon="lock" iconColor={C.purple} label="Sifre Degistir" onPress={handlePasswordReset} />
-        </SettingsGroup>
-
-        <SettingsGroup title="TERCIHLER">
+        <SettingsGroup title="TERCİHLER">
           <SettingsRow
-            icon="target" iconColor={C.amber}
-            label="Hedeflerim"
-            onPress={() => go(SCREENS.GOALS)}
-          />
-          <SettingsRow
-            icon="bell" iconColor={C.amber}
+            icon="bell"
+            iconColor={C.amber}
             label="Bildirimler"
             onPress={() => go(SCREENS.NOTIFICATIONS_SETTINGS)}
           />
           <SettingsRow
-            icon="moon" iconColor={C.purple}
-            label="Gorunum"
+            icon="moon"
+            iconColor={C.purple}
+            label="Görünüm"
             onPress={() => go(SCREENS.APPEARANCE)}
           />
         </SettingsGroup>
 
         <SettingsGroup title="UYGULAMA">
-          <SettingsRow icon="info" iconColor={C.blue} label="Hakkinda" onPress={() => go(SCREENS.ABOUT)} />
-          <SettingsRow icon="shield" iconColor={C.green} label="Gizlilik Politikasi" onPress={() => go(SCREENS.PRIVACY)} />
-          <SettingsRow icon="share" iconColor={C.amber} label="Yardim" onPress={handleHelp} />
+          <SettingsRow
+            icon="lock"
+            iconColor={C.blue}
+            label="Gizlilik Politikası"
+            onPress={() => go(SCREENS.PRIVACY)}
+          />
+          <SettingsRow
+            icon="info"
+            iconColor={C.green}
+            label="Hakkında"
+            onPress={() => go(SCREENS.ABOUT)}
+          />
+          <SettingsRow
+            icon="share"
+            iconColor={C.coral}
+            label="Yardım"
+            onPress={handleHelp}
+          />
         </SettingsGroup>
 
         <Pressable
           onPress={handleLogout}
-          style={({ pressed }) => [styles.logoutBtn, { opacity: pressed ? 0.8 : 1 }]}
+          style={({ pressed }) => [
+            styles.logoutBtn,
+            {
+              backgroundColor: C.red + "12",
+              borderColor: C.red + "30",
+              opacity: pressed ? 0.85 : 1,
+            },
+          ]}
         >
-          <Icon name="logOut" size={20} color={C.red} />
-          <Text style={styles.logoutText}>Cikis Yap</Text>
+          <Icon name="x" size={18} color={C.red} />
+          <Text style={[styles.logoutText, { color: C.red }]}>Çıkış Yap</Text>
         </Pressable>
 
-        <Text style={styles.version}>Maraton v1.0.0</Text>
+        <Text style={[styles.version, { color: C.muted }]}>Maraton v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -124,7 +114,6 @@ const styles = {
   },
   headerTitle: {
     ...TYPOGRAPHY.subheading,
-    color: C.text,
   },
   scroll: {
     paddingHorizontal: SPACING.lg,
@@ -136,21 +125,17 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.sm,
-    backgroundColor: C.red + "18",
     borderWidth: 1,
-    borderColor: C.red + "40",
     borderRadius: RADIUS.xl,
     paddingVertical: SPACING.lg,
-    marginTop: SPACING.sm,
+    marginTop: SPACING.lg,
   },
   logoutText: {
     ...TYPOGRAPHY.button,
-    color: C.red,
   },
   version: {
     ...TYPOGRAPHY.caption,
-    color: C.muted,
     textAlign: "center",
     marginTop: SPACING.xxl,
   },
-};
+});

@@ -65,31 +65,29 @@ export default function ProfileScreen() {
     ];
   }, [gStats, todayLogs, trials, streak]);
 
+  // GERÇEK başarı verisi: derslerin denemedeki doğru/yanlış oranı.
+  // Sahte %100 göstermemek için sadece veri varsa list dönüyor.
   const strengths = useMemo(() => {
-    const qBySubject = {};
-    todayLogs.forEach((l) => {
-      const key = l.subject;
-      qBySubject[key] = (qBySubject[key] || 0) + (l.questionCount || 0);
-    });
+    if (!trials.length) return [];
+    const latest = trials[0];
     const subjectMap = {};
     subjects.forEach((s) => { subjectMap[s.key] = s; });
-    const entries = Object.entries(qBySubject)
-      .map(([key, q]) => ({ key, q, label: subjectMap[key]?.label || key, color: subjectMap[key]?.color || C.muted }))
-      .sort((a, b) => b.q - a.q);
-    const maxQ = entries[0]?.q || 1;
-    if (entries.length > 0) {
-      return entries.slice(0, 6).map((e) => ({
-        name: e.label,
-        c: e.color,
-        v: Math.round((e.q / maxQ) * 100),
-      }));
-    }
-    return subjects.slice(0, 6).map((s) => ({
-      name: s.label,
-      c: s.color,
-      v: 0,
-    }));
-  }, [subjects, todayLogs]);
+
+    const entries = [];
+    Object.entries(latest.subjects || {}).forEach(([key, data]) => {
+      const total = (data.correct || 0) + (data.wrong || 0);
+      if (total < 5) return; // anlamlı veri için min 5 soru
+      const acc = Math.round(((data.correct || 0) / total) * 100);
+      const norm = key.replace(/^tyt_/, "").replace(/^ayt_/, "");
+      const subj = subjectMap[norm] || subjectMap[key];
+      entries.push({
+        name: subj?.label || norm,
+        c: subj?.color || C.muted,
+        v: acc,
+      });
+    });
+    return entries.sort((a, b) => b.v - a.v).slice(0, 6);
+  }, [subjects, trials]);
 
   const handleNavigate = (route) => {
     navigation.navigate(route);
@@ -130,12 +128,16 @@ export default function ProfileScreen() {
         <AnimatedCard delay={120}>
           <StatsGrid stats={computedStats} />
         </AnimatedCard>
-        <AnimatedCard delay={200}>
-          <BadgeRow badges={displayBadges} />
-        </AnimatedCard>
-        <AnimatedCard delay={240}>
-          <StrengthBars strengths={strengths} />
-        </AnimatedCard>
+        {displayBadges.length > 0 ? (
+          <AnimatedCard delay={200}>
+            <BadgeRow badges={displayBadges} />
+          </AnimatedCard>
+        ) : null}
+        {strengths.length > 0 ? (
+          <AnimatedCard delay={240}>
+            <StrengthBars strengths={strengths} />
+          </AnimatedCard>
+        ) : null}
         <AnimatedCard delay={320}>
           <SettingsMenu
             onNavigate={handleNavigate}

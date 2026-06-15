@@ -96,6 +96,27 @@ export const TRIAL_TYPES = {
 
 export const TRIAL_TYPE_LIST = Object.values(TRIAL_TYPES);
 
+// Kullanıcının field'ına göre gösterilecek tip listesi.
+// Sayısal kullanıcı sözel görmesin; sözel kullanıcı sayısal görmesin.
+// field: "sayisal" | "ea" | "sozel" | "dil" | null
+export function getTrialTypesForField(field) {
+  const all = TRIAL_TYPE_LIST;
+  if (!field) return all;
+  if (field === "sayisal") {
+    return all.filter((t) => ["TYT", "AYT_SAY", "BRANCH"].includes(t.code));
+  }
+  if (field === "ea") {
+    return all.filter((t) => ["TYT", "AYT_EA", "BRANCH"].includes(t.code));
+  }
+  if (field === "sozel") {
+    return all.filter((t) => ["TYT", "AYT_SOZ", "BRANCH"].includes(t.code));
+  }
+  if (field === "dil") {
+    return all.filter((t) => ["TYT", "BRANCH"].includes(t.code));
+  }
+  return all;
+}
+
 export function getSubjectsForType(typeCode, branchSubjectKey = null) {
   const type = TRIAL_TYPES[typeCode];
   if (!type) return [];
