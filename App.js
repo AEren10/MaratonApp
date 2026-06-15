@@ -81,6 +81,6 @@ function ThemedRoot() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.dark.background,
+    backgroundColor: COLORS.light.background,
   },
 });

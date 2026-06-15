@@ -1,17 +1,22 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, GlassCard } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { Icon } from "../../../components/design";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function WeakCard({ message, onPress }) {
+  const C = useC();
   return (
     <Pressable onPress={onPress}>
-      <GlassCard radius={24} intensity={36} style={{ padding: 15 }}>
+      <View style={{
+        padding: 16, borderRadius: 22,
+        backgroundColor: C.red + "10",
+        borderWidth: 1, borderColor: C.red + "26",
+      }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <View
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: 12,
+              width: 42,
+              height: 42,
+              borderRadius: 14,
               backgroundColor: C.red + "22",
               alignItems: "center",
               justifyContent: "center",
@@ -23,14 +28,14 @@ export function WeakCard({ message, onPress }) {
             <Text
               style={{
                 fontFamily: "Inter_500Medium",
-                fontSize: 13.5,
+                fontSize: 14,
                 color: C.text,
-                lineHeight: 18,
+                lineHeight: 19,
               }}
             >
               {message}
             </Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 5 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6 }}>
               <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12.5, color: C.red }}>
                 Analiz Et
               </Text>
@@ -38,7 +43,7 @@ export function WeakCard({ message, onPress }) {
             </View>
           </View>
         </View>
-      </GlassCard>
+      </View>
     </Pressable>
   );
 }

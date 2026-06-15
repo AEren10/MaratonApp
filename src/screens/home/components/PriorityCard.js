@@ -1,42 +1,72 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY } from "../../../themes/tokens";
+import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
 
-const FOREST = "#1E3A33";
-const CREAM = "#FBF1DC";
-
-// Ekranın tek "yıldız" kartı — solid krem, koyu orman yazı + başla CTA.
-// task: { topicLabel, subjectLabel, reason } | plan: { dersler, hours }
+// Bugünün önceliği — kimlik renkli hero kart.
+// Urgency tier'a göre badge:
+//   - red:   "🚨 Bayadır dönmedin"
+//   - amber: gün uyarısı
+//   - blue:  düzenli tekrar
+// task: { topicLabel, subjectLabel, reason, subject, rkind, urgencyDays }
+// plan: { dersler, hours }
 export function PriorityCard({ task, plan, onStart }) {
+  const C = useC();
+  const subjectId = useSubjectIdentity(task?.subject);
   const title = task?.topicLabel || task?.subjectLabel || "Günlük plan";
   const reason = task?.reason || (plan ? `${plan.dersler} ders · ${plan.hours}` : "Çalışmaya hazır mısın?");
 
+  // Tier rengi — engine'in verdiği `badge` öncelikli, yoksa rkind'den türet
+  const tier =
+    task?.tier === "critical" || task?.rkind === "red"
+      ? { color: C.red,    bg: C.red + "12",    label: task?.badge || "ACİL"   } :
+    task?.tier === "high" || task?.rkind === "amber"
+      ? { color: C.amber,  bg: C.amber + "14",  label: task?.badge || "DİKKAT" } :
+    task?.rkind === "blue"
+      ? { color: C.blue,   bg: C.blue + "12",   label: task?.badge || "DÜZENLİ" } :
+      { color: subjectId?.solid || C.purple, bg: subjectId?.tint || C.purple + "10", label: task?.badge || "BUGÜN" };
+
+  const onStartHandler = () => { haptic.tap(); onStart?.(); };
+
   return (
-    <View style={s.card}>
-      <Text style={s.label}>BUGÜNÜN ÖNCELİĞİ</Text>
-      <Text style={s.title} numberOfLines={2}>{title}</Text>
-      <Text style={s.reason} numberOfLines={1}>{reason}</Text>
+    <View style={[s.card, { backgroundColor: tier.bg, borderColor: tier.color + "26" }]}>
+      <View style={s.headRow}>
+        <View style={[s.tierChip, { backgroundColor: tier.color }]}>
+          <Text style={[s.tierText, { color: "#FFFFFF" }]}>{tier.label}</Text>
+        </View>
+        <Text style={[s.label, { color: tier.color }]}>BUGÜNÜN ÖNCELİĞİ</Text>
+      </View>
+
+      <Text style={[s.title, { color: C.text }]} numberOfLines={2}>{title}</Text>
+      <Text style={[s.reason, { color: C.sec }]} numberOfLines={2}>{reason}</Text>
 
       <Pressable
-        onPress={() => { haptic.tap(); onStart(); }}
-        style={({ pressed }) => [s.btn, pressed && { opacity: 0.92, transform: [{ scale: 0.98 }] }]}
+        onPress={onStartHandler}
+        style={({ pressed }) => [
+          s.btn,
+          { backgroundColor: tier.color },
+          pressed && { opacity: 0.92, transform: [{ scale: 0.98 }] },
+        ]}
       >
         <Text style={s.btnText}>Çalışmaya Başla</Text>
-        <Icon name="arrowR" size={18} color={CREAM} sw={2.5} />
+        <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />
       </Pressable>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  card: { borderRadius: 24, padding: 20, backgroundColor: CREAM },
-  label: { ...TYPOGRAPHY.micro, color: "#5C7A6E", letterSpacing: 0.6 },
-  title: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: FOREST, marginTop: 6, letterSpacing: -0.5 },
-  reason: { ...TYPOGRAPHY.caption, color: "#6E8C80", marginTop: 4 },
+  card: { borderRadius: 28, padding: 20, borderWidth: 1 },
+  headRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 },
+  tierChip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 },
+  tierText: { ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold", letterSpacing: 0.8 },
+  label: { ...TYPOGRAPHY.micro, letterSpacing: 0.6 },
+  title: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, marginTop: 4, letterSpacing: -0.5 },
+  reason: { ...TYPOGRAPHY.caption, marginTop: 6, lineHeight: 18 },
   btn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    backgroundColor: FOREST, borderRadius: 15, paddingVertical: 14, marginTop: 18,
+    borderRadius: 16, paddingVertical: 15, marginTop: 18,
   },
-  btnText: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: CREAM },
+  btnText: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#FFFFFF" },
 });

@@ -67,27 +67,62 @@ export function generateDailyPlan({
       ? `${subject.label} · ${weakestTopic.topic}`
       : subject.label;
 
+    // === Urgency tier kararı ===
+    // tier:   "critical" | "high" | "medium" | "low"
+    // rkind:  "red" | "amber" | "blue" | "gray"  (geriye uyumlu)
+    // badge:  başlıkta gösterilecek kısa etiket
     let reason = "";
     let rkind = "gray";
+    let tier = "low";
+    let badge = null;
     const daysSince = recentStudy[key]
       ? differenceInDays(today, new Date(recentStudy[key]))
       : null;
+    const acc = weakAreas[key] ?? 50;
 
     if (priorityReasons[key]) {
+      // smartNudge net düşüş sinyali — en yüksek aciliyet.
       reason = priorityReasons[key];
       rkind = "red";
-    } else if (weakestTopic && weakestTopic.acc < 50) {
-      reason = `${weakestTopic.topic}: %${weakestTopic.acc}`;
+      tier = "critical";
+      badge = "DÜŞÜŞ VAR";
+    } else if (daysSince !== null && daysSince > 14) {
+      // 2 haftadan uzun süredir dokunulmamış — kritik.
+      reason = `🚨 Bu konuya ${daysSince} gündür dönmedin!`;
       rkind = "red";
-    } else if (daysSince && daysSince > 7) {
-      reason = `${daysSince} gundur calismadin`;
+      tier = "critical";
+      badge = "ACİL";
+    } else if (weakestTopic && weakestTopic.acc < 40) {
+      // Konu seviyesinde çok zayıf — yüksek aciliyet.
+      reason = `${weakestTopic.topic}: sadece %${weakestTopic.acc} doğru`;
+      rkind = "red";
+      tier = "high";
+      badge = "ZAYIF";
+    } else if (daysSince !== null && daysSince > 7) {
+      // 1-2 hafta dokunulmamış — dikkat.
+      reason = `${daysSince} gündür çalışmadın`;
       rkind = "amber";
-    } else if ((weakAreas[key] ?? 50) < 40) {
-      reason = "Zayif alanin";
+      tier = "high";
+      badge = "DİKKAT";
+    } else if (weakestTopic && weakestTopic.acc < 60) {
+      // Konu seviyesinde orta zayıf.
+      reason = `${weakestTopic.topic}: %${weakestTopic.acc} doğru`;
+      rkind = "amber";
+      tier = "medium";
+    } else if (acc < 40) {
+      // Dersin geneli zayıf.
+      reason = "Zayıf alanın — soru bombala";
       rkind = "red";
+      tier = "high";
+      badge = "ZAYIF";
+    } else if (acc < 60) {
+      reason = "Pekiştirme zamanı";
+      rkind = "amber";
+      tier = "medium";
     } else {
-      reason = "Duzenli tekrar";
-      rkind = "gray";
+      reason = "Düzenli tekrar";
+      rkind = "blue";
+      tier = "low";
     }
 
     tasks.push({
@@ -100,6 +135,10 @@ export function generateDailyPlan({
       priority: i + 1,
       reason,
       rkind,
+      tier,
+      badge,
+      daysSince,
+      accuracy: acc,
       completed: false,
     });
 

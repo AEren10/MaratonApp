@@ -14,7 +14,8 @@ import { usePlanContext } from "../../hooks/usePlanContext";
 import { useAppDispatch } from "../../store/hooks";
 import { addAdHocTask } from "../../store/slices/planSlice";
 import { getSubjectByKey } from "../../themes/subjects";
-import { C, SPACING, PASTEL } from "../../themes/tokens";
+import { SPACING } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
@@ -42,12 +43,7 @@ import { DailyActionCard } from "./components/DailyActionCard";
 import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
 import { ALL_SUBJECTS } from "../trial/trialTypes";
 
-const QUICK_ITEMS = [
-  { icon: "edit", label: "Kaydet", c: PASTEL.gold.solid, go: SCREENS.ADD_STUDY },
-  { icon: "chart", label: "Deneme", c: PASTEL.blue.solid, go: SCREENS.TRIAL_ENTRY },
-  { icon: "camera", label: "Yanlış", c: PASTEL.rose.solid, go: SCREENS.ADD_WRONG },
-  { icon: "calendar", label: "Yol Haritası", c: PASTEL.mint.solid, go: SCREENS.ROADMAP },
-];
+// QUICK_ITEMS palette HomeScreen içinde useC ile inşa edilir.
 
 function HomeSkeleton() {
   return (
@@ -69,9 +65,17 @@ function HomeSkeleton() {
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const C = useC();
   const { user } = useAuth();
   const { reward, xpToast, dismissXP } = useGamification();
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
+
+  const QUICK_ITEMS = useMemo(() => [
+    { icon: "edit",     label: "Kaydet",       c: C.amber,  go: SCREENS.ADD_STUDY },
+    { icon: "chart",    label: "Deneme",       c: C.blue,   go: SCREENS.TRIAL_ENTRY },
+    { icon: "camera",   label: "Yanlış",       c: C.coral,  go: SCREENS.ADD_WRONG },
+    { icon: "calendar", label: "Yol Haritası", c: C.purple, go: SCREENS.ROADMAP },
+  ], [C.amber, C.blue, C.coral, C.purple]);
   const streak = useSelector(selectStreak);
   const freezeCount = useSelector(selectFreezeCount);
   const todayLogs = useSelector(selectTodayLogs);
@@ -206,7 +210,7 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.purple} colors={[C.purple]} />}
       >
         <HomeHeader
           name={displayName}
@@ -244,18 +248,22 @@ export default function HomeScreen() {
           {planCtx.srDue > 0 ? (
             <AnimatedCard delay={120}>
               <Pressable onPress={go(SCREENS.REVIEW_SESSION)}>
-                <GlassCard radius={22} intensity={36} style={{ flexDirection: "row", alignItems: "center", gap: 12, padding: 16 }}>
-                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.amber + "22", alignItems: "center", justifyContent: "center" }}>
-                    <Icon name="refresh" size={22} color={C.amber} />
+                <View style={{
+                  flexDirection: "row", alignItems: "center", gap: 12, padding: 16,
+                  borderRadius: 22, backgroundColor: C.coral + "14",
+                  borderWidth: 1, borderColor: C.coral + "28",
+                }}>
+                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.coral + "24", alignItems: "center", justifyContent: "center" }}>
+                    <Icon name="refresh" size={22} color={C.coral} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.amber, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.coral, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
                     <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.text, marginTop: 2 }}>
                       {planCtx.srDue} yanlışın tekrar zamanı geldi
                     </Text>
                   </View>
-                  <Icon name="arrowR" size={18} color={C.amber} />
-                </GlassCard>
+                  <Icon name="arrowR" size={18} color={C.coral} />
+                </View>
               </Pressable>
             </AnimatedCard>
           ) : null}

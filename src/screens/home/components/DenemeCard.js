@@ -1,17 +1,27 @@
-import { View, Text } from "react-native";
-import { BentoCard, Stat, Trend } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { View, Text, Pressable } from "react-native";
+import { Stat, Trend } from "../../../components/design";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function DenemeCard({ data, onPress }) {
+  const C = useC();
   return (
-    <BentoCard onPress={onPress} pad={16} style={{ flex: 1 }}>
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.muted, letterSpacing: 0.6 }}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flex: 1,
+        padding: 16,
+        borderRadius: 24,
+        backgroundColor: C.blue + "12",
+        borderWidth: 1,
+        borderColor: C.blue + "28",
+        opacity: pressed ? 0.92 : 1,
+      })}
+    >
+      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.blue, letterSpacing: 0.6 }}>
         SON DENEME
       </Text>
       <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8, marginTop: 8 }}>
-        <Stat size={36} color={C.amber}>
-          {data.net}
-        </Stat>
+        <Stat size={36} color={C.text}>{data.net}</Stat>
         <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: C.sec }}>net</Text>
       </View>
       <View style={{ marginTop: 8 }}>
@@ -39,6 +49,6 @@ export function DenemeCard({ data, onPress }) {
           />
         ))}
       </View>
-    </BentoCard>
+    </Pressable>
   );
 }

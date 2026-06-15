@@ -1,11 +1,11 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Chip, GlassCard } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { Icon, Chip } from "../../../components/design";
+import { useC } from "../../../contexts/ThemeContext";
 
-function StatBlock({ value, label, color }) {
+function StatBlock({ value, label, color, C }) {
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color }}>
+      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color }}>
         {value}
       </Text>
       <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, marginTop: 2 }}>
@@ -16,6 +16,7 @@ function StatBlock({ value, label, color }) {
 }
 
 export function WeeklyReportCard({ report, onPress }) {
+  const C = useC();
   const hoursStr = report.totalMinutes >= 60
     ? `${(report.totalMinutes / 60).toFixed(1)}sa`
     : `${report.totalMinutes}dk`;
@@ -25,10 +26,20 @@ export function WeeklyReportCard({ report, onPress }) {
 
   return (
     <Pressable onPress={onPress}>
-      <GlassCard radius={24} intensity={36} style={{ padding: 16 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+      <View style={{
+        padding: 18, borderRadius: 24,
+        backgroundColor: C.surface,
+        borderWidth: 1, borderColor: C.border,
+      }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Icon name="calendar" size={16} color={C.blue} />
+            <View style={{
+              width: 30, height: 30, borderRadius: 10,
+              backgroundColor: C.blue + "1A",
+              alignItems: "center", justifyContent: "center",
+            }}>
+              <Icon name="calendar" size={15} color={C.blue} />
+            </View>
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
               Bu Hafta
             </Text>
@@ -48,12 +59,12 @@ export function WeeklyReportCard({ report, onPress }) {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <StatBlock value={report.totalQuestions} label="Soru" color={C.amber} />
-          <StatBlock value={hoursStr} label="Süre" color={C.blue} />
-          <StatBlock value={report.activeDays} label="Aktif Gün" color={C.green} />
-          <StatBlock value={report.trialCount} label="Deneme" color={C.purple} />
+          <StatBlock C={C} value={report.totalQuestions} label="Soru" color={C.amber} />
+          <StatBlock C={C} value={hoursStr} label="Süre" color={C.blue} />
+          <StatBlock C={C} value={report.activeDays} label="Aktif Gün" color={C.green} />
+          <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.purple} />
         </View>
-      </GlassCard>
+      </View>
     </Pressable>
   );
 }
