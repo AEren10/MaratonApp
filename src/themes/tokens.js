@@ -191,8 +191,31 @@ export function paletteFor(scheme) {
 }
 
 // LEGACY default export — yeni kod `useTheme().palette` kullanmalı.
-// Eski tüm dosyalar `import { C }` ile çağırıyor; default light verir, ThemeContext gerçek değeri override eder.
-export const C = paletteFor("light");
+// Eski tüm dosyalar `import { C }` ile çağırıyor. Proxy ile runtime-aware:
+// ThemeProvider scheme değiştirince setRuntimeScheme() çağırır → tüm `C.bg`,
+// `C.text` vb. erişimleri o anki temanın değerini döner. Böylece eski 70+
+// dosyayı tek tek refactor etmeden hem light hem dark düzgün çalışır.
+let _runtimeScheme = "light";
+let _runtimePalette = paletteFor("light");
+
+export function setRuntimeScheme(scheme) {
+  const next = scheme === "dark" ? "dark" : "light";
+  if (next === _runtimeScheme) return;
+  _runtimeScheme = next;
+  _runtimePalette = paletteFor(next);
+}
+
+export const C = new Proxy({}, {
+  get(_target, prop) {
+    return _runtimePalette[prop];
+  },
+  ownKeys() {
+    return Reflect.ownKeys(_runtimePalette);
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    return { enumerable: true, configurable: true, value: _runtimePalette[prop] };
+  },
+});
 
 // ===== Pastel chips (eski) =====
 export const PASTEL = {

@@ -3,7 +3,6 @@ import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
-import { TYPOGRAPHY } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -23,7 +22,8 @@ function avatarPalette(name = "?", C) {
   return palette[sum % palette.length];
 }
 
-// Sade profil başlığı: yan yana avatar + isim + lig chip, altında 2 stat kart.
+// Klasik profil başlığı: ortalanmış büyük avatar + isim + exam + lig chip + countdown.
+// Tema-duyarlı (useC) — light ve dark'ta nötr, hardcoded renk yok.
 export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
   const C = useC();
   const initials = (name || "??").slice(0, 2).toUpperCase();
@@ -68,173 +68,132 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
   };
 
   return (
-    <View style={{ marginTop: 8, marginBottom: 18 }}>
-      {/* === Üst sıra: avatar + isim + lig === */}
-      <View style={{
-        flexDirection: "row", alignItems: "center", gap: 14,
-        padding: 16,
-        borderRadius: 24,
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-      }}>
-        <Pressable onPress={pickAvatar}>
-          <View style={{
-            width: 72, height: 72, borderRadius: 22,
-            overflow: "hidden",
-            backgroundColor: C.surface2,
-          }}>
-            {avatarUri ? (
-              <Image
-                source={{ uri: avatarUri }}
-                style={{ width: 72, height: 72 }}
-                contentFit="cover"
-                cachePolicy="memory-disk"
-                transition={200}
-              />
-            ) : (
-              <LinearGradient
-                colors={[c1, c2]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{ width: 72, height: 72, alignItems: "center", justifyContent: "center" }}
-              >
-                <Text style={{
-                  fontFamily: "SpaceGrotesk_700Bold",
-                  fontSize: 28,
-                  color: "#FFFFFF",
-                  letterSpacing: -1,
-                }}>
-                  {initials}
-                </Text>
-              </LinearGradient>
-            )}
-            {uploading && (
-              <View style={{
-                position: "absolute", left: 0, right: 0, top: 0, bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.45)",
-                alignItems: "center", justifyContent: "center",
+    <View style={{ marginTop: 16, marginBottom: 18, alignItems: "center" }}>
+      {/* === Büyük ortalanmış avatar === */}
+      <Pressable onPress={pickAvatar}>
+        <View style={{
+          width: 132, height: 132, borderRadius: 66,
+          overflow: "hidden",
+          backgroundColor: C.surface2,
+          borderWidth: 3,
+          borderColor: C.amber + "55",
+        }}>
+          {avatarUri ? (
+            <Image
+              source={{ uri: avatarUri }}
+              style={{ width: 132, height: 132 }}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={200}
+            />
+          ) : (
+            <LinearGradient
+              colors={[c1, c2]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ width: 132, height: 132, alignItems: "center", justifyContent: "center" }}
+            >
+              <Text style={{
+                fontFamily: "SpaceGrotesk_700Bold",
+                fontSize: 52,
+                color: "#FFFFFF",
+                letterSpacing: -1.4,
               }}>
-                <ActivityIndicator color="#FFFFFF" />
-              </View>
-            )}
-          </View>
-          {/* Camera dot */}
-          <View style={{
-            position: "absolute",
-            bottom: -2, right: -2,
-            width: 26, height: 26, borderRadius: 9,
-            backgroundColor: C.purple,
-            alignItems: "center", justifyContent: "center",
-            borderWidth: 3,
-            borderColor: C.surface,
-          }}>
-            <Icon name="camera" size={11} color="#FFFFFF" sw={2.4} />
-          </View>
-        </Pressable>
-
-        <View style={{ flex: 1 }}>
-          <Text style={{
-            fontFamily: "SpaceGrotesk_700Bold",
-            fontSize: 22,
-            color: C.text,
-            letterSpacing: -0.4,
-          }} numberOfLines={1}>
-            {name}
-          </Text>
-          {/* Lig chip */}
-          <View style={{
-            flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: C.purple + "14",
-            paddingHorizontal: 9, paddingVertical: 4,
-            borderRadius: 999,
-            marginTop: 6,
-            alignSelf: "flex-start",
-          }}>
-            {league?.icon ? <Icon name={league.icon} size={11} color={C.purple} /> : null}
-            <Text style={{
-              fontFamily: "Inter_600SemiBold",
-              fontSize: 11,
-              color: C.purple,
-              letterSpacing: 0.4,
+                {initials}
+              </Text>
+            </LinearGradient>
+          )}
+          {uploading && (
+            <View style={{
+              position: "absolute", left: 0, right: 0, top: 0, bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.45)",
+              alignItems: "center", justifyContent: "center",
             }}>
-              {league?.name || "Bronz Lig"}
-            </Text>
-          </View>
+              <ActivityIndicator color="#FFFFFF" />
+            </View>
+          )}
         </View>
+        {/* Camera fab */}
+        <View style={{
+          position: "absolute",
+          bottom: 4, right: 4,
+          width: 38, height: 38, borderRadius: 19,
+          backgroundColor: C.amber,
+          alignItems: "center", justifyContent: "center",
+          borderWidth: 3,
+          borderColor: C.bg,
+        }}>
+          <Icon name="camera" size={16} color="#FFFFFF" sw={2.4} />
+        </View>
+      </Pressable>
+
+      {/* === İsim === */}
+      <Text style={{
+        fontFamily: "SpaceGrotesk_700Bold",
+        fontSize: 26,
+        color: C.text,
+        letterSpacing: -0.5,
+        marginTop: 18,
+      }} numberOfLines={1}>
+        {name}
+      </Text>
+
+      {/* === Exam type === */}
+      {exam ? (
+        <Text style={{
+          fontFamily: "Inter_500Medium",
+          fontSize: 14,
+          color: C.sec,
+          marginTop: 4,
+        }}>
+          {exam}
+        </Text>
+      ) : null}
+
+      {/* === Lig chip === */}
+      <View style={{
+        flexDirection: "row", alignItems: "center", gap: 6,
+        backgroundColor: C.amber + "18",
+        borderWidth: 1,
+        borderColor: C.amber + "40",
+        paddingHorizontal: 12, paddingVertical: 6,
+        borderRadius: 999,
+        marginTop: 14,
+        alignSelf: "center",
+      }}>
+        {league?.icon ? <Icon name={league.icon} size={13} color={C.amber} /> : null}
+        <Text style={{
+          fontFamily: "Inter_600SemiBold",
+          fontSize: 12,
+          color: C.amber,
+          letterSpacing: 0.4,
+        }}>
+          {league?.name || "Bronz Lig"}
+        </Text>
       </View>
 
-      {/* === Alt sıra: 2 stat kart === */}
-      <View style={{
-        marginTop: 12,
-        flexDirection: "row",
-        gap: 12,
-      }}>
-        <View style={{
-          flex: 1.4,
-          padding: 14,
-          borderRadius: 18,
-          backgroundColor: C.coral + "12",
-          borderWidth: 1,
-          borderColor: C.coral + "28",
-        }}>
-          <Text style={{
-            fontFamily: "Inter_600SemiBold",
-            fontSize: 10,
-            color: C.coral,
-            letterSpacing: 0.8,
-          }}>
-            SINAVA
-          </Text>
-          <View style={{ flexDirection: "row", alignItems: "baseline", gap: 4, marginTop: 4 }}>
+      {/* === Countdown stat === */}
+      {countdown != null ? (
+        <View style={{ alignItems: "center", marginTop: 18 }}>
+          <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
             <Text style={{
               fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 28,
+              fontSize: 38,
               color: C.text,
-              letterSpacing: -0.8,
+              letterSpacing: -1,
             }}>
-              {countdown != null ? countdown : "—"}
+              {countdown}
             </Text>
             <Text style={{
               fontFamily: "Inter_500Medium",
-              fontSize: 13,
+              fontSize: 15,
               color: C.sec,
             }}>
-              gün
+              gün kaldı
             </Text>
           </View>
         </View>
-
-        <View style={{
-          flex: 1,
-          padding: 14,
-          borderRadius: 18,
-          backgroundColor: C.purple + "12",
-          borderWidth: 1,
-          borderColor: C.purple + "28",
-        }}>
-          <Text style={{
-            fontFamily: "Inter_600SemiBold",
-            fontSize: 10,
-            color: C.purple,
-            letterSpacing: 0.8,
-          }}>
-            SINAV TÜRÜN
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              fontSize: 13,
-              color: C.text,
-              marginTop: 6,
-              lineHeight: 17,
-            }}
-            numberOfLines={2}
-          >
-            {exam}
-          </Text>
-        </View>
-      </View>
+      ) : null}
     </View>
   );
 }
