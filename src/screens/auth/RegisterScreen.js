@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { AuthInput } from "./components/AuthInput";
 import { Icon } from "../../components/design";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
+  const C = useC();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,55 +37,79 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <LinearGradient
+        colors={[C.coral, "#FFC9A8"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          paddingTop: 60,
+          paddingBottom: 50,
+          paddingHorizontal: 24,
+          borderBottomLeftRadius: 40,
+          borderBottomRightRadius: 40,
+        }}
+      >
+        <View style={{
+          position: "absolute", top: -30, right: -30,
+          width: 150, height: 150, borderRadius: 75,
+          backgroundColor: "rgba(255,255,255,0.12)",
+        }} />
+        <View style={{
+          position: "absolute", bottom: -40, left: -40,
+          width: 120, height: 120, borderRadius: 60,
+          backgroundColor: "rgba(255,255,255,0.08)",
+        }} />
+
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={10}
+          style={({ pressed }) => ({
+            width: 40, height: 40, borderRadius: 14,
+            backgroundColor: "rgba(255,255,255,0.22)",
+            alignItems: "center", justifyContent: "center",
+            marginBottom: 24,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Icon name="arrowL" size={18} color="#FFFFFF" sw={2.5} />
+        </Pressable>
+
+        <View style={{
+          width: 56, height: 56, borderRadius: 18,
+          backgroundColor: "rgba(255,255,255,0.22)",
+          alignItems: "center", justifyContent: "center",
+          marginBottom: 14,
+        }}>
+          <Icon name="user" size={26} color="#FFFFFF" sw={2.4} />
+        </View>
+
+        <Text style={{
+          fontFamily: "SpaceGrotesk_700Bold",
+          fontSize: 30,
+          color: "#FFFFFF",
+          letterSpacing: -0.7,
+        }}>
+          Aramıza katıl
+        </Text>
+        <Text style={{
+          fontFamily: "Inter_500Medium",
+          fontSize: 14,
+          color: "rgba(255,255,255,0.92)",
+          marginTop: 6,
+        }}>
+          Bugün başla, sınava hazır gel.
+        </Text>
+      </LinearGradient>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={{ padding: 24, flexGrow: 1 }}
+          contentContainerStyle={{ padding: 24, paddingTop: 32 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Pressable
-            onPress={() => navigation.goBack()}
-            hitSlop={10}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              backgroundColor: C.surface,
-              borderWidth: 1,
-              borderColor: C.border,
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 24,
-            }}
-          >
-            <Icon name="x" size={18} color={C.text} />
-          </Pressable>
-
-          <Text
-            style={{
-              fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 28,
-              color: C.text,
-              letterSpacing: -0.5,
-            }}
-          >
-            Aramıza katıl
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: 15,
-              color: C.muted,
-              marginTop: 6,
-              marginBottom: 32,
-            }}
-          >
-            Bugün başla, sınava hazır gel.
-          </Text>
-
           <AuthInput
             label="Ad"
             value={name}
@@ -92,6 +117,7 @@ export default function RegisterScreen() {
             placeholder="Eren"
             autoCapitalize="words"
             error={errors.name}
+            icon="user"
           />
           <AuthInput
             label="E-posta"
@@ -100,6 +126,7 @@ export default function RegisterScreen() {
             placeholder="ornek@mail.com"
             keyboardType="email-address"
             error={errors.email}
+            icon="mail"
           />
           <AuthInput
             label="Şifre"
@@ -108,31 +135,47 @@ export default function RegisterScreen() {
             placeholder="••••••••"
             secureTextEntry
             error={errors.password}
+            icon="lock"
           />
 
           <Pressable
             onPress={submit}
             disabled={busy}
             style={({ pressed }) => ({
-              backgroundColor: C.amber,
-              borderRadius: 16,
-              paddingVertical: 16,
+              backgroundColor: C.coral,
+              borderRadius: 999,
+              paddingVertical: 17,
               alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 8,
               marginTop: 12,
-              opacity: busy ? 0.6 : pressed ? 0.85 : 1,
-              shadowColor: C.amber,
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.4,
-              shadowRadius: 16,
+              opacity: busy ? 0.6 : pressed ? 0.92 : 1,
+              shadowColor: C.coral,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.32,
+              shadowRadius: 18,
               elevation: 6,
             })}
           >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.bg }}>
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
               {busy ? "Hesap açılıyor..." : "Kayıt Ol"}
+            </Text>
+            {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate(SCREENS.LOGIN)}
+            style={{ marginTop: 20, alignItems: "center" }}
+            hitSlop={6}
+          >
+            <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
+              Zaten hesabın var mı?{" "}
+              <Text style={{ color: C.coral, fontFamily: "Inter_600SemiBold" }}>Giriş Yap</Text>
             </Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

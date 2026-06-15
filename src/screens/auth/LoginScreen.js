@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../components/design";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
-import { C, SPACING } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { AuthInput } from "./components/AuthInput";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const C = useC();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -25,7 +27,6 @@ export default function LoginScreen() {
     setBusy(true);
     try {
       await signIn({ email, password });
-      // AuthContext will pick up the session and switch to main tabs.
     } catch (err) {
       Alert.alert("Giriş başarısız", err.message ?? "Bir sorun oldu");
     } finally {
@@ -34,38 +35,83 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* === Hero gradient banner === */}
+      <LinearGradient
+        colors={[C.purple, "#C5B0FF"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          paddingTop: 70,
+          paddingBottom: 40,
+          paddingHorizontal: 28,
+          borderBottomLeftRadius: 40,
+          borderBottomRightRadius: 40,
+        }}
+      >
+        {/* Decorative blobs */}
+        <View style={{
+          position: "absolute", top: -30, right: -30,
+          width: 160, height: 160, borderRadius: 80,
+          backgroundColor: "rgba(255,255,255,0.12)",
+        }} />
+        <View style={{
+          position: "absolute", bottom: -40, left: -40,
+          width: 130, height: 130, borderRadius: 65,
+          backgroundColor: "rgba(255,255,255,0.08)",
+        }} />
+
+        <View style={{
+          width: 60, height: 60, borderRadius: 18,
+          backgroundColor: "rgba(255,255,255,0.22)",
+          alignItems: "center", justifyContent: "center",
+          marginBottom: 16,
+        }}>
+          <Icon name="zap" size={30} color="#FFFFFF" sw={2.5} />
+        </View>
+
+        <Text style={{
+          fontFamily: "SpaceGrotesk_700Bold",
+          fontSize: 38,
+          color: "#FFFFFF",
+          letterSpacing: -1,
+        }}>
+          Maraton
+        </Text>
+        <Text style={{
+          fontFamily: "Inter_500Medium",
+          fontSize: 15,
+          color: "rgba(255,255,255,0.92)",
+          marginTop: 6,
+        }}>
+          YKS yolculuğun burada başlıyor.
+        </Text>
+      </LinearGradient>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={{ padding: 24, flexGrow: 1, justifyContent: "center" }}
+          contentContainerStyle={{ padding: 24, paddingTop: 32 }}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={{ marginBottom: 8 }}>
-            <Icon name="zap" size={48} color={C.amber} />
-          </View>
-          <Text
-            style={{
-              fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 32,
-              color: C.text,
-              letterSpacing: -0.8,
-            }}
-          >
-            Maraton
+          <Text style={{
+            fontFamily: "SpaceGrotesk_700Bold",
+            fontSize: 24,
+            color: C.text,
+            letterSpacing: -0.4,
+            marginBottom: 4,
+          }}>
+            Tekrar Hoş Geldin
           </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: 15,
-              color: C.muted,
-              marginTop: 6,
-              marginBottom: 36,
-            }}
-          >
-            YKS yolculuğun burada başlıyor.
+          <Text style={{
+            fontFamily: "Inter_400Regular",
+            fontSize: 14,
+            color: C.muted,
+            marginBottom: 28,
+          }}>
+            Hesabınla giriş yap, kaldığın yerden devam et.
           </Text>
 
           <AuthInput
@@ -75,6 +121,7 @@ export default function LoginScreen() {
             placeholder="ornek@mail.com"
             keyboardType="email-address"
             error={errors.email}
+            icon="mail"
           />
           <AuthInput
             label="Şifre"
@@ -83,14 +130,16 @@ export default function LoginScreen() {
             placeholder="••••••••"
             secureTextEntry
             error={errors.password}
+            icon="lock"
           />
 
           <Pressable
             onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)}
-            style={{ alignSelf: "flex-end", marginBottom: SPACING.md }}
+            style={{ alignSelf: "flex-end", marginBottom: 8, marginTop: -4 }}
+            hitSlop={6}
           >
-            <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.amber }}>
-              Sifremi Unuttum
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.purple }}>
+              Şifremi unuttum
             </Text>
           </Pressable>
 
@@ -98,35 +147,55 @@ export default function LoginScreen() {
             onPress={submit}
             disabled={busy}
             style={({ pressed }) => ({
-              backgroundColor: C.amber,
-              borderRadius: 16,
-              paddingVertical: 16,
+              backgroundColor: C.purple,
+              borderRadius: 999,
+              paddingVertical: 17,
               alignItems: "center",
-              marginTop: 8,
-              opacity: busy ? 0.6 : pressed ? 0.85 : 1,
-              shadowColor: C.amber,
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.4,
-              shadowRadius: 16,
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 8,
+              marginTop: 16,
+              opacity: busy ? 0.6 : pressed ? 0.92 : 1,
+              shadowColor: C.purple,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.30,
+              shadowRadius: 18,
               elevation: 6,
             })}
           >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.bg }}>
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
               {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
             </Text>
+            {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
           </Pressable>
+
+          {/* Divider */}
+          <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 22, gap: 12 }}>
+            <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+            <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>
+              veya
+            </Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+          </View>
 
           <Pressable
             onPress={() => navigation.navigate(SCREENS.REGISTER)}
-            style={{ marginTop: 24, alignItems: "center" }}
+            style={({ pressed }) => ({
+              backgroundColor: C.surface,
+              borderRadius: 999,
+              paddingVertical: 16,
+              alignItems: "center",
+              borderWidth: 1.5,
+              borderColor: C.border,
+              opacity: pressed ? 0.85 : 1,
+            })}
           >
-            <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
-              Hesabın yok mu?{" "}
-              <Text style={{ color: C.amber, fontFamily: "Inter_600SemiBold" }}>Kayıt Ol</Text>
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
+              Hesap Oluştur
             </Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

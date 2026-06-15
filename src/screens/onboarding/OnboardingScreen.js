@@ -2,39 +2,47 @@ import { useState, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import Svg, { Circle, Path, Polyline, Line } from "react-native-svg";
 
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { Icon } from "../../components/design";
 
 const SLIDES = [
   {
     icon: "target",
-    color: C.amber,
+    gradientKey: "purple",
+    grad: ["#9D86FF", "#C5B0FF"],
     title: "Hedefe Odaklan",
-    desc: "Yapay zeka destekli kisisel calisma planin, her gun seni hedefe yaklastirir.",
+    desc: "Yapay zeka destekli kişisel çalışma planın, her gün seni hedefe yaklaştırır.",
   },
   {
     icon: "chart",
-    color: C.green,
-    title: "Gelisimini Takip Et",
-    desc: "Deneme sonuclarin, ders bazli analizler ve trend grafikleri tek yerde.",
+    gradientKey: "blue",
+    grad: ["#4F8DF2", "#A6CCFF"],
+    title: "Gelişimini Takip Et",
+    desc: "Deneme sonuçların, ders bazlı analizler ve trend grafikleri tek yerde.",
   },
   {
     icon: "flame",
-    color: "#F2706E",
-    title: "Seri Olustur",
-    desc: "Gunluk calisma serini koru, rozet kazan ve ligde yuksel.",
+    gradientKey: "coral",
+    grad: ["#F08568", "#FFC9A8"],
+    title: "Seri Oluştur",
+    desc: "Günlük çalışma serini koru, rozet kazan ve ligde yüksel.",
   },
   {
     icon: "users",
-    color: C.purple,
-    title: "Birlikte Calis",
-    desc: "Canli calisma odalarina katil, arkadaslarinla yarisarak motive ol.",
+    gradientKey: "green",
+    grad: ["#22B47A", "#7CD8A8"],
+    title: "Birlikte Çalış",
+    desc: "Canlı çalışma odalarına katıl, arkadaşlarınla yarışarak motive ol.",
   },
 ];
 
-function SlideIcon({ name, color, size = 80 }) {
+function SlideIcon({ name, size = 120, color = "#FFFFFF" }) {
   const ICON_MAP = {
     target: (
       <>
@@ -66,16 +74,15 @@ function SlideIcon({ name, color, size = 80 }) {
     ),
   };
   return (
-    <View style={[styles.iconContainer, { backgroundColor: color + "15" }]}>
-      <Svg width={size} height={size} viewBox="0 0 80 80">
-        {ICON_MAP[name]}
-      </Svg>
-    </View>
+    <Svg width={size} height={size} viewBox="0 0 80 80">
+      {ICON_MAP[name]}
+    </Svg>
   );
 }
 
 export default function OnboardingScreen() {
   const navigation = useNavigation();
+  const C = useC();
   const [index, setIndex] = useState(0);
 
   const slide = SLIDES[index];
@@ -94,73 +101,142 @@ export default function OnboardingScreen() {
   }, [navigation]);
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
-      <View style={styles.topRow}>
-        <View />
-        <Pressable onPress={skip} hitSlop={12}>
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>Atla</Text>
-        </Pressable>
-      </View>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+        {/* Skip butonu */}
+        <View style={styles.topRow}>
+          <View />
+          <Pressable onPress={skip} hitSlop={12} style={({ pressed }) => ({
+            paddingHorizontal: 14, paddingVertical: 7,
+            borderRadius: 999,
+            backgroundColor: C.surface,
+            borderWidth: 1,
+            borderColor: C.border,
+            opacity: pressed ? 0.7 : 1,
+          })}>
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.muted, letterSpacing: 0.4 }}>
+              Atla
+            </Text>
+          </Pressable>
+        </View>
 
-      <View style={styles.slideArea}>
-        <SlideIcon name={slide.icon} color={slide.color} />
-        <Text style={styles.slideTitle}>{slide.title}</Text>
-        <Text style={styles.slideDesc}>{slide.desc}</Text>
-      </View>
+        {/* === Hero illustration === */}
+        <Animated.View
+          key={`hero-${index}`}
+          entering={FadeIn.duration(420)}
+          style={{ alignItems: "center", marginTop: 20, marginBottom: 30, paddingHorizontal: 30 }}
+        >
+          <LinearGradient
+            colors={slide.grad}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              width: 240, height: 240, borderRadius: 60,
+              alignItems: "center", justifyContent: "center",
+              shadowColor: slide.grad[0],
+              shadowOffset: { width: 0, height: 18 },
+              shadowOpacity: 0.40,
+              shadowRadius: 30,
+              elevation: 12,
+              overflow: "hidden",
+            }}
+          >
+            {/* Decorative blobs inside */}
+            <View style={{
+              position: "absolute", top: -40, left: -40,
+              width: 140, height: 140, borderRadius: 70,
+              backgroundColor: "rgba(255,255,255,0.18)",
+            }} />
+            <View style={{
+              position: "absolute", bottom: -50, right: -30,
+              width: 120, height: 120, borderRadius: 60,
+              backgroundColor: "rgba(255,255,255,0.10)",
+            }} />
 
-      <View style={styles.dots}>
-        {SLIDES.map((s, i) => (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              i === index && { width: 24, backgroundColor: s.color },
-            ]}
-          />
-        ))}
-      </View>
+            <SlideIcon name={slide.icon} size={120} color="#FFFFFF" />
+          </LinearGradient>
+        </Animated.View>
 
-      <Pressable onPress={goNext} style={styles.nextBtn}>
-        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
-          {isLast ? "Baslayalim" : "Devam"}
-        </Text>
-      </Pressable>
-    </SafeAreaView>
+        {/* === Text content === */}
+        <Animated.View
+          key={`text-${index}`}
+          entering={FadeInDown.delay(120).duration(420)}
+          style={{ paddingHorizontal: 32, alignItems: "center" }}
+        >
+          <Text style={[styles.slideTitle, { color: C.text }]}>{slide.title}</Text>
+          <Text style={[styles.slideDesc, { color: C.muted }]}>{slide.desc}</Text>
+        </Animated.View>
+
+        <View style={{ flex: 1 }} />
+
+        {/* === Dots + CTA === */}
+        <View style={{ paddingHorizontal: 24, paddingBottom: 30 }}>
+          <View style={styles.dots}>
+            {SLIDES.map((s, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  { backgroundColor: i === index ? s.grad[0] : C.border },
+                  i === index && { width: 28 },
+                ]}
+              />
+            ))}
+          </View>
+
+          <Pressable
+            onPress={goNext}
+            style={({ pressed }) => ({
+              backgroundColor: slide.grad[0],
+              borderRadius: 999,
+              paddingVertical: 17,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 8,
+              shadowColor: slide.grad[0],
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.40,
+              shadowRadius: 20,
+              elevation: 8,
+              opacity: pressed ? 0.92 : 1,
+            })}
+          >
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
+              {isLast ? "Başlayalım" : "Devam"}
+            </Text>
+            <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
   topRow: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
     paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
   },
-  slideArea: {
-    flex: 1, alignItems: "center", justifyContent: "center",
-    paddingHorizontal: SPACING.xxxl,
-  },
-  iconContainer: {
-    width: 140, height: 140, borderRadius: 70,
-    alignItems: "center", justifyContent: "center", marginBottom: SPACING.xxxl,
-  },
   slideTitle: {
-    ...TYPOGRAPHY.heading, color: C.text, textAlign: "center", marginBottom: SPACING.md,
+    fontFamily: "SpaceGrotesk_700Bold",
+    fontSize: 30,
+    letterSpacing: -0.8,
+    textAlign: "center",
+    marginBottom: 12,
   },
   slideDesc: {
-    ...TYPOGRAPHY.body, color: C.sec, textAlign: "center", lineHeight: 24,
-    maxWidth: 300,
+    ...TYPOGRAPHY.body,
+    fontSize: 15,
+    textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 320,
   },
   dots: {
-    flexDirection: "row", justifyContent: "center", gap: 8,
-    marginBottom: SPACING.xxxl,
+    flexDirection: "row", justifyContent: "center", gap: 6,
+    marginBottom: 24,
   },
   dot: {
-    width: 8, height: 8, borderRadius: 4, backgroundColor: C.surface2,
-  },
-  nextBtn: {
-    backgroundColor: C.amber, borderRadius: RADIUS.xl,
-    marginHorizontal: SPACING.lg, marginBottom: SPACING.lg,
-    paddingVertical: SPACING.lg, alignItems: "center",
-    ...SHADOWS.amber,
+    width: 8, height: 8, borderRadius: 4,
   },
 });
