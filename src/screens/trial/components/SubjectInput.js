@@ -1,122 +1,119 @@
-import { useState, useCallback, useMemo } from "react";
-import { View, Text, TextInput } from "react-native";
-import { IconBox } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useCallback, useMemo } from "react";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
+import { Icon } from "../../../components/design";
 
+// Ders satırı: kimlik renkli sol şerit + ad + 3 input (D/Y/B otomatik) + net
 export function SubjectInput({ subject, values, onChange }) {
-  const { name, color, icon, max } = subject;
+  const C = useC();
+  const id = useSubjectIdentity(subject.key);
+  const { name, icon, max } = subject;
+  const color = id?.solid || subject.color;
+  const tint  = id?.tint  || (color + "14");
 
-  const net = useMemo(() => {
-    const d = parseInt(values.correct, 10) || 0;
-    const y = parseInt(values.wrong, 10) || 0;
-    return (d - y * 0.25).toFixed(2);
-  }, [values.correct, values.wrong]);
+  const correct = parseInt(values.correct, 10) || 0;
+  const wrong   = parseInt(values.wrong,   10) || 0;
 
-  const handleCorrect = useCallback(
-    (text) => onChange({ ...values, correct: text }),
-    [values, onChange]
-  );
+  // Boş = max - doğru - yanlış (kullanıcı isterse manuel override eder)
+  const emptyAuto = Math.max(0, max - correct - wrong);
+  const emptyInput = values.empty != null ? values.empty : String(emptyAuto);
 
-  const handleWrong = useCallback(
-    (text) => onChange({ ...values, wrong: text }),
-    [values, onChange]
-  );
+  const net = useMemo(() => (correct - wrong * 0.25).toFixed(2), [correct, wrong]);
+
+  const setCorrect = useCallback((t) => onChange({ ...values, correct: t.replace(/[^0-9]/g, "") }), [values, onChange]);
+  const setWrong   = useCallback((t) => onChange({ ...values, wrong:   t.replace(/[^0-9]/g, "") }), [values, onChange]);
+  const setEmpty   = useCallback((t) => onChange({ ...values, empty:   t.replace(/[^0-9]/g, "") }), [values, onChange]);
 
   return (
-    <View style={[styles.card, { borderColor: color + "40" }]}>
-      {/* Accent bar */}
-      <View style={[styles.accent, { backgroundColor: color }]} />
+    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+      {/* Sol kimlik şerit */}
+      <View style={[s.stripe, { backgroundColor: color }]} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <IconBox icon={icon} color={color} size={36} rounded={10} />
-        <Text style={[styles.name, { color }]}>{name}</Text>
-        <Text style={[styles.net, { color }]}>{net} net</Text>
-      </View>
-
-      {/* Inputs */}
-      <View style={styles.inputs}>
-        <View style={styles.inputWrap}>
-          <Text style={styles.inputLabel}>Dogru</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="number-pad"
-            maxLength={2}
-            placeholder="0"
-            placeholderTextColor={C.muted}
-            value={values.correct}
-            onChangeText={handleCorrect}
-          />
+      <View style={s.body}>
+        {/* Header: ikon + ad + max + net */}
+        <View style={s.head}>
+          <View style={[s.iconBox, { backgroundColor: tint }]}>
+            <Icon name={icon} size={18} color={color} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[s.name, { color: C.text }]}>{name}</Text>
+            <Text style={[s.max, { color: C.muted }]}>{max} soru</Text>
+          </View>
+          <View style={[s.netBadge, { backgroundColor: color + "16" }]}>
+            <Text style={[s.netValue, { color: color }]}>{net}</Text>
+            <Text style={[s.netLabel, { color }]}>net</Text>
+          </View>
         </View>
-        <View style={styles.inputWrap}>
-          <Text style={styles.inputLabel}>Yanlis</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="number-pad"
-            maxLength={2}
-            placeholder="0"
-            placeholderTextColor={C.muted}
-            value={values.wrong}
-            onChangeText={handleWrong}
-          />
+
+        {/* Inputs D / Y / B */}
+        <View style={s.inputs}>
+          <NumInput label="Doğru" value={values.correct} onChange={setCorrect} max={max} tone={C.green} C={C} />
+          <NumInput label="Yanlış" value={values.wrong}   onChange={setWrong}   max={max} tone={C.red}   C={C} />
+          <NumInput label="Boş"    value={emptyInput}     onChange={setEmpty}   max={max} tone={C.muted} C={C} dim />
         </View>
       </View>
     </View>
   );
 }
 
-const styles = {
+function NumInput({ label, value, onChange, max, tone, C, dim }) {
+  return (
+    <View style={s.inputWrap}>
+      <Text style={[s.inputLabel, { color: dim ? C.muted : tone }]}>{label.toUpperCase()}</Text>
+      <TextInput
+        value={String(value || "")}
+        onChangeText={onChange}
+        keyboardType="number-pad"
+        maxLength={String(max).length}
+        placeholder="0"
+        placeholderTextColor={C.muted}
+        style={[
+          s.input,
+          {
+            color: C.text,
+            backgroundColor: C.surface2,
+            borderColor: dim ? C.border : tone + "30",
+          },
+        ]}
+      />
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
   card: {
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xxl,
+    flexDirection: "row",
+    borderRadius: 22,
     borderWidth: 1,
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
+    marginBottom: 12,
     overflow: "hidden",
-    position: "relative",
   },
-  accent: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    opacity: 0.6,
+  stripe: { width: 5 },
+  body: { flex: 1, padding: 14 },
+  head: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
+  iconBox: {
+    width: 36, height: 36, borderRadius: 12,
+    alignItems: "center", justifyContent: "center",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.sm,
-    marginBottom: SPACING.md,
+  name: { ...TYPOGRAPHY.bodySemiBold },
+  max: { ...TYPOGRAPHY.micro, marginTop: 1 },
+  netBadge: {
+    flexDirection: "row", alignItems: "baseline", gap: 4,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999,
   },
-  name: {
-    ...TYPOGRAPHY.bodySemiBold,
-    flex: 1,
-  },
-  net: {
-    ...TYPOGRAPHY.statSmall,
-  },
-  inputs: {
-    flexDirection: "row",
-    gap: SPACING.md,
-  },
-  inputWrap: {
-    flex: 1,
-  },
-  inputLabel: {
-    ...TYPOGRAPHY.captionMedium,
-    color: C.sec,
-    marginBottom: SPACING.xs,
-  },
+  netValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, letterSpacing: -0.3 },
+  netLabel: { ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold" },
+  inputs: { flexDirection: "row", gap: 8 },
+  inputWrap: { flex: 1 },
+  inputLabel: { ...TYPOGRAPHY.micro, marginBottom: 4, letterSpacing: 0.5 },
   input: {
-    ...TYPOGRAPHY.subheading,
-    color: C.text,
-    backgroundColor: C.surface2,
+    fontFamily: "SpaceGrotesk_700Bold", fontSize: 20,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: C.border,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
     textAlign: "center",
+    letterSpacing: -0.3,
   },
-};
+});

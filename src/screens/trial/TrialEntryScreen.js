@@ -225,8 +225,8 @@ export default function TrialEntryScreen() {
               style={[styles.submitBtn, saving && { opacity: 0.6 }]}
               disabled={saving}
             >
-              <Icon name="check" size={20} color={C.bg} />
-              <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Kaydet"}</Text>
+              <Icon name="check" size={22} color="#FFFFFF" sw={2.5} />
+              <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}</Text>
             </Pressable>
           )}
         </ScrollView>
@@ -300,13 +300,19 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.sm,
-    backgroundColor: C.amber,
-    borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.lg,
-    ...SHADOWS.amber,
+    backgroundColor: C.purple,
+    borderRadius: 999,
+    paddingVertical: 18,
+    marginTop: SPACING.lg,
+    shadowColor: C.purple,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.32,
+    shadowRadius: 20,
+    elevation: 8,
   },
   submitText: {
     ...TYPOGRAPHY.button,
-    color: C.bg,
+    color: "#FFFFFF",
+    fontSize: 16,
   },
 };
