@@ -21,9 +21,9 @@ const ANSWERS = ["A", "B", "C", "D", "E"];
 export default function AddWrongScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const { subjects } = useCurriculum();
+  const { tytSubjects, aytSubjects } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
-  const [subject, setSubject] = useState(() => subjects[1] || subjects[0] || { key: "matematik", label: "Matematik", color: "#EBAE63", icon: "hash" });
+  const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: "#EBAE63", icon: "hash" });
   const [topic, setTopic] = useState("");
   const [topicSource, setTopicSource] = useState(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -119,40 +119,39 @@ export default function AddWrongScreen() {
         contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        <Label>Ders</Label>
-        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-          {subjects.map((s) => {
-            const active = subject.key === s.key;
-            return (
-              <Pressable
-                key={s.key}
-                onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 10,
-                  borderRadius: 14,
-                  backgroundColor: active ? s.color + "22" : C.surface,
-                  borderWidth: 1,
-                  borderColor: active ? s.color : C.border,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <Icon name={s.icon} size={18} color={active ? s.color : C.sec} />
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 13,
-                    color: active ? s.color : C.sec,
-                  }}
-                >
-                  {s.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        {/* TYT bölümü */}
+        {tytSubjects.length > 0 && (
+          <>
+            <SectionLabel color={C.blue}>TYT</SectionLabel>
+            <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+              {tytSubjects.map((s) => (
+                <SubjectChip
+                  key={s.key}
+                  s={s}
+                  active={subject.key === s.key}
+                  onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
+                />
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* AYT bölümü */}
+        {aytSubjects.length > 0 && (
+          <>
+            <SectionLabel color={C.purple}>AYT</SectionLabel>
+            <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+              {aytSubjects.map((s) => (
+                <SubjectChip
+                  key={s.key}
+                  s={s}
+                  active={subject.key === s.key}
+                  onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
+                />
+              ))}
+            </View>
+          </>
+        )}
 
         <Label>Konu</Label>
         <Pressable
@@ -363,5 +362,61 @@ function Label({ children }) {
     >
       {children}
     </Text>
+  );
+}
+
+function SectionLabel({ children, color }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        marginTop: 18,
+        marginBottom: 8,
+      }}
+    >
+      <View style={{ width: 4, height: 14, borderRadius: 2, backgroundColor: color }} />
+      <Text
+        style={{
+          fontFamily: "SpaceGrotesk_700Bold",
+          fontSize: 13,
+          color,
+          letterSpacing: 0.8,
+        }}
+      >
+        {children}
+      </Text>
+    </View>
+  );
+}
+
+function SubjectChip({ s, active, onPress }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 14,
+        backgroundColor: active ? s.color + "22" : C.surface,
+        borderWidth: 1,
+        borderColor: active ? s.color : C.border,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+      }}
+    >
+      <Icon name={s.icon} size={18} color={active ? s.color : C.sec} />
+      <Text
+        style={{
+          fontFamily: "Inter_600SemiBold",
+          fontSize: 13,
+          color: active ? s.color : C.sec,
+        }}
+      >
+        {s.label}
+      </Text>
+    </Pressable>
   );
 }

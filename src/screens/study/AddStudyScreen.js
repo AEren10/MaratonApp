@@ -19,46 +19,13 @@ import { useAppDispatch } from "../../store/hooks";
 import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
 import { computeStreakUpdate } from "../../lib/streakFreeze";
 import { useGamification } from "../../hooks/useGamification";
-import { useExam } from "../../contexts/ExamContext";
+import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
-
-// === Sınav tipine göre ders setleri ===
-const TYT_SUBJECTS = [
-  { key: "turkce",    name: "Türkçe",     icon: "bookOpen" },
-  { key: "matematik", name: "Matematik",  icon: "hash" },
-  { key: "fizik",     name: "Fizik",      icon: "zap" },
-  { key: "kimya",     name: "Kimya",      icon: "flask" },
-  { key: "biyoloji",  name: "Biyoloji",   icon: "activity" },
-  { key: "tarih",     name: "Tarih",      icon: "clock" },
-  { key: "cografya",  name: "Coğrafya",   icon: "globe" },
-  { key: "felsefe",   name: "Felsefe",    icon: "bookOpen" },
-  { key: "din",       name: "Din",        icon: "bookOpen" },
-];
-
-const AYT_SUBJECTS_BY_FIELD = {
-  sayisal: [
-    { key: "ayt_matematik", name: "AYT Matematik", icon: "hash" },
-    { key: "ayt_fizik",     name: "AYT Fizik",     icon: "zap" },
-    { key: "ayt_kimya",     name: "AYT Kimya",     icon: "flask" },
-    { key: "ayt_biyoloji",  name: "AYT Biyoloji",  icon: "activity" },
-  ],
-  ea: [
-    { key: "ayt_ea_matematik", name: "AYT Matematik", icon: "hash" },
-    { key: "ayt_edebiyat",     name: "AYT Edebiyat",  icon: "bookOpen" },
-    { key: "ayt_tarih_ea",     name: "AYT Tarih-1",   icon: "clock" },
-    { key: "ayt_cografya_ea",  name: "AYT Coğrafya-1", icon: "globe" },
-  ],
-  sozel: [
-    { key: "ayt_edebiyat_soz", name: "AYT Edebiyat",  icon: "bookOpen" },
-    { key: "ayt_tarih_soz",    name: "AYT Tarih",     icon: "clock" },
-    { key: "ayt_cografya_soz", name: "AYT Coğrafya",  icon: "globe" },
-    { key: "ayt_felsefe_soz",  name: "AYT Felsefe",   icon: "bookOpen" },
-  ],
-};
+import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
 
 const DURATIONS = [15, 30, 45, 60, 90, 120];
 
@@ -67,28 +34,38 @@ export default function AddStudyScreen() {
   const C = useC();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const { field } = useExam();
+  const { tytSubjects, aytSubjects } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
 
   const [examTier, setExamTier] = useState("TYT"); // TYT | AYT
-  const [subject, setSubject]   = useState(null);
+  const [subjectKey, setSubjectKey] = useState(null);
   const [topic, setTopic]       = useState("");
+  const [topicPickerOpen, setTopicPickerOpen] = useState(false);
   const [questionCount, setQC]  = useState("");
   const [duration, setDuration] = useState(null);
   const [notes, setNotes]       = useState("");
   const [saving, setSaving]     = useState(false);
 
-  // Sınav tipine göre ders havuzu
   const subjects = useMemo(() => {
-    if (examTier === "TYT") return TYT_SUBJECTS;
-    return AYT_SUBJECTS_BY_FIELD[field || "sayisal"] || AYT_SUBJECTS_BY_FIELD.sayisal;
-  }, [examTier, field]);
+    return examTier === "TYT" ? tytSubjects : aytSubjects;
+  }, [examTier, tytSubjects, aytSubjects]);
 
-  const canSave = !!subject && topic.trim() && duration;
+  const currentSubject = useMemo(
+    () => subjects.find((s) => s.key === subjectKey) || null,
+    [subjects, subjectKey]
+  );
+
+  const canSave = !!subjectKey && topic.trim() && duration;
 
   const handleSwitchTier = (tier) => {
     setExamTier(tier);
-    setSubject(null); // ders sıfırla, set değişiyor
+    setSubjectKey(null);
+    setTopic("");
+  };
+
+  const handleSelectSubject = (key) => {
+    setSubjectKey(key);
+    setTopic("");
   };
 
   const save = useCallback(async () => {
@@ -98,7 +75,7 @@ export default function AddStudyScreen() {
     const qc = parseInt(questionCount, 10) || 0;
     const localLog = {
       id: Date.now().toString(),
-      subject,
+      subject: subjectKey,
       topic: topic.trim(),
       questionCount: qc,
       duration,
@@ -111,7 +88,7 @@ export default function AddStudyScreen() {
     setSaving(true);
     const result = await saveStudyLogOffline({
       user_id: user.id,
-      subject,
+      subject: subjectKey,
       topic: topic.trim(),
       question_count: qc,
       correct_count: 0,
@@ -143,7 +120,7 @@ export default function AddStudyScreen() {
     if (qc > 0) reward("question_solved", { count: qc });
 
     navigation.goBack();
-  }, [saving, canSave, subject, topic, duration, questionCount, notes, examTier, user, dispatch, reward, navigation]);
+  }, [saving, canSave, subjectKey, topic, duration, questionCount, notes, examTier, user, dispatch, reward, navigation]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -222,23 +199,47 @@ export default function AddStudyScreen() {
               <SubjectChip
                 key={sub.key}
                 subject={sub}
-                selected={subject === sub.key}
-                onPress={() => setSubject(sub.key)}
+                selected={subjectKey === sub.key}
+                onPress={() => handleSelectSubject(sub.key)}
                 C={C}
               />
             ))}
           </View>
 
-          {/* === Konu === */}
+          {/* === Konu (curriculum konu listesi) === */}
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>KONU</Text>
-          <TextInput
-            value={topic}
-            onChangeText={setTopic}
-            placeholder="Örn. Türev, Köklü Sayılar..."
-            placeholderTextColor={C.muted}
-            style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
-            maxLength={60}
-          />
+          <Pressable
+            onPress={() => {
+              if (!currentSubject) {
+                Alert.alert("Önce ders seç", "Konu listesi için ders seçmelisin.");
+                return;
+              }
+              setTopicPickerOpen(true);
+            }}
+            style={[
+              s.input,
+              {
+                backgroundColor: C.surface,
+                borderColor: C.border,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: 15,
+                color: topic ? C.text : C.muted,
+                flex: 1,
+              }}
+              numberOfLines={1}
+            >
+              {topic || (currentSubject ? "Konu seç" : "Önce ders seç")}
+            </Text>
+            <Icon name="chevDown" size={16} color={C.muted} />
+          </Pressable>
 
           {/* === Süre pill row === */}
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>SÜRE</Text>
@@ -314,6 +315,13 @@ export default function AddStudyScreen() {
           </Pressable>
         </View>
 
+        <TopicPicker
+          visible={topicPickerOpen}
+          subject={currentSubject}
+          onClose={() => setTopicPickerOpen(false)}
+          onSelect={(name) => setTopic(name)}
+        />
+
         <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
         <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
       </KeyboardAvoidingView>
@@ -323,7 +331,7 @@ export default function AddStudyScreen() {
 
 function SubjectChip({ subject, selected, onPress, C }) {
   const id = useSubjectIdentity(subject.key);
-  const color = id?.solid || C.purple;
+  const color = id?.solid || subject.color || C.purple;
   return (
     <Pressable
       onPress={onPress}
@@ -342,7 +350,7 @@ function SubjectChip({ subject, selected, onPress, C }) {
         <Icon name={subject.icon} size={16} color={selected ? "#FFFFFF" : color} />
       </View>
       <Text style={[s.subjName, { color: selected ? "#FFFFFF" : C.text }]} numberOfLines={1}>
-        {subject.name}
+        {subject.label || subject.name}
       </Text>
     </Pressable>
   );

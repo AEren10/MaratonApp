@@ -26,7 +26,7 @@ function WrongSkeleton() {
   );
 }
 
-// === Filter chip atomu ===
+// === Filter chip atomu — kompakt ===
 function FilterPill({ label, count, active, color, onPress, C }) {
   return (
     <Pressable
@@ -34,25 +34,25 @@ function FilterPill({ label, count, active, color, onPress, C }) {
       style={{
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
-        paddingHorizontal: 13,
-        paddingVertical: 8,
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
         borderRadius: 999,
-        backgroundColor: active ? color : color + "12",
+        backgroundColor: active ? color : color + "10",
         borderWidth: 1,
-        borderColor: active ? color : color + "26",
+        borderColor: active ? color : color + "22",
       }}
     >
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: active ? "#FFFFFF" : color }}>
+      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: active ? "#FFFFFF" : color }}>
         {label}
       </Text>
       {count != null && count > 0 ? (
         <View style={{
-          paddingHorizontal: 6, paddingVertical: 1,
+          paddingHorizontal: 5, paddingVertical: 0,
           borderRadius: 999,
-          backgroundColor: active ? "rgba(255,255,255,0.25)" : color + "1A",
+          backgroundColor: active ? "rgba(255,255,255,0.28)" : color + "1A",
         }}>
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: active ? "#FFFFFF" : color }}>
+          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 10, color: active ? "#FFFFFF" : color }}>
             {count}
           </Text>
         </View>
