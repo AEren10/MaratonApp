@@ -71,10 +71,10 @@ export default function HomeScreen() {
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
   const QUICK_ITEMS = useMemo(() => [
-    { icon: "edit",     label: "Kaydet",       c: C.amber,  go: SCREENS.ADD_STUDY },
-    { icon: "chart",    label: "Deneme",       c: C.blue,   go: SCREENS.TRIAL_ENTRY },
-    { icon: "camera",   label: "Yanlış",       c: C.coral,  go: SCREENS.ADD_WRONG },
-    { icon: "calendar", label: "Yol Haritası", c: C.purple, go: SCREENS.ROADMAP },
+    { icon: "edit",     label: "Kaydet",         c: C.amber,  go: SCREENS.ADD_STUDY },
+    { icon: "chart",    label: "Deneme",         c: C.blue,   go: SCREENS.TRIAL_ENTRY },
+    { icon: "camera",   label: "Yanlış Ekle",    c: C.coral,  go: SCREENS.ADD_WRONG },
+    { icon: "notebook", label: "Yanlış Defteri", c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
   ], [C.amber, C.blue, C.coral, C.purple]);
   const streak = useSelector(selectStreak);
   const freezeCount = useSelector(selectFreezeCount);

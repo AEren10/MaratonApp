@@ -1,32 +1,46 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, Modal, StyleSheet, Platform } from "react-native";
-import { Icon, IconBox } from "../design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { Icon } from "../design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const ACTIONS = [
-  { key: "study", icon: "edit", label: "Calisma Kaydet", desc: "Ders calismani kaydet", color: C.amber, screen: "AddStudy" },
-  { key: "trial", icon: "chart", label: "Deneme Gir", desc: "Deneme sonuclarini gir", color: C.blue, screen: "TrialEntry" },
-  { key: "wrong", icon: "camera", label: "Yanlis Ekle", desc: "Yanlis soruyu kaydet", color: C.red, screen: "AddWrong" },
+  { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       toneKey: "amber",  screen: "AddStudy" },
+  { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      toneKey: "blue",   screen: "TrialEntry" },
+  { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        toneKey: "coral",  screen: "AddWrong" },
+  { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    toneKey: "purple", screen: "WrongNotebook" },
 ];
 
-function ActionRow({ item, onPress }) {
+function ActionRow({ item, onPress, C }) {
   const handlePress = useCallback(() => onPress(item.screen), [item.screen, onPress]);
+  const color = C[item.toneKey] || C.purple;
 
   return (
-    <Pressable onPress={handlePress}>
-      <View style={styles.row}>
-        <IconBox icon={item.icon} color={item.color} size={44} rounded={RADIUS.md} />
-        <View style={styles.rowText}>
-          <Text style={styles.label}>{item.label}</Text>
-          <Text style={styles.desc}>{item.desc}</Text>
-        </View>
-        <Icon name="chevR" size={18} color={C.muted} />
+    <Pressable
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.row,
+        {
+          backgroundColor: color + "12",
+          borderColor: color + "26",
+          opacity: pressed ? 0.92 : 1,
+        },
+      ]}
+    >
+      <View style={[styles.iconBox, { backgroundColor: color }]}>
+        <Icon name={item.icon} size={22} color="#FFFFFF" sw={2.3} />
       </View>
+      <View style={styles.rowText}>
+        <Text style={[styles.label, { color: C.text }]}>{item.label}</Text>
+        <Text style={[styles.desc, { color: C.sec }]}>{item.desc}</Text>
+      </View>
+      <Icon name="chevR" size={18} color={C.muted} />
     </Pressable>
   );
 }
 
 export function QuickActionSheet({ visible, onClose, onAction }) {
+  const C = useC();
   const handleAction = useCallback(
     (screen) => {
       onClose();
@@ -38,16 +52,16 @@ export function QuickActionSheet({ visible, onClose, onAction }) {
   return (
     <Modal visible={visible} transparent animationType={Platform.OS === "web" ? "none" : "fade"} onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-          <View style={styles.handle} />
+        <Pressable style={[styles.sheet, { backgroundColor: C.surface }]} onPress={(e) => e.stopPropagation()}>
+          <View style={[styles.handle, { backgroundColor: C.border }]} />
+          <Text style={[styles.sheetTitle, { color: C.text }]}>Hızlı Aksiyon</Text>
           <View style={styles.actions}>
             {ACTIONS.map((a) => (
-              <ActionRow key={a.key} item={a} onPress={handleAction} />
+              <ActionRow key={a.key} item={a} onPress={handleAction} C={C} />
             ))}
           </View>
           <Pressable style={styles.closeBtn} onPress={onClose}>
-            <Icon name="x" size={20} color={C.sec} />
-            <Text style={styles.closeText}>Kapat</Text>
+            <Text style={[styles.closeText, { color: C.muted }]}>Kapat</Text>
           </Pressable>
         </Pressable>
       </Pressable>
@@ -58,44 +72,50 @@ export function QuickActionSheet({ visible, onClose, onAction }) {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: C.bg,
-    borderTopLeftRadius: RADIUS.xxl,
-    borderTopRightRadius: RADIUS.xxl,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingBottom: SPACING.xxxl,
     paddingHorizontal: SPACING.lg,
+    paddingTop: 12,
   },
   handle: {
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: C.muted,
     alignSelf: "center",
-    marginTop: SPACING.md,
-    marginBottom: SPACING.xxl,
+    marginBottom: 14,
   },
-  actions: { gap: SPACING.sm },
+  sheetTitle: {
+    ...TYPOGRAPHY.subheading,
+    fontSize: 18,
+    marginBottom: 14,
+    paddingHorizontal: 4,
+  },
+  actions: { gap: 10 },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.md,
-    gap: SPACING.md,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 12,
+    gap: 12,
+  },
+  iconBox: {
+    width: 44, height: 44, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
   },
   rowText: { flex: 1 },
-  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  desc: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 },
+  label: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15 },
+  desc: { ...TYPOGRAPHY.caption, marginTop: 2 },
   closeBtn: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: SPACING.sm,
-    marginTop: SPACING.xl,
+    marginTop: 14,
     paddingVertical: SPACING.md,
   },
-  closeText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
+  closeText: { ...TYPOGRAPHY.bodySemiBold },
 });
