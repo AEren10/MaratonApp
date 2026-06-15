@@ -1,20 +1,9 @@
 import { View, Text } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-
-function StaticBar({ value, color }) {
-  return (
-    <View
-      style={{
-        width: `${value}%`,
-        height: "100%",
-        borderRadius: RADIUS.sm,
-        backgroundColor: color,
-      }}
-    />
-  );
-}
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function StrengthBars({ strengths }) {
+  const C = useC();
   const sorted = [...strengths].sort((a, b) => b.v - a.v);
 
   return (
@@ -54,11 +43,18 @@ export function StrengthBars({ strengths }) {
               style={{
                 height: 8,
                 borderRadius: RADIUS.sm,
-                backgroundColor: C.surface,
+                backgroundColor: C.surface2,
                 overflow: "hidden",
               }}
             >
-              <StaticBar value={s.v} color={s.c} />
+              <View
+                style={{
+                  width: `${s.v}%`,
+                  height: "100%",
+                  borderRadius: RADIUS.sm,
+                  backgroundColor: s.c,
+                }}
+              />
             </View>
           </View>
         ))}

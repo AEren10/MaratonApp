@@ -7,9 +7,11 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { C, SPACING, RADIUS } from "../../themes/tokens";
+import { SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 export function SkeletonCard({ width = "100%", height = 80, rounded = RADIUS.xl }) {
+  const C = useC();
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
@@ -24,7 +26,10 @@ export function SkeletonCard({ width = "100%", height = 80, rounded = RADIUS.xl 
 
   return (
     <Animated.View
-      style={[styles.card, { width, height, borderRadius: rounded }, animStyle]}
+      style={[
+        { backgroundColor: C.surface2, width, height, borderRadius: rounded },
+        animStyle,
+      ]}
     />
   );
 }
@@ -39,9 +44,3 @@ export function SkeletonList({ count = 3, gap = SPACING.md }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: C.surface2,
-  },
-});

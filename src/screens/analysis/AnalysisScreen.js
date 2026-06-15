@@ -7,7 +7,8 @@ import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { TRIAL_TYPES, ALL_SUBJECTS } from "../trial/trialTypes";
 import { useSync } from "../../contexts/DataSyncContext";
-import { C, TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -61,6 +62,8 @@ function subjectsForFilter(filter, latestTrial) {
 
 export default function AnalysisScreen() {
   const navigation = useNavigation();
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const trials = useSelector(selectTrials);
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
@@ -83,7 +86,6 @@ export default function AnalysisScreen() {
     const prev = sorted[1];
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
-    // History: hero grafiği için son 12, listede yine son 6 göster
     const heroSlice = sorted.slice(0, 12);
     const history = sorted.slice(0, 6).map((t, i) => {
       const prevT = sorted[i + 1];
@@ -97,24 +99,19 @@ export default function AnalysisScreen() {
       };
     });
     const subjects = subjectsForFilter(filter, latest);
-    const bars = subjects.map((s) => ({
-      key: s.key,
-      name: s.name,
-      color: s.color,
-      net: latest?.subjects?.[s.key]?.net || 0,
-      max: s.max,
+    const bars = subjects.map((sub) => ({
+      key: sub.key,
+      name: sub.name,
+      color: sub.color,
+      net: latest?.subjects?.[sub.key]?.net || 0,
+      max: sub.max,
     }));
     const line = history.map((h) => h.net).reverse();
     const lineLabels = history.map((h) => h.date).reverse();
-    // Hero: son 12, eskiden yeniye
-    const heroLine = heroSlice
-      .slice()
-      .reverse()
-      .map((t) => t.totalNet || 0);
-    const heroLabels = heroSlice
-      .slice()
-      .reverse()
-      .map((t) => new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }));
+    const heroLine = heroSlice.slice().reverse().map((t) => t.totalNet || 0);
+    const heroLabels = heroSlice.slice().reverse().map((t) =>
+      new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })
+    );
     return {
       latest: {
         net,
@@ -173,7 +170,7 @@ export default function AnalysisScreen() {
 
         <View style={s.content}>
           {deneme.empty ? (
-            <GlassCard radius={20} style={s.emptyBox}>
+            <View style={[s.emptyBox, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Icon name="chart" size={48} color={C.muted} />
               <Text style={s.emptyTitle}>Henüz deneme yok</Text>
               <Text style={s.emptySub}>
@@ -181,10 +178,9 @@ export default function AnalysisScreen() {
                   ? "Bir deneme girince burada görünecek"
                   : `${filter} denemesi henüz girmedin`}
               </Text>
-            </GlassCard>
+            </View>
           ) : (
             <>
-              {/* HERO: son 12 denemenin net trendi */}
               {deneme.heroLine && deneme.heroLine.length > 1 && (
                 <AnimatedCard delay={0}>
                   <TrendChart
@@ -237,7 +233,7 @@ export default function AnalysisScreen() {
         onPress={handleTrialEntry}
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
       >
-        <Icon name="plus" size={22} color={C.bg} sw={2.5} />
+        <Icon name="plus" size={22} color="#FFFFFF" sw={2.5} />
         <Text style={s.fabText}>Deneme Gir</Text>
       </Pressable>
     </SafeAreaView>
@@ -245,38 +241,39 @@ export default function AnalysisScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
-  title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
-  content: { gap: SPACING.xl },
-  emptyBox: {
-    padding: SPACING.xxl,
-    alignItems: "center",
-    gap: SPACING.sm,
-  },
-  emptyTitle: {
-    ...TYPOGRAPHY.subheading,
-    color: C.text,
-  },
-  emptySub: {
-    ...TYPOGRAPHY.caption,
-    color: C.muted,
-    textAlign: "center",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 100,
-    right: SPACING.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.sm,
-    backgroundColor: C.amber,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    borderRadius: 999,
-    ...SHADOWS.fab,
-  },
-  fabPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
-  fabText: { ...TYPOGRAPHY.button, color: C.bg },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
+    title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
+    content: { gap: SPACING.xl },
+    emptyBox: {
+      padding: SPACING.xxl,
+      alignItems: "center",
+      gap: SPACING.sm,
+      borderRadius: 20,
+      borderWidth: 1,
+    },
+    emptyTitle: { ...TYPOGRAPHY.subheading, color: C.text },
+    emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
+    fab: {
+      position: "absolute",
+      bottom: 100,
+      right: SPACING.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.sm,
+      backgroundColor: C.amber,
+      paddingHorizontal: SPACING.xl,
+      paddingVertical: SPACING.md,
+      borderRadius: 999,
+      shadowColor: C.amber,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.32,
+      shadowRadius: 14,
+      elevation: 6,
+    },
+    fabPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
+    fabText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
+  });
+}

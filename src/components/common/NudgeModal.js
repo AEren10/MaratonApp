@@ -1,12 +1,13 @@
+import { useMemo } from "react";
 import { View, Text, Pressable, Modal, FlatList, StyleSheet } from "react-native";
 import { Icon } from "../design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 
-const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
-const PRIORITY_ICON = { high: "alert", medium: "bell", low: "trendUp" };
-
-function NudgeItem({ nudge, onAction }) {
+function NudgeItem({ nudge, onAction, C, styles }) {
+  const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
+  const PRIORITY_ICON = { high: "alert", medium: "bell", low: "trendUp" };
   const color = PRIORITY_COLOR[nudge.priority] || C.amber;
   const icon = PRIORITY_ICON[nudge.priority] || "bell";
   const subj = nudge.subject ? getSubjectByKey(nudge.subject) : null;
@@ -32,6 +33,8 @@ function NudgeItem({ nudge, onAction }) {
 }
 
 export function NudgeModal({ visible, nudges, onClose, onAction }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   if (!nudges || nudges.length === 0) return null;
 
   return (
@@ -39,11 +42,11 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={styles.handle} />
-          <Text style={styles.title}>Bugunun Onerileri</Text>
+          <Text style={styles.title}>Bugünün Önerileri</Text>
           <FlatList
             data={nudges}
             keyExtractor={(_, i) => String(i)}
-            renderItem={({ item }) => <NudgeItem nudge={item} onAction={onAction} />}
+            renderItem={({ item }) => <NudgeItem nudge={item} onAction={onAction} C={C} styles={styles} />}
             contentContainerStyle={{ gap: SPACING.sm }}
             showsVerticalScrollIndicator={false}
           />
@@ -56,82 +59,84 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "#00000088",
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    backgroundColor: C.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: SPACING.lg,
-    maxHeight: "70%",
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: C.border,
-    alignSelf: "center",
-    marginBottom: SPACING.lg,
-  },
-  title: {
-    ...TYPOGRAPHY.heading,
-    color: C.text,
-    fontSize: 18,
-    marginBottom: SPACING.lg,
-  },
-  item: {
-    backgroundColor: C.bg,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    borderLeftWidth: 3,
-  },
-  itemHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.sm,
-    marginBottom: SPACING.xs,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  badgeText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 11,
-  },
-  message: {
-    ...TYPOGRAPHY.body,
-    color: C.sec,
-    lineHeight: 20,
-  },
-  actionBtn: {
-    alignSelf: "flex-start",
-    marginTop: SPACING.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  actionText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 12,
-  },
-  closeBtn: {
-    alignSelf: "center",
-    marginTop: SPACING.lg,
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    backgroundColor: C.amber,
-    borderRadius: RADIUS.lg,
-  },
-  closeText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 14,
-    color: C.bg,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: "#00000088",
+      justifyContent: "flex-end",
+    },
+    sheet: {
+      backgroundColor: C.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      padding: SPACING.lg,
+      maxHeight: "70%",
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: C.border,
+      alignSelf: "center",
+      marginBottom: SPACING.lg,
+    },
+    title: {
+      ...TYPOGRAPHY.heading,
+      color: C.text,
+      fontSize: 18,
+      marginBottom: SPACING.lg,
+    },
+    item: {
+      backgroundColor: C.surface2,
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      borderLeftWidth: 3,
+    },
+    itemHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.sm,
+      marginBottom: SPACING.xs,
+    },
+    badge: {
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 6,
+    },
+    badgeText: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 11,
+    },
+    message: {
+      ...TYPOGRAPHY.body,
+      color: C.text,
+      lineHeight: 20,
+    },
+    actionBtn: {
+      alignSelf: "flex-start",
+      marginTop: SPACING.sm,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      borderWidth: 1,
+    },
+    actionText: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 12,
+    },
+    closeBtn: {
+      alignSelf: "center",
+      marginTop: SPACING.lg,
+      paddingHorizontal: 32,
+      paddingVertical: 12,
+      backgroundColor: C.amber,
+      borderRadius: RADIUS.lg,
+    },
+    closeText: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 14,
+      color: "#FFFFFF",
+    },
+  });
+}

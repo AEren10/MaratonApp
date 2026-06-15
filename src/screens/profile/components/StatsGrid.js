@@ -1,10 +1,11 @@
 import { View, Text } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { GlassCard } from "../../../components/design";
-
-const TINT_COLORS = [C.amber, C.blue, C.green, C.purple];
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function StatsGrid({ stats }) {
+  const C = useC();
+  const tintColors = [C.amber, C.blue, C.green, C.purple];
+
   return (
     <View
       style={{
@@ -14,35 +15,40 @@ export function StatsGrid({ stats }) {
         marginBottom: SPACING.xxl,
       }}
     >
-      {stats.map((s, i) => (
-        <GlassCard
-          key={i}
-          radius={RADIUS.xl}
-          color={TINT_COLORS[i]}
-          style={{
-            flex: 1,
-            minWidth: "45%",
-            padding: SPACING.lg,
-            alignItems: "center",
-          }}
-        >
-          <Text
+      {stats.map((stat, i) => {
+        const color = tintColors[i % tintColors.length];
+        return (
+          <View
+            key={i}
             style={{
-              fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 24,
-              lineHeight: 30,
-              letterSpacing: -0.5,
-              color: C.text,
-              marginBottom: SPACING.xs,
+              flex: 1,
+              minWidth: "45%",
+              padding: SPACING.lg,
+              alignItems: "center",
+              borderRadius: RADIUS.xl,
+              backgroundColor: color + "14",
+              borderWidth: 1,
+              borderColor: color + "30",
             }}
           >
-            {s.v}
-          </Text>
-          <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>
-            {s.l}
-          </Text>
-        </GlassCard>
-      ))}
+            <Text
+              style={{
+                fontFamily: "SpaceGrotesk_700Bold",
+                fontSize: 24,
+                lineHeight: 30,
+                letterSpacing: -0.5,
+                color: C.text,
+                marginBottom: SPACING.xs,
+              }}
+            >
+              {stat.v}
+            </Text>
+            <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>
+              {stat.l}
+            </Text>
+          </View>
+        );
+      })}
     </View>
   );
 }

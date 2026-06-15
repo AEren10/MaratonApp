@@ -6,13 +6,13 @@ import { SCREENS } from "../../constants/screens";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 // Sol kenardan başlasın — scroll içeren ekranlarda yan dürtme bile tetiklemesin.
-const EDGE_ZONE = 40;
-// Yatay aktivasyon eşiği yüksek + dikey fail eşiği düşük → vertical scroll'u
-// bozmaz, sadece net soldan-sağa flick'te çalışır.
-const ACTIVE_X = 50;
-const FAIL_Y = 14;
-const MIN_TRANSLATION = 140;
-const MIN_VELOCITY = 600;
+const EDGE_ZONE = 60;
+// Yatay aktivasyon eşiği makul + dikey fail eşiği düşük → vertical scroll'u
+// bozmaz, sade soldan-sağa flick'te çalışır. Ne çok hassas ne de ölü.
+const ACTIVE_X = 24;
+const FAIL_Y = 18;
+const MIN_TRANSLATION = 90;
+const MIN_VELOCITY = 250;
 
 // Tab ekranlarında (Analiz/Profil) sağa kaydırınca Ana Sayfa'ya dön.
 // Sıkı eşikler — aşağı scroll'a yanlışlıkla tetiklenmesin.

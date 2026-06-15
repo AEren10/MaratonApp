@@ -1,8 +1,10 @@
 import { View, Text, ScrollView } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { IconBox } from "../../../components/design";
 
 export function BadgeRow({ badges }) {
+  const C = useC();
   return (
     <View style={{ marginBottom: SPACING.xxl }}>
       <Text

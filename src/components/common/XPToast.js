@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
@@ -9,9 +9,11 @@ import Animated, {
   withDelay,
   runOnJS,
 } from "react-native-reanimated";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 export function XPToast({ amount, visible, onDone }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const translateY = useSharedValue(60);
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.7);
@@ -53,32 +55,34 @@ export function XPToast({ amount, visible, onDone }) {
   );
 }
 
-const s = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 120,
-    alignSelf: "center",
-    backgroundColor: C.amber + "EE",
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    shadowColor: C.amber,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
-    zIndex: 9999,
-    left: 0,
-    right: 0,
-  },
-  icon: { fontSize: 18, textAlign: "center" },
-  text: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 18,
-    color: C.bg,
-    letterSpacing: -0.3,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    container: {
+      position: "absolute",
+      bottom: 120,
+      alignSelf: "center",
+      backgroundColor: C.amber + "EE",
+      borderRadius: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      shadowColor: C.amber,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.4,
+      shadowRadius: 12,
+      elevation: 8,
+      zIndex: 9999,
+      left: 0,
+      right: 0,
+    },
+    icon: { fontSize: 18, textAlign: "center" },
+    text: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 18,
+      color: "#FFFFFF",
+      letterSpacing: -0.3,
+    },
+  });
+}
