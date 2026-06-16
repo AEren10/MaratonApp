@@ -10,16 +10,15 @@ async function uriToArrayBuffer(uri) {
 
 function guessExt(uri) {
   const m = uri.match(/\.(jpg|jpeg|png|webp|heic|gif)(?:\?.*)?$/i);
-  return (m?.[1] || "jpg").toLowerCase();
+  const raw = (m?.[1] || "jpg").toLowerCase();
+  if (raw === "heic" || raw === "gif") return "jpg";
+  return raw;
 }
 
 function mimeFor(ext) {
   const e = ext.toLowerCase();
-  if (e === "jpg" || e === "jpeg") return "image/jpeg";
   if (e === "png") return "image/png";
   if (e === "webp") return "image/webp";
-  if (e === "heic") return "image/heic";
-  if (e === "gif") return "image/gif";
   return "image/jpeg";
 }
 

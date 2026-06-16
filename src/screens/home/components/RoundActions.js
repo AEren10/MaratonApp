@@ -15,7 +15,7 @@ function RoundAction({ item, onPress, C }) {
       onPress={() => { haptic.tap(); onPress(item); }}
       style={s.item}
     >
-      <Animated.View style={[s.circle, { backgroundColor: item.c }, style]}>
+      <Animated.View style={[s.circle, { backgroundColor: item.c, shadowColor: item.c }, style]}>
         <Icon name={item.icon} size={24} color="#FFFFFF" sw={2.2} />
       </Animated.View>
       <Text style={[s.label, { color: C.sec }]} numberOfLines={1}>{item.label}</Text>
@@ -27,7 +27,7 @@ function RoundAction({ item, onPress, C }) {
 export function RoundActions({ items, onPress }) {
   const C = useC();
   return (
-    <View style={s.row}>
+    <View style={s.grid}>
       {items.map((item) => (
         <RoundAction key={item.label} item={item} onPress={onPress} C={C} />
       ))}
@@ -36,12 +36,12 @@ export function RoundActions({ items, onPress }) {
 }
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  item: { alignItems: "center", flex: 1, gap: 8 },
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 16 },
+  item: { alignItems: "center", width: "25%", gap: 8 },
   circle: {
-    width: 64, height: 64, borderRadius: 22,
+    width: 56, height: 56, borderRadius: 18,
     alignItems: "center", justifyContent: "center",
-    shadowColor: "#1B1530", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.16, shadowRadius: 14, elevation: 4,
+    shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.38, shadowRadius: 12, elevation: 5,
   },
-  label: { ...TYPOGRAPHY.captionMedium, fontSize: 11 },
+  label: { ...TYPOGRAPHY.captionMedium, fontSize: 10 },
 });

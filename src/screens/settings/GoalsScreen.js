@@ -1,17 +1,18 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
 import { Icon, IconBox, GlassCard } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
 import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "../../supabase/profiles";
 
-function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
+function GoalInput({ icon, color, label, hint, value, onChange, suffix, styles }) {
   return (
     <GlassCard radius={RADIUS.xl} style={styles.card}>
       <View style={styles.row}>
@@ -36,6 +37,8 @@ function GoalInput({ icon, color, label, hint, value, onChange, suffix }) {
 }
 
 export default function GoalsScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const goals = useSelector(selectGoals);
@@ -91,6 +94,7 @@ export default function GoalsScreen() {
           value={draft.dailyQuestions}
           onChange={(v) => setDraft((d) => ({ ...d, dailyQuestions: v }))}
           suffix="soru"
+          styles={styles}
         />
 
         <View style={styles.chipRow}>
@@ -116,6 +120,7 @@ export default function GoalsScreen() {
           value={draft.weeklyTrials}
           onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))}
           suffix="adet"
+          styles={styles}
         />
 
         <GoalInput
@@ -126,6 +131,7 @@ export default function GoalsScreen() {
           value={draft.weeklyMinutes}
           onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))}
           suffix="dk"
+          styles={styles}
         />
 
         <Pressable
@@ -140,78 +146,80 @@ export default function GoalsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-  },
-  title: { ...TYPOGRAPHY.subheading, color: C.text },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  subtitle: {
-    ...TYPOGRAPHY.caption,
-    color: C.muted,
-    marginBottom: SPACING.lg,
-  },
-  card: {
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  row: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
-  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
-  inputWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: C.surface2,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: C.border,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-  },
-  input: {
-    ...TYPOGRAPHY.bodySemiBold,
-    color: C.text,
-    minWidth: 40,
-    textAlign: "right",
-  },
-  suffix: { ...TYPOGRAPHY.caption, color: C.muted },
-  chipRow: {
-    flexDirection: "row",
-    gap: SPACING.sm,
-    marginTop: -SPACING.xs,
-    marginBottom: SPACING.md,
-  },
-  chip: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: SPACING.sm,
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: C.border,
-  },
-  chipActive: {
-    backgroundColor: C.amber + "20",
-    borderColor: C.amber,
-  },
-  chipText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
-  chipTextActive: { color: C.amber },
-  saveBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.sm,
-    backgroundColor: C.amber,
-    borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.lg,
-    marginTop: SPACING.lg,
-    ...SHADOWS.amber,
-  },
-  saveText: { ...TYPOGRAPHY.button, color: C.bg },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+    },
+    title: { ...TYPOGRAPHY.subheading, color: C.text },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    subtitle: {
+      ...TYPOGRAPHY.caption,
+      color: C.muted,
+      marginBottom: SPACING.lg,
+    },
+    card: {
+      padding: SPACING.md,
+      marginBottom: SPACING.md,
+    },
+    row: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
+    label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
+    inputWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: C.surface2,
+      borderRadius: RADIUS.md,
+      borderWidth: 1,
+      borderColor: C.border,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: SPACING.xs,
+    },
+    input: {
+      ...TYPOGRAPHY.bodySemiBold,
+      color: C.text,
+      minWidth: 40,
+      textAlign: "right",
+    },
+    suffix: { ...TYPOGRAPHY.caption, color: C.muted },
+    chipRow: {
+      flexDirection: "row",
+      gap: SPACING.sm,
+      marginTop: -SPACING.xs,
+      marginBottom: SPACING.md,
+    },
+    chip: {
+      flex: 1,
+      alignItems: "center",
+      paddingVertical: SPACING.sm,
+      backgroundColor: C.surface,
+      borderRadius: RADIUS.md,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    chipActive: {
+      backgroundColor: C.amber + "20",
+      borderColor: C.amber,
+    },
+    chipText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
+    chipTextActive: { color: C.amber },
+    saveBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: SPACING.sm,
+      backgroundColor: C.amber,
+      borderRadius: RADIUS.xl,
+      paddingVertical: SPACING.lg,
+      marginTop: SPACING.lg,
+      ...SHADOWS.amber,
+    },
+    saveText: { ...TYPOGRAPHY.button, color: C.bg },
+  });
+}

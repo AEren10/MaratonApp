@@ -6,7 +6,8 @@ import * as Haptics from "expo-haptics";
 import Svg, { Circle } from "react-native-svg";
 
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAppDispatch } from "../../store/hooks";
 import { addLog } from "../../store/slices/studyLogSlice";
@@ -15,13 +16,16 @@ import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
+import { SCREENS } from "../../constants/screens";
 
-const MODES = [
-  { key: "FREE", label: "Serbest", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
-  { key: "POMODORO_25", label: "Pomodoro 25/5", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
-  { key: "POMODORO_50", label: "Pomodoro 50/10", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
-  { key: "DEEP_90", label: "Derin Odak 90", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
-];
+function buildModes(C) {
+  return [
+    { key: "FREE", label: "Serbest", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
+    { key: "POMODORO_25", label: "Pomodoro 25/5", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
+    { key: "POMODORO_50", label: "Pomodoro 50/10", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
+    { key: "DEEP_90", label: "Derin Odak 90", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
+  ];
+}
 
 const PHASE = {
   FOCUS: "FOCUS",
@@ -29,7 +33,7 @@ const PHASE = {
   LONG_BREAK: "LONG_BREAK",
 };
 
-function TimerRing({ size = 240, stroke = 10, pct = 0, color, secondary, children }) {
+function TimerRing({ size = 240, stroke = 10, pct = 0, color, secondary, children, C }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - Math.min(Math.max(pct, 0), 1));
@@ -58,6 +62,9 @@ const fmt = (s) => {
 };
 
 export default function StudyTimerScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const MODES = useMemo(() => buildModes(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useAppDispatch();
@@ -69,7 +76,7 @@ export default function StudyTimerScreen() {
   const topic = topicName || "Çalışma";
 
   const [modeKey, setModeKey] = useState("FREE");
-  const mode = useMemo(() => MODES.find((m) => m.key === modeKey), [modeKey]);
+  const mode = useMemo(() => MODES.find((m) => m.key === modeKey), [modeKey, MODES]);
 
   const [phase, setPhase] = useState(PHASE.FOCUS);
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -240,11 +247,14 @@ export default function StudyTimerScreen() {
     });
     if (questions > 0) reward("question_solved", { count: questions });
 
-    Alert.alert(
-      "Kaydedildi",
-      `${minutes} dk • ${questions} soru`,
-      [{ text: "Tamam", onPress: () => navigation.goBack() }],
-    );
+    navigation.replace(SCREENS.STUDY_SUMMARY, {
+      subjectLabel: subject.label || subject.name,
+      subjectColor: subject.color,
+      subjectIcon: subject.icon,
+      topic,
+      duration: minutes,
+      questions,
+    });
   }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, subject, topic, user, dispatch, reward, navigation, saving]);
 
   const exit = useCallback(() => {
@@ -306,7 +316,7 @@ export default function StudyTimerScreen() {
           {topic}
         </Text>
 
-        <TimerRing size={240} stroke={10} pct={pct} color={phaseColor}>
+        <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
           <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{fmt(elapsed)}</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 4 }]}>
             / {isPomodoro ? `${Math.floor(phaseTargetSec / 60)} dk` : "serbest"}
@@ -363,58 +373,60 @@ export default function StudyTimerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  subjectBadge: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    backgroundColor: C.surface, borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
-  },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  modeRow: {
-    flexDirection: "row",
-    gap: SPACING.xs,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    flexWrap: "wrap",
-  },
-  modeChip: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: 40 },
-  controls: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.xl, marginTop: SPACING.xxxl,
-  },
-  sideBtn: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
-  },
-  mainBtn: {
-    width: 72, height: 72, borderRadius: 36,
-    alignItems: "center", justifyContent: "center",
-    ...SHADOWS.card,
-  },
-  questionRow: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.lg,
-    marginTop: SPACING.xxxl, backgroundColor: C.surface,
-    borderRadius: RADIUS.xl, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
-  },
-  stepper: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-  stepBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
-  },
-  finishBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-    backgroundColor: C.amber, borderRadius: RADIUS.xl,
-    marginHorizontal: SPACING.lg, marginBottom: SPACING.xxl, paddingVertical: SPACING.lg,
-    ...SHADOWS.amber,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    subjectBadge: {
+      flexDirection: "row", alignItems: "center", gap: 6,
+      backgroundColor: C.surface, borderRadius: RADIUS.full,
+      paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
+    },
+    dot: { width: 8, height: 8, borderRadius: 4 },
+    modeRow: {
+      flexDirection: "row",
+      gap: SPACING.xs,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.sm,
+      flexWrap: "wrap",
+    },
+    modeChip: {
+      paddingHorizontal: SPACING.md,
+      paddingVertical: 6,
+      borderRadius: 999,
+      borderWidth: 1,
+    },
+    center: { flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: 40 },
+    controls: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.xl, marginTop: SPACING.xxxl,
+    },
+    sideBtn: {
+      width: 48, height: 48, borderRadius: 24,
+      backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
+    },
+    mainBtn: {
+      width: 72, height: 72, borderRadius: 36,
+      alignItems: "center", justifyContent: "center",
+      ...SHADOWS.card,
+    },
+    questionRow: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.lg,
+      marginTop: SPACING.xxxl, backgroundColor: C.surface,
+      borderRadius: RADIUS.xl, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
+    },
+    stepper: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+    stepBtn: {
+      width: 36, height: 36, borderRadius: 18,
+      backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
+    },
+    finishBtn: {
+      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
+      backgroundColor: C.amber, borderRadius: RADIUS.xl,
+      marginHorizontal: SPACING.lg, marginBottom: SPACING.xxl, paddingVertical: SPACING.lg,
+      ...SHADOWS.amber,
+    },
+  });
+}

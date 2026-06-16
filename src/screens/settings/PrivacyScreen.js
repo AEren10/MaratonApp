@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const SECTIONS = [
   {
@@ -29,6 +30,8 @@ const SECTIONS = [
 ];
 
 export default function PrivacyScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
@@ -57,15 +60,17 @@ export default function PrivacyScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: 60 },
-  section: { marginBottom: SPACING.xxl },
-  sectionTitle: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.sm },
-  sectionBody: { ...TYPOGRAPHY.body, color: C.sec },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
+    scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: 60 },
+    section: { marginBottom: SPACING.xxl },
+    sectionTitle: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.sm },
+    sectionBody: { ...TYPOGRAPHY.body, color: C.sec },
+  });
+}

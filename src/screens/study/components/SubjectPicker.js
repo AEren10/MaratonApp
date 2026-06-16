@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import { IconBox } from "../../../components/design";
-import { C, SPACING } from "../../../themes/tokens";
+import { SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 const SUBJECTS = [
   { key: "turkce", name: "Turkce", color: "#6FA8F2", icon: "bookOpen" },
@@ -10,6 +11,7 @@ const SUBJECTS = [
 ];
 
 export function SubjectPicker({ selected, onSelect }) {
+  const C = useC();
   return (
     <View style={{ flexDirection: "row", gap: SPACING.sm, flexWrap: "wrap" }}>
       {SUBJECTS.map((s) => {

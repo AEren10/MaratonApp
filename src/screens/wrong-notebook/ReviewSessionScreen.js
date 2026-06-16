@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
 import { getWrongQuestionImageUrl } from "../../supabase/storage";
@@ -27,6 +28,8 @@ function resolveSubject(raw) {
 }
 
 export default function ReviewSessionScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
   const [queue, setQueue] = useState([]);
@@ -140,29 +143,31 @@ export default function ReviewSessionScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  title: { ...TYPOGRAPHY.subheading, color: C.text },
-  counter: { ...TYPOGRAPHY.captionMedium, color: C.muted },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.sm },
-  scroll: { padding: SPACING.lg, gap: SPACING.lg },
-  chip: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12 },
-  chipText: { ...TYPOGRAPHY.captionMedium },
-  image: { width: "100%", height: 300, borderRadius: RADIUS.lg, backgroundColor: C.surface },
-  noImage: { height: 200, borderRadius: RADIUS.lg, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, alignItems: "center", justifyContent: "center", gap: SPACING.md, padding: SPACING.lg },
-  noImageText: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center" },
-  answerBox: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, gap: SPACING.sm, borderWidth: 1, borderColor: C.border },
-  note: { ...TYPOGRAPHY.body, color: C.text },
-  answerText: { ...TYPOGRAPHY.bodyMedium, color: C.sec },
-  footer: { padding: SPACING.lg, borderTopWidth: 1, borderTopColor: C.border },
-  revealBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, alignItems: "center" },
-  revealText: { ...TYPOGRAPHY.button, color: C.bg },
-  gradeRow: { flexDirection: "row", gap: SPACING.sm },
-  gradeBtn: { flex: 1, alignItems: "center", gap: 4, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
-  gradeText: { ...TYPOGRAPHY.micro },
-  doneTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.md },
-  doneSub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
-  closeBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
-  closeText: { ...TYPOGRAPHY.button, color: C.bg },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    title: { ...TYPOGRAPHY.subheading, color: C.text },
+    counter: { ...TYPOGRAPHY.captionMedium, color: C.muted },
+    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.sm },
+    scroll: { padding: SPACING.lg, gap: SPACING.lg },
+    chip: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12 },
+    chipText: { ...TYPOGRAPHY.captionMedium },
+    image: { width: "100%", height: 300, borderRadius: RADIUS.lg, backgroundColor: C.surface },
+    noImage: { height: 200, borderRadius: RADIUS.lg, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, alignItems: "center", justifyContent: "center", gap: SPACING.md, padding: SPACING.lg },
+    noImageText: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center" },
+    answerBox: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, gap: SPACING.sm, borderWidth: 1, borderColor: C.border },
+    note: { ...TYPOGRAPHY.body, color: C.text },
+    answerText: { ...TYPOGRAPHY.bodyMedium, color: C.sec },
+    footer: { padding: SPACING.lg, borderTopWidth: 1, borderTopColor: C.border },
+    revealBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, alignItems: "center" },
+    revealText: { ...TYPOGRAPHY.button, color: C.bg },
+    gradeRow: { flexDirection: "row", gap: SPACING.sm },
+    gradeBtn: { flex: 1, alignItems: "center", gap: 4, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
+    gradeText: { ...TYPOGRAPHY.micro },
+    doneTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.md },
+    doneSub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
+    closeBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
+    closeText: { ...TYPOGRAPHY.button, color: C.bg },
+  });
+}

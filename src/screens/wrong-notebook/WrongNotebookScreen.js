@@ -249,23 +249,33 @@ export default function WrongNotebookScreen() {
 
       {/* === "Bugün tekrar" banner === */}
       {dueCount > 0 ? (
-        <Pressable
-          onPress={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
-          style={[s.dueBanner, { backgroundColor: C.coral + "12", borderColor: C.coral + "30" }]}
-        >
-          <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.coral + "22", alignItems: "center", justifyContent: "center" }}>
-            <Icon name="refresh" size={18} color={C.coral} />
+        <View style={[s.dueBanner, { backgroundColor: C.coral + "12", borderColor: C.coral + "30" }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.coral + "22", alignItems: "center", justifyContent: "center" }}>
+              <Icon name="refresh" size={18} color={C.coral} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ ...TYPOGRAPHY.label, color: C.coral, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
+              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: 1 }}>{dueCount} sorunun tekrar zamanı geldi</Text>
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ ...TYPOGRAPHY.label, color: C.coral, letterSpacing: 0.6 }}>
-              BUGÜN TEKRAR
-            </Text>
-            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: 1 }}>
-              {dueCount} sorunun tekrar zamanı geldi
-            </Text>
+          <View style={{ flexDirection: "row", gap: 8, marginTop: 10 }}>
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
+              style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.coral + "18" }}
+            >
+              <Icon name="list" size={14} color={C.coral} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.coral }}>Klasik</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.SWIPE_REVIEW)}
+              style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.amber + "18" }}
+            >
+              <Icon name="layers" size={14} color={C.amber} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Swipe</Text>
+            </Pressable>
           </View>
-          <Icon name="arrowR" size={16} color={C.coral} />
-        </Pressable>
+        </View>
       ) : null}
 
       {/* === Ders filter chips (yatay scroll) === */}

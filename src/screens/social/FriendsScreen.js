@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { Avatar } from "../../components/design/Avatar";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   listFriends,
@@ -16,6 +17,8 @@ import {
 } from "../../supabase/friends";
 
 function FriendRow({ user, action }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   return (
     <View style={s.row}>
       <Avatar init={(user.name || "??").slice(0, 2).toUpperCase()} size={36} image={user.avatar_url} />
@@ -26,6 +29,8 @@ function FriendRow({ user, action }) {
 }
 
 export default function FriendsScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
   const [friends, setFriends] = useState([]);
@@ -208,7 +213,7 @@ export default function FriendsScreen() {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",

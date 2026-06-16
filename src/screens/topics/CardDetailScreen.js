@@ -1,15 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const { width: SW } = Dimensions.get("window");
 const CARD_W = SW - SPACING.lg * 2;
 
-function Flashcard({ card, flipped, onFlip }) {
+function Flashcard({ card, flipped, onFlip, styles, C }) {
   return (
     <Pressable onPress={onFlip} style={styles.flashcard}>
       <View style={styles.cardLabel}>
@@ -32,6 +33,8 @@ function Flashcard({ card, flipped, onFlip }) {
 }
 
 export default function CardDetailScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
   const flashcards = route.params?.flashcards || [];
@@ -110,7 +113,7 @@ export default function CardDetailScreen() {
       </View>
 
       <View style={styles.center}>
-        <Flashcard card={card} flipped={flipped} onFlip={flip} />
+        <Flashcard card={card} flipped={flipped} onFlip={flip} styles={styles} C={C} />
       </View>
 
       <View style={styles.actions}>
@@ -139,44 +142,46 @@ export default function CardDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  progressRow: {
-    flexDirection: "row", justifyContent: "center", gap: 6,
-    paddingHorizontal: SPACING.lg, marginTop: SPACING.sm,
-  },
-  progressDot: {
-    flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2, maxWidth: 60,
-  },
-  progressActive: { backgroundColor: C.amber },
-  progressKnown: { backgroundColor: C.green },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.lg },
-  flashcard: {
-    width: CARD_W, minHeight: 280,
-    backgroundColor: C.surface, borderRadius: RADIUS.xxl,
-    borderWidth: 1, borderColor: C.border,
-    alignItems: "center", justifyContent: "center",
-    padding: SPACING.xxxl,
-    ...SHADOWS.card,
-  },
-  cardLabel: {
-    flexDirection: "row", alignItems: "center", gap: 4,
-    position: "absolute", top: SPACING.lg,
-  },
-  actions: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xxl,
-  },
-  navBtn: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
-  },
-  actionBtn: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    borderRadius: RADIUS.full, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    progressRow: {
+      flexDirection: "row", justifyContent: "center", gap: 6,
+      paddingHorizontal: SPACING.lg, marginTop: SPACING.sm,
+    },
+    progressDot: {
+      flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2, maxWidth: 60,
+    },
+    progressActive: { backgroundColor: C.amber },
+    progressKnown: { backgroundColor: C.green },
+    center: { flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.lg },
+    flashcard: {
+      width: CARD_W, minHeight: 280,
+      backgroundColor: C.surface, borderRadius: RADIUS.xxl,
+      borderWidth: 1, borderColor: C.border,
+      alignItems: "center", justifyContent: "center",
+      padding: SPACING.xxxl,
+      ...SHADOWS.card,
+    },
+    cardLabel: {
+      flexDirection: "row", alignItems: "center", gap: 4,
+      position: "absolute", top: SPACING.lg,
+    },
+    actions: {
+      flexDirection: "row", alignItems: "center", justifyContent: "center",
+      gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xxl,
+    },
+    navBtn: {
+      width: 44, height: 44, borderRadius: 22,
+      backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
+    },
+    actionBtn: {
+      flexDirection: "row", alignItems: "center", gap: 6,
+      borderRadius: RADIUS.full, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
+    },
+  });
+}

@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { Icon, GlassCard } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getTopicNote, saveTopicNote } from "../../../supabase/topicNotes";
 
 // Konuya özel kalıcı not (DB'de saklanır).
 export function TopicNoteCard({ subjectKey, topicName }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const { user } = useAuth();
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState("");
@@ -56,7 +59,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: { padding: SPACING.md, marginTop: SPACING.md },
   head: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm },
   title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 },

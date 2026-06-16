@@ -3,13 +3,13 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
-import { TRIAL_TYPE_LIST, getTrialTypesForField } from "../trialTypes";
+import { getTrialTypeList, getTrialTypesForField } from "../trialTypes";
 
 export function TrialTypeSelector({ value, onChange }) {
   const C = useC();
   const { field } = useExam();
   // Kullanıcının alanına göre filtrele: sayısal user sözel görmesin
-  const list = getTrialTypesForField(field);
+  const list = getTrialTypesForField(C, field);
   return (
     <View style={{ marginBottom: SPACING.xl }}>
       <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md, paddingHorizontal: 4 }]}>

@@ -1,17 +1,18 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, Alert, Modal } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, IconBox, Chip } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { getWrongQuestionImageUrl } from "../../supabase/storage";
 import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
 
-function InfoRow({ icon, label, value, color }) {
+function InfoRow({ icon, label, value, color, styles, C }) {
   return (
     <View style={styles.infoRow}>
       <Icon name={icon} size={16} color={color || C.muted} />
@@ -21,7 +22,7 @@ function InfoRow({ icon, label, value, color }) {
   );
 }
 
-function AnswerBadge({ label, answer, color }) {
+function AnswerBadge({ label, answer, color, styles, C }) {
   return (
     <View style={[styles.answerBox, { borderColor: color + "40" }]}>
       <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{label}</Text>
@@ -31,6 +32,8 @@ function AnswerBadge({ label, answer, color }) {
 }
 
 export default function WrongDetailScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
   const { item: passedItem } = route.params ?? {};
@@ -73,16 +76,16 @@ export default function WrongDetailScreen() {
         </View>
 
         <View style={styles.answersRow}>
-          <AnswerBadge label="Benim cevabim" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} />
-          <AnswerBadge label="Dogru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} />
+          <AnswerBadge label="Benim cevabim" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
+          <AnswerBadge label="Dogru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
         </View>
 
         <View style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
             DETAYLAR
           </Text>
-          <InfoRow icon="calendar" label="Tarih" value={date} />
-          <InfoRow icon="bookOpen" label="Konu" value={item.topic} color={s.color} />
+          <InfoRow icon="calendar" label="Tarih" value={date} styles={styles} C={C} />
+          <InfoRow icon="bookOpen" label="Konu" value={item.topic} color={s.color} styles={styles} C={C} />
         </View>
 
         <View style={styles.section}>
@@ -166,60 +169,62 @@ export default function WrongDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  subjectCard: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    borderLeftWidth: 3, padding: SPACING.lg, marginBottom: SPACING.xl,
-  },
-  answersRow: {
-    flexDirection: "row", gap: SPACING.md, marginBottom: SPACING.xxl,
-  },
-  answerBox: {
-    flex: 1, alignItems: "center", paddingVertical: SPACING.lg,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    borderWidth: 1,
-  },
-  section: { marginBottom: SPACING.xxl },
-  infoRow: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-    paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: C.border,
-  },
-  noteCard: {
-    backgroundColor: C.surface, borderRadius: RADIUS.lg,
-    padding: SPACING.lg, borderWidth: 1, borderColor: C.border,
-  },
-  resolveBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-    backgroundColor: C.green, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
-  },
-  photo: {
-    width: "100%", height: 200, borderRadius: RADIUS.lg,
-    backgroundColor: C.surface,
-  },
-  zoomHint: {
-    flexDirection: "row", alignItems: "center", gap: 4,
-    position: "absolute", bottom: 8, right: 8,
-    backgroundColor: C.bg + "CC", borderRadius: RADIUS.sm,
-    paddingHorizontal: 8, paddingVertical: 4,
-  },
-  zoomOverlay: {
-    flex: 1, backgroundColor: C.bg + "F0",
-    alignItems: "center", justifyContent: "center",
-  },
-  zoomClose: {
-    position: "absolute", top: 60, right: 20, zIndex: 10,
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
-    borderWidth: 1, borderColor: C.border,
-  },
-  zoomImage: {
-    width: "92%", height: "70%",
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    subjectCard: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.md,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      borderLeftWidth: 3, padding: SPACING.lg, marginBottom: SPACING.xl,
+    },
+    answersRow: {
+      flexDirection: "row", gap: SPACING.md, marginBottom: SPACING.xxl,
+    },
+    answerBox: {
+      flex: 1, alignItems: "center", paddingVertical: SPACING.lg,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      borderWidth: 1,
+    },
+    section: { marginBottom: SPACING.xxl },
+    infoRow: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+      paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: C.border,
+    },
+    noteCard: {
+      backgroundColor: C.surface, borderRadius: RADIUS.lg,
+      padding: SPACING.lg, borderWidth: 1, borderColor: C.border,
+    },
+    resolveBtn: {
+      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
+      backgroundColor: C.green, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
+    },
+    photo: {
+      width: "100%", height: 200, borderRadius: RADIUS.lg,
+      backgroundColor: C.surface,
+    },
+    zoomHint: {
+      flexDirection: "row", alignItems: "center", gap: 4,
+      position: "absolute", bottom: 8, right: 8,
+      backgroundColor: C.bg + "CC", borderRadius: RADIUS.sm,
+      paddingHorizontal: 8, paddingVertical: 4,
+    },
+    zoomOverlay: {
+      flex: 1, backgroundColor: C.bg + "F0",
+      alignItems: "center", justifyContent: "center",
+    },
+    zoomClose: {
+      position: "absolute", top: 60, right: 20, zIndex: 10,
+      width: 40, height: 40, borderRadius: 20,
+      backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
+      borderWidth: 1, borderColor: C.border,
+    },
+    zoomImage: {
+      width: "92%", height: "70%",
+    },
+  });
+}

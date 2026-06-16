@@ -1,18 +1,19 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { useTheme } from "../../contexts/ThemeContext";
-
-const OPTIONS = [
-  { key: "system", icon: "settings", label: "Sistem", desc: "Cihazımın temasını kullan", color: C.blue },
-  { key: "dark", icon: "moon", label: "Karanlık", desc: "Gözlere yumuşak, gece dostu", color: C.purple },
-  { key: "light", icon: "sun", label: "Aydınlık", desc: "Gün ışığında daha okunaklı", color: C.amber },
-];
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useTheme, useC } from "../../contexts/ThemeContext";
 
 export default function AppearanceScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
+  const OPTIONS = useMemo(() => ([
+    { key: "system", icon: "settings", label: "Sistem", desc: "Cihazımın temasını kullan", color: C.blue },
+    { key: "dark", icon: "moon", label: "Karanlık", desc: "Gözlere yumuşak, gece dostu", color: C.purple },
+    { key: "light", icon: "sun", label: "Aydınlık", desc: "Gün ışığında daha okunaklı", color: C.amber },
+  ]), [C]);
   const navigation = useNavigation();
   const { pref, setPref } = useTheme();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
@@ -65,36 +66,38 @@ export default function AppearanceScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  content: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl },
-  sectionLabel: { ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.sm },
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.md,
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1.5,
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  rowLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  rowDesc: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
-  radio: {
-    width: 22, height: 22, borderRadius: 11,
-    borderWidth: 2,
-    alignItems: "center", justifyContent: "center",
-  },
-  radioInner: { width: 12, height: 12, borderRadius: 6 },
-  infoBox: {
-    flexDirection: "row", alignItems: "flex-start", gap: SPACING.sm,
-    marginTop: SPACING.xl, paddingHorizontal: SPACING.xs,
-  },
-  infoText: { ...TYPOGRAPHY.caption, color: C.sec, flex: 1 },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
+    content: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl },
+    sectionLabel: { ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.sm },
+    card: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.md,
+      backgroundColor: C.surface,
+      borderRadius: RADIUS.xl,
+      borderWidth: 1.5,
+      padding: SPACING.md,
+      marginBottom: SPACING.sm,
+    },
+    rowLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    rowDesc: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
+    radio: {
+      width: 22, height: 22, borderRadius: 11,
+      borderWidth: 2,
+      alignItems: "center", justifyContent: "center",
+    },
+    radioInner: { width: 12, height: 12, borderRadius: 6 },
+    infoBox: {
+      flexDirection: "row", alignItems: "flex-start", gap: SPACING.sm,
+      marginTop: SPACING.xl, paddingHorizontal: SPACING.xs,
+    },
+    infoText: { ...TYPOGRAPHY.caption, color: C.sec, flex: 1 },
+  });
+}

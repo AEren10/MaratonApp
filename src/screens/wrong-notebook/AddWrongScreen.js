@@ -4,8 +4,8 @@ import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { C } from "../../themes/tokens";
 import { Icon } from "../../components/design";
+import { useC } from "../../contexts/ThemeContext";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
@@ -19,9 +19,10 @@ import { TopicPicker } from "./components/TopicPicker";
 const ANSWERS = ["A", "B", "C", "D", "E"];
 
 export default function AddWrongScreen() {
+  const C = useC();
   const navigation = useNavigation();
   const { user } = useAuth();
-  const { tytSubjects, aytSubjects } = useCurriculum();
+  const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: "#EBAE63", icon: "hash" });
   const [topic, setTopic] = useState("");
@@ -76,7 +77,7 @@ export default function AddWrongScreen() {
       });
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Hata", "Kaydederken bir sorun oluştu.");
+      Alert.alert("Hata", "Kaydederken bir sorun oluştu.\n" + (err?.message || ""));
     } finally {
       setSaving(false);
     }
@@ -122,7 +123,7 @@ export default function AddWrongScreen() {
         {/* TYT bölümü */}
         {tytSubjects.length > 0 && (
           <>
-            <SectionLabel color={C.blue}>TYT</SectionLabel>
+            <SectionLabel color={C.blue}>{group1Label}</SectionLabel>
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
               {tytSubjects.map((s) => (
                 <SubjectChip
@@ -130,6 +131,7 @@ export default function AddWrongScreen() {
                   s={s}
                   active={subject.key === s.key}
                   onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
+                  C={C}
                 />
               ))}
             </View>
@@ -139,7 +141,7 @@ export default function AddWrongScreen() {
         {/* AYT bölümü */}
         {aytSubjects.length > 0 && (
           <>
-            <SectionLabel color={C.purple}>AYT</SectionLabel>
+            <SectionLabel color={C.purple}>{group2Label}</SectionLabel>
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
               {aytSubjects.map((s) => (
                 <SubjectChip
@@ -147,16 +149,17 @@ export default function AddWrongScreen() {
                   s={s}
                   active={subject.key === s.key}
                   onPress={() => { setSubject(s); setTopic(""); setTopicSource(null); }}
+                  C={C}
                 />
               ))}
             </View>
           </>
         )}
 
-        <Label>Konu</Label>
+        <Label C={C}>Konu</Label>
         <Pressable
           onPress={() => setPickerOpen(true)}
-          style={[inputStyle, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
+          style={[makeInputStyle(C), { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
         >
           <Text style={{ fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }}>
             {topic || "Konu seç"}
@@ -164,10 +167,10 @@ export default function AddWrongScreen() {
           <Icon name="chevDown" size={16} color={C.muted} />
         </Pressable>
 
-        <Label>Şıklar</Label>
+        <Label C={C}>Şıklar</Label>
         <View style={{ flexDirection: "row", gap: 8 }}>
           <View style={{ flex: 1 }}>
-            <Text style={miniLabel}>Cevabın</Text>
+            <Text style={makeMiniLabel(C)}>Cevabın</Text>
             <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
               {ANSWERS.map((a) => {
                 const active = myAnswer === a;
@@ -201,7 +204,7 @@ export default function AddWrongScreen() {
           </View>
         </View>
         <View style={{ marginTop: 10 }}>
-          <Text style={miniLabel}>Doğru Cevap</Text>
+          <Text style={makeMiniLabel(C)}>Doğru Cevap</Text>
           <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
             {ANSWERS.map((a) => {
               const active = correctAnswer === a;
@@ -234,17 +237,17 @@ export default function AddWrongScreen() {
           </View>
         </View>
 
-        <Label>Not</Label>
+        <Label C={C}>Not</Label>
         <TextInput
           value={note}
           onChangeText={setNote}
           placeholder="Nerede takıldın? Tekrar bakman gereken şey ne?"
           placeholderTextColor={C.muted}
           multiline
-          style={[inputStyle, { minHeight: 90, textAlignVertical: "top", paddingTop: 12 }]}
+          style={[makeInputStyle(C), { minHeight: 90, textAlignVertical: "top", paddingTop: 12 }]}
         />
 
-        <Label>Foto (opsiyonel)</Label>
+        <Label C={C}>Foto (opsiyonel)</Label>
         <Pressable
           onPress={pickImage}
           style={{
@@ -327,7 +330,7 @@ export default function AddWrongScreen() {
   );
 }
 
-const inputStyle = {
+const makeInputStyle = (C) => ({
   backgroundColor: C.surface,
   borderWidth: 1,
   borderColor: C.border,
@@ -337,17 +340,17 @@ const inputStyle = {
   fontFamily: "Inter_400Regular",
   fontSize: 15,
   color: C.text,
-};
+});
 
-const miniLabel = {
+const makeMiniLabel = (C) => ({
   fontFamily: "Inter_500Medium",
   fontSize: 11,
   color: C.muted,
   letterSpacing: 0.4,
   textTransform: "uppercase",
-};
+});
 
-function Label({ children }) {
+function Label({ children, C }) {
   return (
     <Text
       style={{
@@ -391,7 +394,7 @@ function SectionLabel({ children, color }) {
   );
 }
 
-function SubjectChip({ s, active, onPress }) {
+function SubjectChip({ s, active, onPress, C }) {
   return (
     <Pressable
       onPress={onPress}

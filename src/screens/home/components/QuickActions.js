@@ -1,8 +1,9 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
 import { Icon } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 function QuickItem({ item, onPress }) {
+  const C = useC();
   return (
     <Pressable
       onPress={() => onPress?.(item)}
@@ -42,6 +43,7 @@ function QuickItem({ item, onPress }) {
 }
 
 export function QuickActions({ items, onPress }) {
+  const C = useC();
   return (
     <View>
       <Text

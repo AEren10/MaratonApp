@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 const WEEKDAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
@@ -45,7 +46,7 @@ function intensity(data) {
   return 0;
 }
 
-const INTENSITY_COLOR = [
+const getIntensityColor = (C) => [
   "transparent",
   C.amber + "30",
   C.amber + "55",
@@ -53,54 +54,7 @@ const INTENSITY_COLOR = [
   C.amber,
 ];
 
-export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect }) {
-  const days = getCalendarDays(monthDate);
-
-  return (
-    <View style={styles.wrap}>
-      <View style={styles.weekRow}>
-        {WEEKDAYS.map((w) => (
-          <Text key={w} style={styles.weekLabel}>{w}</Text>
-        ))}
-      </View>
-      <View style={styles.grid}>
-        {days.map((d, i) => {
-          if (!d) {
-            return <View key={i} style={styles.cell} />;
-          }
-          const iso = isoDate(d);
-          const data = dayMap[iso];
-          const lvl = intensity(data);
-          const isSelected = selectedDay === iso;
-          const today = isToday(d);
-          const hasTrial = data?.trials?.length > 0;
-          return (
-            <Pressable
-              key={i}
-              onPress={() => onSelect(iso)}
-              style={[
-                styles.cell,
-                styles.dayCell,
-                { backgroundColor: INTENSITY_COLOR[lvl] },
-                isSelected && styles.selected,
-                today && styles.today,
-              ]}
-            >
-              <Text style={[styles.dayText, isSelected && { color: C.bg }]}>
-                {d.getDate()}
-              </Text>
-              {hasTrial && (
-                <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.teal }]} />
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
-
-const styles = {
+const makeStyles = (C) => ({
   wrap: {
     backgroundColor: C.surface,
     borderRadius: RADIUS.xxl,
@@ -153,4 +107,55 @@ const styles = {
     height: 4,
     borderRadius: 2,
   },
-};
+});
+
+export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const INTENSITY_COLOR = useMemo(() => getIntensityColor(C), [C]);
+  const days = getCalendarDays(monthDate);
+
+  return (
+    <View style={styles.wrap}>
+      <View style={styles.weekRow}>
+        {WEEKDAYS.map((w) => (
+          <Text key={w} style={styles.weekLabel}>{w}</Text>
+        ))}
+      </View>
+      <View style={styles.grid}>
+        {days.map((d, i) => {
+          if (!d) {
+            return <View key={i} style={styles.cell} />;
+          }
+          const iso = isoDate(d);
+          const data = dayMap[iso];
+          const lvl = intensity(data);
+          const isSelected = selectedDay === iso;
+          const today = isToday(d);
+          const hasTrial = data?.trials?.length > 0;
+          return (
+            <Pressable
+              key={i}
+              onPress={() => onSelect(iso)}
+              style={[
+                styles.cell,
+                styles.dayCell,
+                { backgroundColor: INTENSITY_COLOR[lvl] },
+                isSelected && styles.selected,
+                today && styles.today,
+              ]}
+            >
+              <Text style={[styles.dayText, isSelected && { color: C.bg }]}>
+                {d.getDate()}
+              </Text>
+              {hasTrial && (
+                <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.teal }]} />
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+

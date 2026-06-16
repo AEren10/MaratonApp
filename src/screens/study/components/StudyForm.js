@@ -1,10 +1,11 @@
 import { View, Text, TextInput } from "react-native";
 import { useState } from "react";
-import { C, SPACING } from "../../../themes/tokens";
+import { SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { DurationPicker } from "./DurationPicker";
 import { QuestionStepper } from "./QuestionStepper";
 
-function Label({ children }) {
+function Label({ children, C }) {
   return (
     <Text
       style={{
@@ -23,12 +24,13 @@ function Label({ children }) {
 }
 
 export function StudyForm({ form, setForm }) {
+  const C = useC();
   const [topicFocused, setTopicFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
 
   return (
     <View>
-      <Label>Konu</Label>
+      <Label C={C}>Konu</Label>
       <TextInput
         value={form.topic}
         onChangeText={(t) => setForm((p) => ({ ...p, topic: t }))}
@@ -49,19 +51,19 @@ export function StudyForm({ form, setForm }) {
         }}
       />
 
-      <Label>Soru Sayisi</Label>
+      <Label C={C}>Soru Sayisi</Label>
       <QuestionStepper
         value={form.questionCount}
         onChange={(v) => setForm((p) => ({ ...p, questionCount: v }))}
       />
 
-      <Label>Sure</Label>
+      <Label C={C}>Sure</Label>
       <DurationPicker
         selected={form.duration}
         onSelect={(v) => setForm((p) => ({ ...p, duration: v }))}
       />
 
-      <Label>Not (opsiyonel)</Label>
+      <Label C={C}>Not (opsiyonel)</Label>
       <TextInput
         value={form.notes}
         onChangeText={(t) => setForm((p) => ({ ...p, notes: t }))}

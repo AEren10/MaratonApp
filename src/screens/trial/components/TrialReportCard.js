@@ -1,45 +1,9 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-// Madde 6: Instagram story için paylaşılabilir deneme karnesi (watermark'lı).
-// captureRef ile görüntüye çevrilmek üzere ref'lenir. Ekran dışında render edilir.
-export const TrialReportCard = forwardRef(function TrialReportCard(
-  { name, typeLabel, net, dateStr, bars },
-  ref
-) {
-  return (
-    <View ref={ref} collapsable={false} style={s.card}>
-      <View style={s.accent} />
-
-      <View style={s.headerRow}>
-        <Text style={s.brand}>MARATON</Text>
-        <Text style={s.type}>{typeLabel}</Text>
-      </View>
-
-      <Text style={s.owner}>{name} · {dateStr}</Text>
-
-      <View style={s.netWrap}>
-        <Text style={s.netValue}>{net.toFixed(1)}</Text>
-        <Text style={s.netLabel}>NET</Text>
-      </View>
-
-      <View style={s.barsWrap}>
-        {bars.slice(0, 6).map((b) => (
-          <View key={b.name} style={s.barRow}>
-            <View style={[s.dot, { backgroundColor: b.c }]} />
-            <Text style={s.barName} numberOfLines={1}>{b.name}</Text>
-            <Text style={[s.barNet, { color: b.c }]}>{b.net.toFixed(1)}</Text>
-          </View>
-        ))}
-      </View>
-
-      <Text style={s.footer}>maraton.app · YKS hazırlık asistanın</Text>
-    </View>
-  );
-});
-
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: {
     width: 340,
     backgroundColor: C.bg,
@@ -88,3 +52,43 @@ const s = StyleSheet.create({
     marginTop: SPACING.xl,
   },
 });
+
+// Madde 6: Instagram story için paylaşılabilir deneme karnesi (watermark'lı).
+// captureRef ile görüntüye çevrilmek üzere ref'lenir. Ekran dışında render edilir.
+export const TrialReportCard = forwardRef(function TrialReportCard(
+  { name, typeLabel, net, dateStr, bars },
+  ref
+) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
+  return (
+    <View ref={ref} collapsable={false} style={s.card}>
+      <View style={s.accent} />
+
+      <View style={s.headerRow}>
+        <Text style={s.brand}>MARATON</Text>
+        <Text style={s.type}>{typeLabel}</Text>
+      </View>
+
+      <Text style={s.owner}>{name} · {dateStr}</Text>
+
+      <View style={s.netWrap}>
+        <Text style={s.netValue}>{net.toFixed(1)}</Text>
+        <Text style={s.netLabel}>NET</Text>
+      </View>
+
+      <View style={s.barsWrap}>
+        {bars.slice(0, 6).map((b) => (
+          <View key={b.name} style={s.barRow}>
+            <View style={[s.dot, { backgroundColor: b.c }]} />
+            <Text style={s.barName} numberOfLines={1}>{b.name}</Text>
+            <Text style={[s.barNet, { color: b.c }]}>{b.net.toFixed(1)}</Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={s.footer}>maraton.app · YKS hazırlık asistanın</Text>
+    </View>
+  );
+});
+

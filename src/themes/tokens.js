@@ -1,101 +1,107 @@
-// Design System v2 — "Lavender Glass"
+// Design System v3 — "Ink & Volt"
 //
 // Felsefe:
-//   - Tek bir "amber accent" YOK. Her bölüm / ders kendi kimlik renginde.
-//   - Surface'ler nötr-soft (krem-leylak veya gece-leylak), kenarsız, gölgeli.
+//   - Jenerik mor-cam (glassmorphism + glow) dilini bıraktık. O görünüm "AI yapmış
+//     gibi" duruyordu. Yerine editöryal / atletik bir dil: mürekkep + kağıt + tek imza.
+//   - Renk = ANLAM + ENERJİ. Brand sinyali SUNSET CORAL (sıcak mercan) birincil aksiyon
+//     ve hero'da. Kategori rengi ders kimliğinden gelir.
+//   - CANLI: dolu/doygun sıcak renkler (mercan-turuncu-pembe-amber), sönük tint değil.
+//     Hero kartlar dolu renk dolgusu + beyaz metin; 3'lü istatistik baloncukları solid.
+//   - Güven; glow/blur'dan değil, boşluk ritmi + güçlü tipografi + nötr yüzeylerden.
 //   - Hem light hem dark tam set; system theme respect.
-//   - Glassmorphism kartlar için blur + soft border.
 //
 // Renk seçimleri:
-//   light = "ferah kağıt + leylak nefes" — beyaz kart, krem zemin, lavanta tints
-//   dark  = "gece çalışması + neon olmadan" — ink-purple zemin, ametist kartlar
+//   light = "sıcak kağıt + mürekkep" — beyaz kart, kağıt zemin, nötr ink metin
+//   dark  = "gece antrenmanı" — sıcak-nötr mürekkep-siyahı zemin, mor YOK
+//   signal = VOLT (elektrik-lime) — subject paletinde olmayan, mor olmayan tek vurgu
 
 export const COLORS = {
   light: {
     // Surface stack
-    background:    "#F5F2FB",  // pale lavender wash
+    background:    "#F4F1EA",  // warm paper
     surface:       "#FFFFFF",  // white card
-    surface2:      "#EDE7F8",  // soft lavender chip
-    surfaceLight:  "#FAF8FE",
+    surface2:      "#ECE8DE",  // warm sand chip
+    surfaceLight:  "#FAF8F3",
     card:          "#FFFFFF",
-    cardHover:     "#F6F2FC",
+    cardHover:     "#F6F3EC",
 
-    // Borders & dividers — neredeyse görünmez
-    border:        "rgba(60, 40, 110, 0.08)",
-    borderSoft:    "rgba(60, 40, 110, 0.04)",
-    borderLight:   "rgba(60, 40, 110, 0.12)",
+    // Borders & dividers — nötr ink, neredeyse görünmez
+    border:        "rgba(20, 18, 12, 0.09)",
+    borderSoft:    "rgba(20, 18, 12, 0.05)",
+    borderLight:   "rgba(20, 18, 12, 0.14)",
 
-    // Text stack
-    textPrimary:   "#1B1530",  // ink-purple black
-    textSecondary: "#5A5470",
-    textMuted:     "#8E88A4",
-    textInverse:   "#FFFFFF",
+    // Text stack — nötr ink (mor değil)
+    textPrimary:   "#15161A",  // near-black ink
+    textSecondary: "#56585F",
+    textMuted:     "#8A8C93",
+    textInverse:   "#FFFFFF",  // sıcak dolgu üstünde beyaz okunur
 
     // Semantic (vurgu için, accent değil)
-    success:       "#22B47A",  // green
-    successLight:  "rgba(34,180,122,0.12)",
-    warning:       "#F0A038",  // amber (uyarı için)
-    warningLight:  "rgba(240,160,56,0.14)",
-    danger:        "#E84855",  // red (acil)
-    dangerLight:   "rgba(232,72,85,0.12)",
-    info:          "#4F8DF2",  // blue
-    infoLight:     "rgba(79,141,242,0.12)",
+    success:       "#1FA567",  // green
+    successLight:  "rgba(31,165,103,0.12)",
+    warning:       "#E08A1E",  // amber (uyarı için)
+    warningLight:  "rgba(224,138,30,0.14)",
+    danger:        "#E23B43",  // red (acil)
+    dangerLight:   "rgba(226,59,67,0.12)",
+    info:          "#2D6FE0",  // blue
+    infoLight:     "rgba(45,111,224,0.12)",
 
-    // Brand spotlight — accent rengini kaldırdık, ama tema kimliği için tek vurgu
-    accent:        "#6B4FE0",  // violet
-    accentLight:   "rgba(107,79,224,0.12)",
-    accentDark:    "#4D38B8",
+    // Brand spotlight — SUNSET CORAL (sıcak, canlı), CTA dolgusu beyaz metinle
+    accent:        "#FF5A3C",  // sunset coral
+    accentLight:   "rgba(255,90,60,0.14)",
+    accentDark:    "#D23A18",  // accent-as-text için okunur koyu
 
     // Generic palette (geri uyumlu — eski kodda C.amber vb. var)
-    amber:         "#F0A038",
-    green:         "#22B47A",
-    yellow:        "#F0C648",
-    red:           "#E84855",
-    teal:          "#26B8A6",
+    amber:         "#E8841A",
+    green:         "#15A86A",
+    yellow:        "#E0A81E",
+    red:           "#E23B49",
+    teal:          "#0FA595",
     purple:        "#6B4FE0",
-    blue:          "#4F8DF2",
-    pink:          "#EC6FA0",
-    coral:         "#F08568",
+    blue:          "#2E7DEB",
+    pink:          "#E24F8C",
+    coral:         "#E8612F",
   },
   dark: {
-    background:    "#0F0B22",  // ink purple night
-    surface:       "#1A1538",  // amethyst card
-    surface2:      "#241E48",
-    surfaceLight:  "#1D1740",
-    card:          "#1A1538",
-    cardHover:     "#241E48",
+    background:    "#0C0D11",  // warm-neutral ink night
+    surface:       "#15171C",  // charcoal card
+    surface2:      "#1E2128",
+    surfaceLight:  "#191B21",
+    card:          "#15171C",
+    cardHover:     "#1E2128",
 
-    border:        "rgba(180, 165, 255, 0.10)",
-    borderSoft:    "rgba(180, 165, 255, 0.05)",
-    borderLight:   "rgba(180, 165, 255, 0.16)",
+    border:        "rgba(255, 255, 255, 0.08)",
+    borderSoft:    "rgba(255, 255, 255, 0.04)",
+    borderLight:   "rgba(255, 255, 255, 0.14)",
 
-    textPrimary:   "#F2EEFF",
-    textSecondary: "#A39BC4",
-    textMuted:     "#736C8E",
-    textInverse:   "#0F0B22",
+    textPrimary:   "#F4F5F7",
+    textSecondary: "#9CA0AA",
+    textMuted:     "#62666F",
+    textInverse:   "#0C0D11",
 
-    success:       "#5BD89F",
-    successLight:  "rgba(91,216,159,0.16)",
-    warning:       "#F5B05C",
-    warningLight:  "rgba(245,176,92,0.18)",
-    danger:        "#FF7686",
-    dangerLight:   "rgba(255,118,134,0.16)",
-    info:          "#7EB2FF",
-    infoLight:     "rgba(126,178,255,0.16)",
+    success:       "#46E0A0",
+    successLight:  "rgba(70,224,160,0.16)",
+    warning:       "#F5B24A",
+    warningLight:  "rgba(245,178,74,0.18)",
+    danger:        "#FF6470",
+    dangerLight:   "rgba(255,100,112,0.16)",
+    info:          "#5C9BFF",
+    infoLight:     "rgba(92,155,255,0.16)",
 
-    accent:        "#9D86FF",
-    accentLight:   "rgba(157,134,255,0.18)",
-    accentDark:    "#7B65E0",
+    // Brand spotlight — SUNSET CORAL, mürekkep üstünde sıcak parlak
+    accent:        "#FF5A3C",  // sunset coral
+    accentLight:   "rgba(255,90,60,0.16)",
+    accentDark:    "#E0431F",
 
-    amber:         "#F5B05C",
-    green:         "#5BD89F",
-    yellow:        "#F8D274",
-    red:           "#FF7686",
-    teal:          "#5DD8C5",
-    purple:        "#9D86FF",
-    blue:          "#7EB2FF",
-    pink:          "#FF94BC",
-    coral:         "#FFA88F",
+    amber:         "#FF9F3D",
+    green:         "#3DDB8E",
+    yellow:        "#FFD24A",
+    red:           "#FF5C6E",
+    teal:          "#2ED9C6",
+    purple:        "#9B7BFF",
+    blue:          "#4D9BFF",
+    pink:          "#FF6FA8",
+    coral:         "#FF7A4D",
   },
 };
 
@@ -103,34 +109,34 @@ export const COLORS = {
 // Light + dark için ayrı: hem solid (ikon/buton) hem tint (background wash).
 export const SUBJECT_COLORS = {
   light: {
-    turkce:       { solid: "#4F8DF2", tint: "#E6F0FF", soft: "#C8DCFA" }, // mavi
-    matematik:    { solid: "#F0A038", tint: "#FFEFD9", soft: "#FAD9A8" }, // amber/turuncu
-    fen:          { solid: "#22B47A", tint: "#D6F4E5", soft: "#A8E5C6" }, // mint
-    sosyal:       { solid: "#6B4FE0", tint: "#E4DEFA", soft: "#C6B9F2" }, // violet
-    fizik:        { solid: "#4F8DF2", tint: "#E6F0FF", soft: "#C8DCFA" },
-    kimya:        { solid: "#26B8A6", tint: "#D6F2EE", soft: "#A8E0D6" }, // teal
-    biyoloji:     { solid: "#22B47A", tint: "#D6F4E5", soft: "#A8E5C6" },
-    tarih:        { solid: "#E84855", tint: "#FCDBDE", soft: "#F2A8AE" }, // kırmızı
-    cografya:     { solid: "#F08568", tint: "#FCE0D6", soft: "#F5BBA8" }, // coral
-    felsefe:      { solid: "#6B4FE0", tint: "#E4DEFA", soft: "#C6B9F2" },
-    din:          { solid: "#F0C648", tint: "#FCF1CC", soft: "#F5DD8A" }, // sarı
-    edebiyat:     { solid: "#EC6FA0", tint: "#FBDCE8", soft: "#F5AEC9" }, // pembe
-    ydt_ingilizce:{ solid: "#9D86FF", tint: "#EAE4FC", soft: "#C8B9F5" },
+    turkce:       { solid: "#2E7DEB", tint: "#E4EEFF", soft: "#BBD4FB" }, // mavi
+    matematik:    { solid: "#E8841A", tint: "#FCEDD7", soft: "#F7D3A3" }, // turuncu
+    fen:          { solid: "#15A86A", tint: "#DAF4E7", soft: "#A8E5C7" }, // yeşil
+    sosyal:       { solid: "#6B4FE0", tint: "#E7E0FB", soft: "#C7B9F4" }, // violet
+    fizik:        { solid: "#2E7DEB", tint: "#E4EEFF", soft: "#BBD4FB" },
+    kimya:        { solid: "#0FA595", tint: "#D6F2EE", soft: "#A3E0D7" }, // teal
+    biyoloji:     { solid: "#15A86A", tint: "#DAF4E7", soft: "#A8E5C7" },
+    tarih:        { solid: "#E23B49", tint: "#FCDEE1", soft: "#F5AEB4" }, // kırmızı
+    cografya:     { solid: "#E8612F", tint: "#FCE2D8", soft: "#F7BCA6" }, // coral
+    felsefe:      { solid: "#6B4FE0", tint: "#E7E0FB", soft: "#C7B9F4" },
+    din:          { solid: "#E0A81E", tint: "#FBF0D2", soft: "#F2DC97" }, // sarı
+    edebiyat:     { solid: "#E24F8C", tint: "#FCE0EB", soft: "#F7B6CF" }, // pembe
+    ydt_ingilizce:{ solid: "#8A6BF0", tint: "#EAE2FC", soft: "#CDB9F7" },
   },
   dark: {
-    turkce:       { solid: "#7EB2FF", tint: "rgba(126,178,255,0.16)",  soft: "rgba(126,178,255,0.32)" },
-    matematik:    { solid: "#F5B05C", tint: "rgba(245,176,92,0.16)",   soft: "rgba(245,176,92,0.32)" },
-    fen:          { solid: "#5BD89F", tint: "rgba(91,216,159,0.16)",   soft: "rgba(91,216,159,0.32)" },
-    sosyal:       { solid: "#9D86FF", tint: "rgba(157,134,255,0.16)",  soft: "rgba(157,134,255,0.32)" },
-    fizik:        { solid: "#7EB2FF", tint: "rgba(126,178,255,0.16)",  soft: "rgba(126,178,255,0.32)" },
-    kimya:        { solid: "#5DD8C5", tint: "rgba(93,216,197,0.16)",   soft: "rgba(93,216,197,0.32)" },
-    biyoloji:     { solid: "#5BD89F", tint: "rgba(91,216,159,0.16)",   soft: "rgba(91,216,159,0.32)" },
-    tarih:        { solid: "#FF7686", tint: "rgba(255,118,134,0.16)",  soft: "rgba(255,118,134,0.32)" },
-    cografya:     { solid: "#FFA88F", tint: "rgba(255,168,143,0.16)",  soft: "rgba(255,168,143,0.32)" },
-    felsefe:      { solid: "#9D86FF", tint: "rgba(157,134,255,0.16)",  soft: "rgba(157,134,255,0.32)" },
-    din:          { solid: "#F8D274", tint: "rgba(248,210,116,0.16)",  soft: "rgba(248,210,116,0.32)" },
-    edebiyat:     { solid: "#FF94BC", tint: "rgba(255,148,188,0.16)",  soft: "rgba(255,148,188,0.32)" },
-    ydt_ingilizce:{ solid: "#C5B0FF", tint: "rgba(197,176,255,0.16)",  soft: "rgba(197,176,255,0.32)" },
+    turkce:       { solid: "#4D9BFF", tint: "rgba(77,155,255,0.16)",   soft: "rgba(77,155,255,0.32)" },
+    matematik:    { solid: "#FF9F3D", tint: "rgba(255,159,61,0.16)",   soft: "rgba(255,159,61,0.32)" },
+    fen:          { solid: "#3DDB8E", tint: "rgba(61,219,142,0.16)",   soft: "rgba(61,219,142,0.32)" },
+    sosyal:       { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)",  soft: "rgba(155,123,255,0.32)" },
+    fizik:        { solid: "#4D9BFF", tint: "rgba(77,155,255,0.16)",   soft: "rgba(77,155,255,0.32)" },
+    kimya:        { solid: "#2ED9C6", tint: "rgba(46,217,198,0.16)",   soft: "rgba(46,217,198,0.32)" },
+    biyoloji:     { solid: "#3DDB8E", tint: "rgba(61,219,142,0.16)",   soft: "rgba(61,219,142,0.32)" },
+    tarih:        { solid: "#FF5C6E", tint: "rgba(255,92,110,0.16)",   soft: "rgba(255,92,110,0.32)" },
+    cografya:     { solid: "#FF7A4D", tint: "rgba(255,122,77,0.16)",   soft: "rgba(255,122,77,0.32)" },
+    felsefe:      { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)",  soft: "rgba(155,123,255,0.32)" },
+    din:          { solid: "#FFD24A", tint: "rgba(255,210,74,0.16)",   soft: "rgba(255,210,74,0.32)" },
+    edebiyat:     { solid: "#FF6FA8", tint: "rgba(255,111,168,0.16)",  soft: "rgba(255,111,168,0.32)" },
+    ydt_ingilizce:{ solid: "#B79BFF", tint: "rgba(183,155,255,0.16)",  soft: "rgba(183,155,255,0.32)" },
   },
 };
 
@@ -145,16 +151,16 @@ export function getSubjectIdentity(scheme, key) {
     .replace(/^ayt_ea_/, "")
     .replace(/^ayt_say_/, "")
     .replace(/^ayt_sozel_/, "");
-  return map[norm] || map[key] || { solid: "#9D86FF", tint: "rgba(157,134,255,0.16)", soft: "rgba(157,134,255,0.32)" };
+  return map[norm] || map[key] || { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)", soft: "rgba(155,123,255,0.32)" };
 }
 
 // Surface elevation (gölge) — light için belirgin, dark için minimal
 export const ELEVATION = {
   light: {
-    sm: { shadowColor: "#1B1530", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 6,  elevation: 2 },
-    md: { shadowColor: "#1B1530", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 14, elevation: 4 },
-    lg: { shadowColor: "#1B1530", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 24, elevation: 8 },
-    xl: { shadowColor: "#1B1530", shadowOffset: { width: 0, height: 14}, shadowOpacity: 0.10, shadowRadius: 40, elevation: 12 },
+    sm: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6,  elevation: 2 },
+    md: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.07, shadowRadius: 14, elevation: 4 },
+    lg: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.09, shadowRadius: 24, elevation: 8 },
+    xl: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 14}, shadowOpacity: 0.11, shadowRadius: 40, elevation: 12 },
   },
   dark: {
     sm: { shadowColor: "#000",    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.20, shadowRadius: 6,  elevation: 2 },
@@ -186,36 +192,24 @@ export function paletteFor(scheme) {
     text:       src.textPrimary,
     sec:        src.textSecondary,
     muted:      src.textMuted,
-    cream:      "#FBF1DC",
+    cream:      "#F4F1EA",
   };
 }
 
-// LEGACY default export — yeni kod `useTheme().palette` kullanmalı.
-// Eski tüm dosyalar `import { C }` ile çağırıyor. Proxy ile runtime-aware:
-// ThemeProvider scheme değiştirince setRuntimeScheme() çağırır → tüm `C.bg`,
-// `C.text` vb. erişimleri o anki temanın değerini döner. Böylece eski 70+
-// dosyayı tek tek refactor etmeden hem light hem dark düzgün çalışır.
+// LEGACY — yeni kod `useC()` kullanmalı.
+// Eski 70+ dosya `import { C }` ile çağırıyor. Object.assign ile in-place
+// mutate: setRuntimeScheme() tüm key'leri güncel palette ile değiştirir.
 let _runtimeScheme = "light";
-let _runtimePalette = paletteFor("light");
+
+export const C = paletteFor("light");
 
 export function setRuntimeScheme(scheme) {
   const next = scheme === "dark" ? "dark" : "light";
   if (next === _runtimeScheme) return;
   _runtimeScheme = next;
-  _runtimePalette = paletteFor(next);
+  Object.assign(C, paletteFor(next));
+  Object.assign(SHADOWS, _buildShadows(next));
 }
-
-export const C = new Proxy({}, {
-  get(_target, prop) {
-    return _runtimePalette[prop];
-  },
-  ownKeys() {
-    return Reflect.ownKeys(_runtimePalette);
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    return { enumerable: true, configurable: true, value: _runtimePalette[prop] };
-  },
-});
 
 // ===== Pastel chips (eski) =====
 export const PASTEL = {
@@ -281,9 +275,12 @@ export const TYPOGRAPHY = {
   },
 };
 
-// Eski kod SHADOWS bekliyor — light teması için ELEVATION'ı bağla.
-export const SHADOWS = {
-  card:  ELEVATION.light.md,
-  amber: { ...ELEVATION.light.md, shadowColor: "#F0A038", shadowOpacity: 0.30 },
-  fab:   { ...ELEVATION.light.lg, shadowColor: "#6B4FE0", shadowOpacity: 0.35 },
-};
+function _buildShadows(scheme) {
+  const e = scheme === "dark" ? ELEVATION.dark : ELEVATION.light;
+  return {
+    card:  e.md,
+    amber: { ...e.md, shadowColor: "#E08A1E", shadowOpacity: 0.30 },
+    fab:   { ...e.lg, shadowColor: "#FF5A3C", shadowOpacity: 0.35 },
+  };
+}
+export const SHADOWS = _buildShadows("light");

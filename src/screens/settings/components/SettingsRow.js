@@ -1,8 +1,13 @@
+import { useMemo } from "react";
 import { Pressable, View, Text, Switch } from "react-native";
 import { Icon, IconBox } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function SettingsRow({ icon, iconColor, label, toggle, value, onToggle, onPress, disabled }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+
   const content = (
     <View style={styles.row}>
       <IconBox icon={icon} color={iconColor ?? C.amber} size={38} rounded={12} />
@@ -33,7 +38,7 @@ export function SettingsRow({ icon, iconColor, label, toggle, value, onToggle, o
   );
 }
 
-const styles = {
+const makeStyles = (C) => ({
   wrapper: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
@@ -48,4 +53,4 @@ const styles = {
     color: C.text,
     flex: 1,
   },
-};
+});

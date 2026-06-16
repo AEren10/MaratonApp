@@ -1,8 +1,9 @@
 import { View, Text, Pressable } from "react-native";
 import { ProgressRing, Chip, Icon, AnimatedNumber } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function PlanCard({ plan, onPress, onStart }) {
+  const C = useC();
   const pct = plan.total ? plan.done / plan.total : 0;
   const remaining = plan.total - plan.done;
 

@@ -53,6 +53,16 @@ export const SCREENS = {
   // Goals
   GOALS: "Goals",
 
+  // New flows
+  STUDY_SUMMARY: "StudySummary",
+  TRIAL_INSIGHTS: "TrialInsights",
+  WEEKLY_REVIEW: "WeeklyReview",
+  SWIPE_REVIEW: "SwipeReview",
+  QUICK_PRACTICE: "QuickPractice",
+  CHALLENGE: "Challenge",
+  EXAM_SIMULATOR: "ExamSimulator",
+  SHARE_CARD: "ShareCard",
+
   // Social
   FRIENDS: "Friends",
 

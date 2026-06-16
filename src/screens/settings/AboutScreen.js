@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const INFO_ROWS = [
   { label: "Gelistirici", value: "Maraton Team" },
@@ -12,6 +13,8 @@ const INFO_ROWS = [
 ];
 
 export default function AboutScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
@@ -50,34 +53,36 @@ export default function AboutScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  center: { alignItems: "center", marginTop: SPACING.xxxl },
-  iconWrap: {
-    width: 88, height: 88, borderRadius: RADIUS.xxl,
-    backgroundColor: C.amber + "18", alignItems: "center",
-    justifyContent: "center", marginBottom: SPACING.lg,
-  },
-  appName: { ...TYPOGRAPHY.heading, color: C.text },
-  version: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: SPACING.xs },
-  infoCard: {
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    marginHorizontal: SPACING.lg, marginTop: SPACING.xxxl,
-  },
-  infoRow: {
-    flexDirection: "row", justifyContent: "space-between",
-    alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.lg,
-  },
-  infoRowBorder: { borderBottomWidth: 1, borderBottomColor: C.border },
-  infoLabel: { ...TYPOGRAPHY.body, color: C.sec },
-  infoValue: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  footer: {
-    ...TYPOGRAPHY.caption, color: C.muted,
-    textAlign: "center", marginTop: SPACING.xxxl,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
+    center: { alignItems: "center", marginTop: SPACING.xxxl },
+    iconWrap: {
+      width: 88, height: 88, borderRadius: RADIUS.xxl,
+      backgroundColor: C.amber + "18", alignItems: "center",
+      justifyContent: "center", marginBottom: SPACING.lg,
+    },
+    appName: { ...TYPOGRAPHY.heading, color: C.text },
+    version: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: SPACING.xs },
+    infoCard: {
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      marginHorizontal: SPACING.lg, marginTop: SPACING.xxxl,
+    },
+    infoRow: {
+      flexDirection: "row", justifyContent: "space-between",
+      alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.lg,
+    },
+    infoRowBorder: { borderBottomWidth: 1, borderBottomColor: C.border },
+    infoLabel: { ...TYPOGRAPHY.body, color: C.sec },
+    infoValue: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    footer: {
+      ...TYPOGRAPHY.caption, color: C.muted,
+      textAlign: "center", marginTop: SPACING.xxxl,
+    },
+  });
+}

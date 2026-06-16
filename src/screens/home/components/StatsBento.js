@@ -1,10 +1,14 @@
+import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
-import { C, TYPOGRAPHY, PASTEL } from "../../../themes/tokens";
+import { TYPOGRAPHY, PASTEL } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 // Çok renkli pastel bento — her tile kendi yumuşak kimlik rengini taşır.
 // Streak (şeftali) hero, Deneme (mavi) + Lig (mor) sağ kolon, Canlı (nane) alt şerit.
 export function StatsBento({ deneme = {}, streak = {}, league = {}, live = {}, onDeneme, onStreak, onLeague, onLive }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const liveCount = live.count || 0;
   return (
     <View style={s.container}>
@@ -80,7 +84,7 @@ export function StatsBento({ deneme = {}, streak = {}, league = {}, live = {}, o
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   container: {
     backgroundColor: C.surface,
     borderRadius: 26,

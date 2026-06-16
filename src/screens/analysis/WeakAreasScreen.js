@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { ALL_SUBJECTS } from "../trial/trialTypes";
+import { getAllSubjects } from "../trial/trialTypes";
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const SUGGESTIONS = {
   neglected: "Bu konuya uzun süredir çalışmadın, tekrar et.",
@@ -14,12 +15,12 @@ const SUGGESTIONS = {
 };
 const DEFAULT_SUGGESTION = "Bu konuda daha fazla pratik yapman gerekiyor.";
 
-function computeWeakTopics(trials) {
+function computeWeakTopics(C, trials) {
   if (!trials.length) return [];
   const sorted = [...trials].sort((a, b) => new Date(b.date) - new Date(a.date));
   const recent = sorted.slice(0, 5);
   const weak = [];
-  ALL_SUBJECTS.forEach((s) => {
+  getAllSubjects(C).forEach((s) => {
     const nets = recent
       .map((t) => t.subjects?.[s.key]?.net)
       .filter((n) => n !== undefined && n !== null);
@@ -38,7 +39,7 @@ function computeWeakTopics(trials) {
   return weak.sort((a, b) => a.acc - b.acc);
 }
 
-const WeakCard = React.memo(function WeakCard({ item }) {
+const WeakCard = React.memo(function WeakCard({ item, s, C }) {
   const suggestion = SUGGESTIONS[item.status] || DEFAULT_SUGGESTION;
   return (
     <View style={[s.card, { borderLeftColor: item.subject.color }]}>
@@ -56,11 +57,13 @@ const WeakCard = React.memo(function WeakCard({ item }) {
 });
 
 export default function WeakAreasScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const trials = useSelector(selectTrials);
-  const weakTopics = useMemo(() => computeWeakTopics(trials), [trials]);
+  const weakTopics = useMemo(() => computeWeakTopics(C, trials), [C, trials]);
 
-  const renderItem = useCallback(({ item }) => <WeakCard item={item} />, []);
+  const renderItem = useCallback(({ item }) => <WeakCard item={item} s={s} C={C} />, [s, C]);
   const keyExtractor = useCallback((item, i) => `${item.subject.key}-${item.name}-${i}`, []);
 
   return (
@@ -99,18 +102,20 @@ export default function WeakAreasScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  list: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  card: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.md, borderLeftWidth: 3 },
-  cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.sm, gap: SPACING.sm },
-  subjectName: { ...TYPOGRAPHY.captionMedium, color: C.sec, flex: 1 },
-  accBadge: { ...TYPOGRAPHY.bodySemiBold },
-  topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.xs },
-  suggestion: { ...TYPOGRAPHY.caption, color: C.sec },
-  footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.xl, gap: SPACING.sm },
-  footerText: { ...TYPOGRAPHY.captionMedium, color: C.amber },
-  empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
-  emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    list: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+    card: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.md, borderLeftWidth: 3 },
+    cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.sm, gap: SPACING.sm },
+    subjectName: { ...TYPOGRAPHY.captionMedium, color: C.sec, flex: 1 },
+    accBadge: { ...TYPOGRAPHY.bodySemiBold },
+    topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.xs },
+    suggestion: { ...TYPOGRAPHY.caption, color: C.sec },
+    footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.xl, gap: SPACING.sm },
+    footerText: { ...TYPOGRAPHY.captionMedium, color: C.amber },
+    empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
+    emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
+  });
+}

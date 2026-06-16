@@ -3,7 +3,8 @@ import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { getSubjectByKey } from "../../themes/subjects";
@@ -17,6 +18,8 @@ import { PlanTaskItem } from "./components/PlanTaskItem";
 import { TaskReasonSheet } from "./components/TaskReasonSheet";
 
 export default function PlanDetailScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const trials = useAppSelector(selectTrials);
   const adHocTasks = useAppSelector(selectAdHocTasks);
@@ -142,23 +145,25 @@ export default function PlanDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    gap: SPACING.md,
-  },
-  title: { ...TYPOGRAPHY.subheading, color: C.text, flex: 1 },
-  date: { ...TYPOGRAPHY.captionMedium, color: C.muted },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 90 },
-  listLabel: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.sm,
-    marginBottom: SPACING.md,
-  },
-  taskList: { gap: SPACING.md },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+      gap: SPACING.md,
+    },
+    title: { ...TYPOGRAPHY.subheading, color: C.text, flex: 1 },
+    date: { ...TYPOGRAPHY.captionMedium, color: C.muted },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 90 },
+    listLabel: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.sm,
+      marginBottom: SPACING.md,
+    },
+    taskList: { gap: SPACING.md },
+  });
+}

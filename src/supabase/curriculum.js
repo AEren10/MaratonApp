@@ -7,7 +7,9 @@ export async function fetchSubjects(exam, field) {
     .select("*, topics(id, name, sort_order)")
     .order("sort_order", { ascending: true });
 
-  if (exam === "tyt") {
+  if (exam === "lgs") {
+    query.eq("exam", "lgs");
+  } else if (exam === "tyt") {
     query.eq("exam", "tyt");
   } else if (exam === "tyt_ayt") {
     query.or(`exam.eq.tyt,and(exam.eq.ayt,field.eq.${field})`);

@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { View, Text, Pressable, Switch, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import {
   getNotifPrefs,
   setNotifPrefs,
@@ -19,6 +20,8 @@ const HOUR_OPTIONS = [
 ];
 
 export default function NotificationsSettingsScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const [prefs, setPrefs] = useState(null);
@@ -145,38 +148,40 @@ export default function NotificationsSettingsScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  list: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
-  row: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    padding: SPACING.lg, marginBottom: SPACING.sm,
-  },
-  label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
-  subBox: {
-    backgroundColor: C.surface + "80",
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  subLabel: {
-    ...TYPOGRAPHY.label,
-    color: C.muted,
-    marginBottom: SPACING.sm,
-  },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.xs },
-  chip: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderWidth: 1,
-    borderRadius: 999,
-  },
-  chipText: { ...TYPOGRAPHY.captionMedium },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
+    list: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
+    row: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.md,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      padding: SPACING.lg, marginBottom: SPACING.sm,
+    },
+    label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
+    subBox: {
+      backgroundColor: C.surface + "80",
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.sm,
+    },
+    subLabel: {
+      ...TYPOGRAPHY.label,
+      color: C.muted,
+      marginBottom: SPACING.sm,
+    },
+    chipRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.xs },
+    chip: {
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.xs,
+      borderWidth: 1,
+      borderRadius: 999,
+    },
+    chipText: { ...TYPOGRAPHY.captionMedium },
+  });
+}

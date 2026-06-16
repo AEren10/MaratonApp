@@ -1,15 +1,16 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { TRIAL_TYPES, ALL_SUBJECTS } from "./trialTypes";
+import { getTrialTypes, getAllSubjects } from "./trialTypes";
 
-function CompareBar({ label, v1, v2, max, color }) {
+function CompareBar({ label, v1, v2, max, color, styles, C }) {
   const p1 = max > 0 ? (v1 / max) * 100 : 0;
   const p2 = max > 0 ? (v2 / max) * 100 : 0;
   const diff = v2 - v1;
@@ -39,6 +40,8 @@ function CompareBar({ label, v1, v2, max, color }) {
 }
 
 export default function TrialCompareScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
@@ -48,10 +51,12 @@ export default function TrialCompareScreen() {
   const newer = sorted[0];
   const older = sorted.find((t, i) => i > 0 && t.trialType === newer?.trialType) || sorted[1] || sorted[0];
 
-  const typeMeta = TRIAL_TYPES[newer?.trialType];
+  const trialTypes = useMemo(() => getTrialTypes(C), [C]);
+  const allSubjects = useMemo(() => getAllSubjects(C), [C]);
+  const typeMeta = trialTypes[newer?.trialType];
   const subjects = typeMeta?.subjects ||
     (newer?.trialType === "BRANCH" && newer?.branchSubject
-      ? ALL_SUBJECTS.filter((s) => s.key === newer.branchSubject)
+      ? allSubjects.filter((s) => s.key === newer.branchSubject)
       : []);
 
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) : "—";
@@ -140,6 +145,8 @@ export default function TrialCompareScreen() {
             v2={s.v2}
             max={s.max}
             color={s.c}
+            styles={styles}
+            C={C}
           />
         ))}
 
@@ -158,48 +165,50 @@ export default function TrialCompareScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  dateCards: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: SPACING.md, marginBottom: SPACING.xxl,
-  },
-  dateCard: {
-    alignItems: "center", gap: SPACING.xs,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg,
-    flex: 1,
-  },
-  totalDiff: {
-    alignItems: "center", backgroundColor: C.surface,
-    borderRadius: RADIUS.xxl, padding: SPACING.xxl, marginBottom: SPACING.xxl,
-  },
-  totalRow: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md, marginTop: SPACING.sm,
-  },
-  compareRow: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-    paddingVertical: SPACING.lg, borderBottomWidth: 1, borderBottomColor: C.border,
-  },
-  barBg: {
-    height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden",
-  },
-  barFill: { height: 6, borderRadius: 3 },
-  diffBadge: {
-    borderRadius: RADIUS.full, paddingHorizontal: 8, paddingVertical: 2,
-    minWidth: 40, alignItems: "center",
-  },
-  legendRow: {
-    flexDirection: "row", justifyContent: "center", gap: SPACING.xl,
-    marginTop: SPACING.xl,
-  },
-  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-  legendDot: {
-    width: 8, height: 8, borderRadius: 4, backgroundColor: C.amber,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    dateCards: {
+      flexDirection: "row", alignItems: "center", justifyContent: "center",
+      gap: SPACING.md, marginBottom: SPACING.xxl,
+    },
+    dateCard: {
+      alignItems: "center", gap: SPACING.xs,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg,
+      flex: 1,
+    },
+    totalDiff: {
+      alignItems: "center", backgroundColor: C.surface,
+      borderRadius: RADIUS.xxl, padding: SPACING.xxl, marginBottom: SPACING.xxl,
+    },
+    totalRow: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.md, marginTop: SPACING.sm,
+    },
+    compareRow: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+      paddingVertical: SPACING.lg, borderBottomWidth: 1, borderBottomColor: C.border,
+    },
+    barBg: {
+      height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden",
+    },
+    barFill: { height: 6, borderRadius: 3 },
+    diffBadge: {
+      borderRadius: RADIUS.full, paddingHorizontal: 8, paddingVertical: 2,
+      minWidth: 40, alignItems: "center",
+    },
+    legendRow: {
+      flexDirection: "row", justifyContent: "center", gap: SPACING.xl,
+      marginTop: SPACING.xl,
+    },
+    legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+    legendDot: {
+      width: 8, height: 8, borderRadius: 4, backgroundColor: C.amber,
+    },
+  });
+}

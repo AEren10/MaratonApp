@@ -1,6 +1,7 @@
 import { differenceInDays } from "date-fns";
 import { TYT_SUBJECTS } from "../themes/subjects";
-import { ALL_SUBJECTS } from "../screens/trial/trialTypes";
+import { getAllSubjects } from "../screens/trial/trialTypes";
+import { C } from "../themes/tokens";
 
 /**
  * Akilli uyari/oneri sistemi.
@@ -21,7 +22,7 @@ const NUDGE_TYPES = {
 
 // Gives a display label for a trial subject key (tyt_turkce → "Türkçe")
 function trialSubjectLabel(key) {
-  const found = ALL_SUBJECTS.find((s) => s.key === key);
+  const found = getAllSubjects(C).find((s) => s.key === key);
   return found?.name || key;
 }
 

@@ -1,15 +1,16 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, IconBox, Chip } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 
-function CardItem({ item, onPress }) {
+function CardItem({ item, onPress, styles, C }) {
   const pct = item.count > 0 ? Math.round((item.mastered / item.count) * 100) : 0;
   const pctColor = pct >= 70 ? C.green : pct >= 40 ? C.amber : C.red;
   return (
@@ -33,6 +34,8 @@ function CardItem({ item, onPress }) {
 }
 
 export default function TopicCardsScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
   const [cards, setCards] = useState([]);
@@ -52,7 +55,7 @@ export default function TopicCardsScreen() {
         setCards(mapped.filter((c) => c.count > 0));
       })
       .catch(() => {});
-  }, [user?.id]);
+  }, [user?.id, C]);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const openCard = useCallback((id) => {
@@ -60,8 +63,8 @@ export default function TopicCardsScreen() {
   }, [navigation]);
 
   const renderItem = useCallback(({ item }) => (
-    <CardItem item={item} onPress={openCard} />
-  ), [openCard]);
+    <CardItem item={item} onPress={openCard} styles={styles} C={C} />
+  ), [openCard, styles, C]);
 
   const keyExtractor = useCallback((item) => String(item.id), []);
 
@@ -100,20 +103,22 @@ export default function TopicCardsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  list: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  card: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    padding: SPACING.lg,
-  },
-  miniBar: {
-    width: 50, height: 4, borderRadius: 2, backgroundColor: C.surface2, overflow: "hidden",
-  },
-  miniBarFill: { height: 4, borderRadius: 2 },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row", alignItems: "center",
+      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    },
+    list: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    card: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.md,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      padding: SPACING.lg,
+    },
+    miniBar: {
+      width: 50, height: 4, borderRadius: 2, backgroundColor: C.surface2, overflow: "hidden",
+    },
+    miniBarFill: { height: 4, borderRadius: 2 },
+  });
+}

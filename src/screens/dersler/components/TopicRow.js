@@ -2,11 +2,12 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { getMastery } from "../../../lib/mastery";
 
-function AccBadge({ acc }) {
+function AccBadge({ acc, C }) {
   const color = acc >= 75 ? C.green : acc >= 50 ? C.amber : C.red;
   return (
     <View
@@ -47,6 +48,7 @@ function MiniBar({ pct, color }) {
 }
 
 export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) {
+  const C = useC();
   const navigation = useNavigation();
   const mastery = getMastery({ q: topic.q, acc: topic.acc });
   const dotColor = mastery.color;
@@ -106,7 +108,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
 
       {/* Right side: accuracy + mini bar */}
       <View style={{ alignItems: "flex-end", gap: 4, marginLeft: SPACING.sm }}>
-        <AccBadge acc={topic.acc} />
+        <AccBadge acc={topic.acc} C={C} />
         <MiniBar pct={topic.pct} color={color} />
       </View>
 

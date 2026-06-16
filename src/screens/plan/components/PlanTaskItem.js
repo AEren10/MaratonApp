@@ -1,14 +1,13 @@
+import { useMemo } from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import { Icon, Chip } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-
-const REASON_COLORS = {
-  gray: C.muted,
-  red: C.red,
-  amber: C.amber,
-};
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const REASON_COLORS = { gray: C.muted, red: C.red, amber: C.amber };
   const { s, topic, q, reason, rkind, done } = task;
   const reasonColor = REASON_COLORS[rkind] || C.muted;
 
@@ -51,7 +50,7 @@ export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",

@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { TRIAL_TYPES, ALL_SUBJECTS } from "../trial/trialTypes";
+import { getTrialTypes, getAllSubjects } from "../trial/trialTypes";
 import { useSync } from "../../contexts/DataSyncContext";
 import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -44,7 +44,9 @@ function filterTrials(trials, filter) {
   return trials;
 }
 
-function subjectsForFilter(filter, latestTrial) {
+function subjectsForFilter(C, filter, latestTrial) {
+  const TRIAL_TYPES = getTrialTypes(C);
+  const ALL_SUBJECTS = getAllSubjects(C);
   if (filter === "TYT") return TRIAL_TYPES.TYT.subjects;
   if (filter === "AYT" && latestTrial?.trialType) {
     const type = TRIAL_TYPES[latestTrial.trialType];
@@ -98,7 +100,7 @@ export default function AnalysisScreen() {
         name: t.name,
       };
     });
-    const subjects = subjectsForFilter(filter, latest);
+    const subjects = subjectsForFilter(C, filter, latest);
     const bars = subjects.map((sub) => ({
       key: sub.key,
       name: sub.name,
@@ -117,7 +119,7 @@ export default function AnalysisScreen() {
         net,
         trend,
         date: new Date(latest.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }),
-        typeLabel: TRIAL_TYPES[latest.trialType]?.label || latest.name || "Deneme",
+        typeLabel: getTrialTypes(C)[latest.trialType]?.label || latest.name || "Deneme",
       },
       bars,
       line,
@@ -127,7 +129,7 @@ export default function AnalysisScreen() {
       history,
       empty: false,
     };
-  }, [trials, filter]);
+  }, [trials, filter, C]);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
@@ -189,6 +191,17 @@ export default function AnalysisScreen() {
                     title="Net Trendin"
                     color={C.purple}
                   />
+                  <Pressable
+                    onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
+                    style={{
+                      flexDirection: "row", alignItems: "center", justifyContent: "center",
+                      gap: 6, marginTop: SPACING.md, paddingVertical: SPACING.sm,
+                    }}
+                  >
+                    <Icon name="trendUp" size={14} color={C.amber} />
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Detaylı Analiz</Text>
+                    <Icon name="chevR" size={12} color={C.amber} />
+                  </Pressable>
                 </AnimatedCard>
               )}
 
@@ -223,6 +236,29 @@ export default function AnalysisScreen() {
 
               <AnimatedCard delay={360}>
                 <MoodTrend trials={filterTrials(trials, filter)} />
+              </AnimatedCard>
+
+              <AnimatedCard delay={420}>
+                <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+                  <Pressable
+                    onPress={() => navigation.navigate(SCREENS.QUICK_PRACTICE)}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.green + "10", borderWidth: 1, borderColor: C.green + "20" }}
+                  >
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.green + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="target" size={15} color={C.green} />
+                    </View>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>5dk Quiz</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => navigation.navigate(SCREENS.EXAM_SIMULATOR)}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.red + "10", borderWidth: 1, borderColor: C.red + "20" }}
+                  >
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.red + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="clock" size={15} color={C.red} />
+                    </View>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Simülasyon</Text>
+                  </Pressable>
+                </View>
               </AnimatedCard>
             </>
           )}

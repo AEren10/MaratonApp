@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
-import { ALL_SUBJECTS } from "../trial/trialTypes";
+import { getAllSubjects } from "../trial/trialTypes";
 import { TRIAL_TO_CURRICULUM } from "../trial/trialKeyMap";
 import { SCREENS } from "../../constants/screens";
 import { selectTrials } from "../../store/slices/trialSlice";
@@ -14,7 +15,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getWrongQuestions } from "../../supabase/wrongQuestions";
 import { TrendChart } from "./components/TrendChart";
 
-function StatBox({ label, value }) {
+function StatBox({ label, value, s }) {
   return (
     <View style={s.statBox}>
       <Text style={s.statValue}>{value}</Text>
@@ -23,7 +24,7 @@ function StatBox({ label, value }) {
   );
 }
 
-function TopicRow({ topic, color }) {
+function TopicRow({ topic, color, s }) {
   const barWidth = Math.round(Math.max(topic.acc, 5));
   return (
     <View style={s.topicRow}>
@@ -40,6 +41,8 @@ function TopicRow({ topic, color }) {
 }
 
 export default function SubjectDetailScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
   const trials = useSelector(selectTrials);
@@ -50,7 +53,8 @@ export default function SubjectDetailScreen() {
   const subjectName = route.params?.subjectName || route.params?.subject?.name;
 
   // Find subject color and meta
-  const trialSubject = ALL_SUBJECTS.find((s) => s.key === subjectKey);
+  const allSubjects = useMemo(() => getAllSubjects(C), [C]);
+  const trialSubject = allSubjects.find((s) => s.key === subjectKey);
 
   // Map trial key → curriculum key for topics
   const curriculumKeys = TRIAL_TO_CURRICULUM[subjectKey] || [subjectKey];
@@ -174,10 +178,10 @@ export default function SubjectDetailScreen() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.statsRow}>
-          <StatBox label="Ort. Net" value={totals.netAvg} />
-          <StatBox label="Doğru" value={totals.totalCorrect} />
-          <StatBox label="Yanlış" value={totals.totalWrong} />
-          {accuracy !== null && <StatBox label="Başarı %" value={`${accuracy}`} />}
+          <StatBox label="Ort. Net" value={totals.netAvg} s={s} />
+          <StatBox label="Doğru" value={totals.totalCorrect} s={s} />
+          <StatBox label="Yanlış" value={totals.totalWrong} s={s} />
+          {accuracy !== null && <StatBox label="Başarı %" value={`${accuracy}`} s={s} />}
         </View>
 
         {trendData.data.length >= 2 && (
@@ -240,7 +244,7 @@ export default function SubjectDetailScreen() {
           <>
             <Text style={s.sectionTitle}>KONULAR</Text>
             {topics.slice(0, 15).map((t, i) => (
-              <TopicRow key={`${t.name}-${i}`} topic={t} color={subjectColor} />
+              <TopicRow key={`${t.name}-${i}`} topic={t} color={subjectColor} s={s} />
             ))}
           </>
         )}
@@ -261,38 +265,40 @@ export default function SubjectDetailScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  colorBar: { width: 4, height: 20, borderRadius: 2, marginLeft: SPACING.md },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.lg },
-  statBox: { flex: 1, backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, alignItems: "center" },
-  statValue: { ...TYPOGRAPHY.statSmall, color: C.text },
-  statLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
-  sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
-  historyCard: {
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    gap: SPACING.sm,
-  },
-  histRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: SPACING.sm,
-    gap: SPACING.sm,
-  },
-  wrongTopicRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.sm },
-  wrongBadge: { backgroundColor: C.red + "18", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  topicRow: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm },
-  topicInfo: { width: 110 },
-  topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  topicQ: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 },
-  barTrack: { flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3, marginHorizontal: SPACING.sm },
-  barFill: { height: 6, borderRadius: 3 },
-  topicAcc: { ...TYPOGRAPHY.bodySemiBold, width: 44, textAlign: "right" },
-  cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxxl, gap: SPACING.sm },
-  ctaText: { ...TYPOGRAPHY.button, color: C.bg },
-  emptyBox: { flex: 1, alignItems: "center", justifyContent: "center" },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    colorBar: { width: 4, height: 20, borderRadius: 2, marginLeft: SPACING.md },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+    statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.lg },
+    statBox: { flex: 1, backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, alignItems: "center" },
+    statValue: { ...TYPOGRAPHY.statSmall, color: C.text },
+    statLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
+    sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
+    historyCard: {
+      backgroundColor: C.surface,
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      gap: SPACING.sm,
+    },
+    histRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: SPACING.sm,
+      gap: SPACING.sm,
+    },
+    wrongTopicRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.sm },
+    wrongBadge: { backgroundColor: C.red + "18", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+    topicRow: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm },
+    topicInfo: { width: 110 },
+    topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    topicQ: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 },
+    barTrack: { flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3, marginHorizontal: SPACING.sm },
+    barFill: { height: 6, borderRadius: 3 },
+    topicAcc: { ...TYPOGRAPHY.bodySemiBold, width: 44, textAlign: "right" },
+    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxxl, gap: SPACING.sm },
+    ctaText: { ...TYPOGRAPHY.button, color: C.bg },
+    emptyBox: { flex: 1, alignItems: "center", justifyContent: "center" },
+  });
+}

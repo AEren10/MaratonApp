@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
 import { Icon } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-function StatBlock({ icon, color, label, value }) {
+function StatBlock({ icon, color, label, value, styles }) {
   return (
     <View style={styles.block}>
       <View style={[styles.iconBox, { backgroundColor: color + "22" }]}>
@@ -14,22 +16,7 @@ function StatBlock({ icon, color, label, value }) {
   );
 }
 
-export function MonthStats({ stats }) {
-  const hoursStr = stats.totalMinutes >= 60
-    ? `${(stats.totalMinutes / 60).toFixed(1)}sa`
-    : `${stats.totalMinutes}dk`;
-
-  return (
-    <View style={styles.row}>
-      <StatBlock icon="calendar" color={C.amber} label="Aktif Gün" value={stats.activeDays} />
-      <StatBlock icon="clock" color={C.blue} label="Süre" value={hoursStr} />
-      <StatBlock icon="target" color={C.green} label="Soru" value={stats.totalQuestions} />
-      <StatBlock icon="chart" color={C.teal} label="Deneme" value={stats.totalTrials} />
-    </View>
-  );
-}
-
-const styles = {
+const makeStyles = (C) => ({
   row: {
     flexDirection: "row",
     gap: SPACING.sm,
@@ -61,4 +48,22 @@ const styles = {
     color: C.muted,
     marginTop: 2,
   },
-};
+});
+
+export function MonthStats({ stats }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const hoursStr = stats.totalMinutes >= 60
+    ? `${(stats.totalMinutes / 60).toFixed(1)}sa`
+    : `${stats.totalMinutes}dk`;
+
+  return (
+    <View style={styles.row}>
+      <StatBlock icon="calendar" color={C.amber} label="Aktif Gün" value={stats.activeDays} styles={styles} />
+      <StatBlock icon="clock" color={C.blue} label="Süre" value={hoursStr} styles={styles} />
+      <StatBlock icon="target" color={C.green} label="Soru" value={stats.totalQuestions} styles={styles} />
+      <StatBlock icon="chart" color={C.teal} label="Deneme" value={stats.totalTrials} styles={styles} />
+    </View>
+  );
+}
+

@@ -7,8 +7,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
-import { TRIAL_TYPES, getSubjectsForType, getFieldFromType } from "./trialTypes";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
+import { getTrialTypes, getSubjectsForType, getFieldFromType } from "./trialTypes";
 import { SubjectInput } from "./components/SubjectInput";
 import { TotalCard } from "./components/TotalCard";
 import { TrialTypeSelector } from "./components/TrialTypeSelector";
@@ -20,6 +21,7 @@ import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveTrialOffline } from "../../lib/offlineQueue";
+import { SCREENS } from "../../constants/screens";
 
 const EMPTY = { correct: "", wrong: "" };
 
@@ -29,7 +31,7 @@ const MOODS = [
   { key: "bad", emoji: "😞", label: "Kötü" },
 ];
 
-function MoodSelector({ value, onChange }) {
+function MoodSelector({ value, onChange, C, styles }) {
   return (
     <View style={styles.moodWrap}>
       <Text style={styles.moodTitle}>Nasıl hissettin? (opsiyonel)</Text>
@@ -62,6 +64,8 @@ const today = () => {
 export default function TrialEntryScreen() {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const { user } = useAuth();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
 
@@ -72,8 +76,8 @@ export default function TrialEntryScreen() {
   const [mood, setMood] = useState(null);
 
   const subjects = useMemo(
-    () => getSubjectsForType(trialType, branchSubject),
-    [trialType, branchSubject]
+    () => getSubjectsForType(C, trialType, branchSubject),
+    [C, trialType, branchSubject]
   );
 
   const handleTypeChange = useCallback((newType) => {
@@ -126,7 +130,7 @@ export default function TrialEntryScreen() {
     }
 
     const netVal = parseFloat(totalNet);
-    const typeMeta = TRIAL_TYPES[trialType];
+    const typeMeta = getTrialTypes(C)[trialType];
     const trialName = trialType === "BRANCH"
       ? `${subjects[0]?.name || "Branş"} Branş`
       : typeMeta.label;
@@ -165,14 +169,8 @@ export default function TrialEntryScreen() {
         { type: "max", key: "maxNet", value: netVal },
       ],
     });
-    Alert.alert(
-      result.queued ? "Çevrimdışı kaydedildi" : "Kaydedildi",
-      result.queued
-        ? "Deneme sonucun internet geldiğinde sunucuya gönderilecek."
-        : "Deneme sonucun basariyla kaydedildi."
-    );
-    navigation.goBack();
-  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, user, dispatch, reward, navigation]);
+    navigation.replace(SCREENS.TRIAL_DETAIL, { trial: localTrial, fromEntry: true });
+  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, user, dispatch, reward, navigation, C]);
 
   const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
 
@@ -217,7 +215,7 @@ export default function TrialEntryScreen() {
 
           {showSubjectInputs && <TotalCard totalNet={totalNet} />}
 
-          {showSubjectInputs && <MoodSelector value={mood} onChange={setMood} />}
+          {showSubjectInputs && <MoodSelector value={mood} onChange={setMood} C={C} styles={styles} />}
 
           {showSubjectInputs && (
             <Pressable
@@ -237,7 +235,7 @@ export default function TrialEntryScreen() {
   );
 }
 
-const styles = {
+const makeStyles = (C) => ({
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -315,4 +313,4 @@ const styles = {
     color: "#FFFFFF",
     fontSize: 16,
   },
-};
+});

@@ -17,25 +17,36 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-function ProgressBar({ pct, color }) {
+function ProgressBar({ pct, color, C, done, total }) {
   return (
-    <View
-      style={{
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: "rgba(255,255,255,0.5)",
-        marginTop: SPACING.lg,
-        overflow: "hidden",
-      }}
-    >
+    <View style={{ marginTop: SPACING.lg }}>
       <View
         style={{
-          width: `${pct}%`,
-          height: 6,
-          borderRadius: 3,
-          backgroundColor: color,
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: C.surface2,
+          overflow: "hidden",
         }}
-      />
+      >
+        <View
+          style={{
+            width: `${Math.min(pct, 100)}%`,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: color,
+          }}
+        />
+      </View>
+      <Text
+        style={{
+          ...TYPOGRAPHY.micro,
+          color: C.sec,
+          marginTop: 4,
+          textAlign: "right",
+        }}
+      >
+        {done}/{total} konu
+      </Text>
     </View>
   );
 }
@@ -123,7 +134,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
           />
         </View>
 
-        <ProgressBar pct={pct} color={color} />
+        <ProgressBar pct={pct} color={color} C={C} done={done} total={total} />
 
         <View
           style={{

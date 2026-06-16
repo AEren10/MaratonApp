@@ -26,6 +26,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
+import { SCREENS } from "../../constants/screens";
 
 const DURATIONS = [15, 30, 45, 60, 90, 120];
 
@@ -34,7 +35,7 @@ export default function AddStudyScreen() {
   const C = useC();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const { tytSubjects, aytSubjects } = useCurriculum();
+  const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
 
   const [examTier, setExamTier] = useState("TYT"); // TYT | AYT
@@ -119,7 +120,14 @@ export default function AddStudyScreen() {
     reward("study_log", { minutes: duration, statUpdates });
     if (qc > 0) reward("question_solved", { count: qc });
 
-    navigation.goBack();
+    navigation.replace(SCREENS.STUDY_SUMMARY, {
+      subjectLabel: currentSubject?.label || currentSubject?.name || subjectKey,
+      subjectColor: currentSubject?.color || C.purple,
+      subjectIcon: currentSubject?.icon || "bookOpen",
+      topic: topic.trim(),
+      duration,
+      questions: qc,
+    });
   }, [saving, canSave, subjectKey, topic, duration, questionCount, notes, examTier, user, dispatch, reward, navigation]);
 
   return (
@@ -161,10 +169,10 @@ export default function AddStudyScreen() {
               ]}
             >
               <Text style={[s.tierTitle, { color: examTier === "TYT" ? "#FFFFFF" : C.blue }]}>
-                TYT
+                {group1Label}
               </Text>
               <Text style={[s.tierDesc, { color: examTier === "TYT" ? "rgba(255,255,255,0.85)" : C.muted }]}>
-                Temel Yeterlilik
+                Temel Dersler
               </Text>
             </Pressable>
 
@@ -184,10 +192,10 @@ export default function AddStudyScreen() {
               ]}
             >
               <Text style={[s.tierTitle, { color: examTier === "AYT" ? "#FFFFFF" : C.purple }]}>
-                AYT
+                {group2Label}
               </Text>
               <Text style={[s.tierDesc, { color: examTier === "AYT" ? "rgba(255,255,255,0.85)" : C.muted }]}>
-                Alan Yeterlilik
+                Alan Dersleri
               </Text>
             </Pressable>
           </View>

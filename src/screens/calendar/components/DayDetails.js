@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
 import { Icon, IconBox } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
-import { TRIAL_TYPES } from "../../trial/trialTypes";
+import { getTrialTypes } from "../../trial/trialTypes";
 
 function formatDay(iso) {
   return new Date(iso).toLocaleDateString("tr-TR", {
@@ -12,7 +14,7 @@ function formatDay(iso) {
   });
 }
 
-function LogRow({ log }) {
+function LogRow({ log, C }) {
   const subj = getSubjectByKey(log.subject) || { label: log.subject, color: C.amber, icon: "bookOpen" };
   return (
     <View style={styles.row}>
@@ -33,8 +35,8 @@ function LogRow({ log }) {
   );
 }
 
-function TrialRow({ trial }) {
-  const meta = TRIAL_TYPES[trial.trialType];
+function TrialRow({ trial, C }) {
+  const meta = getTrialTypes(C)[trial.trialType];
   const color = meta?.color || C.amber;
   return (
     <View style={styles.row}>
@@ -47,41 +49,7 @@ function TrialRow({ trial }) {
   );
 }
 
-export function DayDetails({ day, data }) {
-  const label = formatDay(day);
-
-  if (!data || (data.logs.length === 0 && data.trials.length === 0)) {
-    return (
-      <View style={styles.card}>
-        <Text style={styles.dayLabel}>{label}</Text>
-        <View style={styles.empty}>
-          <Icon name="moon" size={28} color={C.muted} />
-          <Text style={styles.emptyText}>Bu gün boş geçmiş</Text>
-        </View>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.card}>
-      <Text style={styles.dayLabel}>{label}</Text>
-      {data.trials.length > 0 && (
-        <View style={{ marginTop: SPACING.md }}>
-          <Text style={styles.section}>DENEMELER</Text>
-          {data.trials.map((t) => <TrialRow key={t.id} trial={t} />)}
-        </View>
-      )}
-      {data.logs.length > 0 && (
-        <View style={{ marginTop: SPACING.md }}>
-          <Text style={styles.section}>ÇALIŞMALAR</Text>
-          {data.logs.map((l) => <LogRow key={l.id} log={l} />)}
-        </View>
-      )}
-    </View>
-  );
-}
-
-const styles = {
+const makeStyles = (C) => ({
   card: {
     backgroundColor: C.surface,
     borderRadius: RADIUS.xxl,
@@ -130,4 +98,41 @@ const styles = {
     ...TYPOGRAPHY.caption,
     color: C.muted,
   },
-};
+});
+
+export function DayDetails({ day, data }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const label = formatDay(day);
+
+  if (!data || (data.logs.length === 0 && data.trials.length === 0)) {
+    return (
+      <View style={styles.card}>
+        <Text style={styles.dayLabel}>{label}</Text>
+        <View style={styles.empty}>
+          <Icon name="moon" size={28} color={C.muted} />
+          <Text style={styles.emptyText}>Bu gün boş geçmiş</Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.dayLabel}>{label}</Text>
+      {data.trials.length > 0 && (
+        <View style={{ marginTop: SPACING.md }}>
+          <Text style={styles.section}>DENEMELER</Text>
+          {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} />)}
+        </View>
+      )}
+      {data.logs.length > 0 && (
+        <View style={{ marginTop: SPACING.md }}>
+          <Text style={styles.section}>ÇALIŞMALAR</Text>
+          {data.logs.map((l) => <LogRow key={l.id} log={l} C={C} />)}
+        </View>
+      )}
+    </View>
+  );
+}
+

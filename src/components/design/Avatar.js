@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const PALETTE = ["#6FA8F2", "#EBAE63", "#4ECE8E", "#A99BF5", "#F2C879", "#46C7B0"];
 
@@ -10,6 +10,7 @@ function hashColor(text = "") {
 }
 
 export function Avatar({ init = "??", size = 26, ring = 0, color, image, style }) {
+  const C = useC();
   const bg = color ?? hashColor(init);
 
   if (image) {

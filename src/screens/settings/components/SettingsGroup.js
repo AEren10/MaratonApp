@@ -1,8 +1,13 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { GlassCard } from "../../../components/design";
 
 export function SettingsGroup({ title, children }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+
   return (
     <View style={styles.container}>
       {title ? <Text style={styles.title}>{title}</Text> : null}
@@ -11,7 +16,7 @@ export function SettingsGroup({ title, children }) {
   );
 }
 
-const styles = {
+const makeStyles = (C) => ({
   container: {
     marginBottom: SPACING.xl,
   },
@@ -24,4 +29,4 @@ const styles = {
   card: {
     paddingVertical: SPACING.xs,
   },
-};
+});

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   View, Text, Pressable, Alert,
   KeyboardAvoidingView, Platform, ScrollView, StyleSheet,
@@ -6,11 +6,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { resetPassword } from "../../supabase/auth";
 import { AuthInput } from "./components/AuthInput";
 
 export default function ForgotPasswordScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -96,26 +99,28 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: SPACING.xxl, flexGrow: 1 },
-  back: { marginBottom: SPACING.xxxl },
-  iconWrap: { alignItems: "center", marginBottom: SPACING.xxl },
-  title: { ...TYPOGRAPHY.heading, color: C.text, textAlign: "center" },
-  subtitle: {
-    ...TYPOGRAPHY.body, color: C.sec,
-    textAlign: "center", marginTop: SPACING.sm, marginBottom: SPACING.xxxl,
-  },
-  btn: {
-    backgroundColor: C.amber, borderRadius: RADIUS.lg,
-    paddingVertical: SPACING.lg, alignItems: "center", marginTop: SPACING.sm,
-    ...SHADOWS.amber,
-  },
-  btnText: { ...TYPOGRAPHY.button, color: C.bg },
-  successBox: {
-    alignItems: "center", gap: SPACING.md,
-    backgroundColor: C.green + "18", borderWidth: 1, borderColor: C.green + "40",
-    borderRadius: RADIUS.xl, padding: SPACING.xxl, marginTop: SPACING.lg,
-  },
-  successText: { ...TYPOGRAPHY.bodySemiBold, color: C.green, textAlign: "center" },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    scroll: { padding: SPACING.xxl, flexGrow: 1 },
+    back: { marginBottom: SPACING.xxxl },
+    iconWrap: { alignItems: "center", marginBottom: SPACING.xxl },
+    title: { ...TYPOGRAPHY.heading, color: C.text, textAlign: "center" },
+    subtitle: {
+      ...TYPOGRAPHY.body, color: C.sec,
+      textAlign: "center", marginTop: SPACING.sm, marginBottom: SPACING.xxxl,
+    },
+    btn: {
+      backgroundColor: C.amber, borderRadius: RADIUS.lg,
+      paddingVertical: SPACING.lg, alignItems: "center", marginTop: SPACING.sm,
+      ...SHADOWS.amber,
+    },
+    btnText: { ...TYPOGRAPHY.button, color: C.bg },
+    successBox: {
+      alignItems: "center", gap: SPACING.md,
+      backgroundColor: C.green + "18", borderWidth: 1, borderColor: C.green + "40",
+      borderRadius: RADIUS.xl, padding: SPACING.xxl, marginTop: SPACING.lg,
+    },
+    successText: { ...TYPOGRAPHY.bodySemiBold, color: C.green, textAlign: "center" },
+  });
+}

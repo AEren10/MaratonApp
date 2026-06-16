@@ -7,10 +7,11 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { GlassCard } from "../../../components/design";
 
-function Bar({ name, color, net, max, delay, onPress }) {
+function Bar({ name, color, net, max, delay, onPress, C }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
   const width = useSharedValue(0);
 
@@ -55,6 +56,7 @@ function Bar({ name, color, net, max, delay, onPress }) {
 }
 
 export function SubjectBars({ bars, onBarPress }) {
+  const C = useC();
   return (
     <View style={{ gap: SPACING.md }}>
       <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Ders Bazli</Text>
@@ -74,6 +76,7 @@ export function SubjectBars({ bars, onBarPress }) {
             max={b.max}
             delay={i * 120}
             onPress={() => onBarPress?.(b)}
+            C={C}
           />
         ))}
       </GlassCard>

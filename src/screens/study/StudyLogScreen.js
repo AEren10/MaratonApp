@@ -3,12 +3,13 @@ import { View, Text, FlatList, Pressable, StyleSheet, RefreshControl, ActivityIn
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 
-const LogRow = React.memo(function LogRow({ item }) {
+const LogRow = React.memo(function LogRow({ item, s }) {
   const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: "#9A9EAB", label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
@@ -32,11 +33,11 @@ const LogRow = React.memo(function LogRow({ item }) {
   );
 });
 
-function SectionHeader({ title }) {
+function SectionHeader({ title, s }) {
   return <Text style={s.section}>{title}</Text>;
 }
 
-function EmptyState() {
+function EmptyState({ s, C }) {
   return (
     <View style={s.empty}>
       <Icon name="clock" size={40} color={C.muted} />
@@ -59,6 +60,8 @@ function relativeDate(iso) {
 }
 
 export default function StudyLogScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
   const [logs, setLogs] = useState([]);
@@ -104,9 +107,9 @@ export default function StudyLogScreen() {
   }, [logs]);
 
   const renderItem = useCallback(({ item }) => {
-    if (item.type === "header") return <SectionHeader title={item.title} />;
-    return <LogRow item={item} />;
-  }, []);
+    if (item.type === "header") return <SectionHeader title={item.title} s={s} />;
+    return <LogRow item={item} s={s} />;
+  }, [s]);
 
   const keyExtractor = useCallback((item) => item.id, []);
 
@@ -128,7 +131,7 @@ export default function StudyLogScreen() {
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={s.list}
-          ListEmptyComponent={<EmptyState />}
+          ListEmptyComponent={<EmptyState s={s} C={C} />}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -144,20 +147,22 @@ export default function StudyLogScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  list: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  section: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xl, marginBottom: SPACING.sm },
-  row: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, marginBottom: SPACING.sm, gap: SPACING.sm },
-  rowContent: { flex: 1 },
-  topic: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  date: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 },
-  chip: { borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs },
-  chipText: { ...TYPOGRAPHY.captionMedium },
-  qBox: { alignItems: "center", minWidth: 40 },
-  qCount: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  qLabel: { ...TYPOGRAPHY.micro, color: C.muted },
-  empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
-  emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    list: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+    section: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xl, marginBottom: SPACING.sm },
+    row: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, marginBottom: SPACING.sm, gap: SPACING.sm },
+    rowContent: { flex: 1 },
+    topic: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    date: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 },
+    chip: { borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs },
+    chipText: { ...TYPOGRAPHY.captionMedium },
+    qBox: { alignItems: "center", minWidth: 40 },
+    qCount: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
+    qLabel: { ...TYPOGRAPHY.micro, color: C.muted },
+    empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
+    emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
+  });
+}

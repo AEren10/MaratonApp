@@ -1,12 +1,15 @@
 import { useMemo, useState } from "react";
 import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
 import { getSubjectByKey } from "../../../themes/subjects";
 
 // B) Yanlış soru konu seçici — curriculum'dan dropdown + "elle yaz" seçeneği.
 // onSelect(topicName, source) → source: 'curriculum' | 'custom'
 export function TopicPicker({ visible, subject, onClose, onSelect }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const [query, setQuery] = useState("");
   const [customMode, setCustomMode] = useState(false);
   const [customText, setCustomText] = useState("");
@@ -102,7 +105,7 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: "#000000AA", justifyContent: "flex-end" },
   sheet: {
     backgroundColor: C.surface,

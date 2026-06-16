@@ -2,7 +2,8 @@ import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { ScrollView, View, Text, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
@@ -38,6 +39,7 @@ function buildSections(subjects, progressMap) {
         acc: tp && tp.total_questions > 0 ? Math.round((tp.correct_count / tp.total_questions) * 100) : 0,
         last: tp?.last_studied_at || null,
         pct: tp ? Math.min(100, Math.round((tp.study_count / 3) * 100)) : 0,
+        studyCount: tp?.study_count || 0,
       };
     });
     const done = topicsList.filter((t) => t.pct >= 100).length;
@@ -92,7 +94,7 @@ function buildSections(subjects, progressMap) {
   return { sections, dersler };
 }
 
-function SectionHeader({ label, color, icon, count, topicCount }) {
+function SectionHeader({ label, color, icon, count, topicCount, C }) {
   return (
     <View
       style={{
@@ -135,7 +137,7 @@ function SectionHeader({ label, color, icon, count, topicCount }) {
   );
 }
 
-function PageHeader({ totalDone, totalAll }) {
+function PageHeader({ totalDone, totalAll, C }) {
   return (
     <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.xl }}>
       <Text style={{ ...TYPOGRAPHY.heading, color: C.text }}>Dersler</Text>
@@ -161,7 +163,7 @@ function PageHeader({ totalDone, totalAll }) {
   );
 }
 
-function DerslerSkeleton() {
+function DerslerSkeleton({ C }) {
   return (
     <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.md }}>
       <SkeletonCard height={24} width={120} rounded={8} />
@@ -179,7 +181,8 @@ function DerslerSkeleton() {
 }
 
 export default function DerslerScreen() {
-  const { tytSubjects, aytSubjects, loading: currLoading } = useCurriculum();
+  const C = useC();
+  const { tytSubjects, aytSubjects, loading: currLoading, group1Label, group2Label } = useCurriculum();
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [progressMap, setProgressMap] = useState({});
@@ -222,7 +225,7 @@ export default function DerslerScreen() {
   if (currLoading) {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <DerslerSkeleton />
+        <DerslerSkeleton C={C} />
       </SafeAreaView>
     );
   }
@@ -247,10 +250,10 @@ export default function DerslerScreen() {
           />
         }
       >
-        <PageHeader totalDone={totalDone} totalAll={totalAll} />
+        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} />
 
         {hasTyt && hasAyt && (
-          <ExamBadge label="TYT" color={C.amber} count={tytData.dersler.length} />
+          <ExamBadge label={group1Label} color={C.amber} count={tytData.dersler.length} C={C} />
         )}
 
         <View style={{ gap: SPACING.md }}>
@@ -264,6 +267,7 @@ export default function DerslerScreen() {
                   icon={item.icon}
                   count={item.count}
                   topicCount={item.topicCount}
+                  C={C}
                 />
               );
             }
@@ -279,7 +283,7 @@ export default function DerslerScreen() {
         {hasAyt && (
           <>
             <View style={{ marginTop: SPACING.xxxl }}>
-              <ExamBadge label="AYT" color={C.blue} count={aytData.dersler.length} />
+              <ExamBadge label={group2Label} color={C.blue} count={aytData.dersler.length} C={C} />
             </View>
             <View style={{ gap: SPACING.md }}>
               {aytData.sections.map((item, i) => {
@@ -292,6 +296,7 @@ export default function DerslerScreen() {
                       icon={item.icon}
                       count={item.count}
                       topicCount={item.topicCount}
+                      C={C}
                     />
                   );
                 }
@@ -310,7 +315,7 @@ export default function DerslerScreen() {
   );
 }
 
-function ExamBadge({ label, color, count }) {
+function ExamBadge({ label, color, count, C }) {
   return (
     <View
       style={{

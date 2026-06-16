@@ -2,7 +2,8 @@
 // Falls back to a rule-based engine when no API key is present
 // (so the app stays self-sufficient without Anthropic credits).
 
-import { ALL_SUBJECTS } from "../screens/trial/trialTypes";
+import { getAllSubjects } from "../screens/trial/trialTypes";
+import { C } from "../themes/tokens";
 
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_KEY;
 const MODEL = "claude-haiku-4-5-20251001";
@@ -20,7 +21,7 @@ function summarizeUser({ trials, todayLogs, streak, weakAreas, examLabel }) {
     .sort((a, b) => a[1] - b[1])
     .slice(0, 4)
     .map(([k, v]) => {
-      const subj = ALL_SUBJECTS.find((s) => s.key === k);
+      const subj = getAllSubjects(C).find((s) => s.key === k);
       return `${subj?.name || k}: %${v}`;
     });
   if (weakList.length) lines.push(`Zayıf alanlar (düşükten yükseğe): ${weakList.join(", ")}`);
@@ -29,7 +30,7 @@ function summarizeUser({ trials, todayLogs, streak, weakAreas, examLabel }) {
 
 function ruleBasedSuggestions({ weakAreas }) {
   const sorted = Object.entries(weakAreas)
-    .filter(([k]) => ALL_SUBJECTS.find((s) => s.key === k))
+    .filter(([k]) => getAllSubjects(C).find((s) => s.key === k))
     .sort((a, b) => a[1] - b[1])
     .slice(0, 3);
 
@@ -39,7 +40,7 @@ function ruleBasedSuggestions({ weakAreas }) {
     ];
   }
   return sorted.map(([key, pct]) => {
-    const subj = ALL_SUBJECTS.find((s) => s.key === key) || { name: key, color: "#9A9EAB" };
+    const subj = getAllSubjects(C).find((s) => s.key === key) || { name: key, color: "#9A9EAB" };
     const advice =
       pct < 30 ? "Temel kavramlardan başla, video + kitap karması işe yarar."
       : pct < 50 ? "Yeni konu çalışmadan önce eski denemelerindeki yanlışlarını tekrarla."
@@ -90,7 +91,7 @@ async function callClaude(promptText) {
     if (!match) return null;
     const arr = JSON.parse(match[0]);
     return arr.map((a) => {
-      const subj = ALL_SUBJECTS.find((s) => s.key === a.ders);
+      const subj = getAllSubjects(C).find((s) => s.key === a.ders);
       return {
         title: a.baslik,
         body: a.icerik,

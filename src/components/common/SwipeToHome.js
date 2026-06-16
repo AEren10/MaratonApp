@@ -1,5 +1,5 @@
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
-import { runOnJS } from "react-native-reanimated";
+import { runOnJS, useSharedValue } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { SCREENS } from "../../constants/screens";
@@ -11,28 +11,33 @@ const EDGE_ZONE = 60;
 // bozmaz, sade soldan-sağa flick'te çalışır. Ne çok hassas ne de ölü.
 const ACTIVE_X = 24;
 const FAIL_Y = 18;
-const MIN_TRANSLATION = 90;
-const MIN_VELOCITY = 250;
+const MIN_TRANSLATION = 120;
+const MIN_VELOCITY = 450;
 
 // Tab ekranlarında (Analiz/Profil) sağa kaydırınca Ana Sayfa'ya dön.
 // Sıkı eşikler — aşağı scroll'a yanlışlıkla tetiklenmesin.
 export function SwipeToHome({ children }) {
   const navigation = useNavigation();
   const goHome = () => navigation.navigate(SCREENS.HOME);
+  const edgeStart = useSharedValue(false);
 
   const pan = Gesture.Pan()
-    .activeOffsetX(ACTIVE_X)
+    .manualActivation(true)
     .failOffsetY([-FAIL_Y, FAIL_Y])
-    .onBegin((e) => {
-      // Sol kenar dışında başlarsa gesture state'i kendisi reddedecek (manual flag).
-      // RNGH'de onBegin'den fail tetikleyemiyoruz; onEnd'te kontrol ediyoruz.
+    .onTouchesDown((e, manager) => {
+      "worklet";
+      const x = e.allTouches[0]?.x ?? SCREEN_W;
+      edgeStart.value = x <= EDGE_ZONE;
+      if (!edgeStart.value) manager.fail();
+    })
+    .onTouchesMove((_e, manager) => {
+      "worklet";
+      if (edgeStart.value) manager.activate();
     })
     .onEnd((e) => {
-      const startX = e.absoluteX - e.translationX;
-      if (startX > EDGE_ZONE) return; // sol kenardan başlamadı
+      "worklet";
       if (e.translationX < MIN_TRANSLATION) return;
       if (e.velocityX < MIN_VELOCITY) return;
-      // Yatay > dikey: açıyı sınırla, eğri kaydırmaları reddet.
       if (Math.abs(e.translationY) > Math.abs(e.translationX) * 0.4) return;
       runOnJS(goHome)();
     });

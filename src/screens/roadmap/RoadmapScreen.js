@@ -4,7 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectTrials } from "../../store/slices/trialSlice";
@@ -14,6 +15,8 @@ import { weightedWeakAreas } from "../../lib/buildPlanContext";
 import { buildRoadmap } from "../../lib/roadmapEngine";
 
 function WeekCard({ week }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   return (
     <GlassCard radius={RADIUS.xl} color={week.isCurrent ? C.amber : undefined} style={s.weekCard}>
       <View style={s.weekHead}>
@@ -39,6 +42,8 @@ function WeekCard({ week }) {
 }
 
 export default function RoadmapScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { examType, field, daysUntilExam } = useExam();
   const { user } = useAuth();
@@ -115,7 +120,7 @@ export default function RoadmapScreen() {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   title: { ...TYPOGRAPHY.subheading, color: C.text },

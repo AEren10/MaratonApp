@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Icon, Stat } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-function StaticRing({ size = 120, stroke = 10, value = 0, color, children }) {
+function StaticRing({ size = 120, stroke = 10, value = 0, color, C, children }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - Math.min(Math.max(value, 0), 1));
@@ -19,6 +21,8 @@ function StaticRing({ size = 120, stroke = 10, value = 0, color, children }) {
 }
 
 export function PlanHeader({ done, total, soru, hours }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const pct = total > 0 ? done / total : 0;
   const showMotiv = pct > 0.5;
 
@@ -29,6 +33,7 @@ export function PlanHeader({ done, total, soru, hours }) {
         stroke={10}
         value={pct}
         color={pct >= 1 ? C.green : C.amber}
+        C={C}
       >
         <Stat size={36} color={C.text}>
           {done}/{total}
@@ -46,9 +51,9 @@ export function PlanHeader({ done, total, soru, hours }) {
       </Text>
 
       <View style={styles.statsRow}>
-        <StatPill icon="target" label={`${soru} soru`} />
+        <StatPill icon="target" label={`${soru} soru`} C={C} />
         <View style={styles.dot} />
-        <StatPill icon="clock" label={hours} />
+        <StatPill icon="clock" label={hours} C={C} />
       </View>
 
       {showMotiv && (
@@ -63,7 +68,7 @@ export function PlanHeader({ done, total, soru, hours }) {
   );
 }
 
-function StatPill({ icon, label }) {
+function StatPill({ icon, label, C }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <Icon name={icon} size={14} color={C.muted} />
@@ -74,7 +79,7 @@ function StatPill({ icon, label }) {
   );
 }
 
-const styles = {
+const makeStyles = (C) => ({
   statsRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -96,4 +101,4 @@ const styles = {
     paddingVertical: SPACING.sm,
     borderRadius: 999,
   },
-};
+});

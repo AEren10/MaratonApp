@@ -6,6 +6,7 @@ import { View, ActivityIndicator, Platform } from "react-native";
 
 import { SCREENS } from "../constants/screens";
 import { C } from "../themes/tokens";
+import { useC } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useExam } from "../contexts/ExamContext";
 import { ScreenErrorBoundary } from "../components/common/ScreenErrorBoundary";
@@ -53,6 +54,14 @@ import FriendsScreen from "../screens/social/FriendsScreen";
 import RankSimulatorScreen from "../screens/simulator/RankSimulatorScreen";
 import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
 import RoadmapScreen from "../screens/roadmap/RoadmapScreen";
+import StudySummaryScreen from "../screens/study/StudySummaryScreen";
+import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
+import WeeklyReviewScreen from "../screens/home/WeeklyReviewScreen";
+import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
+import ChallengeScreen from "../screens/social/ChallengeScreen";
+import QuickPracticeScreen from "../screens/practice/QuickPracticeScreen";
+import ShareCardScreen from "../screens/social/ShareCardScreen";
+import ExamSimulatorScreen from "../screens/simulator/ExamSimulatorScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -105,6 +114,14 @@ const EBFriends = withEB(FriendsScreen);
 const EBRankSimulator = withEB(RankSimulatorScreen);
 const EBReviewSession = withEB(ReviewSessionScreen);
 const EBRoadmap = withEB(RoadmapScreen);
+const EBStudySummary = withEB(StudySummaryScreen);
+const EBTrialInsights = withEB(TrialInsightsScreen);
+const EBWeeklyReview = withEB(WeeklyReviewScreen);
+const EBSwipeReview = withEB(SwipeReviewScreen);
+const EBChallenge = withEB(ChallengeScreen);
+const EBQuickPractice = withEB(QuickPracticeScreen);
+const EBShareCard = withEB(ShareCardScreen);
+const EBExamSimulator = withEB(ExamSimulatorScreen);
 
 const screenOptions = {
   headerShown: false,
@@ -193,6 +210,14 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.RANK_SIMULATOR} component={EBRankSimulator} />
       <Stack.Screen name={SCREENS.REVIEW_SESSION} component={EBReviewSession} />
       <Stack.Screen name={SCREENS.ROADMAP} component={EBRoadmap} />
+      <Stack.Screen name={SCREENS.STUDY_SUMMARY} component={EBStudySummary} options={modalOptions} />
+      <Stack.Screen name={SCREENS.TRIAL_INSIGHTS} component={EBTrialInsights} />
+      <Stack.Screen name={SCREENS.WEEKLY_REVIEW} component={EBWeeklyReview} />
+      <Stack.Screen name={SCREENS.SWIPE_REVIEW} component={EBSwipeReview} />
+      <Stack.Screen name={SCREENS.CHALLENGE} component={EBChallenge} />
+      <Stack.Screen name={SCREENS.QUICK_PRACTICE} component={EBQuickPractice} />
+      <Stack.Screen name={SCREENS.SHARE_CARD} component={EBShareCard} />
+      <Stack.Screen name={SCREENS.EXAM_SIMULATOR} component={EBExamSimulator} />
     </Stack.Navigator>
   );
 }
@@ -206,6 +231,7 @@ function AppStack() {
 }
 
 function Loading() {
+  const C = useC();
   return (
     <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
       <ActivityIndicator color={C.amber} size="large" />

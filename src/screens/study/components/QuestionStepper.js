@@ -1,9 +1,11 @@
 import { View, Text, Pressable, TextInput } from "react-native";
 import { useState, useCallback } from "react";
 import { Icon } from "../../../components/design";
-import { C, SPACING } from "../../../themes/tokens";
+import { SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function QuestionStepper({ value, onChange }) {
+  const C = useC();
   const [focused, setFocused] = useState(false);
 
   const decrement = useCallback(() => {

@@ -25,8 +25,22 @@ export function useCurriculum() {
     return () => { cancelled = true; };
   }, [examType, field]);
 
-  const tytSubjects = subjects.filter((s) => s.exam === "tyt");
-  const aytSubjects = subjects.filter((s) => s.exam === "ayt" || s.exam === "ydt");
+  const isLGS = examType === "lgs";
 
-  return { subjects, tytSubjects, aytSubjects, loading };
+  const tytSubjects = isLGS
+    ? subjects.filter((s) => s.group === "sozel")
+    : subjects.filter((s) => s.exam === "tyt");
+  const aytSubjects = isLGS
+    ? subjects.filter((s) => s.group === "sayisal")
+    : subjects.filter((s) => s.exam === "ayt" || s.exam === "ydt");
+
+  return {
+    subjects,
+    tytSubjects,
+    aytSubjects,
+    isLGS,
+    group1Label: isLGS ? "Sözel" : "TYT",
+    group2Label: isLGS ? "Sayısal" : "AYT",
+    loading,
+  };
 }

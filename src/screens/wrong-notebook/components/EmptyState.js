@@ -1,8 +1,9 @@
 import { View, Text } from "react-native";
 import { Icon } from "../../../components/design";
-import { C } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function EmptyState({ resolved }) {
+  const C = useC();
   return (
     <View style={{ alignItems: "center", paddingVertical: 80, paddingHorizontal: 24 }}>
       <Icon

@@ -1,4 +1,5 @@
-import { XP_REWARDS, LEVELS, BADGES } from "../constants/gamification";
+import { XP_REWARDS, LEVELS, getBadges } from "../constants/gamification";
+import { C } from "../themes/tokens";
 
 export function calculateXP(action, data = {}) {
   switch (action) {
@@ -44,7 +45,7 @@ export function getLevelForXP(totalXP) {
 export function checkBadgeUnlocks(userStats, unlockedIds) {
   const newBadges = [];
 
-  for (const badge of BADGES) {
+  for (const badge of getBadges(C)) {
     if (unlockedIds.includes(badge.id)) continue;
 
     const { type, value } = badge.condition;

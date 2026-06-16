@@ -1,11 +1,26 @@
+import { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { GlassCard } from "../../../components/design";
 
 // Madde 4: Son denemelerin moral (mood) trendi — emoji şerit.
 const EMOJI = { good: "😄", okay: "😐", bad: "😞" };
 
+const makeStyles = (C) =>
+  StyleSheet.create({
+    card: {
+      padding: SPACING.lg,
+    },
+    title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.md },
+    row: { flexDirection: "row", justifyContent: "space-between" },
+    item: { alignItems: "center", gap: 4, flex: 1 },
+    date: { ...TYPOGRAPHY.micro, color: C.muted },
+  });
+
 export function MoodTrend({ trials }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const withMood = trials.filter((t) => t.mood).slice(0, 7).reverse();
   if (withMood.length < 2) return null;
 
@@ -26,12 +41,3 @@ export function MoodTrend({ trials }) {
   );
 }
 
-const s = StyleSheet.create({
-  card: {
-    padding: SPACING.lg,
-  },
-  title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.md },
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  item: { alignItems: "center", gap: 4, flex: 1 },
-  date: { ...TYPOGRAPHY.micro, color: C.muted },
-});

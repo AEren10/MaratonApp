@@ -37,17 +37,13 @@ export function ThemeProvider({ children }) {
 
   const scheme = pref === "system" ? (systemScheme || "light") : pref;
 
-  // 73 dosya hâlâ statik `import { C }` kullanıyor. Proxy üzerinden runtime
-  // scheme'i render anında set ederek dark/light geçişlerinde tüm uygulamayı
-  // senkron tut (useEffect bir frame geç çalıştığı için inline tercih edildi).
-  setRuntimeScheme(scheme);
-
   const setPref = useCallback((next) => {
     setPrefState(next);
     AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {});
   }, []);
 
   const value = useMemo(() => {
+    setRuntimeScheme(scheme);
     const palette = paletteFor(scheme);
     const colors = scheme === "dark" ? COLORS.dark : COLORS.light;
     return {

@@ -1,10 +1,62 @@
+import { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Icon, IconBox } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { ALL_SUBJECTS } from "../trialTypes";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
+import { getAllSubjects } from "../trialTypes";
+
+const makeStyles = (C) => ({
+  wrap: {
+    marginBottom: SPACING.lg,
+  },
+  label: {
+    ...TYPOGRAPHY.label,
+    color: C.muted,
+    marginBottom: SPACING.sm,
+    letterSpacing: 0.7,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1.5,
+  },
+  parent: {
+    ...TYPOGRAPHY.micro,
+    letterSpacing: 0.6,
+    fontFamily: "Inter_600SemiBold",
+  },
+  name: {
+    ...TYPOGRAPHY.bodySemiBold,
+    marginTop: 2,
+  },
+  maxBox: {
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    minWidth: 48,
+  },
+  maxText: {
+    fontFamily: "SpaceGrotesk_700Bold",
+    fontSize: 16,
+    letterSpacing: -0.4,
+  },
+  maxSub: {
+    ...TYPOGRAPHY.micro,
+    fontSize: 9,
+    fontFamily: "Inter_500Medium",
+  },
+});
 
 // Alt alta dizilmiş ders kartları — TYT/AYT chip etiketli, kompakt.
 export function BranchSubjectPicker({ value, onChange }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const ALL_SUBJECTS = useMemo(() => getAllSubjects(C), [C]);
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>HANGİ DERS?</Text>
@@ -52,49 +104,3 @@ export function BranchSubjectPicker({ value, onChange }) {
   );
 }
 
-const styles = {
-  wrap: {
-    marginBottom: SPACING.lg,
-  },
-  label: {
-    ...TYPOGRAPHY.label,
-    color: C.muted,
-    marginBottom: SPACING.sm,
-    letterSpacing: 0.7,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
-  },
-  parent: {
-    ...TYPOGRAPHY.micro,
-    letterSpacing: 0.6,
-    fontFamily: "Inter_600SemiBold",
-  },
-  name: {
-    ...TYPOGRAPHY.bodySemiBold,
-    marginTop: 2,
-  },
-  maxBox: {
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    minWidth: 48,
-  },
-  maxText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 16,
-    letterSpacing: -0.4,
-  },
-  maxSub: {
-    ...TYPOGRAPHY.micro,
-    fontSize: 9,
-    fontFamily: "Inter_500Medium",
-  },
-};

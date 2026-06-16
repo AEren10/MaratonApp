@@ -1,18 +1,22 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Icon, IconBox } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 
-const EXAM_OPTIONS = [
-  { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi", icon: "target", color: C.amber },
-  { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
-  { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
-  { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat", icon: "bookOpen", color: C.purple },
-  { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#46C7B0" },
-];
+function buildExamOptions(C) {
+  return [
+    { id: "lgs", examType: "lgs", field: null, label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)", icon: "shield", color: C.green },
+    { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi", icon: "target", color: C.amber },
+    { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
+    { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
+    { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat", icon: "bookOpen", color: C.purple },
+    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#46C7B0" },
+  ];
+}
 
 function buildExamMonthOptions() {
   const now = new Date();
@@ -28,7 +32,7 @@ function buildExamMonthOptions() {
 
 const MONTHS = buildExamMonthOptions();
 
-function ExamOption({ item, selected, onPress }) {
+function ExamOption({ item, selected, onPress, styles, C }) {
   const active = selected === item.id;
   return (
     <Pressable
@@ -48,6 +52,9 @@ function ExamOption({ item, selected, onPress }) {
 }
 
 export default function ExamSetupScreen() {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const EXAM_OPTIONS = useMemo(() => buildExamOptions(C), [C]);
   const { updateExamConfig } = useExam();
   const [selectedId, setSelectedId] = useState(null);
   const [examDate, setExamDate] = useState(MONTHS[0]);
@@ -68,7 +75,7 @@ export default function ExamSetupScreen() {
     } catch (e) {
       Alert.alert("Hata", e.message);
     }
-  }, [selectedId, examDate, updateExamConfig]);
+  }, [selectedId, examDate, updateExamConfig, EXAM_OPTIONS]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
@@ -86,7 +93,7 @@ export default function ExamSetupScreen() {
         </Text>
 
         {EXAM_OPTIONS.map((opt) => (
-          <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={setSelectedId} />
+          <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={setSelectedId} styles={styles} C={C} />
         ))}
 
         <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }]}>
@@ -124,42 +131,44 @@ export default function ExamSetupScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 30 },
-  hero: {
-    alignItems: "center", paddingVertical: SPACING.xxxl,
-  },
-  heroTitle: {
-    ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg,
-  },
-  heroDesc: {
-    ...TYPOGRAPHY.body, color: C.sec, textAlign: "center",
-    marginTop: SPACING.sm, maxWidth: 300, lineHeight: 22,
-  },
-  optionCard: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    padding: SPACING.lg, marginBottom: SPACING.md,
-    borderWidth: 1.5, borderColor: C.border,
-  },
-  radio: {
-    width: 22, height: 22, borderRadius: 11,
-    borderWidth: 2, borderColor: C.border,
-    alignItems: "center", justifyContent: "center",
-  },
-  radioInner: { width: 12, height: 12, borderRadius: 6 },
-  dateRow: { flexDirection: "row", gap: SPACING.md },
-  dateChip: {
-    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
-    backgroundColor: C.surface, borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.lg, borderWidth: 1.5, borderColor: C.border,
-  },
-  dateActive: { borderColor: C.amber, backgroundColor: C.amber + "10" },
-  continueBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-    backgroundColor: C.amber, borderRadius: RADIUS.xl,
-    marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
-    ...SHADOWS.amber,
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 30 },
+    hero: {
+      alignItems: "center", paddingVertical: SPACING.xxxl,
+    },
+    heroTitle: {
+      ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg,
+    },
+    heroDesc: {
+      ...TYPOGRAPHY.body, color: C.sec, textAlign: "center",
+      marginTop: SPACING.sm, maxWidth: 300, lineHeight: 22,
+    },
+    optionCard: {
+      flexDirection: "row", alignItems: "center", gap: SPACING.md,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      padding: SPACING.lg, marginBottom: SPACING.md,
+      borderWidth: 1.5, borderColor: C.border,
+    },
+    radio: {
+      width: 22, height: 22, borderRadius: 11,
+      borderWidth: 2, borderColor: C.border,
+      alignItems: "center", justifyContent: "center",
+    },
+    radioInner: { width: 12, height: 12, borderRadius: 6 },
+    dateRow: { flexDirection: "row", gap: SPACING.md },
+    dateChip: {
+      flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      paddingVertical: SPACING.lg, borderWidth: 1.5, borderColor: C.border,
+    },
+    dateActive: { borderColor: C.amber, backgroundColor: C.amber + "10" },
+    continueBtn: {
+      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
+      backgroundColor: C.amber, borderRadius: RADIUS.xl,
+      marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
+      ...SHADOWS.amber,
+    },
+  });
+}

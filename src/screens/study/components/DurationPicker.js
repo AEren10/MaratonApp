@@ -1,5 +1,6 @@
 import { View, Text, Pressable } from "react-native";
-import { C, SPACING } from "../../../themes/tokens";
+import { SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 const DURATIONS = [
   { label: "15dk", value: 15 },
@@ -11,6 +12,7 @@ const DURATIONS = [
 ];
 
 export function DurationPicker({ selected, onSelect }) {
+  const C = useC();
   return (
     <View style={{ flexDirection: "row", gap: SPACING.sm, flexWrap: "wrap" }}>
       {DURATIONS.map((d) => {

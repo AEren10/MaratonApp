@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, Alert, StyleSheet, Share } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { Icon, Avatar } from "../../components/design";
 import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
 
 function MemberRow({ item }) {
+  const C = useC();
+  const st = useMemo(() => makeStyles(C), [C]);
   const isYou = item.you;
   const medal = item.rank === 1 ? "#EBAE63" : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
   return (
@@ -23,6 +26,8 @@ function MemberRow({ item }) {
 }
 
 export function GroupsTab({ user }) {
+  const C = useC();
+  const st = useMemo(() => makeStyles(C), [C]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
@@ -172,6 +177,8 @@ export function GroupsTab({ user }) {
 }
 
 function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap }) {
+  const C = useC();
+  const st = useMemo(() => makeStyles(C), [C]);
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={st.backdrop} onPress={onClose}>
@@ -196,7 +203,7 @@ function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onC
   );
 }
 
-const st = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   actions: { flexDirection: "row", gap: SPACING.sm, paddingHorizontal: 16, marginBottom: SPACING.sm },
   actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },

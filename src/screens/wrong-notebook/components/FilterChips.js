@@ -1,7 +1,8 @@
+import { useMemo } from "react";
 import { ScrollView, Pressable, Text, View } from "react-native";
-import { C } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-const FILTERS = [
+const makeFilters = (C) => [
   { key: "all", short: "Tümü", color: C.amber },
   { key: "turkce", short: "Türkçe", color: "#6FA8F2" },
   { key: "matematik", short: "Mat", color: "#EBAE63" },
@@ -10,6 +11,8 @@ const FILTERS = [
 ];
 
 export function FilterChips({ active, onChange, status, onStatusChange }) {
+  const C = useC();
+  const FILTERS = useMemo(() => makeFilters(C), [C]);
   return (
     <View>
       <ScrollView

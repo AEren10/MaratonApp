@@ -3,7 +3,8 @@ import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 import { useSelector } from "react-redux";
@@ -29,6 +30,8 @@ function monthLabel(date) {
 }
 
 export default function CalendarScreen() {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
   const trials = useSelector(selectTrials);
@@ -151,38 +154,40 @@ export default function CalendarScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-  },
-  title: { ...TYPOGRAPHY.subheading, color: C.text },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  monthHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: SPACING.lg,
-  },
-  monthBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: C.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  monthLabel: {
-    ...TYPOGRAPHY.subheading,
-    color: C.text,
-    textTransform: "capitalize",
-  },
-  loadingBox: {
-    paddingVertical: SPACING.huge,
-    alignItems: "center",
-  },
-});
+function makeStyles(C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.bg },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+    },
+    title: { ...TYPOGRAPHY.subheading, color: C.text },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+    monthHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: SPACING.lg,
+    },
+    monthBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: C.surface,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    monthLabel: {
+      ...TYPOGRAPHY.subheading,
+      color: C.text,
+      textTransform: "capitalize",
+    },
+    loadingBox: {
+      paddingVertical: SPACING.huge,
+      alignItems: "center",
+    },
+  });
+}

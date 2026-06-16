@@ -1,11 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withSequence, Easing } from "react-native-reanimated";
 import { ProgressRing, AnimatedNumber, Icon } from "../../../components/design";
-import { C, PASTEL, TYPOGRAPHY } from "../../../themes/tokens";
+import { PASTEL, TYPOGRAPHY } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 // Halo hero: büyük günlük hedef halkası + nabız atan alev rozeti + count-up.
 export function GoalHalo({ solved = 0, goal = 100, streak = 0, onPress }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const safeGoal = goal > 0 ? goal : 100;
   const pct = solved / safeGoal;
   const done = solved >= safeGoal;
@@ -50,7 +53,7 @@ export function GoalHalo({ solved = 0, goal = 100, streak = 0, onPress }) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   wrap: { alignItems: "center", paddingVertical: 6 },
   ringHolder: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
   bigNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 44, color: C.text, letterSpacing: -1, includeFontPadding: false },

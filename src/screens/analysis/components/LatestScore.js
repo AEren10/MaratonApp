@@ -1,8 +1,10 @@
 import { View, Text } from "react-native";
 import { BentoCard, Stat, Trend, Chip, Icon } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export function LatestScore({ net, trend, date, typeLabel }) {
+  const C = useC();
   return (
     <BentoCard
       gradient={[C.amber + "18", C.surface, C.surface]}

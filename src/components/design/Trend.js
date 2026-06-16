@@ -1,7 +1,8 @@
 import { View, Text } from "react-native";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 export function Trend({ v = 0, size = 12 }) {
+  const C = useC();
   const up = v > 0;
   const flat = v === 0;
   const color = flat ? C.muted : up ? C.green : C.red;

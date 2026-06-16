@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
 import { TrendChart } from "../../analysis/components/TrendChart";
 import { TRIAL_TO_CURRICULUM } from "../../trial/trialKeyMap";
 
-// C) Görev gerekçesi + son denemelerde bu dersin net trendi.
+// Görev gerekçesi + son denemelerde bu dersin net trendi.
 function trialKeysForCurriculum(curriculumKey) {
   return Object.entries(TRIAL_TO_CURRICULUM)
     .filter(([, vals]) => vals.includes(curriculumKey))
@@ -13,6 +14,8 @@ function trialKeysForCurriculum(curriculumKey) {
 }
 
 export function TaskReasonSheet({ task, trials, onClose }) {
+  const C = useC();
+  const s = useMemo(() => makeStyles(C), [C]);
   const trend = useMemo(() => {
     if (!task) return { data: [], labels: [] };
     const trialKeys = trialKeysForCurriculum(task.s?.key);
@@ -66,7 +69,7 @@ export function TaskReasonSheet({ task, trials, onClose }) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: "#000000AA", justifyContent: "flex-end" },
   sheet: {
     backgroundColor: C.surface,

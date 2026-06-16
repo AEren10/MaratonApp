@@ -1,16 +1,9 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-export function TotalCard({ totalNet }) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.label}>Toplam Net</Text>
-      <Text style={styles.value}>{totalNet}</Text>
-    </View>
-  );
-}
-
-const styles = {
+const makeStyles = (C) => ({
   card: {
     backgroundColor: C.surface,
     borderRadius: RADIUS.xxl,
@@ -30,4 +23,15 @@ const styles = {
     ...TYPOGRAPHY.statSmall,
     color: C.amber,
   },
-};
+});
+
+export function TotalCard({ totalNet }) {
+  const C = useC();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  return (
+    <View style={styles.card}>
+      <Text style={styles.label}>Toplam Net</Text>
+      <Text style={styles.value}>{totalNet}</Text>
+    </View>
+  );
+}

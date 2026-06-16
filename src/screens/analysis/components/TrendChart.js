@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import Svg, { Polyline, Line, Defs, LinearGradient, Stop, Polygon } from "react-native-svg";
-import { C, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { Icon, GlassCard } from "../../../components/design";
 
 const W = 310;
@@ -34,7 +35,9 @@ function gridLines(data) {
   return lines;
 }
 
-export function TrendChart({ data, labels, color = C.amber, title = "Net Trendi", compact = false }) {
+export function TrendChart({ data, labels, color, title = "Net Trendi", compact = false }) {
+  const C = useC();
+  if (!color) color = C.amber;
   if (!data || data.length < 2) return null;
   const pts = buildPoints(data);
   const grids = gridLines(data);

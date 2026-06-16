@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
-import { ScrollView, Alert } from "react-native";
+import { ScrollView, Alert, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -13,7 +13,7 @@ import { useAppSelector } from "../../store/hooks";
 import { selectLevel, selectXP, selectBadgeIds, selectStats } from "../../store/slices/gamificationSlice";
 import { selectTodayLogs, selectStreak } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { BADGES } from "../../constants/gamification";
+import { getBadges } from "../../constants/gamification";
 import { useCurriculum } from "../../hooks/useCurriculum";
 
 import { ProfileHeader } from "./components/ProfileHeader";
@@ -23,7 +23,41 @@ import { StrengthBars } from "./components/StrengthBars";
 import { SettingsMenu } from "./components/SettingsMenu";
 import { LevelBar } from "./components/LevelBar";
 
+import { Icon } from "../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+
+const QUICK_LINK_ITEMS = [
+  { icon: "users", label: "Challenge", color: "blue", screen: SCREENS.CHALLENGE },
+  { icon: "share", label: "Paylaş", color: "purple", screen: SCREENS.SHARE_CARD, params: { type: "overall" } },
+  { icon: "target", label: "5dk Quiz", color: "green", screen: SCREENS.QUICK_PRACTICE },
+  { icon: "clock", label: "Simülasyon", color: "red", screen: SCREENS.EXAM_SIMULATOR },
+];
+
+function QuickLinks({ onNavigate, C }) {
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginVertical: SPACING.sm }}>
+      {QUICK_LINK_ITEMS.map((item) => (
+        <Pressable
+          key={item.label}
+          onPress={() => onNavigate(item.screen, item.params)}
+          style={{
+            flex: 1, minWidth: "45%", flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+            backgroundColor: C[item.color] + "10", borderRadius: RADIUS.xl,
+            padding: SPACING.md, borderWidth: 1, borderColor: C[item.color] + "20",
+          }}
+        >
+          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C[item.color] + "20", alignItems: "center", justifyContent: "center" }}>
+            <Icon name={item.icon} size={15} color={C[item.color]} />
+          </View>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C[item.color] }}>{item.label}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
 export default function ProfileScreen() {
+  const C = useC();
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   const { examType, field, daysUntilExam } = useExam();
@@ -46,7 +80,7 @@ export default function ProfileScreen() {
     return "YKS";
   }, [examType, field]);
 
-  const earnedBadges = BADGES.filter((b) => unlockedIds.includes(b.id));
+  const earnedBadges = getBadges(C).filter((b) => unlockedIds.includes(b.id));
   const displayBadges = earnedBadges.length > 0
     ? earnedBadges.map((b) => ({ icon: b.icon, name: b.name, color: b.color }))
     : [];
@@ -89,8 +123,8 @@ export default function ProfileScreen() {
     return entries.sort((a, b) => b.v - a.v).slice(0, 6);
   }, [subjects, trials]);
 
-  const handleNavigate = (route) => {
-    navigation.navigate(route);
+  const handleNavigate = (route, params) => {
+    navigation.navigate(route, params);
   };
 
   const handleLogout = useCallback(() => {
@@ -138,7 +172,10 @@ export default function ProfileScreen() {
             <StrengthBars strengths={strengths} />
           </AnimatedCard>
         ) : null}
-        <AnimatedCard delay={320}>
+        <AnimatedCard delay={300}>
+          <QuickLinks onNavigate={handleNavigate} C={C} />
+        </AnimatedCard>
+        <AnimatedCard delay={360}>
           <SettingsMenu
             onNavigate={handleNavigate}
             onLogout={handleLogout}

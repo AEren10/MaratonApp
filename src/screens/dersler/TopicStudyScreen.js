@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -39,6 +39,107 @@ function SubtopicRow({ item, C, color }) {
   );
 }
 
+function formatLastStudied(dateStr) {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return "Bugün";
+    if (diff === 1) return "Dün";
+    if (diff < 7) return `${diff} gün önce`;
+    return d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+  } catch {
+    return null;
+  }
+}
+
+function ProgressHeader({ topic, color, C }) {
+  const styles = useMemo(() => makeProgressStyles(C), [C]);
+  const studyCount = topic.studyCount || 0;
+  const pct = topic.pct || 0;
+  const lastLabel = formatLastStudied(topic.last);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.barRow}>
+        <Text style={[styles.barLabel, { color: C.text }]}>İlerleme</Text>
+        <Text style={[styles.barPct, { color }]}>%{pct}</Text>
+      </View>
+      <View style={styles.barTrack}>
+        <View style={[styles.barFill, { width: `${Math.min(pct, 100)}%`, backgroundColor: color }]} />
+      </View>
+      <View style={styles.metaRow}>
+        <View style={styles.metaItem}>
+          <Icon name="repeat" size={13} color={color} sw={1.8} />
+          <Text style={[styles.metaText, { color: C.sec }]}>
+            {studyCount} kez calisildi
+          </Text>
+        </View>
+        {lastLabel ? (
+          <View style={styles.metaItem}>
+            <Icon name="clock" size={13} color={C.muted} sw={1.8} />
+            <Text style={[styles.metaText, { color: C.muted }]}>{lastLabel}</Text>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+function makeProgressStyles(C) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: C.surface,
+      borderRadius: RADIUS.xl,
+      borderWidth: 1,
+      borderColor: C.border,
+      padding: SPACING.lg,
+      marginTop: SPACING.xl,
+    },
+    barRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: SPACING.sm,
+    },
+    barLabel: {
+      ...TYPOGRAPHY.bodySemiBold,
+      fontSize: 14,
+    },
+    barPct: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      letterSpacing: -0.3,
+    },
+    barTrack: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: C.surface2,
+      overflow: "hidden",
+    },
+    barFill: {
+      height: 4,
+      borderRadius: 2,
+    },
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: SPACING.md,
+      gap: SPACING.lg,
+    },
+    metaItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+    },
+    metaText: {
+      ...TYPOGRAPHY.caption,
+      fontSize: 12,
+    },
+  });
+}
+
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
   const C = useC();
@@ -71,6 +172,9 @@ export default function TopicStudyScreen() {
           <Icon name={subject.icon} size={14} color={color} />
           <Text style={[s.chipText, { color }]}>{subject.name}</Text>
         </View>
+
+        {/* === Ilerleme header === */}
+        <ProgressHeader topic={topic} color={color} C={C} />
 
         {/* === Stat kartlar — her biri kimlik renkli soft === */}
         <View style={s.statsRow}>

@@ -1,18 +1,19 @@
 import { View, Text, Pressable } from "react-native";
 import { Icon, Trend, GlassCard } from "../../../components/design";
-import { C, TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
-const TYPE_BADGE = {
+const getTypeBadge = (C) => ({
   TYT: { label: "TYT", color: C.blue },
   AYT_SAY: { label: "AYT SAY", color: C.amber },
   AYT_EA: { label: "AYT EA", color: C.purple },
   AYT_SOZ: { label: "AYT SOZ", color: C.green },
   BRANCH: { label: "Branş", color: C.teal },
   AYT: { label: "AYT", color: C.amber },
-};
+});
 
-function HistoryRow({ item, onPress }) {
-  const badge = TYPE_BADGE[item.trialType] || null;
+function HistoryRow({ item, onPress, C }) {
+  const badge = getTypeBadge(C)[item.trialType] || null;
   return (
     <Pressable
       onPress={onPress}
@@ -65,6 +66,7 @@ function HistoryRow({ item, onPress }) {
 }
 
 export function HistoryList({ history, onPress, onCompare }) {
+  const C = useC();
   return (
     <View style={{ gap: SPACING.md }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
@@ -99,7 +101,7 @@ export function HistoryList({ history, onPress, onCompare }) {
             {i > 0 && (
               <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: SPACING.lg }} />
             )}
-            <HistoryRow item={h} onPress={() => onPress?.(h)} />
+            <HistoryRow item={h} onPress={() => onPress?.(h)} C={C} />
           </View>
         ))}
       </GlassCard>

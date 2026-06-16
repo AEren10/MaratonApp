@@ -29,7 +29,7 @@ import { NudgeModal } from "../../components/common/NudgeModal";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
-import { GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
+import { GlowBackground, WARM_GLOW, GlassCard, SectionLabel } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
 import { GoalTrack } from "./components/GoalTrack";
 import { PriorityCard } from "./components/PriorityCard";
@@ -40,8 +40,10 @@ import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { DailyActionCard } from "./components/DailyActionCard";
+import { ExamCountdown } from "./components/ExamCountdown";
+import { MorningBriefing } from "./components/MorningBriefing";
 import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
-import { ALL_SUBJECTS } from "../trial/trialTypes";
+import { getAllSubjects } from "../trial/trialTypes";
 
 // QUICK_ITEMS palette HomeScreen içinde useC ile inşa edilir.
 
@@ -71,11 +73,15 @@ export default function HomeScreen() {
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
   const QUICK_ITEMS = useMemo(() => [
-    { icon: "edit",     label: "Kaydet",         c: C.amber,  go: SCREENS.ADD_STUDY },
-    { icon: "chart",    label: "Deneme",         c: C.blue,   go: SCREENS.TRIAL_ENTRY },
-    { icon: "camera",   label: "Yanlış Ekle",    c: C.coral,  go: SCREENS.ADD_WRONG },
-    { icon: "notebook", label: "Yanlış Defteri", c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
-  ], [C.amber, C.blue, C.coral, C.purple]);
+    { icon: "edit",     label: "Kaydet",      c: C.amber,  go: SCREENS.ADD_STUDY },
+    { icon: "chart",    label: "Deneme",      c: C.blue,   go: SCREENS.TRIAL_ENTRY },
+    { icon: "camera",   label: "Yanlış Ekle", c: C.coral,  go: SCREENS.ADD_WRONG },
+    { icon: "notebook", label: "Defterim",    c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
+    { icon: "target",   label: "5dk Quiz",    c: C.teal,   go: SCREENS.QUICK_PRACTICE },
+    { icon: "clock",    label: "Simülasyon",  c: C.red,    go: SCREENS.EXAM_SIMULATOR },
+    { icon: "users",    label: "Challenge",   c: C.pink,   go: SCREENS.CHALLENGE },
+    { icon: "trophy",   label: "Sıralama",    c: C.amber,  go: SCREENS.LEAGUE },
+  ], [C.amber, C.blue, C.coral, C.purple, C.teal, C.red, C.pink]);
   const streak = useSelector(selectStreak);
   const freezeCount = useSelector(selectFreezeCount);
   const todayLogs = useSelector(selectTodayLogs);
@@ -173,14 +179,14 @@ export default function HomeScreen() {
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
     const bars = Object.entries(latest.subjects || {}).slice(0, 4).map(([key, s]) => {
-      const subj = ALL_SUBJECTS.find((x) => x.key === key);
+      const subj = getAllSubjects(C).find((x) => x.key === key);
       return {
         c: subj?.color || C.amber,
         v: Math.min(1, Math.max(0, (s.net || 0) / (subj?.max || 40))),
       };
     });
     return { net, trend, bars };
-  }, [trials]);
+  }, [trials, C]);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
@@ -210,7 +216,7 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.purple} colors={[C.purple]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
         <HomeHeader
           name={displayName}
@@ -220,13 +226,22 @@ export default function HomeScreen() {
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
-        <GoalTrack
-          solved={solvedToday}
-          goal={dailyGoal}
-          onPress={go(SCREENS.ADD_STUDY)}
+        <MorningBriefing
+          userName={displayName}
+          planTaskCount={plan.dersler}
+          srDueCount={planCtx.srDue}
+          streak={streak}
+          onStart={go(SCREENS.PLAN_DETAIL)}
         />
 
-        <View style={{ marginTop: 24, marginBottom: 24 }}>
+        {/* HERO — bugünün ilerlemesi + bakışta metrikler + sınav bağlamı, tek nefeste */}
+        <View style={{ gap: 14, marginTop: 16 }}>
+          <GoalTrack
+            solved={solvedToday}
+            goal={dailyGoal}
+            onPress={go(SCREENS.ADD_STUDY)}
+          />
+
           <StatBubbles
             streak={streak}
             net={lastDeneme.net}
@@ -237,11 +252,18 @@ export default function HomeScreen() {
             onNet={go(SCREENS.ANALYSIS)}
             onLeague={go(SCREENS.LEAGUE)}
           />
+
+          <ExamCountdown onPress={go(SCREENS.GOALS)} />
         </View>
 
-        <RoundActions items={QUICK_ITEMS} onPress={(q) => q.go && navigation.navigate(q.go)} />
+        <View style={{ marginTop: 28 }}>
+          <SectionLabel>HIZLI İŞLEM</SectionLabel>
+          <RoundActions items={QUICK_ITEMS} onPress={(q) => q.go && navigation.navigate(q.go)} />
+        </View>
 
-        <View style={{ gap: 14, marginTop: 28 }}>
+        <View style={{ marginTop: 28 }}>
+          <SectionLabel>SENİN İÇİN</SectionLabel>
+          <View style={{ gap: 14 }}>
           <AnimatedCard delay={40}>
             <PriorityCard task={topTask} plan={plan} onStart={go(SCREENS.PLAN_DETAIL)} />
           </AnimatedCard>
@@ -270,7 +292,7 @@ export default function HomeScreen() {
           ) : null}
 
           <AnimatedCard delay={200}>
-            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.CALENDAR)} />
+            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.WEEKLY_REVIEW)} />
           </AnimatedCard>
 
           {!actionDismissed && (dailyAction || aiLoading) ? (
@@ -288,6 +310,7 @@ export default function HomeScreen() {
               <WeakCard message={nudges[0].message} onPress={() => setNudgeVisible(true)} />
             </AnimatedCard>
           ) : null}
+          </View>
         </View>
       </ScrollView>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -39,7 +39,10 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
       .catch(() => {});
   }, [user?.id]);
 
+  const avatarSource = useMemo(() => avatarUri ? { uri: avatarUri } : null, [avatarUri]);
+
   const pickAvatar = async () => {
+    if (!user?.id) return;
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
       Alert.alert("İzin gerekli", "Galeriden fotoğraf seçmek için izin ver.");
@@ -80,7 +83,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
         }}>
           {avatarUri ? (
             <Image
-              source={{ uri: avatarUri }}
+              source={avatarSource}
               style={{ width: 132, height: 132 }}
               contentFit="cover"
               cachePolicy="memory-disk"

@@ -5,7 +5,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
-import { C } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
 
 const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -19,6 +19,7 @@ export function BentoCard({
   style,
   ...rest
 }) {
+  const C = useC();
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
