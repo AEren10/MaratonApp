@@ -45,7 +45,7 @@ export default function PlanDetailScreen() {
       const subj = getSubjectByKey(t.subject);
       return {
         id: t.id,
-        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || "#EBAE63", icon: "bookOpen" },
+        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || C.amber, icon: "bookOpen" },
         topic: t.topic ? `${t.subjectLabel} · ${t.topic}` : t.subjectLabel,
         topicKey: t.topic,
         q: t.questionCount,

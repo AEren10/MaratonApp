@@ -79,7 +79,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         backgroundColor: C.surface,
         borderWidth: 1,
         borderColor: C.border,
-        shadowColor: "#1B1530",
+        shadowColor: "#15161A",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.06,
         shadowRadius: 14,

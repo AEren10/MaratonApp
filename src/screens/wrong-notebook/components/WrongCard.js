@@ -19,20 +19,20 @@ function relativeDate(iso) {
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
 }
 
-function resolveSubject(raw) {
+function resolveSubject(raw, C) {
   if (typeof raw === "string") {
     const found = getSubjectByKey(raw);
     return found
       ? { key: raw, label: found.label, color: found.color, icon: found.icon }
-      : { key: raw, label: raw, color: "#9A9EAB", icon: "bookOpen" };
+      : { key: raw, label: raw, color: C.muted, icon: "bookOpen" };
   }
-  return raw || { key: "?", label: "?", color: "#9A9EAB", icon: "bookOpen" };
+  return raw || { key: "?", label: "?", color: C.muted, icon: "bookOpen" };
 }
 
 // Twitter-tweet benzeri kart: kimlik avatar + ders/konu + içerik + büyük foto + meta.
-export function WrongCard({ item, onPress, onResolve }) {
+export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const C = useC();
-  const subj = resolveSubject(item.subject);
+  const subj = resolveSubject(item.subject, C);
   const id = useSubjectIdentity(subj.key);
   const subjColor = id?.solid || subj.color;
   const diff = !item.is_resolved ? getTopicDifficulty(item.topic) : null;
@@ -128,48 +128,63 @@ export function WrongCard({ item, onPress, onResolve }) {
         />
       ) : null}
 
-      {/* Meta row — cevaplar + zorluk badge */}
-      {(myA || diff) ? (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-          {myA && corA ? (
-            <View style={{
-              flexDirection: "row", alignItems: "center", gap: 5,
-              backgroundColor: C.surface2,
+      {/* Meta row — cevaplar + zorluk + share */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+        {myA && corA ? (
+          <View style={{
+            flexDirection: "row", alignItems: "center", gap: 5,
+            backgroundColor: C.surface2,
+            paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
+          }}>
+            <Text style={{ fontSize: 12, color: C.red, fontFamily: "Inter_600SemiBold" }}>{myA}</Text>
+            <Icon name="arrowR" size={11} color={C.muted} />
+            <Text style={{ fontSize: 12, color: C.green, fontFamily: "Inter_600SemiBold" }}>{corA}</Text>
+          </View>
+        ) : null}
+
+        {diff ? (
+          <View style={{
+            flexDirection: "row", alignItems: "center", gap: 4,
+            backgroundColor: diff.color + "16",
+            paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
+          }}>
+            <Icon name="users" size={10} color={diff.color} />
+            <Text style={{ fontSize: 11, color: diff.color, fontFamily: "Inter_600SemiBold" }}>
+              ~%{diff.correctRate} doğru · -{diff.netLoss}
+            </Text>
+          </View>
+        ) : null}
+
+        {item.is_resolved ? (
+          <View style={{
+            flexDirection: "row", alignItems: "center", gap: 4,
+            backgroundColor: C.green + "18",
+            paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
+          }}>
+            <Icon name="check" size={10} color={C.green} />
+            <Text style={{ fontSize: 11, color: C.green, fontFamily: "Inter_600SemiBold" }}>Çözüldü</Text>
+          </View>
+        ) : null}
+
+        <View style={{ flex: 1 }} />
+
+        {onShare ? (
+          <Pressable
+            onPress={onShare}
+            hitSlop={8}
+            style={{
+              flexDirection: "row", alignItems: "center", gap: 4,
+              backgroundColor: shared ? C.accent + "18" : C.surface2,
               paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
-            }}>
-              <Text style={{ fontSize: 12, color: C.red, fontFamily: "Inter_600SemiBold" }}>{myA}</Text>
-              <Icon name="arrowR" size={11} color={C.muted} />
-              <Text style={{ fontSize: 12, color: C.green, fontFamily: "Inter_600SemiBold" }}>{corA}</Text>
-            </View>
-          ) : null}
-
-          {diff ? (
-            <View style={{
-              flexDirection: "row", alignItems: "center", gap: 4,
-              backgroundColor: diff.color + "16",
-              paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
-            }}>
-              <Icon name="users" size={10} color={diff.color} />
-              <Text style={{ fontSize: 11, color: diff.color, fontFamily: "Inter_600SemiBold" }}>
-                ~%{diff.correctRate} doğru · -{diff.netLoss}
-              </Text>
-            </View>
-          ) : null}
-
-          {item.is_resolved ? (
-            <View style={{
-              flexDirection: "row", alignItems: "center", gap: 4,
-              backgroundColor: C.green + "18",
-              paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
-            }}>
-              <Icon name="check" size={10} color={C.green} />
-              <Text style={{ fontSize: 11, color: C.green, fontFamily: "Inter_600SemiBold" }}>
-                Çözüldü
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
+            }}
+          >
+            <Icon name="globe" size={11} color={shared ? C.accent : C.muted} />
+            <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: shared ? C.accent : C.muted }}>
+              {shared ? "Paylaşıldı" : "Paylaş"}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
     </Pressable>
   );
 }

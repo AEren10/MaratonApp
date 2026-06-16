@@ -11,4 +11,6 @@ export { Icon } from "./Icon";
 export { AnimatedCard } from "./AnimatedCard";
 export { GlassCard } from "./GlassCard";
 export { SectionLabel } from "./SectionLabel";
+export { HexBadge } from "./HexBadge";
+export { Spot } from "./Spot";
 export { GlowBackground, WARM_GLOW } from "./GlowBackground";

@@ -8,7 +8,7 @@ const TIER_GRADIENTS = {
   Gümüş:    ["#9CA3AF", "#D1D5DB"],
   Altın:    ["#E8B547", "#FFD97D"],
   Elmas:    ["#5DD8C5", "#A0E8DA"],
-  Obsidyen: ["#1B1530", "#3F2B73"],
+  Obsidyen: ["#241B40", "#3F2B73"],
 };
 
 const TIER_ICON = {

@@ -144,5 +144,5 @@ const makeStyles = (C) =>
     summaryLabel: { ...TYPOGRAPHY.body, color: C.sec },
     summaryTime: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
     finishBtn: { marginTop: SPACING.xl, backgroundColor: C.amber, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
-    finishText: { ...TYPOGRAPHY.body, color: "#000", fontWeight: "700" },
+    finishText: { ...TYPOGRAPHY.body, color: "#FFFFFF", fontWeight: "700" },
   });

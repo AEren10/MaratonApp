@@ -1,37 +1,38 @@
+import { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "../design";
+import Animated, {
+  FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
+} from "react-native-reanimated";
+import { Spot } from "../design";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
-// Illustrated empty state — gradient circle + icon, soft shadow, friendly tone.
+// Tutarlı illüstrasyon (Spot) + yüzen animasyon + giriş. Tüm boş durumlarda aynı dil.
 export function EmptyState({
-  icon = "bookOpen",
+  icon,
   title = "Henüz bir şey yok",
   message,
   actionLabel,
   onAction,
-  color = "purple",
+  color = "accent",
 }) {
   const C = useC();
-  const accent = C[color] || C.purple;
-  const accent2 = accent + "60";
+  const accent = C[color] || C.accent;
+
+  const float = useSharedValue(0);
+  useEffect(() => {
+    float.value = withRepeat(withSequence(
+      withTiming(-6, { duration: 1400, easing: Easing.inOut(Easing.quad) }),
+      withTiming(0, { duration: 1400, easing: Easing.inOut(Easing.quad) })
+    ), -1, false);
+  }, []);
+  const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: float.value }] }));
 
   return (
-    <View style={styles.container}>
-      {/* Concentric illustrated circles */}
-      <View style={styles.illustration}>
-        <View style={[styles.outerRing, { backgroundColor: accent + "0A" }]} />
-        <View style={[styles.midRing, { backgroundColor: accent + "18" }]} />
-        <LinearGradient
-          colors={[accent, accent2]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.innerCircle}
-        >
-          <Icon name={icon} size={36} color="#FFFFFF" sw={2.2} />
-        </LinearGradient>
-      </View>
+    <Animated.View entering={FadeInDown.duration(420).springify().damping(18)} style={styles.container}>
+      <Animated.View style={floatStyle}>
+        <Spot name="empty" size={132} icon={icon} color={accent} />
+      </Animated.View>
 
       {title ? (
         <Text style={[styles.title, { color: C.text }]}>{title}</Text>
@@ -51,7 +52,7 @@ export function EmptyState({
           <Text style={styles.actionText}>{actionLabel}</Text>
         </Pressable>
       ) : null}
-    </View>
+    </Animated.View>
   );
 }
 

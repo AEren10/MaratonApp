@@ -31,10 +31,9 @@ import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
 import { GlowBackground, WARM_GLOW, GlassCard, SectionLabel } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
-import { GoalTrack } from "./components/GoalTrack";
+import { HomeHero } from "./components/HomeHero";
 import { PriorityCard } from "./components/PriorityCard";
 import { PlanCard } from "./components/PlanCard";
-import { StatBubbles } from "./components/StatBubbles";
 import { RoundActions } from "./components/RoundActions";
 import { WeakCard } from "./components/WeakCard";
 import { MotivCard } from "./components/MotivCard";
@@ -234,25 +233,24 @@ export default function HomeScreen() {
           onStart={go(SCREENS.PLAN_DETAIL)}
         />
 
-        {/* HERO — bugünün ilerlemesi + bakışta metrikler + sınav bağlamı, tek nefeste */}
-        <View style={{ gap: 14, marginTop: 16 }}>
-          <GoalTrack
+        {/* HERO — Whoop ringi: dev animasyonlu ilerleme + nabız atan streak + stat rayı */}
+        <View style={{ marginTop: 8 }}>
+          <HomeHero
             solved={solvedToday}
             goal={dailyGoal}
-            onPress={go(SCREENS.ADD_STUDY)}
-          />
-
-          <StatBubbles
             streak={streak}
             net={lastDeneme.net}
             trend={lastDeneme.trend}
             xp={xp}
             tier={xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz"}
+            onRingPress={go(SCREENS.ADD_STUDY)}
             onStreak={go(SCREENS.PROFILE)}
             onNet={go(SCREENS.ANALYSIS)}
             onLeague={go(SCREENS.LEAGUE)}
           />
+        </View>
 
+        <View style={{ marginTop: 16 }}>
           <ExamCountdown onPress={go(SCREENS.GOALS)} />
         </View>
 

@@ -9,7 +9,7 @@ function MemberRow({ item }) {
   const C = useC();
   const st = useMemo(() => makeStyles(C), [C]);
   const isYou = item.you;
-  const medal = item.rank === 1 ? "#EBAE63" : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const medal = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
   return (
     <View style={[st.row, isYou && st.rowYou]}>
       <View style={{ width: 26, alignItems: "center" }}>

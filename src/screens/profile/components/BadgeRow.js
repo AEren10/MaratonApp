@@ -1,7 +1,7 @@
 import { View, Text, ScrollView } from "react-native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { IconBox } from "../../../components/design";
+import { HexBadge } from "../../../components/design";
 
 export function BadgeRow({ badges }) {
   const C = useC();
@@ -21,36 +21,14 @@ export function BadgeRow({ badges }) {
         contentContainerStyle={{ gap: SPACING.lg, paddingHorizontal: SPACING.xs }}
       >
         {badges.map((b, i) => (
-          <View
+          <HexBadge
             key={i}
-            style={{
-              alignItems: "center",
-              gap: SPACING.sm,
-              width: 72,
-            }}
-          >
-            <View
-              style={{
-                borderRadius: RADIUS.lg,
-                borderWidth: 1,
-                borderColor: b.color + "40",
-                padding: 2,
-              }}
-            >
-              <IconBox
-                icon={b.icon}
-                color={b.color}
-                size={48}
-                rounded={RADIUS.md}
-              />
-            </View>
-            <Text
-              style={[TYPOGRAPHY.micro, { color: C.sec, textAlign: "center" }]}
-              numberOfLines={2}
-            >
-              {b.name}
-            </Text>
-          </View>
+            icon={b.icon}
+            color={b.color}
+            locked={b.locked ?? b.earned === false}
+            label={b.name}
+            size={60}
+          />
         ))}
       </ScrollView>
     </View>

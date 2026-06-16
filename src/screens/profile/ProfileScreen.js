@@ -23,7 +23,7 @@ import { StrengthBars } from "./components/StrengthBars";
 import { SettingsMenu } from "./components/SettingsMenu";
 import { LevelBar } from "./components/LevelBar";
 
-import { Icon } from "../../components/design";
+import { Icon, SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 
 const QUICK_LINK_ITEMS = [
@@ -159,22 +159,41 @@ export default function ProfileScreen() {
             xpForNext={level.xpForNext}
           />
         </AnimatedCard>
+        <View style={{ marginTop: SPACING.lg }}>
+          <SectionLabel>İstatistik</SectionLabel>
+        </View>
         <AnimatedCard delay={120}>
           <StatsGrid stats={computedStats} />
         </AnimatedCard>
         {displayBadges.length > 0 ? (
-          <AnimatedCard delay={200}>
-            <BadgeRow badges={displayBadges} />
-          </AnimatedCard>
+          <>
+            <View style={{ marginTop: SPACING.lg }}>
+              <SectionLabel>Rozetler</SectionLabel>
+            </View>
+            <AnimatedCard delay={200}>
+              <BadgeRow badges={displayBadges} />
+            </AnimatedCard>
+          </>
         ) : null}
         {strengths.length > 0 ? (
-          <AnimatedCard delay={240}>
-            <StrengthBars strengths={strengths} />
-          </AnimatedCard>
+          <>
+            <View style={{ marginTop: SPACING.lg }}>
+              <SectionLabel>Güçlü Yönler</SectionLabel>
+            </View>
+            <AnimatedCard delay={240}>
+              <StrengthBars strengths={strengths} />
+            </AnimatedCard>
+          </>
         ) : null}
+        <View style={{ marginTop: SPACING.lg }}>
+          <SectionLabel>Hızlı Erişim</SectionLabel>
+        </View>
         <AnimatedCard delay={300}>
           <QuickLinks onNavigate={handleNavigate} C={C} />
         </AnimatedCard>
+        <View style={{ marginTop: SPACING.lg }}>
+          <SectionLabel>Ayarlar</SectionLabel>
+        </View>
         <AnimatedCard delay={360}>
           <SettingsMenu
             onNavigate={handleNavigate}

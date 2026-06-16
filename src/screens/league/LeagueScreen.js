@@ -71,7 +71,7 @@ function MiniStat({ label, value, color, C }) {
 
 function LeaderboardRow({ item, C }) {
   const isYou = item.you;
-  const medalColor = item.rank === 1 ? "#EBAE63" : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const medalColor = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
 
   return (
     <View style={[

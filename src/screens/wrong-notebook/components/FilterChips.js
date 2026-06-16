@@ -4,10 +4,10 @@ import { useC } from "../../../contexts/ThemeContext";
 
 const makeFilters = (C) => [
   { key: "all", short: "Tümü", color: C.amber },
-  { key: "turkce", short: "Türkçe", color: "#6FA8F2" },
-  { key: "matematik", short: "Mat", color: "#EBAE63" },
-  { key: "fen", short: "Fen", color: "#4ECE8E" },
-  { key: "sosyal", short: "Sosyal", color: "#A99BF5" },
+  { key: "turkce", short: "Türkçe", color: C.blue },
+  { key: "matematik", short: "Mat", color: C.amber },
+  { key: "fen", short: "Fen", color: C.green },
+  { key: "sosyal", short: "Sosyal", color: C.purple },
 ];
 
 export function FilterChips({ active, onChange, status, onStatusChange }) {

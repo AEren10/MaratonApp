@@ -4,20 +4,21 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import { useC } from "../../../contexts/ThemeContext";
-import { Icon } from "../../../components/design";
+import { Icon, Spot } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
 import { uploadAvatar, getAvatarUrl } from "../../../supabase/storage";
 import { getProfile, updateProfile } from "../../../supabase/profiles";
 
 function avatarPalette(name = "?", C) {
   const sum = name.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+  // Canlı solid → aynı tonun yarı saydamı: token-driven, dark/light tutarlı.
   const palette = [
-    [C.purple, "#C5B0FF"],
-    [C.coral,  "#FFC9A8"],
-    [C.blue,   "#A6CCFF"],
-    [C.pink,   "#FFC0DC"],
-    [C.amber,  "#FFE6A8"],
-    [C.teal,   "#9EE0D2"],
+    [C.accent, C.coral + "CC"],
+    [C.purple, C.pink + "CC"],
+    [C.blue,   C.teal + "CC"],
+    [C.pink,   C.purple + "CC"],
+    [C.amber,  C.accent + "CC"],
+    [C.teal,   C.blue + "CC"],
   ];
   return palette[sum % palette.length];
 }
@@ -72,6 +73,11 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
 
   return (
     <View style={{ marginTop: 16, marginBottom: 18, alignItems: "center" }}>
+      {/* Hafif dekoratif backdrop — glyph avatarın arkasında gizli, blob+noktalar çevrede */}
+      <View pointerEvents="none" style={{ position: "absolute", top: -42, opacity: 0.6 }}>
+        <Spot name="trophy" size={216} color={c1} />
+      </View>
+
       {/* === Büyük ortalanmış avatar === */}
       <Pressable onPress={pickAvatar}>
         <View style={{

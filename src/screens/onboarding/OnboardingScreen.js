@@ -1,9 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
+import Animated, {
+  FadeInDown, FadeIn, ZoomIn,
+  useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
+} from "react-native-reanimated";
 import Svg, { Circle, Path, Polyline, Line } from "react-native-svg";
 
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
@@ -14,29 +17,29 @@ import { Icon } from "../../components/design";
 const SLIDES = [
   {
     icon: "target",
-    gradientKey: "purple",
-    grad: ["#9D86FF", "#C5B0FF"],
+    gradientKey: "accent",
+    tail: "#FFC9A8",
     title: "Hedefe Odaklan",
     desc: "Yapay zeka destekli kişisel çalışma planın, her gün seni hedefe yaklaştırır.",
   },
   {
     icon: "chart",
     gradientKey: "blue",
-    grad: ["#4F8DF2", "#A6CCFF"],
+    tail: "#A6CCFF",
     title: "Gelişimini Takip Et",
     desc: "Deneme sonuçların, ders bazlı analizler ve trend grafikleri tek yerde.",
   },
   {
     icon: "flame",
     gradientKey: "coral",
-    grad: ["#F08568", "#FFC9A8"],
+    tail: "#FFC9A8",
     title: "Seri Oluştur",
     desc: "Günlük çalışma serini koru, rozet kazan ve ligde yüksel.",
   },
   {
     icon: "users",
     gradientKey: "green",
-    grad: ["#22B47A", "#7CD8A8"],
+    tail: "#7CD8A8",
     title: "Birlikte Çalış",
     desc: "Canlı çalışma odalarına katıl, arkadaşlarınla yarışarak motive ol.",
   },
@@ -87,6 +90,23 @@ export default function OnboardingScreen() {
 
   const slide = SLIDES[index];
   const isLast = index === SLIDES.length - 1;
+  const grad = [C[slide.gradientKey] || C.accent, slide.tail];
+
+  // İkon yüzme + dekoratif nokta nabzı
+  const float = useSharedValue(0);
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    float.value = withRepeat(withSequence(
+      withTiming(1, { duration: 1700, easing: Easing.inOut(Easing.quad) }),
+      withTiming(0, { duration: 1700, easing: Easing.inOut(Easing.quad) })
+    ), -1, false);
+    pulse.value = withRepeat(withSequence(
+      withTiming(1, { duration: 1100, easing: Easing.inOut(Easing.quad) }),
+      withTiming(0, { duration: 1100, easing: Easing.inOut(Easing.quad) })
+    ), -1, false);
+  }, []);
+  const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -9 * float.value }] }));
+  const pulseStyle = useAnimatedStyle(() => ({ opacity: 0.25 + pulse.value * 0.5, transform: [{ scale: 0.85 + pulse.value * 0.3 }] }));
 
   const goNext = useCallback(() => {
     if (isLast) {
@@ -127,13 +147,13 @@ export default function OnboardingScreen() {
           style={{ alignItems: "center", marginTop: 20, marginBottom: 30, paddingHorizontal: 30 }}
         >
           <LinearGradient
-            colors={slide.grad}
+            colors={grad}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
               width: 240, height: 240, borderRadius: 60,
               alignItems: "center", justifyContent: "center",
-              shadowColor: slide.grad[0],
+              shadowColor: grad[0],
               shadowOffset: { width: 0, height: 18 },
               shadowOpacity: 0.40,
               shadowRadius: 30,
@@ -153,7 +173,14 @@ export default function OnboardingScreen() {
               backgroundColor: "rgba(255,255,255,0.10)",
             }} />
 
-            <SlideIcon name={slide.icon} size={120} color="#FFFFFF" />
+            {/* Nabız atan dekoratif noktalar */}
+            <Animated.View style={[{ position: "absolute", top: 34, right: 40, width: 14, height: 14, borderRadius: 7, backgroundColor: "rgba(255,255,255,0.85)" }, pulseStyle]} />
+            <Animated.View style={[{ position: "absolute", bottom: 46, left: 36, width: 10, height: 10, borderRadius: 5, backgroundColor: "rgba(255,255,255,0.7)" }, pulseStyle]} />
+            <Animated.View style={[{ position: "absolute", top: 60, left: 30, width: 7, height: 7, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.6)" }, pulseStyle]} />
+
+            <Animated.View key={`icon-${index}`} entering={ZoomIn.springify().damping(13)} style={floatStyle}>
+              <SlideIcon name={slide.icon} size={120} color="#FFFFFF" />
+            </Animated.View>
           </LinearGradient>
         </Animated.View>
 
@@ -177,7 +204,7 @@ export default function OnboardingScreen() {
                 key={i}
                 style={[
                   styles.dot,
-                  { backgroundColor: i === index ? s.grad[0] : C.border },
+                  { backgroundColor: i === index ? (C[s.gradientKey] || C.accent) : C.border },
                   i === index && { width: 28 },
                 ]}
               />
@@ -187,14 +214,14 @@ export default function OnboardingScreen() {
           <Pressable
             onPress={goNext}
             style={({ pressed }) => ({
-              backgroundColor: slide.grad[0],
+              backgroundColor: grad[0],
               borderRadius: 999,
               paddingVertical: 17,
               alignItems: "center",
               flexDirection: "row",
               justifyContent: "center",
               gap: 8,
-              shadowColor: slide.grad[0],
+              shadowColor: grad[0],
               shadowOffset: { width: 0, height: 10 },
               shadowOpacity: 0.40,
               shadowRadius: 20,

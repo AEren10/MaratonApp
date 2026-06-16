@@ -9,8 +9,8 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 
-const LogRow = React.memo(function LogRow({ item, s }) {
-  const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: "#9A9EAB", label: item.subject };
+const LogRow = React.memo(function LogRow({ item, s, fallbackColor }) {
+  const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: fallbackColor, label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
   return (
@@ -108,8 +108,8 @@ export default function StudyLogScreen() {
 
   const renderItem = useCallback(({ item }) => {
     if (item.type === "header") return <SectionHeader title={item.title} s={s} />;
-    return <LogRow item={item} s={s} />;
-  }, [s]);
+    return <LogRow item={item} s={s} fallbackColor={C.muted} />;
+  }, [s, C]);
 
   const keyExtractor = useCallback((item) => item.id, []);
 

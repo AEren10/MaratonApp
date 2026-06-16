@@ -3,15 +3,16 @@ import { IconBox } from "../../../components/design";
 import { SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-const SUBJECTS = [
-  { key: "turkce", name: "Turkce", color: "#6FA8F2", icon: "bookOpen" },
-  { key: "matematik", name: "Matematik", color: "#EBAE63", icon: "hash" },
-  { key: "fen", name: "Fen Bilimleri", color: "#4ECE8E", icon: "activity" },
-  { key: "sosyal", name: "Sosyal Bilimler", color: "#A99BF5", icon: "layers" },
+const makeSubjects = (C) => [
+  { key: "turkce", name: "Turkce", color: C.blue, icon: "bookOpen" },
+  { key: "matematik", name: "Matematik", color: C.amber, icon: "hash" },
+  { key: "fen", name: "Fen Bilimleri", color: C.green, icon: "activity" },
+  { key: "sosyal", name: "Sosyal Bilimler", color: C.purple, icon: "layers" },
 ];
 
 export function SubjectPicker({ selected, onSelect }) {
   const C = useC();
+  const SUBJECTS = makeSubjects(C);
   return (
     <View style={{ flexDirection: "row", gap: SPACING.sm, flexWrap: "wrap" }}>
       {SUBJECTS.map((s) => {

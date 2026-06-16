@@ -12,9 +12,16 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 
 const GROUP_META = {
-  fen: { label: "Fen Bilimleri", color: "#4ECE8E", icon: "activity" },
-  sosyal: { label: "Sosyal Bilimler", color: "#A99BF5", icon: "layers" },
+  fen: { label: "Fen Bilimleri", color: null, icon: "activity" },
+  sosyal: { label: "Sosyal Bilimler", color: null, icon: "layers" },
 };
+
+// Grup rengi token'dan — fen=yeşil, sosyal=mor. Dark/light tutarlı.
+function groupColor(key, C) {
+  if (key === "fen") return C.green;
+  if (key === "sosyal") return C.purple;
+  return C.amber;
+}
 
 const FEN_KEYS = ["fizik", "kimya", "biyoloji"];
 const SOSYAL_KEYS = ["tarih", "cografya", "felsefe", "din", "edebiyat"];
@@ -263,7 +270,7 @@ export default function DerslerScreen() {
                 <SectionHeader
                   key={item.key}
                   label={item.label}
-                  color={item.color}
+                  color={groupColor(item.key, C)}
                   icon={item.icon}
                   count={item.count}
                   topicCount={item.topicCount}
@@ -292,7 +299,7 @@ export default function DerslerScreen() {
                     <SectionHeader
                       key={`ayt_${item.key}`}
                       label={item.label}
-                      color={item.color}
+                      color={groupColor(item.key, C)}
                       icon={item.icon}
                       count={item.count}
                       topicCount={item.topicCount}

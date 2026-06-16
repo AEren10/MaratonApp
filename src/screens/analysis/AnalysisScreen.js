@@ -11,6 +11,7 @@ import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
+import { SectionLabel } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
@@ -184,12 +185,14 @@ export default function AnalysisScreen() {
           ) : (
             <>
               {deneme.heroLine && deneme.heroLine.length > 1 && (
+                <View>
+                <SectionLabel>TREND</SectionLabel>
                 <AnimatedCard delay={0}>
                   <TrendChart
                     data={deneme.heroLine}
                     labels={deneme.heroLabels}
                     title="Net Trendin"
-                    color={C.purple}
+                    color={C.accent}
                   />
                   <Pressable
                     onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
@@ -203,8 +206,10 @@ export default function AnalysisScreen() {
                     <Icon name="chevR" size={12} color={C.amber} />
                   </Pressable>
                 </AnimatedCard>
+                </View>
               )}
 
+              <SectionLabel>GENEL</SectionLabel>
               <AnimatedCard delay={80}>
                 <LatestScore
                   net={deneme.latest.net}
@@ -214,6 +219,7 @@ export default function AnalysisScreen() {
                 />
               </AnimatedCard>
 
+              <SectionLabel>DERSLER</SectionLabel>
               <AnimatedCard delay={160}>
                 <SubjectBars
                   bars={deneme.bars}
@@ -226,6 +232,7 @@ export default function AnalysisScreen() {
                 />
               </AnimatedCard>
 
+              <SectionLabel>GEÇMİŞ</SectionLabel>
               <AnimatedCard delay={300}>
                 <HistoryList
                   history={deneme.history}
@@ -238,6 +245,7 @@ export default function AnalysisScreen() {
                 <MoodTrend trials={filterTrials(trials, filter)} />
               </AnimatedCard>
 
+              <SectionLabel>PRATİK</SectionLabel>
               <AnimatedCard delay={420}>
                 <View style={{ flexDirection: "row", gap: SPACING.sm }}>
                   <Pressable

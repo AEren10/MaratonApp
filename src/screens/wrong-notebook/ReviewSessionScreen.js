@@ -13,18 +13,18 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import * as haptic from "../../lib/haptics";
 
-const GRADES = [
-  { grade: 0, label: "Hatırlamıyorum", color: "#F2706E", icon: "x" },
-  { grade: 1, label: "Zorlandım", color: "#EBAE63", icon: "alert" },
-  { grade: 3, label: "Biliyorum", color: "#4ECE8E", icon: "check" },
+const makeGrades = (C) => [
+  { grade: 0, label: "Hatırlamıyorum", color: C.red, icon: "x" },
+  { grade: 1, label: "Zorlandım", color: C.amber, icon: "alert" },
+  { grade: 3, label: "Biliyorum", color: C.green, icon: "check" },
 ];
 
-function resolveSubject(raw) {
+function resolveSubject(raw, C) {
   if (typeof raw === "string") {
     const f = getSubjectByKey(raw);
-    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: "#9A9EAB", icon: "bookOpen" };
+    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: C.muted, icon: "bookOpen" };
   }
-  return raw || { label: "?", color: "#9A9EAB", icon: "bookOpen" };
+  return raw || { label: "?", color: C.muted, icon: "bookOpen" };
 }
 
 export default function ReviewSessionScreen() {
@@ -90,7 +90,7 @@ export default function ReviewSessionScreen() {
       ) : current ? (
         <ScrollView contentContainerStyle={s.scroll}>
           {(() => {
-            const subj = resolveSubject(current.subject);
+            const subj = resolveSubject(current.subject, C);
             return (
               <View style={[s.chip, { backgroundColor: subj.color + "18" }]}>
                 <Icon name={subj.icon} size={14} color={subj.color} />
@@ -129,7 +129,7 @@ export default function ReviewSessionScreen() {
             </Pressable>
           ) : (
             <View style={s.gradeRow}>
-              {GRADES.map((g) => (
+              {makeGrades(C).map((g) => (
                 <Pressable key={g.grade} onPress={() => grade(g.grade)} style={[s.gradeBtn, { backgroundColor: g.color + "1A", borderColor: g.color }]}>
                   <Icon name={g.icon} size={18} color={g.color} />
                   <Text style={[s.gradeText, { color: g.color }]}>{g.label}</Text>

@@ -23,12 +23,12 @@ import * as haptic from "../../lib/haptics";
 const { width: SW } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SW * 0.3;
 
-function resolveSubject(raw) {
+function resolveSubject(raw, C) {
   if (typeof raw === "string") {
     const f = getSubjectByKey(raw);
-    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: "#9A9EAB", icon: "bookOpen" };
+    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: C.muted, icon: "bookOpen" };
   }
-  return raw || { label: "?", color: "#9A9EAB", icon: "bookOpen" };
+  return raw || { label: "?", color: C.muted, icon: "bookOpen" };
 }
 
 export default function SwipeReviewScreen() {
@@ -168,7 +168,7 @@ export default function SwipeReviewScreen() {
 
               {/* Card content */}
               {(() => {
-                const subj = resolveSubject(current.subject);
+                const subj = resolveSubject(current.subject, C);
                 return (
                   <View style={[s.subjChip, { backgroundColor: subj.color + "18" }]}>
                     <Icon name={subj.icon} size={14} color={subj.color} />

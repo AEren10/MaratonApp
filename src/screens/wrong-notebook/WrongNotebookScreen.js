@@ -1,11 +1,12 @@
 import { useMemo, useState, useCallback } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
+import { shareQuestion, isQuestionShared } from "../../supabase/community";
 import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -15,6 +16,7 @@ import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
 
 import { WrongCard } from "./components/WrongCard";
+import { CommunityTab } from "./CommunityTab";
 
 function WrongSkeleton() {
   return (
@@ -91,6 +93,8 @@ export default function WrongNotebookScreen() {
   const [subject, setSubject] = useState("all");
   const [topicFilter, setTopicFilter] = useState("all");
   const [status, setStatus] = useState("open"); // "open" | "resolved" | "all"
+  const [mainTab, setMainTab] = useState("mine"); // "mine" | "community"
+  const [sharedIds, setSharedIds] = useState(new Set());
 
   const setSubjectAndReset = useCallback((s) => {
     setSubject(s);
@@ -102,9 +106,46 @@ export default function WrongNotebookScreen() {
     try {
       const data = await getWrongQuestions(user.id);
       setItems(data || []);
+      const ids = new Set();
+      for (const it of data || []) {
+        const yes = await isQuestionShared(it.id).catch(() => false);
+        if (yes) ids.add(it.id);
+      }
+      setSharedIds(ids);
     } catch {}
     setLoading(false);
   }, [user?.id]);
+
+  const handleShare = useCallback((item) => {
+    const subKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
+    Alert.alert(
+      "Soruyu Paylaş",
+      "Bu yanlışı toplulukla paylaşmak ister misin?",
+      [
+        { text: "Anonim Paylaş", onPress: () => doShare(item, subKey, true) },
+        { text: "İsimle Paylaş", onPress: () => doShare(item, subKey, false) },
+        { text: "Vazgeç", style: "cancel" },
+      ],
+    );
+  }, [user?.id]);
+
+  const doShare = async (item, subKey, anonymous) => {
+    try {
+      await shareQuestion({
+        wrongQuestionId: item.id,
+        userId: user.id,
+        subject: subKey,
+        topic: item.topic,
+        imagePath: item.image_path,
+        note: item.note,
+        isAnonymous: anonymous,
+      });
+      haptic.success();
+      setSharedIds((prev) => new Set([...prev, item.id]));
+    } catch (e) {
+      Alert.alert("Hata", e?.message || "Paylaşılamadı");
+    }
+  };
 
   // Sayma için — sadece status filtresinin uygulanmadığı sayım
   const subjectCounts = useMemo(() => {
@@ -219,32 +260,64 @@ export default function WrongNotebookScreen() {
         </Pressable>
       </View>
 
-      {/* === Status tabs (Çözülmemiş / Çözüldü / Tümü) === */}
+      {/* === Main tabs: Defterim | Topluluk === */}
+      <View style={[s.mainTabs, { borderBottomColor: C.border }]}>
+        {[
+          { key: "mine", label: "Defterim", icon: "notebook" },
+          { key: "community", label: "Topluluk", icon: "globe" },
+        ].map((t) => {
+          const active = mainTab === t.key;
+          return (
+            <Pressable
+              key={t.key}
+              onPress={() => setMainTab(t.key)}
+              style={[s.mainTab, active && { borderBottomColor: C.accent }]}
+            >
+              <Icon name={t.icon} size={16} color={active ? C.accent : C.muted} />
+              <Text style={{
+                fontFamily: active ? "Inter_700Bold" : "Inter_500Medium",
+                fontSize: 14, color: active ? C.text : C.muted,
+              }}>
+                {t.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {mainTab === "community" ? (
+        <CommunityTab visible={mainTab === "community"} />
+      ) : (
+      <View style={{ flex: 1 }}>
+      {/* === Status filter pills (Çözülmemiş / Çözüldü / Tümü) === */}
       <View style={s.statusTabs}>
-        <Pressable
-          onPress={() => setStatus("open")}
-          style={[s.statusTab, status === "open" && { borderBottomColor: C.purple }]}
-        >
-          <Text style={[s.statusText, { color: status === "open" ? C.purple : C.muted, fontFamily: status === "open" ? "Inter_600SemiBold" : "Inter_500Medium" }]}>
-            Çözülmemiş · {counts.open}
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setStatus("resolved")}
-          style={[s.statusTab, status === "resolved" && { borderBottomColor: C.green }]}
-        >
-          <Text style={[s.statusText, { color: status === "resolved" ? C.green : C.muted, fontFamily: status === "resolved" ? "Inter_600SemiBold" : "Inter_500Medium" }]}>
-            Çözüldü · {counts.total - counts.open}
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setStatus("all")}
-          style={[s.statusTab, status === "all" && { borderBottomColor: C.text }]}
-        >
-          <Text style={[s.statusText, { color: status === "all" ? C.text : C.muted, fontFamily: status === "all" ? "Inter_600SemiBold" : "Inter_500Medium" }]}>
-            Tümü
-          </Text>
-        </Pressable>
+        {[
+          { key: "open", label: `Çözülmemiş · ${counts.open}`, color: C.accent },
+          { key: "resolved", label: `Çözüldü · ${counts.total - counts.open}`, color: C.success },
+          { key: "all", label: "Tümü", color: C.text },
+        ].map((t) => {
+          const active = status === t.key;
+          return (
+            <Pressable
+              key={t.key}
+              onPress={() => setStatus(t.key)}
+              style={[
+                s.statusChip,
+                {
+                  backgroundColor: active ? t.color + "18" : "transparent",
+                  borderColor: active ? t.color + "40" : C.border,
+                },
+              ]}
+            >
+              <Text style={{
+                fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
+                fontSize: 13, color: active ? t.color : C.muted,
+              }}>
+                {t.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {/* === "Bugün tekrar" banner === */}
@@ -355,6 +428,8 @@ export default function WrongNotebookScreen() {
               item={item}
               onPress={() => navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item })}
               onResolve={() => toggleResolve(item.id)}
+              onShare={() => handleShare(item)}
+              shared={sharedIds.has(item.id)}
             />
           )}
           contentContainerStyle={{
@@ -385,6 +460,8 @@ export default function WrongNotebookScreen() {
           }
           showsVerticalScrollIndicator={false}
         />
+      )}
+      </View>
       )}
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
@@ -421,18 +498,33 @@ const s = StyleSheet.create({
     shadowRadius: 12,
     elevation: 5,
   },
+  mainTabs: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    gap: 24,
+    borderBottomWidth: 1,
+    marginBottom: 12,
+  },
+  mainTab: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderBottomWidth: 2.5,
+    borderBottomColor: "transparent",
+  },
   statusTabs: {
     flexDirection: "row",
     paddingHorizontal: 16,
-    gap: 16,
-    marginBottom: 12,
+    gap: 8,
+    marginBottom: 10,
   },
-  statusTab: {
-    paddingVertical: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
+  statusChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    borderWidth: 1,
   },
-  statusText: { fontSize: 13 },
   dueBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -444,6 +536,8 @@ const s = StyleSheet.create({
     borderWidth: 1,
   },
   subjectFilterRow: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingBottom: 10,
     gap: 6,

@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
+import { Icon, Spot } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
@@ -96,7 +96,10 @@ export default function StudySummaryScreen() {
             <View style={[s.goalBarFill, { width: `${goalPct * 100}%`, backgroundColor: goalReached ? C.green : C.amber }]} />
           </View>
           {goalReached && (
-            <Text style={[s.goalDone, { color: C.green }]}>Hedefini tamamladın!</Text>
+            <Animated.View entering={ZoomIn.delay(550).springify()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: SPACING.sm }}>
+              <Spot name="trophy" size={40} color={C.green} />
+              <Text style={[s.goalDone, { color: C.green, marginTop: 0 }]}>Hedefini tamamladın!</Text>
+            </Animated.View>
           )}
         </Animated.View>
 

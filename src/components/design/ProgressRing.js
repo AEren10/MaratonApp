@@ -14,8 +14,8 @@ export function ProgressRing({
   size = 56,
   stroke = 6,
   value = 0,
-  color = "#6B4FE0",         // light purple accent
-  trackColor = "rgba(60,40,110,0.10)", // soft lavender border
+  color = "#FF5A3C",
+  trackColor = "rgba(21,22,26,0.08)",
   children,
   animated = true,
 }) {
