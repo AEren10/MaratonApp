@@ -1,52 +1,88 @@
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "./AuthContext";
 
 const ExamContext = createContext(null);
 
 const STORAGE_KEY = "@exam_config";
+const SLIDES_KEY = "@has_seen_onboarding";
 
 export function ExamProvider({ children }) {
+  const { session } = useAuth();
   const [examType, setExamType] = useState(null);
   const [field, setField] = useState(null);
   const [examDate, setExamDate] = useState(null);
+  const [targetRanking, setTargetRanking] = useState(null);
+  const [targetDepartment, setTargetDepartment] = useState(null);
+  const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+    Promise.all([
+      AsyncStorage.getItem(STORAGE_KEY),
+      AsyncStorage.getItem(SLIDES_KEY),
+    ]).then(([raw, seenRaw]) => {
       if (raw) {
-        const data = JSON.parse(raw);
-        setExamType(data.examType);
-        setField(data.field || null);
-        setExamDate(data.examDate ? new Date(data.examDate) : null);
+        const d = JSON.parse(raw);
+        setExamType(d.examType);
+        setField(d.field || null);
+        setExamDate(d.examDate ? new Date(d.examDate) : null);
+        setTargetRanking(d.targetRanking || null);
+        setTargetDepartment(d.targetDepartment || null);
       }
+      setHasSeenSlides(seenRaw === "true");
       setLoading(false);
     });
+  }, []);
+
+  useEffect(() => {
+    if (!session) {
+      setExamType(null);
+      setField(null);
+      setExamDate(null);
+      setTargetRanking(null);
+      setTargetDepartment(null);
+    }
+  }, [session]);
+
+  const markSlidesAsSeen = useCallback(() => {
+    setHasSeenSlides(true);
+    AsyncStorage.setItem(SLIDES_KEY, "true").catch(() => {});
   }, []);
 
   const updateExamConfig = useCallback(async (type, selectedField, date) => {
     setExamType(type);
     setField(selectedField || null);
     setExamDate(date);
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    const existing = raw ? JSON.parse(raw) : {};
     await AsyncStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ examType: type, field: selectedField || null, examDate: date?.toISOString() })
+      JSON.stringify({ ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() }),
     );
   }, []);
 
-  const onboardingDone = !!examType;
+  const updateGoal = useCallback(async (ranking, department) => {
+    setTargetRanking(ranking);
+    setTargetDepartment(department || null);
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    const existing = raw ? JSON.parse(raw) : {};
+    await AsyncStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
+    );
+  }, []);
+
+  const onboardingDone = !!examType && !!targetRanking;
 
   const daysUntilExam = examDate
     ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24)))
     : null;
 
   const value = {
-    examType,
-    field,
-    examDate,
-    daysUntilExam,
-    loading,
-    onboardingDone,
-    updateExamConfig,
+    examType, field, examDate, targetRanking, targetDepartment,
+    daysUntilExam, loading, onboardingDone, hasSeenSlides,
+    updateExamConfig, updateGoal, markSlidesAsSeen,
   };
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;

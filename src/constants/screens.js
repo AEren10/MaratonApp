@@ -7,6 +7,7 @@ export const SCREENS = {
   // Onboarding
   ONBOARDING: "Onboarding",
   EXAM_SETUP: "ExamSetup",
+  GOAL_SETUP: "GoalSetup",
 
   // Main Tabs
   HOME: "Home",

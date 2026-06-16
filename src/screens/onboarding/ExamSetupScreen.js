@@ -1,11 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 import { Icon, IconBox } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
+import { SCREENS } from "../../constants/screens";
 
 function buildExamOptions(C) {
   return [
@@ -21,7 +23,7 @@ function buildExamOptions(C) {
 function buildExamMonthOptions() {
   const now = new Date();
   const currentYear = now.getFullYear();
-  const beforeExamThisYear = now.getMonth() < 5; // before June
+  const beforeExamThisYear = now.getMonth() < 5;
   const startYear = beforeExamThisYear ? currentYear : currentYear + 1;
   return [
     `Haziran ${startYear}`,
@@ -32,19 +34,19 @@ function buildExamMonthOptions() {
 
 const MONTHS = buildExamMonthOptions();
 
-function ExamOption({ item, selected, onPress, styles, C }) {
+function ExamOption({ item, selected, onPress, C }) {
   const active = selected === item.id;
   return (
     <Pressable
       onPress={() => onPress(item.id)}
-      style={[styles.optionCard, active && { borderColor: item.color }]}
+      style={[styles.optionCard, { backgroundColor: C.surface, borderColor: active ? item.color : C.border }]}
     >
       <IconBox icon={item.icon} color={item.color} size={44} rounded={14} />
       <View style={{ flex: 1 }}>
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: active ? C.text : C.sec }]}>{item.label}</Text>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 2 }]}>{item.desc}</Text>
       </View>
-      <View style={[styles.radio, active && { borderColor: item.color }]}>
+      <View style={[styles.radio, { borderColor: active ? item.color : C.border }]}>
         {active && <View style={[styles.radioInner, { backgroundColor: item.color }]} />}
       </View>
     </Pressable>
@@ -53,7 +55,7 @@ function ExamOption({ item, selected, onPress, styles, C }) {
 
 export default function ExamSetupScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
+  const navigation = useNavigation();
   const EXAM_OPTIONS = useMemo(() => buildExamOptions(C), [C]);
   const { updateExamConfig } = useExam();
   const [selectedId, setSelectedId] = useState(null);
@@ -63,41 +65,41 @@ export default function ExamSetupScreen() {
 
   const finish = useCallback(() => {
     const opt = EXAM_OPTIONS.find((o) => o.id === selectedId);
-    if (!opt) {
-      Alert.alert("Hata", "Lütfen sınav türünü seç");
-      return;
-    }
+    if (!opt) return;
     const match = examDate.match(/(\d{4})/);
     const year = match ? parseInt(match[1], 10) : new Date().getFullYear() + 1;
     const date = new Date(year, 5, 15);
-    try {
-      updateExamConfig(opt.examType, opt.field, date).catch(() => {});
-    } catch (e) {
-      Alert.alert("Hata", e.message);
-    }
-  }, [selectedId, examDate, updateExamConfig, EXAM_OPTIONS]);
+    updateExamConfig(opt.examType, opt.field, date).catch(() => {});
+    navigation.navigate(SCREENS.GOAL_SETUP);
+  }, [selectedId, examDate, updateExamConfig, EXAM_OPTIONS, navigation]);
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+    <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Step indicator */}
+        <View style={styles.stepRow}>
+          <View style={[styles.stepDot, { backgroundColor: C.amber }]} />
+          <View style={[styles.stepDot, { backgroundColor: C.border }]} />
+        </View>
+
         <View style={styles.hero}>
           <IconBox icon="shield" color={C.amber} size={56} rounded={18} />
-          <Text style={styles.heroTitle}>Sinav Bilgilerin</Text>
-          <Text style={styles.heroDesc}>
-            Sana ozel calisma plani olusturabilmemiz icin sinav turunu ve tarihini sec.
+          <Text style={[styles.heroTitle, { color: C.text }]}>Sınav Bilgilerin</Text>
+          <Text style={[styles.heroDesc, { color: C.sec }]}>
+            Sana özel çalışma planı oluşturabilmemiz için sınav türünü ve tarihini seç.
           </Text>
         </View>
 
         <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-          SINAV TURU
+          SINAV TÜRÜ
         </Text>
 
         {EXAM_OPTIONS.map((opt) => (
-          <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={setSelectedId} styles={styles} C={C} />
+          <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={setSelectedId} C={C} />
         ))}
 
         <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }]}>
-          SINAV TARIHI
+          SINAV TARİHİ
         </Text>
 
         <View style={styles.dateRow}>
@@ -105,13 +107,11 @@ export default function ExamSetupScreen() {
             <Pressable
               key={m}
               onPress={() => setExamDate(m)}
-              style={[styles.dateChip, examDate === m && styles.dateActive]}
+              style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.amber : C.border },
+                examDate === m && { backgroundColor: C.amber + "10" }]}
             >
               <Icon name="calendar" size={14} color={examDate === m ? C.amber : C.muted} />
-              <Text style={[
-                TYPOGRAPHY.captionMedium,
-                { color: examDate === m ? C.text : C.sec },
-              ]}>
+              <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.sec }]}>
                 {m}
               </Text>
             </Pressable>
@@ -121,7 +121,7 @@ export default function ExamSetupScreen() {
 
       <Pressable
         onPress={finish}
-        style={[styles.continueBtn, !canContinue && { opacity: 0.4 }]}
+        style={[styles.continueBtn, { backgroundColor: C.amber, ...SHADOWS.amber }, !canContinue && { opacity: 0.4 }]}
         disabled={!canContinue}
       >
         <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Devam Et</Text>
@@ -131,44 +131,41 @@ export default function ExamSetupScreen() {
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 30 },
-    hero: {
-      alignItems: "center", paddingVertical: SPACING.xxxl,
-    },
-    heroTitle: {
-      ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg,
-    },
-    heroDesc: {
-      ...TYPOGRAPHY.body, color: C.sec, textAlign: "center",
-      marginTop: SPACING.sm, maxWidth: 300, lineHeight: 22,
-    },
-    optionCard: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.md,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      padding: SPACING.lg, marginBottom: SPACING.md,
-      borderWidth: 1.5, borderColor: C.border,
-    },
-    radio: {
-      width: 22, height: 22, borderRadius: 11,
-      borderWidth: 2, borderColor: C.border,
-      alignItems: "center", justifyContent: "center",
-    },
-    radioInner: { width: 12, height: 12, borderRadius: 6 },
-    dateRow: { flexDirection: "row", gap: SPACING.md },
-    dateChip: {
-      flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      paddingVertical: SPACING.lg, borderWidth: 1.5, borderColor: C.border,
-    },
-    dateActive: { borderColor: C.amber, backgroundColor: C.amber + "10" },
-    continueBtn: {
-      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-      backgroundColor: C.amber, borderRadius: RADIUS.xl,
-      marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
-      ...SHADOWS.amber,
-    },
-  });
-}
+const styles = StyleSheet.create({
+  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 30 },
+  stepRow: {
+    flexDirection: "row", justifyContent: "center", gap: 8,
+    paddingVertical: SPACING.lg,
+  },
+  stepDot: { width: 8, height: 8, borderRadius: 4 },
+  hero: { alignItems: "center", paddingVertical: SPACING.xl },
+  heroTitle: {
+    fontFamily: "SpaceGrotesk_700Bold", fontSize: 24,
+    letterSpacing: -0.5, marginTop: SPACING.lg,
+  },
+  heroDesc: {
+    ...TYPOGRAPHY.body, textAlign: "center",
+    marginTop: SPACING.sm, maxWidth: 300, lineHeight: 22,
+  },
+  optionCard: {
+    flexDirection: "row", alignItems: "center", gap: SPACING.md,
+    borderRadius: RADIUS.xl, padding: SPACING.lg,
+    marginBottom: SPACING.md, borderWidth: 1.5,
+  },
+  radio: {
+    width: 22, height: 22, borderRadius: 11,
+    borderWidth: 2, alignItems: "center", justifyContent: "center",
+  },
+  radioInner: { width: 12, height: 12, borderRadius: 6 },
+  dateRow: { flexDirection: "row", gap: SPACING.md },
+  dateChip: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
+    borderWidth: 1.5,
+  },
+  continueBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
+    borderRadius: RADIUS.xl,
+    marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
+  },
+});

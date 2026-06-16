@@ -28,11 +28,7 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "appleId": "",
-        "ascAppId": "",
-        "appleTeamId": ""
-      },
+      "ios": {},
       "android": {
         "serviceAccountKeyPath": "./pc-api-key.json",
         "track": "internal"

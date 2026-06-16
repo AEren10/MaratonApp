@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   FadeInDown, FadeIn, ZoomIn,
@@ -11,7 +10,7 @@ import Svg, { Circle, Path, Polyline, Line } from "react-native-svg";
 
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { SCREENS } from "../../constants/screens";
+import { useExam } from "../../contexts/ExamContext";
 import { Icon } from "../../components/design";
 
 const SLIDES = [
@@ -84,8 +83,8 @@ function SlideIcon({ name, size = 120, color = "#FFFFFF" }) {
 }
 
 export default function OnboardingScreen() {
-  const navigation = useNavigation();
   const C = useC();
+  const { markSlidesAsSeen } = useExam();
   const [index, setIndex] = useState(0);
 
   const slide = SLIDES[index];
@@ -110,15 +109,15 @@ export default function OnboardingScreen() {
 
   const goNext = useCallback(() => {
     if (isLast) {
-      navigation.replace(SCREENS.EXAM_SETUP);
+      markSlidesAsSeen();
     } else {
       setIndex((i) => i + 1);
     }
-  }, [isLast, navigation]);
+  }, [isLast, markSlidesAsSeen]);
 
   const skip = useCallback(() => {
-    navigation.replace(SCREENS.EXAM_SETUP);
-  }, [navigation]);
+    markSlidesAsSeen();
+  }, [markSlidesAsSeen]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>

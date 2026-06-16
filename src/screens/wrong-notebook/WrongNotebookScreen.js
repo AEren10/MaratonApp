@@ -28,42 +28,36 @@ function WrongSkeleton() {
   );
 }
 
-// === Filter chip atomu — kompakt ===
-function FilterPill({ label, count, active, color, onPress, C }) {
+function FilterPill({ label, count, active, color, onPress }) {
   return (
     <Pressable
       onPress={onPress}
       style={{
         flexDirection: "row",
         alignItems: "center",
-        gap: 4,
-        paddingHorizontal: 10,
-        paddingVertical: 6,
+        gap: 5,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
         borderRadius: 999,
-        backgroundColor: active ? color : color + "10",
+        backgroundColor: active ? color + "1A" : "transparent",
         borderWidth: 1,
-        borderColor: active ? color : color + "22",
+        borderColor: active ? color : color + "30",
       }}
     >
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: active ? "#FFFFFF" : color }}>
+      <Text style={{ fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium", fontSize: 12, color }}>
         {label}
       </Text>
       {count != null && count > 0 ? (
-        <View style={{
-          paddingHorizontal: 5, paddingVertical: 0,
-          borderRadius: 999,
-          backgroundColor: active ? "rgba(255,255,255,0.28)" : color + "1A",
-        }}>
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 10, color: active ? "#FFFFFF" : color }}>
-            {count}
-          </Text>
-        </View>
+        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: color + "99" }}>
+          {count}
+        </Text>
       ) : null}
     </Pressable>
   );
 }
 
-function SubjectFilterPill({ subKey, active, count, onPress, C }) {
+function SubjectFilterPill({ subKey, active, count, onPress }) {
+  const C = useC();
   const id = useSubjectIdentity(subKey);
   const color = id?.solid || C.purple;
   const labels = {
@@ -78,7 +72,6 @@ function SubjectFilterPill({ subKey, active, count, onPress, C }) {
       color={color}
       active={active}
       onPress={onPress}
-      C={C}
     />
   );
 }
@@ -363,7 +356,6 @@ export default function WrongNotebookScreen() {
           color={C.purple}
           active={subject === "all"}
           onPress={() => setSubjectAndReset("all")}
-          C={C}
         />
         {subjectKeys.map((key) => (
           <SubjectFilterPill
@@ -372,7 +364,6 @@ export default function WrongNotebookScreen() {
             count={subjectCounts[key]}
             active={subject === key}
             onPress={() => setSubjectAndReset(key)}
-            C={C}
           />
         ))}
       </ScrollView>
@@ -501,15 +492,17 @@ const s = StyleSheet.create({
   mainTabs: {
     flexDirection: "row",
     paddingHorizontal: 16,
-    gap: 24,
+    gap: 0,
     borderBottomWidth: 1,
     marginBottom: 12,
   },
   mainTab: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 6,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 2.5,
     borderBottomColor: "transparent",
   },

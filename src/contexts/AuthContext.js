@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "../supabase/client";
 import { signOut as supaSignOut } from "../supabase/auth";
 
@@ -35,6 +36,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       return;
     }
+    await AsyncStorage.removeItem("@exam_config");
     await supaSignOut();
   }, []);
 

@@ -164,7 +164,7 @@ export function CommunityTab({ visible }) {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: SPACING.md }}>
+        contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: SPACING.md, alignItems: "center" }}>
         {FILTERS.map((f) => {
           const subj = f.key !== "all" ? getSubjectByKey(f.key) : null;
           const clr = subj?.color || C.amber;

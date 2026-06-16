@@ -50,7 +50,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
       return;
     }
     const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       quality: 0.7,
       allowsEditing: true,
       aspect: [1, 1],
@@ -63,7 +63,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
       const path = await uploadAvatar(user.id, localUri);
       const url = getAvatarUrl(path);
       await updateProfile(user.id, { avatar_url: url });
-      setAvatarUri(url);
+      setAvatarUri(url + "?t=" + Date.now());
     } catch (e) {
       Alert.alert("Hata", "Avatar yüklenirken bir sorun oluştu.\n\n" + (e?.message || ""));
     } finally {

@@ -35,6 +35,7 @@ import TopicCardsScreen from "../screens/topics/TopicCardsScreen";
 import CardDetailScreen from "../screens/topics/CardDetailScreen";
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 import ExamSetupScreen from "../screens/onboarding/ExamSetupScreen";
+import GoalSetupScreen from "../screens/onboarding/GoalSetupScreen";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import StudyLogScreen from "../screens/study/StudyLogScreen";
 import SubjectDetailScreen from "../screens/analysis/SubjectDetailScreen";
@@ -96,6 +97,7 @@ const EBCardDetail = withEB(CardDetailScreen);
 const EBSettings = withEB(SettingsScreen);
 const EBOnboarding = withEB(OnboardingScreen);
 const EBExamSetup = withEB(ExamSetupScreen);
+const EBGoalSetup = withEB(GoalSetupScreen);
 const EBStudyLog = withEB(StudyLogScreen);
 const EBSubjectDetail = withEB(SubjectDetailScreen);
 const EBWeakAreas = withEB(WeakAreasScreen);
@@ -164,11 +166,19 @@ function AuthStack() {
   );
 }
 
-function OnboardingStack() {
+function SlidesStack() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name={SCREENS.ONBOARDING} component={EBOnboarding} />
+    </Stack.Navigator>
+  );
+}
+
+function SetupStack() {
+  return (
+    <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name={SCREENS.EXAM_SETUP} component={EBExamSetup} />
+      <Stack.Screen name={SCREENS.GOAL_SETUP} component={EBGoalSetup} />
       <Stack.Screen name="MainTabs" component={MainTabs} />
     </Stack.Navigator>
   );
@@ -192,6 +202,7 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.SETTINGS} component={EBSettings} />
       <Stack.Screen name={SCREENS.ONBOARDING} component={EBOnboarding} />
       <Stack.Screen name={SCREENS.EXAM_SETUP} component={EBExamSetup} />
+      <Stack.Screen name={SCREENS.GOAL_SETUP} component={EBGoalSetup} />
       <Stack.Screen name={SCREENS.STUDY_LOG} component={EBStudyLog} />
       <Stack.Screen name={SCREENS.SUBJECT_DETAIL} component={EBSubjectDetail} />
       <Stack.Screen name={SCREENS.WEAK_AREAS} component={EBWeakAreas} />
@@ -241,15 +252,17 @@ function Loading() {
 
 export default function AppNavigator() {
   const { session, loading } = useAuth();
-  const { onboardingDone, loading: examLoading } = useExam();
+  const { onboardingDone, hasSeenSlides, loading: examLoading } = useExam();
 
   if (loading || examLoading) return <Loading />;
 
   let content;
-  if (!session) {
+  if (!hasSeenSlides) {
+    content = <SlidesStack />;
+  } else if (!session) {
     content = <AuthStack />;
   } else if (!onboardingDone) {
-    content = <OnboardingStack />;
+    content = <SetupStack />;
   } else {
     content = <AppStack />;
   }
