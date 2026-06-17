@@ -71,7 +71,7 @@ export default function AddWrongScreen() {
         is_resolved: false,
         ...initialReview(),
       });
-      reward("question_solved", {
+      await reward("question_solved", {
         count: 1,
         statUpdates: [{ type: "increment", key: "totalQuestions" }],
       });

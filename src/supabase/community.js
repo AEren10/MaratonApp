@@ -17,6 +17,7 @@ async function uploadAnswerImage(userId, uri) {
   const ext = guessExt(uri);
   const path = `${userId}/${Date.now()}.${ext}`;
   const res = await fetch(uri);
+  if (!res.ok) throw new Error("Görsel yüklenemedi");
   const buffer = await res.arrayBuffer();
   const { data, error } = await supabase.storage
     .from("community-answers")

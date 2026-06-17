@@ -46,10 +46,10 @@ function CenterFab({ onPress, C }) {
           <View
             style={{
               width: 54, height: 54, borderRadius: 27,
-              backgroundColor: C.purple,
+              backgroundColor: C.accent,
               alignItems: "center", justifyContent: "center",
               marginTop: -18,
-              shadowColor: C.purple,
+              shadowColor: C.accent,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.32,
               shadowRadius: 14,
@@ -91,12 +91,12 @@ function TabItem({ tab, active, onPress, C }) {
       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }}
     >
       <Animated.View style={[{ alignItems: "center" }, iconStyle]}>
-        <Icon name={tab.icon} size={22} color={active ? C.purple : C.muted} sw={active ? 2.2 : 1.8} />
+        <Icon name={tab.icon} size={22} color={active ? C.accent : C.muted} sw={active ? 2.2 : 1.8} />
         <Animated.View
           style={[
             {
               width: 4, height: 4, borderRadius: 2,
-              backgroundColor: C.purple,
+              backgroundColor: C.accent,
               marginTop: 3,
             },
             dotStyle,
@@ -107,7 +107,7 @@ function TabItem({ tab, active, onPress, C }) {
         style={{
           fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
           fontSize: 10,
-          color: active ? C.purple : C.muted,
+          color: active ? C.accent : C.muted,
           marginTop: active ? 0 : 4,
         }}
       >

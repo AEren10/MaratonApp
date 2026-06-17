@@ -37,7 +37,10 @@ export default function ChallengeScreen() {
       const [ch, fr] = await Promise.all([listMyChallenges(user.id), listFriends(user.id)]);
       setChallenges(ch || []);
       setFriends(fr || []);
-    } catch {} finally { setLoading(false); }
+    } catch {
+      setChallenges([]);
+      setFriends([]);
+    } finally { setLoading(false); }
   }, [user?.id]);
 
   useEffect(() => { load(); }, [load]);

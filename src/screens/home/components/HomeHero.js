@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, {
   FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
 } from "react-native-reanimated";
-import { ProgressRing, AnimatedNumber, Icon } from "../../../components/design";
+import { ProgressRing, AnimatedNumber, Icon, SparkBurst } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
 
@@ -36,6 +36,13 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
   const pct = Math.min(1, solved / safeGoal);
   const done = solved >= safeGoal;
   const ringColor = done ? C.green : C.accent;
+
+  const [sparkVisible, setSparkVisible] = useState(false);
+  const prevDone = useRef(done);
+  useEffect(() => {
+    if (done && !prevDone.current) setSparkVisible(true);
+    prevDone.current = done;
+  }, [done]);
 
   const flame = useSharedValue(1);
   useEffect(() => {
@@ -78,6 +85,7 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
           </View>
           <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
         </ProgressRing>
+        <SparkBurst trigger={sparkVisible} onDone={() => setSparkVisible(false)} />
       </Pressable>
 
       <View style={[s.rail, { borderColor: C.border }]}>

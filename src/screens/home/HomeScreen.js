@@ -35,7 +35,7 @@ import { HomeHero } from "./components/HomeHero";
 import { PriorityCard } from "./components/PriorityCard";
 import { PlanCard } from "./components/PlanCard";
 import { RoundActions } from "./components/RoundActions";
-import { WeakCard } from "./components/WeakCard";
+import { FeedbackStack } from "./components/FeedbackCard";
 import { MotivCard } from "./components/MotivCard";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { DailyActionCard } from "./components/DailyActionCard";
@@ -196,6 +196,7 @@ export default function HomeScreen() {
     setRefreshing(true);
     try {
       await refresh();
+    } catch {
     } finally {
       setRefreshing(false);
     }
@@ -303,13 +304,24 @@ export default function HomeScreen() {
                 onLater={() => dismissAction(false)}
               />
             </AnimatedCard>
-          ) : nudges.length > 0 ? (
-            <AnimatedCard delay={300}>
-              <WeakCard message={nudges[0].message} onPress={() => setNudgeVisible(true)} />
-            </AnimatedCard>
           ) : null}
+
           </View>
         </View>
+
+        {nudges.length > 0 ? (
+          <View style={{ marginTop: 28 }}>
+            <SectionLabel>GERİ BİLDİRİM</SectionLabel>
+            <FeedbackStack
+              nudges={nudges}
+              max={3}
+              onAction={(nudge) => {
+                if (nudge.subject) navigation.navigate(SCREENS.ANALYSIS);
+                else navigation.navigate(SCREENS.PLAN_DETAIL);
+              }}
+            />
+          </View>
+        ) : null}
       </ScrollView>
 
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />

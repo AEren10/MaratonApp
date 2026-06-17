@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY } from "../../../themes/tokens";
+import { TYPOGRAPHY, RADIUS } from "../../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
 
@@ -29,35 +30,37 @@ export function PriorityCard({ task, plan, onStart }) {
 
   const onStartHandler = () => { haptic.tap(); onStart?.(); };
 
+  const gradientColors = [tier.color, tier.color + "BB"];
+
   return (
-    <View style={[s.card, { backgroundColor: tier.bg, borderColor: tier.color + "26" }]}>
+    <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.card}>
       <View style={s.headRow}>
-        <View style={[s.tierChip, { backgroundColor: tier.color }]}>
+        <View style={[s.tierChip, { backgroundColor: "rgba(255,255,255,0.22)" }]}>
           <Text style={[s.tierText, { color: "#FFFFFF" }]}>{tier.label}</Text>
         </View>
-        <Text style={[s.label, { color: tier.color }]}>BUGÜNÜN ÖNCELİĞİ</Text>
+        <Text style={[s.label, { color: "rgba(255,255,255,0.8)" }]}>BUGÜNÜN ÖNCELİĞİ</Text>
       </View>
 
-      <Text style={[s.title, { color: C.text }]} numberOfLines={2}>{title}</Text>
-      <Text style={[s.reason, { color: C.sec }]} numberOfLines={2}>{reason}</Text>
+      <Text style={[s.title, { color: "#FFFFFF" }]} numberOfLines={2}>{title}</Text>
+      <Text style={[s.reason, { color: "rgba(255,255,255,0.75)" }]} numberOfLines={2}>{reason}</Text>
 
       <Pressable
         onPress={onStartHandler}
         style={({ pressed }) => [
           s.btn,
-          { backgroundColor: tier.color },
+          { backgroundColor: "rgba(255,255,255,0.22)" },
           pressed && { opacity: 0.92, transform: [{ scale: 0.98 }] },
         ]}
       >
         <Text style={s.btnText}>Çalışmaya Başla</Text>
         <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />
       </Pressable>
-    </View>
+    </LinearGradient>
   );
 }
 
 const s = StyleSheet.create({
-  card: { borderRadius: 28, padding: 20, borderWidth: 1 },
+  card: { borderRadius: RADIUS.xxl, padding: 20, overflow: "hidden" },
   headRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 },
   tierChip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 },
   tierText: { ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold", letterSpacing: 0.8 },
@@ -66,7 +69,7 @@ const s = StyleSheet.create({
   reason: { ...TYPOGRAPHY.caption, marginTop: 6, lineHeight: 18 },
   btn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    borderRadius: 16, paddingVertical: 15, marginTop: 18,
+    borderRadius: RADIUS.xl, paddingVertical: 15, marginTop: 18,
   },
   btnText: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#FFFFFF" },
 });

@@ -41,7 +41,7 @@ export function DenemeCard({ data, onPress }) {
             key={i}
             style={{
               flex: 1,
-              height: `${30 + b.v * 70}%`,
+              height: Math.max(4, 26 * (0.3 + b.v * 0.7)),
               backgroundColor: b.c,
               borderRadius: 4,
               opacity: 0.9,

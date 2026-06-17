@@ -34,7 +34,8 @@ export function getLevelForXP(totalXP) {
       break;
     }
   }
-  const next = LEVELS[current.level] || null;
+  const nextIdx = LEVELS.findIndex((l) => l.xp > current.xp);
+  const next = nextIdx !== -1 ? LEVELS[nextIdx] : null;
   const xpInLevel = totalXP - current.xp;
   const xpForNext = next ? next.xp - current.xp : 0;
   const progress = xpForNext > 0 ? xpInLevel / xpForNext : 1;

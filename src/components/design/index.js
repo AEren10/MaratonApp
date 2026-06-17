@@ -14,3 +14,4 @@ export { SectionLabel } from "./SectionLabel";
 export { HexBadge } from "./HexBadge";
 export { Spot } from "./Spot";
 export { GlowBackground, WARM_GLOW } from "./GlowBackground";
+export { SparkBurst } from "./SparkBurst";

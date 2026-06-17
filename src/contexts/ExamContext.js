@@ -23,16 +23,19 @@ export function ExamProvider({ children }) {
       AsyncStorage.getItem(SLIDES_KEY),
     ]).then(([raw, seenRaw]) => {
       if (raw) {
-        const d = JSON.parse(raw);
-        setExamType(d.examType);
-        setField(d.field || null);
-        setExamDate(d.examDate ? new Date(d.examDate) : null);
-        setTargetRanking(d.targetRanking || null);
-        setTargetDepartment(d.targetDepartment || null);
+        try {
+          const d = JSON.parse(raw);
+          setExamType(d.examType);
+          setField(d.field || null);
+          setExamDate(d.examDate ? new Date(d.examDate) : null);
+          setTargetRanking(d.targetRanking || null);
+          setTargetDepartment(d.targetDepartment || null);
+        } catch {}
       }
       setHasSeenSlides(seenRaw === "true");
-      setLoading(false);
-    });
+    })
+    .catch(() => {})
+    .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -54,23 +57,27 @@ export function ExamProvider({ children }) {
     setExamType(type);
     setField(selectedField || null);
     setExamDate(date);
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    const existing = raw ? JSON.parse(raw) : {};
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() }),
-    );
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : {};
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() }),
+      );
+    } catch {}
   }, []);
 
   const updateGoal = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    const existing = raw ? JSON.parse(raw) : {};
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
-    );
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : {};
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
+      );
+    } catch {}
   }, []);
 
   const onboardingDone = !!examType && !!targetRanking;

@@ -5,7 +5,7 @@ import { loadGoalsFromStorage } from "./slices/goalsSlice";
 export function ReduxHydrator() {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    loadGoalsFromStorage(dispatch);
+    loadGoalsFromStorage(dispatch).catch(() => {});
   }, [dispatch]);
   return null;
 }

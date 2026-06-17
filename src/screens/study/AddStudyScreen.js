@@ -109,7 +109,14 @@ export default function AddStudyScreen() {
         }
       } catch (_) {}
     } else if (result.queued) {
-      Alert.alert("Çevrimdışı", "Internet yok, kayıt bağlantı geldiğinde otomatik gönderilecek.");
+      const msg = result.error?.message || "";
+      const isNetwork = msg.includes("network") || msg.includes("fetch") || msg.includes("Failed to fetch");
+      Alert.alert(
+        isNetwork ? "Çevrimdışı" : "Kayıt beklemede",
+        isNetwork
+          ? "İnternet yok, kayıt bağlantı geldiğinde otomatik gönderilecek."
+          : "Kayıt sıraya alındı, kısa süre içinde gönderilecek."
+      );
     }
     setSaving(false);
 

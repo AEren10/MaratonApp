@@ -41,14 +41,17 @@ export default function QuickPracticeScreen() {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    if (!user?.id) { setLoading(false); return; }
     (async () => {
-      const data = await getDueWrongQuestions(user.id);
-      setQuestions(shuffle(data).slice(0, TOTAL));
+      try {
+        const data = await getDueWrongQuestions(user.id);
+        setQuestions(shuffle(data || []).slice(0, TOTAL));
+      } catch {}
       setLoading(false);
       timerRef.current = setInterval(() => setElapsed((t) => t + 1), 1000);
     })();
-    return () => clearInterval(timerRef.current);
-  }, [user.id]);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [user?.id]);
 
   const done = idx >= questions.length && questions.length > 0;
   const score = results.filter((r) => r).length;

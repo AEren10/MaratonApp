@@ -61,7 +61,7 @@ export default function ProfileScreen() {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   const { examType, field, daysUntilExam } = useExam();
-  const { subjects } = useCurriculum();
+  const { subjects = [] } = useCurriculum();
   const level = useAppSelector(selectLevel);
   const totalXP = useAppSelector(selectXP);
   const unlockedIds = useAppSelector(selectBadgeIds);

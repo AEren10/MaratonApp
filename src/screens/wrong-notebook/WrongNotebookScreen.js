@@ -99,11 +99,13 @@ export default function WrongNotebookScreen() {
     try {
       const data = await getWrongQuestions(user.id);
       setItems(data || []);
+      const results = await Promise.allSettled(
+        (data || []).map((it) => isQuestionShared(it.id).catch(() => false)),
+      );
       const ids = new Set();
-      for (const it of data || []) {
-        const yes = await isQuestionShared(it.id).catch(() => false);
-        if (yes) ids.add(it.id);
-      }
+      results.forEach((r, i) => {
+        if (r.status === "fulfilled" && r.value) ids.add(data[i].id);
+      });
       setSharedIds(ids);
     } catch {}
     setLoading(false);

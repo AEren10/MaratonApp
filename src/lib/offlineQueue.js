@@ -23,13 +23,18 @@ async function writeQueue(items) {
   } catch (_) {}
 }
 
+const MAX_QUEUE_SIZE = 200;
+
 export async function enqueue(op) {
-  const list = await readQueue();
+  let list = await readQueue();
   list.push({
     ...op,
     queuedAt: Date.now(),
     id: `${op.type}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
   });
+  if (list.length > MAX_QUEUE_SIZE) {
+    list = list.slice(-MAX_QUEUE_SIZE);
+  }
   await writeQueue(list);
 }
 
@@ -78,6 +83,13 @@ export async function clearQueue() {
 }
 
 // Save with offline fallback. Returns { saved: boolean, queued: boolean }
+export async function getPendingStudyLogs() {
+  const list = await readQueue();
+  return list
+    .filter((item) => item.type === OP_STUDY_LOG)
+    .map((item) => item.payload);
+}
+
 export async function saveStudyLogOffline(payload) {
   try {
     await addStudyLog(payload);

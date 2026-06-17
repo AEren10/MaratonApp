@@ -140,10 +140,16 @@ export default function StudyTimerScreen() {
           return next;
         });
       }, 1000);
-    } else {
+    } else if (interval.current) {
       clearInterval(interval.current);
+      interval.current = null;
     }
-    return () => clearInterval(interval.current);
+    return () => {
+      if (interval.current) {
+        clearInterval(interval.current);
+        interval.current = null;
+      }
+    };
   }, [running, isPomodoro, phaseTargetSec, advancePhase]);
 
   // Track total focus seconds for FREE mode based on elapsed.

@@ -5,7 +5,7 @@ import { signOut as supaSignOut } from "../supabase/auth";
 
 const AuthContext = createContext(null);
 
-const DEV_BYPASS = false;
+const DEV_BYPASS = __DEV__ && process.env.EXPO_PUBLIC_DEV_AUTH === "true";
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(DEV_BYPASS ? { user: { id: "dev" } } : null);
@@ -14,11 +14,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (DEV_BYPASS) return;
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session: s } }) => {
+        setSession(s);
+        setUser(s?.user ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
 
     const {
       data: { subscription },

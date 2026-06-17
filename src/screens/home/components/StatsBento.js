@@ -20,9 +20,9 @@ export function StatsBento({ deneme = {}, streak = {}, league = {}, live = {}, o
               <Icon name="flame" size={20} color={PASTEL.peach.solid} />
             </View>
             {streak.freezeCount > 0 ? (
-              <View style={[s.joker, { backgroundColor: PASTEL.sky.tint }]}>
-                <Icon name="shield" size={10} color={PASTEL.sky.solid} />
-                <Text style={[s.jokerText, { color: PASTEL.sky.solid }]}>{streak.freezeCount}</Text>
+              <View style={[s.joker, { backgroundColor: PASTEL.blue.tint }]}>
+                <Icon name="shield" size={10} color={PASTEL.blue.solid} />
+                <Text style={[s.jokerText, { color: PASTEL.blue.solid }]}>{streak.freezeCount}</Text>
               </View>
             ) : null}
           </View>

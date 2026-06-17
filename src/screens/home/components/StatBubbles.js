@@ -2,6 +2,7 @@ import { Text, Pressable, View, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { AnimatedNumber, Icon } from "../../../components/design";
 import { TYPOGRAPHY } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 // 3 solid sıcak baloncuk — dolu renk + beyaz içerik. Canlı, kart kart bağımsız.
 function Bubble({ delay, color, value, label, decimals, trend, icon, onPress }) {
@@ -28,11 +29,12 @@ function Bubble({ delay, color, value, label, decimals, trend, icon, onPress }) 
 }
 
 export function StatBubbles({ streak = 0, net = 0, trend = 0, xp = 0, tier = "Bronz", onStreak, onNet, onLeague }) {
+  const C = useC();
   return (
     <View style={s.row}>
-      <Bubble delay={60}  color="#FF5A3C" value={streak} label="gün seri"     icon="flame"  onPress={onStreak} />
-      <Bubble delay={140} color="#2E8BFF" value={net} decimals trend={trend} label="son net" icon="chart" onPress={onNet} />
-      <Bubble delay={220} color="#8B5CF6" value={xp} label={`${tier} · XP`}   icon="trophy" onPress={onLeague} />
+      <Bubble delay={60}  color={C.accent} value={streak} label="gün seri"     icon="flame"  onPress={onStreak} />
+      <Bubble delay={140} color={C.blue}   value={net} decimals trend={trend} label="son net" icon="chart" onPress={onNet} />
+      <Bubble delay={220} color={C.purple} value={xp} label={`${tier} · XP`}   icon="trophy" onPress={onLeague} />
     </View>
   );
 }

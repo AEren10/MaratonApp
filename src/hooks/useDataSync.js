@@ -8,7 +8,7 @@ import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
 import { getStreak } from "../supabase/streaks";
 import { getProfile } from "../supabase/profiles";
-import { flushQueue } from "../lib/offlineQueue";
+import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
 
 async function loadAll(userId, dispatch) {
   // Try to flush any pending offline operations first
@@ -60,7 +60,23 @@ async function loadAll(userId, dispatch) {
       duration: l.duration_minutes,
       study_date: l.study_date,
     }));
-    dispatch(setTodayLogs(mapped));
+
+    const todayStr = new Date().toISOString().split("T")[0];
+    const pending = await getPendingStudyLogs().catch(() => []);
+    const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}`));
+    const pendingToday = pending
+      .filter((p) => p.study_date === todayStr)
+      .filter((p) => !existingIds.has(`${p.subject}_${p.topic}_${p.question_count}`))
+      .map((p, i) => ({
+        id: `pending_${i}`,
+        subject: p.subject,
+        topic: p.topic,
+        questionCount: p.question_count,
+        duration: p.duration_minutes,
+        study_date: p.study_date,
+      }));
+
+    dispatch(setTodayLogs([...mapped, ...pendingToday]));
   }
 
   // DB'deki daily_question_goal varsa AsyncStorage'ı geçersiz kıl.
@@ -78,9 +94,11 @@ export function useDataSync() {
     if (!user?.id || user.id === "dev") return;
     let cancelled = false;
     setSyncing(true);
-    loadAll(user.id, dispatch).finally(() => {
-      if (!cancelled) setSyncing(false);
-    });
+    loadAll(user.id, dispatch)
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setSyncing(false);
+      });
     return () => { cancelled = true; };
   }, [user?.id, dispatch]);
 

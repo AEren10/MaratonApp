@@ -37,7 +37,7 @@ export function computeStreakUpdate(streakData, now = new Date()) {
   // Haftalık joker yenilemesi
   let freezeCount = streakData?.freeze_count ?? 1;
   let freezeResetAt = streakData?.freeze_reset_at ? new Date(streakData.freeze_reset_at) : null;
-  if (!freezeResetAt || freezeResetAt <= now) {
+  if (!freezeResetAt || freezeResetAt.getTime() <= now.getTime()) {
     freezeCount = 1;
     freezeResetAt = nextMondayReset(now);
   }
