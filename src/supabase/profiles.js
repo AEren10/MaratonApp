@@ -20,3 +20,15 @@ export const updateProfile = async (userId, updates) => {
   if (error) throw error;
   return data;
 };
+
+export const updateExamConfig = async (userId, config) => {
+  return updateProfile(userId, {
+    exam_type: config.examType,
+    field: config.field || null,
+    exam_date: config.examDate
+      ? config.examDate.toISOString().split("T")[0]
+      : null,
+    target_ranking: config.targetRanking || null,
+    target_department: config.targetDepartment || null,
+  });
+};

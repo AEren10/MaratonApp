@@ -107,6 +107,17 @@ export function getTrialTypeList(C) {
   return Object.values(getTrialTypes(C));
 }
 
+export function getSubjectsForBranch(C, examType, field) {
+  if (!examType || examType === "lgs") return getTYTSubjects(C);
+  const subjects = [...getTYTSubjects(C)];
+  if (examType === "tyt_ayt") {
+    if (field === "sayisal") subjects.push(...getAYTSaySubjects(C));
+    else if (field === "ea") subjects.push(...getAYTEASubjects(C));
+    else if (field === "sozel") subjects.push(...getAYTSozSubjects(C));
+  }
+  return subjects;
+}
+
 export function getTrialTypesForField(C, field) {
   const all = getTrialTypeList(C);
   if (!field) return all;

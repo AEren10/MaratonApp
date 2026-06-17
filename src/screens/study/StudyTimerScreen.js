@@ -16,6 +16,7 @@ import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
+import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 
 function buildModes(C) {
@@ -84,6 +85,7 @@ export default function StudyTimerScreen() {
   const [running, setRunning] = useState(false);
   const [totalFocusSeconds, setTotalFocusSeconds] = useState(0);
   const [questions, setQuestions] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [saving, setSaving] = useState(false);
   const interval = useRef(null);
 
@@ -172,7 +174,18 @@ export default function StudyTimerScreen() {
     setQuestions((p) => p + 1);
     Haptics.selectionAsync().catch(() => {});
   }, []);
-  const removeQ = useCallback(() => setQuestions((p) => Math.max(0, p - 1)), []);
+  const removeQ = useCallback(() => {
+    setQuestions((p) => {
+      const next = Math.max(0, p - 1);
+      setCorrectCount((c) => Math.min(c, next));
+      return next;
+    });
+  }, []);
+  const addCC = useCallback(() => {
+    setCorrectCount((c) => Math.min(c + 1, questions));
+    Haptics.selectionAsync().catch(() => {});
+  }, [questions]);
+  const removeCC = useCallback(() => setCorrectCount((c) => Math.max(0, c - 1)), []);
 
   const pct = Math.min(elapsed / phaseTargetSec, 1);
 
@@ -221,11 +234,24 @@ export default function StudyTimerScreen() {
     const minutes = Math.max(1, Math.round(focusForSave / 60));
     const todayStr = new Date().toISOString().split("T")[0];
 
+    const parsed = studyLogSchema.safeParse({
+      subject: subject.key,
+      topic,
+      questionCount: questions,
+      correctCount,
+      duration: minutes,
+    });
+    if (!parsed.success) {
+      Alert.alert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
+      return;
+    }
+
     dispatch(addLog({
       id: Date.now().toString(),
       subject: subject.key,
       topic,
       questionCount: questions,
+      correctCount,
       duration: minutes,
       study_date: todayStr,
     }));
@@ -237,7 +263,7 @@ export default function StudyTimerScreen() {
         subject: subject.key,
         topic,
         question_count: questions,
-        correct_count: 0,
+        correct_count: correctCount,
         duration_minutes: minutes,
         study_date: todayStr,
       });
@@ -261,7 +287,7 @@ export default function StudyTimerScreen() {
       duration: minutes,
       questions,
     });
-  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, subject, topic, user, dispatch, reward, navigation, saving]);
+  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, correctCount, subject, topic, user, dispatch, reward, navigation, saving]);
 
   const exit = useCallback(() => {
     if (elapsed >= 30 || totalFocusSeconds >= 30) {
@@ -361,6 +387,22 @@ export default function StudyTimerScreen() {
             </Pressable>
           </View>
         </View>
+        {questions > 0 && (
+          <View style={styles.questionRow}>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>Doğru sayısı</Text>
+            <View style={styles.stepper}>
+              <Pressable onPress={removeCC} hitSlop={8} style={styles.stepBtn}>
+                <Text style={[TYPOGRAPHY.subheading, { color: C.muted }]}>-</Text>
+              </Pressable>
+              <Text style={[TYPOGRAPHY.statSmall, { color: C.text, minWidth: 40, textAlign: "center" }]}>
+                {correctCount}
+              </Text>
+              <Pressable onPress={addCC} hitSlop={8} style={styles.stepBtn}>
+                <Text style={[TYPOGRAPHY.subheading, { color: C.green }]}>+</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
       </View>
 
       <Pressable

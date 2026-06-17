@@ -25,9 +25,12 @@ export const trialEntrySchema = z.object({
 
 export const studyLogSchema = z.object({
   subject: z.string().min(1),
-  topic: z.string().optional(),
-  questionCount: z.number().min(0).optional(),
-  correctCount: z.number().min(0).optional(),
-  duration: z.number().min(0).optional(),
-  note: z.string().optional(),
-});
+  topic: z.string().min(1),
+  questionCount: z.number().int().min(0).max(1000).optional(),
+  correctCount: z.number().int().min(0).max(1000).optional(),
+  duration: z.number().int().min(1).max(720),
+  notes: z.string().max(140).optional(),
+}).refine(
+  (d) => !d.correctCount || !d.questionCount || d.correctCount <= d.questionCount,
+  { message: "Doğru sayısı soru sayısından büyük olamaz", path: ["correctCount"] },
+);

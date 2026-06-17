@@ -26,6 +26,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
+import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 
 const DURATIONS = [15, 30, 45, 60, 90, 120];
@@ -43,6 +44,7 @@ export default function AddStudyScreen() {
   const [topic, setTopic]       = useState("");
   const [topicPickerOpen, setTopicPickerOpen] = useState(false);
   const [questionCount, setQC]  = useState("");
+  const [correctCount, setCC]   = useState("");
   const [duration, setDuration] = useState(null);
   const [notes, setNotes]       = useState("");
   const [saving, setSaving]     = useState(false);
@@ -74,11 +76,27 @@ export default function AddStudyScreen() {
 
     const todayStr = new Date().toISOString().split("T")[0];
     const qc = parseInt(questionCount, 10) || 0;
+    const cc = parseInt(correctCount, 10) || 0;
+
+    const parsed = studyLogSchema.safeParse({
+      subject: subjectKey,
+      topic: topic.trim(),
+      questionCount: qc,
+      correctCount: cc,
+      duration,
+      notes: notes.trim() || undefined,
+    });
+    if (!parsed.success) {
+      Alert.alert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
+      return;
+    }
+
     const localLog = {
       id: Date.now().toString(),
       subject: subjectKey,
       topic: topic.trim(),
       questionCount: qc,
+      correctCount: cc,
       duration,
       notes,
       examTier,
@@ -92,9 +110,10 @@ export default function AddStudyScreen() {
       subject: subjectKey,
       topic: topic.trim(),
       question_count: qc,
-      correct_count: 0,
+      correct_count: cc,
       duration_minutes: duration,
       study_date: todayStr,
+      notes: notes.trim() || null,
     });
 
     if (result.saved) {
@@ -135,7 +154,7 @@ export default function AddStudyScreen() {
       duration,
       questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, duration, questionCount, notes, examTier, user, dispatch, reward, navigation]);
+  }, [saving, canSave, subjectKey, topic, duration, questionCount, correctCount, notes, examTier, user, dispatch, reward, navigation]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -285,13 +304,29 @@ export default function AddStudyScreen() {
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>ÇÖZÜLEN SORU (opsiyonel)</Text>
           <TextInput
             value={questionCount}
-            onChangeText={(t) => setQC(t.replace(/[^0-9]/g, ""))}
+            onChangeText={(t) => { setQC(t.replace(/[^0-9]/g, "")); if (!t) setCC(""); }}
             placeholder="0"
             placeholderTextColor={C.muted}
             keyboardType="number-pad"
             maxLength={4}
             style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
           />
+
+          {/* === Doğru sayısı (sadece soru varsa) === */}
+          {parseInt(questionCount, 10) > 0 && (
+            <>
+              <Text style={[s.label, { color: C.muted, marginTop: 14 }]}>DOĞRU SAYISI (opsiyonel)</Text>
+              <TextInput
+                value={correctCount}
+                onChangeText={(t) => setCC(t.replace(/[^0-9]/g, ""))}
+                placeholder="0"
+                placeholderTextColor={C.muted}
+                keyboardType="number-pad"
+                maxLength={4}
+                style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
+              />
+            </>
+          )}
 
           {/* === Not === */}
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>NOT (opsiyonel)</Text>

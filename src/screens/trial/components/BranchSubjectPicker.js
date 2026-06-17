@@ -3,7 +3,8 @@ import { View, Text, Pressable } from "react-native";
 import { Icon, IconBox } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { getAllSubjects } from "../trialTypes";
+import { useExam } from "../../../contexts/ExamContext";
+import { getSubjectsForBranch } from "../trialTypes";
 
 const makeStyles = (C) => ({
   wrap: {
@@ -55,8 +56,9 @@ const makeStyles = (C) => ({
 // Alt alta dizilmiş ders kartları — TYT/AYT chip etiketli, kompakt.
 export function BranchSubjectPicker({ value, onChange }) {
   const C = useC();
+  const { examType, field } = useExam();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const ALL_SUBJECTS = useMemo(() => getAllSubjects(C), [C]);
+  const ALL_SUBJECTS = useMemo(() => getSubjectsForBranch(C, examType, field), [C, examType, field]);
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>HANGİ DERS?</Text>
