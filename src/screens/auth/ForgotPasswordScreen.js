@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import {
-  View, Text, Pressable, Alert,
+  View, Text, Pressable,
   KeyboardAvoidingView, Platform, ScrollView, StyleSheet,
 } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
@@ -10,9 +11,12 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { resetPassword } from "../../supabase/auth";
 import { AuthInput } from "./components/AuthInput";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function ForgotPasswordScreen() {
   const C = useC();
+  const showAlert = useAlert();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -31,9 +35,11 @@ export default function ForgotPasswordScreen() {
     setBusy(true);
     try {
       await resetPassword(email);
+      H.success();
       setSent(true);
     } catch (err) {
-      Alert.alert("Hata", err.message ?? "Bir sorun oldu");
+      H.error();
+      showAlert("Hata", err.message ?? "Bir sorun oldu");
     } finally {
       setBusy(false);
     }
@@ -53,44 +59,54 @@ export default function ForgotPasswordScreen() {
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
 
-          <View style={s.iconWrap}>
-            <Icon name="lock" size={56} color={C.amber} />
-          </View>
+          <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
+            <View style={s.iconWrap}>
+              <Icon name="lock" size={56} color={C.amber} />
+            </View>
+          </Animated.View>
 
-          <Text style={s.title}>Sifreni Sifirla</Text>
-          <Text style={s.subtitle}>
-            E-posta adresini gir, sifre sifirlama baglantisi gonderelim.
-          </Text>
+          <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
+            <Text style={s.title}>Sifreni Sifirla</Text>
+            <Text style={s.subtitle}>
+              E-posta adresini gir, sifre sifirlama baglantisi gonderelim.
+            </Text>
+          </Animated.View>
 
           {sent ? (
-            <View style={s.successBox}>
-              <Icon name="checkCircle" size={28} color={C.green} />
-              <Text style={s.successText}>
-                E-posta gonderildi! Gelen kutunu kontrol et.
-              </Text>
-            </View>
+            <Animated.View entering={FadeInDown.delay(260).duration(400).springify()}>
+              <View style={s.successBox}>
+                <Icon name="checkCircle" size={28} color={C.green} />
+                <Text style={s.successText}>
+                  E-posta gonderildi! Gelen kutunu kontrol et.
+                </Text>
+              </View>
+            </Animated.View>
           ) : (
             <>
-              <AuthInput
-                label="E-posta"
-                value={email}
-                onChangeText={setEmail}
-                placeholder="ornek@mail.com"
-                keyboardType="email-address"
-                error={error}
-              />
-              <Pressable
-                onPress={submit}
-                disabled={busy}
-                style={({ pressed }) => [
-                  s.btn,
-                  { opacity: busy ? 0.6 : pressed ? 0.85 : 1 },
-                ]}
-              >
-                <Text style={s.btnText}>
-                  {busy ? "Gonderiliyor..." : "Sifirlama Linki Gonder"}
-                </Text>
-              </Pressable>
+              <Animated.View entering={FadeInDown.delay(260).duration(400).springify()}>
+                <AuthInput
+                  label="E-posta"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="ornek@mail.com"
+                  keyboardType="email-address"
+                  error={error}
+                />
+              </Animated.View>
+              <Animated.View entering={FadeInDown.delay(340).duration(400).springify()}>
+                <Pressable
+                  onPress={submit}
+                  disabled={busy}
+                  style={({ pressed }) => [
+                    s.btn,
+                    { opacity: busy ? 0.6 : pressed ? 0.85 : 1 },
+                  ]}
+                >
+                  <Text style={s.btnText}>
+                    {busy ? "Gonderiliyor..." : "Sifirlama Linki Gonder"}
+                  </Text>
+                </Pressable>
+              </Animated.View>
             </>
           )}
         </ScrollView>

@@ -1,16 +1,19 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { View, Text, Pressable, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { listMyChallenges, createChallenge, cancelChallenge } from "../../supabase/challenges";
 import { listFriends } from "../../supabase/friends";
 import { SCREENS } from "../../constants/screens";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 const METRICS = [
   { key: "questions", label: "Soru Sayısı", icon: "hash", targets: [100, 250, 500] },
@@ -23,6 +26,7 @@ export default function ChallengeScreen() {
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
+  const showAlert = useAlert();
   const [tab, setTab] = useState("active");
   const [challenges, setChallenges] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -49,9 +53,10 @@ export default function ChallengeScreen() {
     if (!pick.friend || !pick.metric || !pick.target) return;
     try {
       await createChallenge({ opponentId: pick.friend.id, metric: pick.metric, target: pick.target });
+      H.success();
       setCreating(false); setStep(0); setPick({ friend: null, metric: null, target: null });
       load();
-    } catch { Alert.alert("Hata", "Challenge oluşturulamadı"); }
+    } catch { H.error(); showAlert("Hata", "Challenge oluşturulamadı"); }
   }, [pick, load]);
 
   const handleCancel = useCallback(async (id) => {
@@ -75,9 +80,9 @@ export default function ChallengeScreen() {
         </View>
         <View style={{ padding: SPACING.lg, gap: SPACING.lg }}>
           {step === 0 && (
-            <Animated.View entering={FadeInDown} style={{ gap: SPACING.md }}>
+            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Arkadaş Seç</Text>
-              {friends.length === 0 ? <Text style={s.empty}>Henüz arkadaşın yok</Text> : friends.map((f) => (
+              {friends.length === 0 ? <EmptyState icon="users" title="Henüz arkadaşın yok" message="Challenge başlatmak için arkadaş ekle" /> : friends.map((f) => (
                 <Pressable key={f.id} onPress={() => { setPick((p) => ({ ...p, friend: f })); setStep(1); }}
                   style={[s.optionRow, pick.friend?.id === f.id && { borderColor: C.amber }]}>
                   <Icon name="user" size={16} color={C.sec} />
@@ -87,7 +92,7 @@ export default function ChallengeScreen() {
             </Animated.View>
           )}
           {step === 1 && (
-            <Animated.View entering={FadeInDown} style={{ gap: SPACING.md }}>
+            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Metrik Seç</Text>
               {METRICS.map((m) => (
                 <Pressable key={m.key} onPress={() => { setPick((p) => ({ ...p, metric: m.key })); setStep(2); }}
@@ -99,7 +104,7 @@ export default function ChallengeScreen() {
             </Animated.View>
           )}
           {step === 2 && (
-            <Animated.View entering={FadeInDown} style={{ gap: SPACING.md }}>
+            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Hedef Seç</Text>
               {(METRICS.find((m) => m.key === pick.metric)?.targets || []).map((t) => (
                 <Pressable key={t} onPress={() => { setPick((p) => ({ ...p, target: t })); }}
@@ -127,52 +132,61 @@ export default function ChallengeScreen() {
         <Pressable onPress={() => setCreating(true)} hitSlop={12}><Icon name="plus" size={20} color={C.amber} /></Pressable>
       </View>
 
-      <View style={s.tabs}>
+      <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.tabs}>
         {["active", "past"].map((t) => (
           <Pressable key={t} onPress={() => setTab(t)} style={[s.tab, tab === t && { backgroundColor: C.amber + "18" }]}>
             <Text style={[s.tabText, tab === t && { color: C.amber }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
           </Pressable>
         ))}
-      </View>
+      </Animated.View>
 
       <FlatList
         data={shown}
         keyExtractor={(i) => i.id}
         contentContainerStyle={{ padding: SPACING.lg, gap: SPACING.md }}
-        ListEmptyComponent={<Text style={s.empty}>Henüz challenge yok</Text>}
-        renderItem={({ item }) => {
-          const isCreator = item.creator_id === user.id;
-          const opponent = isCreator ? item.opponent : item.creator;
-          const myProgress = isCreator ? item.creator_progress : item.opponent_progress;
-          const theirProgress = isCreator ? item.opponent_progress : item.creator_progress;
-          const pct = item.target > 0 ? Math.min(1, (myProgress || 0) / item.target) : 0;
-          const metric = METRICS.find((m) => m.key === item.metric);
-          return (
-            <Animated.View entering={FadeInDown} style={s.card}>
-              <View style={s.cardTop}>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.cardName}>{opponent?.name || "Rakip"}</Text>
-                  <Text style={s.cardMeta}>{metric?.label || item.metric} · Hedef: {item.target}</Text>
-                </View>
-                <View style={[s.statusBadge, { backgroundColor: (item.status === "active" ? C.green : C.muted) + "18" }]}>
-                  <Text style={{ ...TYPOGRAPHY.micro, color: item.status === "active" ? C.green : C.muted }}>{item.status === "active" ? "Aktif" : item.status}</Text>
-                </View>
-              </View>
-              <View style={s.progressRow}>
-                <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
-                <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.amber }]} /></View>
-                <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
-              </View>
-              {item.status === "active" && (
-                <Pressable onPress={() => handleCancel(item.id)} style={s.cancelBtn}>
-                  <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal Et</Text>
-                </Pressable>
-              )}
-            </Animated.View>
-          );
-        }}
+        ListEmptyComponent={<EmptyState icon="zap" title="Henüz challenge yok" message="Yeni bir challenge oluşturarak arkadaşlarınla yarış" actionLabel="Challenge Oluştur" onAction={() => setCreating(true)} />}
+        renderItem={({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />}
       />
     </SafeAreaView>
+  );
+}
+
+function ChallengeCard({ item, user, handleCancel, s, C }) {
+  const isCreator = item.creator_id === user.id;
+  const opponent = isCreator ? item.opponent : item.creator;
+  const myProgress = isCreator ? item.creator_progress : item.opponent_progress;
+  const theirProgress = isCreator ? item.opponent_progress : item.creator_progress;
+  const pct = item.target > 0 ? Math.min(1, (myProgress || 0) / item.target) : 0;
+  const metric = METRICS.find((m) => m.key === item.metric);
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return (
+    <Pressable
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+    >
+      <Animated.View style={[s.card, pressStyle]}>
+        <View style={s.cardTop}>
+          <View style={{ flex: 1 }}>
+            <Text style={s.cardName}>{opponent?.name || "Rakip"}</Text>
+            <Text style={s.cardMeta}>{metric?.label || item.metric} · Hedef: {item.target}</Text>
+          </View>
+          <View style={[s.statusBadge, { backgroundColor: (item.status === "active" ? C.green : C.muted) + "18" }]}>
+            <Text style={{ ...TYPOGRAPHY.micro, color: item.status === "active" ? C.green : C.muted }}>{item.status === "active" ? "Aktif" : item.status}</Text>
+          </View>
+        </View>
+        <View style={s.progressRow}>
+          <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
+          <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.amber }]} /></View>
+          <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
+        </View>
+        {item.status === "active" && (
+          <Pressable onPress={() => handleCancel(item.id)} style={s.cancelBtn}>
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal Et</Text>
+          </Pressable>
+        )}
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -198,7 +212,6 @@ function makeStyles(C) {
     stepLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     optionRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border },
     optionText: { ...TYPOGRAPHY.bodyMedium, color: C.text },
-    empty: { ...TYPOGRAPHY.body, color: C.muted, textAlign: "center", marginTop: SPACING.xxl },
     cta: { backgroundColor: C.amber, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, alignItems: "center" },
     ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
   });

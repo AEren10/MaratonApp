@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, Modal, FlatList, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -59,7 +60,6 @@ function SubjectRow({ subject, values, onChange, C, color }) {
   const totalNet = net(values.c, values.w);
   return (
     <View style={[srs.row, { backgroundColor: C.surface, borderColor: C.border }]}>
-      <View style={[srs.stripe, { backgroundColor: color }]} />
       <View style={srs.body}>
         <View style={srs.head}>
           <Text style={[srs.name, { color: C.text }]} numberOfLines={1}>{subject.name}</Text>
@@ -205,7 +205,7 @@ export default function RankSimulatorScreen() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {/* === Sıralama hero === */}
-        <View style={[s.rankCard, { backgroundColor: C.purple + "14", borderColor: C.purple + "30" }]}>
+        <Animated.View entering={FadeInDown.delay(0).duration(420).springify()} style={[s.rankCard, { backgroundColor: C.purple + "14", borderColor: C.purple + "30" }]}>
           <Text style={[s.rankLabel, { color: C.purple }]}>TAHMİNİ SIRALAMAN</Text>
           <Text style={[s.rankBig, { color: C.text }]}>{fmt(simRank)}</Text>
           {baseRank !== simRank && (
@@ -219,9 +219,10 @@ export default function RankSimulatorScreen() {
           <Text style={[s.netSummary, { color: C.sec }]}>
             TYT {tytNet.toFixed(1)} · AYT {aytNet.toFixed(1)} net
           </Text>
-        </View>
+        </Animated.View>
 
         {/* === Hedef bölüm === */}
+        <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
         <Pressable onPress={() => setPickerOpen(true)} style={{ marginTop: 14 }}>
           <View style={[s.targetCard, { backgroundColor: C.surface, borderColor: C.border }]}>
             <View style={{ flex: 1 }}>
@@ -254,8 +255,10 @@ export default function RankSimulatorScreen() {
             </View>
           </View>
         </Pressable>
+        </Animated.View>
 
         {/* === TYT dersleri === */}
+        <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
         <Text style={[s.sectionTitle, { color: C.muted }]}>TYT NETLERİN</Text>
         {TYT_SUBJECTS.map((subj) => (
           <SubjectRow
@@ -267,10 +270,11 @@ export default function RankSimulatorScreen() {
             C={C}
           />
         ))}
+        </Animated.View>
 
         {/* === AYT dersleri === */}
         {type !== "soz" && type !== "ea" && type !== "say" ? null : (
-          <>
+          <Animated.View entering={FadeInDown.delay(210).duration(420).springify()}>
             <Text style={[s.sectionTitle, { color: C.muted }]}>
               AYT NETLERİN ({type.toUpperCase()})
             </Text>
@@ -284,7 +288,7 @@ export default function RankSimulatorScreen() {
                 C={C}
               />
             ))}
-          </>
+          </Animated.View>
         )}
 
         <Text style={[s.disclaimer, { color: C.muted }]}>{RANKING_DISCLAIMER}</Text>
@@ -444,14 +448,12 @@ const s = StyleSheet.create({
 
 const srs = StyleSheet.create({
   row: {
-    flexDirection: "row",
     borderRadius: 18,
     borderWidth: 1,
     marginBottom: 10,
     overflow: "hidden",
   },
-  stripe: { width: 4 },
-  body: { flex: 1, padding: 12 },
+  body: { padding: 12 },
   head: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
   name: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, flex: 1 },
   netBadge: {

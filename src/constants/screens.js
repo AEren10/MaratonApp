@@ -26,6 +26,7 @@ export const SCREENS = {
 
   // Analysis Stack
   TRIAL_ENTRY: "TrialEntry",
+  TRIAL_SUMMARY: "TrialSummary",
   TRIAL_DETAIL: "TrialDetail",
   TRIAL_COMPARE: "TrialCompare",
   SUBJECT_DETAIL: "SubjectDetail",
@@ -58,6 +59,7 @@ export const SCREENS = {
   STUDY_SUMMARY: "StudySummary",
   TRIAL_INSIGHTS: "TrialInsights",
   WEEKLY_REVIEW: "WeeklyReview",
+  WEEKLY_TRIAL_REVIEW: "WeeklyTrialReview",
   SWIPE_REVIEW: "SwipeReview",
   QUICK_PRACTICE: "QuickPractice",
   CHALLENGE: "Challenge",
@@ -69,6 +71,12 @@ export const SCREENS = {
 
   // Social
   FRIENDS: "Friends",
+
+  // Study Save (post-timer)
+  STUDY_SAVE: "StudySave",
+
+  // User Tasks
+  ADD_TASK: "AddTask",
 
   // Settings
   SETTINGS: "Settings",

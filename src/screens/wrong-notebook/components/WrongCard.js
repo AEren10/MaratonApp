@@ -1,5 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -42,18 +43,23 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const myA = item.my_answer ?? item.myAnswer;
   const corA = item.correct_answer ?? item.correctAnswer;
 
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => ({
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+      style={{
         backgroundColor: C.surface,
         borderRadius: 22,
         borderWidth: 1,
         borderColor: item.is_resolved ? C.green + "30" : C.border,
         padding: 14,
-        opacity: pressed ? 0.95 : item.is_resolved ? 0.7 : 1,
-      })}
+      }}
     >
+      <Animated.View style={pressStyle}>
       {/* Header row — avatar + ders chip + tarih + resolve check */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={{
@@ -85,14 +91,21 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           onPress={onResolve}
           hitSlop={8}
           style={{
-            width: 30, height: 30, borderRadius: 10,
-            backgroundColor: item.is_resolved ? C.green + "26" : C.surface2,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+            paddingHorizontal: 12,
+            paddingVertical: 7,
+            borderRadius: 999,
+            backgroundColor: item.is_resolved ? C.green + "1A" : C.amber + "14",
             borderWidth: 1,
-            borderColor: item.is_resolved ? C.green : C.border,
-            alignItems: "center", justifyContent: "center",
+            borderColor: item.is_resolved ? C.green + "40" : C.amber + "30",
           }}
         >
-          {item.is_resolved ? <Icon name="check" size={14} color={C.green} sw={3} /> : null}
+          <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.green : C.amber} sw={item.is_resolved ? 3 : 1.5} />
+          <Text style={{ fontSize: 12, fontFamily: "Inter_600SemiBold", color: item.is_resolved ? C.green : C.amber }}>
+            {item.is_resolved ? "Çözüldü" : "Çözdüm"}
+          </Text>
         </Pressable>
       </View>
 
@@ -172,19 +185,23 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           <Pressable
             onPress={onShare}
             hitSlop={8}
-            style={{
-              flexDirection: "row", alignItems: "center", gap: 4,
-              backgroundColor: shared ? C.accent + "18" : C.surface2,
-              paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
-            }}
+            style={({ pressed }) => ({
+              flexDirection: "row", alignItems: "center", gap: 6,
+              backgroundColor: shared ? C.green + "18" : C.accent + "14",
+              paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999,
+              borderWidth: 1,
+              borderColor: shared ? C.green + "30" : C.accent + "30",
+              opacity: pressed ? 0.85 : 1,
+            })}
           >
-            <Icon name="globe" size={11} color={shared ? C.accent : C.muted} />
-            <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: shared ? C.accent : C.muted }}>
+            <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.green : C.accent} />
+            <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: shared ? C.green : C.accent }}>
               {shared ? "Paylaşıldı" : "Paylaş"}
             </Text>
           </Pressable>
         ) : null}
       </View>
+      </Animated.View>
     </Pressable>
   );
 }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { ScrollView, Alert, View, Text, Pressable } from "react-native";
+import { ScrollView, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
@@ -25,6 +25,8 @@ import { LevelBar } from "./components/LevelBar";
 
 import { Icon, SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 const QUICK_LINK_ITEMS = [
   { icon: "users", label: "Challenge", color: "blue", screen: SCREENS.CHALLENGE },
@@ -60,6 +62,7 @@ export default function ProfileScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+  const showAlert = useAlert();
   const { examType, field, daysUntilExam } = useExam();
   const { subjects = [] } = useCurriculum();
   const level = useAppSelector(selectLevel);
@@ -128,7 +131,8 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = useCallback(() => {
-    Alert.alert("Cikis Yap", "Hesabindan cikis yapmak istedigin kesin mi?", [
+    H.warn();
+    showAlert("Cikis Yap", "Hesabindan cikis yapmak istedigin kesin mi?", [
       { text: "Iptal", style: "cancel" },
       { text: "Cikis Yap", style: "destructive", onPress: logout },
     ]);

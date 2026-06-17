@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
+import * as H from "../../lib/haptics";
 import { Icon, Spot } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -45,16 +46,14 @@ export default function StudySummaryScreen() {
     return xp;
   }, [duration, questions]);
 
+  useEffect(() => { H.success(); }, []);
+
   const safeGoal = dailyGoal > 0 ? dailyGoal : 100;
   const goalPct = Math.min(todaySolved / safeGoal, 1);
   const goalReached = todaySolved >= safeGoal;
 
   const dismiss = () => {
-    if (navigation.canGoBack()) {
-      navigation.pop(2);
-    } else {
-      navigation.goBack();
-    }
+    navigation.goBack();
   };
 
   return (

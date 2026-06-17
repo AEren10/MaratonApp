@@ -7,9 +7,9 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StyleSheet,
 } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
@@ -28,12 +28,15 @@ import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 const DURATIONS = [15, 30, 45, 60, 90, 120];
 
 export default function AddStudyScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const showAlert = useAlert();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
@@ -46,6 +49,7 @@ export default function AddStudyScreen() {
   const [questionCount, setQC]  = useState("");
   const [correctCount, setCC]   = useState("");
   const [duration, setDuration] = useState(null);
+  const [customDur, setCustomDur] = useState("");
   const [notes, setNotes]       = useState("");
   const [saving, setSaving]     = useState(false);
 
@@ -67,6 +71,7 @@ export default function AddStudyScreen() {
   };
 
   const handleSelectSubject = (key) => {
+    H.select();
     setSubjectKey(key);
     setTopic("");
   };
@@ -87,7 +92,8 @@ export default function AddStudyScreen() {
       notes: notes.trim() || undefined,
     });
     if (!parsed.success) {
-      Alert.alert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
+      H.warn();
+      showAlert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
       return;
     }
 
@@ -124,13 +130,13 @@ export default function AddStudyScreen() {
         dispatch(setStreak(newStreak));
         dispatch(setFreezeCount(freezeCount));
         if (usedFreeze) {
-          Alert.alert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
+          showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
         }
       } catch (_) {}
     } else if (result.queued) {
       const msg = result.error?.message || "";
       const isNetwork = msg.includes("network") || msg.includes("fetch") || msg.includes("Failed to fetch");
-      Alert.alert(
+      showAlert(
         isNetwork ? "Çevrimdışı" : "Kayıt beklemede",
         isNetwork
           ? "İnternet yok, kayıt bağlantı geldiğinde otomatik gönderilecek."
@@ -146,6 +152,7 @@ export default function AddStudyScreen() {
     reward("study_log", { minutes: duration, statUpdates });
     if (qc > 0) reward("question_solved", { count: qc });
 
+    H.success();
     navigation.replace(SCREENS.STUDY_SUMMARY, {
       subjectLabel: currentSubject?.label || currentSubject?.name || subjectKey,
       subjectColor: currentSubject?.color || C.purple,
@@ -177,6 +184,7 @@ export default function AddStudyScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* === Sınav tipi: TYT / AYT === */}
+          <Animated.View entering={FadeInDown.delay(0).duration(420).springify()}>
           <Text style={[s.label, { color: C.muted }]}>SINAV TİPİ</Text>
           <View style={s.tierRow}>
             <Pressable
@@ -225,8 +233,10 @@ export default function AddStudyScreen() {
               </Text>
             </Pressable>
           </View>
+          </Animated.View>
 
           {/* === Ders grid === */}
+          <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>DERS</Text>
           <View style={s.subjectGrid}>
             {subjects.map((sub) => (
@@ -239,15 +249,19 @@ export default function AddStudyScreen() {
               />
             ))}
           </View>
+          </Animated.View>
 
           {/* === Konu (curriculum konu listesi) === */}
+          <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>KONU</Text>
           <Pressable
             onPress={() => {
               if (!currentSubject) {
-                Alert.alert("Önce ders seç", "Konu listesi için ders seçmelisin.");
+                H.warn();
+                showAlert("Önce ders seç", "Konu listesi için ders seçmelisin.");
                 return;
               }
+              H.select();
               setTopicPickerOpen(true);
             }}
             style={[
@@ -274,16 +288,18 @@ export default function AddStudyScreen() {
             </Text>
             <Icon name="chevDown" size={16} color={C.muted} />
           </Pressable>
+          </Animated.View>
 
-          {/* === Süre pill row === */}
+          {/* === Süre pill row + custom input === */}
+          <Animated.View entering={FadeInDown.delay(210).duration(420).springify()}>
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>SÜRE</Text>
           <View style={s.durationRow}>
             {DURATIONS.map((d) => {
-              const active = duration === d;
+              const active = duration === d && !customDur;
               return (
                 <Pressable
                   key={d}
-                  onPress={() => setDuration(d)}
+                  onPress={() => { H.tap(); setDuration(d); setCustomDur(""); }}
                   style={[
                     s.durChip,
                     {
@@ -298,9 +314,31 @@ export default function AddStudyScreen() {
                 </Pressable>
               );
             })}
+            <View style={[s.durChip, s.durCustom, {
+              backgroundColor: customDur ? C.amber + "18" : C.surface,
+              borderColor: customDur ? C.amber : C.border,
+            }]}>
+              <TextInput
+                value={customDur}
+                onChangeText={(t) => {
+                  const num = t.replace(/[^0-9]/g, "");
+                  setCustomDur(num);
+                  const v = parseInt(num, 10);
+                  setDuration(v > 0 && v <= 720 ? v : null);
+                }}
+                placeholder="Özel"
+                placeholderTextColor={C.muted}
+                keyboardType="number-pad"
+                maxLength={3}
+                style={[s.durText, { color: customDur ? C.amber : C.text, minWidth: 36, textAlign: "center", padding: 0 }]}
+              />
+              {customDur ? <Text style={[s.durText, { color: C.amber }]}>dk</Text> : null}
+            </View>
           </View>
+          </Animated.View>
 
           {/* === Soru sayısı === */}
+          <Animated.View entering={FadeInDown.delay(280).duration(420).springify()}>
           <Text style={[s.label, { color: C.muted, marginTop: 22 }]}>ÇÖZÜLEN SORU (opsiyonel)</Text>
           <TextInput
             value={questionCount}
@@ -342,10 +380,11 @@ export default function AddStudyScreen() {
               { backgroundColor: C.surface, color: C.text, borderColor: C.border },
             ]}
           />
+          </Animated.View>
         </ScrollView>
 
         {/* === Submit bar === */}
-        <View style={[s.bottomBar, { backgroundColor: C.bg, borderTopColor: C.border }]}>
+        <Animated.View entering={FadeInDown.delay(350).duration(420).springify()} style={[s.bottomBar, { backgroundColor: C.bg, borderTopColor: C.border }]}>
           <Pressable
             onPress={save}
             disabled={!canSave || saving}
@@ -363,7 +402,7 @@ export default function AddStudyScreen() {
               {saving ? "Kaydediliyor..." : "Çalışmayı Kaydet"}
             </Text>
           </Pressable>
-        </View>
+        </Animated.View>
 
         <TopicPicker
           visible={topicPickerOpen}
@@ -452,6 +491,7 @@ const s = StyleSheet.create({
 
   durationRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   durChip: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999, borderWidth: 1 },
+  durCustom: { flexDirection: "row", alignItems: "center", gap: 2 },
   durText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14 },
 
   bottomBar: {

@@ -1,11 +1,13 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ActivityIndicator, StyleSheet } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
@@ -69,23 +71,32 @@ function MiniStat({ label, value, color, C }) {
   );
 }
 
+const AnimPressable = Animated.createAnimatedComponent(Pressable);
+
 function LeaderboardRow({ item, C }) {
   const isYou = item.you;
   const medalColor = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <View style={[
-      {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: isYou ? C.amber + "14" : C.surface,
-        borderRadius: 16,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        borderWidth: isYou ? 1 : 0,
-        borderColor: isYou ? C.amber + "40" : "transparent",
-      },
-    ]}>
+    <AnimPressable
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: isYou ? C.amber + "14" : C.surface,
+          borderRadius: 16,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          borderWidth: isYou ? 1 : 0,
+          borderColor: isYou ? C.amber + "40" : "transparent",
+        },
+        pressStyle,
+      ]}
+    >
       <View style={{ width: 28, alignItems: "center", marginRight: 8 }}>
         {medalColor ? (
           <Icon name="trophy" size={18} color={medalColor} />
@@ -116,41 +127,10 @@ function LeaderboardRow({ item, C }) {
         {item.weekly_xp}
       </Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
-    </View>
+    </AnimPressable>
   );
 }
 
-function EmptyState({ tab, onAddFriend, C }) {
-  if (tab === "friends") {
-    return (
-      <View style={{ alignItems: "center", paddingTop: SPACING.huge, gap: SPACING.sm }}>
-        <Icon name="users" size={44} color={C.muted} />
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: SPACING.sm }]}>Henüz arkadaşın yok</Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.muted, textAlign: "center" }]}>Arkadaş ekle, haftalık ligde yarışın.</Text>
-        <Pressable onPress={onAddFriend} style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: SPACING.sm,
-          backgroundColor: C.amber,
-          paddingHorizontal: SPACING.xl,
-          paddingVertical: SPACING.md,
-          borderRadius: 999,
-          marginTop: SPACING.md,
-        }}>
-          <Icon name="plus" size={16} color="#FFFFFF" sw={2.5} />
-          <Text style={[TYPOGRAPHY.button, { color: "#FFFFFF" }]}>Arkadaş Ekle</Text>
-        </Pressable>
-      </View>
-    );
-  }
-  return (
-    <View style={{ alignItems: "center", paddingTop: SPACING.huge, gap: SPACING.sm }}>
-      <Icon name="award" size={44} color={C.muted} />
-      <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: SPACING.sm }]}>Sıralama yüklenemedi</Text>
-      <Text style={[TYPOGRAPHY.caption, { color: C.muted, textAlign: "center" }]}>Bağlantını kontrol edip tekrar dene.</Text>
-    </View>
-  );
-}
 
 export default function LeagueScreen() {
   const navigation = useNavigation();
@@ -280,7 +260,9 @@ export default function LeagueScreen() {
           }
           renderItem={({ item }) => <LeaderboardRow item={item} C={C} />}
           ListEmptyComponent={
-            <EmptyState tab={error ? "global" : tab} onAddFriend={goAddFriend} C={C} />
+            (error || tab !== "friends")
+              ? <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="amber" />
+              : <EmptyState icon="users" title="Henüz arkadaşın yok" message="Arkadaş ekle, haftalık ligde yarışın." actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="amber" />
           }
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
           showsVerticalScrollIndicator={false}

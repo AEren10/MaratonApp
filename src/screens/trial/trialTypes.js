@@ -42,6 +42,17 @@ export function getAYTSozSubjects(C) {
   ];
 }
 
+export function getLGSSubjects(C) {
+  return [
+    { key: "lgs_turkce", name: "Türkçe", color: C.blue, icon: "bookOpen", max: 20, parent: "LGS" },
+    { key: "lgs_matematik", name: "Matematik", color: C.amber, icon: "hash", max: 20, parent: "LGS" },
+    { key: "lgs_fen", name: "Fen Bilimleri", color: C.green, icon: "activity", max: 20, parent: "LGS" },
+    { key: "lgs_inkilap", name: "T.C. İnkılap Tarihi", color: C.red, icon: "clock", max: 10, parent: "LGS" },
+    { key: "lgs_din", name: "Din Kültürü", color: C.purple, icon: "bookOpen", max: 10, parent: "LGS" },
+    { key: "lgs_ingilizce", name: "İngilizce", color: C.teal, icon: "globe", max: 10, parent: "LGS" },
+  ];
+}
+
 export function getAllSubjects(C) {
   return [
     ...getTYTSubjects(C),
@@ -50,6 +61,7 @@ export function getAllSubjects(C) {
     ...getAYTSozSubjects(C).filter(
       (s) => !["ayt_edebiyat", "ayt_tarih1", "ayt_cografya1"].includes(s.key)
     ),
+    ...getLGSSubjects(C),
   ];
 }
 
@@ -91,6 +103,15 @@ export function getTrialTypes(C) {
       subjects: getAYTSozSubjects(C),
       totalQuestions: 80,
     },
+    LGS: {
+      code: "LGS",
+      label: "LGS Denemesi",
+      description: "90 soru · 6 ders",
+      icon: "shield",
+      color: C.green,
+      subjects: getLGSSubjects(C),
+      totalQuestions: 90,
+    },
     BRANCH: {
       code: "BRANCH",
       label: "Branş Denemesi",
@@ -108,7 +129,8 @@ export function getTrialTypeList(C) {
 }
 
 export function getSubjectsForBranch(C, examType, field) {
-  if (!examType || examType === "lgs") return getTYTSubjects(C);
+  if (examType === "lgs") return getLGSSubjects(C);
+  if (!examType) return getTYTSubjects(C);
   const subjects = [...getTYTSubjects(C)];
   if (examType === "tyt_ayt") {
     if (field === "sayisal") subjects.push(...getAYTSaySubjects(C));
@@ -118,14 +140,19 @@ export function getSubjectsForBranch(C, examType, field) {
   return subjects;
 }
 
-export function getTrialTypesForField(C, field) {
+export function getTrialTypesForExam(C, examType, field) {
   const all = getTrialTypeList(C);
-  if (!field) return all;
+  if (examType === "lgs") return all.filter((t) => ["LGS", "BRANCH"].includes(t.code));
   if (field === "sayisal") return all.filter((t) => ["TYT", "AYT_SAY", "BRANCH"].includes(t.code));
   if (field === "ea") return all.filter((t) => ["TYT", "AYT_EA", "BRANCH"].includes(t.code));
   if (field === "sozel") return all.filter((t) => ["TYT", "AYT_SOZ", "BRANCH"].includes(t.code));
   if (field === "dil") return all.filter((t) => ["TYT", "BRANCH"].includes(t.code));
+  if (!field) return all.filter((t) => ["TYT", "BRANCH"].includes(t.code));
   return all;
+}
+
+export function getTrialTypesForField(C, field) {
+  return getTrialTypesForExam(C, null, field);
 }
 
 export function getSubjectsForType(C, typeCode, branchSubjectKey = null) {

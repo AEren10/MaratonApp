@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Alert, Modal } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon, IconBox, Chip } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
@@ -11,6 +12,8 @@ import { getWrongQuestionImageUrl } from "../../supabase/storage";
 import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 function InfoRow({ icon, label, value, color, styles, C }) {
   return (
@@ -36,6 +39,7 @@ export default function WrongDetailScreen() {
   const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
+  const showAlert = useAlert();
   const { item: passedItem } = route.params ?? {};
   const [photoZoom, setPhotoZoom] = useState(false);
   const [resolving, setResolving] = useState(false);
@@ -67,28 +71,28 @@ export default function WrongDetailScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={[styles.subjectCard, { borderLeftColor: s.color }]}>
+        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={[styles.subjectCard, { borderLeftColor: s.color }]}>
           <IconBox icon={s.icon} color={s.color} size={44} rounded={14} />
           <View style={{ flex: 1 }}>
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{s.label || s.name}</Text>
             <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: 2 }]}>{item.topic}</Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.answersRow}>
+        <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={styles.answersRow}>
           <AnswerBadge label="Benim cevabim" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
           <AnswerBadge label="Dogru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
-        </View>
+        </Animated.View>
 
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
             DETAYLAR
           </Text>
           <InfoRow icon="calendar" label="Tarih" value={date} styles={styles} C={C} />
           <InfoRow icon="bookOpen" label="Konu" value={item.topic} color={s.color} styles={styles} C={C} />
-        </View>
+        </Animated.View>
 
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
             NOTLARIM
           </Text>
@@ -97,10 +101,10 @@ export default function WrongDetailScreen() {
               {item.note || "Not eklenmedi."}
             </Text>
           </View>
-        </View>
+        </Animated.View>
 
         {imageUrl && (
-          <View style={styles.section}>
+          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()} style={styles.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
               FOTOĞRAF
             </Text>
@@ -117,36 +121,39 @@ export default function WrongDetailScreen() {
                 <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>Büyütmek için dokun</Text>
               </View>
             </Pressable>
-          </View>
+          </Animated.View>
         )}
 
         {!item.is_resolved && !localResolved && (
-          <Pressable
-            onPress={async () => {
-              if (resolving) return;
-              setResolving(true);
-              try {
-                await resolveWrongQuestion(item.id);
-                setLocalResolved(true);
-                reward("wrong_resolved", {
-                  statUpdates: [{ type: "increment", key: "wrongsResolved" }],
-                });
-                Alert.alert("Çözüldü", "Bu soru çözüldü olarak işaretlendi.");
-                navigation.goBack();
-              } catch (e) {
-                Alert.alert("Hata", e.message || "Kaydedilemedi.");
-              } finally {
-                setResolving(false);
-              }
-            }}
-            disabled={resolving}
-            style={[styles.resolveBtn, resolving && { opacity: 0.6 }]}
-          >
-            <Icon name="check" size={20} color={C.bg} />
-            <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
-              {resolving ? "İşleniyor..." : "Çözüldü İşaretle"}
-            </Text>
-          </Pressable>
+          <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
+            <Pressable
+              onPress={async () => {
+                if (resolving) return;
+                setResolving(true);
+                try {
+                  await resolveWrongQuestion(item.id);
+                  H.success();
+                  setLocalResolved(true);
+                  reward("wrong_resolved", {
+                    statUpdates: [{ type: "increment", key: "wrongsResolved" }],
+                  });
+                  showAlert("Çözüldü", "Bu soru çözüldü olarak işaretlendi.");
+                  navigation.goBack();
+                } catch (e) {
+                  showAlert("Hata", e.message || "Kaydedilemedi.");
+                } finally {
+                  setResolving(false);
+                }
+              }}
+              disabled={resolving}
+              style={[styles.resolveBtn, resolving && { opacity: 0.6 }]}
+            >
+              <Icon name="check" size={20} color={C.bg} />
+              <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
+                {resolving ? "İşleniyor..." : "Çözüldü İşaretle"}
+              </Text>
+            </Pressable>
+          </Animated.View>
         )}
       </ScrollView>
 

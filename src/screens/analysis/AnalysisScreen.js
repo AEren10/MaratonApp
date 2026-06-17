@@ -7,15 +7,21 @@ import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { getTrialTypes, getAllSubjects } from "../trial/trialTypes";
 import { useSync } from "../../contexts/DataSyncContext";
-import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, SHADOWS, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { SCREENS } from "../../constants/screens";
-import { Icon, GlowBackground, WARM_GLOW, GlassCard } from "../../components/design";
+import { Icon, GlowBackground, WARM_GLOW, GlassCard, Stat, Trend, Chip } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { SectionLabel } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
+import * as H from "../../lib/haptics";
 
+import { NudgePopup } from "../../components/common/NudgePopup";
+import { useRecommendations } from "../../hooks/useRecommendations";
+import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { LatestScore } from "./components/LatestScore";
 import { SubjectBars } from "./components/SubjectBars";
 import { TrendChart } from "./components/TrendChart";
@@ -36,8 +42,9 @@ function AnalysisSkeleton() {
 }
 
 function filterTrials(trials, filter) {
-  if (filter === "ALL") return trials;
+  if (filter === "ALL") return trials.filter((t) => t.trialType !== "BRANCH");
   if (filter === "TYT") return trials.filter((t) => t.trialType === "TYT");
+  if (filter === "LGS") return trials.filter((t) => t.trialType === "LGS");
   if (filter === "BRANCH") return trials.filter((t) => t.trialType === "BRANCH");
   if (filter === "AYT") {
     return trials.filter((t) => t.trialType && t.trialType.startsWith("AYT"));
@@ -45,10 +52,11 @@ function filterTrials(trials, filter) {
   return trials;
 }
 
-function subjectsForFilter(C, filter, latestTrial) {
+function subjectsForFilter(C, filter, latestTrial, examType) {
   const TRIAL_TYPES = getTrialTypes(C);
   const ALL_SUBJECTS = getAllSubjects(C);
   if (filter === "TYT") return TRIAL_TYPES.TYT.subjects;
+  if (filter === "LGS") return TRIAL_TYPES.LGS.subjects;
   if (filter === "AYT" && latestTrial?.trialType) {
     const type = TRIAL_TYPES[latestTrial.trialType];
     if (type) return type.subjects;
@@ -60,14 +68,18 @@ function subjectsForFilter(C, filter, latestTrial) {
     const type = TRIAL_TYPES[latestTrial.trialType];
     if (type) return type.subjects;
   }
+  if (examType === "lgs") return TRIAL_TYPES.LGS.subjects;
   return TRIAL_TYPES.TYT.subjects;
 }
 
 export default function AnalysisScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const { examType } = useExam();
   const s = useMemo(() => makeStyles(C), [C]);
   const trials = useSelector(selectTrials);
+  const nudges = useRecommendations();
+  const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -89,7 +101,10 @@ export default function AnalysisScreen() {
     const prev = sorted[1];
     const net = latest.totalNet || 0;
     const trend = prev ? net - (prev.totalNet || 0) : 0;
-    const heroSlice = sorted.slice(0, 12);
+    const heroType = latest.trialType;
+    const heroSlice = filter === "ALL"
+      ? sorted.filter((t) => t.trialType === heroType).slice(0, 12)
+      : sorted.slice(0, 12);
     const history = sorted.slice(0, 6).map((t, i) => {
       const prevT = sorted[i + 1];
       return {
@@ -101,7 +116,7 @@ export default function AnalysisScreen() {
         name: t.name,
       };
     });
-    const subjects = subjectsForFilter(C, filter, latest);
+    const subjects = subjectsForFilter(C, filter, latest, examType);
     const bars = subjects.map((sub) => ({
       key: sub.key,
       name: sub.name,
@@ -115,6 +130,32 @@ export default function AnalysisScreen() {
     const heroLabels = heroSlice.slice().reverse().map((t) =>
       new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })
     );
+    let typeBreakdown = null;
+    if (filter === "ALL") {
+      const byType = {};
+      sorted.forEach((t) => {
+        if (!byType[t.trialType]) byType[t.trialType] = [];
+        byType[t.trialType].push(t);
+      });
+      const types = getTrialTypes(C);
+      typeBreakdown = Object.entries(byType)
+        .filter(([, arr]) => arr.length > 0)
+        .map(([type, arr]) => {
+          const lat = arr[0];
+          const prev = arr[1];
+          const color = types[type]?.color || C.amber;
+          return {
+            type,
+            label: types[type]?.label || type,
+            color,
+            net: lat.totalNet || 0,
+            trend: prev ? (lat.totalNet || 0) - (prev.totalNet || 0) : 0,
+            date: new Date(lat.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
+            count: arr.length,
+          };
+        });
+    }
+
     return {
       latest: {
         net,
@@ -128,14 +169,18 @@ export default function AnalysisScreen() {
       heroLine,
       heroLabels,
       history,
+      typeBreakdown,
       empty: false,
     };
-  }, [trials, filter, C]);
+  }, [trials, filter, C, examType]);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
+    const t = setTimeout(() => {
+      setLoading(false);
+      showNudgePopup(3000);
+    }, 600);
     return () => clearTimeout(t);
-  }, []);
+  }, [showNudgePopup]);
 
   const { refresh } = useSync();
   const onRefresh = useCallback(async () => {
@@ -169,19 +214,16 @@ export default function AnalysisScreen() {
       >
         <Text style={s.title}>Analiz</Text>
 
-        <TrialFilter value={filter} onChange={setFilter} />
+        <TrialFilter value={filter} onChange={(v) => { H.select(); setFilter(v); }} />
 
         <View style={s.content}>
           {deneme.empty ? (
-            <View style={[s.emptyBox, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Icon name="chart" size={48} color={C.muted} />
-              <Text style={s.emptyTitle}>Henüz deneme yok</Text>
-              <Text style={s.emptySub}>
-                {filter === "ALL"
-                  ? "Bir deneme girince burada görünecek"
-                  : `${filter} denemesi henüz girmedin`}
-              </Text>
-            </View>
+            <EmptyState
+              icon="edit"
+              title="Henüz deneme yok"
+              message={filter === "ALL" ? "İlk denemeni gir, analizleri burada gör" : `${filter} denemesi henüz girmedin`}
+              color="amber"
+            />
           ) : (
             <>
               {deneme.heroLine && deneme.heroLine.length > 1 && (
@@ -198,26 +240,46 @@ export default function AnalysisScreen() {
                     onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
                     style={{
                       flexDirection: "row", alignItems: "center", justifyContent: "center",
-                      gap: 6, marginTop: SPACING.md, paddingVertical: SPACING.sm,
+                      gap: 8, marginTop: SPACING.lg, paddingVertical: 12, paddingHorizontal: SPACING.lg,
+                      backgroundColor: C.amber + "18", borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.amber + "30",
                     }}
                   >
-                    <Icon name="trendUp" size={14} color={C.amber} />
-                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Detaylı Analiz</Text>
-                    <Icon name="chevR" size={12} color={C.amber} />
+                    <Icon name="trendUp" size={16} color={C.amber} />
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Detaylı Analiz</Text>
+                    <Icon name="chevR" size={14} color={C.amber} />
                   </Pressable>
                 </AnimatedCard>
                 </View>
               )}
 
               <SectionLabel>GENEL</SectionLabel>
-              <AnimatedCard delay={80}>
-                <LatestScore
-                  net={deneme.latest.net}
-                  trend={deneme.latest.trend}
-                  date={deneme.latest.date}
-                  typeLabel={deneme.latest.typeLabel}
-                />
-              </AnimatedCard>
+              {filter === "ALL" && deneme.typeBreakdown?.length > 1 ? (
+                <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+                  {deneme.typeBreakdown.map((tb) => (
+                    <AnimatedCard key={tb.type} delay={80} style={{ flex: 1 }}>
+                      <GlassCard style={{ padding: SPACING.lg, alignItems: "center", gap: SPACING.sm }}>
+                        <Chip color={tb.color}>{tb.label}</Chip>
+                        <Stat size={36} color={C.text}>{tb.net}</Stat>
+                        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>toplam net</Text>
+                        <Trend v={tb.trend} size={12} />
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
+                          <Icon name="calendar" size={11} color={C.muted} />
+                          <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{tb.date}</Text>
+                        </View>
+                      </GlassCard>
+                    </AnimatedCard>
+                  ))}
+                </View>
+              ) : (
+                <AnimatedCard delay={80}>
+                  <LatestScore
+                    net={deneme.latest.net}
+                    trend={deneme.latest.trend}
+                    date={deneme.latest.date}
+                    typeLabel={deneme.latest.typeLabel}
+                  />
+                </AnimatedCard>
+              )}
 
               <SectionLabel>DERSLER</SectionLabel>
               <AnimatedCard delay={160}>
@@ -273,6 +335,16 @@ export default function AnalysisScreen() {
         </View>
       </ScrollView>
 
+      <NudgePopup
+        nudge={nudgePopup}
+        visible={!!nudgePopup}
+        onDismiss={dismissNudgePopup}
+        onAction={(n) => {
+          dismissNudgePopup();
+          if (n.subject) navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: n.subject });
+        }}
+      />
+
       <Pressable
         onPress={handleTrialEntry}
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
@@ -291,15 +363,6 @@ function makeStyles(C) {
     scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
     title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
     content: { gap: SPACING.xl },
-    emptyBox: {
-      padding: SPACING.xxl,
-      alignItems: "center",
-      gap: SPACING.sm,
-      borderRadius: 20,
-      borderWidth: 1,
-    },
-    emptyTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
     fab: {
       position: "absolute",
       bottom: 100,

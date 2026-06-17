@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useGamification } from "../../hooks/useGamification";
@@ -15,6 +16,8 @@ import { addWrongQuestion } from "../../supabase/wrongQuestions";
 import { uploadWrongQuestionImage } from "../../supabase/storage";
 import { initialReview } from "../../lib/spacedRepetition";
 import { TopicPicker } from "./components/TopicPicker";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 const ANSWERS = ["A", "B", "C", "D", "E"];
 
@@ -22,6 +25,7 @@ export default function AddWrongScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { user } = useAuth();
+  const showAlert = useAlert();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: C.amber, icon: "hash" });
@@ -34,23 +38,46 @@ export default function AddWrongScreen() {
   const [image, setImage] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const pickImage = async () => {
+  const launchGallery = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("İzin gerekli", "Galeriden foto seçmek için izin ver.");
+      showAlert("İzin gerekli", "Galeriden foto seçmek için izin ver.");
       return;
     }
     const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       quality: 0.7,
       allowsEditing: true,
     });
-    if (!res.canceled) setImage(res.assets[0].uri);
+    if (!res.canceled) { H.select(); setImage(res.assets[0].uri); }
+  };
+
+  const launchCamera = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      showAlert("İzin gerekli", "Kamera kullanmak için izin ver.");
+      return;
+    }
+    const res = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      quality: 0.7,
+      allowsEditing: true,
+    });
+    if (!res.canceled) { H.select(); setImage(res.assets[0].uri); }
+  };
+
+  const pickImage = () => {
+    showAlert("Fotoğraf Ekle", "Nereden eklemek istersin?", [
+      { text: "Kamera", onPress: launchCamera },
+      { text: "Galeri", onPress: launchGallery },
+      { text: "İptal", style: "cancel" },
+    ]);
   };
 
   const save = async () => {
     if (!topic.trim()) {
-      Alert.alert("Konu eksik", "Hangi konuda yanlış yaptın?");
+      H.error();
+      showAlert("Konu eksik", "Hangi konuda yanlış yaptın?");
       return;
     }
     setSaving(true);
@@ -71,13 +98,15 @@ export default function AddWrongScreen() {
         is_resolved: false,
         ...initialReview(),
       });
+      H.success();
       await reward("question_solved", {
         count: 1,
         statUpdates: [{ type: "increment", key: "totalQuestions" }],
       });
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Hata", "Kaydederken bir sorun oluştu.\n" + (err?.message || ""));
+      H.error();
+      showAlert("Hata", "Kaydederken bir sorun oluştu.\n" + (err?.message || ""));
     } finally {
       setSaving(false);
     }
@@ -122,7 +151,7 @@ export default function AddWrongScreen() {
       >
         {/* TYT bölümü */}
         {tytSubjects.length > 0 && (
-          <>
+          <Animated.View entering={FadeInDown.delay(60).duration(400).springify()}>
             <SectionLabel color={C.blue}>{group1Label}</SectionLabel>
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
               {tytSubjects.map((s) => (
@@ -135,12 +164,12 @@ export default function AddWrongScreen() {
                 />
               ))}
             </View>
-          </>
+          </Animated.View>
         )}
 
         {/* AYT bölümü */}
         {aytSubjects.length > 0 && (
-          <>
+          <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
             <SectionLabel color={C.purple}>{group2Label}</SectionLabel>
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
               {aytSubjects.map((s) => (
@@ -153,38 +182,75 @@ export default function AddWrongScreen() {
                 />
               ))}
             </View>
-          </>
+          </Animated.View>
         )}
 
-        <Label C={C}>Konu</Label>
-        <Pressable
-          onPress={() => setPickerOpen(true)}
-          style={[makeInputStyle(C), { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
-        >
-          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }}>
-            {topic || "Konu seç"}
-          </Text>
-          <Icon name="chevDown" size={16} color={C.muted} />
-        </Pressable>
+        <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
+          <Label C={C}>Konu</Label>
+          <Pressable
+            onPress={() => setPickerOpen(true)}
+            style={[makeInputStyle(C), { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
+          >
+            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }}>
+              {topic || "Konu seç"}
+            </Text>
+            <Icon name="chevDown" size={16} color={C.muted} />
+          </Pressable>
+        </Animated.View>
 
-        <Label C={C}>Şıklar</Label>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={makeMiniLabel(C)}>Cevabın</Text>
+        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+          <Label C={C}>Şıklar</Label>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={{ flex: 1 }}>
+              <Text style={makeMiniLabel(C)}>Cevabın</Text>
+              <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
+                {ANSWERS.map((a) => {
+                  const active = myAnswer === a;
+                  return (
+                    <Pressable
+                      key={a}
+                      onPress={() => setMyAnswer(a)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 10,
+                        borderRadius: 10,
+                        backgroundColor: active ? C.red + "22" : C.surface,
+                        borderWidth: 1,
+                        borderColor: active ? C.red : C.border,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "Inter_600SemiBold",
+                          fontSize: 13,
+                          color: active ? C.red : C.sec,
+                        }}
+                      >
+                        {a}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <Text style={makeMiniLabel(C)}>Doğru Cevap</Text>
             <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
               {ANSWERS.map((a) => {
-                const active = myAnswer === a;
+                const active = correctAnswer === a;
                 return (
                   <Pressable
                     key={a}
-                    onPress={() => setMyAnswer(a)}
+                    onPress={() => setCorrectAnswer(a)}
                     style={{
                       flex: 1,
                       paddingVertical: 10,
                       borderRadius: 10,
-                      backgroundColor: active ? C.red + "22" : C.surface,
+                      backgroundColor: active ? C.green + "22" : C.surface,
                       borderWidth: 1,
-                      borderColor: active ? C.red : C.border,
+                      borderColor: active ? C.green : C.border,
                       alignItems: "center",
                     }}
                   >
@@ -192,7 +258,7 @@ export default function AddWrongScreen() {
                       style={{
                         fontFamily: "Inter_600SemiBold",
                         fontSize: 13,
-                        color: active ? C.red : C.sec,
+                        color: active ? C.green : C.sec,
                       }}
                     >
                       {a}
@@ -202,88 +268,59 @@ export default function AddWrongScreen() {
               })}
             </View>
           </View>
-        </View>
-        <View style={{ marginTop: 10 }}>
-          <Text style={makeMiniLabel(C)}>Doğru Cevap</Text>
-          <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
-            {ANSWERS.map((a) => {
-              const active = correctAnswer === a;
-              return (
-                <Pressable
-                  key={a}
-                  onPress={() => setCorrectAnswer(a)}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    backgroundColor: active ? C.green + "22" : C.surface,
-                    borderWidth: 1,
-                    borderColor: active ? C.green : C.border,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_600SemiBold",
-                      fontSize: 13,
-                      color: active ? C.green : C.sec,
-                    }}
-                  >
-                    {a}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
+        </Animated.View>
 
-        <Label C={C}>Not</Label>
-        <TextInput
-          value={note}
-          onChangeText={setNote}
-          placeholder="Nerede takıldın? Tekrar bakman gereken şey ne?"
-          placeholderTextColor={C.muted}
-          multiline
-          style={[makeInputStyle(C), { minHeight: 90, textAlignVertical: "top", paddingTop: 12 }]}
-        />
+        <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
+          <Label C={C}>Not</Label>
+          <TextInput
+            value={note}
+            onChangeText={setNote}
+            placeholder="Nerede takıldın? Tekrar bakman gereken şey ne?"
+            placeholderTextColor={C.muted}
+            multiline
+            style={[makeInputStyle(C), { minHeight: 90, textAlignVertical: "top", paddingTop: 12 }]}
+          />
+        </Animated.View>
 
-        <Label C={C}>Foto (opsiyonel)</Label>
-        <Pressable
-          onPress={pickImage}
-          style={{
-            height: image ? 180 : 100,
-            borderRadius: 16,
-            backgroundColor: C.surface,
-            borderWidth: 1,
-            borderColor: image ? C.amber + "40" : C.border,
-            borderStyle: image ? "solid" : "dashed",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            overflow: "hidden",
-          }}
-        >
-          {image ? (
-            <>
-              <Image source={{ uri: image }} style={{ width: "100%", height: 180, borderRadius: 14 }} contentFit="cover" cachePolicy="memory-disk" />
-              <View style={{
-                position: "absolute", bottom: 8, right: 8,
-                backgroundColor: C.bg + "CC", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
-                flexDirection: "row", alignItems: "center", gap: 4,
-              }}>
-                <Icon name="camera" size={12} color={C.sec} />
-                <Text style={{ fontFamily: "Inter_500Medium", fontSize: 11, color: C.sec }}>Değiştir</Text>
-              </View>
-            </>
-          ) : (
-            <>
-              <Icon name="camera" size={26} color={C.muted} />
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.muted }}>
-                Foto ekle
-              </Text>
-            </>
-          )}
-        </Pressable>
+        <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
+          <Label C={C}>Foto (opsiyonel)</Label>
+          <Pressable
+            onPress={pickImage}
+            style={{
+              height: image ? 180 : 100,
+              borderRadius: 16,
+              backgroundColor: C.surface,
+              borderWidth: 1,
+              borderColor: image ? C.amber + "40" : C.border,
+              borderStyle: image ? "solid" : "dashed",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              overflow: "hidden",
+            }}
+          >
+            {image ? (
+              <>
+                <Image source={{ uri: image }} style={{ width: "100%", height: 180, borderRadius: 14 }} contentFit="cover" cachePolicy="memory-disk" />
+                <View style={{
+                  position: "absolute", bottom: 8, right: 8,
+                  backgroundColor: C.bg + "CC", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
+                  flexDirection: "row", alignItems: "center", gap: 4,
+                }}>
+                  <Icon name="camera" size={12} color={C.sec} />
+                  <Text style={{ fontFamily: "Inter_500Medium", fontSize: 11, color: C.sec }}>Değiştir</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <Icon name="camera" size={26} color={C.muted} />
+                <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.muted }}>
+                  Foto ekle
+                </Text>
+              </>
+            )}
+          </Pressable>
+        </Animated.View>
       </ScrollView>
 
       <View

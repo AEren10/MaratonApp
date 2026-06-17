@@ -26,8 +26,10 @@ import AnalysisScreen from "../screens/analysis/AnalysisScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import AddStudyScreen from "../screens/study/AddStudyScreen";
 import StudyTimerScreen from "../screens/study/StudyTimerScreen";
+import StudySaveScreen from "../screens/study/StudySaveScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import TrialEntryScreen from "../screens/trial/TrialEntryScreen";
+import TrialSummaryScreen from "../screens/trial/TrialSummaryScreen";
 import TrialDetailScreen from "../screens/trial/TrialDetailScreen";
 import TrialCompareScreen from "../screens/trial/TrialCompareScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
@@ -58,11 +60,13 @@ import RoadmapScreen from "../screens/roadmap/RoadmapScreen";
 import StudySummaryScreen from "../screens/study/StudySummaryScreen";
 import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
 import WeeklyReviewScreen from "../screens/home/WeeklyReviewScreen";
+import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
 import ChallengeScreen from "../screens/social/ChallengeScreen";
 import QuickPracticeScreen from "../screens/practice/QuickPracticeScreen";
 import ShareCardScreen from "../screens/social/ShareCardScreen";
 import ExamSimulatorScreen from "../screens/simulator/ExamSimulatorScreen";
+import AddTaskScreen from "../screens/plan/AddTaskScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,7 +93,9 @@ const EBWrongDetail = withEB(WrongDetailScreen);
 const EBPlanDetail = withEB(PlanDetailScreen);
 const EBAddStudy = withEB(AddStudyScreen);
 const EBStudyTimer = withEB(StudyTimerScreen);
+const EBStudySave = withEB(StudySaveScreen);
 const EBTrialEntry = withEB(TrialEntryScreen);
+const EBTrialSummary = withEB(TrialSummaryScreen);
 const EBTrialDetail = withEB(TrialDetailScreen);
 const EBTrialCompare = withEB(TrialCompareScreen);
 const EBTopicCards = withEB(TopicCardsScreen);
@@ -119,11 +125,13 @@ const EBRoadmap = withEB(RoadmapScreen);
 const EBStudySummary = withEB(StudySummaryScreen);
 const EBTrialInsights = withEB(TrialInsightsScreen);
 const EBWeeklyReview = withEB(WeeklyReviewScreen);
+const EBWeeklyTrialReview = withEB(WeeklyTrialReviewScreen);
 const EBSwipeReview = withEB(SwipeReviewScreen);
 const EBChallenge = withEB(ChallengeScreen);
 const EBQuickPractice = withEB(QuickPracticeScreen);
 const EBShareCard = withEB(ShareCardScreen);
 const EBExamSimulator = withEB(ExamSimulatorScreen);
+const EBAddTask = withEB(AddTaskScreen);
 
 const screenOptions = {
   headerShown: false,
@@ -194,7 +202,9 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.PLAN_DETAIL} component={EBPlanDetail} />
       <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} />
       <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} />
+      <Stack.Screen name={SCREENS.STUDY_SAVE} component={EBStudySave} />
       <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} />
+      <Stack.Screen name={SCREENS.TRIAL_SUMMARY} component={EBTrialSummary} options={{ gestureEnabled: false }} />
       <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} />
       <Stack.Screen name={SCREENS.TRIAL_COMPARE} component={EBTrialCompare} />
       <Stack.Screen name={SCREENS.TOPIC_CARDS} component={EBTopicCards} />
@@ -224,11 +234,13 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.STUDY_SUMMARY} component={EBStudySummary} options={modalOptions} />
       <Stack.Screen name={SCREENS.TRIAL_INSIGHTS} component={EBTrialInsights} />
       <Stack.Screen name={SCREENS.WEEKLY_REVIEW} component={EBWeeklyReview} />
+      <Stack.Screen name={SCREENS.WEEKLY_TRIAL_REVIEW} component={EBWeeklyTrialReview} />
       <Stack.Screen name={SCREENS.SWIPE_REVIEW} component={EBSwipeReview} />
       <Stack.Screen name={SCREENS.CHALLENGE} component={EBChallenge} />
       <Stack.Screen name={SCREENS.QUICK_PRACTICE} component={EBQuickPractice} />
       <Stack.Screen name={SCREENS.SHARE_CARD} component={EBShareCard} />
       <Stack.Screen name={SCREENS.EXAM_SIMULATOR} component={EBExamSimulator} />
+      <Stack.Screen name={SCREENS.ADD_TASK} component={EBAddTask} options={modalOptions} />
     </Stack.Navigator>
   );
 }

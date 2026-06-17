@@ -51,3 +51,16 @@ export const deleteStudyLog = async (id) => {
   const { error } = await supabase.from("study_logs").delete().eq("id", id);
   if (error) throw error;
 };
+
+export const getStudyLogsByTopic = async (userId, subjectKey, topicName, limit = 20) => {
+  const { data, error } = await supabase
+    .from("study_logs")
+    .select("id, study_date, duration_minutes, question_count, correct_count, created_at")
+    .eq("user_id", userId)
+    .eq("subject", subjectKey)
+    .eq("topic", topicName)
+    .order("study_date", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data;
+};

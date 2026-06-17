@@ -22,6 +22,7 @@ import { ThemeProvider } from "./src/contexts/ThemeContext";
 import { ExamProvider } from "./src/contexts/ExamContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary";
+import { AlertProvider } from "./src/contexts/AlertContext";
 import { ReduxHydrator } from "./src/store/hydrate";
 import { COLORS } from "./src/themes/tokens";
 import { initErrorReporting } from "./src/lib/errorReporting";
@@ -69,12 +70,14 @@ export default function App() {
 function ThemedRoot() {
   const { scheme, colors } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style={scheme === "light" ? "dark" : "light"} />
-      <ScreenErrorBoundary>
-        <AppNavigator />
-      </ScreenErrorBoundary>
-    </View>
+    <AlertProvider>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <StatusBar style={scheme === "light" ? "dark" : "light"} />
+        <ScreenErrorBoundary>
+          <AppNavigator />
+        </ScreenErrorBoundary>
+      </View>
+    </AlertProvider>
   );
 }
 

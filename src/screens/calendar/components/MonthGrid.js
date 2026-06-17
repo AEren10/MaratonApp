@@ -36,22 +36,21 @@ function isToday(d) {
     d.getDate() === t.getDate();
 }
 
-function intensity(data) {
-  if (!data) return 0;
-  const score = (data.totalMinutes / 30) + data.trials.length * 2;
-  if (score >= 6) return 4;
-  if (score >= 4) return 3;
-  if (score >= 2) return 2;
-  if (score >= 1) return 1;
-  return 0;
+function completionLevel(data, dailyGoal) {
+  if (!data || data.totalQuestions === 0) return 0;
+  const pct = data.totalQuestions / (dailyGoal || 80);
+  if (pct >= 1) return 4;
+  if (pct >= 0.7) return 3;
+  if (pct >= 0.4) return 2;
+  return 1;
 }
 
-const getIntensityColor = (C) => [
+const getCompletionColor = (C) => [
   "transparent",
   C.amber + "30",
-  C.amber + "55",
-  C.amber + "80",
-  C.amber,
+  C.amber + "60",
+  C.green + "50",
+  C.green + "90",
 ];
 
 const makeStyles = (C) => ({
@@ -109,10 +108,10 @@ const makeStyles = (C) => ({
   },
 });
 
-export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect }) {
+export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80 }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const INTENSITY_COLOR = useMemo(() => getIntensityColor(C), [C]);
+  const COMP_COLOR = useMemo(() => getCompletionColor(C), [C]);
   const days = getCalendarDays(monthDate);
 
   return (
@@ -129,7 +128,7 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect }) {
           }
           const iso = isoDate(d);
           const data = dayMap[iso];
-          const lvl = intensity(data);
+          const lvl = completionLevel(data, dailyGoal);
           const isSelected = selectedDay === iso;
           const today = isToday(d);
           const hasTrial = data?.trials?.length > 0;
@@ -140,7 +139,7 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect }) {
               style={[
                 styles.cell,
                 styles.dayCell,
-                { backgroundColor: INTENSITY_COLOR[lvl] },
+                { backgroundColor: COMP_COLOR[lvl] },
                 isSelected && styles.selected,
                 today && styles.today,
               ]}

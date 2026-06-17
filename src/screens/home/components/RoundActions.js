@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -27,11 +27,11 @@ function RoundAction({ item, onPress, C }) {
 export function RoundActions({ items, onPress }) {
   const C = useC();
   return (
-    <View style={s.grid}>
+    <Animated.View entering={FadeInDown.delay(160).duration(440).springify().damping(16)} style={s.grid}>
       {items.map((item) => (
         <RoundAction key={item.label} item={item} onPress={onPress} C={C} />
       ))}
-    </View>
+    </Animated.View>
   );
 }
 

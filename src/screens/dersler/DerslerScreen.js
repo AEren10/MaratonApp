@@ -34,6 +34,17 @@ function inferGroup(subject) {
   return null;
 }
 
+const EXPECTED_QUESTIONS = 30;
+
+function calcTopicProgress(tp) {
+  const questionScore = Math.min((tp.total_questions || 0) / EXPECTED_QUESTIONS, 1) * 40;
+  const accScore = tp.total_questions > 0
+    ? ((tp.correct_count || 0) / tp.total_questions) * 30
+    : 0;
+  const freqScore = Math.min((tp.study_count || 0) / 3, 1) * 30;
+  return Math.min(100, Math.round(questionScore + accScore + freqScore));
+}
+
 function buildSections(subjects, progressMap) {
   const dersler = subjects.map((s) => {
     const subjectProgress = progressMap[s.key] || {};
@@ -45,7 +56,7 @@ function buildSections(subjects, progressMap) {
         q: tp?.total_questions || 0,
         acc: tp && tp.total_questions > 0 ? Math.round((tp.correct_count / tp.total_questions) * 100) : 0,
         last: tp?.last_studied_at || null,
-        pct: tp ? Math.min(100, Math.round((tp.study_count / 3) * 100)) : 0,
+        pct: tp ? calcTopicProgress(tp) : 0,
         studyCount: tp?.study_count || 0,
       };
     });

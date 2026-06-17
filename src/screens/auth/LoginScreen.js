@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
+import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../components/design";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,10 +9,13 @@ import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { AuthInput } from "./components/AuthInput";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const showAlert = useAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,8 +31,10 @@ export default function LoginScreen() {
     setBusy(true);
     try {
       await signIn({ email, password });
+      H.success();
     } catch (err) {
-      Alert.alert("Giriş başarısız", err.message ?? "Bir sorun oldu");
+      H.error();
+      showAlert("Giriş başarısız", err.message ?? "Bir sorun oldu");
     } finally {
       setBusy(false);
     }
@@ -96,104 +102,114 @@ export default function LoginScreen() {
           contentContainerStyle={{ padding: 24, paddingTop: 32 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={{
-            fontFamily: "SpaceGrotesk_700Bold",
-            fontSize: 24,
-            color: C.text,
-            letterSpacing: -0.4,
-            marginBottom: 4,
-          }}>
-            Tekrar Hoş Geldin
-          </Text>
-          <Text style={{
-            fontFamily: "Inter_400Regular",
-            fontSize: 14,
-            color: C.muted,
-            marginBottom: 28,
-          }}>
-            Hesabınla giriş yap, kaldığın yerden devam et.
-          </Text>
-
-          <AuthInput
-            label="E-posta"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="ornek@mail.com"
-            keyboardType="email-address"
-            error={errors.email}
-            icon="mail"
-          />
-          <AuthInput
-            label="Şifre"
-            value={password}
-            onChangeText={setPassword}
-            placeholder="••••••••"
-            secureTextEntry
-            error={errors.password}
-            icon="lock"
-          />
-
-          <Pressable
-            onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)}
-            style={{ alignSelf: "flex-end", marginBottom: 8, marginTop: -4 }}
-            hitSlop={6}
-          >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.purple }}>
-              Şifremi unuttum
+          <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
+            <Text style={{
+              fontFamily: "SpaceGrotesk_700Bold",
+              fontSize: 24,
+              color: C.text,
+              letterSpacing: -0.4,
+              marginBottom: 4,
+            }}>
+              Tekrar Hoş Geldin
             </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={submit}
-            disabled={busy}
-            style={({ pressed }) => ({
-              backgroundColor: C.purple,
-              borderRadius: 999,
-              paddingVertical: 17,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 8,
-              marginTop: 16,
-              opacity: busy ? 0.6 : pressed ? 0.92 : 1,
-              shadowColor: C.purple,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.30,
-              shadowRadius: 18,
-              elevation: 6,
-            })}
-          >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
-              {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
+            <Text style={{
+              fontFamily: "Inter_400Regular",
+              fontSize: 14,
+              color: C.muted,
+              marginBottom: 28,
+            }}>
+              Hesabınla giriş yap, kaldığın yerden devam et.
             </Text>
-            {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
-          </Pressable>
+          </Animated.View>
 
-          {/* Divider */}
-          <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 22, gap: 12 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-            <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>
-              veya
-            </Text>
-            <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-          </View>
+          <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
+            <AuthInput
+              label="E-posta"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="ornek@mail.com"
+              keyboardType="email-address"
+              error={errors.email}
+              icon="mail"
+            />
+          </Animated.View>
 
-          <Pressable
-            onPress={() => navigation.navigate(SCREENS.REGISTER)}
-            style={({ pressed }) => ({
-              backgroundColor: C.surface,
-              borderRadius: 999,
-              paddingVertical: 16,
-              alignItems: "center",
-              borderWidth: 1.5,
-              borderColor: C.border,
-              opacity: pressed ? 0.85 : 1,
-            })}
-          >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
-              Hesap Oluştur
-            </Text>
-          </Pressable>
+          <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+            <AuthInput
+              label="Şifre"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••••"
+              secureTextEntry
+              error={errors.password}
+              icon="lock"
+            />
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)}
+              style={{ alignSelf: "flex-end", marginBottom: 8, marginTop: -4 }}
+              hitSlop={6}
+            >
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.purple }}>
+                Şifremi unuttum
+              </Text>
+            </Pressable>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
+            <Pressable
+              onPress={submit}
+              disabled={busy}
+              style={({ pressed }) => ({
+                backgroundColor: C.purple,
+                borderRadius: 999,
+                paddingVertical: 17,
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "center",
+                gap: 8,
+                marginTop: 16,
+                opacity: busy ? 0.6 : pressed ? 0.92 : 1,
+                shadowColor: C.purple,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.30,
+                shadowRadius: 18,
+                elevation: 6,
+              })}
+            >
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
+                {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
+              </Text>
+              {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
+            </Pressable>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(380).duration(400).springify()}>
+            {/* Divider */}
+            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 22, gap: 12 }}>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>
+                veya
+              </Text>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+            </View>
+
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.REGISTER)}
+              style={({ pressed }) => ({
+                backgroundColor: C.surface,
+                borderRadius: 999,
+                paddingVertical: 16,
+                alignItems: "center",
+                borderWidth: 1.5,
+                borderColor: C.border,
+                opacity: pressed ? 0.85 : 1,
+              })}
+            >
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
+                Hesap Oluştur
+              </Text>
+            </Pressable>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

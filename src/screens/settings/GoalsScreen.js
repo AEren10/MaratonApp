@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -11,6 +11,8 @@ import { useAppDispatch } from "../../store/hooks";
 import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "../../supabase/profiles";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 function GoalInput({ icon, color, label, hint, value, onChange, suffix, styles }) {
   return (
@@ -43,6 +45,7 @@ export default function GoalsScreen() {
   const dispatch = useAppDispatch();
   const goals = useSelector(selectGoals);
   const { user } = useAuth();
+  const showAlert = useAlert();
 
   const [draft, setDraft] = useState({
     dailyQuestions: goals.dailyQuestions,
@@ -67,7 +70,8 @@ export default function GoalsScreen() {
         await updateProfile(user.id, { daily_question_goal: draft.dailyQuestions });
       } catch (_) {}
     }
-    Alert.alert("Kaydedildi", "Hedeflerin güncellendi.");
+    H.success();
+    showAlert("Kaydedildi", "Hedeflerin güncellendi.");
     navigation.goBack();
   }, [draft, dispatch, navigation, user?.id]);
 

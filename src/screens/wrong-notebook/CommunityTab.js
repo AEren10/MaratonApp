@@ -14,11 +14,13 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
 
 const FILTERS = [
-  { key: "all", label: "Tümü" },
-  { key: "turkce", label: "Türkçe" },
-  { key: "matematik", label: "Mat" },
-  { key: "fen", label: "Fen" },
-  { key: "sosyal", label: "Sosyal" },
+  { key: "all", label: "Tümü", icon: "layers" },
+  { key: "turkce", label: "Türkçe", icon: "bookOpen" },
+  { key: "matematik", label: "Matematik", icon: "hash" },
+  { key: "fizik", label: "Fizik", icon: "zap" },
+  { key: "kimya", label: "Kimya", icon: "flask" },
+  { key: "biyoloji", label: "Biyoloji", icon: "activity" },
+  { key: "tarih", label: "Tarih", icon: "clock" },
 ];
 
 function relativeTime(iso) {
@@ -39,10 +41,15 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
   const imageUri = item.image_path ? getWrongQuestionImageUrl(item.image_path) : null;
 
   return (
-    <View style={{
-      backgroundColor: C.surface, borderRadius: 22,
-      borderWidth: 1, borderColor: C.border, padding: 14,
-    }}>
+    <Pressable
+      onPress={() => onAnswer(item)}
+      style={({ pressed }) => ({
+        backgroundColor: C.surface, borderRadius: 22,
+        borderWidth: 1, borderColor: C.border, padding: 14,
+        opacity: pressed ? 0.95 : 1,
+      })}
+    >
+      {/* Header: avatar + user + subject chip */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={{
           width: 40, height: 40, borderRadius: 14,
@@ -52,17 +59,37 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
           <Icon name={icon} size={20} color={color} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>
-            {item.profile?.display_name || "Anonim Kullanıcı"}
-          </Text>
-          <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, marginTop: 1 }}>
-            {relativeTime(item.created_at)}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, fontSize: 14, color: C.text }}>
+              {item.profile?.name || "Anonim"}
+            </Text>
+            <Text style={{ color: C.muted, fontSize: 13 }}>·</Text>
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>
+              {relativeTime(item.created_at)}
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 }}>
+            <View style={{
+              flexDirection: "row", alignItems: "center", gap: 3,
+              backgroundColor: color + "16", paddingHorizontal: 8, paddingVertical: 3,
+              borderRadius: RADIUS.pill,
+            }}>
+              <Icon name={icon} size={10} color={color} />
+              <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color }}>
+                {subj?.label || item.subject}
+              </Text>
+            </View>
+            {item.topic ? (
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }} numberOfLines={1}>
+                {item.topic}
+              </Text>
+            ) : null}
+          </View>
         </View>
       </View>
 
       {item.note ? (
-        <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.text, marginTop: 10 }} numberOfLines={3}>
+        <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.text, marginTop: 10, lineHeight: 21 }} numberOfLines={3}>
           {item.note}
         </Text>
       ) : null}
@@ -75,44 +102,40 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
         />
       ) : null}
 
-      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 12, gap: 8 }}>
-        <View style={{
-          flexDirection: "row", alignItems: "center", gap: 4,
-          backgroundColor: color + "16", paddingHorizontal: 9, paddingVertical: 5,
-          borderRadius: RADIUS.pill,
-        }}>
-          <Icon name={icon} size={11} color={color} />
-          <Text style={{ ...TYPOGRAPHY.micro, color }}>
-            {item.topic || subj?.label || item.subject}
-          </Text>
-        </View>
-        <View style={{ flex: 1 }} />
+      {/* Footer: answer count + answer button */}
+      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 12, gap: 10 }}>
         {item.answer_count > 0 ? (
           <View style={{
-            backgroundColor: C.surface2, paddingHorizontal: 8, paddingVertical: 4,
-            borderRadius: RADIUS.pill, flexDirection: "row", alignItems: "center", gap: 4,
+            flexDirection: "row", alignItems: "center", gap: 5,
+            backgroundColor: C.surface2, paddingHorizontal: 10, paddingVertical: 6,
+            borderRadius: RADIUS.pill,
           }}>
-            <Icon name="chat" size={11} color={C.sec} />
-            <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>{item.answer_count}</Text>
+            <Icon name="chat" size={13} color={C.sec} />
+            <Text style={{ fontSize: 12, fontFamily: "Inter_600SemiBold", color: C.sec }}>
+              {item.answer_count} cevap
+            </Text>
           </View>
         ) : null}
+        <View style={{ flex: 1 }} />
         <Pressable
           onPress={() => onAnswer(item)}
           style={({ pressed }) => ({
-            flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: C.accent, paddingHorizontal: 12, paddingVertical: 7,
+            flexDirection: "row", alignItems: "center", gap: 6,
+            backgroundColor: C.accent, paddingHorizontal: 16, paddingVertical: 9,
             borderRadius: RADIUS.pill, opacity: pressed ? 0.85 : 1,
           })}
         >
-          <Icon name="camera" size={13} color="#FFFFFF" />
-          <Text style={{ ...TYPOGRAPHY.micro, color: "#FFFFFF" }}>Cevap ver</Text>
+          <Icon name="edit" size={14} color="#FFFFFF" />
+          <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" }}>
+            Cevap Yaz
+          </Text>
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 });
 
-export function CommunityTab({ visible }) {
+export function CommunityTab({ visible, onSwitchToMine }) {
   const C = useC();
   const { user } = useAuth();
   const nav = useNavigation();
@@ -120,15 +143,20 @@ export function CommunityTab({ visible }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [loadError, setLoadError] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const data = await getSharedQuestions(
         filter === "all" ? {} : { subject: filter },
       );
       setItems(data || []);
-    } catch {}
+    } catch (e) {
+      console.warn("CommunityTab load error:", e?.message);
+      setLoadError(e?.message || "Yüklenemedi");
+    }
     setLoading(false);
   }, [filter]);
 
@@ -136,7 +164,10 @@ export function CommunityTab({ visible }) {
 
   useEffect(() => {
     if (!visible) return;
-    const unsub = subscribeToFeed((row) => setItems((prev) => [row, ...prev]));
+    const unsub = subscribeToFeed((row) => setItems((prev) => {
+      if (prev.some((p) => p.id === row.id)) return prev;
+      return [row, ...prev];
+    }));
     return unsub;
   }, [visible]);
 
@@ -167,15 +198,17 @@ export function CommunityTab({ visible }) {
         contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: SPACING.md, alignItems: "center" }}>
         {FILTERS.map((f) => {
           const subj = f.key !== "all" ? getSubjectByKey(f.key) : null;
-          const clr = subj?.color || C.amber;
+          const clr = subj?.color || C.accent;
           const on = filter === f.key;
           return (
             <Pressable key={f.key} onPress={() => setFilter(f.key)} style={{
-              paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.pill,
-              backgroundColor: on ? clr + "22" : C.surface,
-              borderWidth: 1, borderColor: on ? clr : C.border,
+              flexDirection: "row", alignItems: "center", gap: 6,
+              paddingHorizontal: 14, paddingVertical: 9, borderRadius: RADIUS.pill,
+              backgroundColor: on ? clr + "1A" : "transparent",
+              borderWidth: 1, borderColor: on ? clr + "40" : C.border,
             }}>
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: on ? clr : C.sec }}>
+              <Icon name={f.icon} size={13} color={on ? clr : C.muted} />
+              <Text style={{ fontSize: 13, fontFamily: on ? "Inter_600SemiBold" : "Inter_500Medium", color: on ? clr : C.sec }}>
                 {f.label}
               </Text>
             </Pressable>
@@ -187,9 +220,24 @@ export function CommunityTab({ visible }) {
         <View style={{ gap: SPACING.md, paddingHorizontal: 16 }}>
           <SkeletonCard height={200} /><SkeletonCard height={160} /><SkeletonCard height={180} />
         </View>
+      ) : loadError ? (
+        <EmptyState
+          icon="alert"
+          title="Yüklenemedi"
+          message={`Topluluk verileri alınamadı: ${loadError}`}
+          actionLabel="Tekrar Dene"
+          onAction={load}
+          color="red"
+        />
       ) : filtered.length === 0 ? (
-        <EmptyState icon="users" title="Henüz paylaşım yok"
-          message="Topluluktan yanlış soru paylaşıldığında burada görünecek." />
+        <EmptyState
+          icon="globe"
+          title="Topluluk henüz boş"
+          message="Yanlış defterinden bir soru paylaşarak topluluğu başlat! Diğer öğrenciler çözüm önerebilir."
+          actionLabel="Defterime Git"
+          onAction={onSwitchToMine}
+          color="accent"
+        />
       ) : (
         <FlatList
           data={filtered} renderItem={renderItem}

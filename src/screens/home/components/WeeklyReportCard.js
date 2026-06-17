@@ -64,6 +64,10 @@ export function WeeklyReportCard({ report, onPress }) {
           <StatBlock C={C} value={report.activeDays} label="Aktif Gün" color={C.green} />
           <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.purple} />
         </View>
+
+        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>
+          Detaylı raporu görmek için dokun
+        </Text>
       </View>
     </Pressable>
   );

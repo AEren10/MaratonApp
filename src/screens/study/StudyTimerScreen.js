@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -9,15 +9,8 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
-import { useAppDispatch } from "../../store/hooks";
-import { addLog } from "../../store/slices/studyLogSlice";
-import { useGamification } from "../../hooks/useGamification";
-import { XPToast } from "../../components/common/XPToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
-import { useAuth } from "../../contexts/AuthContext";
-import { saveStudyLogOffline } from "../../lib/offlineQueue";
-import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
+import { useAlert } from "../../contexts/AlertContext";
 
 function buildModes(C) {
   return [
@@ -64,17 +57,18 @@ const fmt = (s) => {
 
 export default function StudyTimerScreen() {
   const C = useC();
+  const showAlert = useAlert();
   const styles = useMemo(() => makeStyles(C), [C]);
   const MODES = useMemo(() => buildModes(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
-  const dispatch = useAppDispatch();
-  const { user } = useAuth();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const { subjectKey, topicName } = route.params ?? {};
 
-  const subject = getSubjectByKey(subjectKey || "matematik") || { key: "matematik", label: "Matematik", color: C.amber, icon: "hash" };
-  const topic = topicName || "Çalışma";
+  const hasSubject = !!subjectKey;
+  const subject = hasSubject
+    ? (getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.amber, icon: "bookOpen" })
+    : { key: null, label: "Çalışma", color: C.amber, icon: "clock" };
+  const topic = topicName || "";
 
   const [modeKey, setModeKey] = useState("FREE");
   const mode = useMemo(() => MODES.find((m) => m.key === modeKey), [modeKey, MODES]);
@@ -86,7 +80,6 @@ export default function StudyTimerScreen() {
   const [totalFocusSeconds, setTotalFocusSeconds] = useState(0);
   const [questions, setQuestions] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
-  const [saving, setSaving] = useState(false);
   const interval = useRef(null);
 
   // For pomodoro modes, target time of current phase. For free, no target.
@@ -191,7 +184,7 @@ export default function StudyTimerScreen() {
 
   const handleModeChange = useCallback((key) => {
     if (elapsed > 30) {
-      Alert.alert("Modu değiştir", "Çalışman sıfırlanacak. Emin misin?", [
+      showAlert("Modu değiştir", "Çalışman sıfırlanacak. Emin misin?", [
         { text: "İptal", style: "cancel" },
         {
           text: "Değiştir",
@@ -215,8 +208,7 @@ export default function StudyTimerScreen() {
     }
   }, [elapsed]);
 
-  const finish = useCallback(async () => {
-    if (saving) return;
+  const finish = useCallback(() => {
     setRunning(false);
 
     const focusForSave = isPomodoro
@@ -224,7 +216,7 @@ export default function StudyTimerScreen() {
       : elapsed;
 
     if (focusForSave < 30) {
-      Alert.alert("Çok kısa", "30 saniyeden az çalışma kaydedilmez.", [
+      showAlert("Çok kısa", "30 saniyeden az çalışma kaydedilmez.", [
         { text: "Çık", onPress: () => navigation.goBack() },
         { text: "Devam", style: "cancel" },
       ]);
@@ -232,66 +224,19 @@ export default function StudyTimerScreen() {
     }
 
     const minutes = Math.max(1, Math.round(focusForSave / 60));
-    const todayStr = new Date().toISOString().split("T")[0];
 
-    const parsed = studyLogSchema.safeParse({
-      subject: subject.key,
-      topic,
-      questionCount: questions,
-      correctCount,
-      duration: minutes,
-    });
-    if (!parsed.success) {
-      Alert.alert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
-      return;
-    }
-
-    dispatch(addLog({
-      id: Date.now().toString(),
-      subject: subject.key,
-      topic,
-      questionCount: questions,
-      correctCount,
-      duration: minutes,
-      study_date: todayStr,
-    }));
-
-    setSaving(true);
-    if (user?.id && user.id !== "dev") {
-      await saveStudyLogOffline({
-        user_id: user.id,
-        subject: subject.key,
-        topic,
-        question_count: questions,
-        correct_count: correctCount,
-        duration_minutes: minutes,
-        study_date: todayStr,
-      });
-    }
-    setSaving(false);
-
-    reward("study_log", {
-      minutes,
-      statUpdates: [
-        { type: "increment", key: "totalQuestions", value: questions },
-        { type: "increment", key: "totalMinutes", value: minutes },
-      ],
-    });
-    if (questions > 0) reward("question_solved", { count: questions });
-
-    navigation.replace(SCREENS.STUDY_SUMMARY, {
-      subjectLabel: subject.label || subject.name,
-      subjectColor: subject.color,
-      subjectIcon: subject.icon,
-      topic,
+    navigation.replace(SCREENS.STUDY_SAVE, {
       duration: minutes,
       questions,
+      correctCount,
+      subjectKey: hasSubject ? subject.key : undefined,
+      topicName: topic || undefined,
     });
-  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, correctCount, subject, topic, user, dispatch, reward, navigation, saving]);
+  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, correctCount, subject, topic, hasSubject, navigation]);
 
   const exit = useCallback(() => {
     if (elapsed >= 30 || totalFocusSeconds >= 30) {
-      Alert.alert("Çıkış", "Çalışmayı kaydetmeden çıkmak istiyor musun?", [
+      showAlert("Çıkış", "Çalışmayı kaydetmeden çıkmak istiyor musun?", [
         { text: "İptal", style: "cancel" },
         { text: "Çıkış", style: "destructive", onPress: () => navigation.goBack() },
       ]);
@@ -308,7 +253,9 @@ export default function StudyTimerScreen() {
         </Pressable>
         <View style={styles.subjectBadge}>
           <View style={[styles.dot, { backgroundColor: subject.color }]} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: subject.color }]}>{subject.label || subject.name}</Text>
+          <Text style={[TYPOGRAPHY.captionMedium, { color: hasSubject ? subject.color : C.sec }]}>
+            {hasSubject ? (subject.label || subject.name) : "Serbest Çalışma"}
+          </Text>
         </View>
         <View style={{ width: 22 }} />
       </View>
@@ -344,9 +291,13 @@ export default function StudyTimerScreen() {
         <Text style={[TYPOGRAPHY.label, { color: phaseColor, marginBottom: 4 }]}>
           {isPomodoro ? phaseLabel.toUpperCase() : ""}
         </Text>
-        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec, marginBottom: SPACING.lg }]}>
-          {topic}
-        </Text>
+        {topic ? (
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec, marginBottom: SPACING.lg }]}>
+            {topic}
+          </Text>
+        ) : (
+          <View style={{ marginBottom: SPACING.lg }} />
+        )}
 
         <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
           <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{fmt(elapsed)}</Text>
@@ -405,18 +356,10 @@ export default function StudyTimerScreen() {
         )}
       </View>
 
-      <Pressable
-        onPress={finish}
-        disabled={saving}
-        style={[styles.finishBtn, saving && { opacity: 0.6 }]}
-      >
+      <Pressable onPress={finish} style={styles.finishBtn}>
         <Icon name="check" size={20} color={C.bg} />
-        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
-          {saving ? "Kaydediliyor..." : "Bitir ve Kaydet"}
-        </Text>
+        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Bitir</Text>
       </Pressable>
-      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
-      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );
 }

@@ -40,6 +40,7 @@ export async function getNotifPrefs() {
     dailyReminderMinute: 0,
     streakRiskEnabled: true,
     trialReminderEnabled: false,
+    taskReminderEnabled: true,
   };
 }
 
@@ -104,6 +105,53 @@ export async function applyNotifPrefs(prefs) {
   if (prefs.streakRiskEnabled) {
     await scheduleStreakRiskReminder();
   }
+}
+
+export async function scheduleTaskNotifications(taskCount) {
+  if (Platform.OS === "web") return;
+  const prefs = await getNotifPrefs();
+  if (prefs.taskReminderEnabled === false) return;
+  await cancelTaskReminders();
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Çalışma listen yarım kaldı 📋",
+        body: `${taskCount} görevden tamamlanmamışlar var. Geri dön ve bitir!`,
+        data: { type: "task_reminder", url: "maraton://plan" },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 9000,
+      },
+    });
+    const now = new Date();
+    if (now.getHours() < 20) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Bugünkü hedeflerine ulaşmadın 🎯",
+          body: "Hâlâ tamamlanmamış görevlerin var. Son bir hamle!",
+          data: { type: "task_reminder", url: "maraton://plan" },
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: 20,
+          minute: 0,
+        },
+      });
+    }
+  } catch (_) {}
+}
+
+export async function cancelTaskReminders() {
+  if (Platform.OS === "web") return;
+  try {
+    const all = await Notifications.getAllScheduledNotificationsAsync();
+    for (const n of all) {
+      if (n.content?.data?.type === "task_reminder") {
+        await Notifications.cancelScheduledNotificationAsync(n.identifier);
+      }
+    }
+  } catch (_) {}
 }
 
 export async function notifyXP(amount) {

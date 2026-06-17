@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
@@ -10,19 +10,24 @@ import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { getAllSubjects } from "../trial/trialTypes";
 import * as haptic from "../../lib/haptics";
+import { useAlert } from "../../contexts/AlertContext";
 
 const TYT_CONFIG = { time: 165, label: "TYT", sections: ["turkce", "sosyal", "matematik", "fen"] };
 const AYT_CONFIG = { time: 180, label: "AYT", sections: ["mat", "fizik", "kimya", "biyoloji", "edebiyat", "tarih1", "cografya1"] };
+const LGS_CONFIG = { time: 155, label: "LGS", sections: ["turkce", "matematik", "fen", "inkilap", "din", "ingilizce"] };
 
 export default function ExamSimulatorScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { examType } = useExam();
+  const showAlert = useAlert();
   const allSubjects = getAllSubjects(C);
 
   const [phase, setPhase] = useState("setup");
-  const [config, setConfig] = useState(examType === "ayt" ? AYT_CONFIG : TYT_CONFIG);
+  const [config, setConfig] = useState(
+    examType === "lgs" ? LGS_CONFIG : examType === "ayt" ? AYT_CONFIG : TYT_CONFIG
+  );
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef(null);
@@ -50,7 +55,8 @@ export default function ExamSimulatorScreen() {
   }, [phase, paused, config.time]);
 
   const finishEarly = useCallback(() => {
-    Alert.alert("Bitir", "Simülasyonu bitirmek istiyor musun?", [
+    haptic.warn();
+    showAlert("Bitir", "Simülasyonu bitirmek istiyor musun?", [
       { text: "İptal", style: "cancel" },
       { text: "Bitir", onPress: () => { clearInterval(timerRef.current); setPhase("done"); haptic.success(); } },
     ]);
@@ -78,10 +84,10 @@ export default function ExamSimulatorScreen() {
           </Animated.View>
           <Text style={s.setupTitle}>Gerçek sınav koşullarında çalış</Text>
           <Text style={s.setupSub}>Zamanlayıcı sınavdaki süreyi simüle eder. Kendi kitapçığınla çöz, süreyi buradan takip et.</Text>
-          <View style={s.configRow}>
-            {[TYT_CONFIG, AYT_CONFIG].map((cfg) => (
+          <View style={[s.configRow, examType === "lgs" && { justifyContent: "center" }]}>
+            {(examType === "lgs" ? [LGS_CONFIG] : [TYT_CONFIG, AYT_CONFIG]).map((cfg) => (
               <Pressable key={cfg.label} onPress={() => setConfig(cfg)}
-                style={[s.configBtn, config.label === cfg.label && { borderColor: C.amber, backgroundColor: C.amber + "12" }]}>
+                style={[s.configBtn, examType === "lgs" && { flex: 0, minWidth: 140 }, config.label === cfg.label && { borderColor: C.amber, backgroundColor: C.amber + "12" }]}>
                 <Text style={[s.configText, config.label === cfg.label && { color: C.amber }]}>{cfg.label}</Text>
                 <Text style={s.configMeta}>{cfg.time} dk</Text>
               </Pressable>

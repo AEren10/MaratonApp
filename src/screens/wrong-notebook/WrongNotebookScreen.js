@@ -1,21 +1,25 @@
 import { useMemo, useState, useCallback } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
-import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
+import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { shareQuestion, isQuestionShared } from "../../supabase/community";
 import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
+import { AppModal } from "../../components/common/AppModal";
 import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
 
-import { WrongCard } from "./components/WrongCard";
+import { SwipeableWrongCard } from "./components/SwipeableWrongCard";
+import { FilterPill, SubjectFilterPill } from "./components/FilterPills";
+import { DueBanner } from "./components/DueBanner";
 import { CommunityTab } from "./CommunityTab";
 
 function WrongSkeleton() {
@@ -28,53 +32,6 @@ function WrongSkeleton() {
   );
 }
 
-function FilterPill({ label, count, active, color, onPress }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 5,
-        paddingHorizontal: 12,
-        paddingVertical: 7,
-        borderRadius: 999,
-        backgroundColor: active ? color + "1A" : "transparent",
-        borderWidth: 1,
-        borderColor: active ? color : color + "30",
-      }}
-    >
-      <Text style={{ fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium", fontSize: 12, color }}>
-        {label}
-      </Text>
-      {count != null && count > 0 ? (
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: color + "99" }}>
-          {count}
-        </Text>
-      ) : null}
-    </Pressable>
-  );
-}
-
-function SubjectFilterPill({ subKey, active, count, onPress }) {
-  const C = useC();
-  const id = useSubjectIdentity(subKey);
-  const color = id?.solid || C.purple;
-  const labels = {
-    turkce: "Türkçe", matematik: "Matematik", fizik: "Fizik", kimya: "Kimya",
-    biyoloji: "Biyoloji", tarih: "Tarih", cografya: "Coğrafya", felsefe: "Felsefe",
-    din: "Din", fen: "Fen", sosyal: "Sosyal", edebiyat: "Edebiyat",
-  };
-  return (
-    <FilterPill
-      label={labels[subKey] || subKey}
-      count={count}
-      color={color}
-      active={active}
-      onPress={onPress}
-    />
-  );
-}
 
 export default function WrongNotebookScreen() {
   const navigation = useNavigation();
@@ -88,8 +45,11 @@ export default function WrongNotebookScreen() {
   const [status, setStatus] = useState("open"); // "open" | "resolved" | "all"
   const [mainTab, setMainTab] = useState("mine"); // "mine" | "community"
   const [sharedIds, setSharedIds] = useState(new Set());
+  const [shareModal, setShareModal] = useState({ visible: false, item: null });
+  const [errorModal, setErrorModal] = useState({ visible: false, message: "" });
 
   const setSubjectAndReset = useCallback((s) => {
+    haptic.select();
     setSubject(s);
     setTopicFilter("all");
   }, []);
@@ -112,19 +72,12 @@ export default function WrongNotebookScreen() {
   }, [user?.id]);
 
   const handleShare = useCallback((item) => {
-    const subKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
-    Alert.alert(
-      "Soruyu Paylaş",
-      "Bu yanlışı toplulukla paylaşmak ister misin?",
-      [
-        { text: "Anonim Paylaş", onPress: () => doShare(item, subKey, true) },
-        { text: "İsimle Paylaş", onPress: () => doShare(item, subKey, false) },
-        { text: "Vazgeç", style: "cancel" },
-      ],
-    );
-  }, [user?.id]);
+    setShareModal({ visible: true, item });
+  }, []);
 
-  const doShare = async (item, subKey, anonymous) => {
+  const doShare = useCallback(async (item, anonymous) => {
+    if (!item) return;
+    const subKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
     try {
       await shareQuestion({
         wrongQuestionId: item.id,
@@ -137,10 +90,11 @@ export default function WrongNotebookScreen() {
       });
       haptic.success();
       setSharedIds((prev) => new Set([...prev, item.id]));
+      setMainTab("community");
     } catch (e) {
-      Alert.alert("Hata", e?.message || "Paylaşılamadı");
+      setErrorModal({ visible: true, message: e?.message || "Paylaşılamadı" });
     }
-  };
+  }, [user?.id]);
 
   // Sayma için — sadece status filtresinin uygulanmadığı sayım
   const subjectCounts = useMemo(() => {
@@ -265,7 +219,7 @@ export default function WrongNotebookScreen() {
           return (
             <Pressable
               key={t.key}
-              onPress={() => setMainTab(t.key)}
+              onPress={() => { haptic.select(); setMainTab(t.key); }}
               style={[s.mainTab, active && { borderBottomColor: C.accent }]}
             >
               <Icon name={t.icon} size={16} color={active ? C.accent : C.muted} />
@@ -281,7 +235,7 @@ export default function WrongNotebookScreen() {
       </View>
 
       {mainTab === "community" ? (
-        <CommunityTab visible={mainTab === "community"} />
+        <CommunityTab visible={mainTab === "community"} onSwitchToMine={() => setMainTab("mine")} />
       ) : (
       <View style={{ flex: 1 }}>
       {/* === Status filter pills (Çözülmemiş / Çözüldü / Tümü) === */}
@@ -295,7 +249,7 @@ export default function WrongNotebookScreen() {
           return (
             <Pressable
               key={t.key}
-              onPress={() => setStatus(t.key)}
+              onPress={() => { haptic.select(); setStatus(t.key); }}
               style={[
                 s.statusChip,
                 {
@@ -316,37 +270,16 @@ export default function WrongNotebookScreen() {
       </View>
 
       {/* === "Bugün tekrar" banner === */}
-      {dueCount > 0 ? (
-        <View style={[s.dueBanner, { backgroundColor: C.coral + "12", borderColor: C.coral + "30" }]}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.coral + "22", alignItems: "center", justifyContent: "center" }}>
-              <Icon name="refresh" size={18} color={C.coral} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ ...TYPOGRAPHY.label, color: C.coral, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
-              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: 1 }}>{dueCount} sorunun tekrar zamanı geldi</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", gap: 8, marginTop: 10 }}>
-            <Pressable
-              onPress={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
-              style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.coral + "18" }}
-            >
-              <Icon name="list" size={14} color={C.coral} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.coral }}>Klasik</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => navigation.navigate(SCREENS.SWIPE_REVIEW)}
-              style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.amber + "18" }}
-            >
-              <Icon name="layers" size={14} color={C.amber} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Swipe</Text>
-            </Pressable>
-          </View>
-        </View>
-      ) : null}
+      {status !== "resolved" && (
+        <DueBanner
+          dueCount={dueCount}
+          onClassic={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
+          onSwipe={() => navigation.navigate(SCREENS.SWIPE_REVIEW)}
+        />
+      )}
 
       {/* === Ders filter chips (yatay scroll) === */}
+      {filtered.length > 0 || subject !== "all" ? (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -369,6 +302,7 @@ export default function WrongNotebookScreen() {
           />
         ))}
       </ScrollView>
+      ) : null}
 
       {/* === Konu filter (alt seviye) === */}
       {topicOptions.length > 0 ? (
@@ -378,7 +312,7 @@ export default function WrongNotebookScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, gap: 6, paddingBottom: 8 }}
         >
           <Pressable
-            onPress={() => setTopicFilter("all")}
+            onPress={() => { haptic.select(); setTopicFilter("all"); }}
             style={[s.topicChip, {
               backgroundColor: topicFilter === "all" ? C.surface2 : "transparent",
               borderColor: topicFilter === "all" ? C.border : "transparent",
@@ -393,7 +327,7 @@ export default function WrongNotebookScreen() {
             return (
               <Pressable
                 key={t.name}
-                onPress={() => setTopicFilter(t.name)}
+                onPress={() => { haptic.select(); setTopicFilter(t.name); }}
                 style={[s.topicChip, {
                   backgroundColor: active ? C.surface2 : "transparent",
                   borderColor: active ? C.border : "transparent",
@@ -417,7 +351,7 @@ export default function WrongNotebookScreen() {
           keyExtractor={(item) => item.id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.purple} colors={[C.purple]} />}
           renderItem={({ item }) => (
-            <WrongCard
+            <SwipeableWrongCard
               item={item}
               onPress={() => navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item })}
               onResolve={() => toggleResolve(item.id)}
@@ -432,30 +366,40 @@ export default function WrongNotebookScreen() {
             gap: 12,
           }}
           ListEmptyComponent={
-            <View style={s.empty}>
-              <View style={{
-                width: 64, height: 64, borderRadius: 22,
-                backgroundColor: C.purple + "1A",
-                alignItems: "center", justifyContent: "center",
-                marginBottom: 14,
-              }}>
-                <Icon name={status === "resolved" ? "check" : "notebook"} size={32} color={C.purple} />
-              </View>
-              <Text style={[s.emptyTitle, { color: C.text }]}>
-                {status === "resolved" ? "Henüz çözüldü olarak işaretlemediğin yok" : "Henüz yanlış yok"}
-              </Text>
-              <Text style={[s.emptySub, { color: C.muted }]}>
-                {subject === "all"
-                  ? "Yeni eklemek için sağ üstteki + butonuna bas"
-                  : "Bu ders için kayıt yok, başka dersi dene"}
-              </Text>
-            </View>
+            <EmptyState
+              icon={status === "resolved" ? "check" : "notebook"}
+              title={status === "resolved" ? "Henüz çözüldü olarak işaretlediğin yok" : "Henüz yanlış yok"}
+              message={subject === "all" ? "Yeni eklemek için sağ üstteki + butonuna bas" : "Bu ders için kayıt yok, başka dersi dene"}
+              color="purple"
+            />
           }
           showsVerticalScrollIndicator={false}
         />
       )}
       </View>
       )}
+      <AppModal
+        visible={shareModal.visible}
+        onClose={() => setShareModal({ visible: false, item: null })}
+        icon="globe"
+        iconColor={C.accent}
+        title="Soruyu Paylaş"
+        message="Bu yanlışı toplulukla paylaşmak ister misin?"
+        actions={[
+          { label: "Anonim Paylaş", icon: "users", color: C.purple, onPress: () => doShare(shareModal.item, true) },
+          { label: "İsimle Paylaş", icon: "user", color: C.accent, onPress: () => doShare(shareModal.item, false) },
+          { label: "Vazgeç", style: "cancel" },
+        ]}
+      />
+      <AppModal
+        visible={errorModal.visible}
+        onClose={() => setErrorModal({ visible: false, message: "" })}
+        icon="alert"
+        iconColor={C.danger}
+        title="Hata"
+        message={errorModal.message}
+        actions={[{ label: "Tamam", style: "cancel" }]}
+      />
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
@@ -512,7 +456,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 16,
     gap: 8,
-    marginBottom: 10,
+    marginBottom: 6,
   },
   statusChip: {
     paddingHorizontal: 12,
@@ -520,21 +464,11 @@ const s = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
   },
-  dueBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 18,
-    borderWidth: 1,
-  },
   subjectFilterRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingBottom: 10,
+    paddingBottom: 6,
     gap: 6,
   },
   topicChip: {
@@ -542,21 +476,5 @@ const s = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
-  },
-  empty: {
-    alignItems: "center",
-    paddingTop: 60,
-    paddingHorizontal: 24,
-  },
-  emptyTitle: {
-    ...TYPOGRAPHY.subheading,
-    fontSize: 16,
-    textAlign: "center",
-  },
-  emptySub: {
-    ...TYPOGRAPHY.caption,
-    textAlign: "center",
-    marginTop: 6,
-    lineHeight: 18,
   },
 });

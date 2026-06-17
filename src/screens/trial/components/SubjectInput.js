@@ -3,9 +3,10 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
+import * as H from "../../../lib/haptics";
 
 // Ders satırı: kimlik renkli sol şerit + ad + 3 input (D/Y/B otomatik) + net
-export function SubjectInput({ subject, values, onChange }) {
+export function SubjectInput({ subject, values, onChange, wrongPenalty = 0.25 }) {
   const C = useC();
   const id = useSubjectIdentity(subject.key);
   const { name, icon, max } = subject;
@@ -19,17 +20,33 @@ export function SubjectInput({ subject, values, onChange }) {
   const emptyAuto = Math.max(0, max - correct - wrong);
   const emptyInput = values.empty != null ? values.empty : String(emptyAuto);
 
-  const net = useMemo(() => (correct - wrong * 0.25).toFixed(2), [correct, wrong]);
+  const net = useMemo(() => (correct - wrong * wrongPenalty).toFixed(2), [correct, wrong, wrongPenalty]);
 
-  const setCorrect = useCallback((t) => onChange({ ...values, correct: t.replace(/[^0-9]/g, "") }), [values, onChange]);
-  const setWrong   = useCallback((t) => onChange({ ...values, wrong:   t.replace(/[^0-9]/g, "") }), [values, onChange]);
-  const setEmpty   = useCallback((t) => onChange({ ...values, empty:   t.replace(/[^0-9]/g, "") }), [values, onChange]);
+  const cap = useCallback((t, limit) => {
+    const clean = t.replace(/[^0-9]/g, "");
+    if (!clean) return "";
+    const num = parseInt(clean, 10);
+    if (isNaN(num)) return "";
+    if (num > limit) return String(limit);
+    return clean;
+  }, []);
+
+  const setCorrect = useCallback((t) => {
+    const newCorrect = cap(t, max);
+    const c = parseInt(newCorrect, 10) || 0;
+    const w = parseInt(values.wrong, 10) || 0;
+    const cappedWrong = w > max - c ? String(max - c) : values.wrong;
+    onChange({ ...values, correct: newCorrect, wrong: cappedWrong });
+  }, [values, onChange, max, cap]);
+
+  const setWrong = useCallback((t) => {
+    onChange({ ...values, wrong: cap(t, max - correct) });
+  }, [values, onChange, max, correct, cap]);
+
+  const setEmpty = useCallback((t) => onChange({ ...values, empty: cap(t, max) }), [values, onChange, max, cap]);
 
   return (
     <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-      {/* Sol kimlik şerit */}
-      <View style={[s.stripe, { backgroundColor: color }]} />
-
       <View style={s.body}>
         {/* Header: ikon + ad + max + net */}
         <View style={s.head}>
@@ -64,6 +81,7 @@ function NumInput({ label, value, onChange, max, tone, C, dim }) {
       <TextInput
         value={String(value || "")}
         onChangeText={onChange}
+        onFocus={() => H.tap()}
         keyboardType="number-pad"
         maxLength={String(max).length}
         placeholder="0"
@@ -83,14 +101,12 @@ function NumInput({ label, value, onChange, max, tone, C, dim }) {
 
 const s = StyleSheet.create({
   card: {
-    flexDirection: "row",
     borderRadius: 22,
     borderWidth: 1,
     marginBottom: 12,
     overflow: "hidden",
   },
-  stripe: { width: 5 },
-  body: { flex: 1, padding: 14 },
+  body: { padding: 14 },
   head: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
   iconBox: {
     width: 36, height: 36, borderRadius: 12,

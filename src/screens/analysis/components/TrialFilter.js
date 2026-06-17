@@ -2,13 +2,23 @@ import { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { useExam } from "../../../contexts/ExamContext";
 
-const getFilters = (C) => [
-  { key: "ALL", label: "Tümü", color: C.text },
-  { key: "TYT", label: "TYT", color: C.blue },
-  { key: "AYT", label: "AYT", color: C.amber },
-  { key: "BRANCH", label: "Branş", color: C.teal },
-];
+function getFilters(C, examType) {
+  if (examType === "lgs") {
+    return [
+      { key: "ALL", label: "Tümü", color: C.text },
+      { key: "LGS", label: "LGS", color: C.green },
+      { key: "BRANCH", label: "Branş", color: C.teal },
+    ];
+  }
+  return [
+    { key: "ALL", label: "Tümü", color: C.text },
+    { key: "TYT", label: "TYT", color: C.blue },
+    { key: "AYT", label: "AYT", color: C.amber },
+    { key: "BRANCH", label: "Branş", color: C.teal },
+  ];
+}
 
 const makeStyles = (C) => ({
   row: {
@@ -30,8 +40,9 @@ const makeStyles = (C) => ({
 
 export function TrialFilter({ value, onChange }) {
   const C = useC();
+  const { examType } = useExam();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const FILTERS = useMemo(() => getFilters(C), [C]);
+  const FILTERS = useMemo(() => getFilters(C, examType), [C, examType]);
   return (
     <View style={styles.row}>
       {FILTERS.map((f) => {

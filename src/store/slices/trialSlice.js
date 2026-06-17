@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 
 const trialSlice = createSlice({
   name: "trials",
@@ -26,19 +26,20 @@ export default trialSlice.reducer;
 export const selectTrials = (state) => state.trials.trials;
 export const selectLatestTrial = (state) => state.trials.trials[0] || null;
 
-export const selectTrialsByType = (state, type) =>
-  state.trials.trials.filter((t) => t.trialType === type);
+export const selectTYTTrials = createSelector(
+  selectTrials,
+  (trials) => trials.filter((t) => t.trialType === "TYT"),
+);
 
-export const selectTYTTrials = (state) =>
-  state.trials.trials.filter((t) => t.trialType === "TYT");
+export const selectAYTTrials = createSelector(
+  selectTrials,
+  (trials) => trials.filter((t) => t.trialType && t.trialType.startsWith("AYT")),
+);
 
-export const selectAYTTrials = (state) =>
-  state.trials.trials.filter((t) =>
-    t.trialType && t.trialType.startsWith("AYT")
-  );
-
-export const selectBranchTrials = (state) =>
-  state.trials.trials.filter((t) => t.trialType === "BRANCH");
+export const selectBranchTrials = createSelector(
+  selectTrials,
+  (trials) => trials.filter((t) => t.trialType === "BRANCH"),
+);
 
 export const selectTrialsBySubject = (state, subject) =>
   state.trials.trials

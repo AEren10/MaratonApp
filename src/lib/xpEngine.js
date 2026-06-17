@@ -21,6 +21,8 @@ export function calculateXP(action, data = {}) {
       return XP_REWARDS.perfect_plan;
     case "daily_goal_complete":
       return XP_REWARDS.daily_goal_complete;
+    case "comeback_bonus":
+      return XP_REWARDS.comeback_bonus;
     default:
       return 0;
   }

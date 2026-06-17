@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,6 +12,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProfile, updateProfile } from "../../supabase/profiles";
 import { uploadAvatar, getAvatarUrl } from "../../supabase/storage";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -22,6 +25,7 @@ export default function EditProfileScreen() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const showAlert = useAlert();
   const initials = (name || "??").slice(0, 2).toUpperCase();
   const avatarSource = useMemo(() => avatarUri ? { uri: avatarUri } : null, [avatarUri]);
 
@@ -40,21 +44,7 @@ export default function EditProfileScreen() {
       .finally(() => setLoading(false));
   }, [user?.id]);
 
-  const pickAvatar = useCallback(async () => {
-    if (!user?.id) return;
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
-      Alert.alert("İzin gerekli", "Galeriden fotoğraf seçmek için izin ver.");
-      return;
-    }
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 0.7,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
-    if (res.canceled) return;
-    const localUri = res.assets[0].uri;
+  const handleAvatarPicked = useCallback(async (localUri) => {
     setAvatarUri(localUri);
     setUploading(true);
     try {
@@ -63,25 +53,47 @@ export default function EditProfileScreen() {
       await updateProfile(user.id, { avatar_url: url });
       setAvatarUri(url + "?t=" + Date.now());
     } catch (e) {
-      Alert.alert("Hata", "Avatar yüklenirken sorun oluştu.");
+      showAlert("Hata", "Avatar yüklenirken sorun oluştu.");
     } finally {
       setUploading(false);
     }
   }, [user?.id]);
 
+  const pickAvatar = useCallback(() => {
+    if (!user?.id) return;
+    showAlert("Profil Fotoğrafı", "Nereden eklemek istersin?", [
+      { text: "Kamera", onPress: async () => {
+        const perm = await ImagePicker.requestCameraPermissionsAsync();
+        if (!perm.granted) { showAlert("İzin gerekli", "Kamera erişimi için izin ver."); return; }
+        const res = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1] });
+        if (!res.canceled) handleAvatarPicked(res.assets[0].uri);
+      }},
+      { text: "Galeri", onPress: async () => {
+        const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!perm.granted) { showAlert("İzin gerekli", "Galeri erişimi için izin ver."); return; }
+        const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1] });
+        if (!res.canceled) handleAvatarPicked(res.assets[0].uri);
+      }},
+      { text: "İptal", style: "cancel" },
+    ]);
+  }, [user?.id, handleAvatarPicked]);
+
   const save = useCallback(async () => {
     if (saving) return;
     if (!name.trim()) {
-      Alert.alert("İsim eksik", "Lütfen adını gir.");
+      H.error();
+      showAlert("İsim eksik", "Lütfen adını gir.");
       return;
     }
     setSaving(true);
     try {
       await updateProfile(user.id, { name: name.trim(), bio: bio.trim() || null });
-      Alert.alert("Kaydedildi", "Profilin güncellendi.");
+      H.success();
+      showAlert("Kaydedildi", "Profilin güncellendi.");
       navigation.goBack();
     } catch (e) {
-      Alert.alert("Hata", e.message || "Profil güncellenemedi.");
+      H.error();
+      showAlert("Hata", e.message || "Profil güncellenemedi.");
     } finally {
       setSaving(false);
     }
@@ -106,61 +118,69 @@ export default function EditProfileScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll}>
-        <Pressable onPress={pickAvatar} style={s.avatarWrap}>
-          <View>
-            <View style={[s.avatarCircle, { backgroundColor: C.surface, borderColor: C.border }]}>
-              {avatarSource ? (
-                <Image source={avatarSource} style={s.avatarImg} contentFit="cover" cachePolicy="memory-disk" transition={200} />
-              ) : (
-                <Text style={[s.avatarInitials, { color: C.purple }]}>{initials}</Text>
-              )}
-              {uploading && (
-                <View style={s.avatarOverlay}>
-                  <ActivityIndicator color="#FFFFFF" />
-                </View>
-              )}
+        <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
+          <Pressable onPress={pickAvatar} style={s.avatarWrap}>
+            <View>
+              <View style={[s.avatarCircle, { backgroundColor: C.surface, borderColor: C.border }]}>
+                {avatarSource ? (
+                  <Image source={avatarSource} style={s.avatarImg} contentFit="cover" cachePolicy="memory-disk" transition={200} />
+                ) : (
+                  <Text style={[s.avatarInitials, { color: C.purple }]}>{initials}</Text>
+                )}
+                {uploading && (
+                  <View style={s.avatarOverlay}>
+                    <ActivityIndicator color="#FFFFFF" />
+                  </View>
+                )}
+              </View>
+              <View style={[s.cameraBadge, { backgroundColor: C.purple }]}>
+                <Icon name="camera" size={14} color="#FFFFFF" />
+              </View>
             </View>
-            <View style={[s.cameraBadge, { backgroundColor: C.purple }]}>
-              <Icon name="camera" size={14} color="#FFFFFF" />
-            </View>
-          </View>
-          <Text style={[s.changeText, { color: C.purple }]}>Fotoğrafı değiştir</Text>
-        </Pressable>
+            <Text style={[s.changeText, { color: C.purple }]}>Fotoğrafı değiştir</Text>
+          </Pressable>
+        </Animated.View>
 
-        <Text style={[s.label, { color: C.muted }]}>AD SOYAD</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Adın"
-          placeholderTextColor={C.muted}
-          style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
-          maxLength={50}
-        />
+        <Animated.View entering={FadeInDown.delay(160).duration(400).springify()}>
+          <Text style={[s.label, { color: C.muted }]}>AD SOYAD</Text>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Adın"
+            placeholderTextColor={C.muted}
+            style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
+            maxLength={50}
+          />
+        </Animated.View>
 
-        <Text style={[s.label, { color: C.muted, marginTop: SPACING.lg }]}>HAKKINDA (opsiyonel)</Text>
-        <TextInput
-          value={bio}
-          onChangeText={setBio}
-          placeholder="Kendinden kısa bahset"
-          placeholderTextColor={C.muted}
-          style={[s.input, s.multiline, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
-          multiline
-          maxLength={150}
-        />
-        <Text style={[s.hint, { color: C.muted }]}>{bio.length}/150</Text>
+        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+          <Text style={[s.label, { color: C.muted, marginTop: SPACING.lg }]}>HAKKINDA (opsiyonel)</Text>
+          <TextInput
+            value={bio}
+            onChangeText={setBio}
+            placeholder="Kendinden kısa bahset"
+            placeholderTextColor={C.muted}
+            style={[s.input, s.multiline, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
+            multiline
+            maxLength={150}
+          />
+          <Text style={[s.hint, { color: C.muted }]}>{bio.length}/150</Text>
+        </Animated.View>
 
-        <Pressable
-          onPress={save}
-          disabled={saving}
-          style={({ pressed }) => [
-            s.saveBtn,
-            { backgroundColor: C.purple },
-            (pressed || saving) && { opacity: 0.85 },
-          ]}
-        >
-          <Icon name="check" size={20} color="#FFFFFF" />
-          <Text style={s.saveText}>{saving ? "Kaydediliyor..." : "Kaydet"}</Text>
-        </Pressable>
+        <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
+          <Pressable
+            onPress={save}
+            disabled={saving}
+            style={({ pressed }) => [
+              s.saveBtn,
+              { backgroundColor: C.purple },
+              (pressed || saving) && { opacity: 0.85 },
+            ]}
+          >
+            <Icon name="check" size={20} color="#FFFFFF" />
+            <Text style={s.saveText}>{saving ? "Kaydediliyor..." : "Kaydet"}</Text>
+          </Pressable>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

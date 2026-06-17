@@ -3,13 +3,13 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
-import { getTrialTypeList, getTrialTypesForField } from "../trialTypes";
+import { getTrialTypesForExam } from "../trialTypes";
+import * as H from "../../../lib/haptics";
 
 export function TrialTypeSelector({ value, onChange }) {
   const C = useC();
-  const { field } = useExam();
-  // Kullanıcının alanına göre filtrele: sayısal user sözel görmesin
-  const list = getTrialTypesForField(C, field);
+  const { examType, field } = useExam();
+  const list = getTrialTypesForExam(C, examType, field);
   return (
     <View style={{ marginBottom: SPACING.xl }}>
       <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md, paddingHorizontal: 4 }]}>
@@ -25,7 +25,7 @@ export function TrialTypeSelector({ value, onChange }) {
           return (
             <Pressable
               key={t.code}
-              onPress={() => onChange(t.code)}
+              onPress={() => { H.select(); onChange(t.code); }}
               style={{
                 width: 168,
                 borderRadius: 20,

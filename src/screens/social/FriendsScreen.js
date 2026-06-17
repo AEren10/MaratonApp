@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { Avatar } from "../../components/design/Avatar";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -15,6 +17,8 @@ import {
   respondToRequest,
   unfriend,
 } from "../../supabase/friends";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 function FriendRow({ user, action }) {
   const C = useC();
@@ -33,6 +37,7 @@ export default function FriendsScreen() {
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { user } = useAuth();
+  const showAlert = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [query, setQuery] = useState("");
@@ -75,10 +80,11 @@ export default function FriendsScreen() {
   const addFriend = useCallback(async (targetId) => {
     try {
       await sendFriendRequest(targetId);
-      Alert.alert("İstek gönderildi", "Arkadaşlık isteğin iletildi.");
+      H.success();
+      showAlert("İstek gönderildi", "Arkadaşlık isteğin iletildi.");
       setSearchResults((prev) => prev.filter((u) => u.id !== targetId));
     } catch (e) {
-      Alert.alert("Hata", e.message || "İstek gönderilemedi.");
+      showAlert("Hata", e.message || "İstek gönderilemedi.");
     }
   }, []);
 
@@ -87,12 +93,13 @@ export default function FriendsScreen() {
       await respondToRequest(id, accept);
       load();
     } catch (e) {
-      Alert.alert("Hata", e.message || "İşlem başarısız.");
+      showAlert("Hata", e.message || "İşlem başarısız.");
     }
   }, [load]);
 
   const remove = useCallback(async (friendshipId) => {
-    Alert.alert("Arkadaşlıktan çıkar", "Bu kişiyi listenden kaldır?", [
+    H.warn();
+    showAlert("Arkadaşlıktan çıkar", "Bu kişiyi listenden kaldır?", [
       { text: "İptal", style: "cancel" },
       {
         text: "Kaldır",
@@ -118,7 +125,7 @@ export default function FriendsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-        <View style={s.searchBox}>
+        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.searchBox}>
           <Icon name="search" size={18} color={C.muted} />
           <TextInput
             value={query}
@@ -128,10 +135,10 @@ export default function FriendsScreen() {
             style={s.searchInput}
           />
           {searching && <ActivityIndicator color={C.amber} size="small" />}
-        </View>
+        </Animated.View>
 
         {searchResults.length > 0 && (
-          <View>
+          <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
             <Text style={s.sectionLabel}>ARAMA SONUÇLARI</Text>
             <View style={s.card}>
               {searchResults.map((u) => (
@@ -150,7 +157,7 @@ export default function FriendsScreen() {
                 />
               ))}
             </View>
-          </View>
+          </Animated.View>
         )}
 
         {loading ? (
@@ -158,7 +165,7 @@ export default function FriendsScreen() {
         ) : (
           <>
             {requests.length > 0 && (
-              <View style={{ marginTop: SPACING.lg }}>
+              <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
                 <Text style={s.sectionLabel}>İSTEKLER ({requests.length})</Text>
                 <View style={s.card}>
                   {requests.map((r) => (
@@ -178,18 +185,18 @@ export default function FriendsScreen() {
                     />
                   ))}
                 </View>
-              </View>
+              </Animated.View>
             )}
 
-            <View style={{ marginTop: SPACING.lg }}>
+            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
               <Text style={s.sectionLabel}>ARKADAŞLARIN ({friends.length})</Text>
               {friends.length === 0 ? (
-                <View style={[s.card, s.empty]}>
-                  <Icon name="users" size={36} color={C.muted} />
-                  <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: SPACING.sm, textAlign: "center" }]}>
-                    Henüz arkadaşın yok. Arama kutusundan başla.
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="users"
+                  title="Henüz arkadaşın yok"
+                  message="Arama kutusundan arkadaş bul"
+                  color="accent"
+                />
               ) : (
                 <View style={s.card}>
                   {friends.map((f) => (
@@ -205,7 +212,7 @@ export default function FriendsScreen() {
                   ))}
                 </View>
               )}
-            </View>
+            </Animated.View>
           </>
         )}
       </ScrollView>
@@ -269,9 +276,5 @@ const makeStyles = (C) => StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: 6,
     borderRadius: 999,
-  },
-  empty: {
-    padding: SPACING.xl,
-    alignItems: "center",
   },
 });

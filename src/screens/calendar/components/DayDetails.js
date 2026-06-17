@@ -14,36 +14,36 @@ function formatDay(iso) {
   });
 }
 
-function LogRow({ log, C }) {
+function LogRow({ log, C, s }) {
   const subj = getSubjectByKey(log.subject) || { label: log.subject, color: C.amber, icon: "bookOpen" };
   return (
-    <View style={styles.row}>
+    <View style={s.row}>
       <IconBox icon={subj.icon} color={subj.color} size={32} rounded={8} />
       <View style={{ flex: 1 }}>
-        <Text style={styles.title}>{subj.label}</Text>
-        {log.topic && <Text style={styles.sub}>{log.topic}</Text>}
+        <Text style={s.title}>{subj.label}</Text>
+        {log.topic && <Text style={s.sub}>{log.topic}</Text>}
       </View>
-      <View style={styles.metrics}>
+      <View style={s.metrics}>
         {log.question_count > 0 && (
-          <Text style={[styles.metric, { color: C.amber }]}>{log.question_count} soru</Text>
+          <Text style={[s.metric, { color: C.amber }]}>{log.question_count} soru</Text>
         )}
         {log.duration_minutes > 0 && (
-          <Text style={[styles.metric, { color: C.blue }]}>{log.duration_minutes}dk</Text>
+          <Text style={[s.metric, { color: C.blue }]}>{log.duration_minutes}dk</Text>
         )}
       </View>
     </View>
   );
 }
 
-function TrialRow({ trial, C }) {
+function TrialRow({ trial, C, s }) {
   const meta = getTrialTypes(C)[trial.trialType];
   const color = meta?.color || C.amber;
   return (
-    <View style={styles.row}>
+    <View style={s.row}>
       <IconBox icon={meta?.icon || "chart"} color={color} size={32} rounded={8} />
       <View style={{ flex: 1 }}>
-        <Text style={styles.title}>{meta?.label || trial.name || "Deneme"}</Text>
-        <Text style={styles.sub}>{trial.totalNet?.toFixed(1) || "0.0"} net</Text>
+        <Text style={s.title}>{meta?.label || trial.name || "Deneme"}</Text>
+        <Text style={s.sub}>{trial.totalNet?.toFixed(1) || "0.0"} net</Text>
       </View>
     </View>
   );
@@ -123,13 +123,13 @@ export function DayDetails({ day, data }) {
       {data.trials.length > 0 && (
         <View style={{ marginTop: SPACING.md }}>
           <Text style={styles.section}>DENEMELER</Text>
-          {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} />)}
+          {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} s={styles} />)}
         </View>
       )}
       {data.logs.length > 0 && (
         <View style={{ marginTop: SPACING.md }}>
           <Text style={styles.section}>ÇALIŞMALAR</Text>
-          {data.logs.map((l) => <LogRow key={l.id} log={l} C={C} />)}
+          {data.logs.map((l) => <LogRow key={l.id} log={l} C={C} s={styles} />)}
         </View>
       )}
     </View>

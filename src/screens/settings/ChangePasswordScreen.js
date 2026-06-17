@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -7,6 +8,8 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { supabase } from "../../supabase/client";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
@@ -15,25 +18,30 @@ export default function ChangePasswordScreen() {
   const [confirm, setConfirm] = useState("");
   const [show, setShow] = useState(false);
   const [saving, setSaving] = useState(false);
+  const showAlert = useAlert();
 
   const save = useCallback(async () => {
     if (saving) return;
     if (next.length < 6) {
-      Alert.alert("Şifre kısa", "En az 6 karakter olmalı.");
+      H.error();
+      showAlert("Şifre kısa", "En az 6 karakter olmalı.");
       return;
     }
     if (next !== confirm) {
-      Alert.alert("Eşleşmiyor", "Şifre tekrarı doğru değil.");
+      H.error();
+      showAlert("Eşleşmiyor", "Şifre tekrarı doğru değil.");
       return;
     }
     setSaving(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: next });
       if (error) throw error;
-      Alert.alert("Güncellendi", "Şifren başarıyla değiştirildi.");
+      H.success();
+      showAlert("Güncellendi", "Şifren başarıyla değiştirildi.");
       navigation.goBack();
     } catch (e) {
-      Alert.alert("Hata", e.message || "Şifre değiştirilemedi.");
+      H.error();
+      showAlert("Hata", e.message || "Şifre değiştirilemedi.");
     } finally {
       setSaving(false);
     }
@@ -50,54 +58,62 @@ export default function ChangePasswordScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll}>
-        <Text style={[s.label, { color: C.muted }]}>YENİ ŞİFRE</Text>
-        <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-          <TextInput
-            value={next}
-            onChangeText={setNext}
-            placeholder="En az 6 karakter"
-            placeholderTextColor={C.muted}
-            style={[s.input, { color: C.text }]}
-            secureTextEntry={!show}
-            autoCapitalize="none"
-          />
-          <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
-            <Icon name={show ? "eye" : "lock"} size={18} color={C.muted} />
+        <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
+          <Text style={[s.label, { color: C.muted }]}>YENİ ŞİFRE</Text>
+          <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <TextInput
+              value={next}
+              onChangeText={setNext}
+              placeholder="En az 6 karakter"
+              placeholderTextColor={C.muted}
+              style={[s.input, { color: C.text }]}
+              secureTextEntry={!show}
+              autoCapitalize="none"
+            />
+            <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
+              <Icon name={show ? "eye" : "lock"} size={18} color={C.muted} />
+            </Pressable>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(160).duration(400).springify()}>
+          <Text style={[s.label, { color: C.muted, marginTop: SPACING.lg }]}>TEKRAR</Text>
+          <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <TextInput
+              value={confirm}
+              onChangeText={setConfirm}
+              placeholder="Yeniden gir"
+              placeholderTextColor={C.muted}
+              style={[s.input, { color: C.text }]}
+              secureTextEntry={!show}
+              autoCapitalize="none"
+            />
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+          <View style={[s.info, { backgroundColor: C.blue + "10", borderColor: C.blue + "30" }]}>
+            <Icon name="info" size={14} color={C.blue} />
+            <Text style={[s.infoText, { color: C.sec }]}>
+              Şifreni değiştirdikten sonra diğer cihazlarda tekrar giriş yapman gerekebilir.
+            </Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
+          <Pressable
+            onPress={save}
+            disabled={saving}
+            style={({ pressed }) => [
+              s.saveBtn,
+              { backgroundColor: C.purple },
+              (pressed || saving) && { opacity: 0.85 },
+            ]}
+          >
+            <Icon name="check" size={20} color="#FFFFFF" />
+            <Text style={s.saveText}>{saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}</Text>
           </Pressable>
-        </View>
-
-        <Text style={[s.label, { color: C.muted, marginTop: SPACING.lg }]}>TEKRAR</Text>
-        <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-          <TextInput
-            value={confirm}
-            onChangeText={setConfirm}
-            placeholder="Yeniden gir"
-            placeholderTextColor={C.muted}
-            style={[s.input, { color: C.text }]}
-            secureTextEntry={!show}
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View style={[s.info, { backgroundColor: C.blue + "10", borderColor: C.blue + "30" }]}>
-          <Icon name="info" size={14} color={C.blue} />
-          <Text style={[s.infoText, { color: C.sec }]}>
-            Şifreni değiştirdikten sonra diğer cihazlarda tekrar giriş yapman gerekebilir.
-          </Text>
-        </View>
-
-        <Pressable
-          onPress={save}
-          disabled={saving}
-          style={({ pressed }) => [
-            s.saveBtn,
-            { backgroundColor: C.purple },
-            (pressed || saving) && { opacity: 0.85 },
-          ]}
-        >
-          <Icon name="check" size={20} color="#FFFFFF" />
-          <Text style={s.saveText}>{saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}</Text>
-        </Pressable>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

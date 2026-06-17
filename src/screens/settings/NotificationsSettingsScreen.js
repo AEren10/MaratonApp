@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, Pressable, Switch, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, Switch, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
@@ -11,6 +11,7 @@ import {
   applyNotifPrefs,
   requestNotificationPermissions,
 } from "../../lib/notifications";
+import { useAlert } from "../../contexts/AlertContext";
 
 const HOUR_OPTIONS = [
   { h: 8, label: "08:00 Sabah" },
@@ -26,6 +27,7 @@ export default function NotificationsSettingsScreen() {
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const [prefs, setPrefs] = useState(null);
   const [busy, setBusy] = useState(false);
+  const showAlert = useAlert();
 
   useEffect(() => {
     getNotifPrefs().then(setPrefs);
@@ -41,7 +43,7 @@ export default function NotificationsSettingsScreen() {
         if (next.dailyReminderEnabled || next.streakRiskEnabled) {
           const granted = await requestNotificationPermissions();
           if (!granted) {
-            Alert.alert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
+            showAlert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
             next.dailyReminderEnabled = false;
             next.streakRiskEnabled = false;
             setPrefs(next);
@@ -139,6 +141,20 @@ export default function NotificationsSettingsScreen() {
             onValueChange={(v) => update({ trialReminderEnabled: v })}
             trackColor={{ false: C.border, true: C.amber + "80" }}
             thumbColor={prefs.trialReminderEnabled ? C.amber : C.muted}
+          />
+        </View>
+
+        <View style={s.row}>
+          <IconBox icon="layers" color={C.coral} size={38} rounded={12} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.label}>Görev Hatırlatıcı</Text>
+            <Text style={s.hint}>Çalışma listen yarım kalırsa bildirir</Text>
+          </View>
+          <Switch
+            value={prefs.taskReminderEnabled !== false}
+            onValueChange={(v) => update({ taskReminderEnabled: v })}
+            trackColor={{ false: C.border, true: C.amber + "80" }}
+            thumbColor={prefs.taskReminderEnabled !== false ? C.amber : C.muted}
           />
         </View>
 

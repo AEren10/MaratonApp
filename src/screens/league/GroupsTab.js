@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, Alert, StyleSheet, Share } from "react-native";
+import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Avatar } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 function MemberRow({ item }) {
   const C = useC();
@@ -27,6 +30,7 @@ function MemberRow({ item }) {
 
 export function GroupsTab({ user }) {
   const C = useC();
+  const showAlert = useAlert();
   const st = useMemo(() => makeStyles(C), [C]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,13 +65,14 @@ export function GroupsTab({ user }) {
     setBusy(true);
     try {
       const g = await createGroup(name);
+      H.success();
       setCreateOpen(false);
       setName("");
       await loadGroups();
       setSelected(g);
-      Alert.alert("Grup oluştu", `Kod: ${g.code}\nArkadaşlarınla paylaş!`);
+      showAlert("Grup oluştu", `Kod: ${g.code}\nArkadaşlarınla paylaş!`);
     } catch (e) {
-      Alert.alert("Hata", "Grup oluşturulamadı.");
+      showAlert("Hata", "Grup oluşturulamadı.");
     }
     setBusy(false);
   };
@@ -77,17 +82,19 @@ export function GroupsTab({ user }) {
     setBusy(true);
     try {
       await joinByCode(code);
+      H.success();
       setJoinOpen(false);
       setCode("");
       await loadGroups();
     } catch (e) {
-      Alert.alert("Hata", "Kod geçersiz ya da grup bulunamadı.");
+      showAlert("Hata", "Kod geçersiz ya da grup bulunamadı.");
     }
     setBusy(false);
   };
 
   const doLeave = (g) => {
-    Alert.alert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
+    H.warn();
+    showAlert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
       { text: "İptal", style: "cancel" },
       { text: "Ayrıl", style: "destructive", onPress: async () => {
         await leaveGroup(g.id, user.id).catch(() => {});
@@ -119,11 +126,7 @@ export function GroupsTab({ user }) {
       </View>
 
       {groups.length === 0 ? (
-        <View style={st.empty}>
-          <Icon name="users" size={44} color={C.muted} />
-          <Text style={st.emptyTitle}>Henüz grubun yok</Text>
-          <Text style={st.emptySub}>Bir grup oluştur ya da arkadaşının koduyla katıl.</Text>
-        </View>
+        <EmptyState icon="users" title="Henüz grubun yok" message="Bir grup oluştur ya da arkadaşının koduyla katıl" />
       ) : (
         <>
           <FlatList
@@ -208,8 +211,6 @@ const makeStyles = (C) => StyleSheet.create({
   actions: { flexDirection: "row", gap: SPACING.sm, paddingHorizontal: 16, marginBottom: SPACING.sm },
   actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },
   actText: { ...TYPOGRAPHY.button },
-  empty: { alignItems: "center", paddingTop: SPACING.huge, gap: SPACING.sm },
-  emptyTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.sm },
   emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", paddingHorizontal: SPACING.xl },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
   chipActive: { backgroundColor: C.amber + "18", borderColor: C.amber },

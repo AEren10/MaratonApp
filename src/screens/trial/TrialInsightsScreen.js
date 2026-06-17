@@ -7,8 +7,10 @@ import Svg, { Polyline, Line, Circle as SvgCircle, Defs, LinearGradient, Stop, P
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { getAllSubjects } from "./trialTypes";
 
@@ -114,25 +116,38 @@ function ChangeBadge({ current, previous, C }) {
   );
 }
 
-const TYPE_FILTERS = [
-  { key: "ALL", label: "Tümü" },
-  { key: "TYT", label: "TYT" },
-  { key: "AYT", label: "AYT" },
-  { key: "BRANCH", label: "Branş" },
-];
+function getTypeFilters(examType) {
+  if (examType === "lgs") {
+    return [
+      { key: "ALL", label: "Tümü" },
+      { key: "LGS", label: "LGS" },
+      { key: "BRANCH", label: "Branş" },
+    ];
+  }
+  return [
+    { key: "ALL", label: "Tümü" },
+    { key: "TYT", label: "TYT" },
+    { key: "AYT", label: "AYT" },
+    { key: "BRANCH", label: "Branş" },
+  ];
+}
 
 export default function TrialInsightsScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const { examType } = useExam();
   const allTrials = useSelector(selectTrials);
   const [filter, setFilter] = useState("ALL");
+  const TYPE_FILTERS = useMemo(() => getTypeFilters(examType), [examType]);
 
   const filteredTrials = useMemo(() => {
     let list = [...allTrials].reverse();
-    if (filter === "TYT") list = list.filter((t) => t.trialType === "TYT");
+    if (filter === "LGS") list = list.filter((t) => t.trialType === "LGS");
+    else if (filter === "TYT") list = list.filter((t) => t.trialType === "TYT");
     else if (filter === "AYT") list = list.filter((t) => t.trialType?.startsWith("AYT"));
     else if (filter === "BRANCH") list = list.filter((t) => t.trialType === "BRANCH");
+    else list = list.filter((t) => t.trialType !== "BRANCH");
     return list;
   }, [allTrials, filter]);
 
@@ -234,11 +249,12 @@ export default function TrialInsightsScreen() {
         ))}
 
         {filteredTrials.length === 0 && (
-          <View style={s.empty}>
-            <Icon name="trendUp" size={40} color={C.muted} />
-            <Text style={s.emptyText}>Henüz deneme girişi yok</Text>
-            <Text style={s.emptyDesc}>Deneme girdikçe net trendlerin burada görünecek</Text>
-          </View>
+          <EmptyState
+            icon="trendUp"
+            title="Henüz deneme girişi yok"
+            message="Deneme girdikçe net trendlerin burada görünecek"
+            color="purple"
+          />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -295,8 +311,5 @@ function makeStyles(C) {
     subjName: { ...TYPOGRAPHY.bodyMedium, color: C.text },
     subjNet: { ...TYPOGRAPHY.statSmall, marginRight: 4 },
 
-    empty: { alignItems: "center", paddingVertical: 60, gap: SPACING.md },
-    emptyText: { ...TYPOGRAPHY.bodyMedium, color: C.text },
-    emptyDesc: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
   });
 }

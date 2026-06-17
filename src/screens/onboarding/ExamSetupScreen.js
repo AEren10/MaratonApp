@@ -8,10 +8,17 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { SCREENS } from "../../constants/screens";
+import * as H from "../../lib/haptics";
 
-function buildExamOptions(C) {
+function buildCategoryOptions(C) {
   return [
-    { id: "lgs", examType: "lgs", field: null, label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)", icon: "shield", color: C.green },
+    { id: "lgs", label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)", icon: "shield", color: C.green },
+    { id: "yks", label: "YKS", desc: "Yükseköğretim Kurumları Sınavı", icon: "target", color: C.amber },
+  ];
+}
+
+function buildYKSOptions(C) {
+  return [
     { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi", icon: "target", color: C.amber },
     { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
     { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
@@ -23,7 +30,7 @@ function buildExamOptions(C) {
 function buildExamMonthOptions() {
   const now = new Date();
   const currentYear = now.getFullYear();
-  const beforeExamThisYear = now.getMonth() < 5;
+  const beforeExamThisYear = now.getMonth() < 5 || (now.getMonth() === 5 && now.getDate() < 20);
   const startYear = beforeExamThisYear ? currentYear : currentYear + 1;
   return [
     `Haziran ${startYear}`,
@@ -56,27 +63,41 @@ function ExamOption({ item, selected, onPress, C }) {
 export default function ExamSetupScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const EXAM_OPTIONS = useMemo(() => buildExamOptions(C), [C]);
+  const CATEGORIES = useMemo(() => buildCategoryOptions(C), [C]);
+  const YKS_OPTIONS = useMemo(() => buildYKSOptions(C), [C]);
   const { updateExamConfig } = useExam();
+
+  const [category, setCategory] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [examDate, setExamDate] = useState(MONTHS[0]);
 
-  const canContinue = selectedId !== null;
+  const isLGS = category === "lgs";
+  const canContinue = isLGS ? category !== null : selectedId !== null;
 
   const finish = useCallback(() => {
-    const opt = EXAM_OPTIONS.find((o) => o.id === selectedId);
-    if (!opt) return;
     const match = examDate.match(/(\d{4})/);
     const year = match ? parseInt(match[1], 10) : new Date().getFullYear() + 1;
     const date = new Date(year, 5, 15);
-    updateExamConfig(opt.examType, opt.field, date).catch(() => {});
+    if (isLGS) {
+      updateExamConfig("lgs", null, date).catch(() => {});
+    } else {
+      const opt = YKS_OPTIONS.find((o) => o.id === selectedId);
+      if (!opt) return;
+      updateExamConfig(opt.examType, opt.field, date).catch(() => {});
+    }
+    H.success();
     navigation.navigate(SCREENS.GOAL_SETUP);
-  }, [selectedId, examDate, updateExamConfig, EXAM_OPTIONS, navigation]);
+  }, [category, selectedId, examDate, isLGS, updateExamConfig, YKS_OPTIONS, navigation]);
+
+  const handleCategorySelect = useCallback((id) => {
+    H.select();
+    setCategory(id);
+    setSelectedId(null);
+  }, []);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Step indicator */}
         <View style={styles.stepRow}>
           <View style={[styles.stepDot, { backgroundColor: C.amber }]} />
           <View style={[styles.stepDot, { backgroundColor: C.border }]} />
@@ -91,32 +112,46 @@ export default function ExamSetupScreen() {
         </View>
 
         <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-          SINAV TÜRÜ
+          SINAV KATEGORİSİ
         </Text>
 
-        {EXAM_OPTIONS.map((opt) => (
-          <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={setSelectedId} C={C} />
+        {CATEGORIES.map((opt) => (
+          <ExamOption key={opt.id} item={opt} selected={category} onPress={handleCategorySelect} C={C} />
         ))}
 
-        <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }]}>
-          SINAV TARİHİ
-        </Text>
+        {category === "yks" && (
+          <>
+            <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xl, marginBottom: SPACING.md }]}>
+              ALAN SEÇİMİ
+            </Text>
+            {YKS_OPTIONS.map((opt) => (
+              <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={(id) => { H.select(); setSelectedId(id); }} C={C} />
+            ))}
+          </>
+        )}
 
-        <View style={styles.dateRow}>
-          {MONTHS.map((m) => (
-            <Pressable
-              key={m}
-              onPress={() => setExamDate(m)}
-              style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.amber : C.border },
-                examDate === m && { backgroundColor: C.amber + "10" }]}
-            >
-              <Icon name="calendar" size={14} color={examDate === m ? C.amber : C.muted} />
-              <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.sec }]}>
-                {m}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        {category && (
+          <>
+            <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }]}>
+              SINAV TARİHİ
+            </Text>
+            <View style={styles.dateRow}>
+              {MONTHS.map((m) => (
+                <Pressable
+                  key={m}
+                  onPress={() => setExamDate(m)}
+                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.amber : C.border },
+                    examDate === m && { backgroundColor: C.amber + "10" }]}
+                >
+                  <Icon name="calendar" size={14} color={examDate === m ? C.amber : C.muted} />
+                  <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.sec }]}>
+                    {m}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        )}
       </ScrollView>
 
       <Pressable

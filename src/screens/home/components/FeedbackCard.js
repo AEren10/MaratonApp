@@ -6,12 +6,12 @@ import { useC } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
 
 const COLOR_MAP = {
-  red: (C) => ({ bg: C.red + "12", border: C.red + "26", solid: C.red }),
-  amber: (C) => ({ bg: C.amber + "12", border: C.amber + "26", solid: C.amber }),
-  green: (C) => ({ bg: C.green + "12", border: C.green + "26", solid: C.green }),
-  blue: (C) => ({ bg: C.blue + "12", border: C.blue + "26", solid: C.blue }),
-  purple: (C) => ({ bg: C.purple + "12", border: C.purple + "26", solid: C.purple }),
-  coral: (C) => ({ bg: C.coral + "12", border: C.coral + "26", solid: C.coral }),
+  red: (C) => ({ bg: C.red + "22", border: C.red + "44", solid: C.red }),
+  amber: (C) => ({ bg: C.amber + "22", border: C.amber + "44", solid: C.amber }),
+  green: (C) => ({ bg: C.green + "22", border: C.green + "44", solid: C.green }),
+  blue: (C) => ({ bg: C.blue + "22", border: C.blue + "44", solid: C.blue }),
+  purple: (C) => ({ bg: C.purple + "22", border: C.purple + "44", solid: C.purple }),
+  coral: (C) => ({ bg: C.coral + "22", border: C.coral + "44", solid: C.coral }),
 };
 
 export function FeedbackCard({ nudge, onAction, delay = 0 }) {
@@ -33,29 +33,32 @@ export function FeedbackCard({ nudge, onAction, delay = 0 }) {
         onPress={handlePress}
       >
         <View style={[s.card, { backgroundColor: colors.bg, borderColor: colors.border }]}>
-          <View style={s.row}>
-            <View style={[s.iconBox, { backgroundColor: colors.solid + "22" }]}>
-              <Icon name={nudge.icon || "alert"} size={20} color={colors.solid} />
-            </View>
-            <View style={s.content}>
-              <Text style={[s.message, { color: C.text }]} numberOfLines={2}>
-                {nudge.message}
-              </Text>
-              {nudge.detail ? (
-                <Text style={[s.detail, { color: C.sec }]} numberOfLines={2}>
-                  {nudge.detail}
+          <View style={s.inner}>
+            <View style={s.row}>
+              <View style={[s.iconBox, { backgroundColor: colors.solid + "36" }]}>
+                <Icon name={nudge.icon || "alert"} size={20} color={colors.solid} />
+                <View style={[s.dot, { backgroundColor: colors.solid }]} />
+              </View>
+              <View style={s.content}>
+                <Text style={[s.message, { color: C.text }]} numberOfLines={2}>
+                  {nudge.message}
                 </Text>
-              ) : null}
-            </View>
-          </View>
-          {nudge.actionLabel ? (
-            <View style={s.footer}>
-              <View style={[s.actionBtn, { backgroundColor: colors.solid }]}>
-                <Text style={s.actionText}>{nudge.actionLabel}</Text>
-                <Icon name="arrowR" size={14} color="#FFFFFF" sw={2.5} />
+                {nudge.detail ? (
+                  <Text style={[s.detail, { color: C.sec }]} numberOfLines={2}>
+                    {nudge.detail}
+                  </Text>
+                ) : null}
               </View>
             </View>
-          ) : null}
+            {nudge.actionLabel ? (
+              <View style={s.footer}>
+                <View style={[s.actionBtn, { backgroundColor: colors.solid }]}>
+                  <Text style={s.actionText}>{nudge.actionLabel}</Text>
+                  <Icon name="arrowR" size={14} color="#FFFFFF" sw={2.5} />
+                </View>
+              </View>
+            ) : null}
+          </View>
         </View>
       </Pressable>
     </Animated.View>
@@ -80,8 +83,9 @@ const s = StyleSheet.create({
   card: {
     borderRadius: RADIUS.xxl,
     borderWidth: 1,
-    padding: SPACING.lg,
+    overflow: "hidden",
   },
+  inner: { padding: SPACING.lg },
   row: { flexDirection: "row", alignItems: "flex-start", gap: SPACING.md },
   iconBox: {
     width: 44,
@@ -89,6 +93,16 @@ const s = StyleSheet.create({
     borderRadius: RADIUS.lg,
     alignItems: "center",
     justifyContent: "center",
+  },
+  dot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#FFFFFF10",
   },
   content: { flex: 1, gap: 4 },
   message: {

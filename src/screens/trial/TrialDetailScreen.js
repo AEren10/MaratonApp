@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
@@ -13,7 +14,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getMyPercentiles } from "../../supabase/percentile";
 import { getTrialTypes, getAllSubjects } from "./trialTypes";
 import { TrialReportCard } from "./components/TrialReportCard";
+import { NudgePopup } from "../../components/common/NudgePopup";
+import { useRecommendations } from "../../hooks/useRecommendations";
+import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { SCREENS } from "../../constants/screens";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 function ScoreRing({ size = 140, stroke = 10, net, max = 120, C }) {
   const pct = Math.min(net / max, 1);
@@ -87,7 +93,10 @@ export default function TrialDetailScreen() {
   const trials = useSelector(selectTrials);
   const { user } = useAuth();
   const cardRef = useRef(null);
+  const showAlert = useAlert();
   const [percentiles, setPercentiles] = useState({});
+  const nudges = useRecommendations();
+  const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
@@ -98,6 +107,10 @@ export default function TrialDetailScreen() {
 
   const trial = route.params?.trial;
   const fromEntry = route.params?.fromEntry;
+
+  useEffect(() => {
+    if (fromEntry) showNudgePopup(2500);
+  }, [fromEntry, showNudgePopup]);
   const sorted = useMemo(
     () => [...trials].sort((a, b) => new Date(b.date) - new Date(a.date)),
     [trials]
@@ -166,6 +179,7 @@ export default function TrialDetailScreen() {
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
 
   const handleShare = async () => {
+    H.medium();
     // Native modüller (view-shot/sharing) lazy yüklenir; Expo Go / eski build'de
     // uygulamanın açılışını bloklamasın diye top-level import edilmez.
     let captureRef, Sharing;
@@ -173,18 +187,18 @@ export default function TrialDetailScreen() {
       ({ captureRef } = require("react-native-view-shot"));
       Sharing = require("expo-sharing");
     } catch (e) {
-      Alert.alert("Paylaşım kullanılamıyor", "Bu özellik için güncel uygulama derlemesi gerekiyor.");
+      showAlert("Paylaşım kullanılamıyor", "Bu özellik için güncel uygulama derlemesi gerekiyor.");
       return;
     }
     try {
       const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
       if (!(await Sharing.isAvailableAsync())) {
-        Alert.alert("Paylaşım yok", "Bu cihazda paylaşım kullanılamıyor.");
+        showAlert("Paylaşım yok", "Bu cihazda paylaşım kullanılamıyor.");
         return;
       }
       await Sharing.shareAsync(uri, { mimeType: "image/png", dialogTitle: "Deneme karneni paylaş" });
     } catch (e) {
-      Alert.alert("Hata", "Karne oluşturulamadı, tekrar dene.");
+      showAlert("Hata", "Karne oluşturulamadı, tekrar dene.");
     }
   };
 
@@ -194,8 +208,8 @@ export default function TrialDetailScreen() {
         <Pressable onPress={goBack} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
-          Deneme Detayı
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]} numberOfLines={1}>
+          {latest.name || "Deneme Detayı"}
         </Text>
         <Chip color={C.surface2}>{dateStr}</Chip>
         <Pressable onPress={handleShare} hitSlop={12} style={styles.shareBtn}>
@@ -210,7 +224,7 @@ export default function TrialDetailScreen() {
           </View>
         )}
 
-        <View style={styles.scoreCard}>
+        <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.scoreCard}>
           {typeMeta && (
             <View style={{ marginBottom: SPACING.md }}>
               <Chip color={typeMeta.color}>
@@ -227,10 +241,10 @@ export default function TrialDetailScreen() {
               {trend > 0 ? "+" : ""}{trend.toFixed(1)} net
             </Text>
           </View>
-        </View>
+        </Animated.View>
 
         {prev && (
-          <View style={[styles.section, { backgroundColor: C.surface, borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1, borderColor: C.border }]}>
+          <Animated.View entering={FadeInDown.delay(170).duration(420).springify()} style={[styles.section, { backgroundColor: C.surface, borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1, borderColor: C.border }]}>
             <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
               ÖNCEKİ DENEMEYE GÖRE
             </Text>
@@ -254,20 +268,20 @@ export default function TrialDetailScreen() {
                 </View>
               );
             })}
-          </View>
+          </Animated.View>
         )}
 
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(240).duration(420).springify()} style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
             DERS BAZLI SONUCLAR
           </Text>
           {bars.map((b) => (
-            <SubjectRow key={b.name} name={b.name} color={b.c} net={b.net} max={b.max} percentile={percentiles[b.key]?.percentile} styles={styles} C={C} />
+            <SubjectRow key={b.key} name={b.name} color={b.c} net={b.net} max={b.max} percentile={percentiles[b.key]?.percentile} styles={styles} C={C} />
           ))}
-        </View>
+        </Animated.View>
 
         {history.length > 1 && (
-          <View style={styles.section}>
+          <Animated.View entering={FadeInDown.delay(310).duration(420).springify()} style={styles.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
               GECMIS {typeMeta?.label.toUpperCase() || ""} DENEMELERI
             </Text>
@@ -287,20 +301,32 @@ export default function TrialDetailScreen() {
                 )}
               </View>
             ))}
-          </View>
+          </Animated.View>
         )}
-        <Pressable
-          onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
-          style={{
-            flexDirection: "row", alignItems: "center", justifyContent: "center",
-            gap: 8, backgroundColor: C.surface, borderRadius: RADIUS.xl,
-            paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border, marginTop: SPACING.md,
-          }}
-        >
-          <Icon name="trendUp" size={16} color={C.amber} />
-          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Tüm Denemelerin Analizi</Text>
-        </Pressable>
+        <Animated.View entering={FadeInDown.delay(380).duration(420).springify()}>
+          <Pressable
+            onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
+            style={{
+              flexDirection: "row", alignItems: "center", justifyContent: "center",
+              gap: 8, backgroundColor: C.surface, borderRadius: RADIUS.xl,
+              paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border, marginTop: SPACING.md,
+            }}
+          >
+            <Icon name="trendUp" size={16} color={C.amber} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Tüm Denemelerin Analizi</Text>
+          </Pressable>
+        </Animated.View>
       </ScrollView>
+
+      <NudgePopup
+        nudge={nudgePopup}
+        visible={!!nudgePopup}
+        onDismiss={dismissNudgePopup}
+        onAction={(n) => {
+          dismissNudgePopup();
+          if (n.subject) navigation.navigate(SCREENS.ANALYSIS);
+        }}
+      />
 
       {/* Paylaşım için ekran dışı render edilen karne */}
       <View style={styles.offscreen} pointerEvents="none">

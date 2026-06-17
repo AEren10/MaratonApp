@@ -69,7 +69,7 @@ export function SubjectBars({ bars, onBarPress }) {
       >
         {bars.map((b, i) => (
           <Bar
-            key={b.name}
+            key={b.key || `${b.name}-${i}`}
             name={b.name}
             color={b.color}
             net={b.net}

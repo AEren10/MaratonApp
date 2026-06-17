@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
@@ -11,6 +12,8 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectAdHocTasks } from "../../store/slices/planSlice";
+import { selectUserTasks } from "../../store/slices/userTasksSlice";
+import { useUserTasks } from "../../hooks/useUserTasks";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import * as haptic from "../../lib/haptics";
 import { PlanHeader } from "./components/PlanHeader";
@@ -23,6 +26,8 @@ export default function PlanDetailScreen() {
   const navigation = useNavigation();
   const trials = useAppSelector(selectTrials);
   const adHocTasks = useAppSelector(selectAdHocTasks);
+  const userTasks = useAppSelector(selectUserTasks);
+  const { toggleTask: toggleUserTask } = useUserTasks();
   const ctx = usePlanContext();
 
   const plan = useMemo(() => generateDailyPlan(ctx), [ctx]);
@@ -55,8 +60,22 @@ export default function PlanDetailScreen() {
         adHoc: true,
       };
     });
-    return [...adHoc, ...generated];
-  }, [plan, adHocTasks]);
+    const userMapped = userTasks.map((t) => {
+      const subj = getSubjectByKey(t.subject);
+      return {
+        id: t.id,
+        s: subj || { key: t.subject, label: t.subject, color: C.accent, icon: "bookOpen" },
+        topic: t.topic ? `${(subj?.label || t.subject)} · ${t.topic}` : (subj?.label || t.subject),
+        topicKey: t.topic,
+        q: t.question_count,
+        reason: t.note || "Senin eklediğin görev",
+        rkind: "blue",
+        done: t.completed,
+        userTask: true,
+      };
+    });
+    return [...userMapped, ...adHoc, ...generated];
+  }, [plan, adHocTasks, userTasks]);
 
   const [tasks, setTasks] = useState(initialTasks);
   const [reasonTask, setReasonTask] = useState(null);
@@ -77,6 +96,11 @@ export default function PlanDetailScreen() {
     : `~${plan.estimatedMinutes} dk`;
 
   const toggleTask = useCallback((id) => {
+    const task = tasks.find((t) => t.id === id);
+    if (task?.userTask) {
+      if (!task.done) haptic.success();
+      toggleUserTask(id);
+    }
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id !== id) return t;
@@ -84,7 +108,7 @@ export default function PlanDetailScreen() {
         return { ...t, done: !t.done };
       })
     );
-  }, []);
+  }, [tasks, toggleUserTask]);
 
   const startTask = useCallback(
     (id) => {
@@ -106,38 +130,46 @@ export default function PlanDetailScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={styles.title}>Gunluk Plan</Text>
-        <Text style={styles.date}>{dateLabel}</Text>
+        <Pressable onPress={() => navigation.navigate(SCREENS.ADD_TASK)} hitSlop={12} style={styles.addBtn}>
+          <Icon name="plus" size={18} color={C.accent} sw={2.5} />
+        </Pressable>
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <PlanHeader
-          done={doneCount}
-          total={tasks.length}
-          soru={plan.totalQuestions}
-          hours={estHours}
-        />
+        <Animated.View entering={FadeInDown.delay(0).duration(420).springify()}>
+          <PlanHeader
+            done={doneCount}
+            total={tasks.length}
+            soru={plan.totalQuestions}
+            hours={estHours}
+          />
+        </Animated.View>
 
-        <View style={styles.listLabel}>
-          <Icon name="layers" size={16} color={C.sec} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.sec }}>
-            Gorevler
-          </Text>
-        </View>
+        <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
+          <View style={styles.listLabel}>
+            <Icon name="layers" size={16} color={C.sec} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.sec }}>
+              Gorevler
+            </Text>
+          </View>
+        </Animated.View>
 
-        <View style={styles.taskList}>
-          {tasks.map((task) => (
-            <PlanTaskItem
-              key={task.id}
-              task={task}
-              onToggle={() => toggleTask(task.id)}
-              onStart={() => startTask(task.id)}
-              onInfo={() => setReasonTask(task)}
-            />
-          ))}
-        </View>
+        <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
+          <View style={styles.taskList}>
+            {tasks.map((task) => (
+              <PlanTaskItem
+                key={task.id}
+                task={task}
+                onToggle={() => toggleTask(task.id)}
+                onStart={() => startTask(task.id)}
+                onInfo={() => setReasonTask(task)}
+              />
+            ))}
+          </View>
+        </Animated.View>
       </ScrollView>
 
       <TaskReasonSheet task={reasonTask} trials={trials} onClose={() => setReasonTask(null)} />
@@ -156,7 +188,11 @@ function makeStyles(C) {
       gap: SPACING.md,
     },
     title: { ...TYPOGRAPHY.subheading, color: C.text, flex: 1 },
-    date: { ...TYPOGRAPHY.captionMedium, color: C.muted },
+    addBtn: {
+      width: 36, height: 36, borderRadius: 12,
+      backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "30",
+      alignItems: "center", justifyContent: "center",
+    },
     scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 90 },
     listLabel: {
       flexDirection: "row",

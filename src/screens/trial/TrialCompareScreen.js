@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -67,6 +68,7 @@ export default function TrialCompareScreen() {
   const diff = newerNet - olderNet;
 
   const subjectPairs = subjects.map((s) => ({
+    key: s.key,
     name: s.name,
     c: s.color,
     v1: older?.subjects?.[s.key]?.net || 0,
@@ -107,7 +109,7 @@ export default function TrialCompareScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.dateCards}>
+        <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.dateCards}>
           <View style={[styles.dateCard, { opacity: 0.6 }]}>
             <Icon name="calendar" size={14} color={C.muted} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>{olderDate}</Text>
@@ -119,9 +121,9 @@ export default function TrialCompareScreen() {
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>{newerDate}</Text>
             <Text style={[TYPOGRAPHY.statSmall, { color: C.amber }]}>{newerNet}</Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.totalDiff}>
+        <Animated.View entering={FadeInDown.delay(170).duration(420).springify()} style={styles.totalDiff}>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec }]}>Toplam degisim</Text>
           <View style={styles.totalRow}>
             <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>
@@ -131,35 +133,37 @@ export default function TrialCompareScreen() {
               {diff >= 0 ? "Artis" : "Dusus"}
             </Chip>
           </View>
-        </View>
+        </Animated.View>
 
-        <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-          DERS BAZLI KARSILASTIRMA
-        </Text>
+        <Animated.View entering={FadeInDown.delay(240).duration(420).springify()}>
+          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
+            DERS BAZLI KARSILASTIRMA
+          </Text>
 
-        {subjectPairs.map((s) => (
-          <CompareBar
-            key={s.name}
-            label={s.name}
-            v1={s.v1}
-            v2={s.v2}
-            max={s.max}
-            color={s.c}
-            styles={styles}
-            C={C}
-          />
-        ))}
+          {subjectPairs.map((s) => (
+            <CompareBar
+              key={s.key}
+              label={s.name}
+              v1={s.v1}
+              v2={s.v2}
+              max={s.max}
+              color={s.c}
+              styles={styles}
+              C={C}
+            />
+          ))}
 
-        <View style={styles.legendRow}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { opacity: 0.4 }]} />
-            <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{olderDate}</Text>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { opacity: 0.4 }]} />
+              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{olderDate}</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={styles.legendDot} />
+              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{newerDate}</Text>
+            </View>
           </View>
-          <View style={styles.legendItem}>
-            <View style={styles.legendDot} />
-            <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{newerDate}</Text>
-          </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

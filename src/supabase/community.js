@@ -29,7 +29,7 @@ async function uploadAnswerImage(userId, uri) {
 export async function getSharedQuestions({ subject, limit = 20, offset = 0 } = {}) {
   let query = supabase
     .from("shared_questions")
-    .select("*, profiles:user_id(display_name, avatar_url)")
+    .select("*, profiles:shared_questions_user_id_profiles_fkey(name, avatar_url)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -82,7 +82,7 @@ export async function unshareQuestion(id) {
 export async function getAnswers(sharedQuestionId) {
   const { data, error } = await supabase
     .from("question_answers")
-    .select("*, profiles:user_id(display_name, avatar_url)")
+    .select("*, profiles:question_answers_user_id_profiles_fkey(name, avatar_url)")
     .eq("shared_question_id", sharedQuestionId)
     .order("created_at", { ascending: true });
   if (error) throw error;

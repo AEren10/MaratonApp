@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -9,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
+import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { MonthStats } from "./components/MonthStats";
@@ -35,6 +37,7 @@ export default function CalendarScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const trials = useSelector(selectTrials);
+  const dailyGoal = useSelector(selectDailyQuestionsGoal);
   const [monthDate, setMonthDate] = useState(() => new Date());
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +124,7 @@ export default function CalendarScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <View style={s.monthHeader}>
+        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.monthHeader}>
           <Pressable onPress={prevMonth} hitSlop={12} style={s.monthBtn}>
             <Icon name="chevL" size={20} color={C.text} />
           </Pressable>
@@ -129,7 +132,7 @@ export default function CalendarScreen() {
           <Pressable onPress={nextMonth} hitSlop={12} style={s.monthBtn}>
             <Icon name="chevR" size={20} color={C.text} />
           </Pressable>
-        </View>
+        </Animated.View>
 
         {loading ? (
           <View style={s.loadingBox}>
@@ -137,16 +140,23 @@ export default function CalendarScreen() {
           </View>
         ) : (
           <>
-            <MonthGrid
-              monthDate={monthDate}
-              dayMap={dayMap}
-              selectedDay={selectedDay}
-              onSelect={setSelectedDay}
-            />
+            <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
+              <MonthGrid
+                monthDate={monthDate}
+                dayMap={dayMap}
+                selectedDay={selectedDay}
+                onSelect={setSelectedDay}
+                dailyGoal={dailyGoal}
+              />
+            </Animated.View>
 
-            <MonthStats stats={monthStats} />
+            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
+              <MonthStats stats={monthStats} />
+            </Animated.View>
 
-            <DayDetails day={selectedDay} data={selectedDayData} />
+            <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+              <DayDetails day={selectedDay} data={selectedDayData} />
+            </Animated.View>
           </>
         )}
       </ScrollView>

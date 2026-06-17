@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -9,6 +9,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
 import { TopicNoteCard } from "./components/TopicNoteCard";
+import { useAuth } from "../../contexts/AuthContext";
+import { getStudyLogsByTopic } from "../../supabase/studyLogs";
 
 function StatBox({ label, value, color, C }) {
   return (
@@ -35,6 +37,36 @@ function SubtopicRow({ item, C, color }) {
       ]}>
         {item.name}
       </Text>
+    </View>
+  );
+}
+
+function StudyHistoryRow({ item, C, color }) {
+  const dateLabel = (() => {
+    try {
+      return new Date(item.study_date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+    } catch { return item.study_date; }
+  })();
+  const acc = item.question_count > 0
+    ? Math.round((item.correct_count / item.question_count) * 100)
+    : null;
+
+  return (
+    <View style={[s.historyRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+      <View style={[s.historyDateBox, { backgroundColor: color + "12" }]}>
+        <Text style={[s.historyDate, { color }]}>{dateLabel}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, fontSize: 14 }]}>
+          {item.duration_minutes} dk
+          {item.question_count > 0 ? ` · ${item.question_count} soru` : ""}
+        </Text>
+        {acc !== null && (
+          <Text style={[TYPOGRAPHY.caption, { color: acc >= 80 ? C.green : acc >= 60 ? C.amber : C.red, marginTop: 2 }]}>
+            %{acc} başarı
+          </Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -144,8 +176,17 @@ export default function TopicStudyScreen() {
   const navigation = useNavigation();
   const C = useC();
   const route = useRoute();
+  const { user } = useAuth();
   const { topic, subject, subtopics: paramSubtopics } = route.params;
   const mastery = topic.acc / 100;
+
+  const [history, setHistory] = useState([]);
+  useEffect(() => {
+    if (!user?.id || user.id === "dev" || !subject.key) return;
+    getStudyLogsByTopic(user.id, subject.key, topic.name)
+      .then(setHistory)
+      .catch(() => {});
+  }, [user?.id, subject.key, topic.name]);
   const masteryLevel = getMastery({ q: topic.q, acc: topic.acc });
   const circumference = 2 * Math.PI * 40;
   const subtopics = (paramSubtopics || []).map((name, i) => ({
@@ -222,6 +263,16 @@ export default function TopicStudyScreen() {
           </>
         ) : null}
 
+        {/* === Çalışma Geçmişi === */}
+        {history.length > 0 && (
+          <>
+            <Text style={[s.sectionTitle, { color: C.muted }]}>ÇALIŞMA GEÇMİŞİ</Text>
+            {history.map((h) => (
+              <StudyHistoryRow key={h.id} item={h} C={C} color={color} />
+            ))}
+          </>
+        )}
+
         {/* === Çalış CTA — purple pill === */}
         <Pressable
           onPress={() => navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: subject.key, topicName: topic.name })}
@@ -279,6 +330,14 @@ const s = StyleSheet.create({
     gap: 12, borderWidth: 1,
   },
   subtopicName: { ...TYPOGRAPHY.body, flex: 1, fontSize: 14 },
+  historyRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    borderRadius: 14, padding: 14, marginBottom: 8, borderWidth: 1,
+  },
+  historyDateBox: {
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10,
+  },
+  historyDate: { ...TYPOGRAPHY.captionMedium, fontSize: 12 },
   cta: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     borderRadius: 999, paddingVertical: 17, marginTop: SPACING.xxxl,

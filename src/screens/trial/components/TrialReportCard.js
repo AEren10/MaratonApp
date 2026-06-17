@@ -79,7 +79,7 @@ export const TrialReportCard = forwardRef(function TrialReportCard(
 
       <View style={s.barsWrap}>
         {bars.slice(0, 6).map((b) => (
-          <View key={b.name} style={s.barRow}>
+          <View key={b.key} style={s.barRow}>
             <View style={[s.dot, { backgroundColor: b.c }]} />
             <Text style={s.barName} numberOfLines={1}>{b.name}</Text>
             <Text style={[s.barNet, { color: b.c }]}>{b.net.toFixed(1)}</Text>

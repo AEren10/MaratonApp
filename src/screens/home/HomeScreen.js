@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectStreak, selectTodayLogs, selectFreezeCount } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { selectStats, selectXP } from "../../store/slices/gamificationSlice";
+import { selectXP } from "../../store/slices/gamificationSlice";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { usePlanContext } from "../../hooks/usePlanContext";
@@ -23,9 +23,14 @@ import { Icon } from "../../components/design";
 
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
+import { useWeeklyTrialReport } from "../../hooks/useWeeklyTrialReport";
 import { useAISuggestions } from "../../hooks/useAISuggestions";
 import { useSync } from "../../contexts/DataSyncContext";
 import { NudgeModal } from "../../components/common/NudgeModal";
+import { NudgePopup } from "../../components/common/NudgePopup";
+import { ComebackModal } from "../../components/common/ComebackModal";
+import { useNudgePopup } from "../../hooks/useNudgePopup";
+import { useRetention } from "../../hooks/useRetention";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
@@ -38,11 +43,14 @@ import { RoundActions } from "./components/RoundActions";
 import { FeedbackStack } from "./components/FeedbackCard";
 import { MotivCard } from "./components/MotivCard";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
+import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
 import { DailyActionCard } from "./components/DailyActionCard";
 import { ExamCountdown } from "./components/ExamCountdown";
 import { MorningBriefing } from "./components/MorningBriefing";
+import { StudyListCard } from "./components/StudyListCard";
 import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
 import { getAllSubjects } from "../trial/trialTypes";
+import { selectUserTasksProgress } from "../../store/slices/userTasksSlice";
 
 // QUICK_ITEMS palette HomeScreen içinde useC ile inşa edilir.
 
@@ -69,7 +77,9 @@ export default function HomeScreen() {
   const C = useC();
   const { user } = useAuth();
   const { reward, xpToast, dismissXP } = useGamification();
+  const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
+  const userTasksProgress = useSelector(selectUserTasksProgress);
 
   const QUICK_ITEMS = useMemo(() => [
     { icon: "edit",     label: "Kaydet",      c: C.amber,  go: SCREENS.ADD_STUDY },
@@ -85,13 +95,14 @@ export default function HomeScreen() {
   const freezeCount = useSelector(selectFreezeCount);
   const todayLogs = useSelector(selectTodayLogs);
   const trials = useSelector(selectTrials);
-  const gStats = useSelector(selectStats);
   const xp = useSelector(selectXP);
 
   const dispatch = useAppDispatch();
   const planCtx = usePlanContext();
   const nudges = useRecommendations();
+  const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
   const weeklyReport = useWeeklyReport();
+  const weeklyTrialReport = useWeeklyTrialReport();
   const { suggestions: aiSuggestions, loading: aiLoading } = useAISuggestions();
   const { refresh } = useSync();
   const [nudgeVisible, setNudgeVisible] = useState(false);
@@ -188,9 +199,12 @@ export default function HomeScreen() {
   }, [trials, C]);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
+    const t = setTimeout(() => {
+      setLoading(false);
+      showNudgePopup(2000);
+    }, 600);
     return () => clearTimeout(t);
-  }, []);
+  }, [showNudgePopup]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -267,6 +281,14 @@ export default function HomeScreen() {
             <PriorityCard task={topTask} plan={plan} onStart={go(SCREENS.PLAN_DETAIL)} />
           </AnimatedCard>
 
+          <AnimatedCard delay={80}>
+            <StudyListCard
+              progress={userTasksProgress}
+              onNavigate={go(SCREENS.PLAN_DETAIL)}
+              onCreate={go(SCREENS.ADD_TASK)}
+            />
+          </AnimatedCard>
+
           {planCtx.srDue > 0 ? (
             <AnimatedCard delay={120}>
               <Pressable onPress={go(SCREENS.REVIEW_SESSION)}>
@@ -294,6 +316,10 @@ export default function HomeScreen() {
             <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.WEEKLY_REVIEW)} />
           </AnimatedCard>
 
+          <AnimatedCard delay={220}>
+            <WeeklyTrialCard report={weeklyTrialReport} onPress={go(SCREENS.WEEKLY_TRIAL_REVIEW)} />
+          </AnimatedCard>
+
           {!actionDismissed && (dailyAction || aiLoading) ? (
             <AnimatedCard delay={260}>
               <DailyActionCard
@@ -314,7 +340,7 @@ export default function HomeScreen() {
             <SectionLabel>GERİ BİLDİRİM</SectionLabel>
             <FeedbackStack
               nudges={nudges}
-              max={3}
+              max={2}
               onAction={(nudge) => {
                 if (nudge.subject) navigation.navigate(SCREENS.ANALYSIS);
                 else navigation.navigate(SCREENS.PLAN_DETAIL);
@@ -325,6 +351,24 @@ export default function HomeScreen() {
       </ScrollView>
 
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+
+      <ComebackModal
+        visible={!!comeback}
+        daysAway={comeback?.daysAway}
+        xpBonus={comeback?.xpBonus || 50}
+        onDismiss={dismissComeback}
+      />
+
+      <NudgePopup
+        nudge={nudgePopup}
+        visible={!!nudgePopup}
+        onDismiss={dismissNudgePopup}
+        onAction={(n) => {
+          dismissNudgePopup();
+          if (n.subject) navigation.navigate(SCREENS.ANALYSIS);
+          else navigation.navigate(SCREENS.PLAN_DETAIL);
+        }}
+      />
 
       <NudgeModal
         visible={nudgeVisible}

@@ -126,7 +126,12 @@ export function ExamProvider({ children }) {
   const onboardingDone = !!examType && !!targetRanking;
 
   const daysUntilExam = examDate
-    ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24)))
+    ? (() => {
+        const now = new Date();
+        const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        const examUTC = Date.UTC(examDate.getFullYear(), examDate.getMonth(), examDate.getDate());
+        return Math.max(0, Math.round((examUTC - todayUTC) / (1000 * 60 * 60 * 24)));
+      })()
     : null;
 
   const value = {

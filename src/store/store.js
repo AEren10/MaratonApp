@@ -4,6 +4,7 @@ import trialReducer from "./slices/trialSlice";
 import gamificationReducer from "./slices/gamificationSlice";
 import goalsReducer from "./slices/goalsSlice";
 import planReducer from "./slices/planSlice";
+import userTasksReducer from "./slices/userTasksSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     gamification: gamificationReducer,
     goals: goalsReducer,
     plan: planReducer,
+    userTasks: userTasksReducer,
   },
 });

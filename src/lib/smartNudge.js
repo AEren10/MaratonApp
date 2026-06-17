@@ -1,5 +1,5 @@
 import { differenceInDays } from "date-fns";
-import { TYT_SUBJECTS } from "../themes/subjects";
+import { TYT_SUBJECTS, getSubjectByKey } from "../themes/subjects";
 import { getAllSubjects } from "../screens/trial/trialTypes";
 import { C } from "../themes/tokens";
 
@@ -15,13 +15,14 @@ export const NUDGE_TYPES = {
   SUGGEST: "suggest",
 };
 
-function trialSubjectLabel(key) {
-  const found = getAllSubjects(C).find((s) => s.key === key);
-  return found?.name || key;
-}
-
 function subjectLabel(key) {
-  return TYT_SUBJECTS[key]?.label || trialSubjectLabel(key) || key;
+  const curriculum = getSubjectByKey(key);
+  if (curriculum) return curriculum.label;
+  const tyt = TYT_SUBJECTS[key];
+  if (tyt) return tyt.label;
+  const trial = getAllSubjects(C).find((s) => s.key === key);
+  if (trial) return trial.name;
+  return key;
 }
 
 export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTotal = 0, dailyGoal = 0 }) {
@@ -83,7 +84,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "high",
             subject: key,
             icon: "trendDown",
-            message: `${trialSubjectLabel(key)}'te ${drop.toFixed(1)} net düştün`,
+            message: `${subjectLabel(key)}'te ${drop.toFixed(1)} net düştün`,
             detail: "Bu derste yoğunlaşman gerek. Zayıf konularını analiz et.",
             actionLabel: "Analiz Et",
             color: "red",
@@ -94,7 +95,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "medium",
             subject: key,
             icon: "trendDown",
-            message: `${trialSubjectLabel(key)}'te ${drop.toFixed(1)} net düşüş`,
+            message: `${subjectLabel(key)}'te ${drop.toFixed(1)} net düşüş`,
             detail: "Küçük düşüşler normal ama takip etmen önemli.",
             actionLabel: "Konu Analizi",
             color: "amber",
@@ -107,7 +108,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "low",
             subject: key,
             icon: "trendUp",
-            message: `${trialSubjectLabel(key)}'te +${(latestNet - prevNet).toFixed(1)} net artış!`,
+            message: `${subjectLabel(key)}'te +${(latestNet - prevNet).toFixed(1)} net artış!`,
             detail: "Harika gidiyorsun, bu tempoyu koru!",
             color: "green",
           });

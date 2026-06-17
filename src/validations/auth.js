@@ -34,3 +34,10 @@ export const studyLogSchema = z.object({
   (d) => !d.correctCount || !d.questionCount || d.correctCount <= d.questionCount,
   { message: "Doğru sayısı soru sayısından büyük olamaz", path: ["correctCount"] },
 );
+
+export const userTaskSchema = z.object({
+  subject: z.string().min(1, "Ders seçmelisin"),
+  topic: z.string().optional(),
+  questionCount: z.number().int().min(1).max(500),
+  note: z.string().max(140).optional(),
+});

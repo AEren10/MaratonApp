@@ -1,20 +1,30 @@
 import React, { useMemo, useCallback, useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet, RefreshControl, ActivityIndicator } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, IconBox } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 
+const AnimPressable = Animated.createAnimatedComponent(Pressable);
+
 const LogRow = React.memo(function LogRow({ item, s, fallbackColor }) {
   const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: fallbackColor, label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   return (
-    <View style={s.row}>
+    <AnimPressable
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
+      style={[s.row, pressStyle]}
+    >
       <IconBox icon={subj.icon} size={32} color={subj.color} rounded={8} />
       <View style={s.rowContent}>
         <Text style={s.topic} numberOfLines={1}>{item.topic || subj.label || ""}</Text>
@@ -29,7 +39,7 @@ const LogRow = React.memo(function LogRow({ item, s, fallbackColor }) {
         <Text style={s.qCount}>{item.question_count || item.questionCount || 0}</Text>
         <Text style={s.qLabel}>soru</Text>
       </View>
-    </View>
+    </AnimPressable>
   );
 });
 
@@ -37,14 +47,6 @@ function SectionHeader({ title, s }) {
   return <Text style={s.section}>{title}</Text>;
 }
 
-function EmptyState({ s, C }) {
-  return (
-    <View style={s.empty}>
-      <Icon name="clock" size={40} color={C.muted} />
-      <Text style={s.emptyText}>Henuz calisma kaydedilmedi</Text>
-    </View>
-  );
-}
 
 function relativeDate(iso) {
   if (!iso) return "—";
@@ -131,7 +133,7 @@ export default function StudyLogScreen() {
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={s.list}
-          ListEmptyComponent={<EmptyState s={s} C={C} />}
+          ListEmptyComponent={<EmptyState icon="clock" title="Henüz çalışma yok" message="İlk çalışmanı kaydet, burada görünsün" actionLabel="Çalışma Ekle" onAction={() => navigation.navigate("AddStudy")} color="amber" />}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -162,7 +164,5 @@ function makeStyles(C) {
     qBox: { alignItems: "center", minWidth: 40 },
     qCount: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     qLabel: { ...TYPOGRAPHY.micro, color: C.muted },
-    empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
-    emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
   });
 }

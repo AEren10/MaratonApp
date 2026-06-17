@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { getLevelForXP } from "../../lib/xpEngine";
 
 const initialState = {
@@ -68,6 +68,9 @@ export const selectXP = (state) => state.gamification.xp;
 export const selectWeeklyXP = (state) => state.gamification.weeklyXP;
 export const selectBadgeIds = (state) => state.gamification.badges;
 export const selectStats = (state) => state.gamification.stats;
-export const selectLevel = (state) => getLevelForXP(state.gamification.xp);
+export const selectLevel = createSelector(
+  selectXP,
+  (xp) => getLevelForXP(xp),
+);
 
 export default gamificationSlice.reducer;

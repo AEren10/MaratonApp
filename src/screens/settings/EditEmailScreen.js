@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -8,6 +8,8 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { supabase } from "../../supabase/client";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function EditEmailScreen() {
   const navigation = useNavigation();
@@ -15,29 +17,34 @@ export default function EditEmailScreen() {
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [saving, setSaving] = useState(false);
+  const showAlert = useAlert();
 
   const save = useCallback(async () => {
     if (saving) return;
     const v = email.trim();
     if (!v.includes("@")) {
-      Alert.alert("Geçersiz", "Geçerli bir e-posta gir.");
+      H.error();
+      showAlert("Geçersiz", "Geçerli bir e-posta gir.");
       return;
     }
     if (v === user?.email) {
-      Alert.alert("Aynı adres", "Bu zaten mevcut e-postan.");
+      H.error();
+      showAlert("Aynı adres", "Bu zaten mevcut e-postan.");
       return;
     }
     setSaving(true);
     try {
       const { error } = await supabase.auth.updateUser({ email: v });
       if (error) throw error;
-      Alert.alert(
+      H.success();
+      showAlert(
         "Doğrulama gönderildi",
         `${v} adresine bir doğrulama bağlantısı gönderildi. Onayladığında değişiklik aktifleşecek.`,
       );
       navigation.goBack();
     } catch (e) {
-      Alert.alert("Hata", e.message || "E-posta değiştirilemedi.");
+      H.error();
+      showAlert("Hata", e.message || "E-posta değiştirilemedi.");
     } finally {
       setSaving(false);
     }

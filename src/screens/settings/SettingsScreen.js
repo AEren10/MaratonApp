@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { ScrollView, View, Text, Pressable, Alert, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -8,9 +9,11 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
+import { useAlert } from "../../contexts/AlertContext";
 
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
+import * as H from "../../lib/haptics";
 
 // Ayarlar artık sade — Profile menüde olan kişisel öğeler burada gözükmüyor.
 // Sadece sistem-tarafı tercihler: Bildirimler, Görünüm, Gizlilik, Yardım, Hakkında.
@@ -18,16 +21,18 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { logout } = useAuth();
+  const showAlert = useAlert();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const go = useCallback((s) => navigation.navigate(s), [navigation]);
 
   const handleHelp = useCallback(() => {
-    Alert.alert("Yardım", "Sorularını için bize ulaşabilirsin:\n\ndestek@maraton.app");
+    showAlert("Yardım", "Sorularını için bize ulaşabilirsin:\n\ndestek@maraton.app");
   }, []);
 
   const handleLogout = useCallback(() => {
-    Alert.alert("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin?", [
+    H.warn();
+    showAlert("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin?", [
       { text: "İptal", style: "cancel" },
       { text: "Çıkış Yap", style: "destructive", onPress: logout },
     ]);
@@ -47,58 +52,66 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsGroup title="TERCİHLER">
-          <SettingsRow
-            icon="bell"
-            iconColor={C.amber}
-            label="Bildirimler"
-            onPress={() => go(SCREENS.NOTIFICATIONS_SETTINGS)}
-          />
-          <SettingsRow
-            icon="moon"
-            iconColor={C.purple}
-            label="Görünüm"
-            onPress={() => go(SCREENS.APPEARANCE)}
-          />
-        </SettingsGroup>
+        <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
+          <SettingsGroup title="TERCİHLER">
+            <SettingsRow
+              icon="bell"
+              iconColor={C.amber}
+              label="Bildirimler"
+              onPress={() => { H.tap(); go(SCREENS.NOTIFICATIONS_SETTINGS); }}
+            />
+            <SettingsRow
+              icon="moon"
+              iconColor={C.purple}
+              label="Görünüm"
+              onPress={() => { H.tap(); go(SCREENS.APPEARANCE); }}
+            />
+          </SettingsGroup>
+        </Animated.View>
 
-        <SettingsGroup title="UYGULAMA">
-          <SettingsRow
-            icon="lock"
-            iconColor={C.blue}
-            label="Gizlilik Politikası"
-            onPress={() => go(SCREENS.PRIVACY)}
-          />
-          <SettingsRow
-            icon="info"
-            iconColor={C.green}
-            label="Hakkında"
-            onPress={() => go(SCREENS.ABOUT)}
-          />
-          <SettingsRow
-            icon="share"
-            iconColor={C.coral}
-            label="Yardım"
-            onPress={handleHelp}
-          />
-        </SettingsGroup>
+        <Animated.View entering={FadeInDown.delay(160).duration(400).springify()}>
+          <SettingsGroup title="UYGULAMA">
+            <SettingsRow
+              icon="lock"
+              iconColor={C.blue}
+              label="Gizlilik Politikası"
+              onPress={() => { H.tap(); go(SCREENS.PRIVACY); }}
+            />
+            <SettingsRow
+              icon="info"
+              iconColor={C.green}
+              label="Hakkında"
+              onPress={() => { H.tap(); go(SCREENS.ABOUT); }}
+            />
+            <SettingsRow
+              icon="share"
+              iconColor={C.coral}
+              label="Yardım"
+              onPress={() => { H.tap(); handleHelp(); }}
+            />
+          </SettingsGroup>
+        </Animated.View>
 
-        <Pressable
-          onPress={handleLogout}
-          style={({ pressed }) => [
-            styles.logoutBtn,
-            {
-              backgroundColor: C.red + "12",
-              borderColor: C.red + "30",
-              opacity: pressed ? 0.85 : 1,
-            },
-          ]}
-        >
-          <Icon name="x" size={18} color={C.red} />
-          <Text style={[styles.logoutText, { color: C.red }]}>Çıkış Yap</Text>
-        </Pressable>
+        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+          <Pressable
+            onPress={handleLogout}
+            style={({ pressed }) => [
+              styles.logoutBtn,
+              {
+                backgroundColor: C.red + "12",
+                borderColor: C.red + "30",
+                opacity: pressed ? 0.85 : 1,
+              },
+            ]}
+          >
+            <Icon name="x" size={18} color={C.red} />
+            <Text style={[styles.logoutText, { color: C.red }]}>Çıkış Yap</Text>
+          </Pressable>
+        </Animated.View>
 
-        <Text style={[styles.version, { color: C.muted }]}>Maraton v1.0.0</Text>
+        <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
+          <Text style={[styles.version, { color: C.muted }]}>Maraton v1.0.0</Text>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

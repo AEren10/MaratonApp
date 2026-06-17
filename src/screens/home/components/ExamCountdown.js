@@ -1,4 +1,6 @@
 import { View, Text, Pressable } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
@@ -23,11 +25,11 @@ function getMilestone(days) {
   return null;
 }
 
-function urgencyColor(days, C) {
-  if (days <= 7) return C.red;
-  if (days <= 30) return C.amber;
-  if (days <= 100) return C.blue;
-  return C.green;
+function urgencyGradient(days) {
+  if (days <= 7) return ["#E23B49", "#C0222E"];
+  if (days <= 30) return ["#E8841A", "#D06A08"];
+  if (days <= 100) return ["#2D6FE0", "#1A4FAA"];
+  return ["#15A86A", "#0D8A52"];
 }
 
 export function ExamCountdown({ onPress }) {
@@ -35,59 +37,80 @@ export function ExamCountdown({ onPress }) {
   const { daysUntilExam, examDate, examType } = useExam();
   if (daysUntilExam == null) return null;
 
-  const color = urgencyColor(daysUntilExam, C);
+  const gradient = urgencyGradient(daysUntilExam);
   const milestone = getMilestone(daysUntilExam);
   const isExamDay = daysUntilExam <= 0;
   const dateStr = examDate
-    ? examDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long" })
+    ? examDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
     : "";
 
+  const pct = Math.max(0, Math.min(1, 1 - daysUntilExam / 365));
+
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.94 }}>
-      <View style={{
-        flexDirection: "row", alignItems: "center", gap: SPACING.lg,
-        borderRadius: RADIUS.xxl, padding: SPACING.md,
-        backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
-      }}>
-        {/* Gün karosu — solid renk, beyaz dev rakam */}
+    <Animated.View entering={FadeInDown.delay(160).duration(440).springify().damping(16)}>
+      <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.94 }}>
         <View style={{
-          width: 64, height: 64, borderRadius: 18,
-          backgroundColor: color, alignItems: "center", justifyContent: "center",
-          shadowColor: color, shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.32, shadowRadius: 10, elevation: 4,
+          borderRadius: RADIUS.xxl, overflow: "hidden",
+          backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
         }}>
-          {isExamDay ? (
-            <Text style={{ fontSize: 30 }}>🚀</Text>
-          ) : (
-            <>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, lineHeight: 30, color: "#FFFFFF", letterSpacing: -1 }}>
-                {daysUntilExam}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.lg, padding: SPACING.md }}>
+            <LinearGradient
+              colors={gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                width: 68, height: 68, borderRadius: 20,
+                alignItems: "center", justifyContent: "center",
+                shadowColor: gradient[0], shadowOffset: { width: 0, height: 5 },
+                shadowOpacity: 0.35, shadowRadius: 10, elevation: 4,
+              }}
+            >
+              {isExamDay ? (
+                <Text style={{ fontSize: 30 }}>🚀</Text>
+              ) : (
+                <>
+                  <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, lineHeight: 30, color: "#FFFFFF", letterSpacing: -1 }}>
+                    {daysUntilExam}
+                  </Text>
+                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 9, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>GÜN</Text>
+                </>
+              )}
+            </LinearGradient>
+
+            <View style={{ flex: 1, gap: 3 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{examType?.toUpperCase() || "YKS"}</Text>
+                <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>·</Text>
+                <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>{dateStr}</Text>
+              </View>
+              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, color: C.text, letterSpacing: -0.3 }}>
+                {isExamDay ? "Bugün sınav günü!" : "Sınava kaldı"}
               </Text>
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 9, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>GÜN</Text>
-            </>
-          )}
-        </View>
-
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>
-            {examType?.toUpperCase() || "YKS"} · {dateStr}
-          </Text>
-          <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, color: C.text, letterSpacing: -0.3 }}>
-            {isExamDay ? "Bugün sınav günü!" : "Sınava kaldı"}
-          </Text>
-          {milestone && (
-            <View style={{
-              flexDirection: "row", alignItems: "center", gap: 5, alignSelf: "flex-start",
-              backgroundColor: color + "18", borderRadius: RADIUS.pill,
-              paddingHorizontal: 10, paddingVertical: 4, marginTop: 2,
-            }}>
-              <Text style={{ fontSize: 12 }}>{milestone.emoji}</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color, fontFamily: "Inter_600SemiBold" }}>{milestone.message}</Text>
+              {milestone && (
+                <View style={{
+                  flexDirection: "row", alignItems: "center", gap: 5, alignSelf: "flex-start",
+                  backgroundColor: gradient[0] + "14", borderRadius: RADIUS.pill,
+                  paddingHorizontal: 10, paddingVertical: 4, marginTop: 2,
+                }}>
+                  <Text style={{ fontSize: 12 }}>{milestone.emoji}</Text>
+                  <Text style={{ ...TYPOGRAPHY.micro, color: gradient[0], fontFamily: "Inter_600SemiBold" }}>{milestone.message}</Text>
+                </View>
+              )}
             </View>
-          )}
-        </View>
 
-        <Icon name="chevR" size={18} color={C.muted} />
-      </View>
-    </Pressable>
+            <Icon name="chevR" size={18} color={C.muted} />
+          </View>
+
+          <View style={{ height: 3, backgroundColor: C.surface2, marginHorizontal: SPACING.md, borderRadius: 2, marginBottom: SPACING.sm }}>
+            <LinearGradient
+              colors={gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ width: `${Math.round(pct * 100)}%`, height: 3, borderRadius: 2 }}
+            />
+          </View>
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 }

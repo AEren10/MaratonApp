@@ -48,6 +48,21 @@ export function useWeeklyReport() {
     return () => { cancelled = true; };
   }, [user?.id, weekStart, weekEnd]);
 
+  const [prevLogs, setPrevLogs] = useState([]);
+
+  useEffect(() => {
+    if (!user?.id || user.id === "dev") return;
+    let cancelled = false;
+    const ps = new Date(weekStart);
+    ps.setDate(ps.getDate() - 7);
+    const pe = new Date(weekStart);
+    pe.setDate(pe.getDate() - 1);
+    getStudyLogs(user.id, { from: toIso(ps), to: toIso(pe) })
+      .then((data) => { if (!cancelled) setPrevLogs(data || []); })
+      .catch(() => { if (!cancelled) setPrevLogs([]); });
+    return () => { cancelled = true; };
+  }, [user?.id, weekStart]);
+
   return useMemo(() => {
     const weekTrials = trials.filter((t) => {
       const d = new Date(t.date);
@@ -57,11 +72,12 @@ export function useWeeklyReport() {
     const totalQuestions = logs.reduce((s, l) => s + (l.question_count || 0), 0);
     const totalMinutes = logs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
 
-    // Active days
     const days = new Set(logs.map((l) => l.study_date));
     const activeDays = days.size;
 
-    // Net change: compare avg this week vs prev week
+    const prevTotalQuestions = prevLogs.reduce((s, l) => s + (l.question_count || 0), 0);
+    const prevTotalMinutes = prevLogs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
+
     const weekNetAvg = weekTrials.length > 0
       ? weekTrials.reduce((s, t) => s + (t.totalNet || 0), 0) / weekTrials.length
       : 0;
@@ -77,8 +93,29 @@ export function useWeeklyReport() {
     const prevWeekNetAvg = prevWeekTrials.length > 0
       ? prevWeekTrials.reduce((s, t) => s + (t.totalNet || 0), 0) / prevWeekTrials.length
       : 0;
-
     const netDelta = weekNetAvg - prevWeekNetAvg;
+
+    const subjectMap = {};
+    logs.forEach((l) => {
+      const key = l.subject || "other";
+      if (!subjectMap[key]) subjectMap[key] = { questions: 0, minutes: 0 };
+      subjectMap[key].questions += l.question_count || 0;
+      subjectMap[key].minutes += l.duration_minutes || 0;
+    });
+    const subjects = Object.entries(subjectMap)
+      .map(([key, v]) => ({ key, ...v }))
+      .sort((a, b) => b.questions - a.questions);
+
+    const dayLabels = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+    const dailyHeatmap = dayLabels.map((label, i) => {
+      const d = new Date(weekStart);
+      d.setDate(d.getDate() + i);
+      const dateStr = toIso(d);
+      const active = days.has(dateStr);
+      const q = logs.filter((l) => l.study_date === dateStr)
+        .reduce((s, l) => s + (l.question_count || 0), 0);
+      return { label, date: dateStr, active, questions: q };
+    });
 
     return {
       totalQuestions,
@@ -87,7 +124,13 @@ export function useWeeklyReport() {
       trialCount: weekTrials.length,
       weekNetAvg: weekNetAvg.toFixed(1),
       netDelta: netDelta.toFixed(1),
-      hasPrev: prevWeekTrials.length > 0,
+      hasPrev: prevWeekTrials.length > 0 || prevLogs.length > 0,
+      prevTotalQuestions,
+      prevTotalMinutes,
+      questionsDelta: totalQuestions - prevTotalQuestions,
+      minutesDelta: totalMinutes - prevTotalMinutes,
+      subjects,
+      dailyHeatmap,
     };
-  }, [logs, trials, weekStart, weekEnd]);
+  }, [logs, prevLogs, trials, weekStart, weekEnd]);
 }

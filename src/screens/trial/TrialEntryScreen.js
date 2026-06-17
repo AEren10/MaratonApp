@@ -1,16 +1,19 @@
 import { useState, useMemo, useCallback } from "react";
 import {
-  ScrollView, View, Text, Pressable,
-  KeyboardAvoidingView, Platform, Alert,
+  ScrollView, View, Text, Pressable, TextInput,
+  KeyboardAvoidingView, Platform,
 } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon, IconBox } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { getTrialTypes, getSubjectsForType, getFieldFromType } from "./trialTypes";
 import { SubjectInput } from "./components/SubjectInput";
+import { useAlert } from "../../contexts/AlertContext";
 import { TotalCard } from "./components/TotalCard";
 import { TrialTypeSelector } from "./components/TrialTypeSelector";
 import { BranchSubjectPicker } from "./components/BranchSubjectPicker";
@@ -22,6 +25,7 @@ import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveTrialOffline } from "../../lib/offlineQueue";
 import { SCREENS } from "../../constants/screens";
+import * as H from "../../lib/haptics";
 
 const EMPTY = { correct: "", wrong: "" };
 
@@ -41,7 +45,7 @@ function MoodSelector({ value, onChange, C, styles }) {
           return (
             <Pressable
               key={m.key}
-              onPress={() => onChange(active ? null : m.key)}
+              onPress={() => { H.select(); onChange(active ? null : m.key); }}
               style={[styles.moodBtn, active && styles.moodBtnActive]}
             >
               <Text style={{ fontSize: 24 }}>{m.emoji}</Text>
@@ -54,12 +58,32 @@ function MoodSelector({ value, onChange, C, styles }) {
   );
 }
 
-const today = () => {
-  const d = new Date();
+function formatDateLong(d) {
   return d.toLocaleDateString("tr-TR", {
     day: "numeric", month: "long", year: "numeric",
   });
-};
+}
+
+function formatDateISO(d) {
+  return d.toISOString().split("T")[0];
+}
+
+function getRecentDays(count = 7) {
+  const days = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    d.setHours(12, 0, 0, 0);
+    const dayNames = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
+    days.push({
+      date: d,
+      iso: formatDateISO(d),
+      day: d.getDate(),
+      dayName: i === 0 ? "Bugün" : i === 1 ? "Dün" : dayNames[d.getDay()],
+    });
+  }
+  return days;
+}
 
 export default function TrialEntryScreen() {
   const navigation = useNavigation();
@@ -68,12 +92,18 @@ export default function TrialEntryScreen() {
   const styles = useMemo(() => makeStyles(C), [C]);
   const { user } = useAuth();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { examType: userExamType } = useExam();
+  const showAlert = useAlert();
 
-  const [trialType, setTrialType] = useState("TYT");
+  const [trialType, setTrialType] = useState(userExamType === "lgs" ? "LGS" : "TYT");
   const [branchSubject, setBranchSubject] = useState(null);
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState({});
   const [mood, setMood] = useState(null);
+  const [title, setTitle] = useState("");
+  const [trialDate, setTrialDate] = useState(() => new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const recentDays = useMemo(() => getRecentDays(14), []);
 
   const subjects = useMemo(
     () => getSubjectsForType(C, trialType, branchSubject),
@@ -81,12 +111,14 @@ export default function TrialEntryScreen() {
   );
 
   const handleTypeChange = useCallback((newType) => {
+    H.select();
     setTrialType(newType);
     setValues({});
     if (newType !== "BRANCH") setBranchSubject(null);
   }, []);
 
   const handleBranchChange = useCallback((key) => {
+    H.select();
     setBranchSubject(key);
     setValues({});
   }, []);
@@ -95,21 +127,24 @@ export default function TrialEntryScreen() {
     setValues((prev) => ({ ...prev, [key]: v }));
   }, []);
 
+  const wrongPenalty = trialType === "LGS" ? 1 / 3 : 0.25;
+
   const totalNet = useMemo(() => {
     return subjects.reduce((sum, s) => {
       const val = values[s.key] || EMPTY;
       const d = parseInt(val.correct, 10) || 0;
       const y = parseInt(val.wrong, 10) || 0;
-      return sum + d - y * 0.25;
+      return sum + d - y * wrongPenalty;
     }, 0).toFixed(2);
-  }, [values, subjects]);
+  }, [values, subjects, wrongPenalty]);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
   const handleSave = useCallback(async () => {
     if (saving) return;
     if (trialType === "BRANCH" && !branchSubject) {
-      Alert.alert("Ders sec", "Branş denemesi için bir ders seçmelisin.");
+      H.warn();
+      showAlert("Ders sec", "Branş denemesi için bir ders seçmelisin.");
       return;
     }
 
@@ -121,23 +156,26 @@ export default function TrialEntryScreen() {
       const c = parseInt(val.correct, 10) || 0;
       const w = parseInt(val.wrong, 10) || 0;
       if (c || w) hasAny = true;
-      subjectsMap[s.key] = { correct: c, wrong: w, net: c - w * 0.25 };
-      subjectsArr.push({ subject: s.key, correct_count: c, wrong_count: w, empty_count: 0 });
+      subjectsMap[s.key] = { correct: c, wrong: w, net: c - w * wrongPenalty };
+      subjectsArr.push({ subject: s.key, correct_count: c, wrong_count: w, empty_count: Math.max(0, s.max - c - w) });
     });
     if (!hasAny) {
-      Alert.alert("Bos deneme", "En az bir ders icin deger gir.");
+      H.warn();
+      showAlert("Bos deneme", "En az bir ders icin deger gir.");
       return;
     }
 
     const netVal = parseFloat(totalNet);
     const typeMeta = getTrialTypes(C)[trialType];
-    const trialName = trialType === "BRANCH"
+    const autoName = trialType === "BRANCH"
       ? `${subjects[0]?.name || "Branş"} Branş`
       : typeMeta.label;
+    const trialName = title.trim() || autoName;
 
     const localTrial = {
       id: Date.now().toString(),
-      date: today(),
+      date: formatDateISO(trialDate),
+      name: trialName,
       totalNet: netVal,
       subjects: subjectsMap,
       trialType,
@@ -152,7 +190,7 @@ export default function TrialEntryScreen() {
       {
         user_id: user.id,
         name: trialName,
-        trial_date: new Date().toISOString().split("T")[0],
+        trial_date: formatDateISO(trialDate),
         exam_type: trialType,
         field: getFieldFromType(trialType),
         branch_subject: branchSubject,
@@ -169,8 +207,9 @@ export default function TrialEntryScreen() {
         { type: "max", key: "maxNet", value: netVal },
       ],
     });
-    navigation.replace(SCREENS.TRIAL_DETAIL, { trial: localTrial, fromEntry: true });
-  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, user, dispatch, reward, navigation, C]);
+    H.success();
+    navigation.replace(SCREENS.TRIAL_SUMMARY, { trial: localTrial });
+  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, title, trialDate, user, dispatch, reward, navigation, C]);
 
   const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
 
@@ -193,39 +232,102 @@ export default function TrialEntryScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.dateRow}>
+          <Pressable
+            onPress={() => setShowDatePicker((p) => !p)}
+            style={styles.dateRow}
+          >
             <IconBox icon="calendar" color={C.amber} size={34} rounded={10} />
-            <Text style={styles.dateText}>{today()}</Text>
-          </View>
+            <Text style={styles.dateText}>{formatDateLong(trialDate)}</Text>
+            <Icon name={showDatePicker ? "chevUp" : "chevDown"} size={16} color={C.muted} />
+          </Pressable>
 
-          <TrialTypeSelector value={trialType} onChange={handleTypeChange} />
+          {showDatePicker && (
+            <Animated.View entering={FadeIn.duration(200)} style={styles.datePicker}>
+              {recentDays.map((d) => {
+                const active = formatDateISO(trialDate) === d.iso;
+                return (
+                  <Pressable
+                    key={d.iso}
+                    onPress={() => { H.tap(); setTrialDate(d.date); setShowDatePicker(false); }}
+                    style={[
+                      styles.dateChip,
+                      {
+                        backgroundColor: active ? C.amber + "1A" : C.surface,
+                        borderColor: active ? C.amber : C.border,
+                      },
+                    ]}
+                  >
+                    <Text style={{
+                      fontFamily: "Inter_500Medium", fontSize: 11,
+                      color: active ? C.amber : C.muted,
+                    }}>{d.dayName}</Text>
+                    <Text style={{
+                      fontFamily: "SpaceGrotesk_700Bold", fontSize: 18,
+                      color: active ? C.amber : C.text,
+                    }}>{d.day}</Text>
+                  </Pressable>
+                );
+              })}
+            </Animated.View>
+          )}
+
+          <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.titleRow}>
+            <Icon name="edit" size={16} color={C.muted} />
+            <TextInput
+              value={title}
+              onChangeText={setTitle}
+              placeholder="Deneme adı (Özdebir, 3D, Limit...)"
+              placeholderTextColor={C.muted}
+              style={styles.titleInput}
+              maxLength={40}
+            />
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(170).duration(420).springify()}>
+            <TrialTypeSelector value={trialType} onChange={handleTypeChange} />
+          </Animated.View>
 
           {trialType === "BRANCH" && (
             <BranchSubjectPicker value={branchSubject} onChange={handleBranchChange} />
           )}
 
-          {showSubjectInputs && subjects.map((s) => (
-            <SubjectInput
-              key={s.key}
-              subject={s}
-              values={values[s.key] || EMPTY}
-              onChange={handleChange(s.key)}
-            />
-          ))}
-
-          {showSubjectInputs && <TotalCard totalNet={totalNet} />}
-
-          {showSubjectInputs && <MoodSelector value={mood} onChange={setMood} C={C} styles={styles} />}
+          {showSubjectInputs && (
+            <Animated.View entering={FadeInDown.delay(240).duration(420).springify()}>
+              {subjects.map((s) => (
+                <SubjectInput
+                  key={s.key}
+                  subject={s}
+                  values={values[s.key] || EMPTY}
+                  onChange={handleChange(s.key)}
+                  wrongPenalty={wrongPenalty}
+                />
+              ))}
+            </Animated.View>
+          )}
 
           {showSubjectInputs && (
-            <Pressable
-              onPress={handleSave}
-              style={[styles.submitBtn, saving && { opacity: 0.6 }]}
-              disabled={saving}
-            >
-              <Icon name="check" size={22} color="#FFFFFF" sw={2.5} />
-              <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}</Text>
-            </Pressable>
+            <Animated.View entering={FadeInDown.delay(310).duration(420).springify()}>
+              <TotalCard totalNet={totalNet} />
+            </Animated.View>
+          )}
+
+          {showSubjectInputs && (
+            <Animated.View entering={FadeInDown.delay(380).duration(420).springify()}>
+              <MoodSelector value={mood} onChange={setMood} C={C} styles={styles} />
+            </Animated.View>
+          )}
+
+          {showSubjectInputs && (
+            <Animated.View entering={FadeInDown.delay(450).duration(420).springify()}>
+              <Pressable
+                onPress={handleSave}
+                style={[styles.submitBtn, saving && { opacity: 0.6 }]}
+                disabled={saving}
+              >
+                <Icon name="check" size={22} color="#FFFFFF" sw={2.5} />
+                <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}</Text>
+              </Pressable>
+            </Animated.View>
           )}
         </ScrollView>
         <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
@@ -261,6 +363,41 @@ const makeStyles = (C) => ({
   dateText: {
     ...TYPOGRAPHY.bodyMedium,
     color: C.sec,
+    flex: 1,
+  },
+  datePicker: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: SPACING.lg,
+    flexWrap: "wrap",
+  },
+  dateChip: {
+    alignItems: "center",
+    gap: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    minWidth: 52,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
+    backgroundColor: C.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: C.border,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 2,
+    marginBottom: SPACING.lg,
+  },
+  titleInput: {
+    flex: 1,
+    fontFamily: "Inter_500Medium",
+    fontSize: 15,
+    color: C.text,
+    paddingVertical: 12,
   },
   moodWrap: {
     marginTop: SPACING.lg,
