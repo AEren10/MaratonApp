@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -8,7 +8,7 @@ import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } f
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
-function MemberRow({ item }) {
+const MemberRow = React.memo(function MemberRow({ item }) {
   const C = useC();
   const st = useMemo(() => makeStyles(C), [C]);
   const isYou = item.you;
@@ -26,7 +26,7 @@ function MemberRow({ item }) {
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
     </View>
   );
-}
+});
 
 export function GroupsTab({ user }) {
   const C = useC();

@@ -2,40 +2,38 @@ import { View, Text, Pressable } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
+import { SCREENS } from "../../../constants/screens";
 
-// Bölümler: Hesap | Çalışma | Sistem | Çıkış
 const SECTIONS = [
   {
     title: "HESAP",
     items: [
-      { icon: "user",  label: "Profil Düzenle", route: "EditProfile", color: "purple" },
-      { icon: "mail",  label: "E-posta Değiştir", route: "EditEmail", color: "blue" },
-      { icon: "lock",  label: "Şifre Değiştir", route: "ChangePassword", color: "coral" },
+      { icon: "user",  label: "Profil Düzenle", route: SCREENS.EDIT_PROFILE, color: "purple" },
+      { icon: "mail",  label: "E-posta Değiştir", route: SCREENS.EDIT_EMAIL, color: "blue" },
+      { icon: "lock",  label: "Şifre Değiştir", route: SCREENS.CHANGE_PASSWORD, color: "coral" },
     ],
   },
   {
     title: "ÇALIŞMA",
     items: [
-      { icon: "target",   label: "Hedeflerim",     route: "Goals",         color: "amber" },
-      { icon: "chart",    label: "Net Simülatörü", route: "RankSimulator", color: "teal" },
-      { icon: "layers",   label: "Yol Haritası",   route: "Roadmap",       color: "green" },
-      { icon: "calendar", label: "Takvim",         route: "Calendar",      color: "blue" },
+      { icon: "target",   label: "Hedeflerim",       route: SCREENS.GOALS,           color: "amber" },
+      { icon: "clock",    label: "Çalışma Geçmişi",  route: SCREENS.STUDY_LOG,       color: "blue" },
+      { icon: "hash",     label: "Konu Kartları",     route: SCREENS.TOPIC_CARDS,     color: "purple" },
+      { icon: "chart",    label: "Net Simülatörü",    route: SCREENS.RANK_SIMULATOR,  color: "teal" },
+      { icon: "layers",   label: "Yol Haritası",      route: SCREENS.ROADMAP,         color: "green" },
+      { icon: "calendar", label: "Takvim",            route: SCREENS.CALENDAR,        color: "blue" },
     ],
   },
   {
     title: "SOSYAL",
     items: [
-      { icon: "users",  label: "Arkadaşlar", route: "Friends", color: "pink" },
+      { icon: "users",  label: "Arkadaşlar", route: SCREENS.FRIENDS, color: "pink" },
     ],
   },
   {
     title: "SİSTEM",
     items: [
-      { icon: "settings", label: "Ayarlar",     route: "Settings",              color: "muted" },
-      { icon: "bell",     label: "Bildirimler", route: "NotificationsSettings", color: "muted" },
-      { icon: "moon",     label: "Görünüm",     route: "Appearance",            color: "muted" },
-      { icon: "lock",     label: "Gizlilik",    route: "Privacy",               color: "muted" },
-      { icon: "info",     label: "Hakkında",    route: "About",                 color: "muted" },
+      { icon: "settings", label: "Ayarlar", route: SCREENS.SETTINGS, color: "muted" },
     ],
   },
 ];

@@ -21,6 +21,8 @@ export function useRetention(reward) {
   useEffect(() => {
     if (processed.current) return;
     processed.current = true;
+    let alive = true;
+    let timer;
 
     (async () => {
       const today = todayStr();
@@ -28,7 +30,7 @@ export function useRetention(reward) {
       const loginRewarded = await AsyncStorage.getItem(KEY_LOGIN_REWARDED);
       const comebackShown = await AsyncStorage.getItem(KEY_COMEBACK_SHOWN);
 
-      if (lastActive) {
+      if (lastActive && alive) {
         const daysAway = daysBetween(lastActive, today);
 
         if (daysAway >= 2 && comebackShown !== today) {
@@ -37,13 +39,15 @@ export function useRetention(reward) {
         }
       }
 
-      if (loginRewarded !== today && reward) {
+      if (loginRewarded !== today && reward && alive) {
         await AsyncStorage.setItem(KEY_LOGIN_REWARDED, today);
-        setTimeout(() => reward("daily_login"), 3500);
+        timer = setTimeout(() => { if (alive) reward("daily_login"); }, 3500);
       }
 
-      await AsyncStorage.setItem(KEY_LAST_ACTIVE, today);
+      if (alive) await AsyncStorage.setItem(KEY_LAST_ACTIVE, today);
     })();
+
+    return () => { alive = false; clearTimeout(timer); };
   }, [reward]);
 
   const dismissComeback = useCallback(() => {

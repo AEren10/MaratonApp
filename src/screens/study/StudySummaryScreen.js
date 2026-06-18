@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
+import { SCREENS } from "../../constants/screens";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
@@ -53,7 +54,12 @@ export default function StudySummaryScreen() {
   const goalReached = todaySolved >= safeGoal;
 
   const dismiss = () => {
-    navigation.goBack();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "MainTabs", state: { routes: [{ name: SCREENS.HOME }] } }],
+      }),
+    );
   };
 
   return (

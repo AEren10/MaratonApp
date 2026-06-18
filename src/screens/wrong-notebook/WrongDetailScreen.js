@@ -8,7 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, IconBox, Chip } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import SignedImage from "../../components/common/SignedImage";
 import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
@@ -49,7 +49,7 @@ export default function WrongDetailScreen() {
   const item = passedItem || {};
   const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
   const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.muted, icon: "bookOpen" };
-  const imageUrl = item.image_path ? getWrongQuestionImageUrl(item.image_path) : null;
+  const hasImage = !!item.image_path;
   const date = new Date(item.created_at).toLocaleDateString("tr-TR", {
     day: "numeric", month: "long", year: "numeric",
   });
@@ -59,7 +59,7 @@ export default function WrongDetailScreen() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
@@ -103,14 +103,15 @@ export default function WrongDetailScreen() {
           </View>
         </Animated.View>
 
-        {imageUrl && (
+        {hasImage && (
           <Animated.View entering={FadeInDown.delay(300).duration(400).springify()} style={styles.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
               FOTOĞRAF
             </Text>
             <Pressable onPress={() => setPhotoZoom(true)}>
-              <Image
-                source={{ uri: imageUrl }}
+              <SignedImage
+                bucket="wrong-questions"
+                path={item.image_path}
                 style={styles.photo}
                 contentFit="cover"
                 cachePolicy="memory-disk"
@@ -157,14 +158,15 @@ export default function WrongDetailScreen() {
         )}
       </ScrollView>
 
-      {imageUrl && (
+      {hasImage && (
         <Modal visible={photoZoom} transparent animationType="fade">
           <View style={styles.zoomOverlay}>
-            <Pressable style={styles.zoomClose} onPress={() => setPhotoZoom(false)}>
+            <Pressable style={styles.zoomClose} onPress={() => setPhotoZoom(false)} accessibilityLabel="Kapat" accessibilityRole="button">
               <Icon name="x" size={22} color={C.text} />
             </Pressable>
-            <Image
-              source={{ uri: imageUrl }}
+            <SignedImage
+              bucket="wrong-questions"
+              path={item.image_path}
               style={styles.zoomImage}
               contentFit="contain"
               cachePolicy="memory-disk"

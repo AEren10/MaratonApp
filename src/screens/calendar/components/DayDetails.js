@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { Icon, IconBox } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -35,17 +35,18 @@ function LogRow({ log, C, s }) {
   );
 }
 
-function TrialRow({ trial, C, s }) {
+function TrialRow({ trial, C, s, onPress }) {
   const meta = getTrialTypes(C)[trial.trialType];
   const color = meta?.color || C.amber;
   return (
-    <View style={s.row}>
+    <Pressable onPress={() => onPress?.(trial)} style={({ pressed }) => [s.row, pressed && { opacity: 0.6 }]}>
       <IconBox icon={meta?.icon || "chart"} color={color} size={32} rounded={8} />
       <View style={{ flex: 1 }}>
         <Text style={s.title}>{meta?.label || trial.name || "Deneme"}</Text>
         <Text style={s.sub}>{trial.totalNet?.toFixed(1) || "0.0"} net</Text>
       </View>
-    </View>
+      <Icon name="chevR" size={14} color={C.muted} />
+    </Pressable>
   );
 }
 
@@ -100,7 +101,7 @@ const makeStyles = (C) => ({
   },
 });
 
-export function DayDetails({ day, data }) {
+export function DayDetails({ day, data, onTrialPress }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const label = formatDay(day);
@@ -123,7 +124,7 @@ export function DayDetails({ day, data }) {
       {data.trials.length > 0 && (
         <View style={{ marginTop: SPACING.md }}>
           <Text style={styles.section}>DENEMELER</Text>
-          {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} s={styles} />)}
+          {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} s={styles} onPress={onTrialPress} />)}
         </View>
       )}
       {data.logs.length > 0 && (

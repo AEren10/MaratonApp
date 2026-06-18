@@ -4,7 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-na
 import { Icon } from "../../../components/design";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
-import { getWrongQuestionImageUrl } from "../../../supabase/storage";
+import SignedImage from "../../../components/common/SignedImage";
 import { getTopicDifficulty } from "../../../lib/topicDifficulty";
 
 function relativeDate(iso) {
@@ -37,9 +37,8 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const id = useSubjectIdentity(subj.key);
   const subjColor = id?.solid || subj.color;
   const diff = !item.is_resolved ? getTopicDifficulty(item.topic) : null;
-  const imageUri = item.image_path
-    ? getWrongQuestionImageUrl(item.image_path)
-    : item.image || null;
+  const imagePath = item.image_path || null;
+  const fallbackImage = item.image || null;
   const myA = item.my_answer ?? item.myAnswer;
   const corA = item.correct_answer ?? item.correctAnswer;
 
@@ -126,19 +125,24 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
       ) : null}
 
       {/* Foto — büyük, twitter style */}
-      {imageUri ? (
-        <Image
-          source={{ uri: imageUri }}
-          style={{
-            marginTop: 12,
-            height: 200,
-            borderRadius: 16,
-            backgroundColor: C.surface2,
-          }}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={200}
-        />
+      {(imagePath || fallbackImage) ? (
+        imagePath ? (
+          <SignedImage
+            bucket="wrong-questions"
+            path={imagePath}
+            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.surface2 }}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <Image
+            source={{ uri: fallbackImage }}
+            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.surface2 }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={200}
+          />
+        )
       ) : null}
 
       {/* Meta row — cevaplar + zorluk + share */}

@@ -1,5 +1,10 @@
 import { useCallback } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+
+if (Text.defaultProps == null) Text.defaultProps = {};
+Text.defaultProps.maxFontSizeMultiplier = 1.3;
+if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+TextInput.defaultProps.maxFontSizeMultiplier = 1.3;
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";

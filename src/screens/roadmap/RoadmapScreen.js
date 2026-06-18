@@ -260,7 +260,7 @@ const makeStyles = (C) => StyleSheet.create({
   weekTitleRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   weekTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, letterSpacing: -0.3 },
   currentBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.pill },
-  currentBadgeText: { fontFamily: "Inter_600SemiBold", fontSize: 9, color: "#FFFFFF", letterSpacing: 0.6 },
+  currentBadgeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, color: "#FFFFFF", letterSpacing: 0.6 },
   weekSub: { ...TYPOGRAPHY.caption, marginTop: 2 },
   topicList: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md, gap: SPACING.sm },
   topicRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },

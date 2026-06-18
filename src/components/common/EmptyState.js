@@ -63,22 +63,6 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     paddingHorizontal: SPACING.xxxl,
   },
-  illustration: {
-    width: 140, height: 140,
-    alignItems: "center", justifyContent: "center",
-  },
-  outerRing: {
-    position: "absolute",
-    width: 140, height: 140, borderRadius: 70,
-  },
-  midRing: {
-    position: "absolute",
-    width: 100, height: 100, borderRadius: 50,
-  },
-  innerCircle: {
-    width: 68, height: 68, borderRadius: 24,
-    alignItems: "center", justifyContent: "center",
-  },
   title: {
     ...TYPOGRAPHY.subheading,
     marginTop: SPACING.xl,

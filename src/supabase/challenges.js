@@ -40,20 +40,11 @@ export async function cancelChallenge(id) {
 }
 
 export async function bumpMyProgress(id, side, value) {
-  // side is 'creator' or 'opponent'
-  const field = side === "creator" ? "creator_progress" : "opponent_progress";
-  // Non-atomic increment (oku + yaz)
-  const { data: existing, error: getErr } = await supabase
-    .from("challenges")
-    .select(field)
-    .eq("id", id)
-    .single();
-  if (getErr) throw getErr;
-  const next = (existing?.[field] || 0) + value;
-  const { error: updErr } = await supabase
-    .from("challenges")
-    .update({ [field]: next })
-    .eq("id", id);
-  if (updErr) throw updErr;
-  return next;
+  const { data, error } = await supabase.rpc("bump_challenge_progress", {
+    challenge_id: id,
+    side,
+    increment_value: value,
+  });
+  if (error) throw error;
+  return data;
 }

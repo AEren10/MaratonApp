@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -10,11 +10,14 @@ import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 
-function CardItem({ item, onPress, styles, C }) {
+const ItemSeparator = () => <View style={{ height: SPACING.md }} />;
+
+const CardItem = React.memo(function CardItem({ item, onPress, styles, C }) {
   const pct = item.count > 0 ? Math.round((item.mastered / item.count) * 100) : 0;
   const pctColor = pct >= 70 ? C.green : pct >= 40 ? C.amber : C.red;
+  const handlePress = useCallback(() => onPress(item.id), [onPress, item.id]);
   return (
-    <Pressable onPress={() => onPress(item.id)} style={styles.card}>
+    <Pressable onPress={handlePress} style={styles.card}>
       <IconBox icon={item.icon} color={item.color} size={44} rounded={14} />
       <View style={{ flex: 1 }}>
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{item.title}</Text>
@@ -31,7 +34,7 @@ function CardItem({ item, onPress, styles, C }) {
       <Icon name="chevR" size={16} color={C.muted} />
     </Pressable>
   );
-}
+});
 
 export default function TopicCardsScreen() {
   const C = useC();
@@ -96,7 +99,7 @@ export default function TopicCardsScreen() {
           keyExtractor={keyExtractor}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: SPACING.md }} />}
+          ItemSeparatorComponent={ItemSeparator}
         />
       )}
     </SafeAreaView>

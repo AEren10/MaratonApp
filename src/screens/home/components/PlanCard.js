@@ -39,7 +39,7 @@ export function PlanCard({ plan, onPress, onStart }) {
           </View>
           <ProgressRing size={64} stroke={7} value={pct} color={ringColor} trackColor={C.surface2 || C.border}>
             <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text }}>{plan.done}</Text>
-            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 9, color: C.muted }}>/{plan.total}</Text>
+            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted }}>/{plan.total}</Text>
           </ProgressRing>
         </View>
 

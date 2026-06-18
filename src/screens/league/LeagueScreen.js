@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ActivityIndicator, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -73,7 +73,7 @@ function MiniStat({ label, value, color, C }) {
 
 const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
-function LeaderboardRow({ item, C }) {
+const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
   const isYou = item.you;
   const medalColor = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
   const scale = useSharedValue(1);
@@ -129,7 +129,7 @@ function LeaderboardRow({ item, C }) {
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
     </AnimPressable>
   );
-}
+});
 
 
 export default function LeagueScreen() {
@@ -154,6 +154,7 @@ export default function LeagueScreen() {
       setError(false);
     } catch (e) {
       setError(true);
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     } finally {
       setLoading(false);
     }
@@ -182,6 +183,8 @@ export default function LeagueScreen() {
   const nextTier = useMemo(() => getNextTier(data.myScore), [data.myScore]);
 
   const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
+
+  const renderItem = useCallback(({ item }) => <LeaderboardRow item={item} C={C} />, [C]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -258,7 +261,7 @@ export default function LeagueScreen() {
           ListHeaderComponent={
             <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} C={C} />
           }
-          renderItem={({ item }) => <LeaderboardRow item={item} C={C} />}
+          renderItem={renderItem}
           ListEmptyComponent={
             (error || tab !== "friends")
               ? <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="amber" />

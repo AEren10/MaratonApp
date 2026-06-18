@@ -21,7 +21,7 @@ export default function AboutScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={s.headerTitle}>Hakkinda</Text>

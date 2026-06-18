@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ import { selectTrials } from "../../store/slices/trialSlice";
 import { selectAdHocTasks } from "../../store/slices/planSlice";
 import { selectUserTasks } from "../../store/slices/userTasksSlice";
 import { useUserTasks } from "../../hooks/useUserTasks";
+import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import * as haptic from "../../lib/haptics";
 import { PlanHeader } from "./components/PlanHeader";
@@ -28,22 +29,24 @@ export default function PlanDetailScreen() {
   const adHocTasks = useAppSelector(selectAdHocTasks);
   const userTasks = useAppSelector(selectUserTasks);
   const { toggleTask: toggleUserTask } = useUserTasks();
+  const { isDone: isPlanDone, toggle: togglePlanDone } = usePlanCompletion();
   const ctx = usePlanContext();
 
   const plan = useMemo(() => generateDailyPlan(ctx), [ctx]);
 
   const initialTasks = useMemo(() => {
     const generated = plan.tasks.map((t, i) => {
+      const pid = `plan_${i}`;
       const subj = getSubjectByKey(t.subject);
       return {
-        id: String(i + 1),
+        id: pid,
         s: subj || { key: t.subject, label: t.subjectLabel, color: t.color, icon: "bookOpen" },
         topic: t.topicLabel || t.subjectLabel,
         topicKey: t.topic,
         q: t.questionCount,
         reason: t.reason,
         rkind: t.rkind || "gray",
-        done: t.completed,
+        done: isPlanDone(pid),
       };
     });
     const adHoc = adHocTasks.map((t) => {
@@ -75,9 +78,11 @@ export default function PlanDetailScreen() {
       };
     });
     return [...userMapped, ...adHoc, ...generated];
-  }, [plan, adHocTasks, userTasks]);
+  }, [plan, adHocTasks, userTasks, isPlanDone]);
 
   const [tasks, setTasks] = useState(initialTasks);
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
   const [reasonTask, setReasonTask] = useState(null);
 
   // Plan/ad-hoc değişince listeyi tazele ama mevcut done durumlarını koru.
@@ -96,31 +101,38 @@ export default function PlanDetailScreen() {
     : `~${plan.estimatedMinutes} dk`;
 
   const toggleTask = useCallback((id) => {
-    const task = tasks.find((t) => t.id === id);
-    if (task?.userTask) {
-      if (!task.done) haptic.success();
-      toggleUserTask(id);
-    }
-    setTasks((prev) =>
-      prev.map((t) => {
+    setTasks((prev) => {
+      const task = prev.find((t) => t.id === id);
+      if (task?.userTask) {
+        if (!task.done) haptic.success();
+        toggleUserTask(id);
+      } else {
+        togglePlanDone(id);
+      }
+      return prev.map((t) => {
         if (t.id !== id) return t;
         if (!t.done) haptic.success();
         return { ...t, done: !t.done };
-      })
-    );
-  }, [tasks, toggleUserTask]);
+      });
+    });
+  }, [toggleUserTask, togglePlanDone]);
 
   const startTask = useCallback(
     (id) => {
-      const task = tasks.find((t) => t.id === id);
+      const task = tasksRef.current.find((t) => t.id === id);
       navigation.navigate(SCREENS.STUDY_TIMER, {
         taskId: id,
         subjectKey: task?.s?.key,
         topicName: task?.topic,
       });
     },
-    [navigation, tasks]
+    [navigation]
   );
+
+  const showReason = useCallback((id) => {
+    const task = tasksRef.current.find((t) => t.id === id);
+    if (task) setReasonTask(task);
+  }, []);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
@@ -163,9 +175,9 @@ export default function PlanDetailScreen() {
               <PlanTaskItem
                 key={task.id}
                 task={task}
-                onToggle={() => toggleTask(task.id)}
-                onStart={() => startTask(task.id)}
-                onInfo={() => setReasonTask(task)}
+                onToggle={toggleTask}
+                onStart={startTask}
+                onInfo={showReason}
               />
             ))}
           </View>

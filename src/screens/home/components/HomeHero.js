@@ -68,6 +68,7 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
             <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
           </View>
           <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
+          <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
         </ProgressRing>
         <SparkBurst trigger={sparkVisible} onDone={() => setSparkVisible(false)} />
       </Pressable>
@@ -90,6 +91,7 @@ const s = StyleSheet.create({
   ringValRow: { flexDirection: "row", alignItems: "flex-start" },
   ringVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 62, lineHeight: 64, letterSpacing: -2 },
   ringSub: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 2 },
+  ringHint: { fontFamily: "Inter_400Regular", fontSize: 10, marginTop: 6, letterSpacing: 0.5 },
   rail: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", borderWidth: 1, borderRadius: 20, paddingVertical: 14 },
   cell: { flex: 1, alignItems: "center", gap: 5 },
   cellChip: { width: 26, height: 26, borderRadius: 9, alignItems: "center", justifyContent: "center" },

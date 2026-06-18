@@ -1,12 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial } from "../supabase/trials";
+import { addWrongQuestion } from "../supabase/wrongQuestions";
+import { createUserTask } from "../supabase/userTasks";
 
 const QUEUE_KEY = "@maraton:offlineQueue";
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
 
 // Operation types
 export const OP_STUDY_LOG = "STUDY_LOG";
 export const OP_TRIAL = "TRIAL";
+export const OP_WRONG_QUESTION = "WRONG_QUESTION";
+export const OP_USER_TASK = "USER_TASK";
 
 async function readQueue() {
   try {
@@ -51,6 +56,12 @@ async function runOne(item) {
     case OP_TRIAL:
       await addTrial(item.payload.trial, item.payload.subjects);
       break;
+    case OP_WRONG_QUESTION:
+      await addWrongQuestion(item.payload);
+      break;
+    case OP_USER_TASK:
+      await createUserTask(item.payload);
+      break;
     default:
       throw new Error(`Unknown op type: ${item.type}`);
   }
@@ -58,16 +69,20 @@ async function runOne(item) {
 
 export async function flushQueue() {
   const list = await readQueue();
-  if (!list.length) return { processed: 0, failed: 0 };
+  if (!list.length) return { processed: 0, failed: 0, types: [] };
 
+  const now = Date.now();
   const remaining = [];
   let processed = 0;
   let failed = 0;
+  const processedTypes = [];
 
   for (const item of list) {
+    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) continue;
     try {
       await runOne(item);
       processed += 1;
+      if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
     } catch (e) {
       remaining.push(item);
       failed += 1;
@@ -75,7 +90,7 @@ export async function flushQueue() {
   }
 
   await writeQueue(remaining);
-  return { processed, failed };
+  return { processed, failed, types: processedTypes };
 }
 
 export async function clearQueue() {
@@ -106,6 +121,26 @@ export async function saveTrialOffline(trial, subjects) {
     return { saved: true, queued: false };
   } catch (e) {
     await enqueue({ type: OP_TRIAL, payload: { trial, subjects } });
+    return { saved: false, queued: true, error: e };
+  }
+}
+
+export async function saveWrongQuestionOffline(payload) {
+  try {
+    const saved = await addWrongQuestion(payload);
+    return { saved: true, queued: false, data: saved };
+  } catch (e) {
+    await enqueue({ type: OP_WRONG_QUESTION, payload });
+    return { saved: false, queued: true, error: e };
+  }
+}
+
+export async function saveUserTaskOffline(payload) {
+  try {
+    const saved = await createUserTask(payload);
+    return { saved: true, queued: false, data: saved };
+  } catch (e) {
+    await enqueue({ type: OP_USER_TASK, payload });
     return { saved: false, queued: true, error: e };
   }
 }

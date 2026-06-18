@@ -90,7 +90,7 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
             <Text style={[s.action, { color: colors.bg }]}>{nudge.actionLabel} →</Text>
           ) : null}
         </View>
-        <Pressable onPress={handleDismiss} hitSlop={12} style={s.close}>
+        <Pressable onPress={handleDismiss} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={s.close}>
           <Icon name="x" size={14} color={C.muted} />
         </Pressable>
       </Pressable>

@@ -1,4 +1,4 @@
-import { differenceInDays } from "date-fns";
+import { differenceInDays } from "./dateUtils";
 import { TYT_SUBJECTS, getSubjectByKey } from "../themes/subjects";
 import { getAllSubjects } from "../screens/trial/trialTypes";
 import { C } from "../themes/tokens";

@@ -20,7 +20,7 @@ import * as H from "../../lib/haptics";
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const { logout } = useAuth();
+  const { logout, deleteAccount } = useAuth();
   const showAlert = useAlert();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
@@ -37,6 +37,26 @@ export default function SettingsScreen() {
       { text: "Çıkış Yap", style: "destructive", onPress: logout },
     ]);
   }, [logout]);
+
+  const handleDeleteAccount = useCallback(() => {
+    H.warn();
+    showAlert(
+      "Hesabını Sil",
+      "Hesabın ve tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      [
+        { text: "İptal", style: "cancel" },
+        {
+          text: "Hesabımı Sil",
+          style: "destructive",
+          onPress: () => {
+            deleteAccount().catch(() =>
+              showAlert("Hata", "Hesap silinemedi. Lütfen tekrar dene.")
+            );
+          },
+        },
+      ]
+    );
+  }, [deleteAccount]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -110,6 +130,18 @@ export default function SettingsScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
+          <Pressable
+            onPress={handleDeleteAccount}
+            style={({ pressed }) => [
+              styles.deleteBtn,
+              { opacity: pressed ? 0.85 : 1 },
+            ]}
+          >
+            <Text style={styles.deleteText}>Hesabımı Sil</Text>
+          </Pressable>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
           <Text style={[styles.version, { color: C.muted }]}>Maraton v1.0.0</Text>
         </Animated.View>
       </ScrollView>
@@ -145,6 +177,16 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     ...TYPOGRAPHY.button,
+  },
+  deleteBtn: {
+    alignItems: "center",
+    paddingVertical: SPACING.md,
+    marginTop: SPACING.xl,
+  },
+  deleteText: {
+    ...TYPOGRAPHY.caption,
+    color: "#666",
+    textDecorationLine: "underline",
   },
   version: {
     ...TYPOGRAPHY.caption,

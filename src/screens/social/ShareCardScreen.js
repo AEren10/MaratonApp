@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { useC } from "../../contexts/ThemeContext";
+import { useAlert } from "../../contexts/AlertContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
@@ -32,7 +33,27 @@ export default function ShareCardScreen() {
   const streak = useSelector(selectStreak);
   const xp = useSelector(selectXP);
 
+  const cardRef = useRef(null);
+  const showAlert = useAlert();
   const name = user?.user_metadata?.name || user?.email || "Maratoncu";
+
+  const handleShare = useCallback(async () => {
+    let captureRef, Sharing;
+    try {
+      ({ captureRef } = require("react-native-view-shot"));
+      Sharing = require("expo-sharing");
+    } catch {
+      showAlert("Paylaşım kullanılamıyor");
+      return;
+    }
+    try {
+      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
+      if (!(await Sharing.isAvailableAsync())) { showAlert("Paylaşım yok"); return; }
+      await Sharing.shareAsync(uri, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
+    } catch {
+      showAlert("Hata", "Kart oluşturulamadı.");
+    }
+  }, []);
   const isWeekly = type === "weekly";
   const heroValue = isWeekly ? fmtTime(report.totalMinutes) : `${streak} Gun`;
   const heroLabel = isWeekly ? "Haftalik Calisma" : "Gunluk Seri";
@@ -55,7 +76,7 @@ export default function ShareCardScreen() {
       </View>
 
       <View style={s.center}>
-        <Animated.View entering={FadeInDown.duration(500)} style={s.card}>
+        <Animated.View ref={cardRef} entering={FadeInDown.duration(500)} style={s.card} collapsable={false}>
           {/* Brand + Badge */}
           <View style={s.brandRow}>
             <Text style={s.brand}>MARATON</Text>
@@ -92,7 +113,10 @@ export default function ShareCardScreen() {
         </Animated.View>
       </View>
 
-      <Text style={s.hint}>Ekran görüntüsü alarak paylaşabilirsin</Text>
+      <Pressable onPress={handleShare} style={({ pressed }) => [s.shareBtn, pressed && { opacity: 0.85 }]}>
+        <Icon name="share" size={18} color="#FFFFFF" />
+        <Text style={s.shareBtnText}>Paylaş</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -118,5 +142,6 @@ const makeStyles = (C) => StyleSheet.create({
   pill: { backgroundColor: C.bg, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: RADIUS.pill },
   pillText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
   watermark: { ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", opacity: 0.5 },
-  hint: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", marginBottom: SPACING.xxl },
+  shareBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, marginHorizontal: SPACING.xxxl, marginBottom: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.xl, backgroundColor: C.amber },
+  shareBtnText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

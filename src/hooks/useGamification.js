@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   earnXP,
@@ -22,6 +22,7 @@ export function useGamification() {
 
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });
   const [badgeModal, setBadgeModal] = useState({ visible: false, badge: null });
+  const badgeTimerRef = useRef(null);
 
   const reward = useCallback(
     (action, data = {}) => {
@@ -49,11 +50,13 @@ export function useGamification() {
       const newBadges = checkBadgeUnlocks(updatedStats, badgeIds);
       if (newBadges.length > 0) {
         newBadges.forEach((b) => dispatch(unlockBadge({ badgeId: b.id })));
-        setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
+        badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
       }
     },
     [dispatch, badgeIds, stats, level, user?.id],
   );
+
+  useEffect(() => () => clearTimeout(badgeTimerRef.current), []);
 
   const dismissXP = useCallback(() => setXpToast({ visible: false, amount: 0 }), []);
   const dismissBadge = useCallback(() => setBadgeModal({ visible: false, badge: null }), []);

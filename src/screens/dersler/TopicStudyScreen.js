@@ -177,17 +177,17 @@ export default function TopicStudyScreen() {
   const C = useC();
   const route = useRoute();
   const { user } = useAuth();
-  const { topic, subject, subtopics: paramSubtopics } = route.params;
-  const mastery = topic.acc / 100;
+  const { topic, subject, subtopics: paramSubtopics } = route.params ?? {};
+  const mastery = (topic?.acc || 0) / 100;
 
   const [history, setHistory] = useState([]);
   useEffect(() => {
-    if (!user?.id || user.id === "dev" || !subject.key) return;
+    if (!user?.id || user.id === "dev" || !subject?.key || !topic?.name) return;
     getStudyLogsByTopic(user.id, subject.key, topic.name)
       .then(setHistory)
       .catch(() => {});
   }, [user?.id, subject.key, topic.name]);
-  const masteryLevel = getMastery({ q: topic.q, acc: topic.acc });
+  const masteryLevel = getMastery({ q: topic?.q || 0, acc: topic?.acc || 0 });
   const circumference = 2 * Math.PI * 40;
   const subtopics = (paramSubtopics || []).map((name, i) => ({
     name,

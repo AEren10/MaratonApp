@@ -12,8 +12,8 @@ import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
-import { addWrongQuestion } from "../../supabase/wrongQuestions";
 import { uploadWrongQuestionImage } from "../../supabase/storage";
+import { saveWrongQuestionOffline } from "../../lib/offlineQueue";
 import { initialReview } from "../../lib/spacedRepetition";
 import { TopicPicker } from "./components/TopicPicker";
 import { useAlert } from "../../contexts/AlertContext";
@@ -86,7 +86,7 @@ export default function AddWrongScreen() {
       if (image) {
         imagePath = await uploadWrongQuestionImage(user.id, image);
       }
-      await addWrongQuestion({
+      const payload = {
         user_id: user.id,
         subject: subject.key,
         topic: topic.trim(),
@@ -97,8 +97,14 @@ export default function AddWrongScreen() {
         topic_source: topicSource,
         is_resolved: false,
         ...initialReview(),
-      });
-      H.success();
+      };
+      const result = await saveWrongQuestionOffline(payload);
+      if (result.queued) {
+        H.tap();
+        showAlert("Çevrimdışı", "Yanlış soru bağlantı geldiğinde kaydedilecek.");
+      } else {
+        H.success();
+      }
       await reward("question_solved", {
         count: 1,
         statUpdates: [{ type: "increment", key: "totalQuestions" }],

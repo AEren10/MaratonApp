@@ -14,10 +14,10 @@ import { useAlert } from "../../contexts/AlertContext";
 
 function buildModes(C) {
   return [
-    { key: "FREE", label: "Serbest", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
-    { key: "POMODORO_25", label: "Pomodoro 25/5", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
-    { key: "POMODORO_50", label: "Pomodoro 50/10", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
-    { key: "DEEP_90", label: "Derin Odak 90", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
+    { key: "FREE", label: "Serbest", icon: "zap", desc: "Süresiz — istediğin zaman bitir", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
+    { key: "POMODORO_25", label: "25/5", icon: "timer", desc: "25 dk odak + 5 dk mola × 4 tur", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
+    { key: "POMODORO_50", label: "50/10", icon: "clock", desc: "50 dk odak + 10 dk mola × 3 tur", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
+    { key: "DEEP_90", label: "90 dk", icon: "flame", desc: "90 dk derin odak + 20 dk mola × 2 tur", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
   ];
 }
 
@@ -248,7 +248,7 @@ export default function StudyTimerScreen() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={exit} hitSlop={12}>
+        <Pressable onPress={exit} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <View style={styles.subjectBadge}>
@@ -261,7 +261,7 @@ export default function StudyTimerScreen() {
       </View>
 
       {/* Mode selector */}
-      <View style={styles.modeRow}>
+      <View style={[styles.modeContainer, { backgroundColor: C.surface, borderColor: C.border }]}>
         {MODES.map((m) => {
           const active = m.key === modeKey;
           return (
@@ -269,16 +269,19 @@ export default function StudyTimerScreen() {
               key={m.key}
               onPress={() => handleModeChange(m.key)}
               style={[
-                styles.modeChip,
-                { borderColor: active ? m.color : C.border, backgroundColor: active ? m.color + "20" : "transparent" },
+                styles.modeSegment,
+                active && { backgroundColor: m.color + "22", borderColor: m.color + "44" },
+                !active && { borderColor: "transparent" },
               ]}
             >
+              <View style={[styles.modeIconWrap, { backgroundColor: active ? m.color : C.surface2 }]}>
+                <Icon name={m.icon} size={14} color={active ? "#FFF" : C.muted} />
+              </View>
               <Text
-                style={{
-                  ...TYPOGRAPHY.captionMedium,
-                  color: active ? m.color : C.muted,
-                  fontSize: 11,
-                }}
+                style={[
+                  styles.modeLabel,
+                  { color: active ? m.color : C.muted },
+                ]}
               >
                 {m.label}
               </Text>
@@ -287,9 +290,12 @@ export default function StudyTimerScreen() {
         })}
       </View>
 
+      {/* Mode description */}
+      <Text style={[styles.modeDesc, { color: C.muted }]}>{mode.desc}</Text>
+
       <View style={styles.center}>
         <Text style={[TYPOGRAPHY.label, { color: phaseColor, marginBottom: 4 }]}>
-          {isPomodoro ? phaseLabel.toUpperCase() : ""}
+          {isPomodoro ? `${phaseLabel.toUpperCase()}  ·  Tur ${cycleIndex + 1}/${mode.cycles}` : ""}
         </Text>
         {topic ? (
           <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec, marginBottom: SPACING.lg }]}>
@@ -308,11 +314,11 @@ export default function StudyTimerScreen() {
 
         <View style={styles.controls}>
           {isPomodoro && (
-            <Pressable onPress={skipPhase} style={styles.sideBtn}>
+            <Pressable onPress={skipPhase} accessibilityLabel="Fazı Atla" accessibilityRole="button" style={styles.sideBtn}>
               <Icon name="chevR" size={20} color={C.muted} />
             </Pressable>
           )}
-          <Pressable onPress={toggle} style={[styles.mainBtn, { backgroundColor: phaseColor }]}>
+          <Pressable onPress={toggle} accessibilityLabel={running ? "Duraklat" : "Başlat"} accessibilityRole="button" style={[styles.mainBtn, { backgroundColor: phaseColor }]}>
             <Icon name={running ? "pause" : "play"} size={28} color={C.bg} />
           </Pressable>
           {isPomodoro && (
@@ -377,18 +383,40 @@ function makeStyles(C) {
       paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
     },
     dot: { width: 8, height: 8, borderRadius: 4 },
-    modeRow: {
+    modeContainer: {
       flexDirection: "row",
-      gap: SPACING.xs,
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.sm,
-      flexWrap: "wrap",
-    },
-    modeChip: {
-      paddingHorizontal: SPACING.md,
-      paddingVertical: 6,
-      borderRadius: 999,
+      marginHorizontal: SPACING.lg,
+      marginVertical: SPACING.sm,
+      borderRadius: RADIUS.xl,
       borderWidth: 1,
+      padding: 4,
+      gap: 4,
+    },
+    modeSegment: {
+      flex: 1,
+      alignItems: "center",
+      gap: 4,
+      paddingVertical: 10,
+      borderRadius: RADIUS.lg,
+      borderWidth: 1.5,
+    },
+    modeIconWrap: {
+      width: 28,
+      height: 28,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modeLabel: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 11,
+      letterSpacing: 0.2,
+    },
+    modeDesc: {
+      ...TYPOGRAPHY.caption,
+      textAlign: "center",
+      marginTop: 8,
+      marginBottom: 4,
     },
     center: { flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: 40 },
     controls: {

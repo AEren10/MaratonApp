@@ -5,10 +5,10 @@ import { Icon } from "../design";
 import { captureError } from "../../lib/errorReporting";
 
 export class ScreenErrorBoundary extends React.Component {
-  state = { hasError: false };
+  state = { hasError: false, errorMsg: null };
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, errorMsg: error?.message || null };
   }
 
   componentDidCatch(error, info) {
@@ -16,21 +16,34 @@ export class ScreenErrorBoundary extends React.Component {
   }
 
   handleReset = () => {
-    this.setState({ hasError: false });
+    this.setState({ hasError: false, errorMsg: null });
+  };
+
+  handleGoBack = () => {
+    this.setState({ hasError: false, errorMsg: null });
+    this.props.navigation?.goBack?.();
   };
 
   render() {
     if (this.state.hasError) {
+      const hasNav = !!this.props.navigation?.goBack;
       return (
         <View style={styles.container}>
           <Icon name="alert" size={48} color={COLORS.dark.warning} />
-          <Text style={styles.title}>Bir sorun olustu</Text>
+          <Text style={styles.title}>Bir sorun oluştu</Text>
           <Text style={styles.subtitle}>
             Bu ekranda beklenmeyen bir hata var.
           </Text>
-          <TouchableOpacity style={styles.button} onPress={this.handleReset}>
-            <Text style={styles.buttonText}>Tekrar Dene</Text>
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.button} onPress={this.handleReset}>
+              <Text style={styles.buttonText}>Tekrar Dene</Text>
+            </TouchableOpacity>
+            {hasNav && (
+              <TouchableOpacity style={styles.backButton} onPress={this.handleGoBack}>
+                <Text style={styles.backText}>Geri Dön</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       );
     }
@@ -47,10 +60,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: SPACING.xxl,
   },
-  iconWrap: { marginBottom: SPACING.lg },
   title: {
     ...TYPOGRAPHY.subheading,
     color: COLORS.dark.textPrimary,
+    marginTop: SPACING.lg,
     marginBottom: SPACING.sm,
   },
   subtitle: {
@@ -58,6 +71,10 @@ const styles = StyleSheet.create({
     color: COLORS.dark.textSecondary,
     textAlign: "center",
     marginBottom: SPACING.xxl,
+  },
+  actions: {
+    flexDirection: "row",
+    gap: SPACING.md,
   },
   button: {
     backgroundColor: COLORS.dark.accent,
@@ -68,5 +85,16 @@ const styles = StyleSheet.create({
   buttonText: {
     ...TYPOGRAPHY.button,
     color: COLORS.dark.textInverse,
+  },
+  backButton: {
+    borderWidth: 1,
+    borderColor: COLORS.dark.border,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  backText: {
+    ...TYPOGRAPHY.button,
+    color: COLORS.dark.textSecondary,
   },
 });

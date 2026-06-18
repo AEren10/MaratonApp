@@ -82,6 +82,7 @@ export default function StudySaveScreen() {
   const [topicPickerOpen, setTopicPickerOpen] = useState(false);
   const [questionCount, setQC] = useState(initQuestions > 0 ? String(initQuestions) : "");
   const [correctCount, setCC] = useState(initCorrect > 0 ? String(initCorrect) : "");
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
   const subjects = useMemo(() => {
@@ -115,12 +116,14 @@ export default function StudySaveScreen() {
     const cc = parseInt(correctCount, 10) || 0;
     const topicVal = topic.trim() || (currentSubject?.label || subjectKey);
 
+    const notesVal = notes.trim() || undefined;
     const parsed = studyLogSchema.safeParse({
       subject: subjectKey,
       topic: topicVal,
       questionCount: qc,
       correctCount: cc,
       duration,
+      notes: notesVal,
     });
     if (!parsed.success) {
       H.warn();
@@ -135,6 +138,7 @@ export default function StudySaveScreen() {
       questionCount: qc,
       correctCount: cc,
       duration,
+      notes: notesVal,
       study_date: todayStr,
     }));
 
@@ -147,6 +151,7 @@ export default function StudySaveScreen() {
       correct_count: cc,
       duration_minutes: duration,
       study_date: todayStr,
+      ...(notesVal ? { notes: notesVal } : {}),
     });
 
     if (result.saved) {
@@ -190,7 +195,7 @@ export default function StudySaveScreen() {
       duration,
       questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C]);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -199,7 +204,7 @@ export default function StudySaveScreen() {
           <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={[styles.closeBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
             <Icon name="arrowL" size={18} color={C.text} />
           </Pressable>
-          <Text style={[styles.title, { color: C.text }]}>Çalışmayı Kaydet</Text>
+          <Text style={[styles.title, { color: C.text }]}>Ne çalıştın?</Text>
           <View style={{ width: 36 }} />
         </View>
 
@@ -219,25 +224,22 @@ export default function StudySaveScreen() {
           {!preSubjectKey && (
             <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
               <Text style={[styles.label, { color: C.muted }]}>SINAV TİPİ</Text>
-              <View style={styles.tierRow}>
-                <Pressable
-                  onPress={() => handleSwitchTier("TYT")}
-                  style={[styles.tierBtn, {
-                    backgroundColor: examTier === "TYT" ? C.blue : C.blue + "10",
-                    borderColor: examTier === "TYT" ? C.blue : C.blue + "26",
-                  }]}
-                >
-                  <Text style={[styles.tierTitle, { color: examTier === "TYT" ? "#FFFFFF" : C.blue }]}>{group1Label}</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => handleSwitchTier("AYT")}
-                  style={[styles.tierBtn, {
-                    backgroundColor: examTier === "AYT" ? C.purple : C.purple + "10",
-                    borderColor: examTier === "AYT" ? C.purple : C.purple + "26",
-                  }]}
-                >
-                  <Text style={[styles.tierTitle, { color: examTier === "AYT" ? "#FFFFFF" : C.purple }]}>{group2Label}</Text>
-                </Pressable>
+              <View style={[styles.tierRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+                {[["TYT", group1Label, C.blue], ["AYT", group2Label, C.purple]].map(([t, lbl, clr]) => {
+                  const active = examTier === t;
+                  return (
+                    <Pressable
+                      key={t}
+                      onPress={() => handleSwitchTier(t)}
+                      style={[styles.tierBtn, {
+                        backgroundColor: active ? clr : "transparent",
+                        borderColor: active ? clr : "transparent",
+                      }]}
+                    >
+                      <Text style={[styles.tierTitle, { color: active ? "#FFFFFF" : clr }]}>{lbl}</Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </Animated.View>
           )}
@@ -291,6 +293,21 @@ export default function StudySaveScreen() {
                 onChangeText={setCC}
               />
             </View>
+          </Animated.View>
+
+          {/* Notes */}
+          <Animated.View entering={FadeInDown.delay(preSubjectKey ? 280 : 350).duration(420).springify()}>
+            <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>NOT (isteğe bağlı)</Text>
+            <TextInput
+              value={notes}
+              onChangeText={setNotes}
+              placeholder="Kendine bir not bırak..."
+              placeholderTextColor={C.muted}
+              multiline
+              maxLength={140}
+              style={[styles.noteInput, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]}
+            />
+            <Text style={[styles.charCount, { color: C.muted }]}>{notes.length}/140</Text>
           </Animated.View>
         </ScrollView>
 
@@ -349,9 +366,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full, borderWidth: 1, marginBottom: SPACING.lg,
   },
 
-  tierRow: { flexDirection: "row", gap: 12 },
+  tierRow: {
+    flexDirection: "row", borderRadius: RADIUS.xl, borderWidth: 1, padding: 4, gap: 4,
+  },
   tierBtn: {
-    flex: 1, paddingVertical: 14, borderRadius: 14, borderWidth: 1.5,
+    flex: 1, paddingVertical: 14, borderRadius: RADIUS.lg, borderWidth: 1.5,
     alignItems: "center",
   },
   tierTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, letterSpacing: -0.3 },
@@ -383,4 +402,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.30, shadowRadius: 18, elevation: 6,
   },
   submitText: { fontFamily: "Inter_600SemiBold", fontSize: 16 },
+
+  noteInput: {
+    borderRadius: 14, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 14,
+    fontFamily: "Inter_400Regular", fontSize: 15, minHeight: 80, textAlignVertical: "top",
+  },
+  charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },
 });

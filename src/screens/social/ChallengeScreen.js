@@ -63,10 +63,12 @@ export default function ChallengeScreen() {
     try { await cancelChallenge(id); load(); } catch {}
   }, [load]);
 
-  const active = challenges.filter((c) => c.status === "active" || c.status === "pending");
-  const past = challenges.filter((c) => c.status !== "active" && c.status !== "pending");
+  const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);
+  const past = useMemo(() => challenges.filter((c) => c.status !== "active" && c.status !== "pending"), [challenges]);
 
   const shown = tab === "active" ? active : past;
+
+  const renderItem = useCallback(({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />, [user, handleCancel, s, C]);
 
   if (loading) return <SafeAreaView style={s.safe}><View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View></SafeAreaView>;
 
@@ -145,7 +147,7 @@ export default function ChallengeScreen() {
         keyExtractor={(i) => i.id}
         contentContainerStyle={{ padding: SPACING.lg, gap: SPACING.md }}
         ListEmptyComponent={<EmptyState icon="zap" title="Henüz challenge yok" message="Yeni bir challenge oluşturarak arkadaşlarınla yarış" actionLabel="Challenge Oluştur" onAction={() => setCreating(true)} />}
-        renderItem={({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />}
+        renderItem={renderItem}
       />
     </SafeAreaView>
   );
@@ -157,11 +159,15 @@ function ChallengeCard({ item, user, handleCancel, s, C }) {
   const myProgress = isCreator ? item.creator_progress : item.opponent_progress;
   const theirProgress = isCreator ? item.opponent_progress : item.creator_progress;
   const pct = item.target > 0 ? Math.min(1, (myProgress || 0) / item.target) : 0;
+  const oppPct = item.target > 0 ? Math.min(1, (theirProgress || 0) / item.target) : 0;
   const metric = METRICS.find((m) => m.key === item.metric);
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const [expanded, setExpanded] = useState(false);
+  const daysLeft = item.ends_at ? Math.max(0, Math.ceil((new Date(item.ends_at) - Date.now()) / 86400000)) : null;
   return (
     <Pressable
+      onPress={() => { H.select(); setExpanded((v) => !v); }}
       onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
     >
@@ -180,6 +186,20 @@ function ChallengeCard({ item, user, handleCancel, s, C }) {
           <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.amber }]} /></View>
           <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
         </View>
+        {expanded && (
+          <View style={{ marginTop: SPACING.sm, gap: SPACING.xs }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Rakip ilerleme</Text>
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>{Math.round(oppPct * 100)}%</Text>
+            </View>
+            {daysLeft !== null && (
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Kalan süre</Text>
+                <Text style={{ ...TYPOGRAPHY.captionMedium, color: daysLeft <= 1 ? C.red : C.text }}>{daysLeft} gün</Text>
+              </View>
+            )}
+          </View>
+        )}
         {item.status === "active" && (
           <Pressable onPress={() => handleCancel(item.id)} style={s.cancelBtn}>
             <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal Et</Text>

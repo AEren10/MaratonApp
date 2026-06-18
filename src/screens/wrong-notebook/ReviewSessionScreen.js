@@ -8,7 +8,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
-import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import SignedImage from "../../components/common/SignedImage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import * as haptic from "../../lib/haptics";
@@ -69,7 +69,7 @@ export default function ReviewSessionScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
           <Icon name="x" size={22} color={C.text} />
         </Pressable>
         <Text style={s.title}>Tekrar</Text>
@@ -100,7 +100,7 @@ export default function ReviewSessionScreen() {
           })()}
 
           {current.image_path ? (
-            <Image source={{ uri: getWrongQuestionImageUrl(current.image_path) }} style={s.image} contentFit="contain" cachePolicy="memory-disk" />
+            <SignedImage bucket="wrong-questions" path={current.image_path} style={s.image} contentFit="contain" />
           ) : (
             <View style={s.noImage}>
               <Icon name="notebook" size={32} color={C.muted} />

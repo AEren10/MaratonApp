@@ -237,7 +237,7 @@ export default function AnalysisScreen() {
                     color={C.accent}
                   />
                   <Pressable
-                    onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
+                    onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS, { initialFilter: filter })}
                     style={{
                       flexDirection: "row", alignItems: "center", justifyContent: "center",
                       gap: 8, marginTop: SPACING.lg, paddingVertical: 12, paddingHorizontal: SPACING.lg,

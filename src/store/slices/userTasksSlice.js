@@ -28,6 +28,11 @@ const userTasksSlice = createSlice({
       const task = state.tasks.find((t) => t.id === action.payload);
       if (task) task.completed = !task.completed;
     },
+    replaceUserTask: (state, action) => {
+      const { tempId, real } = action.payload;
+      const idx = state.tasks.findIndex((t) => t.id === tempId);
+      if (idx !== -1) state.tasks[idx] = real;
+    },
     removeUserTask: (state, action) => {
       state.tasks = state.tasks.filter((t) => t.id !== action.payload);
     },
@@ -39,7 +44,7 @@ const userTasksSlice = createSlice({
   },
 });
 
-export const { setUserTasks, addUserTask, toggleUserTask, removeUserTask, clearUserTasks } =
+export const { setUserTasks, addUserTask, replaceUserTask, toggleUserTask, removeUserTask, clearUserTasks } =
   userTasksSlice.actions;
 
 export default userTasksSlice.reducer;

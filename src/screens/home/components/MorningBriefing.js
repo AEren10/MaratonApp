@@ -43,7 +43,7 @@ export function MorningBriefing({ userName, planTaskCount, srDueCount, streak, o
 
   return (
     <Animated.View entering={FadeInDown.duration(420).springify().damping(20).mass(0.6)} style={s.card}>
-      <Pressable onPress={dismiss} hitSlop={12} style={s.closeBtn}>
+      <Pressable onPress={dismiss} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={s.closeBtn}>
         <Icon name="x" size={18} color={C.muted} sw={2} />
       </Pressable>
 

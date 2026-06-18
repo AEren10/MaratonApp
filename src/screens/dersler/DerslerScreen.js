@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { ScrollView, View, Text, RefreshControl } from "react-native";
+import { ScrollView, View, Text, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { SCREENS } from "../../constants/screens";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -155,10 +157,38 @@ function SectionHeader({ label, color, icon, count, topicCount, C }) {
   );
 }
 
-function PageHeader({ totalDone, totalAll, C }) {
+function PageHeader({ totalDone, totalAll, C, onTopicCards, onPlan }) {
   return (
     <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.xl }}>
-      <Text style={{ ...TYPOGRAPHY.heading, color: C.text }}>Dersler</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Text style={{ ...TYPOGRAPHY.heading, color: C.text }}>Dersler</Text>
+        <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+          <Pressable
+            onPress={onPlan}
+            style={({ pressed }) => ({
+              flexDirection: "row", alignItems: "center", gap: 6,
+              backgroundColor: C.amber + "15", borderRadius: RADIUS.lg,
+              paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Icon name="layers" size={14} color={C.amber} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Günlük Plan</Text>
+          </Pressable>
+          <Pressable
+            onPress={onTopicCards}
+            style={({ pressed }) => ({
+              flexDirection: "row", alignItems: "center", gap: 6,
+              backgroundColor: C.purple + "15", borderRadius: RADIUS.lg,
+              paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Icon name="hash" size={14} color={C.purple} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.purple }}>Kartlar</Text>
+          </Pressable>
+        </View>
+      </View>
       <View
         style={{
           flexDirection: "row",
@@ -200,6 +230,7 @@ function DerslerSkeleton({ C }) {
 
 export default function DerslerScreen() {
   const C = useC();
+  const navigation = useNavigation();
   const { tytSubjects, aytSubjects, loading: currLoading, group1Label, group2Label } = useCurriculum();
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -268,7 +299,7 @@ export default function DerslerScreen() {
           />
         }
       >
-        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} />
+        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} onPlan={() => navigation.navigate(SCREENS.PLAN_DETAIL)} onTopicCards={() => navigation.navigate(SCREENS.TOPIC_CARDS)} />
 
         {hasTyt && hasAyt && (
           <ExamBadge label={group1Label} color={C.amber} count={tytData.dersler.length} C={C} />

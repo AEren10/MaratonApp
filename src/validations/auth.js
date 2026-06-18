@@ -11,16 +11,19 @@ export const registerSchema = z.object({
   password: z.string().min(6, "Sifre en az 6 karakter olmali"),
 });
 
+export const trialSubjectSchema = z.object({
+  subject: z.string().min(1),
+  correct_count: z.number().int().min(0).max(120),
+  wrong_count: z.number().int().min(0).max(120),
+  empty_count: z.number().int().min(0).max(120),
+});
+
 export const trialEntrySchema = z.object({
-  name: z.string().min(1, "Deneme adi girin"),
-  date: z.string(),
-  subjects: z.record(
-    z.object({
-      correct: z.number().min(0),
-      wrong: z.number().min(0),
-      empty: z.number().min(0),
-    })
-  ),
+  name: z.string().min(1, "Deneme adi girin").max(100),
+  trial_date: z.string().min(1),
+  exam_type: z.enum(["tyt", "ayt_say", "ayt_ea", "ayt_soz", "ydt", "branch"]),
+  total_net: z.number().min(-200).max(500),
+  subjects: z.array(trialSubjectSchema).min(1),
 });
 
 export const studyLogSchema = z.object({
@@ -38,6 +41,7 @@ export const studyLogSchema = z.object({
 export const userTaskSchema = z.object({
   subject: z.string().min(1, "Ders seçmelisin"),
   topic: z.string().optional(),
-  questionCount: z.number().int().min(1).max(500),
+  questionCount: z.number().int().min(0).max(500).optional(),
+  targetMinutes: z.number().int().min(0).max(720).optional(),
   note: z.string().max(140).optional(),
 });

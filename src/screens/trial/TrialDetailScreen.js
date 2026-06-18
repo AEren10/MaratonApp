@@ -125,7 +125,7 @@ export default function TrialDetailScreen() {
     return (
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12}>
+          <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginLeft: SPACING.md }]}>
@@ -142,10 +142,13 @@ export default function TrialDetailScreen() {
     );
   }
 
-  const subjects = getSubjectsForTrial(latest, C);
-  const sameTypeTrials = sorted.filter((t) => t.trialType === latest.trialType);
-  const idxInType = sameTypeTrials.findIndex((t) => t.id === latest.id);
-  const prev = sameTypeTrials[idxInType + 1];
+  const subjects = useMemo(() => getSubjectsForTrial(latest, C), [latest, C]);
+
+  const { sameTypeTrials, prev } = useMemo(() => {
+    const same = sorted.filter((t) => t.trialType === latest.trialType);
+    const idx = same.findIndex((t) => t.id === latest.id);
+    return { sameTypeTrials: same, prev: same[idx + 1] };
+  }, [sorted, latest]);
 
   const net = latest.totalNet || 0;
   const trend = prev ? net - (prev.totalNet || 0) : 0;
@@ -154,10 +157,10 @@ export default function TrialDetailScreen() {
     ? new Date(latest.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
     : "—";
 
-  const totalMax = subjects.reduce((sum, s) => sum + s.max, 0);
+  const totalMax = useMemo(() => subjects.reduce((sum, s) => sum + s.max, 0), [subjects]);
   const typeMeta = getTrialTypes(C)[latest.trialType];
 
-  const bars = subjects.map((s) => ({
+  const bars = useMemo(() => subjects.map((s) => ({
     key: s.key,
     name: s.name,
     c: s.color,
@@ -165,16 +168,16 @@ export default function TrialDetailScreen() {
     correct: latest.subjects?.[s.key]?.correct || 0,
     wrong: latest.subjects?.[s.key]?.wrong || 0,
     max: s.max,
-  }));
+  })), [subjects, latest]);
 
-  const history = sameTypeTrials.slice(0, 6).map((t, i) => {
+  const history = useMemo(() => sameTypeTrials.slice(0, 6).map((t, i) => {
     const prevT = sameTypeTrials[i + 1];
     return {
       date: new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
       net: t.totalNet || 0,
       trend: prevT ? (t.totalNet || 0) - (prevT.totalNet || 0) : 0,
     };
-  });
+  }), [sameTypeTrials]);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
 
@@ -205,14 +208,14 @@ export default function TrialDetailScreen() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]} numberOfLines={1}>
           {latest.name || "Deneme Detayı"}
         </Text>
         <Chip color={C.surface2}>{dateStr}</Chip>
-        <Pressable onPress={handleShare} hitSlop={12} style={styles.shareBtn}>
+        <Pressable onPress={handleShare} hitSlop={12} accessibilityLabel="Paylaş" accessibilityRole="button" style={styles.shareBtn}>
           <Icon name="share" size={18} color={C.amber} />
         </Pressable>
       </View>
@@ -303,17 +306,28 @@ export default function TrialDetailScreen() {
             ))}
           </Animated.View>
         )}
-        <Animated.View entering={FadeInDown.delay(380).duration(420).springify()}>
+        <Animated.View entering={FadeInDown.delay(380).duration(420).springify()} style={{ gap: SPACING.sm, marginTop: SPACING.md }}>
           <Pressable
             onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS)}
             style={{
               flexDirection: "row", alignItems: "center", justifyContent: "center",
               gap: 8, backgroundColor: C.surface, borderRadius: RADIUS.xl,
-              paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border, marginTop: SPACING.md,
+              paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border,
             }}
           >
             <Icon name="trendUp" size={16} color={C.amber} />
             <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Tüm Denemelerin Analizi</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate(SCREENS.TRIAL_COMPARE)}
+            style={{
+              flexDirection: "row", alignItems: "center", justifyContent: "center",
+              gap: 8, backgroundColor: C.surface, borderRadius: RADIUS.xl,
+              paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border,
+            }}
+          >
+            <Icon name="layers" size={16} color={C.purple} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.purple }}>Önceki Denemeyle Karşılaştır</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>

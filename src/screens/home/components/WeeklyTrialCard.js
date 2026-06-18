@@ -59,6 +59,10 @@ export function WeeklyTrialCard({ report, onPress }) {
           <StatBlock C={C} value={report.bestNet} label="En İyi" color={C.green} />
           <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" color={C.blue} />
         </View>
+
+        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>
+          Detaylı raporu görmek için dokun
+        </Text>
       </View>
     </Pressable>
   );

@@ -48,7 +48,7 @@ const makeStyles = (C) => ({
   },
   maxSub: {
     ...TYPOGRAPHY.micro,
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: "Inter_500Medium",
   },
 });

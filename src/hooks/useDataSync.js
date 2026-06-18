@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
+import { AppState } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
@@ -13,8 +14,7 @@ import { getUserTasksByDate } from "../supabase/userTasks";
 import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
 
 async function loadAll(userId, dispatch) {
-  // Try to flush any pending offline operations first
-  await flushQueue().catch(() => {});
+  const flushed = await flushQueue().catch(() => ({ processed: 0, types: [] }));
 
   const todayDate = new Date().toISOString().split("T")[0];
   const [trials, streak, todayLogs, profile, userTasks] = await Promise.allSettled([
@@ -107,6 +107,20 @@ export function useDataSync() {
         if (!cancelled) setSyncing(false);
       });
     return () => { cancelled = true; };
+  }, [user?.id, dispatch]);
+
+  const appStateRef = useRef(AppState.currentState);
+  useEffect(() => {
+    if (!user?.id || user.id === "dev") return;
+    const sub = AppState.addEventListener("change", (next) => {
+      if (appStateRef.current.match(/inactive|background/) && next === "active") {
+        flushQueue()
+          .then((r) => { if (r.processed > 0) loadAll(user.id, dispatch).catch(() => {}); })
+          .catch(() => {});
+      }
+      appStateRef.current = next;
+    });
+    return () => sub.remove();
   }, [user?.id, dispatch]);
 
   const refresh = useCallback(async () => {

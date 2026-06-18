@@ -39,16 +39,14 @@ export default function TrialSummaryScreen() {
 
   const trial = route.params?.trial;
 
-  useEffect(() => { H.success(); }, []);
+  useEffect(() => { if (trial) H.success(); }, []);
+  useEffect(() => { if (!trial) navigation.goBack(); }, [trial, navigation]);
 
-  if (!trial) {
-    navigation.goBack();
-    return null;
-  }
+  if (!trial) return null;
 
-  const typeMeta = getTrialTypes(C)[trial.trialType];
+  const typeMeta = useMemo(() => getTrialTypes(C)[trial.trialType], [C, trial.trialType]);
   const typeColor = typeMeta?.color || C.amber;
-  const allSubjects = getAllSubjects(C);
+  const allSubjects = useMemo(() => getAllSubjects(C), [C]);
 
   const subjects = useMemo(() => {
     if (trial.trialType === "BRANCH" && trial.branchSubject) {
@@ -57,16 +55,16 @@ export default function TrialSummaryScreen() {
     return typeMeta?.subjects || [];
   }, [trial, typeMeta, allSubjects]);
 
-  const bars = subjects.map((s) => ({
+  const bars = useMemo(() => subjects.map((s) => ({
     key: s.key, name: s.name, c: s.color,
     net: trial.subjects?.[s.key]?.net || 0,
     correct: trial.subjects?.[s.key]?.correct || 0,
     wrong: trial.subjects?.[s.key]?.wrong || 0,
     max: s.max,
-  }));
+  })), [subjects, trial.subjects]);
 
-  const totalCorrect = bars.reduce((s, b) => s + b.correct, 0);
-  const totalWrong = bars.reduce((s, b) => s + b.wrong, 0);
+  const totalCorrect = useMemo(() => bars.reduce((s, b) => s + b.correct, 0), [bars]);
+  const totalWrong = useMemo(() => bars.reduce((s, b) => s + b.wrong, 0), [bars]);
 
   const sameType = useMemo(
     () => [...trials].filter((t) => t.trialType === trial.trialType && t.id !== trial.id)
@@ -102,6 +100,17 @@ export default function TrialSummaryScreen() {
 
   return (
     <SafeAreaView style={[st.safe, { backgroundColor: C.bg }]}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm }}>
+        <Pressable
+          onPress={() => navigation.replace(SCREENS.TRIAL_DETAIL, { trial, fromEntry: false })}
+          hitSlop={12}
+          accessibilityLabel="Kapat"
+          accessibilityRole="button"
+          style={({ pressed }) => ({ padding: 8, opacity: pressed ? 0.5 : 0.7 })}
+        >
+          <Icon name="x" size={22} color={C.muted} />
+        </Pressable>
+      </View>
       <ScrollView contentContainerStyle={st.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[st.heroCircle, { backgroundColor: typeColor + "20" }]}>
           <LinearGradient colors={[typeColor, typeColor + "CC"]} style={st.heroInner}>
@@ -155,7 +164,7 @@ export default function TrialSummaryScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(620)} style={st.actions}>
-          <Pressable onPress={handleShare} style={({ pressed }) => [st.shareBtn, { backgroundColor: C.surface, borderColor: C.border, opacity: pressed ? 0.85 : 1 }]}>
+          <Pressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={({ pressed }) => [st.shareBtn, { backgroundColor: C.surface, borderColor: C.border, opacity: pressed ? 0.85 : 1 }]}>
             <Icon name="share" size={18} color={C.amber} />
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>Paylaş</Text>
           </Pressable>

@@ -10,10 +10,11 @@ import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
+import { SCREENS } from "../../constants/screens";
 
 const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
-const LogRow = React.memo(function LogRow({ item, s, fallbackColor }) {
+const LogRow = React.memo(function LogRow({ item, s, fallbackColor, onPress }) {
   const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: fallbackColor, label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
@@ -21,6 +22,7 @@ const LogRow = React.memo(function LogRow({ item, s, fallbackColor }) {
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   return (
     <AnimPressable
+      onPress={() => onPress?.(item.subject)}
       onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
       style={[s.row, pressStyle]}
@@ -108,10 +110,14 @@ export default function StudyLogScreen() {
     return result;
   }, [logs]);
 
+  const goSubject = useCallback((subjectKey) => {
+    if (subjectKey) navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey });
+  }, [navigation]);
+
   const renderItem = useCallback(({ item }) => {
     if (item.type === "header") return <SectionHeader title={item.title} s={s} />;
-    return <LogRow item={item} s={s} fallbackColor={C.muted} />;
-  }, [s, C]);
+    return <LogRow item={item} s={s} fallbackColor={C.muted} onPress={goSubject} />;
+  }, [s, C, goSubject]);
 
   const keyExtractor = useCallback((item) => item.id, []);
 
@@ -133,7 +139,7 @@ export default function StudyLogScreen() {
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={s.list}
-          ListEmptyComponent={<EmptyState icon="clock" title="Henüz çalışma yok" message="İlk çalışmanı kaydet, burada görünsün" actionLabel="Çalışma Ekle" onAction={() => navigation.navigate("AddStudy")} color="amber" />}
+          ListEmptyComponent={<EmptyState icon="clock" title="Henüz çalışma yok" message="İlk çalışmanı kaydet, burada görünsün" actionLabel="Çalışma Ekle" onAction={() => navigation.navigate(SCREENS.ADD_STUDY)} color="amber" />}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl

@@ -132,9 +132,9 @@ export default function ProfileScreen() {
 
   const handleLogout = useCallback(() => {
     H.warn();
-    showAlert("Cikis Yap", "Hesabindan cikis yapmak istedigin kesin mi?", [
-      { text: "Iptal", style: "cancel" },
-      { text: "Cikis Yap", style: "destructive", onPress: logout },
+    showAlert("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin?", [
+      { text: "İptal", style: "cancel" },
+      { text: "Çıkış Yap", style: "destructive", onPress: logout },
     ]);
   }, [logout]);
 

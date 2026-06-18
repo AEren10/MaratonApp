@@ -80,9 +80,11 @@ export const uploadQuestionImage = async (userId, fileName, file) => {
   return data.path;
 };
 
-export const getQuestionImageUrl = (path) => {
-  const { data } = supabase.storage
+export const getQuestionImageUrl = async (path) => {
+  if (!path) return null;
+  const { data, error } = await supabase.storage
     .from("wrong-questions")
-    .getPublicUrl(path);
-  return data.publicUrl;
+    .createSignedUrl(path, 3600);
+  if (error) return null;
+  return data.signedUrl;
 };

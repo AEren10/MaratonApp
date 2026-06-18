@@ -8,7 +8,7 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
 import { getSharedQuestions, subscribeToFeed } from "../../supabase/community";
-import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import SignedImage from "../../components/common/SignedImage";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
@@ -38,7 +38,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
   const id = useSubjectIdentity(item.subject);
   const color = id?.solid || subj?.color || C.muted;
   const icon = subj?.icon || "bookOpen";
-  const imageUri = item.image_path ? getWrongQuestionImageUrl(item.image_path) : null;
+  const hasImage = !!item.image_path;
 
   return (
     <Pressable
@@ -94,11 +94,12 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
         </Text>
       ) : null}
 
-      {imageUri ? (
-        <Image
-          source={{ uri: imageUri }}
+      {hasImage ? (
+        <SignedImage
+          bucket="wrong-questions"
+          path={item.image_path}
           style={{ marginTop: 12, height: 220, borderRadius: 16, backgroundColor: C.surface2 }}
-          contentFit="cover" cachePolicy="memory-disk" transition={200}
+          contentFit="cover" transition={200}
         />
       ) : null}
 
@@ -154,7 +155,6 @@ export function CommunityTab({ visible, onSwitchToMine }) {
       );
       setItems(data || []);
     } catch (e) {
-      console.warn("CommunityTab load error:", e?.message);
       setLoadError(e?.message || "Yüklenemedi");
     }
     setLoading(false);

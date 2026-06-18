@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, Modal, FlatList, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +16,32 @@ import { getProfile, updateProfile } from "../../supabase/profiles";
 
 const FIELD_TO_TYPE = { sayisal: "say", ea: "ea", sozel: "soz", dil: "ea" };
 const fmt = (n) => n.toLocaleString("tr-TR");
+
+const ProgramRow = React.memo(function ProgramRow({ item, onSelect, C }) {
+  const cat = PROGRAM_CATEGORIES.find((x) => x.id === item.category);
+  const color = cat ? (C[cat.color] || C.purple) : C.purple;
+  const handlePress = useCallback(() => onSelect(item), [onSelect, item]);
+  return (
+    <Pressable onPress={handlePress} style={[s.progRow, { borderBottomColor: C.border }]}>
+      <View style={[s.progIcon, { backgroundColor: color + "1A" }]}>
+        <Icon name={cat?.icon || "target"} size={15} color={color} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[s.progName, { color: C.text }]}>{item.name}</Text>
+        <Text style={[s.progUni, { color: C.muted }]}>{item.uni}</Text>
+      </View>
+      <Text style={[s.progRank, { color: color }]}>~{fmt(item.rank)}</Text>
+    </Pressable>
+  );
+});
+
+const progKeyExtractor = (item) => item.id;
+const progListStyle = { marginTop: 8, maxHeight: 380 };
+const ProgEmptyComponent = (
+  <View style={{ padding: 24, alignItems: "center" }}>
+    <Text style={{ color: "#888" }}>Sonuç bulunamadı</Text>
+  </View>
+);
 
 // === Subject groups per AYT field ===
 // rank simulation için kullanıcının ders ders D/Y/B girebilmesini sağla
@@ -178,6 +204,10 @@ export default function RankSimulatorScreen() {
       updateProfile(user.id, { target_program_id: program.id }).catch(() => {});
     }
   }, [user?.id]);
+
+  const renderProgItem = useCallback(({ item }) => (
+    <ProgramRow item={item} onSelect={selectTarget} C={C} />
+  ), [selectTarget, C]);
 
   const filteredPrograms = useMemo(
     () => searchPrograms(query, { type, category }),
@@ -360,30 +390,11 @@ export default function RankSimulatorScreen() {
 
               <FlatList
                 data={filteredPrograms}
-                keyExtractor={(item) => item.id}
-                style={{ marginTop: 8, maxHeight: 380 }}
+                keyExtractor={progKeyExtractor}
+                style={progListStyle}
                 keyboardShouldPersistTaps="handled"
-                ListEmptyComponent={() => (
-                  <View style={{ padding: 24, alignItems: "center" }}>
-                    <Text style={{ color: C.muted }}>Sonuç bulunamadı</Text>
-                  </View>
-                )}
-                renderItem={({ item }) => {
-                  const cat = PROGRAM_CATEGORIES.find((x) => x.id === item.category);
-                  const color = cat ? (C[cat.color] || C.purple) : C.purple;
-                  return (
-                    <Pressable onPress={() => selectTarget(item)} style={[s.progRow, { borderBottomColor: C.border }]}>
-                      <View style={[s.progIcon, { backgroundColor: color + "1A" }]}>
-                        <Icon name={cat?.icon || "target"} size={15} color={color} />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={[s.progName, { color: C.text }]}>{item.name}</Text>
-                        <Text style={[s.progUni, { color: C.muted }]}>{item.uni}</Text>
-                      </View>
-                      <Text style={[s.progRank, { color: color }]}>~{fmt(item.rank)}</Text>
-                    </Pressable>
-                  );
-                }}
+                ListEmptyComponent={ProgEmptyComponent}
+                renderItem={renderProgItem}
               />
             </Pressable>
           </Pressable>

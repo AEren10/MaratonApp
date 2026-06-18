@@ -56,9 +56,12 @@ export const uploadWrongQuestionImage = async (userId, uri) => {
   return data.path;
 };
 
-export const getWrongQuestionImageUrl = (path) => {
+export const getWrongQuestionImageUrl = async (path) => {
   if (!path) return null;
   if (path.startsWith("http")) return path;
-  const { data } = supabase.storage.from("wrong-questions").getPublicUrl(path);
-  return data.publicUrl;
+  const { data, error } = await supabase.storage
+    .from("wrong-questions")
+    .createSignedUrl(path, 3600);
+  if (error) return null;
+  return data.signedUrl;
 };

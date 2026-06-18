@@ -72,7 +72,7 @@ export function ExamCountdown({ onPress }) {
                   <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, lineHeight: 30, color: "#FFFFFF", letterSpacing: -1 }}>
                     {daysUntilExam}
                   </Text>
-                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 9, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>GÜN</Text>
+                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>GÜN</Text>
                 </>
               )}
             </LinearGradient>
@@ -98,7 +98,10 @@ export function ExamCountdown({ onPress }) {
               )}
             </View>
 
-            <Icon name="chevR" size={18} color={C.muted} />
+            <View style={{ alignItems: "center", gap: 2 }}>
+              <Icon name="settings" size={16} color={C.muted} />
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, fontSize: 11 }}>Hedef</Text>
+            </View>
           </View>
 
           <View style={{ height: 3, backgroundColor: C.surface2, marginHorizontal: SPACING.md, borderRadius: 2, marginBottom: SPACING.sm }}>

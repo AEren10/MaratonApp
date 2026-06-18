@@ -14,7 +14,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
-import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import SignedImage from "../../components/common/SignedImage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import { useGamification } from "../../hooks/useGamification";
@@ -116,7 +116,7 @@ export default function SwipeReviewScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
           <Icon name="x" size={22} color={C.text} />
         </Pressable>
         <Text style={s.title}>Swipe Tekrar</Text>
@@ -180,7 +180,7 @@ export default function SwipeReviewScreen() {
               <Text style={s.topicText}>{current.topic}</Text>
 
               {current.image_path ? (
-                <Image source={{ uri: getWrongQuestionImageUrl(current.image_path) }} style={s.image} contentFit="contain" cachePolicy="memory-disk" />
+                <SignedImage bucket="wrong-questions" path={current.image_path} style={s.image} contentFit="contain" />
               ) : current.note ? (
                 <View style={s.noteBox}>
                   <Text style={s.noteText}>{current.note}</Text>
@@ -197,6 +197,28 @@ export default function SwipeReviewScreen() {
               )}
             </Animated.View>
           </GestureDetector>
+
+          {/* Tap alternatives for accessibility */}
+          <View style={s.tapRow}>
+            <Pressable
+              onPress={() => handleGrade(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Bilmedim"
+              style={[s.tapBtn, { borderColor: C.red + "40", backgroundColor: C.red + "14" }]}
+            >
+              <Icon name="x" size={18} color={C.red} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Bilmedim</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => handleGrade(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Bildim"
+              style={[s.tapBtn, { borderColor: C.green + "40", backgroundColor: C.green + "14" }]}
+            >
+              <Icon name="check" size={18} color={C.green} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>Bildim</Text>
+            </Pressable>
+          </View>
         </View>
       ) : null}
     </SafeAreaView>
@@ -235,5 +257,7 @@ function makeStyles(C) {
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
     closeBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
     closeText: { ...TYPOGRAPHY.button, color: C.bg },
+    tapRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.lg, width: "100%" },
+    tapBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
   });
 }

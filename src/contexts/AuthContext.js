@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "../supabase/client";
-import { signOut as supaSignOut } from "../supabase/auth";
+import { signOut as supaSignOut, deleteAccount as supaDeleteAccount } from "../supabase/auth";
 
 const AuthContext = createContext(null);
 
@@ -40,7 +40,13 @@ export function AuthProvider({ children }) {
     await supaSignOut();
   }, []);
 
-  const value = { session, user, loading, logout };
+  const deleteAccount = useCallback(async () => {
+    await supaDeleteAccount();
+    setSession(null);
+    setUser(null);
+  }, []);
+
+  const value = useMemo(() => ({ session, user, loading, logout, deleteAccount }), [session, user, loading, logout, deleteAccount]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

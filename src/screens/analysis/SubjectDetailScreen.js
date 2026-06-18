@@ -24,10 +24,10 @@ function StatBox({ label, value, s }) {
   );
 }
 
-function TopicRow({ topic, color, s }) {
+function TopicRow({ topic, color, s, onPress }) {
   const barWidth = Math.round(Math.max(topic.acc, 5));
   return (
-    <View style={s.topicRow}>
+    <Pressable onPress={() => onPress?.(topic)} style={({ pressed }) => [s.topicRow, pressed && { opacity: 0.6 }]}>
       <View style={s.topicInfo}>
         <Text style={s.topicName} numberOfLines={1}>{topic.name}</Text>
         <Text style={s.topicQ}>{topic.q} soru</Text>
@@ -36,7 +36,7 @@ function TopicRow({ topic, color, s }) {
         <View style={[s.barFill, { width: `${barWidth}%`, backgroundColor: color }]} />
       </View>
       <Text style={[s.topicAcc, { color }]}>{topic.acc}%</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -49,8 +49,12 @@ export default function SubjectDetailScreen() {
   const { user } = useAuth();
 
   // Support both old and new param shapes
-  const subjectKey = route.params?.subjectKey || route.params?.subject?.key;
+  const subjectKey = route.params?.subjectKey || route.params?.subject?.key || null;
   const subjectName = route.params?.subjectName || route.params?.subject?.name;
+
+  useEffect(() => {
+    if (!subjectKey) navigation.goBack();
+  }, [subjectKey, navigation]);
 
   // Find subject color and meta
   const allSubjects = useMemo(() => getAllSubjects(C), [C]);
@@ -150,7 +154,7 @@ export default function SubjectDetailScreen() {
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+          <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginLeft: SPACING.md }]}>
@@ -167,7 +171,7 @@ export default function SubjectDetailScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <View style={[s.colorBar, { backgroundColor: subjectColor }]} />
@@ -244,10 +248,21 @@ export default function SubjectDetailScreen() {
           <>
             <Text style={s.sectionTitle}>KONULAR</Text>
             {topics.slice(0, 15).map((t, i) => (
-              <TopicRow key={`${t.name}-${i}`} topic={t} color={subjectColor} s={s} />
+              <TopicRow key={`${t.name}-${i}`} topic={t} color={subjectColor} s={s} onPress={(tp) => navigation.navigate(SCREENS.TOPIC_STUDY, { subjectKey, topicName: tp.name })} />
             ))}
           </>
         )}
+
+        <Pressable
+          onPress={() => navigation.navigate(SCREENS.WEAK_AREAS, { subjectKey, subjectName })}
+          style={({ pressed }) => [
+            s.secondaryCta,
+            pressed && { opacity: 0.7 },
+          ]}
+        >
+          <Icon name="alert" size={18} color={C.amber} />
+          <Text style={[s.secondaryCtaText, { color: C.amber }]}>Zayıf Alanları Gör</Text>
+        </Pressable>
 
         <Pressable
           onPress={() => navigation.navigate(SCREENS.STUDY_TIMER)}
@@ -297,7 +312,9 @@ function makeStyles(C) {
     barTrack: { flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3, marginHorizontal: SPACING.sm },
     barFill: { height: 6, borderRadius: 3 },
     topicAcc: { ...TYPOGRAPHY.bodySemiBold, width: 44, textAlign: "right" },
-    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxxl, gap: SPACING.sm },
+    secondaryCta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.md, marginTop: SPACING.xxl, gap: SPACING.sm, borderWidth: 1, borderColor: C.amber + "40", backgroundColor: C.amber + "10" },
+    secondaryCtaText: { ...TYPOGRAPHY.button },
+    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.md, gap: SPACING.sm },
     ctaText: { ...TYPOGRAPHY.button, color: C.bg },
     emptyBox: { flex: 1, alignItems: "center", justifyContent: "center" },
   });

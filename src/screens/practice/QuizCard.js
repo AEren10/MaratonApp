@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Image } from "expo-image";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
-import { getWrongQuestionImageUrl } from "../../supabase/storage";
+import SignedImage from "../../components/common/SignedImage";
 
 const CHOICES = ["A", "B", "C", "D", "E"];
 
@@ -25,8 +24,9 @@ export default function QuizCard({ item, selected, feedback, onAnswer }) {
       </View>
 
       {item.image_path ? (
-        <Image
-          source={{ uri: getWrongQuestionImageUrl(item.image_path) }}
+        <SignedImage
+          bucket="wrong-questions"
+          path={item.image_path}
           style={s.image}
           contentFit="contain"
           transition={200}

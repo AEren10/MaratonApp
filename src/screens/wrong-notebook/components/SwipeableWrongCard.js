@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import { Text, Pressable } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { Icon } from "../../../components/design";
@@ -7,15 +7,18 @@ import { TYPOGRAPHY } from "../../../themes/tokens";
 import { WrongCard } from "./WrongCard";
 import * as H from "../../../lib/haptics";
 
-export function SwipeableWrongCard({ item, onPress, onResolve, onShare, onDelete, shared }) {
+export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item, onPress, onResolve, onShare, onDelete, shared }) {
   const C = useC();
   const ref = useRef(null);
+
+  const handlePress = useCallback(() => onPress?.(item), [onPress, item]);
+  const handleShare = useCallback(() => onShare?.(item), [onShare, item]);
 
   const handleResolve = useCallback(() => {
     ref.current?.close();
     H.success();
-    onResolve?.();
-  }, [onResolve]);
+    onResolve?.(item.id);
+  }, [onResolve, item.id]);
 
   const handleDelete = useCallback(() => {
     ref.current?.close();
@@ -74,11 +77,11 @@ export function SwipeableWrongCard({ item, onPress, onResolve, onShare, onDelete
     >
       <WrongCard
         item={item}
-        onPress={onPress}
-        onResolve={onResolve}
-        onShare={onShare}
+        onPress={handlePress}
+        onResolve={handleResolve}
+        onShare={handleShare}
         shared={shared}
       />
     </Swipeable>
   );
-}
+});

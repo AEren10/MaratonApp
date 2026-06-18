@@ -124,7 +124,7 @@ export function LiveCard({ count = 0, avatars = [], onPress }) {
             >
               <Text style={{
                 fontFamily: "Inter_600SemiBold",
-                fontSize: 9,
+                fontSize: 11,
                 color: "#FFFFFF",
               }}>
                 {a}

@@ -1,4 +1,4 @@
-import { differenceInDays } from "date-fns";
+import { differenceInDays } from "./dateUtils";
 import { getSubjectsForExam } from "../data/curriculum";
 
 /**

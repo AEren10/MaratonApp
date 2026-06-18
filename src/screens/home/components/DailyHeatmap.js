@@ -38,9 +38,9 @@ export function DailyHeatmap({ dailyHeatmap }) {
                 {d.label}
               </Text>
               {d.active ? (
-                <Text style={{ ...TYPOGRAPHY.micro, fontSize: 9, color: C.sec }}>{d.questions}</Text>
+                <Text style={{ ...TYPOGRAPHY.micro, fontSize: 11, color: C.sec }}>{d.questions}</Text>
               ) : (
-                <Text style={{ ...TYPOGRAPHY.micro, fontSize: 9, color: C.muted }}>—</Text>
+                <Text style={{ ...TYPOGRAPHY.micro, fontSize: 11, color: C.muted }}>—</Text>
               )}
             </View>
           );

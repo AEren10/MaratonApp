@@ -37,24 +37,31 @@ export default function QuickPracticeScreen() {
   const [selected, setSelected] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
     if (!user?.id) { setLoading(false); return; }
+    let cancelled = false;
     (async () => {
       try {
         const data = await getDueWrongQuestions(user.id);
+        if (cancelled) return;
         setQuestions(shuffle(data || []).slice(0, TOTAL));
-      } catch {}
+      } catch (e) {
+        if (cancelled) return;
+        setLoadError(e?.message || "Sorular yüklenemedi");
+      }
+      if (cancelled) return;
       setLoading(false);
       timerRef.current = setInterval(() => setElapsed((t) => t + 1), 1000);
     })();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => { cancelled = true; if (timerRef.current) clearInterval(timerRef.current); };
   }, [user?.id]);
 
   const done = idx >= questions.length && questions.length > 0;
-  const score = results.filter((r) => r).length;
+  const score = useMemo(() => results.filter((r) => r).length, [results]);
   const current = questions[idx];
 
   const handleAnswer = useCallback((answer) => {
@@ -84,6 +91,18 @@ export default function QuickPracticeScreen() {
     return (
       <SafeAreaView style={[s.container, s.center]}>
         <ActivityIndicator color={C.amber} size="large" />
+      </SafeAreaView>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <SafeAreaView style={[s.container, s.center]}>
+        <Icon name="alert" size={48} color={C.red} />
+        <Text style={s.emptyText}>{loadError}</Text>
+        <TouchableOpacity style={s.backBtn} onPress={() => nav.goBack()}>
+          <Text style={s.backBtnText}>Geri Dön</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -118,6 +137,9 @@ export default function QuickPracticeScreen() {
   return (
     <SafeAreaView style={s.container}>
       <View style={s.topBar}>
+        <TouchableOpacity onPress={() => nav.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={{ padding: 4 }}>
+          <Icon name="x" size={20} color={C.muted} />
+        </TouchableOpacity>
         <View style={s.dots}>
           {questions.map((_, i) => {
             const bg = i < results.length ? (results[i] ? C.green : C.red) : i === idx ? C.amber : C.surface2;

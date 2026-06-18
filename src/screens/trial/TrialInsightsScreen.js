@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Svg, { Polyline, Line, Circle as SvgCircle, Defs, LinearGradient, Stop, Polygon } from "react-native-svg";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -136,9 +136,10 @@ export default function TrialInsightsScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const route = useRoute();
   const { examType } = useExam();
   const allTrials = useSelector(selectTrials);
-  const [filter, setFilter] = useState("ALL");
+  const [filter, setFilter] = useState(route.params?.initialFilter || "ALL");
   const TYPE_FILTERS = useMemo(() => getTypeFilters(examType), [examType]);
 
   const filteredTrials = useMemo(() => {

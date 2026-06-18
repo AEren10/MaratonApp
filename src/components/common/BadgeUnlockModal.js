@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import Animated, {
   FadeIn, FadeInDown, ZoomIn,
   useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing,
+  cancelAnimation,
 } from "react-native-reanimated";
 import { HexBadge } from "../design";
 import { useC } from "../../contexts/ThemeContext";
@@ -22,6 +23,7 @@ export function BadgeUnlockModal({ badge, visible, onClose }) {
       ), -1, false);
       spin.value = withDelay(150, withRepeat(withTiming(1, { duration: 9000, easing: Easing.linear }), -1, false));
     }
+    return () => { cancelAnimation(glow); cancelAnimation(spin); };
   }, [visible]);
   const glowStyle = useAnimatedStyle(() => ({ opacity: 0.18 + glow.value * 0.4, transform: [{ scale: 0.9 + glow.value * 0.25 }] }));
   const spinStyle = useAnimatedStyle(() => ({ opacity: 0.5, transform: [{ rotate: `${spin.value * 360}deg` }] }));

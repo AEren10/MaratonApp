@@ -19,6 +19,7 @@ export function useNudgePopup(nudges) {
   const [popup, setPopup] = useState(null);
   const shownRef = useRef(new Set());
   const dayRef = useRef(todayKey());
+  const timerRef = useRef(null);
 
   useEffect(() => {
     const day = todayKey();
@@ -47,8 +48,10 @@ export function useNudgePopup(nudges) {
       SHOWN_KEY,
       JSON.stringify({ day: todayKey(), ids: [...shownRef.current] }),
     ).catch(() => {});
-    setTimeout(() => setPopup(candidate), delay);
+    timerRef.current = setTimeout(() => setPopup(candidate), delay);
   }, [nudges]);
+
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const dismiss = useCallback(() => setPopup(null), []);
 

@@ -1,19 +1,22 @@
-import { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import { Icon, Chip } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
+export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const REASON_COLORS = { gray: C.muted, red: C.red, amber: C.amber };
-  const { s, topic, q, reason, rkind, done } = task;
+  const { s, topic, q, reason, rkind, done, id } = task;
   const reasonColor = REASON_COLORS[rkind] || C.muted;
+  const handleToggle = useCallback(() => onToggle(id), [onToggle, id]);
+  const handleStart = useCallback(() => onStart(id), [onStart, id]);
+  const handleInfo = useCallback(() => (onInfo || onToggle)(id), [onInfo, onToggle, id]);
 
   return (
     <View style={[styles.card, { borderLeftColor: s.color }]}>
-      <Pressable onPress={onToggle} hitSlop={8} style={styles.checkArea}>
+      <Pressable onPress={handleToggle} hitSlop={8} style={styles.checkArea}>
         <Icon
           name={done ? "checkCircle" : "circle"}
           size={24}
@@ -21,7 +24,7 @@ export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
         />
       </Pressable>
 
-      <Pressable onPress={onInfo || onToggle} style={styles.middle}>
+      <Pressable onPress={handleInfo} style={styles.middle}>
         <Text style={[TYPOGRAPHY.micro, { color: s.color, textTransform: "uppercase", letterSpacing: 0.8 }]}>
           {s.label || s.name}
         </Text>
@@ -41,14 +44,14 @@ export function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
           {reason}
         </Chip>
         {!done && (
-          <Pressable onPress={onStart} hitSlop={6} style={styles.playBtn}>
+          <Pressable onPress={handleStart} hitSlop={6} style={styles.playBtn}>
             <Icon name="play" size={14} color={s.color} />
           </Pressable>
         )}
       </View>
     </View>
   );
-}
+});
 
 const makeStyles = (C) => StyleSheet.create({
   card: {

@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
@@ -67,7 +67,9 @@ export default function WrongNotebookScreen() {
         if (r.status === "fulfilled" && r.value) ids.add(data[i].id);
       });
       setSharedIds(ids);
-    } catch {}
+    } catch (e) {
+      setErrorModal({ visible: true, message: e?.message || "Yanlış defteri yüklenemedi." });
+    }
     setLoading(false);
   }, [user?.id]);
 
@@ -139,18 +141,22 @@ export default function WrongNotebookScreen() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, n]) => ({ name, n }));
   }, [items, subject, status]);
 
-  const toggleResolve = async (id) => {
-    const item = items.find((it) => it.id === id);
-    const wasResolved = item?.is_resolved;
-    setItems((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, is_resolved: !it.is_resolved } : it)),
-    );
-    if (!wasResolved) {
-      haptic.success();
-      reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
-      try { await resolveWrongQuestion(id); } catch {}
+  const toggleResolve = useCallback(async (id) => {
+    setItems((prev) => {
+      const item = prev.find((it) => it.id === id);
+      if (!item || item.is_resolved) return prev;
+      return prev.map((it) => (it.id === id ? { ...it, is_resolved: true } : it));
+    });
+    haptic.success();
+    reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
+    try {
+      await resolveWrongQuestion(id);
+    } catch {
+      setItems((prev) =>
+        prev.map((it) => (it.id === id ? { ...it, is_resolved: false } : it)),
+      );
     }
-  };
+  }, [reward]);
 
   useFocusEffect(useCallback(() => {
     loadItems();
@@ -173,6 +179,20 @@ export default function WrongNotebookScreen() {
     return items.filter((i) => !i.is_resolved && i.next_review_at && new Date(i.next_review_at).getTime() <= now).length;
   }, [items]);
 
+  const handleCardPress = useCallback((item) => {
+    navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item });
+  }, [navigation]);
+
+  const renderItem = useCallback(({ item }) => (
+    <SwipeableWrongCard
+      item={item}
+      onPress={handleCardPress}
+      onResolve={toggleResolve}
+      onShare={handleShare}
+      shared={sharedIds.has(item.id)}
+    />
+  ), [handleCardPress, toggleResolve, handleShare, sharedIds]);
+
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       {/* === Header === */}
@@ -181,6 +201,8 @@ export default function WrongNotebookScreen() {
           <Pressable
             onPress={() => navigation.goBack()}
             hitSlop={10}
+            accessibilityLabel="Geri"
+            accessibilityRole="button"
             style={[s.backBtn, { backgroundColor: C.surface, borderColor: C.border }]}
           >
             <Icon name="arrowL" size={18} color={C.text} />
@@ -196,6 +218,8 @@ export default function WrongNotebookScreen() {
         {/* Yeni yanlış ekle — büyük + button */}
         <Pressable
           onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}
+          accessibilityLabel="Ekle"
+          accessibilityRole="button"
           style={({ pressed }) => [
             s.addBtn,
             {
@@ -209,8 +233,8 @@ export default function WrongNotebookScreen() {
         </Pressable>
       </View>
 
-      {/* === Main tabs: Defterim | Topluluk === */}
-      <View style={[s.mainTabs, { borderBottomColor: C.border }]}>
+      {/* === Main tabs: Defterim | Topluluk (segment control) === */}
+      <View style={{ flexDirection: "row", marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, backgroundColor: C.surface2, borderRadius: RADIUS.lg, padding: 3 }}>
         {[
           { key: "mine", label: "Defterim", icon: "notebook" },
           { key: "community", label: "Topluluk", icon: "globe" },
@@ -220,7 +244,12 @@ export default function WrongNotebookScreen() {
             <Pressable
               key={t.key}
               onPress={() => { haptic.select(); setMainTab(t.key); }}
-              style={[s.mainTab, active && { borderBottomColor: C.accent }]}
+              style={{
+                flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
+                gap: 6, paddingVertical: 10, borderRadius: RADIUS.md,
+                backgroundColor: active ? C.surface : "transparent",
+                ...(active ? { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3, elevation: 2 } : {}),
+              }}
             >
               <Icon name={t.icon} size={16} color={active ? C.accent : C.muted} />
               <Text style={{
@@ -269,14 +298,12 @@ export default function WrongNotebookScreen() {
         })}
       </View>
 
-      {/* === "Bugün tekrar" banner === */}
-      {status !== "resolved" && (
-        <DueBanner
-          dueCount={dueCount}
-          onClassic={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
-          onSwipe={() => navigation.navigate(SCREENS.SWIPE_REVIEW)}
-        />
-      )}
+      {/* === Tekrar banner (kalıcı) === */}
+      <DueBanner
+        dueCount={dueCount}
+        onClassic={() => navigation.navigate(SCREENS.REVIEW_SESSION)}
+        onSwipe={() => navigation.navigate(SCREENS.SWIPE_REVIEW)}
+      />
 
       {/* === Ders filter chips (yatay scroll) === */}
       {filtered.length > 0 || subject !== "all" ? (
@@ -350,15 +377,7 @@ export default function WrongNotebookScreen() {
           data={filtered}
           keyExtractor={(item) => item.id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.purple} colors={[C.purple]} />}
-          renderItem={({ item }) => (
-            <SwipeableWrongCard
-              item={item}
-              onPress={() => navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item })}
-              onResolve={() => toggleResolve(item.id)}
-              onShare={() => handleShare(item)}
-              shared={sharedIds.has(item.id)}
-            />
-          )}
+          renderItem={renderItem}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 14,

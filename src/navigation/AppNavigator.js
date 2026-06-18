@@ -73,7 +73,7 @@ const Tab = createBottomTabNavigator();
 
 function withEB(Comp) {
   const Wrapped = (props) => (
-    <ScreenErrorBoundary>
+    <ScreenErrorBoundary navigation={props.navigation}>
       <Comp {...props} />
     </ScreenErrorBoundary>
   );

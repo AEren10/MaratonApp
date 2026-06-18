@@ -6,26 +6,40 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
+const LAST_UPDATED = "18 Haziran 2026";
+
 const SECTIONS = [
   {
     title: "Veri Toplama",
-    body: "Maraton, hizmetlerini sunabilmek icin ad, e-posta adresi ve calisma verilerinizi toplar. Bu veriler yalnizca uygulamanin islevselligini saglamak amaciyla kullanilir.",
+    body: "Maraton, hizmetlerini sunabilmek için ad, e-posta adresi ve çalışma verilerinizi toplar. Bu veriler yalnızca uygulamanın işlevselliğini sağlamak amacıyla kullanılır.",
   },
   {
-    title: "Veri Kullanimi",
-    body: "Toplanan veriler, kisisellestirilmis calisma planlari olusturmak, ilerlemenizi takip etmek ve istatistiklerinizi gostermek icin kullanilir. Verileriniz ucuncu taraflarla paylasılmaz.",
+    title: "Veri Kullanımı",
+    body: "Toplanan veriler, kişiselleştirilmiş çalışma planları oluşturmak, ilerlemenizi takip etmek ve istatistiklerinizi göstermek için kullanılır. Verileriniz üçüncü taraflarla paylaşılmaz.",
   },
   {
-    title: "Veri Guvenligi",
-    body: "Tum veriler sifrelenmis baglanti uzerinden iletilir ve guvenli sunucularda saklanir. Erisim kontrolleri ve duzenli guvenlik denetimleri uygulanmaktadir.",
+    title: "Üçüncü Taraf Hizmetleri",
+    body: "Uygulama altyapısı Supabase (veritabanı ve kimlik doğrulama), Sentry (hata takibi) ve Expo (uygulama güncellemeleri) hizmetlerini kullanmaktadır. Bu hizmetler yalnızca teknik altyapı amacıyla veri işler.",
   },
   {
-    title: "Haklariniz",
-    body: "Verilerinize erisim talep edebilir, duzeltme isteyebilir veya hesabinizi sildirebilirsiniz. Talepleriniz 30 gun icerisinde isleme alinir.",
+    title: "Veri Güvenliği",
+    body: "Tüm veriler şifrelenmiş bağlantı (TLS) üzerinden iletilir ve güvenli sunucularda saklanır. Erişim kontrolleri, satır düzeyinde güvenlik (RLS) ve düzenli güvenlik denetimleri uygulanmaktadır.",
   },
   {
-    title: "Iletisim",
-    body: "Gizlilik politikamizla ilgili sorulariniz icin destek@maraton.app adresine e-posta gonderebilirsiniz.",
+    title: "Veri Saklama Süresi",
+    body: "Kişisel verileriniz hesabınız aktif olduğu sürece saklanır. Hesabınızı sildiğinizde tüm verileriniz kalıcı olarak silinir.",
+  },
+  {
+    title: "Yaş Sınırı",
+    body: "Maraton, 13 yaş ve üzeri kullanıcılar için tasarlanmıştır. 13 yaşından küçük bireylerin kişisel verilerini bilerek toplamıyoruz.",
+  },
+  {
+    title: "Haklarınız",
+    body: "Verilerinize erişim talep edebilir, düzeltme isteyebilir veya Ayarlar ekranından hesabınızı silebilirsiniz. Talepleriniz 30 gün içerisinde işleme alınır.",
+  },
+  {
+    title: "İletişim",
+    body: "Gizlilik politikamızla ilgili sorularınız için destek@maraton.app adresine e-posta gönderebilirsiniz.",
   },
 ];
 
@@ -41,7 +55,7 @@ export default function PrivacyScreen() {
         <Pressable onPress={goBack} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={s.headerTitle}>Gizlilik Politikasi</Text>
+        <Text style={s.headerTitle}>Gizlilik Politikası</Text>
         <View style={{ width: 22 }} />
       </View>
 
@@ -49,6 +63,7 @@ export default function PrivacyScreen() {
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={s.updated}>Son güncelleme: {LAST_UPDATED}</Text>
         {SECTIONS.map((sec) => (
           <View key={sec.title} style={s.section}>
             <Text style={s.sectionTitle}>{sec.title}</Text>
@@ -69,6 +84,7 @@ function makeStyles(C) {
     },
     headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
     scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: 60 },
+    updated: { ...TYPOGRAPHY.caption, color: C.muted, marginBottom: SPACING.xl },
     section: { marginBottom: SPACING.xxl },
     sectionTitle: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.sm },
     sectionBody: { ...TYPOGRAPHY.body, color: C.sec },

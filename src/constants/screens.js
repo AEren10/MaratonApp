@@ -66,9 +66,6 @@ export const SCREENS = {
   EXAM_SIMULATOR: "ExamSimulator",
   SHARE_CARD: "ShareCard",
 
-  // Community
-  SHARED_QUESTION_DETAIL: "SharedQuestionDetail",
-
   // Social
   FRIENDS: "Friends",
 

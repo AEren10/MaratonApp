@@ -23,6 +23,9 @@ function nudgesToPriorityReasons(nudges) {
   return map;
 }
 
+// Module-level cache — paylaşılan veri, her instance sıfırdan fetch etmesin.
+let _cache = { uid: null, weekLogs: [], topicRows: [], srDue: 0 };
+
 // C) HomeScreen ve PlanDetailScreen için ortak plan bağlamı.
 // Son 3 deneme ağırlıklı zayıflık + 7 günlük çalışma + konu zayıflığı + nudge sinyalleri.
 export function usePlanContext() {
@@ -32,29 +35,42 @@ export function usePlanContext() {
   const todayLogs = useAppSelector(selectTodayLogs);
   const dailyTarget = useAppSelector(selectDailyQuestionsGoal);
 
-  const [weekLogs, setWeekLogs] = useState([]);
-  const [topicRows, setTopicRows] = useState([]);
-  const [srDue, setSrDue] = useState(0);
+  const uid = user?.id;
+  const cached = uid && uid === _cache.uid;
+
+  const [weekLogs, setWeekLogs] = useState(cached ? _cache.weekLogs : []);
+  const [topicRows, setTopicRows] = useState(cached ? _cache.topicRows : []);
+  const [srDue, setSrDue] = useState(cached ? _cache.srDue : 0);
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!uid || uid === "dev") return;
+    if (uid === _cache.uid && _cache.weekLogs.length > 0) {
+      setWeekLogs(_cache.weekLogs);
+      setTopicRows(_cache.topicRows);
+      setSrDue(_cache.srDue);
+      return;
+    }
     let cancelled = false;
     const to = new Date();
     const from = new Date(Date.now() - 7 * 86400000);
     const fmt = (d) => d.toISOString().split("T")[0];
 
     Promise.allSettled([
-      getStudyLogs(user.id, { from: fmt(from), to: fmt(to) }),
-      getTopicProgress(user.id),
-      getDueWrongQuestions(user.id),
+      getStudyLogs(uid, { from: fmt(from), to: fmt(to) }),
+      getTopicProgress(uid),
+      getDueWrongQuestions(uid),
     ]).then(([logsRes, topicRes, dueRes]) => {
       if (cancelled) return;
-      if (logsRes.status === "fulfilled") setWeekLogs(logsRes.value || []);
-      if (topicRes.status === "fulfilled") setTopicRows(topicRes.value || []);
-      if (dueRes.status === "fulfilled") setSrDue((dueRes.value || []).length);
+      const wl = logsRes.status === "fulfilled" ? (logsRes.value || []) : [];
+      const tr = topicRes.status === "fulfilled" ? (topicRes.value || []) : [];
+      const sd = dueRes.status === "fulfilled" ? (dueRes.value || []).length : 0;
+      _cache = { uid, weekLogs: wl, topicRows: tr, srDue: sd };
+      setWeekLogs(wl);
+      setTopicRows(tr);
+      setSrDue(sd);
     });
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, [uid]);
 
   return useMemo(() => {
     const weakAreas = weightedWeakAreas(trials);

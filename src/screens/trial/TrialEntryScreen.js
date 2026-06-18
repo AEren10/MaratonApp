@@ -24,6 +24,7 @@ import { XPToast } from "../../components/common/XPToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveTrialOffline } from "../../lib/offlineQueue";
+import { trialEntrySchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 
@@ -185,6 +186,19 @@ export default function TrialEntryScreen() {
     };
     dispatch(addTrial(localTrial));
 
+    const parsed = trialEntrySchema.safeParse({
+      name: trialName,
+      trial_date: formatDateISO(trialDate),
+      exam_type: trialType.toLowerCase(),
+      total_net: netVal,
+      subjects: subjectsArr,
+    });
+    if (!parsed.success) {
+      H.warn();
+      showAlert("Geçersiz veri", parsed.error.issues[0]?.message || "Lütfen verileri kontrol edin.");
+      return;
+    }
+
     setSaving(true);
     const result = await saveTrialOffline(
       {
@@ -200,6 +214,10 @@ export default function TrialEntryScreen() {
       subjectsArr
     );
     setSaving(false);
+
+    if (result.queued) {
+      showAlert("Çevrimdışı", "Deneme sonucu bağlantı geldiğinde gönderilecek.");
+    }
 
     reward("trial_entry", {
       statUpdates: [
@@ -220,7 +238,7 @@ export default function TrialEntryScreen() {
         style={{ flex: 1 }}
       >
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12}>
+          <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Deneme Gir</Text>

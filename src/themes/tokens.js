@@ -33,7 +33,7 @@ export const COLORS = {
     // Text stack — nötr ink (mor değil)
     textPrimary:   "#15161A",  // near-black ink
     textSecondary: "#56585F",
-    textMuted:     "#8A8C93",
+    textMuted:     "#6E7078",
     textInverse:   "#FFFFFF",  // sıcak dolgu üstünde beyaz okunur
 
     // Semantic (vurgu için, accent değil)
@@ -76,7 +76,7 @@ export const COLORS = {
 
     textPrimary:   "#F4F5F7",
     textSecondary: "#9CA0AA",
-    textMuted:     "#62666F",
+    textMuted:     "#7A7E87",
     textInverse:   "#0C0D11",
 
     success:       "#46E0A0",

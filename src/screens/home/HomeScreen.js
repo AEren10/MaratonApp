@@ -11,9 +11,6 @@ import { selectXP } from "../../store/slices/gamificationSlice";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { usePlanContext } from "../../hooks/usePlanContext";
-import { useAppDispatch } from "../../store/hooks";
-import { addAdHocTask } from "../../store/slices/planSlice";
-import { getSubjectByKey } from "../../themes/subjects";
 import { SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -37,20 +34,14 @@ import { XPToast } from "../../components/common/XPToast";
 import { GlowBackground, WARM_GLOW, GlassCard, SectionLabel } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeHero } from "./components/HomeHero";
-import { PriorityCard } from "./components/PriorityCard";
-import { PlanCard } from "./components/PlanCard";
+import { TodayPlanCard } from "./components/TodayPlanCard";
 import { RoundActions } from "./components/RoundActions";
 import { FeedbackStack } from "./components/FeedbackCard";
-import { MotivCard } from "./components/MotivCard";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
-import { DailyActionCard } from "./components/DailyActionCard";
 import { ExamCountdown } from "./components/ExamCountdown";
 import { MorningBriefing } from "./components/MorningBriefing";
-import { StudyListCard } from "./components/StudyListCard";
-import { TRIAL_TO_CURRICULUM } from "../../screens/trial/trialKeyMap";
 import { getAllSubjects } from "../trial/trialTypes";
-import { selectUserTasksProgress } from "../../store/slices/userTasksSlice";
 
 // QUICK_ITEMS palette HomeScreen içinde useC ile inşa edilir.
 
@@ -79,10 +70,9 @@ export default function HomeScreen() {
   const { reward, xpToast, dismissXP } = useGamification();
   const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
-  const userTasksProgress = useSelector(selectUserTasksProgress);
 
   const QUICK_ITEMS = useMemo(() => [
-    { icon: "edit",     label: "Kaydet",      c: C.amber,  go: SCREENS.ADD_STUDY },
+    { icon: "play",     label: "Çalış",       c: C.amber,  go: SCREENS.STUDY_TIMER },
     { icon: "chart",    label: "Deneme",      c: C.blue,   go: SCREENS.TRIAL_ENTRY },
     { icon: "camera",   label: "Yanlış Ekle", c: C.coral,  go: SCREENS.ADD_WRONG },
     { icon: "notebook", label: "Defterim",    c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
@@ -97,49 +87,22 @@ export default function HomeScreen() {
   const trials = useSelector(selectTrials);
   const xp = useSelector(selectXP);
 
-  const dispatch = useAppDispatch();
   const planCtx = usePlanContext();
   const nudges = useRecommendations();
   const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
   const weeklyReport = useWeeklyReport();
   const weeklyTrialReport = useWeeklyTrialReport();
-  const { suggestions: aiSuggestions, loading: aiLoading } = useAISuggestions();
+  const { suggestions: aiSuggestions } = useAISuggestions();
   const { refresh } = useSync();
   const [nudgeVisible, setNudgeVisible] = useState(false);
-  const [actionDismissed, setActionDismissed] = useState(false);
-
-  const todayActionKey = `@daily_action_done_${new Date().toISOString().split("T")[0]}`;
-  useEffect(() => {
-    AsyncStorage.getItem(todayActionKey).then((v) => { if (v) setActionDismissed(true); });
-  }, [todayActionKey]);
 
   const dailyAction = aiSuggestions && aiSuggestions.length ? aiSuggestions[0] : null;
 
-  const addActionToPlan = useCallback(() => {
-    if (!dailyAction) return;
-    const tKey = dailyAction.subjectKey;
-    const curr = tKey ? (TRIAL_TO_CURRICULUM[tKey]?.[0] || tKey) : null;
-    if (curr) {
-      const subj = getSubjectByKey(curr);
-      dispatch(addAdHocTask({
-        subject: curr,
-        subjectLabel: subj?.label || dailyAction.title,
-        reason: dailyAction.body,
-        questionCount: 20,
-        color: subj?.color || dailyAction.color,
-      }));
-    }
-    AsyncStorage.setItem(todayActionKey, "1");
-    setActionDismissed(true);
-    navigation.navigate(SCREENS.PLAN_DETAIL);
-  }, [dailyAction, dispatch, navigation, todayActionKey]);
-
-  const dismissAction = useCallback((persist) => {
-    if (persist) AsyncStorage.setItem(todayActionKey, "1");
-    setActionDismissed(true);
-  }, [todayActionKey]);
-
-  const go = (route) => () => navigation.navigate(route);
+  const goCache = useRef({});
+  const go = useCallback((route) => {
+    if (!goCache.current[route]) goCache.current[route] = () => navigation.navigate(route);
+    return goCache.current[route];
+  }, [navigation]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -169,7 +132,7 @@ export default function HomeScreen() {
     });
   }, [solvedToday, dailyGoal, reward]);
 
-  const { plan, topTask } = useMemo(() => {
+  const { plan, generatedTasks } = useMemo(() => {
     const generated = generateDailyPlan(planCtx);
     const totalQ = todayLogs.reduce((s, l) => s + (l.questionCount || 0), 0);
     const estHours = generated.estimatedMinutes >= 60
@@ -177,7 +140,7 @@ export default function HomeScreen() {
       : `~${generated.estimatedMinutes} dk`;
     return {
       plan: { total: generated.totalQuestions, done: totalQ, dersler: generated.tasks.length, hours: estHours },
-      topTask: generated.tasks[0] || null,
+      generatedTasks: generated.tasks,
     };
   }, [todayLogs, planCtx]);
 
@@ -236,7 +199,7 @@ export default function HomeScreen() {
           name={displayName}
           streak={streak}
           onProfilePress={go(SCREENS.PROFILE)}
-          onStreakPress={go(SCREENS.PROFILE)}
+          onStreakPress={go(SCREENS.CALENDAR)}
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
@@ -259,7 +222,7 @@ export default function HomeScreen() {
             xp={xp}
             tier={xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz"}
             onRingPress={go(SCREENS.ADD_STUDY)}
-            onStreak={go(SCREENS.PROFILE)}
+            onStreak={go(SCREENS.CALENDAR)}
             onNet={go(SCREENS.ANALYSIS)}
             onLeague={go(SCREENS.LEAGUE)}
           />
@@ -278,19 +241,17 @@ export default function HomeScreen() {
           <SectionLabel>SENİN İÇİN</SectionLabel>
           <View style={{ gap: 14 }}>
           <AnimatedCard delay={40}>
-            <PriorityCard task={topTask} plan={plan} onStart={go(SCREENS.PLAN_DETAIL)} />
-          </AnimatedCard>
-
-          <AnimatedCard delay={80}>
-            <StudyListCard
-              progress={userTasksProgress}
-              onNavigate={go(SCREENS.PLAN_DETAIL)}
-              onCreate={go(SCREENS.ADD_TASK)}
+            <TodayPlanCard
+              generatedTasks={generatedTasks}
+              aiSuggestion={dailyAction}
+              planSummary={plan}
+              onViewAll={go(SCREENS.PLAN_DETAIL)}
+              onAddTask={go(SCREENS.ADD_TASK)}
             />
           </AnimatedCard>
 
           {planCtx.srDue > 0 ? (
-            <AnimatedCard delay={120}>
+            <AnimatedCard delay={80}>
               <Pressable onPress={go(SCREENS.REVIEW_SESSION)}>
                 <View style={{
                   flexDirection: "row", alignItems: "center", gap: 12, padding: 16,
@@ -312,25 +273,13 @@ export default function HomeScreen() {
             </AnimatedCard>
           ) : null}
 
-          <AnimatedCard delay={200}>
+          <AnimatedCard delay={160}>
             <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.WEEKLY_REVIEW)} />
           </AnimatedCard>
 
-          <AnimatedCard delay={220}>
+          <AnimatedCard delay={180}>
             <WeeklyTrialCard report={weeklyTrialReport} onPress={go(SCREENS.WEEKLY_TRIAL_REVIEW)} />
           </AnimatedCard>
-
-          {!actionDismissed && (dailyAction || aiLoading) ? (
-            <AnimatedCard delay={260}>
-              <DailyActionCard
-                suggestion={dailyAction}
-                loading={aiLoading}
-                onAdd={addActionToPlan}
-                onUnderstood={() => dismissAction(true)}
-                onLater={() => dismissAction(false)}
-              />
-            </AnimatedCard>
-          ) : null}
 
           </View>
         </View>
@@ -377,15 +326,7 @@ export default function HomeScreen() {
         onAction={(nudge) => {
           setNudgeVisible(false);
           if (nudge.actionLabel === "Plana Ekle" && nudge.subject) {
-            const subj = getSubjectByKey(nudge.subject);
-            dispatch(addAdHocTask({
-              subject: nudge.subject,
-              subjectLabel: subj?.label || nudge.subject,
-              reason: nudge.message,
-              questionCount: 15,
-              color: subj?.color,
-            }));
-            navigation.navigate(SCREENS.PLAN_DETAIL);
+            navigation.navigate(SCREENS.ADD_TASK, { preSubject: nudge.subject });
           } else if (nudge.subject) {
             navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: nudge.subject });
           } else {

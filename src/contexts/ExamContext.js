@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "./AuthContext";
 import { getProfile } from "../supabase/profiles";
@@ -125,20 +125,21 @@ export function ExamProvider({ children }) {
 
   const onboardingDone = !!examType && !!targetRanking;
 
-  const daysUntilExam = examDate
-    ? (() => {
-        const now = new Date();
-        const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-        const examUTC = Date.UTC(examDate.getFullYear(), examDate.getMonth(), examDate.getDate());
-        return Math.max(0, Math.round((examUTC - todayUTC) / (1000 * 60 * 60 * 24)));
-      })()
-    : null;
+  const daysUntilExam = useMemo(() => {
+    if (!examDate) return null;
+    const now = new Date();
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const examUTC = Date.UTC(examDate.getFullYear(), examDate.getMonth(), examDate.getDate());
+    return Math.max(0, Math.round((examUTC - todayUTC) / (1000 * 60 * 60 * 24)));
+  }, [examDate]);
 
-  const value = {
+  const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment,
     daysUntilExam, loading, onboardingDone, hasSeenSlides,
     updateExamConfig, updateGoal, markSlidesAsSeen,
-  };
+  }), [examType, field, examDate, targetRanking, targetDepartment,
+    daysUntilExam, loading, onboardingDone, hasSeenSlides,
+    updateExamConfig, updateGoal, markSlidesAsSeen]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;
 }

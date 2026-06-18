@@ -55,7 +55,7 @@ export default function ForgotPasswordScreen() {
           contentContainerStyle={s.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Pressable onPress={goBack} hitSlop={12} style={s.back}>
+          <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={s.back}>
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
 

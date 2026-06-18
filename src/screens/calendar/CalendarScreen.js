@@ -11,6 +11,7 @@ import { getStudyLogs } from "../../supabase/studyLogs";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
+import { SCREENS } from "../../constants/screens";
 import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { MonthStats } from "./components/MonthStats";
@@ -41,6 +42,7 @@ export default function CalendarScreen() {
   const [monthDate, setMonthDate] = useState(() => new Date());
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [selectedDay, setSelectedDay] = useState(() => toIsoDate(new Date()));
 
   const monthStart = useMemo(() => startOfMonth(monthDate), [monthDate]);
@@ -53,6 +55,7 @@ export default function CalendarScreen() {
     }
     let cancelled = false;
     setLoading(true);
+    setLoadError(null);
     getStudyLogs(user.id, {
       from: toIsoDate(monthStart),
       to: toIsoDate(monthEnd),
@@ -60,8 +63,11 @@ export default function CalendarScreen() {
       .then((data) => {
         if (!cancelled) setLogs(data || []);
       })
-      .catch(() => {
-        if (!cancelled) setLogs([]);
+      .catch((e) => {
+        if (!cancelled) {
+          setLogs([]);
+          setLoadError(e?.message || "Veriler yüklenemedi");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -116,7 +122,7 @@ export default function CalendarScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={s.title}>Takvim</Text>
@@ -125,11 +131,11 @@ export default function CalendarScreen() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.monthHeader}>
-          <Pressable onPress={prevMonth} hitSlop={12} style={s.monthBtn}>
+          <Pressable onPress={prevMonth} hitSlop={12} accessibilityLabel="Önceki ay" accessibilityRole="button" style={s.monthBtn}>
             <Icon name="chevL" size={20} color={C.text} />
           </Pressable>
           <Text style={s.monthLabel}>{monthLabel(monthDate)}</Text>
-          <Pressable onPress={nextMonth} hitSlop={12} style={s.monthBtn}>
+          <Pressable onPress={nextMonth} hitSlop={12} accessibilityLabel="Sonraki ay" accessibilityRole="button" style={s.monthBtn}>
             <Icon name="chevR" size={20} color={C.text} />
           </Pressable>
         </Animated.View>
@@ -155,7 +161,7 @@ export default function CalendarScreen() {
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
-              <DayDetails day={selectedDay} data={selectedDayData} />
+              <DayDetails day={selectedDay} data={selectedDayData} onTrialPress={(t) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: t })} />
             </Animated.View>
           </>
         )}
