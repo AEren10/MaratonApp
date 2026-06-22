@@ -15,8 +15,8 @@ export function SubjectBreakdown({ subjects }) {
       padding: SPACING.lg, borderWidth: 1, borderColor: C.border,
     }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 16 }}>
-        <View style={{ width: 28, height: 28, borderRadius: 9, backgroundColor: C.purple + "18", alignItems: "center", justifyContent: "center" }}>
-          <Icon name="chart" size={14} color={C.purple} />
+        <View style={{ width: 28, height: 28, borderRadius: 9, backgroundColor: C.accent + "18", alignItems: "center", justifyContent: "center" }}>
+          <Icon name="chart" size={14} color={C.accent} />
         </View>
         <Text style={{ ...TYPOGRAPHY.bodySemiBold, fontSize: 14, color: C.text }}>Ders Dağılımı</Text>
       </View>

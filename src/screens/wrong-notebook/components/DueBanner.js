@@ -32,10 +32,10 @@ export function DueBanner({ dueCount, onClassic, onSwipe }) {
         </Pressable>
         <Pressable
           onPress={onSwipe}
-          style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.amber + "18" }}
+          style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, backgroundColor: C.accent + "18" }}
         >
-          <Icon name="layers" size={14} color={C.amber} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Swipe</Text>
+          <Icon name="layers" size={14} color={C.accent} />
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Swipe</Text>
         </Pressable>
       </View>
     </View>

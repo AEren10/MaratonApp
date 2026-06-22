@@ -93,11 +93,11 @@ const makeStyles = (C) => ({
     fontSize: 13,
   },
   selected: {
-    backgroundColor: C.amber,
+    backgroundColor: C.accent,
   },
   today: {
     borderWidth: 1.5,
-    borderColor: C.amber,
+    borderColor: C.accent,
   },
   trialDot: {
     position: "absolute",

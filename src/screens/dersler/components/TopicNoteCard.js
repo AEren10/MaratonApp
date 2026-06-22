@@ -39,7 +39,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
   return (
     <GlassCard radius={RADIUS.lg} style={s.card}>
       <View style={s.head}>
-        <Icon name="edit" size={15} color={C.amber} />
+        <Icon name="edit" size={15} color={C.accent} />
         <Text style={s.title}>Konu Notum</Text>
         {dirty ? (
           <Pressable onPress={save} disabled={saving} style={s.saveBtn}>
@@ -63,7 +63,7 @@ const makeStyles = (C) => StyleSheet.create({
   card: { padding: SPACING.md, marginTop: SPACING.md },
   head: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm },
   title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 },
-  saveBtn: { backgroundColor: C.amber, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.md, paddingVertical: 6 },
+  saveBtn: { backgroundColor: C.accent, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.md, paddingVertical: 6 },
   saveText: { ...TYPOGRAPHY.micro, color: C.bg },
   input: { ...TYPOGRAPHY.body, color: C.text, minHeight: 80, textAlignVertical: "top" },
 });

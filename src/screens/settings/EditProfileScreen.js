@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -102,7 +102,7 @@ export default function EditProfileScreen() {
   if (loading) {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <ActivityIndicator color={C.purple} style={{ marginTop: 60 }} />
+        <ActivityIndicator color={C.accent} style={{ marginTop: 60 }} />
       </SafeAreaView>
     );
   }
@@ -117,6 +117,7 @@ export default function EditProfileScreen() {
         <View style={{ width: 22 }} />
       </View>
 
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll}>
         <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
           <Pressable onPress={pickAvatar} style={s.avatarWrap}>
@@ -125,7 +126,7 @@ export default function EditProfileScreen() {
                 {avatarSource ? (
                   <Image source={avatarSource} style={s.avatarImg} contentFit="cover" cachePolicy="memory-disk" transition={200} />
                 ) : (
-                  <Text style={[s.avatarInitials, { color: C.purple }]}>{initials}</Text>
+                  <Text style={[s.avatarInitials, { color: C.accent }]}>{initials}</Text>
                 )}
                 {uploading && (
                   <View style={s.avatarOverlay}>
@@ -133,11 +134,11 @@ export default function EditProfileScreen() {
                   </View>
                 )}
               </View>
-              <View style={[s.cameraBadge, { backgroundColor: C.purple }]}>
+              <View style={[s.cameraBadge, { backgroundColor: C.accent }]}>
                 <Icon name="camera" size={14} color="#FFFFFF" />
               </View>
             </View>
-            <Text style={[s.changeText, { color: C.purple }]}>Fotoğrafı değiştir</Text>
+            <Text style={[s.changeText, { color: C.accent }]}>Fotoğrafı değiştir</Text>
           </Pressable>
         </Animated.View>
 
@@ -173,7 +174,7 @@ export default function EditProfileScreen() {
             disabled={saving}
             style={({ pressed }) => [
               s.saveBtn,
-              { backgroundColor: C.purple },
+              { backgroundColor: C.accent },
               (pressed || saving) && { opacity: 0.85 },
             ]}
           >
@@ -182,6 +183,7 @@ export default function EditProfileScreen() {
           </Pressable>
         </Animated.View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

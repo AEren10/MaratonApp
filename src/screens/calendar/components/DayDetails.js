@@ -25,7 +25,7 @@ function LogRow({ log, C, s }) {
       </View>
       <View style={s.metrics}>
         {log.question_count > 0 && (
-          <Text style={[s.metric, { color: C.amber }]}>{log.question_count} soru</Text>
+          <Text style={[s.metric, { color: C.accent }]}>{log.question_count} soru</Text>
         )}
         {log.duration_minutes > 0 && (
           <Text style={[s.metric, { color: C.blue }]}>{log.duration_minutes}dk</Text>
@@ -112,7 +112,7 @@ export function DayDetails({ day, data, onTrialPress }) {
         <Text style={styles.dayLabel}>{label}</Text>
         <View style={styles.empty}>
           <Icon name="moon" size={28} color={C.muted} />
-          <Text style={styles.emptyText}>Bu gün boş geçmiş</Text>
+          <Text style={styles.emptyText}>Bu gün dinlenme günü olmuş</Text>
         </View>
       </View>
     );

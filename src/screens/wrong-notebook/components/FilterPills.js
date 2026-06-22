@@ -10,6 +10,9 @@ const SUBJECT_LABELS = {
 export function FilterPill({ label, count, active, color, onPress }) {
   return (
     <Pressable
+      accessibilityRole="tab"
+      accessibilityLabel={count > 0 ? `${label}, ${count} yanlış` : label}
+      accessibilityState={{ selected: active }}
       onPress={onPress}
       style={{
         flexDirection: "row",

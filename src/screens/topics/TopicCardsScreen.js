@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, IconBox, Chip } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -52,7 +53,7 @@ export default function TopicCardsScreen() {
           title: r.topic_name || "Konu",
           count: r.total_questions || 0,
           mastered: r.correct_count || 0,
-          color: C.amber,
+          color: C.accent,
           icon: "hash",
         }));
         setCards(mapped.filter((c) => c.count > 0));
@@ -86,12 +87,14 @@ export default function TopicCardsScreen() {
       </View>
 
       {cards.length === 0 ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.xxxl }}>
-          <Icon name="bookOpen" size={48} color={C.muted} />
-          <Text style={[TYPOGRAPHY.body, { color: C.muted, marginTop: SPACING.lg, textAlign: "center" }]}>
-            Henuz konu ilerleme verisi yok. Soru cozerek kartlarini olustur!
-          </Text>
-        </View>
+        <EmptyState
+          icon="bookOpen"
+          title="Konu kartların burada oluşacak"
+          message="Soru çözdükçe her konunun ilerleme kartı otomatik olarak burada belirecek. İlk adımı at!"
+          actionLabel="Soru Çöz"
+          onAction={() => navigation.navigate(SCREENS.QUICK_PRACTICE)}
+          color="accent"
+        />
       ) : (
         <FlatList
           data={cards}
@@ -99,6 +102,8 @@ export default function TopicCardsScreen() {
           keyExtractor={keyExtractor}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          windowSize={5}
+          maxToRenderPerBatch={10}
           ItemSeparatorComponent={ItemSeparator}
         />
       )}

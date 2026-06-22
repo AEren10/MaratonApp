@@ -11,6 +11,14 @@ const storageKey = () => {
   return `@briefing_dismissed_${d}`;
 };
 
+function greet() {
+  const h = new Date().getHours();
+  if (h < 5) return "İyi geceler";
+  if (h < 12) return "Günaydın";
+  if (h < 18) return "İyi günler";
+  return "İyi akşamlar";
+}
+
 export function MorningBriefing({ userName, planTaskCount, srDueCount, streak, onStart, onDismiss }) {
   const C = useC();
   const [visible, setVisible] = useState(false);
@@ -47,7 +55,7 @@ export function MorningBriefing({ userName, planTaskCount, srDueCount, streak, o
         <Icon name="x" size={18} color={C.muted} sw={2} />
       </Pressable>
 
-      <Text style={s.greeting}>Günaydın, {userName}</Text>
+      <Text style={s.greeting}>{greet()}, {userName}</Text>
       <Text style={s.sub}>Bugünkü planına göz at</Text>
 
       <View style={s.pillRow}>
@@ -72,7 +80,7 @@ const makeStyles = (C) => StyleSheet.create({
     backgroundColor: C.surface,
     borderRadius: RADIUS.xxl,
     borderWidth: 1,
-    borderColor: C.amber + "30",
+    borderColor: C.accent + "30",
     padding: SPACING.xl,
     gap: SPACING.md,
   },

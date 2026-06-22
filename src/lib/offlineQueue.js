@@ -17,7 +17,8 @@ async function readQueue() {
   try {
     const raw = await AsyncStorage.getItem(QUEUE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch (_) {
+  } catch (e) {
+    if (__DEV__) console.warn("[offlineQueue] readQueue", e);
     return [];
   }
 }
@@ -25,7 +26,9 @@ async function readQueue() {
 async function writeQueue(items) {
   try {
     await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(items));
-  } catch (_) {}
+  } catch (e) {
+    if (__DEV__) console.warn("[offlineQueue] writeQueue", e);
+  }
 }
 
 const MAX_QUEUE_SIZE = 200;
@@ -67,7 +70,12 @@ async function runOne(item) {
   }
 }
 
+let _flushing = false;
+
 export async function flushQueue() {
+  if (_flushing) return { processed: 0, failed: 0, types: [] };
+  _flushing = true;
+  try {
   const list = await readQueue();
   if (!list.length) return { processed: 0, failed: 0, types: [] };
 
@@ -91,6 +99,7 @@ export async function flushQueue() {
 
   await writeQueue(remaining);
   return { processed, failed, types: processedTypes };
+  } finally { _flushing = false; }
 }
 
 export async function clearQueue() {

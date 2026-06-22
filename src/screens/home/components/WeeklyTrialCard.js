@@ -9,7 +9,7 @@ function StatBlock({ value, label, color, C }) {
       <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color }}>
         {value}
       </Text>
-      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, marginTop: 2 }}>
+      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color, opacity: 0.7, marginTop: 2 }}>
         {label}
       </Text>
     </View>
@@ -34,10 +34,10 @@ export function WeeklyTrialCard({ report, onPress }) {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <View style={{
               width: 30, height: 30, borderRadius: 10,
-              backgroundColor: C.purple + "1A",
+              backgroundColor: C.accent + "14",
               alignItems: "center", justifyContent: "center",
             }}>
-              <Icon name="target" size={15} color={C.purple} />
+              <Icon name="target" size={15} color={C.accent} />
             </View>
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
               Haftalık Deneme
@@ -54,10 +54,10 @@ export function WeeklyTrialCard({ report, onPress }) {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <StatBlock C={C} value={String(report.count)} label="Deneme" color={C.purple} />
-          <StatBlock C={C} value={report.avgNet} label="Ort. Net" color={C.amber} />
+          <StatBlock C={C} value={String(report.count)} label="Deneme" color={C.blue} />
+          <StatBlock C={C} value={report.avgNet} label="Ort. Net" color={C.purple} />
           <StatBlock C={C} value={report.bestNet} label="En İyi" color={C.green} />
-          <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" color={C.blue} />
+          <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" color={C.orange} />
         </View>
 
         <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>

@@ -11,19 +11,19 @@ export function StreakCard({ streak, best, freezeCount = 0, onPress }) {
         flex: 1,
         padding: 16,
         borderRadius: 24,
-        backgroundColor: C.coral + "16",
+        backgroundColor: C.orange + "16",
         borderWidth: 1,
-        borderColor: C.coral + "30",
+        borderColor: C.orange + "30",
         opacity: pressed ? 0.92 : 1,
       })}
     >
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <View style={{
           width: 36, height: 36, borderRadius: 12,
-          backgroundColor: C.coral + "24",
+          backgroundColor: C.orange + "24",
           alignItems: "center", justifyContent: "center",
         }}>
-          <Icon name="flame" size={20} color={C.coral} />
+          <Icon name="flame" size={20} color={C.orange} />
         </View>
         {freezeCount > 0 ? (
           <View
@@ -38,7 +38,7 @@ export function StreakCard({ streak, best, freezeCount = 0, onPress }) {
             }}
           >
             <Icon name="shield" size={11} color={C.blue} />
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 10, color: C.blue }}>
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.blue }}>
               {freezeCount} joker
             </Text>
           </View>

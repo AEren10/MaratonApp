@@ -9,21 +9,26 @@ import * as haptic from "../../../lib/haptics";
 
 // Whoop iskeleti: dev animasyonlu ring + nabız atan streak ateşi + ince ayraçlı stat rayı.
 // Kart yığını YOK — tek nefes, hareket dolu hero.
-function StatCell({ label, value, decimals, color, valueColor, icon, trend, trendColor, delay = 0, onPress }) {
+function StatCell({ label, value, decimals, color, valueColor, icon, trend, trendColor, delay = 0, onPress, dormantHint }) {
+  const isDormant = dormantHint && value === 0;
   return (
     <Animated.View entering={FadeInDown.delay(delay).duration(440).springify().damping(16)} style={{ flex: 1 }}>
       <Pressable onPress={onPress} style={s.cell}>
-        <View style={[s.cellChip, { backgroundColor: color + "1F" }]}>
-          <Icon name={icon} size={13} color={color} sw={2.6} />
+        <View style={[s.cellChip, { backgroundColor: color + (isDormant ? "12" : "1F") }]}>
+          <Icon name={icon} size={13} color={color} sw={2.6} style={isDormant ? { opacity: 0.5 } : undefined} />
         </View>
-        <View style={s.cellValRow}>
-          <AnimatedNumber
-            value={value}
-            format={(v) => (decimals ? v.toFixed(1) : Math.round(v))}
-            style={[s.cellValue, { color: valueColor }]}
-          />
-          {trend ? <Icon name={trend > 0 ? "trendUp" : "trendDown"} size={13} color={trendColor} sw={2.6} /> : null}
-        </View>
+        {isDormant ? (
+          <Text style={[s.cellDormant, { color: valueColor }]} numberOfLines={1}>{dormantHint}</Text>
+        ) : (
+          <View style={s.cellValRow}>
+            <AnimatedNumber
+              value={value}
+              format={(v) => (decimals ? v.toFixed(1) : Math.round(v))}
+              style={[s.cellValue, { color: valueColor }]}
+            />
+            {trend ? <Icon name={trend > 0 ? "trendUp" : "trendDown"} size={13} color={trendColor} sw={2.6} /> : null}
+          </View>
+        )}
         <Text style={[s.cellLabel, { color }]}>{label}</Text>
       </Pressable>
     </Animated.View>
@@ -36,6 +41,7 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
   const pct = Math.min(1, solved / safeGoal);
   const done = solved >= safeGoal;
   const ringColor = done ? C.green : C.accent;
+  const isNewUser = solved === 0 && streak === 0 && net === 0 && xp === 0;
 
   const [sparkVisible, setSparkVisible] = useState(false);
   const prevDone = useRef(done);
@@ -43,6 +49,18 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
     if (done && !prevDone.current) setSparkVisible(true);
     prevDone.current = done;
   }, [done]);
+
+  // Yeni kullanıcı play icon pulse
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    if (isNewUser) {
+      pulse.value = withRepeat(withSequence(
+        withTiming(1.08, { duration: 1200, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.quad) })
+      ), -1, false);
+    } else { pulse.value = 1; }
+  }, [isNewUser]);
+  const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
   // Hedef bitince: nabız atan glow halesi (konfeti değil — sakin parıltı)
   const glow = useSharedValue(0);
@@ -63,22 +81,34 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
           <Animated.View pointerEvents="none" style={[{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignSelf: "center", borderRadius: 110, backgroundColor: ringColor }, glowStyle]} />
         ) : null}
         <ProgressRing size={196} stroke={15} value={pct} color={ringColor} trackColor={C.surface2 || C.border}>
-          <Text style={[s.ringTop, { color: C.muted }]}>BUGÜN ÇÖZÜLEN</Text>
-          <View style={s.ringValRow}>
-            <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
-          </View>
-          <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
-          <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
+          {isNewUser ? (
+            <>
+              <Text style={[s.ringTop, { color: C.muted }]}>BAŞLANGIÇ NOKTASIN</Text>
+              <Animated.View style={pulseStyle}>
+                <Icon name="play" size={40} color={C.accent} sw={2} />
+              </Animated.View>
+              <Text style={[s.ringSub, { color: C.sec, marginTop: 6 }]}>İlk çalışmanı kaydet</Text>
+            </>
+          ) : (
+            <>
+              <Text style={[s.ringTop, { color: C.muted }]}>BUGÜN ÇÖZÜLEN</Text>
+              <View style={s.ringValRow}>
+                <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
+              </View>
+              <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
+              <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
+            </>
+          )}
         </ProgressRing>
         <SparkBurst trigger={sparkVisible} onDone={() => setSparkVisible(false)} />
       </Pressable>
 
       <View style={[s.rail, { borderColor: C.border }]}>
-        <StatCell label="SERİ" value={streak} color={C.coral} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} />
+        <StatCell label="SERİ" value={streak} color={C.orange} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label="SON NET" value={net} decimals color={C.blue} valueColor={C.text} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} />
+        <StatCell label="SON NET" value={net} decimals color={C.blue} valueColor={C.text} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label={tier.toUpperCase()} value={xp} color={C.purple} valueColor={C.text} icon="trophy" delay={280} onPress={onLeague} />
+        <StatCell label={tier.toUpperCase()} value={xp} color={C.amber} valueColor={C.text} icon="trophy" delay={280} onPress={onLeague} dormantHint={isNewUser ? "XP kazan" : null} />
       </View>
     </Animated.View>
   );
@@ -87,16 +117,17 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
 const s = StyleSheet.create({
   wrap: { alignItems: "center", paddingTop: 8 },
   ringWrap: { marginTop: 18, marginBottom: 22 },
-  ringTop: { fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  ringTop: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 1, marginBottom: 2 },
   ringValRow: { flexDirection: "row", alignItems: "flex-start" },
   ringVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 62, lineHeight: 64, letterSpacing: -2 },
   ringSub: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 2 },
-  ringHint: { fontFamily: "Inter_400Regular", fontSize: 10, marginTop: 6, letterSpacing: 0.5 },
+  ringHint: { fontFamily: "Inter_400Regular", fontSize: 11, marginTop: 6, letterSpacing: 0.5 },
   rail: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", borderWidth: 1, borderRadius: 20, paddingVertical: 14 },
   cell: { flex: 1, alignItems: "center", gap: 5 },
   cellChip: { width: 26, height: 26, borderRadius: 9, alignItems: "center", justifyContent: "center" },
   cellValRow: { flexDirection: "row", alignItems: "center", gap: 3 },
-  cellLabel: { fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 0.4 },
+  cellLabel: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 0.4 },
   cellValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, letterSpacing: -0.6 },
+  cellDormant: { fontFamily: "Inter_500Medium", fontSize: 13, letterSpacing: -0.1 },
   div: { width: 1, height: 34 },
 });

@@ -21,7 +21,7 @@ const makeStyles = (C) => ({
   },
   value: {
     ...TYPOGRAPHY.statSmall,
-    color: C.amber,
+    color: C.accent,
   },
 });
 

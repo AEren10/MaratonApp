@@ -22,8 +22,8 @@ function StatPill({ icon, value, label, color, C }) {
       <View style={[st.statIcon, { backgroundColor: color + "18" }]}>
         <Icon name={icon} size={16} color={color} />
       </View>
-      <Text style={[st.statVal, { color: C.text }]}>{value}</Text>
-      <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, fontSize: 10 }}>{label}</Text>
+      <Text style={[st.statVal, { color }]}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.caption, color, opacity: 0.7, fontSize: 11 }}>{label}</Text>
     </View>
   );
 }
@@ -99,7 +99,7 @@ export default function TrialSummaryScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={[st.safe, { backgroundColor: C.bg }]}>
+    <SafeAreaView edges={["top"]} style={[st.safe, { backgroundColor: C.bg }]}>
       <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm }}>
         <Pressable
           onPress={() => navigation.replace(SCREENS.TRIAL_DETAIL, { trial, fromEntry: false })}
@@ -129,7 +129,7 @@ export default function TrialSummaryScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(380)} style={st.netBox}>
-          <Text style={[st.netNum, { color: C.text }]}>{(trial.totalNet || 0).toFixed(1)}</Text>
+          <Text style={[st.netNum, { color: typeColor }]}>{(trial.totalNet || 0).toFixed(1)}</Text>
           <Text style={[st.netLabel, { color: typeColor }]}>TOPLAM NET</Text>
           {trend !== 0 && (
             <View style={[st.trendPill, { backgroundColor: (trend > 0 ? C.green : C.red) + "16" }]}>
@@ -144,7 +144,7 @@ export default function TrialSummaryScreen() {
         <Animated.View entering={FadeInDown.delay(460)} style={st.statsRow}>
           <StatPill icon="check" value={String(totalCorrect)} label="Doğru" color={C.green} C={C} />
           <StatPill icon="x" value={String(totalWrong)} label="Yanlış" color={C.red} C={C} />
-          <StatPill icon="hash" value={`#${sameType.length + 1}`} label="Deneme" color={C.purple} C={C} />
+          <StatPill icon="hash" value={`#${sameType.length + 1}`} label="Deneme" color={C.accent} C={C} />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(540)} style={[st.barsCard, { backgroundColor: C.surface, borderColor: C.border }]}>
@@ -165,7 +165,7 @@ export default function TrialSummaryScreen() {
 
         <Animated.View entering={FadeInDown.delay(620)} style={st.actions}>
           <Pressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={({ pressed }) => [st.shareBtn, { backgroundColor: C.surface, borderColor: C.border, opacity: pressed ? 0.85 : 1 }]}>
-            <Icon name="share" size={18} color={C.amber} />
+            <Icon name="share" size={18} color={C.accent} />
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>Paylaş</Text>
           </Pressable>
           <Pressable

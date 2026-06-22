@@ -5,9 +5,9 @@
 export const LEAGUE_TIERS = [
   { key: "bronz", name: "Bronz", icon: "medal", color: "#CD7F47", minXP: 0 },
   { key: "gumus", name: "Gümüş", icon: "medal", color: "#C0C5CE", minXP: 150 },
-  { key: "altin", name: "Altın", icon: "trophy", color: "#EBAE63", minXP: 400 },
-  { key: "elmas", name: "Elmas", icon: "award", color: "#5EE7E7", minXP: 800 },
-  { key: "obsidyen", name: "Obsidyen", icon: "crown", color: "#8B7FD6", minXP: 1500 },
+  { key: "altin", name: "Altın", icon: "trophy", color: "#fbbf24", minXP: 400 },
+  { key: "elmas", name: "Elmas", icon: "award", color: "#22d3ee", minXP: 800 },
+  { key: "obsidyen", name: "Obsidyen", icon: "crown", color: "#c084fc", minXP: 1500 },
 ];
 
 export function getTier(weeklyXP) {

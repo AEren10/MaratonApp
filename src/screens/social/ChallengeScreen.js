@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -60,8 +60,8 @@ export default function ChallengeScreen() {
   }, [pick, load]);
 
   const handleCancel = useCallback(async (id) => {
-    try { await cancelChallenge(id); load(); } catch {}
-  }, [load]);
+    try { await cancelChallenge(id, user.id); load(); } catch {}
+  }, [load, user.id]);
 
   const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);
   const past = useMemo(() => challenges.filter((c) => c.status !== "active" && c.status !== "pending"), [challenges]);
@@ -70,7 +70,7 @@ export default function ChallengeScreen() {
 
   const renderItem = useCallback(({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />, [user, handleCancel, s, C]);
 
-  if (loading) return <SafeAreaView style={s.safe}><View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View></SafeAreaView>;
+  if (loading) return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
 
   if (creating) {
     return (
@@ -84,9 +84,9 @@ export default function ChallengeScreen() {
           {step === 0 && (
             <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Arkadaş Seç</Text>
-              {friends.length === 0 ? <EmptyState icon="users" title="Henüz arkadaşın yok" message="Challenge başlatmak için arkadaş ekle" /> : friends.map((f) => (
-                <Pressable key={f.id} onPress={() => { setPick((p) => ({ ...p, friend: f })); setStep(1); }}
-                  style={[s.optionRow, pick.friend?.id === f.id && { borderColor: C.amber }]}>
+              {friends.length === 0 ? <EmptyState icon="users" title="Rakibini bul" message="Challenge başlatmak için arkadaş ekle" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
+                <Pressable key={f.id} onPress={() => { H.select(); setPick((p) => ({ ...p, friend: f })); setStep(1); }}
+                  style={[s.optionRow, pick.friend?.id === f.id && { borderColor: C.accent }]}>
                   <Icon name="user" size={16} color={C.sec} />
                   <Text style={s.optionText}>{f.name || "Kullanıcı"}</Text>
                 </Pressable>
@@ -97,9 +97,9 @@ export default function ChallengeScreen() {
             <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Metrik Seç</Text>
               {METRICS.map((m) => (
-                <Pressable key={m.key} onPress={() => { setPick((p) => ({ ...p, metric: m.key })); setStep(2); }}
+                <Pressable key={m.key} onPress={() => { H.select(); setPick((p) => ({ ...p, metric: m.key })); setStep(2); }}
                   style={s.optionRow}>
-                  <Icon name={m.icon} size={16} color={C.amber} />
+                  <Icon name={m.icon} size={16} color={C.accent} />
                   <Text style={s.optionText}>{m.label}</Text>
                 </Pressable>
               ))}
@@ -109,13 +109,13 @@ export default function ChallengeScreen() {
             <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Hedef Seç</Text>
               {(METRICS.find((m) => m.key === pick.metric)?.targets || []).map((t) => (
-                <Pressable key={t} onPress={() => { setPick((p) => ({ ...p, target: t })); }}
-                  style={[s.optionRow, pick.target === t && { borderColor: C.amber }]}>
+                <Pressable key={t} onPress={() => { H.select(); setPick((p) => ({ ...p, target: t })); }}
+                  style={[s.optionRow, pick.target === t && { borderColor: C.accent }]}>
                   <Text style={s.optionText}>{t}</Text>
                 </Pressable>
               ))}
               {pick.target && (
-                <Pressable onPress={handleCreate} style={s.cta}>
+                <Pressable onPress={() => { H.medium(); handleCreate(); }} style={s.cta}>
                   <Text style={s.ctaText}>Gönder</Text>
                 </Pressable>
               )}
@@ -129,15 +129,15 @@ export default function ChallengeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}><Icon name="arrowL" size={20} color={C.text} /></Pressable>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner"><Icon name="arrowL" size={20} color={C.text} /></Pressable>
         <Text style={s.title}>Challenges</Text>
-        <Pressable onPress={() => setCreating(true)} hitSlop={12}><Icon name="plus" size={20} color={C.amber} /></Pressable>
+        <Pressable onPress={() => setCreating(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Yeni challenge" accessibilityHint="Yeni challenge oluşturmaya başlar"><Icon name="plus" size={20} color={C.accent} /></Pressable>
       </View>
 
       <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.tabs}>
         {["active", "past"].map((t) => (
-          <Pressable key={t} onPress={() => setTab(t)} style={[s.tab, tab === t && { backgroundColor: C.amber + "18" }]}>
-            <Text style={[s.tabText, tab === t && { color: C.amber }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
+          <Pressable key={t} onPress={() => { H.tap(); setTab(t); }} accessibilityRole="tab" accessibilityLabel={t === "active" ? "Aktif" : "Geçmiş"} accessibilityHint="Challenge listesini filtreler" style={[s.tab, tab === t && { backgroundColor: C.accent + "18" }]}>
+            <Text style={[s.tabText, tab === t && { color: C.accent }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
           </Pressable>
         ))}
       </Animated.View>
@@ -146,14 +146,16 @@ export default function ChallengeScreen() {
         data={shown}
         keyExtractor={(i) => i.id}
         contentContainerStyle={{ padding: SPACING.lg, gap: SPACING.md }}
-        ListEmptyComponent={<EmptyState icon="zap" title="Henüz challenge yok" message="Yeni bir challenge oluşturarak arkadaşlarınla yarış" actionLabel="Challenge Oluştur" onAction={() => setCreating(true)} />}
+        windowSize={5}
+        maxToRenderPerBatch={10}
+        ListEmptyComponent={<EmptyState icon="zap" title="Arkadaşlarınla yarışarak motive ol" message="Bir challenge oluştur, kimin daha çok çözdüğünü görün" actionLabel="Challenge Oluştur" onAction={() => setCreating(true)} color="accent" />}
         renderItem={renderItem}
       />
     </SafeAreaView>
   );
 }
 
-function ChallengeCard({ item, user, handleCancel, s, C }) {
+const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCancel, s, C }) {
   const isCreator = item.creator_id === user.id;
   const opponent = isCreator ? item.opponent : item.creator;
   const myProgress = isCreator ? item.creator_progress : item.opponent_progress;
@@ -183,7 +185,7 @@ function ChallengeCard({ item, user, handleCancel, s, C }) {
         </View>
         <View style={s.progressRow}>
           <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
-          <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.amber }]} /></View>
+          <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.accent }]} /></View>
           <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
         </View>
         {expanded && (
@@ -208,7 +210,7 @@ function ChallengeCard({ item, user, handleCancel, s, C }) {
       </Animated.View>
     </Pressable>
   );
-}
+});
 
 function makeStyles(C) {
   return StyleSheet.create({
@@ -232,7 +234,7 @@ function makeStyles(C) {
     stepLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     optionRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border },
     optionText: { ...TYPOGRAPHY.bodyMedium, color: C.text },
-    cta: { backgroundColor: C.amber, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, alignItems: "center" },
+    cta: { backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, alignItems: "center" },
     ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
   });
 }

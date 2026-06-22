@@ -115,7 +115,7 @@ export function LiveCard({ count = 0, avatars = [], onPress }) {
               key={i}
               style={{
                 width: 24, height: 24, borderRadius: 12,
-                backgroundColor: [C.purple, C.amber, C.blue, C.coral][i % 4],
+                backgroundColor: [C.purple, C.teal, C.blue, C.accent][i % 4],
                 alignItems: "center", justifyContent: "center",
                 marginLeft: i ? -7 : 0,
                 borderWidth: 2,

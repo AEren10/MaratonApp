@@ -39,12 +39,12 @@ export function TaskReasonSheet({ task, trials, onClose }) {
           {task ? (
             <>
               <View style={s.titleRow}>
-                <View style={[s.dot, { backgroundColor: task.s?.color || C.amber }]} />
+                <View style={[s.dot, { backgroundColor: task.s?.color || C.accent }]} />
                 <Text style={s.title}>{task.topic}</Text>
               </View>
 
               <View style={s.reasonBox}>
-                <Icon name="info" size={16} color={C.amber} />
+                <Icon name="info" size={16} color={C.accent} />
                 <Text style={s.reasonText}>{task.reason}</Text>
               </View>
 
@@ -52,7 +52,7 @@ export function TaskReasonSheet({ task, trials, onClose }) {
 
               {trend.data.length >= 2 ? (
                 <View style={{ marginTop: SPACING.lg }}>
-                  <TrendChart data={trend.data} labels={trend.labels} color={task.s?.color || C.amber} title="Bu derste net trendi" />
+                  <TrendChart data={trend.data} labels={trend.labels} color={task.s?.color || C.accent} title="Bu derste net trendi" />
                 </View>
               ) : (
                 <Text style={s.empty}>Net trendi için en az 2 deneme gerek.</Text>
@@ -70,11 +70,11 @@ export function TaskReasonSheet({ task, trials, onClose }) {
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "#000000AA", justifyContent: "flex-end" },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
   sheet: {
     backgroundColor: C.surface,
-    borderTopLeftRadius: RADIUS.xxl,
-    borderTopRightRadius: RADIUS.xxl,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     padding: SPACING.lg,
     paddingBottom: SPACING.xxxl,
   },
@@ -86,7 +86,7 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.sm,
-    backgroundColor: C.amber + "12",
+    backgroundColor: C.accent + "12",
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     marginTop: SPACING.md,

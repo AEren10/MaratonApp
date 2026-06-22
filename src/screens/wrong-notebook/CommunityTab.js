@@ -232,9 +232,9 @@ export function CommunityTab({ visible, onSwitchToMine }) {
       ) : filtered.length === 0 ? (
         <EmptyState
           icon="globe"
-          title="Topluluk henüz boş"
-          message="Yanlış defterinden bir soru paylaşarak topluluğu başlat! Diğer öğrenciler çözüm önerebilir."
-          actionLabel="Defterime Git"
+          title="Binlerce öğrenci birlikte çalışıyor"
+          message="Yanlış defterinden bir soru paylaş — diğer adaylar çözüm önersin, sen de onlarınkine bak. Sınava en iyi hazırlık başkalarının hatalarından öğrenmek."
+          actionLabel="İlk Soruyu Paylaş"
           onAction={onSwitchToMine}
           color="accent"
         />
@@ -242,6 +242,8 @@ export function CommunityTab({ visible, onSwitchToMine }) {
         <FlatList
           data={filtered} renderItem={renderItem}
           keyExtractor={(i) => i.id} showsVerticalScrollIndicator={false}
+          windowSize={5}
+          maxToRenderPerBatch={10}
           contentContainerStyle={{ gap: SPACING.md, paddingHorizontal: 16, paddingBottom: 100 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}
             tintColor={C.accent} colors={[C.accent]} />}

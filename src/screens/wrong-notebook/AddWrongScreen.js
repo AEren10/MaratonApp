@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -16,10 +16,9 @@ import { uploadWrongQuestionImage } from "../../supabase/storage";
 import { saveWrongQuestionOffline } from "../../lib/offlineQueue";
 import { initialReview } from "../../lib/spacedRepetition";
 import { TopicPicker } from "./components/TopicPicker";
+import { AnswerSelector } from "./components/AnswerSelector";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
-
-const ANSWERS = ["A", "B", "C", "D", "E"];
 
 export default function AddWrongScreen() {
   const C = useC();
@@ -120,6 +119,7 @@ export default function AddWrongScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View
         style={{
           flexDirection: "row",
@@ -205,75 +205,12 @@ export default function AddWrongScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
-          <Label C={C}>Şıklar</Label>
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            <View style={{ flex: 1 }}>
-              <Text style={makeMiniLabel(C)}>Cevabın</Text>
-              <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
-                {ANSWERS.map((a) => {
-                  const active = myAnswer === a;
-                  return (
-                    <Pressable
-                      key={a}
-                      onPress={() => setMyAnswer(a)}
-                      style={{
-                        flex: 1,
-                        paddingVertical: 10,
-                        borderRadius: 10,
-                        backgroundColor: active ? C.red + "22" : C.surface,
-                        borderWidth: 1,
-                        borderColor: active ? C.red : C.border,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: "Inter_600SemiBold",
-                          fontSize: 13,
-                          color: active ? C.red : C.sec,
-                        }}
-                      >
-                        {a}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Text style={makeMiniLabel(C)}>Doğru Cevap</Text>
-            <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
-              {ANSWERS.map((a) => {
-                const active = correctAnswer === a;
-                return (
-                  <Pressable
-                    key={a}
-                    onPress={() => setCorrectAnswer(a)}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 10,
-                      borderRadius: 10,
-                      backgroundColor: active ? C.green + "22" : C.surface,
-                      borderWidth: 1,
-                      borderColor: active ? C.green : C.border,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: "Inter_600SemiBold",
-                        fontSize: 13,
-                        color: active ? C.green : C.sec,
-                      }}
-                    >
-                      {a}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
+          <AnswerSelector
+            myAnswer={myAnswer}
+            correctAnswer={correctAnswer}
+            onMyAnswer={setMyAnswer}
+            onCorrectAnswer={setCorrectAnswer}
+          />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
@@ -297,7 +234,7 @@ export default function AddWrongScreen() {
               borderRadius: 16,
               backgroundColor: C.surface,
               borderWidth: 1,
-              borderColor: image ? C.amber + "40" : C.border,
+              borderColor: image ? C.accent + "40" : C.border,
               borderStyle: image ? "solid" : "dashed",
               alignItems: "center",
               justifyContent: "center",
@@ -345,7 +282,7 @@ export default function AddWrongScreen() {
           onPress={save}
           disabled={saving}
           style={({ pressed }) => ({
-            backgroundColor: saving ? C.surface2 : C.amber,
+            backgroundColor: saving ? C.surface2 : C.accent,
             borderRadius: 16,
             paddingVertical: 16,
             alignItems: "center",
@@ -369,6 +306,7 @@ export default function AddWrongScreen() {
       />
       <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -383,14 +321,6 @@ const makeInputStyle = (C) => ({
   fontFamily: "Inter_400Regular",
   fontSize: 15,
   color: C.text,
-});
-
-const makeMiniLabel = (C) => ({
-  fontFamily: "Inter_500Medium",
-  fontSize: 11,
-  color: C.muted,
-  letterSpacing: 0.4,
-  textTransform: "uppercase",
 });
 
 function Label({ children, C }) {

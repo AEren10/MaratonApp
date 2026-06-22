@@ -1,9 +1,11 @@
 import { supabase } from "./client";
 
+const WQ_COLUMNS = "id, user_id, subject, topic, image_path, note, is_resolved, created_at, my_answer, correct_answer, next_review_at, interval_days, ease, last_reviewed_at, topic_source";
+
 export const getWrongQuestions = async (userId, { subject, resolved } = {}) => {
   let query = supabase
     .from("wrong_questions")
-    .select("*")
+    .select(WQ_COLUMNS)
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -13,6 +15,15 @@ export const getWrongQuestions = async (userId, { subject, resolved } = {}) => {
   const { data, error } = await query;
   if (error) throw error;
   return data;
+};
+
+export const getWrongQuestionCount = async (userId) => {
+  const { count, error } = await supabase
+    .from("wrong_questions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+  if (error) throw error;
+  return count ?? 0;
 };
 
 export const addWrongQuestion = async (question) => {
@@ -25,13 +36,13 @@ export const addWrongQuestion = async (question) => {
   return data;
 };
 
-export const resolveWrongQuestion = async (id) => {
-  const { data, error } = await supabase
+export const resolveWrongQuestion = async (id, userId) => {
+  let query = supabase
     .from("wrong_questions")
     .update({ is_resolved: true })
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query.select().single();
   if (error) throw error;
   return data;
 };
@@ -41,7 +52,7 @@ export const getDueWrongQuestions = async (userId) => {
   const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("wrong_questions")
-    .select("*")
+    .select(WQ_COLUMNS)
     .eq("user_id", userId)
     .eq("is_resolved", false)
     .not("next_review_at", "is", null)
@@ -52,22 +63,24 @@ export const getDueWrongQuestions = async (userId) => {
 };
 
 // SR güncellemesi (tekrar sonrası interval/ease/next_review_at).
-export const reviewWrongQuestion = async (id, updates) => {
-  const { data, error } = await supabase
+export const reviewWrongQuestion = async (id, userId, updates) => {
+  let query = supabase
     .from("wrong_questions")
     .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query.select().single();
   if (error) throw error;
   return data;
 };
 
-export const deleteWrongQuestion = async (id) => {
-  const { error } = await supabase
+export const deleteWrongQuestion = async (id, userId) => {
+  let query = supabase
     .from("wrong_questions")
     .delete()
     .eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { error } = await query;
   if (error) throw error;
 };
 

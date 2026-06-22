@@ -71,11 +71,13 @@ export async function shareQuestion({
   return data;
 }
 
-export async function unshareQuestion(id) {
-  const { error } = await supabase
+export async function unshareQuestion(id, userId) {
+  let query = supabase
     .from("shared_questions")
     .delete()
     .eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { error } = await query;
   if (error) throw error;
 }
 
@@ -159,4 +161,14 @@ export async function isQuestionShared(wrongQuestionId) {
     .eq("wrong_question_id", wrongQuestionId);
   if (error) throw error;
   return count > 0;
+}
+
+export async function getSharedQuestionIds(wrongQuestionIds) {
+  if (!wrongQuestionIds.length) return new Set();
+  const { data, error } = await supabase
+    .from("shared_questions")
+    .select("wrong_question_id")
+    .in("wrong_question_id", wrongQuestionIds);
+  if (error) throw error;
+  return new Set((data || []).map((r) => r.wrong_question_id));
 }

@@ -15,11 +15,11 @@ function avatarPalette(name = "?", C) {
   const sum = name.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
   // Canlı solid → aynı tonun yarı saydamı: token-driven, dark/light tutarlı.
   const palette = [
-    [C.accent, C.coral + "CC"],
+    [C.accent, C.accent + "CC"],
     [C.purple, C.pink + "CC"],
     [C.blue,   C.teal + "CC"],
     [C.pink,   C.purple + "CC"],
-    [C.amber,  C.accent + "CC"],
+    [C.green,  C.teal + "CC"],
     [C.teal,   C.blue + "CC"],
   ];
   return palette[sum % palette.length];
@@ -103,7 +103,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
           overflow: "hidden",
           backgroundColor: C.surface2,
           borderWidth: 3,
-          borderColor: C.amber + "55",
+          borderColor: C.accent + "55",
         }}>
           {avatarUri ? (
             <Image
@@ -145,7 +145,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
           position: "absolute",
           bottom: 4, right: 4,
           width: 38, height: 38, borderRadius: 19,
-          backgroundColor: C.amber,
+          backgroundColor: C.accent,
           alignItems: "center", justifyContent: "center",
           borderWidth: 3,
           borderColor: C.bg,
@@ -180,19 +180,19 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
       {/* === Lig chip === */}
       <View style={{
         flexDirection: "row", alignItems: "center", gap: 6,
-        backgroundColor: C.amber + "18",
+        backgroundColor: C.accent + "18",
         borderWidth: 1,
-        borderColor: C.amber + "40",
+        borderColor: C.accent + "40",
         paddingHorizontal: 12, paddingVertical: 6,
         borderRadius: 999,
         marginTop: 14,
         alignSelf: "center",
       }}>
-        {league?.icon ? <Icon name={league.icon} size={13} color={C.amber} /> : null}
+        {league?.icon ? <Icon name={league.icon} size={13} color={C.accent} /> : null}
         <Text style={{
           fontFamily: "Inter_600SemiBold",
           fontSize: 12,
-          color: C.amber,
+          color: C.accent,
           letterSpacing: 0.4,
         }}>
           {league?.name || "Bronz Lig"}

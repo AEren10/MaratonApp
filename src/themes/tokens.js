@@ -33,7 +33,7 @@ export const COLORS = {
     // Text stack — nötr ink (mor değil)
     textPrimary:   "#15161A",  // near-black ink
     textSecondary: "#56585F",
-    textMuted:     "#6E7078",
+    textMuted:     "#5C5E66",
     textInverse:   "#FFFFFF",  // sıcak dolgu üstünde beyaz okunur
 
     // Semantic (vurgu için, accent değil)
@@ -46,10 +46,13 @@ export const COLORS = {
     info:          "#2D6FE0",  // blue
     infoLight:     "rgba(45,111,224,0.12)",
 
-    // Brand spotlight — SUNSET CORAL (sıcak, canlı), CTA dolgusu beyaz metinle
-    accent:        "#FF5A3C",  // sunset coral
-    accentLight:   "rgba(255,90,60,0.14)",
-    accentDark:    "#D23A18",  // accent-as-text için okunur koyu
+    // Brand — MOR primary, TURUNCU energy/streak
+    accent:        "#8b5cf6",  // brand primary (mor)
+    accentLight:   "rgba(139,92,246,0.14)",
+    accentDark:    "#7c3aed",  // brand deep
+    brandLight:    "#a78bfa",
+    orange:        "#ff6b35",
+    orangeLight:   "rgba(255,107,53,0.14)",
 
     // Generic palette (geri uyumlu — eski kodda C.amber vb. var)
     amber:         "#E8841A",
@@ -61,6 +64,10 @@ export const COLORS = {
     blue:          "#2E7DEB",
     pink:          "#E24F8C",
     coral:         "#E8612F",
+
+    // Dormant — "henüz başlanmadı" durumu (kırmızı/danger DEĞİL)
+    dormant:       "rgba(20, 18, 12, 0.25)",
+    dormantBg:     "rgba(20, 18, 12, 0.05)",
   },
   dark: {
     background:    "#0C0D11",  // warm-neutral ink night
@@ -76,32 +83,38 @@ export const COLORS = {
 
     textPrimary:   "#F4F5F7",
     textSecondary: "#9CA0AA",
-    textMuted:     "#7A7E87",
+    textMuted:     "#8E929B",
     textInverse:   "#0C0D11",
 
-    success:       "#46E0A0",
-    successLight:  "rgba(70,224,160,0.16)",
-    warning:       "#F5B24A",
-    warningLight:  "rgba(245,178,74,0.18)",
-    danger:        "#FF6470",
-    dangerLight:   "rgba(255,100,112,0.16)",
-    info:          "#5C9BFF",
-    infoLight:     "rgba(92,155,255,0.16)",
+    success:       "#34d399",
+    successLight:  "rgba(52,211,153,0.16)",
+    warning:       "#fbbf24",
+    warningLight:  "rgba(251,191,36,0.18)",
+    danger:        "#f87171",
+    dangerLight:   "rgba(248,113,113,0.16)",
+    info:          "#60a5fa",
+    infoLight:     "rgba(96,165,250,0.16)",
 
-    // Brand spotlight — SUNSET CORAL, mürekkep üstünde sıcak parlak
-    accent:        "#FF5A3C",  // sunset coral
-    accentLight:   "rgba(255,90,60,0.16)",
-    accentDark:    "#E0431F",
+    // Brand — MOR primary, TURUNCU energy/streak
+    accent:        "#8b5cf6",  // brand primary (mor) — CTA, başla, kaydet
+    accentLight:   "rgba(139,92,246,0.16)",
+    accentDark:    "#7c3aed",  // brand deep — pressed state
+    brandLight:    "#a78bfa",  // link rengi, hover, secondary brand
+    orange:        "#ff6b35",  // streak, FAB, finalize (bitir/çık)
+    orangeLight:   "rgba(255,107,53,0.16)",
 
-    amber:         "#FF9F3D",
-    green:         "#3DDB8E",
-    yellow:        "#FFD24A",
-    red:           "#FF5C6E",
-    teal:          "#2ED9C6",
-    purple:        "#9B7BFF",
-    blue:          "#4D9BFF",
-    pink:          "#FF6FA8",
-    coral:         "#FF7A4D",
+    amber:         "#fbbf24",
+    green:         "#34d399",
+    yellow:        "#fbbf24",
+    red:           "#f87171",
+    teal:          "#2dd4bf",
+    purple:        "#8b5cf6",
+    blue:          "#60a5fa",
+    pink:          "#f472b6",
+    coral:         "#ff6b35",
+
+    dormant:       "rgba(255, 255, 255, 0.25)",
+    dormantBg:     "rgba(255, 255, 255, 0.05)",
   },
 };
 
@@ -109,34 +122,34 @@ export const COLORS = {
 // Light + dark için ayrı: hem solid (ikon/buton) hem tint (background wash).
 export const SUBJECT_COLORS = {
   light: {
-    turkce:       { solid: "#2E7DEB", tint: "#E4EEFF", soft: "#BBD4FB" }, // mavi
-    matematik:    { solid: "#E8841A", tint: "#FCEDD7", soft: "#F7D3A3" }, // turuncu
-    fen:          { solid: "#15A86A", tint: "#DAF4E7", soft: "#A8E5C7" }, // yeşil
-    sosyal:       { solid: "#6B4FE0", tint: "#E7E0FB", soft: "#C7B9F4" }, // violet
-    fizik:        { solid: "#2E7DEB", tint: "#E4EEFF", soft: "#BBD4FB" },
-    kimya:        { solid: "#0FA595", tint: "#D6F2EE", soft: "#A3E0D7" }, // teal
-    biyoloji:     { solid: "#15A86A", tint: "#DAF4E7", soft: "#A8E5C7" },
-    tarih:        { solid: "#E23B49", tint: "#FCDEE1", soft: "#F5AEB4" }, // kırmızı
-    cografya:     { solid: "#E8612F", tint: "#FCE2D8", soft: "#F7BCA6" }, // coral
-    felsefe:      { solid: "#6B4FE0", tint: "#E7E0FB", soft: "#C7B9F4" },
-    din:          { solid: "#E0A81E", tint: "#FBF0D2", soft: "#F2DC97" }, // sarı
-    edebiyat:     { solid: "#E24F8C", tint: "#FCE0EB", soft: "#F7B6CF" }, // pembe
-    ydt_ingilizce:{ solid: "#8A6BF0", tint: "#EAE2FC", soft: "#CDB9F7" },
+    turkce:       { solid: "#3b82f6", tint: "#dbeafe", soft: "#93c5fd" }, // mavi
+    matematik:    { solid: "#f97316", tint: "#ffedd5", soft: "#fdba74" }, // turuncu
+    fen:          { solid: "#10b981", tint: "#d1fae5", soft: "#6ee7b7" }, // yeşil
+    sosyal:       { solid: "#a855f7", tint: "#f3e8ff", soft: "#c4b5fd" }, // violet
+    fizik:        { solid: "#06b6d4", tint: "#cffafe", soft: "#67e8f9" }, // cyan
+    kimya:        { solid: "#ec4899", tint: "#fce7f3", soft: "#f9a8d4" }, // pembe
+    biyoloji:     { solid: "#10b981", tint: "#d1fae5", soft: "#6ee7b7" },
+    tarih:        { solid: "#eab308", tint: "#fef9c3", soft: "#fde047" }, // amber
+    cografya:     { solid: "#14b8a6", tint: "#ccfbf1", soft: "#5eead4" }, // teal
+    felsefe:      { solid: "#a855f7", tint: "#f3e8ff", soft: "#c4b5fd" },
+    din:          { solid: "#84cc16", tint: "#ecfccb", soft: "#bef264" }, // lime
+    edebiyat:     { solid: "#ec4899", tint: "#fce7f3", soft: "#f9a8d4" }, // pembe
+    ydt_ingilizce:{ solid: "#8b5cf6", tint: "#ede9fe", soft: "#c4b5fd" },
   },
   dark: {
-    turkce:       { solid: "#4D9BFF", tint: "rgba(77,155,255,0.16)",   soft: "rgba(77,155,255,0.32)" },
-    matematik:    { solid: "#FF9F3D", tint: "rgba(255,159,61,0.16)",   soft: "rgba(255,159,61,0.32)" },
-    fen:          { solid: "#3DDB8E", tint: "rgba(61,219,142,0.16)",   soft: "rgba(61,219,142,0.32)" },
-    sosyal:       { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)",  soft: "rgba(155,123,255,0.32)" },
-    fizik:        { solid: "#4D9BFF", tint: "rgba(77,155,255,0.16)",   soft: "rgba(77,155,255,0.32)" },
-    kimya:        { solid: "#2ED9C6", tint: "rgba(46,217,198,0.16)",   soft: "rgba(46,217,198,0.32)" },
-    biyoloji:     { solid: "#3DDB8E", tint: "rgba(61,219,142,0.16)",   soft: "rgba(61,219,142,0.32)" },
-    tarih:        { solid: "#FF5C6E", tint: "rgba(255,92,110,0.16)",   soft: "rgba(255,92,110,0.32)" },
-    cografya:     { solid: "#FF7A4D", tint: "rgba(255,122,77,0.16)",   soft: "rgba(255,122,77,0.32)" },
-    felsefe:      { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)",  soft: "rgba(155,123,255,0.32)" },
-    din:          { solid: "#FFD24A", tint: "rgba(255,210,74,0.16)",   soft: "rgba(255,210,74,0.32)" },
-    edebiyat:     { solid: "#FF6FA8", tint: "rgba(255,111,168,0.16)",  soft: "rgba(255,111,168,0.32)" },
-    ydt_ingilizce:{ solid: "#B79BFF", tint: "rgba(183,155,255,0.16)",  soft: "rgba(183,155,255,0.32)" },
+    turkce:       { solid: "#60a5fa", tint: "rgba(96,165,250,0.16)",   soft: "rgba(96,165,250,0.32)" },
+    matematik:    { solid: "#fb923c", tint: "rgba(251,146,60,0.16)",   soft: "rgba(251,146,60,0.32)" },
+    fen:          { solid: "#34d399", tint: "rgba(52,211,153,0.16)",   soft: "rgba(52,211,153,0.32)" },
+    sosyal:       { solid: "#c084fc", tint: "rgba(192,132,252,0.16)",  soft: "rgba(192,132,252,0.32)" },
+    fizik:        { solid: "#22d3ee", tint: "rgba(34,211,238,0.16)",   soft: "rgba(34,211,238,0.32)" },
+    kimya:        { solid: "#f472b6", tint: "rgba(244,114,182,0.16)",  soft: "rgba(244,114,182,0.32)" },
+    biyoloji:     { solid: "#34d399", tint: "rgba(52,211,153,0.16)",   soft: "rgba(52,211,153,0.32)" },
+    tarih:        { solid: "#fbbf24", tint: "rgba(251,191,36,0.16)",   soft: "rgba(251,191,36,0.32)" },
+    cografya:     { solid: "#2dd4bf", tint: "rgba(45,212,191,0.16)",   soft: "rgba(45,212,191,0.32)" },
+    felsefe:      { solid: "#c084fc", tint: "rgba(192,132,252,0.16)",  soft: "rgba(192,132,252,0.32)" },
+    din:          { solid: "#84cc16", tint: "rgba(132,204,22,0.16)",   soft: "rgba(132,204,22,0.32)" },
+    edebiyat:     { solid: "#f472b6", tint: "rgba(244,114,182,0.16)",  soft: "rgba(244,114,182,0.32)" },
+    ydt_ingilizce:{ solid: "#a78bfa", tint: "rgba(167,139,250,0.16)",  soft: "rgba(167,139,250,0.32)" },
   },
 };
 
@@ -189,10 +202,21 @@ export function paletteFor(scheme) {
     pink:       src.pink,
     coral:      src.coral,
     accent:     src.accent,
+    accentLight:src.accentLight,
+    accentDark: src.accentDark,
+    brandLight: src.brandLight,
+    orange:     src.orange,
+    orangeLight:src.orangeLight,
+    success:    src.success,
+    danger:     src.danger,
+    warning:    src.warning,
+    info:       src.info,
     text:       src.textPrimary,
     sec:        src.textSecondary,
     muted:      src.textMuted,
     cream:      "#F4F1EA",
+    dormant:    src.dormant,
+    dormantBg:  src.dormantBg,
   };
 }
 
@@ -278,9 +302,14 @@ export const TYPOGRAPHY = {
 function _buildShadows(scheme) {
   const e = scheme === "dark" ? ELEVATION.dark : ELEVATION.light;
   return {
-    card:  e.md,
-    amber: { ...e.md, shadowColor: "#E08A1E", shadowOpacity: 0.30 },
-    fab:   { ...e.lg, shadowColor: "#FF5A3C", shadowOpacity: 0.35 },
+    sm:     e.sm,
+    card:   e.md,
+    lg:     e.lg,
+    xl:     e.xl,
+    amber:  { ...e.md, shadowColor: "#ff6b35", shadowOpacity: 0.30 },
+    accent: { ...e.md, shadowColor: "#8b5cf6", shadowOpacity: 0.30 },
+    orange: { ...e.md, shadowColor: "#ff6b35", shadowOpacity: 0.30 },
+    fab:    { ...e.lg, shadowColor: "#ff6b35", shadowOpacity: 0.35 },
   };
 }
 export const SHADOWS = _buildShadows("light");

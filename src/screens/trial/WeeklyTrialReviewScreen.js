@@ -19,8 +19,8 @@ function StatTile({ icon, label, value, color, C }) {
       <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: color + "18", alignItems: "center", justifyContent: "center" }}>
         <Icon name={icon} size={16} color={color} />
       </View>
-      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 22, color: C.text }}>{value}</Text>
-      <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{label}</Text>
+      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 22, color }}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.micro, color, opacity: 0.7 }}>{label}</Text>
     </View>
   );
 }
@@ -57,8 +57,8 @@ export default function WeeklyTrialReviewScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInUp.delay(100)} style={[s.heroCard, { backgroundColor: C.purple + "10", borderColor: C.purple + "30" }]}>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.purple, textTransform: "uppercase", letterSpacing: 0.5 }}>Bu Hafta</Text>
+        <Animated.View entering={FadeInUp.delay(100)} style={[s.heroCard, { backgroundColor: C.accent + "10", borderColor: C.accent + "30" }]}>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textTransform: "uppercase", letterSpacing: 0.5 }}>Bu Hafta</Text>
           <Text style={{ ...TYPOGRAPHY.stat, color: C.text, fontSize: 44, marginTop: 4 }}>{report.avgNet}</Text>
           <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, marginTop: 4 }}>ortalama net</Text>
           {report.hasPrev && delta !== 0 && (
@@ -69,9 +69,9 @@ export default function WeeklyTrialReviewScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200)} style={s.grid}>
-          <StatTile icon="target" label="Deneme" value={String(report.count)} color={C.purple} C={C} />
+          <StatTile icon="target" label="Deneme" value={String(report.count)} color={C.blue} C={C} />
           <StatTile icon="trendUp" label="En İyi" value={report.bestNet} color={C.green} C={C} />
-          <StatTile icon="check" label="Doğru" value={String(report.totalCorrect)} color={C.blue} C={C} />
+          <StatTile icon="check" label="Doğru" value={String(report.totalCorrect)} color={C.orange} C={C} />
           <StatTile icon="x" label="Yanlış" value={String(report.totalWrong)} color={C.red} C={C} />
         </Animated.View>
 
@@ -120,7 +120,7 @@ export default function WeeklyTrialReviewScreen() {
           </Text>
         </Animated.View>
 
-        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [s.btn, { backgroundColor: C.purple }, pressed && { opacity: 0.9 }]}>
+        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.9 }]}>
           <Text style={{ ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 }}>Tamam</Text>
         </Pressable>
       </ScrollView>

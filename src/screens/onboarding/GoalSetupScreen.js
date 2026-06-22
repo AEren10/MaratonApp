@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -7,6 +7,7 @@ import { Icon, IconBox } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
+import { requestNotificationPermissions, applyNotifPrefs, getNotifPrefs } from "../../lib/notifications";
 
 const RANKINGS = [
   { id: "1k", label: "İlk 1.000", desc: "Tıp, en üst mühendislik", icon: "flame", tier: "elite" },
@@ -54,19 +55,26 @@ export default function GoalSetupScreen() {
 
   const canContinue = selectedRanking !== null;
 
-  const finish = useCallback(() => {
+  const finish = useCallback(async () => {
     if (!selectedRanking) return;
     updateGoal(selectedRanking, department.trim() || null).catch(() => {});
+    requestNotificationPermissions().then(async (granted) => {
+      if (granted) {
+        const prefs = await getNotifPrefs();
+        await applyNotifPrefs(prefs);
+      }
+    }).catch(() => {});
     navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
   }, [selectedRanking, department, updateGoal, navigation]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Step indicator */}
         <View style={styles.stepRow}>
           <View style={[styles.stepDot, { backgroundColor: C.border }]} />
-          <View style={[styles.stepDot, { backgroundColor: C.amber }]} />
+          <View style={[styles.stepDot, { backgroundColor: C.accent }]} />
         </View>
 
         <View style={styles.hero}>
@@ -97,10 +105,11 @@ export default function GoalSetupScreen() {
           style={[styles.input, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]}
         />
       </ScrollView>
+      </KeyboardAvoidingView>
 
       <Pressable
         onPress={finish}
-        style={[styles.continueBtn, { backgroundColor: C.amber, ...SHADOWS.amber }, !canContinue && { opacity: 0.4 }]}
+        style={[styles.continueBtn, { backgroundColor: C.accent, ...SHADOWS.fab }, !canContinue && { opacity: 0.4 }]}
         disabled={!canContinue}
       >
         <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Başlayalım</Text>

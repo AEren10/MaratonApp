@@ -2,10 +2,12 @@ import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
+import { SPACING, SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { Icon } from "../../components/design";
 import { useAlert } from "../../contexts/AlertContext";
@@ -14,6 +16,7 @@ import * as H from "../../lib/haptics";
 export default function RegisterScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const insets = useSafeAreaInsets();
   const showAlert = useAlert();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,13 +48,13 @@ export default function RegisterScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <LinearGradient
-        colors={[C.coral, "#FFC9A8"]}
+        colors={[C.accent, "#FFC9A8"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
-          paddingTop: 60,
+          paddingTop: insets.top + SPACING.md,
           paddingBottom: 50,
-          paddingHorizontal: 24,
+          paddingHorizontal: SPACING.xxl,
           borderBottomLeftRadius: 40,
           borderBottomRightRadius: 40,
         }}
@@ -157,7 +160,7 @@ export default function RegisterScreen() {
               onPress={submit}
               disabled={busy}
               style={({ pressed }) => ({
-                backgroundColor: C.coral,
+                backgroundColor: C.accent,
                 borderRadius: 999,
                 paddingVertical: 17,
                 alignItems: "center",
@@ -166,11 +169,7 @@ export default function RegisterScreen() {
                 gap: 8,
                 marginTop: 12,
                 opacity: busy ? 0.6 : pressed ? 0.92 : 1,
-                shadowColor: C.coral,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.32,
-                shadowRadius: 18,
-                elevation: 6,
+                ...SHADOWS.accent,
               })}
             >
               <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
@@ -188,7 +187,7 @@ export default function RegisterScreen() {
             >
               <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
                 Zaten hesabın var mı?{" "}
-                <Text style={{ color: C.coral, fontFamily: "Inter_600SemiBold" }}>Giriş Yap</Text>
+                <Text style={{ color: C.brandLight, fontFamily: "Inter_600SemiBold" }}>Giriş Yap</Text>
               </Text>
             </Pressable>
           </Animated.View>

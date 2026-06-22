@@ -3,7 +3,7 @@ import { supabase } from "./client";
 export const getProfile = async (userId) => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, bio, target_program_id, show_in_leaderboard")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -19,6 +19,15 @@ export const updateProfile = async (userId, updates) => {
     .single();
   if (error) throw error;
   return data;
+};
+
+export const getPremiumStatus = async (userId) => {
+  const { data } = await supabase
+    .from("profiles")
+    .select("is_premium")
+    .eq("id", userId)
+    .maybeSingle();
+  return !!data?.is_premium;
 };
 
 export const updateExamConfig = async (userId, config) => {

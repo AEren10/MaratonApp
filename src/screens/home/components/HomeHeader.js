@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
+import { SHADOWS } from "../../../themes/tokens";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getProfile } from "../../../supabase/profiles";
 
@@ -52,7 +53,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
 
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingTop: 6, paddingBottom: 22 }}>
-      <Pressable onPress={onProfilePress} hitSlop={6}>
+      <Pressable onPress={onProfilePress} hitSlop={6} accessibilityRole="button" accessibilityLabel="Profil" accessibilityHint="Profil sayfanı açar">
         {avatarUri ? (
           <Image source={{ uri: avatarUri }} style={{ width: 52, height: 52, borderRadius: 18, ...avatarShadow }} cachePolicy="memory-disk" transition={200} />
         ) : (
@@ -71,6 +72,9 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
       <Pressable
         onPress={onCalendarPress}
         hitSlop={6}
+        accessibilityRole="button"
+        accessibilityLabel="Takvim"
+        accessibilityHint="Çalışma takvimini açar"
         style={({ pressed }) => ({
           width: 42, height: 42, borderRadius: 14,
           backgroundColor: C.surface,
@@ -83,29 +87,44 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
         <Icon name="calendar" size={18} color={C.text} />
       </Pressable>
 
-      {/* Streak pill — pulsing flame, gradient bg */}
-      <Pressable onPress={onStreakPress} hitSlop={6} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-        <LinearGradient
-          colors={["#FF6B35", "#FF3D00"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{
+      {/* Streak pill — gradient when active, muted when dormant */}
+      <Pressable onPress={onStreakPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Streak ${streak} gün`} accessibilityHint="Streak detaylarını gösterir" style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
+        {streak > 0 ? (
+          <LinearGradient
+            colors={[C.orange, C.orange + "CC"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row", alignItems: "center", gap: 5,
+              borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9,
+              ...SHADOWS.orange,
+            }}
+          >
+            <Animated.View style={flameAnim}>
+              <Icon name="flame" size={18} color="#FFFFFF" sw={2.6} />
+            </Animated.View>
+            <Text style={{
+              fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
+              color: "#FFFFFF", letterSpacing: -0.3,
+            }}>
+              {streak}
+            </Text>
+          </LinearGradient>
+        ) : (
+          <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
             borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9,
-            shadowColor: "#FF3D00", shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.4, shadowRadius: 8, elevation: 5,
-          }}
-        >
-          <Animated.View style={flameAnim}>
-            <Icon name="flame" size={18} color="#FFFFFF" sw={2.6} />
-          </Animated.View>
-          <Text style={{
-            fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
-            color: "#FFFFFF", letterSpacing: -0.3,
+            backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
           }}>
-            {streak}
-          </Text>
-        </LinearGradient>
+            <Icon name="flame" size={16} color={C.muted} sw={2} />
+            <Text style={{
+              fontFamily: "Inter_500Medium", fontSize: 13,
+              color: C.muted, letterSpacing: -0.1,
+            }}>
+              Başla
+            </Text>
+          </View>
+        )}
       </Pressable>
     </View>
   );

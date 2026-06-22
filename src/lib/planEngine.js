@@ -63,9 +63,7 @@ export function generateDailyPlan({
     // En zayıf konuyu seç (varsa) → görev konu seviyesine iner.
     const weakTopics = topicWeakness[key];
     const weakestTopic = weakTopics && weakTopics.length ? weakTopics[0] : null;
-    const topicLabel = weakestTopic
-      ? `${subject.label} · ${weakestTopic.topic}`
-      : subject.label;
+    const topicLabel = weakestTopic?.topic || null;
 
     // === Urgency tier kararı ===
     // tier:   "critical" | "high" | "medium" | "low"
@@ -116,7 +114,7 @@ export function generateDailyPlan({
       tier = "high";
       badge = "ZAYIF";
     } else if (acc < 60) {
-      reason = "Pekiştirme zamanı";
+      reason = `%${acc} doğruluk — pekiştir`;
       rkind = "amber";
       tier = "medium";
     } else {

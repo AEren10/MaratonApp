@@ -35,6 +35,16 @@ export const getSession = async () => {
   return data.session;
 };
 
+export const updateEmail = async (email) => {
+  const { error } = await supabase.auth.updateUser({ email });
+  if (error) throw error;
+};
+
+export const updatePassword = async (password) => {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw error;
+};
+
 export const deleteAccount = async () => {
   const { error } = await supabase.rpc("delete_own_account");
   if (error) throw error;

@@ -33,7 +33,7 @@ export function QuestionStepper({ value, onChange }) {
         backgroundColor: C.surface,
         borderRadius: 14,
         borderWidth: 1,
-        borderColor: focused ? C.amber : C.border,
+        borderColor: focused ? C.accent : C.border,
         overflow: "hidden",
       }}
     >
@@ -83,7 +83,7 @@ export function QuestionStepper({ value, onChange }) {
           opacity: pressed ? 0.6 : 1,
         })}
       >
-        <Icon name="plus" size={18} color={C.amber} />
+        <Icon name="plus" size={18} color={C.accent} />
       </Pressable>
     </View>
   );

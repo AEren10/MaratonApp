@@ -61,13 +61,13 @@ export default function SwipeReviewScreen() {
     const g = knew ? 3 : 0;
     if (knew) haptic.success(); else haptic.error();
     const updates = computeNextReview(current, g);
-    reviewWrongQuestion(current.id, updates).catch(() => {});
+    reviewWrongQuestion(current.id, user.id, updates).catch(() => {});
     if (knew && current.is_resolved !== true) {
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
     }
     setStats((prev) => knew ? { ...prev, knew: prev.knew + 1 } : { ...prev, didnt: prev.didnt + 1 });
     setIdx((i) => i + 1);
-  }, [current, reward]);
+  }, [current, reward, user.id]);
 
   const pan = Gesture.Pan()
     .onUpdate((e) => {
@@ -110,7 +110,7 @@ export default function SwipeReviewScreen() {
   }));
 
   if (loading) {
-    return <SafeAreaView style={s.safe}><View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View></SafeAreaView>;
+    return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
   }
 
   return (
@@ -232,7 +232,7 @@ function makeStyles(C) {
     title: { ...TYPOGRAPHY.subheading, color: C.text },
     counter: { ...TYPOGRAPHY.captionMedium, color: C.muted },
     progressBg: { height: 3, backgroundColor: C.surface2, marginHorizontal: SPACING.lg },
-    progressFill: { height: 3, backgroundColor: C.amber, borderRadius: 2 },
+    progressFill: { height: 3, backgroundColor: C.accent, borderRadius: 2 },
     center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.md },
     cardArea: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: SPACING.lg },
     hintRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginBottom: SPACING.md },
@@ -255,7 +255,7 @@ function makeStyles(C) {
     statsRow: { flexDirection: "row", gap: SPACING.lg, marginTop: SPACING.md },
     statBadge: { alignItems: "center", gap: 4, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    closeBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
+    closeBtn: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
     closeText: { ...TYPOGRAPHY.button, color: C.bg },
     tapRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.lg, width: "100%" },
     tapBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },

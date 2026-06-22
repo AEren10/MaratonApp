@@ -32,6 +32,9 @@ function SubjectCard({ subject, selected, onPress }) {
   const sid = useSubjectIdentity(subject.key);
   return (
     <Pressable
+      accessibilityRole="radio"
+      accessibilityLabel={subject.label || subject.name}
+      accessibilityState={{ selected }}
       onPress={onPress}
       style={[st.subCard, {
         backgroundColor: selected ? sid.tint : C.surface,
@@ -78,7 +81,7 @@ export default function AddStudyScreen() {
   const current = useMemo(() => subjects.find((s) => s.key === subjectKey), [subjects, subjectKey]);
   const canSave = !!subjectKey && topic.trim() && duration;
 
-  const switchTier = (t) => { setTier(t); setSubjectKey(null); setTopic(""); };
+  const switchTier = (t) => { H.select(); setTier(t); setSubjectKey(null); setTopic(""); };
   const pickSubject = (key) => { H.select(); setSubjectKey(key); setTopic(""); };
 
   const openTopicPicker = () => {
@@ -175,7 +178,7 @@ export default function AddStudyScreen() {
               {[["TYT", group1Label, C.blue], ["AYT", group2Label, C.purple]].map(([t, lbl, clr]) => {
                 const active = tier === t;
                 return (
-                  <Pressable key={t} onPress={() => switchTier(t)} style={[st.tierBtn, { backgroundColor: active ? clr : "transparent", borderColor: active ? clr : "transparent" }]}>
+                  <Pressable key={t} accessibilityRole="radio" accessibilityLabel={lbl} accessibilityState={{ selected: active }} onPress={() => switchTier(t)} style={[st.tierBtn, { backgroundColor: active ? clr : "transparent", borderColor: active ? clr : "transparent" }]}>
                     <Text style={[st.tierTitle, { color: active ? "#FFF" : clr }]}>{lbl}</Text>
                   </Pressable>
                 );
@@ -196,7 +199,7 @@ export default function AddStudyScreen() {
           {/* Topic */}
           <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
             <Text style={[st.sectionLabel, { color: C.muted }]}>KONU</Text>
-            <Pressable onPress={openTopicPicker} style={[st.topicBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel={topic || "Konu seç"} accessibilityHint="Konu seçici açılır" onPress={openTopicPicker} style={[st.topicBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Icon name={topic ? "checkCircle" : "search"} size={16} color={topic ? C.green : C.muted} />
               <Text style={{ flex: 1, fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }} numberOfLines={1}>
                 {topic || (current ? "Konu seç..." : "Önce ders seç")}
@@ -212,7 +215,7 @@ export default function AddStudyScreen() {
               {D_PRESETS.map((d) => {
                 const active = duration === d && isDurPreset;
                 return (
-                  <Pressable key={d} onPress={() => pickDuration(d)} style={[st.segPill, { backgroundColor: active ? C.blue : "transparent" }]}>
+                  <Pressable key={d} accessibilityRole="radio" accessibilityLabel={`${fmtDur(d)} süre`} accessibilityState={{ selected: active }} onPress={() => pickDuration(d)} style={[st.segPill, { backgroundColor: active ? C.blue : "transparent" }]}>
                     <Text style={[st.segText, { color: active ? "#FFF" : C.text }]}>{fmtDur(d)}</Text>
                   </Pressable>
                 );
@@ -251,7 +254,7 @@ export default function AddStudyScreen() {
         </ScrollView>
 
         <View style={[st.bottom, { borderTopColor: C.border }]}>
-          <Pressable onPress={save} disabled={!canSave || saving} style={({ pressed }) => [st.saveBtn, { backgroundColor: canSave ? C.purple : C.surface, opacity: pressed ? 0.92 : 1 }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Kaydet" accessibilityHint="Çalışma kaydını kaydeder" onPress={save} disabled={!canSave || saving} style={({ pressed }) => [st.saveBtn, { backgroundColor: canSave ? C.accent : C.surface, opacity: pressed ? 0.92 : 1 }]}>
             <Icon name="check" size={18} color={canSave ? "#FFF" : C.muted} sw={2.5} />
             <Text style={[st.saveBtnText, { color: canSave ? "#FFF" : C.muted }]}>{saving ? "Kaydediliyor..." : "Çalışmayı Kaydet"}</Text>
           </Pressable>

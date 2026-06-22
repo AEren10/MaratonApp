@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -7,7 +7,7 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { supabase } from "../../supabase/client";
+import { updateEmail } from "../../supabase/auth";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -34,8 +34,7 @@ export default function EditEmailScreen() {
     }
     setSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({ email: v });
-      if (error) throw error;
+      await updateEmail(v);
       H.success();
       showAlert(
         "Doğrulama gönderildi",
@@ -60,6 +59,7 @@ export default function EditEmailScreen() {
         <View style={{ width: 22 }} />
       </View>
 
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll}>
         <View style={[s.currentBox, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[s.currentLabel, { color: C.muted }]}>MEVCUT</Text>
@@ -78,8 +78,8 @@ export default function EditEmailScreen() {
           style={[s.input, { backgroundColor: C.surface, color: C.text, borderColor: C.border }]}
         />
 
-        <View style={[s.info, { backgroundColor: C.amber + "12", borderColor: C.amber + "32" }]}>
-          <Icon name="alert" size={14} color={C.amber} />
+        <View style={[s.info, { backgroundColor: C.accent + "12", borderColor: C.accent + "32" }]}>
+          <Icon name="alert" size={14} color={C.accent} />
           <Text style={[s.infoText, { color: C.sec }]}>
             Yeni adresine bir doğrulama bağlantısı gönderilecek. Bağlantıyı onaylayana kadar e-posta değişmez.
           </Text>
@@ -90,14 +90,15 @@ export default function EditEmailScreen() {
           disabled={saving}
           style={({ pressed }) => [
             s.saveBtn,
-            { backgroundColor: C.purple },
+            { backgroundColor: C.accent },
             (pressed || saving) && { opacity: 0.85 },
           ]}
         >
-          <Icon name="mail" size={20} color="#FFFFFF" />
+          {saving ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Icon name="mail" size={20} color="#FFFFFF" />}
           <Text style={s.saveText}>{saving ? "Gönderiliyor..." : "Doğrulama Gönder"}</Text>
         </Pressable>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

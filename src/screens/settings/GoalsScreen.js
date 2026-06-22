@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -85,6 +85,7 @@ export default function GoalsScreen() {
         <View style={{ width: 22 }} />
       </View>
 
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.subtitle}>
           Hedef belirlemek odaklanmanı artırır. İstediğin zaman değiştirebilirsin.
@@ -92,7 +93,7 @@ export default function GoalsScreen() {
 
         <GoalInput
           icon="target"
-          color={C.amber}
+          color={C.accent}
           label="Günlük Soru Hedefi"
           hint="Her gün çözmen gereken soru sayısı"
           value={draft.dailyQuestions}
@@ -146,6 +147,7 @@ export default function GoalsScreen() {
           <Text style={styles.saveText}>Kaydet</Text>
         </Pressable>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -208,21 +210,21 @@ function makeStyles(C) {
       borderColor: C.border,
     },
     chipActive: {
-      backgroundColor: C.amber + "20",
-      borderColor: C.amber,
+      backgroundColor: C.accent + "20",
+      borderColor: C.accent,
     },
     chipText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
-    chipTextActive: { color: C.amber },
+    chipTextActive: { color: C.accent },
     saveBtn: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
       gap: SPACING.sm,
-      backgroundColor: C.amber,
+      backgroundColor: C.accent,
       borderRadius: RADIUS.xl,
       paddingVertical: SPACING.lg,
       marginTop: SPACING.lg,
-      ...SHADOWS.amber,
+      ...SHADOWS.accent,
     },
     saveText: { ...TYPOGRAPHY.button, color: C.bg },
   });

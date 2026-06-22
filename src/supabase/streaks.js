@@ -3,7 +3,7 @@ import { supabase } from "./client";
 export const getStreak = async (userId) => {
   const { data, error } = await supabase
     .from("streaks")
-    .select("*")
+    .select("user_id, current_streak, longest_streak, last_study_date, freeze_count, last_freeze_at, freeze_reset_at")
     .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;

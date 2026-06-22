@@ -70,7 +70,7 @@ export function HistoryList({ history, onPress, onCompare }) {
   return (
     <View style={{ gap: SPACING.md }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
-        <Icon name="clock" size={18} color={C.blue} />
+        <Icon name="clock" size={18} color={C.sec} />
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Gecmis Denemeler</Text>
         {history.length >= 2 && onCompare && (
           <Pressable
@@ -80,15 +80,15 @@ export function HistoryList({ history, onPress, onCompare }) {
               flexDirection: "row",
               alignItems: "center",
               gap: 4,
-              backgroundColor: C.amber + "18",
+              backgroundColor: C.accent + "18",
               borderRadius: RADIUS.full,
               paddingHorizontal: SPACING.md,
               paddingVertical: 6,
               opacity: pressed ? 0.7 : 1,
             })}
           >
-            <Icon name="barChart" size={14} color={C.amber} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>
+            <Icon name="barChart" size={14} color={C.accent} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>
               Karşılaştır
             </Text>
           </Pressable>

@@ -80,15 +80,15 @@ export default function ExamSimulatorScreen() {
         </View>
         <View style={s.setupBody}>
           <Animated.View entering={FadeInDown}>
-            <Icon name="clock" size={48} color={C.amber} />
+            <Icon name="clock" size={48} color={C.accent} />
           </Animated.View>
           <Text style={s.setupTitle}>Gerçek sınav koşullarında çalış</Text>
           <Text style={s.setupSub}>Zamanlayıcı sınavdaki süreyi simüle eder. Kendi kitapçığınla çöz, süreyi buradan takip et.</Text>
           <View style={[s.configRow, examType === "lgs" && { justifyContent: "center" }]}>
             {(examType === "lgs" ? [LGS_CONFIG] : [TYT_CONFIG, AYT_CONFIG]).map((cfg) => (
               <Pressable key={cfg.label} onPress={() => setConfig(cfg)}
-                style={[s.configBtn, examType === "lgs" && { flex: 0, minWidth: 140 }, config.label === cfg.label && { borderColor: C.amber, backgroundColor: C.amber + "12" }]}>
-                <Text style={[s.configText, config.label === cfg.label && { color: C.amber }]}>{cfg.label}</Text>
+                style={[s.configBtn, examType === "lgs" && { flex: 0, minWidth: 140 }, config.label === cfg.label && { borderColor: C.accent, backgroundColor: C.accent + "12" }]}>
+                <Text style={[s.configText, config.label === cfg.label && { color: C.accent }]}>{cfg.label}</Text>
                 <Text style={s.configMeta}>{cfg.time} dk</Text>
               </Pressable>
             ))}
@@ -139,9 +139,9 @@ export default function ExamSimulatorScreen() {
       </View>
 
       <View style={s.controls}>
-        <Pressable onPress={togglePause} style={[s.controlBtn, { backgroundColor: (paused ? C.green : C.amber) + "18" }]}>
-          <Icon name={paused ? "play" : "pause"} size={22} color={paused ? C.green : C.amber} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: paused ? C.green : C.amber }}>{paused ? "Devam" : "Duraklat"}</Text>
+        <Pressable onPress={togglePause} style={[s.controlBtn, { backgroundColor: (paused ? C.green : C.accent) + "18" }]}>
+          <Icon name={paused ? "play" : "pause"} size={22} color={paused ? C.green : C.accent} />
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: paused ? C.green : C.accent }}>{paused ? "Devam" : "Duraklat"}</Text>
         </Pressable>
         <Pressable onPress={finishEarly} style={[s.controlBtn, { backgroundColor: C.red + "18" }]}>
           <Icon name="check" size={22} color={C.red} />
@@ -151,8 +151,8 @@ export default function ExamSimulatorScreen() {
 
       {paused && (
         <Animated.View entering={FadeInDown} style={s.pauseBanner}>
-          <Icon name="pause" size={16} color={C.amber} />
-          <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.amber }}>Duraklatıldı</Text>
+          <Icon name="pause" size={16} color={C.accent} />
+          <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.accent }}>Duraklatıldı</Text>
         </Animated.View>
       )}
     </SafeAreaView>
@@ -173,7 +173,7 @@ function makeStyles(C) {
     configBtn: { flex: 1, alignItems: "center", padding: SPACING.lg, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
     configText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     configMeta: { ...TYPOGRAPHY.micro, color: C.muted, marginTop: 2 },
-    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.amber, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, paddingHorizontal: SPACING.xxxl },
+    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, paddingHorizontal: SPACING.xxxl },
     ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
     timerArea: { alignItems: "center", paddingVertical: SPACING.xxxl, gap: SPACING.sm },
     timerText: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64 },
@@ -184,7 +184,7 @@ function makeStyles(C) {
     controlBtn: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl, borderRadius: RADIUS.xl },
     pauseBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, paddingVertical: SPACING.lg, marginTop: SPACING.xl },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    doneStat: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 36, color: C.text },
+    doneStat: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 36, color: C.green },
     doneSub: { ...TYPOGRAPHY.caption, color: C.muted },
   });
 }

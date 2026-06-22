@@ -14,6 +14,7 @@ import { getSubjectsForExam } from "../../data/curriculum";
 import { getTopicProgress } from "../../supabase/topicProgress";
 import { weightedWeakAreas } from "../../lib/buildPlanContext";
 import { buildRoadmap } from "../../lib/roadmapEngine";
+import * as H from "../../lib/haptics";
 
 function ProgressHeader({ roadmap, C, s }) {
   const pct = Math.round(roadmap.progress * 100);
@@ -46,7 +47,7 @@ function ProgressHeader({ roadmap, C, s }) {
       </View>
       {roadmap.nextMilestone ? (
         <View style={s.milestoneHint}>
-          <Icon name={roadmap.nextMilestone.icon} size={14} color={C.amber} />
+          <Icon name={roadmap.nextMilestone.icon} size={14} color={C.accent} />
           <Text style={[s.milestoneHintText, { color: C.sec }]}>
             Sonraki hedef: {roadmap.nextMilestone.label} (%{Math.round(roadmap.nextMilestone.at * 100)})
           </Text>
@@ -97,7 +98,7 @@ function WeekNode({ week, C, s, delay }) {
           <Pressable
             onPressIn={() => { scale.value = withSpring(0.98, { damping: 16 }); }}
             onPressOut={() => { scale.value = withSpring(1, { damping: 16 }); }}
-            onPress={() => setExpanded((v) => !v)}
+            onPress={() => { H.tap(); setExpanded((v) => !v); }}
           >
             <View style={[s.weekCard, {
               backgroundColor: week.isCurrent ? C.accent + "10" : C.surface,
@@ -128,16 +129,16 @@ function WeekNode({ week, C, s, delay }) {
                     <View key={`${t.subject}-${t.topic}-${i}`} style={s.topicRow}>
                       <View style={[s.topicDot, { backgroundColor: t.color }]} />
                       <Text style={[s.topicName, { color: C.text }]} numberOfLines={1}>{t.topic}</Text>
-                      <View style={[s.masteryChip, { backgroundColor: t.masteryColor + "22" }]}>
-                        <Text style={[s.masteryText, { color: t.masteryColor }]}>{t.masteryLabel}</Text>
+                      <View style={[s.masteryChip, { backgroundColor: C[t.masteryColorKey] + "22" }]}>
+                        <Text style={[s.masteryText, { color: C[t.masteryColorKey] }]}>{t.masteryLabel}</Text>
                       </View>
                     </View>
                   ))}
                 </View>
               ) : null}
 
-              <View style={[s.weekTipRow, { backgroundColor: C.amber + "0A" }]}>
-                <Icon name="lightbulb" size={13} color={C.amber} />
+              <View style={[s.weekTipRow, { backgroundColor: C.accent + "0A" }]}>
+                <Icon name="lightbulb" size={13} color={C.accent} />
                 <Text style={[s.weekTipText, { color: C.sec }]}>{week.tip}</Text>
               </View>
             </View>
@@ -192,7 +193,7 @@ export default function RoadmapScreen() {
       </View>
 
       {loading ? (
-        <View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View>
+        <View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View>
       ) : (
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
           <ProgressHeader roadmap={roadmap} C={C} s={s} />
@@ -267,7 +268,7 @@ const makeStyles = (C) => StyleSheet.create({
   topicDot: { width: 8, height: 8, borderRadius: 4 },
   topicName: { ...TYPOGRAPHY.bodyMedium, flex: 1 },
   masteryChip: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.pill },
-  masteryText: { fontFamily: "Inter_600SemiBold", fontSize: 10 },
+  masteryText: { fontFamily: "Inter_600SemiBold", fontSize: 11 },
   weekTipRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm + 2, borderTopWidth: 1, borderTopColor: C.border },
   weekTipText: { ...TYPOGRAPHY.caption, flex: 1, lineHeight: 17 },
 

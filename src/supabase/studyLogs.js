@@ -1,9 +1,11 @@
 import { supabase } from "./client";
 
+const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, study_date, created_at";
+
 export const getStudyLogs = async (userId, { from, to } = {}) => {
   let query = supabase
     .from("study_logs")
-    .select("*")
+    .select(SL_COLUMNS)
     .eq("user_id", userId)
     .order("study_date", { ascending: false });
 
@@ -18,7 +20,7 @@ export const getStudyLogs = async (userId, { from, to } = {}) => {
 export const getStudyLogsByDate = async (userId, date) => {
   const { data, error } = await supabase
     .from("study_logs")
-    .select("*")
+    .select(SL_COLUMNS)
     .eq("user_id", userId)
     .eq("study_date", date)
     .order("created_at", { ascending: false });
@@ -47,8 +49,10 @@ export const updateStudyLog = async (id, updates) => {
   return data;
 };
 
-export const deleteStudyLog = async (id) => {
-  const { error } = await supabase.from("study_logs").delete().eq("id", id);
+export const deleteStudyLog = async (id, userId) => {
+  let query = supabase.from("study_logs").delete().eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { error } = await query;
   if (error) throw error;
 };
 

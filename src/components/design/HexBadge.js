@@ -47,5 +47,5 @@ export function HexBadge({ icon = "trophy", color, locked = false, size = 64, la
 }
 
 const s = StyleSheet.create({
-  label: { fontFamily: "Inter_600SemiBold", fontSize: 10, lineHeight: 13, textAlign: "center" },
+  label: { fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 14, textAlign: "center" },
 });

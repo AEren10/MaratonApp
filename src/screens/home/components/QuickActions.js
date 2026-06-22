@@ -6,6 +6,9 @@ function QuickItem({ item, onPress }) {
   const C = useC();
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
+      accessibilityHint={`${item.label} ekranına gider`}
       onPress={() => onPress?.(item)}
       style={({ pressed }) => ({
         alignItems: "center",

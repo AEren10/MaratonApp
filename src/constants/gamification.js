@@ -36,8 +36,8 @@ export const LEVELS = [
 
 export function getBadges(C) {
   return [
-    { id: "streak_3", name: "3 Gün Seri", icon: "flame", color: C.amber, desc: "3 gün üst üste çalış", condition: { type: "streak", value: 3 } },
-    { id: "streak_7", name: "Haftalık Seri", icon: "flame", color: C.amber, desc: "7 gün üst üste çalış", condition: { type: "streak", value: 7 } },
+    { id: "streak_3", name: "3 Gün Seri", icon: "flame", color: C.accent, desc: "3 gün üst üste çalış", condition: { type: "streak", value: 3 } },
+    { id: "streak_7", name: "Haftalık Seri", icon: "flame", color: C.accent, desc: "7 gün üst üste çalış", condition: { type: "streak", value: 7 } },
     { id: "streak_30", name: "Maratoncu", icon: "flame", color: C.red, desc: "30 gün üst üste çalış", condition: { type: "streak", value: 30 } },
     { id: "streak_100", name: "Yüz Günlük", icon: "flame", color: "#FF6B6B", desc: "100 gün üst üste çalış", condition: { type: "streak", value: 100 } },
     { id: "questions_100", name: "Yüzlük", icon: "target", color: C.blue, desc: "100 soru çöz", condition: { type: "questions", value: 100 } },
@@ -45,19 +45,19 @@ export function getBadges(C) {
     { id: "questions_1000", name: "Binyıldız", icon: "award", color: C.green, desc: "1000 soru çöz", condition: { type: "questions", value: 1000 } },
     { id: "trial_first", name: "İlk Deneme", icon: "chart", color: C.blue, desc: "İlk denemeni gir", condition: { type: "trials", value: 1 } },
     { id: "trial_5", name: "Deneyimli", icon: "chart", color: C.purple, desc: "5 deneme gir", condition: { type: "trials", value: 5 } },
-    { id: "trial_10", name: "Deneme Ustası", icon: "chart", color: "#46C7B0", desc: "10 deneme gir", condition: { type: "trials", value: 10 } },
+    { id: "trial_10", name: "Deneme Ustası", icon: "chart", color: C.teal, desc: "10 deneme gir", condition: { type: "trials", value: 10 } },
     { id: "net_80", name: "80+ Net", icon: "trendUp", color: C.green, desc: "Bir denemede 80+ net yap", condition: { type: "max_net", value: 80 } },
     { id: "net_100", name: "Yüzlük Net", icon: "trendUp", color: "#FFD700", desc: "Bir denemede 100+ net yap", condition: { type: "max_net", value: 100 } },
     { id: "wrong_10", name: "Hata Avcısı", icon: "notebook", color: C.red, desc: "10 yanlışı çöz", condition: { type: "wrongs_resolved", value: 10 } },
     { id: "perfect_day", name: "Mükemmel Gün", icon: "checkCircle", color: C.green, desc: "Günlük planı %100 tamamla", condition: { type: "perfect_plan", value: 1 } },
-    { id: "level_10", name: "Seviye 10", icon: "shield", color: C.amber, desc: "Seviye 10'a ulaş", condition: { type: "level", value: 10 } },
+    { id: "level_10", name: "Seviye 10", icon: "shield", color: C.accent, desc: "Seviye 10'a ulaş", condition: { type: "level", value: 10 } },
   ];
 }
 
 export const LEAGUE_TIERS = [
   { key: "bronz", name: "Bronz Lig", icon: "shield", color: "#CD7F47", minRank: 0 },
   { key: "gumus", name: "Gümüş Lig", icon: "shield", color: "#C0C5CE", minRank: 100 },
-  { key: "altin", name: "Altın Lig", icon: "shield", color: "#EBAE63", minRank: 500 },
-  { key: "elmas", name: "Elmas Lig", icon: "shield", color: "#6FA8F2", minRank: 2000 },
-  { key: "obsidyen", name: "Obsidyen Lig", icon: "shield", color: "#A99BF5", minRank: 5000 },
+  { key: "altin", name: "Altın Lig", icon: "shield", color: "#fbbf24", minRank: 500 },
+  { key: "elmas", name: "Elmas Lig", icon: "shield", color: "#60a5fa", minRank: 2000 },
+  { key: "obsidyen", name: "Obsidyen Lig", icon: "shield", color: "#c084fc", minRank: 5000 },
 ];

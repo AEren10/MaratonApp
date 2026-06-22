@@ -30,7 +30,7 @@ export default function AboutScreen() {
 
       <View style={s.center}>
         <View style={s.iconWrap}>
-          <Icon name="zap" size={56} color={C.amber} />
+          <Icon name="zap" size={56} color={C.accent} />
         </View>
         <Text style={s.appName}>Maraton</Text>
         <Text style={s.version}>v1.0.0</Text>
@@ -64,7 +64,7 @@ function makeStyles(C) {
     center: { alignItems: "center", marginTop: SPACING.xxxl },
     iconWrap: {
       width: 88, height: 88, borderRadius: RADIUS.xxl,
-      backgroundColor: C.amber + "18", alignItems: "center",
+      backgroundColor: C.accent + "18", alignItems: "center",
       justifyContent: "center", marginBottom: SPACING.lg,
     },
     appName: { ...TYPOGRAPHY.heading, color: C.text },

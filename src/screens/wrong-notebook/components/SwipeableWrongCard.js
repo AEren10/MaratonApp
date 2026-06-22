@@ -37,6 +37,9 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
     if (item.is_resolved) return null;
     return (
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Çözdüm"
+        accessibilityHint="Yanlışı çözülmüş olarak işaretler"
         onPress={handleResolve}
         style={{ ...actionStyle, backgroundColor: C.green, marginLeft: 8 }}
       >
@@ -50,6 +53,9 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
     if (!onDelete) return null;
     return (
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Sil"
+        accessibilityHint="Yanlış soruyu siler"
         onPress={handleDelete}
         style={{ ...actionStyle, backgroundColor: C.red, marginRight: 8 }}
       >

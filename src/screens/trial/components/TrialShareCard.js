@@ -31,14 +31,14 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
   return (
     <View ref={ref} collapsable={false} style={[st.card, { backgroundColor: C.bg }]}>
       <LinearGradient
-        colors={[C.amber + "18", "transparent"]}
+        colors={[C.accent + "18", "transparent"]}
         style={st.glow}
       />
 
       <View style={st.header}>
         <Text style={st.brand}>MARATON</Text>
-        <View style={[st.typeBadge, { backgroundColor: C.amber + "18" }]}>
-          <Text style={[st.typeText, { color: C.amber }]}>{typeName}</Text>
+        <View style={[st.typeBadge, { backgroundColor: C.accent + "18" }]}>
+          <Text style={[st.typeText, { color: C.accent }]}>{typeName}</Text>
         </View>
       </View>
 
@@ -47,8 +47,8 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
       ) : null}
 
       <View style={st.netSection}>
-        <Text style={[st.netNum, { color: C.text }]}>{net.toFixed(1)}</Text>
-        <Text style={[st.netLabel, { color: C.amber }]}>TOPLAM NET</Text>
+        <Text style={[st.netNum, { color: C.accent }]}>{net.toFixed(1)}</Text>
+        <Text style={[st.netLabel, { color: C.accent }]}>TOPLAM NET</Text>
         {trend !== 0 && (
           <View style={[st.trendPill, { backgroundColor: trendColor + "18" }]}>
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, color: trendColor }}>
@@ -86,7 +86,7 @@ const st = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
   },
   brand: {
-    fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: "#F5A623", letterSpacing: 1.5,
+    fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: "#8b5cf6", letterSpacing: 1.5,
   },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   typeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 0.5 },
@@ -102,5 +102,5 @@ const st = StyleSheet.create({
   footerUser: { fontFamily: "Inter_600SemiBold", fontSize: 13 },
   footerDate: { fontFamily: "Inter_400Regular", fontSize: 12 },
   divider: { height: 1, marginTop: 14, marginBottom: 10 },
-  watermark: { fontFamily: "Inter_400Regular", fontSize: 10, textAlign: "center" },
+  watermark: { fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center" },
 });

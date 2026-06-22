@@ -23,7 +23,7 @@ export function GlowBackground({ blobs = [], style }) {
 }
 
 export const WARM_GLOW = [
-  { x: 0.82, y: 0.08, r: 0.45, color: "#FF5A3C", opacity: 0.07 },
-  { x: 0.15, y: 0.35, r: 0.50, color: "#F5A623", opacity: 0.05 },
-  { x: 0.55, y: 0.75, r: 0.40, color: "#6B4FE0", opacity: 0.04 },
+  { x: 0.82, y: 0.08, r: 0.45, color: "#8b5cf6", opacity: 0.07 },
+  { x: 0.15, y: 0.35, r: 0.50, color: "#ff6b35", opacity: 0.05 },
+  { x: 0.55, y: 0.75, r: 0.40, color: "#7c3aed", opacity: 0.04 },
 ];

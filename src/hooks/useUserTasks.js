@@ -94,10 +94,10 @@ export function useUserTasks() {
   const removeTask = useCallback(async (id) => {
     const task = tasks.find((t) => t.id === id);
     dispatch(removeAction(id));
-    deleteUserTask(id).catch(() => {
+    deleteUserTask(id, user.id).catch(() => {
       if (task) dispatch(addUserTask(task));
     });
-  }, [dispatch, tasks]);
+  }, [dispatch, tasks, user.id]);
 
   const clearAll = useCallback(async () => {
     if (!user?.id) return;

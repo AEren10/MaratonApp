@@ -4,15 +4,12 @@ import { signOut as supaSignOut, deleteAccount as supaDeleteAccount } from "../s
 
 const AuthContext = createContext(null);
 
-const DEV_BYPASS = __DEV__ && process.env.EXPO_PUBLIC_DEV_AUTH === "true";
-
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(DEV_BYPASS ? { user: { id: "dev" } } : null);
-  const [user, setUser] = useState(DEV_BYPASS ? { id: "dev", email: "dev@test.com" } : null);
-  const [loading, setLoading] = useState(DEV_BYPASS ? false : true);
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (DEV_BYPASS) return;
     supabase.auth.getSession()
       .then(({ data: { session: s } }) => {
         setSession(s);
@@ -32,11 +29,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    if (DEV_BYPASS) {
-      setSession(null);
-      setUser(null);
-      return;
-    }
     await supaSignOut();
   }, []);
 

@@ -23,7 +23,7 @@ function buildYKSOptions(C) {
     { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
     { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
     { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat", icon: "bookOpen", color: C.purple },
-    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: "#46C7B0" },
+    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: C.teal },
   ];
 }
 
@@ -99,12 +99,12 @@ export default function ExamSetupScreen() {
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.stepRow}>
-          <View style={[styles.stepDot, { backgroundColor: C.amber }]} />
+          <View style={[styles.stepDot, { backgroundColor: C.accent }]} />
           <View style={[styles.stepDot, { backgroundColor: C.border }]} />
         </View>
 
         <View style={styles.hero}>
-          <IconBox icon="shield" color={C.amber} size={56} rounded={18} />
+          <IconBox icon="shield" color={C.accent} size={56} rounded={18} />
           <Text style={[styles.heroTitle, { color: C.text }]}>Sınav Bilgilerin</Text>
           <Text style={[styles.heroDesc, { color: C.sec }]}>
             Sana özel çalışma planı oluşturabilmemiz için sınav türünü ve tarihini seç.
@@ -140,10 +140,10 @@ export default function ExamSetupScreen() {
                 <Pressable
                   key={m}
                   onPress={() => setExamDate(m)}
-                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.amber : C.border },
-                    examDate === m && { backgroundColor: C.amber + "10" }]}
+                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.border },
+                    examDate === m && { backgroundColor: C.accent + "10" }]}
                 >
-                  <Icon name="calendar" size={14} color={examDate === m ? C.amber : C.muted} />
+                  <Icon name="calendar" size={14} color={examDate === m ? C.accent : C.muted} />
                   <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.sec }]}>
                     {m}
                   </Text>
@@ -156,7 +156,7 @@ export default function ExamSetupScreen() {
 
       <Pressable
         onPress={finish}
-        style={[styles.continueBtn, { backgroundColor: C.amber, ...SHADOWS.amber }, !canContinue && { opacity: 0.4 }]}
+        style={[styles.continueBtn, { backgroundColor: C.accent, ...SHADOWS.fab }, !canContinue && { opacity: 0.4 }]}
         disabled={!canContinue}
       >
         <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Devam Et</Text>

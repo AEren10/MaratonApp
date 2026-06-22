@@ -3,17 +3,10 @@
 // "100 öğrenciden ~X doğru yapıyor" sosyal-kanıt + net etkisi gösteriyoruz.
 // İleride topic_progress agregesi geldiğinde bu sabitler gerçek oranla değişebilir.
 
-const C = {
-  red: "#F2706E",
-  amber: "#EBAE63",
-  green: "#4ECE8E",
-};
-
-// Zorluk → ortalama doğruluk oranı (%) ve net etkisi.
 const DIFFICULTY_META = {
-  zor: { correctRate: 34, label: "Zor", color: C.red },
-  orta: { correctRate: 54, label: "Orta", color: C.amber },
-  kolay: { correctRate: 72, label: "Kolay", color: C.green },
+  zor: { correctRate: 34, label: "Zor", colorKey: "danger" },
+  orta: { correctRate: 54, label: "Orta", colorKey: "warning" },
+  kolay: { correctRate: 72, label: "Kolay", colorKey: "success" },
 };
 
 // YKS'de tipik olarak zorlanılan konu anahtar kelimeleri (alt-string eşleşme).
@@ -50,7 +43,7 @@ export function getTopicDifficulty(topic) {
     difficulty,
     correctRate: meta.correctRate,
     label: meta.label,
-    color: meta.color,
+    colorKey: meta.colorKey,
     netLoss: NET_LOSS_PER_WRONG,
   };
 }

@@ -9,13 +9,13 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
       padding: SPACING.lg,
       marginBottom: SPACING.xxl,
       borderRadius: 20,
-      backgroundColor: C.amber + "12",
+      backgroundColor: C.accent + "12",
       borderWidth: 1,
-      borderColor: C.amber + "30",
+      borderColor: C.accent + "30",
     }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-          <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.amber }}>
+          <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.accent }}>
             Lv.{level}
           </Text>
           <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
@@ -31,7 +31,7 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
         style={{
           height: 8,
           borderRadius: RADIUS.sm,
-          backgroundColor: C.amber + "20",
+          backgroundColor: C.accent + "20",
           marginTop: SPACING.md,
           overflow: "hidden",
         }}
@@ -41,7 +41,7 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
             width: `${progress * 100}%`,
             height: "100%",
             borderRadius: RADIUS.sm,
-            backgroundColor: C.amber,
+            backgroundColor: C.accent,
           }}
         />
       </View>

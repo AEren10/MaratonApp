@@ -1,4 +1,5 @@
 import { supabase } from "./client";
+import { handleSupabaseError } from "./handleError";
 
 // F) Grup ligi modülü.
 
@@ -20,7 +21,8 @@ export async function createGroup(name) {
     .single();
   if (error) throw error;
   // Sahip otomatik üye olur.
-  await supabase.from("group_members").insert({ group_id: data.id, user_id: user.id });
+  const { error: memberErr } = await supabase.from("group_members").insert({ group_id: data.id, user_id: user.id });
+  handleSupabaseError(memberErr, "createGroup:addOwner");
   return data;
 }
 

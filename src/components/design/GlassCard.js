@@ -19,7 +19,7 @@ export function GlassCard({ children, style, radius = 22, color }) {
       {color ? (
         <View
           pointerEvents="none"
-          style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, backgroundColor: color }}
+          style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, backgroundColor: color, borderTopLeftRadius: 24, borderBottomLeftRadius: 24 }}
         />
       ) : null}
       {children}

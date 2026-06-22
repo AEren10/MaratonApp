@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export function Chip({ children, color = "#EBAE63", bg, style }) {
+export function Chip({ children, color = "#8b5cf6", bg, style }) {
   const background = bg ?? color + "1C";
   const border = color + "40";
   return (

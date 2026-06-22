@@ -11,7 +11,7 @@ const COLOR_MAP = {
   green: (C) => ({ bg: C.green + "22", border: C.green + "44", solid: C.green }),
   blue: (C) => ({ bg: C.blue + "22", border: C.blue + "44", solid: C.blue }),
   purple: (C) => ({ bg: C.purple + "22", border: C.purple + "44", solid: C.purple }),
-  coral: (C) => ({ bg: C.coral + "22", border: C.coral + "44", solid: C.coral }),
+  coral: (C) => ({ bg: C.accent + "22", border: C.accent + "44", solid: C.accent }),
 };
 
 export function FeedbackCard({ nudge, onAction, delay = 0 }) {

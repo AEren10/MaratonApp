@@ -61,7 +61,7 @@ export default function NotificationsSettingsScreen() {
   if (!prefs) {
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
-        <ActivityIndicator style={{ flex: 1 }} color={C.amber} />
+        <ActivityIndicator style={{ flex: 1 }} color={C.accent} />
       </SafeAreaView>
     );
   }
@@ -78,7 +78,7 @@ export default function NotificationsSettingsScreen() {
 
       <View style={s.list}>
         <View style={s.row}>
-          <IconBox icon="clock" color={C.amber} size={38} rounded={12} />
+          <IconBox icon="clock" color={C.accent} size={38} rounded={12} />
           <View style={{ flex: 1 }}>
             <Text style={s.label}>Günlük Hatırlatıcı</Text>
             <Text style={s.hint}>Çalışmayı unutmamak için bir hatırlatma</Text>
@@ -86,8 +86,8 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={prefs.dailyReminderEnabled}
             onValueChange={(v) => update({ dailyReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.amber + "80" }}
-            thumbColor={prefs.dailyReminderEnabled ? C.amber : C.muted}
+            trackColor={{ false: C.border, true: C.accent + "80" }}
+            thumbColor={prefs.dailyReminderEnabled ? C.accent : C.muted}
           />
         </View>
 
@@ -103,10 +103,10 @@ export default function NotificationsSettingsScreen() {
                     onPress={() => update({ dailyReminderHour: o.h, dailyReminderMinute: 0 })}
                     style={[
                       s.chip,
-                      { borderColor: active ? C.amber : C.border, backgroundColor: active ? C.amber + "20" : "transparent" },
+                      { borderColor: active ? C.accent : C.border, backgroundColor: active ? C.accent + "20" : "transparent" },
                     ]}
                   >
-                    <Text style={[s.chipText, { color: active ? C.amber : C.sec }]}>
+                    <Text style={[s.chipText, { color: active ? C.accent : C.sec }]}>
                       {o.label}
                     </Text>
                   </Pressable>
@@ -125,8 +125,8 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={prefs.streakRiskEnabled}
             onValueChange={(v) => update({ streakRiskEnabled: v })}
-            trackColor={{ false: C.border, true: C.amber + "80" }}
-            thumbColor={prefs.streakRiskEnabled ? C.amber : C.muted}
+            trackColor={{ false: C.border, true: C.accent + "80" }}
+            thumbColor={prefs.streakRiskEnabled ? C.accent : C.muted}
           />
         </View>
 
@@ -139,13 +139,13 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={prefs.trialReminderEnabled}
             onValueChange={(v) => update({ trialReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.amber + "80" }}
-            thumbColor={prefs.trialReminderEnabled ? C.amber : C.muted}
+            trackColor={{ false: C.border, true: C.accent + "80" }}
+            thumbColor={prefs.trialReminderEnabled ? C.accent : C.muted}
           />
         </View>
 
         <View style={s.row}>
-          <IconBox icon="layers" color={C.coral} size={38} rounded={12} />
+          <IconBox icon="layers" color={C.accent} size={38} rounded={12} />
           <View style={{ flex: 1 }}>
             <Text style={s.label}>Görev Hatırlatıcı</Text>
             <Text style={s.hint}>Çalışma listen yarım kalırsa bildirir</Text>
@@ -153,12 +153,12 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={prefs.taskReminderEnabled !== false}
             onValueChange={(v) => update({ taskReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.amber + "80" }}
-            thumbColor={prefs.taskReminderEnabled !== false ? C.amber : C.muted}
+            trackColor={{ false: C.border, true: C.accent + "80" }}
+            thumbColor={prefs.taskReminderEnabled !== false ? C.accent : C.muted}
           />
         </View>
 
-        {busy && <ActivityIndicator color={C.amber} style={{ marginTop: SPACING.lg }} />}
+        {busy && <ActivityIndicator color={C.accent} style={{ marginTop: SPACING.lg }} />}
       </View>
     </SafeAreaView>
   );

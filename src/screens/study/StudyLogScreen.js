@@ -132,21 +132,23 @@ export default function StudyLogScreen() {
         </Text>
       </View>
       {loading ? (
-        <ActivityIndicator color={C.amber} style={{ marginTop: 40 }} />
+        <ActivityIndicator color={C.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={sections}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={s.list}
-          ListEmptyComponent={<EmptyState icon="clock" title="Henüz çalışma yok" message="İlk çalışmanı kaydet, burada görünsün" actionLabel="Çalışma Ekle" onAction={() => navigation.navigate(SCREENS.ADD_STUDY)} color="amber" />}
+          windowSize={5}
+          maxToRenderPerBatch={10}
+          ListEmptyComponent={<EmptyState icon="clock" title="Çalışma geçmişin burada olacak" message="Kronometreyi başlat veya manuel kayıt ekle, ilerlemenin haritasını çıkaralım. İlk oturum 1 dakika sürer!" actionLabel="Çalışma Ekle" onAction={() => navigation.navigate(SCREENS.ADD_STUDY)} color="accent" />}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor={C.amber}
-              colors={[C.amber]}
+              tintColor={C.accent}
+              colors={[C.accent]}
             />
           }
         />

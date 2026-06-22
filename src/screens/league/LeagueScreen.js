@@ -12,6 +12,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
 import { GroupsTab } from "./GroupsTab";
+import * as H from "../../lib/haptics";
 
 const POLL_MS = 30000;
 
@@ -46,7 +47,7 @@ function TierHeader({ tier, nextTier, myScore, myRank, C }) {
           borderColor: C.border,
         }}>
           <MiniStat label="Haftalık XP" value={myScore} color={C.amber} C={C} />
-          <MiniStat label="Sıran" value={myRank ? `#${myRank}` : "—"} color={C.blue} C={C} />
+          <MiniStat label="Sıran" value={myRank ? `#${myRank}` : "—"} color={C.purple} C={C} />
         </View>
 
         {nextTier && (
@@ -65,8 +66,8 @@ function TierHeader({ tier, nextTier, myScore, myRank, C }) {
 function MiniStat({ label, value, color, C }) {
   return (
     <View style={{ alignItems: "center" }}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: C.text }}>{value}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>{label}</Text>
+      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: color || C.text }}>{value}</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: color || C.sec, opacity: color ? 0.7 : 1 }]}>{label}</Text>
     </View>
   );
 }
@@ -87,12 +88,12 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
         {
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: isYou ? C.amber + "14" : C.surface,
+          backgroundColor: isYou ? C.accent + "14" : C.surface,
           borderRadius: 16,
           paddingHorizontal: 14,
           paddingVertical: 12,
           borderWidth: isYou ? 1 : 0,
-          borderColor: isYou ? C.amber + "40" : "transparent",
+          borderColor: isYou ? C.accent + "40" : "transparent",
         },
         pressStyle,
       ]}
@@ -105,14 +106,14 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
         )}
       </View>
 
-      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={34} color={isYou ? C.amber : undefined} />
+      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={34} color={isYou ? C.accent : undefined} />
 
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text
           style={{
             fontFamily: isYou ? "Inter_600SemiBold" : "Inter_500Medium",
             fontSize: 14,
-            color: isYou ? C.amber : C.text,
+            color: isYou ? C.accent : C.text,
           }}
           numberOfLines={1}
         >
@@ -213,7 +214,25 @@ export default function LeagueScreen() {
           <Icon name="chevL" size={20} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Lig</Text>
-        <View style={{ width: 36 }} />
+        <Pressable
+          onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel="Challenge"
+          accessibilityHint="Challenge ekranına gider"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 12,
+            backgroundColor: C.surface,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 1,
+            borderColor: C.border,
+          }}
+        >
+          <Icon name="zap" size={18} color={C.sec} />
+        </Pressable>
       </View>
 
       <View style={{
@@ -229,20 +248,20 @@ export default function LeagueScreen() {
         ].map((t) => (
           <Pressable
             key={t.key}
-            onPress={() => setTab(t.key)}
+            onPress={() => { H.tap(); setTab(t.key); }}
             style={{
               flex: 1,
               alignItems: "center",
               paddingVertical: SPACING.sm,
               borderRadius: 12,
-              backgroundColor: tab === t.key ? C.amber + "18" : C.surface,
+              backgroundColor: tab === t.key ? C.accent + "18" : C.surface,
               borderWidth: 1,
-              borderColor: tab === t.key ? C.amber : C.border,
+              borderColor: tab === t.key ? C.accent : C.border,
             }}
           >
             <Text style={[
               TYPOGRAPHY.captionMedium,
-              { color: tab === t.key ? C.amber : C.sec },
+              { color: tab === t.key ? C.accent : C.sec },
             ]}>{t.label}</Text>
           </Pressable>
         ))}
@@ -252,7 +271,7 @@ export default function LeagueScreen() {
         <GroupsTab user={user} />
       ) : loading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator color={C.amber} size="large" />
+          <ActivityIndicator color={C.accent} size="large" />
         </View>
       ) : (
         <FlatList
@@ -262,15 +281,18 @@ export default function LeagueScreen() {
             <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} C={C} />
           }
           renderItem={renderItem}
+          windowSize={5}
+          maxToRenderPerBatch={10}
           ListEmptyComponent={
             (error || tab !== "friends")
-              ? <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="amber" />
-              : <EmptyState icon="users" title="Henüz arkadaşın yok" message="Arkadaş ekle, haftalık ligde yarışın." actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="amber" />
+              ? <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="accent" />
+              : <EmptyState icon="users" title="Rakibini bul, motivasyonunu katla" message="Arkadaşlarını ekle, haftalık XP sıralaması başlasın" actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="accent" />
           }
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
+          removeClippedSubviews={true}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />
           }
         />
       )}

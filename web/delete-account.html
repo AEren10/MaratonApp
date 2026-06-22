@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hesap Silme — Maraton</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0A0A0F; color: #E0E0E6; line-height: 1.7; padding: 2rem 1rem; }
+    .container { max-width: 680px; margin: 0 auto; }
+    h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem; color: #F5A623; }
+    .subtitle { font-size: 1rem; color: #888; margin-bottom: 2rem; }
+    h2 { font-size: 1.1rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.5rem; color: #fff; }
+    p { margin-bottom: 1rem; color: #B0B0BA; }
+    .warning { background: #2A1A1A; border: 1px solid #5C2020; border-radius: 12px; padding: 1.25rem; margin: 1.5rem 0; }
+    .warning p { color: #F5A0A0; margin: 0; }
+    .steps { background: #1A1A23; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+    .step { display: flex; gap: 12px; margin-bottom: 1rem; }
+    .step:last-child { margin-bottom: 0; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: #F5A623; color: #0A0A0F; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px; }
+    .step-text { color: #B0B0BA; }
+    .email-link { display: inline-block; margin-top: 1.5rem; padding: 12px 32px; background: #F5A623; color: #0A0A0F; font-weight: 600; border-radius: 12px; text-decoration: none; font-size: 1rem; }
+    .email-link:hover { background: #E09520; }
+    .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #2A2A36; font-size: 0.85rem; color: #666; text-align: center; }
+    a { color: #F5A623; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hesap Silme</h1>
+    <p class="subtitle">Maraton hesabınızı ve tüm verilerinizi kalıcı olarak silebilirsiniz.</p>
+
+    <h2>Uygulama İçinden Silme</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <p class="step-text">Maraton uygulamasını açın ve Profil sekmesine gidin.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <p class="step-text">Sağ üst köşedeki Ayarlar simgesine dokunun.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <p class="step-text">Sayfanın altında "Hesabımı Sil" bağlantısına dokunun.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <p class="step-text">Onay kutusunda "Hesabımı Sil" butonuna dokunarak işlemi tamamlayın.</p>
+      </div>
+    </div>
+
+    <h2>E-posta ile Silme Talebi</h2>
+    <p>Uygulamaya erişemiyorsanız, hesabınızla ilişkili e-posta adresinden aşağıdaki adrese silme talebi gönderebilirsiniz. Talebiniz 30 gün içerisinde işleme alınır.</p>
+    <a href="mailto:destek@maraton.app?subject=Hesap%20Silme%20Talebi&body=Hesab%C4%B1m%C4%B1%20ve%20t%C3%BCm%20verilerimi%20silmenizi%20talep%20ediyorum.%0A%0AHesap%20e-posta%20adresim%3A%20" class="email-link">destek@maraton.app adresine e-posta gönder</a>
+
+    <div class="warning">
+      <p><strong>Dikkat:</strong> Hesap silme işlemi geri alınamaz. Silme işlemi sonucunda aşağıdaki verileriniz kalıcı olarak kaldırılır:</p>
+      <p style="margin-top: 8px;">• Profil bilgileriniz (ad, e-posta, avatar)<br>
+         • Tüm çalışma kayıtlarınız ve istatistikleriniz<br>
+         • Deneme sonuçlarınız ve analizleriniz<br>
+         • Yanlış defteri kayıtlarınız ve fotoğraflarınız<br>
+         • Çalışma planlarınız ve hedefleriniz<br>
+         • XP puanlarınız ve lig sıramanız</p>
+    </div>
+
+    <h2>Silinen Veriler</h2>
+    <p>Hesabınız silindiğinde, Supabase veritabanındaki tüm kişisel verileriniz cascade olarak kaldırılır. Depolama alanındaki (fotoğraflar, avatarlar) dosyalarınız da silinir. Yasal zorunluluklar gereği bazı anonim istatistiksel veriler saklanabilir.</p>
+
+    <div class="footer">
+      <p>&copy; 2026 Maraton. Tüm hakları saklıdır.</p>
+      <p><a href="/privacy">Gizlilik Politikası</a> · <a href="/terms">Kullanım Koşulları</a></p>
+    </div>
+  </div>
+</body>
+</html>

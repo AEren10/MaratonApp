@@ -9,12 +9,12 @@ export function DailyActionCard({ suggestion, loading, onAdd, onUnderstood, onLa
   if (loading) {
     return (
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border, alignItems: "center" }]}>
-        <ActivityIndicator color={C.purple} />
+        <ActivityIndicator color={C.accent} />
       </View>
     );
   }
   if (!suggestion) return null;
-  const color = suggestion.color || C.purple;
+  const color = suggestion.color || C.accent;
 
   return (
     <View style={[s.card, { backgroundColor: color + "0F", borderColor: color + "30" }]}>

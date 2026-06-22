@@ -1,49 +1,15 @@
+import { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 
-const SECTIONS = [
-  {
-    title: "HESAP",
-    items: [
-      { icon: "user",  label: "Profil Düzenle", route: SCREENS.EDIT_PROFILE, color: "purple" },
-      { icon: "mail",  label: "E-posta Değiştir", route: SCREENS.EDIT_EMAIL, color: "blue" },
-      { icon: "lock",  label: "Şifre Değiştir", route: SCREENS.CHANGE_PASSWORD, color: "coral" },
-    ],
-  },
-  {
-    title: "ÇALIŞMA",
-    items: [
-      { icon: "target",   label: "Hedeflerim",       route: SCREENS.GOALS,           color: "amber" },
-      { icon: "clock",    label: "Çalışma Geçmişi",  route: SCREENS.STUDY_LOG,       color: "blue" },
-      { icon: "hash",     label: "Konu Kartları",     route: SCREENS.TOPIC_CARDS,     color: "purple" },
-      { icon: "chart",    label: "Net Simülatörü",    route: SCREENS.RANK_SIMULATOR,  color: "teal" },
-      { icon: "layers",   label: "Yol Haritası",      route: SCREENS.ROADMAP,         color: "green" },
-      { icon: "calendar", label: "Takvim",            route: SCREENS.CALENDAR,        color: "blue" },
-    ],
-  },
-  {
-    title: "SOSYAL",
-    items: [
-      { icon: "users",  label: "Arkadaşlar", route: SCREENS.FRIENDS, color: "pink" },
-    ],
-  },
-  {
-    title: "SİSTEM",
-    items: [
-      { icon: "settings", label: "Ayarlar", route: SCREENS.SETTINGS, color: "muted" },
-    ],
-  },
-];
-
 function MenuRow({ item, isLast, onNavigate, C }) {
-  const iconColor = item.color === "muted" ? C.muted : (C[item.color] || C.text);
-  const bg        = item.color === "muted" ? C.surface2 : (C[item.color] + "1A");
-
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
       onPress={() => item.route && onNavigate?.(item.route)}
       style={({ pressed }) => ({
         flexDirection: "row",
@@ -57,11 +23,11 @@ function MenuRow({ item, isLast, onNavigate, C }) {
     >
       <View style={{
         width: 34, height: 34, borderRadius: 11,
-        backgroundColor: bg,
+        backgroundColor: (item.color || C.muted) + "18",
         alignItems: "center", justifyContent: "center",
         marginRight: 12,
       }}>
-        <Icon name={item.icon} size={17} color={iconColor} />
+        <Icon name={item.icon} size={17} color={item.color || C.sec} />
       </View>
       <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>
         {item.label}
@@ -73,6 +39,39 @@ function MenuRow({ item, isLast, onNavigate, C }) {
 
 export function SettingsMenu({ onNavigate, onLogout }) {
   const C = useC();
+  const SECTIONS = useMemo(() => [
+    {
+      title: "HESAP",
+      items: [
+        { icon: "user",  label: "Profil Düzenle", route: SCREENS.EDIT_PROFILE, color: C.blue },
+        { icon: "mail",  label: "E-posta Değiştir", route: SCREENS.EDIT_EMAIL, color: C.teal },
+        { icon: "lock",  label: "Şifre Değiştir", route: SCREENS.CHANGE_PASSWORD, color: C.amber },
+      ],
+    },
+    {
+      title: "ÇALIŞMA",
+      items: [
+        { icon: "target",   label: "Hedeflerim",       route: SCREENS.GOALS,           color: C.green },
+        { icon: "clock",    label: "Çalışma Geçmişi",  route: SCREENS.STUDY_LOG,       color: C.blue },
+        { icon: "hash",     label: "Konu Kartları",     route: SCREENS.TOPIC_CARDS,     color: C.brandLight },
+        { icon: "chart",    label: "Net Simülatörü",    route: SCREENS.RANK_SIMULATOR,  color: C.pink },
+        { icon: "layers",   label: "Yol Haritası",      route: SCREENS.ROADMAP,         color: C.teal },
+        { icon: "calendar", label: "Takvim",            route: SCREENS.CALENDAR,        color: C.amber },
+      ],
+    },
+    {
+      title: "SOSYAL",
+      items: [
+        { icon: "users",  label: "Arkadaşlar", route: SCREENS.FRIENDS, color: C.pink },
+      ],
+    },
+    {
+      title: "SİSTEM",
+      items: [
+        { icon: "settings", label: "Ayarlar", route: SCREENS.SETTINGS, color: C.muted },
+      ],
+    },
+  ], [C]);
   return (
     <View style={{ gap: SPACING.lg }}>
       {SECTIONS.map((section) => (
@@ -102,6 +101,9 @@ export function SettingsMenu({ onNavigate, onLogout }) {
 
       {/* Çıkış — ayrı, kırmızı */}
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Çıkış Yap"
+        accessibilityHint="Hesabından çıkış yapar"
         onPress={onLogout}
         style={({ pressed }) => ({
           flexDirection: "row", alignItems: "center", justifyContent: "center",

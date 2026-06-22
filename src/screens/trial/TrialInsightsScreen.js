@@ -196,9 +196,9 @@ export default function TrialInsightsScreen() {
           <Pressable
             key={f.key}
             onPress={() => setFilter(f.key)}
-            style={[s.filterChip, filter === f.key && { backgroundColor: C.amber + "22", borderColor: C.amber }]}
+            style={[s.filterChip, filter === f.key && { backgroundColor: C.accent + "22", borderColor: C.accent }]}
           >
-            <Text style={[s.filterText, filter === f.key && { color: C.amber }]}>{f.label}</Text>
+            <Text style={[s.filterText, filter === f.key && { color: C.accent }]}>{f.label}</Text>
           </Pressable>
         ))}
       </View>
@@ -216,7 +216,7 @@ export default function TrialInsightsScreen() {
             </View>
             <Text style={s.trialCount}>{filteredTrials.length} deneme</Text>
           </View>
-          <NetChart data={overallData} color={C.amber} C={C} showLabels />
+          <NetChart data={overallData} color={C.accent} C={C} showLabels />
 
           {/* Date labels */}
           {overallData.length >= 2 && (
@@ -252,9 +252,9 @@ export default function TrialInsightsScreen() {
         {filteredTrials.length === 0 && (
           <EmptyState
             icon="trendUp"
-            title="Henüz deneme girişi yok"
-            message="Deneme girdikçe net trendlerin burada görünecek"
-            color="purple"
+            title="İlk denemenle trend başlasın"
+            message="Net trendlerin, ders bazlı analizin ve gelişim grafiklerin burada olacak"
+            color="accent"
           />
         )}
       </ScrollView>
@@ -296,7 +296,7 @@ function makeStyles(C) {
     },
     mainHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: SPACING.md },
     mainLabel: { ...TYPOGRAPHY.captionMedium, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5 },
-    mainValue: { ...TYPOGRAPHY.stat, color: C.text, fontSize: 36 },
+    mainValue: { ...TYPOGRAPHY.stat, color: C.accent, fontSize: 36 },
     trialCount: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 4 },
     dateRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
     dateLabel: { ...TYPOGRAPHY.micro, color: C.muted },

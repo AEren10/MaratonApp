@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -36,6 +36,13 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
     reset();
     onClose();
   };
+
+  const renderTopicItem = useCallback(({ item }) => (
+    <Pressable onPress={() => pick(item, "curriculum")} style={s.row}>
+      <Text style={s.rowText}>{item}</Text>
+      <Icon name="chevR" size={14} color={C.muted} />
+    </Pressable>
+  ), [pick, s, C.muted]);
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -82,19 +89,16 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
                 keyExtractor={(item, i) => `${item}-${i}`}
                 style={{ maxHeight: 320 }}
                 keyboardShouldPersistTaps="handled"
-                renderItem={({ item }) => (
-                  <Pressable onPress={() => pick(item, "curriculum")} style={s.row}>
-                    <Text style={s.rowText}>{item}</Text>
-                    <Icon name="chevR" size={14} color={C.muted} />
-                  </Pressable>
-                )}
+                windowSize={5}
+                maxToRenderPerBatch={10}
+                renderItem={renderTopicItem}
                 ListEmptyComponent={
                   <Text style={s.emptyText}>Eşleşen konu yok</Text>
                 }
               />
 
               <Pressable onPress={() => setCustomMode(true)} style={s.customRow}>
-                <Icon name="edit" size={15} color={C.amber} />
+                <Icon name="edit" size={15} color={C.accent} />
                 <Text style={s.customText}>Listede yok, elle yaz</Text>
               </Pressable>
             </>
@@ -150,7 +154,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingVertical: SPACING.md,
     marginTop: SPACING.sm,
   },
-  customText: { ...TYPOGRAPHY.bodySemiBold, color: C.amber },
+  customText: { ...TYPOGRAPHY.bodySemiBold, color: C.accent },
   input: {
     backgroundColor: C.surface2,
     borderWidth: 1,
@@ -162,7 +166,7 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.text,
   },
   primaryBtn: {
-    backgroundColor: C.amber,
+    backgroundColor: C.accent,
     borderRadius: RADIUS.lg,
     paddingVertical: SPACING.md,
     alignItems: "center",

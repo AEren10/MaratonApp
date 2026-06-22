@@ -47,6 +47,9 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${subj.label}${item.topic ? `, ${item.topic}` : ""}${item.is_resolved ? ", çözüldü" : ""}`}
+      accessibilityHint="Detayları görmek için dokun"
       onPress={onPress}
       onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
@@ -87,6 +90,9 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
         </View>
 
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={item.is_resolved ? "Çözüldü" : "Çözdüm olarak işaretle"}
+          accessibilityHint={item.is_resolved ? "" : "Yanlışı çözülmüş olarak işaretler"}
           onPress={onResolve}
           hitSlop={8}
           style={{
@@ -162,24 +168,13 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
         {diff ? (
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 4,
-            backgroundColor: diff.color + "16",
+            backgroundColor: C[diff.colorKey] + "16",
             paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
           }}>
-            <Icon name="users" size={10} color={diff.color} />
-            <Text style={{ fontSize: 11, color: diff.color, fontFamily: "Inter_600SemiBold" }}>
+            <Icon name="users" size={10} color={C[diff.colorKey]} />
+            <Text style={{ fontSize: 11, color: C[diff.colorKey], fontFamily: "Inter_600SemiBold" }}>
               ~%{diff.correctRate} doğru · -{diff.netLoss}
             </Text>
-          </View>
-        ) : null}
-
-        {item.is_resolved ? (
-          <View style={{
-            flexDirection: "row", alignItems: "center", gap: 4,
-            backgroundColor: C.green + "18",
-            paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
-          }}>
-            <Icon name="check" size={10} color={C.green} />
-            <Text style={{ fontSize: 11, color: C.green, fontFamily: "Inter_600SemiBold" }}>Çözüldü</Text>
           </View>
         ) : null}
 
@@ -187,6 +182,9 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
 
         {onShare ? (
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={shared ? "Paylaşıldı" : "Paylaş"}
+            accessibilityHint={shared ? "" : "Soruyu toplulukla paylaşır"}
             onPress={onShare}
             hitSlop={8}
             style={({ pressed }) => ({

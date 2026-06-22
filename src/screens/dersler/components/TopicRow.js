@@ -7,12 +7,15 @@ import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { getMastery } from "../../../lib/mastery";
 
-function AccBadge({ acc, C }) {
-  const color = acc >= 75 ? C.green : acc >= 50 ? C.amber : C.red;
+function AccBadge({ acc, q, subjectColor, C }) {
+  const isDormant = q === 0;
+  const color = isDormant
+    ? (subjectColor || C.dormant)
+    : acc >= 75 ? C.green : acc >= 50 ? C.amber : (acc < 30 && q >= 10) ? C.red : C.amber;
   return (
     <View
       style={{
-        backgroundColor: color + "18",
+        backgroundColor: isDormant ? (subjectColor ? subjectColor + "14" : C.dormantBg) : color + "18",
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 8,
@@ -20,7 +23,9 @@ function AccBadge({ acc, C }) {
         alignItems: "center",
       }}
     >
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color }}>%{acc}</Text>
+      <Text style={{ ...TYPOGRAPHY.captionMedium, color, opacity: isDormant ? 0.5 : 1 }}>
+        {isDormant ? "—" : `%${acc}`}
+      </Text>
     </View>
   );
 }
@@ -51,7 +56,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
   const C = useC();
   const navigation = useNavigation();
   const mastery = getMastery({ q: topic.q, acc: topic.acc });
-  const dotColor = mastery.color;
+  const dotColor = C[mastery.colorKey];
 
   const handlePress = () => {
     const subjectInfo = { key: subject.key, name: subject.name, color: subject.color, icon: subject.icon };
@@ -94,8 +99,8 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
           {topic.name}
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
-          <Icon name="hash" size={11} color={C.muted} sw={1.5} />
-          <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, marginLeft: 3 }}>
+          <Icon name="hash" size={11} color={color} sw={1.5} style={{ opacity: 0.6 }} />
+          <Text style={{ ...TYPOGRAPHY.micro, color, opacity: 0.6, marginLeft: 3 }}>
             {topic.q} soru
           </Text>
           {topic.wrong ? (
@@ -108,7 +113,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
 
       {/* Right side: accuracy + mini bar */}
       <View style={{ alignItems: "flex-end", gap: 4, marginLeft: SPACING.sm }}>
-        <AccBadge acc={topic.acc} C={C} />
+        <AccBadge acc={topic.acc} q={topic.q} subjectColor={color} C={C} />
         <MiniBar pct={topic.pct} color={color} />
       </View>
 

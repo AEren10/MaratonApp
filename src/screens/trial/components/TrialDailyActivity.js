@@ -21,17 +21,17 @@ export function TrialDailyActivity({ dailyActivity }) {
           return (
             <View key={d.label} style={{ flex: 1, alignItems: "center", gap: 6 }}>
               <Text style={{
-                fontFamily: "SpaceGrotesk_700Bold", fontSize: 10,
-                color: active ? C.purple : "transparent",
+                fontFamily: "SpaceGrotesk_700Bold", fontSize: 11,
+                color: active ? C.accent : "transparent",
               }}>
                 {d.count}
               </Text>
               <View style={{
                 width: "100%", height: h, borderRadius: 4,
-                backgroundColor: active ? C.purple : C.surface2,
+                backgroundColor: active ? C.accent : C.surface2,
               }} />
               <Text style={{
-                fontFamily: "Inter_500Medium", fontSize: 10,
+                fontFamily: "Inter_500Medium", fontSize: 11,
                 color: active ? C.text : C.muted,
               }}>
                 {d.label}

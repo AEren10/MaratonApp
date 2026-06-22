@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, COLORS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -13,6 +13,7 @@ import { selectLatestTYT, selectLatestAYT } from "../../store/slices/trialSlice"
 import { estimateRank, RANKING_DISCLAIMER } from "../../data/rankingTable";
 import { PROGRAMS, PROGRAM_CATEGORIES, getProgramById, searchPrograms } from "../../data/programs";
 import { getProfile, updateProfile } from "../../supabase/profiles";
+import * as H from "../../lib/haptics";
 
 const FIELD_TO_TYPE = { sayisal: "say", ea: "ea", sozel: "soz", dil: "ea" };
 const fmt = (n) => n.toLocaleString("tr-TR");
@@ -39,7 +40,7 @@ const progKeyExtractor = (item) => item.id;
 const progListStyle = { marginTop: 8, maxHeight: 380 };
 const ProgEmptyComponent = (
   <View style={{ padding: 24, alignItems: "center" }}>
-    <Text style={{ color: "#888" }}>Sonuç bulunamadı</Text>
+    <Text style={{ color: COLORS.dark.textMuted }}>Sonuç bulunamadı</Text>
   </View>
 );
 
@@ -198,6 +199,7 @@ export default function RankSimulatorScreen() {
   const reachable = target ? simRank <= target.rank : null;
 
   const selectTarget = useCallback(async (program) => {
+    H.select();
     setTargetId(program.id);
     setPickerOpen(false);
     if (user?.id && user.id !== "dev") {
@@ -228,15 +230,15 @@ export default function RankSimulatorScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[s.title, { color: C.text }]}>Net Simülatörü</Text>
-        <Pressable onPress={() => { setTouched(false); }} hitSlop={12}>
+        <Pressable onPress={() => { H.tap(); setTouched(false); }} hitSlop={12}>
           <Icon name="refresh" size={20} color={C.muted} />
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {/* === Sıralama hero === */}
-        <Animated.View entering={FadeInDown.delay(0).duration(420).springify()} style={[s.rankCard, { backgroundColor: C.purple + "14", borderColor: C.purple + "30" }]}>
-          <Text style={[s.rankLabel, { color: C.purple }]}>TAHMİNİ SIRALAMAN</Text>
+        <Animated.View entering={FadeInDown.delay(0).duration(420).springify()} style={[s.rankCard, { backgroundColor: C.accent + "14", borderColor: C.accent + "30" }]}>
+          <Text style={[s.rankLabel, { color: C.accent }]}>TAHMİNİ SIRALAMAN</Text>
           <Text style={[s.rankBig, { color: C.text }]}>{fmt(simRank)}</Text>
           {baseRank !== simRank && (
             <View style={[s.deltaChip, { backgroundColor: delta > 0 ? C.green + "20" : C.red + "20" }]}>
@@ -253,7 +255,7 @@ export default function RankSimulatorScreen() {
 
         {/* === Hedef bölüm === */}
         <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
-        <Pressable onPress={() => setPickerOpen(true)} style={{ marginTop: 14 }}>
+        <Pressable onPress={() => { H.tap(); setPickerOpen(true); }} style={{ marginTop: 14 }}>
           <View style={[s.targetCard, { backgroundColor: C.surface, borderColor: C.border }]}>
             <View style={{ flex: 1 }}>
               <Text style={[s.targetLabel, { color: C.muted }]}>HEDEF BÖLÜM</Text>
@@ -280,8 +282,8 @@ export default function RankSimulatorScreen() {
                 <Text style={[s.targetName, { color: C.muted }]}>Bölüm seç</Text>
               )}
             </View>
-            <View style={[s.targetIcon, { backgroundColor: C.purple + "1A" }]}>
-              <Icon name="chevR" size={18} color={C.purple} />
+            <View style={[s.targetIcon, { backgroundColor: C.accent + "1A" }]}>
+              <Icon name="chevR" size={18} color={C.accent} />
             </View>
           </View>
         </Pressable>
@@ -358,8 +360,8 @@ export default function RankSimulatorScreen() {
                   <Pressable
                     onPress={() => setCategory(null)}
                     style={[s.catChip, {
-                      backgroundColor: !category ? C.purple : C.surface2,
-                      borderColor: !category ? C.purple : C.border,
+                      backgroundColor: !category ? C.accent : C.surface2,
+                      borderColor: !category ? C.accent : C.border,
                     }]}
                   >
                     <Text style={[s.catText, { color: !category ? "#FFFFFF" : C.sec }]}>
@@ -393,6 +395,8 @@ export default function RankSimulatorScreen() {
                 keyExtractor={progKeyExtractor}
                 style={progListStyle}
                 keyboardShouldPersistTaps="handled"
+                windowSize={5}
+                maxToRenderPerBatch={10}
                 ListEmptyComponent={ProgEmptyComponent}
                 renderItem={renderProgItem}
               />

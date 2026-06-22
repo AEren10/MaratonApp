@@ -25,9 +25,9 @@ export function DurationPicker({ selected, onSelect }) {
               paddingHorizontal: SPACING.lg,
               paddingVertical: 10,
               borderRadius: 12,
-              backgroundColor: active ? C.amber + "22" : C.surface,
+              backgroundColor: active ? C.accent + "22" : C.surface,
               borderWidth: 1,
-              borderColor: active ? C.amber : C.border,
+              borderColor: active ? C.accent : C.border,
               minWidth: 56,
               alignItems: "center",
             }}
@@ -36,7 +36,7 @@ export function DurationPicker({ selected, onSelect }) {
               style={{
                 fontFamily: "Inter_600SemiBold",
                 fontSize: 13,
-                color: active ? C.amber : C.sec,
+                color: active ? C.accent : C.sec,
               }}
             >
               {d.label}

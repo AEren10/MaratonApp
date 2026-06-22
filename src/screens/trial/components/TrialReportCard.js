@@ -17,7 +17,7 @@ const makeStyles = (C) => StyleSheet.create({
     left: 0,
     right: 0,
     height: 4,
-    backgroundColor: C.amber,
+    backgroundColor: C.accent,
   },
   headerRow: {
     flexDirection: "row",
@@ -27,7 +27,7 @@ const makeStyles = (C) => StyleSheet.create({
   brand: {
     fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 18,
-    color: C.amber,
+    color: C.accent,
     letterSpacing: 1,
   },
   type: { ...TYPOGRAPHY.captionMedium, color: C.sec },
@@ -36,10 +36,10 @@ const makeStyles = (C) => StyleSheet.create({
   netValue: {
     fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 64,
-    color: C.text,
+    color: C.accent,
     letterSpacing: -2,
   },
-  netLabel: { ...TYPOGRAPHY.label, color: C.amber, marginTop: -SPACING.xs },
+  netLabel: { ...TYPOGRAPHY.label, color: C.accent, marginTop: -SPACING.xs },
   barsWrap: { gap: SPACING.sm },
   barRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   dot: { width: 8, height: 8, borderRadius: 4 },

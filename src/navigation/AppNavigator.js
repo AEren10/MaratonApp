@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -13,68 +13,111 @@ import { ScreenErrorBoundary } from "../components/common/ScreenErrorBoundary";
 
 import { TabBar } from "./TabBar";
 import { DataSyncProvider } from "../contexts/DataSyncContext";
+import { PremiumProvider } from "../contexts/PremiumContext";
 import { linkingConfig } from "./linking";
 
+// Tab screens — eager (always visible)
 import HomeScreen from "../screens/home/HomeScreen";
-import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
-import AddWrongScreen from "../screens/wrong-notebook/AddWrongScreen";
-import WrongDetailScreen from "../screens/wrong-notebook/WrongDetailScreen";
-import LoginScreen from "../screens/auth/LoginScreen";
-import RegisterScreen from "../screens/auth/RegisterScreen";
 import DerslerScreen from "../screens/dersler/DerslerScreen";
 import AnalysisScreen from "../screens/analysis/AnalysisScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
+import LeagueScreen from "../screens/league/LeagueScreen";
+
+// Auth — eager (login akışı hemen açılmalı)
+import LoginScreen from "../screens/auth/LoginScreen";
+import RegisterScreen from "../screens/auth/RegisterScreen";
+import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
+
+// Onboarding — eager (ilk kullanımda hemen açılmalı)
+import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
+import ExamSetupScreen from "../screens/onboarding/ExamSetupScreen";
+import GoalSetupScreen from "../screens/onboarding/GoalSetupScreen";
+
+// Wrong notebook — eager (sık kullanılan ana akış)
+import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
+import AddWrongScreen from "../screens/wrong-notebook/AddWrongScreen";
+import WrongDetailScreen from "../screens/wrong-notebook/WrongDetailScreen";
+import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
+import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
+
+// Study — eager (ana akış)
 import AddStudyScreen from "../screens/study/AddStudyScreen";
 import StudyTimerScreen from "../screens/study/StudyTimerScreen";
 import StudySaveScreen from "../screens/study/StudySaveScreen";
-import SettingsScreen from "../screens/settings/SettingsScreen";
+import StudyLogScreen from "../screens/study/StudyLogScreen";
+import StudySummaryScreen from "../screens/study/StudySummaryScreen";
+import StudyHistoryScreen from "../screens/study/StudyHistoryScreen";
+
+// Trials — eager (ana akış)
 import TrialEntryScreen from "../screens/trial/TrialEntryScreen";
 import TrialSummaryScreen from "../screens/trial/TrialSummaryScreen";
 import TrialDetailScreen from "../screens/trial/TrialDetailScreen";
 import TrialCompareScreen from "../screens/trial/TrialCompareScreen";
+import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
+import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
+
+// Plan — eager (günlük kullanım)
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
+import AddTaskScreen from "../screens/plan/AddTaskScreen";
+
+// Topics / Dersler — eager (ana akış)
 import TopicCardsScreen from "../screens/topics/TopicCardsScreen";
 import CardDetailScreen from "../screens/topics/CardDetailScreen";
-import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
-import ExamSetupScreen from "../screens/onboarding/ExamSetupScreen";
-import GoalSetupScreen from "../screens/onboarding/GoalSetupScreen";
-import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
-import StudyLogScreen from "../screens/study/StudyLogScreen";
+import TopicStudyScreen from "../screens/dersler/TopicStudyScreen";
+
+// Analysis detail — eager (tab'dan hemen erişilebilir)
 import SubjectDetailScreen from "../screens/analysis/SubjectDetailScreen";
 import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
-import TopicStudyScreen from "../screens/dersler/TopicStudyScreen";
-import AppearanceScreen from "../screens/settings/AppearanceScreen";
-import EditProfileScreen from "../screens/settings/EditProfileScreen";
-import ChangePasswordScreen from "../screens/settings/ChangePasswordScreen";
-import EditEmailScreen from "../screens/settings/EditEmailScreen";
-import NotificationsSettingsScreen from "../screens/settings/NotificationsSettingsScreen";
-import PrivacyScreen from "../screens/settings/PrivacyScreen";
-import AboutScreen from "../screens/settings/AboutScreen";
-import LeagueScreen from "../screens/league/LeagueScreen";
-import CalendarScreen from "../screens/calendar/CalendarScreen";
+
+// Settings — eager (ana sayfa, sık erişilir)
+import SettingsScreen from "../screens/settings/SettingsScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
-import FriendsScreen from "../screens/social/FriendsScreen";
-import RankSimulatorScreen from "../screens/simulator/RankSimulatorScreen";
-import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
-import RoadmapScreen from "../screens/roadmap/RoadmapScreen";
-import StudySummaryScreen from "../screens/study/StudySummaryScreen";
-import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
+
+// Settings alt sayfaları — lazy (nadir erişilir)
+const AppearanceScreen = React.lazy(() => import("../screens/settings/AppearanceScreen"));
+const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
+const ChangePasswordScreen = React.lazy(() => import("../screens/settings/ChangePasswordScreen"));
+const EditEmailScreen = React.lazy(() => import("../screens/settings/EditEmailScreen"));
+const NotificationsSettingsScreen = React.lazy(() => import("../screens/settings/NotificationsSettingsScreen"));
+const PrivacyScreen = React.lazy(() => import("../screens/settings/PrivacyScreen"));
+const TermsScreen = React.lazy(() => import("../screens/settings/TermsScreen"));
+const AboutScreen = React.lazy(() => import("../screens/settings/AboutScreen"));
+
+// Social — lazy (nadir kullanım)
+const FriendsScreen = React.lazy(() => import("../screens/social/FriendsScreen"));
+const ChallengeScreen = React.lazy(() => import("../screens/social/ChallengeScreen"));
+const ShareCardScreen = React.lazy(() => import("../screens/social/ShareCardScreen"));
+
+// Other — karma
+import CalendarScreen from "../screens/calendar/CalendarScreen";
 import WeeklyReviewScreen from "../screens/home/WeeklyReviewScreen";
-import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
-import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
-import ChallengeScreen from "../screens/social/ChallengeScreen";
-import QuickPracticeScreen from "../screens/practice/QuickPracticeScreen";
-import ShareCardScreen from "../screens/social/ShareCardScreen";
-import ExamSimulatorScreen from "../screens/simulator/ExamSimulatorScreen";
-import AddTaskScreen from "../screens/plan/AddTaskScreen";
+const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
+const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
+const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
+const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
+const QuickPracticeScreen = React.lazy(() => import("../screens/practice/QuickPracticeScreen"));
+const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
+
+// Premium — lazy
+const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+function LazyFallback() {
+  return (
+    <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
+      <ActivityIndicator color={C.accent} size="large" />
+    </View>
+  );
+}
+
 function withEB(Comp) {
   const Wrapped = (props) => (
     <ScreenErrorBoundary navigation={props.navigation}>
-      <Comp {...props} />
+      <Suspense fallback={<LazyFallback />}>
+        <Comp {...props} />
+      </Suspense>
     </ScreenErrorBoundary>
   );
   Wrapped.displayName = `EB(${Comp.displayName || Comp.name || "Screen"})`;
@@ -94,6 +137,7 @@ const EBPlanDetail = withEB(PlanDetailScreen);
 const EBAddStudy = withEB(AddStudyScreen);
 const EBStudyTimer = withEB(StudyTimerScreen);
 const EBStudySave = withEB(StudySaveScreen);
+const EBStudyHistory = withEB(StudyHistoryScreen);
 const EBTrialEntry = withEB(TrialEntryScreen);
 const EBTrialSummary = withEB(TrialSummaryScreen);
 const EBTrialDetail = withEB(TrialDetailScreen);
@@ -114,12 +158,15 @@ const EBChangePassword = withEB(ChangePasswordScreen);
 const EBEditEmail = withEB(EditEmailScreen);
 const EBNotificationsSettings = withEB(NotificationsSettingsScreen);
 const EBPrivacy = withEB(PrivacyScreen);
+const EBTerms = withEB(TermsScreen);
 const EBAbout = withEB(AboutScreen);
 const EBLeague = withEB(LeagueScreen);
 const EBCalendar = withEB(CalendarScreen);
 const EBGoals = withEB(GoalsScreen);
 const EBFriends = withEB(FriendsScreen);
 const EBRankSimulator = withEB(RankSimulatorScreen);
+const EBNetForecast = withEB(NetForecastScreen);
+const EBComparative = withEB(ComparativeScreen);
 const EBReviewSession = withEB(ReviewSessionScreen);
 const EBRoadmap = withEB(RoadmapScreen);
 const EBStudySummary = withEB(StudySummaryScreen);
@@ -132,6 +179,7 @@ const EBQuickPractice = withEB(QuickPracticeScreen);
 const EBShareCard = withEB(ShareCardScreen);
 const EBExamSimulator = withEB(ExamSimulatorScreen);
 const EBAddTask = withEB(AddTaskScreen);
+const EBPaywall = withEB(PaywallScreen);
 
 const screenOptions = {
   headerShown: false,
@@ -203,6 +251,7 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} />
       <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} />
       <Stack.Screen name={SCREENS.STUDY_SAVE} component={EBStudySave} />
+      <Stack.Screen name={SCREENS.STUDY_HISTORY} component={EBStudyHistory} />
       <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} />
       <Stack.Screen name={SCREENS.TRIAL_SUMMARY} component={EBTrialSummary} options={{ gestureEnabled: false }} />
       <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} />
@@ -223,12 +272,15 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.EDIT_EMAIL} component={EBEditEmail} options={modalOptions} />
       <Stack.Screen name={SCREENS.NOTIFICATIONS_SETTINGS} component={EBNotificationsSettings} />
       <Stack.Screen name={SCREENS.PRIVACY} component={EBPrivacy} />
+      <Stack.Screen name={SCREENS.TERMS} component={EBTerms} />
       <Stack.Screen name={SCREENS.ABOUT} component={EBAbout} />
       <Stack.Screen name={SCREENS.LEAGUE} component={EBLeague} />
       <Stack.Screen name={SCREENS.CALENDAR} component={EBCalendar} />
       <Stack.Screen name={SCREENS.GOALS} component={EBGoals} />
       <Stack.Screen name={SCREENS.FRIENDS} component={EBFriends} />
       <Stack.Screen name={SCREENS.RANK_SIMULATOR} component={EBRankSimulator} />
+      <Stack.Screen name={SCREENS.NET_FORECAST} component={EBNetForecast} />
+      <Stack.Screen name={SCREENS.COMPARATIVE} component={EBComparative} />
       <Stack.Screen name={SCREENS.REVIEW_SESSION} component={EBReviewSession} />
       <Stack.Screen name={SCREENS.ROADMAP} component={EBRoadmap} />
       <Stack.Screen name={SCREENS.STUDY_SUMMARY} component={EBStudySummary} options={modalOptions} />
@@ -241,6 +293,7 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.SHARE_CARD} component={EBShareCard} />
       <Stack.Screen name={SCREENS.EXAM_SIMULATOR} component={EBExamSimulator} />
       <Stack.Screen name={SCREENS.ADD_TASK} component={EBAddTask} options={modalOptions} />
+      <Stack.Screen name={SCREENS.PAYWALL} component={EBPaywall} options={modalOptions} />
     </Stack.Navigator>
   );
 }
@@ -248,7 +301,9 @@ function AppStackInner() {
 function AppStack() {
   return (
     <DataSyncProvider>
-      <AppStackInner />
+      <PremiumProvider>
+        <AppStackInner />
+      </PremiumProvider>
     </DataSyncProvider>
   );
 }
@@ -257,7 +312,7 @@ function Loading() {
   const C = useC();
   return (
     <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
-      <ActivityIndicator color={C.amber} size="large" />
+      <ActivityIndicator color={C.accent} size="large" />
     </View>
   );
 }

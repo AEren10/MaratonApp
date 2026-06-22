@@ -76,13 +76,13 @@ export default function SettingsScreen() {
           <SettingsGroup title="TERCİHLER">
             <SettingsRow
               icon="bell"
-              iconColor={C.amber}
+              iconColor={C.accent}
               label="Bildirimler"
               onPress={() => { H.tap(); go(SCREENS.NOTIFICATIONS_SETTINGS); }}
             />
             <SettingsRow
               icon="moon"
-              iconColor={C.purple}
+              iconColor={C.accent}
               label="Görünüm"
               onPress={() => { H.tap(); go(SCREENS.APPEARANCE); }}
             />
@@ -98,6 +98,12 @@ export default function SettingsScreen() {
               onPress={() => { H.tap(); go(SCREENS.PRIVACY); }}
             />
             <SettingsRow
+              icon="book"
+              iconColor={C.teal}
+              label="Kullanım Koşulları"
+              onPress={() => { H.tap(); go(SCREENS.TERMS); }}
+            />
+            <SettingsRow
               icon="info"
               iconColor={C.green}
               label="Hakkında"
@@ -105,7 +111,7 @@ export default function SettingsScreen() {
             />
             <SettingsRow
               icon="share"
-              iconColor={C.coral}
+              iconColor={C.accent}
               label="Yardım"
               onPress={() => { H.tap(); handleHelp(); }}
             />
@@ -137,7 +143,7 @@ export default function SettingsScreen() {
               { opacity: pressed ? 0.85 : 1 },
             ]}
           >
-            <Text style={styles.deleteText}>Hesabımı Sil</Text>
+            <Text style={[styles.deleteText, { color: C.muted }]}>Hesabımı Sil</Text>
           </Pressable>
         </Animated.View>
 
@@ -185,7 +191,6 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     ...TYPOGRAPHY.caption,
-    color: "#666",
     textDecorationLine: "underline",
   },
   version: {

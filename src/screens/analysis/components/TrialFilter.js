@@ -4,19 +4,19 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
 
-function getFilters(C, examType) {
+function getFilters(examType) {
   if (examType === "lgs") {
     return [
-      { key: "ALL", label: "Tümü", color: C.text },
-      { key: "LGS", label: "LGS", color: C.green },
-      { key: "BRANCH", label: "Branş", color: C.teal },
+      { key: "ALL", label: "Tümü" },
+      { key: "LGS", label: "LGS" },
+      { key: "BRANCH", label: "Branş" },
     ];
   }
   return [
-    { key: "ALL", label: "Tümü", color: C.text },
-    { key: "TYT", label: "TYT", color: C.blue },
-    { key: "AYT", label: "AYT", color: C.amber },
-    { key: "BRANCH", label: "Branş", color: C.teal },
+    { key: "ALL", label: "Tümü" },
+    { key: "TYT", label: "TYT" },
+    { key: "AYT", label: "AYT" },
+    { key: "BRANCH", label: "Branş" },
   ];
 }
 
@@ -42,7 +42,7 @@ export function TrialFilter({ value, onChange }) {
   const C = useC();
   const { examType } = useExam();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const FILTERS = useMemo(() => getFilters(C, examType), [C, examType]);
+  const FILTERS = useMemo(() => getFilters(examType), [examType]);
   return (
     <View style={styles.row}>
       {FILTERS.map((f) => {
@@ -50,19 +50,22 @@ export function TrialFilter({ value, onChange }) {
         return (
           <Pressable
             key={f.key}
+            accessibilityRole="tab"
+            accessibilityLabel={f.label}
+            accessibilityState={{ selected: active }}
             onPress={() => onChange(f.key)}
             style={[
               styles.tab,
               {
-                backgroundColor: active ? f.color + "20" : "transparent",
-                borderColor: active ? f.color : C.border,
+                backgroundColor: active ? C.accent + "20" : "transparent",
+                borderColor: active ? C.accent : C.border,
               },
             ]}
           >
             <Text
               style={[
                 styles.label,
-                { color: active ? f.color : C.sec },
+                { color: active ? C.accent : C.sec },
               ]}
             >
               {f.label}

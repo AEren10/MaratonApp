@@ -20,7 +20,7 @@ const POPUP_COLORS = {
   green: (C) => ({ bg: C.green, icon: C.green }),
   blue: (C) => ({ bg: C.blue, icon: C.blue }),
   purple: (C) => ({ bg: C.purple, icon: C.purple }),
-  coral: (C) => ({ bg: C.coral, icon: C.coral }),
+  coral: (C) => ({ bg: C.accent, icon: C.accent }),
 };
 
 const AUTO_DISMISS_MS = 4500;

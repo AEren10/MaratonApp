@@ -65,7 +65,7 @@ export function BadgeUnlockModal({ badge, visible, onClose }) {
 
 function makeStyles(C) {
   return StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.78)", alignItems: "center", justifyContent: "center" },
+    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", alignItems: "center", justifyContent: "center" },
     content: {
       backgroundColor: C.surface, borderRadius: 32, borderWidth: 1, borderColor: C.border,
       padding: 32, alignItems: "center", marginHorizontal: 32, width: "85%", maxWidth: 340,

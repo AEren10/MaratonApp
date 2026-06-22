@@ -15,11 +15,11 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getWrongQuestions } from "../../supabase/wrongQuestions";
 import { TrendChart } from "./components/TrendChart";
 
-function StatBox({ label, value, s }) {
+function StatBox({ label, value, color, s }) {
   return (
     <View style={s.statBox}>
-      <Text style={s.statValue}>{value}</Text>
-      <Text style={s.statLabel}>{label}</Text>
+      <Text style={[s.statValue, color && { color }]}>{value}</Text>
+      <Text style={[s.statLabel, color && { color, opacity: 0.7 }]}>{label}</Text>
     </View>
   );
 }
@@ -182,10 +182,10 @@ export default function SubjectDetailScreen() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.statsRow}>
-          <StatBox label="Ort. Net" value={totals.netAvg} s={s} />
-          <StatBox label="Doğru" value={totals.totalCorrect} s={s} />
-          <StatBox label="Yanlış" value={totals.totalWrong} s={s} />
-          {accuracy !== null && <StatBox label="Başarı %" value={`${accuracy}`} s={s} />}
+          <StatBox label="Ort. Net" value={totals.netAvg} color={C.purple} s={s} />
+          <StatBox label="Doğru" value={totals.totalCorrect} color={C.green} s={s} />
+          <StatBox label="Yanlış" value={totals.totalWrong} color={C.red} s={s} />
+          {accuracy !== null && <StatBox label="Başarı %" value={`${accuracy}`} color={C.blue} s={s} />}
         </View>
 
         {trendData.data.length >= 2 && (
@@ -260,8 +260,8 @@ export default function SubjectDetailScreen() {
             pressed && { opacity: 0.7 },
           ]}
         >
-          <Icon name="alert" size={18} color={C.amber} />
-          <Text style={[s.secondaryCtaText, { color: C.amber }]}>Zayıf Alanları Gör</Text>
+          <Icon name="alert" size={18} color={C.accent} />
+          <Text style={[s.secondaryCtaText, { color: C.accent }]}>Zayıf Alanları Gör</Text>
         </Pressable>
 
         <Pressable
@@ -312,7 +312,7 @@ function makeStyles(C) {
     barTrack: { flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3, marginHorizontal: SPACING.sm },
     barFill: { height: 6, borderRadius: 3 },
     topicAcc: { ...TYPOGRAPHY.bodySemiBold, width: 44, textAlign: "right" },
-    secondaryCta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.md, marginTop: SPACING.xxl, gap: SPACING.sm, borderWidth: 1, borderColor: C.amber + "40", backgroundColor: C.amber + "10" },
+    secondaryCta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.md, marginTop: SPACING.xxl, gap: SPACING.sm, borderWidth: 1, borderColor: C.accent + "40", backgroundColor: C.accent + "10" },
     secondaryCtaText: { ...TYPOGRAPHY.button },
     cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.md, gap: SPACING.sm },
     ctaText: { ...TYPOGRAPHY.button, color: C.bg },

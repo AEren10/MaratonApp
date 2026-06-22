@@ -19,10 +19,10 @@ function StatTile({ icon, label, value, color, delta, C }) {
       <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: color + "18", alignItems: "center", justifyContent: "center" }}>
         <Icon name={icon} size={16} color={color} />
       </View>
-      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 22, color: C.text }}>{value}</Text>
-      <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{label}</Text>
+      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 22, color }}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.micro, color, opacity: 0.7 }}>{label}</Text>
       {delta != null && delta !== 0 ? (
-        <Text style={{ ...TYPOGRAPHY.micro, fontSize: 10, color: delta > 0 ? C.green : C.red }}>
+        <Text style={{ ...TYPOGRAPHY.micro, fontSize: 11, color: delta > 0 ? C.green : C.red }}>
           {delta > 0 ? "+" : ""}{delta}
         </Text>
       ) : null}
@@ -62,13 +62,13 @@ export default function WeeklyReviewScreen() {
         </Pressable>
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Haftalık Rapor</Text>
         <Pressable onPress={() => navigation.navigate(SCREENS.SHARE_CARD, { type: "weekly" })} hitSlop={12}>
-          <Icon name="share" size={18} color={C.amber} />
+          <Icon name="share" size={18} color={C.accent} />
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInUp.delay(100)} style={[s.heroCard, { backgroundColor: C.amber + "10", borderColor: C.amber + "30" }]}>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber, textTransform: "uppercase", letterSpacing: 0.5 }}>Bu Hafta</Text>
+        <Animated.View entering={FadeInUp.delay(100)} style={[s.heroCard, { backgroundColor: C.accent + "10", borderColor: C.accent + "30" }]}>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textTransform: "uppercase", letterSpacing: 0.5 }}>Bu Hafta</Text>
           <Text style={{ ...TYPOGRAPHY.stat, color: C.text, fontSize: 44, marginTop: 4 }}>{timeStr}</Text>
           <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, marginTop: 4 }}>toplam çalışma süresi</Text>
           {report.hasPrev ? (
@@ -80,9 +80,9 @@ export default function WeeklyReviewScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200)} style={s.grid}>
-          <StatTile icon="hash" label="Soru" value={String(report.totalQuestions)} color={C.amber} C={C} />
+          <StatTile icon="hash" label="Soru" value={String(report.totalQuestions)} color={C.orange} C={C} />
           <StatTile icon="target" label="Deneme" value={String(report.trialCount)} color={C.blue} C={C} />
-          <StatTile icon="calendar" label="Aktif Gün" value={`${report.activeDays}/7`} color={C.purple} C={C} />
+          <StatTile icon="calendar" label="Aktif Gün" value={`${report.activeDays}/7`} color={C.teal} C={C} />
           <StatTile icon="activity" label="Streak" value={`${streak}`} color={C.green} C={C} />
         </Animated.View>
 
@@ -117,7 +117,7 @@ export default function WeeklyReviewScreen() {
           </Text>
         </Animated.View>
 
-        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [s.btn, { backgroundColor: C.amber }, pressed && { opacity: 0.9 }]}>
+        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.9 }]}>
           <Text style={{ ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 }}>Tamam</Text>
         </Pressable>
       </ScrollView>
@@ -133,5 +133,5 @@ const s = StyleSheet.create({
   grid: { flexDirection: "row", gap: SPACING.sm, width: "100%" },
   netCard: { width: "100%", borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1 },
   motivCard: { width: "100%", flexDirection: "row", alignItems: "center", gap: SPACING.md, borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1 },
-  btn: { borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, alignItems: "center", ...SHADOWS.amber },
+  btn: { borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, alignItems: "center", ...SHADOWS.fab },
 });

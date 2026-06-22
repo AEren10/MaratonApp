@@ -4,20 +4,14 @@
 //   sarı (gelişiyor) : >= 10 soru ve %60-80 doğruluk
 //   yeşil (ustalaştın): >= 20 soru ve > %80 doğruluk
 
-const COLORS = {
-  mastered: "#4ECE8E", // yeşil
-  improving: "#EBAE63", // sarı/amber
-  starter: "#686C7A", // gri (muted)
-};
-
 export function getMastery({ q = 0, acc = 0 } = {}) {
   if (q >= 20 && acc > 80) {
-    return { level: "mastered", color: COLORS.mastered, label: "Ustalaştın" };
+    return { level: "mastered", colorKey: "success", label: "Ustalaştın" };
   }
   if (q >= 10 && acc >= 60) {
-    return { level: "improving", color: COLORS.improving, label: "Gelişiyor" };
+    return { level: "improving", colorKey: "warning", label: "Gelişiyor" };
   }
-  return { level: "starter", color: COLORS.starter, label: "Başlangıç" };
+  return { level: "starter", colorKey: "textMuted", label: "Başlangıç" };
 }
 
 // Bir konu listesindeki "yeşillik" (ustalaşma) yüzdesi.

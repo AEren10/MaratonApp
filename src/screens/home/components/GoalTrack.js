@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withRepeat, withSequence, Easing,
 } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY } from "../../../themes/tokens";
+import { TYPOGRAPHY, SHADOWS } from "../../../themes/tokens";
 
 // Pist hero: günün ilerlemesi = pist üzerinde koşan nokta (başlangıç → 🏁).
 // "Sunset" — sıcak mercan-turuncu-pembe gradyan kart, üstünde beyaz pist.
@@ -36,9 +36,9 @@ export function GoalTrack({ solved = 0, goal = 100, hoursLeft, onPress }) {
 
   const remaining = Math.max(0, safeGoal - solved);
   // in-progress = sunset coral, done = sıcak gold→coral kutlama
-  const grad = done ? ["#FFC24D", "#FF8A3C", "#FF5A2E"] : ["#FF9A4D", "#FF5A3C", "#FF4D8D"];
-  const shadow = done ? "#FF7A2E" : "#FF5A3C";
-  const badgeIcon = done ? "#FF7A2E" : "#FF5A3C";
+  const grad = done ? ["#ff6b35", "#ff8a3c", "#fbbf24"] : ["#8b5cf6", "#a78bfa", "#c084fc"];
+  const shadow = done ? "#ff6b35" : "#8b5cf6";
+  const badgeIcon = done ? "#ff6b35" : "#8b5cf6";
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.94 }}>
@@ -101,7 +101,7 @@ const s = StyleSheet.create({
   badge: {
     width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center",
     backgroundColor: INK,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.20, shadowRadius: 8, elevation: 4,
+    ...SHADOWS.card,
   },
   lane: { height: 40, marginBottom: 12, justifyContent: "center" },
   laneBg: { position: "absolute", left: 0, right: 26, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.32)" },
@@ -111,7 +111,7 @@ const s = StyleSheet.create({
     position: "absolute", top: 5, width: 30, height: 30, borderRadius: 15, backgroundColor: INK,
     alignItems: "center", justifyContent: "center",
     borderWidth: 3, borderColor: "rgba(255,255,255,0.85)",
-    shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.22, shadowRadius: 5, elevation: 3,
+    ...SHADOWS.sm,
   },
   flag: { position: "absolute", right: 0, top: 11 },
   big: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 34, letterSpacing: -1, color: INK },

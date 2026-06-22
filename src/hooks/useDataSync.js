@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import { AppState } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
+import { useNetwork } from "../contexts/NetworkContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount } from "../store/slices/studyLogSlice";
@@ -95,19 +96,28 @@ async function loadAll(userId, dispatch) {
 export function useDataSync() {
   const { user } = useAuth();
   const dispatch = useAppDispatch();
+  const { isConnected } = useNetwork();
   const [syncing, setSyncing] = useState(false);
+  const wasOfflineRef = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; }, []);
+
+  const safeDispatch = useCallback(
+    (action) => { if (mountedRef.current) dispatch(action); },
+    [dispatch],
+  );
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
     let cancelled = false;
     setSyncing(true);
-    loadAll(user.id, dispatch)
+    loadAll(user.id, safeDispatch)
       .catch(() => {})
       .finally(() => {
         if (!cancelled) setSyncing(false);
       });
     return () => { cancelled = true; };
-  }, [user?.id, dispatch]);
+  }, [user?.id, safeDispatch]);
 
   const appStateRef = useRef(AppState.currentState);
   useEffect(() => {
@@ -115,23 +125,37 @@ export function useDataSync() {
     const sub = AppState.addEventListener("change", (next) => {
       if (appStateRef.current.match(/inactive|background/) && next === "active") {
         flushQueue()
-          .then((r) => { if (r.processed > 0) loadAll(user.id, dispatch).catch(() => {}); })
+          .then((r) => { if (r.processed > 0) loadAll(user.id, safeDispatch).catch(() => {}); })
           .catch(() => {});
       }
       appStateRef.current = next;
     });
     return () => sub.remove();
-  }, [user?.id, dispatch]);
+  }, [user?.id, safeDispatch]);
+
+  // Network reconnection sync
+  useEffect(() => {
+    if (!isConnected) {
+      wasOfflineRef.current = true;
+      return;
+    }
+    if (wasOfflineRef.current && user?.id && user.id !== "dev") {
+      wasOfflineRef.current = false;
+      flushQueue()
+        .then(() => loadAll(user.id, safeDispatch).catch(() => {}))
+        .catch(() => {});
+    }
+  }, [isConnected, user?.id, safeDispatch]);
 
   const refresh = useCallback(async () => {
     if (!user?.id || user.id === "dev") return;
     setSyncing(true);
     try {
-      await loadAll(user.id, dispatch);
+      await loadAll(user.id, safeDispatch);
     } finally {
-      setSyncing(false);
+      if (mountedRef.current) setSyncing(false);
     }
-  }, [user?.id, dispatch]);
+  }, [user?.id, safeDispatch]);
 
   return { syncing, refresh };
 }

@@ -10,11 +10,14 @@ import { useC } from "../../contexts/ThemeContext";
 // Tutarlı illüstrasyon (Spot) + yüzen animasyon + giriş. Tüm boş durumlarda aynı dil.
 export function EmptyState({
   icon,
-  title = "Henüz bir şey yok",
+  title = "Burada neler olacak?",
   message,
   actionLabel,
   onAction,
+  secondaryLabel,
+  onSecondary,
   color = "accent",
+  children,
 }) {
   const C = useC();
   const accent = C[color] || C.accent;
@@ -52,6 +55,15 @@ export function EmptyState({
           <Text style={styles.actionText}>{actionLabel}</Text>
         </Pressable>
       ) : null}
+      {secondaryLabel && onSecondary ? (
+        <Pressable
+          style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]}
+          onPress={onSecondary}
+        >
+          <Text style={[styles.secondaryText, { color: accent }]}>{secondaryLabel}</Text>
+        </Pressable>
+      ) : null}
+      {children}
     </Animated.View>
   );
 }
@@ -88,5 +100,13 @@ const styles = StyleSheet.create({
   actionText: {
     ...TYPOGRAPHY.button,
     color: "#FFFFFF",
+  },
+  secondaryBtn: {
+    marginTop: SPACING.md,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  secondaryText: {
+    ...TYPOGRAPHY.captionMedium,
   },
 });

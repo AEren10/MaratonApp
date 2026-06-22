@@ -2,20 +2,19 @@ import { View, Text, Pressable } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../../components/design";
-import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { SPACING, RADIUS } from "../../../themes/tokens";
 
 const MILESTONES = [
-  { days: 365, emoji: "🏁", message: "Maraton başladı!" },
-  { days: 180, emoji: "📅", message: "6 ay kaldı — tempoyu artır" },
-  { days: 100, emoji: "💯", message: "Son 100 gün!" },
+  { days: 365, emoji: "\u{1F3C1}", message: "Maraton başladı!" },
+  { days: 180, emoji: "\u{1F4C5}", message: "6 ay kaldı — tempoyu artır" },
+  { days: 100, emoji: "\u{1F4AF}", message: "Son 100 gün!" },
   { days: 60, emoji: "⚡", message: "Son 60 gün — yoğunlaş" },
-  { days: 30, emoji: "🔥", message: "Son 30 gün — full gaz!" },
+  { days: 30, emoji: "\u{1F525}", message: "Son 30 gün — full gaz!" },
   { days: 14, emoji: "⏰", message: "Son 2 hafta — tekrar odaklı" },
-  { days: 7, emoji: "🎯", message: "Son hafta — sakin ve odaklı" },
-  { days: 1, emoji: "🌟", message: "Yarın sınav — erken yat!" },
-  { days: 0, emoji: "🚀", message: "Bugün sınav günü! Başarılar!" },
+  { days: 7, emoji: "\u{1F3AF}", message: "Son hafta — sakin ve odaklı" },
+  { days: 1, emoji: "\u{1F31F}", message: "Yarın sınav — erken yat!" },
+  { days: 0, emoji: "\u{1F680}", message: "Bugün sınav günü! Başarılar!" },
 ];
 
 function getMilestone(days) {
@@ -33,7 +32,6 @@ function urgencyGradient(days) {
 }
 
 export function ExamCountdown({ onPress }) {
-  const C = useC();
   const { daysUntilExam, examDate, examType } = useExam();
   if (daysUntilExam == null) return null;
 
@@ -43,77 +41,74 @@ export function ExamCountdown({ onPress }) {
   const dateStr = examDate
     ? examDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
     : "";
-
   const pct = Math.max(0, Math.min(1, 1 - daysUntilExam / 365));
 
   return (
     <Animated.View entering={FadeInDown.delay(160).duration(440).springify().damping(16)}>
       <Pressable onPress={onPress} style={({ pressed }) => pressed && { opacity: 0.94 }}>
-        <View style={{
-          borderRadius: RADIUS.xxl, overflow: "hidden",
-          backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
-        }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.lg, padding: SPACING.md }}>
-            <LinearGradient
-              colors={gradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                width: 68, height: 68, borderRadius: 20,
-                alignItems: "center", justifyContent: "center",
-                shadowColor: gradient[0], shadowOffset: { width: 0, height: 5 },
-                shadowOpacity: 0.35, shadowRadius: 10, elevation: 4,
-              }}
-            >
-              {isExamDay ? (
-                <Text style={{ fontSize: 30 }}>🚀</Text>
-              ) : (
-                <>
-                  <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, lineHeight: 30, color: "#FFFFFF", letterSpacing: -1 }}>
-                    {daysUntilExam}
-                  </Text>
-                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>GÜN</Text>
-                </>
-              )}
-            </LinearGradient>
+        <LinearGradient
+          colors={gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ borderRadius: RADIUS.xxl, padding: SPACING.lg, overflow: "hidden" }}
+        >
+          <View style={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, borderRadius: 60, backgroundColor: "rgba(255,255,255,0.06)" }} />
+          <View style={{ position: "absolute", bottom: -30, left: -30, width: 100, height: 100, borderRadius: 50, backgroundColor: "rgba(255,255,255,0.04)" }} />
 
-            <View style={{ flex: 1, gap: 3 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{examType?.toUpperCase() || "YKS"}</Text>
-                <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>·</Text>
-                <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>{dateStr}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={pill}>
+                <Text style={pillText}>{examType?.toUpperCase() || "YKS"}</Text>
               </View>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, color: C.text, letterSpacing: -0.3 }}>
-                {isExamDay ? "Bugün sınav günü!" : "Sınava kaldı"}
-              </Text>
-              {milestone && (
-                <View style={{
-                  flexDirection: "row", alignItems: "center", gap: 5, alignSelf: "flex-start",
-                  backgroundColor: gradient[0] + "14", borderRadius: RADIUS.pill,
-                  paddingHorizontal: 10, paddingVertical: 4, marginTop: 2,
-                }}>
-                  <Text style={{ fontSize: 12 }}>{milestone.emoji}</Text>
-                  <Text style={{ ...TYPOGRAPHY.micro, color: gradient[0], fontFamily: "Inter_600SemiBold" }}>{milestone.message}</Text>
-                </View>
-              )}
+              <Text style={dateLabel}>{dateStr}</Text>
             </View>
-
-            <View style={{ alignItems: "center", gap: 2 }}>
-              <Icon name="settings" size={16} color={C.muted} />
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, fontSize: 11 }}>Hedef</Text>
+            <View style={gearWrap}>
+              <Icon name="settings" size={15} color="rgba(255,255,255,0.9)" />
             </View>
           </View>
 
-          <View style={{ height: 3, backgroundColor: C.surface2, marginHorizontal: SPACING.md, borderRadius: 2, marginBottom: SPACING.sm }}>
-            <LinearGradient
-              colors={gradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ width: `${Math.round(pct * 100)}%`, height: 3, borderRadius: 2 }}
-            />
+          <View style={{ alignItems: "center", paddingVertical: SPACING.xxl }}>
+            {isExamDay ? (
+              <Text style={{ fontSize: 48 }}>{"\u{1F680}"}</Text>
+            ) : (
+              <>
+                <Text style={heroNum}>{daysUntilExam}</Text>
+                <Text style={heroSub}>GÜN KALDI</Text>
+              </>
+            )}
           </View>
-        </View>
+
+          {milestone && (
+            <View style={badge}>
+              <Text style={{ fontSize: 14 }}>{milestone.emoji}</Text>
+              <Text style={badgeText}>{milestone.message}</Text>
+            </View>
+          )}
+
+          <View style={track}>
+            <View style={[fill, { width: `${Math.round(pct * 100)}%` }]} />
+          </View>
+        </LinearGradient>
       </Pressable>
     </Animated.View>
   );
 }
+
+const pill = { backgroundColor: "rgba(255,255,255,0.2)", borderRadius: RADIUS.pill, paddingHorizontal: 10, paddingVertical: 3 };
+const pillText = { fontFamily: "Inter_600SemiBold", fontSize: 11, color: "#FFF", letterSpacing: 0.8 };
+const dateLabel = { fontFamily: "Inter_500Medium", fontSize: 12, color: "rgba(255,255,255,0.8)" };
+const gearWrap = { width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.15)", alignItems: "center", justifyContent: "center" };
+const heroNum = {
+  fontFamily: "SpaceGrotesk_700Bold", fontSize: 64, lineHeight: 68,
+  color: "#FFF", letterSpacing: -2,
+  textShadowColor: "rgba(0,0,0,0.15)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8,
+};
+const heroSub = { fontFamily: "Inter_600SemiBold", fontSize: 14, color: "rgba(255,255,255,0.85)", letterSpacing: 3, marginTop: -2 };
+const badge = {
+  alignSelf: "center", flexDirection: "row", alignItems: "center", gap: 6,
+  backgroundColor: "rgba(255,255,255,0.18)", borderRadius: RADIUS.pill,
+  paddingHorizontal: 14, paddingVertical: 6, marginBottom: SPACING.md,
+};
+const badgeText = { fontFamily: "Inter_600SemiBold", fontSize: 12, color: "#FFF" };
+const track = { height: 4, backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 2 };
+const fill = { height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.7)" };

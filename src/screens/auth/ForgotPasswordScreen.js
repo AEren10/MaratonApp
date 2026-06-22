@@ -61,7 +61,7 @@ export default function ForgotPasswordScreen() {
 
           <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
             <View style={s.iconWrap}>
-              <Icon name="lock" size={56} color={C.amber} />
+              <Icon name="lock" size={56} color={C.accent} />
             </View>
           </Animated.View>
 
@@ -127,9 +127,9 @@ function makeStyles(C) {
       textAlign: "center", marginTop: SPACING.sm, marginBottom: SPACING.xxxl,
     },
     btn: {
-      backgroundColor: C.amber, borderRadius: RADIUS.lg,
+      backgroundColor: C.accent, borderRadius: RADIUS.lg,
       paddingVertical: SPACING.lg, alignItems: "center", marginTop: SPACING.sm,
-      ...SHADOWS.amber,
+      ...SHADOWS.fab,
     },
     btnText: { ...TYPOGRAPHY.button, color: C.bg },
     successBox: {

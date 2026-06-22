@@ -45,6 +45,7 @@
     "plugins": [
       "expo-font",
       "expo-secure-store",
+      "@sentry/react-native/expo",
       [
         "expo-notifications",
         {
@@ -66,6 +67,7 @@
         "projectId": "b7c40c1c-f724-4c07-ad36-696ef890ce64"
       }
     },
+    "privacy": "https://maraton.app/privacy",
     "owner": "ahmeterenn",
     "updates": {
       "url": "https://u.expo.dev/b7c40c1c-f724-4c07-ad36-696ef890ce64"

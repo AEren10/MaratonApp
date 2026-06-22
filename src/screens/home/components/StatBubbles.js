@@ -34,7 +34,7 @@ export function StatBubbles({ streak = 0, net = 0, trend = 0, xp = 0, tier = "Br
     <View style={s.row}>
       <Bubble delay={60}  color={C.accent} value={streak} label="gün seri"     icon="flame"  onPress={onStreak} />
       <Bubble delay={140} color={C.blue}   value={net} decimals trend={trend} label="son net" icon="chart" onPress={onNet} />
-      <Bubble delay={220} color={C.purple} value={xp} label={`${tier} · XP`}   icon="trophy" onPress={onLeague} />
+      <Bubble delay={220} color={C.accent} value={xp} label={`${tier} · XP`}   icon="trophy" onPress={onLeague} />
     </View>
   );
 }

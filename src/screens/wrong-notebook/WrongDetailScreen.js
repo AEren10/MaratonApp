@@ -10,6 +10,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import SignedImage from "../../components/common/SignedImage";
 import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
+import { useAuth } from "../../contexts/AuthContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
 import { useAlert } from "../../contexts/AlertContext";
@@ -40,6 +41,7 @@ export default function WrongDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const showAlert = useAlert();
+  const { user } = useAuth();
   const { item: passedItem } = route.params ?? {};
   const [photoZoom, setPhotoZoom] = useState(false);
   const [resolving, setResolving] = useState(false);
@@ -63,10 +65,10 @@ export default function WrongDetailScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
-          Soru Detayi
+          Soru Detayı
         </Text>
         <Chip color={item.is_resolved ? C.green : C.red}>
-          {item.is_resolved ? "Cozuldu" : "Bekliyor"}
+          {item.is_resolved ? "Çözüldü" : "Bekliyor"}
         </Chip>
       </View>
 
@@ -132,7 +134,7 @@ export default function WrongDetailScreen() {
                 if (resolving) return;
                 setResolving(true);
                 try {
-                  await resolveWrongQuestion(item.id);
+                  await resolveWrongQuestion(item.id, user.id);
                   H.success();
                   setLocalResolved(true);
                   reward("wrong_resolved", {

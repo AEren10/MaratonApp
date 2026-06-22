@@ -25,6 +25,10 @@ export function TrialTypeSelector({ value, onChange }) {
           return (
             <Pressable
               key={t.code}
+              accessibilityRole="radio"
+              accessibilityLabel={t.label}
+              accessibilityState={{ selected: active }}
+              accessibilityHint={t.description}
               onPress={() => { H.select(); onChange(t.code); }}
               style={{
                 width: 168,

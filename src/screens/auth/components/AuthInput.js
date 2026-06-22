@@ -19,7 +19,7 @@ export function AuthInput({
   const [show, setShow] = useState(false);
   const isPassword = !!secureTextEntry;
 
-  const borderColor = error ? C.red : focused ? C.purple : C.border;
+  const borderColor = error ? C.red : focused ? C.accent : C.border;
 
   return (
     <View style={{ marginBottom: 14 }}>
@@ -27,7 +27,7 @@ export function AuthInput({
         style={{
           fontFamily: "Inter_600SemiBold",
           fontSize: 11,
-          color: focused ? C.purple : C.muted,
+          color: focused ? C.accent : C.muted,
           letterSpacing: 0.6,
           marginBottom: 8,
           textTransform: "uppercase",
@@ -46,7 +46,7 @@ export function AuthInput({
         paddingRight: isPassword ? 10 : 0,
       }}>
         {icon ? (
-          <Icon name={icon} size={17} color={focused ? C.purple : C.muted} sw={1.8} />
+          <Icon name={icon} size={17} color={focused ? C.accent : C.muted} sw={1.8} />
         ) : null}
         <TextInput
           value={value}

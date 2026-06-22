@@ -142,7 +142,7 @@ export default function CalendarScreen() {
 
         {loading ? (
           <View style={s.loadingBox}>
-            <ActivityIndicator color={C.amber} />
+            <ActivityIndicator color={C.accent} />
           </View>
         ) : (
           <>

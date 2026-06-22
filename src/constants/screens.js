@@ -72,8 +72,18 @@ export const SCREENS = {
   // Study Save (post-timer)
   STUDY_SAVE: "StudySave",
 
+  // Study History
+  STUDY_HISTORY: "StudyHistory",
+
   // User Tasks
   ADD_TASK: "AddTask",
+
+  // Forecast & Analytics
+  NET_FORECAST: "NetForecast",
+  COMPARATIVE: "Comparative",
+
+  // Premium
+  PAYWALL: "Paywall",
 
   // Settings
   SETTINGS: "Settings",
@@ -83,5 +93,6 @@ export const SCREENS = {
   EDIT_EMAIL: "EditEmail",
   NOTIFICATIONS_SETTINGS: "NotificationsSettings",
   PRIVACY: "Privacy",
+  TERMS: "Terms",
   ABOUT: "About",
 };

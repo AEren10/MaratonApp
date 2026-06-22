@@ -24,7 +24,7 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
         />
       </Pressable>
 
-      <Pressable onPress={handleInfo} style={styles.middle}>
+      <Pressable onPress={done ? handleInfo : handleStart} style={styles.middle}>
         <Text style={[TYPOGRAPHY.micro, { color: s.color, textTransform: "uppercase", letterSpacing: 0.8 }]}>
           {s.label || s.name}
         </Text>
@@ -40,9 +40,11 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
       </Pressable>
 
       <View style={styles.right}>
-        <Chip color={reasonColor} style={styles.reasonChip}>
-          {reason}
-        </Chip>
+        <Pressable onPress={handleInfo} hitSlop={6}>
+          <Chip color={reasonColor} style={styles.reasonChip}>
+            {reason}
+          </Chip>
+        </Pressable>
         {!done && (
           <Pressable onPress={handleStart} hitSlop={6} style={styles.playBtn}>
             <Icon name="play" size={14} color={s.color} />

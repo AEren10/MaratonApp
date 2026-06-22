@@ -38,9 +38,9 @@ export function usePlanContext() {
   const uid = user?.id;
   const cached = uid && uid === _cache.uid;
 
-  const [weekLogs, setWeekLogs] = useState(cached ? _cache.weekLogs : []);
-  const [topicRows, setTopicRows] = useState(cached ? _cache.topicRows : []);
-  const [srDue, setSrDue] = useState(cached ? _cache.srDue : 0);
+  const [weekLogs, setWeekLogs] = useState(cached ? (_cache.weekLogs || []) : []);
+  const [topicRows, setTopicRows] = useState(cached ? (_cache.topicRows || []) : []);
+  const [srDue, setSrDue] = useState(cached ? (_cache.srDue || 0) : 0);
 
   useEffect(() => {
     if (!uid || uid === "dev") return;
@@ -63,7 +63,8 @@ export function usePlanContext() {
       if (cancelled) return;
       const wl = logsRes.status === "fulfilled" ? (logsRes.value || []) : [];
       const tr = topicRes.status === "fulfilled" ? (topicRes.value || []) : [];
-      const sd = dueRes.status === "fulfilled" ? (dueRes.value || []).length : 0;
+      const dueVal = dueRes.status === "fulfilled" ? (dueRes.value || []) : [];
+      const sd = Array.isArray(dueVal) ? dueVal.length : 0;
       _cache = { uid, weekLogs: wl, topicRows: tr, srDue: sd };
       setWeekLogs(wl);
       setTopicRows(tr);

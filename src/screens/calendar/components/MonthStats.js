@@ -59,10 +59,10 @@ export function MonthStats({ stats }) {
 
   return (
     <View style={styles.row}>
-      <StatBlock icon="calendar" color={C.amber} label="Aktif Gün" value={stats.activeDays} styles={styles} />
-      <StatBlock icon="clock" color={C.blue} label="Süre" value={hoursStr} styles={styles} />
-      <StatBlock icon="target" color={C.green} label="Soru" value={stats.totalQuestions} styles={styles} />
-      <StatBlock icon="chart" color={C.teal} label="Deneme" value={stats.totalTrials} styles={styles} />
+      <StatBlock icon="calendar" color={C.teal} label="Aktif Gün" value={stats.activeDays} styles={styles} />
+      <StatBlock icon="clock" color={C.purple} label="Süre" value={hoursStr} styles={styles} />
+      <StatBlock icon="target" color={C.orange} label="Soru" value={stats.totalQuestions} styles={styles} />
+      <StatBlock icon="chart" color={C.blue} label="Deneme" value={stats.totalTrials} styles={styles} />
     </View>
   );
 }

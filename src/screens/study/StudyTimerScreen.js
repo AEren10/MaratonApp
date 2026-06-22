@@ -11,13 +11,14 @@ import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
+import { SubjectPicker } from "./components/SubjectPicker";
 
 function buildModes(C) {
   return [
     { key: "FREE", label: "Serbest", icon: "zap", desc: "Süresiz — istediğin zaman bitir", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
     { key: "POMODORO_25", label: "25/5", icon: "timer", desc: "25 dk odak + 5 dk mola × 4 tur", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
-    { key: "POMODORO_50", label: "50/10", icon: "clock", desc: "50 dk odak + 10 dk mola × 3 tur", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
-    { key: "DEEP_90", label: "90 dk", icon: "flame", desc: "90 dk derin odak + 20 dk mola × 2 tur", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
+    { key: "POMODORO_50", label: "50/10", icon: "timer", desc: "50 dk odak + 10 dk mola × 3 tur", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
+    { key: "DEEP_90", label: "90 dk", icon: "timer", desc: "Sınav modu — 90dk kesintisiz", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
   ];
 }
 
@@ -62,13 +63,15 @@ export default function StudyTimerScreen() {
   const MODES = useMemo(() => buildModes(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
-  const { subjectKey, topicName } = route.params ?? {};
+  const { subjectKey: routeSubjectKey, topicName } = route.params ?? {};
 
-  const hasSubject = !!subjectKey;
-  const subject = hasSubject
-    ? (getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.amber, icon: "bookOpen" })
-    : { key: null, label: "Çalışma", color: C.amber, icon: "clock" };
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState(routeSubjectKey || null);
   const topic = topicName || "";
+
+  const subject = selectedSubjectKey
+    ? (getSubjectByKey(selectedSubjectKey) || { key: selectedSubjectKey, label: selectedSubjectKey, color: C.amber, icon: "bookOpen" })
+    : { key: null, label: "Ders Seçilmedi", color: C.muted, icon: "clock" };
+  const hasSubject = !!selectedSubjectKey;
 
   const [modeKey, setModeKey] = useState("FREE");
   const mode = useMemo(() => MODES.find((m) => m.key === modeKey), [modeKey, MODES]);
@@ -81,6 +84,7 @@ export default function StudyTimerScreen() {
   const [questions, setQuestions] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const interval = useRef(null);
+  const phaseTimeout = useRef(null);
 
   // For pomodoro modes, target time of current phase. For free, no target.
   const phaseTargetSec = useMemo(() => {
@@ -128,8 +132,7 @@ export default function StudyTimerScreen() {
         setElapsed((p) => {
           const next = p + 1;
           if (isPomodoro && next >= phaseTargetSec) {
-            // schedule phase change for next tick
-            setTimeout(advancePhase, 0);
+            phaseTimeout.current = setTimeout(advancePhase, 0);
             return phaseTargetSec;
           }
           return next;
@@ -144,6 +147,7 @@ export default function StudyTimerScreen() {
         clearInterval(interval.current);
         interval.current = null;
       }
+      clearTimeout(phaseTimeout.current);
     };
   }, [running, isPomodoro, phaseTargetSec, advancePhase]);
 
@@ -229,10 +233,10 @@ export default function StudyTimerScreen() {
       duration: minutes,
       questions,
       correctCount,
-      subjectKey: hasSubject ? subject.key : undefined,
+      subjectKey: selectedSubjectKey || undefined,
       topicName: topic || undefined,
     });
-  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, correctCount, subject, topic, hasSubject, navigation]);
+  }, [elapsed, totalFocusSeconds, phase, isPomodoro, questions, correctCount, selectedSubjectKey, topic, navigation]);
 
   const exit = useCallback(() => {
     if (elapsed >= 30 || totalFocusSeconds >= 30) {
@@ -257,7 +261,9 @@ export default function StudyTimerScreen() {
             {hasSubject ? (subject.label || subject.name) : "Serbest Çalışma"}
           </Text>
         </View>
-        <View style={{ width: 22 }} />
+        <Pressable onPress={() => navigation.navigate(SCREENS.STUDY_HISTORY)} hitSlop={12} accessibilityLabel="Geçmiş" accessibilityRole="button">
+          <Icon name="clock" size={22} color={C.muted} />
+        </Pressable>
       </View>
 
       {/* Mode selector */}
@@ -293,6 +299,11 @@ export default function StudyTimerScreen() {
       {/* Mode description */}
       <Text style={[styles.modeDesc, { color: C.muted }]}>{mode.desc}</Text>
 
+      {/* Subject picker — visible only before timer starts */}
+      {!running && elapsed === 0 && (
+        <SubjectPicker selected={selectedSubjectKey} onSelect={setSelectedSubjectKey} />
+      )}
+
       <View style={styles.center}>
         <Text style={[TYPOGRAPHY.label, { color: phaseColor, marginBottom: 4 }]}>
           {isPomodoro ? `${phaseLabel.toUpperCase()}  ·  Tur ${cycleIndex + 1}/${mode.cycles}` : ""}
@@ -307,9 +318,11 @@ export default function StudyTimerScreen() {
 
         <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
           <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{fmt(elapsed)}</Text>
-          <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 4 }]}>
-            / {isPomodoro ? `${Math.floor(phaseTargetSec / 60)} dk` : "serbest"}
-          </Text>
+          {isPomodoro && (
+            <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 4 }]}>
+              {`${Math.floor(phaseTargetSec / 60)} dk`}
+            </Text>
+          )}
         </TimerRing>
 
         <View style={styles.controls}>
@@ -318,8 +331,16 @@ export default function StudyTimerScreen() {
               <Icon name="chevR" size={20} color={C.muted} />
             </Pressable>
           )}
-          <Pressable onPress={toggle} accessibilityLabel={running ? "Duraklat" : "Başlat"} accessibilityRole="button" style={[styles.mainBtn, { backgroundColor: phaseColor }]}>
-            <Icon name={running ? "pause" : "play"} size={28} color={C.bg} />
+          <Pressable
+            onPress={hasSubject ? toggle : undefined}
+            accessibilityLabel={running ? "Duraklat" : "Başlat"}
+            accessibilityRole="button"
+            style={[
+              styles.mainBtn,
+              { backgroundColor: hasSubject ? phaseColor : C.border },
+            ]}
+          >
+            <Icon name={running ? "pause" : "play"} size={28} color={hasSubject ? C.bg : C.muted} />
           </Pressable>
           {isPomodoro && (
             <View style={styles.sideBtn}>
@@ -443,9 +464,9 @@ function makeStyles(C) {
     },
     finishBtn: {
       flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-      backgroundColor: C.amber, borderRadius: RADIUS.xl,
+      backgroundColor: C.accent, borderRadius: RADIUS.xl,
       marginHorizontal: SPACING.lg, marginBottom: SPACING.xxl, paddingVertical: SPACING.lg,
-      ...SHADOWS.amber,
+      ...SHADOWS.accent,
     },
   });
 }

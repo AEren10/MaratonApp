@@ -1,19 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, Modal, StyleSheet, Platform } from "react-native";
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
-const ACTIONS = [
-  { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       toneKey: "amber",  screen: "AddStudy" },
-  { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      toneKey: "blue",   screen: "TrialEntry" },
-  { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        toneKey: "coral",  screen: "AddWrong" },
-  { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    toneKey: "purple", screen: "WrongNotebook" },
-];
-
 function ActionRow({ item, onPress, C }) {
   const handlePress = useCallback(() => onPress(item.screen), [item.screen, onPress]);
-  const color = C[item.toneKey] || C.purple;
 
   return (
     <Pressable
@@ -21,26 +13,33 @@ function ActionRow({ item, onPress, C }) {
       style={({ pressed }) => [
         styles.row,
         {
-          backgroundColor: color + "12",
-          borderColor: color + "26",
-          opacity: pressed ? 0.92 : 1,
+          backgroundColor: C.surface2,
+          borderColor: C.border,
+          opacity: pressed ? 0.85 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
         },
       ]}
     >
-      <View style={[styles.iconBox, { backgroundColor: color }]}>
-        <Icon name={item.icon} size={22} color="#FFFFFF" sw={2.3} />
+      <View style={[styles.iconBox, { backgroundColor: item.color + "1A" }]}>
+        <Icon name={item.icon} size={22} color={item.color} sw={2} />
       </View>
       <View style={styles.rowText}>
         <Text style={[styles.label, { color: C.text }]}>{item.label}</Text>
         <Text style={[styles.desc, { color: C.sec }]}>{item.desc}</Text>
       </View>
-      <Icon name="chevR" size={18} color={C.muted} />
+      <Icon name="chevR" size={16} color={C.muted} />
     </Pressable>
   );
 }
 
 export function QuickActionSheet({ visible, onClose, onAction }) {
   const C = useC();
+  const ACTIONS = useMemo(() => [
+    { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       screen: "AddStudy",       color: C.orange },
+    { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      screen: "TrialEntry",     color: C.blue },
+    { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        screen: "AddWrong",       color: C.pink },
+    { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    screen: "WrongNotebook",  color: C.brandLight },
+  ], [C]);
   const handleAction = useCallback(
     (screen) => {
       onClose();
@@ -107,6 +106,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 44, height: 44, borderRadius: 14,
     alignItems: "center", justifyContent: "center",
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.06)",
   },
   rowText: { flex: 1 },
   label: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15 },

@@ -21,7 +21,7 @@ export default function StudySummaryScreen() {
 
   const {
     subjectLabel = "Çalışma",
-    subjectColor = C.amber,
+    subjectColor = C.accent,
     subjectIcon = "bookOpen",
     topic = "",
     duration = 0,
@@ -63,7 +63,7 @@ export default function StudySummaryScreen() {
   };
 
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.container}>
         {/* Success icon */}
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.successCircle, { backgroundColor: subjectColor + "20" }]}>
@@ -83,9 +83,9 @@ export default function StudySummaryScreen() {
 
         {/* Stats grid */}
         <Animated.View entering={FadeInDown.delay(350)} style={s.statsGrid}>
-          <StatBox icon="clock" label="Süre" value={`${duration} dk`} color={C.blue} C={C} />
-          <StatBox icon="hash" label="Soru" value={String(questions)} color={C.amber} C={C} />
-          <StatBox icon="zap" label="XP" value={`+${xpEarned}`} color={C.purple} C={C} />
+          <StatBox icon="clock" label="Süre" value={`${duration} dk`} color={C.purple} C={C} />
+          <StatBox icon="hash" label="Soru" value={String(questions)} color={C.orange} C={C} />
+          <StatBox icon="zap" label="XP" value={`+${xpEarned}`} color={C.amber} C={C} />
           <StatBox icon="activity" label="Streak" value={`${streak} gün`} color={C.green} C={C} />
         </Animated.View>
 
@@ -98,7 +98,7 @@ export default function StudySummaryScreen() {
             </Text>
           </View>
           <View style={s.goalBarBg}>
-            <View style={[s.goalBarFill, { width: `${goalPct * 100}%`, backgroundColor: goalReached ? C.green : C.amber }]} />
+            <View style={[s.goalBarFill, { width: `${goalPct * 100}%`, backgroundColor: goalReached ? C.green : C.accent }]} />
           </View>
           {goalReached && (
             <Animated.View entering={ZoomIn.delay(550).springify()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: SPACING.sm }}>
@@ -140,8 +140,8 @@ function StatBox({ icon, label, value, color, C }) {
       }}>
         <Icon name={icon} size={18} color={color} />
       </View>
-      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 20, color: C.text }}>{value}</Text>
-      <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>{label}</Text>
+      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 20, color }}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.caption, color, opacity: 0.7 }}>{label}</Text>
     </View>
   );
 }

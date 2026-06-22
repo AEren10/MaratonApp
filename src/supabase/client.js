@@ -12,10 +12,46 @@ if (Platform.OS === "web") {
   };
 } else {
   const SecureStore = require("expo-secure-store");
+  const CHUNK_SIZE = 2048;
+
   storageAdapter = {
-    getItem: (key) => SecureStore.getItemAsync(key),
-    setItem: (key, value) => SecureStore.setItemAsync(key, value),
-    removeItem: (key) => SecureStore.deleteItemAsync(key),
+    async getItem(key) {
+      const raw = await SecureStore.getItemAsync(key);
+      if (raw !== null) return raw;
+      const count = await SecureStore.getItemAsync(`${key}__c`);
+      if (!count) return null;
+      const n = parseInt(count, 10);
+      const parts = await Promise.all(
+        Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)),
+      );
+      return parts.join("");
+    },
+    async setItem(key, value) {
+      if (value.length <= CHUNK_SIZE) {
+        await SecureStore.setItemAsync(key, value);
+        const old = await SecureStore.getItemAsync(`${key}__c`);
+        if (old) {
+          const n = parseInt(old, 10);
+          await Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)));
+          await SecureStore.deleteItemAsync(`${key}__c`);
+        }
+        return;
+      }
+      const chunks = [];
+      for (let i = 0; i < value.length; i += CHUNK_SIZE) chunks.push(value.slice(i, i + CHUNK_SIZE));
+      await SecureStore.setItemAsync(`${key}__c`, String(chunks.length));
+      await Promise.all(chunks.map((ch, i) => SecureStore.setItemAsync(`${key}__${i}`, ch)));
+      try { await SecureStore.deleteItemAsync(key); } catch {}
+    },
+    async removeItem(key) {
+      try { await SecureStore.deleteItemAsync(key); } catch {}
+      const count = await SecureStore.getItemAsync(`${key}__c`);
+      if (count) {
+        const n = parseInt(count, 10);
+        await Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)));
+        await SecureStore.deleteItemAsync(`${key}__c`);
+      }
+    },
   };
 }
 

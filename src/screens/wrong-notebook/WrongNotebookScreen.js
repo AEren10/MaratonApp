@@ -2,11 +2,11 @@ import { useMemo, useState, useCallback } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
-import { shareQuestion, isQuestionShared } from "../../supabase/community";
+import { shareQuestion, getSharedQuestionIds } from "../../supabase/community";
 import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -43,7 +43,7 @@ export default function WrongNotebookScreen() {
   const [subject, setSubject] = useState("all");
   const [topicFilter, setTopicFilter] = useState("all");
   const [status, setStatus] = useState("open"); // "open" | "resolved" | "all"
-  const [mainTab, setMainTab] = useState("mine"); // "mine" | "community"
+  const [mainTab, setMainTab] = useState("community"); // "community" | "mine"
   const [sharedIds, setSharedIds] = useState(new Set());
   const [shareModal, setShareModal] = useState({ visible: false, item: null });
   const [errorModal, setErrorModal] = useState({ visible: false, message: "" });
@@ -59,13 +59,7 @@ export default function WrongNotebookScreen() {
     try {
       const data = await getWrongQuestions(user.id);
       setItems(data || []);
-      const results = await Promise.allSettled(
-        (data || []).map((it) => isQuestionShared(it.id).catch(() => false)),
-      );
-      const ids = new Set();
-      results.forEach((r, i) => {
-        if (r.status === "fulfilled" && r.value) ids.add(data[i].id);
-      });
+      const ids = await getSharedQuestionIds((data || []).map((it) => it.id));
       setSharedIds(ids);
     } catch (e) {
       setErrorModal({ visible: true, message: e?.message || "Yanlış defteri yüklenemedi." });
@@ -150,13 +144,13 @@ export default function WrongNotebookScreen() {
     haptic.success();
     reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
     try {
-      await resolveWrongQuestion(id);
+      await resolveWrongQuestion(id, user.id);
     } catch {
       setItems((prev) =>
         prev.map((it) => (it.id === id ? { ...it, is_resolved: false } : it)),
       );
     }
-  }, [reward]);
+  }, [reward, user.id]);
 
   useFocusEffect(useCallback(() => {
     loadItems();
@@ -218,13 +212,14 @@ export default function WrongNotebookScreen() {
         {/* Yeni yanlış ekle — büyük + button */}
         <Pressable
           onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}
-          accessibilityLabel="Ekle"
+          accessibilityLabel="Yeni yanlış ekle"
           accessibilityRole="button"
+          accessibilityHint="Yeni yanlış soru ekleme ekranına gider"
           style={({ pressed }) => [
             s.addBtn,
             {
-              backgroundColor: C.purple,
-              shadowColor: C.purple,
+              backgroundColor: C.orange,
+              shadowColor: C.orange,
               opacity: pressed ? 0.92 : 1,
             },
           ]}
@@ -236,19 +231,22 @@ export default function WrongNotebookScreen() {
       {/* === Main tabs: Defterim | Topluluk (segment control) === */}
       <View style={{ flexDirection: "row", marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, backgroundColor: C.surface2, borderRadius: RADIUS.lg, padding: 3 }}>
         {[
+          { key: "community", label: "Topluluk", icon: "globe", badge: true },
           { key: "mine", label: "Defterim", icon: "notebook" },
-          { key: "community", label: "Topluluk", icon: "globe" },
         ].map((t) => {
           const active = mainTab === t.key;
           return (
             <Pressable
               key={t.key}
+              accessibilityRole="tab"
+              accessibilityLabel={t.label}
+              accessibilityState={{ selected: active }}
               onPress={() => { haptic.select(); setMainTab(t.key); }}
               style={{
                 flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
                 gap: 6, paddingVertical: 10, borderRadius: RADIUS.md,
                 backgroundColor: active ? C.surface : "transparent",
-                ...(active ? { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3, elevation: 2 } : {}),
+                ...(active ? SHADOWS.sm : {}),
               }}
             >
               <Icon name={t.icon} size={16} color={active ? C.accent : C.muted} />
@@ -258,6 +256,9 @@ export default function WrongNotebookScreen() {
               }}>
                 {t.label}
               </Text>
+              {t.badge && !active && (
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.accent, marginLeft: -2 }} />
+              )}
             </Pressable>
           );
         })}
@@ -278,6 +279,9 @@ export default function WrongNotebookScreen() {
           return (
             <Pressable
               key={t.key}
+              accessibilityRole="tab"
+              accessibilityLabel={t.label}
+              accessibilityState={{ selected: active }}
               onPress={() => { haptic.select(); setStatus(t.key); }}
               style={[
                 s.statusChip,
@@ -315,7 +319,7 @@ export default function WrongNotebookScreen() {
         <FilterPill
           label="Tüm Dersler"
           count={Object.values(subjectCounts).reduce((a, b) => a + b, 0)}
-          color={C.purple}
+          color={C.accent}
           active={subject === "all"}
           onPress={() => setSubjectAndReset("all")}
         />
@@ -339,6 +343,9 @@ export default function WrongNotebookScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, gap: 6, paddingBottom: 8 }}
         >
           <Pressable
+            accessibilityRole="tab"
+            accessibilityLabel="Tüm konular"
+            accessibilityState={{ selected: topicFilter === "all" }}
             onPress={() => { haptic.select(); setTopicFilter("all"); }}
             style={[s.topicChip, {
               backgroundColor: topicFilter === "all" ? C.surface2 : "transparent",
@@ -354,6 +361,9 @@ export default function WrongNotebookScreen() {
             return (
               <Pressable
                 key={t.name}
+                accessibilityRole="tab"
+                accessibilityLabel={`${t.name}, ${t.n} yanlış`}
+                accessibilityState={{ selected: active }}
                 onPress={() => { haptic.select(); setTopicFilter(t.name); }}
                 style={[s.topicChip, {
                   backgroundColor: active ? C.surface2 : "transparent",
@@ -376,8 +386,10 @@ export default function WrongNotebookScreen() {
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.purple} colors={[C.purple]} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
           renderItem={renderItem}
+          windowSize={5}
+          maxToRenderPerBatch={10}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 14,
@@ -387,9 +399,11 @@ export default function WrongNotebookScreen() {
           ListEmptyComponent={
             <EmptyState
               icon={status === "resolved" ? "check" : "notebook"}
-              title={status === "resolved" ? "Henüz çözüldü olarak işaretlediğin yok" : "Henüz yanlış yok"}
-              message={subject === "all" ? "Yeni eklemek için sağ üstteki + butonuna bas" : "Bu ders için kayıt yok, başka dersi dene"}
-              color="purple"
+              title={status === "resolved" ? "Çözülmüş yanlışlar burada görünecek" : "Yanlış defterini doldur, konularına hakim ol"}
+              message={subject === "all" ? "Deneme veya pratik yaptıktan sonra yanlış soruların burada toplanır. Bir soru eklemek 30 saniye sürer!" : "Bu ders için kayıt yok, başka dersi dene"}
+              actionLabel={status !== "resolved" ? "Yanlış Ekle" : undefined}
+              onAction={status !== "resolved" ? () => navigation.navigate(SCREENS.ADD_WRONG) : undefined}
+              color="accent"
             />
           }
           showsVerticalScrollIndicator={false}
@@ -405,7 +419,7 @@ export default function WrongNotebookScreen() {
         title="Soruyu Paylaş"
         message="Bu yanlışı toplulukla paylaşmak ister misin?"
         actions={[
-          { label: "Anonim Paylaş", icon: "users", color: C.purple, onPress: () => doShare(shareModal.item, true) },
+          { label: "Anonim Paylaş", icon: "users", color: C.accent, onPress: () => doShare(shareModal.item, true) },
           { label: "İsimle Paylaş", icon: "user", color: C.accent, onPress: () => doShare(shareModal.item, false) },
           { label: "Vazgeç", style: "cancel" },
         ]}
@@ -449,10 +463,7 @@ const s = StyleSheet.create({
   addBtn: {
     width: 44, height: 44, borderRadius: 14,
     alignItems: "center", justifyContent: "center",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.30,
-    shadowRadius: 12,
-    elevation: 5,
+    ...SHADOWS.orange,
   },
   mainTabs: {
     flexDirection: "row",

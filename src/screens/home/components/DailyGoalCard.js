@@ -10,16 +10,16 @@ export function DailyGoalCard({ solved, goal, onPress }) {
   const pct = solved / safeGoal;
   const done = solved >= safeGoal;
   const remaining = Math.max(0, safeGoal - solved);
-  const accent = done ? C.green : C.purple;
+  const accent = done ? C.green : C.accent;
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
-        backgroundColor: done ? C.green + "14" : C.purple + "10",
+        backgroundColor: done ? C.green + "14" : C.accent + "10",
         borderRadius: 28,
         borderWidth: 1,
-        borderColor: done ? C.green + "40" : C.purple + "26",
+        borderColor: done ? C.green + "40" : C.accent + "26",
         padding: 18,
         flexDirection: "row",
         alignItems: "center",
@@ -28,10 +28,10 @@ export function DailyGoalCard({ solved, goal, onPress }) {
       })}
     >
       <ProgressRing size={72} stroke={8} value={pct} color={accent} trackColor={accent + "1F"}>
-        <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.text }}>
+        <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: accent }}>
           {solved}
         </Text>
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 10, color: C.muted }}>
+        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted }}>
           /{safeGoal}
         </Text>
       </ProgressRing>
@@ -49,7 +49,7 @@ export function DailyGoalCard({ solved, goal, onPress }) {
           </View>
         ) : (
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6, marginTop: 4 }}>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 30, color: C.text, letterSpacing: -0.5 }}>
+            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 30, color: accent, letterSpacing: -0.5 }}>
               {remaining}
             </Text>
             <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>

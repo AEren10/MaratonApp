@@ -29,10 +29,10 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
 const QUICK_LINK_ITEMS = [
-  { icon: "users", label: "Challenge", color: "blue", screen: SCREENS.CHALLENGE },
-  { icon: "share", label: "Paylaş", color: "purple", screen: SCREENS.SHARE_CARD, params: { type: "overall" } },
-  { icon: "target", label: "5dk Quiz", color: "green", screen: SCREENS.QUICK_PRACTICE },
-  { icon: "clock", label: "Simülasyon", color: "red", screen: SCREENS.EXAM_SIMULATOR },
+  { icon: "users", label: "Challenge", screen: SCREENS.CHALLENGE },
+  { icon: "share", label: "Paylaş", screen: SCREENS.SHARE_CARD, params: { type: "overall" } },
+  { icon: "target", label: "5dk Quiz", screen: SCREENS.QUICK_PRACTICE },
+  { icon: "clock", label: "Simülasyon", screen: SCREENS.EXAM_SIMULATOR },
 ];
 
 function QuickLinks({ onNavigate, C }) {
@@ -41,17 +41,21 @@ function QuickLinks({ onNavigate, C }) {
       {QUICK_LINK_ITEMS.map((item) => (
         <Pressable
           key={item.label}
+          accessibilityRole="button"
+          accessibilityLabel={item.label}
+          accessibilityHint={`${item.label} ekranına gider`}
           onPress={() => onNavigate(item.screen, item.params)}
-          style={{
+          style={({ pressed }) => ({
             flex: 1, minWidth: "45%", flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-            backgroundColor: C[item.color] + "10", borderRadius: RADIUS.xl,
-            padding: SPACING.md, borderWidth: 1, borderColor: C[item.color] + "20",
-          }}
+            backgroundColor: C.surface, borderRadius: RADIUS.xl,
+            padding: SPACING.md, borderWidth: 1, borderColor: C.border,
+            opacity: pressed ? 0.7 : 1,
+          })}
         >
-          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C[item.color] + "20", alignItems: "center", justifyContent: "center" }}>
-            <Icon name={item.icon} size={15} color={C[item.color]} />
+          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
+            <Icon name={item.icon} size={15} color={C.sec} />
           </View>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C[item.color] }}>{item.label}</Text>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>{item.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -95,12 +99,12 @@ export default function ProfileScreen() {
     const trialCount = gStats.totalTrials || trials.length;
     const bestStreak = Math.max(streak, gStats.streak || 0);
     return [
-      { v: totalQ > 999 ? `${(totalQ / 1000).toFixed(1)}k` : String(totalQ), l: "toplam soru" },
-      { v: String(hours), l: "saat çalışma" },
-      { v: String(trialCount), l: "deneme" },
-      { v: String(bestStreak), l: "gün en uzun seri" },
+      { v: totalQ > 999 ? `${(totalQ / 1000).toFixed(1)}k` : String(totalQ), l: "toplam soru", color: C.orange },
+      { v: String(hours), l: "saat çalışma", color: C.purple },
+      { v: String(trialCount), l: "deneme", color: C.blue },
+      { v: String(bestStreak), l: "gün en uzun seri", color: C.green },
     ];
-  }, [gStats, todayLogs, trials, streak]);
+  }, [gStats, todayLogs, trials, streak, C]);
 
   // GERÇEK başarı verisi: derslerin denemedeki doğru/yanlış oranı.
   // Sahte %100 göstermemek için sadece veri varsa list dönüyor.

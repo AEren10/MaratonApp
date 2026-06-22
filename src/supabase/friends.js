@@ -1,5 +1,11 @@
 import { supabase } from "./client";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function assertUUID(val, label = "id") {
+  if (!val || !UUID_RE.test(val)) throw new Error(`Invalid ${label}`);
+}
+
 export async function searchUsers(query) {
   if (!query || query.length < 3) return [];
   const { data, error } = await supabase
@@ -12,6 +18,7 @@ export async function searchUsers(query) {
 }
 
 export async function sendFriendRequest(addresseeId) {
+  assertUUID(addresseeId, "addresseeId");
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Oturum yok");
   const { data, error } = await supabase
@@ -38,6 +45,7 @@ export async function respondToRequest(friendshipId, accept) {
 }
 
 export async function listIncomingRequests(userId) {
+  assertUUID(userId, "userId");
   const { data, error } = await supabase
     .from("friendships")
     .select("*, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url)")
@@ -48,6 +56,7 @@ export async function listIncomingRequests(userId) {
 }
 
 export async function listFriends(userId) {
+  assertUUID(userId, "userId");
   const { data, error } = await supabase
     .from("friendships")
     .select("*, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url)")
@@ -60,7 +69,9 @@ export async function listFriends(userId) {
   });
 }
 
-export async function unfriend(friendshipId) {
-  const { error } = await supabase.from("friendships").delete().eq("id", friendshipId);
+export async function unfriend(friendshipId, userId) {
+  let query = supabase.from("friendships").delete().eq("id", friendshipId);
+  if (userId) query = query.or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+  const { error } = await query;
   if (error) throw error;
 }

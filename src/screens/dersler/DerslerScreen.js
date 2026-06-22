@@ -167,25 +167,26 @@ function PageHeader({ totalDone, totalAll, C, onTopicCards, onPlan }) {
             onPress={onPlan}
             style={({ pressed }) => ({
               flexDirection: "row", alignItems: "center", gap: 6,
-              backgroundColor: C.amber + "15", borderRadius: RADIUS.lg,
+              backgroundColor: C.accent + "15", borderRadius: RADIUS.lg,
               paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
               opacity: pressed ? 0.7 : 1,
             })}
           >
-            <Icon name="layers" size={14} color={C.amber} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>Günlük Plan</Text>
+            <Icon name="layers" size={14} color={C.accent} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Günlük Plan</Text>
           </Pressable>
           <Pressable
             onPress={onTopicCards}
             style={({ pressed }) => ({
               flexDirection: "row", alignItems: "center", gap: 6,
-              backgroundColor: C.purple + "15", borderRadius: RADIUS.lg,
+              backgroundColor: C.surface, borderRadius: RADIUS.lg,
               paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+              borderWidth: 1, borderColor: C.border,
               opacity: pressed ? 0.7 : 1,
             })}
           >
-            <Icon name="hash" size={14} color={C.purple} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.purple }}>Kartlar</Text>
+            <Icon name="hash" size={14} color={C.sec} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Kartlar</Text>
           </Pressable>
         </View>
       </View>
@@ -204,7 +205,7 @@ function PageHeader({ totalDone, totalAll, C, onTopicCards, onPlan }) {
             marginLeft: SPACING.xs,
           }}
         >
-          {totalDone}/{totalAll} konu tamamlandi
+          {totalDone}/{totalAll} konu tamamlandı
         </Text>
       </View>
     </View>
@@ -294,8 +295,8 @@ export default function DerslerScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={C.amber}
-            colors={[C.amber]}
+            tintColor={C.accent}
+            colors={[C.accent]}
           />
         }
       >

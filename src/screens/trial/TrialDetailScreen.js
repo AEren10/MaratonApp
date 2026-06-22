@@ -37,8 +37,8 @@ function ScoreRing({ size = 140, stroke = 10, net, max = 120, C }) {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{net.toFixed(1)}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>/ {max}</Text>
+      <Text style={[TYPOGRAPHY.stat, { color }]}>{net.toFixed(1)}</Text>
+      <Text style={[TYPOGRAPHY.micro, { color, opacity: 0.6 }]}>/ {max}</Text>
     </View>
   );
 }
@@ -216,7 +216,7 @@ export default function TrialDetailScreen() {
         </Text>
         <Chip color={C.surface2}>{dateStr}</Chip>
         <Pressable onPress={handleShare} hitSlop={12} accessibilityLabel="Paylaş" accessibilityRole="button" style={styles.shareBtn}>
-          <Icon name="share" size={18} color={C.amber} />
+          <Icon name="share" size={18} color={C.accent} />
         </Pressable>
       </View>
 
@@ -315,8 +315,8 @@ export default function TrialDetailScreen() {
               paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border,
             }}
           >
-            <Icon name="trendUp" size={16} color={C.amber} />
-            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Tüm Denemelerin Analizi</Text>
+            <Icon name="trendUp" size={16} color={C.accent} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.accent }}>Tüm Denemelerin Analizi</Text>
           </Pressable>
           <Pressable
             onPress={() => navigation.navigate(SCREENS.TRIAL_COMPARE)}
@@ -326,8 +326,8 @@ export default function TrialDetailScreen() {
               paddingVertical: SPACING.md, borderWidth: 1, borderColor: C.border,
             }}
           >
-            <Icon name="layers" size={16} color={C.purple} />
-            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.purple }}>Önceki Denemeyle Karşılaştır</Text>
+            <Icon name="layers" size={16} color={C.text} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Önceki Denemeyle Karşılaştır</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -401,7 +401,7 @@ function makeStyles(C) {
       width: 36,
       height: 36,
       borderRadius: RADIUS.md,
-      backgroundColor: C.amber + "18",
+      backgroundColor: C.accent + "18",
       alignItems: "center",
       justifyContent: "center",
     },

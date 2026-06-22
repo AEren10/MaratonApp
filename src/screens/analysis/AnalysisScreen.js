@@ -88,7 +88,7 @@ export default function AnalysisScreen() {
     const filtered = filterTrials(trials, filter);
     if (!filtered.length) {
       return {
-        latest: { net: 0, trend: 0, date: "Henüz deneme yok" },
+        latest: { net: 0, trend: 0, date: "İlk denemeni gir" },
         bars: [],
         line: [],
         lineLabels: [],
@@ -175,11 +175,8 @@ export default function AnalysisScreen() {
   }, [trials, filter, C, examType]);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setLoading(false);
-      showNudgePopup(3000);
-    }, 600);
-    return () => clearTimeout(t);
+    setLoading(false);
+    showNudgePopup(3000);
   }, [showNudgePopup]);
 
   const { refresh } = useSync();
@@ -210,7 +207,7 @@ export default function AnalysisScreen() {
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.amber} colors={[C.amber]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
         <Text style={s.title}>Analiz</Text>
 
@@ -219,10 +216,12 @@ export default function AnalysisScreen() {
         <View style={s.content}>
           {deneme.empty ? (
             <EmptyState
-              icon="edit"
-              title="Henüz deneme yok"
-              message={filter === "ALL" ? "İlk denemeni gir, analizleri burada gör" : `${filter} denemesi henüz girmedin`}
-              color="amber"
+              icon="chart"
+              title="İlk deneme sonucunu gir"
+              message={filter === "ALL" ? "Net trendin, ders bazlı analizin ve gelişim grafiklerin burada olacak" : `${filter} denemeni gir, karşılaştırmaya başlayalım`}
+              actionLabel="Deneme Gir"
+              onAction={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
+              color="accent"
             />
           ) : (
             <>
@@ -237,20 +236,60 @@ export default function AnalysisScreen() {
                     color={C.accent}
                   />
                   <Pressable
-                    onPress={() => navigation.navigate(SCREENS.TRIAL_INSIGHTS, { initialFilter: filter })}
+                    accessibilityRole="button"
+                    accessibilityLabel="Detaylı Analiz"
+                    accessibilityHint="Deneme trendlerinin detaylı analizine gider"
+                    onPress={() => { H.tap(); navigation.navigate(SCREENS.TRIAL_INSIGHTS, { initialFilter: filter }); }}
                     style={{
                       flexDirection: "row", alignItems: "center", justifyContent: "center",
                       gap: 8, marginTop: SPACING.lg, paddingVertical: 12, paddingHorizontal: SPACING.lg,
-                      backgroundColor: C.amber + "18", borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.amber + "30",
+                      backgroundColor: C.accent + "18", borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.accent + "30",
                     }}
                   >
-                    <Icon name="trendUp" size={16} color={C.amber} />
-                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.amber }}>Detaylı Analiz</Text>
-                    <Icon name="chevR" size={14} color={C.amber} />
+                    <Icon name="trendUp" size={16} color={C.accent} />
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.accent }}>Detaylı Analiz</Text>
+                    <Icon name="chevR" size={14} color={C.accent} />
                   </Pressable>
                 </AnimatedCard>
                 </View>
               )}
+
+              <AnimatedCard delay={60}>
+                <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Net Tahmini"
+                    onPress={() => { H.tap(); navigation.navigate(SCREENS.NET_FORECAST); }}
+                    style={({ pressed }) => ({
+                      flex: 1, alignItems: "center", gap: SPACING.sm,
+                      padding: SPACING.lg, borderRadius: RADIUS.xxl,
+                      backgroundColor: C.accent + "12", borderWidth: 1, borderColor: C.accent + "25",
+                      opacity: pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }],
+                    })}
+                  >
+                    <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.accent + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="trendUp" size={18} color={C.accent} />
+                    </View>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, textAlign: "center" }}>Net Tahmini</Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Karşılaştırmalı Analiz"
+                    onPress={() => { H.tap(); navigation.navigate(SCREENS.COMPARATIVE); }}
+                    style={({ pressed }) => ({
+                      flex: 1, alignItems: "center", gap: SPACING.sm,
+                      padding: SPACING.lg, borderRadius: RADIUS.xxl,
+                      backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
+                      opacity: pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }],
+                    })}
+                  >
+                    <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="chart" size={18} color={C.sec} />
+                    </View>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, textAlign: "center" }}>Dönem Analizi</Text>
+                  </Pressable>
+                </View>
+              </AnimatedCard>
 
               <SectionLabel>GENEL</SectionLabel>
               {filter === "ALL" && deneme.typeBreakdown?.length > 1 ? (
@@ -311,22 +350,28 @@ export default function AnalysisScreen() {
               <AnimatedCard delay={420}>
                 <View style={{ flexDirection: "row", gap: SPACING.sm }}>
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="5dk Quiz"
+                    accessibilityHint="Hızlı pratik quize gider"
                     onPress={() => navigation.navigate(SCREENS.QUICK_PRACTICE)}
-                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.green + "10", borderWidth: 1, borderColor: C.green + "20" }}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }}
                   >
-                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.green + "20", alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="target" size={15} color={C.green} />
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="target" size={15} color={C.sec} />
                     </View>
-                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>5dk Quiz</Text>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>5dk Quiz</Text>
                   </Pressable>
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Simülasyon"
+                    accessibilityHint="Sınav simülasyonuna gider"
                     onPress={() => navigation.navigate(SCREENS.EXAM_SIMULATOR)}
-                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.red + "10", borderWidth: 1, borderColor: C.red + "20" }}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }}
                   >
-                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.red + "20", alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="clock" size={15} color={C.red} />
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="clock" size={15} color={C.sec} />
                     </View>
-                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Simülasyon</Text>
+                    <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Simülasyon</Text>
                   </Pressable>
                 </View>
               </AnimatedCard>
@@ -346,6 +391,9 @@ export default function AnalysisScreen() {
       />
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Deneme Gir"
+        accessibilityHint="Yeni deneme sonucu giriş ekranına gider"
         onPress={handleTrialEntry}
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
       >
@@ -370,15 +418,11 @@ function makeStyles(C) {
       flexDirection: "row",
       alignItems: "center",
       gap: SPACING.sm,
-      backgroundColor: C.amber,
+      backgroundColor: C.accent,
       paddingHorizontal: SPACING.xl,
       paddingVertical: SPACING.md,
       borderRadius: 999,
-      shadowColor: C.amber,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.32,
-      shadowRadius: 14,
-      elevation: 6,
+      ...SHADOWS.fab,
     },
     fabPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
     fabText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },

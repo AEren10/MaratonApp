@@ -4,6 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -41,7 +42,7 @@ export default function PlanDetailScreen() {
       return {
         id: pid,
         s: subj || { key: t.subject, label: t.subjectLabel, color: t.color, icon: "bookOpen" },
-        topic: t.topicLabel || t.subjectLabel,
+        topic: t.topicLabel || "Genel çalışma",
         topicKey: t.topic,
         q: t.questionCount,
         reason: t.reason,
@@ -54,7 +55,7 @@ export default function PlanDetailScreen() {
       return {
         id: t.id,
         s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || C.amber, icon: "bookOpen" },
-        topic: t.topic ? `${t.subjectLabel} · ${t.topic}` : t.subjectLabel,
+        topic: t.topic || "Genel çalışma",
         topicKey: t.topic,
         q: t.questionCount,
         reason: t.reason,
@@ -68,7 +69,7 @@ export default function PlanDetailScreen() {
       return {
         id: t.id,
         s: subj || { key: t.subject, label: t.subject, color: C.accent, icon: "bookOpen" },
-        topic: t.topic ? `${(subj?.label || t.subject)} · ${t.topic}` : (subj?.label || t.subject),
+        topic: t.topic || "Genel çalışma",
         topicKey: t.topic,
         q: t.question_count,
         reason: t.note || "Senin eklediğin görev",
@@ -141,7 +142,7 @@ export default function PlanDetailScreen() {
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={styles.title}>Gunluk Plan</Text>
+        <Text style={styles.title}>Günlük Plan</Text>
         <Pressable onPress={() => navigation.navigate(SCREENS.ADD_TASK)} hitSlop={12} style={styles.addBtn}>
           <Icon name="plus" size={18} color={C.accent} sw={2.5} />
         </Pressable>
@@ -164,23 +165,34 @@ export default function PlanDetailScreen() {
           <View style={styles.listLabel}>
             <Icon name="layers" size={16} color={C.sec} />
             <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.sec }}>
-              Gorevler
+              Görevler
             </Text>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
-          <View style={styles.taskList}>
-            {tasks.map((task) => (
-              <PlanTaskItem
-                key={task.id}
-                task={task}
-                onToggle={toggleTask}
-                onStart={startTask}
-                onInfo={showReason}
-              />
-            ))}
-          </View>
+          {tasks.length === 0 ? (
+            <EmptyState
+              icon="layers"
+              title="Bugünkü planın hazır değil"
+              message="Hedeflerini ve deneme sonuçlarını girdikçe kişiselleştirilmiş planın oluşacak. İlk görevi eklemek 10 saniye sürer!"
+              actionLabel="Görev Ekle"
+              onAction={() => navigation.navigate(SCREENS.ADD_TASK)}
+              color="accent"
+            />
+          ) : (
+            <View style={styles.taskList}>
+              {tasks.map((task) => (
+                <PlanTaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={toggleTask}
+                  onStart={startTask}
+                  onInfo={showReason}
+                />
+              ))}
+            </View>
+          )}
         </Animated.View>
       </ScrollView>
 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -7,7 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { supabase } from "../../supabase/client";
+import { updatePassword } from "../../supabase/auth";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -34,8 +34,7 @@ export default function ChangePasswordScreen() {
     }
     setSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: next });
-      if (error) throw error;
+      await updatePassword(next);
       H.success();
       showAlert("Güncellendi", "Şifren başarıyla değiştirildi.");
       navigation.goBack();
@@ -57,6 +56,7 @@ export default function ChangePasswordScreen() {
         <View style={{ width: 22 }} />
       </View>
 
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll}>
         <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
           <Text style={[s.label, { color: C.muted }]}>YENİ ŞİFRE</Text>
@@ -106,15 +106,16 @@ export default function ChangePasswordScreen() {
             disabled={saving}
             style={({ pressed }) => [
               s.saveBtn,
-              { backgroundColor: C.purple },
+              { backgroundColor: C.accent },
               (pressed || saving) && { opacity: 0.85 },
             ]}
           >
-            <Icon name="check" size={20} color="#FFFFFF" />
+            {saving ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Icon name="check" size={20} color="#FFFFFF" />}
             <Text style={s.saveText}>{saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

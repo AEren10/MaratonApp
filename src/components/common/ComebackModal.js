@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Icon } from "../design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
 const MESSAGES = [
@@ -43,9 +43,9 @@ export const ComebackModal = memo(function ComebackModal({ visible, daysAway, xp
             {msg.sub}
           </Animated.Text>
 
-          <Animated.View entering={FadeInDown.delay(500)} style={[s.bonusRow, { backgroundColor: C.amber + "14", borderColor: C.amber + "30" }]}>
-            <Icon name="zap" size={20} color={C.amber} />
-            <Text style={[s.bonusText, { color: C.amber }]}>+{xpBonus} XP Bonus</Text>
+          <Animated.View entering={FadeInDown.delay(500)} style={[s.bonusRow, { backgroundColor: C.accent + "14", borderColor: C.accent + "30" }]}>
+            <Icon name="zap" size={20} color={C.accent} />
+            <Text style={[s.bonusText, { color: C.accent }]}>+{xpBonus} XP Bonus</Text>
           </Animated.View>
 
           <Animated.Text entering={FadeInDown.delay(550)} style={[s.daysLabel, { color: C.muted }]}>
@@ -53,7 +53,7 @@ export const ComebackModal = memo(function ComebackModal({ visible, daysAway, xp
           </Animated.Text>
 
           <Animated.View entering={FadeInDown.delay(650)} style={{ width: "100%" }}>
-            <Pressable onPress={handleClaim} style={({ pressed }) => [s.btn, { backgroundColor: C.amber }, pressed && { opacity: 0.9 }]}>
+            <Pressable onPress={handleClaim} style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.9 }]}>
               <Icon name="zap" size={18} color="#FFFFFF" />
               <Text style={s.btnText}>Bonusu Al & Başla</Text>
             </Pressable>
@@ -66,7 +66,7 @@ export const ComebackModal = memo(function ComebackModal({ visible, daysAway, xp
 
 const s = StyleSheet.create({
   overlay: {
-    flex: 1, backgroundColor: "rgba(0,0,0,0.65)",
+    flex: 1, backgroundColor: "rgba(0,0,0,0.7)",
     alignItems: "center", justifyContent: "center", padding: 28,
   },
   card: {
@@ -86,7 +86,7 @@ const s = StyleSheet.create({
   btn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     gap: 8, borderRadius: RADIUS.xl, paddingVertical: 16, marginTop: 24,
-    ...SHADOWS.amber,
+    shadowColor: "#8b5cf6", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
   },
   btnText: { ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 },
 });

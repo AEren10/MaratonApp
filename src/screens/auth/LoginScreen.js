@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
+import { SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
@@ -44,7 +45,7 @@ export default function LoginScreen() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       {/* === Hero gradient banner === */}
       <LinearGradient
-        colors={[C.purple, "#C5B0FF"]}
+        colors={[C.accent, C.accent + "99"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -149,7 +150,7 @@ export default function LoginScreen() {
               style={{ alignSelf: "flex-end", marginBottom: 8, marginTop: -4 }}
               hitSlop={6}
             >
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.purple }}>
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.brandLight }}>
                 Şifremi unuttum
               </Text>
             </Pressable>
@@ -160,7 +161,7 @@ export default function LoginScreen() {
               onPress={submit}
               disabled={busy}
               style={({ pressed }) => ({
-                backgroundColor: C.purple,
+                backgroundColor: C.accent,
                 borderRadius: 999,
                 paddingVertical: 17,
                 alignItems: "center",
@@ -169,11 +170,7 @@ export default function LoginScreen() {
                 gap: 8,
                 marginTop: 16,
                 opacity: busy ? 0.6 : pressed ? 0.92 : 1,
-                shadowColor: C.purple,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.30,
-                shadowRadius: 18,
-                elevation: 6,
+                ...SHADOWS.accent,
               })}
             >
               <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>

@@ -72,7 +72,7 @@ export default function QuickPracticeScreen() {
     setSelected(answer);
     setFeedback(true);
     const next = computeNextReview(q, correct ? 3 : 0);
-    reviewWrongQuestion(q.id, { ...next, is_resolved: correct || q.is_resolved });
+    reviewWrongQuestion(q.id, user.id, { ...next, is_resolved: correct || q.is_resolved });
     if (correct) reward("wrong_resolved", { subject: q.subject });
     setTimeout(() => {
       setResults((prev) => [...prev, correct]);
@@ -80,7 +80,7 @@ export default function QuickPracticeScreen() {
       setFeedback(null);
       setIdx((i) => i + 1);
     }, 500);
-  }, [feedback, questions, idx, reward]);
+  }, [feedback, questions, idx, reward, user.id]);
 
   const finish = useCallback(() => {
     clearInterval(timerRef.current);
@@ -89,15 +89,15 @@ export default function QuickPracticeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[s.container, s.center]}>
-        <ActivityIndicator color={C.amber} size="large" />
+      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
+        <ActivityIndicator color={C.accent} size="large" />
       </SafeAreaView>
     );
   }
 
   if (loadError) {
     return (
-      <SafeAreaView style={[s.container, s.center]}>
+      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
         <Icon name="alert" size={48} color={C.red} />
         <Text style={s.emptyText}>{loadError}</Text>
         <TouchableOpacity style={s.backBtn} onPress={() => nav.goBack()}>
@@ -109,7 +109,7 @@ export default function QuickPracticeScreen() {
 
   if (questions.length === 0) {
     return (
-      <SafeAreaView style={[s.container, s.center]}>
+      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
         <Icon name="check-circle" size={48} color={C.green} />
         <Text style={s.emptyText}>Tekrar edilecek soru yok!</Text>
         <TouchableOpacity style={s.backBtn} onPress={() => nav.goBack()}>
@@ -121,7 +121,7 @@ export default function QuickPracticeScreen() {
 
   if (done) {
     return (
-      <SafeAreaView style={s.container}>
+      <SafeAreaView edges={["top"]} style={s.container}>
         <Animated.View entering={ZoomIn.duration(400)} style={[s.center, { flex: 1 }]}>
           <Text style={s.summaryScore}>{score}/{questions.length}</Text>
           <Text style={s.summaryLabel}>Doğru</Text>
@@ -135,14 +135,14 @@ export default function QuickPracticeScreen() {
   }
 
   return (
-    <SafeAreaView style={s.container}>
+    <SafeAreaView edges={["top"]} style={s.container}>
       <View style={s.topBar}>
         <TouchableOpacity onPress={() => nav.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={{ padding: 4 }}>
           <Icon name="x" size={20} color={C.muted} />
         </TouchableOpacity>
         <View style={s.dots}>
           {questions.map((_, i) => {
-            const bg = i < results.length ? (results[i] ? C.green : C.red) : i === idx ? C.amber : C.surface2;
+            const bg = i < results.length ? (results[i] ? C.green : C.red) : i === idx ? C.accent : C.surface2;
             return <View key={i} style={[s.dot, { backgroundColor: bg }]} />;
           })}
         </View>
@@ -164,10 +164,10 @@ const makeStyles = (C) =>
     timer: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.sec },
     emptyText: { ...TYPOGRAPHY.body, color: C.sec, marginTop: SPACING.sm },
     backBtn: { marginTop: SPACING.md, paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.md },
-    backBtnText: { ...TYPOGRAPHY.body, color: C.amber, fontWeight: "600" },
-    summaryScore: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 56, color: C.amber },
+    backBtnText: { ...TYPOGRAPHY.body, color: C.accent, fontWeight: "600" },
+    summaryScore: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 56, color: C.accent },
     summaryLabel: { ...TYPOGRAPHY.body, color: C.sec },
     summaryTime: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
-    finishBtn: { marginTop: SPACING.xl, backgroundColor: C.amber, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
+    finishBtn: { marginTop: SPACING.xl, backgroundColor: C.orange, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
     finishText: { ...TYPOGRAPHY.body, color: "#FFFFFF", fontWeight: "700" },
   });

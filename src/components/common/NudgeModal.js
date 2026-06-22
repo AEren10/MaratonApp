@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable, Modal, FlatList, StyleSheet } from "react-native";
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 
-function NudgeItem({ nudge, onAction, C, styles }) {
+const NudgeItem = React.memo(function NudgeItem({ nudge, onAction, C, styles }) {
   const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
   const PRIORITY_ICON = { high: "alert", medium: "bell", low: "trendUp" };
   const color = PRIORITY_COLOR[nudge.priority] || C.amber;
@@ -30,11 +30,15 @@ function NudgeItem({ nudge, onAction, C, styles }) {
       )}
     </View>
   );
-}
+});
 
 export function NudgeModal({ visible, nudges, onClose, onAction }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
+  const renderNudgeItem = useCallback(({ item }) => (
+    <NudgeItem nudge={item} onAction={onAction} C={C} styles={styles} />
+  ), [onAction, C, styles]);
+
   if (!nudges || nudges.length === 0) return null;
 
   return (
@@ -46,7 +50,7 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
           <FlatList
             data={nudges}
             keyExtractor={(_, i) => String(i)}
-            renderItem={({ item }) => <NudgeItem nudge={item} onAction={onAction} C={C} styles={styles} />}
+            renderItem={renderNudgeItem}
             contentContainerStyle={{ gap: SPACING.sm }}
             showsVerticalScrollIndicator={false}
           />
@@ -63,13 +67,13 @@ function makeStyles(C) {
   return StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: "#00000088",
+      backgroundColor: "rgba(0,0,0,0.5)",
       justifyContent: "flex-end",
     },
     sheet: {
       backgroundColor: C.surface,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      borderTopLeftRadius: 28,
+      borderTopRightRadius: 28,
       padding: SPACING.lg,
       maxHeight: "70%",
     },
@@ -130,7 +134,7 @@ function makeStyles(C) {
       marginTop: SPACING.lg,
       paddingHorizontal: 32,
       paddingVertical: 12,
-      backgroundColor: C.amber,
+      backgroundColor: C.accent,
       borderRadius: RADIUS.lg,
     },
     closeText: {

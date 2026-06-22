@@ -26,6 +26,8 @@ import { useSync } from "../../contexts/DataSyncContext";
 import { NudgeModal } from "../../components/common/NudgeModal";
 import { NudgePopup } from "../../components/common/NudgePopup";
 import { ComebackModal } from "../../components/common/ComebackModal";
+import { LevelUpModal } from "../../components/common/LevelUpModal";
+import { GoalCompleteModal } from "../../components/common/GoalCompleteModal";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useRetention } from "../../hooks/useRetention";
 import { getMotivMessage } from "../../lib/motivMessages";
@@ -42,8 +44,8 @@ import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
 import { ExamCountdown } from "./components/ExamCountdown";
 import { MorningBriefing } from "./components/MorningBriefing";
 import { getAllSubjects } from "../trial/trialTypes";
+import * as H from "../../lib/haptics";
 
-// QUICK_ITEMS palette HomeScreen içinde useC ile inşa edilir.
 
 function HomeSkeleton() {
   return (
@@ -67,20 +69,22 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { user } = useAuth();
-  const { reward, xpToast, dismissXP } = useGamification();
+  const { reward, xpToast, dismissXP, levelUpModal, dismissLevelUp } = useGamification();
   const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
-  const QUICK_ITEMS = useMemo(() => [
-    { icon: "play",     label: "Çalış",       c: C.amber,  go: SCREENS.STUDY_TIMER },
-    { icon: "chart",    label: "Deneme",      c: C.blue,   go: SCREENS.TRIAL_ENTRY },
-    { icon: "camera",   label: "Yanlış Ekle", c: C.coral,  go: SCREENS.ADD_WRONG },
-    { icon: "notebook", label: "Defterim",    c: C.purple, go: SCREENS.WRONG_NOTEBOOK },
-    { icon: "target",   label: "5dk Quiz",    c: C.teal,   go: SCREENS.QUICK_PRACTICE },
-    { icon: "clock",    label: "Simülasyon",  c: C.red,    go: SCREENS.EXAM_SIMULATOR },
-    { icon: "users",    label: "Challenge",   c: C.pink,   go: SCREENS.CHALLENGE },
-    { icon: "trophy",   label: "Sıralama",    c: C.amber,  go: SCREENS.LEAGUE },
-  ], [C.amber, C.blue, C.coral, C.purple, C.teal, C.red, C.pink]);
+  const QUICK_PRIMARY = useMemo(() => [
+    { icon: "play",     label: "Çalış",       go: SCREENS.STUDY_TIMER,    color: C.orange },
+    { icon: "chart",    label: "Deneme",      go: SCREENS.TRIAL_ENTRY,    color: C.blue },
+    { icon: "camera",   label: "Yanlış Ekle", go: SCREENS.ADD_WRONG,      color: C.pink },
+    { icon: "notebook", label: "Defterim",    go: SCREENS.WRONG_NOTEBOOK, color: C.brandLight },
+  ], [C]);
+  const QUICK_SECONDARY = useMemo(() => [
+    { icon: "target",   label: "5dk Quiz",    go: SCREENS.QUICK_PRACTICE, color: C.teal },
+    { icon: "clock",    label: "Simülasyon",  go: SCREENS.EXAM_SIMULATOR, color: C.amber },
+    { icon: "users",    label: "Challenge",   go: SCREENS.CHALLENGE,      color: C.pink },
+    { icon: "trophy",   label: "Sıralama",    go: SCREENS.LEAGUE,         color: C.amber },
+  ], [C]);
   const streak = useSelector(selectStreak);
   const freezeCount = useSelector(selectFreezeCount);
   const todayLogs = useSelector(selectTodayLogs);
@@ -95,14 +99,20 @@ export default function HomeScreen() {
   const { suggestions: aiSuggestions } = useAISuggestions();
   const { refresh } = useSync();
   const [nudgeVisible, setNudgeVisible] = useState(false);
+  const [goalCompleteVisible, setGoalCompleteVisible] = useState(false);
 
   const dailyAction = aiSuggestions && aiSuggestions.length ? aiSuggestions[0] : null;
 
+  const navRef = useRef(navigation);
   const goCache = useRef({});
+  if (navRef.current !== navigation) {
+    navRef.current = navigation;
+    goCache.current = {};
+  }
   const go = useCallback((route) => {
-    if (!goCache.current[route]) goCache.current[route] = () => navigation.navigate(route);
+    if (!goCache.current[route]) goCache.current[route] = () => navRef.current.navigate(route);
     return goCache.current[route];
-  }, [navigation]);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -129,6 +139,7 @@ export default function HomeScreen() {
       goalRewarded.current.fired = true;
       AsyncStorage.setItem(todayKey, "1");
       reward("daily_goal_complete");
+      setTimeout(() => setGoalCompleteVisible(true), 1500);
     });
   }, [solvedToday, dailyGoal, reward]);
 
@@ -162,14 +173,12 @@ export default function HomeScreen() {
   }, [trials, C]);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setLoading(false);
-      showNudgePopup(2000);
-    }, 600);
-    return () => clearTimeout(t);
+    setLoading(false);
+    showNudgePopup(2000);
   }, [showNudgePopup]);
 
   const onRefresh = useCallback(async () => {
+    H.tap();
     setRefreshing(true);
     try {
       await refresh();
@@ -203,6 +212,10 @@ export default function HomeScreen() {
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
+        <View style={{ marginTop: 4 }}>
+          <ExamCountdown onPress={go(SCREENS.GOALS)} />
+        </View>
+
         <MorningBriefing
           userName={displayName}
           planTaskCount={plan.dersler}
@@ -228,18 +241,14 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View style={{ marginTop: 16 }}>
-          <ExamCountdown onPress={go(SCREENS.GOALS)} />
-        </View>
-
-        <View style={{ marginTop: 28 }}>
+        <View style={{ marginTop: 36 }}>
           <SectionLabel>HIZLI İŞLEM</SectionLabel>
-          <RoundActions items={QUICK_ITEMS} onPress={(q) => q.go && navigation.navigate(q.go)} />
+          <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => q.go && navigation.navigate(q.go)} />
         </View>
 
-        <View style={{ marginTop: 28 }}>
+        <View style={{ marginTop: 40 }}>
           <SectionLabel>SENİN İÇİN</SectionLabel>
-          <View style={{ gap: 14 }}>
+          <View style={{ gap: 10 }}>
           <AnimatedCard delay={40}>
             <TodayPlanCard
               generatedTasks={generatedTasks}
@@ -252,7 +261,7 @@ export default function HomeScreen() {
 
           {planCtx.srDue > 0 ? (
             <AnimatedCard delay={80}>
-              <Pressable onPress={go(SCREENS.REVIEW_SESSION)}>
+              <Pressable onPress={go(SCREENS.REVIEW_SESSION)} accessibilityRole="button" accessibilityLabel={`${planCtx.srDue} yanlışın tekrar zamanı geldi`} accessibilityHint="Tekrar oturumuna gider">
                 <View style={{
                   flexDirection: "row", alignItems: "center", gap: 12, padding: 16,
                   borderRadius: 22, backgroundColor: C.coral + "14",
@@ -285,7 +294,7 @@ export default function HomeScreen() {
         </View>
 
         {nudges.length > 0 ? (
-          <View style={{ marginTop: 28 }}>
+          <View style={{ marginTop: 36 }}>
             <SectionLabel>GERİ BİLDİRİM</SectionLabel>
             <FeedbackStack
               nudges={nudges}
@@ -306,6 +315,21 @@ export default function HomeScreen() {
         daysAway={comeback?.daysAway}
         xpBonus={comeback?.xpBonus || 50}
         onDismiss={dismissComeback}
+      />
+
+      <GoalCompleteModal
+        visible={goalCompleteVisible}
+        solved={solvedToday}
+        goal={dailyGoal}
+        onDismiss={() => setGoalCompleteVisible(false)}
+        onShare={() => { setGoalCompleteVisible(false); navigation.navigate(SCREENS.SHARE_CARD); }}
+      />
+
+      <LevelUpModal
+        visible={levelUpModal.visible}
+        level={levelUpModal.level}
+        title={levelUpModal.title}
+        onClose={dismissLevelUp}
       />
 
       <NudgePopup

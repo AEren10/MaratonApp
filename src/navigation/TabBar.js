@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Pressable, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,11 +13,11 @@ import { Icon } from "../components/design";
 import { QuickActionSheet } from "../components/common/QuickActionSheet";
 
 const TABS = [
-  { key: "Home",      label: "Ana Sayfa", icon: "home" },
-  { key: "DailyPlan", label: "Dersler",   icon: "book" },
-  { key: "Add",       label: "Kaydet",    icon: "plus", center: true },
-  { key: "Analysis",  label: "Analiz",    icon: "chart" },
-  { key: "Profile",   label: "Profil",    icon: "user" },
+  { key: "Home",      label: "Ana Sayfa", icon: "home",  hint: "Ana sayfaya gider" },
+  { key: "DailyPlan", label: "Dersler",   icon: "book",  hint: "Ders planını gösterir" },
+  { key: "Add",       label: "Kaydet",    icon: "plus",  center: true },
+  { key: "Analysis",  label: "Analiz",    icon: "chart", hint: "Analiz ekranına gider" },
+  { key: "Profile",   label: "Profil",    icon: "user",  hint: "Profil sayfanı açar" },
 ];
 
 function CenterFab({ onPress, C }) {
@@ -30,6 +31,9 @@ function CenterFab({ onPress, C }) {
     <View style={{ flex: 1, alignItems: "center" }}>
       <Animated.View style={fabStyle}>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Yeni kayıt ekle"
+          accessibilityHint="Hızlı işlem menüsünü açar"
           onPressIn={() => {
             scale.value = withSpring(0.90, { damping: 14, stiffness: 320 });
             rotation.value = withSpring(45, { damping: 14, stiffness: 220 });
@@ -46,10 +50,10 @@ function CenterFab({ onPress, C }) {
           <View
             style={{
               width: 54, height: 54, borderRadius: 27,
-              backgroundColor: C.accent,
+              backgroundColor: C.orange,
               alignItems: "center", justifyContent: "center",
               marginTop: -18,
-              shadowColor: C.accent,
+              shadowColor: C.orange,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.32,
               shadowRadius: 14,
@@ -82,6 +86,10 @@ function TabItem({ tab, active, onPress, C }) {
 
   return (
     <Pressable
+      accessibilityRole="tab"
+      accessibilityLabel={tab.label}
+      accessibilityHint={tab.hint}
+      accessibilityState={{ selected: active }}
       onPressIn={() => { scale.value = withSpring(0.88, { damping: 14, stiffness: 360 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 14, stiffness: 360 }); }}
       onPress={() => {
@@ -91,12 +99,12 @@ function TabItem({ tab, active, onPress, C }) {
       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }}
     >
       <Animated.View style={[{ alignItems: "center" }, iconStyle]}>
-        <Icon name={tab.icon} size={22} color={active ? C.accent : C.muted} sw={active ? 2.2 : 1.8} />
+        <Icon name={tab.icon} size={22} color={active ? C.orange : C.muted} sw={active ? 2.2 : 1.8} />
         <Animated.View
           style={[
             {
               width: 4, height: 4, borderRadius: 2,
-              backgroundColor: C.accent,
+              backgroundColor: C.orange,
               marginTop: 3,
             },
             dotStyle,
@@ -106,8 +114,8 @@ function TabItem({ tab, active, onPress, C }) {
       <Text
         style={{
           fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
-          fontSize: 10,
-          color: active ? C.accent : C.muted,
+          fontSize: 11,
+          color: active ? C.orange : C.muted,
           marginTop: active ? 0 : 4,
         }}
       >
@@ -130,11 +138,14 @@ export function TabBar({ state, navigation }) {
         onClose={() => setSheetOpen(false)}
         onAction={(screen) => navigation.navigate(screen)}
       />
+      <LinearGradient
+        colors={["transparent", C.surface + "CC", C.surface]}
+        style={{ position: "absolute", top: -20, left: 0, right: 0, height: 20 }}
+        pointerEvents="none"
+      />
       <View style={{
         flexDirection: "row",
         backgroundColor: C.surface,
-        borderTopWidth: 1,
-        borderTopColor: C.border,
         paddingTop: 8,
         paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
         paddingHorizontal: 8,

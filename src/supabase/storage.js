@@ -1,4 +1,5 @@
 import { supabase } from "./client";
+import { handleSupabaseError } from "./handleError";
 
 // React Native + Supabase storage için sağlam yöntem:
 // fetch(uri).blob() bazen size=0 dönüyor → upload boş kalıyor.
@@ -62,6 +63,6 @@ export const getWrongQuestionImageUrl = async (path) => {
   const { data, error } = await supabase.storage
     .from("wrong-questions")
     .createSignedUrl(path, 3600);
-  if (error) return null;
+  if (handleSupabaseError(error, "getWrongQuestionImageUrl")) return null;
   return data.signedUrl;
 };

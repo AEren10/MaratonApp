@@ -4,19 +4,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
 import { TopicNoteCard } from "./components/TopicNoteCard";
 import { useAuth } from "../../contexts/AuthContext";
+import { useAlert } from "../../contexts/AlertContext";
 import { getStudyLogsByTopic } from "../../supabase/studyLogs";
 
 function StatBox({ label, value, color, C }) {
   return (
     <View style={[s.statBox, { backgroundColor: color + "12", borderColor: color + "26" }]}>
-      <Text style={[s.statValue, { color: C.text }]}>{value}</Text>
-      <Text style={[s.statLabel, { color }]}>{label}</Text>
+      <Text style={[s.statValue, { color }]}>{value}</Text>
+      <Text style={[s.statLabel, { color, opacity: 0.7 }]}>{label}</Text>
     </View>
   );
 }
@@ -105,7 +106,7 @@ function ProgressHeader({ topic, color, C }) {
         <View style={styles.metaItem}>
           <Icon name="repeat" size={13} color={color} sw={1.8} />
           <Text style={[styles.metaText, { color: C.sec }]}>
-            {studyCount} kez calisildi
+            {studyCount} kez çalışıldı
           </Text>
         </View>
         {lastLabel ? (
@@ -177,6 +178,7 @@ export default function TopicStudyScreen() {
   const C = useC();
   const route = useRoute();
   const { user } = useAuth();
+  const showAlert = useAlert();
   const { topic, subject, subtopics: paramSubtopics } = route.params ?? {};
   const mastery = (topic?.acc || 0) / 100;
 
@@ -220,8 +222,8 @@ export default function TopicStudyScreen() {
         {/* === Stat kartlar — her biri kimlik renkli soft === */}
         <View style={s.statsRow}>
           <StatBox C={C} label="Toplam Soru" value={topic.q || 0} color={color} />
-          <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={C.amber} />
-          <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={C.blue} />
+          <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={color} />
+          <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={color} />
         </View>
 
         {/* === Hakimiyet ring === */}
@@ -236,17 +238,32 @@ export default function TopicStudyScreen() {
             </Svg>
             <Text style={{
               fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 26,
-              color: C.text,
+              fontSize: (topic?.q || 0) === 0 ? 22 : 26,
+              color: (topic?.q || 0) === 0 ? C.muted : C.text,
               letterSpacing: -0.5,
             }}>
-              %{topic.acc || 0}
+              {(topic?.q || 0) === 0 ? "—" : `%${topic.acc || 0}`}
             </Text>
           </View>
-          <Text style={[s.ringLabel, { color: C.sec }]}>Hakimiyet</Text>
-          <View style={[s.masteryBadge, { backgroundColor: masteryLevel.color + "1A" }]}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: masteryLevel.color }} />
-            <Text style={[s.masteryText, { color: masteryLevel.color }]}>{masteryLevel.label}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Text style={[s.ringLabel, { color: C.sec }]}>
+              {(topic?.q || 0) === 0 ? "Soru çözdükçe hakimiyetin oluşacak" : "Hakimiyet"}
+            </Text>
+            {(topic?.q || 0) > 0 && (
+              <Pressable
+                hitSlop={10}
+                onPress={() => showAlert(
+                  "Hakimiyet Nedir?",
+                  "Hakimiyet, bu konudaki doğru cevap oranını ve çözülen soru sayısını birlikte değerlendirir.\n\n• %80+ → Uzman\n• %60-79 → İyi\n• %40-59 → Orta\n• %40 altı → Zayıf\n\nDaha çok soru çözdükçe hakimiyet seviyeni yukarı taşırsın."
+                )}
+              >
+                <Icon name="info" size={15} color={C.muted} />
+              </Pressable>
+            )}
+          </View>
+          <View style={[s.masteryBadge, { backgroundColor: C[masteryLevel.colorKey] + "1A" }]}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C[masteryLevel.colorKey] }} />
+            <Text style={[s.masteryText, { color: C[masteryLevel.colorKey] }]}>{masteryLevel.label}</Text>
           </View>
         </View>
 
@@ -279,8 +296,8 @@ export default function TopicStudyScreen() {
           style={({ pressed }) => [
             s.cta,
             {
-              backgroundColor: C.purple,
-              shadowColor: C.purple,
+              backgroundColor: C.accent,
+              shadowColor: C.accent,
               opacity: pressed ? 0.92 : 1,
             },
           ]}
@@ -342,10 +359,7 @@ const s = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     borderRadius: 999, paddingVertical: 17, marginTop: SPACING.xxxl,
     gap: 8,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.32,
-    shadowRadius: 18,
-    elevation: 6,
+    ...SHADOWS.accent,
   },
   ctaText: {
     fontFamily: "Inter_600SemiBold",

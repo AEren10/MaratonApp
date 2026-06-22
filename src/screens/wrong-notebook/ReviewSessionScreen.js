@@ -54,14 +54,14 @@ export default function ReviewSessionScreen() {
     else if (g <= 0) haptic.error();
     else haptic.tap();
     const updates = computeNextReview(current, g);
-    reviewWrongQuestion(current.id, updates).catch(() => {});
+    reviewWrongQuestion(current.id, user.id, updates).catch(() => {});
     setDone((d) => d + 1);
     setRevealed(false);
     setIdx((i) => i + 1);
-  }, [current]);
+  }, [current, user.id]);
 
   if (loading) {
-    return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.amber} size="large" /></View></SafeAreaView>;
+    return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
   }
 
   const finished = idx >= queue.length;
@@ -160,14 +160,14 @@ function makeStyles(C) {
     note: { ...TYPOGRAPHY.body, color: C.text },
     answerText: { ...TYPOGRAPHY.bodyMedium, color: C.sec },
     footer: { padding: SPACING.lg, borderTopWidth: 1, borderTopColor: C.border },
-    revealBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, alignItems: "center" },
+    revealBtn: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, alignItems: "center" },
     revealText: { ...TYPOGRAPHY.button, color: C.bg },
     gradeRow: { flexDirection: "row", gap: SPACING.sm },
     gradeBtn: { flex: 1, alignItems: "center", gap: 4, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
     gradeText: { ...TYPOGRAPHY.micro },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.md },
     doneSub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
-    closeBtn: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
+    closeBtn: { backgroundColor: C.orange, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
     closeText: { ...TYPOGRAPHY.button, color: C.bg },
   });
 }

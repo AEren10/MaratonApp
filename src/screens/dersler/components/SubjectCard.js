@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { TopicRow } from "./TopicRow";
 import { masteryPercent } from "../../../lib/mastery";
@@ -79,11 +79,7 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         backgroundColor: C.surface,
         borderWidth: 1,
         borderColor: C.border,
-        shadowColor: "#15161A",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
-        shadowRadius: 14,
-        elevation: 3,
+        ...SHADOWS.card,
       }}
     >
       {/* Üst yarı — ders renginin tint'i */}
@@ -112,17 +108,22 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
               {name}
             </Text>
             <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 3 }}>
-              {done}/{total} konu · {last || "Henüz çalışılmadı"}
+              {done}/{total} konu · {last || "Keşfetmeye hazır"}
             </Text>
           </View>
 
-          {/* % rozet */}
+          {/* % rozet — dormant when pct===0 */}
           <View style={{
             paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
-            backgroundColor: color,
+            backgroundColor: pct === 0 ? C.dormantBg : color,
+            borderWidth: pct === 0 ? 1 : 0,
+            borderColor: pct === 0 ? C.border : "transparent",
           }}>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, color: "#FFFFFF", letterSpacing: -0.2 }}>
-              %{pct}
+            <Text style={{
+              fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, letterSpacing: -0.2,
+              color: pct === 0 ? C.dormant : "#FFFFFF",
+            }}>
+              {pct === 0 ? "Başla" : `%${pct}`}
             </Text>
           </View>
 
@@ -146,12 +147,12 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         >
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: "rgba(255,255,255,0.55)",
+            backgroundColor: C.surface2,
             paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
           }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : C.muted }} />
-            <Text style={{ ...TYPOGRAPHY.micro, color: C.text }}>
-              %{masteryPct} ustalaşıldı
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : C.dormant }} />
+            <Text style={{ ...TYPOGRAPHY.micro, color: masteryPct === 0 ? C.muted : C.text }}>
+              {masteryPct === 0 ? "Henüz ustalaşılmadı" : `%${masteryPct} ustalaşıldı`}
             </Text>
           </View>
 

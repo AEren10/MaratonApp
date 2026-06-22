@@ -46,7 +46,7 @@ export function SubjectInput({ subject, values, onChange, wrongPenalty = 0.25 })
   const setEmpty = useCallback((t) => onChange({ ...values, empty: cap(t, max) }), [values, onChange, max, cap]);
 
   return (
-    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+    <View accessible accessibilityLabel={`${name} dersi, ${net} net`} style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
       <View style={s.body}>
         {/* Header: ikon + ad + max + net */}
         <View style={s.head}>
@@ -79,6 +79,7 @@ function NumInput({ label, value, onChange, max, tone, C, dim }) {
     <View style={s.inputWrap}>
       <Text style={[s.inputLabel, { color: dim ? C.muted : tone }]}>{label.toUpperCase()}</Text>
       <TextInput
+        accessibilityLabel={label}
         value={String(value || "")}
         onChangeText={onChange}
         onFocus={() => H.tap()}

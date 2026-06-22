@@ -26,7 +26,7 @@ function Flashcard({ card, flipped, onFlip, styles, C }) {
         {flipped ? card.back : card.front}
       </Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginTop: SPACING.lg }]}>
-        Cevirmek icin dokun
+        Çevirmek için dokun
       </Text>
     </Pressable>
   );
@@ -59,7 +59,7 @@ export default function CardDetailScreen() {
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.xxxl }}>
           <Icon name="bookOpen" size={48} color={C.muted} />
           <Text style={[TYPOGRAPHY.body, { color: C.muted, marginTop: SPACING.lg, textAlign: "center" }]}>
-            Bu konu icin henuz flashcard bulunmuyor.
+            Bu konu için henüz flashcard bulunmuyor.
           </Text>
         </View>
       </SafeAreaView>
@@ -156,7 +156,7 @@ function makeStyles(C) {
     progressDot: {
       flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2, maxWidth: 60,
     },
-    progressActive: { backgroundColor: C.amber },
+    progressActive: { backgroundColor: C.accent },
     progressKnown: { backgroundColor: C.green },
     center: { flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.lg },
     flashcard: {

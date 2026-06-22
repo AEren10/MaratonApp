@@ -34,8 +34,8 @@ function TaskRow({ item, C, isLast, onToggle }) {
           <Text style={[s.aiTagText, { color: C.blue }]}>önerilen</Text>
         </View>
       ) : item.source === "plan" ? (
-        <View style={[s.aiTag, { backgroundColor: C.amber + "14" }]}>
-          <Text style={[s.aiTagText, { color: C.amber }]}>öneri</Text>
+        <View style={[s.aiTag, { backgroundColor: C.accent + "14" }]}>
+          <Text style={[s.aiTagText, { color: C.accent }]}>öneri</Text>
         </View>
       ) : item.count > 0 ? (
         <Text style={[s.countText, { color: C.sec }]}>{item.count} soru</Text>

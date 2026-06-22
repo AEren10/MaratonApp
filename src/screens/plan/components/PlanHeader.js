@@ -32,7 +32,7 @@ export function PlanHeader({ done, total, soru, hours }) {
         size={120}
         stroke={10}
         value={pct}
-        color={pct >= 1 ? C.green : C.amber}
+        color={pct >= 1 ? C.green : C.accent}
         C={C}
       >
         <Stat size={36} color={C.text}>
@@ -42,12 +42,12 @@ export function PlanHeader({ done, total, soru, hours }) {
 
       <Text
         style={{
-          ...TYPOGRAPHY.bodySemiBold,
-          color: C.sec,
-          marginTop: SPACING.md,
+          ...TYPOGRAPHY.caption,
+          color: C.muted,
+          marginTop: SPACING.sm,
         }}
       >
-        {done}/{total} tamamlandi
+        görev tamamlandı
       </Text>
 
       <View style={styles.statsRow}>
@@ -58,9 +58,9 @@ export function PlanHeader({ done, total, soru, hours }) {
 
       {showMotiv && (
         <View style={styles.motivRow}>
-          <Icon name="flame" size={16} color={C.amber} />
-          <Text style={{ ...TYPOGRAPHY.caption, color: C.amber, marginLeft: 6 }}>
-            Yarisini bitirdin, devam et!
+          <Icon name="flame" size={16} color={C.accent} />
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.accent, marginLeft: 6 }}>
+            Yarısını bitirdin, devam et!
           </Text>
         </View>
       )}
@@ -96,7 +96,7 @@ const makeStyles = (C) => ({
     flexDirection: "row",
     alignItems: "center",
     marginTop: SPACING.lg,
-    backgroundColor: C.amber + "14",
+    backgroundColor: C.accent + "14",
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: 999,

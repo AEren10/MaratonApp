@@ -46,11 +46,14 @@ function MoodSelector({ value, onChange, C, styles }) {
           return (
             <Pressable
               key={m.key}
+              accessibilityRole="radio"
+              accessibilityLabel={`Ruh hali: ${m.label}`}
+              accessibilityState={{ selected: active }}
               onPress={() => { H.select(); onChange(active ? null : m.key); }}
               style={[styles.moodBtn, active && styles.moodBtnActive]}
             >
               <Text style={{ fontSize: 24 }}>{m.emoji}</Text>
-              <Text style={[styles.moodLabel, active && { color: C.amber }]}>{m.label}</Text>
+              <Text style={[styles.moodLabel, active && { color: C.accent }]}>{m.label}</Text>
             </Pressable>
           );
         })}
@@ -162,7 +165,7 @@ export default function TrialEntryScreen() {
     });
     if (!hasAny) {
       H.warn();
-      showAlert("Bos deneme", "En az bir ders icin deger gir.");
+      showAlert("Boş deneme", "En az bir ders için değer gir.");
       return;
     }
 
@@ -172,19 +175,6 @@ export default function TrialEntryScreen() {
       ? `${subjects[0]?.name || "Branş"} Branş`
       : typeMeta.label;
     const trialName = title.trim() || autoName;
-
-    const localTrial = {
-      id: Date.now().toString(),
-      date: formatDateISO(trialDate),
-      name: trialName,
-      totalNet: netVal,
-      subjects: subjectsMap,
-      trialType,
-      field: getFieldFromType(trialType),
-      branchSubject,
-      mood,
-    };
-    dispatch(addTrial(localTrial));
 
     const parsed = trialEntrySchema.safeParse({
       name: trialName,
@@ -198,6 +188,19 @@ export default function TrialEntryScreen() {
       showAlert("Geçersiz veri", parsed.error.issues[0]?.message || "Lütfen verileri kontrol edin.");
       return;
     }
+
+    const localTrial = {
+      id: Date.now().toString(),
+      date: formatDateISO(trialDate),
+      name: trialName,
+      totalNet: netVal,
+      subjects: subjectsMap,
+      trialType,
+      field: getFieldFromType(trialType),
+      branchSubject,
+      mood,
+    };
+    dispatch(addTrial(localTrial));
 
     setSaving(true);
     const result = await saveTrialOffline(
@@ -226,8 +229,8 @@ export default function TrialEntryScreen() {
       ],
     });
     H.success();
-    navigation.replace(SCREENS.TRIAL_SUMMARY, { trial: localTrial });
-  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, title, trialDate, user, dispatch, reward, navigation, C]);
+    if (localTrial) navigation.replace(SCREENS.TRIAL_SUMMARY, { trial: localTrial });
+  }, [saving, trialType, branchSubject, subjects, values, totalNet, mood, title, trialDate, user, dispatch, reward, navigation, C, showAlert]);
 
   const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
 
@@ -251,10 +254,13 @@ export default function TrialEntryScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Tarih: ${formatDateLong(trialDate)}`}
+            accessibilityHint="Tarih seçiciyi açar veya kapatır"
             onPress={() => setShowDatePicker((p) => !p)}
             style={styles.dateRow}
           >
-            <IconBox icon="calendar" color={C.amber} size={34} rounded={10} />
+            <IconBox icon="calendar" color={C.accent} size={34} rounded={10} />
             <Text style={styles.dateText}>{formatDateLong(trialDate)}</Text>
             <Icon name={showDatePicker ? "chevUp" : "chevDown"} size={16} color={C.muted} />
           </Pressable>
@@ -266,22 +272,25 @@ export default function TrialEntryScreen() {
                 return (
                   <Pressable
                     key={d.iso}
+                    accessibilityRole="radio"
+                    accessibilityLabel={`${d.dayName} ${d.day}`}
+                    accessibilityState={{ selected: active }}
                     onPress={() => { H.tap(); setTrialDate(d.date); setShowDatePicker(false); }}
                     style={[
                       styles.dateChip,
                       {
-                        backgroundColor: active ? C.amber + "1A" : C.surface,
-                        borderColor: active ? C.amber : C.border,
+                        backgroundColor: active ? C.accent + "1A" : C.surface,
+                        borderColor: active ? C.accent : C.border,
                       },
                     ]}
                   >
                     <Text style={{
                       fontFamily: "Inter_500Medium", fontSize: 11,
-                      color: active ? C.amber : C.muted,
+                      color: active ? C.accent : C.muted,
                     }}>{d.dayName}</Text>
                     <Text style={{
                       fontFamily: "SpaceGrotesk_700Bold", fontSize: 18,
-                      color: active ? C.amber : C.text,
+                      color: active ? C.accent : C.text,
                     }}>{d.day}</Text>
                   </Pressable>
                 );
@@ -292,6 +301,7 @@ export default function TrialEntryScreen() {
           <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.titleRow}>
             <Icon name="edit" size={16} color={C.muted} />
             <TextInput
+              accessibilityLabel="Deneme adı"
               value={title}
               onChangeText={setTitle}
               placeholder="Deneme adı (Özdebir, 3D, Limit...)"
@@ -338,6 +348,9 @@ export default function TrialEntryScreen() {
           {showSubjectInputs && (
             <Animated.View entering={FadeInDown.delay(450).duration(420).springify()}>
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Denemeyi Kaydet"
+                accessibilityHint="Deneme sonuçlarını kaydeder"
                 onPress={handleSave}
                 style={[styles.submitBtn, saving && { opacity: 0.6 }]}
                 disabled={saving}
@@ -441,8 +454,8 @@ const makeStyles = (C) => ({
     borderColor: C.border,
   },
   moodBtnActive: {
-    borderColor: C.amber,
-    backgroundColor: C.amber + "18",
+    borderColor: C.accent,
+    backgroundColor: C.accent + "18",
   },
   moodLabel: {
     ...TYPOGRAPHY.micro,
@@ -453,15 +466,11 @@ const makeStyles = (C) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.sm,
-    backgroundColor: C.purple,
+    backgroundColor: C.accent,
     borderRadius: 999,
     paddingVertical: 18,
     marginTop: SPACING.lg,
-    shadowColor: C.purple,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.32,
-    shadowRadius: 20,
-    elevation: 8,
+    ...SHADOWS.fab,
   },
   submitText: {
     ...TYPOGRAPHY.button,

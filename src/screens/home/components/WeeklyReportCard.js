@@ -3,12 +3,17 @@ import { Icon, Chip } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 
 function StatBlock({ value, label, color, C }) {
+  const isZero = value === 0 || value === "0dk";
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color }}>
-        {value}
+      <Text style={{
+        fontFamily: isZero ? "Inter_500Medium" : "SpaceGrotesk_700Bold",
+        fontSize: isZero ? 15 : 22,
+        color: isZero ? C.muted : color,
+      }}>
+        {isZero ? "—" : value}
       </Text>
-      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, marginTop: 2 }}>
+      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: isZero ? C.muted : color, opacity: isZero ? 1 : 0.7, marginTop: 2 }}>
         {label}
       </Text>
     </View>
@@ -20,6 +25,7 @@ export function WeeklyReportCard({ report, onPress }) {
   const hoursStr = report.totalMinutes >= 60
     ? `${(report.totalMinutes / 60).toFixed(1)}sa`
     : `${report.totalMinutes}dk`;
+  const allZero = report.totalQuestions === 0 && report.activeDays === 0 && report.trialCount === 0;
 
   const deltaPositive = parseFloat(report.netDelta) > 0;
   const deltaColor = deltaPositive ? C.green : parseFloat(report.netDelta) < 0 ? C.red : C.muted;
@@ -35,10 +41,10 @@ export function WeeklyReportCard({ report, onPress }) {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <View style={{
               width: 30, height: 30, borderRadius: 10,
-              backgroundColor: C.blue + "1A",
+              backgroundColor: C.accent + "14",
               alignItems: "center", justifyContent: "center",
             }}>
-              <Icon name="calendar" size={15} color={C.blue} />
+              <Icon name="calendar" size={15} color={C.accent} />
             </View>
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
               Bu Hafta
@@ -59,14 +65,14 @@ export function WeeklyReportCard({ report, onPress }) {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <StatBlock C={C} value={report.totalQuestions} label="Soru" color={C.amber} />
-          <StatBlock C={C} value={hoursStr} label="Süre" color={C.blue} />
-          <StatBlock C={C} value={report.activeDays} label="Aktif Gün" color={C.green} />
-          <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.purple} />
+          <StatBlock C={C} value={report.totalQuestions} label="Soru" color={C.orange} />
+          <StatBlock C={C} value={hoursStr} label="Süre" color={C.purple} />
+          <StatBlock C={C} value={report.activeDays} label="Aktif Gün" color={C.teal} />
+          <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.blue} />
         </View>
 
         <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>
-          Detaylı raporu görmek için dokun
+          {allZero ? "İlk çalışmanı yap, haftalık raporun başlasın" : "Detaylı raporu görmek için dokun"}
         </Text>
       </View>
     </Pressable>

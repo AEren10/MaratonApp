@@ -28,14 +28,25 @@ import { ExamProvider } from "./src/contexts/ExamContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary";
 import { AlertProvider } from "./src/contexts/AlertContext";
+import { NetworkProvider } from "./src/contexts/NetworkContext";
 import { ReduxHydrator } from "./src/store/hydrate";
 import { COLORS } from "./src/themes/tokens";
 import { initErrorReporting } from "./src/lib/errorReporting";
 import { useTheme } from "./src/contexts/ThemeContext";
+import { applyNotifPrefs, getNotifPrefs } from "./src/lib/notifications";
+import OfflineBanner from "./src/components/common/OfflineBanner";
 
 initErrorReporting();
 
 SplashScreen.preventAutoHideAsync();
+
+async function initNotifications() {
+  try {
+    const prefs = await getNotifPrefs();
+    await applyNotifPrefs(prefs);
+  } catch (_) {}
+}
+initNotifications();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -59,6 +70,7 @@ export default function App() {
       <Provider store={store}>
         <ReduxHydrator />
         <SafeAreaProvider>
+          <NetworkProvider>
           <AuthProvider>
             <ExamProvider>
               <ThemeProvider>
@@ -66,6 +78,7 @@ export default function App() {
               </ThemeProvider>
             </ExamProvider>
           </AuthProvider>
+          </NetworkProvider>
         </SafeAreaProvider>
       </Provider>
     </GestureHandlerRootView>
@@ -77,6 +90,7 @@ function ThemedRoot() {
   return (
     <AlertProvider>
       <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <OfflineBanner />
         <StatusBar style={scheme === "light" ? "dark" : "light"} />
         <ScreenErrorBoundary>
           <AppNavigator />

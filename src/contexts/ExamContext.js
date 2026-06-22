@@ -42,8 +42,9 @@ export function ExamProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!session?.user?.id || session.user.id === "dev") {
+    if (!session?.user?.id) {
       if (!session) {
+        dbLoaded.current = false;
         setExamType(null);
         setField(null);
         setExamDate(null);
@@ -56,7 +57,20 @@ export function ExamProvider({ children }) {
     dbLoaded.current = true;
 
     getProfile(session.user.id).then((p) => {
-      if (!p?.exam_type) return;
+      if (!p?.exam_type) {
+        AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+          if (!raw) return;
+          try {
+            const d = JSON.parse(raw);
+            setExamType(d.examType);
+            setField(d.field || null);
+            setExamDate(d.examDate ? new Date(d.examDate) : null);
+            setTargetRanking(d.targetRanking || null);
+            setTargetDepartment(d.targetDepartment || null);
+          } catch {}
+        }).catch(() => {});
+        return;
+      }
       const config = {
         examType: p.exam_type,
         field: p.field || null,
@@ -96,7 +110,7 @@ export function ExamProvider({ children }) {
         JSON.stringify({ ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() }),
       );
     } catch {}
-    if (session?.user?.id && session.user.id !== "dev") {
+    if (session?.user?.id && session.user.id) {
       syncExamConfig(session.user.id, {
         examType: type, field: selectedField || null, examDate: date,
         targetRanking, targetDepartment,
@@ -115,7 +129,7 @@ export function ExamProvider({ children }) {
         JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
       );
     } catch {}
-    if (session?.user?.id && session.user.id !== "dev") {
+    if (session?.user?.id && session.user.id) {
       syncExamConfig(session.user.id, {
         examType, field, examDate,
         targetRanking: ranking, targetDepartment: department || null,

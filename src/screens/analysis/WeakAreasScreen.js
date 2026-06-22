@@ -83,10 +83,12 @@ export default function WeakAreasScreen() {
         renderItem={renderItem}
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
+        windowSize={5}
+        maxToRenderPerBatch={10}
         ListFooterComponent={
           weakTopics.length > 0 ? (
             <View style={s.footer}>
-              <Icon name="alert" size={16} color={C.amber} />
+              <Icon name="alert" size={16} color={C.accent} />
               <Text style={s.footerText}>{weakTopics.length} zayif alan tespit edildi</Text>
             </View>
           ) : null
@@ -114,7 +116,7 @@ function makeStyles(C) {
     topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.xs },
     suggestion: { ...TYPOGRAPHY.caption, color: C.sec },
     footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.xl, gap: SPACING.sm },
-    footerText: { ...TYPOGRAPHY.captionMedium, color: C.amber },
+    footerText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
     empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },
     emptyText: { ...TYPOGRAPHY.body, color: C.muted, marginTop: SPACING.md },
   });

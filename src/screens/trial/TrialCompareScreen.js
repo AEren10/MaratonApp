@@ -115,18 +115,18 @@ export default function TrialCompareScreen() {
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>{olderDate}</Text>
             <Text style={[TYPOGRAPHY.statSmall, { color: C.muted }]}>{olderNet}</Text>
           </View>
-          <Icon name="arrowR" size={20} color={C.amber} />
+          <Icon name="arrowR" size={20} color={C.accent} />
           <View style={styles.dateCard}>
-            <Icon name="calendar" size={14} color={C.amber} />
+            <Icon name="calendar" size={14} color={C.accent} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>{newerDate}</Text>
-            <Text style={[TYPOGRAPHY.statSmall, { color: C.amber }]}>{newerNet}</Text>
+            <Text style={[TYPOGRAPHY.statSmall, { color: C.accent }]}>{newerNet}</Text>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(170).duration(420).springify()} style={styles.totalDiff}>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec }]}>Toplam degisim</Text>
           <View style={styles.totalRow}>
-            <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>
+            <Text style={[TYPOGRAPHY.stat, { color: diff >= 0 ? C.green : C.red }]}>
               {diff.toFixed(1)}
             </Text>
             <Chip color={diff >= 0 ? C.green : C.red}>
@@ -212,7 +212,7 @@ function makeStyles(C) {
     },
     legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
     legendDot: {
-      width: 8, height: 8, borderRadius: 4, backgroundColor: C.amber,
+      width: 8, height: 8, borderRadius: 4, backgroundColor: C.accent,
     },
   });
 }

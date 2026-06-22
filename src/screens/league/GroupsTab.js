@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
+import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, StyleSheet, Share, KeyboardAvoidingView, Platform } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Avatar } from "../../components/design";
@@ -18,8 +18,8 @@ const MemberRow = React.memo(function MemberRow({ item }) {
       <View style={{ width: 26, alignItems: "center" }}>
         {medal ? <Icon name="trophy" size={16} color={medal} /> : <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{item.rank}</Text>}
       </View>
-      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={30} color={isYou ? C.amber : undefined} />
-      <Text style={{ flex: 1, marginLeft: 10, ...TYPOGRAPHY.bodyMedium, color: isYou ? C.amber : C.text }} numberOfLines={1}>
+      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={30} color={isYou ? C.accent : undefined} />
+      <Text style={{ flex: 1, marginLeft: 10, ...TYPOGRAPHY.bodyMedium, color: isYou ? C.accent : C.text }} numberOfLines={1}>
         {isYou ? "Sen" : item.name || "Öğrenci"}
       </Text>
       <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 15, color: C.text }}>{item.weekly_xp}</Text>
@@ -108,14 +108,29 @@ export function GroupsTab({ user }) {
     Share.share({ message: `Maraton'da "${g.name}" grubuma katıl! Kod: ${g.code}` }).catch(() => {});
   };
 
+  const renderGroupChip = useCallback(({ item }) => {
+    const active = selected?.id === item.id;
+    return (
+      <Pressable
+        onPress={() => setSelected(item)}
+        onLongPress={() => doLeave(item)}
+        style={[st.chip, active && st.chipActive]}
+      >
+        <Text style={[st.chipText, active && { color: C.accent }]}>{item.name}</Text>
+      </Pressable>
+    );
+  }, [selected?.id, st, C.accent, doLeave]);
+
+  const renderMemberItem = useCallback(({ item }) => <MemberRow item={item} />, []);
+
   if (loading) {
-    return <View style={st.center}><ActivityIndicator color={C.amber} size="large" /></View>;
+    return <View style={st.center}><ActivityIndicator color={C.accent} size="large" /></View>;
   }
 
   return (
     <View style={{ flex: 1 }}>
       <View style={st.actions}>
-        <Pressable onPress={() => setCreateOpen(true)} style={[st.actBtn, { backgroundColor: C.amber }]}>
+        <Pressable onPress={() => setCreateOpen(true)} style={[st.actBtn, { backgroundColor: C.accent }]}>
           <Icon name="plus" size={15} color={C.bg} sw={2.5} />
           <Text style={[st.actText, { color: C.bg }]}>Grup Oluştur</Text>
         </Pressable>
@@ -126,7 +141,7 @@ export function GroupsTab({ user }) {
       </View>
 
       {groups.length === 0 ? (
-        <EmptyState icon="users" title="Henüz grubun yok" message="Bir grup oluştur ya da arkadaşının koduyla katıl" />
+        <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla bir grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
       ) : (
         <>
           <FlatList
@@ -135,28 +150,19 @@ export function GroupsTab({ user }) {
             keyExtractor={(g) => g.id}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 8 }}
-            renderItem={({ item }) => {
-              const active = selected?.id === item.id;
-              return (
-                <Pressable
-                  onPress={() => setSelected(item)}
-                  onLongPress={() => doLeave(item)}
-                  style={[st.chip, active && st.chipActive]}
-                >
-                  <Text style={[st.chipText, active && { color: C.amber }]}>{item.name}</Text>
-                </Pressable>
-              );
-            }}
+            renderItem={renderGroupChip}
           />
 
           {selected ? (
             <FlatList
               data={board.list}
               keyExtractor={(m) => String(m.user_id)}
-              renderItem={({ item }) => <MemberRow item={item} />}
+              renderItem={renderMemberItem}
+              windowSize={5}
+              maxToRenderPerBatch={10}
               ListHeaderComponent={
                 <Pressable onPress={() => shareCode(selected)} style={st.codeRow}>
-                  <Icon name="share" size={14} color={C.amber} />
+                  <Icon name="share" size={14} color={C.accent} />
                   <Text style={st.codeText}>Kod: {selected.code} · paylaş</Text>
                 </Pressable>
               }
@@ -184,6 +190,7 @@ function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onC
   const st = useMemo(() => makeStyles(C), [C]);
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <Pressable style={st.backdrop} onPress={onClose}>
         <Pressable style={st.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={st.handle} />
@@ -202,6 +209,7 @@ function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onC
           </Pressable>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -213,17 +221,17 @@ const makeStyles = (C) => StyleSheet.create({
   actText: { ...TYPOGRAPHY.button },
   emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", paddingHorizontal: SPACING.xl },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
-  chipActive: { backgroundColor: C.amber + "18", borderColor: C.amber },
+  chipActive: { backgroundColor: C.accent + "18", borderColor: C.accent },
   chipText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
   codeRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md },
-  codeText: { ...TYPOGRAPHY.captionMedium, color: C.amber },
+  codeText: { ...TYPOGRAPHY.captionMedium, color: C.accent },
   row: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10 },
-  rowYou: { backgroundColor: C.amber + "14", borderWidth: 1, borderColor: C.amber + "40" },
-  backdrop: { flex: 1, backgroundColor: "#000000AA", justifyContent: "flex-end" },
-  sheet: { backgroundColor: C.surface, borderTopLeftRadius: RADIUS.xxl, borderTopRightRadius: RADIUS.xxl, padding: SPACING.lg, paddingBottom: SPACING.xxxl },
+  rowYou: { backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "40" },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  sheet: { backgroundColor: C.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: SPACING.lg, paddingBottom: SPACING.xxxl },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: SPACING.md },
   sheetTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.md },
   input: { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, ...TYPOGRAPHY.body, color: C.text },
-  submit: { backgroundColor: C.amber, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, alignItems: "center", marginTop: SPACING.md },
+  submit: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, alignItems: "center", marginTop: SPACING.md },
   submitText: { ...TYPOGRAPHY.button, color: C.bg },
 });

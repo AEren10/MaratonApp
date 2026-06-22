@@ -19,7 +19,7 @@ export function PlanCard({ plan, onPress, onStart }) {
   const remaining = Math.max(0, plan.total - plan.done);
   const done = pct >= 1;
   const status = statusMessage(pct);
-  const ringColor = done ? C.green : C.amber;
+  const ringColor = done ? C.green : C.accent;
 
   return (
     <View style={{
@@ -29,9 +29,9 @@ export function PlanCard({ plan, onPress, onStart }) {
       <Pressable onPress={onPress} style={{ padding: 18, paddingBottom: 0 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View style={{ gap: 6 }}>
-            <Chip color={C.amber}>
-              <Icon name="zap" size={11} color={C.amber} sw={2.5} />
-              <Text style={{ color: C.amber, fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 0.6 }}>GÜNLÜK PLAN</Text>
+            <Chip color={C.accent}>
+              <Icon name="zap" size={11} color={C.accent} sw={2.5} />
+              <Text style={{ color: C.accent, fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 0.6 }}>GÜNLÜK PLAN</Text>
             </Chip>
             <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.muted }}>
               {plan.dersler} ders · {plan.hours}
@@ -61,7 +61,7 @@ export function PlanCard({ plan, onPress, onStart }) {
 
       <View style={{ height: 4, backgroundColor: C.surface2 }}>
         <LinearGradient
-          colors={done ? [C.green, C.teal] : [C.amber, C.accent]}
+          colors={done ? [C.green, C.teal] : [C.accent, C.accent]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{ width: `${Math.round(Math.min(1, pct) * 100)}%`, height: 4 }}
@@ -72,7 +72,7 @@ export function PlanCard({ plan, onPress, onStart }) {
         onPress={onStart}
         style={({ pressed }) => ({
           margin: 14, marginTop: 10,
-          backgroundColor: done ? C.green : C.amber,
+          backgroundColor: done ? C.green : C.accent,
           borderRadius: RADIUS.lg,
           paddingVertical: 14,
           flexDirection: "row",

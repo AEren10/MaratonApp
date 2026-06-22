@@ -48,7 +48,7 @@ export function buildRoadmap({ pool = [], progressByKey = {}, weakAreas = {}, da
         topic: name,
         mastery: mastery.level,
         masteryLabel: mastery.label,
-        masteryColor: mastery.color,
+        masteryColorKey: mastery.colorKey,
         acc,
         q,
       };

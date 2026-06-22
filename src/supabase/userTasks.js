@@ -3,7 +3,7 @@ import { supabase } from "./client";
 export const getUserTasksByDate = async (userId, date) => {
   const { data, error } = await supabase
     .from("user_tasks")
-    .select("*")
+    .select("id, user_id, task_date, subject, topic, question_count, note, completed, created_at")
     .eq("user_id", userId)
     .eq("task_date", date)
     .order("created_at", { ascending: true });
@@ -32,8 +32,10 @@ export const updateUserTask = async (id, updates) => {
   return data;
 };
 
-export const deleteUserTask = async (id) => {
-  const { error } = await supabase.from("user_tasks").delete().eq("id", id);
+export const deleteUserTask = async (id, userId) => {
+  let query = supabase.from("user_tasks").delete().eq("id", id);
+  if (userId) query = query.eq("user_id", userId);
+  const { error } = await query;
   if (error) throw error;
 };
 

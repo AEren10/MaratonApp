@@ -55,23 +55,23 @@ export default function ShareCardScreen() {
     }
   }, []);
   const isWeekly = type === "weekly";
-  const heroValue = isWeekly ? fmtTime(report.totalMinutes) : `${streak} Gun`;
-  const heroLabel = isWeekly ? "Haftalik Calisma" : "Gunluk Seri";
+  const heroValue = isWeekly ? fmtTime(report.totalMinutes) : `${streak} Gün`;
+  const heroLabel = isWeekly ? "Haftalık Çalışma" : "Günlük Seri";
 
   const grid = [
     { label: "Soru", value: report.totalQuestions, icon: "checkCircle", color: C.green },
     { label: "Deneme", value: report.trialCount, icon: "fileText", color: C.blue },
-    { label: "Aktif Gun", value: report.activeDays, icon: "calendar", color: C.purple },
-    { label: "Net Ort.", value: report.weekNetAvg, icon: "trendingUp", color: C.amber },
+    { label: "Aktif Gün", value: report.activeDays, icon: "calendar", color: C.sec },
+    { label: "Net Ort.", value: report.weekNetAvg, icon: "trendingUp", color: C.accent },
   ];
 
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Pressable onPress={() => nav.goBack()} hitSlop={12}>
           <Icon name="arrowLeft" size={24} color={C.text} />
         </Pressable>
-        <Text style={s.title}>Paylas</Text>
+        <Text style={s.title}>Paylaş</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -105,7 +105,7 @@ export default function ShareCardScreen() {
             <View style={s.pill}><Text style={s.pillText}>🔥 {streak}</Text></View>
             <View style={s.pill}><Text style={s.pillText}>⚡ {xp} XP</Text></View>
             {daysUntilExam != null && (
-              <View style={s.pill}><Text style={s.pillText}>{daysUntilExam} gun</Text></View>
+              <View style={s.pill}><Text style={s.pillText}>{daysUntilExam} gün</Text></View>
             )}
           </View>
 
@@ -128,9 +128,9 @@ const makeStyles = (C) => StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   card: { width: 300, aspectRatio: 9 / 16, backgroundColor: C.surface, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: C.border, padding: SPACING.xl, justifyContent: "space-between" },
   brandRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-  brand: { ...TYPOGRAPHY.subheading, color: C.amber, letterSpacing: 3 },
-  badge: { backgroundColor: C.amber + "22", paddingHorizontal: SPACING.sm, paddingVertical: 2, borderRadius: RADIUS.sm },
-  badgeText: { ...TYPOGRAPHY.micro, color: C.amber },
+  brand: { ...TYPOGRAPHY.subheading, color: C.accent, letterSpacing: 3 },
+  badge: { backgroundColor: C.accent + "22", paddingHorizontal: SPACING.sm, paddingVertical: 2, borderRadius: RADIUS.sm },
+  badgeText: { ...TYPOGRAPHY.micro, color: C.accent },
   name: { ...TYPOGRAPHY.bodyMedium, color: C.sec, marginTop: SPACING.xs },
   heroValue: { ...TYPOGRAPHY.stat, color: C.text, textAlign: "center" },
   heroLabel: { ...TYPOGRAPHY.captionMedium, color: C.muted, textAlign: "center", marginTop: -SPACING.xs },
@@ -142,6 +142,6 @@ const makeStyles = (C) => StyleSheet.create({
   pill: { backgroundColor: C.bg, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: RADIUS.pill },
   pillText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
   watermark: { ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", opacity: 0.5 },
-  shareBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, marginHorizontal: SPACING.xxxl, marginBottom: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.xl, backgroundColor: C.amber },
+  shareBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, marginHorizontal: SPACING.xxxl, marginBottom: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.xl, backgroundColor: C.accent },
   shareBtnText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -18,6 +18,7 @@ import {
   unfriend,
 } from "../../supabase/friends";
 import { useAlert } from "../../contexts/AlertContext";
+import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 
 function FriendRow({ user, action }) {
@@ -106,24 +107,25 @@ export default function FriendsScreen() {
         style: "destructive",
         onPress: async () => {
           try {
-            await unfriend(friendshipId);
+            await unfriend(friendshipId, user.id);
             load();
           } catch (_) {}
         },
       },
     ]);
-  }, [load]);
+  }, [load, user.id]);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={s.title}>Arkadaşlar</Text>
         <View style={{ width: 22 }} />
       </View>
 
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.searchBox}>
           <Icon name="search" size={18} color={C.muted} />
@@ -134,7 +136,7 @@ export default function FriendsScreen() {
             placeholderTextColor={C.muted}
             style={s.searchInput}
           />
-          {searching && <ActivityIndicator color={C.amber} size="small" />}
+          {searching && <ActivityIndicator color={C.accent} size="small" />}
         </Animated.View>
 
         {searchResults.length > 0 && (
@@ -150,8 +152,8 @@ export default function FriendsScreen() {
                       onPress={() => addFriend(u.id)}
                       style={s.actionBtn}
                     >
-                      <Icon name="plus" size={14} color={C.amber} />
-                      <Text style={{ ...TYPOGRAPHY.micro, color: C.amber }}>Ekle</Text>
+                      <Icon name="plus" size={14} color={C.accent} />
+                      <Text style={{ ...TYPOGRAPHY.micro, color: C.accent }}>Ekle</Text>
                     </Pressable>
                   }
                 />
@@ -161,7 +163,7 @@ export default function FriendsScreen() {
         )}
 
         {loading ? (
-          <ActivityIndicator color={C.amber} style={{ marginTop: 40 }} />
+          <ActivityIndicator color={C.accent} style={{ marginTop: 40 }} />
         ) : (
           <>
             {requests.length > 0 && (
@@ -193,8 +195,8 @@ export default function FriendsScreen() {
               {friends.length === 0 ? (
                 <EmptyState
                   icon="users"
-                  title="Henüz arkadaşın yok"
-                  message="Arama kutusundan arkadaş bul"
+                  title="Rakiplerini ekle, birlikte yüksel"
+                  message="Yukarıdaki arama kutusundan arkadaşlarını bul"
                   color="accent"
                 />
               ) : (
@@ -213,9 +215,31 @@ export default function FriendsScreen() {
                 </View>
               )}
             </Animated.View>
+
+            {friends.length > 0 && (
+              <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+                <Pressable
+                  onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Challenge Başlat"
+                  accessibilityHint="Challenge ekranını açar"
+                  style={({ pressed }) => [s.challengeBanner, pressed && { opacity: 0.8 }]}
+                >
+                  <View style={s.challengeIcon}>
+                    <Icon name="zap" size={20} color={C.accent} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Challenge Başlat</Text>
+                    <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 }}>Arkadaşınla yarış, motivasyonunu katla</Text>
+                  </View>
+                  <Icon name="arrowR" size={16} color={C.muted} />
+                </Pressable>
+              </Animated.View>
+            )}
           </>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -272,9 +296,27 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: C.amber + "15",
+    backgroundColor: C.accent + "15",
     paddingHorizontal: SPACING.sm,
     paddingVertical: 6,
     borderRadius: 999,
+  },
+  challengeBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.md,
+    padding: SPACING.lg,
+    backgroundColor: C.accent + "0A",
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderColor: C.accent + "20",
+  },
+  challengeIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: C.accent + "18",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
