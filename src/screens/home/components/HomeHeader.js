@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
-import { Icon } from "../../../components/design";
+import Animated, {
+  useSharedValue, useAnimatedStyle,
+  withRepeat, withSequence, withTiming, withSpring, Easing,
+} from "react-native-reanimated";
+import { Icon, SparkBurst } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHADOWS } from "../../../themes/tokens";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -23,21 +26,43 @@ function avatarColors(name = "?", C) {
   return [C[p[0]], p[1]];
 }
 
-export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCalendarPress, onProfilePress }) {
+export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, lastStudyDate, onStreakPress, onCalendarPress, onProfilePress }) {
   const C = useC();
   const { user } = useAuth();
   const initials = name.slice(0, 2).toUpperCase();
   const [c1, c2] = avatarColors(name, C);
   const [avatarUri, setAvatarUri] = useState(null);
+  const [streakBurst, setStreakBurst] = useState(false);
+
+  const prevStreakRef = useRef(null);
+  useEffect(() => {
+    if (prevStreakRef.current !== null && streak > prevStreakRef.current && streak > 0) {
+      setStreakBurst(true);
+    }
+    prevStreakRef.current = streak;
+  }, [streak]);
 
   const flamePulse = useSharedValue(1);
+  const flameBoost = useSharedValue(1);
+
   useEffect(() => {
     flamePulse.value = withRepeat(withSequence(
       withTiming(1.18, { duration: 600, easing: Easing.inOut(Easing.quad) }),
       withTiming(1, { duration: 600, easing: Easing.inOut(Easing.quad) })
     ), -1, false);
   }, []);
-  const flameAnim = useAnimatedStyle(() => ({ transform: [{ scale: flamePulse.value }] }));
+
+  useEffect(() => {
+    if (!streakBurst) return;
+    flameBoost.value = withSequence(
+      withSpring(1.6, { damping: 8, stiffness: 200 }),
+      withSpring(1, { damping: 12, stiffness: 180 }),
+    );
+  }, [streakBurst]);
+
+  const flameAnim = useAnimatedStyle(() => ({
+    transform: [{ scale: flamePulse.value * flameBoost.value }],
+  }));
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
@@ -49,6 +74,9 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
   }, [user?.id]);
 
   const [g, gEmoji] = greet();
+  const todayStr = new Date().toISOString().split("T")[0];
+  const studiedToday = lastStudyDate === todayStr;
+  const atRisk = streak > 0 && !studiedToday && new Date().getHours() >= 18;
   const avatarShadow = { shadowColor: c1, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.32, shadowRadius: 14, elevation: 5 };
 
   return (
@@ -87,29 +115,42 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
         <Icon name="calendar" size={18} color={C.text} />
       </Pressable>
 
-      {/* Streak pill — gradient when active, muted when dormant */}
+      {/* Streak pill */}
       <Pressable onPress={onStreakPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Streak ${streak} gün`} accessibilityHint="Streak detaylarını gösterir" style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
         {streak > 0 ? (
-          <LinearGradient
-            colors={[C.orange, C.orange + "CC"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{
-              flexDirection: "row", alignItems: "center", gap: 5,
-              borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9,
-              ...SHADOWS.orange,
-            }}
-          >
-            <Animated.View style={flameAnim}>
-              <Icon name="flame" size={18} color="#FFFFFF" sw={2.6} />
-            </Animated.View>
-            <Text style={{
-              fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
-              color: "#FFFFFF", letterSpacing: -0.3,
-            }}>
-              {streak}
-            </Text>
-          </LinearGradient>
+          <View style={{ position: "relative" }}>
+            <LinearGradient
+              colors={atRisk ? [C.danger, C.danger + "CC"] : [C.orange, C.orange + "CC"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                flexDirection: "row", alignItems: "center", gap: 5,
+                borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9,
+                ...(atRisk ? { ...SHADOWS.orange, shadowColor: C.danger } : SHADOWS.orange),
+              }}
+            >
+              <Animated.View style={flameAnim}>
+                <Icon name={atRisk ? "alert" : "flame"} size={18} color="#FFFFFF" sw={2.6} />
+              </Animated.View>
+              <Text style={{
+                fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
+                color: "#FFFFFF", letterSpacing: -0.3,
+              }}>
+                {streak}
+              </Text>
+            </LinearGradient>
+            {freezeCount > 0 && (
+              <View style={{
+                position: "absolute", top: -5, right: -5,
+                width: 18, height: 18, borderRadius: 9,
+                backgroundColor: C.info, alignItems: "center", justifyContent: "center",
+                borderWidth: 2, borderColor: C.bg,
+              }}>
+                <Icon name="shield" size={10} color="#FFFFFF" sw={2.5} />
+              </View>
+            )}
+            <SparkBurst trigger={streakBurst} onDone={() => setStreakBurst(false)} />
+          </View>
         ) : (
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,

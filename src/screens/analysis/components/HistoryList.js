@@ -72,27 +72,6 @@ export function HistoryList({ history, onPress, onCompare }) {
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
         <Icon name="clock" size={18} color={C.sec} />
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Gecmis Denemeler</Text>
-        {history.length >= 2 && onCompare && (
-          <Pressable
-            onPress={onCompare}
-            hitSlop={8}
-            style={({ pressed }) => ({
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-              backgroundColor: C.accent + "18",
-              borderRadius: RADIUS.full,
-              paddingHorizontal: SPACING.md,
-              paddingVertical: 6,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Icon name="barChart" size={14} color={C.accent} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>
-              Karşılaştır
-            </Text>
-          </Pressable>
-        )}
       </View>
 
       <GlassCard radius={RADIUS.xxl}>
@@ -105,6 +84,47 @@ export function HistoryList({ history, onPress, onCompare }) {
           </View>
         ))}
       </GlassCard>
+
+      {history.length >= 2 && onCompare && (
+        <Pressable
+          onPress={onCompare}
+          style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
+        >
+          <GlassCard radius={RADIUS.xxl} color={C.accent}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: SPACING.xl,
+                paddingVertical: SPACING.lg,
+                gap: SPACING.md,
+              }}
+            >
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: RADIUS.xl,
+                  backgroundColor: C.accent + "22",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon name="barChart" size={20} color={C.accent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
+                  Denemeleri Karşılaştır
+                </Text>
+                <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 }}>
+                  Son iki denemeni kıyasla
+                </Text>
+              </View>
+              <Icon name="chevR" size={18} color={C.accent} />
+            </View>
+          </GlassCard>
+        </Pressable>
+      )}
     </View>
   );
 }

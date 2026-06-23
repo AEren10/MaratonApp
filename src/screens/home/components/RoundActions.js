@@ -19,8 +19,8 @@ function RoundAction({ item, onPress, C }) {
       onPress={() => { haptic.tap(); onPress(item); }}
       style={s.item}
     >
-      <Animated.View style={[s.circle, { backgroundColor: (item.color || C.accent) + "28", borderColor: (item.color || C.accent) + "40" }, style]}>
-        <Icon name={item.icon} size={22} color={item.color || C.accent} sw={2} />
+      <Animated.View style={[s.circle, { backgroundColor: (item.color || C.accent) + "20", borderColor: (item.color || C.accent) + "50" }, style]}>
+        <Icon name={item.icon} size={22} color={item.color || C.accent} sw={2.2} />
       </Animated.View>
       <Text style={[s.label, { color: C.sec }]} numberOfLines={1}>{item.label}</Text>
     </Pressable>

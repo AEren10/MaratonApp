@@ -3,6 +3,7 @@ import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial } from "../supabase/trials";
 import { addWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
+import { uploadWrongQuestionImage } from "../supabase/storage";
 
 const QUEUE_KEY = "@maraton:offlineQueue";
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
@@ -59,9 +60,15 @@ async function runOne(item) {
     case OP_TRIAL:
       await addTrial(item.payload.trial, item.payload.subjects);
       break;
-    case OP_WRONG_QUESTION:
-      await addWrongQuestion(item.payload);
+    case OP_WRONG_QUESTION: {
+      const p = { ...item.payload };
+      if (p.image_local_uri && !p.image_path) {
+        p.image_path = await uploadWrongQuestionImage(p.user_id, p.image_local_uri);
+      }
+      delete p.image_local_uri;
+      await addWrongQuestion(p);
       break;
+    }
     case OP_USER_TASK:
       await createUserTask(item.payload);
       break;

@@ -28,10 +28,12 @@ export function useUserTasks() {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectUserTasks);
   const progress = useAppSelector(selectUserTasksProgress);
+  const existingDay = useAppSelector((state) => state.userTasks.day);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
+    if (existingDay === today()) return;
     let cancelled = false;
     setLoading(true);
     getUserTasksByDate(user.id, today())
@@ -41,7 +43,7 @@ export function useUserTasks() {
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [user?.id, dispatch]);
+  }, [user?.id, dispatch, existingDay]);
 
   const createTask = useCallback(async (input) => {
     const parsed = userTaskSchema.parse(input);
@@ -82,6 +84,7 @@ export function useUserTasks() {
     const task = tasks.find((t) => t.id === id);
     if (!task) return;
     const newCompleted = !task.completed;
+    if (typeof id === "string" && id.startsWith("temp_")) return;
     updateUserTask(id, { completed: newCompleted }).catch(() => {
       dispatch(toggleAction(id));
     });

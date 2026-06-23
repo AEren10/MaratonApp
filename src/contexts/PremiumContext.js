@@ -7,6 +7,12 @@ import { getWrongQuestionCount } from "../supabase/wrongQuestions";
 import { getActiveChallengeCount } from "../supabase/challenges";
 import { SCREENS } from "../constants/screens";
 import { FREE_LIMITS } from "../constants/premium";
+import {
+  initPurchases,
+  getCustomerInfo,
+  isPremiumFromInfo,
+  isInitialized,
+} from "../lib/purchases";
 
 const PremiumContext = createContext(null);
 
@@ -18,12 +24,20 @@ export function PremiumProvider({ children }) {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetchPremiumStatus();
+    initPurchases(user.id).then(fetchPremiumStatus);
+    refreshUsage();
   }, [user?.id]);
 
   const fetchPremiumStatus = useCallback(async () => {
     if (!user?.id) return;
     try {
+      if (isInitialized()) {
+        const info = await getCustomerInfo();
+        if (info && isPremiumFromInfo(info)) {
+          setIsPremium(true);
+          return;
+        }
+      }
       setIsPremium(await getPremiumStatus(user.id));
     } catch (e) {
       if (__DEV__) console.warn("[PremiumContext] fetchPremiumStatus", e);

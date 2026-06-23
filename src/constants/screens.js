@@ -30,6 +30,7 @@ export const SCREENS = {
   TRIAL_DETAIL: "TrialDetail",
   TRIAL_COMPARE: "TrialCompare",
   SUBJECT_DETAIL: "SubjectDetail",
+  SUBJECT_LIST: "SubjectList",
   WEAK_AREAS: "WeakAreas",
 
   // Wrong Notebook
@@ -68,6 +69,7 @@ export const SCREENS = {
 
   // Social
   FRIENDS: "Friends",
+  REFERRAL: "Referral",
 
   // Study Save (post-timer)
   STUDY_SAVE: "StudySave",

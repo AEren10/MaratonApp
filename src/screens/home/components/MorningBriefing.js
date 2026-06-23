@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { Icon } from "../../../components/design";
+import { Icon, AnimatedPressable } from "../../../components/design";
 
 const storageKey = () => {
   const d = new Date().toISOString().slice(0, 10);
@@ -67,10 +67,10 @@ export function MorningBriefing({ userName, planTaskCount, srDueCount, streak, o
         ))}
       </View>
 
-      <Pressable onPress={handleStart} style={({ pressed }) => [s.cta, pressed && { opacity: 0.85 }]}>
+      <AnimatedPressable onPress={handleStart} haptic="medium" style={s.cta}>
         <Icon name="play" size={16} color="#FFFFFF" sw={2.5} />
         <Text style={s.ctaText}>Başla</Text>
-      </Pressable>
+      </AnimatedPressable>
     </Animated.View>
   );
 }

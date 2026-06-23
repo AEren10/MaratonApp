@@ -13,6 +13,7 @@ import { listMyChallenges, createChallenge, cancelChallenge } from "../../supaba
 import { listFriends } from "../../supabase/friends";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import * as H from "../../lib/haptics";
 
 const METRICS = [
@@ -27,6 +28,7 @@ export default function ChallengeScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const showAlert = useAlert();
+  const { checkFeature, showPaywall } = usePremium();
   const [tab, setTab] = useState("active");
   const [challenges, setChallenges] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -51,6 +53,11 @@ export default function ChallengeScreen() {
 
   const handleCreate = useCallback(async () => {
     if (!pick.friend || !pick.metric || !pick.target) return;
+    if (!checkFeature("unlimited_challenges")) {
+      H.warn();
+      showPaywall();
+      return;
+    }
     try {
       await createChallenge({ opponentId: pick.friend.id, metric: pick.metric, target: pick.target });
       H.success();

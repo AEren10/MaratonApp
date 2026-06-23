@@ -13,21 +13,21 @@ function ActionRow({ item, onPress, C }) {
       style={({ pressed }) => [
         styles.row,
         {
-          backgroundColor: C.surface2,
-          borderColor: C.border,
-          opacity: pressed ? 0.85 : 1,
+          backgroundColor: item.color + "12",
+          borderColor: item.color + "26",
+          opacity: pressed ? 0.92 : 1,
           transform: [{ scale: pressed ? 0.98 : 1 }],
         },
       ]}
     >
-      <View style={[styles.iconBox, { backgroundColor: item.color + "1A" }]}>
-        <Icon name={item.icon} size={22} color={item.color} sw={2} />
+      <View style={[styles.iconBox, { backgroundColor: item.color }]}>
+        <Icon name={item.icon} size={22} color="#FFFFFF" sw={2.3} />
       </View>
       <View style={styles.rowText}>
         <Text style={[styles.label, { color: C.text }]}>{item.label}</Text>
         <Text style={[styles.desc, { color: C.sec }]}>{item.desc}</Text>
       </View>
-      <Icon name="chevR" size={16} color={C.muted} />
+      <Icon name="chevR" size={18} color={C.muted} />
     </Pressable>
   );
 }
@@ -35,10 +35,10 @@ function ActionRow({ item, onPress, C }) {
 export function QuickActionSheet({ visible, onClose, onAction }) {
   const C = useC();
   const ACTIONS = useMemo(() => [
-    { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       screen: "AddStudy",       color: C.orange },
+    { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       screen: "AddStudy",       color: C.amber },
     { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      screen: "TrialEntry",     color: C.blue },
-    { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        screen: "AddWrong",       color: C.pink },
-    { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    screen: "WrongNotebook",  color: C.brandLight },
+    { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        screen: "AddWrong",       color: C.coral },
+    { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    screen: "WrongNotebook",  color: C.purple },
   ], [C]);
   const handleAction = useCallback(
     (screen) => {
@@ -106,7 +106,6 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 44, height: 44, borderRadius: 14,
     alignItems: "center", justifyContent: "center",
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.06)",
   },
   rowText: { flex: 1 },
   label: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15 },

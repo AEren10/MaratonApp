@@ -5,8 +5,9 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { getAllSubjects } from "../trial/trialTypes";
-import { Icon, IconBox } from "../../components/design";
+import { Icon, IconBox, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 
 const SUGGESTIONS = {
@@ -39,12 +40,13 @@ function computeWeakTopics(C, trials) {
   return weak.sort((a, b) => a.acc - b.acc);
 }
 
-const WeakCard = React.memo(function WeakCard({ item, s, C }) {
+const WeakCard = React.memo(function WeakCard({ item, s, C, onStudy }) {
   const suggestion = SUGGESTIONS[item.status] || DEFAULT_SUGGESTION;
+  const color = item.subject.color;
   return (
-    <View style={[s.card, { borderLeftColor: item.subject.color }]}>
+    <View style={[s.card, { borderLeftColor: color }]}>
       <View style={s.cardHeader}>
-        <IconBox icon={item.subject.icon} size={28} color={item.subject.color} rounded={8} />
+        <IconBox icon={item.subject.icon} size={28} color={color} rounded={8} />
         <Text style={s.subjectName}>{item.subject.name}</Text>
         <Text style={[s.accBadge, { color: item.acc < 50 ? C.red : C.amber }]}>
           {item.acc}%
@@ -52,6 +54,16 @@ const WeakCard = React.memo(function WeakCard({ item, s, C }) {
       </View>
       <Text style={s.topicName}>{item.name}</Text>
       <Text style={s.suggestion}>{suggestion}</Text>
+      <AnimatedPressable
+        onPress={() => onStudy(item)}
+        haptic="medium"
+        style={[s.studyBtn, { backgroundColor: color + "16", borderColor: color + "30" }]}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name} konusuna git çalış`}
+      >
+        <Icon name="arrowR" size={14} color={color} sw={2.5} />
+        <Text style={[s.studyBtnText, { color }]}>Git Çalış</Text>
+      </AnimatedPressable>
     </View>
   );
 });
@@ -63,7 +75,14 @@ export default function WeakAreasScreen() {
   const trials = useSelector(selectTrials);
   const weakTopics = useMemo(() => computeWeakTopics(C, trials), [C, trials]);
 
-  const renderItem = useCallback(({ item }) => <WeakCard item={item} s={s} C={C} />, [s, C]);
+  const handleStudy = useCallback((item) => {
+    navigation.navigate(SCREENS.TOPIC_STUDY, {
+      topic: { name: item.name, acc: item.acc },
+      subject: item.subject,
+    });
+  }, [navigation]);
+
+  const renderItem = useCallback(({ item }) => <WeakCard item={item} s={s} C={C} onStudy={handleStudy} />, [s, C, handleStudy]);
   const keyExtractor = useCallback((item, i) => `${item.subject.key}-${item.name}-${i}`, []);
 
   return (
@@ -115,6 +134,18 @@ function makeStyles(C) {
     accBadge: { ...TYPOGRAPHY.bodySemiBold },
     topicName: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.xs },
     suggestion: { ...TYPOGRAPHY.caption, color: C.sec },
+    studyBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      gap: 6,
+      marginTop: SPACING.md,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: RADIUS.full,
+      borderWidth: 1,
+    },
+    studyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 13 },
     footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.xl, gap: SPACING.sm },
     footerText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
     empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },

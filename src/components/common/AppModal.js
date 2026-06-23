@@ -32,7 +32,7 @@ export function AppModal({ visible, onClose, title, message, actions = [], icon,
                 return (
                   <Pressable
                     key={a.label}
-                    onPress={() => { a.onPress?.(); onClose(); }}
+                    onPress={() => { onClose(); a.onPress?.(); }}
                     style={({ pressed }) => [styles.cancelBtn, { backgroundColor: C.surface2 }, pressed && { opacity: 0.8 }]}
                   >
                     <Text style={[styles.cancelText, { color: C.muted }]}>{a.label}</Text>
@@ -43,7 +43,7 @@ export function AppModal({ visible, onClose, title, message, actions = [], icon,
               return (
                 <Pressable
                   key={a.label}
-                  onPress={() => { a.onPress?.(); onClose(); }}
+                  onPress={() => { onClose(); a.onPress?.(); }}
                   style={({ pressed }) => [
                     styles.actionBtn,
                     { backgroundColor: isDestructive ? C.danger + "14" : color + "14", borderColor: isDestructive ? C.danger + "30" : color + "30" },

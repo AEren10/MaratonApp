@@ -9,6 +9,7 @@ import {
   selectStats,
   selectLevel,
   selectXP,
+  saveGamificationToStorage,
 } from "../store/slices/gamificationSlice";
 import { calculateXP, checkBadgeUnlocks, getLevelForXP } from "../lib/xpEngine";
 import { useAuth } from "../contexts/AuthContext";
@@ -32,10 +33,21 @@ export function useGamification() {
   const badgeIdsRef = useRef(badgeIds);
   const levelRef = useRef(level);
   const totalXPRef = useRef(totalXP);
+  const saveTimer = useRef(null);
   statsRef.current = stats;
   badgeIdsRef.current = badgeIds;
   levelRef.current = level;
   totalXPRef.current = totalXP;
+
+  const debouncedSave = useCallback(() => {
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveGamificationToStorage({
+        xp: totalXPRef.current, weeklyXP: 0,
+        badges: badgeIdsRef.current, stats: statsRef.current,
+      });
+    }, 500);
+  }, []);
 
   const reward = useCallback(
     (action, data = {}) => {
@@ -74,8 +86,9 @@ export function useGamification() {
         clearTimeout(badgeTimerRef.current);
         badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
       }
+      debouncedSave();
     },
-    [dispatch, user?.id],
+    [dispatch, user?.id, debouncedSave],
   );
 
   const syncStat = useCallback(
@@ -88,13 +101,15 @@ export function useGamification() {
         clearTimeout(badgeTimerRef.current);
         badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
       }
+      debouncedSave();
     },
-    [dispatch],
+    [dispatch, debouncedSave],
   );
 
   useEffect(() => () => {
     clearTimeout(badgeTimerRef.current);
     clearTimeout(levelUpTimerRef.current);
+    clearTimeout(saveTimer.current);
   }, []);
 
   const dismissXP = useCallback(() => setXpToast({ visible: false, amount: 0 }), []);

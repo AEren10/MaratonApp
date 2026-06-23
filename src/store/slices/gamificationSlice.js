@@ -1,5 +1,8 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLevelForXP } from "../../lib/xpEngine";
+
+const STORAGE_KEY = "@maraton:gamification";
 
 const initialState = {
   xp: 0,
@@ -14,6 +17,7 @@ const initialState = {
     perfectPlans: 0,
     streak: 0,
   },
+  hydrated: false,
 };
 
 const gamificationSlice = createSlice({
@@ -52,6 +56,18 @@ const gamificationSlice = createSlice({
     resetWeeklyXP(state) {
       state.weeklyXP = 0;
     },
+    hydrateGamification(state, action) {
+      const d = action.payload || {};
+      if (d.xp != null) state.xp = d.xp;
+      if (d.weeklyXP != null) state.weeklyXP = d.weeklyXP;
+      if (Array.isArray(d.badges)) state.badges = d.badges;
+      if (d.stats) {
+        Object.keys(d.stats).forEach((k) => {
+          if (k in state.stats) state.stats[k] = d.stats[k];
+        });
+      }
+      state.hydrated = true;
+    },
   },
 });
 
@@ -62,6 +78,7 @@ export const {
   incrementStat,
   setMaxStat,
   resetWeeklyXP,
+  hydrateGamification,
 } = gamificationSlice.actions;
 
 export const selectXP = (state) => state.gamification.xp;
@@ -74,3 +91,22 @@ export const selectLevel = createSelector(
 );
 
 export default gamificationSlice.reducer;
+
+export async function saveGamificationToStorage(state) {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+      xp: state.xp, weeklyXP: state.weeklyXP,
+      badges: state.badges, stats: state.stats,
+    }));
+  } catch (_) {}
+}
+
+export async function loadGamificationFromStorage(dispatch) {
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    if (raw) dispatch(hydrateGamification(JSON.parse(raw)));
+    else dispatch(hydrateGamification({}));
+  } catch (_) {
+    dispatch(hydrateGamification({}));
+  }
+}

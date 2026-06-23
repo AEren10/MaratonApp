@@ -31,8 +31,8 @@ import * as H from "../../lib/haptics";
 const QUICK_LINK_ITEMS = [
   { icon: "users", label: "Challenge", screen: SCREENS.CHALLENGE },
   { icon: "share", label: "Paylaş", screen: SCREENS.SHARE_CARD, params: { type: "overall" } },
+  { icon: "mail", label: "Davet Et", screen: SCREENS.REFERRAL },
   { icon: "target", label: "5dk Quiz", screen: SCREENS.QUICK_PRACTICE },
-  { icon: "clock", label: "Simülasyon", screen: SCREENS.EXAM_SIMULATOR },
 ];
 
 function QuickLinks({ onNavigate, C }) {

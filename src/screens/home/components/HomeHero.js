@@ -35,13 +35,14 @@ function StatCell({ label, value, decimals, color, valueColor, icon, trend, tren
   );
 }
 
-export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 0, xp = 0, tier = "Bronz", onRingPress, onStreak, onNet, onLeague }) {
+export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net = 0, trend = 0, xp = 0, tier = "Bronz", onRingPress, onStreak, onNet, onLeague }) {
   const C = useC();
   const safeGoal = goal > 0 ? goal : 100;
-  const pct = Math.min(1, solved / safeGoal);
-  const done = solved >= safeGoal;
+  const timeOnly = solved === 0 && minutes > 0;
+  const pct = timeOnly ? Math.min(1, minutes / 60) : Math.min(1, solved / safeGoal);
+  const done = timeOnly ? minutes >= 60 : solved >= safeGoal;
   const ringColor = done ? C.green : C.accent;
-  const isNewUser = solved === 0 && streak === 0 && net === 0 && xp === 0;
+  const isNewUser = solved === 0 && minutes === 0 && streak === 0 && net === 0 && xp === 0;
 
   const [sparkVisible, setSparkVisible] = useState(false);
   const prevDone = useRef(done);
@@ -80,7 +81,7 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
         {done ? (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignSelf: "center", borderRadius: 110, backgroundColor: ringColor }, glowStyle]} />
         ) : null}
-        <ProgressRing size={196} stroke={15} value={pct} color={ringColor} trackColor={ringColor + "18"}>
+        <ProgressRing size={172} stroke={14} value={pct} color={ringColor} trackColor={ringColor + "18"}>
           {isNewUser ? (
             <>
               <Text style={[s.ringTop, { color: C.muted }]}>BAŞLANGIÇ NOKTASIN</Text>
@@ -88,6 +89,16 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
                 <Icon name="play" size={40} color={C.accent} sw={2} />
               </Animated.View>
               <Text style={[s.ringSub, { color: C.sec, marginTop: 6 }]}>İlk çalışmanı kaydet</Text>
+            </>
+          ) : timeOnly ? (
+            <>
+              <Text style={[s.ringTop, { color: C.accent }]}>BUGÜN ÇALIŞILAN</Text>
+              <View style={s.ringValRow}>
+                <AnimatedNumber value={minutes} style={[s.ringVal, { color: C.text }]} />
+                <Text style={[s.ringUnit, { color: C.sec }]}>dk</Text>
+              </View>
+              <Text style={[s.ringSub, { color: C.sec }]}>{done ? "Harika tempo! 🏁" : "Devam et!"}</Text>
+              <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
             </>
           ) : (
             <>
@@ -116,11 +127,12 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
 }
 
 const s = StyleSheet.create({
-  wrap: { alignItems: "center", paddingTop: 8 },
-  ringWrap: { marginTop: 18, marginBottom: 22 },
+  wrap: { alignItems: "center", paddingTop: 4 },
+  ringWrap: { marginTop: 10, marginBottom: 14 },
   ringTop: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 1, marginBottom: 2 },
   ringValRow: { flexDirection: "row", alignItems: "flex-start" },
-  ringVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 62, lineHeight: 64, letterSpacing: -2 },
+  ringVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 52, lineHeight: 56, letterSpacing: -2 },
+  ringUnit: { fontFamily: "Inter_600SemiBold", fontSize: 18, marginLeft: 2, marginTop: 16 },
   ringSub: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 2 },
   ringHint: { fontFamily: "Inter_400Regular", fontSize: 11, marginTop: 6, letterSpacing: 0.5 },
   rail: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", borderWidth: 1, borderRadius: 20, paddingVertical: 14 },

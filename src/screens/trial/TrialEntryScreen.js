@@ -7,13 +7,14 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, IconBox } from "../../components/design";
+import { Icon, IconBox, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { getTrialTypes, getSubjectsForType, getFieldFromType } from "./trialTypes";
 import { SubjectInput } from "./components/SubjectInput";
 import { useAlert } from "../../contexts/AlertContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import { TotalCard } from "./components/TotalCard";
 import { TrialTypeSelector } from "./components/TrialTypeSelector";
 import { BranchSubjectPicker } from "./components/BranchSubjectPicker";
@@ -98,6 +99,7 @@ export default function TrialEntryScreen() {
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
   const { examType: userExamType } = useExam();
   const showAlert = useAlert();
+  const { checkFeature, showPaywall, refreshUsage } = usePremium();
 
   const [trialType, setTrialType] = useState(userExamType === "lgs" ? "LGS" : "TYT");
   const [branchSubject, setBranchSubject] = useState(null);
@@ -146,6 +148,11 @@ export default function TrialEntryScreen() {
 
   const handleSave = useCallback(async () => {
     if (saving) return;
+    if (!checkFeature("unlimited_trials")) {
+      H.warn();
+      showPaywall();
+      return;
+    }
     if (trialType === "BRANCH" && !branchSubject) {
       H.warn();
       showAlert("Ders sec", "Branş denemesi için bir ders seçmelisin.");
@@ -347,17 +354,18 @@ export default function TrialEntryScreen() {
 
           {showSubjectInputs && (
             <Animated.View entering={FadeInDown.delay(450).duration(420).springify()}>
-              <Pressable
+              <AnimatedPressable
                 accessibilityRole="button"
                 accessibilityLabel="Denemeyi Kaydet"
                 accessibilityHint="Deneme sonuçlarını kaydeder"
                 onPress={handleSave}
+                haptic="medium"
                 style={[styles.submitBtn, saving && { opacity: 0.6 }]}
                 disabled={saving}
               >
                 <Icon name="check" size={22} color="#FFFFFF" sw={2.5} />
                 <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}</Text>
-              </Pressable>
+              </AnimatedPressable>
             </Animated.View>
           )}
         </ScrollView>

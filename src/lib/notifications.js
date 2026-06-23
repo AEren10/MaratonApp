@@ -41,6 +41,7 @@ export async function getNotifPrefs() {
     streakRiskEnabled: true,
     trialReminderEnabled: false,
     taskReminderEnabled: true,
+    weeklySummaryEnabled: true,
   };
 }
 
@@ -96,6 +97,27 @@ export async function scheduleStreakRiskReminder() {
   }
 }
 
+export async function scheduleWeeklySummary() {
+  if (Platform.OS === "web") return null;
+  try {
+    return await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Haftalık raporun hazır 📊",
+        body: "Bu haftaki çalışma özetine göz at — ne kadar ilerledin?",
+        data: { type: "weekly_summary", url: "maraton://weekly-review" },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+        weekday: 1,
+        hour: 10,
+        minute: 0,
+      },
+    });
+  } catch (_) {
+    return null;
+  }
+}
+
 export async function applyNotifPrefs(prefs) {
   await cancelAllScheduled();
   if (!prefs) return;
@@ -104,6 +126,9 @@ export async function applyNotifPrefs(prefs) {
   }
   if (prefs.streakRiskEnabled) {
     await scheduleStreakRiskReminder();
+  }
+  if (prefs.weeklySummaryEnabled !== false) {
+    await scheduleWeeklySummary();
   }
 }
 

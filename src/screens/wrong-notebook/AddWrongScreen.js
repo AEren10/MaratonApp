@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon } from "../../components/design";
+import { Icon, AnimatedPressable } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useGamification } from "../../hooks/useGamification";
 import { XPToast } from "../../components/common/XPToast";
@@ -18,6 +18,7 @@ import { initialReview } from "../../lib/spacedRepetition";
 import { TopicPicker } from "./components/TopicPicker";
 import { AnswerSelector } from "./components/AnswerSelector";
 import { useAlert } from "../../contexts/AlertContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import * as H from "../../lib/haptics";
 
 export default function AddWrongScreen() {
@@ -27,6 +28,7 @@ export default function AddWrongScreen() {
   const showAlert = useAlert();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { checkFeature, showPaywall } = usePremium();
   const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: C.amber, icon: "hash" });
   const [topic, setTopic] = useState("");
   const [topicSource, setTopicSource] = useState(null);
@@ -74,6 +76,11 @@ export default function AddWrongScreen() {
   };
 
   const save = async () => {
+    if (!checkFeature("unlimited_wrongs")) {
+      H.warn();
+      showPaywall();
+      return;
+    }
     if (!topic.trim()) {
       H.error();
       showAlert("Konu eksik", "Hangi konuda yanlış yaptın?");
@@ -82,8 +89,13 @@ export default function AddWrongScreen() {
     setSaving(true);
     try {
       let imagePath = null;
+      let imageLocalUri = null;
       if (image) {
-        imagePath = await uploadWrongQuestionImage(user.id, image);
+        try {
+          imagePath = await uploadWrongQuestionImage(user.id, image);
+        } catch (_) {
+          imageLocalUri = image;
+        }
       }
       const payload = {
         user_id: user.id,
@@ -93,14 +105,18 @@ export default function AddWrongScreen() {
         correct_answer: correctAnswer,
         note: note.trim() || null,
         image_path: imagePath,
+        ...(imageLocalUri ? { image_local_uri: imageLocalUri } : {}),
         topic_source: topicSource,
         is_resolved: false,
         ...initialReview(),
       };
       const result = await saveWrongQuestionOffline(payload);
-      if (result.queued) {
+      if (result.queued || imageLocalUri) {
         H.tap();
-        showAlert("Çevrimdışı", "Yanlış soru bağlantı geldiğinde kaydedilecek.");
+        showAlert(
+          imageLocalUri ? "Fotoğraf beklemede" : "Çevrimdışı",
+          "Bağlantı geldiğinde otomatik kaydedilecek.",
+        );
       } else {
         H.success();
       }
@@ -278,10 +294,11 @@ export default function AddWrongScreen() {
           borderTopColor: C.border,
         }}
       >
-        <Pressable
+        <AnimatedPressable
           onPress={save}
           disabled={saving}
-          style={({ pressed }) => ({
+          haptic="medium"
+          style={{
             backgroundColor: saving ? C.surface2 : C.accent,
             borderRadius: 16,
             paddingVertical: 16,
@@ -289,14 +306,13 @@ export default function AddWrongScreen() {
             flexDirection: "row",
             justifyContent: "center",
             gap: 8,
-            opacity: pressed && !saving ? 0.85 : 1,
-          })}
+          }}
         >
           {saving && <ActivityIndicator size="small" color={C.muted} />}
           <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: saving ? C.muted : C.bg }}>
             {saving ? "Kaydediliyor..." : "Kaydet"}
           </Text>
-        </Pressable>
+        </AnimatedPressable>
       </View>
       <TopicPicker
         visible={pickerOpen}

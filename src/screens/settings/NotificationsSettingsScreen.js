@@ -40,12 +40,14 @@ export default function NotificationsSettingsScreen() {
       setPrefs(next);
       setBusy(true);
       try {
-        if (next.dailyReminderEnabled || next.streakRiskEnabled) {
+        const anyEnabled = next.dailyReminderEnabled || next.streakRiskEnabled || next.weeklySummaryEnabled;
+        if (anyEnabled) {
           const granted = await requestNotificationPermissions();
           if (!granted) {
             showAlert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
             next.dailyReminderEnabled = false;
             next.streakRiskEnabled = false;
+            next.weeklySummaryEnabled = false;
             setPrefs(next);
           }
         }
@@ -155,6 +157,20 @@ export default function NotificationsSettingsScreen() {
             onValueChange={(v) => update({ taskReminderEnabled: v })}
             trackColor={{ false: C.border, true: C.accent + "80" }}
             thumbColor={prefs.taskReminderEnabled !== false ? C.accent : C.muted}
+          />
+        </View>
+
+        <View style={s.row}>
+          <IconBox icon="chart" color={C.teal} size={38} rounded={12} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.label}>Haftalık Özet</Text>
+            <Text style={s.hint}>Her pazartesi haftalık raporunu bildirir</Text>
+          </View>
+          <Switch
+            value={prefs.weeklySummaryEnabled !== false}
+            onValueChange={(v) => update({ weeklySummaryEnabled: v })}
+            trackColor={{ false: C.border, true: C.accent + "80" }}
+            thumbColor={prefs.weeklySummaryEnabled !== false ? C.accent : C.muted}
           />
         </View>
 

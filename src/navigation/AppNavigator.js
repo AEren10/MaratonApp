@@ -67,6 +67,7 @@ import TopicStudyScreen from "../screens/dersler/TopicStudyScreen";
 
 // Analysis detail — eager (tab'dan hemen erişilebilir)
 import SubjectDetailScreen from "../screens/analysis/SubjectDetailScreen";
+import SubjectListScreen from "../screens/analysis/SubjectListScreen";
 import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
 
 // Settings — eager (ana sayfa, sık erişilir)
@@ -87,6 +88,7 @@ const AboutScreen = React.lazy(() => import("../screens/settings/AboutScreen"));
 const FriendsScreen = React.lazy(() => import("../screens/social/FriendsScreen"));
 const ChallengeScreen = React.lazy(() => import("../screens/social/ChallengeScreen"));
 const ShareCardScreen = React.lazy(() => import("../screens/social/ShareCardScreen"));
+const ReferralScreen = React.lazy(() => import("../screens/social/ReferralScreen"));
 
 // Other — karma
 import CalendarScreen from "../screens/calendar/CalendarScreen";
@@ -150,6 +152,7 @@ const EBExamSetup = withEB(ExamSetupScreen);
 const EBGoalSetup = withEB(GoalSetupScreen);
 const EBStudyLog = withEB(StudyLogScreen);
 const EBSubjectDetail = withEB(SubjectDetailScreen);
+const EBSubjectList = withEB(SubjectListScreen);
 const EBWeakAreas = withEB(WeakAreasScreen);
 const EBTopicStudy = withEB(TopicStudyScreen);
 const EBAppearance = withEB(AppearanceScreen);
@@ -177,23 +180,36 @@ const EBSwipeReview = withEB(SwipeReviewScreen);
 const EBChallenge = withEB(ChallengeScreen);
 const EBQuickPractice = withEB(QuickPracticeScreen);
 const EBShareCard = withEB(ShareCardScreen);
+const EBReferral = withEB(ReferralScreen);
 const EBExamSimulator = withEB(ExamSimulatorScreen);
 const EBAddTask = withEB(AddTaskScreen);
 const EBPaywall = withEB(PaywallScreen);
 
+const isWeb = Platform.OS === "web";
+
 const screenOptions = {
   headerShown: false,
   contentStyle: { backgroundColor: C.bg },
-  animation: Platform.OS === "web" ? "none" : "slide_from_right",
+  animation: isWeb ? "none" : "slide_from_right",
   animationDuration: 240,
-  // Geri çıkış: ekranın her yerinden sağa kaydır (sadece kenar değil).
   gestureEnabled: true,
   fullScreenGestureEnabled: true,
 };
 
 const modalOptions = {
-  animation: Platform.OS === "web" ? "none" : "slide_from_bottom",
+  animation: isWeb ? "none" : "slide_from_bottom",
   presentation: "modal",
+  animationDuration: 280,
+};
+
+const celebrationOptions = {
+  animation: isWeb ? "none" : "fade_from_bottom",
+  animationDuration: 320,
+  gestureEnabled: false,
+};
+
+const detailOptions = {
+  animation: isWeb ? "none" : "fade",
   animationDuration: 280,
 };
 
@@ -246,26 +262,27 @@ function AppStackInner() {
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name={SCREENS.WRONG_NOTEBOOK} component={EBWrongNotebook} />
       <Stack.Screen name={SCREENS.ADD_WRONG} component={EBAddWrong} />
-      <Stack.Screen name={SCREENS.WRONG_DETAIL} component={EBWrongDetail} />
+      <Stack.Screen name={SCREENS.WRONG_DETAIL} component={EBWrongDetail} options={detailOptions} />
       <Stack.Screen name={SCREENS.PLAN_DETAIL} component={EBPlanDetail} />
       <Stack.Screen name={SCREENS.ADD_STUDY} component={EBAddStudy} />
       <Stack.Screen name={SCREENS.STUDY_TIMER} component={EBStudyTimer} />
       <Stack.Screen name={SCREENS.STUDY_SAVE} component={EBStudySave} />
       <Stack.Screen name={SCREENS.STUDY_HISTORY} component={EBStudyHistory} />
       <Stack.Screen name={SCREENS.TRIAL_ENTRY} component={EBTrialEntry} />
-      <Stack.Screen name={SCREENS.TRIAL_SUMMARY} component={EBTrialSummary} options={{ gestureEnabled: false }} />
-      <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} />
-      <Stack.Screen name={SCREENS.TRIAL_COMPARE} component={EBTrialCompare} />
+      <Stack.Screen name={SCREENS.TRIAL_SUMMARY} component={EBTrialSummary} options={celebrationOptions} />
+      <Stack.Screen name={SCREENS.TRIAL_DETAIL} component={EBTrialDetail} options={detailOptions} />
+      <Stack.Screen name={SCREENS.TRIAL_COMPARE} component={EBTrialCompare} options={detailOptions} />
       <Stack.Screen name={SCREENS.TOPIC_CARDS} component={EBTopicCards} />
-      <Stack.Screen name={SCREENS.CARD_DETAIL} component={EBCardDetail} />
+      <Stack.Screen name={SCREENS.CARD_DETAIL} component={EBCardDetail} options={detailOptions} />
       <Stack.Screen name={SCREENS.SETTINGS} component={EBSettings} />
       <Stack.Screen name={SCREENS.ONBOARDING} component={EBOnboarding} />
       <Stack.Screen name={SCREENS.EXAM_SETUP} component={EBExamSetup} />
       <Stack.Screen name={SCREENS.GOAL_SETUP} component={EBGoalSetup} />
       <Stack.Screen name={SCREENS.STUDY_LOG} component={EBStudyLog} />
-      <Stack.Screen name={SCREENS.SUBJECT_DETAIL} component={EBSubjectDetail} />
+      <Stack.Screen name={SCREENS.SUBJECT_DETAIL} component={EBSubjectDetail} options={detailOptions} />
+      <Stack.Screen name={SCREENS.SUBJECT_LIST} component={EBSubjectList} />
       <Stack.Screen name={SCREENS.WEAK_AREAS} component={EBWeakAreas} />
-      <Stack.Screen name={SCREENS.TOPIC_STUDY} component={EBTopicStudy} />
+      <Stack.Screen name={SCREENS.TOPIC_STUDY} component={EBTopicStudy} options={detailOptions} />
       <Stack.Screen name={SCREENS.APPEARANCE} component={EBAppearance} />
       <Stack.Screen name={SCREENS.EDIT_PROFILE} component={EBEditProfile} options={modalOptions} />
       <Stack.Screen name={SCREENS.CHANGE_PASSWORD} component={EBChangePassword} options={modalOptions} />
@@ -283,14 +300,15 @@ function AppStackInner() {
       <Stack.Screen name={SCREENS.COMPARATIVE} component={EBComparative} />
       <Stack.Screen name={SCREENS.REVIEW_SESSION} component={EBReviewSession} />
       <Stack.Screen name={SCREENS.ROADMAP} component={EBRoadmap} />
-      <Stack.Screen name={SCREENS.STUDY_SUMMARY} component={EBStudySummary} options={modalOptions} />
-      <Stack.Screen name={SCREENS.TRIAL_INSIGHTS} component={EBTrialInsights} />
-      <Stack.Screen name={SCREENS.WEEKLY_REVIEW} component={EBWeeklyReview} />
-      <Stack.Screen name={SCREENS.WEEKLY_TRIAL_REVIEW} component={EBWeeklyTrialReview} />
+      <Stack.Screen name={SCREENS.STUDY_SUMMARY} component={EBStudySummary} options={celebrationOptions} />
+      <Stack.Screen name={SCREENS.TRIAL_INSIGHTS} component={EBTrialInsights} options={detailOptions} />
+      <Stack.Screen name={SCREENS.WEEKLY_REVIEW} component={EBWeeklyReview} options={celebrationOptions} />
+      <Stack.Screen name={SCREENS.WEEKLY_TRIAL_REVIEW} component={EBWeeklyTrialReview} options={celebrationOptions} />
       <Stack.Screen name={SCREENS.SWIPE_REVIEW} component={EBSwipeReview} />
       <Stack.Screen name={SCREENS.CHALLENGE} component={EBChallenge} />
       <Stack.Screen name={SCREENS.QUICK_PRACTICE} component={EBQuickPractice} />
       <Stack.Screen name={SCREENS.SHARE_CARD} component={EBShareCard} />
+      <Stack.Screen name={SCREENS.REFERRAL} component={EBReferral} />
       <Stack.Screen name={SCREENS.EXAM_SIMULATOR} component={EBExamSimulator} />
       <Stack.Screen name={SCREENS.ADD_TASK} component={EBAddTask} options={modalOptions} />
       <Stack.Screen name={SCREENS.PAYWALL} component={EBPaywall} options={modalOptions} />

@@ -1,8 +1,7 @@
 import { memo, useMemo } from "react";
-import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
+import { View, Text, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown, ZoomIn, BounceIn } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
-import { Icon } from "../design";
+import { Icon, SparkBurst, AnimatedPressable } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
@@ -14,14 +13,13 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
   if (!visible) return null;
 
-  const handleShare = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    onShare?.();
-  };
-
   return (
     <Modal visible transparent animationType="fade" statusBarTranslucent>
       <View style={s.overlay}>
+        <View style={s.burstWrap} pointerEvents="none">
+          <SparkBurst trigger={visible} />
+        </View>
+
         <Animated.View entering={ZoomIn.springify().damping(14)} style={s.card}>
           <View style={s.confettiRow}>
             {CONFETTI.map((e, i) => (
@@ -52,20 +50,22 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
           <Animated.View entering={FadeIn.delay(600)} style={s.btnRow}>
             {onShare && (
-              <Pressable
-                onPress={handleShare}
-                style={({ pressed }) => [s.shareBtn, { borderColor: C.accent }, pressed && { opacity: 0.85 }]}
+              <AnimatedPressable
+                onPress={onShare}
+                haptic="success"
+                style={[s.shareBtn, { borderColor: C.accent }]}
               >
                 <Icon name="share" size={16} color={C.accent} />
                 <Text style={[s.shareBtnText, { color: C.accent }]}>Paylaş</Text>
-              </Pressable>
+              </AnimatedPressable>
             )}
-            <Pressable
+            <AnimatedPressable
               onPress={onDismiss}
-              style={({ pressed }) => [s.mainBtn, { backgroundColor: C.green, ...SHADOWS.green }, pressed && { opacity: 0.9 }]}
+              haptic="tap"
+              style={[s.mainBtn, { backgroundColor: C.green, ...SHADOWS.green }]}
             >
               <Text style={s.mainBtnText}>Devam Et</Text>
-            </Pressable>
+            </AnimatedPressable>
           </Animated.View>
         </Animated.View>
       </View>
@@ -76,6 +76,11 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 function makeStyles(C) {
   return StyleSheet.create({
     overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", alignItems: "center", justifyContent: "center", padding: 28 },
+    burstWrap: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     card: {
       width: "100%", borderRadius: 28, padding: 28,
       alignItems: "center", backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,

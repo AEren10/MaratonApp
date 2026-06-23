@@ -1,14 +1,24 @@
-import { useState, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon } from "../../components/design";
+import { Icon, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { PLANS, PREMIUM_FEATURE_LIST } from "../../constants/premium";
 import { SCREENS } from "../../constants/screens";
+import { usePremium } from "../../contexts/PremiumContext";
+import { useAlert } from "../../contexts/AlertContext";
+import {
+  getOfferings,
+  purchasePackage,
+  restorePurchases,
+  isInitialized,
+} from "../../lib/purchases";
+import { updateProfile } from "../../supabase/profiles";
+import { useAuth } from "../../contexts/AuthContext";
 import PlanCard from "./components/PlanCard";
 import FeatureRow from "./components/FeatureRow";
 import * as H from "../../lib/haptics";
@@ -17,16 +27,70 @@ export default function PaywallScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const { user } = useAuth();
+  const { refreshPremium } = usePremium();
+  const showAlert = useAlert();
   const [selectedPlan, setSelectedPlan] = useState("yearly");
+  const [packages, setPackages] = useState(null);
+  const [purchasing, setPurchasing] = useState(false);
   const s = useMemo(() => makeStyles(C), [C]);
 
-  const handlePurchase = () => {
+  useEffect(() => {
+    if (!isInitialized()) return;
+    getOfferings().then((offering) => {
+      if (offering?.availablePackages) setPackages(offering.availablePackages);
+    });
+  }, []);
+
+  const getSelectedPackage = useCallback(() => {
+    if (!packages) return null;
+    const identifier = selectedPlan === "yearly" ? "$rc_annual" : "$rc_monthly";
+    return packages.find((p) => p.identifier === identifier) || packages[0];
+  }, [packages, selectedPlan]);
+
+  const handlePurchase = useCallback(async () => {
     H.medium();
-    // RevenueCat integration placeholder
-    // When API key is available:
-    // await Purchases.purchasePackage(selectedPackage);
-    if (__DEV__) console.warn("[Premium] RevenueCat not configured yet. Plan:", selectedPlan);
-  };
+    setPurchasing(true);
+    try {
+      const pkg = getSelectedPackage();
+      if (!pkg) {
+        showAlert("Henüz Hazır Değil", "Satın alma şu an kullanılamıyor. Kısa süre sonra aktif olacak.");
+        return;
+      }
+      const isPro = await purchasePackage(pkg);
+      if (isPro) {
+        H.success();
+        if (user?.id) await updateProfile(user.id, { is_premium: true });
+        await refreshPremium();
+        navigation.goBack();
+      }
+    } catch (e) {
+      if (e.userCancelled) return;
+      showAlert("Hata", "Satın alma işlemi başarısız oldu. Lütfen tekrar dene.");
+    } finally {
+      setPurchasing(false);
+    }
+  }, [getSelectedPackage, user?.id, refreshPremium, navigation, showAlert]);
+
+  const handleRestore = useCallback(async () => {
+    setPurchasing(true);
+    try {
+      const isPro = await restorePurchases();
+      if (isPro) {
+        H.success();
+        if (user?.id) await updateProfile(user.id, { is_premium: true });
+        await refreshPremium();
+        showAlert("Başarılı", "Premium üyeliğin geri yüklendi!");
+        navigation.goBack();
+      } else {
+        showAlert("Bulunamadı", "Aktif bir abonelik bulunamadı.");
+      }
+    } catch {
+      showAlert("Hata", "Geri yükleme başarısız oldu.");
+    } finally {
+      setPurchasing(false);
+    }
+  }, [user?.id, refreshPremium, navigation, showAlert]);
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
@@ -65,11 +129,23 @@ export default function PaywallScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(500).delay(360)}>
-          <Pressable style={[s.ctaBtn, { backgroundColor: C.accent, shadowColor: C.accent }]} onPress={handlePurchase}>
-            <Text style={s.ctaText}>Hemen Başla</Text>
-          </Pressable>
+          <AnimatedPressable
+            style={[s.ctaBtn, { backgroundColor: C.accent, shadowColor: C.accent }]}
+            onPress={handlePurchase}
+            haptic="medium"
+            disabled={purchasing}
+          >
+            {purchasing ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={s.ctaText}>Hemen Başla</Text>
+            )}
+          </AnimatedPressable>
           <Text style={s.socialProof}>Bu hafta 1.200+ öğrenci Pro'ya geçti</Text>
           <Text style={s.cancelText}>İstediğin zaman iptal edebilirsin</Text>
+          <Pressable onPress={handleRestore} style={s.restoreBtn}>
+            <Text style={[s.restoreText, { color: C.accent }]}>Satın almayı geri yükle</Text>
+          </Pressable>
           <View style={s.linksRow}>
             <Pressable onPress={() => navigation.navigate(SCREENS.PRIVACY)}>
               <Text style={s.linkText}>Gizlilik Politikası</Text>
@@ -128,6 +204,8 @@ function makeStyles(C) {
       flexDirection: "row", justifyContent: "center", alignItems: "center",
       gap: SPACING.sm, marginTop: SPACING.sm,
     },
+    restoreBtn: { alignItems: "center", paddingVertical: SPACING.sm, marginTop: SPACING.xs },
+    restoreText: { ...TYPOGRAPHY.captionMedium, textDecorationLine: "underline" },
     linkText: { ...TYPOGRAPHY.caption, color: C.sec, textDecorationLine: "underline" },
     linkDot: { ...TYPOGRAPHY.caption, color: C.muted },
   });

@@ -10,38 +10,52 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
+import * as H from "../../lib/haptics";
 
 export function XPToast({ amount, visible, onDone }) {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
-  const translateY = useSharedValue(60);
+  const translateY = useSharedValue(80);
   const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.7);
+  const scale = useSharedValue(0.5);
+  const rotate = useSharedValue(0);
 
   useEffect(() => {
     if (!visible) return;
 
-    translateY.value = 60;
-    opacity.value = 0;
-    scale.value = 0.7;
+    H.tap();
 
-    translateY.value = withSpring(-20, { damping: 12, stiffness: 200 });
+    translateY.value = 80;
+    opacity.value = 0;
+    scale.value = 0.5;
+    rotate.value = 0;
+
+    translateY.value = withSpring(-24, { damping: 10, stiffness: 180, mass: 0.8 });
 
     opacity.value = withSequence(
-      withTiming(1, { duration: 200 }),
-      withDelay(1500, withTiming(0, { duration: 400 }, () => {
+      withTiming(1, { duration: 150 }),
+      withDelay(1600, withTiming(0, { duration: 400 }, () => {
         if (onDone) runOnJS(onDone)();
       }))
     );
 
     scale.value = withSequence(
-      withSpring(1.1, { damping: 8, stiffness: 300 }),
-      withSpring(1, { damping: 14 })
+      withSpring(1.2, { damping: 6, stiffness: 280 }),
+      withSpring(1, { damping: 14, stiffness: 200 })
+    );
+
+    rotate.value = withSequence(
+      withTiming(-3, { duration: 100 }),
+      withSpring(0, { damping: 8, stiffness: 200 })
     );
   }, [visible]);
 
   const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value },
+      { rotate: `${rotate.value}deg` },
+    ],
     opacity: opacity.value,
   }));
 

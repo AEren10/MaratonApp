@@ -23,6 +23,8 @@ export function calculateXP(action, data = {}) {
       return XP_REWARDS.daily_goal_complete;
     case "comeback_bonus":
       return XP_REWARDS.comeback_bonus;
+    case "referral_applied":
+      return data.xpOverride || XP_REWARDS.referral_applied;
     default:
       return 0;
   }

@@ -9,6 +9,7 @@ export const XP_REWARDS = {
   perfect_plan: 100,
   daily_goal_complete: 40,
   comeback_bonus: 50,
+  referral_applied: 50,
 };
 
 export const LEVELS = [

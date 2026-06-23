@@ -33,6 +33,7 @@ export const linkingConfig = {
       Comparative: "karsilastirmali-analiz",
       ReviewSession: "yanlis/tekrar",
       SubjectDetail: "ders/:subjectKey",
+      WeeklyReview: "weekly-review",
       Settings: "ayarlar",
       NotificationsSettings: "ayarlar/bildirim",
       Privacy: "gizlilik",

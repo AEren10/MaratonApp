@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "../../components/design";
+import { Icon, SparkBurst, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -113,14 +113,21 @@ export default function TrialSummaryScreen() {
       </View>
       <ScrollView contentContainerStyle={st.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[st.heroCircle, { backgroundColor: typeColor + "20" }]}>
-          <LinearGradient colors={[typeColor, typeColor + "CC"]} style={st.heroInner}>
-            <Icon name="check" size={38} color="#FFFFFF" sw={3} />
+          <LinearGradient colors={trend > 0 ? [C.green, C.green + "CC"] : [typeColor, typeColor + "CC"]} style={st.heroInner}>
+            <Icon name={trend > 0 ? "trendUp" : "check"} size={38} color="#FFFFFF" sw={3} />
           </LinearGradient>
+          {trend > 0 && <SparkBurst trigger={true} />}
         </Animated.View>
 
         <Animated.Text entering={FadeInUp.delay(200)} style={[st.title, { color: C.text }]}>
-          Deneme Kaydedildi!
+          {trend > 0 ? "Öncekinden İyi!" : "Deneme Kaydedildi!"}
         </Animated.Text>
+
+        {trend > 0 && (
+          <Animated.Text entering={FadeInUp.delay(260)} style={[st.improveSub, { color: C.green }]}>
+            +{trend.toFixed(1)} net gelişme gösterdin 🔥
+          </Animated.Text>
+        )}
 
         <Animated.View entering={FadeInUp.delay(280)} style={[st.nameBadge, { backgroundColor: typeColor + "14" }]}>
           <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: typeColor }}>
@@ -184,17 +191,18 @@ export default function TrialSummaryScreen() {
         )}
 
         <Animated.View entering={FadeInDown.delay(totalWrong > 0 ? 700 : 620)} style={st.actions}>
-          <Pressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={({ pressed }) => [st.shareBtn, { backgroundColor: C.surface, borderColor: C.border, opacity: pressed ? 0.85 : 1 }]}>
+          <AnimatedPressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={[st.shareBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
             <Icon name="share" size={18} color={C.accent} />
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>Paylaş</Text>
-          </Pressable>
-          <Pressable
+          </AnimatedPressable>
+          <AnimatedPressable
             onPress={() => navigation.replace(SCREENS.TRIAL_DETAIL, { trial, fromEntry: false })}
-            style={({ pressed }) => [st.detailBtn, { backgroundColor: typeColor, opacity: pressed ? 0.9 : 1 }]}
+            haptic="medium"
+            style={[st.detailBtn, { backgroundColor: typeColor }]}
           >
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#FFFFFF" }}>Detayları Gör</Text>
             <Icon name="arrowR" size={16} color="#FFFFFF" sw={2.5} />
-          </Pressable>
+          </AnimatedPressable>
         </Animated.View>
       </ScrollView>
 
@@ -220,6 +228,7 @@ const st = StyleSheet.create({
   heroCircle: { width: 104, height: 104, borderRadius: 52, alignItems: "center", justifyContent: "center" },
   heroInner: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center", ...SHADOWS.card },
   title: { ...TYPOGRAPHY.heading, fontSize: 26, marginTop: SPACING.lg },
+  improveSub: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, marginTop: 4 },
   nameBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999, marginTop: SPACING.sm },
   netBox: { alignItems: "center", marginVertical: SPACING.xl },
   netNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64, letterSpacing: -2.5, lineHeight: 68 },

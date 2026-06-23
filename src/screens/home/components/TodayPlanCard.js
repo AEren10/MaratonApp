@@ -1,6 +1,6 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Icon } from "../../../components/design";
+import { Icon, AnimatedPressable } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { useUserTasks } from "../../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../../hooks/usePlanCompletion";
@@ -50,10 +50,13 @@ export function TodayPlanCard({
   planSummary,
   onViewAll,
   onAddTask,
+  onAllDone,
+  onTaskDone,
 }) {
   const C = useC();
   const { tasks: userTasks, toggleTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlan } = usePlanCompletion();
+  const rewardedRef = useRef(false);
 
   const merged = useMemo(() => {
     const items = [];
@@ -92,6 +95,15 @@ export function TodayPlanCard({
     }
     return items;
   }, [generatedTasks, userTasks, aiSuggestion, isPlanDone]);
+
+  useEffect(() => {
+    if (merged.length === 0 || rewardedRef.current) return;
+    const allDone = merged.every((t) => t.completed);
+    if (allDone) {
+      rewardedRef.current = true;
+      onAllDone?.();
+    }
+  }, [merged, onAllDone]);
 
   const preview = merged.slice(0, 3);
   const remaining = Math.max(0, merged.length - 3);
@@ -172,6 +184,7 @@ export function TodayPlanCard({
               H.select();
               if (item.source === "user") toggleTask(item.id);
               else togglePlan(item.id);
+              if (!item.completed) onTaskDone?.();
             }}
           />
         ))}

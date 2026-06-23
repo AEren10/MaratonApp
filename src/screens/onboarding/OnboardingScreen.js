@@ -11,7 +11,7 @@ import Svg, { Circle, Path, Polyline, Line } from "react-native-svg";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
-import { Icon } from "../../components/design";
+import { Icon, AnimatedPressable } from "../../components/design";
 
 const SLIDES = [
   {
@@ -210,9 +210,10 @@ export default function OnboardingScreen() {
             ))}
           </View>
 
-          <Pressable
+          <AnimatedPressable
             onPress={goNext}
-            style={({ pressed }) => ({
+            haptic="medium"
+            style={{
               backgroundColor: grad[0],
               borderRadius: 999,
               paddingVertical: 17,
@@ -225,14 +226,13 @@ export default function OnboardingScreen() {
               shadowOpacity: 0.40,
               shadowRadius: 20,
               elevation: 8,
-              opacity: pressed ? 0.92 : 1,
-            })}
+            }}
           >
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
               {isLast ? "Başlayalım" : "Devam"}
             </Text>
             <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />
-          </Pressable>
+          </AnimatedPressable>
         </View>
       </SafeAreaView>
     </View>

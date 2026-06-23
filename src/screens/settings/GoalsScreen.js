@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon, IconBox, GlassCard } from "../../components/design";
+import { Icon, IconBox, GlassCard, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
@@ -72,7 +72,11 @@ export default function GoalsScreen() {
     dispatch(setGoals(draft));
     saveGoalsToStorage(draft);
     if (user?.id && user.id !== "dev") {
-      try { await updateProfile(user.id, { daily_question_goal: draft.dailyQuestions }); } catch (_) {}
+      try { await updateProfile(user.id, {
+        daily_question_goal: draft.dailyQuestions,
+        weekly_trials_goal: draft.weeklyTrials,
+        weekly_minutes_goal: draft.weeklyMinutes,
+      }); } catch (e) { __DEV__ && console.warn("goals sync failed:", e); }
     }
     H.success();
     showAlert("Kaydedildi", "Hedeflerin güncellendi.");
@@ -124,10 +128,10 @@ export default function GoalsScreen() {
         <GoalRow icon="chart" color={C.teal} label="Haftalık Deneme" value={draft.weeklyTrials} onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))} suffix="adet" C={C} />
         <GoalRow icon="clock" color={C.blue} label="Haftalık Süre" value={draft.weeklyMinutes} onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))} suffix="dk" C={C} />
 
-        <Pressable onPress={save} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.lg, ...SHADOWS.accent, opacity: pressed ? 0.85 : 1 })}>
+        <AnimatedPressable onPress={save} haptic="medium" style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.lg, ...SHADOWS.accent }}>
           <Icon name="check" size={20} color={C.bg} />
           <Text style={{ ...TYPOGRAPHY.button, color: C.bg }}>Kaydet</Text>
-        </Pressable>
+        </AnimatedPressable>
       </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

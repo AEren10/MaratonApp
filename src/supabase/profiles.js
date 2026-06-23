@@ -3,7 +3,7 @@ import { supabase } from "./client";
 export const getProfile = async (userId) => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, bio, target_program_id, show_in_leaderboard")
+    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -24,10 +24,12 @@ export const updateProfile = async (userId, updates) => {
 export const getPremiumStatus = async (userId) => {
   const { data } = await supabase
     .from("profiles")
-    .select("is_premium")
+    .select("is_premium, premium_until")
     .eq("id", userId)
     .maybeSingle();
-  return !!data?.is_premium;
+  if (!data) return false;
+  if (data.premium_until && new Date(data.premium_until) <= new Date()) return false;
+  return !!data.is_premium;
 };
 
 export const updateExamConfig = async (userId, config) => {

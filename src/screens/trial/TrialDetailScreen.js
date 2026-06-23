@@ -4,6 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
@@ -21,24 +22,28 @@ import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
-function ScoreRing({ size = 140, stroke = 10, net, max = 120, C }) {
+function scoreColor(pct, C) {
+  return pct >= 0.7 ? C.green : pct >= 0.5 ? C.amber : C.red;
+}
+
+function ScoreRing({ size = 150, stroke = 12, net, max = 120, C }) {
   const pct = Math.min(net / max, 1);
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - pct);
-  const color = pct >= 0.7 ? C.green : pct >= 0.5 ? C.amber : C.red;
+  const color = scoreColor(pct, C);
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={{ position: "absolute" }}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={C.border} strokeWidth={stroke} fill="none" />
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={color + "18"} strokeWidth={stroke} fill="none" />
         <Circle
           cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none"
           strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <Text style={[TYPOGRAPHY.stat, { color }]}>{net.toFixed(1)}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color, opacity: 0.6 }]}>/ {max}</Text>
+      <Text style={[TYPOGRAPHY.stat, { color, fontSize: 48 }]}>{net.toFixed(1)}</Text>
+      <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>/ {max} net</Text>
     </View>
   );
 }
@@ -228,6 +233,10 @@ export default function TrialDetailScreen() {
         )}
 
         <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.scoreCard}>
+          <LinearGradient
+            colors={[scoreColor(Math.min(net / (totalMax || 120), 1), C) + "14", "transparent"]}
+            style={styles.scoreGradient}
+          />
           {typeMeta && (
             <View style={{ marginBottom: SPACING.md }}>
               <Chip color={typeMeta.color}>
@@ -238,7 +247,7 @@ export default function TrialDetailScreen() {
             </View>
           )}
           <ScoreRing net={net} max={totalMax || 120} C={C} />
-          <View style={styles.trendBadge}>
+          <View style={[styles.trendBadge, { backgroundColor: trendColor + "16" }]}>
             <Icon name={trend >= 0 ? "trendUp" : "trendDown"} size={14} color={trendColor} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: trendColor }]}>
               {trend > 0 ? "+" : ""}{trend.toFixed(1)} net
@@ -368,12 +377,17 @@ function makeStyles(C) {
     scoreCard: {
       alignItems: "center", paddingVertical: SPACING.xxxl,
       backgroundColor: C.surface, borderRadius: RADIUS.xxl,
-      marginBottom: SPACING.xxl,
+      marginBottom: SPACING.xxl, overflow: "hidden",
+      borderWidth: 1, borderColor: C.border,
+    },
+    scoreGradient: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: RADIUS.xxl,
     },
     trendBadge: {
       flexDirection: "row", alignItems: "center", gap: 4,
-      marginTop: SPACING.md, backgroundColor: C.surface2,
-      borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
+      marginTop: SPACING.lg,
+      borderRadius: RADIUS.full, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm,
     },
     section: { marginBottom: SPACING.xxl },
     subjRow: {

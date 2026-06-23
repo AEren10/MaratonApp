@@ -16,12 +16,9 @@ const STORAGE_KEY = "@maraton:themePref";
 // pref: "system" | "light" | "dark"
 // scheme: actual resolved value (system follows OS)
 //
-// Default "light" — dark tema henüz tüm ekranlarda eşit kalitede değil,
-// kullanıcı manuel "dark"a geçinceye kadar light kullanılır. System ile
-// otomatik geçiş istenirse "system" seçilebilir.
 export function ThemeProvider({ children }) {
-  const systemScheme = useColorScheme(); // null | "light" | "dark"
-  const [pref, setPrefState] = useState("light");
+  const systemScheme = useColorScheme();
+  const [pref, setPrefState] = useState("dark");
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

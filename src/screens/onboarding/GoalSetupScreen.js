@@ -8,6 +8,7 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { requestNotificationPermissions, applyNotifPrefs, getNotifPrefs } from "../../lib/notifications";
+import { SCREENS } from "../../constants/screens";
 
 const RANKINGS = [
   { id: "1k", label: "İlk 1.000", desc: "Tıp, en üst mühendislik", icon: "flame", tier: "elite" },
@@ -64,7 +65,7 @@ export default function GoalSetupScreen() {
         await applyNotifPrefs(prefs);
       }
     }).catch(() => {});
-    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
+    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }, { name: SCREENS.PAYWALL }] });
   }, [selectedRanking, department, updateGoal, navigation]);
 
   return (

@@ -325,10 +325,7 @@ export default function AnalysisScreen() {
                 <SubjectBars
                   bars={deneme.bars}
                   onBarPress={(b) =>
-                    navigation.navigate(SCREENS.SUBJECT_DETAIL, {
-                      subjectKey: b.key,
-                      subjectName: b.name,
-                    })
+                    navigation.navigate(SCREENS.SUBJECT_LIST, { filter })
                   }
                 />
               </AnimatedCard>
@@ -347,7 +344,28 @@ export default function AnalysisScreen() {
               </AnimatedCard>
 
               <SectionLabel>PRATİK</SectionLabel>
-              <AnimatedCard delay={420}>
+              <AnimatedCard delay={380}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Yanlış Defteri"
+                  onPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK)}
+                  style={({ pressed }) => ({
+                    flexDirection: "row", alignItems: "center", gap: 12, padding: SPACING.md,
+                    borderRadius: 22, backgroundColor: C.coral + "14",
+                    borderWidth: 1, borderColor: C.coral + "28", opacity: pressed ? 0.85 : 1,
+                  })}
+                >
+                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.coral + "24", alignItems: "center", justifyContent: "center" }}>
+                    <Icon name="notebook" size={22} color={C.coral} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Yanlış Defteri</Text>
+                    <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 1 }}>Yanlışlarını tekrar edip güçlen</Text>
+                  </View>
+                  <Icon name="arrowR" size={18} color={C.coral} />
+                </Pressable>
+              </AnimatedCard>
+              <AnimatedCard delay={440}>
                 <View style={{ flexDirection: "row", gap: SPACING.sm }}>
                   <Pressable
                     accessibilityRole="button"

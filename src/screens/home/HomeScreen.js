@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { useAuth } from "../../contexts/AuthContext";
-import { selectStreak, selectTodayLogs, selectFreezeCount } from "../../store/slices/studyLogSlice";
+import { selectStreak, selectTodayLogs, selectFreezeCount, selectLongestStreak, selectFreezeResetAt, selectLastStudyDate } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectXP } from "../../store/slices/gamificationSlice";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
@@ -43,6 +43,7 @@ import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
 import { ExamCountdown } from "./components/ExamCountdown";
 import { MorningBriefing } from "./components/MorningBriefing";
+import { StreakDetailSheet } from "../../components/common/StreakDetailSheet";
 import { getAllSubjects } from "../trial/trialTypes";
 import * as H from "../../lib/haptics";
 
@@ -75,9 +76,9 @@ export default function HomeScreen() {
 
   const QUICK_PRIMARY = useMemo(() => [
     { icon: "play",     label: "Çalış",       go: SCREENS.STUDY_TIMER,    color: C.accent },
-    { icon: "chart",    label: "Deneme",      go: SCREENS.TRIAL_ENTRY,    color: C.orange },
-    { icon: "camera",   label: "Yanlış Ekle", go: SCREENS.ADD_WRONG,      color: C.accent },
-    { icon: "notebook", label: "Defterim",    go: SCREENS.WRONG_NOTEBOOK, color: C.orange },
+    { icon: "chart",    label: "Deneme",      go: SCREENS.TRIAL_ENTRY,    color: C.blue },
+    { icon: "camera",   label: "Yanlış Ekle", go: SCREENS.ADD_WRONG,      color: C.coral },
+    { icon: "notebook", label: "Defterim",    go: SCREENS.WRONG_NOTEBOOK, color: C.teal },
   ], [C]);
   const QUICK_SECONDARY = useMemo(() => [
     { icon: "target",   label: "5dk Quiz",    go: SCREENS.QUICK_PRACTICE, color: C.teal },
@@ -87,7 +88,11 @@ export default function HomeScreen() {
   ], [C]);
   const streak = useSelector(selectStreak);
   const freezeCount = useSelector(selectFreezeCount);
+  const longestStreak = useSelector(selectLongestStreak);
+  const freezeResetAt = useSelector(selectFreezeResetAt);
+  const lastStudyDate = useSelector(selectLastStudyDate);
   const todayLogs = useSelector(selectTodayLogs);
+  const [streakSheetVisible, setStreakSheetVisible] = useState(false);
   const trials = useSelector(selectTrials);
   const xp = useSelector(selectXP);
 
@@ -124,6 +129,10 @@ export default function HomeScreen() {
 
   const solvedToday = useMemo(
     () => todayLogs.reduce((s, l) => s + (l.questionCount || 0), 0),
+    [todayLogs]
+  );
+  const minutesToday = useMemo(
+    () => todayLogs.reduce((s, l) => s + (l.duration_minutes || l.durationMinutes || 0), 0),
     [todayLogs]
   );
 
@@ -211,8 +220,10 @@ export default function HomeScreen() {
         <HomeHeader
           name={displayName}
           streak={streak}
+          freezeCount={freezeCount}
+          lastStudyDate={lastStudyDate}
           onProfilePress={go(SCREENS.PROFILE)}
-          onStreakPress={go(SCREENS.LEAGUE)}
+          onStreakPress={() => setStreakSheetVisible(true)}
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
@@ -233,6 +244,7 @@ export default function HomeScreen() {
           <HomeHero
             solved={solvedToday}
             goal={dailyGoal}
+            minutes={minutesToday}
             streak={streak}
             net={lastDeneme.net}
             trend={lastDeneme.trend}
@@ -260,6 +272,10 @@ export default function HomeScreen() {
               planSummary={plan}
               onViewAll={go(SCREENS.PLAN_DETAIL)}
               onAddTask={go(SCREENS.ADD_TASK)}
+              onTaskDone={() => reward("plan_task_done")}
+              onAllDone={() => reward("perfect_plan", {
+                statUpdates: [{ type: "increment", key: "perfectPlans" }],
+              })}
             />
           </AnimatedCard>
 
@@ -345,6 +361,16 @@ export default function HomeScreen() {
           if (n.subject) navigation.navigate(SCREENS.ANALYSIS);
           else navigation.navigate(SCREENS.PLAN_DETAIL);
         }}
+      />
+
+      <StreakDetailSheet
+        visible={streakSheetVisible}
+        onClose={() => setStreakSheetVisible(false)}
+        streak={streak}
+        longestStreak={longestStreak}
+        freezeCount={freezeCount}
+        freezeResetAt={freezeResetAt}
+        lastStudyDate={lastStudyDate}
       />
 
       <NudgeModal

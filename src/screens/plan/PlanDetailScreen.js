@@ -168,6 +168,18 @@ export default function PlanDetailScreen() {
               Görevler
             </Text>
           </View>
+          <Pressable
+            onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+            style={({ pressed }) => [
+              styles.addRow,
+              { borderColor: C.accent + "50", opacity: pressed ? 0.8 : 1 },
+            ]}
+          >
+            <View style={[styles.addIcon, { backgroundColor: C.accent }]}>
+              <Icon name="plus" size={14} color="#FFF" sw={2.5} />
+            </View>
+            <Text style={[styles.addText, { color: C.accent }]}>Görev Ekle</Text>
+          </Pressable>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
@@ -225,5 +237,21 @@ function makeStyles(C) {
       marginBottom: SPACING.md,
     },
     taskList: { gap: SPACING.md },
+    addRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: SPACING.md,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      borderWidth: 1.5,
+      borderStyle: "dashed",
+    },
+    addIcon: {
+      width: 26, height: 26, borderRadius: 8,
+      alignItems: "center", justifyContent: "center",
+    },
+    addText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
   });
 }

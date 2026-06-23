@@ -29,8 +29,9 @@ export function useWeeklyReport() {
   const trials = useSelector(selectTrials);
   const [logs, setLogs] = useState([]);
 
-  const weekStart = useMemo(() => startOfWeek(), []);
-  const weekEnd = useMemo(() => endOfWeek(), []);
+  const todayKey = toIso(new Date());
+  const weekStart = useMemo(() => startOfWeek(), [todayKey]);
+  const weekEnd = useMemo(() => endOfWeek(), [todayKey]);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;

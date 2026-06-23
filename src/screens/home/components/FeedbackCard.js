@@ -1,9 +1,8 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import { Icon } from "../../../components/design";
+import { View, Text, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { Icon, AnimatedPressable } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import * as haptic from "../../../lib/haptics";
 
 const COLOR_MAP = {
   red: (C) => ({ bg: C.red + "22", border: C.red + "44", solid: C.red }),
@@ -17,51 +16,41 @@ const COLOR_MAP = {
 export function FeedbackCard({ nudge, onAction, delay = 0 }) {
   const C = useC();
   const colors = (COLOR_MAP[nudge.color] || COLOR_MAP.amber)(C);
-  const scale = useSharedValue(1);
-  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-  const handlePress = () => {
-    haptic.tap();
-    onAction?.(nudge);
-  };
 
   return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(420).springify().damping(16)} style={pressStyle}>
-      <Pressable
-        onPressIn={() => { scale.value = withSpring(0.97, { damping: 16, stiffness: 300 }); }}
-        onPressOut={() => { scale.value = withSpring(1, { damping: 16, stiffness: 300 }); }}
-        onPress={handlePress}
-      >
-        <View style={[s.card, { backgroundColor: colors.bg, borderColor: colors.border }]}>
-          <View style={s.inner}>
-            <View style={s.row}>
-              <View style={[s.iconBox, { backgroundColor: colors.solid + "36" }]}>
-                <Icon name={nudge.icon || "alert"} size={20} color={colors.solid} />
-                <View style={[s.dot, { backgroundColor: colors.solid }]} />
-              </View>
-              <View style={s.content}>
-                <Text style={[s.message, { color: C.text }]} numberOfLines={2}>
-                  {nudge.message}
+    <AnimatedPressable
+      onPress={() => onAction?.(nudge)}
+      entering={FadeInDown.delay(delay).duration(420).springify().damping(16)}
+    >
+      <View style={[s.card, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+        <View style={s.inner}>
+          <View style={s.row}>
+            <View style={[s.iconBox, { backgroundColor: colors.solid + "36" }]}>
+              <Icon name={nudge.icon || "alert"} size={20} color={colors.solid} />
+              <View style={[s.dot, { backgroundColor: colors.solid }]} />
+            </View>
+            <View style={s.content}>
+              <Text style={[s.message, { color: C.text }]} numberOfLines={2}>
+                {nudge.message}
+              </Text>
+              {nudge.detail ? (
+                <Text style={[s.detail, { color: C.sec }]} numberOfLines={2}>
+                  {nudge.detail}
                 </Text>
-                {nudge.detail ? (
-                  <Text style={[s.detail, { color: C.sec }]} numberOfLines={2}>
-                    {nudge.detail}
-                  </Text>
-                ) : null}
+              ) : null}
+            </View>
+          </View>
+          {nudge.actionLabel ? (
+            <View style={s.footer}>
+              <View style={[s.actionBtn, { backgroundColor: colors.solid }]}>
+                <Text style={s.actionText}>{nudge.actionLabel}</Text>
+                <Icon name="arrowR" size={14} color="#FFFFFF" sw={2.5} />
               </View>
             </View>
-            {nudge.actionLabel ? (
-              <View style={s.footer}>
-                <View style={[s.actionBtn, { backgroundColor: colors.solid }]}>
-                  <Text style={s.actionText}>{nudge.actionLabel}</Text>
-                  <Icon name="arrowR" size={14} color="#FFFFFF" sw={2.5} />
-                </View>
-              </View>
-            ) : null}
-          </View>
+          ) : null}
         </View>
-      </Pressable>
-    </Animated.View>
+      </View>
+    </AnimatedPressable>
   );
 }
 

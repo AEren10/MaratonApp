@@ -25,10 +25,10 @@ export const COLORS = {
     card:          "#FFFFFF",
     cardHover:     "#F6F3EC",
 
-    // Borders & dividers — nötr ink, neredeyse görünmez
-    border:        "rgba(20, 18, 12, 0.09)",
-    borderSoft:    "rgba(20, 18, 12, 0.05)",
-    borderLight:   "rgba(20, 18, 12, 0.14)",
+    // Borders & dividers
+    border:        "rgba(20, 18, 12, 0.12)",
+    borderSoft:    "rgba(20, 18, 12, 0.06)",
+    borderLight:   "rgba(20, 18, 12, 0.18)",
 
     // Text stack — nötr ink (mor değil)
     textPrimary:   "#15161A",  // near-black ink
