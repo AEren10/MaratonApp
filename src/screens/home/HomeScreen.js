@@ -69,15 +69,15 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { user } = useAuth();
-  const { reward, xpToast, dismissXP, levelUpModal, dismissLevelUp } = useGamification();
+  const { reward, syncStat, xpToast, dismissXP, levelUpModal, dismissLevelUp } = useGamification();
   const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
   const QUICK_PRIMARY = useMemo(() => [
-    { icon: "play",     label: "Çalış",       go: SCREENS.STUDY_TIMER,    color: C.orange },
-    { icon: "chart",    label: "Deneme",      go: SCREENS.TRIAL_ENTRY,    color: C.blue },
-    { icon: "camera",   label: "Yanlış Ekle", go: SCREENS.ADD_WRONG,      color: C.pink },
-    { icon: "notebook", label: "Defterim",    go: SCREENS.WRONG_NOTEBOOK, color: C.brandLight },
+    { icon: "play",     label: "Çalış",       go: SCREENS.STUDY_TIMER,    color: C.accent },
+    { icon: "chart",    label: "Deneme",      go: SCREENS.TRIAL_ENTRY,    color: C.orange },
+    { icon: "camera",   label: "Yanlış Ekle", go: SCREENS.ADD_WRONG,      color: C.accent },
+    { icon: "notebook", label: "Defterim",    go: SCREENS.WRONG_NOTEBOOK, color: C.orange },
   ], [C]);
   const QUICK_SECONDARY = useMemo(() => [
     { icon: "target",   label: "5dk Quiz",    go: SCREENS.QUICK_PRACTICE, color: C.teal },
@@ -90,6 +90,10 @@ export default function HomeScreen() {
   const todayLogs = useSelector(selectTodayLogs);
   const trials = useSelector(selectTrials);
   const xp = useSelector(selectXP);
+
+  useEffect(() => {
+    if (streak > 0) syncStat("streak", streak);
+  }, [streak, syncStat]);
 
   const planCtx = usePlanContext();
   const nudges = useRecommendations();
@@ -208,7 +212,7 @@ export default function HomeScreen() {
           name={displayName}
           streak={streak}
           onProfilePress={go(SCREENS.PROFILE)}
-          onStreakPress={go(SCREENS.CALENDAR)}
+          onStreakPress={go(SCREENS.LEAGUE)}
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 

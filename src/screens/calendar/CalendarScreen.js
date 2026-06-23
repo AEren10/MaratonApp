@@ -15,6 +15,7 @@ import { SCREENS } from "../../constants/screens";
 import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { MonthStats } from "./components/MonthStats";
+import { useCalendarTasks } from "../../hooks/useCalendarTasks";
 
 function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -44,6 +45,7 @@ export default function CalendarScreen() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [selectedDay, setSelectedDay] = useState(() => toIsoDate(new Date()));
+  const { tasks: calendarTasks, addTask, toggleTask, removeTask } = useCalendarTasks();
 
   const monthStart = useMemo(() => startOfMonth(monthDate), [monthDate]);
   const monthEnd = useMemo(() => endOfMonth(monthDate), [monthDate]);
@@ -153,6 +155,7 @@ export default function CalendarScreen() {
                 selectedDay={selectedDay}
                 onSelect={setSelectedDay}
                 dailyGoal={dailyGoal}
+                calendarTasks={calendarTasks}
               />
             </Animated.View>
 
@@ -161,7 +164,15 @@ export default function CalendarScreen() {
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
-              <DayDetails day={selectedDay} data={selectedDayData} onTrialPress={(t) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: t })} />
+              <DayDetails
+                day={selectedDay}
+                data={selectedDayData}
+                onTrialPress={(t) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: t })}
+                calendarTasks={calendarTasks[selectedDay] || []}
+                onAddTask={addTask}
+                onToggleTask={toggleTask}
+                onRemoveTask={removeTask}
+              />
             </Animated.View>
           </>
         )}

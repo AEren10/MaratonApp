@@ -11,7 +11,8 @@ import { getMastery } from "../../lib/mastery";
 import { TopicNoteCard } from "./components/TopicNoteCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
-import { getStudyLogsByTopic } from "../../supabase/studyLogs";
+import { getStudyLogsByTopic, addStudyLog } from "../../supabase/studyLogs";
+import * as H from "../../lib/haptics";
 
 function StatBox({ label, value, color, C }) {
   return (
@@ -24,16 +25,16 @@ function StatBox({ label, value, color, C }) {
 
 function SubtopicRow({ item, C, color }) {
   return (
-    <View style={[s.subtopicRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+    <View style={[s.subtopicRow, { backgroundColor: item.done ? color + "14" : C.surface, borderColor: item.done ? color + "20" : C.border }]}>
       <Icon
-        name={item.done ? "check" : "circle"}
+        name={item.done ? "checkCircle" : "circle"}
         size={20}
         color={item.done ? color : C.muted}
-        sw={item.done ? 3 : 1.8}
+        sw={item.done ? 2.5 : 1.8}
       />
       <Text style={[
         s.subtopicName,
-        { color: item.done ? C.muted : C.text },
+        { color: item.done ? C.sec : C.text },
         item.done && { textDecorationLine: "line-through" },
       ]}>
         {item.name}
@@ -68,6 +69,30 @@ function StudyHistoryRow({ item, C, color }) {
           </Text>
         )}
       </View>
+    </View>
+  );
+}
+
+function getStudyTip(mastery, q, studyCount) {
+  if (q === 0) return { icon: "play", text: "Bu konuda henüz soru çözmedin. İlk adımı at!", color: "blue" };
+  if (mastery < 0.4) return { icon: "alert", text: "Bu konu zayıf alanın. Tekrar çalışıp soru çözmeye odaklan.", color: "red" };
+  if (mastery < 0.7) return { icon: "target", text: "Orta seviyedesin. Düzenli tekrar ile ustalaş.", color: "amber" };
+  if (studyCount < 3) return { icon: "refresh", text: "Başarı oranın iyi ama daha fazla tekrar gerekli.", color: "amber" };
+  return { icon: "star", text: "Bu konuda güçlüsün! Arada tekrar ederek seviyeni koru.", color: "green" };
+}
+
+function StudyTip({ mastery, q, studyCount, color, C }) {
+  const tip = getStudyTip(mastery, q, studyCount);
+  const tipColor = C[tip.color] || color;
+  return (
+    <View style={{
+      flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+      backgroundColor: tipColor + "12", borderRadius: RADIUS.lg,
+      padding: SPACING.md, marginTop: SPACING.lg,
+      borderWidth: 1, borderColor: tipColor + "25",
+    }}>
+      <Icon name={tip.icon} size={18} color={tipColor} sw={2} />
+      <Text style={{ ...TYPOGRAPHY.caption, color: C.text, flex: 1, lineHeight: 18 }}>{tip.text}</Text>
     </View>
   );
 }
@@ -183,14 +208,36 @@ export default function TopicStudyScreen() {
   const mastery = (topic?.acc || 0) / 100;
 
   const [history, setHistory] = useState([]);
+  const [completing, setCompleting] = useState(false);
   useEffect(() => {
     if (!user?.id || user.id === "dev" || !subject?.key || !topic?.name) return;
     getStudyLogsByTopic(user.id, subject.key, topic.name)
       .then(setHistory)
       .catch(() => {});
   }, [user?.id, subject.key, topic.name]);
+
+  const handleMarkComplete = async () => {
+    if (!user?.id || user.id === "dev") return;
+    setCompleting(true);
+    try {
+      await addStudyLog({
+        user_id: user.id,
+        subject: subject.key,
+        topic: topic.name,
+        question_count: 0,
+        correct_count: 0,
+        duration_minutes: 0,
+        study_date: new Date().toISOString().split("T")[0],
+      });
+      H.success();
+      showAlert("Tamamlandı", "Bu konu çalışıldı olarak işaretlendi.");
+    } catch {
+      showAlert("Hata", "İşaretleme başarısız oldu.");
+    } finally {
+      setCompleting(false);
+    }
+  };
   const masteryLevel = getMastery({ q: topic?.q || 0, acc: topic?.acc || 0 });
-  const circumference = 2 * Math.PI * 40;
   const subtopics = (paramSubtopics || []).map((name, i) => ({
     name,
     done: i < Math.floor((paramSubtopics?.length || 0) * mastery),
@@ -219,11 +266,11 @@ export default function TopicStudyScreen() {
         {/* === Ilerleme header === */}
         <ProgressHeader topic={topic} color={color} C={C} />
 
-        {/* === Stat kartlar — her biri kimlik renkli soft === */}
+        {/* === Stat kartlar === */}
         <View style={s.statsRow}>
-          <StatBox C={C} label="Toplam Soru" value={topic.q || 0} color={color} />
-          <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={color} />
-          <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={color} />
+          <StatBox C={C} label="Toplam Soru" value={topic.q || 0} color={C.blue} />
+          <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={C.green} />
+          <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={C.amber} />
         </View>
 
         {/* === Hakimiyet ring === */}
@@ -267,13 +314,16 @@ export default function TopicStudyScreen() {
           </View>
         </View>
 
+        {/* Öneri kartı */}
+        <StudyTip mastery={mastery} q={topic?.q || 0} studyCount={topic?.studyCount || 0} color={color} C={C} />
+
         {/* Konu notu */}
         {subject.key ? <TopicNoteCard subjectKey={subject.key} topicName={topic.name} /> : null}
 
         {/* === Alt konular === */}
         {subtopics.length > 0 ? (
           <>
-            <Text style={[s.sectionTitle, { color: C.muted }]}>ALT KONULAR</Text>
+            <Text style={[s.sectionTitle, { color: C.sec }]}>ALT KONULAR</Text>
             {subtopics.map((st) => (
               <SubtopicRow key={st.name} item={st} C={C} color={color} />
             ))}
@@ -283,14 +333,14 @@ export default function TopicStudyScreen() {
         {/* === Çalışma Geçmişi === */}
         {history.length > 0 && (
           <>
-            <Text style={[s.sectionTitle, { color: C.muted }]}>ÇALIŞMA GEÇMİŞİ</Text>
+            <Text style={[s.sectionTitle, { color: C.sec }]}>ÇALIŞMA GEÇMİŞİ</Text>
             {history.map((h) => (
               <StudyHistoryRow key={h.id} item={h} C={C} color={color} />
             ))}
           </>
         )}
 
-        {/* === Çalış CTA — purple pill === */}
+        {/* === CTA buttons === */}
         <Pressable
           onPress={() => navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: subject.key, topicName: topic.name })}
           style={({ pressed }) => [
@@ -304,6 +354,21 @@ export default function TopicStudyScreen() {
         >
           <Icon name="play" size={20} color="#FFFFFF" sw={2.5} />
           <Text style={s.ctaText}>Çalışmaya Başla</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={handleMarkComplete}
+          disabled={completing}
+          style={({ pressed }) => [
+            s.secondaryCta,
+            {
+              borderColor: color + "40",
+              opacity: pressed || completing ? 0.6 : 1,
+            },
+          ]}
+        >
+          <Icon name="check" size={18} color={color} sw={2} />
+          <Text style={[s.secondaryCtaText, { color }]}>Konuyu Tamamla</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -365,5 +430,14 @@ const s = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     fontSize: 16,
     color: "#FFFFFF",
+  },
+  secondaryCta: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    borderRadius: 999, paddingVertical: 14, marginTop: SPACING.md,
+    gap: 8, borderWidth: 1.5,
+  },
+  secondaryCtaText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
   },
 });

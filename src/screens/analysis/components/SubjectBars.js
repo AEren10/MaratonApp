@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { GlassCard } from "../../../components/design";
+import { GlassCard, Icon } from "../../../components/design";
 
 function Bar({ name, color, net, max, delay, onPress, C }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
@@ -28,19 +28,20 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, opacity: pressed ? 0.7 : 1 }]}>
+      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
       <Text
-        style={{ ...TYPOGRAPHY.captionMedium, color: C.sec, width: 80 }}
+        style={{ ...TYPOGRAPHY.captionMedium, color, width: 74 }}
         numberOfLines={1}
       >
         {name}
       </Text>
 
-      <View style={{ flex: 1, height: 10, borderRadius: RADIUS.sm, backgroundColor: color + "1A", overflow: "hidden" }}>
+      <View style={{ flex: 1, height: 12, borderRadius: 6, backgroundColor: color + "1A", overflow: "hidden" }}>
         <Animated.View
           style={[
             {
-              height: 10,
-              borderRadius: RADIUS.sm,
+              height: 12,
+              borderRadius: 6,
               backgroundColor: color,
             },
             fillStyle,
@@ -48,9 +49,10 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
         />
       </View>
 
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, width: 60, textAlign: "right" }}>
-        {Number(net).toFixed(1)}/{max}
+      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color: C.text, width: 60, textAlign: "right", letterSpacing: -0.3 }}>
+        {Number(net).toFixed(1)}<Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>/{max}</Text>
       </Text>
+      <Icon name="chevR" size={12} color={C.muted} />
     </Pressable>
   );
 }

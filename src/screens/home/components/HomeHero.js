@@ -80,7 +80,7 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
         {done ? (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignSelf: "center", borderRadius: 110, backgroundColor: ringColor }, glowStyle]} />
         ) : null}
-        <ProgressRing size={196} stroke={15} value={pct} color={ringColor} trackColor={C.surface2 || C.border}>
+        <ProgressRing size={196} stroke={15} value={pct} color={ringColor} trackColor={ringColor + "18"}>
           {isNewUser ? (
             <>
               <Text style={[s.ringTop, { color: C.muted }]}>BAŞLANGIÇ NOKTASIN</Text>
@@ -91,9 +91,10 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
             </>
           ) : (
             <>
-              <Text style={[s.ringTop, { color: C.muted }]}>BUGÜN ÇÖZÜLEN</Text>
+              <Text style={[s.ringTop, { color: C.accent }]}>BUGÜN ÇÖZÜLEN</Text>
               <View style={s.ringValRow}>
                 <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
+                {pct > 0.05 && <Icon name="flame" size={14 + Math.round(Math.min(1, pct) * 12)} color={C.orange} sw={2} style={{ marginLeft: -4, marginTop: 6 }} />}
               </View>
               <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
               <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
@@ -104,11 +105,11 @@ export function HomeHero({ solved = 0, goal = 100, streak = 0, net = 0, trend = 
       </Pressable>
 
       <View style={[s.rail, { borderColor: C.border }]}>
-        <StatCell label="SERİ" value={streak} color={C.orange} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
+        <StatCell label="SERİ" value={streak} color={C.orange} valueColor={C.orange} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label="SON NET" value={net} decimals color={C.blue} valueColor={C.text} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
+        <StatCell label="SON NET" value={net} decimals color={C.blue} valueColor={C.blue} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label={tier.toUpperCase()} value={xp} color={C.amber} valueColor={C.text} icon="trophy" delay={280} onPress={onLeague} dormantHint={isNewUser ? "XP kazan" : null} />
+        <StatCell label={tier.toUpperCase()} value={xp} color={C.amber} valueColor={C.amber} icon="trophy" delay={280} onPress={onLeague} dormantHint={isNewUser ? "XP kazan" : null} />
       </View>
     </Animated.View>
   );

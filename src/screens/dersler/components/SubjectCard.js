@@ -22,17 +22,17 @@ function ProgressBar({ pct, color, C, done, total }) {
     <View style={{ marginTop: SPACING.lg }}>
       <View
         style={{
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: C.surface2,
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: color + "20",
           overflow: "hidden",
         }}
       >
         <View
           style={{
-            width: `${Math.min(pct, 100)}%`,
-            height: 4,
-            borderRadius: 2,
+            width: `${Math.max(Math.min(pct, 100), 2)}%`,
+            height: 6,
+            borderRadius: 3,
             backgroundColor: color,
           }}
         />
@@ -112,16 +112,16 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
             </Text>
           </View>
 
-          {/* % rozet — dormant when pct===0 */}
+          {/* % rozet */}
           <View style={{
             paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
-            backgroundColor: pct === 0 ? C.dormantBg : color,
+            backgroundColor: pct === 0 ? color + "20" : color,
             borderWidth: pct === 0 ? 1 : 0,
-            borderColor: pct === 0 ? C.border : "transparent",
+            borderColor: pct === 0 ? color + "40" : "transparent",
           }}>
             <Text style={{
               fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, letterSpacing: -0.2,
-              color: pct === 0 ? C.dormant : "#FFFFFF",
+              color: pct === 0 ? color : "#FFFFFF",
             }}>
               {pct === 0 ? "Başla" : `%${pct}`}
             </Text>
@@ -147,12 +147,12 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         >
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: C.surface2,
+            backgroundColor: masteryPct > 0 ? color + "12" : C.surface2,
             paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
           }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : C.dormant }} />
-            <Text style={{ ...TYPOGRAPHY.micro, color: masteryPct === 0 ? C.muted : C.text }}>
-              {masteryPct === 0 ? "Henüz ustalaşılmadı" : `%${masteryPct} ustalaşıldı`}
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : color + "60" }} />
+            <Text style={{ ...TYPOGRAPHY.micro, color: masteryPct === 0 ? C.sec : color }}>
+              {masteryPct === 0 ? "Keşfetmeye hazır" : `%${masteryPct} ustalaşıldı`}
             </Text>
           </View>
 

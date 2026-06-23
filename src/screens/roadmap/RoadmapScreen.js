@@ -28,17 +28,17 @@ function ProgressHeader({ roadmap, C, s }) {
         <View style={s.progressStats}>
           <View style={s.miniStat}>
             <Text style={[s.miniVal, { color: C.green }]}>{roadmap.masteredCount}</Text>
-            <Text style={[s.miniLabel, { color: C.muted }]}>bitti</Text>
+            <Text style={[s.miniLabel, { color: C.sec }]}>bitti</Text>
           </View>
           <View style={[s.miniDivider, { backgroundColor: C.border }]} />
           <View style={s.miniStat}>
             <Text style={[s.miniVal, { color: C.amber }]}>{roadmap.improvingCount}</Text>
-            <Text style={[s.miniLabel, { color: C.muted }]}>devam</Text>
+            <Text style={[s.miniLabel, { color: C.sec }]}>devam</Text>
           </View>
           <View style={[s.miniDivider, { backgroundColor: C.border }]} />
           <View style={s.miniStat}>
             <Text style={[s.miniVal, { color: C.text }]}>{roadmap.remainingCount}</Text>
-            <Text style={[s.miniLabel, { color: C.muted }]}>kaldı</Text>
+            <Text style={[s.miniLabel, { color: C.sec }]}>kaldı</Text>
           </View>
         </View>
       </View>

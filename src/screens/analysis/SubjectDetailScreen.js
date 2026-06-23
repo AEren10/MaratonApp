@@ -290,7 +290,7 @@ function makeStyles(C) {
     statBox: { flex: 1, backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.md, alignItems: "center" },
     statValue: { ...TYPOGRAPHY.statSmall, color: C.text },
     statLabel: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
-    sectionTitle: { ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md },
+    sectionTitle: { ...TYPOGRAPHY.label, color: C.sec, marginTop: SPACING.xxl, marginBottom: SPACING.md },
     historyCard: {
       backgroundColor: C.surface,
       borderRadius: RADIUS.lg,

@@ -11,13 +11,14 @@ import * as Haptics from "expo-haptics";
 import { useC } from "../contexts/ThemeContext";
 import { Icon } from "../components/design";
 import { QuickActionSheet } from "../components/common/QuickActionSheet";
+import { SCREENS } from "../constants/screens";
 
 const TABS = [
-  { key: "Home",      label: "Ana Sayfa", icon: "home",  hint: "Ana sayfaya gider" },
-  { key: "DailyPlan", label: "Dersler",   icon: "book",  hint: "Ders planını gösterir" },
-  { key: "Add",       label: "Kaydet",    icon: "plus",  center: true },
-  { key: "Analysis",  label: "Analiz",    icon: "chart", hint: "Analiz ekranına gider" },
-  { key: "Profile",   label: "Profil",    icon: "user",  hint: "Profil sayfanı açar" },
+  { key: SCREENS.HOME,       label: "Ana Sayfa", icon: "home",  hint: "Ana sayfaya gider" },
+  { key: SCREENS.DAILY_PLAN, label: "Dersler",   icon: "book",  hint: "Ders planını gösterir" },
+  { key: "Add",              label: "Kaydet",    icon: "plus",  center: true },
+  { key: SCREENS.ANALYSIS,   label: "Analiz",    icon: "chart", hint: "Analiz ekranına gider" },
+  { key: SCREENS.PROFILE,    label: "Profil",    icon: "user",  hint: "Profil sayfanı açar" },
 ];
 
 function CenterFab({ onPress, C }) {

@@ -1,37 +1,46 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { useState, useCallback, useEffect } from "react";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, IconBox, GlassCard } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
 import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
 import { useAuth } from "../../contexts/AuthContext";
+import { useExam } from "../../contexts/ExamContext";
 import { updateProfile } from "../../supabase/profiles";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { GoalHeroCard } from "./components/GoalHeroCard";
 
-function GoalInput({ icon, color, label, hint, value, onChange, suffix, styles }) {
+const RANKINGS = [
+  { id: "1k", label: "İlk 1.000", icon: "flame", color: "#E8841A" },
+  { id: "5k", label: "İlk 5.000", icon: "target", color: "#15A86A" },
+  { id: "10k", label: "İlk 10.000", icon: "chart", color: "#15A86A" },
+  { id: "25k", label: "İlk 25.000", icon: "hash", color: "#2E7DEB" },
+  { id: "50k", label: "İlk 50.000", icon: "layers", color: "#2E7DEB" },
+  { id: "100k", label: "İlk 100.000", icon: "bookOpen", color: "#6B4FE0" },
+  { id: "100k+", label: "100.000+", icon: "shield", color: "#6B4FE0" },
+];
+
+function GoalRow({ icon, color, label, value, onChange, suffix, C }) {
   return (
-    <GlassCard radius={RADIUS.xl} style={styles.card}>
-      <View style={styles.row}>
+    <GlassCard radius={RADIUS.xl} style={{ padding: SPACING.md, marginBottom: SPACING.md }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md }}>
         <IconBox icon={icon} color={color} size={36} rounded={10} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.label}>{label}</Text>
-          <Text style={styles.hint}>{hint}</Text>
-        </View>
-        <View style={styles.inputWrap}>
+        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 }}>{label}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: C.surface2, borderRadius: RADIUS.md, borderWidth: 1, borderColor: C.border, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs }}>
           <TextInput
             value={String(value)}
             onChangeText={(t) => onChange(parseInt(t.replace(/[^0-9]/g, ""), 10) || 0)}
             keyboardType="number-pad"
-            style={styles.input}
+            style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, minWidth: 40, textAlign: "right" }}
             maxLength={5}
           />
-          <Text style={styles.suffix}>{suffix}</Text>
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>{suffix}</Text>
         </View>
       </View>
     </GlassCard>
@@ -40,192 +49,87 @@ function GoalInput({ icon, color, label, hint, value, onChange, suffix, styles }
 
 export default function GoalsScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
-  const navigation = useNavigation();
+  const nav = useNavigation();
   const dispatch = useAppDispatch();
   const goals = useSelector(selectGoals);
   const { user } = useAuth();
+  const { targetRanking, targetDepartment, daysUntilExam, updateGoal } = useExam();
   const showAlert = useAlert();
-
-  const [draft, setDraft] = useState({
-    dailyQuestions: goals.dailyQuestions,
-    weeklyTrials: goals.weeklyTrials,
-    weeklyMinutes: goals.weeklyMinutes,
-  });
+  const [showPicker, setShowPicker] = useState(false);
+  const [draft, setDraft] = useState({ dailyQuestions: goals.dailyQuestions, weeklyTrials: goals.weeklyTrials, weeklyMinutes: goals.weeklyMinutes });
 
   useEffect(() => {
-    setDraft({
-      dailyQuestions: goals.dailyQuestions,
-      weeklyTrials: goals.weeklyTrials,
-      weeklyMinutes: goals.weeklyMinutes,
-    });
+    setDraft({ dailyQuestions: goals.dailyQuestions, weeklyTrials: goals.weeklyTrials, weeklyMinutes: goals.weeklyMinutes });
   }, [goals.dailyQuestions, goals.weeklyTrials, goals.weeklyMinutes]);
+
+  const pickRanking = useCallback((id) => {
+    updateGoal(id, targetDepartment);
+    H.success();
+    setShowPicker(false);
+  }, [updateGoal, targetDepartment]);
 
   const save = useCallback(async () => {
     dispatch(setGoals(draft));
     saveGoalsToStorage(draft);
-    // Cihazlar arası senkron: profili güncelle (migration 008 sütunu).
     if (user?.id && user.id !== "dev") {
-      try {
-        await updateProfile(user.id, { daily_question_goal: draft.dailyQuestions });
-      } catch (_) {}
+      try { await updateProfile(user.id, { daily_question_goal: draft.dailyQuestions }); } catch (_) {}
     }
     H.success();
     showAlert("Kaydedildi", "Hedeflerin güncellendi.");
-    navigation.goBack();
-  }, [draft, dispatch, navigation, user?.id]);
+    nav.goBack();
+  }, [draft, dispatch, nav, user?.id, showAlert]);
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
-        <Text style={styles.title}>Hedeflerim</Text>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md }}>
+        <Pressable onPress={() => nav.goBack()} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
+        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Hedeflerim</Text>
         <View style={{ width: 22 }} />
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.subtitle}>
-          Hedef belirlemek odaklanmanı artırır. İstediğin zaman değiştirebilirsin.
-        </Text>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 60 }}>
+        <GoalHeroCard targetRanking={targetRanking} targetDepartment={targetDepartment} daysUntilExam={daysUntilExam} onEdit={() => setShowPicker((p) => !p)} />
 
-        <GoalInput
-          icon="target"
-          color={C.accent}
-          label="Günlük Soru Hedefi"
-          hint="Her gün çözmen gereken soru sayısı"
-          value={draft.dailyQuestions}
-          onChange={(v) => setDraft((d) => ({ ...d, dailyQuestions: v }))}
-          suffix="soru"
-          styles={styles}
-        />
+        {showPicker && (
+          <Animated.View entering={FadeInDown.duration(300)} style={{ marginTop: SPACING.md }}>
+            <Text style={{ ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.sm }}>HEDEF SIRALAMA SEÇ</Text>
+            {RANKINGS.map((r) => {
+              const active = targetRanking === r.id;
+              return (
+                <Pressable key={r.id} onPress={() => pickRanking(r.id)} style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md, borderRadius: RADIUS.xl, padding: SPACING.md, marginBottom: SPACING.sm, borderWidth: 1.5, backgroundColor: C.surface, borderColor: active ? r.color : C.border }}>
+                  <IconBox icon={r.icon} color={r.color} size={36} rounded={10} />
+                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: active ? C.text : C.sec, flex: 1 }}>{r.label}</Text>
+                  {active && <Icon name="check" size={18} color={r.color} />}
+                </Pressable>
+              );
+            })}
+          </Animated.View>
+        )}
 
-        <View style={styles.chipRow}>
+        <Text style={{ ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }}>GÜNLÜK & HAFTALIK</Text>
+
+        <GoalRow icon="target" color={C.accent} label="Günlük Soru" value={draft.dailyQuestions} onChange={(v) => setDraft((d) => ({ ...d, dailyQuestions: v }))} suffix="soru" C={C} />
+        <View style={{ flexDirection: "row", gap: SPACING.sm, marginTop: -SPACING.xs, marginBottom: SPACING.md }}>
           {[50, 100, 150, 200].map((n) => {
-            const active = draft.dailyQuestions === n;
+            const on = draft.dailyQuestions === n;
             return (
-              <Pressable
-                key={n}
-                onPress={() => setDraft((d) => ({ ...d, dailyQuestions: n }))}
-                style={[styles.chip, active && styles.chipActive]}
-              >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>{n}</Text>
+              <Pressable key={n} onPress={() => setDraft((d) => ({ ...d, dailyQuestions: n }))} style={{ flex: 1, alignItems: "center", paddingVertical: SPACING.sm, backgroundColor: on ? C.accent + "20" : C.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: on ? C.accent : C.border }}>
+                <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: on ? C.accent : C.sec }}>{n}</Text>
               </Pressable>
             );
           })}
         </View>
 
-        <GoalInput
-          icon="chart"
-          color={C.teal}
-          label="Haftalık Deneme Hedefi"
-          hint="Her hafta girmen gereken deneme sayısı"
-          value={draft.weeklyTrials}
-          onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))}
-          suffix="adet"
-          styles={styles}
-        />
+        <GoalRow icon="chart" color={C.teal} label="Haftalık Deneme" value={draft.weeklyTrials} onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))} suffix="adet" C={C} />
+        <GoalRow icon="clock" color={C.blue} label="Haftalık Süre" value={draft.weeklyMinutes} onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))} suffix="dk" C={C} />
 
-        <GoalInput
-          icon="clock"
-          color={C.blue}
-          label="Haftalık Çalışma Süresi"
-          hint="Toplam çalışma süresi (dakika)"
-          value={draft.weeklyMinutes}
-          onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))}
-          suffix="dk"
-          styles={styles}
-        />
-
-        <Pressable
-          onPress={save}
-          style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.85 }]}
-        >
+        <Pressable onPress={save} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.lg, ...SHADOWS.accent, opacity: pressed ? 0.85 : 1 })}>
           <Icon name="check" size={20} color={C.bg} />
-          <Text style={styles.saveText}>Kaydet</Text>
+          <Text style={{ ...TYPOGRAPHY.button, color: C.bg }}>Kaydet</Text>
         </Pressable>
       </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
-    },
-    title: { ...TYPOGRAPHY.subheading, color: C.text },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-    subtitle: {
-      ...TYPOGRAPHY.caption,
-      color: C.muted,
-      marginBottom: SPACING.lg,
-    },
-    card: {
-      padding: SPACING.md,
-      marginBottom: SPACING.md,
-    },
-    row: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
-    label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-    hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
-    inputWrap: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: C.surface2,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: C.border,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: SPACING.xs,
-    },
-    input: {
-      ...TYPOGRAPHY.bodySemiBold,
-      color: C.text,
-      minWidth: 40,
-      textAlign: "right",
-    },
-    suffix: { ...TYPOGRAPHY.caption, color: C.muted },
-    chipRow: {
-      flexDirection: "row",
-      gap: SPACING.sm,
-      marginTop: -SPACING.xs,
-      marginBottom: SPACING.md,
-    },
-    chip: {
-      flex: 1,
-      alignItems: "center",
-      paddingVertical: SPACING.sm,
-      backgroundColor: C.surface,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: C.border,
-    },
-    chipActive: {
-      backgroundColor: C.accent + "20",
-      borderColor: C.accent,
-    },
-    chipText: { ...TYPOGRAPHY.bodySemiBold, color: C.sec },
-    chipTextActive: { color: C.accent },
-    saveBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: SPACING.sm,
-      backgroundColor: C.accent,
-      borderRadius: RADIUS.xl,
-      paddingVertical: SPACING.lg,
-      marginTop: SPACING.lg,
-      ...SHADOWS.accent,
-    },
-    saveText: { ...TYPOGRAPHY.button, color: C.bg },
-  });
 }

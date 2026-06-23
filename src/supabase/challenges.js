@@ -18,7 +18,7 @@ export async function getActiveChallengeCount(userId) {
   const { count, error } = await supabase
     .from("challenges")
     .select("id", { count: "exact", head: true })
-    .eq("challenger_id", userId)
+    .eq("creator_id", userId)
     .eq("status", "active");
   if (error) throw error;
   return count ?? 0;

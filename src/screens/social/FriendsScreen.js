@@ -91,12 +91,12 @@ export default function FriendsScreen() {
 
   const respond = useCallback(async (id, accept) => {
     try {
-      await respondToRequest(id, accept);
+      await respondToRequest(id, accept, user?.id);
       load();
     } catch (e) {
       showAlert("Hata", e.message || "İşlem başarısız.");
     }
-  }, [load]);
+  }, [load, user?.id]);
 
   const remove = useCallback(async (friendshipId) => {
     H.warn();

@@ -59,7 +59,7 @@ function HistoryRow({ item, onPress, C }) {
           <Trend v={item.trend} size={11} />
         </View>
 
-        <Icon name="chevR" size={16} color={C.muted} />
+        <Icon name="chevR" size={16} color={C.sec} />
       </View>
     </Pressable>
   );

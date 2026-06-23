@@ -102,9 +102,9 @@ export function TodayPlanCard({
     return (
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
         <View style={{ alignItems: "center", paddingVertical: 20, gap: 8 }}>
-          <Icon name="clipboard" size={28} color={C.muted} />
+          <Icon name="clipboard" size={28} color={C.sec} />
           <Text style={[s.emptyTitle, { color: C.text }]}>Bugün planın boş</Text>
-          <Text style={[s.emptyMsg, { color: C.muted }]}>
+          <Text style={[s.emptyMsg, { color: C.sec }]}>
             Bir görev ekleyerek başla
           </Text>
           <Pressable

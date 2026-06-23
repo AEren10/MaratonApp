@@ -64,7 +64,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, onStreakPress, onCa
       </Pressable>
 
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.muted, letterSpacing: 0.2 }}>{g} {gEmoji}</Text>
+        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.sec, letterSpacing: 0.2 }}>{g} {gEmoji}</Text>
         <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: C.text, letterSpacing: -0.4, marginTop: 1 }} numberOfLines={1}>{name}</Text>
       </View>
 

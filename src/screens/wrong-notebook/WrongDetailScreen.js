@@ -87,7 +87,7 @@ export default function WrongDetailScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>
-          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
+          <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
             DETAYLAR
           </Text>
           <InfoRow icon="calendar" label="Tarih" value={date} styles={styles} C={C} />
@@ -95,7 +95,7 @@ export default function WrongDetailScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={styles.section}>
-          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
+          <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
             NOTLARIM
           </Text>
           <View style={styles.noteCard}>
@@ -107,7 +107,7 @@ export default function WrongDetailScreen() {
 
         {hasImage && (
           <Animated.View entering={FadeInDown.delay(300).duration(400).springify()} style={styles.section}>
-            <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
+            <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
               FOTOĞRAF
             </Text>
             <Pressable onPress={() => setPhotoZoom(true)}>

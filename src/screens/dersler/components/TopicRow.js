@@ -23,7 +23,7 @@ function AccBadge({ acc, q, subjectColor, C }) {
         alignItems: "center",
       }}
     >
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color, opacity: isDormant ? 0.5 : 1 }}>
+      <Text style={{ ...TYPOGRAPHY.captionMedium, color, opacity: isDormant ? 0.7 : 1 }}>
         {isDormant ? "—" : `%${acc}`}
       </Text>
     </View>
@@ -34,17 +34,17 @@ function MiniBar({ pct, color }) {
   return (
     <View
       style={{
-        width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: color + "20",
+        width: 56,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: color + "22",
       }}
     >
       <View
         style={{
-          width: `${Math.round(pct * 100)}%`,
-          height: 4,
-          borderRadius: 2,
+          width: `${Math.max(Math.round(pct * 100), 4)}%`,
+          height: 5,
+          borderRadius: 3,
           backgroundColor: color,
         }}
       />
@@ -84,7 +84,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
               width: 7,
               height: 7,
               borderRadius: 4,
-              backgroundColor: dotColor,
+              backgroundColor: dotColor || (color + "50"),
             }}
           />
         ) : null}

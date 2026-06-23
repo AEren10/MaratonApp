@@ -30,7 +30,8 @@ export async function sendFriendRequest(addresseeId) {
   return data;
 }
 
-export async function respondToRequest(friendshipId, accept) {
+export async function respondToRequest(friendshipId, accept, userId) {
+  if (!userId || !UUID_RE.test(userId)) throw new Error("Invalid userId");
   const { data, error } = await supabase
     .from("friendships")
     .update({
@@ -38,6 +39,7 @@ export async function respondToRequest(friendshipId, accept) {
       responded_at: new Date().toISOString(),
     })
     .eq("id", friendshipId)
+    .eq("addressee_id", userId)
     .select()
     .single();
   if (error) throw error;

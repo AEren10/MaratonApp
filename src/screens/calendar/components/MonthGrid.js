@@ -47,10 +47,10 @@ function completionLevel(data, dailyGoal) {
 
 const getCompletionColor = (C) => [
   "transparent",
-  C.amber + "30",
-  C.amber + "60",
-  C.green + "50",
-  C.green + "90",
+  C.amber + "44",
+  C.amber + "78",
+  C.green + "6A",
+  C.green + "A8",
 ];
 
 const makeStyles = (C) => ({
@@ -108,7 +108,7 @@ const makeStyles = (C) => ({
   },
 });
 
-export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80 }) {
+export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80, calendarTasks = {} }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const COMP_COLOR = useMemo(() => getCompletionColor(C), [C]);
@@ -132,6 +132,7 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal 
           const isSelected = selectedDay === iso;
           const today = isToday(d);
           const hasTrial = data?.trials?.length > 0;
+          const hasTask = calendarTasks[iso]?.length > 0;
           return (
             <Pressable
               key={i}
@@ -147,9 +148,10 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal 
               <Text style={[styles.dayText, isSelected && { color: C.bg }]}>
                 {d.getDate()}
               </Text>
-              {hasTrial && (
-                <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.teal }]} />
-              )}
+              <View style={{ position: "absolute", bottom: 4, flexDirection: "row", gap: 3 }}>
+                {hasTrial && <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.teal }]} />}
+                {hasTask && <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.accent }]} />}
+              </View>
             </Pressable>
           );
         })}

@@ -279,12 +279,12 @@ export default function AnalysisScreen() {
                     style={({ pressed }) => ({
                       flex: 1, alignItems: "center", gap: SPACING.sm,
                       padding: SPACING.lg, borderRadius: RADIUS.xxl,
-                      backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
+                      backgroundColor: C.blue + "12", borderWidth: 1, borderColor: C.blue + "25",
                       opacity: pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }],
                     })}
                   >
-                    <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="chart" size={18} color={C.sec} />
+                    <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.blue + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="chart" size={18} color={C.blue} />
                     </View>
                     <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, textAlign: "center" }}>Dönem Analizi</Text>
                   </Pressable>
@@ -354,10 +354,10 @@ export default function AnalysisScreen() {
                     accessibilityLabel="5dk Quiz"
                     accessibilityHint="Hızlı pratik quize gider"
                     onPress={() => navigation.navigate(SCREENS.QUICK_PRACTICE)}
-                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.green + "12", borderWidth: 1, borderColor: C.green + "25" }}
                   >
-                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="target" size={15} color={C.sec} />
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.green + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="target" size={15} color={C.green} />
                     </View>
                     <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>5dk Quiz</Text>
                   </Pressable>
@@ -366,10 +366,10 @@ export default function AnalysisScreen() {
                     accessibilityLabel="Simülasyon"
                     accessibilityHint="Sınav simülasyonuna gider"
                     onPress={() => navigation.navigate(SCREENS.EXAM_SIMULATOR)}
-                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }}
+                    style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.orange + "12", borderWidth: 1, borderColor: C.orange + "25" }}
                   >
-                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="clock" size={15} color={C.sec} />
+                    <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.orange + "20", alignItems: "center", justifyContent: "center" }}>
+                      <Icon name="clock" size={15} color={C.orange} />
                     </View>
                     <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Simülasyon</Text>
                   </Pressable>
@@ -413,8 +413,8 @@ function makeStyles(C) {
     content: { gap: SPACING.xl },
     fab: {
       position: "absolute",
-      bottom: 100,
-      right: SPACING.lg,
+      bottom: 90,
+      right: SPACING.md,
       flexDirection: "row",
       alignItems: "center",
       gap: SPACING.sm,

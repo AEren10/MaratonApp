@@ -82,7 +82,7 @@ export const COLORS = {
     borderLight:   "rgba(255, 255, 255, 0.14)",
 
     textPrimary:   "#F4F5F7",
-    textSecondary: "#9CA0AA",
+    textSecondary: "#B0B4BD",
     textMuted:     "#8E929B",
     textInverse:   "#0C0D11",
 

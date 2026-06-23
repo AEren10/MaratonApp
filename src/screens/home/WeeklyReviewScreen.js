@@ -70,7 +70,7 @@ export default function WeeklyReviewScreen() {
         <Animated.View entering={FadeInUp.delay(100)} style={[s.heroCard, { backgroundColor: C.accent + "10", borderColor: C.accent + "30" }]}>
           <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textTransform: "uppercase", letterSpacing: 0.5 }}>Bu Hafta</Text>
           <Text style={{ ...TYPOGRAPHY.stat, color: C.text, fontSize: 44, marginTop: 4 }}>{timeStr}</Text>
-          <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, marginTop: 4 }}>toplam çalışma süresi</Text>
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 4 }}>toplam çalışma süresi</Text>
           {report.hasPrev ? (
             <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
               <DeltaChip value={report.questionsDelta} label="soru" C={C} />
@@ -98,7 +98,7 @@ export default function WeeklyReviewScreen() {
                 </View>
               </View>
             </View>
-            <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, marginTop: 4 }}>Geçen haftaya göre</Text>
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 4 }}>Geçen haftaya göre</Text>
           </Animated.View>
         )}
 

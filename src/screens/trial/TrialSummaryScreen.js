@@ -163,7 +163,27 @@ export default function TrialSummaryScreen() {
           })}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(620)} style={st.actions}>
+        {totalWrong > 0 && (
+          <Animated.View entering={FadeInDown.delay(600)} style={{ width: "100%", marginTop: SPACING.lg }}>
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}
+              accessibilityRole="button"
+              accessibilityLabel="Yanlış defterine ekle"
+              style={({ pressed }) => [st.wrongBanner, { backgroundColor: C.red + "10", borderColor: C.red + "25", opacity: pressed ? 0.85 : 1 }]}
+            >
+              <View style={[st.wrongIcon, { backgroundColor: C.red + "1A" }]}>
+                <Icon name="x" size={18} color={C.red} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>{totalWrong} yanlış cevabın var</Text>
+                <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 1 }}>Yanlış defterine ekleyerek tekrar çalış</Text>
+              </View>
+              <Icon name="arrowR" size={16} color={C.red} />
+            </Pressable>
+          </Animated.View>
+        )}
+
+        <Animated.View entering={FadeInDown.delay(totalWrong > 0 ? 700 : 620)} style={st.actions}>
           <Pressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={({ pressed }) => [st.shareBtn, { backgroundColor: C.surface, borderColor: C.border, opacity: pressed ? 0.85 : 1 }]}>
             <Icon name="share" size={18} color={C.accent} />
             <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>Paylaş</Text>
@@ -218,5 +238,7 @@ const st = StyleSheet.create({
   actions: { flexDirection: "row", gap: 12, width: "100%", marginTop: SPACING.xxl },
   shareBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderRadius: RADIUS.xl, borderWidth: 1 },
   detailBtn: { flex: 1.4, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderRadius: RADIUS.xl, ...SHADOWS.card },
+  wrongBanner: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.md, borderRadius: RADIUS.xl, borderWidth: 1 },
+  wrongIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   offscreen: { position: "absolute", top: -9999, left: -9999 },
 });

@@ -38,7 +38,7 @@ export async function getSharedQuestions({ subject, limit = 20, offset = 0 } = {
   const { data, error } = await query;
   if (error) throw error;
 
-  return data.map((q) => ({
+  return (data || []).map((q) => ({
     ...q,
     profile: q.is_anonymous ? null : q.profiles,
     profiles: undefined,
@@ -89,7 +89,7 @@ export async function getAnswers(sharedQuestionId) {
     .order("created_at", { ascending: true });
   if (error) throw error;
 
-  return data.map((a) => ({
+  return (data || []).map((a) => ({
     ...a,
     profile: a.is_anonymous ? null : a.profiles,
     profiles: undefined,

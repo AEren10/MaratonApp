@@ -5,6 +5,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../trial/trialTypes";
+import { DayTasks } from "./DayTasks";
 
 function formatDay(iso) {
   return new Date(iso).toLocaleDateString("tr-TR", {
@@ -65,7 +66,7 @@ const makeStyles = (C) => ({
   },
   section: {
     ...TYPOGRAPHY.label,
-    color: C.muted,
+    color: C.sec,
     marginBottom: SPACING.sm,
   },
   row: {
@@ -101,38 +102,35 @@ const makeStyles = (C) => ({
   },
 });
 
-export function DayDetails({ day, data, onTrialPress }) {
+export function DayDetails({ day, data, onTrialPress, calendarTasks = [], onAddTask, onToggleTask, onRemoveTask }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const label = formatDay(day);
 
-  if (!data || (data.logs.length === 0 && data.trials.length === 0)) {
-    return (
-      <View style={styles.card}>
-        <Text style={styles.dayLabel}>{label}</Text>
-        <View style={styles.empty}>
-          <Icon name="moon" size={28} color={C.muted} />
-          <Text style={styles.emptyText}>Bu gün dinlenme günü olmuş</Text>
-        </View>
-      </View>
-    );
-  }
+  const hasStudy = data && (data.logs.length > 0 || data.trials.length > 0);
 
   return (
     <View style={styles.card}>
       <Text style={styles.dayLabel}>{label}</Text>
-      {data.trials.length > 0 && (
+      {!hasStudy && calendarTasks.length === 0 && (
+        <View style={styles.empty}>
+          <Icon name="moon" size={28} color={C.muted} />
+          <Text style={styles.emptyText}>Bu gün dinlenme günü olmuş</Text>
+        </View>
+      )}
+      {data?.trials?.length > 0 && (
         <View style={{ marginTop: SPACING.md }}>
           <Text style={styles.section}>DENEMELER</Text>
           {data.trials.map((t) => <TrialRow key={t.id} trial={t} C={C} s={styles} onPress={onTrialPress} />)}
         </View>
       )}
-      {data.logs.length > 0 && (
+      {data?.logs?.length > 0 && (
         <View style={{ marginTop: SPACING.md }}>
           <Text style={styles.section}>ÇALIŞMALAR</Text>
           {data.logs.map((l) => <LogRow key={l.id} log={l} C={C} s={styles} />)}
         </View>
       )}
+      <DayTasks date={day} tasks={calendarTasks} onAdd={onAddTask} onToggle={onToggleTask} onRemove={onRemoveTask} />
     </View>
   );
 }

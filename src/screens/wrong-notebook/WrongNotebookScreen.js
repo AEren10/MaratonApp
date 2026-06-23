@@ -228,13 +228,14 @@ export default function WrongNotebookScreen() {
         </Pressable>
       </View>
 
-      {/* === Main tabs: Defterim | Topluluk (segment control) === */}
+      {/* === Main tabs: Topluluk | Defterim (segment control) === */}
       <View style={{ flexDirection: "row", marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, backgroundColor: C.surface2, borderRadius: RADIUS.lg, padding: 3 }}>
         {[
-          { key: "community", label: "Topluluk", icon: "globe", badge: true },
+          { key: "community", label: "Topluluk", icon: "globe", accentBg: true },
           { key: "mine", label: "Defterim", icon: "notebook" },
         ].map((t) => {
           const active = mainTab === t.key;
+          const isAccent = t.accentBg && active;
           return (
             <Pressable
               key={t.key}
@@ -245,19 +246,19 @@ export default function WrongNotebookScreen() {
               style={{
                 flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
                 gap: 6, paddingVertical: 10, borderRadius: RADIUS.md,
-                backgroundColor: active ? C.surface : "transparent",
+                backgroundColor: isAccent ? C.accent : active ? C.surface : "transparent",
                 ...(active ? SHADOWS.sm : {}),
               }}
             >
-              <Icon name={t.icon} size={16} color={active ? C.accent : C.muted} />
+              <Icon name={t.icon} size={16} color={isAccent ? "#FFF" : active ? C.accent : C.muted} />
               <Text style={{
                 fontFamily: active ? "Inter_700Bold" : "Inter_500Medium",
-                fontSize: 14, color: active ? C.text : C.muted,
+                fontSize: 14, color: isAccent ? "#FFF" : active ? C.text : C.muted,
               }}>
                 {t.label}
               </Text>
-              {t.badge && !active && (
-                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.accent, marginLeft: -2 }} />
+              {t.accentBg && !active && (
+                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.accent, marginLeft: -2 }} />
               )}
             </Pressable>
           );
@@ -268,6 +269,26 @@ export default function WrongNotebookScreen() {
         <CommunityTab visible={mainTab === "community"} onSwitchToMine={() => setMainTab("mine")} />
       ) : (
       <View style={{ flex: 1 }}>
+      {/* Community promo banner */}
+      {counts.open > 0 && (
+        <Pressable
+          onPress={() => { haptic.tap(); setMainTab("community"); }}
+          style={({ pressed }) => ({
+            flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+            marginHorizontal: SPACING.lg, marginBottom: SPACING.sm,
+            backgroundColor: C.accent + "12", borderRadius: RADIUS.lg,
+            padding: SPACING.md, borderWidth: 1, borderColor: C.accent + "25",
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <Icon name="globe" size={18} color={C.accent} />
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.text, flex: 1 }}>
+            Yanlışlarını paylaş, diğer adaylardan çözüm önerisi al
+          </Text>
+          <Icon name="chevR" size={14} color={C.accent} />
+        </Pressable>
+      )}
+
       {/* === Status filter pills (Çözülmemiş / Çözüldü / Tümü) === */}
       <View style={s.statusTabs}>
         {[

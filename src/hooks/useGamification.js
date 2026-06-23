@@ -31,21 +31,24 @@ export function useGamification() {
   const statsRef = useRef(stats);
   const badgeIdsRef = useRef(badgeIds);
   const levelRef = useRef(level);
+  const totalXPRef = useRef(totalXP);
   statsRef.current = stats;
   badgeIdsRef.current = badgeIds;
   levelRef.current = level;
+  totalXPRef.current = totalXP;
 
   const reward = useCallback(
     (action, data = {}) => {
       const amount = calculateXP(action, data);
       if (amount <= 0) return;
 
-      const prevLevel = getLevelForXP(totalXP);
+      const currentXP = totalXPRef.current;
+      const prevLevel = getLevelForXP(currentXP);
       dispatch(earnXP({ amount }));
       logXP(user?.id, amount, action);
       setXpToast({ visible: true, amount });
 
-      const newLevel = getLevelForXP(totalXP + amount);
+      const newLevel = getLevelForXP(currentXP + amount);
       if (newLevel.level > prevLevel.level) {
         clearTimeout(levelUpTimerRef.current);
         levelUpTimerRef.current = setTimeout(() => setLevelUpModal({ visible: true, level: newLevel.level, title: newLevel.title }), 3000);
@@ -75,6 +78,20 @@ export function useGamification() {
     [dispatch, user?.id],
   );
 
+  const syncStat = useCallback(
+    (key, value) => {
+      dispatch(setMaxStat({ key, value }));
+      const updatedStats = { ...statsRef.current, [key]: Math.max(statsRef.current[key] || 0, value), level: levelRef.current.level };
+      const newBadges = checkBadgeUnlocks(updatedStats, badgeIdsRef.current);
+      if (newBadges.length > 0) {
+        newBadges.forEach((b) => dispatch(unlockBadge({ badgeId: b.id })));
+        clearTimeout(badgeTimerRef.current);
+        badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
+      }
+    },
+    [dispatch],
+  );
+
   useEffect(() => () => {
     clearTimeout(badgeTimerRef.current);
     clearTimeout(levelUpTimerRef.current);
@@ -84,5 +101,5 @@ export function useGamification() {
   const dismissBadge = useCallback(() => setBadgeModal({ visible: false, badge: null }), []);
   const dismissLevelUp = useCallback(() => setLevelUpModal({ visible: false, level: 0, title: "" }), []);
 
-  return { reward, xpToast, dismissXP, badgeModal, dismissBadge, levelUpModal, dismissLevelUp, level };
+  return { reward, syncStat, xpToast, dismissXP, badgeModal, dismissBadge, levelUpModal, dismissLevelUp, level };
 }

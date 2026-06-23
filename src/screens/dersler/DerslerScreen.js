@@ -142,7 +142,7 @@ function SectionHeader({ label, color, icon, count, topicCount, C }) {
         <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
           {label}
         </Text>
-        <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>
           {count} ders · {topicCount} konu
         </Text>
       </View>
@@ -159,56 +159,57 @@ function SectionHeader({ label, color, icon, count, topicCount, C }) {
 
 function PageHeader({ totalDone, totalAll, C, onTopicCards, onPlan }) {
   return (
-    <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.xl }}>
+    <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.md }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ ...TYPOGRAPHY.heading, color: C.text }}>Dersler</Text>
-        <View style={{ flexDirection: "row", gap: SPACING.sm }}>
-          <Pressable
-            onPress={onPlan}
-            style={({ pressed }) => ({
-              flexDirection: "row", alignItems: "center", gap: 6,
-              backgroundColor: C.accent + "15", borderRadius: RADIUS.lg,
-              paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Icon name="layers" size={14} color={C.accent} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Günlük Plan</Text>
-          </Pressable>
-          <Pressable
-            onPress={onTopicCards}
-            style={({ pressed }) => ({
-              flexDirection: "row", alignItems: "center", gap: 6,
-              backgroundColor: C.surface, borderRadius: RADIUS.lg,
-              paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-              borderWidth: 1, borderColor: C.border,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Icon name="hash" size={14} color={C.sec} />
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Kartlar</Text>
-          </Pressable>
-        </View>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginTop: SPACING.xs,
-        }}
-      >
-        <Icon name="layers" size={14} color={C.sec} sw={1.5} />
-        <Text
-          style={{
-            ...TYPOGRAPHY.caption,
-            color: C.sec,
-            marginLeft: SPACING.xs,
-          }}
+        <Pressable
+          onPress={onTopicCards}
+          style={({ pressed }) => ({
+            flexDirection: "row", alignItems: "center", gap: 6,
+            backgroundColor: C.surface, borderRadius: RADIUS.lg,
+            paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+            borderWidth: 1, borderColor: C.border,
+            opacity: pressed ? 0.7 : 1,
+          })}
         >
+          <Icon name="hash" size={14} color={C.sec} />
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Kartlar</Text>
+        </Pressable>
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "center", marginTop: SPACING.xs }}>
+        <Icon name="layers" size={14} color={C.sec} sw={1.5} />
+        <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginLeft: SPACING.xs }}>
           {totalDone}/{totalAll} konu tamamlandı
         </Text>
       </View>
     </View>
+  );
+}
+
+function PlanBanner({ C, onPress }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: "row", alignItems: "center",
+        backgroundColor: C.accent + "18", borderRadius: RADIUS.xl,
+        padding: SPACING.md, marginBottom: SPACING.lg,
+        borderWidth: 1, borderColor: C.accent + "30",
+        opacity: pressed ? 0.85 : 1,
+      })}
+    >
+      <View style={{
+        width: 40, height: 40, borderRadius: 14,
+        backgroundColor: C.accent, alignItems: "center", justifyContent: "center",
+      }}>
+        <Icon name="layers" size={20} color="#FFF" />
+      </View>
+      <View style={{ flex: 1, marginLeft: SPACING.md }}>
+        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Günlük Plan</Text>
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 2 }}>Bugün hangi konuları çalışacağını gör</Text>
+      </View>
+      <Icon name="chevR" size={16} color={C.accent} />
+    </Pressable>
   );
 }
 
@@ -300,7 +301,8 @@ export default function DerslerScreen() {
           />
         }
       >
-        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} onPlan={() => navigation.navigate(SCREENS.PLAN_DETAIL)} onTopicCards={() => navigation.navigate(SCREENS.TOPIC_CARDS)} />
+        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} onTopicCards={() => navigation.navigate(SCREENS.TOPIC_CARDS)} />
+        <PlanBanner C={C} onPress={() => navigation.navigate(SCREENS.PLAN_DETAIL)} />
 
         {hasTyt && hasAyt && (
           <ExamBadge label={group1Label} color={C.amber} count={tytData.dersler.length} C={C} />
@@ -396,7 +398,7 @@ function ExamBadge({ label, color, count, C }) {
           {label}
         </Text>
       </View>
-      <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>
+      <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>
         {count} ders
       </Text>
       <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />

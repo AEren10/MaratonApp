@@ -87,14 +87,14 @@ export default function NetForecastScreen() {
               <GlassCard radius={RADIUS.xxl} style={{ marginTop: SPACING.lg, padding: SPACING.lg }}>
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                   <View>
-                    <Text style={{ ...TYPOGRAPHY.label, color: C.muted, letterSpacing: 0.6 }}>TAHMİNİ SIRALAMA</Text>
+                    <Text style={{ ...TYPOGRAPHY.label, color: C.sec, letterSpacing: 0.6 }}>TAHMİNİ SIRALAMA</Text>
                     <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.accent, marginTop: SPACING.xs }}>
                       ~{fmt(projectedRank)}
                     </Text>
                   </View>
                   {currentRank && (
                     <View style={{ alignItems: "flex-end" }}>
-                      <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>Şu anki</Text>
+                      <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Şu anki</Text>
                       <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.sec }}>
                         ~{fmt(currentRank)}
                       </Text>

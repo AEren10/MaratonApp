@@ -29,7 +29,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await supaSignOut();
+    try {
+      await supaSignOut();
+    } catch (_) {}
+    setSession(null);
+    setUser(null);
   }, []);
 
   const deleteAccount = useCallback(async () => {

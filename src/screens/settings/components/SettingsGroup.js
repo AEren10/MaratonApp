@@ -22,7 +22,7 @@ const makeStyles = (C) => ({
   },
   title: {
     ...TYPOGRAPHY.label,
-    color: C.muted,
+    color: C.sec,
     marginBottom: SPACING.sm,
     marginLeft: SPACING.xs,
   },
