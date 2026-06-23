@@ -23,7 +23,7 @@ const CardItem = React.memo(function CardItem({ item, onPress, styles, C }) {
       <View style={{ flex: 1 }}>
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{item.title}</Text>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 2 }]}>
-          {item.mastered}/{item.count} ogrenildi
+          {item.mastered}/{item.count} öğrenildi
         </Text>
       </View>
       <View style={{ alignItems: "flex-end", gap: 4 }}>
@@ -79,7 +79,7 @@ export default function TopicCardsScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
-          Konu Kartlari
+          Konu Kartları
         </Text>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>
           {cards.length} konu

@@ -154,7 +154,7 @@ export default function ProfileScreen() {
           <ProfileHeader
             name={displayName}
             exam={examLabel}
-            league={totalXP >= 10000 ? { name: "Obsidyen Lig", icon: "crown" } : totalXP >= 5000 ? { name: "Elmas Lig", icon: "award" } : totalXP >= 2000 ? { name: "Altin Lig", icon: "trophy" } : totalXP >= 500 ? { name: "Gumus Lig", icon: "medal" } : { name: "Bronz Lig", icon: "medal" }}
+            league={totalXP >= 10000 ? { name: "Obsidyen Lig", icon: "crown" } : totalXP >= 5000 ? { name: "Elmas Lig", icon: "award" } : totalXP >= 2000 ? { name: "Altın Lig", icon: "trophy" } : totalXP >= 500 ? { name: "Gümüş Lig", icon: "medal" } : { name: "Bronz Lig", icon: "medal" }}
             countdown={daysUntilExam}
           />
         </AnimatedCard>

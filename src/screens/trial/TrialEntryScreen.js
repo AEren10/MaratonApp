@@ -155,7 +155,7 @@ export default function TrialEntryScreen() {
     }
     if (trialType === "BRANCH" && !branchSubject) {
       H.warn();
-      showAlert("Ders sec", "Branş denemesi için bir ders seçmelisin.");
+      showAlert("Ders seç", "Branş denemesi için bir ders seçmelisin.");
       return;
     }
 

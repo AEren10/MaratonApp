@@ -61,7 +61,7 @@ export function SubjectBars({ bars, onBarPress }) {
   const C = useC();
   return (
     <View style={{ gap: SPACING.md }}>
-      <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Ders Bazli</Text>
+      <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Ders Bazlı</Text>
       <GlassCard
         radius={24}
         style={{

@@ -28,7 +28,7 @@ export default function ForgotPasswordScreen() {
 
   const submit = async () => {
     if (!email.includes("@")) {
-      setError("Gecerli bir e-posta gir");
+      setError("Geçerli bir e-posta gir");
       return;
     }
     setError("");
@@ -66,9 +66,9 @@ export default function ForgotPasswordScreen() {
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
-            <Text style={s.title}>Sifreni Sifirla</Text>
+            <Text style={s.title}>Şifreni Sıfırla</Text>
             <Text style={s.subtitle}>
-              E-posta adresini gir, sifre sifirlama baglantisi gonderelim.
+              E-posta adresini gir, şifre sıfırlama bağlantısı gönderelim.
             </Text>
           </Animated.View>
 
@@ -77,7 +77,7 @@ export default function ForgotPasswordScreen() {
               <View style={s.successBox}>
                 <Icon name="checkCircle" size={28} color={C.green} />
                 <Text style={s.successText}>
-                  E-posta gonderildi! Gelen kutunu kontrol et.
+                  E-posta gönderildi! Gelen kutunu kontrol et.
                 </Text>
               </View>
             </Animated.View>
@@ -103,7 +103,7 @@ export default function ForgotPasswordScreen() {
                   ]}
                 >
                   <Text style={s.btnText}>
-                    {busy ? "Gonderiliyor..." : "Sifirlama Linki Gonder"}
+                    {busy ? "Gönderiliyor..." : "Sıfırlama Linki Gönder"}
                   </Text>
                 </Pressable>
               </Animated.View>

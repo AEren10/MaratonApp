@@ -71,7 +71,7 @@ export function HistoryList({ history, onPress, onCompare }) {
     <View style={{ gap: SPACING.md }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
         <Icon name="clock" size={18} color={C.sec} />
-        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Gecmis Denemeler</Text>
+        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Geçmiş Denemeler</Text>
       </View>
 
       <GlassCard radius={RADIUS.xxl}>

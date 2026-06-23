@@ -7,7 +7,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
 const INFO_ROWS = [
-  { label: "Gelistirici", value: "Maraton Team" },
+  { label: "Geliştirici", value: "Maraton Team" },
   { label: "E-posta", value: "destek@maraton.app" },
   { label: "Web", value: "maraton.app" },
 ];
@@ -24,7 +24,7 @@ export default function AboutScreen() {
         <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={s.headerTitle}>Hakkinda</Text>
+        <Text style={s.headerTitle}>Hakkında</Text>
         <View style={{ width: 22 }} />
       </View>
 
@@ -48,7 +48,7 @@ export default function AboutScreen() {
         ))}
       </View>
 
-      <Text style={s.footer}>React Native ile yapildi</Text>
+      <Text style={s.footer}>React Native ile yapıldı</Text>
     </SafeAreaView>
   );
 }

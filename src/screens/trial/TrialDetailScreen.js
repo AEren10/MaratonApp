@@ -285,7 +285,7 @@ export default function TrialDetailScreen() {
 
         <Animated.View entering={FadeInDown.delay(240).duration(420).springify()} style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-            DERS BAZLI SONUCLAR
+            DERS BAZLI SONUÇLAR
           </Text>
           {bars.map((b) => (
             <SubjectRow key={b.key} name={b.name} color={b.c} net={b.net} max={b.max} percentile={percentiles[b.key]?.percentile} styles={styles} C={C} />
@@ -295,7 +295,7 @@ export default function TrialDetailScreen() {
         {history.length > 1 && (
           <Animated.View entering={FadeInDown.delay(310).duration(420).springify()} style={styles.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-              GECMIS {typeMeta?.label.toUpperCase() || ""} DENEMELERI
+              GEÇMİŞ {typeMeta?.label.toUpperCase() || ""} DENEMELERI
             </Text>
             {history.map((h, i) => (
               <View key={i} style={styles.histRow}>

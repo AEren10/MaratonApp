@@ -167,8 +167,8 @@ export function getSubjectsForType(C, typeCode, branchSubjectKey = null) {
 }
 
 export function getFieldFromType(typeCode) {
-  if (typeCode === "AYT_SAY") return "Sayisal";
-  if (typeCode === "AYT_EA") return "Esit Agirlik";
-  if (typeCode === "AYT_SOZ") return "Sozel";
+  if (typeCode === "AYT_SAY") return "Sayısal";
+  if (typeCode === "AYT_EA") return "Eşit Ağırlık";
+  if (typeCode === "AYT_SOZ") return "Sözel";
   return null;
 }

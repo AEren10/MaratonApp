@@ -82,8 +82,8 @@ export default function WrongDetailScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={styles.answersRow}>
-          <AnswerBadge label="Benim cevabim" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
-          <AnswerBadge label="Dogru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
+          <AnswerBadge label="Benim cevabım" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
+          <AnswerBadge label="Doğru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>

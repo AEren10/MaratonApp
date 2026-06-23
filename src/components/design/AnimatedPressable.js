@@ -35,7 +35,7 @@ export function AnimatedPressable({
     transform: [{ scale: scale.value }],
   }));
 
-  return (
+  const pressable = (
     <ReanimatedPressable
       onPress={(e) => {
         if (haptic && HAPTIC_FN[haptic]) HAPTIC_FN[haptic]();
@@ -50,12 +50,20 @@ export function AnimatedPressable({
         onPressOut?.(e);
       }}
       disabled={disabled}
-      entering={entering}
-      exiting={exiting}
       style={[animStyle, style]}
       {...rest}
     >
       {children}
     </ReanimatedPressable>
   );
+
+  if (entering || exiting) {
+    return (
+      <Animated.View entering={entering} exiting={exiting}>
+        {pressable}
+      </Animated.View>
+    );
+  }
+
+  return pressable;
 }

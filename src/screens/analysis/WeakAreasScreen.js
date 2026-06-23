@@ -92,7 +92,7 @@ export default function WeakAreasScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
-          Zayif Alanlar
+          Zayıf Alanlar
         </Text>
       </View>
 
@@ -108,14 +108,14 @@ export default function WeakAreasScreen() {
           weakTopics.length > 0 ? (
             <View style={s.footer}>
               <Icon name="alert" size={16} color={C.accent} />
-              <Text style={s.footerText}>{weakTopics.length} zayif alan tespit edildi</Text>
+              <Text style={s.footerText}>{weakTopics.length} zayıf alan tespit edildi</Text>
             </View>
           ) : null
         }
         ListEmptyComponent={
           <View style={s.empty}>
             <Icon name="check" size={40} color={C.green} />
-            <Text style={s.emptyText}>Zayif alan bulunamadi</Text>
+            <Text style={s.emptyText}>Zayıf alan bulunamadı</Text>
           </View>
         }
       />

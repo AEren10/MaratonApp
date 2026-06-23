@@ -89,7 +89,7 @@ export default function TrialCompareScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Pressable onPress={goBack} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karsilastirma</Text>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karşılaştırma</Text>
       </View>
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Icon name="chart" size={40} color={C.muted} />
@@ -102,7 +102,7 @@ export default function TrialCompareScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Pressable onPress={goBack} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karsilastirma</Text>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karşılaştırma</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -127,15 +127,15 @@ export default function TrialCompareScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(170).duration(420).springify()} style={styles.totalDiff}>
-          <Text style={[TYPOGRAPHY.caption, { color: C.sec }]}>Toplam degisim</Text>
+          <Text style={[TYPOGRAPHY.caption, { color: C.sec }]}>Toplam değişim</Text>
           <View style={styles.totalRow}>
             <Text style={[TYPOGRAPHY.stat, { color: diff >= 0 ? C.green : C.red }]}>{diff.toFixed(1)}</Text>
-            <Chip color={diff >= 0 ? C.green : C.red}>{diff >= 0 ? "Artis" : "Dusus"}</Chip>
+            <Chip color={diff >= 0 ? C.green : C.red}>{diff >= 0 ? "Artış" : "Düşüş"}</Chip>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(240).duration(420).springify()}>
-          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>DERS BAZLI KARSILASTIRMA</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>DERS BAZLI KARŞILAŞTIRMA</Text>
           {subjectPairs.map((s) => (
             <CompareBar key={s.key} label={s.name} v1={s.v1} v2={s.v2} max={s.max} color={s.c} styles={styles} C={C} />
           ))}

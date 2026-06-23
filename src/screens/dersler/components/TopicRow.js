@@ -105,7 +105,7 @@ export const TopicRow = React.memo(function TopicRow({ topic, color, subject }) 
           </Text>
           {topic.wrong ? (
             <Text style={{ ...TYPOGRAPHY.micro, color: C.red, marginLeft: 8 }}>
-              {topic.wrong} yanlis
+              {topic.wrong} yanlış
             </Text>
           ) : null}
         </View>
