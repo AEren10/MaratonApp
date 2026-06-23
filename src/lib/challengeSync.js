@@ -12,7 +12,7 @@ export async function syncChallengeProgress(userId, { questions = 0, minutes = 0
         const side = c.creator_id === userId ? "creator" : "opponent";
         const value =
           c.metric === "questions" ? questions :
-          c.metric === "minutes" ? minutes : 0;
+          c.metric === "study_minutes" ? minutes : 0;
         if (value <= 0) return null;
         return bumpMyProgress(c.id, side, value).catch(() => null);
       })

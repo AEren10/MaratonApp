@@ -12,10 +12,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import {
   listFriends,
   listIncomingRequests,
+  listOutgoingRequests,
   searchUsers,
   sendFriendRequest,
   respondToRequest,
   unfriend,
+  cancelRequest,
 } from "../../supabase/friends";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
@@ -41,6 +43,7 @@ export default function FriendsScreen() {
   const showAlert = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [outgoing, setOutgoing] = useState([]);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,9 +55,10 @@ export default function FriendsScreen() {
       return;
     }
     try {
-      const [f, r] = await Promise.all([listFriends(user.id), listIncomingRequests(user.id)]);
+      const [f, r, o] = await Promise.all([listFriends(user.id), listIncomingRequests(user.id), listOutgoingRequests(user.id)]);
       setFriends(f);
       setRequests(r);
+      setOutgoing(o);
     } catch (_) {}
     setLoading(false);
   }, [user?.id]);
@@ -78,16 +82,30 @@ export default function FriendsScreen() {
     return () => { cancelled = true; clearTimeout(t); };
   }, [query, user?.id]);
 
+  const friendIds = useMemo(() => new Set(friends.map((f) => f.id)), [friends]);
+  const outgoingIds = useMemo(() => new Set(outgoing.map((o) => o.addressee?.id).filter(Boolean)), [outgoing]);
+  const incomingIds = useMemo(() => new Set(requests.map((r) => r.requester?.id).filter(Boolean)), [requests]);
+
   const addFriend = useCallback(async (targetId) => {
     try {
       await sendFriendRequest(targetId);
       H.success();
       showAlert("İstek gönderildi", "Arkadaşlık isteğin iletildi.");
-      setSearchResults((prev) => prev.filter((u) => u.id !== targetId));
+      load();
     } catch (e) {
       showAlert("Hata", e.message || "İstek gönderilemedi.");
     }
-  }, []);
+  }, [load]);
+
+  const cancelOutgoing = useCallback(async (friendshipId) => {
+    try {
+      await cancelRequest(friendshipId, user?.id);
+      H.select();
+      load();
+    } catch (e) {
+      showAlert("Hata", e.message || "İşlem başarısız.");
+    }
+  }, [load, user?.id]);
 
   const respond = useCallback(async (id, accept) => {
     try {
@@ -143,21 +161,31 @@ export default function FriendsScreen() {
           <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
             <Text style={s.sectionLabel}>ARAMA SONUÇLARI</Text>
             <View style={s.card}>
-              {searchResults.map((u) => (
-                <FriendRow
-                  key={u.id}
-                  user={u}
-                  action={
-                    <Pressable
-                      onPress={() => addFriend(u.id)}
-                      style={s.actionBtn}
-                    >
-                      <Icon name="plus" size={14} color={C.accent} />
-                      <Text style={{ ...TYPOGRAPHY.micro, color: C.accent }}>Ekle</Text>
-                    </Pressable>
-                  }
-                />
-              ))}
+              {searchResults.map((u) => {
+                const isFriend = friendIds.has(u.id);
+                const isPending = outgoingIds.has(u.id);
+                const isIncoming = incomingIds.has(u.id);
+                return (
+                  <FriendRow
+                    key={u.id}
+                    user={u}
+                    action={
+                      isFriend ? (
+                        <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>Arkadaş</Text>
+                      ) : isPending ? (
+                        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>Gönderildi</Text>
+                      ) : isIncoming ? (
+                        <Text style={{ ...TYPOGRAPHY.micro, color: C.green }}>İstek var</Text>
+                      ) : (
+                        <Pressable onPress={() => addFriend(u.id)} style={s.actionBtn}>
+                          <Icon name="plus" size={14} color={C.accent} />
+                          <Text style={{ ...TYPOGRAPHY.micro, color: C.accent }}>Ekle</Text>
+                        </Pressable>
+                      )
+                    }
+                  />
+                );
+              })}
             </View>
           </Animated.View>
         )}
@@ -168,7 +196,7 @@ export default function FriendsScreen() {
           <>
             {requests.length > 0 && (
               <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
-                <Text style={s.sectionLabel}>İSTEKLER ({requests.length})</Text>
+                <Text style={s.sectionLabel}>GELEN İSTEKLER ({requests.length})</Text>
                 <View style={s.card}>
                   {requests.map((r) => (
                     <FriendRow
@@ -183,6 +211,26 @@ export default function FriendsScreen() {
                             <Icon name="x" size={14} color={C.red} />
                           </Pressable>
                         </View>
+                      }
+                    />
+                  ))}
+                </View>
+              </Animated.View>
+            )}
+
+            {outgoing.length > 0 && (
+              <Animated.View entering={FadeInDown.delay(150).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+                <Text style={s.sectionLabel}>GÖNDERİLEN İSTEKLER ({outgoing.length})</Text>
+                <View style={s.card}>
+                  {outgoing.map((o) => (
+                    <FriendRow
+                      key={o.id}
+                      user={o.addressee}
+                      action={
+                        <Pressable onPress={() => cancelOutgoing(o.id)} style={[s.actionBtn, { backgroundColor: C.red + "15" }]}>
+                          <Icon name="x" size={14} color={C.red} />
+                          <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal</Text>
+                        </Pressable>
                       }
                     />
                   ))}

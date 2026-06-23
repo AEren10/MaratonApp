@@ -18,8 +18,7 @@ import * as H from "../../lib/haptics";
 
 const METRICS = [
   { key: "questions", label: "Soru Sayısı", icon: "hash", targets: [100, 250, 500] },
-  { key: "minutes", label: "Çalışma Süresi (dk)", icon: "clock", targets: [120, 300, 600] },
-  { key: "streak", label: "Streak (gün)", icon: "flame", targets: [3, 7, 14] },
+  { key: "study_minutes", label: "Çalışma Süresi (dk)", icon: "clock", targets: [120, 300, 600] },
 ];
 
 export default function ChallengeScreen() {
@@ -173,7 +172,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   const [expanded, setExpanded] = useState(false);
-  const daysLeft = item.ends_at ? Math.max(0, Math.ceil((new Date(item.ends_at) - Date.now()) / 86400000)) : null;
+  const daysLeft = item.ends_on ? Math.max(0, Math.ceil((new Date(item.ends_on) - Date.now()) / 86400000)) : null;
   return (
     <Pressable
       onPress={() => { H.select(); setExpanded((v) => !v); }}

@@ -28,6 +28,8 @@ export function useWeeklyReport() {
   const { user } = useAuth();
   const trials = useSelector(selectTrials);
   const [logs, setLogs] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const todayKey = toIso(new Date());
   const weekStart = useMemo(() => startOfWeek(), [todayKey]);
@@ -43,9 +45,10 @@ export function useWeeklyReport() {
       .then((data) => {
         if (!cancelled) setLogs(data || []);
       })
-      .catch(() => {
-        if (!cancelled) setLogs([]);
-      });
+      .catch((e) => {
+        if (!cancelled) { setLogs([]); setError(e); }
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [user?.id, weekStart, weekEnd]);
 
@@ -64,7 +67,7 @@ export function useWeeklyReport() {
     return () => { cancelled = true; };
   }, [user?.id, weekStart]);
 
-  return useMemo(() => {
+  const data = useMemo(() => {
     const weekTrials = trials.filter((t) => {
       const d = new Date(t.date);
       return d >= weekStart && d <= weekEnd;
@@ -134,4 +137,6 @@ export function useWeeklyReport() {
       dailyHeatmap,
     };
   }, [logs, prevLogs, trials, weekStart, weekEnd]);
+
+  return { ...data, error, loading };
 }

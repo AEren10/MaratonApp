@@ -21,6 +21,7 @@ import { getStreak, updateStreak } from "../../supabase/streaks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
+import { STORAGE_KEYS } from "../../constants/storageKeys";
 import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
@@ -137,7 +138,7 @@ export default function AddStudyScreen() {
         try {
           await updateStreak(user.id, updates);
         } catch (_) {
-          AsyncStorage.setItem("@maraton:pending_streak", JSON.stringify({ userId: user.id, updates })).catch(() => {});
+          AsyncStorage.setItem(STORAGE_KEYS.PENDING_STREAK, JSON.stringify({ userId: user.id, updates })).catch(() => {});
         }
         if (usedFreeze) showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
       } catch (e) { __DEV__ && console.warn("streak update failed:", e); }

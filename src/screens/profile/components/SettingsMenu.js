@@ -4,13 +4,18 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
+import { usePremium } from "../../../contexts/PremiumContext";
 
-function MenuRow({ item, isLast, onNavigate, C }) {
+function MenuRow({ item, isLast, onNavigate, onGated, C }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={item.label}
-      onPress={() => item.route && onNavigate?.(item.route)}
+      onPress={() => {
+        if (!item.route) return;
+        if (item.premiumKey && onGated) { onGated(item.premiumKey, item.route); return; }
+        onNavigate?.(item.route);
+      }}
       style={({ pressed }) => ({
         flexDirection: "row",
         alignItems: "center",
@@ -39,6 +44,7 @@ function MenuRow({ item, isLast, onNavigate, C }) {
 
 export function SettingsMenu({ onNavigate, onLogout }) {
   const C = useC();
+  const { checkFeature, showPaywall } = usePremium();
   const SECTIONS = useMemo(() => [
     {
       title: "HESAP",
@@ -54,8 +60,8 @@ export function SettingsMenu({ onNavigate, onLogout }) {
         { icon: "target",   label: "Hedeflerim",       route: SCREENS.GOALS,           color: C.green },
         { icon: "clock",    label: "Çalışma Geçmişi",  route: SCREENS.STUDY_LOG,       color: C.blue },
         { icon: "hash",     label: "Konu Kartları",     route: SCREENS.TOPIC_CARDS,     color: C.brandLight },
-        { icon: "chart",    label: "Net Simülatörü",    route: SCREENS.RANK_SIMULATOR,  color: C.pink },
-        { icon: "layers",   label: "Yol Haritası",      route: SCREENS.ROADMAP,         color: C.teal },
+        { icon: "chart",    label: "Net Simülatörü",    route: SCREENS.RANK_SIMULATOR,  color: C.pink,  premiumKey: "rank_simulator" },
+        { icon: "layers",   label: "Yol Haritası",      route: SCREENS.ROADMAP,         color: C.teal,  premiumKey: "detailed_roadmap" },
         { icon: "calendar", label: "Takvim",            route: SCREENS.CALENDAR,        color: C.amber },
       ],
     },
@@ -92,6 +98,9 @@ export function SettingsMenu({ onNavigate, onLogout }) {
                 item={item}
                 isLast={i === section.items.length - 1}
                 onNavigate={onNavigate}
+                onGated={(key, route) => {
+                  if (checkFeature(key)) { onNavigate?.(route); } else { showPaywall(); }
+                }}
                 C={C}
               />
             ))}

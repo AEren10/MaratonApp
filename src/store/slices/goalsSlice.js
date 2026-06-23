@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../../constants/storageKeys";
 
-const STORAGE_KEY = "@maraton:goals";
+const STORAGE_KEY = STORAGE_KEYS.GOALS;
 
 const initialState = {
   dailyQuestions: 80,

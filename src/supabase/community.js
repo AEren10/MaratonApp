@@ -1,4 +1,5 @@
 import { supabase } from "./client";
+import { handleSupabaseError } from "./handleError";
 
 function guessExt(uri) {
   const m = uri.match(/\.(jpg|jpeg|png|webp|heic|gif)(?:\?.*)?$/i);
@@ -14,35 +15,45 @@ function mimeFor(ext) {
 }
 
 async function uploadAnswerImage(userId, uri) {
-  const ext = guessExt(uri);
-  const path = `${userId}/${Date.now()}.${ext}`;
-  const res = await fetch(uri);
-  if (!res.ok) throw new Error("Görsel yüklenemedi");
-  const buffer = await res.arrayBuffer();
-  const { data, error } = await supabase.storage
-    .from("community-answers")
-    .upload(path, buffer, { contentType: mimeFor(ext), upsert: true });
-  if (error) throw error;
-  return data.path;
+  try {
+    const ext = guessExt(uri);
+    const path = `${userId}/${Date.now()}.${ext}`;
+    const res = await fetch(uri);
+    if (!res.ok) throw new Error("Görsel yüklenemedi");
+    const buffer = await res.arrayBuffer();
+    const { data, error } = await supabase.storage
+      .from("community-answers")
+      .upload(path, buffer, { contentType: mimeFor(ext), upsert: true });
+    if (error) throw error;
+    return data?.path ?? null;
+  } catch (e) {
+    handleSupabaseError(e, "uploadAnswerImage");
+    throw e;
+  }
 }
 
 export async function getSharedQuestions({ subject, limit = 20, offset = 0 } = {}) {
-  let query = supabase
-    .from("shared_questions")
-    .select("*, profiles:shared_questions_user_id_profiles_fkey(name, avatar_url)")
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+  try {
+    let query = supabase
+      .from("shared_questions")
+      .select("*, profiles:shared_questions_user_id_profiles_fkey(name, avatar_url)")
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
-  if (subject) query = query.eq("subject", subject);
+    if (subject) query = query.eq("subject", subject);
 
-  const { data, error } = await query;
-  if (error) throw error;
+    const { data, error } = await query;
+    if (error) throw error;
 
-  return (data || []).map((q) => ({
-    ...q,
-    profile: q.is_anonymous ? null : q.profiles,
-    profiles: undefined,
-  }));
+    return (data || []).map((q) => ({
+      ...q,
+      profile: q.is_anonymous ? null : q.profiles,
+      profiles: undefined,
+    }));
+  } catch (e) {
+    handleSupabaseError(e, "getSharedQuestions");
+    throw e;
+  }
 }
 
 export async function shareQuestion({
@@ -54,46 +65,61 @@ export async function shareQuestion({
   note,
   isAnonymous = true,
 }) {
-  const { data, error } = await supabase
-    .from("shared_questions")
-    .insert({
-      wrong_question_id: wrongQuestionId,
-      user_id: userId,
-      subject,
-      topic,
-      image_path: imagePath,
-      note,
-      is_anonymous: isAnonymous,
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  try {
+    const { data, error } = await supabase
+      .from("shared_questions")
+      .insert({
+        wrong_question_id: wrongQuestionId,
+        user_id: userId,
+        subject,
+        topic,
+        image_path: imagePath,
+        note,
+        is_anonymous: isAnonymous,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    handleSupabaseError(e, "shareQuestion");
+    throw e;
+  }
 }
 
 export async function unshareQuestion(id, userId) {
-  let query = supabase
-    .from("shared_questions")
-    .delete()
-    .eq("id", id);
-  if (userId) query = query.eq("user_id", userId);
-  const { error } = await query;
-  if (error) throw error;
+  if (!userId) throw new Error("userId is required");
+  try {
+    const { error } = await supabase
+      .from("shared_questions")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
+    if (error) throw error;
+  } catch (e) {
+    handleSupabaseError(e, "unshareQuestion");
+    throw e;
+  }
 }
 
 export async function getAnswers(sharedQuestionId) {
-  const { data, error } = await supabase
-    .from("question_answers")
-    .select("*, profiles:question_answers_user_id_profiles_fkey(name, avatar_url)")
-    .eq("shared_question_id", sharedQuestionId)
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  try {
+    const { data, error } = await supabase
+      .from("question_answers")
+      .select("*, profiles:question_answers_user_id_profiles_fkey(name, avatar_url)")
+      .eq("shared_question_id", sharedQuestionId)
+      .order("created_at", { ascending: true });
+    if (error) throw error;
 
-  return (data || []).map((a) => ({
-    ...a,
-    profile: a.is_anonymous ? null : a.profiles,
-    profiles: undefined,
-  }));
+    return (data || []).map((a) => ({
+      ...a,
+      profile: a.is_anonymous ? null : a.profiles,
+      profiles: undefined,
+    }));
+  } catch (e) {
+    handleSupabaseError(e, "getAnswers");
+    throw e;
+  }
 }
 
 export async function postAnswer({
@@ -103,22 +129,33 @@ export async function postAnswer({
   imageUri,
   isAnonymous = true,
 }) {
-  let imagePath = null;
-  if (imageUri) imagePath = await uploadAnswerImage(userId, imageUri);
+  try {
+    let imagePath = null;
+    if (imageUri) {
+      try {
+        imagePath = await uploadAnswerImage(userId, imageUri);
+      } catch (e) {
+        handleSupabaseError(e, "postAnswer:image");
+      }
+    }
 
-  const { data, error } = await supabase
-    .from("question_answers")
-    .insert({
-      shared_question_id: sharedQuestionId,
-      user_id: userId,
-      text: text || null,
-      image_path: imagePath,
-      is_anonymous: isAnonymous,
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+    const { data, error } = await supabase
+      .from("question_answers")
+      .insert({
+        shared_question_id: sharedQuestionId,
+        user_id: userId,
+        text: text || null,
+        image_path: imagePath,
+        is_anonymous: isAnonymous,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    handleSupabaseError(e, "postAnswer");
+    throw e;
+  }
 }
 
 export function subscribeToAnswers(sharedQuestionId, callback) {
@@ -155,20 +192,30 @@ export function subscribeToFeed(callback) {
 }
 
 export async function isQuestionShared(wrongQuestionId) {
-  const { count, error } = await supabase
-    .from("shared_questions")
-    .select("id", { count: "exact", head: true })
-    .eq("wrong_question_id", wrongQuestionId);
-  if (error) throw error;
-  return count > 0;
+  try {
+    const { count, error } = await supabase
+      .from("shared_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("wrong_question_id", wrongQuestionId);
+    if (error) throw error;
+    return count > 0;
+  } catch (e) {
+    handleSupabaseError(e, "isQuestionShared");
+    throw e;
+  }
 }
 
 export async function getSharedQuestionIds(wrongQuestionIds) {
-  if (!wrongQuestionIds.length) return new Set();
-  const { data, error } = await supabase
-    .from("shared_questions")
-    .select("wrong_question_id")
-    .in("wrong_question_id", wrongQuestionIds);
-  if (error) throw error;
-  return new Set((data || []).map((r) => r.wrong_question_id));
+  try {
+    if (!wrongQuestionIds.length) return new Set();
+    const { data, error } = await supabase
+      .from("shared_questions")
+      .select("wrong_question_id")
+      .in("wrong_question_id", wrongQuestionIds);
+    if (error) throw error;
+    return new Set((data || []).map((r) => r.wrong_question_id));
+  } catch (e) {
+    handleSupabaseError(e, "getSharedQuestionIds");
+    throw e;
+  }
 }

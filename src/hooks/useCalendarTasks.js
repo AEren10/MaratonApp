@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../supabase/client";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
-const KEY = "@maraton:calendar_tasks";
+const KEY = STORAGE_KEYS.CALENDAR_TASKS;
 const CAL_SUBJECT = "__calendar";
 
 export function useCalendarTasks() {
   const [tasks, setTasks] = useState({});
+  const [error, setError] = useState(null);
   const { user } = useAuth();
   const synced = useRef(false);
 
@@ -26,7 +28,8 @@ export function useCalendarTasks() {
       .eq("user_id", user.id)
       .eq("subject", CAL_SUBJECT)
       .order("created_at", { ascending: true })
-      .then(({ data }) => {
+      .then(({ data, error: fetchErr }) => {
+        if (fetchErr) { setError(fetchErr); return; }
         if (!data?.length) return;
         setTasks((prev) => {
           const merged = { ...prev };
@@ -69,7 +72,7 @@ export function useCalendarTasks() {
           persist(next);
           return next;
         });
-      });
+      }).catch(() => {});
     }
   }, [persist, user?.id]);
 
@@ -80,7 +83,14 @@ export function useCalendarTasks() {
       persist(next);
       const toggled = list.find((t) => t.id === taskId);
       if (toggled?.remoteId) {
-        supabase.from("user_tasks").update({ completed: toggled.done }).eq("id", toggled.remoteId).then(() => {});
+        supabase.from("user_tasks").update({ completed: toggled.done }).eq("id", toggled.remoteId).catch(() => {
+          setTasks((revert) => {
+            const revList = (revert[date] || []).map((t) => t.id === taskId ? { ...t, done: !t.done } : t);
+            const revNext = { ...revert, [date]: revList };
+            persist(revNext);
+            return revNext;
+          });
+        });
       }
       return next;
     });
@@ -95,11 +105,18 @@ export function useCalendarTasks() {
       else delete next[date];
       persist(next);
       if (removed?.remoteId) {
-        supabase.from("user_tasks").delete().eq("id", removed.remoteId).then(() => {});
+        supabase.from("user_tasks").delete().eq("id", removed.remoteId).catch(() => {
+          setTasks((revert) => {
+            const revList = [...(revert[date] || []), removed];
+            const revNext = { ...revert, [date]: revList };
+            persist(revNext);
+            return revNext;
+          });
+        });
       }
       return next;
     });
   }, [persist]);
 
-  return { tasks, addTask, toggleTask, removeTask };
+  return { tasks, addTask, toggleTask, removeTask, error };
 }

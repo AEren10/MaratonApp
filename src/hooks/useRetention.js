@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
-const KEY_LAST_ACTIVE = "@maraton:last_active";
-const KEY_LOGIN_REWARDED = "@maraton:login_rewarded";
-const KEY_COMEBACK_SHOWN = "@maraton:comeback_shown";
+const KEY_LAST_ACTIVE = STORAGE_KEYS.LAST_ACTIVE;
+const KEY_LOGIN_REWARDED = STORAGE_KEYS.LOGIN_REWARDED;
+const KEY_COMEBACK_SHOWN = STORAGE_KEYS.COMEBACK_SHOWN;
 
 function todayStr() {
   return new Date().toISOString().split("T")[0];
@@ -25,26 +26,28 @@ export function useRetention(reward) {
     let timer;
 
     (async () => {
-      const today = todayStr();
-      const lastActive = await AsyncStorage.getItem(KEY_LAST_ACTIVE);
-      const loginRewarded = await AsyncStorage.getItem(KEY_LOGIN_REWARDED);
-      const comebackShown = await AsyncStorage.getItem(KEY_COMEBACK_SHOWN);
+      try {
+        const today = todayStr();
+        const lastActive = await AsyncStorage.getItem(KEY_LAST_ACTIVE);
+        const loginRewarded = await AsyncStorage.getItem(KEY_LOGIN_REWARDED);
+        const comebackShown = await AsyncStorage.getItem(KEY_COMEBACK_SHOWN);
 
-      if (lastActive && alive) {
-        const daysAway = daysBetween(lastActive, today);
+        if (lastActive && alive) {
+          const daysAway = daysBetween(lastActive, today);
 
-        if (daysAway >= 2 && comebackShown !== today) {
-          setComeback({ daysAway, xpBonus: 50 });
-          await AsyncStorage.setItem(KEY_COMEBACK_SHOWN, today);
+          if (daysAway >= 2 && comebackShown !== today) {
+            setComeback({ daysAway, xpBonus: 50 });
+            await AsyncStorage.setItem(KEY_COMEBACK_SHOWN, today);
+          }
         }
-      }
 
-      if (loginRewarded !== today && reward && alive) {
-        await AsyncStorage.setItem(KEY_LOGIN_REWARDED, today);
-        timer = setTimeout(() => { if (alive) reward("daily_login"); }, 3500);
-      }
+        if (loginRewarded !== today && reward && alive) {
+          await AsyncStorage.setItem(KEY_LOGIN_REWARDED, today);
+          timer = setTimeout(() => { if (alive) reward("daily_login"); }, 3500);
+        }
 
-      if (alive) await AsyncStorage.setItem(KEY_LAST_ACTIVE, today);
+        if (alive) await AsyncStorage.setItem(KEY_LAST_ACTIVE, today);
+      } catch (_) {}
     })();
 
     return () => { alive = false; clearTimeout(timer); };

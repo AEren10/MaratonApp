@@ -12,7 +12,7 @@ export function usePlanCompletion() {
       if (val) {
         try { setDoneIds(new Set(JSON.parse(val))); } catch {}
       }
-    });
+    }).catch(() => {});
   }, []);
 
   const toggle = useCallback((id) => {

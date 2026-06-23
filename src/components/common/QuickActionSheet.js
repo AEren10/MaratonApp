@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, StyleSheet, Platform } from "react-native
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
 
 function ActionRow({ item, onPress, C }) {
   const handlePress = useCallback(() => onPress(item.screen), [item.screen, onPress]);
@@ -35,10 +36,10 @@ function ActionRow({ item, onPress, C }) {
 export function QuickActionSheet({ visible, onClose, onAction }) {
   const C = useC();
   const ACTIONS = useMemo(() => [
-    { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       screen: "AddStudy",       color: C.amber },
-    { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      screen: "TrialEntry",     color: C.blue },
-    { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        screen: "AddWrong",       color: C.coral },
-    { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    screen: "WrongNotebook",  color: C.purple },
+    { key: "study",  icon: "edit",     label: "Çalışma Kaydet",  desc: "Ders çalışmanı kaydet",       screen: SCREENS.ADD_STUDY,       color: C.amber },
+    { key: "trial",  icon: "chart",    label: "Deneme Gir",      desc: "Deneme sonuçlarını gir",      screen: SCREENS.TRIAL_ENTRY,     color: C.blue },
+    { key: "wrong",  icon: "camera",   label: "Yanlış Ekle",     desc: "Yanlış soruyu kaydet",        screen: SCREENS.ADD_WRONG,       color: C.coral },
+    { key: "wrnb",   icon: "notebook", label: "Yanlış Defteri",  desc: "Eklediğin yanlışları gör",    screen: SCREENS.WRONG_NOTEBOOK,  color: C.purple },
   ], [C]);
   const handleAction = useCallback(
     (screen) => {

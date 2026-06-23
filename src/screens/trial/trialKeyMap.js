@@ -19,6 +19,13 @@ export const TRIAL_TO_CURRICULUM = {
   ayt_cografya2: ["ayt_cografya_soz"],
   ayt_felsefe: ["ayt_felsefe_soz"],
   ayt_din: [],
+
+  lgs_turkce: ["lgs_turkce"],
+  lgs_matematik: ["lgs_matematik"],
+  lgs_fen: ["lgs_fen"],
+  lgs_inkilap: ["lgs_inkilap"],
+  lgs_din: ["lgs_din"],
+  lgs_ingilizce: ["lgs_ingilizce"],
 };
 
 export function trialSubjectsToCurriculumWeakAreas(subjectsMap) {

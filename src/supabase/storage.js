@@ -5,8 +5,13 @@ import { handleSupabaseError } from "./handleError";
 // fetch(uri).blob() bazen size=0 dönüyor → upload boş kalıyor.
 // Çözüm: fetch().arrayBuffer() ile ham byte buffer'ı al ve upload et.
 async function uriToArrayBuffer(uri) {
-  const res = await fetch(uri);
-  return await res.arrayBuffer();
+  try {
+    const res = await fetch(uri);
+    return await res.arrayBuffer();
+  } catch (e) {
+    handleSupabaseError(e, "uriToArrayBuffer");
+    throw e;
+  }
 }
 
 function guessExt(uri) {
@@ -24,16 +29,22 @@ function mimeFor(ext) {
 }
 
 export const uploadAvatar = async (userId, uri) => {
-  const ext = guessExt(uri);
-  const contentType = mimeFor(ext);
-  const path = `${userId}/avatar.${ext}`;
-  const buffer = await uriToArrayBuffer(uri);
+  if (!userId) throw new Error("userId is required");
+  try {
+    const ext = guessExt(uri);
+    const contentType = mimeFor(ext);
+    const path = `${userId}/avatar.${ext}`;
+    const buffer = await uriToArrayBuffer(uri);
 
-  const { data, error } = await supabase.storage
-    .from("avatars")
-    .upload(path, buffer, { contentType, upsert: true });
-  if (error) throw error;
-  return data.path;
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .upload(path, buffer, { contentType, upsert: true });
+    if (error) throw error;
+    return data?.path ?? null;
+  } catch (e) {
+    handleSupabaseError(e, "uploadAvatar");
+    throw e;
+  }
 };
 
 export const getAvatarUrl = (path) => {
@@ -44,25 +55,36 @@ export const getAvatarUrl = (path) => {
 };
 
 export const uploadWrongQuestionImage = async (userId, uri) => {
-  const ext = guessExt(uri);
-  const contentType = mimeFor(ext);
-  const name = `${Date.now()}.${ext}`;
-  const path = `${userId}/${name}`;
-  const buffer = await uriToArrayBuffer(uri);
+  if (!userId) throw new Error("userId is required");
+  try {
+    const ext = guessExt(uri);
+    const contentType = mimeFor(ext);
+    const name = `${Date.now()}.${ext}`;
+    const path = `${userId}/${name}`;
+    const buffer = await uriToArrayBuffer(uri);
 
-  const { data, error } = await supabase.storage
-    .from("wrong-questions")
-    .upload(path, buffer, { contentType, upsert: true });
-  if (error) throw error;
-  return data.path;
+    const { data, error } = await supabase.storage
+      .from("wrong-questions")
+      .upload(path, buffer, { contentType, upsert: true });
+    if (error) throw error;
+    return data?.path ?? null;
+  } catch (e) {
+    handleSupabaseError(e, "uploadWrongQuestionImage");
+    throw e;
+  }
 };
 
 export const getWrongQuestionImageUrl = async (path) => {
-  if (!path) return null;
-  if (path.startsWith("http")) return path;
-  const { data, error } = await supabase.storage
-    .from("wrong-questions")
-    .createSignedUrl(path, 3600);
-  if (handleSupabaseError(error, "getWrongQuestionImageUrl")) return null;
-  return data.signedUrl;
+  try {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    const { data, error } = await supabase.storage
+      .from("wrong-questions")
+      .createSignedUrl(path, 3600);
+    if (handleSupabaseError(error, "getWrongQuestionImageUrl")) return null;
+    return data?.signedUrl ?? null;
+  } catch (e) {
+    handleSupabaseError(e, "getWrongQuestionImageUrl");
+    throw e;
+  }
 };

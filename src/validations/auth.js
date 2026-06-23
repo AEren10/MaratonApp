@@ -21,7 +21,7 @@ export const trialSubjectSchema = z.object({
 export const trialEntrySchema = z.object({
   name: z.string().min(1, "Deneme adi girin").max(100),
   trial_date: z.string().min(1),
-  exam_type: z.enum(["tyt", "ayt_say", "ayt_ea", "ayt_soz", "ydt", "branch"]),
+  exam_type: z.enum(["tyt", "ayt_say", "ayt_ea", "ayt_soz", "lgs", "branch"]),
   total_net: z.number().min(-200).max(500),
   subjects: z.array(trialSubjectSchema).min(1),
 });

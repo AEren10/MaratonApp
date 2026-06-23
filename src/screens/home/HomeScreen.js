@@ -32,6 +32,7 @@ import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useRetention } from "../../hooks/useRetention";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
+import { usePremium } from "../../contexts/PremiumContext";
 import { XPToast } from "../../components/common/XPToast";
 import { GlowBackground, WARM_GLOW, GlassCard, SectionLabel } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
@@ -71,6 +72,7 @@ export default function HomeScreen() {
   const C = useC();
   const { user } = useAuth();
   const { reward, syncStat, xpToast, dismissXP, levelUpModal, dismissLevelUp } = useGamification();
+  const { checkFeature, showPaywall } = usePremium();
   const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
@@ -259,7 +261,11 @@ export default function HomeScreen() {
 
         <View style={{ marginTop: 36 }}>
           <SectionLabel>HIZLI İŞLEM</SectionLabel>
-          <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => q.go && navigation.navigate(q.go)} />
+          <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => {
+            if (!q.go) return;
+            if (q.go === SCREENS.EXAM_SIMULATOR && !checkFeature("exam_simulator")) { showPaywall(); return; }
+            navigation.navigate(q.go);
+          }} />
         </View>
 
         <View style={{ marginTop: 40 }}>

@@ -5,7 +5,7 @@ import { useNetwork } from "../contexts/NetworkContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate } from "../store/slices/studyLogSlice";
-import { setGoals } from "../store/slices/goalsSlice";
+import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadGamificationFromStorage, hydrateGamification } from "../store/slices/gamificationSlice";
@@ -19,14 +19,15 @@ import { getUserTasksByDate } from "../supabase/userTasks";
 import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
 import { getExpoPushToken } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
 async function retryPendingStreak() {
   try {
-    const raw = await AsyncStorage.getItem("@maraton:pending_streak");
+    const raw = await AsyncStorage.getItem(STORAGE_KEYS.PENDING_STREAK);
     if (!raw) return;
     const { userId, updates } = JSON.parse(raw);
     await updateStreak(userId, updates);
-    await AsyncStorage.removeItem("@maraton:pending_streak");
+    await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_STREAK);
   } catch (_) {}
 }
 
@@ -73,7 +74,7 @@ async function loadAll(userId, dispatch) {
 
   if (streak.status === "fulfilled" && streak.value) {
     dispatch(setStreak(streak.value.current_streak || 0));
-    dispatch(setFreezeCount(streak.value.freeze_count ?? 1));
+    dispatch(setFreezeCount(streak.value.freeze_count ?? 0));
     dispatch(setLongestStreak(streak.value.longest_streak || 0));
     dispatch(setFreezeResetAt(streak.value.freeze_reset_at || null));
     dispatch(setLastStudyDate(streak.value.last_study_date || null));
@@ -91,10 +92,10 @@ async function loadAll(userId, dispatch) {
 
     const todayStr = new Date().toISOString().split("T")[0];
     const pending = await getPendingStudyLogs().catch(() => []);
-    const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}`));
+    const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}_${m.duration}`));
     const pendingToday = pending
       .filter((p) => p.study_date === todayStr)
-      .filter((p) => !existingIds.has(`${p.subject}_${p.topic}_${p.question_count}`))
+      .filter((p) => !existingIds.has(`${p.subject}_${p.topic}_${p.question_count}_${p.duration_minutes}`))
       .map((p, i) => ({
         id: `pending_${i}`,
         subject: p.subject,
@@ -111,11 +112,13 @@ async function loadAll(userId, dispatch) {
     dispatch(setUserTasks(userTasks.value));
   }
 
-  if (profile.status === "fulfilled" && profile.value?.daily_question_goal != null) {
+  const localGoalsRaw = await AsyncStorage.getItem(STORAGE_KEYS.GOALS).catch(() => null);
+  if (!localGoalsRaw && profile.status === "fulfilled" && profile.value?.daily_question_goal != null) {
     const g = { dailyQuestions: profile.value.daily_question_goal };
     if (profile.value.weekly_trials_goal != null) g.weeklyTrials = profile.value.weekly_trials_goal;
     if (profile.value.weekly_minutes_goal != null) g.weeklyMinutes = profile.value.weekly_minutes_goal;
     dispatch(setGoals(g));
+    saveGoalsToStorage(g);
   }
 
   const xpFromServer = serverXP.status === "fulfilled" ? serverXP.value : 0;
@@ -140,6 +143,7 @@ export function useDataSync() {
   const dispatch = useAppDispatch();
   const { isConnected } = useNetwork();
   const [syncing, setSyncing] = useState(false);
+  const [error, setError] = useState(null);
   const wasOfflineRef = useRef(false);
   const mountedRef = useRef(true);
   useEffect(() => () => { mountedRef.current = false; }, []);
@@ -154,7 +158,7 @@ export function useDataSync() {
     let cancelled = false;
     setSyncing(true);
     loadAll(user.id, safeDispatch)
-      .catch(() => {})
+      .catch((e) => { if (!cancelled) setError(e); })
       .finally(() => {
         if (!cancelled) setSyncing(false);
       });
@@ -194,10 +198,12 @@ export function useDataSync() {
     setSyncing(true);
     try {
       await loadAll(user.id, safeDispatch);
+    } catch (e) {
+      if (mountedRef.current) setError(e);
     } finally {
       if (mountedRef.current) setSyncing(false);
     }
   }, [user?.id, safeDispatch]);
 
-  return { syncing, refresh };
+  return { syncing, refresh, error };
 }

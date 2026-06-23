@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   earnXP,
+  revertXP,
   unlockBadge,
   incrementStat,
   setMaxStat,
@@ -64,7 +65,7 @@ export function useGamification() {
       const currentXP = totalXPRef.current;
       const prevLevel = getLevelForXP(currentXP);
       dispatch(earnXP({ amount }));
-      logXP(user?.id, amount, action);
+      if (user?.id) logXP(user.id, amount, action).catch(() => dispatch(revertXP({ amount })));
       setXpToast({ visible: true, amount });
 
       const newLevel = getLevelForXP(currentXP + amount);

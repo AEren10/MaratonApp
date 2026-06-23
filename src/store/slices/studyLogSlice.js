@@ -6,7 +6,7 @@ const studyLogSlice = createSlice({
     todayLogs: [],
     streak: 0,
     longestStreak: 0,
-    freezeCount: 1,
+    freezeCount: 0,
     freezeResetAt: null,
     lastStudyDate: null,
     loading: false,

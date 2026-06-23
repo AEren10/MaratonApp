@@ -38,14 +38,23 @@ export async function fetchGlobalTop(userId, limit = 50) {
       .select("weekly_xp")
       .eq("user_id", userId)
       .maybeSingle();
-    handleSupabaseError(ownErr, "fetchGlobalTop:ownScore");
-    myScore = own?.weekly_xp ?? 0;
-    const { count, error: countErr } = await supabase
-      .from("leaderboard_weekly")
-      .select("user_id", { count: "exact", head: true })
-      .gt("weekly_xp", myScore);
-    handleSupabaseError(countErr, "fetchGlobalTop:ownRank");
-    myRank = (count ?? 0) + 1;
+    if (ownErr) {
+      handleSupabaseError(ownErr, "fetchGlobalTop:ownScore");
+      myScore = null;
+      myRank = null;
+    } else {
+      myScore = own?.weekly_xp ?? 0;
+      const { count, error: countErr } = await supabase
+        .from("leaderboard_weekly")
+        .select("user_id", { count: "exact", head: true })
+        .gt("weekly_xp", myScore);
+      if (countErr) {
+        handleSupabaseError(countErr, "fetchGlobalTop:ownRank");
+        myRank = null;
+      } else {
+        myRank = (count ?? 0) + 1;
+      }
+    }
   }
 
   return { list, myRank, myScore };
@@ -53,19 +62,24 @@ export async function fetchGlobalTop(userId, limit = 50) {
 
 // Sadece arkadaşlar + kullanıcı, haftalık XP'ye göre sıralı.
 export async function fetchFriendsLeague(userId) {
-  if (!userId || typeof userId !== "string") throw new Error("Invalid userId");
-  const friends = await listFriends(userId);
-  const ids = [...new Set([userId, ...friends.map((f) => f.id)])];
-  if (ids.length === 0) return { list: [], myRank: null, myScore: 0 };
+  try {
+    if (!userId || typeof userId !== "string") throw new Error("Invalid userId");
+    const friends = await listFriends(userId);
+    const ids = [...new Set([userId, ...friends.map((f) => f.id)])];
+    if (ids.length === 0) return { list: [], myRank: null, myScore: 0 };
 
-  const { data, error } = await supabase
-    .from("leaderboard_weekly")
-    .select("user_id, name, avatar_url, weekly_xp, questions, trials")
-    .in("user_id", ids)
-    .order("weekly_xp", { ascending: false });
-  if (error) throw error;
+    const { data, error } = await supabase
+      .from("leaderboard_weekly")
+      .select("user_id, name, avatar_url, weekly_xp, questions, trials")
+      .in("user_id", ids)
+      .order("weekly_xp", { ascending: false });
+    if (error) throw error;
 
-  const list = withRanks(data || [], userId);
-  const mine = list.find((r) => r.you);
-  return { list, myRank: mine?.rank ?? null, myScore: mine?.weekly_xp ?? 0 };
+    const list = withRanks(data || [], userId);
+    const mine = list.find((r) => r.you);
+    return { list, myRank: mine?.rank ?? null, myScore: mine?.weekly_xp ?? 0 };
+  } catch (e) {
+    handleSupabaseError(e, "fetchFriendsLeague");
+    throw e;
+  }
 }

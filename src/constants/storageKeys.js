@@ -9,6 +9,9 @@ export const STORAGE_KEYS = {
   LAST_ACTIVE: "@maraton:last_active",
   LOGIN_REWARDED: "@maraton:login_rewarded",
   COMEBACK_SHOWN: "@maraton:comeback_shown",
+  GAMIFICATION: "@maraton:gamification",
+  PENDING_STREAK: "@maraton:pending_streak",
+  CALENDAR_TASKS: "@maraton:calendar_tasks",
 };
 
 export function dailyKey(prefix) {

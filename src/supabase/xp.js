@@ -5,9 +5,10 @@ export async function logXP(userId, amount, action) {
   if (!userId || userId === "dev" || !amount) return;
   try {
     const { error } = await supabase.from("xp_events").insert({ user_id: userId, amount, action });
-    handleSupabaseError(error, "logXP");
+    if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "logXP");
+    throw e;
   }
 }
 

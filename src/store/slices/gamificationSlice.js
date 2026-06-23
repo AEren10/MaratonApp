@@ -1,8 +1,9 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLevelForXP } from "../../lib/xpEngine";
+import { STORAGE_KEYS } from "../../constants/storageKeys";
 
-const STORAGE_KEY = "@maraton:gamification";
+const STORAGE_KEY = STORAGE_KEYS.GAMIFICATION;
 
 const initialState = {
   xp: 0,
@@ -28,6 +29,11 @@ const gamificationSlice = createSlice({
       const { amount } = action.payload;
       state.xp += amount;
       state.weeklyXP += amount;
+    },
+    revertXP(state, action) {
+      const { amount } = action.payload;
+      state.xp = Math.max(0, state.xp - amount);
+      state.weeklyXP = Math.max(0, state.weeklyXP - amount);
     },
     unlockBadge(state, action) {
       const { badgeId } = action.payload;
@@ -73,6 +79,7 @@ const gamificationSlice = createSlice({
 
 export const {
   earnXP,
+  revertXP,
   unlockBadge,
   updateStat,
   incrementStat,

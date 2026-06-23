@@ -164,12 +164,9 @@ export function CommunityTab({ visible, onSwitchToMine }) {
 
   useEffect(() => {
     if (!visible) return;
-    const unsub = subscribeToFeed((row) => setItems((prev) => {
-      if (prev.some((p) => p.id === row.id)) return prev;
-      return [row, ...prev];
-    }));
+    const unsub = subscribeToFeed(() => load());
     return unsub;
-  }, [visible]);
+  }, [visible, load]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -178,7 +175,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
   }, [load]);
 
   const onAnswer = useCallback((item) => {
-    nav.navigate(SCREENS.WRONG_DETAIL, { id: item.id, community: true });
+    nav.navigate(SCREENS.WRONG_DETAIL, { item, community: true });
   }, [nav]);
 
   const filtered = useMemo(() =>

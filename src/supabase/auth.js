@@ -32,7 +32,7 @@ export const resetPassword = async (email) => {
 export const getSession = async () => {
   const { data, error } = await supabase.auth.getSession();
   if (error) throw error;
-  return data.session;
+  return data?.session ?? null;
 };
 
 export const updateEmail = async (email) => {

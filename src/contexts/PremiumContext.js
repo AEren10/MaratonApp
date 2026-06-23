@@ -38,7 +38,8 @@ export function PremiumProvider({ children }) {
           return;
         }
       }
-      setIsPremium(await getPremiumStatus(user.id));
+      const status = await getPremiumStatus(user.id);
+      if (status !== null) setIsPremium(status);
     } catch (e) {
       if (__DEV__) console.warn("[PremiumContext] fetchPremiumStatus", e);
     }

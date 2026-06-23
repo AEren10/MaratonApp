@@ -35,7 +35,7 @@ export function computeStreakUpdate(streakData, now = new Date()) {
   const current = streakData?.current_streak || 0;
 
   // Haftalık joker yenilemesi
-  let freezeCount = streakData?.freeze_count ?? 1;
+  let freezeCount = streakData?.freeze_count ?? 0;
   let freezeResetAt = streakData?.freeze_reset_at ? new Date(streakData.freeze_reset_at) : null;
   if (!freezeResetAt || freezeResetAt.getTime() <= now.getTime()) {
     freezeCount = 1;

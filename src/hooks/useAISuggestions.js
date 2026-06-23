@@ -14,6 +14,7 @@ export function useAISuggestions() {
 
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,21 +33,25 @@ export function useAISuggestions() {
       }
 
       const examLabel = `${examType?.toUpperCase() || "TYT"}${field ? "/" + field : ""}`;
-      const data = await getAISuggestions({
-        trials,
-        todayLogs,
-        streak,
-        weakAreas: weakAreasTrialKeyed,
-        examLabel,
-      });
-      if (!cancelled) {
-        setSuggestions(data || []);
-        setLoading(false);
+      try {
+        const data = await getAISuggestions({
+          trials,
+          todayLogs,
+          streak,
+          weakAreas: weakAreasTrialKeyed,
+          examLabel,
+        });
+        if (!cancelled) {
+          setSuggestions(data || []);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled) { setLoading(false); setError(e); }
       }
     }
     load();
     return () => { cancelled = true; };
   }, [trials, todayLogs, streak, examType, field]);
 
-  return { suggestions, loading };
+  return { suggestions, loading, error };
 }

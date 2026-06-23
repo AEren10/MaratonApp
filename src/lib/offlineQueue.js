@@ -4,9 +4,12 @@ import { addTrial } from "../supabase/trials";
 import { addWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
 import { uploadWrongQuestionImage } from "../supabase/storage";
+import { STORAGE_KEYS } from "../constants/storageKeys";
+import { supabase } from "../supabase/client";
 
-const QUEUE_KEY = "@maraton:offlineQueue";
+const QUEUE_KEY = STORAGE_KEYS.OFFLINE_QUEUE;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
+const MAX_RETRIES = 10;
 
 // Operation types
 export const OP_STUDY_LOG = "STUDY_LOG";
@@ -79,10 +82,19 @@ async function runOne(item) {
 
 let _flushing = false;
 
+function isAuthError(e) {
+  const msg = e?.message || "";
+  const status = e?.status || e?.statusCode;
+  return status === 401 || status === 403 || msg.includes("JWT") || msg.includes("token");
+}
+
 export async function flushQueue() {
   if (_flushing) return { processed: 0, failed: 0, types: [] };
   _flushing = true;
   try {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return { processed: 0, failed: 0, types: [] };
+
   const list = await readQueue();
   if (!list.length) return { processed: 0, failed: 0, types: [] };
 
@@ -92,14 +104,26 @@ export async function flushQueue() {
   let failed = 0;
   const processedTypes = [];
 
-  for (const item of list) {
-    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) continue;
+  const valid = list.filter((item) => {
+    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) return false;
+    if ((item.retryCount || 0) >= MAX_RETRIES) return false;
+    return true;
+  });
+
+  for (let i = 0; i < valid.length; i++) {
+    const item = valid[i];
     try {
       await runOne(item);
       processed += 1;
       if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
     } catch (e) {
-      remaining.push(item);
+      const bumped = { ...item, retryCount: (item.retryCount || 0) + 1 };
+      if (isAuthError(e)) {
+        remaining.push(bumped);
+        for (let j = i + 1; j < valid.length; j++) remaining.push(valid[j]);
+        break;
+      }
+      remaining.push(bumped);
       failed += 1;
     }
   }

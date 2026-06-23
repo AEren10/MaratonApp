@@ -9,9 +9,10 @@ import {
   getSubjectIdentity,
   setRuntimeScheme,
 } from "../themes/tokens";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
 const ThemeContext = createContext(null);
-const STORAGE_KEY = "@maraton:themePref";
+const STORAGE_KEY = STORAGE_KEYS.THEME_PREF;
 
 // pref: "system" | "light" | "dark"
 // scheme: actual resolved value (system follows OS)

@@ -11,7 +11,8 @@ import { getMastery } from "../../lib/mastery";
 import { TopicNoteCard } from "./components/TopicNoteCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
-import { getStudyLogsByTopic, addStudyLog } from "../../supabase/studyLogs";
+import { getStudyLogsByTopic } from "../../supabase/studyLogs";
+import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import * as H from "../../lib/haptics";
 
 function StatBox({ label, value, color, C }) {
@@ -220,7 +221,7 @@ export default function TopicStudyScreen() {
     if (!user?.id || user.id === "dev") return;
     setCompleting(true);
     try {
-      await addStudyLog({
+      await saveStudyLogOffline({
         user_id: user.id,
         subject: subject.key,
         topic: topic.name,

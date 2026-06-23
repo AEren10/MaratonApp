@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import * as Network from "expo-network";
-import { flushQueue } from "../lib/offlineQueue";
 
 const NetworkContext = createContext({ isConnected: true });
 
@@ -23,10 +22,7 @@ export function NetworkProvider({ children }) {
       const connected = state.isConnected && state.isInternetReachable !== false;
       setIsConnected(connected);
 
-      // Was offline, now online => flush queue
-      if (!prevConnected.current && connected) {
-        flushQueue().catch((e) => { if (__DEV__) console.warn("[NetworkContext] flushQueue", e); });
-      }
+      // Reconnection handling done by useDataSync
       prevConnected.current = connected;
     });
 

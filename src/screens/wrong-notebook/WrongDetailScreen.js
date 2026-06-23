@@ -42,7 +42,7 @@ export default function WrongDetailScreen() {
   const route = useRoute();
   const showAlert = useAlert();
   const { user } = useAuth();
-  const { item: passedItem } = route.params ?? {};
+  const { item: passedItem, community } = route.params ?? {};
   const [photoZoom, setPhotoZoom] = useState(false);
   const [resolving, setResolving] = useState(false);
   const [localResolved, setLocalResolved] = useState(false);
@@ -67,9 +67,11 @@ export default function WrongDetailScreen() {
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
           Soru Detayı
         </Text>
-        <Chip color={item.is_resolved ? C.green : C.red}>
-          {item.is_resolved ? "Çözüldü" : "Bekliyor"}
-        </Chip>
+        {!community && (
+          <Chip color={item.is_resolved ? C.green : C.red}>
+            {item.is_resolved ? "Çözüldü" : "Bekliyor"}
+          </Chip>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -81,10 +83,12 @@ export default function WrongDetailScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={styles.answersRow}>
-          <AnswerBadge label="Benim cevabım" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
-          <AnswerBadge label="Doğru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
-        </Animated.View>
+        {!community && (
+          <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={styles.answersRow}>
+            <AnswerBadge label="Benim cevabım" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
+            <AnswerBadge label="Doğru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
+          </Animated.View>
+        )}
 
         <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
@@ -127,7 +131,7 @@ export default function WrongDetailScreen() {
           </Animated.View>
         )}
 
-        {!item.is_resolved && !localResolved && (
+        {!community && !item.is_resolved && !localResolved && (
           <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
             <Pressable
               onPress={async () => {

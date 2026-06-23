@@ -30,6 +30,7 @@ export function useUserTasks() {
   const progress = useAppSelector(selectUserTasksProgress);
   const existingDay = useAppSelector((state) => state.userTasks.day);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
@@ -40,13 +41,18 @@ export function useUserTasks() {
       .then((data) => {
         if (!cancelled) dispatch(setUserTasks(data || []));
       })
-      .catch(() => {})
+      .catch((e) => { if (!cancelled) setError(e); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [user?.id, dispatch, existingDay]);
 
   const createTask = useCallback(async (input) => {
-    const parsed = userTaskSchema.parse(input);
+    let parsed;
+    try {
+      parsed = userTaskSchema.parse(input);
+    } catch (e) {
+      throw new Error(e.errors?.[0]?.message || "Geçersiz görev bilgisi");
+    }
     const tempId = `temp_${Date.now()}`;
     const optimistic = {
       id: tempId,
@@ -97,10 +103,10 @@ export function useUserTasks() {
   const removeTask = useCallback(async (id) => {
     const task = tasks.find((t) => t.id === id);
     dispatch(removeAction(id));
-    deleteUserTask(id, user.id).catch(() => {
+    deleteUserTask(id, user?.id).catch(() => {
       if (task) dispatch(addUserTask(task));
     });
-  }, [dispatch, tasks, user.id]);
+  }, [dispatch, tasks, user?.id]);
 
   const clearAll = useCallback(async () => {
     if (!user?.id) return;
@@ -109,5 +115,5 @@ export function useUserTasks() {
     deleteUserTasksByDate(user.id, today()).catch(() => {});
   }, [user?.id, dispatch]);
 
-  return { tasks, progress, loading, createTask, toggleTask, removeTask, clearAll };
+  return { tasks, progress, loading, error, createTask, toggleTask, removeTask, clearAll };
 }

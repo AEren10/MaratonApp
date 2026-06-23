@@ -12,6 +12,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, GlowBackground, WARM_GLOW, GlassCard, Stat, Trend, Chip } from "../../components/design";
+import { usePremium } from "../../contexts/PremiumContext";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SectionLabel } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -76,6 +77,7 @@ export default function AnalysisScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { examType } = useExam();
+  const { checkFeature, showPaywall } = usePremium();
   const s = useMemo(() => makeStyles(C), [C]);
   const trials = useSelector(selectTrials);
   const nudges = useRecommendations();
@@ -383,7 +385,10 @@ export default function AnalysisScreen() {
                     accessibilityRole="button"
                     accessibilityLabel="Simülasyon"
                     accessibilityHint="Sınav simülasyonuna gider"
-                    onPress={() => navigation.navigate(SCREENS.EXAM_SIMULATOR)}
+                    onPress={() => {
+                      if (!checkFeature("exam_simulator")) { showPaywall(); return; }
+                      navigation.navigate(SCREENS.EXAM_SIMULATOR);
+                    }}
                     style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8, padding: SPACING.md, borderRadius: 16, backgroundColor: C.orange + "12", borderWidth: 1, borderColor: C.orange + "25" }}
                   >
                     <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.orange + "20", alignItems: "center", justifyContent: "center" }}>

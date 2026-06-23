@@ -16,40 +16,54 @@ if (Platform.OS === "web") {
 
   storageAdapter = {
     async getItem(key) {
-      const raw = await SecureStore.getItemAsync(key);
-      if (raw !== null) return raw;
-      const count = await SecureStore.getItemAsync(`${key}__c`);
-      if (!count) return null;
-      const n = parseInt(count, 10);
-      const parts = await Promise.all(
-        Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)),
-      );
-      return parts.join("");
+      try {
+        const raw = await SecureStore.getItemAsync(key);
+        if (raw !== null) return raw;
+        const count = await SecureStore.getItemAsync(`${key}__c`);
+        if (!count) return null;
+        const n = parseInt(count, 10);
+        const parts = await Promise.all(
+          Array.from({ length: n }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)),
+        );
+        return parts.join("");
+      } catch (e) {
+        console.error("[SecureStore:getItem]", e.message || e);
+        return null;
+      }
     },
     async setItem(key, value) {
-      if (value.length <= CHUNK_SIZE) {
-        await SecureStore.setItemAsync(key, value);
-        const old = await SecureStore.getItemAsync(`${key}__c`);
-        if (old) {
-          const n = parseInt(old, 10);
+      try {
+        if (!value || typeof value !== "string") return;
+        if (value.length <= CHUNK_SIZE) {
+          await SecureStore.setItemAsync(key, value);
+          const old = await SecureStore.getItemAsync(`${key}__c`);
+          if (old) {
+            const n = parseInt(old, 10);
+            await Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)));
+            await SecureStore.deleteItemAsync(`${key}__c`);
+          }
+          return;
+        }
+        const chunks = [];
+        for (let i = 0; i < value.length; i += CHUNK_SIZE) chunks.push(value.slice(i, i + CHUNK_SIZE));
+        await SecureStore.setItemAsync(`${key}__c`, String(chunks.length));
+        await Promise.all(chunks.map((ch, i) => SecureStore.setItemAsync(`${key}__${i}`, ch)));
+        try { await SecureStore.deleteItemAsync(key); } catch {}
+      } catch (e) {
+        console.error("[SecureStore:setItem]", e.message || e);
+      }
+    },
+    async removeItem(key) {
+      try {
+        await SecureStore.deleteItemAsync(key);
+        const count = await SecureStore.getItemAsync(`${key}__c`);
+        if (count) {
+          const n = parseInt(count, 10);
           await Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)));
           await SecureStore.deleteItemAsync(`${key}__c`);
         }
-        return;
-      }
-      const chunks = [];
-      for (let i = 0; i < value.length; i += CHUNK_SIZE) chunks.push(value.slice(i, i + CHUNK_SIZE));
-      await SecureStore.setItemAsync(`${key}__c`, String(chunks.length));
-      await Promise.all(chunks.map((ch, i) => SecureStore.setItemAsync(`${key}__${i}`, ch)));
-      try { await SecureStore.deleteItemAsync(key); } catch {}
-    },
-    async removeItem(key) {
-      try { await SecureStore.deleteItemAsync(key); } catch {}
-      const count = await SecureStore.getItemAsync(`${key}__c`);
-      if (count) {
-        const n = parseInt(count, 10);
-        await Promise.all(Array.from({ length: n }, (_, i) => SecureStore.deleteItemAsync(`${key}__${i}`)));
-        await SecureStore.deleteItemAsync(`${key}__c`);
+      } catch (e) {
+        console.error("[SecureStore:removeItem]", e.message || e);
       }
     },
   };
