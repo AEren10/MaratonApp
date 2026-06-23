@@ -118,6 +118,27 @@ export async function scheduleWeeklySummary() {
   }
 }
 
+export async function scheduleTrialReminder() {
+  if (Platform.OS === "web") return null;
+  try {
+    return await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Deneme zamanı 📝",
+        body: "Bu hafta henüz deneme girmedin. Kendini test et!",
+        data: { type: "trial_reminder", url: "maraton://trial-entry" },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+        weekday: 4,
+        hour: 18,
+        minute: 0,
+      },
+    });
+  } catch {
+    return null;
+  }
+}
+
 export async function applyNotifPrefs(prefs) {
   await cancelAllScheduled();
   if (!prefs) return;
@@ -129,6 +150,9 @@ export async function applyNotifPrefs(prefs) {
   }
   if (prefs.weeklySummaryEnabled !== false) {
     await scheduleWeeklySummary();
+  }
+  if (prefs.trialReminderEnabled) {
+    await scheduleTrialReminder();
   }
 }
 
@@ -179,16 +203,16 @@ export async function cancelTaskReminders() {
   } catch (_) {}
 }
 
-export async function notifyXP(amount) {
-  if (Platform.OS === "web") return;
+export async function getExpoPushToken() {
+  if (Platform.OS === "web") return null;
   try {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: `+${amount} XP kazandın! 🎉`,
-        body: "Devam et, daha çok kazanabilirsin!",
-        data: { type: "xp" },
-      },
-      trigger: null,
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== "granted") return null;
+    const { data } = await Notifications.getExpoPushTokenAsync({
+      projectId: "maraton",
     });
-  } catch (_) {}
+    return data;
+  } catch {
+    return null;
+  }
 }

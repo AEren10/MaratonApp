@@ -3,11 +3,31 @@ import { supabase } from "./client";
 export const getProfile = async (userId) => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard")
+    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard, badges, gamification_stats")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
   return data;
+};
+
+export const saveGamificationToSupabase = async (userId, badges, stats) => {
+  if (!userId || userId === "dev") return;
+  try {
+    await supabase
+      .from("profiles")
+      .update({ badges: badges || [], gamification_stats: stats || {} })
+      .eq("id", userId);
+  } catch {}
+};
+
+export const registerPushToken = async (userId, token) => {
+  if (!userId || userId === "dev" || !token) return;
+  try {
+    await supabase
+      .from("profiles")
+      .update({ expo_push_token: token })
+      .eq("id", userId);
+  } catch {}
 };
 
 export const updateProfile = async (userId, updates) => {

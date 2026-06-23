@@ -60,7 +60,11 @@ export default function PaywallScreen() {
       const isPro = await purchasePackage(pkg);
       if (isPro) {
         H.success();
-        if (user?.id) await updateProfile(user.id, { is_premium: true });
+        if (user?.id) {
+          const days = selectedPlan === "yearly" ? 365 : 30;
+          const until = new Date(Date.now() + days * 86400000).toISOString();
+          await updateProfile(user.id, { is_premium: true, premium_until: until });
+        }
         await refreshPremium();
         navigation.goBack();
       }
@@ -78,7 +82,10 @@ export default function PaywallScreen() {
       const isPro = await restorePurchases();
       if (isPro) {
         H.success();
-        if (user?.id) await updateProfile(user.id, { is_premium: true });
+        if (user?.id) {
+          const until = new Date(Date.now() + 365 * 86400000).toISOString();
+          await updateProfile(user.id, { is_premium: true, premium_until: until });
+        }
         await refreshPremium();
         showAlert("Başarılı", "Premium üyeliğin geri yüklendi!");
         navigation.goBack();

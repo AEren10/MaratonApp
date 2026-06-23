@@ -9,11 +9,13 @@ import {
   selectStats,
   selectLevel,
   selectXP,
+  selectWeeklyXP,
   saveGamificationToStorage,
 } from "../store/slices/gamificationSlice";
 import { calculateXP, checkBadgeUnlocks, getLevelForXP } from "../lib/xpEngine";
 import { useAuth } from "../contexts/AuthContext";
 import { logXP } from "../supabase/xp";
+import { saveGamificationToSupabase } from "../supabase/profiles";
 
 export function useGamification() {
   const dispatch = useAppDispatch();
@@ -22,6 +24,7 @@ export function useGamification() {
   const stats = useAppSelector(selectStats);
   const level = useAppSelector(selectLevel);
   const totalXP = useAppSelector(selectXP);
+  const weeklyXP = useAppSelector(selectWeeklyXP);
 
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });
   const [badgeModal, setBadgeModal] = useState({ visible: false, badge: null });
@@ -33,21 +36,25 @@ export function useGamification() {
   const badgeIdsRef = useRef(badgeIds);
   const levelRef = useRef(level);
   const totalXPRef = useRef(totalXP);
+  const weeklyXPRef = useRef(weeklyXP);
   const saveTimer = useRef(null);
   statsRef.current = stats;
   badgeIdsRef.current = badgeIds;
   levelRef.current = level;
   totalXPRef.current = totalXP;
+  weeklyXPRef.current = weeklyXP;
 
   const debouncedSave = useCallback(() => {
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      saveGamificationToStorage({
-        xp: totalXPRef.current, weeklyXP: 0,
+      const state = {
+        xp: totalXPRef.current, weeklyXP: weeklyXPRef.current,
         badges: badgeIdsRef.current, stats: statsRef.current,
-      });
+      };
+      saveGamificationToStorage(state);
+      saveGamificationToSupabase(user?.id, state.badges, state.stats);
     }, 500);
-  }, []);
+  }, [user?.id]);
 
   const reward = useCallback(
     (action, data = {}) => {
