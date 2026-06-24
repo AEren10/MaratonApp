@@ -148,7 +148,7 @@ export default function PaywallScreen() {
               <Text style={s.ctaText}>Hemen Başla</Text>
             )}
           </AnimatedPressable>
-          <Text style={s.socialProof}>Bu hafta 1.200+ öğrenci Pro'ya geçti</Text>
+          <Text style={s.socialProof}>7 gün ücretsiz dene, beğenmezsen iptal et</Text>
           <Text style={s.cancelText}>İstediğin zaman iptal edebilirsin</Text>
           <Pressable onPress={handleRestore} style={s.restoreBtn}>
             <Text style={[s.restoreText, { color: C.accent }]}>Satın almayı geri yükle</Text>

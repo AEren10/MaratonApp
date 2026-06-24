@@ -8,7 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, AnimatedPressable } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useGamification } from "../../hooks/useGamification";
-import { XPToast } from "../../components/common/XPToast";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
@@ -135,7 +135,7 @@ export default function AddWrongScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <View
         style={{
           flexDirection: "row",
@@ -320,7 +320,7 @@ export default function AddWrongScreen() {
         onClose={() => setPickerOpen(false)}
         onSelect={(name, source) => { setTopic(name); setTopicSource(source); }}
       />
-      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+      <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
       </KeyboardAvoidingView>
     </SafeAreaView>

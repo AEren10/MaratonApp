@@ -14,6 +14,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev" || !subjectKey || !topicName) return;
@@ -27,10 +28,13 @@ export function TopicNoteCard({ subjectKey, topicName }) {
   const save = useCallback(async () => {
     if (!user?.id || user.id === "dev") return;
     setSaving(true);
+    setSaveError(false);
     try {
       await saveTopicNote(user.id, subjectKey, topicName, note);
       setSaved(note);
-    } catch (_) {}
+    } catch (_) {
+      setSaveError(true);
+    }
     setSaving(false);
   }, [user?.id, subjectKey, topicName, note]);
 
@@ -41,6 +45,9 @@ export function TopicNoteCard({ subjectKey, topicName }) {
       <View style={s.head}>
         <Icon name="edit" size={15} color={C.accent} />
         <Text style={s.title}>Konu Notum</Text>
+        {saveError ? (
+          <Text style={{ ...TYPOGRAPHY.micro, color: C.danger }}>Kaydedilemedi</Text>
+        ) : null}
         {dirty ? (
           <Pressable onPress={save} disabled={saving} style={s.saveBtn}>
             <Text style={s.saveText}>{saving ? "..." : "Kaydet"}</Text>

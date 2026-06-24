@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInLeft, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -193,7 +194,10 @@ export default function RoadmapScreen() {
       </View>
 
       {loading ? (
-        <View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View>
+        <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.lg }}>
+          <SkeletonCard height={80} />
+          {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} height={100} />)}
+        </View>
       ) : (
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
           <ProgressHeader roadmap={roadmap} C={C} s={s} />

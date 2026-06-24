@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { getDaily, getStreakRisk, getWeekly, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 
@@ -61,15 +62,18 @@ export async function cancelAllScheduled() {
 export async function scheduleDailyReminder(hour = 19, minute = 0) {
   if (Platform.OS === "web") return null;
   try {
+    const optHour = await getOptimalHour().catch(() => hour);
+    const useHour = Math.abs(optHour - hour) <= 3 ? optHour : hour;
+    const { title, body } = getDaily();
     return await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Çalışma zamanı 📚",
-        body: "Bugün hala bir kayıt girmedin. 15 dakika bile yeter — başla!",
+        title,
+        body,
         data: { type: "daily_reminder", url: "maraton://plan" },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour,
+        hour: useHour,
         minute,
       },
     });
@@ -78,13 +82,16 @@ export async function scheduleDailyReminder(hour = 19, minute = 0) {
   }
 }
 
-export async function scheduleStreakRiskReminder() {
+export async function scheduleStreakRiskReminder(streak = 0) {
   if (Platform.OS === "web") return null;
   try {
+    const { title, body } = streak > 0
+      ? getStreakRisk(streak)
+      : { title: "Streak'in tehlikede!", body: "Bugün hiç çalışma kaydetmedin. Seriyi bozma!" };
     return await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Streak'in tehlikede 🔥",
-        body: "Bugün hiç çalışma kaydetmedin. Birazcık çalış, seriyi bozma!",
+        title,
+        body,
         data: { type: "streak_risk", url: "maraton://home" },
       },
       trigger: {
@@ -98,13 +105,17 @@ export async function scheduleStreakRiskReminder() {
   }
 }
 
-export async function scheduleWeeklySummary() {
+export async function scheduleWeeklySummary(weeklyVars = {}) {
   if (Platform.OS === "web") return null;
   try {
+    const hasVars = weeklyVars.xp || weeklyVars.questions || weeklyVars.minutes;
+    const { title, body } = hasVars
+      ? getWeekly({ xp: weeklyVars.xp || 0, questions: weeklyVars.questions || 0, minutes: weeklyVars.minutes || 0 })
+      : { title: "Haftalık raporun hazır", body: "Bu haftanın özetine göz at!" };
     return await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Haftalık raporun hazır 📊",
-        body: "Bu haftaki çalışma özetine göz at — ne kadar ilerledin?",
+        title,
+        body,
         data: { type: "weekly_summary", url: "maraton://weekly-review" },
       },
       trigger: {
@@ -140,17 +151,17 @@ export async function scheduleTrialReminder() {
   }
 }
 
-export async function applyNotifPrefs(prefs) {
+export async function applyNotifPrefs(prefs, context = {}) {
   await cancelAllScheduled();
   if (!prefs) return;
   if (prefs.dailyReminderEnabled) {
     await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute);
   }
   if (prefs.streakRiskEnabled) {
-    await scheduleStreakRiskReminder();
+    await scheduleStreakRiskReminder(context.streak);
   }
   if (prefs.weeklySummaryEnabled !== false) {
-    await scheduleWeeklySummary();
+    await scheduleWeeklySummary(context.weeklyVars);
   }
   if (prefs.trialReminderEnabled) {
     await scheduleTrialReminder();
@@ -163,10 +174,11 @@ export async function scheduleTaskNotifications(taskCount) {
   if (prefs.taskReminderEnabled === false) return;
   await cancelTaskReminders();
   try {
+    const zContent = getZeigarnikContent({ count: taskCount, subject: "", percent: "" });
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Çalışma listen yarım kaldı 📋",
-        body: `${taskCount} görevden tamamlanmamışlar var. Geri dön ve bitir!`,
+        title: zContent.title || "Yarım kalan görevlerin var",
+        body: zContent.body || `${taskCount} görev tamamlanmamış. Geri dön ve bitir!`,
         data: { type: "task_reminder", url: "maraton://plan" },
       },
       trigger: {
@@ -210,7 +222,7 @@ export async function getExpoPushToken() {
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") return null;
     const { data } = await Notifications.getExpoPushTokenAsync({
-      projectId: "maraton",
+      projectId: "b7c40c1c-f724-4c07-ad36-696ef890ce64",
     });
     return data;
   } catch {

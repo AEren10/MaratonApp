@@ -57,6 +57,7 @@ export function SettingsMenu({ onNavigate, onLogout }) {
     {
       title: "ÇALIŞMA",
       items: [
+        { icon: "crown",    label: "Maraton Pro",       route: SCREENS.PAYWALL,         color: C.accent },
         { icon: "target",   label: "Hedeflerim",       route: SCREENS.GOALS,           color: C.green },
         { icon: "clock",    label: "Çalışma Geçmişi",  route: SCREENS.STUDY_LOG,       color: C.blue },
         { icon: "hash",     label: "Konu Kartları",     route: SCREENS.TOPIC_CARDS,     color: C.brandLight },

@@ -7,7 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Icon, IconBox } from "../design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
 export function LevelUpModal({ visible, level, title, onClose }) {
@@ -36,7 +36,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
   if (!visible) return null;
 
   return (
-    <Modal visible transparent animationType="fade" statusBarTranslucent>
+    <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <View style={s.overlay}>
         <Animated.View entering={ZoomIn.springify().damping(14)} style={s.card}>
           <Animated.Text entering={FadeInDown.delay(100)} style={s.eyebrow}>
@@ -79,22 +79,22 @@ export function LevelUpModal({ visible, level, title, onClose }) {
 
 function makeStyles(C) {
   return StyleSheet.create({
-    overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", alignItems: "center", justifyContent: "center", padding: 28 },
+    overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.70)", alignItems: "center", justifyContent: "center", padding: SPACING.xxxl },
     card: {
-      width: "100%", maxWidth: 340, borderRadius: 28, padding: 32,
+      width: "100%", maxWidth: 340, borderRadius: RADIUS.xxl, padding: SPACING.xxxl,
       alignItems: "center", backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
     },
-    eyebrow: { fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.accent, letterSpacing: 1.5, marginBottom: 16 },
-    iconWrap: { width: 120, height: 120, alignItems: "center", justifyContent: "center", marginBottom: 16 },
+    eyebrow: { ...TYPOGRAPHY.label, color: C.accent, letterSpacing: 1.5, marginBottom: SPACING.lg },
+    iconWrap: { width: 120, height: 120, alignItems: "center", justifyContent: "center", marginBottom: SPACING.lg },
     glow: { position: "absolute", width: 110, height: 110, borderRadius: 55 },
-    levelNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 36, color: C.text },
-    levelTitle: { fontFamily: "SpaceGrotesk_600SemiBold", fontSize: 20, color: C.accent, marginTop: 4 },
-    sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: 12, lineHeight: 22 },
+    levelNum: { ...TYPOGRAPHY.stat, color: C.text },
+    levelTitle: { ...TYPOGRAPHY.subheading, color: C.accent, marginTop: SPACING.xs },
+    sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: SPACING.md, lineHeight: 22 },
     btn: {
       flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: 8, borderRadius: RADIUS.xl, paddingVertical: 16, marginTop: 24,
+      gap: SPACING.sm, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxl,
       shadowColor: C.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
     },
-    btnText: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" },
+    btnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 16, color: "#FFFFFF" },
   });
 }

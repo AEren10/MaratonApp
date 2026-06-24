@@ -19,6 +19,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.maraton.app",
       "buildNumber": "1",
+      "usesAppleSignIn": true,
+      "associatedDomains": ["applinks:maraton.app"],
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
         "NSCameraUsageDescription": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli.",
@@ -29,6 +31,20 @@
     "android": {
       "package": "com.maraton.app",
       "versionCode": 1,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "maraton.app",
+              "pathPrefix": "/referral"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A0F"
@@ -45,6 +61,13 @@
       "expo-font",
       "expo-secure-store",
       "@sentry/react-native/expo",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.PLACEHOLDER_IOS_CLIENT_ID"
+        }
+      ],
       [
         "expo-notifications",
         {

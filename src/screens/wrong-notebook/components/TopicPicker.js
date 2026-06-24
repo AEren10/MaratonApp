@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet } from "react-native";
+import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet, Platform, KeyboardAvoidingView } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
@@ -46,6 +46,7 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <Pressable style={s.backdrop} onPress={onClose}>
         <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={s.handle} />
@@ -105,6 +106,7 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
           )}
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

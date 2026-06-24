@@ -34,6 +34,12 @@ export const linkingConfig = {
       ReviewSession: "yanlis/tekrar",
       SubjectDetail: "ders/:subjectKey",
       WeeklyReview: "weekly-review",
+      Referral: {
+        path: "referral/:code?",
+        parse: { code: (c) => c?.toUpperCase() },
+      },
+      Paywall: "premium",
+      ShareCard: "paylasim",
       Settings: "ayarlar",
       NotificationsSettings: "ayarlar/bildirim",
       Privacy: "gizlilik",

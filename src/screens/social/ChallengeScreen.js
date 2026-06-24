@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -66,7 +67,7 @@ export default function ChallengeScreen() {
   }, [pick, load]);
 
   const handleCancel = useCallback(async (id) => {
-    try { await cancelChallenge(id, user.id); load(); } catch {}
+    try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Challenge iptal edilemedi."); }
   }, [load, user.id]);
 
   const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);
@@ -76,7 +77,14 @@ export default function ChallengeScreen() {
 
   const renderItem = useCallback(({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />, [user, handleCancel, s, C]);
 
-  if (loading) return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
+  if (loading) return (
+    <SafeAreaView edges={["top"]} style={s.safe}>
+      <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.md }}>
+        <SkeletonCard height={24} width={180} rounded={8} />
+        {[1, 2, 3].map((i) => <SkeletonCard key={i} height={100} />)}
+      </View>
+    </SafeAreaView>
+  );
 
   if (creating) {
     return (

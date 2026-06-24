@@ -10,6 +10,43 @@ function genCode() {
   return code;
 }
 
+// Client-side brute-force throttle for join codes
+const JOIN_THROTTLE = {
+  failures: 0,
+  lockedUntil: 0,
+  MAX_FAILURES: 5,
+  LOCKOUT_MS: 5 * 60 * 1000, // 5 min lockout after MAX_FAILURES
+  getBackoffMs() {
+    if (this.failures === 0) return 0;
+    // Exponential backoff: 1s, 2s, 4s, 8s then lockout
+    return Math.min(1000 * Math.pow(2, this.failures - 1), this.LOCKOUT_MS);
+  },
+  check() {
+    const now = Date.now();
+    if (this.lockedUntil > now) {
+      const secs = Math.ceil((this.lockedUntil - now) / 1000);
+      throw new Error(`Cok fazla basarisiz deneme. ${secs} saniye sonra tekrar deneyin.`);
+    }
+    const backoff = this.getBackoffMs();
+    if (backoff > 0 && this.lastAttempt && now - this.lastAttempt < backoff) {
+      const secs = Math.ceil((backoff - (now - this.lastAttempt)) / 1000);
+      throw new Error(`Lutfen ${secs} saniye bekleyin.`);
+    }
+  },
+  recordFailure() {
+    this.failures += 1;
+    this.lastAttempt = Date.now();
+    if (this.failures >= this.MAX_FAILURES) {
+      this.lockedUntil = Date.now() + this.LOCKOUT_MS;
+    }
+  },
+  recordSuccess() {
+    this.failures = 0;
+    this.lockedUntil = 0;
+    this.lastAttempt = 0;
+  },
+};
+
 export async function createGroup(name) {
   try {
     if (!name?.trim()) throw new Error("Grup adı gerekli");
@@ -37,11 +74,14 @@ export async function createGroup(name) {
 }
 
 export async function joinByCode(code) {
+  JOIN_THROTTLE.check();
   try {
     const { data, error } = await supabase.rpc("join_group_by_code", { group_code: code.trim().toUpperCase() });
     if (error) throw error;
+    JOIN_THROTTLE.recordSuccess();
     return data; // group id
   } catch (e) {
+    JOIN_THROTTLE.recordFailure();
     handleSupabaseError(e, "joinByCode");
     throw e;
   }

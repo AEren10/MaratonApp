@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -85,8 +86,8 @@ export default function StudyHistoryScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.loader}>
-          <ActivityIndicator color={C.accent} size="large" />
+        <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.md }}>
+          {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} height={64} />)}
         </View>
       ) : sections.length === 0 ? (
         <EmptyState

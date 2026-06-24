@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
@@ -12,6 +12,8 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { XP_REWARDS } from "../../constants/gamification";
+import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
+import { useInAppReview } from "../../hooks/useInAppReview";
 
 export default function StudySummaryScreen() {
   const C = useC();
@@ -47,7 +49,20 @@ export default function StudySummaryScreen() {
     return xp;
   }, [duration, questions]);
 
-  useEffect(() => { H.success(); }, []);
+  const { incrementAndCheck, showDelayedPaywall, cleanup } = usePaywallTrigger();
+  const { maybeRequestReview } = useInAppReview();
+
+  useEffect(() => {
+    H.success();
+    incrementAndCheck().then((shouldShowPaywall) => {
+      if (shouldShowPaywall) {
+        showDelayedPaywall(2000);
+      } else {
+        setTimeout(() => maybeRequestReview(), 2500);
+      }
+    });
+    return cleanup;
+  }, []);
 
   const safeGoal = dailyGoal > 0 ? dailyGoal : 100;
   const goalPct = Math.min(todaySolved / safeGoal, 1);

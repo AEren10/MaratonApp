@@ -13,6 +13,7 @@ export const getStudyLogs = async (userId, { from, to } = {}) => {
 
     if (from) query = query.gte("study_date", from);
     if (to) query = query.lte("study_date", to);
+    if (!from && !to) query = query.limit(500);
 
     const { data, error } = await query;
     if (error) throw error;

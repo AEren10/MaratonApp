@@ -4,30 +4,43 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import { useC } from "../../../contexts/ThemeContext";
-import { Icon, Spot } from "../../../components/design";
+import { Icon } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
 import { uploadAvatar, getAvatarUrl } from "../../../supabase/storage";
 import { getProfile, updateProfile } from "../../../supabase/profiles";
 import { useAlert } from "../../../contexts/AlertContext";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
 function avatarPalette(name = "?", C) {
   const sum = name.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
-  // Canlı solid → aynı tonun yarı saydamı: token-driven, dark/light tutarlı.
   const palette = [
     [C.accent, C.accent + "CC"],
     [C.purple, C.pink + "CC"],
-    [C.blue,   C.teal + "CC"],
-    [C.pink,   C.purple + "CC"],
-    [C.green,  C.teal + "CC"],
-    [C.teal,   C.blue + "CC"],
+    [C.blue, C.teal + "CC"],
+    [C.pink, C.purple + "CC"],
+    [C.green, C.teal + "CC"],
+    [C.teal, C.blue + "CC"],
   ];
   return palette[sum % palette.length];
 }
 
-// Klasik profil başlığı: ortalanmış büyük avatar + isim + exam + lig chip + countdown.
-// Tema-duyarlı (useC) — light ve dark'ta nötr, hardcoded renk yok.
-export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
+function StatPill({ icon, label, color, C }) {
+  return (
+    <View style={{
+      flexDirection: "row", alignItems: "center", gap: 5,
+      backgroundColor: color + "16",
+      borderWidth: 1, borderColor: color + "35",
+      paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+      borderRadius: RADIUS.pill,
+    }}>
+      {icon ? <Icon name={icon} size={13} color={color} /> : null}
+      <Text style={{ ...TYPOGRAPHY.captionMedium, color }}>{label}</Text>
+    </View>
+  );
+}
+
+export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak }) {
   const C = useC();
   const initials = (name || "??").slice(0, 2).toUpperCase();
   const { user } = useAuth();
@@ -89,26 +102,22 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
     ]);
   };
 
-  return (
-    <View style={{ marginTop: 16, marginBottom: 18, alignItems: "center" }}>
-      {/* Hafif dekoratif backdrop — glyph avatarın arkasında gizli, blob+noktalar çevrede */}
-      <View pointerEvents="none" style={{ position: "absolute", top: -42, opacity: 0.6 }}>
-        <Spot name="trophy" size={216} color={c1} />
-      </View>
+  const leagueColor = league?.color || C.accent;
 
-      {/* === Büyük ortalanmış avatar === */}
+  return (
+    <View style={{ marginTop: SPACING.md, marginBottom: SPACING.lg, alignItems: "center" }}>
+      {/* Avatar */}
       <Pressable onPress={pickAvatar}>
         <View style={{
-          width: 132, height: 132, borderRadius: 66,
+          width: 120, height: 120, borderRadius: 60,
           overflow: "hidden",
           backgroundColor: C.surface2,
-          borderWidth: 3,
-          borderColor: C.accent + "55",
+          borderWidth: 3, borderColor: C.accent + "55",
         }}>
           {avatarUri ? (
             <Image
               source={avatarSource}
-              style={{ width: 132, height: 132 }}
+              style={{ width: 120, height: 120 }}
               contentFit="cover"
               cachePolicy="memory-disk"
               transition={200}
@@ -116,15 +125,12 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
           ) : (
             <LinearGradient
               colors={[c1, c2]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ width: 132, height: 132, alignItems: "center", justifyContent: "center" }}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={{ width: 120, height: 120, alignItems: "center", justifyContent: "center" }}
             >
               <Text style={{
                 fontFamily: "SpaceGrotesk_700Bold",
-                fontSize: 52,
-                color: "#FFFFFF",
-                letterSpacing: -1.4,
+                fontSize: 48, color: "#FFFFFF", letterSpacing: -1.4,
               }}>
                 {initials}
               </Text>
@@ -140,87 +146,59 @@ export function ProfileHeader({ name = "Öğrenci", exam, league, countdown }) {
             </View>
           )}
         </View>
-        {/* Camera fab */}
         <View style={{
-          position: "absolute",
-          bottom: 4, right: 4,
-          width: 38, height: 38, borderRadius: 19,
+          position: "absolute", bottom: 2, right: 2,
+          width: 34, height: 34, borderRadius: 17,
           backgroundColor: C.accent,
           alignItems: "center", justifyContent: "center",
-          borderWidth: 3,
-          borderColor: C.bg,
+          borderWidth: 3, borderColor: C.bg,
         }}>
-          <Icon name="camera" size={16} color="#FFFFFF" sw={2.4} />
+          <Icon name="camera" size={14} color="#FFFFFF" sw={2.4} />
         </View>
       </Pressable>
 
-      {/* === İsim === */}
+      {/* Name */}
       <Text style={{
-        fontFamily: "SpaceGrotesk_700Bold",
-        fontSize: 26,
-        color: C.text,
-        letterSpacing: -0.5,
-        marginTop: 18,
+        ...TYPOGRAPHY.heading, fontSize: 26,
+        color: C.text, letterSpacing: -0.5,
+        marginTop: SPACING.lg,
       }} numberOfLines={1}>
         {name}
       </Text>
 
-      {/* === Exam type === */}
+      {/* Exam label */}
       {exam ? (
-        <Text style={{
-          fontFamily: "Inter_500Medium",
-          fontSize: 14,
-          color: C.sec,
-          marginTop: 4,
-        }}>
+        <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs }}>
           {exam}
         </Text>
       ) : null}
 
-      {/* === Lig chip === */}
+      {/* Stat pills */}
       <View style={{
-        flexDirection: "row", alignItems: "center", gap: 6,
-        backgroundColor: C.accent + "18",
-        borderWidth: 1,
-        borderColor: C.accent + "40",
-        paddingHorizontal: 12, paddingVertical: 6,
-        borderRadius: 999,
-        marginTop: 14,
-        alignSelf: "center",
+        flexDirection: "row", flexWrap: "wrap",
+        justifyContent: "center",
+        gap: SPACING.sm,
+        marginTop: SPACING.lg,
       }}>
-        {league?.icon ? <Icon name={league.icon} size={13} color={C.accent} /> : null}
-        <Text style={{
-          fontFamily: "Inter_600SemiBold",
-          fontSize: 12,
-          color: C.accent,
-          letterSpacing: 0.4,
-        }}>
-          {league?.name || "Bronz Lig"}
-        </Text>
+        <StatPill
+          icon="shield"
+          label={`Lv.${level?.level || 1} ${level?.title || "Acemi"}`}
+          color={C.accent}
+          C={C}
+        />
+        <StatPill
+          icon={league?.icon || "medal"}
+          label={league?.name || "Bronz Lig"}
+          color={leagueColor}
+          C={C}
+        />
+        <StatPill
+          icon="flame"
+          label={`${streak || 0} gün`}
+          color={C.orange}
+          C={C}
+        />
       </View>
-
-      {/* === Countdown stat === */}
-      {countdown != null ? (
-        <View style={{ alignItems: "center", marginTop: 18 }}>
-          <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-            <Text style={{
-              fontFamily: "SpaceGrotesk_700Bold",
-              fontSize: 38,
-              color: C.text,
-              letterSpacing: -1,
-            }}>
-              {countdown}
-            </Text>
-            <Text style={{
-              fontFamily: "Inter_500Medium",
-              fontSize: 15,
-              color: C.sec,
-            }}>
-              gün kaldı
-            </Text>
-          </View>
-        </View>
-      ) : null}
     </View>
   );
 }

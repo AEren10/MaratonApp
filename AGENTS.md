@@ -33,8 +33,9 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before 
 
 ## Styling Rules
 - Dark background: #0A0A0F
-- Accent: #F5A623 (amber) for CTAs and active states
-- Subject colors: Turkce=#60A5FA, Matematik=#F5A623, Fen=#34D399, Sosyal=#A78BFA
+- Brand accent: #8b5cf6 (purple) for CTAs, selections, and interactive affordances
+- Energy accent: #ff6b35 (orange-coral) for streaks, FAB, and completion actions
+- Subject colors: Turkce=#60A5FA, Matematik=#fb923c, Fen=#34D399, Sosyal=#A78BFA
 - Cards: rounded-2xl (24px), surface color #1A1A23, border #2A2A36
 - Stats/numbers: Space Grotesk Bold, oversized
 - Touch targets: minimum 44px, spacing minimum 8px

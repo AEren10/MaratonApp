@@ -19,6 +19,7 @@ import { getUserTasksByDate } from "../supabase/userTasks";
 import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
 import { getExpoPushToken } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
+import { supabase } from "../supabase/client";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 
 async function retryPendingStreak() {
@@ -128,14 +129,26 @@ async function loadAll(userId, dispatch) {
 
   if (xpFromServer > 0 || (Array.isArray(serverBadges) && serverBadges.length > 0)) {
     const patch = { xp: xpFromServer, weeklyXP: weeklyFromServer };
-    if (Array.isArray(serverBadges)) patch.badges = serverBadges;
-    if (serverStats && typeof serverStats === "object") patch.stats = serverStats;
+    if (Array.isArray(serverBadges) && serverBadges.length > 0) patch.badges = serverBadges;
+    if (serverStats && typeof serverStats === "object") {
+      const { claimedMilestones: cm, ...pureStats } = serverStats;
+      patch.stats = pureStats;
+      if (Array.isArray(cm) && cm.length > 0) patch.claimedMilestones = cm;
+    }
     dispatch(hydrateGamification(patch));
   }
 
   getExpoPushToken().then((token) => {
     if (token) registerPushToken(userId, token);
   }).catch(() => {});
+
+  // Update last_active for server-side push targeting
+  supabase
+    .from("profiles")
+    .update({ last_active: new Date().toISOString() })
+    .eq("id", userId)
+    .then(() => {})
+    .catch(() => {});
 }
 
 export function useDataSync() {

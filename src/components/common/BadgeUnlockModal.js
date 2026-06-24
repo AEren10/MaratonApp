@@ -6,6 +6,7 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { HexBadge } from "../design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
 export function BadgeUnlockModal({ badge, visible, onClose }) {
@@ -65,22 +66,22 @@ export function BadgeUnlockModal({ badge, visible, onClose }) {
 
 function makeStyles(C) {
   return StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", alignItems: "center", justifyContent: "center" },
+    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.70)", alignItems: "center", justifyContent: "center" },
     content: {
-      backgroundColor: C.surface, borderRadius: 32, borderWidth: 1, borderColor: C.border,
-      padding: 32, alignItems: "center", marginHorizontal: 32, width: "85%", maxWidth: 340,
+      backgroundColor: C.surface, borderRadius: RADIUS.xxl, borderWidth: 1, borderColor: C.border,
+      padding: SPACING.xxxl, alignItems: "center", marginHorizontal: SPACING.xxxl, width: "85%", maxWidth: 340,
     },
-    congrats: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.text, marginBottom: 22 },
-    badgeWrap: { width: 150, height: 150, alignItems: "center", justifyContent: "center", marginBottom: 18 },
+    congrats: { ...TYPOGRAPHY.heading, color: C.text, marginBottom: SPACING.xl },
+    badgeWrap: { width: 150, height: 150, alignItems: "center", justifyContent: "center", marginBottom: SPACING.lg },
     glow: { position: "absolute", width: 130, height: 130, borderRadius: 65 },
     rays: { position: "absolute", width: 150, height: 150, alignItems: "center", justifyContent: "center" },
     ray: { position: "absolute", width: 4, height: 16, borderRadius: 2, opacity: 0.55 },
-    badgeName: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: C.text, marginBottom: 8 },
-    badgeDesc: { fontFamily: "Inter_400Regular", fontSize: 14, color: C.sec, textAlign: "center", marginBottom: 26, lineHeight: 20 },
+    badgeName: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.sm },
+    badgeDesc: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginBottom: SPACING.xxl, lineHeight: 20 },
     btn: {
-      borderRadius: 16, paddingHorizontal: 40, paddingVertical: 14,
+      borderRadius: RADIUS.lg, paddingHorizontal: SPACING.huge, paddingVertical: SPACING.md,
       shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
     },
-    btnText: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" },
+    btnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 16, color: "#FFFFFF" },
   });
 }

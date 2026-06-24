@@ -13,6 +13,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
 import { updateProfile } from "../../supabase/profiles";
 import { useAlert } from "../../contexts/AlertContext";
+import { captureError } from "../../lib/errorReporting";
 import * as H from "../../lib/haptics";
 import { GoalHeroCard } from "./components/GoalHeroCard";
 
@@ -76,7 +77,7 @@ export default function GoalsScreen() {
         daily_question_goal: draft.dailyQuestions,
         weekly_trials_goal: draft.weeklyTrials,
         weekly_minutes_goal: draft.weeklyMinutes,
-      }); } catch (e) { __DEV__ && console.warn("goals sync failed:", e); }
+      }); } catch (e) { captureError(e, { context: "goals_sync" }); }
     }
     H.success();
     showAlert("Kaydedildi", "Hedeflerin güncellendi.");

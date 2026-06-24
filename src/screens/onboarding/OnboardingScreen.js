@@ -40,7 +40,7 @@ const SLIDES = [
     gradientKey: "green",
     tail: "#7CD8A8",
     title: "Birlikte Çalış",
-    desc: "Canlı çalışma odalarına katıl, arkadaşlarınla yarışarak motive ol.",
+    desc: "Gruplarına katıl, arkadaşlarınla yarışarak motive ol.",
   },
 ];
 

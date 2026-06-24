@@ -5,16 +5,23 @@ import { Icon, SparkBurst, AnimatedPressable } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
-const CONFETTI = ["🎉", "⭐", "🔥", "💪", "✨", "🏆"];
+const CONFETTI_ICONS = [
+  { name: "trophy", color: "#fbbf24" },
+  { name: "star", color: "#fbbf24" },
+  { name: "flame", color: "#f97316" },
+  { name: "zap", color: "#a78bfa" },
+  { name: "award", color: "#34d399" },
+  { name: "target", color: "#60a5fa" },
+];
 
-export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solved, goal, onDismiss, onShare }) {
+export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solved, goal, xpEarned = 0, onDismiss, onShare }) {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
 
   if (!visible) return null;
 
   return (
-    <Modal visible transparent animationType="fade" statusBarTranslucent>
+    <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onDismiss}>
       <View style={s.overlay}>
         <View style={s.burstWrap} pointerEvents="none">
           <SparkBurst trigger={visible} />
@@ -22,10 +29,10 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
         <Animated.View entering={ZoomIn.springify().damping(14)} style={s.card}>
           <View style={s.confettiRow}>
-            {CONFETTI.map((e, i) => (
-              <Animated.Text key={i} entering={BounceIn.delay(200 + i * 80)} style={s.confetti}>
-                {e}
-              </Animated.Text>
+            {CONFETTI_ICONS.map((c, i) => (
+              <Animated.View key={i} entering={BounceIn.delay(200 + i * 80)}>
+                <Icon name={c.name} size={24} color={c.color} />
+              </Animated.View>
             ))}
           </View>
 
@@ -38,10 +45,12 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
               <Text style={[s.statNum, { color: C.green }]}>{solved}</Text>
               <Text style={[s.statLabel, { color: C.green }]}>soru</Text>
             </View>
-            <View style={[s.statBox, { backgroundColor: C.accent + "14" }]}>
-              <Text style={[s.statNum, { color: C.accent }]}>+40</Text>
-              <Text style={[s.statLabel, { color: C.accent }]}>XP</Text>
-            </View>
+            {xpEarned > 0 && (
+              <View style={[s.statBox, { backgroundColor: C.accent + "14" }]}>
+                <Text style={[s.statNum, { color: C.accent }]}>+{xpEarned}</Text>
+                <Text style={[s.statLabel, { color: C.accent }]}>XP</Text>
+              </View>
+            )}
           </Animated.View>
 
           <Animated.Text entering={FadeInDown.delay(500)} style={s.sub}>
@@ -75,34 +84,34 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
 function makeStyles(C) {
   return StyleSheet.create({
-    overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", alignItems: "center", justifyContent: "center", padding: 28 },
+    overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.70)", alignItems: "center", justifyContent: "center", padding: SPACING.xxxl },
     burstWrap: {
       ...StyleSheet.absoluteFillObject,
       alignItems: "center",
       justifyContent: "center",
     },
     card: {
-      width: "100%", borderRadius: 28, padding: 28,
+      width: "100%", borderRadius: RADIUS.xxl, padding: SPACING.xxxl,
       alignItems: "center", backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
     },
-    confettiRow: { flexDirection: "row", gap: 6, marginBottom: 12 },
-    confetti: { fontSize: 28 },
-    title: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.text, textAlign: "center" },
-    sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: 12, lineHeight: 22 },
-    statsRow: { flexDirection: "row", gap: 12, marginTop: 20 },
-    statBox: { alignItems: "center", paddingHorizontal: 28, paddingVertical: 14, borderRadius: RADIUS.xl },
-    statNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 28 },
-    statLabel: { fontFamily: "Inter_400Regular", fontSize: 12, marginTop: 2 },
-    btnRow: { flexDirection: "row", gap: 12, marginTop: 24, width: "100%" },
+    confettiRow: { flexDirection: "row", gap: SPACING.xs, marginBottom: SPACING.md },
+    confettiIcon: { marginHorizontal: SPACING.xs },
+    title: { ...TYPOGRAPHY.heading, color: C.text, textAlign: "center" },
+    sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: SPACING.md, lineHeight: 22 },
+    statsRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.xl },
+    statBox: { alignItems: "center", paddingHorizontal: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.xl },
+    statNum: { ...TYPOGRAPHY.statSmall, fontSize: 28 },
+    statLabel: { ...TYPOGRAPHY.micro, marginTop: SPACING.xs },
+    btnRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.xxl, width: "100%" },
     shareBtn: {
       flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: 6, borderRadius: RADIUS.xl, paddingVertical: 14, borderWidth: 1.5,
+      gap: SPACING.xs, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, borderWidth: 1.5,
     },
-    shareBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 15 },
+    shareBtnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15 },
     mainBtn: {
       flex: 1, alignItems: "center", justifyContent: "center",
-      borderRadius: RADIUS.xl, paddingVertical: 14,
+      borderRadius: RADIUS.xl, paddingVertical: SPACING.md,
     },
-    mainBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#FFFFFF" },
+    mainBtnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15, color: "#FFFFFF" },
   });
 }

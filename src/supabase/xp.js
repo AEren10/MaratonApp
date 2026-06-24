@@ -17,10 +17,11 @@ export async function getTotalXP(userId) {
   try {
     const { data, error } = await supabase
       .from("xp_events")
-      .select("amount")
-      .eq("user_id", userId);
+      .select("amount.sum()")
+      .eq("user_id", userId)
+      .single();
     if (error) return 0;
-    return (data || []).reduce((sum, r) => sum + (r.amount || 0), 0);
+    return data?.sum || 0;
   } catch {
     return 0;
   }
@@ -37,11 +38,12 @@ export async function getWeeklyXP(userId) {
 
     const { data, error } = await supabase
       .from("xp_events")
-      .select("amount")
+      .select("amount.sum()")
       .eq("user_id", userId)
-      .gte("created_at", monday.toISOString());
+      .gte("created_at", monday.toISOString())
+      .single();
     if (error) return 0;
-    return (data || []).reduce((sum, r) => sum + (r.amount || 0), 0);
+    return data?.sum || 0;
   } catch {
     return 0;
   }

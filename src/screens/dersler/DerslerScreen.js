@@ -12,6 +12,7 @@ import { AnimatedCard } from "../../components/design/AnimatedCard";
 import { SubjectCard } from "./components/SubjectCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
+import { captureError } from "../../lib/errorReporting";
 
 const GROUP_META = {
   fen: { label: "Fen Bilimleri", color: null, icon: "activity" },
@@ -248,7 +249,7 @@ export default function DerslerScreen() {
         map[r.subject_key][r.topic_name || r.topic_id] = r;
       });
       setProgressMap(map);
-    } catch (_) {}
+    } catch (e) { captureError(e, { context: "dersler_loadProgress" }); }
   }, [user?.id]);
 
   useEffect(() => { loadProgress(); }, [loadProgress]);

@@ -13,8 +13,9 @@ import { useAppDispatch } from "../../store/hooks";
 import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
 import { computeStreakUpdate } from "../../lib/streakFreeze";
 import { useGamification } from "../../hooks/useGamification";
+import { captureError } from "../../lib/errorReporting";
 import { useCurriculum } from "../../hooks/useCurriculum";
-import { XPToast } from "../../components/common/XPToast";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
@@ -141,7 +142,7 @@ export default function AddStudyScreen() {
           AsyncStorage.setItem(STORAGE_KEYS.PENDING_STREAK, JSON.stringify({ userId: user.id, updates })).catch(() => {});
         }
         if (usedFreeze) showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
-      } catch (e) { __DEV__ && console.warn("streak update failed:", e); }
+      } catch (e) { captureError(e, { context: "streak_update_addStudy" }); }
       syncChallengeProgress(user.id, { questions: qc, minutes: duration });
     } else if (result.queued) {
       const msg = result.error?.message || "";
@@ -170,7 +171,7 @@ export default function AddStudyScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <View style={st.header}>
           <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={[st.closeBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
             <Icon name="x" size={18} color={C.text} />
@@ -273,7 +274,7 @@ export default function AddStudyScreen() {
         <TopicPicker subject={current} visible={topicOpen} onSelect={(t) => { setTopic(t); setTopicOpen(false); }} onClose={() => setTopicOpen(false)} />
       ) : null}
 
-      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+      <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );

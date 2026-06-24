@@ -11,7 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
-import { XPToast } from "../../components/common/XPToast";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { AppModal } from "../../components/common/AppModal";
 import { useGamification } from "../../hooks/useGamification";
@@ -454,7 +454,7 @@ export default function WrongNotebookScreen() {
         message={errorModal.message}
         actions={[{ label: "Tamam", style: "cancel" }]}
       />
-      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+      <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
       <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );

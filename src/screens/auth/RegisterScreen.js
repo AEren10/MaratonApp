@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SPACING, SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { Icon } from "../../components/design";
+import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -112,7 +113,7 @@ export default function RegisterScreen() {
       </LinearGradient>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -179,7 +180,16 @@ export default function RegisterScreen() {
             </Pressable>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(380).duration(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
+            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 18, gap: 12 }}>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>veya</Text>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+            </View>
+            <SocialAuthButtons />
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(420).duration(400).springify()}>
             <Pressable
               onPress={() => navigation.navigate(SCREENS.LOGIN)}
               style={{ marginTop: 20, alignItems: "center" }}

@@ -10,6 +10,7 @@ import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
+import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -96,7 +97,7 @@ export default function LoginScreen() {
       </LinearGradient>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -190,20 +191,16 @@ export default function LoginScreen() {
               <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
             </View>
 
+            <SocialAuthButtons />
+
             <Pressable
               onPress={() => navigation.navigate(SCREENS.REGISTER)}
-              style={({ pressed }) => ({
-                backgroundColor: C.surface,
-                borderRadius: 999,
-                paddingVertical: 16,
-                alignItems: "center",
-                borderWidth: 1.5,
-                borderColor: C.border,
-                opacity: pressed ? 0.85 : 1,
-              })}
+              style={{ marginTop: 20, alignItems: "center" }}
+              hitSlop={6}
             >
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
-                Hesap Oluştur
+              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
+                Hesabın yok mu?{" "}
+                <Text style={{ color: C.brandLight, fontFamily: "Inter_600SemiBold" }}>Hesap Oluştur</Text>
               </Text>
             </Pressable>
           </Animated.View>

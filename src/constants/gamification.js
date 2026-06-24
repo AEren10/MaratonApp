@@ -10,6 +10,8 @@ export const XP_REWARDS = {
   daily_goal_complete: 40,
   comeback_bonus: 50,
   referral_applied: 50,
+  streak_milestone: 0,
+  mystery_chest: 0,
 };
 
 export const LEVELS = [
@@ -53,6 +55,13 @@ export function getBadges(C) {
     { id: "wrong_10", name: "Hata Avcısı", icon: "notebook", color: C.red, desc: "10 yanlışı çöz", condition: { type: "wrongs_resolved", value: 10 } },
     { id: "perfect_day", name: "Mükemmel Gün", icon: "checkCircle", color: C.green, desc: "Günlük planı %100 tamamla", condition: { type: "perfect_plan", value: 1 } },
     { id: "level_10", name: "Seviye 10", icon: "shield", color: C.accent, desc: "Seviye 10'a ulaş", condition: { type: "level", value: 10 } },
+    // Streak Society milestones
+    { id: "streak_society_7", name: "Haftalık Savaşçı", icon: "flame", color: "#fb923c", desc: "7 gün seri yap", condition: { type: "streak", value: 7 } },
+    { id: "streak_society_14", name: "İki Haftalık Efsane", icon: "zap", color: "#fbbf24", desc: "14 gün seri yap", condition: { type: "streak", value: 14 } },
+    { id: "streak_society_30", name: "Aylık Titan", icon: "award", color: "#34d399", desc: "30 gün seri yap", condition: { type: "streak", value: 30 } },
+    { id: "streak_society_60", name: "Çelik İrade", icon: "shield", color: "#60a5fa", desc: "60 gün seri yap", condition: { type: "streak", value: 60 } },
+    { id: "streak_society_100", name: "Efsanevi Azim", icon: "crown", color: "#c084fc", desc: "100 gün seri yap", condition: { type: "streak", value: 100 } },
+    { id: "streak_society_365", name: "Yıl Şampiyonu", icon: "trophy", color: "#f472b6", desc: "365 gün seri yap", condition: { type: "streak", value: 365 } },
   ];
 }
 

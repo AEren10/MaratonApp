@@ -14,7 +14,7 @@ export function StrengthBars({ strengths }) {
           { color: C.sec, marginBottom: SPACING.md, paddingHorizontal: SPACING.xs },
         ]}
       >
-        {"DERS BAŞARI ORANLARI"}
+{"GÜÇLÜ YÖNLERİN"}
       </Text>
       <View style={{ gap: SPACING.md }}>
         {sorted.map((s, i) => (

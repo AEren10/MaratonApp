@@ -3,7 +3,16 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "../../../components/design";
 import { useExam } from "../../../contexts/ExamContext";
+import { useC } from "../../../contexts/ThemeContext";
 import { SPACING, RADIUS } from "../../../themes/tokens";
+
+function darken(hex, pct = 0.2) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  const r = Math.max(0, Math.round((n >> 16) * (1 - pct)));
+  const g = Math.max(0, Math.round(((n >> 8) & 0xff) * (1 - pct)));
+  const b = Math.max(0, Math.round((n & 0xff) * (1 - pct)));
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+}
 
 const MILESTONES = [
   { days: 365, emoji: "\u{1F3C1}", message: "Maraton başladı!" },
@@ -24,18 +33,19 @@ function getMilestone(days) {
   return null;
 }
 
-function urgencyGradient(days) {
-  if (days <= 7) return ["#E23B49", "#C0222E"];
-  if (days <= 30) return ["#E8841A", "#D06A08"];
-  if (days <= 100) return ["#2D6FE0", "#1A4FAA"];
-  return ["#15A86A", "#0D8A52"];
+function urgencyGradient(C, days) {
+  if (days <= 7) return [C.danger, darken(C.danger)];
+  if (days <= 30) return [C.amber, darken(C.amber)];
+  if (days <= 100) return [C.blue, darken(C.blue)];
+  return [C.green, darken(C.green)];
 }
 
 export function ExamCountdown({ onPress }) {
+  const C = useC();
   const { daysUntilExam, examDate, examType } = useExam();
   if (daysUntilExam == null) return null;
 
-  const gradient = urgencyGradient(daysUntilExam);
+  const gradient = urgencyGradient(C, daysUntilExam);
   const milestone = getMilestone(daysUntilExam);
   const isExamDay = daysUntilExam <= 0;
   const dateStr = examDate

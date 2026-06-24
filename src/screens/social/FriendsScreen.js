@@ -6,6 +6,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Avatar } from "../../components/design/Avatar";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -59,7 +60,9 @@ export default function FriendsScreen() {
       setFriends(f);
       setRequests(r);
       setOutgoing(o);
-    } catch (_) {}
+    } catch (_) {
+      showAlert("Yüklenemedi", "Arkadaş listesi alınamadı. Tekrar dene.");
+    }
     setLoading(false);
   }, [user?.id]);
 
@@ -191,7 +194,9 @@ export default function FriendsScreen() {
         )}
 
         {loading ? (
-          <ActivityIndicator color={C.accent} style={{ marginTop: 40 }} />
+          <View style={{ paddingTop: SPACING.lg, gap: SPACING.md }}>
+            {[1, 2, 3].map((i) => <SkeletonCard key={i} height={56} />)}
+          </View>
         ) : (
           <>
             {requests.length > 0 && (

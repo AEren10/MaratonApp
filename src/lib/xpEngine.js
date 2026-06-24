@@ -2,32 +2,52 @@ import { XP_REWARDS, LEVELS, getBadges } from "../constants/gamification";
 import { C } from "../themes/tokens";
 
 export function calculateXP(action, data = {}) {
+  let base = 0;
   switch (action) {
     case "study_log":
-      return Math.floor((data.minutes || 0) / 15) * XP_REWARDS.study_15min;
+      base = Math.floor((data.minutes || 0) / 15) * XP_REWARDS.study_15min;
+      break;
     case "question_solved":
-      return (data.count || 0) * XP_REWARDS.question_solved;
+      base = (data.count || 0) * XP_REWARDS.question_solved;
+      break;
     case "trial_entry":
-      return XP_REWARDS.trial_entry;
+      base = XP_REWARDS.trial_entry;
+      break;
     case "wrong_resolved":
-      return XP_REWARDS.wrong_resolved;
+      base = XP_REWARDS.wrong_resolved;
+      break;
     case "daily_login":
-      return XP_REWARDS.daily_login;
+      base = XP_REWARDS.daily_login;
+      break;
     case "streak_bonus":
-      return (data.streak || 0) * XP_REWARDS.streak_bonus_per_day;
+      base = (data.streak || 0) * XP_REWARDS.streak_bonus_per_day;
+      break;
     case "plan_task_done":
-      return XP_REWARDS.plan_task_done;
+      base = XP_REWARDS.plan_task_done;
+      break;
     case "perfect_plan":
-      return XP_REWARDS.perfect_plan;
+      base = XP_REWARDS.perfect_plan;
+      break;
     case "daily_goal_complete":
-      return XP_REWARDS.daily_goal_complete;
+      base = XP_REWARDS.daily_goal_complete;
+      break;
     case "comeback_bonus":
-      return XP_REWARDS.comeback_bonus;
+      base = XP_REWARDS.comeback_bonus;
+      break;
     case "referral_applied":
-      return data.xpOverride || XP_REWARDS.referral_applied;
+      base = data.xpOverride || XP_REWARDS.referral_applied;
+      break;
+    case "streak_milestone":
+      base = data.xpOverride || 0;
+      break;
+    case "mystery_chest":
+      base = data.xpOverride || 0;
+      break;
     default:
-      return 0;
+      base = 0;
   }
+  const multiplier = data.multiplier || 1;
+  return Math.floor(base * multiplier);
 }
 
 export function getLevelForXP(totalXP) {

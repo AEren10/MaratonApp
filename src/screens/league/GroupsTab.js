@@ -49,7 +49,9 @@ export function GroupsTab({ user }) {
       const list = await listMyGroups(user.id);
       setGroups(list);
       if (list.length && !selected) setSelected(list[0]);
-    } catch (e) {}
+    } catch (e) {
+      showAlert("Yüklenemedi", "Gruplar alınamadı. Tekrar dene.");
+    }
     setLoading(false);
   }, [user?.id, selected]);
 
@@ -97,9 +99,11 @@ export function GroupsTab({ user }) {
     showAlert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
       { text: "İptal", style: "cancel" },
       { text: "Ayrıl", style: "destructive", onPress: async () => {
-        await leaveGroup(g.id, user.id).catch(() => {});
-        if (selected?.id === g.id) setSelected(null);
-        loadGroups();
+        try {
+          await leaveGroup(g.id, user.id);
+          if (selected?.id === g.id) setSelected(null);
+          loadGroups();
+        } catch { showAlert("Hata", "Gruptan ayrılınamadı."); }
       } },
     ]);
   };

@@ -12,6 +12,16 @@ export const STORAGE_KEYS = {
   GAMIFICATION: "@maraton:gamification",
   PENDING_STREAK: "@maraton:pending_streak",
   CALENDAR_TASKS: "@maraton:calendar_tasks",
+  CLAIMED_MILESTONES: "@maraton:claimed_milestones",
+  DAILY_CHEST: "@maraton:daily_chest",
+  STUDY_HOURS: "@maraton:study_hours",
+  LEAGUE_RESULT: "@maraton:league_result",
+  ENDOWED_SHOWN: "@maraton:endowed_shown",
+  WRAPPED_LAST: "@maraton:wrapped_last",
+  STUDY_SESSION_COUNT: "@maraton:study_session_count",
+  PAYWALL_SHOWN_SESSION: "@maraton:paywall_shown_session",
+  PENDING_REFERRAL: "@maraton:pending_referral",
+  REVIEW_LAST_ASKED: "@maraton:review_last_asked",
 };
 
 export function dailyKey(prefix) {

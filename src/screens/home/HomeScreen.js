@@ -33,18 +33,20 @@ import { useRetention } from "../../hooks/useRetention";
 import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { usePremium } from "../../contexts/PremiumContext";
-import { XPToast } from "../../components/common/XPToast";
-import { GlowBackground, WARM_GLOW, GlassCard, SectionLabel } from "../../components/design";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
+import StreakMilestoneModal from "../../components/common/StreakMilestoneModal";
+import { trackStudyHour } from "../../lib/notificationTemplates";
+import { GlowBackground, WARM_GLOW, SectionLabel } from "../../components/design";
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeHero } from "./components/HomeHero";
 import { TodayPlanCard } from "./components/TodayPlanCard";
 import { RoundActions } from "./components/RoundActions";
-import { FeedbackStack } from "./components/FeedbackCard";
 import { WeeklyReportCard } from "./components/WeeklyReportCard";
 import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
 import { ExamCountdown } from "./components/ExamCountdown";
-import { MorningBriefing } from "./components/MorningBriefing";
 import { StreakDetailSheet } from "../../components/common/StreakDetailSheet";
+import { WrappedBanner } from "./components/WrappedBanner";
+import { useWrapped } from "../../hooks/useWrapped";
 import { getAllSubjects } from "../trial/trialTypes";
 import * as H from "../../lib/haptics";
 
@@ -71,7 +73,12 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { user } = useAuth();
-  const { reward, syncStat, xpToast, dismissXP, levelUpModal, dismissLevelUp } = useGamification();
+  const {
+    reward, syncStat, checkMilestone,
+    xpToast, dismissXP,
+    levelUpModal, dismissLevelUp,
+    milestoneModal, dismissMilestone,
+  } = useGamification();
   const { checkFeature, showPaywall } = usePremium();
   const { comeback, dismissComeback } = useRetention(reward);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
@@ -102,6 +109,18 @@ export default function HomeScreen() {
     if (streak > 0) syncStat("streak", streak);
   }, [streak, syncStat]);
 
+  useEffect(() => {
+    if (streak > 0) checkMilestone(streak);
+  }, [streak, checkMilestone]);
+
+  const trackedHourRef = useRef(false);
+  useEffect(() => {
+    if (solvedToday > 0 && !trackedHourRef.current) {
+      trackedHourRef.current = true;
+      trackStudyHour();
+    }
+  }, [solvedToday]);
+
   const planCtx = usePlanContext();
   const nudges = useRecommendations();
   const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
@@ -113,6 +132,7 @@ export default function HomeScreen() {
   const [goalCompleteVisible, setGoalCompleteVisible] = useState(false);
 
   const dailyAction = aiSuggestions && aiSuggestions.length ? aiSuggestions[0] : null;
+  const { period: wrappedPeriod, stats: wrappedStats } = useWrapped();
 
   const navRef = useRef(navigation);
   const goCache = useRef({});
@@ -134,13 +154,14 @@ export default function HomeScreen() {
     [todayLogs]
   );
   const minutesToday = useMemo(
-    () => todayLogs.reduce((s, l) => s + (l.duration_minutes || l.durationMinutes || 0), 0),
+    () => todayLogs.reduce((s, l) => s + (l.duration || 0), 0),
     [todayLogs]
   );
 
   // Hedef ilk kez aşıldığında günde bir kez XP ödülü ver.
   // Ref date-keyed; geceyarısı geçince yeni gün için sıfırlanır.
   const goalRewarded = useRef({ date: null, fired: false });
+  const goalTimerRef = useRef(null);
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     if (goalRewarded.current.date !== today) {
@@ -154,8 +175,9 @@ export default function HomeScreen() {
       goalRewarded.current.fired = true;
       AsyncStorage.setItem(todayKey, "1");
       reward("daily_goal_complete");
-      setTimeout(() => setGoalCompleteVisible(true), 1500);
+      goalTimerRef.current = setTimeout(() => setGoalCompleteVisible(true), 1500);
     });
+    return () => { if (goalTimerRef.current) clearTimeout(goalTimerRef.current); };
   }, [solvedToday, dailyGoal, reward]);
 
   const { plan, generatedTasks } = useMemo(() => {
@@ -233,14 +255,6 @@ export default function HomeScreen() {
           <ExamCountdown onPress={go(SCREENS.GOALS)} />
         </View>
 
-        <MorningBriefing
-          userName={displayName}
-          planTaskCount={plan.dersler}
-          srDueCount={planCtx.srDue}
-          streak={streak}
-          onStart={go(SCREENS.PLAN_DETAIL)}
-        />
-
         {/* HERO — Whoop ringi: dev animasyonlu ilerleme + nabız atan streak + stat rayı */}
         <View style={{ marginTop: 8 }}>
           <HomeHero
@@ -259,17 +273,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View style={{ marginTop: 36 }}>
-          <SectionLabel>HIZLI İŞLEM</SectionLabel>
-          <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => {
-            if (!q.go) return;
-            if (q.go === SCREENS.EXAM_SIMULATOR && !checkFeature("exam_simulator")) { showPaywall(); return; }
-            navigation.navigate(q.go);
-          }} />
-        </View>
-
-        <View style={{ marginTop: 40 }}>
-          <SectionLabel>SENİN İÇİN</SectionLabel>
+        <View style={{ marginTop: 28 }}>
           <View style={{ gap: 10 }}>
           <AnimatedCard delay={40}>
             <TodayPlanCard
@@ -308,33 +312,66 @@ export default function HomeScreen() {
             </AnimatedCard>
           ) : null}
 
-          <AnimatedCard delay={160}>
-            <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.WEEKLY_REVIEW)} />
-          </AnimatedCard>
-
-          <AnimatedCard delay={180}>
-            <WeeklyTrialCard report={weeklyTrialReport} onPress={go(SCREENS.WEEKLY_TRIAL_REVIEW)} />
-          </AnimatedCard>
+          {nudges.length > 0 && nudges[0] ? (
+            <AnimatedCard delay={100}>
+              <Pressable onPress={() => {
+                if (nudges[0].subject) navigation.navigate(SCREENS.ANALYSIS);
+                else navigation.navigate(SCREENS.PLAN_DETAIL);
+              }}>
+                <View style={{
+                  flexDirection: "row", alignItems: "center", gap: 12, padding: 14,
+                  borderRadius: 18, backgroundColor: C.accent + "0C",
+                  borderWidth: 1, borderColor: C.accent + "18",
+                }}>
+                  <Icon name="lightbulb" size={16} color={C.accent} />
+                  <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.sec, flex: 1 }} numberOfLines={2}>
+                    {nudges[0].message || nudges[0].title}
+                  </Text>
+                  <Icon name="arrowR" size={14} color={C.muted} />
+                </View>
+              </Pressable>
+            </AnimatedCard>
+          ) : null}
 
           </View>
         </View>
 
-        {nudges.length > 0 ? (
-          <View style={{ marginTop: 36 }}>
-            <SectionLabel>GERİ BİLDİRİM</SectionLabel>
-            <FeedbackStack
-              nudges={nudges}
-              max={2}
-              onAction={(nudge) => {
-                if (nudge.subject) navigation.navigate(SCREENS.ANALYSIS);
-                else navigation.navigate(SCREENS.PLAN_DETAIL);
-              }}
-            />
-          </View>
-        ) : null}
+        <View style={{ marginTop: 28 }}>
+          <SectionLabel>HIZLI İŞLEM</SectionLabel>
+          <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => {
+            if (!q.go) return;
+            if (q.go === SCREENS.EXAM_SIMULATOR && !checkFeature("exam_simulator")) { showPaywall(); return; }
+            navigation.navigate(q.go);
+          }} />
+        </View>
+
+        {(() => {
+          const day = new Date().getDay();
+          const showWeekly = day === 0 || day === 1 || day === 5 || day === 6;
+          if (!showWeekly && !(wrappedStats && wrappedPeriod)) return null;
+          return (
+            <View style={{ marginTop: 28, gap: 10 }}>
+              {showWeekly && (
+                <>
+                  <AnimatedCard delay={160}>
+                    <WeeklyReportCard report={weeklyReport} onPress={go(SCREENS.WEEKLY_REVIEW)} />
+                  </AnimatedCard>
+                  <AnimatedCard delay={180}>
+                    <WeeklyTrialCard report={weeklyTrialReport} onPress={go(SCREENS.WEEKLY_TRIAL_REVIEW)} />
+                  </AnimatedCard>
+                </>
+              )}
+              {wrappedStats && wrappedPeriod && (
+                <AnimatedCard delay={220}>
+                  <WrappedBanner stats={wrappedStats} period={wrappedPeriod} />
+                </AnimatedCard>
+              )}
+            </View>
+          );
+        })()}
       </ScrollView>
 
-      <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+      <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
 
       <ComebackModal
         visible={!!comeback}
@@ -347,6 +384,7 @@ export default function HomeScreen() {
         visible={goalCompleteVisible}
         solved={solvedToday}
         goal={dailyGoal}
+        xpEarned={40}
         onDismiss={() => setGoalCompleteVisible(false)}
         onShare={() => { setGoalCompleteVisible(false); navigation.navigate(SCREENS.SHARE_CARD); }}
       />
@@ -377,6 +415,12 @@ export default function HomeScreen() {
         freezeCount={freezeCount}
         freezeResetAt={freezeResetAt}
         lastStudyDate={lastStudyDate}
+      />
+
+      <StreakMilestoneModal
+        visible={milestoneModal.visible}
+        milestone={milestoneModal.milestone}
+        onDismiss={dismissMilestone}
       />
 
       <NudgeModal

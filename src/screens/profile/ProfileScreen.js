@@ -1,83 +1,43 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { ScrollView, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
-import { GlowBackground, WARM_GLOW } from "../../components/design";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
-import { AnimatedCard } from "../../components/design/AnimatedCard";
 import { useAppSelector } from "../../store/hooks";
 import { selectLevel, selectXP, selectBadgeIds, selectStats } from "../../store/slices/gamificationSlice";
-import { selectTodayLogs, selectStreak } from "../../store/slices/studyLogSlice";
+import { selectStreak } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { getBadges } from "../../constants/gamification";
+import { getBadges, LEAGUE_TIERS } from "../../constants/gamification";
 import { useCurriculum } from "../../hooks/useCurriculum";
-
-import { ProfileHeader } from "./components/ProfileHeader";
-import { StatsGrid } from "./components/StatsGrid";
-import { BadgeRow } from "./components/BadgeRow";
-import { StrengthBars } from "./components/StrengthBars";
-import { SettingsMenu } from "./components/SettingsMenu";
-import { LevelBar } from "./components/LevelBar";
-
 import { Icon, SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { useAlert } from "../../contexts/AlertContext";
-import * as H from "../../lib/haptics";
 
-const QUICK_LINK_ITEMS = [
-  { icon: "users", label: "Challenge", screen: SCREENS.CHALLENGE },
-  { icon: "share", label: "Paylaş", screen: SCREENS.SHARE_CARD, params: { type: "overall" } },
-  { icon: "mail", label: "Davet Et", screen: SCREENS.REFERRAL },
-  { icon: "target", label: "5dk Quiz", screen: SCREENS.QUICK_PRACTICE },
-];
-
-function QuickLinks({ onNavigate, C }) {
-  return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginVertical: SPACING.sm }}>
-      {QUICK_LINK_ITEMS.map((item) => (
-        <Pressable
-          key={item.label}
-          accessibilityRole="button"
-          accessibilityLabel={item.label}
-          accessibilityHint={`${item.label} ekranına gider`}
-          onPress={() => onNavigate(item.screen, item.params)}
-          style={({ pressed }) => ({
-            flex: 1, minWidth: "45%", flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-            backgroundColor: C.surface, borderRadius: RADIUS.xl,
-            padding: SPACING.md, borderWidth: 1, borderColor: C.border,
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: C.surface2, alignItems: "center", justifyContent: "center" }}>
-            <Icon name={item.icon} size={15} color={C.sec} />
-          </View>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>{item.label}</Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
+import { MinimalHeader } from "./components/MinimalHeader";
+import { ProfileHeader } from "./components/ProfileHeader";
+import { CareerStats } from "./components/CareerStats";
+import { BadgeRow } from "./components/BadgeRow";
+import { StrengthBars } from "./components/StrengthBars";
 
 export default function ProfileScreen() {
   const C = useC();
-  const navigation = useNavigation();
-  const { user, logout } = useAuth();
-  const showAlert = useAlert();
-  const { examType, field, daysUntilExam } = useExam();
+  const nav = useNavigation();
+  const { user } = useAuth();
+  const { examType, field } = useExam();
   const { subjects = [] } = useCurriculum();
   const level = useAppSelector(selectLevel);
   const totalXP = useAppSelector(selectXP);
   const unlockedIds = useAppSelector(selectBadgeIds);
   const gStats = useAppSelector(selectStats);
   const streak = useAppSelector(selectStreak);
-  const todayLogs = useAppSelector(selectTodayLogs);
   const trials = useAppSelector(selectTrials);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Kullanıcı";
+
   const examLabel = useMemo(() => {
     if (examType === "tyt") return "Sadece TYT";
     if (examType === "dil") return "YKS Dil";
@@ -87,27 +47,22 @@ export default function ProfileScreen() {
     return "YKS";
   }, [examType, field]);
 
-  const earnedBadges = getBadges(C).filter((b) => unlockedIds.includes(b.id));
-  const displayBadges = earnedBadges.length > 0
-    ? earnedBadges.map((b) => ({ icon: b.icon, name: b.name, color: b.color }))
-    : [];
+  const league = useMemo(() => {
+    const sorted = [...LEAGUE_TIERS].sort((a, b) => b.minRank - a.minRank);
+    const tier = sorted.find((t) => totalXP >= t.minRank) || LEAGUE_TIERS[0];
+    return { name: tier.name, icon: tier.icon, color: tier.color };
+  }, [totalXP]);
 
-  const computedStats = useMemo(() => {
-    const totalQ = gStats.totalQuestions || todayLogs.reduce((s, l) => s + (l.questionCount || 0), 0);
-    const totalMin = gStats.totalMinutes || todayLogs.reduce((s, l) => s + (l.duration || 0), 0);
+  const allBadges = useMemo(() => getBadges(C), [C]);
+
+  const careerStats = useMemo(() => {
+    const totalQ = gStats.totalQuestions || 0;
+    const totalMin = gStats.totalMinutes || 0;
     const hours = Math.floor(totalMin / 60);
     const trialCount = gStats.totalTrials || trials.length;
-    const bestStreak = Math.max(streak, gStats.streak || 0);
-    return [
-      { v: totalQ > 999 ? `${(totalQ / 1000).toFixed(1)}k` : String(totalQ), l: "toplam soru", color: C.orange },
-      { v: String(hours), l: "saat çalışma", color: C.purple },
-      { v: String(trialCount), l: "deneme", color: C.blue },
-      { v: String(bestStreak), l: "gün en uzun seri", color: C.green },
-    ];
-  }, [gStats, todayLogs, trials, streak, C]);
+    return { totalQuestions: totalQ, totalHours: hours, trialCount };
+  }, [gStats, trials]);
 
-  // GERÇEK başarı verisi: derslerin denemedeki doğru/yanlış oranı.
-  // Sahte %100 göstermemek için sadece veri varsa list dönüyor.
   const strengths = useMemo(() => {
     if (!trials.length) return [];
     const latest = trials[0];
@@ -117,97 +72,83 @@ export default function ProfileScreen() {
     const entries = [];
     Object.entries(latest.subjects || {}).forEach(([key, data]) => {
       const total = (data.correct || 0) + (data.wrong || 0);
-      if (total < 5) return; // anlamlı veri için min 5 soru
+      if (total < 5) return;
       const acc = Math.round(((data.correct || 0) / total) * 100);
       const norm = key.replace(/^tyt_/, "").replace(/^ayt_/, "");
       const subj = subjectMap[norm] || subjectMap[key];
-      entries.push({
-        name: subj?.label || norm,
-        c: subj?.color || C.muted,
-        v: acc,
-      });
+      entries.push({ name: subj?.label || norm, c: subj?.color || C.muted, v: acc });
     });
     return entries.sort((a, b) => b.v - a.v).slice(0, 6);
-  }, [subjects, trials]);
-
-  const handleNavigate = (route, params) => {
-    navigation.navigate(route, params);
-  };
-
-  const handleLogout = useCallback(() => {
-    H.warn();
-    showAlert("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin?", [
-      { text: "İptal", style: "cancel" },
-      { text: "Çıkış Yap", style: "destructive", onPress: logout },
-    ]);
-  }, [logout]);
+  }, [subjects, trials, C]);
 
   return (
     <SwipeToHome>
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground blobs={WARM_GLOW} />
+      <MinimalHeader />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
+        contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
       >
-        <AnimatedCard delay={0}>
+        {/* Hero */}
+        <Animated.View entering={FadeInDown.duration(350).springify()}>
           <ProfileHeader
             name={displayName}
             exam={examLabel}
-            league={totalXP >= 10000 ? { name: "Obsidyen Lig", icon: "crown" } : totalXP >= 5000 ? { name: "Elmas Lig", icon: "award" } : totalXP >= 2000 ? { name: "Altın Lig", icon: "trophy" } : totalXP >= 500 ? { name: "Gümüş Lig", icon: "medal" } : { name: "Bronz Lig", icon: "medal" }}
-            countdown={daysUntilExam}
+            level={level}
+            league={league}
+            streak={streak}
           />
-        </AnimatedCard>
-        <AnimatedCard delay={80}>
-          <LevelBar
-            level={level.level}
-            title={level.title}
-            progress={level.progress}
-            xpInLevel={level.xpInLevel}
-            xpForNext={level.xpForNext}
+        </Animated.View>
+
+        {/* Career stats */}
+        <Animated.View entering={FadeInDown.delay(100).duration(350).springify()}>
+          <CareerStats
+            totalQuestions={careerStats.totalQuestions}
+            totalHours={careerStats.totalHours}
+            trialCount={careerStats.trialCount}
           />
-        </AnimatedCard>
-        <View style={{ marginTop: SPACING.lg }}>
-          <SectionLabel>İstatistik</SectionLabel>
-        </View>
-        <AnimatedCard delay={120}>
-          <StatsGrid stats={computedStats} />
-        </AnimatedCard>
-        {displayBadges.length > 0 ? (
-          <>
-            <View style={{ marginTop: SPACING.lg }}>
-              <SectionLabel>Rozetler</SectionLabel>
-            </View>
-            <AnimatedCard delay={200}>
-              <BadgeRow badges={displayBadges} />
-            </AnimatedCard>
-          </>
-        ) : null}
+        </Animated.View>
+
+        {/* Badges */}
+        <Animated.View entering={FadeInDown.delay(200).duration(350).springify()}
+          style={{ marginTop: SPACING.xl }}
+        >
+          <BadgeRow allBadges={allBadges} earnedIds={unlockedIds} />
+        </Animated.View>
+
+        {/* Strengths */}
         {strengths.length > 0 ? (
-          <>
-            <View style={{ marginTop: SPACING.lg }}>
-              <SectionLabel>Güçlü Yönler</SectionLabel>
-            </View>
-            <AnimatedCard delay={240}>
-              <StrengthBars strengths={strengths} />
-            </AnimatedCard>
-          </>
-        ) : null}
-        <View style={{ marginTop: SPACING.lg }}>
-          <SectionLabel>Hızlı Erişim</SectionLabel>
-        </View>
-        <AnimatedCard delay={300}>
-          <QuickLinks onNavigate={handleNavigate} C={C} />
-        </AnimatedCard>
-        <View style={{ marginTop: SPACING.lg }}>
-          <SectionLabel>Ayarlar</SectionLabel>
-        </View>
-        <AnimatedCard delay={360}>
-          <SettingsMenu
-            onNavigate={handleNavigate}
-            onLogout={handleLogout}
-          />
-        </AnimatedCard>
+          <Animated.View entering={FadeInDown.delay(300).duration(350).springify()}
+            style={{ marginTop: SPACING.xl }}
+          >
+            <StrengthBars strengths={strengths} />
+          </Animated.View>
+        ) : (
+          <Animated.View entering={FadeInDown.delay(300).duration(350).springify()}
+            style={{ marginTop: SPACING.xl }}
+          >
+            <Text style={{ ...TYPOGRAPHY.label, color: C.sec, marginBottom: SPACING.md }}>
+              GÜÇLÜ YÖNLERİN
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => nav.navigate(SCREENS.TRIAL_ENTRY)}
+              style={({ pressed }) => ({
+                backgroundColor: C.surface,
+                borderRadius: RADIUS.xxl,
+                borderWidth: 1, borderColor: C.border,
+                padding: SPACING.xl,
+                alignItems: "center",
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
+              <Icon name="chart" size={24} color={C.muted} style={{ marginBottom: SPACING.sm }} />
+              <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center" }}>
+                Denemeni gir, güçlerin burada görünsün
+              </Text>
+            </Pressable>
+          </Animated.View>
+        )}
       </ScrollView>
     </SafeAreaView>
     </SwipeToHome>

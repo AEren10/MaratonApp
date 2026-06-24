@@ -12,8 +12,9 @@
 //
 // Renk seçimleri:
 //   light = "sıcak kağıt + mürekkep" — beyaz kart, kağıt zemin, nötr ink metin
-//   dark  = "gece antrenmanı" — sıcak-nötr mürekkep-siyahı zemin, mor YOK
-//   signal = VOLT (elektrik-lime) — subject paletinde olmayan, mor olmayan tek vurgu
+//   dark  = "gece antrenmanı" — sıcak-nötr mürekkep-siyahı zemin
+//   Brand iki ton: MOR (#8b5cf6) = CTA/aksiyon, TURUNCU (#ff6b35) = enerji/streak
+//   "Mor YOK" eski glassmorphism glow efektleri içindi, solid accent olarak kullanılır
 
 export const COLORS = {
   light: {
@@ -310,6 +311,7 @@ function _buildShadows(scheme) {
     accent: { ...e.md, shadowColor: "#8b5cf6", shadowOpacity: 0.30 },
     orange: { ...e.md, shadowColor: "#ff6b35", shadowOpacity: 0.30 },
     fab:    { ...e.lg, shadowColor: "#ff6b35", shadowOpacity: 0.35 },
+    green:  { ...e.md, shadowColor: "#34d399", shadowOpacity: 0.30 },
   };
 }
 export const SHADOWS = _buildShadows("light");

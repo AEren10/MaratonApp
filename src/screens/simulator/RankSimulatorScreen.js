@@ -329,7 +329,7 @@ export default function RankSimulatorScreen() {
       {/* === Hedef bölüm seçici modal === */}
       <Modal visible={pickerOpen} transparent animationType="slide" onRequestClose={() => setPickerOpen(false)}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
           <Pressable style={s.backdrop} onPress={() => setPickerOpen(false)}>

@@ -15,6 +15,7 @@ import { TabBar } from "./TabBar";
 import { DataSyncProvider } from "../contexts/DataSyncContext";
 import { PremiumProvider } from "../contexts/PremiumContext";
 import { linkingConfig } from "./linking";
+import { useDeepLink } from "../hooks/useDeepLink";
 
 // Tab screens — eager (always visible)
 import HomeScreen from "../screens/home/HomeScreen";
@@ -184,6 +185,9 @@ const EBReferral = withEB(ReferralScreen);
 const EBExamSimulator = withEB(ExamSimulatorScreen);
 const EBAddTask = withEB(AddTaskScreen);
 const EBPaywall = withEB(PaywallScreen);
+const EBLogin = withEB(LoginScreen);
+const EBRegister = withEB(RegisterScreen);
+const EBForgotPassword = withEB(ForgotPasswordScreen);
 
 const isWeb = Platform.OS === "web";
 
@@ -231,9 +235,9 @@ function MainTabs() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
-      <Stack.Screen name={SCREENS.LOGIN} component={LoginScreen} />
-      <Stack.Screen name={SCREENS.REGISTER} component={RegisterScreen} />
-      <Stack.Screen name={SCREENS.FORGOT_PASSWORD} component={ForgotPasswordScreen} />
+      <Stack.Screen name={SCREENS.LOGIN} component={EBLogin} />
+      <Stack.Screen name={SCREENS.REGISTER} component={EBRegister} />
+      <Stack.Screen name={SCREENS.FORGOT_PASSWORD} component={EBForgotPassword} />
     </Stack.Navigator>
   );
 }
@@ -257,6 +261,8 @@ function SetupStack() {
 }
 
 function AppStackInner() {
+  useDeepLink();
+
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="MainTabs" component={MainTabs} />

@@ -94,9 +94,9 @@ export default function SubjectDetailScreen() {
       .slice(0, 8)
       .map((t) => ({
         date: new Date(t.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
-        net: t.subjects[subjectKey].net || 0,
-        correct: t.subjects[subjectKey].correct || 0,
-        wrong: t.subjects[subjectKey].wrong || 0,
+        net: t.subjects?.[subjectKey]?.net || 0,
+        correct: t.subjects?.[subjectKey]?.correct || 0,
+        wrong: t.subjects?.[subjectKey]?.wrong || 0,
       }));
   }, [trials, subjectKey]);
 

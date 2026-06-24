@@ -8,9 +8,11 @@ import {
   StyleSheet,
   ActivityIndicator,
   Share,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
@@ -25,6 +27,7 @@ import {
   getReferralStats,
 } from "../../supabase/referrals";
 import { usePremium } from "../../contexts/PremiumContext";
+import { consumePendingReferral } from "../../hooks/useDeepLink";
 import * as H from "../../lib/haptics";
 
 const REWARD_DAYS = 7;
@@ -33,6 +36,7 @@ export default function ReferralScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const route = useRoute();
   const { user } = useAuth();
   const showAlert = useAlert();
   const { refreshPremium } = usePremium();
@@ -43,6 +47,18 @@ export default function ReferralScreen() {
   const [copied, setCopied] = useState(false);
   const [friendCode, setFriendCode] = useState("");
   const [applying, setApplying] = useState(false);
+
+  // Auto-fill from deep link param or pending referral
+  useEffect(() => {
+    const deepCode = route.params?.code;
+    if (deepCode) {
+      setFriendCode(deepCode.toUpperCase());
+      return;
+    }
+    consumePendingReferral().then((pending) => {
+      if (pending) setFriendCode(pending);
+    });
+  }, [route.params?.code]);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
@@ -78,8 +94,10 @@ export default function ReferralScreen() {
     if (!code) return;
     H.medium();
     try {
+      const link = `https://maraton.app/referral/${code}`;
       await Share.share({
-        message: `Maraton ile birlikte YKS'ye hazırlanmak ister misin? Davet kodum: ${code} — ikinize de 1 hafta Premium hediye! 🎯`,
+        message: `Maraton ile birlikte YKS'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
+        url: link,
       });
     } catch {
       handleCopy();
@@ -129,7 +147,8 @@ export default function ReferralScreen() {
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.heroCircle, { backgroundColor: C.accent + "18" }]}>
           <Icon name="users" size={36} color={C.accent} />
         </Animated.View>
@@ -227,6 +246,7 @@ export default function ReferralScreen() {
           ))}
         </Animated.View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

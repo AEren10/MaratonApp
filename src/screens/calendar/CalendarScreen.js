@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -143,8 +144,9 @@ export default function CalendarScreen() {
         </Animated.View>
 
         {loading ? (
-          <View style={s.loadingBox}>
-            <ActivityIndicator color={C.accent} />
+          <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, gap: SPACING.md }}>
+            <SkeletonCard height={240} />
+            <SkeletonCard height={80} />
           </View>
         ) : (
           <>

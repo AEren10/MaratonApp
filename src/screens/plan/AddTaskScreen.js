@@ -125,7 +125,7 @@ export default function AddTaskScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <View style={st.header}>
           <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={[st.closeBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
             <Icon name="x" size={18} color={C.text} />

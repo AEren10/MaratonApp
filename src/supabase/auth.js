@@ -45,6 +45,25 @@ export const updatePassword = async (password) => {
   if (error) throw error;
 };
 
+export const signInWithAppleToken = async ({ idToken, nonce }) => {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "apple",
+    token: idToken,
+    nonce,
+  });
+  if (error) throw error;
+  return data;
+};
+
+export const signInWithGoogleToken = async ({ idToken }) => {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "google",
+    token: idToken,
+  });
+  if (error) throw error;
+  return data;
+};
+
 export const deleteAccount = async () => {
   const { error } = await supabase.rpc("delete_own_account");
   if (error) throw error;

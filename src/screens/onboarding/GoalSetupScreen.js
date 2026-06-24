@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -56,6 +57,15 @@ export default function GoalSetupScreen() {
 
   const canContinue = selectedRanking !== null;
 
+  const progressSteps = [
+    { label: "Hesap", done: true },
+    { label: "Sınav", done: true },
+    { label: "Hedef", done: canContinue },
+    { label: "Plan", done: false },
+  ];
+  const doneCount = progressSteps.filter((s) => s.done).length;
+  const progressPct = (doneCount / progressSteps.length) * 100;
+
   const finish = useCallback(async () => {
     if (!selectedRanking) return;
     updateGoal(selectedRanking, department.trim() || null).catch(() => {});
@@ -65,7 +75,7 @@ export default function GoalSetupScreen() {
         await applyNotifPrefs(prefs);
       }
     }).catch(() => {});
-    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }, { name: SCREENS.PAYWALL }] });
+    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
   }, [selectedRanking, department, updateGoal, navigation]);
 
   return (
@@ -77,6 +87,26 @@ export default function GoalSetupScreen() {
           <View style={[styles.stepDot, { backgroundColor: C.border }]} />
           <View style={[styles.stepDot, { backgroundColor: C.accent }]} />
         </View>
+
+        <Animated.View entering={FadeIn.delay(200)} style={[styles.progressCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: SPACING.sm }}>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>Kurulum ilerlemen</Text>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.accent }]}>%{Math.round(progressPct)}</Text>
+          </View>
+          <View style={[styles.progressTrack, { backgroundColor: C.border }]}>
+            <View style={[styles.progressFill, { width: `${progressPct}%`, backgroundColor: C.accent }]} />
+          </View>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING.sm }}>
+            {progressSteps.map((s, i) => (
+              <View key={i} style={{ alignItems: "center", flex: 1 }}>
+                <View style={[styles.stepCheck, { backgroundColor: s.done ? C.accent : C.border }]}>
+                  {s.done && <Icon name="checkCircle" size={10} color="#fff" />}
+                </View>
+                <Text style={[TYPOGRAPHY.micro, { color: s.done ? C.sec : C.muted, marginTop: 2, textAlign: "center" }]} numberOfLines={1}>{s.label}</Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
 
         <View style={styles.hero}>
           <IconBox icon="target" color={C.green} size={56} rounded={18} />
@@ -155,5 +185,19 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
     borderRadius: RADIUS.xl,
     marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
+  },
+  progressCard: {
+    borderWidth: 1, borderRadius: RADIUS.xl, padding: SPACING.lg,
+    marginBottom: SPACING.md,
+  },
+  progressTrack: {
+    height: 6, borderRadius: 3, overflow: "hidden",
+  },
+  progressFill: {
+    height: 6, borderRadius: 3,
+  },
+  stepCheck: {
+    width: 16, height: 16, borderRadius: 8,
+    alignItems: "center", justifyContent: "center",
   },
 });

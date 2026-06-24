@@ -1,40 +1,55 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
+import { getZone, getZoneStyle, ZONE, PROMOTE_COUNT, DEMOTE_COUNT } from "../../lib/leagueZones";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
 import { GroupsTab } from "./GroupsTab";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
 import * as H from "../../lib/haptics";
 
 const POLL_MS = 30000;
 
-function TierHeader({ tier, nextTier, myScore, myRank, C }) {
+function TierHeader({ tier, nextTier, myScore, myRank, totalUsers, C }) {
+  const zone = getZone(myRank, totalUsers);
+  const zoneStyle = getZoneStyle(zone, C);
+
   return (
     <AnimatedCard delay={0}>
       <View style={{
         padding: SPACING.lg,
         marginBottom: SPACING.lg,
-        borderRadius: 24,
+        borderRadius: RADIUS.xxl,
         backgroundColor: tier.color + "14",
         borderWidth: 1,
         borderColor: tier.color + "30",
       }}>
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg }}>
           <Icon name={tier.icon} size={32} color={tier.color} />
-          <View style={{ marginLeft: 12, flex: 1 }}>
+          <View style={{ marginLeft: SPACING.md, flex: 1 }}>
             <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
-            <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: 2 }]}>
+            <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
               Bu hafta {myScore} XP{myRank ? ` · #${myRank}` : ""}
             </Text>
           </View>
+          {zoneStyle && (
+            <View style={{
+              paddingHorizontal: SPACING.sm,
+              paddingVertical: SPACING.xs,
+              borderRadius: RADIUS.md,
+              backgroundColor: zoneStyle.bg,
+            }}>
+              <Text style={[TYPOGRAPHY.micro, { color: zoneStyle.color }]}>{zoneStyle.label}</Text>
+            </View>
+          )}
         </View>
 
         <View style={{
@@ -53,9 +68,22 @@ function TierHeader({ tier, nextTier, myScore, myRank, C }) {
         {nextTier && (
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: SPACING.sm }}>
             <Icon name="trendUp" size={14} color={C.green} />
-            <Text style={[TYPOGRAPHY.caption, { color: C.green, marginLeft: 4 }]}>
+            <Text style={[TYPOGRAPHY.caption, { color: C.green, marginLeft: SPACING.xs }]}>
               {nextTier.name} Lig'e {nextTier.minXP - myScore} XP kaldı
             </Text>
+          </View>
+        )}
+
+        {totalUsers >= 3 && (
+          <View style={{ flexDirection: "row", justifyContent: "center", gap: SPACING.md, paddingTop: SPACING.md }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs }}>
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.green }} />
+              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Terfi (ilk {PROMOTE_COUNT})</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs }}>
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.danger }} />
+              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Düşme (son {DEMOTE_COUNT})</Text>
+            </View>
           </View>
         )}
       </View>
@@ -66,7 +94,7 @@ function TierHeader({ tier, nextTier, myScore, myRank, C }) {
 function MiniStat({ label, value, color, C }) {
   return (
     <View style={{ alignItems: "center" }}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: color || C.text }}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.statSmall, color: color || C.text }}>{value}</Text>
       <Text style={[TYPOGRAPHY.micro, { color: color || C.sec, opacity: color ? 0.7 : 1 }]}>{label}</Text>
     </View>
   );
@@ -74,9 +102,11 @@ function MiniStat({ label, value, color, C }) {
 
 const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
-const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
+const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C }) {
   const isYou = item.you;
   const medalColor = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const zone = getZone(item.rank, totalUsers);
+  const zoneColor = zone === ZONE.PROMOTION ? C.green : zone === ZONE.DEMOTION ? C.danger : null;
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -89,26 +119,26 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
           flexDirection: "row",
           alignItems: "center",
           backgroundColor: isYou ? C.accent + "14" : C.surface,
-          borderRadius: 16,
-          paddingHorizontal: 14,
-          paddingVertical: 12,
-          borderWidth: isYou ? 1 : 0,
-          borderColor: isYou ? C.accent + "40" : "transparent",
+          borderRadius: RADIUS.xl,
+          paddingHorizontal: SPACING.md,
+          paddingVertical: SPACING.md,
+          borderWidth: isYou ? 1 : zoneColor ? 1 : 0,
+          borderColor: isYou ? C.accent + "40" : zoneColor ? zoneColor + "30" : "transparent",
         },
         pressStyle,
       ]}
     >
-      <View style={{ width: 28, alignItems: "center", marginRight: 8 }}>
+      <View style={{ width: 28, alignItems: "center", marginRight: SPACING.sm }}>
         {medalColor ? (
           <Icon name="trophy" size={18} color={medalColor} />
         ) : (
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{item.rank}</Text>
+          <Text style={[TYPOGRAPHY.captionMedium, { color: zoneColor || C.muted }]}>{item.rank}</Text>
         )}
       </View>
 
       <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={34} color={isYou ? C.accent : undefined} />
 
-      <View style={{ flex: 1, marginLeft: 10 }}>
+      <View style={{ flex: 1, marginLeft: SPACING.sm }}>
         <Text
           style={{
             fontFamily: isYou ? "Inter_600SemiBold" : "Inter_500Medium",
@@ -124,10 +154,14 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, C }) {
         </Text>
       </View>
 
+      {zoneColor && !isYou && (
+        <Icon name={zone === ZONE.PROMOTION ? "trendUp" : "trendDown"} size={12} color={zoneColor} style={{ marginRight: SPACING.xs }} />
+      )}
+
       <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text }}>
         {item.weekly_xp}
       </Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: SPACING.xs }]}>XP</Text>
     </AnimPressable>
   );
 });
@@ -185,30 +219,41 @@ export default function LeagueScreen() {
 
   const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
 
-  const renderItem = useCallback(({ item }) => <LeaderboardRow item={item} C={C} />, [C]);
+  const totalUsers = data.list.length;
+  const renderItem = useCallback(({ item }) => <LeaderboardRow item={item} totalUsers={totalUsers} C={C} />, [C, totalUsers]);
+
+  const emptyComponent = useMemo(() => {
+    if (error) {
+      return <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="accent" />;
+    }
+    if (tab === "friends") {
+      return <EmptyState icon="users" title="Rakibini bul, motivasyonunu katla" message="Arkadaşlarını ekle, haftalık XP sıralaması başlasın" actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="accent" />;
+    }
+    return <EmptyState icon="award" title="Henüz kimse yok" message="Bu haftanın sıralaması henüz oluşmadı" color="accent" />;
+  }, [error, tab, goAddFriend]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <GlowBackground blobs={WARM_GLOW} />
+      {/* Header */}
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: SPACING.lg,
+        paddingVertical: SPACING.md,
       }}>
         <Pressable
           onPress={() => navigation.goBack()}
-          hitSlop={10}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Geri"
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 12,
+            width: 44, height: 44,
+            borderRadius: RADIUS.md,
             backgroundColor: C.surface,
-            alignItems: "center",
-            justifyContent: "center",
-            borderWidth: 1,
-            borderColor: C.border,
+            alignItems: "center", justifyContent: "center",
+            borderWidth: 1, borderColor: C.border,
           }}
         >
           <Icon name="chevL" size={20} color={C.text} />
@@ -216,29 +261,26 @@ export default function LeagueScreen() {
         <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Lig</Text>
         <Pressable
           onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
-          hitSlop={10}
+          hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Challenge"
-          accessibilityHint="Challenge ekranına gider"
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 12,
+            width: 44, height: 44,
+            borderRadius: RADIUS.md,
             backgroundColor: C.surface,
-            alignItems: "center",
-            justifyContent: "center",
-            borderWidth: 1,
-            borderColor: C.border,
+            alignItems: "center", justifyContent: "center",
+            borderWidth: 1, borderColor: C.border,
           }}
         >
           <Icon name="zap" size={18} color={C.sec} />
         </Pressable>
       </View>
 
+      {/* Tabs */}
       <View style={{
         flexDirection: "row",
         gap: SPACING.sm,
-        paddingHorizontal: 16,
+        paddingHorizontal: SPACING.lg,
         marginBottom: SPACING.md,
       }}>
         {[
@@ -253,7 +295,7 @@ export default function LeagueScreen() {
               flex: 1,
               alignItems: "center",
               paddingVertical: SPACING.sm,
-              borderRadius: 12,
+              borderRadius: RADIUS.md,
               backgroundColor: tab === t.key ? C.accent + "18" : C.surface,
               borderWidth: 1,
               borderColor: tab === t.key ? C.accent : C.border,
@@ -270,25 +312,24 @@ export default function LeagueScreen() {
       {tab === "groups" ? (
         <GroupsTab user={user} />
       ) : loading ? (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator color={C.accent} size="large" />
+        <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.md }}>
+          <SkeletonCard height={120} />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <SkeletonCard key={i} height={52} />
+          ))}
         </View>
       ) : (
         <FlatList
           data={data.list}
           keyExtractor={(item) => String(item.user_id)}
           ListHeaderComponent={
-            <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} C={C} />
+            <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} totalUsers={totalUsers} C={C} />
           }
           renderItem={renderItem}
           windowSize={5}
           maxToRenderPerBatch={10}
-          ListEmptyComponent={
-            (error || tab !== "friends")
-              ? <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="accent" />
-              : <EmptyState icon="users" title="Rakibini bul, motivasyonunu katla" message="Arkadaşlarını ekle, haftalık XP sıralaması başlasın" actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="accent" />
-          }
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
+          ListEmptyComponent={emptyComponent}
+          contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 100, gap: SPACING.sm }}
           removeClippedSubviews={true}
           showsVerticalScrollIndicator={false}
           refreshControl={

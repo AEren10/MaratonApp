@@ -83,6 +83,7 @@ const makeStyles = (C) => StyleSheet.create({
     borderColor: C.accent + "30",
     padding: SPACING.xl,
     gap: SPACING.md,
+    marginTop: SPACING.md,
   },
   closeBtn: {
     position: "absolute",

@@ -12,16 +12,38 @@ export const getProfile = async (userId) => {
   return data;
 };
 
-export const saveGamificationToSupabase = async (userId, badges, stats) => {
+export const saveGamificationToSupabase = async (userId, badges, stats, claimedMilestones) => {
   if (!userId || userId === "dev") return;
   try {
+    const payload = { ...(stats || {}), claimedMilestones: claimedMilestones || [] };
     const { error } = await supabase
       .from("profiles")
-      .update({ badges: badges || [], gamification_stats: stats || {} })
+      .update({ badges: badges || [], gamification_stats: payload })
       .eq("id", userId);
     if (error) handleSupabaseError(error, "saveGamificationToSupabase");
   } catch (e) {
     handleSupabaseError(e, "saveGamificationToSupabase");
+  }
+};
+
+export const grantPremiumDays = async (userId, days) => {
+  if (!userId || userId === "dev" || !days) return;
+  try {
+    const { data } = await supabase
+      .from("profiles")
+      .select("premium_until")
+      .eq("id", userId)
+      .maybeSingle();
+    const now = new Date();
+    const current = data?.premium_until ? new Date(data.premium_until) : now;
+    const base = current > now ? current : now;
+    const until = new Date(base.getTime() + days * 86400000);
+    await supabase
+      .from("profiles")
+      .update({ premium_until: until.toISOString(), is_premium: true })
+      .eq("id", userId);
+  } catch (e) {
+    handleSupabaseError(e, "grantPremiumDays");
   }
 };
 

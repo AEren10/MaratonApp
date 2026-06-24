@@ -21,7 +21,7 @@ import { BranchSubjectPicker } from "./components/BranchSubjectPicker";
 import { useAppDispatch } from "../../store/hooks";
 import { addTrial } from "../../store/slices/trialSlice";
 import { useGamification } from "../../hooks/useGamification";
-import { XPToast } from "../../components/common/XPToast";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveTrialOffline } from "../../lib/offlineQueue";
@@ -244,7 +244,7 @@ export default function TrialEntryScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <View style={styles.header}>
@@ -369,7 +369,7 @@ export default function TrialEntryScreen() {
             </Animated.View>
           )}
         </ScrollView>
-        <XPToast amount={xpToast.amount} visible={xpToast.visible} onDone={dismissXP} />
+        <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
         <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
       </KeyboardAvoidingView>
     </SafeAreaView>
