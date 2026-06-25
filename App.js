@@ -9,16 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-} from "@expo-google-fonts/inter";
-import {
-  SpaceGrotesk_600SemiBold,
-  SpaceGrotesk_700Bold,
-} from "@expo-google-fonts/space-grotesk";
+import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
 import { store } from "./src/store/store";
@@ -35,8 +26,10 @@ import { initErrorReporting } from "./src/lib/errorReporting";
 import { useTheme } from "./src/contexts/ThemeContext";
 import { applyNotifPrefs, getNotifPrefs } from "./src/lib/notifications";
 import OfflineBanner from "./src/components/common/OfflineBanner";
+import { loadHapticPref } from "./src/lib/haptics";
 
 initErrorReporting();
+loadHapticPref();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,11 +43,11 @@ initNotifications();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    SpaceGrotesk_600SemiBold,
-    SpaceGrotesk_700Bold,
+    Inter_400Regular: require("./assets/fonts/Inter_400Regular.ttf"),
+    Inter_500Medium: require("./assets/fonts/Inter_500Medium.ttf"),
+    Inter_600SemiBold: require("./assets/fonts/Inter_600SemiBold.ttf"),
+    SpaceGrotesk_600SemiBold: require("./assets/fonts/SpaceGrotesk_600SemiBold.ttf"),
+    SpaceGrotesk_700Bold: require("./assets/fonts/SpaceGrotesk_700Bold.ttf"),
   });
 
   const onLayoutRootView = useCallback(async () => {
