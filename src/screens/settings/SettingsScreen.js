@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,6 +15,7 @@ import { usePremium } from "../../contexts/PremiumContext";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
 import * as H from "../../lib/haptics";
+import { isHapticEnabled, setHapticEnabled } from "../../lib/haptics";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -22,6 +23,13 @@ export default function SettingsScreen() {
   const { logout, deleteAccount } = useAuth();
   const showAlert = useAlert();
   const { checkFeature, showPaywall } = usePremium();
+  const [hapticsOn, setHapticsOn] = useState(isHapticEnabled());
+
+  const toggleHaptics = useCallback((val) => {
+    setHapticsOn(val);
+    setHapticEnabled(val);
+    if (val) H.tap();
+  }, []);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const go = useCallback((s) => () => { H.tap(); navigation.navigate(s); }, [navigation]);
@@ -113,6 +121,7 @@ export default function SettingsScreen() {
           <SettingsGroup title="TERCİHLER">
             <SettingsRow icon="bell" iconColor={C.accent} label="Bildirimler" onPress={go(SCREENS.NOTIFICATIONS_SETTINGS)} />
             <SettingsRow icon="moon" iconColor={C.accent} label="Görünüm" onPress={go(SCREENS.APPEARANCE)} />
+            <SettingsRow icon="zap" iconColor={C.amber} label="Titreşim" toggle value={hapticsOn} onToggle={toggleHaptics} />
           </SettingsGroup>
         </Animated.View>
 

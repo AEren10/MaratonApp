@@ -18,6 +18,7 @@ export function ExamProvider({ children }) {
   const [targetDepartment, setTargetDepartment] = useState(null);
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [dbLoading, setDbLoading] = useState(false);
   const dbLoaded = useRef(false);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export function ExamProvider({ children }) {
 
   useEffect(() => {
     if (!session?.user?.id) {
-      if (!session) {
+      if (!session && !loading) {
         dbLoaded.current = false;
         setExamType(null);
         setField(null);
@@ -55,6 +56,7 @@ export function ExamProvider({ children }) {
     }
     if (dbLoaded.current) return;
     dbLoaded.current = true;
+    setDbLoading(true);
 
     getProfile(session.user.id).then((p) => {
       if (!p?.exam_type) {
@@ -90,7 +92,7 @@ export function ExamProvider({ children }) {
         targetRanking: config.targetRanking,
         targetDepartment: config.targetDepartment,
       })).catch(() => {});
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setDbLoading(false));
   }, [session]);
 
   const markSlidesAsSeen = useCallback(() => {
@@ -147,12 +149,14 @@ export function ExamProvider({ children }) {
     return Math.max(0, Math.round((examUTC - todayUTC) / (1000 * 60 * 60 * 24)));
   }, [examDate]);
 
+  const combinedLoading = loading || dbLoading;
+
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment,
-    daysUntilExam, loading, onboardingDone, hasSeenSlides,
+    daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
     updateExamConfig, updateGoal, markSlidesAsSeen,
   }), [examType, field, examDate, targetRanking, targetDepartment,
-    daysUntilExam, loading, onboardingDone, hasSeenSlides,
+    daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
     updateExamConfig, updateGoal, markSlidesAsSeen]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;

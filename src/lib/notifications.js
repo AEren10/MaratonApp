@@ -9,12 +9,21 @@ const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
     shouldShowBanner: true,
     shouldShowList: true,
   }),
 });
+
+if (Platform.OS === "android") {
+  Notifications.setNotificationChannelAsync("default", {
+    name: "Genel Bildirimler",
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    sound: "default",
+  }).catch(() => {});
+}
 
 export async function requestNotificationPermissions() {
   if (Platform.OS === "web") return false;
@@ -47,10 +56,29 @@ export async function getNotifPrefs() {
   };
 }
 
-export async function setNotifPrefs(prefs) {
+export async function setNotifPrefs(prefs, userId) {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
   } catch (_) {}
+  if (userId && userId !== "dev") {
+    try {
+      const { supabase } = require("../supabase/client");
+      await supabase.from("profiles").update({ notification_prefs: prefs }).eq("id", userId);
+    } catch {}
+  }
+}
+
+export async function loadNotifPrefsFromServer(userId) {
+  if (!userId || userId === "dev") return null;
+  try {
+    const { supabase } = require("../supabase/client");
+    const { data } = await supabase.from("profiles").select("notification_prefs").eq("id", userId).single();
+    if (data?.notification_prefs) {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data.notification_prefs));
+      return data.notification_prefs;
+    }
+  } catch {}
+  return null;
 }
 
 export async function cancelAllScheduled() {

@@ -3,7 +3,7 @@
 // Joker her pazartesi 04:00'te yenilenir.
 
 function toDateStr(d) {
-  return d.toISOString().split("T")[0];
+  return d.toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" });
 }
 
 function addDays(d, n) {

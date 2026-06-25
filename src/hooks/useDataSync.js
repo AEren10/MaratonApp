@@ -8,16 +8,17 @@ import { setTodayLogs, setStreak, setFreezeCount, setLongestStreak, setFreezeRes
 import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { loadGamificationFromStorage, hydrateGamification } from "../store/slices/gamificationSlice";
+import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
 import { getTotalXP, getWeeklyXP } from "../supabase/xp";
 import { updateStreak } from "../supabase/streaks";
 import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
+import { todayTR } from "../lib/dateUtils";
 import { getStreak } from "../supabase/streaks";
 import { getProfile } from "../supabase/profiles";
 import { getUserTasksByDate } from "../supabase/userTasks";
 import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
-import { getExpoPushToken } from "../lib/notifications";
+import { getExpoPushToken, loadNotifPrefsFromServer, applyNotifPrefs, getNotifPrefs } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
 import { supabase } from "../supabase/client";
 import { STORAGE_KEYS } from "../constants/storageKeys";
@@ -37,7 +38,7 @@ async function loadAll(userId, dispatch) {
   await retryPendingStreak();
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
 
-  const todayDate = new Date().toISOString().split("T")[0];
+  const todayDate = todayTR();
   const [trials, streak, todayLogs, profile, userTasks, serverXP, serverWeeklyXP] = await Promise.allSettled([
     getTrials(userId),
     getStreak(userId),
@@ -74,11 +75,13 @@ async function loadAll(userId, dispatch) {
   }
 
   if (streak.status === "fulfilled" && streak.value) {
-    dispatch(setStreak(streak.value.current_streak || 0));
+    const streakVal = streak.value.current_streak || 0;
+    dispatch(setStreak(streakVal));
     dispatch(setFreezeCount(streak.value.freeze_count ?? 0));
     dispatch(setLongestStreak(streak.value.longest_streak || 0));
     dispatch(setFreezeResetAt(streak.value.freeze_reset_at || null));
     dispatch(setLastStudyDate(streak.value.last_study_date || null));
+    dispatch(setMaxStat({ key: "streak", value: streakVal }));
   }
 
   if (todayLogs.status === "fulfilled" && todayLogs.value) {
@@ -91,7 +94,7 @@ async function loadAll(userId, dispatch) {
       study_date: l.study_date,
     }));
 
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = todayDate;
     const pending = await getPendingStudyLogs().catch(() => []);
     const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}_${m.duration}`));
     const pendingToday = pending
@@ -113,13 +116,17 @@ async function loadAll(userId, dispatch) {
     dispatch(setUserTasks(userTasks.value));
   }
 
-  const localGoalsRaw = await AsyncStorage.getItem(STORAGE_KEYS.GOALS).catch(() => null);
-  if (!localGoalsRaw && profile.status === "fulfilled" && profile.value?.daily_question_goal != null) {
+  if (profile.status === "fulfilled" && profile.value?.daily_question_goal != null) {
     const g = { dailyQuestions: profile.value.daily_question_goal };
     if (profile.value.weekly_trials_goal != null) g.weeklyTrials = profile.value.weekly_trials_goal;
     if (profile.value.weekly_minutes_goal != null) g.weeklyMinutes = profile.value.weekly_minutes_goal;
     dispatch(setGoals(g));
     saveGoalsToStorage(g);
+  } else {
+    const localGoalsRaw = await AsyncStorage.getItem(STORAGE_KEYS.GOALS).catch(() => null);
+    if (localGoalsRaw) {
+      try { dispatch(setGoals(JSON.parse(localGoalsRaw))); } catch {}
+    }
   }
 
   const xpFromServer = serverXP.status === "fulfilled" ? serverXP.value : 0;
@@ -127,7 +134,7 @@ async function loadAll(userId, dispatch) {
   const serverBadges = profile.status === "fulfilled" ? profile.value?.badges : null;
   const serverStats = profile.status === "fulfilled" ? profile.value?.gamification_stats : null;
 
-  if (xpFromServer > 0 || (Array.isArray(serverBadges) && serverBadges.length > 0)) {
+  if (xpFromServer > 0 || (Array.isArray(serverBadges) && serverBadges.length > 0) || serverStats) {
     const patch = { xp: xpFromServer, weeklyXP: weeklyFromServer };
     if (Array.isArray(serverBadges) && serverBadges.length > 0) patch.badges = serverBadges;
     if (serverStats && typeof serverStats === "object") {
@@ -138,8 +145,22 @@ async function loadAll(userId, dispatch) {
     dispatch(hydrateGamification(patch));
   }
 
+  if (profile.status === "fulfilled" && profile.value) {
+    dispatch(setRetentionData({
+      studySessionCount: profile.value.study_session_count || 0,
+      loginRewardedDate: profile.value.login_rewarded_date || null,
+      reviewLastAsked: profile.value.review_last_asked || null,
+      lastActive: profile.value.last_active || null,
+    }));
+  }
+
   getExpoPushToken().then((token) => {
     if (token) registerPushToken(userId, token);
+  }).catch(() => {});
+
+  loadNotifPrefsFromServer(userId).then(async (serverPrefs) => {
+    const prefs = serverPrefs || await getNotifPrefs();
+    applyNotifPrefs(prefs);
   }).catch(() => {});
 
   // Update last_active for server-side push targeting
@@ -181,8 +202,12 @@ export function useDataSync() {
   const appStateRef = useRef(AppState.currentState);
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
-    const sub = AppState.addEventListener("change", (next) => {
+    const sub = AppState.addEventListener("change", async (next) => {
       if (appStateRef.current.match(/inactive|background/) && next === "active") {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+        } catch { return; }
         flushQueue()
           .then((r) => { if (r.processed > 0) loadAll(user.id, safeDispatch).catch(() => {}); })
           .catch(() => {});

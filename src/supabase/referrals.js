@@ -11,23 +11,11 @@ function generateCode() {
 }
 
 async function grantPremiumDays(userId, days) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("premium_until")
-    .eq("id", userId)
-    .maybeSingle();
+  const { error } = await supabase.rpc("grant_premium", {
+    target_user_id: userId,
+    days,
+  });
   if (error) throw error;
-
-  const now = new Date();
-  const current = data?.premium_until ? new Date(data.premium_until) : now;
-  const base = current > now ? current : now;
-  const until = new Date(base.getTime() + days * 86400000);
-
-  const { error: updateErr } = await supabase
-    .from("profiles")
-    .update({ premium_until: until.toISOString(), is_premium: true })
-    .eq("id", userId);
-  if (updateErr) throw updateErr;
 }
 
 export async function getOrCreateReferralCode(userId) {
@@ -57,6 +45,19 @@ export async function getOrCreateReferralCode(userId) {
 export async function applyReferralCode(inviteeId, code) {
   const upper = code.trim().toUpperCase();
 
+  // Try atomic RPC first
+  try {
+    const { data, error } = await supabase.rpc("apply_referral_code", {
+      invitee_uuid: inviteeId,
+      referral_code_input: upper,
+    });
+    if (!error && data) return data;
+    if (error && !error.message?.includes("function") && !error.message?.includes("does not exist")) throw error;
+  } catch (e) {
+    if (e.message && !e.message.includes("function") && !e.message.includes("does not exist")) throw e;
+  }
+
+  // Fallback: client-side (for pre-migration deployments)
   const { data: inviter, error: inviterErr } = await supabase
     .from("profiles")
     .select("id")
@@ -86,9 +87,11 @@ export async function applyReferralCode(inviteeId, code) {
     .eq("id", inviteeId);
   if (refErr) handleSupabaseError(refErr, "applyReferralCode:referred_by");
 
-  await grantPremiumDays(inviter.id, 7);
-  await grantPremiumDays(inviteeId, 7);
+  const grantErrors = [];
+  try { await grantPremiumDays(inviteeId, 7); } catch (e) { grantErrors.push(e); handleSupabaseError(e, "applyReferralCode:inviteePremium"); }
+  try { await grantPremiumDays(inviter.id, 7); } catch (e) { grantErrors.push(e); handleSupabaseError(e, "applyReferralCode:inviterPremium"); }
 
+  if (grantErrors.length === 2) throw new Error("Premium verilemedi. Lütfen tekrar deneyin.");
   return { ok: true, inviterId: inviter.id };
 }
 

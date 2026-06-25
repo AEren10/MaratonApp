@@ -61,3 +61,15 @@ export const completeTask = async (taskId) => {
     throw e;
   }
 };
+
+export const togglePlanTask = async (taskId, completed) => {
+  try {
+    const { error } = await supabase
+      .from("plan_tasks")
+      .update({ completed })
+      .eq("id", taskId);
+    if (error) throw error;
+  } catch (e) {
+    handleSupabaseError(e, "togglePlanTask");
+  }
+};

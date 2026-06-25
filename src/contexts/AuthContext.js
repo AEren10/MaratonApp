@@ -1,9 +1,11 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "../supabase/client";
 import { signOut as supaSignOut, deleteAccount as supaDeleteAccount } from "../supabase/auth";
 import { store, RESET_STORE } from "../store/store";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { onAuthError } from "../lib/authEvents";
+import { setUserContext } from "../lib/errorReporting";
 
 const AuthContext = createContext(null);
 
@@ -11,6 +13,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const loggingOut = useRef(false);
 
   useEffect(() => {
     supabase.auth.getSession()
@@ -18,7 +21,9 @@ export function AuthProvider({ children }) {
         setSession(s);
         setUser(s?.user ?? null);
       })
-      .catch(() => {})
+      .catch((e) => {
+        if (__DEV__) console.warn("[Auth] getSession failed", e.message || e);
+      })
       .finally(() => setLoading(false));
 
     const {
@@ -26,12 +31,15 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
+      setUserContext(s?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const logout = useCallback(async () => {
+    if (loggingOut.current) return;
+    loggingOut.current = true;
     try {
       await supaSignOut();
     } catch (_) {}
@@ -49,7 +57,15 @@ export function AuthProvider({ children }) {
       STORAGE_KEYS.PENDING_STREAK,
       STORAGE_KEYS.CALENDAR_TASKS,
     ]).catch(() => {});
+    loggingOut.current = false;
   }, []);
+
+  useEffect(() => {
+    return onAuthError(() => {
+      if (__DEV__) console.warn("[Auth] 401 detected — forcing logout");
+      logout();
+    });
+  }, [logout]);
 
   const deleteAccount = useCallback(async () => {
     await supaDeleteAccount();

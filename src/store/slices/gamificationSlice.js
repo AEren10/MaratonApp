@@ -19,6 +19,7 @@ const initialState = {
     streak: 0,
   },
   claimedMilestones: [],
+  retentionData: null,
   hydrated: false,
 };
 
@@ -69,17 +70,26 @@ const gamificationSlice = createSlice({
         state.claimedMilestones.push(day);
       }
     },
+    setRetentionData(state, action) {
+      state.retentionData = action.payload;
+    },
     hydrateGamification(state, action) {
       const d = action.payload || {};
-      if (d.xp != null) state.xp = d.xp;
+      if (d.xp != null) state.xp = Math.max(state.xp, d.xp);
       if (d.weeklyXP != null) state.weeklyXP = d.weeklyXP;
-      if (Array.isArray(d.badges)) state.badges = d.badges;
+      if (Array.isArray(d.badges)) {
+        const merged = new Set([...state.badges, ...d.badges]);
+        state.badges = [...merged];
+      }
       if (d.stats) {
         Object.keys(d.stats).forEach((k) => {
-          if (k in state.stats) state.stats[k] = d.stats[k];
+          if (k in state.stats) state.stats[k] = Math.max(state.stats[k], d.stats[k] || 0);
         });
       }
-      if (Array.isArray(d.claimedMilestones)) state.claimedMilestones = d.claimedMilestones;
+      if (Array.isArray(d.claimedMilestones)) {
+        const merged = new Set([...state.claimedMilestones, ...d.claimedMilestones]);
+        state.claimedMilestones = [...merged];
+      }
       state.hydrated = true;
     },
   },
@@ -94,6 +104,7 @@ export const {
   setMaxStat,
   resetWeeklyXP,
   claimStreakMilestone,
+  setRetentionData,
   hydrateGamification,
 } = gamificationSlice.actions;
 
@@ -102,6 +113,7 @@ export const selectWeeklyXP = (state) => state.gamification.weeklyXP;
 export const selectBadgeIds = (state) => state.gamification.badges;
 export const selectStats = (state) => state.gamification.stats;
 export const selectClaimedMilestones = (state) => state.gamification.claimedMilestones;
+export const selectRetentionData = (state) => state.gamification.retentionData;
 export const selectLevel = createSelector(
   selectXP,
   (xp) => getLevelForXP(xp),

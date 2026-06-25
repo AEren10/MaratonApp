@@ -20,8 +20,9 @@ import {
 import { saveUserTaskOffline } from "../lib/offlineQueue";
 import { userTaskSchema } from "../validations/auth";
 import { scheduleTaskNotifications, cancelTaskReminders } from "../lib/notifications";
+import { todayTR } from "../lib/dateUtils";
 
-const today = () => new Date().toISOString().split("T")[0];
+const today = todayTR;
 
 export function useUserTasks() {
   const { user } = useAuth();

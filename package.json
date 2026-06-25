@@ -54,7 +54,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "expo-dev-client": "~6.0.21"
+    "expo-dev-client": "~6.0.21",
+    "typescript": "~5.9.2"
   },
   "private": true
 }

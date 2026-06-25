@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { STORAGE_KEYS } from "../constants/storageKeys";
-
-const KEY_LAST_ACTIVE = STORAGE_KEYS.LAST_ACTIVE;
-const KEY_LOGIN_REWARDED = STORAGE_KEYS.LOGIN_REWARDED;
-const KEY_COMEBACK_SHOWN = STORAGE_KEYS.COMEBACK_SHOWN;
+import { useAppSelector } from "../store/hooks";
+import { selectRetentionData } from "../store/slices/gamificationSlice";
+import { useAuth } from "../contexts/AuthContext";
+import { markLoginRewarded } from "../supabase/profiles";
 
 function todayStr() {
   return new Date().toISOString().split("T")[0];
@@ -18,40 +16,34 @@ function daysBetween(dateA, dateB) {
 export function useRetention(reward) {
   const [comeback, setComeback] = useState(null);
   const processed = useRef(false);
+  const retentionData = useAppSelector(selectRetentionData);
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (processed.current) return;
+    if (processed.current || !retentionData) return;
     processed.current = true;
     let alive = true;
     let timer;
 
-    (async () => {
-      try {
-        const today = todayStr();
-        const lastActive = await AsyncStorage.getItem(KEY_LAST_ACTIVE);
-        const loginRewarded = await AsyncStorage.getItem(KEY_LOGIN_REWARDED);
-        const comebackShown = await AsyncStorage.getItem(KEY_COMEBACK_SHOWN);
+    const today = todayStr();
+    const lastActive = retentionData.lastActive;
+    const loginRewarded = retentionData.loginRewardedDate;
 
-        if (lastActive && alive) {
-          const daysAway = daysBetween(lastActive, today);
+    if (lastActive && alive) {
+      const lastDate = lastActive.split("T")[0];
+      const daysAway = daysBetween(lastDate, today);
+      if (daysAway >= 2) {
+        setComeback({ daysAway, xpBonus: 50 });
+      }
+    }
 
-          if (daysAway >= 2 && comebackShown !== today) {
-            setComeback({ daysAway, xpBonus: 50 });
-            await AsyncStorage.setItem(KEY_COMEBACK_SHOWN, today);
-          }
-        }
-
-        if (loginRewarded !== today && reward && alive) {
-          await AsyncStorage.setItem(KEY_LOGIN_REWARDED, today);
-          timer = setTimeout(() => { if (alive) reward("daily_login"); }, 3500);
-        }
-
-        if (alive) await AsyncStorage.setItem(KEY_LAST_ACTIVE, today);
-      } catch (_) {}
-    })();
+    if (loginRewarded !== today && reward && alive) {
+      if (user?.id) markLoginRewarded(user.id).catch(() => {});
+      timer = setTimeout(() => { if (alive) reward("daily_login"); }, 3500);
+    }
 
     return () => { alive = false; clearTimeout(timer); };
-  }, [reward]);
+  }, [retentionData, reward, user?.id]);
 
   const dismissComeback = useCallback(() => {
     if (comeback && reward) {

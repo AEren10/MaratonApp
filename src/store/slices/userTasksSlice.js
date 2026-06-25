@@ -1,6 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { todayTR } from "../../lib/dateUtils";
 
-const todayStr = () => new Date().toISOString().split("T")[0];
+const todayStr = todayTR;
 
 const userTasksSlice = createSlice({
   name: "userTasks",

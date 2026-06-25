@@ -2,13 +2,16 @@ import { useState, useCallback } from "react";
 import { Platform } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Crypto from "expo-crypto";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { signInWithAppleToken, signInWithGoogleToken } from "../supabase/auth";
 
-GoogleSignin.configure({
-  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-});
+let GoogleSignin = null;
+try {
+  GoogleSignin = require("@react-native-google-signin/google-signin").GoogleSignin;
+  GoogleSignin.configure({
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+  });
+} catch (_) {}
 
 export function useSocialAuth() {
   const [busy, setBusy] = useState(false);
@@ -36,6 +39,7 @@ export function useSocialAuth() {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
+    if (!GoogleSignin) throw new Error("Google Sign-In is not available");
     setBusy(true);
     try {
       await GoogleSignin.hasPlayServices();
@@ -48,5 +52,5 @@ export function useSocialAuth() {
     }
   }, []);
 
-  return { signInWithApple, signInWithGoogle, busy };
+  return { signInWithApple, signInWithGoogle, busy, googleAvailable: !!GoogleSignin };
 }

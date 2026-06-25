@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useRef } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -37,7 +37,7 @@ function TierHeader({ tier, nextTier, myScore, myRank, totalUsers, C }) {
           <View style={{ marginLeft: SPACING.md, flex: 1 }}>
             <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
             <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
-              Bu hafta {myScore} XP{myRank ? ` · #${myRank}` : ""}
+              Bu hafta {myScore ?? 0} XP{myRank ? ` · #${myRank}` : ""}
             </Text>
           </View>
           {zoneStyle && (
@@ -61,7 +61,7 @@ function TierHeader({ tier, nextTier, myScore, myRank, totalUsers, C }) {
           borderBottomWidth: 1,
           borderColor: C.border,
         }}>
-          <MiniStat label="Haftalık XP" value={myScore} color={C.amber} C={C} />
+          <MiniStat label="Haftalık XP" value={myScore ?? 0} color={C.amber} C={C} />
           <MiniStat label="Sıran" value={myRank ? `#${myRank}` : "—"} color={C.purple} C={C} />
         </View>
 
@@ -69,7 +69,7 @@ function TierHeader({ tier, nextTier, myScore, myRank, totalUsers, C }) {
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: SPACING.sm }}>
             <Icon name="trendUp" size={14} color={C.green} />
             <Text style={[TYPOGRAPHY.caption, { color: C.green, marginLeft: SPACING.xs }]}>
-              {nextTier.name} Lig'e {nextTier.minXP - myScore} XP kaldı
+              {nextTier.name} Lig'e {nextTier.minXP - (myScore ?? 0)} XP kaldı
             </Text>
           </View>
         )}
@@ -169,9 +169,10 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
 
 export default function LeagueScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
   const C = useC();
   const { user } = useAuth();
-  const [tab, setTab] = useState("friends");
+  const [tab, setTab] = useState(route.params?.groupCode ? "groups" : "friends");
   const [data, setData] = useState({ list: [], myRank: null, myScore: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -189,7 +190,6 @@ export default function LeagueScreen() {
       setError(false);
     } catch (e) {
       setError(true);
-      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     } finally {
       setLoading(false);
     }
@@ -310,7 +310,7 @@ export default function LeagueScreen() {
       </View>
 
       {tab === "groups" ? (
-        <GroupsTab user={user} />
+        <GroupsTab user={user} initialGroupCode={route.params?.groupCode} />
       ) : loading ? (
         <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.md }}>
           <SkeletonCard height={120} />

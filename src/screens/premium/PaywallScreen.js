@@ -17,7 +17,7 @@ import {
   restorePurchases,
   isInitialized,
 } from "../../lib/purchases";
-import { updateProfile } from "../../supabase/profiles";
+import { startTrial } from "../../supabase/profiles";
 import { useAuth } from "../../contexts/AuthContext";
 import PlanCard from "./components/PlanCard";
 import FeatureRow from "./components/FeatureRow";
@@ -54,17 +54,24 @@ export default function PaywallScreen() {
     try {
       const pkg = getSelectedPackage();
       if (!pkg) {
-        showAlert("Henüz Hazır Değil", "Satın alma şu an kullanılamıyor. Kısa süre sonra aktif olacak.");
+        if (user?.id) {
+          const started = await startTrial(user.id);
+          if (started) {
+            H.success();
+            await refreshPremium();
+            showAlert("Deneme Başladı", "7 günlük ücretsiz denemen başladı!");
+            navigation.goBack();
+            return;
+          }
+          showAlert("Deneme Kullanıldı", "Ücretsiz deneme hakkını zaten kullandın.");
+          return;
+        }
+        showAlert("Henüz Hazır Değil", "Satın alma şu an kullanılamıyor.");
         return;
       }
       const isPro = await purchasePackage(pkg);
       if (isPro) {
         H.success();
-        if (user?.id) {
-          const days = selectedPlan === "yearly" ? 365 : 30;
-          const until = new Date(Date.now() + days * 86400000).toISOString();
-          await updateProfile(user.id, { is_premium: true, premium_until: until });
-        }
         await refreshPremium();
         navigation.goBack();
       }
@@ -82,10 +89,6 @@ export default function PaywallScreen() {
       const isPro = await restorePurchases();
       if (isPro) {
         H.success();
-        if (user?.id) {
-          const until = new Date(Date.now() + 365 * 86400000).toISOString();
-          await updateProfile(user.id, { is_premium: true, premium_until: until });
-        }
         await refreshPremium();
         showAlert("Başarılı", "Premium üyeliğin geri yüklendi!");
         navigation.goBack();

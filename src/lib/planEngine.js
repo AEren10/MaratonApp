@@ -1,4 +1,4 @@
-import { differenceInDays } from "./dateUtils";
+import { differenceInDays, todayTR } from "./dateUtils";
 import { getSubjectsForExam } from "../data/curriculum";
 
 /**
@@ -144,7 +144,7 @@ export function generateDailyPlan({
   }
 
   return {
-    date: today.toISOString().split("T")[0],
+    date: todayTR(),
     tasks,
     totalQuestions: dailyTarget - remaining,
     estimatedMinutes: Math.round(((dailyTarget - remaining) / 80) * 120),

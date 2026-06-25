@@ -22,4 +22,6 @@ const rootReducer = (state, action) => {
   return appReducer(state, action);
 };
 
-export const store = configureStore({ reducer: rootReducer });
+export const store = configureStore({
+  reducer: rootReducer,
+});

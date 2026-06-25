@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Avatar } from "../../components/design/Avatar";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { FriendCodeCard } from "./components/FriendCodeCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -19,6 +20,8 @@ import {
   respondToRequest,
   unfriend,
   cancelRequest,
+  blockUser,
+  listBlockedUsers,
 } from "../../supabase/friends";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
@@ -27,6 +30,7 @@ import * as H from "../../lib/haptics";
 function FriendRow({ user, action }) {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
+  if (!user) return null;
   return (
     <View style={s.row}>
       <Avatar init={(user.name || "??").slice(0, 2).toUpperCase()} size={36} image={user.avatar_url} />
@@ -40,15 +44,18 @@ export default function FriendsScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const route = useRoute();
   const { user } = useAuth();
   const showAlert = useAlert();
   const [friends, setFriends] = useState([]);
+  const [blockedIds, setBlockedIds] = useState(new Set());
   const [requests, setRequests] = useState([]);
   const [outgoing, setOutgoing] = useState([]);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [sending, setSending] = useState(null);
 
   const load = useCallback(async () => {
     if (!user?.id || user.id === "dev") {
@@ -56,10 +63,11 @@ export default function FriendsScreen() {
       return;
     }
     try {
-      const [f, r, o] = await Promise.all([listFriends(user.id), listIncomingRequests(user.id), listOutgoingRequests(user.id)]);
+      const [f, r, o, blocked] = await Promise.all([listFriends(user.id), listIncomingRequests(user.id), listOutgoingRequests(user.id), listBlockedUsers(user.id)]);
       setFriends(f);
       setRequests(r);
       setOutgoing(o);
+      setBlockedIds(new Set((blocked || []).map((b) => b.id)));
     } catch (_) {
       showAlert("Yüklenemedi", "Arkadaş listesi alınamadı. Tekrar dene.");
     }
@@ -78,18 +86,20 @@ export default function FriendsScreen() {
     const t = setTimeout(async () => {
       try {
         const res = await searchUsers(query);
-        if (!cancelled) setSearchResults((res || []).filter((u) => u.id !== user?.id));
+        if (!cancelled) setSearchResults((res || []).filter((u) => u.id !== user?.id && !blockedIds.has(u.id)));
       } catch (_) {}
       if (!cancelled) setSearching(false);
     }, 400);
     return () => { cancelled = true; clearTimeout(t); };
-  }, [query, user?.id]);
+  }, [query, user?.id, blockedIds]);
 
   const friendIds = useMemo(() => new Set(friends.map((f) => f.id)), [friends]);
   const outgoingIds = useMemo(() => new Set(outgoing.map((o) => o.addressee?.id).filter(Boolean)), [outgoing]);
   const incomingIds = useMemo(() => new Set(requests.map((r) => r.requester?.id).filter(Boolean)), [requests]);
 
   const addFriend = useCallback(async (targetId) => {
+    if (sending) return;
+    setSending(targetId);
     try {
       await sendFriendRequest(targetId);
       H.success();
@@ -97,8 +107,10 @@ export default function FriendsScreen() {
       load();
     } catch (e) {
       showAlert("Hata", e.message || "İstek gönderilemedi.");
+    } finally {
+      setSending(null);
     }
-  }, [load]);
+  }, [load, sending]);
 
   const cancelOutgoing = useCallback(async (friendshipId) => {
     try {
@@ -136,6 +148,24 @@ export default function FriendsScreen() {
     ]);
   }, [load, user.id]);
 
+  const block = useCallback((targetUser) => {
+    H.warn();
+    showAlert("Kullanıcıyı Engelle", `${targetUser.name || "Bu kullanıcı"} engellensin mi? Arkadaşlık da kaldırılacak.`, [
+      { text: "İptal", style: "cancel" },
+      {
+        text: "Engelle",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await blockUser(targetUser.id);
+            H.success();
+            load();
+          } catch (e) { showAlert("Hata", e.message || "Engellenemedi."); }
+        },
+      },
+    ]);
+  }, [load]);
+
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
@@ -148,7 +178,9 @@ export default function FriendsScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.searchBox}>
+        <FriendCodeCard onRequestSent={load} initialCode={route.params?.friendCode} />
+
+        <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={s.searchBox}>
           <Icon name="search" size={18} color={C.muted} />
           <TextInput
             value={query}
@@ -180,8 +212,8 @@ export default function FriendsScreen() {
                       ) : isIncoming ? (
                         <Text style={{ ...TYPOGRAPHY.micro, color: C.green }}>İstek var</Text>
                       ) : (
-                        <Pressable onPress={() => addFriend(u.id)} style={s.actionBtn}>
-                          <Icon name="plus" size={14} color={C.accent} />
+                        <Pressable onPress={() => addFriend(u.id)} disabled={sending === u.id} style={[s.actionBtn, sending === u.id && { opacity: 0.5 }]}>
+                          {sending === u.id ? <ActivityIndicator size={14} color={C.accent} /> : <Icon name="plus" size={14} color={C.accent} />}
                           <Text style={{ ...TYPOGRAPHY.micro, color: C.accent }}>Ekle</Text>
                         </Pressable>
                       )
@@ -214,6 +246,9 @@ export default function FriendsScreen() {
                           </Pressable>
                           <Pressable onPress={() => respond(r.id, false)} style={[s.actionBtn, { backgroundColor: C.red + "20" }]}>
                             <Icon name="x" size={14} color={C.red} />
+                          </Pressable>
+                          <Pressable onPress={() => block(r.requester)} style={[s.actionBtn, { backgroundColor: C.muted + "15" }]} accessibilityLabel="Engelle">
+                            <Icon name="shield" size={14} color={C.muted} />
                           </Pressable>
                         </View>
                       }
@@ -259,9 +294,14 @@ export default function FriendsScreen() {
                       key={f.friendshipId}
                       user={f}
                       action={
-                        <Pressable onPress={() => remove(f.friendshipId)} style={s.actionBtn}>
-                          <Icon name="trash" size={14} color={C.red} />
-                        </Pressable>
+                        <View style={{ flexDirection: "row", gap: 4 }}>
+                          <Pressable onPress={() => block(f)} style={[s.actionBtn, { backgroundColor: C.muted + "15" }]} accessibilityLabel="Engelle">
+                            <Icon name="shield" size={14} color={C.muted} />
+                          </Pressable>
+                          <Pressable onPress={() => remove(f.friendshipId)} style={s.actionBtn} accessibilityLabel="Kaldır">
+                            <Icon name="trash" size={14} color={C.red} />
+                          </Pressable>
+                        </View>
                       }
                     />
                   ))}

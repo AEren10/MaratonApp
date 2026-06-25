@@ -74,9 +74,12 @@ export async function createGroup(name) {
 }
 
 export async function joinByCode(code) {
+  if (!code || typeof code !== "string") throw new Error("Geçersiz grup kodu");
+  const trimmed = code.trim().toUpperCase();
+  if (trimmed.length < 4) throw new Error("Grup kodu en az 4 karakter olmalı");
   JOIN_THROTTLE.check();
   try {
-    const { data, error } = await supabase.rpc("join_group_by_code", { group_code: code.trim().toUpperCase() });
+    const { data, error } = await supabase.rpc("join_group_by_code", { group_code: trimmed });
     if (error) throw error;
     JOIN_THROTTLE.recordSuccess();
     return data; // group id
@@ -104,6 +107,12 @@ export async function listMyGroups(userId) {
 export async function leaveGroup(groupId, userId) {
   if (!userId) throw new Error("userId is required");
   try {
+    const { data: group } = await supabase
+      .from("groups")
+      .select("owner_id")
+      .eq("id", groupId)
+      .maybeSingle();
+    if (group?.owner_id === userId) throw new Error("Grup sahibi gruptan ayrılamaz. Önce grubu silin.");
     const { error } = await supabase
       .from("group_members")
       .delete()

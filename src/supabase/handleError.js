@@ -1,4 +1,5 @@
 import { captureError, addBreadcrumb } from "../lib/errorReporting";
+import { emitAuthError } from "../lib/authEvents";
 
 const SAFE_MESSAGES = {
   "23505": "Bu kayit zaten mevcut.",
@@ -17,6 +18,22 @@ function getSafeMessage(error) {
   return "Bir hata olustu. Lutfen tekrar deneyin.";
 }
 
+function isAuthError(error) {
+  if (!error) return false;
+  const code = error.code || error.status || "";
+  const msg = error.message || "";
+  const status = error.status || error.statusCode;
+  return (
+    code === "PGRST301" ||
+    code === "AuthApiError" ||
+    status === 401 ||
+    status === 403 ||
+    msg.includes("JWT") ||
+    msg.includes("token is expired") ||
+    msg.includes("invalid claim")
+  );
+}
+
 export function handleSupabaseError(error, context) {
   if (!error) return null;
 
@@ -31,8 +48,17 @@ export function handleSupabaseError(error, context) {
     captureError(error, { supabaseContext: context });
   }
 
+  if (isAuthError(error)) {
+    emitAuthError();
+  }
+
   error._safeMessage = getSafeMessage(error);
   return error;
+}
+
+export function throwSupabaseError(error, context) {
+  handleSupabaseError(error, context);
+  if (error) throw error;
 }
 
 export function safeAsync(fn, context, fallback = null) {

@@ -12,6 +12,7 @@ import {
   requestNotificationPermissions,
 } from "../../lib/notifications";
 import { useAlert } from "../../contexts/AlertContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const HOUR_OPTIONS = [
   { h: 8, label: "08:00 Sabah" },
@@ -28,6 +29,7 @@ export default function NotificationsSettingsScreen() {
   const [prefs, setPrefs] = useState(null);
   const [busy, setBusy] = useState(false);
   const showAlert = useAlert();
+  const { user } = useAuth();
 
   useEffect(() => {
     getNotifPrefs().then(setPrefs);
@@ -51,7 +53,7 @@ export default function NotificationsSettingsScreen() {
             setPrefs(next);
           }
         }
-        await setNotifPrefs(next);
+        await setNotifPrefs(next, user?.id);
         await applyNotifPrefs(next);
       } finally {
         setBusy(false);

@@ -8,8 +8,10 @@ import { STORAGE_KEYS } from "../constants/storageKeys";
 import { supabase } from "../supabase/client";
 
 const QUEUE_KEY = STORAGE_KEYS.OFFLINE_QUEUE;
-const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
+const DEAD_LETTER_KEY = "@maraton:dead_letter_queue";
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_RETRIES = 10;
+const FLUSH_TIMEOUT_MS = 60_000;
 
 // Operation types
 export const OP_STUDY_LOG = "STUDY_LOG";
@@ -88,9 +90,33 @@ function isAuthError(e) {
   return status === 401 || status === 403 || msg.includes("JWT") || msg.includes("token");
 }
 
+function shouldSkipByBackoff(item) {
+  if (!item.retryCount || !item.lastAttempt) return false;
+  const delay = Math.min(1000 * Math.pow(2, item.retryCount), 300_000);
+  return Date.now() - item.lastAttempt < delay;
+}
+
+async function moveToDeadLetter(items) {
+  if (!items.length) return;
+  try {
+    const raw = await AsyncStorage.getItem(DEAD_LETTER_KEY);
+    const existing = raw ? JSON.parse(raw) : [];
+    const merged = [...existing, ...items].slice(-50);
+    await AsyncStorage.setItem(DEAD_LETTER_KEY, JSON.stringify(merged));
+  } catch {}
+}
+
+export async function getDeadLetterCount() {
+  try {
+    const raw = await AsyncStorage.getItem(DEAD_LETTER_KEY);
+    return raw ? JSON.parse(raw).length : 0;
+  } catch { return 0; }
+}
+
 export async function flushQueue() {
   if (_flushing) return { processed: 0, failed: 0, types: [] };
   _flushing = true;
+  const startTime = Date.now();
   try {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return { processed: 0, failed: 0, types: [] };
@@ -100,24 +126,40 @@ export async function flushQueue() {
 
   const now = Date.now();
   const remaining = [];
+  const dead = [];
   let processed = 0;
   let failed = 0;
   const processedTypes = [];
 
-  const valid = list.filter((item) => {
-    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) return false;
-    if ((item.retryCount || 0) >= MAX_RETRIES) return false;
-    return true;
-  });
+  const valid = [];
+  for (const item of list) {
+    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) {
+      dead.push(item);
+    } else if ((item.retryCount || 0) >= MAX_RETRIES) {
+      dead.push(item);
+    } else {
+      valid.push(item);
+    }
+  }
 
   for (let i = 0; i < valid.length; i++) {
+    if (Date.now() - startTime > FLUSH_TIMEOUT_MS) {
+      for (let j = i; j < valid.length; j++) remaining.push(valid[j]);
+      break;
+    }
+
     const item = valid[i];
+    if (shouldSkipByBackoff(item)) {
+      remaining.push(item);
+      continue;
+    }
+
     try {
       await runOne(item);
       processed += 1;
       if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
     } catch (e) {
-      const bumped = { ...item, retryCount: (item.retryCount || 0) + 1 };
+      const bumped = { ...item, retryCount: (item.retryCount || 0) + 1, lastAttempt: Date.now() };
       if (isAuthError(e)) {
         remaining.push(bumped);
         for (let j = i + 1; j < valid.length; j++) remaining.push(valid[j]);
@@ -128,6 +170,7 @@ export async function flushQueue() {
     }
   }
 
+  if (dead.length) await moveToDeadLetter(dead);
   await writeQueue(remaining);
   return { processed, failed, types: processedTypes };
   } finally { _flushing = false; }

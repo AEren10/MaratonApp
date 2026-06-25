@@ -2,6 +2,7 @@ import { useMemo, useCallback, useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon, AnimatedPressable } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useUserTasks } from "../../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../../hooks/usePlanCompletion";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -54,8 +55,9 @@ export function TodayPlanCard({
   onTaskDone,
 }) {
   const C = useC();
+  const { user } = useAuth();
   const { tasks: userTasks, toggleTask } = useUserTasks();
-  const { isDone: isPlanDone, toggle: togglePlan } = usePlanCompletion();
+  const { isDone: isPlanDone, toggle: togglePlan } = usePlanCompletion(user?.id);
   const rewardedRef = useRef(false);
 
   const merged = useMemo(() => {
@@ -71,18 +73,19 @@ export function TodayPlanCard({
         source: "user",
       });
     });
-    generatedTasks.forEach((t, i) =>
+    generatedTasks.forEach((t) => {
+      const pid = `plan_${t.subject}_${t.topic || "genel"}`;
       items.push({
-        id: `plan_${i}`,
+        id: pid,
         subject: t.subject,
         label: t.topicLabel || t.subjectLabel,
         count: t.questionCount || 0,
-        completed: isPlanDone(`plan_${i}`),
+        completed: isPlanDone(pid),
         badge: t.badge,
         rkind: t.rkind,
         source: "plan",
-      }),
-    );
+      });
+    });
     if (aiSuggestion) {
       items.push({
         id: "ai_suggestion",

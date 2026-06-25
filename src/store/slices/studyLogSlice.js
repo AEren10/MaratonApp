@@ -16,7 +16,12 @@ const studyLogSlice = createSlice({
       state.todayLogs = action.payload;
     },
     addLog: (state, action) => {
-      state.todayLogs.push(action.payload);
+      const log = action.payload;
+      const dup = state.todayLogs.some((l) =>
+        l.subject === log.subject && l.topic === log.topic &&
+        l.questionCount === log.questionCount && l.duration === log.duration,
+      );
+      if (!dup) state.todayLogs.push(log);
     },
     setStreak: (state, action) => {
       state.streak = action.payload;

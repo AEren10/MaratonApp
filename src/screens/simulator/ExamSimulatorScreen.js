@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
@@ -8,9 +8,12 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
-import { getAllSubjects } from "../trial/trialTypes";
+import { useAuth } from "../../contexts/AuthContext";
 import * as haptic from "../../lib/haptics";
 import { useAlert } from "../../contexts/AlertContext";
+import { addStudyLog } from "../../supabase/studyLogs";
+import { SCREENS } from "../../constants/screens";
+import { todayTR } from "../../lib/dateUtils";
 
 const TYT_CONFIG = { time: 165, label: "TYT", sections: ["turkce", "sosyal", "matematik", "fen"] };
 const AYT_CONFIG = { time: 180, label: "AYT", sections: ["mat", "fizik", "kimya", "biyoloji", "edebiyat", "tarih1", "cografya1"] };
@@ -21,8 +24,8 @@ export default function ExamSimulatorScreen() {
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { examType } = useExam();
+  const { user } = useAuth();
   const showAlert = useAlert();
-  const allSubjects = getAllSubjects(C);
 
   const [phase, setPhase] = useState("setup");
   const [config, setConfig] = useState(
@@ -31,6 +34,7 @@ export default function ExamSimulatorScreen() {
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef(null);
+  const savedRef = useRef(false);
 
   const startExam = useCallback(() => {
     setPhase("running");
@@ -63,6 +67,22 @@ export default function ExamSimulatorScreen() {
   }, []);
 
   const togglePause = useCallback(() => setPaused((p) => !p), []);
+
+  useEffect(() => {
+    if (phase !== "done" || savedRef.current) return;
+    savedRef.current = true;
+    if (user?.id && user.id !== "dev") {
+      addStudyLog({
+        user_id: user.id,
+        subject: config.label,
+        topic: "Sınav Simülasyonu",
+        question_count: 0,
+        correct_count: 0,
+        duration_minutes: Math.max(1, Math.ceil(elapsed / 60)),
+        study_date: todayTR(),
+      }).catch(() => {});
+    }
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const remaining = config.time * 60 - elapsed;
   const mins = Math.floor(remaining / 60);
@@ -104,16 +124,23 @@ export default function ExamSimulatorScreen() {
 
   if (phase === "done") {
     const usedMins = Math.floor(elapsed / 60);
+    const timeOut = elapsed >= config.time * 60;
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.center}>
           <Animated.View entering={ZoomIn}><Icon name="checkCircle" size={56} color={C.green} /></Animated.View>
           <Text style={s.doneTitle}>Simülasyon Tamamlandı!</Text>
           <Text style={s.doneStat}>{usedMins} dk {elapsed % 60} sn</Text>
-          <Text style={s.doneSub}>Toplam süre kullanıldı</Text>
-          {elapsed >= config.time * 60 && <Text style={[s.doneSub, { color: C.red }]}>Süre doldu!</Text>}
-          <Pressable onPress={() => navigation.goBack()} style={s.cta}>
-            <Text style={s.ctaText}>Tamam</Text>
+          <Text style={s.doneSub}>{timeOut ? "Süre doldu!" : "Erken bitirdin"}</Text>
+          <Pressable
+            onPress={() => { haptic.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }}
+            style={s.cta}
+          >
+            <Icon name="chart" size={18} color="#FFFFFF" />
+            <Text style={s.ctaText}>Sonuçlarını Gir</Text>
+          </Pressable>
+          <Pressable onPress={() => navigation.goBack()} style={s.secondaryBtn}>
+            <Text style={[s.doneSub, { color: C.sec }]}>Kapat</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -186,5 +213,6 @@ function makeStyles(C) {
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
     doneStat: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 36, color: C.green },
     doneSub: { ...TYPOGRAPHY.caption, color: C.muted },
+    secondaryBtn: { paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl },
   });
 }

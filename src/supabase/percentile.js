@@ -18,3 +18,16 @@ export async function getMyPercentiles() {
     throw e;
   }
 }
+
+let lastRefresh = 0;
+const REFRESH_COOLDOWN = 3600000; // 1 saat
+
+export async function refreshPercentilesIfStale() {
+  if (Date.now() - lastRefresh < REFRESH_COOLDOWN) return;
+  try {
+    const { error } = await supabase.rpc("refresh_percentiles");
+    if (!error) lastRefresh = Date.now();
+  } catch {
+    // Sessizce geç — view bayat kalırsa da crash olmasın
+  }
+}

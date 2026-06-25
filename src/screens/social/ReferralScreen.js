@@ -27,7 +27,8 @@ import {
   getReferralStats,
 } from "../../supabase/referrals";
 import { usePremium } from "../../contexts/PremiumContext";
-import { consumePendingReferral } from "../../hooks/useDeepLink";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../../constants/storageKeys";
 import * as H from "../../lib/haptics";
 
 const REWARD_DAYS = 7;
@@ -48,16 +49,15 @@ export default function ReferralScreen() {
   const [friendCode, setFriendCode] = useState("");
   const [applying, setApplying] = useState(false);
 
-  // Auto-fill from deep link param or pending referral
   useEffect(() => {
     const deepCode = route.params?.code;
     if (deepCode) {
       setFriendCode(deepCode.toUpperCase());
       return;
     }
-    consumePendingReferral().then((pending) => {
-      if (pending) setFriendCode(pending);
-    });
+    AsyncStorage.getItem(STORAGE_KEYS.PENDING_REFERRAL)
+      .then((pending) => { if (pending) setFriendCode(pending); })
+      .catch(() => {});
   }, [route.params?.code]);
 
   useEffect(() => {
@@ -111,6 +111,7 @@ export default function ReferralScreen() {
       const result = await applyReferralCode(user.id, friendCode);
       if (result.ok) {
         H.success();
+        AsyncStorage.removeItem(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
         await refreshPremium();
         showAlert("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
         setFriendCode("");
@@ -131,6 +132,12 @@ export default function ReferralScreen() {
   if (loading) {
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
+        <View style={s.header}>
+          <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+            <Icon name="arrowL" size={22} color={C.text} />
+          </Pressable>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Arkadaşını Davet Et</Text>
+        </View>
         <ActivityIndicator color={C.accent} style={{ flex: 1 }} />
       </SafeAreaView>
     );

@@ -11,7 +11,6 @@ export const XP_REWARDS = {
   comeback_bonus: 50,
   referral_applied: 50,
   streak_milestone: 0,
-  mystery_chest: 0,
 };
 
 export const LEVELS = [
@@ -40,10 +39,6 @@ export const LEVELS = [
 export function getBadges(C) {
   return [
     { id: "streak_3", name: "3 Gün Seri", icon: "flame", color: C.accent, desc: "3 gün üst üste çalış", condition: { type: "streak", value: 3 } },
-    { id: "streak_7", name: "Haftalık Alışkanlık", icon: "flame", color: C.accent, desc: "7 gün üst üste çalışarak alışkanlık oluştur", condition: { type: "streak", value: 7 } },
-    { id: "streak_30", name: "Aylık Disiplin", icon: "flame", color: C.red, desc: "30 gün kesintisiz çalışarak disiplini kanıtla", condition: { type: "streak", value: 30 } },
-    { id: "streak_60", name: "Kararlı Savaşçı", icon: "flame", color: "#FF6B6B", desc: "60 gün boyunca kararlılığını koru", condition: { type: "streak", value: 60 } },
-    { id: "streak_100", name: "Efsanevi Azim", icon: "flame", color: "#FFD700", desc: "100 gün üst üste çalışarak efsane ol", condition: { type: "streak", value: 100 } },
     { id: "questions_100", name: "Yüzlük", icon: "target", color: C.blue, desc: "100 soru çöz", condition: { type: "questions", value: 100 } },
     { id: "questions_500", name: "Beş Yüzlük", icon: "target", color: C.blue, desc: "500 soru çöz", condition: { type: "questions", value: 500 } },
     { id: "questions_1000", name: "Binyıldız", icon: "award", color: C.green, desc: "1000 soru çöz", condition: { type: "questions", value: 1000 } },
@@ -55,7 +50,6 @@ export function getBadges(C) {
     { id: "wrong_10", name: "Hata Avcısı", icon: "notebook", color: C.red, desc: "10 yanlışı çöz", condition: { type: "wrongs_resolved", value: 10 } },
     { id: "perfect_day", name: "Mükemmel Gün", icon: "checkCircle", color: C.green, desc: "Günlük planı %100 tamamla", condition: { type: "perfect_plan", value: 1 } },
     { id: "level_10", name: "Seviye 10", icon: "shield", color: C.accent, desc: "Seviye 10'a ulaş", condition: { type: "level", value: 10 } },
-    // Streak Society milestones
     { id: "streak_society_7", name: "Haftalık Savaşçı", icon: "flame", color: "#fb923c", desc: "7 gün seri yap", condition: { type: "streak", value: 7 } },
     { id: "streak_society_14", name: "İki Haftalık Efsane", icon: "zap", color: "#fbbf24", desc: "14 gün seri yap", condition: { type: "streak", value: 14 } },
     { id: "streak_society_30", name: "Aylık Titan", icon: "award", color: "#34d399", desc: "30 gün seri yap", condition: { type: "streak", value: 30 } },

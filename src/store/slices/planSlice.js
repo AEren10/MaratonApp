@@ -1,22 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { todayTR } from "../../lib/dateUtils";
 
-// C) smartNudge "Plana Ekle" → günlük plana ek görev enjekte eder.
-// adHocTasks gün içinde tutulur; ertesi gün temizlenir (date kontrolü).
 const planSlice = createSlice({
   name: "plan",
   initialState: {
     adHocTasks: [],
-    day: null, // "YYYY-MM-DD"
+    day: null,
   },
   reducers: {
     addAdHocTask: (state, action) => {
-      const today = new Date().toISOString().split("T")[0];
+      const today = todayTR();
       if (state.day !== today) {
         state.day = today;
         state.adHocTasks = [];
       }
       const { subject, subjectLabel, topic, reason, questionCount, color } = action.payload;
-      // Aynı ders+konu için tekrar eklemeyi engelle.
       const exists = state.adHocTasks.some((t) => t.subject === subject && t.topic === topic);
       if (exists) return;
       state.adHocTasks.push({
@@ -37,13 +35,22 @@ const planSlice = createSlice({
     clearAdHocTasks: (state) => {
       state.adHocTasks = [];
     },
+    hydrateAdHocTasks: (state, action) => {
+      const { day, tasks } = action.payload || {};
+      const today = todayTR();
+      if (day === today && Array.isArray(tasks)) {
+        state.day = day;
+        state.adHocTasks = tasks;
+      }
+    },
   },
 });
 
-export const { addAdHocTask, removeAdHocTask, clearAdHocTasks } = planSlice.actions;
+export const { addAdHocTask, removeAdHocTask, clearAdHocTasks, hydrateAdHocTasks } = planSlice.actions;
 export default planSlice.reducer;
 
 export const selectAdHocTasks = (state) => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayTR();
   return state.plan.day === today ? state.plan.adHocTasks : [];
 };
+

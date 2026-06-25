@@ -4,15 +4,20 @@ import { useNavigation } from "@react-navigation/native";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { SCREENS } from "../constants/screens";
 import { usePremium } from "../contexts/PremiumContext";
+import { useAuth } from "../contexts/AuthContext";
+import { incrementSessionCount } from "../supabase/profiles";
 
 const SESSION_THRESHOLD = 3;
 
 export function usePaywallTrigger() {
   const navigation = useNavigation();
   const { isPremium } = usePremium();
+  const { user } = useAuth();
   const timerRef = useRef(null);
 
   const incrementAndCheck = useCallback(async () => {
+    if (user?.id) incrementSessionCount(user.id).catch(() => {});
+
     if (isPremium) return false;
     try {
       const shown = await AsyncStorage.getItem(STORAGE_KEYS.PAYWALL_SHOWN_SESSION);
@@ -30,7 +35,7 @@ export function usePaywallTrigger() {
     } catch {
       return false;
     }
-  }, [isPremium]);
+  }, [isPremium, user?.id]);
 
   const showDelayedPaywall = useCallback((delayMs = 2000) => {
     clearTimeout(timerRef.current);

@@ -49,7 +49,7 @@ export default function ShareCardScreen() {
     try {
       const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
       if (!(await Sharing.isAvailableAsync())) { showAlert("Paylaşım yok"); return; }
-      await Sharing.shareAsync(uri, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
+      await Sharing.shareAsync(`file://${uri}`, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
     } catch {
       showAlert("Hata", "Kart oluşturulamadı.");
     }
@@ -60,16 +60,16 @@ export default function ShareCardScreen() {
 
   const grid = [
     { label: "Soru", value: report.totalQuestions, icon: "checkCircle", color: C.green },
-    { label: "Deneme", value: report.trialCount, icon: "fileText", color: C.blue },
+    { label: "Deneme", value: report.trialCount, icon: "notebook", color: C.blue },
     { label: "Aktif Gün", value: report.activeDays, icon: "calendar", color: C.sec },
-    { label: "Net Ort.", value: report.weekNetAvg, icon: "trendingUp", color: C.accent },
+    { label: "Net Ort.", value: report.weekNetAvg, icon: "trendUp", color: C.accent },
   ];
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Pressable onPress={() => nav.goBack()} hitSlop={12}>
-          <Icon name="arrowLeft" size={24} color={C.text} />
+          <Icon name="arrowL" size={24} color={C.text} />
         </Pressable>
         <Text style={s.title}>Paylaş</Text>
         <View style={{ width: 24 }} />

@@ -40,9 +40,6 @@ export function calculateXP(action, data = {}) {
     case "streak_milestone":
       base = data.xpOverride || 0;
       break;
-    case "mystery_chest":
-      base = data.xpOverride || 0;
-      break;
     default:
       base = 0;
   }

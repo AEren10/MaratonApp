@@ -71,7 +71,9 @@ export const addTrial = async (trial, subjects) => {
       throw subError;
     }
 
-    return getTrialById(trialData.id, trial.user_id);
+    const result = await getTrialById(trialData.id, trial.user_id);
+    import("./percentile").then((m) => m.refreshPercentilesIfStale()).catch(() => {});
+    return result;
   } catch (e) {
     handleSupabaseError(e, "addTrial");
     throw e;

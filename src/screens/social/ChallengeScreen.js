@@ -10,7 +10,7 @@ import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { listMyChallenges, createChallenge, cancelChallenge } from "../../supabase/challenges";
+import { listMyChallenges, createChallenge, cancelChallenge, respondToChallenge, checkExpiredChallenges } from "../../supabase/challenges";
 import { listFriends } from "../../supabase/friends";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
@@ -40,6 +40,7 @@ export default function ChallengeScreen() {
   const load = useCallback(async () => {
     if (!user?.id) return;
     try {
+      await checkExpiredChallenges(user.id);
       const [ch, fr] = await Promise.all([listMyChallenges(user.id), listFriends(user.id)]);
       setChallenges(ch || []);
       setFriends(fr || []);
@@ -70,12 +71,21 @@ export default function ChallengeScreen() {
     try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Challenge iptal edilemedi."); }
   }, [load, user.id]);
 
+  const handleRespond = useCallback(async (id, accept) => {
+    try {
+      await respondToChallenge(id, accept, user.id);
+      H.success();
+      showAlert(accept ? "Kabul edildi!" : "Reddedildi", accept ? "Challenge başladı, bol şans!" : "Challenge reddedildi.");
+      load();
+    } catch (e) { showAlert("Hata", e.message || "İşlem başarısız."); }
+  }, [load, user.id]);
+
   const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);
   const past = useMemo(() => challenges.filter((c) => c.status !== "active" && c.status !== "pending"), [challenges]);
 
   const shown = tab === "active" ? active : past;
 
-  const renderItem = useCallback(({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} s={s} C={C} />, [user, handleCancel, s, C]);
+  const renderItem = useCallback(({ item }) => <ChallengeCard item={item} user={user} handleCancel={handleCancel} handleRespond={handleRespond} s={s} C={C} />, [user, handleCancel, handleRespond, s, C]);
 
   if (loading) return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -169,7 +179,16 @@ export default function ChallengeScreen() {
   );
 }
 
-const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCancel, s, C }) {
+const STATUS_TR = { active: "Aktif", pending: "Bekliyor", completed: "Tamamlandı", cancelled: "İptal Edildi" };
+const STATUS_COLOR = (status, C) => {
+  if (status === "active") return C.green;
+  if (status === "pending") return C.amber;
+  if (status === "completed") return C.accent;
+  return C.muted;
+};
+
+const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCancel, handleRespond, s, C }) {
+  if (!user) return null;
   const isCreator = item.creator_id === user.id;
   const opponent = isCreator ? item.opponent : item.creator;
   const myProgress = isCreator ? item.creator_progress : item.opponent_progress;
@@ -181,6 +200,13 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   const [expanded, setExpanded] = useState(false);
   const daysLeft = item.ends_on ? Math.max(0, Math.ceil((new Date(item.ends_on) - Date.now()) / 86400000)) : null;
+  const isPendingForMe = item.status === "pending" && item.opponent_id === user.id;
+  const isPendingByMe = item.status === "pending" && item.creator_id === user.id;
+  const statusColor = STATUS_COLOR(item.status, C);
+
+  const isWinner = item.status === "completed" && item.winner_id === user.id;
+  const isTie = item.status === "completed" && !item.winner_id;
+
   return (
     <Pressable
       onPress={() => { H.select(); setExpanded((v) => !v); }}
@@ -193,22 +219,35 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
             <Text style={s.cardName}>{opponent?.name || "Rakip"}</Text>
             <Text style={s.cardMeta}>{metric?.label || item.metric} · Hedef: {item.target}</Text>
           </View>
-          <View style={[s.statusBadge, { backgroundColor: (item.status === "active" ? C.green : C.muted) + "18" }]}>
-            <Text style={{ ...TYPOGRAPHY.micro, color: item.status === "active" ? C.green : C.muted }}>{item.status === "active" ? "Aktif" : item.status}</Text>
+          <View style={[s.statusBadge, { backgroundColor: statusColor + "18" }]}>
+            <Text style={{ ...TYPOGRAPHY.micro, color: statusColor }}>{STATUS_TR[item.status] || item.status}</Text>
           </View>
         </View>
-        <View style={s.progressRow}>
-          <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
-          <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.accent }]} /></View>
-          <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
-        </View>
-        {expanded && (
+
+        {item.status === "completed" && (
+          <View style={[s.winnerBanner, { backgroundColor: (isWinner ? C.green : isTie ? C.amber : C.red) + "12" }]}>
+            <Icon name={isWinner ? "trophy" : isTie ? "minus" : "x"} size={16} color={isWinner ? C.green : isTie ? C.amber : C.red} />
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: isWinner ? C.green : isTie ? C.amber : C.red, marginLeft: SPACING.xs }}>
+              {isWinner ? "Kazandın!" : isTie ? "Berabere" : "Kaybettin"}
+            </Text>
+          </View>
+        )}
+
+        {item.status !== "pending" && (
+          <View style={s.progressRow}>
+            <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
+            <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.accent }]} /></View>
+            <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
+          </View>
+        )}
+
+        {expanded && item.status !== "pending" && (
           <View style={{ marginTop: SPACING.sm, gap: SPACING.xs }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Rakip ilerleme</Text>
               <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>{Math.round(oppPct * 100)}%</Text>
             </View>
-            {daysLeft !== null && (
+            {daysLeft !== null && item.status === "active" && (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Kalan süre</Text>
                 <Text style={{ ...TYPOGRAPHY.captionMedium, color: daysLeft <= 1 ? C.red : C.text }}>{daysLeft} gün</Text>
@@ -216,7 +255,27 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
             )}
           </View>
         )}
-        {item.status === "active" && (
+
+        {isPendingForMe && (
+          <View style={{ flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.md }}>
+            <Pressable onPress={() => handleRespond(item.id, true)} style={[s.respondBtn, { backgroundColor: C.green + "18" }]}>
+              <Icon name="check" size={14} color={C.green} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>Kabul Et</Text>
+            </Pressable>
+            <Pressable onPress={() => handleRespond(item.id, false)} style={[s.respondBtn, { backgroundColor: C.red + "18" }]}>
+              <Icon name="x" size={14} color={C.red} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Reddet</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {isPendingByMe && (
+          <Pressable onPress={() => handleCancel(item.id)} style={s.cancelBtn}>
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İsteği Geri Çek</Text>
+          </Pressable>
+        )}
+
+        {item.status === "active" && isCreator && (
           <Pressable onPress={() => handleCancel(item.id)} style={s.cancelBtn}>
             <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal Et</Text>
           </Pressable>
@@ -245,6 +304,8 @@ function makeStyles(C) {
     bar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2 },
     barFill: { height: 4, borderRadius: 2 },
     cancelBtn: { alignSelf: "flex-end", marginTop: SPACING.sm },
+    respondBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.xs, paddingVertical: SPACING.sm, borderRadius: RADIUS.lg },
+    winnerBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.sm, borderRadius: RADIUS.md, marginTop: SPACING.sm },
     stepLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     optionRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border },
     optionText: { ...TYPOGRAPHY.bodyMedium, color: C.text },

@@ -28,7 +28,7 @@ const MemberRow = React.memo(function MemberRow({ item }) {
   );
 });
 
-export function GroupsTab({ user }) {
+export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
   const showAlert = useAlert();
   const st = useMemo(() => makeStyles(C), [C]);
@@ -56,6 +56,15 @@ export function GroupsTab({ user }) {
   }, [user?.id, selected]);
 
   useEffect(() => { loadGroups(); }, [user?.id]);
+
+  useEffect(() => {
+    if (!initialGroupCode || !user?.id) return;
+    setBusy(true);
+    joinByCode(initialGroupCode)
+      .then(() => { H.success(); loadGroups(); })
+      .catch(() => showAlert("Hata", "Grup kodu geçersiz veya zaten üyesin."))
+      .finally(() => setBusy(false));
+  }, [initialGroupCode, user?.id]);
 
   useEffect(() => {
     if (!selected?.id || !user?.id) return;
@@ -103,13 +112,13 @@ export function GroupsTab({ user }) {
           await leaveGroup(g.id, user.id);
           if (selected?.id === g.id) setSelected(null);
           loadGroups();
-        } catch { showAlert("Hata", "Gruptan ayrılınamadı."); }
+        } catch (e) { showAlert("Hata", e.message || "Gruptan ayrılınamadı."); }
       } },
     ]);
   };
 
   const shareCode = (g) => {
-    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl! Kod: ${g.code}` }).catch(() => {});
+    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\nmaraton://group/${g.code}` }).catch(() => {});
   };
 
   const renderGroupChip = useCallback(({ item }) => {
@@ -182,14 +191,14 @@ export function GroupsTab({ user }) {
         value={name} onChange={setName} onSubmit={doCreate} onClose={() => setCreateOpen(false)} busy={busy} cta="Oluştur"
       />
       <CodeModal
-        visible={joinOpen} title="Koda Gir" placeholder="6 haneli kod" autoCap
+        visible={joinOpen} title="Koda Gir" placeholder="6 haneli kod" autoCap maxLen={6}
         value={code} onChange={setCode} onSubmit={doJoin} onClose={() => setJoinOpen(false)} busy={busy} cta="Katıl"
       />
     </View>
   );
 }
 
-function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap }) {
+function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen }) {
   const C = useC();
   const st = useMemo(() => makeStyles(C), [C]);
   return (
@@ -205,6 +214,7 @@ function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onC
             placeholder={placeholder}
             placeholderTextColor={C.muted}
             autoCapitalize={autoCap ? "characters" : "sentences"}
+            maxLength={maxLen}
             style={st.input}
             autoFocus
           />

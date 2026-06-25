@@ -40,6 +40,16 @@
               "scheme": "https",
               "host": "maraton.app",
               "pathPrefix": "/referral"
+            },
+            {
+              "scheme": "https",
+              "host": "maraton.app",
+              "pathPrefix": "/friend"
+            },
+            {
+              "scheme": "https",
+              "host": "maraton.app",
+              "pathPrefix": "/group"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
-import { getPremiumStatus } from "../supabase/profiles";
+import { getTrialInfo } from "../supabase/profiles";
 import { getTrialCountSince } from "../supabase/trials";
 import { getWrongQuestionCount } from "../supabase/wrongQuestions";
 import { getActiveChallengeCount } from "../supabase/challenges";
@@ -20,6 +20,8 @@ export function PremiumProvider({ children }) {
   const { user } = useAuth();
   const navigation = useNavigation();
   const [isPremium, setIsPremium] = useState(false);
+  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
+  const [isInTrial, setIsInTrial] = useState(false);
   const [usage, setUsage] = useState({ trialsThisMonth: 0, wrongEntries: 0, activeChallenges: 0 });
 
   useEffect(() => {
@@ -35,11 +37,27 @@ export function PremiumProvider({ children }) {
         const info = await getCustomerInfo();
         if (info && isPremiumFromInfo(info)) {
           setIsPremium(true);
+          setIsInTrial(false);
           return;
         }
       }
-      const status = await getPremiumStatus(user.id);
-      if (status !== null) setIsPremium(status);
+      const trial = await getTrialInfo(user.id);
+      if (trial) {
+        if (trial.isPremium) {
+          setIsPremium(true);
+          setIsInTrial(false);
+          return;
+        }
+        if (trial.isInTrial) {
+          setIsPremium(true);
+          setIsInTrial(true);
+          setTrialDaysLeft(trial.trialDaysLeft);
+          return;
+        }
+      }
+      setIsPremium(false);
+      setIsInTrial(false);
+      setTrialDaysLeft(0);
     } catch (e) {
       if (__DEV__) console.warn("[PremiumContext] fetchPremiumStatus", e);
     }
@@ -102,13 +120,15 @@ export function PremiumProvider({ children }) {
 
   const value = useMemo(() => ({
     isPremium,
+    isInTrial,
+    trialDaysLeft,
     checkFeature,
     remainingTrials,
     remainingWrongs,
     showPaywall,
     refreshUsage,
     refreshPremium: fetchPremiumStatus,
-  }), [isPremium, checkFeature, remainingTrials, remainingWrongs, showPaywall, refreshUsage, fetchPremiumStatus]);
+  }), [isPremium, isInTrial, trialDaysLeft, checkFeature, remainingTrials, remainingWrongs, showPaywall, refreshUsage, fetchPremiumStatus]);
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;
 }

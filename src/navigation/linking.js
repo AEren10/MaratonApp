@@ -25,8 +25,14 @@ export const linkingConfig = {
       WrongDetail: "yanlis/:id",
       Calendar: "takvim",
       Goals: "hedefler",
-      League: "lig",
-      Friends: "arkadaslar",
+      League: {
+        path: "group/:code?",
+        parse: { code: (c) => c?.toUpperCase() },
+      },
+      Friends: {
+        path: "friend/:code?",
+        parse: { code: (c) => c?.toUpperCase() },
+      },
       Roadmap: "yol-haritasi",
       RankSimulator: "siralama",
       NetForecast: "net-tahmini",

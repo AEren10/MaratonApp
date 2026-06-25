@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { todayTR } from "../../lib/dateUtils";
 import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
@@ -103,7 +104,7 @@ export default function AddStudyScreen() {
 
   const save = useCallback(async () => {
     if (saving || !canSave) return;
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = todayTR();
     const qc = parseInt(qCount, 10) || 0;
     const cc = parseInt(correctCount, 10) || 0;
 

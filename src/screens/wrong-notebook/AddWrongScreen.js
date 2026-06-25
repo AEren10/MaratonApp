@@ -50,7 +50,7 @@ export default function AddWrongScreen() {
       quality: 0.7,
       allowsEditing: true,
     });
-    if (!res.canceled) { H.select(); setImage(res.assets[0].uri); }
+    if (!res.canceled && res.assets?.length) { H.select(); setImage(res.assets[0].uri); }
   };
 
   const launchCamera = async () => {
@@ -64,7 +64,7 @@ export default function AddWrongScreen() {
       quality: 0.7,
       allowsEditing: true,
     });
-    if (!res.canceled) { H.select(); setImage(res.assets[0].uri); }
+    if (!res.canceled && res.assets?.length) { H.select(); setImage(res.assets[0].uri); }
   };
 
   const pickImage = () => {

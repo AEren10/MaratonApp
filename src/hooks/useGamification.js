@@ -77,7 +77,7 @@ export function useGamification() {
         claimedMilestones: claimedRef.current,
       };
       saveGamificationToStorage(state);
-      saveGamificationToSupabase(user?.id, state.badges, state.stats, state.claimedMilestones);
+      saveGamificationToSupabase(user?.id, state.badges, state.stats, state.claimedMilestones).catch(() => {});
     }, 500);
   }, [user?.id]);
 
@@ -87,7 +87,7 @@ export function useGamification() {
       _opLock = true;
       try {
         let multiplier = 1;
-        const noMultiply = ["daily_login", "comeback_bonus", "streak_milestone", "mystery_chest"];
+        const noMultiply = ["daily_login", "comeback_bonus", "streak_milestone"];
         if (!noMultiply.includes(action) && shouldApplyMultiplier()) {
           multiplier = rollMultiplier();
         }
@@ -160,17 +160,28 @@ export function useGamification() {
 
         let showMilestone = null;
 
+        let totalMilestoneXP = 0;
         for (const milestone of unclaimed) {
           claimedRef.current = [...claimedRef.current, milestone.day];
           dispatch(claimStreakMilestone(milestone.day));
           claimMilestone(milestone.day).catch(() => {});
           dispatch(unlockBadge({ badgeId: milestone.badgeId }));
           dispatch(earnXP({ amount: milestone.xp }));
+          totalMilestoneXP += milestone.xp;
           if (user?.id) {
             enqueueXPLog(dispatch, user.id, milestone.xp, "streak_milestone");
             if (milestone.premiumDays > 0) grantPremiumDays(user.id, milestone.premiumDays).catch(() => {});
           }
           showMilestone = milestone;
+        }
+
+        if (totalMilestoneXP > 0) {
+          const prevLevel = getLevelForXP(totalXPRef.current);
+          const newLevel = getLevelForXP(totalXPRef.current + totalMilestoneXP);
+          if (newLevel.level > prevLevel.level) {
+            clearTimeout(levelUpTimerRef.current);
+            levelUpTimerRef.current = setTimeout(() => setLevelUpModal({ visible: true, level: newLevel.level, title: newLevel.title }), 4500);
+          }
         }
 
         if (showMilestone) {

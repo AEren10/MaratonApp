@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from "../../themes/tokens";
+import { View, Text, TouchableOpacity } from "react-native";
+import { C, SPACING, TYPOGRAPHY, RADIUS } from "../../themes/tokens";
 import { Icon } from "../design";
 import { captureError } from "../../lib/errorReporting";
 
@@ -28,19 +28,19 @@ export class ScreenErrorBoundary extends React.Component {
     if (this.state.hasError) {
       const hasNav = !!this.props.navigation?.goBack;
       return (
-        <View style={styles.container}>
-          <Icon name="alert" size={48} color={COLORS.dark.warning} />
-          <Text style={styles.title}>Bir sorun oluştu</Text>
-          <Text style={styles.subtitle}>
+        <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center", padding: SPACING.xxl }}>
+          <Icon name="alert" size={48} color={C.warning} />
+          <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.sm }}>Bir sorun oluştu</Text>
+          <Text style={{ ...TYPOGRAPHY.body, color: C.sec, textAlign: "center", marginBottom: SPACING.xxl }}>
             Bu ekranda beklenmeyen bir hata var.
           </Text>
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.button} onPress={this.handleReset}>
-              <Text style={styles.buttonText}>Tekrar Dene</Text>
+          <View style={{ flexDirection: "row", gap: SPACING.md }}>
+            <TouchableOpacity style={{ backgroundColor: C.accent, paddingHorizontal: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.md }} onPress={this.handleReset}>
+              <Text style={{ ...TYPOGRAPHY.button, color: C.bg }}>Tekrar Dene</Text>
             </TouchableOpacity>
             {hasNav && (
-              <TouchableOpacity style={styles.backButton} onPress={this.handleGoBack}>
-                <Text style={styles.backText}>Geri Dön</Text>
+              <TouchableOpacity style={{ borderWidth: 1, borderColor: C.border, paddingHorizontal: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.md }} onPress={this.handleGoBack}>
+                <Text style={{ ...TYPOGRAPHY.button, color: C.sec }}>Geri Dön</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -51,50 +51,3 @@ export class ScreenErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.dark.background,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: SPACING.xxl,
-  },
-  title: {
-    ...TYPOGRAPHY.subheading,
-    color: COLORS.dark.textPrimary,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.sm,
-  },
-  subtitle: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.dark.textSecondary,
-    textAlign: "center",
-    marginBottom: SPACING.xxl,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: SPACING.md,
-  },
-  button: {
-    backgroundColor: COLORS.dark.accent,
-    paddingHorizontal: SPACING.xxl,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
-  },
-  buttonText: {
-    ...TYPOGRAPHY.button,
-    color: COLORS.dark.textInverse,
-  },
-  backButton: {
-    borderWidth: 1,
-    borderColor: COLORS.dark.border,
-    paddingHorizontal: SPACING.xxl,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
-  },
-  backText: {
-    ...TYPOGRAPHY.button,
-    color: COLORS.dark.textSecondary,
-  },
-});

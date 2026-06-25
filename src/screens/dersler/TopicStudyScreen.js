@@ -14,6 +14,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { getStudyLogsByTopic } from "../../supabase/studyLogs";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import * as H from "../../lib/haptics";
+import { todayTR } from "../../lib/dateUtils";
 
 function StatBox({ label, value, color, C }) {
   return (
@@ -228,7 +229,7 @@ export default function TopicStudyScreen() {
         question_count: 0,
         correct_count: 0,
         duration_minutes: 0,
-        study_date: new Date().toISOString().split("T")[0],
+        study_date: todayTR(),
       });
       H.success();
       showAlert("Tamamlandı", "Bu konu çalışıldı olarak işaretlendi.");

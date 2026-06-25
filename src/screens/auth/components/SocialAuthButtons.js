@@ -27,7 +27,7 @@ function AppleIcon({ size = 18 }) {
 export function SocialAuthButtons() {
   const C = useC();
   const showAlert = useAlert();
-  const { signInWithApple, signInWithGoogle, busy } = useSocialAuth();
+  const { signInWithApple, signInWithGoogle, busy, googleAvailable } = useSocialAuth();
 
   const handleGoogle = async () => {
     try {
@@ -66,12 +66,14 @@ export function SocialAuthButtons() {
 
   return (
     <View style={{ gap: 10 }}>
-      <Pressable onPress={handleGoogle} disabled={busy} style={({ pressed }) => btnStyle(pressed)}>
-        <GoogleIcon />
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
-          Google ile devam et
-        </Text>
-      </Pressable>
+      {googleAvailable && (
+        <Pressable onPress={handleGoogle} disabled={busy} style={({ pressed }) => btnStyle(pressed)}>
+          <GoogleIcon />
+          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
+            Google ile devam et
+          </Text>
+        </Pressable>
+      )}
 
       {Platform.OS === "ios" && (
         <Pressable

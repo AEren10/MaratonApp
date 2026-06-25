@@ -47,6 +47,14 @@ export async function createChallenge({ opponentId, metric, target, days = 7 }) 
     if (!user) throw new Error("Oturum yok");
     const today = new Date();
     const endsOn = new Date(today.getTime() + days * 86400000);
+    if (opponentId === user.id) throw new Error("Kendinize challenge gönderemezsiniz");
+    const { data: blocked } = await supabase
+      .from("friendships")
+      .select("id")
+      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${opponentId}),and(requester_id.eq.${opponentId},addressee_id.eq.${user.id})`)
+      .eq("status", "blocked")
+      .maybeSingle();
+    if (blocked) throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
     const { data, error } = await supabase
       .from("challenges")
       .insert({
@@ -54,6 +62,7 @@ export async function createChallenge({ opponentId, metric, target, days = 7 }) 
         opponent_id: opponentId,
         metric,
         target,
+        status: "pending",
         starts_on: today.toISOString().split("T")[0],
         ends_on: endsOn.toISOString().split("T")[0],
       })
@@ -75,11 +84,74 @@ export async function cancelChallenge(id, userId) {
       .from("challenges")
       .update({ status: "cancelled" })
       .eq("id", id)
-      .eq("creator_id", userId);
+      .eq("creator_id", userId)
+      .in("status", ["pending", "active"]);
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "cancelChallenge");
     throw e;
+  }
+}
+
+export async function respondToChallenge(id, accept, userId) {
+  try {
+    if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
+    if (!userId) throw new Error("userId is required");
+    const newStatus = accept ? "active" : "cancelled";
+    const { data, error } = await supabase
+      .from("challenges")
+      .update({ status: newStatus })
+      .eq("id", id)
+      .eq("opponent_id", userId)
+      .eq("status", "pending")
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error("Challenge bulunamadı veya zaten yanıtlanmış");
+    return data;
+  } catch (e) {
+    handleSupabaseError(e, "respondToChallenge");
+    throw e;
+  }
+}
+
+export async function completeChallenge(id, winnerId) {
+  try {
+    if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
+    const update = { status: "completed" };
+    if (winnerId) update.winner_id = winnerId;
+    const { error } = await supabase
+      .from("challenges")
+      .update(update)
+      .eq("id", id)
+      .in("status", ["active"]);
+    if (error) throw error;
+  } catch (e) {
+    handleSupabaseError(e, "completeChallenge");
+    throw e;
+  }
+}
+
+export async function checkExpiredChallenges(userId) {
+  try {
+    if (!userId) return;
+    const today = new Date().toISOString().split("T")[0];
+    const { data, error } = await supabase
+      .from("challenges")
+      .select("id, creator_id, opponent_id, creator_progress, opponent_progress, target")
+      .or(`creator_id.eq.${userId},opponent_id.eq.${userId}`)
+      .eq("status", "active")
+      .lt("ends_on", today);
+    if (error) throw error;
+    if (!data?.length) return;
+    for (const c of data) {
+      let winnerId = null;
+      if (c.creator_progress > c.opponent_progress) winnerId = c.creator_id;
+      else if (c.opponent_progress > c.creator_progress) winnerId = c.opponent_id;
+      await completeChallenge(c.id, winnerId).catch(() => {});
+    }
+  } catch (e) {
+    handleSupabaseError(e, "checkExpiredChallenges");
   }
 }
 

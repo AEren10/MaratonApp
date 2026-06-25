@@ -5,3 +5,7 @@ export function differenceInDays(a, b) {
   const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
   return Math.floor((utcA - utcB) / MS_PER_DAY);
 }
+
+export function todayTR() {
+  return new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" });
+}

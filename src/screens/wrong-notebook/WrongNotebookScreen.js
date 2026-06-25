@@ -5,7 +5,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { getWrongQuestions, resolveWrongQuestion } from "../../supabase/wrongQuestions";
+import { getWrongQuestions, resolveWrongQuestion, deleteWrongQuestion } from "../../supabase/wrongQuestions";
 import { shareQuestion, getSharedQuestionIds } from "../../supabase/community";
 import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
@@ -16,6 +16,7 @@ import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { AppModal } from "../../components/common/AppModal";
 import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
+import { useAlert } from "../../contexts/AlertContext";
 
 import { SwipeableWrongCard } from "./components/SwipeableWrongCard";
 import { FilterPill, SubjectFilterPill } from "./components/FilterPills";
@@ -38,6 +39,7 @@ export default function WrongNotebookScreen() {
   const C = useC();
   const { user } = useAuth();
   const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const showAlert = useAlert();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [subject, setSubject] = useState("all");
@@ -177,15 +179,35 @@ export default function WrongNotebookScreen() {
     navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item });
   }, [navigation]);
 
+  const handleDelete = useCallback((id) => {
+    showAlert("Soruyu Sil", "Bu yanlış soruyu silmek istediğine emin misin?", [
+      { text: "Vazgeç", style: "cancel" },
+      {
+        text: "Sil",
+        style: "destructive",
+        onPress: async () => {
+          setItems((prev) => prev.filter((it) => it.id !== id));
+          haptic.success();
+          try {
+            await deleteWrongQuestion(id, user.id);
+          } catch {
+            loadItems();
+          }
+        },
+      },
+    ]);
+  }, [showAlert, user.id, loadItems]);
+
   const renderItem = useCallback(({ item }) => (
     <SwipeableWrongCard
       item={item}
       onPress={handleCardPress}
       onResolve={toggleResolve}
       onShare={handleShare}
+      onDelete={handleDelete}
       shared={sharedIds.has(item.id)}
     />
-  ), [handleCardPress, toggleResolve, handleShare, sharedIds]);
+  ), [handleCardPress, toggleResolve, handleShare, handleDelete, sharedIds]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>

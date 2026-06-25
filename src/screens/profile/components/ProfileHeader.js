@@ -80,7 +80,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak 
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
     });
-    if (!res.canceled) handleAvatarPicked(res.assets[0].uri);
+    if (!res.canceled && res.assets?.length) handleAvatarPicked(res.assets[0].uri);
   };
 
   const pickFromCamera = async () => {
@@ -89,7 +89,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak 
     const res = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
     });
-    if (!res.canceled) handleAvatarPicked(res.assets[0].uri);
+    if (!res.canceled && res.assets?.length) handleAvatarPicked(res.assets[0].uri);
   };
 
   const pickAvatar = () => {

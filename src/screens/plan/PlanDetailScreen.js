@@ -14,6 +14,7 @@ import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectAdHocTasks } from "../../store/slices/planSlice";
 import { selectUserTasks } from "../../store/slices/userTasksSlice";
+import { useAuth } from "../../contexts/AuthContext";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
@@ -26,18 +27,23 @@ export default function PlanDetailScreen() {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const { user } = useAuth();
   const trials = useAppSelector(selectTrials);
   const adHocTasks = useAppSelector(selectAdHocTasks);
   const userTasks = useAppSelector(selectUserTasks);
   const { toggleTask: toggleUserTask } = useUserTasks();
-  const { isDone: isPlanDone, toggle: togglePlanDone } = usePlanCompletion();
+  const { isDone: isPlanDone, toggle: togglePlanDone, syncPlan } = usePlanCompletion(user?.id);
   const ctx = usePlanContext();
 
   const plan = useMemo(() => generateDailyPlan(ctx), [ctx]);
 
+  useEffect(() => {
+    if (plan?.tasks?.length) syncPlan(plan);
+  }, [plan, syncPlan]);
+
   const initialTasks = useMemo(() => {
-    const generated = plan.tasks.map((t, i) => {
-      const pid = `plan_${i}`;
+    const generated = plan.tasks.map((t) => {
+      const pid = `plan_${t.subject}_${t.topic || "genel"}`;
       const subj = getSubjectByKey(t.subject);
       return {
         id: pid,

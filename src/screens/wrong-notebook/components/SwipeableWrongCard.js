@@ -23,8 +23,8 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
   const handleDelete = useCallback(() => {
     ref.current?.close();
     H.warn();
-    onDelete?.();
-  }, [onDelete]);
+    onDelete?.(item.id);
+  }, [onDelete, item.id]);
 
   const actionStyle = {
     borderRadius: 22,
