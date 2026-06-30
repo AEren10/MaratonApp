@@ -17,8 +17,9 @@ function GoogleIcon({ size = 18 }) {
 }
 
 function AppleIcon({ size = 18 }) {
+  const C = useC();
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="#FFFFFF">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={C.textOnFill}>
       <Path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.53 8.7 9.28c1.27.07 2.16.72 2.91.77.99-.2 1.94-.78 3-.84 1.28-.08 2.25.48 2.88 1.22-2.65 1.58-2.02 5.07.56 6.04-.47 1.24-.67 1.77-1.29 2.86l.29-.05zM12.05 9.19c-.15-2.35 1.72-4.39 3.95-4.56.32 2.62-2.36 4.7-3.95 4.56z" />
     </Svg>
   );
@@ -81,12 +82,12 @@ export function SocialAuthButtons() {
           disabled={busy}
           style={({ pressed }) => ({
             ...btnStyle(pressed),
-            backgroundColor: "#FFFFFF",
-            borderColor: "#FFFFFF",
+            backgroundColor: C.surface,
+            borderColor: C.surface,
           })}
         >
           <AppleIcon />
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#000000" }}>
+          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
             Apple ile devam et
           </Text>
         </Pressable>

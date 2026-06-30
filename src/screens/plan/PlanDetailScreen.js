@@ -182,7 +182,7 @@ export default function PlanDetailScreen() {
             ]}
           >
             <View style={[styles.addIcon, { backgroundColor: C.accent }]}>
-              <Icon name="plus" size={14} color="#FFF" sw={2.5} />
+              <Icon name="plus" size={14} color={C.textOnFill} sw={2.5} />
             </View>
             <Text style={[styles.addText, { color: C.accent }]}>Görev Ekle</Text>
           </Pressable>

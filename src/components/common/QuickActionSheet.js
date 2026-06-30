@@ -22,7 +22,7 @@ function ActionRow({ item, onPress, C }) {
       ]}
     >
       <View style={[styles.iconBox, { backgroundColor: item.color }]}>
-        <Icon name={item.icon} size={22} color="#FFFFFF" sw={2.3} />
+        <Icon name={item.icon} size={22} color={C.textOnFill} sw={2.3} />
       </View>
       <View style={styles.rowText}>
         <Text style={[styles.label, { color: C.text }]}>{item.label}</Text>

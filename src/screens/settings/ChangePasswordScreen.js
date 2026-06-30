@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { updatePassword } from "../../supabase/auth";
@@ -101,18 +101,9 @@ export default function ChangePasswordScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-          <Pressable
-            onPress={save}
-            disabled={saving}
-            style={({ pressed }) => [
-              s.saveBtn,
-              { backgroundColor: C.accent },
-              (pressed || saving) && { opacity: 0.85 },
-            ]}
-          >
-            {saving ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Icon name="check" size={20} color="#FFFFFF" />}
-            <Text style={s.saveText}>{saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}</Text>
-          </Pressable>
+          <Button onPress={save} loading={saving} icon="check" fullWidth style={{ marginTop: SPACING.xl }}>
+            {saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}
+          </Button>
         </Animated.View>
       </ScrollView>
       </KeyboardAvoidingView>
@@ -139,9 +130,4 @@ const s = StyleSheet.create({
     padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, marginTop: SPACING.xl,
   },
   infoText: { ...TYPOGRAPHY.caption, flex: 1 },
-  saveBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: SPACING.sm, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xl,
-  },
-  saveText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

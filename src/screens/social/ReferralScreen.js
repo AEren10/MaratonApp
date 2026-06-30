@@ -180,8 +180,8 @@ export default function ReferralScreen() {
             </AnimatedPressable>
 
             <AnimatedPressable onPress={handleShare} haptic="medium" style={[s.actionBtn, { backgroundColor: C.accent, borderColor: C.accent }]}>
-              <Icon name="share" size={16} color="#FFFFFF" />
-              <Text style={[s.actionBtnText, { color: "#FFFFFF" }]}>Paylaş</Text>
+              <Icon name="share" size={16} color={C.textOnFill} />
+              <Text style={[s.actionBtnText, { color: C.textOnFill }]}>Paylaş</Text>
             </AnimatedPressable>
           </View>
         </Animated.View>
@@ -229,7 +229,7 @@ export default function ReferralScreen() {
               ]}
             >
               {applying ? (
-                <ActivityIndicator size="small" color="#FFF" />
+                <ActivityIndicator size="small" color={C.textOnFill} />
               ) : (
                 <Text style={s.applyBtnText}>Uygula</Text>
               )}
@@ -368,7 +368,7 @@ function makeStyles(C) {
     applyBtnText: {
       fontFamily: "Inter_600SemiBold",
       fontSize: 14,
-      color: "#FFFFFF",
+      color: C.textOnFill,
     },
     howCard: {
       width: "100%",

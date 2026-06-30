@@ -36,7 +36,7 @@ export class ScreenErrorBoundary extends React.Component {
           </Text>
           <View style={{ flexDirection: "row", gap: SPACING.md }}>
             <TouchableOpacity style={{ backgroundColor: C.accent, paddingHorizontal: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.md }} onPress={this.handleReset}>
-              <Text style={{ ...TYPOGRAPHY.button, color: C.bg }}>Tekrar Dene</Text>
+              <Text style={{ ...TYPOGRAPHY.button, color: C.textOnFill }}>Tekrar Dene</Text>
             </TouchableOpacity>
             {hasNav && (
               <TouchableOpacity style={{ borderWidth: 1, borderColor: C.border, paddingHorizontal: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.md }} onPress={this.handleGoBack}>

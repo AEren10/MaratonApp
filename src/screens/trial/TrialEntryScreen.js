@@ -7,7 +7,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, IconBox, AnimatedPressable } from "../../components/design";
+import { Icon, IconBox, AnimatedPressable, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -22,7 +22,6 @@ import { useAppDispatch } from "../../store/hooks";
 import { addTrial } from "../../store/slices/trialSlice";
 import { useGamification } from "../../hooks/useGamification";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { saveTrialOffline } from "../../lib/offlineQueue";
 import { trialEntrySchema } from "../../validations/auth";
@@ -96,7 +95,7 @@ export default function TrialEntryScreen() {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const { user } = useAuth();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { reward, xpToast, dismissXP } = useGamification();
   const { examType: userExamType } = useExam();
   const showAlert = useAlert();
   const { checkFeature, showPaywall, refreshUsage } = usePremium();
@@ -354,23 +353,13 @@ export default function TrialEntryScreen() {
 
           {showSubjectInputs && (
             <Animated.View entering={FadeInDown.delay(450).duration(420).springify()}>
-              <AnimatedPressable
-                accessibilityRole="button"
-                accessibilityLabel="Denemeyi Kaydet"
-                accessibilityHint="Deneme sonuçlarını kaydeder"
-                onPress={handleSave}
-                haptic="medium"
-                style={[styles.submitBtn, saving && { opacity: 0.6 }]}
-                disabled={saving}
-              >
-                <Icon name="check" size={22} color="#FFFFFF" sw={2.5} />
-                <Text style={styles.submitText}>{saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}</Text>
-              </AnimatedPressable>
+              <Button onPress={handleSave} loading={saving} icon="check" fullWidth>
+                {saving ? "Kaydediliyor..." : "Denemeyi Kaydet"}
+              </Button>
             </Animated.View>
           )}
         </ScrollView>
         <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
-        <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -468,21 +457,5 @@ const makeStyles = (C) => ({
   moodLabel: {
     ...TYPOGRAPHY.micro,
     color: C.muted,
-  },
-  submitBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.sm,
-    backgroundColor: C.accent,
-    borderRadius: 999,
-    paddingVertical: 18,
-    marginTop: SPACING.lg,
-    ...SHADOWS.fab,
-  },
-  submitText: {
-    ...TYPOGRAPHY.button,
-    color: "#FFFFFF",
-    fontSize: 16,
   },
 });

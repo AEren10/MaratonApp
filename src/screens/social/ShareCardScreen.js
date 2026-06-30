@@ -12,7 +12,7 @@ import { useExam } from "../../contexts/ExamContext";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
 import { selectStreak } from "../../store/slices/studyLogSlice";
 import { selectXP } from "../../store/slices/gamificationSlice";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 
 const fmtTime = (m) => {
@@ -113,10 +113,9 @@ export default function ShareCardScreen() {
         </Animated.View>
       </View>
 
-      <Pressable onPress={handleShare} style={({ pressed }) => [s.shareBtn, pressed && { opacity: 0.85 }]}>
-        <Icon name="share" size={18} color="#FFFFFF" />
-        <Text style={s.shareBtnText}>Paylaş</Text>
-      </Pressable>
+      <Button onPress={handleShare} icon="share" fullWidth style={{ marginHorizontal: SPACING.xxxl, marginBottom: SPACING.xxl }}>
+        Paylaş
+      </Button>
     </SafeAreaView>
   );
 }
@@ -142,6 +141,4 @@ const makeStyles = (C) => StyleSheet.create({
   pill: { backgroundColor: C.bg, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: RADIUS.pill },
   pillText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
   watermark: { ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", opacity: 0.5 },
-  shareBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, marginHorizontal: SPACING.xxxl, marginBottom: SPACING.xxl, paddingVertical: SPACING.md, borderRadius: RADIUS.xl, backgroundColor: C.accent },
-  shareBtnText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

@@ -1,9 +1,9 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -85,18 +85,9 @@ export default function EditEmailScreen() {
           </Text>
         </View>
 
-        <Pressable
-          onPress={save}
-          disabled={saving}
-          style={({ pressed }) => [
-            s.saveBtn,
-            { backgroundColor: C.accent },
-            (pressed || saving) && { opacity: 0.85 },
-          ]}
-        >
-          {saving ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Icon name="mail" size={20} color="#FFFFFF" />}
-          <Text style={s.saveText}>{saving ? "Gönderiliyor..." : "Doğrulama Gönder"}</Text>
-        </Pressable>
+        <Button onPress={save} loading={saving} icon="mail" fullWidth style={{ marginTop: SPACING.xl }}>
+          {saving ? "Gönderiliyor..." : "Doğrulama Gönder"}
+        </Button>
       </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -128,9 +119,5 @@ const s = StyleSheet.create({
     padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, marginTop: SPACING.xl,
   },
   infoText: { ...TYPOGRAPHY.caption, flex: 1 },
-  saveBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: SPACING.sm, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xl,
-  },
-  saveText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
+  saveText: { ...TYPOGRAPHY.button },
 });

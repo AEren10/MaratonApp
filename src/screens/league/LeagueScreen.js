@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
@@ -10,7 +10,7 @@ import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW } from "../../com
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
-import { getZone, getZoneStyle, ZONE, PROMOTE_COUNT, DEMOTE_COUNT } from "../../lib/leagueZones";
+import { getZone, ZONE } from "../../lib/leagueZones";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
 import { GroupsTab } from "./GroupsTab";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -18,85 +18,30 @@ import * as H from "../../lib/haptics";
 
 const POLL_MS = 30000;
 
-function TierHeader({ tier, nextTier, myScore, myRank, totalUsers, C }) {
-  const zone = getZone(myRank, totalUsers);
-  const zoneStyle = getZoneStyle(zone, C);
+function TierHeader({ tier, nextTier, myScore, totalUsers, C }) {
+  const xpToNext = nextTier ? nextTier.minXP - (myScore ?? 0) : null;
 
   return (
     <AnimatedCard delay={0}>
       <View style={{
         padding: SPACING.lg,
-        marginBottom: SPACING.lg,
+        marginBottom: SPACING.sm,
         borderRadius: RADIUS.xxl,
         backgroundColor: tier.color + "14",
         borderWidth: 1,
         borderColor: tier.color + "30",
+        flexDirection: "row",
+        alignItems: "center",
       }}>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg }}>
-          <Icon name={tier.icon} size={32} color={tier.color} />
-          <View style={{ marginLeft: SPACING.md, flex: 1 }}>
-            <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
-            <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
-              Bu hafta {myScore ?? 0} XP{myRank ? ` · #${myRank}` : ""}
-            </Text>
-          </View>
-          {zoneStyle && (
-            <View style={{
-              paddingHorizontal: SPACING.sm,
-              paddingVertical: SPACING.xs,
-              borderRadius: RADIUS.md,
-              backgroundColor: zoneStyle.bg,
-            }}>
-              <Text style={[TYPOGRAPHY.micro, { color: zoneStyle.color }]}>{zoneStyle.label}</Text>
-            </View>
-          )}
+        <Icon name={tier.icon} size={36} color={tier.color} />
+        <View style={{ marginLeft: SPACING.md, flex: 1 }}>
+          <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
+          <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
+            {totalUsers} yarışmacı{xpToNext != null ? ` · ${nextTier.name} Lig'e ${xpToNext} XP` : ""}
+          </Text>
         </View>
-
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: SPACING.md,
-          paddingVertical: SPACING.md,
-          borderTopWidth: 1,
-          borderBottomWidth: 1,
-          borderColor: C.border,
-        }}>
-          <MiniStat label="Haftalık XP" value={myScore ?? 0} color={C.amber} C={C} />
-          <MiniStat label="Sıran" value={myRank ? `#${myRank}` : "—"} color={C.purple} C={C} />
-        </View>
-
-        {nextTier && (
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: SPACING.sm }}>
-            <Icon name="trendUp" size={14} color={C.green} />
-            <Text style={[TYPOGRAPHY.caption, { color: C.green, marginLeft: SPACING.xs }]}>
-              {nextTier.name} Lig'e {nextTier.minXP - (myScore ?? 0)} XP kaldı
-            </Text>
-          </View>
-        )}
-
-        {totalUsers >= 3 && (
-          <View style={{ flexDirection: "row", justifyContent: "center", gap: SPACING.md, paddingTop: SPACING.md }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.green }} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Terfi (ilk {PROMOTE_COUNT})</Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.danger }} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Düşme (son {DEMOTE_COUNT})</Text>
-            </View>
-          </View>
-        )}
       </View>
     </AnimatedCard>
-  );
-}
-
-function MiniStat({ label, value, color, C }) {
-  return (
-    <View style={{ alignItems: "center" }}>
-      <Text style={{ ...TYPOGRAPHY.statSmall, color: color || C.text }}>{value}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color: color || C.sec, opacity: color ? 0.7 : 1 }]}>{label}</Text>
-    </View>
   );
 }
 
@@ -118,12 +63,12 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
         {
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: isYou ? C.accent + "14" : C.surface,
+          backgroundColor: isYou ? C.accent + "14" : "transparent",
           borderRadius: RADIUS.xl,
           paddingHorizontal: SPACING.md,
           paddingVertical: SPACING.md,
-          borderWidth: isYou ? 1 : zoneColor ? 1 : 0,
-          borderColor: isYou ? C.accent + "40" : zoneColor ? zoneColor + "30" : "transparent",
+          borderWidth: isYou ? 1 : 0,
+          borderColor: isYou ? C.accent + "40" : "transparent",
         },
         pressStyle,
       ]}
@@ -220,7 +165,41 @@ export default function LeagueScreen() {
   const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
 
   const totalUsers = data.list.length;
-  const renderItem = useCallback(({ item }) => <LeaderboardRow item={item} totalUsers={totalUsers} C={C} />, [C, totalUsers]);
+
+  const listData = useMemo(() => {
+    if (!data.list.length) return [];
+    const items = [];
+    let addedDemotionLabel = false;
+    let addedMidDivider = false;
+    data.list.forEach((item) => {
+      const zone = getZone(item.rank, totalUsers);
+      if (!addedMidDivider && zone !== ZONE.PROMOTION) {
+        items.push({ _type: "divider", _id: "div-mid" });
+        addedMidDivider = true;
+      }
+      if (!addedDemotionLabel && zone === ZONE.DEMOTION) {
+        items.push({ _type: "demotionLabel", _id: "demotion-label" });
+        addedDemotionLabel = true;
+      }
+      items.push(item);
+    });
+    return items;
+  }, [data.list, totalUsers]);
+
+  const renderItem = useCallback(({ item }) => {
+    if (item._type === "divider") {
+      return <View style={{ height: 1, backgroundColor: C.border, marginVertical: SPACING.md }} />;
+    }
+    if (item._type === "demotionLabel") {
+      return (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginBottom: SPACING.xs }}>
+          <Icon name="trendDown" size={13} color={C.danger} />
+          <Text style={[TYPOGRAPHY.label, { color: C.danger, letterSpacing: 0.8 }]}>DÜŞME BÖLGESİ</Text>
+        </View>
+      );
+    }
+    return <LeaderboardRow item={item} totalUsers={totalUsers} C={C} />;
+  }, [C, totalUsers]);
 
   const emptyComponent = useMemo(() => {
     if (error) {
@@ -258,35 +237,38 @@ export default function LeagueScreen() {
         >
           <Icon name="chevL" size={20} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Lig</Text>
+        <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Haftalık Lig</Text>
         <Pressable
           onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Challenge"
           style={{
-            width: 44, height: 44,
-            borderRadius: RADIUS.md,
-            backgroundColor: C.surface,
+            width: 38, height: 38,
+            borderRadius: 12,
+            backgroundColor: C.orange + "28",
             alignItems: "center", justifyContent: "center",
-            borderWidth: 1, borderColor: C.border,
           }}
         >
-          <Icon name="zap" size={18} color={C.sec} />
+          <Icon name="zap" size={18} color={C.orange} />
         </Pressable>
       </View>
 
       {/* Tabs */}
       <View style={{
         flexDirection: "row",
-        gap: SPACING.sm,
-        paddingHorizontal: SPACING.lg,
+        backgroundColor: C.surface,
+        borderWidth: 1,
+        borderColor: C.border,
+        borderRadius: 11,
+        padding: 4,
+        marginHorizontal: SPACING.lg,
         marginBottom: SPACING.md,
       }}>
         {[
           { key: "friends", label: "Arkadaşlar" },
           { key: "global", label: "Global" },
-          { key: "groups", label: "Gruplarım" },
+          { key: "groups", label: "Gruplar" },
         ].map((t) => (
           <Pressable
             key={t.key}
@@ -295,16 +277,13 @@ export default function LeagueScreen() {
               flex: 1,
               alignItems: "center",
               paddingVertical: SPACING.sm,
-              borderRadius: RADIUS.md,
-              backgroundColor: tab === t.key ? C.accent + "18" : C.surface,
-              borderWidth: 1,
-              borderColor: tab === t.key ? C.accent : C.border,
+              borderRadius: 8,
+              backgroundColor: tab === t.key ? C.accent : "transparent",
             }}
           >
-            <Text style={[
-              TYPOGRAPHY.captionMedium,
-              { color: tab === t.key ? C.accent : C.sec },
-            ]}>{t.label}</Text>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: tab === t.key ? C.textOnFill : C.sec }]}>
+              {t.label}
+            </Text>
           </Pressable>
         ))}
       </View>
@@ -320,10 +299,22 @@ export default function LeagueScreen() {
         </View>
       ) : (
         <FlatList
-          data={data.list}
-          keyExtractor={(item) => String(item.user_id)}
+          data={listData}
+          keyExtractor={(item) => item._id ?? String(item.user_id)}
           ListHeaderComponent={
-            <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} myRank={data.myRank} totalUsers={totalUsers} C={C} />
+            <>
+              <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} totalUsers={totalUsers} C={C} />
+              <Text style={[
+                TYPOGRAPHY.label,
+                {
+                  color: C.green,
+                  letterSpacing: 1,
+                  marginTop: SPACING.md,
+                  marginBottom: SPACING.sm,
+                  marginLeft: SPACING.xs,
+                },
+              ]}>▲ YÜKSELME BÖLGESİ</Text>
+            </>
           }
           renderItem={renderItem}
           windowSize={5}

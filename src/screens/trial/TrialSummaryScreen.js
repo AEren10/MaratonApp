@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, SparkBurst, AnimatedPressable } from "../../components/design";
+import { Icon, SparkBurst, AnimatedPressable, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -114,7 +114,7 @@ export default function TrialSummaryScreen() {
       <ScrollView contentContainerStyle={st.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[st.heroCircle, { backgroundColor: typeColor + "20" }]}>
           <LinearGradient colors={trend > 0 ? [C.green, C.green + "CC"] : [typeColor, typeColor + "CC"]} style={st.heroInner}>
-            <Icon name={trend > 0 ? "trendUp" : "check"} size={38} color="#FFFFFF" sw={3} />
+            <Icon name={trend > 0 ? "trendUp" : "check"} size={38} color={C.textOnFill} sw={3} />
           </LinearGradient>
           {trend > 0 && <SparkBurst trigger={true} />}
         </Animated.View>
@@ -191,18 +191,14 @@ export default function TrialSummaryScreen() {
         )}
 
         <Animated.View entering={FadeInDown.delay(totalWrong > 0 ? 700 : 620)} style={st.actions}>
-          <AnimatedPressable onPress={handleShare} accessibilityLabel="Paylaş" accessibilityRole="button" style={[st.shareBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
-            <Icon name="share" size={18} color={C.accent} />
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>Paylaş</Text>
-          </AnimatedPressable>
-          <AnimatedPressable
+          <Button onPress={handleShare} variant="outline" icon="share" style={{ flex: 1 }}>Paylaş</Button>
+          <Button
             onPress={() => navigation.replace(SCREENS.TRIAL_DETAIL, { trial, fromEntry: false })}
-            haptic="medium"
-            style={[st.detailBtn, { backgroundColor: typeColor }]}
+            iconRight="arrowR"
+            style={{ flex: 1 }}
           >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#FFFFFF" }}>Detayları Gör</Text>
-            <Icon name="arrowR" size={16} color="#FFFFFF" sw={2.5} />
-          </AnimatedPressable>
+            Detayları Gör
+          </Button>
         </Animated.View>
       </ScrollView>
 
@@ -245,8 +241,6 @@ const st = StyleSheet.create({
   barTrack: { flex: 1, height: 6, borderRadius: 3, overflow: "hidden" },
   barNet: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, width: 42, textAlign: "right" },
   actions: { flexDirection: "row", gap: 12, width: "100%", marginTop: SPACING.xxl },
-  shareBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderRadius: RADIUS.xl, borderWidth: 1 },
-  detailBtn: { flex: 1.4, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderRadius: RADIUS.xl, ...SHADOWS.card },
   wrongBanner: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.md, borderRadius: RADIUS.xl, borderWidth: 1 },
   wrongIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   offscreen: { position: "absolute", top: -9999, left: -9999 },

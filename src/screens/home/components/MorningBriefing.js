@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { Icon, AnimatedPressable } from "../../../components/design";
+import { Icon, AnimatedPressable, Button } from "../../../components/design";
 
 const storageKey = () => {
   const d = new Date().toISOString().slice(0, 10);
@@ -67,10 +67,7 @@ export function MorningBriefing({ userName, planTaskCount, srDueCount, streak, o
         ))}
       </View>
 
-      <AnimatedPressable onPress={handleStart} haptic="medium" style={s.cta}>
-        <Icon name="play" size={16} color="#FFFFFF" sw={2.5} />
-        <Text style={s.ctaText}>Başla</Text>
-      </AnimatedPressable>
+      <Button onPress={handleStart} icon="play" fullWidth size="sm">Başla</Button>
     </Animated.View>
   );
 }
@@ -103,15 +100,4 @@ const makeStyles = (C) => StyleSheet.create({
     borderRadius: RADIUS.pill,
   },
   pillText: { ...TYPOGRAPHY.micro },
-  cta: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.sm,
-    backgroundColor: C.accent,
-    borderRadius: RADIUS.lg,
-    paddingVertical: SPACING.md,
-    marginTop: SPACING.xs,
-  },
-  ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

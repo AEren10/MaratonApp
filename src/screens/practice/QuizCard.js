@@ -91,7 +91,7 @@ const makeStyles = (C) =>
       paddingVertical: 2,
       borderRadius: RADIUS.sm,
     },
-    chipText: { ...TYPOGRAPHY.caption, color: "#FFFFFF", fontWeight: "700" },
+    chipText: { ...TYPOGRAPHY.caption, color: C.textOnFill, fontWeight: "700" },
     topic: { ...TYPOGRAPHY.body, color: C.sec, flex: 1 },
     image: { width: "100%", height: 200, borderRadius: RADIUS.md },
     note: { ...TYPOGRAPHY.body, color: C.text, lineHeight: 22 },
@@ -113,5 +113,5 @@ const makeStyles = (C) =>
       alignItems: "center",
       justifyContent: "center",
     },
-    knowText: { ...TYPOGRAPHY.body, color: "#FFFFFF", fontWeight: "700" },
+    knowText: { ...TYPOGRAPHY.body, color: C.textOnFill, fontWeight: "700" },
   });

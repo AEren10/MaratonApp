@@ -66,6 +66,16 @@ export const COLORS = {
     pink:          "#E24F8C",
     coral:         "#E8612F",
 
+    // On-fill — renkli dolgu üstüne beyaz metin/ikon
+    textOnBrand:   "#FFFFFF",
+    textOnAccent:  "#FFFFFF",
+    textOnFill:    "#FFFFFF",
+
+    // Pressed / focus states
+    accentPressed: "#7c3aed",
+    orangePressed: "#e55a2b",
+    surfacePressed:"rgba(20, 18, 12, 0.06)",
+
     // Dormant — "henüz başlanmadı" durumu (kırmızı/danger DEĞİL)
     dormant:       "rgba(20, 18, 12, 0.25)",
     dormantBg:     "rgba(20, 18, 12, 0.05)",
@@ -113,6 +123,16 @@ export const COLORS = {
     blue:          "#60a5fa",
     pink:          "#f472b6",
     coral:         "#ff6b35",
+
+    // On-fill — renkli dolgu üstüne beyaz metin/ikon
+    textOnBrand:   "#FFFFFF",
+    textOnAccent:  "#FFFFFF",
+    textOnFill:    "#FFFFFF",
+
+    // Pressed / focus states
+    accentPressed: "#6d28d9",
+    orangePressed: "#cc5520",
+    surfacePressed:"rgba(255, 255, 255, 0.06)",
 
     dormant:       "rgba(255, 255, 255, 0.25)",
     dormantBg:     "rgba(255, 255, 255, 0.05)",
@@ -218,6 +238,12 @@ export function paletteFor(scheme) {
     cream:      "#F4F1EA",
     dormant:    src.dormant,
     dormantBg:  src.dormantBg,
+    textOnBrand:src.textOnBrand,
+    textOnAccent:src.textOnAccent,
+    textOnFill: src.textOnFill,
+    accentPressed: src.accentPressed,
+    orangePressed: src.orangePressed,
+    surfacePressed:src.surfacePressed,
   };
 }
 
@@ -288,6 +314,7 @@ export const TYPOGRAPHY = {
   // Stats — Space Grotesk bold, oversized
   stat:          { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 46, lineHeight: 50, letterSpacing: -1 },
   statLarge:     { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 56, lineHeight: 60, letterSpacing: -1.5 },
+  statMedium:    { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 22, lineHeight: 26, letterSpacing: -0.6 },
   statSmall:     { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 26, lineHeight: 30, letterSpacing: -0.5 },
 
   button:        { fontFamily: "Inter_600SemiBold",      fontSize: 15, lineHeight: 20 },
@@ -297,6 +324,30 @@ export const TYPOGRAPHY = {
     lineHeight: 14,
     letterSpacing: 0.6,
     textTransform: "uppercase",
+  },
+};
+
+// Animation tokens — tüm Reanimated/Animated konfigleri tek yerden
+export const ANIMATION = {
+  duration: {
+    instant: 100,
+    fast:    200,
+    normal:  300,
+    slow:    450,
+    enter:   350,
+    exit:    250,
+  },
+  easing: {
+    easeOut:    "cubic-bezier(0.16, 1, 0.3, 1)",
+    easeIn:     "cubic-bezier(0.55, 0, 1, 0.45)",
+    easeInOut:  "cubic-bezier(0.45, 0, 0.55, 1)",
+    spring:     "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  },
+  spring: {
+    gentle:  { damping: 20, stiffness: 200 },
+    default: { damping: 18, stiffness: 320 },
+    snappy:  { damping: 15, stiffness: 400 },
+    bouncy:  { damping: 12, stiffness: 280 },
   },
 };
 

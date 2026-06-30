@@ -11,7 +11,7 @@ export function getMastery({ q = 0, acc = 0 } = {}) {
   if (q >= 10 && acc >= 60) {
     return { level: "improving", colorKey: "warning", label: "Gelişiyor" };
   }
-  return { level: "starter", colorKey: "textMuted", label: "Başlangıç" };
+  return { level: "starter", colorKey: "muted", label: "Başlangıç" };
 }
 
 // Bir konu listesindeki "yeşillik" (ustalaşma) yüzdesi.

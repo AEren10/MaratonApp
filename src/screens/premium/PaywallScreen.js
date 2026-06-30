@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, AnimatedPressable } from "../../components/design";
+import { Icon, AnimatedPressable, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { PLANS, PREMIUM_FEATURE_LIST } from "../../constants/premium";
 import { SCREENS } from "../../constants/screens";
@@ -139,18 +139,15 @@ export default function PaywallScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(500).delay(360)}>
-          <AnimatedPressable
-            style={[s.ctaBtn, { backgroundColor: C.accent, shadowColor: C.accent }]}
+          <Button
             onPress={handlePurchase}
-            haptic="medium"
-            disabled={purchasing}
+            loading={purchasing}
+            size="lg"
+            fullWidth
+            style={{ ...SHADOWS.fab }}
           >
-            {purchasing ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={s.ctaText}>Hemen Başla</Text>
-            )}
-          </AnimatedPressable>
+            Hemen Başla
+          </Button>
           <Text style={s.socialProof}>7 gün ücretsiz dene, beğenmezsen iptal et</Text>
           <Text style={s.cancelText}>İstediğin zaman iptal edebilirsin</Text>
           <Pressable onPress={handleRestore} style={s.restoreBtn}>
@@ -196,12 +193,6 @@ function makeStyles(C) {
     heroSub: { ...TYPOGRAPHY.body, color: C.sec },
     featuresWrap: { marginBottom: SPACING.xxl },
     plansWrap: { gap: SPACING.md, marginBottom: SPACING.xxl },
-    ctaBtn: {
-      borderRadius: RADIUS.lg, paddingVertical: SPACING.lg,
-      alignItems: "center",
-      ...SHADOWS.fab,
-    },
-    ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 17 },
     socialProof: {
       ...TYPOGRAPHY.caption, color: C.green, textAlign: "center",
       marginTop: SPACING.md,

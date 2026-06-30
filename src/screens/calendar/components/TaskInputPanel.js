@@ -53,7 +53,7 @@ export function TaskInputPanel({ onAdd }) {
           hitSlop={8}
           style={[s.submitBtn, { backgroundColor: text.trim() ? C.accent : C.surface2 }]}
         >
-          <Icon name="check" size={16} color={text.trim() ? "#FFF" : C.muted} />
+          <Icon name="check" size={16} color={text.trim() ? C.textOnFill : C.muted} />
         </Pressable>
       </View>
     </Animated.View>

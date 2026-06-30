@@ -1,5 +1,6 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Chip } from "../../../components/design";
+import { Icon, Chip, IconBox, GlassCard } from "../../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
 function StatBlock({ value, label, color, C }) {
@@ -7,13 +8,15 @@ function StatBlock({ value, label, color, C }) {
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
       <Text style={{
-        fontFamily: isZero ? "Inter_500Medium" : "SpaceGrotesk_700Bold",
-        fontSize: isZero ? 15 : 22,
+        ...(isZero ? TYPOGRAPHY.bodyMedium : TYPOGRAPHY.statMedium),
         color: isZero ? C.muted : color,
       }}>
         {isZero ? "—" : value}
       </Text>
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: isZero ? C.muted : color, opacity: isZero ? 1 : 0.7, marginTop: 2 }}>
+      <Text style={{
+        ...TYPOGRAPHY.label, color: isZero ? C.muted : color,
+        opacity: isZero ? 1 : 0.7, marginTop: 2,
+      }}>
         {label}
       </Text>
     </View>
@@ -32,32 +35,16 @@ export function WeeklyReportCard({ report, onPress }) {
 
   return (
     <Pressable onPress={onPress}>
-      <View style={{
-        padding: 18, borderRadius: 24,
-        backgroundColor: C.surface,
-        borderWidth: 1, borderColor: C.border,
-      }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <View style={{
-              width: 30, height: 30, borderRadius: 10,
-              backgroundColor: C.accent + "14",
-              alignItems: "center", justifyContent: "center",
-            }}>
-              <Icon name="calendar" size={15} color={C.accent} />
-            </View>
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
-              Bu Hafta
-            </Text>
+      <GlassCard radius={RADIUS.xxl} style={{ padding: SPACING.lg }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: SPACING.lg }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
+            <IconBox icon="calendar" color={C.accent} size={30} rounded={10} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Bu Hafta</Text>
           </View>
           {report.hasPrev && (
             <Chip color={deltaColor}>
-              <Icon
-                name={deltaPositive ? "trendUp" : "trendDown"}
-                size={11}
-                color={deltaColor}
-              />
-              <Text style={{ color: deltaColor, fontSize: 11, fontFamily: "Inter_600SemiBold" }}>
+              <Icon name={deltaPositive ? "trendUp" : "trendDown"} size={11} color={deltaColor} />
+              <Text style={{ ...TYPOGRAPHY.label, color: deltaColor }}>
                 {deltaPositive ? "+" : ""}{report.netDelta} net
               </Text>
             </Chip>
@@ -71,10 +58,10 @@ export function WeeklyReportCard({ report, onPress }) {
           <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.blue} />
         </View>
 
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.md }}>
           {allZero ? "İlk çalışmanı yap, haftalık raporun başlasın" : "Detaylı raporu görmek için dokun"}
         </Text>
-      </View>
+      </GlassCard>
     </Pressable>
   );
 }

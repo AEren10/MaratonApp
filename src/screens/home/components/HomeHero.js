@@ -4,6 +4,7 @@ import Animated, {
   FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
 } from "react-native-reanimated";
 import { ProgressRing, AnimatedNumber, Icon, SparkBurst } from "../../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
 
@@ -102,7 +103,7 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
             </>
           ) : (
             <>
-              <Text style={[s.ringTop, { color: C.accent }]}>BUGÜN ÇÖZÜLEN</Text>
+              <Text style={[s.ringTop, { color: C.accent }]}>BUGÜN</Text>
               <View style={s.ringValRow}>
                 <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
                 {pct > 0.05 && <Icon name="flame" size={14 + Math.round(Math.min(1, pct) * 12)} color={C.orange} sw={2} style={{ marginLeft: -4, marginTop: 6 }} />}
@@ -115,32 +116,32 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
         <SparkBurst trigger={sparkVisible} onDone={() => setSparkVisible(false)} />
       </Pressable>
 
-      <View style={[s.rail, { borderColor: C.border }]}>
-        <StatCell label="SERİ" value={streak} color={C.orange} valueColor={C.orange} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
+      <View style={s.rail}>
+        <StatCell label="gün seri" value={streak} color={C.orange} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label="SON NET" value={net} decimals color={C.blue} valueColor={C.blue} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
+        <StatCell label="son net" value={net} decimals color={C.blue} valueColor={C.text} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
-        <StatCell label={tier.toUpperCase()} value={xp} color={C.amber} valueColor={C.amber} icon="trophy" delay={280} onPress={onLeague} dormantHint={isNewUser ? "XP kazan" : null} />
+        <StatCell label={`${tier} · XP`} value={xp} color={C.amber} valueColor={C.text} icon="trophy" delay={280} onPress={onLeague} dormantHint={isNewUser ? "XP kazan" : null} />
       </View>
     </Animated.View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { alignItems: "center", paddingTop: 4 },
-  ringWrap: { marginTop: 10, marginBottom: 14 },
-  ringTop: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 1, marginBottom: 2 },
+  wrap: { alignItems: "center", paddingTop: SPACING.xs },
+  ringWrap: { marginTop: SPACING.sm, marginBottom: SPACING.md },
+  ringTop: { ...TYPOGRAPHY.label, letterSpacing: 1, marginBottom: 2 },
   ringValRow: { flexDirection: "row", alignItems: "flex-start" },
-  ringVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 52, lineHeight: 56, letterSpacing: -2 },
-  ringUnit: { fontFamily: "Inter_600SemiBold", fontSize: 18, marginLeft: 2, marginTop: 16 },
-  ringSub: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 2 },
-  ringHint: { fontFamily: "Inter_400Regular", fontSize: 11, marginTop: 6, letterSpacing: 0.5 },
-  rail: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", borderWidth: 1, borderRadius: 20, paddingVertical: 14 },
-  cell: { flex: 1, alignItems: "center", gap: 5 },
+  ringVal: { ...TYPOGRAPHY.statLarge, fontSize: 56, lineHeight: 60 },
+  ringUnit: { ...TYPOGRAPHY.bodySemiBold, fontSize: 18, marginLeft: 2, marginTop: SPACING.lg },
+  ringSub: { ...TYPOGRAPHY.bodyMedium, marginTop: 2 },
+  ringHint: { ...TYPOGRAPHY.micro, marginTop: SPACING.sm, letterSpacing: 0.5 },
+  rail: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", paddingVertical: SPACING.md },
+  cell: { flex: 1, alignItems: "center", gap: SPACING.xs },
   cellChip: { width: 26, height: 26, borderRadius: 9, alignItems: "center", justifyContent: "center" },
   cellValRow: { flexDirection: "row", alignItems: "center", gap: 3 },
-  cellLabel: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 0.4 },
-  cellValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, letterSpacing: -0.6 },
-  cellDormant: { fontFamily: "Inter_500Medium", fontSize: 13, letterSpacing: -0.1 },
+  cellLabel: { ...TYPOGRAPHY.label, letterSpacing: 0.4 },
+  cellValue: { ...TYPOGRAPHY.statMedium, fontSize: 21 },
+  cellDormant: { ...TYPOGRAPHY.bodyMedium, letterSpacing: -0.1 },
   div: { width: 1, height: 34 },
 });

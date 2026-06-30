@@ -8,54 +8,54 @@ export function StrengthBars({ strengths }) {
 
   return (
     <View style={{ marginBottom: SPACING.xxl }}>
-      <Text
-        style={[
-          TYPOGRAPHY.label,
-          { color: C.sec, marginBottom: SPACING.md, paddingHorizontal: SPACING.xs },
-        ]}
-      >
-{"GÜÇLÜ YÖNLERİN"}
-      </Text>
-      <View style={{ gap: SPACING.md }}>
+      <View style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: SPACING.md,
+        paddingHorizontal: SPACING.xs,
+      }}>
+        <Text style={[TYPOGRAPHY.label, { color: C.sec, letterSpacing: 1.3 }]}>
+          {"GÜÇ HARİTASI"}
+        </Text>
+        <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>
+          ders doğruluk %
+        </Text>
+      </View>
+      <View style={{ gap: 14 }}>
         {sorted.map((s, i) => (
-          <View key={i} style={{ gap: SPACING.xs }}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>
-                {s.name}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "SpaceGrotesk_700Bold",
-                  fontSize: 15,
-                  color: s.c,
-                }}
-              >
-                %{s.v}
-              </Text>
+          <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 13 }}>
+            <Text style={{
+              width: 52,
+              fontFamily: "Inter_500Medium",
+              fontSize: 13,
+              color: C.sec,
+            }} numberOfLines={1}>
+              {s.name}
+            </Text>
+            <View style={{
+              flex: 1,
+              height: 7,
+              borderRadius: 4,
+              backgroundColor: C.surface2,
+              overflow: "hidden",
+            }}>
+              <View style={{
+                width: `${s.v}%`,
+                height: "100%",
+                borderRadius: 4,
+                backgroundColor: s.c,
+              }} />
             </View>
-            <View
-              style={{
-                height: 8,
-                borderRadius: RADIUS.sm,
-                backgroundColor: C.surface2,
-                overflow: "hidden",
-              }}
-            >
-              <View
-                style={{
-                  width: `${s.v}%`,
-                  height: "100%",
-                  borderRadius: RADIUS.sm,
-                  backgroundColor: s.c,
-                }}
-              />
-            </View>
+            <Text style={{
+              width: 46,
+              textAlign: "right",
+              fontFamily: "SpaceGrotesk_600SemiBold",
+              fontSize: 13,
+              color: C.text,
+            }}>
+              %{s.v}
+            </Text>
           </View>
         ))}
       </View>

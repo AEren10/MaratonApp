@@ -2,13 +2,13 @@ import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
-import { SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
@@ -75,22 +75,21 @@ export default function LoginScreen() {
           alignItems: "center", justifyContent: "center",
           marginBottom: 16,
         }}>
-          <Icon name="zap" size={30} color="#FFFFFF" sw={2.5} />
+          <Icon name="zap" size={30} color={C.textOnFill} sw={2.5} />
         </View>
 
         <Text style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          ...TYPOGRAPHY.display,
           fontSize: 38,
-          color: "#FFFFFF",
+          color: C.textOnFill,
           letterSpacing: -1,
         }}>
           Maraton
         </Text>
         <Text style={{
-          fontFamily: "Inter_500Medium",
-          fontSize: 15,
+          ...TYPOGRAPHY.bodyMedium,
           color: "rgba(255,255,255,0.92)",
-          marginTop: 6,
+          marginTop: SPACING.sm,
         }}>
           YKS yolculuğun burada başlıyor.
         </Text>
@@ -106,19 +105,19 @@ export default function LoginScreen() {
         >
           <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
             <Text style={{
-              fontFamily: "SpaceGrotesk_700Bold",
+              ...TYPOGRAPHY.heading,
               fontSize: 24,
               color: C.text,
               letterSpacing: -0.4,
-              marginBottom: 4,
+              marginBottom: SPACING.xs,
             }}>
               Tekrar Hoş Geldin
             </Text>
             <Text style={{
-              fontFamily: "Inter_400Regular",
+              ...TYPOGRAPHY.caption,
               fontSize: 14,
               color: C.muted,
-              marginBottom: 28,
+              marginBottom: SPACING.xxl + SPACING.xs,
             }}>
               Hesabınla giriş yap, kaldığın yerden devam et.
             </Text>
@@ -158,27 +157,16 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-            <Pressable
+            <Button
               onPress={submit}
-              disabled={busy}
-              style={({ pressed }) => ({
-                backgroundColor: C.accent,
-                borderRadius: 999,
-                paddingVertical: 17,
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                gap: 8,
-                marginTop: 16,
-                opacity: busy ? 0.6 : pressed ? 0.92 : 1,
-                ...SHADOWS.accent,
-              })}
+              loading={busy}
+              iconRight={busy ? undefined : "arrowR"}
+              size="lg"
+              fullWidth
+              style={{ marginTop: 16, ...SHADOWS.accent }}
             >
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
-                {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
-              </Text>
-              {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
-            </Pressable>
+              {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
+            </Button>
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(380).duration(400).springify()}>

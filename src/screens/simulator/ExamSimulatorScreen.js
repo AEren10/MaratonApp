@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -113,10 +113,7 @@ export default function ExamSimulatorScreen() {
               </Pressable>
             ))}
           </View>
-          <Pressable onPress={startExam} style={s.cta}>
-            <Icon name="play" size={18} color="#FFFFFF" />
-            <Text style={s.ctaText}>Başla</Text>
-          </Pressable>
+          <Button onPress={startExam} icon="play" fullWidth>Başla</Button>
         </View>
       </SafeAreaView>
     );
@@ -132,16 +129,12 @@ export default function ExamSimulatorScreen() {
           <Text style={s.doneTitle}>Simülasyon Tamamlandı!</Text>
           <Text style={s.doneStat}>{usedMins} dk {elapsed % 60} sn</Text>
           <Text style={s.doneSub}>{timeOut ? "Süre doldu!" : "Erken bitirdin"}</Text>
-          <Pressable
-            onPress={() => { haptic.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }}
-            style={s.cta}
-          >
-            <Icon name="chart" size={18} color="#FFFFFF" />
-            <Text style={s.ctaText}>Sonuçlarını Gir</Text>
-          </Pressable>
-          <Pressable onPress={() => navigation.goBack()} style={s.secondaryBtn}>
-            <Text style={[s.doneSub, { color: C.sec }]}>Kapat</Text>
-          </Pressable>
+          <Button onPress={() => { haptic.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }} icon="chart" fullWidth>
+            Sonuçlarını Gir
+          </Button>
+          <Button onPress={() => navigation.goBack()} variant="ghost" fullWidth>
+            Kapat
+          </Button>
         </View>
       </SafeAreaView>
     );
@@ -200,8 +193,6 @@ function makeStyles(C) {
     configBtn: { flex: 1, alignItems: "center", padding: SPACING.lg, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
     configText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     configMeta: { ...TYPOGRAPHY.micro, color: C.muted, marginTop: 2 },
-    cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, paddingHorizontal: SPACING.xxxl },
-    ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
     timerArea: { alignItems: "center", paddingVertical: SPACING.xxxl, gap: SPACING.sm },
     timerText: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64 },
     timerSub: { ...TYPOGRAPHY.caption, color: C.muted },

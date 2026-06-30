@@ -19,7 +19,7 @@ function TaskRow({ task, onToggle, onRemove, C }) {
         style={({ pressed }) => [s.row(C), pressed && { opacity: 0.6 }]}
       >
         <View style={[s.check(C), task.done && { backgroundColor: C.success, borderColor: C.success }]}>
-          {task.done && <Icon name="check" size={12} color="#FFF" sw={2.5} />}
+          {task.done && <Icon name="check" size={12} color={C.textOnFill} sw={2.5} />}
         </View>
         <Text style={[TYPOGRAPHY.body, { color: task.done ? C.muted : C.text, flex: 1 },
           task.done && { textDecorationLine: "line-through" }
@@ -77,7 +77,7 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove }) {
           style={({ pressed }) => [s.addBtn(C), { opacity: pressed ? 0.7 : 1 }]}
         >
           <View style={[s.addIcon(C)]}>
-            <Icon name="plus" size={14} color="#FFF" sw={2.5} />
+            <Icon name="plus" size={14} color={C.textOnFill} sw={2.5} />
           </View>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accent }]}>Görev Ekle</Text>
         </Pressable>

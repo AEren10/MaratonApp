@@ -94,13 +94,13 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {/* Büyük renkli ikon kart */}
           <View style={{
-            width: 56, height: 56, borderRadius: 18,
+            width: SPACING.huge + SPACING.sm, height: SPACING.huge + SPACING.sm, borderRadius: RADIUS.lg,
             backgroundColor: color,
             alignItems: "center", justifyContent: "center",
             shadowColor: color, shadowOffset: { width: 0, height: 6 },
             shadowOpacity: 0.32, shadowRadius: 12, elevation: 4,
           }}>
-            <Icon name={icon} size={26} color="#FFFFFF" />
+            <Icon name={icon} size={26} color={C.textOnFill} />
           </View>
 
           <View style={{ flex: 1, marginLeft: SPACING.md }}>
@@ -117,11 +117,11 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
             paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
             backgroundColor: pct === 0 ? color + "20" : color,
             borderWidth: pct === 0 ? 1 : 0,
-            borderColor: pct === 0 ? color + "40" : "transparent",
+            borderColor: pct === 0 ? color + "40" : C.border,
           }}>
             <Text style={{
               fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, letterSpacing: -0.2,
-              color: pct === 0 ? color : "#FFFFFF",
+              color: pct === 0 ? color : C.textOnFill,
             }}>
               {pct === 0 ? "Başla" : `%${pct}`}
             </Text>
@@ -147,10 +147,10 @@ export const SubjectCard = React.memo(function SubjectCard({ subject }) {
         >
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: masteryPct > 0 ? color + "12" : C.surface2,
-            paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
+            backgroundColor: masteryPct > 0 ? color + "20" : C.surface2,
+            paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs, borderRadius: RADIUS.pill,
           }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : color + "60" }} />
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: masteryPct > 50 ? C.green : masteryPct > 20 ? C.amber : color + "40" }} />
             <Text style={{ ...TYPOGRAPHY.micro, color: masteryPct === 0 ? C.sec : color }}>
               {masteryPct === 0 ? "Keşfetmeye hazır" : `%${masteryPct} ustalaşıldı`}
             </Text>

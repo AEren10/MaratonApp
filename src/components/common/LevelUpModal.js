@@ -6,7 +6,7 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { Icon, IconBox } from "../design";
+import { Icon, IconBox, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
@@ -63,13 +63,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
           </Animated.Text>
 
           <Animated.View entering={FadeIn.delay(550)} style={{ width: "100%" }}>
-            <Pressable
-              onPress={onClose}
-              style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.85 }]}
-            >
-              <Icon name="zap" size={18} color="#FFFFFF" />
-              <Text style={s.btnText}>Devam Et</Text>
-            </Pressable>
+            <Button onPress={onClose} icon="zap" fullWidth>Devam Et</Button>
           </Animated.View>
         </Animated.View>
       </View>
@@ -90,11 +84,5 @@ function makeStyles(C) {
     levelNum: { ...TYPOGRAPHY.stat, color: C.text },
     levelTitle: { ...TYPOGRAPHY.subheading, color: C.accent, marginTop: SPACING.xs },
     sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: SPACING.md, lineHeight: 22 },
-    btn: {
-      flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: SPACING.sm, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xxl,
-      shadowColor: C.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-    },
-    btnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 16, color: "#FFFFFF" },
   });
 }

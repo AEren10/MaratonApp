@@ -20,10 +20,11 @@ function greet() {
   return ["İyi akşamlar", "🌆"];
 }
 
-const AVATAR_PAL = [["purple","#C5B0FF"],["coral","#FFC9A8"],["blue","#A6CCFF"],["pink","#FFC0DC"],["amber","#FFE6A8"],["teal","#9EE0D2"]];
+const AVATAR_PAL = ["purple","orange","blue","green","red","teal"];
 function avatarColors(name = "?", C) {
-  const p = AVATAR_PAL[name.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % AVATAR_PAL.length];
-  return [C[p[0]], p[1]];
+  const key = AVATAR_PAL[name.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % AVATAR_PAL.length];
+  const base = C[key] || C.accent;
+  return [base, base + "60"];
 }
 
 export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, lastStudyDate, onStreakPress, onCalendarPress, onProfilePress }) {
@@ -86,7 +87,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
           <Image source={{ uri: avatarUri }} style={{ width: 52, height: 52, borderRadius: 18, ...avatarShadow }} cachePolicy="memory-disk" transition={200} />
         ) : (
           <LinearGradient colors={[c1, c2]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 52, height: 52, borderRadius: 18, alignItems: "center", justifyContent: "center", ...avatarShadow }}>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 19, color: "#FFFFFF", letterSpacing: -0.5 }}>{initials}</Text>
+            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 19, color: C.textOnFill, letterSpacing: -0.5 }}>{initials}</Text>
           </LinearGradient>
         )}
       </Pressable>
@@ -130,11 +131,11 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
               }}
             >
               <Animated.View style={flameAnim}>
-                <Icon name={atRisk ? "alert" : "flame"} size={18} color="#FFFFFF" sw={2.6} />
+                <Icon name={atRisk ? "alert" : "flame"} size={18} color={C.textOnFill} sw={2.6} />
               </Animated.View>
               <Text style={{
                 fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
-                color: "#FFFFFF", letterSpacing: -0.3,
+                color: C.textOnFill, letterSpacing: -0.3,
               }}>
                 {streak}
               </Text>
@@ -146,7 +147,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
                 backgroundColor: C.info, alignItems: "center", justifyContent: "center",
                 borderWidth: 2, borderColor: C.bg,
               }}>
-                <Icon name="shield" size={10} color="#FFFFFF" sw={2.5} />
+                <Icon name="shield" size={10} color={C.textOnFill} sw={2.5} />
               </View>
             )}
             <SparkBurst trigger={streakBurst} onDone={() => setStreakBurst(false)} />

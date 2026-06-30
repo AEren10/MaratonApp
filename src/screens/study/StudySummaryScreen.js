@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import * as H from "../../lib/haptics";
-import { Icon, Spot } from "../../components/design";
+import { Icon, Spot, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
@@ -83,7 +83,7 @@ export default function StudySummaryScreen() {
         {/* Success icon */}
         <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.successCircle, { backgroundColor: subjectColor + "20" }]}>
           <View style={[s.successInner, { backgroundColor: subjectColor }]}>
-            <Icon name="check" size={36} color="#FFFFFF" sw={3} />
+            <Icon name="check" size={36} color={C.textOnFill} sw={3} />
           </View>
         </Animated.View>
 
@@ -133,9 +133,7 @@ export default function StudySummaryScreen() {
 
         {/* Dismiss button */}
         <Animated.View entering={FadeInDown.delay(600)} style={{ width: "100%" }}>
-          <Pressable onPress={dismiss} style={({ pressed }) => [s.btn, { backgroundColor: subjectColor, opacity: pressed ? 0.9 : 1 }]}>
-            <Text style={s.btnText}>Devam Et</Text>
-          </Pressable>
+          <Button onPress={dismiss} variant="orange" fullWidth>Devam Et</Button>
         </Animated.View>
       </View>
     </SafeAreaView>
@@ -204,10 +202,5 @@ function makeStyles(C) {
     todayLabel: { ...TYPOGRAPHY.caption, color: C.muted },
     todayValue: { ...TYPOGRAPHY.captionMedium, color: C.sec },
 
-    btn: {
-      borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
-      alignItems: "center", ...SHADOWS.amber,
-    },
-    btnText: { ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 },
   });
 }

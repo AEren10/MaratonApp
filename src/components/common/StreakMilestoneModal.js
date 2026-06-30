@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { View, Text, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
-import { Icon, SparkBurst, AnimatedPressable } from "../design";
+import { Icon, SparkBurst, AnimatedPressable, Button } from "../design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 
@@ -52,14 +52,8 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
           )}
 
           {/* Dismiss */}
-          <Animated.View entering={FadeIn.delay(440)} style={s.btnWrap}>
-            <AnimatedPressable
-              onPress={onDismiss}
-              haptic="tap"
-              style={[s.btn, { backgroundColor: C.accent, shadowColor: C.accent }]}
-            >
-              <Text style={s.btnText}>Harika!</Text>
-            </AnimatedPressable>
+          <Animated.View entering={FadeIn.delay(440)} style={{ width: "100%", alignItems: "center", marginTop: SPACING.md }}>
+            <Button onPress={onDismiss} fullWidth>Harika!</Button>
           </Animated.View>
         </Animated.View>
       </View>
@@ -112,12 +106,5 @@ function makeStyles(C) {
       ...TYPOGRAPHY.bodyMedium, color: C.sec,
       textAlign: "center", marginBottom: SPACING.sm,
     },
-    btnWrap: { width: "100%", alignItems: "center", marginTop: SPACING.md },
-    btn: {
-      borderRadius: RADIUS.lg, paddingHorizontal: SPACING.huge,
-      paddingVertical: SPACING.md, shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-    },
-    btnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 16, color: "#FFFFFF" },
   });
 }

@@ -11,12 +11,12 @@ import { selectXP } from "../../store/slices/gamificationSlice";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { usePlanContext } from "../../hooks/usePlanContext";
-import { SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
-import { Icon } from "../../components/design";
+import { Icon, IconBox, GlassCard } from "../../components/design";
 
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
@@ -30,7 +30,6 @@ import { LevelUpModal } from "../../components/common/LevelUpModal";
 import { GoalCompleteModal } from "../../components/common/GoalCompleteModal";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useRetention } from "../../hooks/useRetention";
-import { getMotivMessage } from "../../lib/motivMessages";
 import { useGamification } from "../../hooks/useGamification";
 import { usePremium } from "../../contexts/PremiumContext";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
@@ -46,21 +45,24 @@ import { WeeklyTrialCard } from "./components/WeeklyTrialCard";
 import { ExamCountdown } from "./components/ExamCountdown";
 import { StreakDetailSheet } from "../../components/common/StreakDetailSheet";
 import { WrappedBanner } from "./components/WrappedBanner";
+import SubjectMomentum from "./components/SubjectMomentum";
+import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
 import { useWrapped } from "../../hooks/useWrapped";
 import { getAllSubjects } from "../trial/trialTypes";
+import { getStudyLogs } from "../../supabase/studyLogs";
 import * as H from "../../lib/haptics";
 
 
 function HomeSkeleton() {
   return (
-    <View style={{ paddingHorizontal: 16, paddingTop: 60, gap: SPACING.md }}>
-      <SkeletonCard height={24} width={160} rounded={8} />
+    <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.md }}>
+      <SkeletonCard height={24} width={160} rounded={SPACING.sm} />
       <SkeletonCard height={160} />
-      <View style={{ flexDirection: "row", gap: 12 }}>
+      <View style={{ flexDirection: "row", gap: SPACING.md }}>
         <SkeletonCard height={110} width="48%" />
         <SkeletonCard height={110} width="48%" />
       </View>
-      <View style={{ flexDirection: "row", gap: 12 }}>
+      <View style={{ flexDirection: "row", gap: SPACING.md }}>
         <SkeletonCard height={110} width="48%" />
         <SkeletonCard height={110} width="48%" />
       </View>
@@ -192,6 +194,71 @@ export default function HomeScreen() {
     };
   }, [todayLogs, planCtx]);
 
+  const subjectMomentum = useMemo(() => {
+    if (trials.length < 2) return [];
+    const allSubj = getAllSubjects(C);
+    const bySubj = {};
+    trials.slice(0, 5).reverse().forEach((t) => {
+      Object.entries(t.subjects || {}).forEach(([key, s]) => {
+        if (!bySubj[key]) bySubj[key] = [];
+        bySubj[key].push(s.net || 0);
+      });
+    });
+    return Object.entries(bySubj)
+      .filter(([, nets]) => nets.length >= 2)
+      .slice(0, 4)
+      .map(([key, nets]) => {
+        const subj = allSubj.find((x) => x.key === key);
+        const current = nets[nets.length - 1];
+        const prev = nets[nets.length - 2];
+        return {
+          name: subj?.label || key,
+          color: subj?.color || C.accent,
+          nets,
+          currentNet: current,
+          delta: current - prev,
+        };
+      });
+  }, [trials, C]);
+
+  const [weeklyActivity, setWeeklyActivity] = useState({ total: 0, counts: [0,0,0,0,0,0,0], percent: 0 });
+  useEffect(() => {
+    const now = new Date();
+    const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - dayOfWeek);
+    monday.setHours(0, 0, 0, 0);
+    const from = monday.toISOString().split("T")[0];
+    const to = now.toISOString().split("T")[0];
+
+    const counts = [0, 0, 0, 0, 0, 0, 0];
+    todayLogs.forEach((l) => { counts[dayOfWeek] += l.questionCount || 0; });
+
+    if (!user?.id || user.id === "dev") {
+      const total = counts.reduce((a, b) => a + b, 0);
+      setWeeklyActivity({ total, counts, percent: 0 });
+      return;
+    }
+
+    let cancelled = false;
+    getStudyLogs(user.id, { from, to }).then((logs) => {
+      if (cancelled) return;
+      const weekCounts = [0, 0, 0, 0, 0, 0, 0];
+      (logs || []).forEach((l) => {
+        const d = new Date(l.study_date);
+        const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+        weekCounts[idx] += l.question_count || 0;
+      });
+      weekCounts[dayOfWeek] = Math.max(weekCounts[dayOfWeek], counts[dayOfWeek]);
+      const total = weekCounts.reduce((a, b) => a + b, 0);
+      setWeeklyActivity({ total, counts: weekCounts, percent: 0 });
+    }).catch(() => {
+      const total = counts.reduce((a, b) => a + b, 0);
+      setWeeklyActivity({ total, counts, percent: 0 });
+    });
+    return () => { cancelled = true; };
+  }, [user?.id, todayLogs]);
+
   const lastDeneme = useMemo(() => {
     if (!trials.length) return { net: 0, trend: 0, bars: [] };
     const latest = trials[0];
@@ -237,7 +304,7 @@ export default function HomeScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 90 }}
+        contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
@@ -251,12 +318,36 @@ export default function HomeScreen() {
           onCalendarPress={go(SCREENS.CALENDAR)}
         />
 
-        <View style={{ marginTop: 4 }}>
+        <View style={{ marginTop: SPACING.lg }}>
           <ExamCountdown onPress={go(SCREENS.GOALS)} />
         </View>
 
-        {/* HERO — Whoop ringi: dev animasyonlu ilerleme + nabız atan streak + stat rayı */}
-        <View style={{ marginTop: 8 }}>
+        {nudges.length > 0 && nudges[0] ? (
+          <Pressable
+            onPress={() => {
+              if (nudges[0].subject) navigation.navigate(SCREENS.ANALYSIS);
+              else navigation.navigate(SCREENS.PLAN_DETAIL);
+            }}
+            style={({ pressed }) => ({
+              flexDirection: "row", alignItems: "center", gap: 11,
+              marginTop: 14, padding: 12, paddingHorizontal: 14,
+              borderRadius: 15, borderWidth: 1,
+              borderColor: C.border, backgroundColor: C.surface,
+              opacity: pressed ? 0.88 : 1,
+            })}
+          >
+            <View style={{ width: 30, height: 30, borderRadius: 9, backgroundColor: "rgba(139,92,246,0.16)", alignItems: "center", justifyContent: "center" }}>
+              <Icon name="target" size={17} color={C.accent} />
+            </View>
+            <Text style={{ flex: 1, fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 18, color: C.sec }} numberOfLines={2}>
+              <Text style={{ fontFamily: "Inter_700Bold", color: C.text }}>Koç: </Text>
+              {nudges[0].message || nudges[0].title}
+            </Text>
+            <Icon name="arrowR" size={14} color={C.muted} />
+          </Pressable>
+        ) : null}
+
+        <View style={{ marginTop: 22 }}>
           <HomeHero
             solved={solvedToday}
             goal={dailyGoal}
@@ -273,8 +364,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View style={{ marginTop: 28 }}>
-          <View style={{ gap: 10 }}>
+        <View style={{ marginTop: SPACING.xxl, gap: SPACING.sm }}>
           <AnimatedCard delay={40}>
             <TodayPlanCard
               generatedTasks={generatedTasks}
@@ -282,6 +372,7 @@ export default function HomeScreen() {
               planSummary={plan}
               onViewAll={go(SCREENS.PLAN_DETAIL)}
               onAddTask={go(SCREENS.ADD_TASK)}
+              onStart={(task) => navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: task.subject })}
               onTaskDone={() => reward("plan_task_done")}
               onAllDone={() => reward("perfect_plan", {
                 statUpdates: [{ type: "increment", key: "perfectPlans" }],
@@ -292,51 +383,44 @@ export default function HomeScreen() {
           {planCtx.srDue > 0 ? (
             <AnimatedCard delay={80}>
               <Pressable onPress={go(SCREENS.REVIEW_SESSION)} accessibilityRole="button" accessibilityLabel={`${planCtx.srDue} yanlışın tekrar zamanı geldi`} accessibilityHint="Tekrar oturumuna gider">
-                <View style={{
-                  flexDirection: "row", alignItems: "center", gap: 12, padding: 16,
-                  borderRadius: 22, backgroundColor: C.coral + "14",
-                  borderWidth: 1, borderColor: C.coral + "28",
-                }}>
-                  <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.coral + "24", alignItems: "center", justifyContent: "center" }}>
-                    <Icon name="refresh" size={22} color={C.coral} />
-                  </View>
+                <GlassCard radius={RADIUS.xxl} style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.lg, backgroundColor: C.coral + "14", borderColor: C.coral + "28" }}>
+                  <IconBox icon="refresh" color={C.coral} size={44} rounded={RADIUS.md} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.coral, letterSpacing: 0.6 }}>BUGÜN TEKRAR</Text>
-                    <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.text, marginTop: 2 }}>
+                    <Text style={{ ...TYPOGRAPHY.label, color: C.coral }}>BUGÜN TEKRAR</Text>
+                    <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.text, marginTop: 2 }}>
                       {planCtx.srDue} yanlışın tekrar zamanı geldi
                     </Text>
                   </View>
                   <Icon name="arrowR" size={18} color={C.coral} />
-                </View>
+                </GlassCard>
               </Pressable>
             </AnimatedCard>
           ) : null}
 
-          {nudges.length > 0 && nudges[0] ? (
-            <AnimatedCard delay={100}>
-              <Pressable onPress={() => {
-                if (nudges[0].subject) navigation.navigate(SCREENS.ANALYSIS);
-                else navigation.navigate(SCREENS.PLAN_DETAIL);
-              }}>
-                <View style={{
-                  flexDirection: "row", alignItems: "center", gap: 12, padding: 14,
-                  borderRadius: 18, backgroundColor: C.accent + "0C",
-                  borderWidth: 1, borderColor: C.accent + "18",
-                }}>
-                  <Icon name="lightbulb" size={16} color={C.accent} />
-                  <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.sec, flex: 1 }} numberOfLines={2}>
-                    {nudges[0].message || nudges[0].title}
-                  </Text>
-                  <Icon name="arrowR" size={14} color={C.muted} />
-                </View>
-              </Pressable>
-            </AnimatedCard>
-          ) : null}
-
-          </View>
         </View>
 
-        <View style={{ marginTop: 28 }}>
+        {subjectMomentum.length > 0 && (
+          <AnimatedCard delay={120}>
+            <View style={{ marginTop: SPACING.md }}>
+              <SubjectMomentum subjects={subjectMomentum} />
+            </View>
+          </AnimatedCard>
+        )}
+
+        {weeklyActivity.total > 0 && (
+          <AnimatedCard delay={140}>
+            <View style={{ marginTop: SPACING.md }}>
+              <WeeklyActivityCard
+                totalQuestions={weeklyActivity.total}
+                percentChange={weeklyActivity.percent}
+                dailyCounts={weeklyActivity.counts}
+                onPress={go(SCREENS.ANALYSIS)}
+              />
+            </View>
+          </AnimatedCard>
+        )}
+
+        <View style={{ marginTop: SPACING.xxl }}>
           <SectionLabel>HIZLI İŞLEM</SectionLabel>
           <RoundActions items={QUICK_PRIMARY} secondaryItems={QUICK_SECONDARY} onPress={(q) => {
             if (!q.go) return;
@@ -350,7 +434,7 @@ export default function HomeScreen() {
           const showWeekly = day === 0 || day === 1 || day === 5 || day === 6;
           if (!showWeekly && !(wrappedStats && wrappedPeriod)) return null;
           return (
-            <View style={{ marginTop: 28, gap: 10 }}>
+            <View style={{ marginTop: SPACING.xxl, gap: SPACING.sm }}>
               {showWeekly && (
                 <>
                   <AnimatedCard delay={160}>

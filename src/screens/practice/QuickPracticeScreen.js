@@ -160,8 +160,8 @@ const makeStyles = (C) =>
     center: { alignItems: "center", justifyContent: "center", gap: SPACING.md },
     topBar: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg },
     dots: { flexDirection: "row", gap: SPACING.sm, flex: 1 },
-    dot: { width: 12, height: 12, borderRadius: 6 },
-    timer: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.sec },
+    dot: { width: SPACING.md, height: SPACING.md, borderRadius: SPACING.md / 2 },
+    timer: { ...TYPOGRAPHY.subheading, color: C.sec },
     emptyText: { ...TYPOGRAPHY.body, color: C.sec, marginTop: SPACING.sm },
     backBtn: { marginTop: SPACING.md, paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.md },
     backBtnText: { ...TYPOGRAPHY.body, color: C.accent, fontWeight: "600" },
@@ -169,5 +169,5 @@ const makeStyles = (C) =>
     summaryLabel: { ...TYPOGRAPHY.body, color: C.sec },
     summaryTime: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
     finishBtn: { marginTop: SPACING.xl, backgroundColor: C.orange, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
-    finishText: { ...TYPOGRAPHY.body, color: "#FFFFFF", fontWeight: "700" },
+    finishText: { ...TYPOGRAPHY.body, color: C.textOnFill, fontWeight: "700" },
   });

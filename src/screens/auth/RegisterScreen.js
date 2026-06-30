@@ -7,9 +7,9 @@ import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
-import { SPACING, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
@@ -49,7 +49,7 @@ export default function RegisterScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <LinearGradient
-        colors={[C.accent, "#FFC9A8"]}
+        colors={[C.accent, C.orange + "80"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -78,35 +78,35 @@ export default function RegisterScreen() {
             width: 40, height: 40, borderRadius: 14,
             backgroundColor: "rgba(255,255,255,0.22)",
             alignItems: "center", justifyContent: "center",
-            marginBottom: 24,
+            marginBottom: SPACING.xxl,
             opacity: pressed ? 0.7 : 1,
           })}
         >
-          <Icon name="arrowL" size={18} color="#FFFFFF" sw={2.5} />
+          <Icon name="arrowL" size={18} color={C.textOnFill} sw={2.5} />
         </Pressable>
 
         <View style={{
           width: 56, height: 56, borderRadius: 18,
           backgroundColor: "rgba(255,255,255,0.22)",
           alignItems: "center", justifyContent: "center",
-          marginBottom: 14,
+          marginBottom: SPACING.md,
         }}>
-          <Icon name="user" size={26} color="#FFFFFF" sw={2.4} />
+          <Icon name="user" size={26} color={C.textOnFill} sw={2.4} />
         </View>
 
         <Text style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          ...TYPOGRAPHY.heading,
           fontSize: 30,
-          color: "#FFFFFF",
+          color: C.textOnFill,
           letterSpacing: -0.7,
         }}>
           Aramıza katıl
         </Text>
         <Text style={{
-          fontFamily: "Inter_500Medium",
+          ...TYPOGRAPHY.captionMedium,
           fontSize: 14,
           color: "rgba(255,255,255,0.92)",
-          marginTop: 6,
+          marginTop: SPACING.sm,
         }}>
           Bugün başla, sınava hazır gel.
         </Text>
@@ -157,27 +157,16 @@ export default function RegisterScreen() {
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-            <Pressable
+            <Button
               onPress={submit}
-              disabled={busy}
-              style={({ pressed }) => ({
-                backgroundColor: C.accent,
-                borderRadius: 999,
-                paddingVertical: 17,
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                gap: 8,
-                marginTop: 12,
-                opacity: busy ? 0.6 : pressed ? 0.92 : 1,
-                ...SHADOWS.accent,
-              })}
+              loading={busy}
+              iconRight={busy ? undefined : "arrowR"}
+              size="lg"
+              fullWidth
+              style={{ marginTop: 12, ...SHADOWS.accent }}
             >
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
-                {busy ? "Hesap açılıyor..." : "Kayıt Ol"}
-              </Text>
-              {!busy && <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />}
-            </Pressable>
+              {busy ? "Hesap açılıyor..." : "Kayıt Ol"}
+            </Button>
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>

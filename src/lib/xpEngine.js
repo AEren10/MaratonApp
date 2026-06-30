@@ -1,5 +1,4 @@
-import { XP_REWARDS, LEVELS, getBadges } from "../constants/gamification";
-import { C } from "../themes/tokens";
+import { XP_REWARDS, LEVELS } from "../constants/gamification";
 
 export function calculateXP(action, data = {}) {
   let base = 0;
@@ -64,41 +63,3 @@ export function getLevelForXP(totalXP) {
   return { ...current, xpInLevel, xpForNext, progress, next };
 }
 
-export function checkBadgeUnlocks(userStats, unlockedIds) {
-  const newBadges = [];
-
-  for (const badge of getBadges(C)) {
-    if (unlockedIds.includes(badge.id)) continue;
-
-    const { type, value } = badge.condition;
-    let met = false;
-
-    switch (type) {
-      case "streak":
-        met = (userStats.streak || 0) >= value;
-        break;
-      case "questions":
-        met = (userStats.totalQuestions || 0) >= value;
-        break;
-      case "trials":
-        met = (userStats.totalTrials || 0) >= value;
-        break;
-      case "max_net":
-        met = (userStats.maxNet || 0) >= value;
-        break;
-      case "wrongs_resolved":
-        met = (userStats.wrongsResolved || 0) >= value;
-        break;
-      case "perfect_plan":
-        met = (userStats.perfectPlans || 0) >= value;
-        break;
-      case "level":
-        met = (userStats.level || 1) >= value;
-        break;
-    }
-
-    if (met) newBadges.push(badge);
-  }
-
-  return newBadges;
-}

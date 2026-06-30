@@ -25,22 +25,7 @@ function avatarPalette(name = "?", C) {
   return palette[sum % palette.length];
 }
 
-function StatPill({ icon, label, color, C }) {
-  return (
-    <View style={{
-      flexDirection: "row", alignItems: "center", gap: 5,
-      backgroundColor: color + "16",
-      borderWidth: 1, borderColor: color + "35",
-      paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-      borderRadius: RADIUS.pill,
-    }}>
-      {icon ? <Icon name={icon} size={13} color={color} /> : null}
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color }}>{label}</Text>
-    </View>
-  );
-}
-
-export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak }) {
+export function ProfileHeader({ name = "Öğrenci", exam, streak }) {
   const C = useC();
   const initials = (name || "??").slice(0, 2).toUpperCase();
   const { user } = useAuth();
@@ -102,22 +87,25 @@ export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak 
     ]);
   };
 
-  const leagueColor = league?.color || C.accent;
-
   return (
-    <View style={{ marginTop: SPACING.md, marginBottom: SPACING.lg, alignItems: "center" }}>
+    <View style={{
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.lg,
+      marginTop: SPACING.md,
+      marginBottom: SPACING.lg,
+    }}>
       {/* Avatar */}
-      <Pressable onPress={pickAvatar}>
+      <Pressable onPress={pickAvatar} style={{ position: "relative" }}>
         <View style={{
-          width: 120, height: 120, borderRadius: 60,
+          width: 74, height: 74, borderRadius: 24,
           overflow: "hidden",
           backgroundColor: C.surface2,
-          borderWidth: 3, borderColor: C.accent + "55",
         }}>
           {avatarUri ? (
             <Image
               source={avatarSource}
-              style={{ width: 120, height: 120 }}
+              style={{ width: 74, height: 74 }}
               contentFit="cover"
               cachePolicy="memory-disk"
               transition={200}
@@ -126,11 +114,11 @@ export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak 
             <LinearGradient
               colors={[c1, c2]}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-              style={{ width: 120, height: 120, alignItems: "center", justifyContent: "center" }}
+              style={{ width: 74, height: 74, alignItems: "center", justifyContent: "center" }}
             >
               <Text style={{
                 fontFamily: "SpaceGrotesk_700Bold",
-                fontSize: 48, color: "#FFFFFF", letterSpacing: -1.4,
+                fontSize: 27, color: C.textOnFill, letterSpacing: -0.5,
               }}>
                 {initials}
               </Text>
@@ -142,62 +130,52 @@ export function ProfileHeader({ name = "Öğrenci", exam, level, league, streak 
               backgroundColor: "rgba(0,0,0,0.45)",
               alignItems: "center", justifyContent: "center",
             }}>
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={C.textOnFill} size="small" />
             </View>
           )}
         </View>
         <View style={{
-          position: "absolute", bottom: 2, right: 2,
-          width: 34, height: 34, borderRadius: 17,
+          position: "absolute", bottom: -2, right: -2,
+          width: 20, height: 20, borderRadius: 10,
           backgroundColor: C.accent,
           alignItems: "center", justifyContent: "center",
-          borderWidth: 3, borderColor: C.bg,
+          borderWidth: 2, borderColor: C.bg,
         }}>
-          <Icon name="camera" size={14} color="#FFFFFF" sw={2.4} />
+          <Icon name="camera" size={9} color={C.textOnFill} sw={2.4} />
         </View>
       </Pressable>
 
-      {/* Name */}
-      <Text style={{
-        ...TYPOGRAPHY.heading, fontSize: 26,
-        color: C.text, letterSpacing: -0.5,
-        marginTop: SPACING.lg,
-      }} numberOfLines={1}>
-        {name}
-      </Text>
-
-      {/* Exam label */}
-      {exam ? (
-        <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs }}>
-          {exam}
+      {/* Name + pills */}
+      <View style={{ flex: 1, gap: SPACING.sm }}>
+        <Text style={{
+          fontFamily: "SpaceGrotesk_700Bold",
+          fontSize: 22, color: C.text, letterSpacing: -0.4,
+        }} numberOfLines={1}>
+          {name}
         </Text>
-      ) : null}
-
-      {/* Stat pills */}
-      <View style={{
-        flexDirection: "row", flexWrap: "wrap",
-        justifyContent: "center",
-        gap: SPACING.sm,
-        marginTop: SPACING.lg,
-      }}>
-        <StatPill
-          icon="shield"
-          label={`Lv.${level?.level || 1} ${level?.title || "Acemi"}`}
-          color={C.accent}
-          C={C}
-        />
-        <StatPill
-          icon={league?.icon || "medal"}
-          label={league?.name || "Bronz Lig"}
-          color={leagueColor}
-          C={C}
-        />
-        <StatPill
-          icon="flame"
-          label={`${streak || 0} gün`}
-          color={C.orange}
-          C={C}
-        />
+        <View style={{ flexDirection: "row", gap: SPACING.sm, flexWrap: "wrap" }}>
+          {exam ? (
+            <View style={{
+              paddingHorizontal: SPACING.md, paddingVertical: 4,
+              borderRadius: RADIUS.pill,
+              backgroundColor: C.surface2,
+            }}>
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.sec }}>{exam}</Text>
+            </View>
+          ) : null}
+          <View style={{
+            flexDirection: "row", alignItems: "center", gap: 4,
+            paddingHorizontal: SPACING.md, paddingVertical: 4,
+            borderRadius: RADIUS.pill,
+            backgroundColor: C.orange + "18",
+            borderWidth: 1, borderColor: C.orange + "35",
+          }}>
+            <Text style={{ fontSize: 12 }}>🔥</Text>
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.orange }}>
+              {streak || 0} gün seri
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
   );

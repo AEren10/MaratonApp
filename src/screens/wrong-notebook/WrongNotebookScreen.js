@@ -12,7 +12,6 @@ import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { AppModal } from "../../components/common/AppModal";
 import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
@@ -38,7 +37,7 @@ export default function WrongNotebookScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { user } = useAuth();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { reward, xpToast, dismissXP } = useGamification();
   const showAlert = useAlert();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
@@ -246,7 +245,7 @@ export default function WrongNotebookScreen() {
             },
           ]}
         >
-          <Icon name="plus" size={22} color="#FFFFFF" sw={3} />
+          <Icon name="plus" size={22} color={C.textOnFill} sw={3} />
         </Pressable>
       </View>
 
@@ -272,10 +271,10 @@ export default function WrongNotebookScreen() {
                 ...(active ? SHADOWS.sm : {}),
               }}
             >
-              <Icon name={t.icon} size={16} color={isAccent ? "#FFF" : active ? C.accent : C.muted} />
+              <Icon name={t.icon} size={16} color={isAccent ? C.textOnFill : active ? C.accent : C.muted} />
               <Text style={{
                 fontFamily: active ? "Inter_700Bold" : "Inter_500Medium",
-                fontSize: 14, color: isAccent ? "#FFF" : active ? C.text : C.muted,
+                fontSize: 14, color: isAccent ? C.textOnFill : active ? C.text : C.muted,
               }}>
                 {t.label}
               </Text>
@@ -477,7 +476,6 @@ export default function WrongNotebookScreen() {
         actions={[{ label: "Tamam", style: "cancel" }]}
       />
       <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
-      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );
 }

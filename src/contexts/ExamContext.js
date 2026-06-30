@@ -16,6 +16,7 @@ export function ExamProvider({ children }) {
   const [examDate, setExamDate] = useState(null);
   const [targetRanking, setTargetRanking] = useState(null);
   const [targetDepartment, setTargetDepartment] = useState(null);
+  const [dailyGoalSet, setDailyGoalSet] = useState(false);
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dbLoading, setDbLoading] = useState(false);
@@ -34,6 +35,7 @@ export function ExamProvider({ children }) {
           setExamDate(d.examDate ? new Date(d.examDate) : null);
           setTargetRanking(d.targetRanking || null);
           setTargetDepartment(d.targetDepartment || null);
+          if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
         } catch {}
       }
       setHasSeenSlides(seenRaw === "true");
@@ -51,6 +53,7 @@ export function ExamProvider({ children }) {
         setExamDate(null);
         setTargetRanking(null);
         setTargetDepartment(null);
+        setDailyGoalSet(false);
       }
       return;
     }
@@ -79,18 +82,21 @@ export function ExamProvider({ children }) {
         examDate: p.exam_date ? new Date(p.exam_date) : null,
         targetRanking: p.target_ranking || null,
         targetDepartment: p.target_department || null,
+        dailyGoalSet: !!p.daily_question_goal || !!p.target_ranking,
       };
       setExamType(config.examType);
       setField(config.field);
       setExamDate(config.examDate);
       setTargetRanking(config.targetRanking);
       setTargetDepartment(config.targetDepartment);
+      if (config.dailyGoalSet) setDailyGoalSet(true);
       AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
         examType: config.examType,
         field: config.field,
         examDate: config.examDate?.toISOString() || null,
         targetRanking: config.targetRanking,
         targetDepartment: config.targetDepartment,
+        dailyGoalSet: config.dailyGoalSet,
       })).catch(() => {});
     }).catch(() => {}).finally(() => setDbLoading(false));
   }, [session]);
@@ -120,7 +126,23 @@ export function ExamProvider({ children }) {
     }
   }, [session, targetRanking, targetDepartment]);
 
-  const updateGoal = useCallback(async (ranking, department) => {
+  const updateGoal = useCallback(async (dailyQuestions) => {
+    setDailyGoalSet(true);
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : {};
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ ...existing, dailyGoalSet: true }),
+      );
+    } catch {}
+    if (session?.user?.id) {
+      const { updateProfile: updateProf } = require("../supabase/profiles");
+      updateProf(session.user.id, { daily_question_goal: dailyQuestions }).catch(() => {});
+    }
+  }, [session]);
+
+  const updateRanking = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
     try {
@@ -131,7 +153,7 @@ export function ExamProvider({ children }) {
         JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
       );
     } catch {}
-    if (session?.user?.id && session.user.id) {
+    if (session?.user?.id) {
       syncExamConfig(session.user.id, {
         examType, field, examDate,
         targetRanking: ranking, targetDepartment: department || null,
@@ -139,7 +161,7 @@ export function ExamProvider({ children }) {
     }
   }, [session, examType, field, examDate]);
 
-  const onboardingDone = !!examType && !!targetRanking;
+  const onboardingDone = !!examType && dailyGoalSet;
 
   const daysUntilExam = useMemo(() => {
     if (!examDate) return null;
@@ -154,10 +176,10 @@ export function ExamProvider({ children }) {
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
-    updateExamConfig, updateGoal, markSlidesAsSeen,
+    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, markSlidesAsSeen,
   }), [examType, field, examDate, targetRanking, targetDepartment,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
-    updateExamConfig, updateGoal, markSlidesAsSeen]);
+    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, markSlidesAsSeen]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;
 }

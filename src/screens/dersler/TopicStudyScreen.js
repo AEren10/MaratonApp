@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Svg, { Circle } from "react-native-svg";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -343,35 +343,23 @@ export default function TopicStudyScreen() {
         )}
 
         {/* === CTA buttons === */}
-        <Pressable
+        <Button
           onPress={() => navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: subject.key, topicName: topic.name })}
-          style={({ pressed }) => [
-            s.cta,
-            {
-              backgroundColor: C.accent,
-              shadowColor: C.accent,
-              opacity: pressed ? 0.92 : 1,
-            },
-          ]}
+          icon="play"
+          fullWidth
         >
-          <Icon name="play" size={20} color="#FFFFFF" sw={2.5} />
-          <Text style={s.ctaText}>Çalışmaya Başla</Text>
-        </Pressable>
+          Çalışmaya Başla
+        </Button>
 
-        <Pressable
+        <Button
           onPress={handleMarkComplete}
           disabled={completing}
-          style={({ pressed }) => [
-            s.secondaryCta,
-            {
-              borderColor: color + "40",
-              opacity: pressed || completing ? 0.6 : 1,
-            },
-          ]}
+          variant="outline"
+          icon="check"
+          fullWidth
         >
-          <Icon name="check" size={18} color={color} sw={2} />
-          <Text style={[s.secondaryCtaText, { color }]}>Konuyu Tamamla</Text>
-        </Pressable>
+          Konuyu Tamamla
+        </Button>
       </ScrollView>
     </SafeAreaView>
   );
@@ -422,24 +410,4 @@ const s = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10,
   },
   historyDate: { ...TYPOGRAPHY.captionMedium, fontSize: 12 },
-  cta: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    borderRadius: 999, paddingVertical: 17, marginTop: SPACING.xxxl,
-    gap: 8,
-    ...SHADOWS.accent,
-  },
-  ctaText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 16,
-    color: "#FFFFFF",
-  },
-  secondaryCta: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    borderRadius: 999, paddingVertical: 14, marginTop: SPACING.md,
-    gap: 8, borderWidth: 1.5,
-  },
-  secondaryCtaText: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 15,
-  },
 });

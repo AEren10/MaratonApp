@@ -2,7 +2,7 @@ import { memo } from "react";
 import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { Icon } from "../design";
+import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
@@ -53,10 +53,7 @@ export const ComebackModal = memo(function ComebackModal({ visible, daysAway, xp
           </Animated.Text>
 
           <Animated.View entering={FadeInDown.delay(650)} style={{ width: "100%" }}>
-            <Pressable onPress={handleClaim} style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.9 }]}>
-              <Icon name="zap" size={18} color="#FFFFFF" />
-              <Text style={s.btnText}>Bonusu Al & Başla</Text>
-            </Pressable>
+            <Button onPress={handleClaim} icon="zap" fullWidth>Bonusu Al & Başla</Button>
           </Animated.View>
         </Animated.View>
       </View>
@@ -83,10 +80,4 @@ const s = StyleSheet.create({
   },
   bonusText: { ...TYPOGRAPHY.statSmall, fontSize: 18 },
   daysLabel: { ...TYPOGRAPHY.caption, marginTop: 12 },
-  btn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: 8, borderRadius: RADIUS.xl, paddingVertical: 16, marginTop: 24,
-    shadowColor: "#8b5cf6", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-  },
-  btnText: { ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 },
 });

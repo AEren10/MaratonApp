@@ -36,7 +36,7 @@ export function useCalendarTasks() {
           data.forEach((row) => {
             const list = merged[row.task_date] || [];
             if (!list.some((t) => t.remoteId === row.id)) {
-              list.push({ id: row.id, remoteId: row.id, text: row.note, done: !!row.completed });
+              list.push({ id: row.id, remoteId: row.id, title: row.note, done: !!row.completed });
             }
             merged[row.task_date] = list;
           });
@@ -61,7 +61,7 @@ export function useCalendarTasks() {
     if (user?.id) {
       supabase.from("user_tasks").insert({
         user_id: user.id, task_date: date, subject: CAL_SUBJECT,
-        note: task.text, completed: false,
+        note: task.title, completed: false,
       }).select("id").single().then(({ data }) => {
         if (!data) return;
         setTasks((prev) => {

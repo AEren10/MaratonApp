@@ -52,7 +52,7 @@ export function EmptyState({
           ]}
           onPress={onAction}
         >
-          <Text style={styles.actionText}>{actionLabel}</Text>
+          <Text style={[styles.actionText, { color: C.textOnFill }]}>{actionLabel}</Text>
         </Pressable>
       ) : null}
       {secondaryLabel && onSecondary ? (
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
   },
   actionText: {
     ...TYPOGRAPHY.button,
-    color: "#FFFFFF",
   },
   secondaryBtn: {
     marginTop: SPACING.md,

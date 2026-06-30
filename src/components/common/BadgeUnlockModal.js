@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing,
   cancelAnimation,
 } from "react-native-reanimated";
-import { HexBadge } from "../design";
+import { HexBadge, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
@@ -54,9 +54,7 @@ export function BadgeUnlockModal({ badge, visible, onClose }) {
           <Animated.Text entering={FadeInDown.delay(320)} style={s.badgeDesc}>{badge.desc}</Animated.Text>
 
           <Animated.View entering={FadeIn.delay(420)} style={{ width: "100%", alignItems: "center" }}>
-            <Pressable onPress={onClose} style={({ pressed }) => [s.btn, { backgroundColor: color, shadowColor: color }, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}>
-              <Text style={s.btnText}>Harika!</Text>
-            </Pressable>
+            <Button onPress={onClose} fullWidth>Harika!</Button>
           </Animated.View>
         </Animated.View>
       </View>
@@ -78,10 +76,5 @@ function makeStyles(C) {
     ray: { position: "absolute", width: 4, height: 16, borderRadius: 2, opacity: 0.55 },
     badgeName: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.sm },
     badgeDesc: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginBottom: SPACING.xxl, lineHeight: 20 },
-    btn: {
-      borderRadius: RADIUS.lg, paddingHorizontal: SPACING.huge, paddingVertical: SPACING.md,
-      shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
-    },
-    btnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 16, color: "#FFFFFF" },
   });
 }

@@ -18,7 +18,7 @@ export function TrialTypeSelector({ value, onChange }) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 10, paddingRight: SPACING.lg }}
+        contentContainerStyle={{ gap: SPACING.sm, paddingRight: SPACING.lg }}
       >
         {list.map((t) => {
           const active = value === t.code;
@@ -32,8 +32,8 @@ export function TrialTypeSelector({ value, onChange }) {
               onPress={() => { H.select(); onChange(t.code); }}
               style={{
                 width: 168,
-                borderRadius: 20,
-                padding: 14,
+                borderRadius: RADIUS.xl,
+                padding: SPACING.md,
                 position: "relative",
                 backgroundColor: active ? t.color : t.color + "12",
                 borderWidth: 1.5,
@@ -48,21 +48,21 @@ export function TrialTypeSelector({ value, onChange }) {
               {/* Büyük ikon */}
               <View style={{
                 width: 44, height: 44, borderRadius: 14,
-                backgroundColor: active ? "rgba(255,255,255,0.25)" : t.color + "1F",
+                backgroundColor: active ? C.textOnFill + "40" : t.color + "20",
                 alignItems: "center", justifyContent: "center",
-                marginBottom: 12,
+                marginBottom: SPACING.md,
               }}>
-                <Icon name={t.icon} size={22} color={active ? "#FFFFFF" : t.color} />
+                <Icon name={t.icon} size={22} color={active ? C.textOnFill : t.color} />
               </View>
 
               <Text style={[TYPOGRAPHY.bodySemiBold, {
-                color: active ? "#FFFFFF" : C.text,
+                color: active ? C.textOnFill : C.text,
                 fontSize: 14,
               }]}>
                 {t.label}
               </Text>
               <Text style={[TYPOGRAPHY.caption, {
-                color: active ? "rgba(255,255,255,0.85)" : C.muted,
+                color: active ? C.textOnFill + "DD" : C.muted,
                 marginTop: 4,
                 lineHeight: 16,
               }]} numberOfLines={2}>
@@ -72,8 +72,8 @@ export function TrialTypeSelector({ value, onChange }) {
               {active && (
                 <View style={{
                   position: "absolute", top: 10, right: 10,
-                  width: 22, height: 22, borderRadius: 11,
-                  backgroundColor: "#FFFFFF",
+                  width: SPACING.xxl, height: SPACING.xxl, borderRadius: SPACING.md,
+                  backgroundColor: C.textOnFill,
                   alignItems: "center", justifyContent: "center",
                 }}>
                   <Icon name="check" size={13} color={t.color} sw={3} />

@@ -420,7 +420,7 @@ export default function AnalysisScreen() {
         onPress={handleTrialEntry}
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
       >
-        <Icon name="plus" size={22} color="#FFFFFF" sw={2.5} />
+        <Icon name="plus" size={22} color={C.textOnFill} sw={2.5} />
         <Text style={s.fabText}>Deneme Gir</Text>
       </Pressable>
     </SafeAreaView>
@@ -448,6 +448,6 @@ function makeStyles(C) {
       ...SHADOWS.fab,
     },
     fabPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
-    fabText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
+    fabText: { ...TYPOGRAPHY.button, color: C.textOnFill },
   });
 }

@@ -105,7 +105,7 @@ function makeStyles(C) {
     heroValue: {
       fontFamily: "SpaceGrotesk_700Bold",
       fontSize: 46,
-      color: "#FFFFFF",
+      color: C.textOnFill,
       zIndex: 1,
       letterSpacing: -1,
     },
@@ -126,7 +126,7 @@ function makeStyles(C) {
     },
     statValue: {
       ...TYPOGRAPHY.statSmall,
-      color: "#FFFFFF",
+      color: C.textOnFill,
       marginTop: SPACING.xs,
     },
     statLabel: {
@@ -147,7 +147,7 @@ function makeStyles(C) {
       marginBottom: SPACING.sm,
     },
     subjectDot: { width: 8, height: 8, borderRadius: 4, marginRight: SPACING.sm },
-    subjectText: { ...TYPOGRAPHY.bodySemiBold, color: "#FFFFFF" },
+    subjectText: { ...TYPOGRAPHY.bodySemiBold, color: C.textOnFill },
     metaRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
     metaItem: { flexDirection: "row", alignItems: "center", gap: SPACING.xs },
     metaValue: { ...TYPOGRAPHY.captionMedium },

@@ -63,7 +63,7 @@ function MilestoneNode({ milestone, C, s, delay }) {
     <Animated.View entering={FadeInLeft.delay(delay).duration(380).springify().damping(16)} style={s.milestoneRow}>
       <View style={s.timelineCol}>
         <View style={[s.milestoneDot, { backgroundColor: C.green }]}>
-          <Icon name={milestone.icon} size={14} color="#FFFFFF" />
+          <Icon name={milestone.icon} size={14} color={C.textOnFill} />
         </View>
       </View>
       <View style={[s.milestoneCard, { backgroundColor: C.green + "12", borderColor: C.green + "26" }]}>
@@ -88,7 +88,7 @@ function WeekNode({ week, C, s, delay }) {
       <View style={s.weekRow}>
         <View style={s.timelineCol}>
           <View style={[s.weekDot, { backgroundColor: dotColor, borderColor: week.isCurrent ? C.accent : C.border }]}>
-            <Text style={[s.weekDotText, { color: week.isCurrent ? "#FFFFFF" : C.muted }]}>
+            <Text style={[s.weekDotText, { color: week.isCurrent ? C.textOnFill : C.muted }]}>
               {week.weekNo}
             </Text>
           </View>
@@ -212,7 +212,7 @@ export default function RoadmapScreen() {
 
           <View style={s.endMark}>
             <View style={[s.endDot, { backgroundColor: C.green }]}>
-              <Icon name="checkCircle" size={18} color="#FFFFFF" />
+              <Icon name="checkCircle" size={18} color={C.textOnFill} />
             </View>
             <Text style={[s.endText, { color: C.green }]}>Sınav Günü</Text>
           </View>
@@ -265,7 +265,7 @@ const makeStyles = (C) => StyleSheet.create({
   weekTitleRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   weekTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, letterSpacing: -0.3 },
   currentBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.pill },
-  currentBadgeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, color: "#FFFFFF", letterSpacing: 0.6 },
+  currentBadgeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, color: C.textOnFill, letterSpacing: 0.6 },
   weekSub: { ...TYPOGRAPHY.caption, marginTop: 2 },
   topicList: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md, gap: SPACING.sm },
   topicRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },

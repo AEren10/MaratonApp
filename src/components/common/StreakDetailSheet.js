@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, Platform, StyleSheet } from "react-native
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon } from "../design";
+import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { nextMondayReset } from "../../lib/streakFreeze";
 
@@ -48,7 +48,7 @@ function StreakCalendar({ lastStudyDate, streak, C }) {
                 : { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border },
               isToday && !active && { borderColor: C.orange, borderWidth: 2 },
             ]}>
-              {active && <Icon name="check" size={12} color="#FFFFFF" sw={3} />}
+              {active && <Icon name="check" size={12} color={C.textOnFill} sw={3} />}
             </View>
           </View>
         );
@@ -139,9 +139,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
             </Text>
           </Animated.View>
 
-          <Pressable onPress={onClose} style={[s.closeBtn, { backgroundColor: C.accent }]}>
-            <Text style={[TYPOGRAPHY.button, { color: "#FFFFFF" }]}>Tamam</Text>
-          </Pressable>
+          <Button onPress={onClose} fullWidth>Tamam</Button>
         </Pressable>
       </Pressable>
     </Modal>
@@ -188,10 +186,6 @@ function makeStyles(C) {
       flexDirection: "row", alignItems: "center", gap: SPACING.sm,
       padding: SPACING.md, borderRadius: RADIUS.lg,
       marginBottom: SPACING.xl,
-    },
-    closeBtn: {
-      alignItems: "center", paddingVertical: SPACING.lg,
-      borderRadius: RADIUS.lg,
     },
   });
 }

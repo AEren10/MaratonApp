@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable, Modal, FlatList, StyleSheet } from "react-native";
-import { Icon } from "../design";
+import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
@@ -54,9 +54,7 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
             contentContainerStyle={{ gap: SPACING.sm }}
             showsVerticalScrollIndicator={false}
           />
-          <Pressable onPress={onClose} style={styles.closeBtn}>
-            <Text style={styles.closeText}>Tamam</Text>
-          </Pressable>
+          <Button onPress={onClose} fullWidth>Tamam</Button>
         </Pressable>
       </Pressable>
     </Modal>
@@ -128,19 +126,6 @@ function makeStyles(C) {
     actionText: {
       fontFamily: "Inter_600SemiBold",
       fontSize: 12,
-    },
-    closeBtn: {
-      alignSelf: "center",
-      marginTop: SPACING.lg,
-      paddingHorizontal: 32,
-      paddingVertical: 12,
-      backgroundColor: C.accent,
-      borderRadius: RADIUS.lg,
-    },
-    closeText: {
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 14,
-      color: "#FFFFFF",
     },
   });
 }

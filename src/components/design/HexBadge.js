@@ -36,7 +36,7 @@ export function HexBadge({ icon = "trophy", color, locked = false, size = 64, la
             <Polygon points={pts} fill={`url(#hg${icon}${locked ? "L" : ""})`} />
             <Polygon points={ipts} fill="rgba(255,255,255,0.16)" x={innerPad} y={innerPad} />
           </Svg>
-          <Icon name={locked ? "lock" : icon} size={S * 0.4} color="#FFFFFF" sw={2.4} />
+          <Icon name={locked ? "lock" : icon} size={S * 0.4} color={C.textOnFill} sw={2.4} />
         </Animated.View>
       </Pressable>
       {label ? (

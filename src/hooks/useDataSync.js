@@ -131,12 +131,10 @@ async function loadAll(userId, dispatch) {
 
   const xpFromServer = serverXP.status === "fulfilled" ? serverXP.value : 0;
   const weeklyFromServer = serverWeeklyXP.status === "fulfilled" ? serverWeeklyXP.value : 0;
-  const serverBadges = profile.status === "fulfilled" ? profile.value?.badges : null;
   const serverStats = profile.status === "fulfilled" ? profile.value?.gamification_stats : null;
 
-  if (xpFromServer > 0 || (Array.isArray(serverBadges) && serverBadges.length > 0) || serverStats) {
+  if (xpFromServer > 0 || serverStats) {
     const patch = { xp: xpFromServer, weeklyXP: weeklyFromServer };
-    if (Array.isArray(serverBadges) && serverBadges.length > 0) patch.badges = serverBadges;
     if (serverStats && typeof serverStats === "object") {
       const { claimedMilestones: cm, ...pureStats } = serverStats;
       patch.stats = pureStats;

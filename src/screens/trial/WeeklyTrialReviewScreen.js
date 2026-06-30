@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeeklyTrialReport } from "../../hooks/useWeeklyTrialReport";
@@ -120,9 +120,7 @@ export default function WeeklyTrialReviewScreen() {
           </Text>
         </Animated.View>
 
-        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [s.btn, { backgroundColor: C.accent }, pressed && { opacity: 0.9 }]}>
-          <Text style={{ ...TYPOGRAPHY.button, color: "#FFFFFF", fontSize: 16 }}>Tamam</Text>
-        </Pressable>
+        <Button onPress={() => navigation.goBack()} fullWidth>Tamam</Button>
       </ScrollView>
     </SafeAreaView>
   );
@@ -137,5 +135,4 @@ const s = StyleSheet.create({
   bestCard: { width: "100%", flexDirection: "row", alignItems: "center", gap: SPACING.md, borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1 },
   bestIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   motivCard: { width: "100%", flexDirection: "row", alignItems: "center", gap: SPACING.md, borderRadius: RADIUS.xl, padding: SPACING.lg, borderWidth: 1 },
-  btn: { borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, alignItems: "center", ...SHADOWS.card },
 });

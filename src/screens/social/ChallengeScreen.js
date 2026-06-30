@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
@@ -139,9 +139,7 @@ export default function ChallengeScreen() {
                 </Pressable>
               ))}
               {pick.target && (
-                <Pressable onPress={() => { H.medium(); handleCreate(); }} style={s.cta}>
-                  <Text style={s.ctaText}>Gönder</Text>
-                </Pressable>
+                <Button onPress={() => { H.medium(); handleCreate(); }} fullWidth>Gönder</Button>
               )}
             </Animated.View>
           )}
@@ -309,7 +307,5 @@ function makeStyles(C) {
     stepLabel: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     optionRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border },
     optionText: { ...TYPOGRAPHY.bodyMedium, color: C.text },
-    cta: { backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, alignItems: "center" },
-    ctaText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
   });
 }

@@ -11,34 +11,39 @@ import Svg, { Circle, Path, Polyline, Line } from "react-native-svg";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
-import { Icon, AnimatedPressable } from "../../components/design";
+import { Icon, AnimatedPressable, Button } from "../../components/design";
+
+// Decorative gradient tail colors for onboarding slides
+const TAIL_PEACH = "#FFC9A8";
+const TAIL_BLUE  = "#A6CCFF";
+const TAIL_GREEN = "#7CD8A8";
 
 const SLIDES = [
   {
     icon: "target",
     gradientKey: "accent",
-    tail: "#FFC9A8",
+    tail: TAIL_PEACH,
     title: "Hedefe Odaklan",
     desc: "Yapay zeka destekli kişisel çalışma planın, her gün seni hedefe yaklaştırır.",
   },
   {
     icon: "chart",
     gradientKey: "blue",
-    tail: "#A6CCFF",
+    tail: TAIL_BLUE,
     title: "Gelişimini Takip Et",
     desc: "Deneme sonuçların, ders bazlı analizler ve trend grafikleri tek yerde.",
   },
   {
     icon: "flame",
     gradientKey: "coral",
-    tail: "#FFC9A8",
+    tail: TAIL_PEACH,
     title: "Seri Oluştur",
     desc: "Günlük çalışma serini koru, rozet kazan ve ligde yüksel.",
   },
   {
     icon: "users",
     gradientKey: "green",
-    tail: "#7CD8A8",
+    tail: TAIL_GREEN,
     title: "Birlikte Çalış",
     desc: "Gruplarına katıl, arkadaşlarınla yarışarak motive ol.",
   },
@@ -133,7 +138,7 @@ export default function OnboardingScreen() {
             borderColor: C.border,
             opacity: pressed ? 0.7 : 1,
           })}>
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.muted, letterSpacing: 0.4 }}>
+            <Text style={{ ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.muted, letterSpacing: 0.4 }}>
               Atla
             </Text>
           </Pressable>
@@ -178,7 +183,7 @@ export default function OnboardingScreen() {
             <Animated.View style={[{ position: "absolute", top: 60, left: 30, width: 7, height: 7, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.6)" }, pulseStyle]} />
 
             <Animated.View key={`icon-${index}`} entering={ZoomIn.springify().damping(13)} style={floatStyle}>
-              <SlideIcon name={slide.icon} size={120} color="#FFFFFF" />
+              <SlideIcon name={slide.icon} size={120} color={C.textOnFill} />
             </Animated.View>
           </LinearGradient>
         </Animated.View>
@@ -210,29 +215,9 @@ export default function OnboardingScreen() {
             ))}
           </View>
 
-          <AnimatedPressable
-            onPress={goNext}
-            haptic="medium"
-            style={{
-              backgroundColor: grad[0],
-              borderRadius: 999,
-              paddingVertical: 17,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 8,
-              shadowColor: grad[0],
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.40,
-              shadowRadius: 20,
-              elevation: 8,
-            }}
-          >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 16, color: "#FFFFFF" }}>
-              {isLast ? "Başlayalım" : "Devam"}
-            </Text>
-            <Icon name="arrowR" size={18} color="#FFFFFF" sw={2.5} />
-          </AnimatedPressable>
+          <Button onPress={goNext} iconRight="arrowR" size="lg" fullWidth>
+            {isLast ? "Başlayalım" : "Devam"}
+          </Button>
         </View>
       </SafeAreaView>
     </View>
@@ -245,11 +230,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
   },
   slideTitle: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    ...TYPOGRAPHY.heading,
     fontSize: 30,
     letterSpacing: -0.8,
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   slideDesc: {
     ...TYPOGRAPHY.body,
@@ -260,7 +245,7 @@ const styles = StyleSheet.create({
   },
   dots: {
     flexDirection: "row", justifyContent: "center", gap: 6,
-    marginBottom: 24,
+    marginBottom: SPACING.xxl,
   },
   dot: {
     width: 8, height: 8, borderRadius: 4,

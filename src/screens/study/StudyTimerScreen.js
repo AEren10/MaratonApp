@@ -281,7 +281,7 @@ export default function StudyTimerScreen() {
               ]}
             >
               <View style={[styles.modeIconWrap, { backgroundColor: active ? m.color : C.surface2 }]}>
-                <Icon name={m.icon} size={14} color={active ? "#FFF" : C.muted} />
+                <Icon name={m.icon} size={14} color={active ? C.textOnFill : C.muted} />
               </View>
               <Text
                 style={[

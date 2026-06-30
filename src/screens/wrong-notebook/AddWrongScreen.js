@@ -9,7 +9,6 @@ import { Icon, AnimatedPressable } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useGamification } from "../../hooks/useGamification";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { uploadWrongQuestionImage } from "../../supabase/storage";
@@ -27,7 +26,7 @@ export default function AddWrongScreen() {
   const { user } = useAuth();
   const showAlert = useAlert();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { reward, xpToast, dismissXP } = useGamification();
   const { checkFeature, showPaywall } = usePremium();
   const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: C.amber, icon: "hash" });
   const [topic, setTopic] = useState("");
@@ -321,7 +320,6 @@ export default function AddWrongScreen() {
         onSelect={(name, source) => { setTopic(name); setTopicSource(source); }}
       />
       <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
-      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

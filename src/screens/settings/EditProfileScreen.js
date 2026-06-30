@@ -6,7 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -130,12 +130,12 @@ export default function EditProfileScreen() {
                 )}
                 {uploading && (
                   <View style={s.avatarOverlay}>
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={C.textOnFill} />
                   </View>
                 )}
               </View>
               <View style={[s.cameraBadge, { backgroundColor: C.accent }]}>
-                <Icon name="camera" size={14} color="#FFFFFF" />
+                <Icon name="camera" size={14} color={C.textOnFill} />
               </View>
             </View>
             <Text style={[s.changeText, { color: C.accent }]}>Fotoğrafı değiştir</Text>
@@ -169,18 +169,9 @@ export default function EditProfileScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-          <Pressable
-            onPress={save}
-            disabled={saving}
-            style={({ pressed }) => [
-              s.saveBtn,
-              { backgroundColor: C.accent },
-              (pressed || saving) && { opacity: 0.85 },
-            ]}
-          >
-            <Icon name="check" size={20} color="#FFFFFF" />
-            <Text style={s.saveText}>{saving ? "Kaydediliyor..." : "Kaydet"}</Text>
-          </Pressable>
+          <Button onPress={save} loading={saving} icon="check" fullWidth style={{ marginTop: SPACING.xl }}>
+            {saving ? "Kaydediliyor..." : "Kaydet"}
+          </Button>
         </Animated.View>
       </ScrollView>
       </KeyboardAvoidingView>
@@ -224,9 +215,4 @@ const s = StyleSheet.create({
   },
   multiline: { minHeight: 100, textAlignVertical: "top" },
   hint: { ...TYPOGRAPHY.micro, marginTop: 4, alignSelf: "flex-end" },
-  saveBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: SPACING.sm, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.xl,
-  },
-  saveText: { ...TYPOGRAPHY.button, color: "#FFFFFF" },
 });

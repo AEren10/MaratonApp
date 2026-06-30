@@ -2,12 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 
 export const STREAK_MILESTONES = [
-  { day: 7, xp: 100, premiumDays: 0, badgeId: "streak_society_7", title: "Haftalık Savaşçı", icon: "flame", color: "#fb923c" },
-  { day: 14, xp: 250, premiumDays: 1, badgeId: "streak_society_14", title: "İki Haftalık Efsane", icon: "zap", color: "#fbbf24" },
-  { day: 30, xp: 500, premiumDays: 3, badgeId: "streak_society_30", title: "Aylık Titan", icon: "award", color: "#34d399" },
-  { day: 60, xp: 1000, premiumDays: 7, badgeId: "streak_society_60", title: "Çelik İrade", icon: "shield", color: "#60a5fa" },
-  { day: 100, xp: 2000, premiumDays: 14, badgeId: "streak_society_100", title: "Efsanevi Azim", icon: "crown", color: "#c084fc" },
-  { day: 365, xp: 5000, premiumDays: 30, badgeId: "streak_society_365", title: "Yıl Şampiyonu", icon: "trophy", color: "#f472b6" },
+  { day: 7, xp: 100, premiumDays: 0, title: "Haftalık Savaşçı", icon: "flame", color: "#fb923c" },
+  { day: 14, xp: 250, premiumDays: 1, title: "İki Haftalık Efsane", icon: "zap", color: "#fbbf24" },
+  { day: 30, xp: 500, premiumDays: 3, title: "Aylık Titan", icon: "award", color: "#34d399" },
+  { day: 60, xp: 1000, premiumDays: 7, title: "Çelik İrade", icon: "shield", color: "#60a5fa" },
+  { day: 100, xp: 2000, premiumDays: 14, title: "Efsanevi Azim", icon: "crown", color: "#c084fc" },
+  { day: 365, xp: 5000, premiumDays: 30, title: "Yıl Şampiyonu", icon: "trophy", color: "#f472b6" },
 ];
 
 export function checkStreakMilestone(currentStreak, claimedMilestones = []) {

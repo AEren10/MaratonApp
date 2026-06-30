@@ -32,15 +32,15 @@ export default function ProgramPickerModal({ visible, onClose, onSelect, type, C
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }}>
               <View style={{ flexDirection: "row", gap: 6, paddingRight: 16 }}>
                 <Pressable onPress={() => setCategory(null)} style={[styles.chip, { backgroundColor: !category ? C.accent : C.surface2, borderColor: !category ? C.accent : C.border }]}>
-                  <Text style={[styles.chipText, { color: !category ? "#FFFFFF" : C.sec }]}>Tümü</Text>
+                  <Text style={[styles.chipText, { color: !category ? C.textOnFill : C.sec }]}>Tümü</Text>
                 </Pressable>
                 {PROGRAM_CATEGORIES.map((cat) => {
                   const active = category === cat.id;
                   const color = C[cat.color] || C.purple;
                   return (
                     <Pressable key={cat.id} onPress={() => setCategory(active ? null : cat.id)} style={[styles.chip, { backgroundColor: active ? color : color + "12", borderColor: active ? color : color + "30" }]}>
-                      <Icon name={cat.icon} size={11} color={active ? "#FFFFFF" : color} />
-                      <Text style={[styles.chipText, { color: active ? "#FFFFFF" : color }]}>{cat.name}</Text>
+                      <Icon name={cat.icon} size={11} color={active ? C.textOnFill : color} />
+                      <Text style={[styles.chipText, { color: active ? C.textOnFill : color }]}>{cat.name}</Text>
                     </Pressable>
                   );
                 })}

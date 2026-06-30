@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -21,20 +22,17 @@ import { useCalendarTasks } from "../../hooks/useCalendarTasks";
 function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
-
 function endOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
-
 function toIsoDate(d) {
   return d.toISOString().split("T")[0];
 }
-
 function monthLabel(date) {
   return date.toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
 }
 
-export default function CalendarScreen() {
+function CalendarScreenInner() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
@@ -52,33 +50,17 @@ export default function CalendarScreen() {
   const monthEnd = useMemo(() => endOfMonth(monthDate), [monthDate]);
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") {
-      setLoading(false);
-      return;
-    }
+    if (!user?.id || user.id === "dev") { setLoading(false); return; }
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    getStudyLogs(user.id, {
-      from: toIsoDate(monthStart),
-      to: toIsoDate(monthEnd),
-    })
-      .then((data) => {
-        if (!cancelled) setLogs(data || []);
-      })
-      .catch((e) => {
-        if (!cancelled) {
-          setLogs([]);
-          setLoadError(e?.message || "Veriler yüklenemedi");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    getStudyLogs(user.id, { from: toIsoDate(monthStart), to: toIsoDate(monthEnd) })
+      .then((data) => { if (!cancelled) setLogs(data || []); })
+      .catch((e) => { if (!cancelled) { setLogs([]); setLoadError(e?.message || "Veriler yüklenemedi"); } })
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [user?.id, monthStart, monthEnd]);
 
-  // Build day → activity map
   const dayMap = useMemo(() => {
     const map = {};
     logs.forEach((l) => {
@@ -99,10 +81,7 @@ export default function CalendarScreen() {
   }, [logs, trials, monthStart, monthEnd]);
 
   const monthStats = useMemo(() => {
-    let activeDays = 0;
-    let totalMinutes = 0;
-    let totalQuestions = 0;
-    let totalTrials = 0;
+    let activeDays = 0, totalMinutes = 0, totalQuestions = 0, totalTrials = 0;
     Object.values(dayMap).forEach((d) => {
       activeDays += 1;
       totalMinutes += d.totalMinutes;
@@ -115,7 +94,6 @@ export default function CalendarScreen() {
   const prevMonth = useCallback(() => {
     setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   }, []);
-
   const nextMonth = useCallback(() => {
     setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
   }, []);
@@ -124,27 +102,46 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
+      {/* Header */}
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-          <Icon name="arrowL" size={22} color={C.text} />
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={12}
+          accessibilityLabel="Geri"
+          accessibilityRole="button"
+          style={s.backBtn}
+        >
+          <Icon name="arrowL" size={18} color={C.text} />
         </Pressable>
         <Text style={s.title}>Takvim</Text>
-        <View style={{ width: 22 }} />
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        {/* Month navigation */}
         <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.monthHeader}>
-          <Pressable onPress={prevMonth} hitSlop={12} accessibilityLabel="Önceki ay" accessibilityRole="button" style={s.monthBtn}>
-            <Icon name="chevL" size={20} color={C.text} />
+          <Pressable
+            onPress={prevMonth}
+            hitSlop={12}
+            accessibilityLabel="Önceki ay"
+            accessibilityRole="button"
+            style={s.monthBtn}
+          >
+            <Icon name="arrowL" size={16} color={C.sec} />
           </Pressable>
           <Text style={s.monthLabel}>{monthLabel(monthDate)}</Text>
-          <Pressable onPress={nextMonth} hitSlop={12} accessibilityLabel="Sonraki ay" accessibilityRole="button" style={s.monthBtn}>
-            <Icon name="chevR" size={20} color={C.text} />
+          <Pressable
+            onPress={nextMonth}
+            hitSlop={12}
+            accessibilityLabel="Sonraki ay"
+            accessibilityRole="button"
+            style={s.monthBtn}
+          >
+            <Icon name="arrowR" size={16} color={C.sec} />
           </Pressable>
         </Animated.View>
 
         {loading ? (
-          <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, gap: SPACING.md }}>
+          <View style={{ gap: SPACING.md }}>
             <SkeletonCard height={240} />
             <SkeletonCard height={80} />
           </View>
@@ -183,18 +180,45 @@ export default function CalendarScreen() {
   );
 }
 
+export default function CalendarScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <CalendarScreenInner />
+    </ScreenErrorBoundary>
+  );
+}
+
 function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      gap: 14,
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
     },
-    title: { ...TYPOGRAPHY.subheading, color: C.text },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+    backBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    title: {
+      fontFamily: "SpaceGrotesk_600SemiBold",
+      fontSize: 19,
+      lineHeight: 24,
+      letterSpacing: -0.3,
+      color: C.text,
+    },
+    scroll: {
+      paddingHorizontal: SPACING.lg,
+      paddingBottom: 100,
+    },
     monthHeader: {
       flexDirection: "row",
       alignItems: "center",
@@ -202,21 +226,21 @@ function makeStyles(C) {
       marginBottom: SPACING.lg,
     },
     monthBtn: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+      width: 34,
+      height: 34,
+      borderRadius: 10,
       backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
       alignItems: "center",
       justifyContent: "center",
     },
     monthLabel: {
-      ...TYPOGRAPHY.subheading,
+      fontFamily: "SpaceGrotesk_600SemiBold",
+      fontSize: 17,
+      lineHeight: 22,
       color: C.text,
       textTransform: "capitalize",
-    },
-    loadingBox: {
-      paddingVertical: SPACING.huge,
-      alignItems: "center",
     },
   });
 }

@@ -10,17 +10,11 @@ function getCalendarDays(monthDate) {
   const month = monthDate.getMonth();
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  // Convert Sunday(0) → 6, Monday(1) → 0
   const startWeekday = (firstDay.getDay() + 6) % 7;
   const totalDays = lastDay.getDate();
-
   const days = [];
   for (let i = 0; i < startWeekday; i++) days.push(null);
-  for (let d = 1; d <= totalDays; d++) {
-    const date = new Date(year, month, d);
-    days.push(date);
-  }
-  // Fill to multiple of 7
+  for (let d = 1; d <= totalDays; d++) days.push(new Date(year, month, d));
   while (days.length % 7 !== 0) days.push(null);
   return days;
 }
@@ -31,43 +25,41 @@ function isoDate(d) {
 
 function isToday(d) {
   const t = new Date();
-  return d.getFullYear() === t.getFullYear() &&
+  return (
+    d.getFullYear() === t.getFullYear() &&
     d.getMonth() === t.getMonth() &&
-    d.getDate() === t.getDate();
+    d.getDate() === t.getDate()
+  );
 }
 
-function completionLevel(data, dailyGoal) {
+// Returns 0–3: 0 = no activity, 1 = light, 2 = medium, 3 = heavy
+function activityLevel(data, dailyGoal) {
   if (!data || data.totalQuestions === 0) return 0;
   const pct = data.totalQuestions / (dailyGoal || 80);
-  if (pct >= 1) return 4;
-  if (pct >= 0.7) return 3;
-  if (pct >= 0.4) return 2;
+  if (pct >= 1) return 3;
+  if (pct >= 0.5) return 2;
   return 1;
 }
 
-const getCompletionColor = (C) => [
+const HEATMAP = [
   "transparent",
-  C.amber + "44",
-  C.amber + "78",
-  C.green + "6A",
-  C.green + "A8",
+  "rgba(139,92,246,0.15)",
+  "rgba(139,92,246,0.35)",
+  "rgba(139,92,246,0.6)",
 ];
 
 const makeStyles = (C) => ({
   wrap: {
-    backgroundColor: C.surface,
-    borderRadius: RADIUS.xxl,
-    borderWidth: 1,
-    borderColor: C.border,
-    padding: SPACING.md,
     marginBottom: SPACING.lg,
   },
   weekRow: {
     flexDirection: "row",
-    marginBottom: SPACING.sm,
+    marginBottom: 4,
   },
   weekLabel: {
-    ...TYPOGRAPHY.micro,
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 10,
+    lineHeight: 14,
     color: C.muted,
     flex: 1,
     textAlign: "center",
@@ -86,18 +78,14 @@ const makeStyles = (C) => ({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
   dayText: {
-    ...TYPOGRAPHY.bodySemiBold,
-    color: C.text,
-    fontSize: 13,
-  },
-  selected: {
-    backgroundColor: C.accent,
-  },
-  today: {
-    borderWidth: 1.5,
-    borderColor: C.accent,
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 12,
+    lineHeight: 16,
   },
   trialDot: {
     position: "absolute",
@@ -111,7 +99,6 @@ const makeStyles = (C) => ({
 export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80, calendarTasks = {} }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const COMP_COLOR = useMemo(() => getCompletionColor(C), [C]);
   const days = getCalendarDays(monthDate);
 
   return (
@@ -123,12 +110,10 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal 
       </View>
       <View style={styles.grid}>
         {days.map((d, i) => {
-          if (!d) {
-            return <View key={i} style={styles.cell} />;
-          }
+          if (!d) return <View key={i} style={styles.cell} />;
           const iso = isoDate(d);
           const data = dayMap[iso];
-          const lvl = completionLevel(data, dailyGoal);
+          const lvl = activityLevel(data, dailyGoal);
           const isSelected = selectedDay === iso;
           const today = isToday(d);
           const hasTrial = data?.trials?.length > 0;
@@ -140,17 +125,25 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal 
               style={[
                 styles.cell,
                 styles.dayCell,
-                { backgroundColor: COMP_COLOR[lvl] },
-                isSelected && styles.selected,
-                today && styles.today,
+                { backgroundColor: isSelected ? C.accent : HEATMAP[lvl] },
+                today && !isSelected && { borderWidth: 1, borderColor: C.accent },
               ]}
             >
-              <Text style={[styles.dayText, isSelected && { color: C.bg }]}>
+              <Text
+                style={[
+                  styles.dayText,
+                  { color: isSelected ? C.textOnFill : lvl > 0 ? C.text : C.muted },
+                ]}
+              >
                 {d.getDate()}
               </Text>
               <View style={{ position: "absolute", bottom: 4, flexDirection: "row", gap: 3 }}>
-                {hasTrial && <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.teal }]} />}
-                {hasTask && <View style={[styles.trialDot, { backgroundColor: isSelected ? C.bg : C.accent }]} />}
+                {hasTrial && (
+                  <View style={[styles.trialDot, { backgroundColor: isSelected ? C.textOnFill : C.teal }]} />
+                )}
+                {hasTask && (
+                  <View style={[styles.trialDot, { backgroundColor: isSelected ? C.textOnFill : C.accent }]} />
+                )}
               </View>
             </Pressable>
           );
@@ -159,4 +152,3 @@ export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal 
     </View>
   );
 }
-

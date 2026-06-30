@@ -54,7 +54,7 @@ export default function GoalsScreen() {
   const dispatch = useAppDispatch();
   const goals = useSelector(selectGoals);
   const { user } = useAuth();
-  const { targetRanking, targetDepartment, daysUntilExam, updateGoal } = useExam();
+  const { targetRanking, targetDepartment, daysUntilExam, updateRanking } = useExam();
   const showAlert = useAlert();
   const [showPicker, setShowPicker] = useState(false);
   const [draft, setDraft] = useState({ dailyQuestions: goals.dailyQuestions, weeklyTrials: goals.weeklyTrials, weeklyMinutes: goals.weeklyMinutes });
@@ -64,10 +64,10 @@ export default function GoalsScreen() {
   }, [goals.dailyQuestions, goals.weeklyTrials, goals.weeklyMinutes]);
 
   const pickRanking = useCallback((id) => {
-    updateGoal(id, targetDepartment);
+    updateRanking(id, targetDepartment);
     H.success();
     setShowPicker(false);
-  }, [updateGoal, targetDepartment]);
+  }, [updateRanking, targetDepartment]);
 
   const save = useCallback(async () => {
     dispatch(setGoals(draft));

@@ -3,241 +3,100 @@ import { ScrollView, View, Text, Pressable, RefreshControl } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
-import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { useC } from "../../contexts/ThemeContext";
+import { Icon } from "../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS, getSubjectIdentity } from "../../themes/tokens";
+import { useC, useTheme } from "../../contexts/ThemeContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
-import { AnimatedCard } from "../../components/design/AnimatedCard";
-import { SubjectCard } from "./components/SubjectCard";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 import { captureError } from "../../lib/errorReporting";
-
-const GROUP_META = {
-  fen: { label: "Fen Bilimleri", color: null, icon: "activity" },
-  sosyal: { label: "Sosyal Bilimler", color: null, icon: "layers" },
-};
-
-// Grup rengi token'dan — fen=yeşil, sosyal=mor. Dark/light tutarlı.
-function groupColor(key, C) {
-  if (key === "fen") return C.green;
-  if (key === "sosyal") return C.purple;
-  return C.amber;
-}
-
-const FEN_KEYS = ["fizik", "kimya", "biyoloji"];
-const SOSYAL_KEYS = ["tarih", "cografya", "felsefe", "din", "edebiyat"];
-
-function inferGroup(subject) {
-  if (subject.group) return subject.group;
-  const k = subject.key.replace(/^ayt_/, "").replace(/^ea_/, "");
-  if (FEN_KEYS.some((f) => k.startsWith(f))) return "fen";
-  if (SOSYAL_KEYS.some((s) => k.startsWith(s))) return "sosyal";
-  return null;
-}
+import { FocusCard } from "./components/FocusCard";
+import { SubjectRow } from "./components/SubjectRow";
 
 const EXPECTED_QUESTIONS = 30;
 
 function calcTopicProgress(tp) {
-  const questionScore = Math.min((tp.total_questions || 0) / EXPECTED_QUESTIONS, 1) * 40;
-  const accScore = tp.total_questions > 0
-    ? ((tp.correct_count || 0) / tp.total_questions) * 30
-    : 0;
+  const qScore = Math.min((tp.total_questions || 0) / EXPECTED_QUESTIONS, 1) * 40;
+  const accScore = tp.total_questions > 0 ? ((tp.correct_count || 0) / tp.total_questions) * 30 : 0;
   const freqScore = Math.min((tp.study_count || 0) / 3, 1) * 30;
-  return Math.min(100, Math.round(questionScore + accScore + freqScore));
+  return Math.min(100, Math.round(qScore + accScore + freqScore));
 }
 
-function buildSections(subjects, progressMap) {
-  const dersler = subjects.map((s) => {
+function buildDersler(subjects, progressMap) {
+  return subjects.map((s) => {
     const subjectProgress = progressMap[s.key] || {};
     const topicsList = (s.topics || []).map((t) => {
       const tName = typeof t === "string" ? t : t.name;
       const tp = subjectProgress[tName];
-      return {
-        name: tName,
-        q: tp?.total_questions || 0,
-        acc: tp && tp.total_questions > 0 ? Math.round((tp.correct_count / tp.total_questions) * 100) : 0,
-        last: tp?.last_studied_at || null,
-        pct: tp ? calcTopicProgress(tp) : 0,
-        studyCount: tp?.study_count || 0,
-      };
+      return { name: tName, pct: tp ? calcTopicProgress(tp) : 0 };
     });
     const done = topicsList.filter((t) => t.pct >= 100).length;
     const total = topicsList.length;
-    return {
-      ...s,
-      name: s.label,
-      short: s.label,
-      pct: total > 0 ? Math.round((done / total) * 100) : 0,
-      done,
-      total,
-      last: null,
-      topics: topicsList,
-    };
+    return { ...s, name: s.label, pct: total > 0 ? Math.round((done / total) * 100) : 0, done, total };
   });
-
-  const standalone = [];
-  const grouped = {};
-
-  dersler.forEach((d) => {
-    const g = inferGroup(d);
-    if (g && GROUP_META[g]) {
-      if (!grouped[g]) grouped[g] = [];
-      grouped[g].push(d);
-    } else {
-      standalone.push(d);
-    }
-  });
-
-  const sections = [];
-
-  standalone.forEach((d) => {
-    sections.push({ type: "subject", data: d });
-  });
-
-  Object.keys(grouped).forEach((g) => {
-    const meta = GROUP_META[g];
-    sections.push({
-      type: "group",
-      key: g,
-      label: meta.label,
-      color: meta.color,
-      icon: meta.icon,
-      count: grouped[g].length,
-      topicCount: grouped[g].reduce((s, d) => s + d.total, 0),
-    });
-    grouped[g].forEach((d) => {
-      sections.push({ type: "subject", data: d, groupKey: g });
-    });
-  });
-
-  return { sections, dersler };
-}
-
-function SectionHeader({ label, color, icon, count, topicCount, C }) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: SPACING.md,
-        paddingHorizontal: SPACING.xs,
-        marginTop: SPACING.lg,
-        marginBottom: SPACING.xs,
-      }}
-    >
-      <View
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 10,
-          backgroundColor: color + "20",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Icon name={icon} size={16} color={color} />
-      </View>
-      <View style={{ flex: 1, marginLeft: SPACING.sm }}>
-        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
-          {label}
-        </Text>
-        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>
-          {count} ders · {topicCount} konu
-        </Text>
-      </View>
-      <View
-        style={{
-          height: 1,
-          flex: 0.3,
-          backgroundColor: color + "30",
-        }}
-      />
-    </View>
-  );
-}
-
-function PageHeader({ totalDone, totalAll, C, onTopicCards, onPlan }) {
-  return (
-    <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.md }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Text style={{ ...TYPOGRAPHY.heading, color: C.text }}>Dersler</Text>
-        <Pressable
-          onPress={onTopicCards}
-          style={({ pressed }) => ({
-            flexDirection: "row", alignItems: "center", gap: 6,
-            backgroundColor: C.surface, borderRadius: RADIUS.lg,
-            paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-            borderWidth: 1, borderColor: C.border,
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <Icon name="hash" size={14} color={C.sec} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Kartlar</Text>
-        </Pressable>
-      </View>
-      <View style={{ flexDirection: "row", alignItems: "center", marginTop: SPACING.xs }}>
-        <Icon name="layers" size={14} color={C.sec} sw={1.5} />
-        <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginLeft: SPACING.xs }}>
-          {totalDone}/{totalAll} konu tamamlandı
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function PlanBanner({ C, onPress }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: "row", alignItems: "center",
-        backgroundColor: C.accent + "18", borderRadius: RADIUS.xl,
-        padding: SPACING.md, marginBottom: SPACING.lg,
-        borderWidth: 1, borderColor: C.accent + "30",
-        opacity: pressed ? 0.85 : 1,
-      })}
-    >
-      <View style={{
-        width: 40, height: 40, borderRadius: 14,
-        backgroundColor: C.accent, alignItems: "center", justifyContent: "center",
-      }}>
-        <Icon name="layers" size={20} color="#FFF" />
-      </View>
-      <View style={{ flex: 1, marginLeft: SPACING.md }}>
-        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Günlük Plan</Text>
-        <Text style={{ ...TYPOGRAPHY.micro, color: C.sec, marginTop: 2 }}>Bugün hangi konuları çalışacağını gör</Text>
-      </View>
-      <Icon name="chevR" size={16} color={C.accent} />
-    </Pressable>
-  );
 }
 
 function DerslerSkeleton({ C }) {
   return (
     <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.md }}>
-      <SkeletonCard height={24} width={120} rounded={8} />
-      <SkeletonCard height={14} width={180} rounded={6} />
-      <View style={{ marginTop: SPACING.lg, gap: SPACING.md }}>
-        <SkeletonCard height={100} />
-        <SkeletonCard height={100} />
-        <SkeletonCard height={24} width={140} rounded={8} />
-        <SkeletonCard height={100} />
-        <SkeletonCard height={100} />
-        <SkeletonCard height={100} />
+      <SkeletonCard height={28} width={120} rounded={8} />
+      <SkeletonCard height={6} rounded={3} />
+      <SkeletonCard height={44} rounded={12} />
+      <SkeletonCard height={120} rounded={22} />
+      <SkeletonCard height={56} rounded={0} />
+      <SkeletonCard height={56} rounded={0} />
+      <SkeletonCard height={56} rounded={0} />
+    </View>
+  );
+}
+
+function EmptyState({ C, onPress }) {
+  return (
+    <View style={{ alignItems: "center", paddingTop: SPACING.huge, paddingHorizontal: SPACING.xxl, gap: SPACING.lg }}>
+      <View style={{ width: 74, height: 74, borderRadius: 24, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, alignItems: "center", justifyContent: "center" }}>
+        <Icon name="bookOpen" size={34} color={C.accent} />
       </View>
+      <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, textAlign: "center" }}>
+        Derslerini tanıyalım
+      </Text>
+      <Text style={{ ...TYPOGRAPHY.body, color: C.sec, textAlign: "center", lineHeight: 22 }}>
+        {"İlk denemeni gir; en zayıf dersinden başlayıp konu konu ilerleyelim. Her dersin neti ve eksik konuların burada belirir."}
+      </Text>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: SPACING.sm,
+          backgroundColor: C.accent,
+          borderRadius: RADIUS.lg,
+          paddingHorizontal: SPACING.xxl,
+          paddingVertical: SPACING.md,
+          opacity: pressed ? 0.85 : 1,
+          marginTop: SPACING.sm,
+        })}
+      >
+        <Icon name="edit" size={16} color={C.textOnFill} />
+        <Text style={{ ...TYPOGRAPHY.button, color: C.textOnFill }}>
+          {"İlk Denemeni Gir"}
+        </Text>
+      </Pressable>
     </View>
   );
 }
 
 export default function DerslerScreen() {
   const C = useC();
+  const { scheme } = useTheme();
+  const subjectId = useCallback((key) => getSubjectIdentity(scheme, key), [scheme]);
   const navigation = useNavigation();
   const { tytSubjects, aytSubjects, loading: currLoading, group1Label, group2Label } = useCurriculum();
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [progressMap, setProgressMap] = useState({});
+  const [activeTab, setActiveTab] = useState("tyt");
 
   const loadProgress = useCallback(async () => {
     if (!user?.id || user.id === "dev") return;
@@ -259,150 +118,124 @@ export default function DerslerScreen() {
     loadProgress().finally(() => setRefreshing(false));
   }, [loadProgress]);
 
-  const hasTyt = tytSubjects.length > 0;
   const hasAyt = aytSubjects.length > 0;
 
-  const tytData = useMemo(() => buildSections(tytSubjects, progressMap), [tytSubjects, progressMap]);
-  const aytData = useMemo(() => buildSections(aytSubjects, progressMap), [aytSubjects, progressMap]);
+  const activeSubjects = useMemo(
+    () => buildDersler(activeTab === "tyt" ? tytSubjects : aytSubjects, progressMap),
+    [activeTab, tytSubjects, aytSubjects, progressMap],
+  );
 
-  const totalDone = useMemo(() => {
-    const all = [...tytData.dersler, ...aytData.dersler];
-    return all.reduce((s, d) => s + d.done, 0);
-  }, [tytData, aytData]);
-  const totalAll = useMemo(() => {
-    const all = [...tytData.dersler, ...aytData.dersler];
-    return all.reduce((s, d) => s + d.total, 0);
-  }, [tytData, aytData]);
+  const { totalDone, totalAll, focusSubject } = useMemo(() => {
+    if (!activeSubjects.length) return { totalDone: 0, totalAll: 0, focusSubject: null };
+    const done = activeSubjects.reduce((s, d) => s + d.done, 0);
+    const all = activeSubjects.reduce((s, d) => s + d.total, 0);
+    const focus = [...activeSubjects].sort((a, b) => a.pct - b.pct)[0];
+    return { totalDone: done, totalAll: all, focusSubject: focus };
+  }, [activeSubjects]);
+
+  const hasNoData = totalAll === 0;
+  const progressPct = totalAll > 0 ? totalDone / totalAll : 0;
 
   if (currLoading) {
     return (
-      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <DerslerSkeleton C={C} />
-      </SafeAreaView>
+      <ScreenErrorBoundary>
+        <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+          <DerslerSkeleton C={C} />
+        </SafeAreaView>
+      </ScreenErrorBoundary>
     );
   }
 
-  let animIndex = 0;
-
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground blobs={WARM_GLOW} />
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: SPACING.lg,
-          paddingBottom: 100,
-        }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={C.accent}
-            colors={[C.accent]}
-          />
-        }
-      >
-        <PageHeader totalDone={totalDone} totalAll={totalAll} C={C} onTopicCards={() => navigation.navigate(SCREENS.TOPIC_CARDS)} />
-        <PlanBanner C={C} onPress={() => navigation.navigate(SCREENS.PLAN_DETAIL)} />
-
-        {hasTyt && hasAyt && (
-          <ExamBadge label={group1Label} color={C.amber} count={tytData.dersler.length} C={C} />
-        )}
-
-        <View style={{ gap: SPACING.md }}>
-          {tytData.sections.map((item, i) => {
-            if (item.type === "group") {
-              return (
-                <SectionHeader
-                  key={item.key}
-                  label={item.label}
-                  color={groupColor(item.key, C)}
-                  icon={item.icon}
-                  count={item.count}
-                  topicCount={item.topicCount}
-                  C={C}
-                />
-              );
-            }
-            const idx = animIndex++;
-            return (
-              <AnimatedCard key={item.data.key} delay={idx * 60}>
-                <SubjectCard subject={item.data} />
-              </AnimatedCard>
-            );
-          })}
-        </View>
-
-        {hasAyt && (
-          <>
-            <View style={{ marginTop: SPACING.xxxl }}>
-              <ExamBadge label={group2Label} color={C.blue} count={aytData.dersler.length} C={C} />
-            </View>
-            <View style={{ gap: SPACING.md }}>
-              {aytData.sections.map((item, i) => {
-                if (item.type === "group") {
-                  return (
-                    <SectionHeader
-                      key={`ayt_${item.key}`}
-                      label={item.label}
-                      color={groupColor(item.key, C)}
-                      icon={item.icon}
-                      count={item.count}
-                      topicCount={item.topicCount}
-                      C={C}
-                    />
-                  );
-                }
-                const idx = animIndex++;
-                return (
-                  <AnimatedCard key={item.data.key} delay={idx * 60}>
-                    <SubjectCard subject={item.data} />
-                  </AnimatedCard>
-                );
-              })}
-            </View>
-          </>
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-function ExamBadge({ label, color, count, C }) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: SPACING.md,
-        gap: SPACING.sm,
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: color + "20",
-          borderRadius: RADIUS.lg,
-          paddingHorizontal: SPACING.md,
-          paddingVertical: SPACING.xs,
-          borderWidth: 1,
-          borderColor: color + "40",
-        }}
-      >
-        <Text
-          style={{
-            ...TYPOGRAPHY.captionMedium,
-            color,
-            fontFamily: "SpaceGrotesk_700Bold",
-            letterSpacing: 1,
-          }}
+    <ScreenErrorBoundary>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />
+          }
         >
-          {label}
-        </Text>
-      </View>
-      <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>
-        {count} ders
-      </Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-    </View>
+          {/* Header */}
+          <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.lg, gap: SPACING.sm }}>
+            <Text style={{ fontFamily: "SpaceGrotesk_600SemiBold", fontSize: 26, lineHeight: 32, letterSpacing: -0.6, color: C.text }}>
+              Dersler
+            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
+              <View style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden" }}>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: C.accent, width: `${Math.round(progressPct * 100)}%` }} />
+              </View>
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, lineHeight: 16, color: C.sec }}>
+                {totalDone}/{totalAll} konu
+              </Text>
+            </View>
+          </View>
+
+          {/* TYT/AYT Segmented Control */}
+          {hasAyt && (
+            <View style={{ flexDirection: "row", backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, padding: 4, marginBottom: SPACING.lg }}>
+              {[{ key: "tyt", label: group1Label }, { key: "ayt", label: group2Label }].map((tab) => (
+                <Pressable
+                  key={tab.key}
+                  onPress={() => setActiveTab(tab.key)}
+                  style={{ flex: 1, borderRadius: RADIUS.sm, paddingVertical: 10, alignItems: "center", backgroundColor: activeTab === tab.key ? C.accent : "transparent" }}
+                >
+                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: activeTab === tab.key ? C.textOnFill : C.sec }}>
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
+          {hasNoData ? (
+            <EmptyState C={C} onPress={() => navigation.navigate(SCREENS.TRIAL_ENTRY)} />
+          ) : (
+            <>
+              {/* Focus section */}
+              {focusSubject && (
+                <View style={{ marginBottom: SPACING.xl }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.md }}>
+                    <Icon name="alert" size={14} color={C.orange} />
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 14, letterSpacing: 1, color: C.orange, textTransform: "uppercase" }}>
+                      {"Önce Buna Odaklan"}
+                    </Text>
+                  </View>
+                  <FocusCard
+                    subject={focusSubject}
+                    identity={subjectId(focusSubject.key)}
+                    textColor={C.text}
+                    mutedColor={C.muted}
+                    surface2Color={C.surface2}
+                    onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { subjectKey: focusSubject.key })}
+                  />
+                </View>
+              )}
+
+              {/* All subjects */}
+              <View style={{ marginBottom: SPACING.xxl }}>
+                <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 14, letterSpacing: 1.3, color: C.muted, textTransform: "uppercase", marginBottom: SPACING.md }}>
+                  {"Tüm Dersler"}
+                </Text>
+                <View>
+                  {activeSubjects.map((subject, i) => (
+                    <SubjectRow
+                      key={subject.key}
+                      subject={subject}
+                      identity={subjectId(subject.key)}
+                      textColor={C.text}
+                      mutedColor={C.muted}
+                      surface2Color={C.surface2}
+                      isLast={i === activeSubjects.length - 1}
+                      onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { subjectKey: subject.key })}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </ScreenErrorBoundary>
   );
 }

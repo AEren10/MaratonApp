@@ -95,7 +95,7 @@ export function BranchSubjectPicker({ value, onChange }) {
                   backgroundColor: s.color,
                   alignItems: "center", justifyContent: "center",
                 }}>
-                  <Icon name="check" size={11} color="#FFFFFF" sw={3} />
+                  <Icon name="check" size={11} color={C.textOnFill} sw={3} />
                 </View>
               )}
             </Pressable>

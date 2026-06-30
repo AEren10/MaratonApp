@@ -112,7 +112,7 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "#000000AA", justifyContent: "flex-end" },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.65)", justifyContent: "flex-end" },
   sheet: {
     backgroundColor: C.surface,
     borderTopLeftRadius: RADIUS.xxl,
@@ -145,7 +145,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: C.border + "60",
+    borderBottomColor: C.borderSoft,
   },
   rowText: { ...TYPOGRAPHY.bodyMedium, color: C.text },
   emptyText: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", padding: SPACING.lg },

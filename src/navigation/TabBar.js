@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useC } from "../contexts/ThemeContext";
+import { TYPOGRAPHY } from "../themes/tokens";
 import { Icon } from "../components/design";
 import { QuickActionSheet } from "../components/common/QuickActionSheet";
 import { SCREENS } from "../constants/screens";
@@ -61,7 +62,7 @@ function CenterFab({ onPress, C }) {
               elevation: 8,
             }}
           >
-            <Icon name="plus" size={24} color="#FFFFFF" sw={3} />
+            <Icon name="plus" size={24} color={C.textOnFill} sw={3} />
           </View>
         </Pressable>
       </Animated.View>
@@ -114,8 +115,8 @@ function TabItem({ tab, active, onPress, C }) {
       </Animated.View>
       <Text
         style={{
+          ...TYPOGRAPHY.micro,
           fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
-          fontSize: 11,
           color: active ? C.orange : C.muted,
           marginTop: active ? 0 : 4,
         }}

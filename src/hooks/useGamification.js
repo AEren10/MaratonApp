@@ -3,10 +3,8 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   earnXP,
   revertXP,
-  unlockBadge,
   incrementStat,
   setMaxStat,
-  selectBadgeIds,
   selectStats,
   selectLevel,
   selectXP,
@@ -15,7 +13,7 @@ import {
   claimStreakMilestone,
   saveGamificationToStorage,
 } from "../store/slices/gamificationSlice";
-import { calculateXP, checkBadgeUnlocks, getLevelForXP } from "../lib/xpEngine";
+import { calculateXP, getLevelForXP } from "../lib/xpEngine";
 import { shouldApplyMultiplier, rollMultiplier } from "../lib/variableRewards";
 import { getAllUnclaimedMilestones, claimMilestone } from "../lib/streakMilestones";
 import { useAuth } from "../contexts/AuthContext";
@@ -39,7 +37,6 @@ function enqueueXPLog(dispatch, userId, amount, action) {
 export function useGamification() {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const badgeIds = useAppSelector(selectBadgeIds);
   const stats = useAppSelector(selectStats);
   const level = useAppSelector(selectLevel);
   const totalXP = useAppSelector(selectXP);
@@ -48,21 +45,17 @@ export function useGamification() {
   const claimedMilestones = useAppSelector(selectClaimedMilestones);
 
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0, multiplier: 1 });
-  const [badgeModal, setBadgeModal] = useState({ visible: false, badge: null });
   const [levelUpModal, setLevelUpModal] = useState({ visible: false, level: 0, title: "" });
   const [milestoneModal, setMilestoneModal] = useState({ visible: false, milestone: null });
-  const badgeTimerRef = useRef(null);
   const levelUpTimerRef = useRef(null);
   const milestoneTimerRef = useRef(null);
 
   const statsRef = useRef(stats);
-  const badgeIdsRef = useRef(badgeIds);
   const levelRef = useRef(level);
   const totalXPRef = useRef(totalXP);
   const weeklyXPRef = useRef(weeklyXP);
   const claimedRef = useRef(claimedMilestones);
   statsRef.current = stats;
-  badgeIdsRef.current = badgeIds;
   levelRef.current = level;
   totalXPRef.current = totalXP;
   weeklyXPRef.current = weeklyXP;
@@ -73,11 +66,11 @@ export function useGamification() {
     _globalSaveTimer = setTimeout(() => {
       const state = {
         xp: totalXPRef.current, weeklyXP: weeklyXPRef.current,
-        badges: badgeIdsRef.current, stats: statsRef.current,
+        stats: statsRef.current,
         claimedMilestones: claimedRef.current,
       };
       saveGamificationToStorage(state);
-      saveGamificationToSupabase(user?.id, state.badges, state.stats, state.claimedMilestones).catch(() => {});
+      saveGamificationToSupabase(user?.id, state.stats, state.claimedMilestones).catch(() => {});
     }, 500);
   }, [user?.id]);
 
@@ -121,12 +114,6 @@ export function useGamification() {
           });
         }
 
-        const newBadges = checkBadgeUnlocks(updatedStats, badgeIdsRef.current);
-        if (newBadges.length > 0) {
-          newBadges.forEach((b) => dispatch(unlockBadge({ badgeId: b.id })));
-          clearTimeout(badgeTimerRef.current);
-          badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
-        }
         debouncedSave();
       } finally {
         _opLock = false;
@@ -138,13 +125,6 @@ export function useGamification() {
   const syncStat = useCallback(
     (key, value) => {
       dispatch(setMaxStat({ key, value }));
-      const updatedStats = { ...statsRef.current, [key]: Math.max(statsRef.current[key] || 0, value), level: levelRef.current.level };
-      const newBadges = checkBadgeUnlocks(updatedStats, badgeIdsRef.current);
-      if (newBadges.length > 0) {
-        newBadges.forEach((b) => dispatch(unlockBadge({ badgeId: b.id })));
-        clearTimeout(badgeTimerRef.current);
-        badgeTimerRef.current = setTimeout(() => setBadgeModal({ visible: true, badge: newBadges[0] }), 2400);
-      }
       debouncedSave();
     },
     [dispatch, debouncedSave],
@@ -165,7 +145,6 @@ export function useGamification() {
           claimedRef.current = [...claimedRef.current, milestone.day];
           dispatch(claimStreakMilestone(milestone.day));
           claimMilestone(milestone.day).catch(() => {});
-          dispatch(unlockBadge({ badgeId: milestone.badgeId }));
           dispatch(earnXP({ amount: milestone.xp }));
           totalMilestoneXP += milestone.xp;
           if (user?.id) {
@@ -197,20 +176,17 @@ export function useGamification() {
   );
 
   useEffect(() => () => {
-    clearTimeout(badgeTimerRef.current);
     clearTimeout(levelUpTimerRef.current);
     clearTimeout(milestoneTimerRef.current);
   }, []);
 
   const dismissXP = useCallback(() => setXpToast({ visible: false, amount: 0, multiplier: 1 }), []);
-  const dismissBadge = useCallback(() => setBadgeModal({ visible: false, badge: null }), []);
   const dismissLevelUp = useCallback(() => setLevelUpModal({ visible: false, level: 0, title: "" }), []);
   const dismissMilestone = useCallback(() => setMilestoneModal({ visible: false, milestone: null }), []);
 
   return {
     reward, syncStat, checkMilestone,
     xpToast, dismissXP,
-    badgeModal, dismissBadge,
     levelUpModal, dismissLevelUp,
     milestoneModal, dismissMilestone,
     level,

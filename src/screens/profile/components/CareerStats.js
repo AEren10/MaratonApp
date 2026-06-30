@@ -23,10 +23,10 @@ function StatCol({ value, label, color }) {
   );
 }
 
-export function CareerStats({ totalQuestions, totalHours, trialCount }) {
+export function CareerStats({ totalQuestions, totalHours, longestStreak }) {
   const C = useC();
-  const qDisplay = totalQuestions > 999
-    ? `${(totalQuestions / 1000).toFixed(1)}k`
+  const qDisplay = totalQuestions >= 1000
+    ? totalQuestions.toLocaleString("tr-TR")
     : String(totalQuestions);
 
   return (
@@ -35,11 +35,11 @@ export function CareerStats({ totalQuestions, totalHours, trialCount }) {
       paddingVertical: SPACING.lg,
       marginHorizontal: SPACING.lg,
     }}>
-      <StatCol value={qDisplay} label="toplam soru" color={C.orange} />
+      <StatCol value={qDisplay} label="soru" color={C.orange} />
       <View style={{ width: 1, backgroundColor: C.border, marginVertical: SPACING.xs }} />
-      <StatCol value={`${totalHours}s`} label="çalışma" color={C.purple} />
+      <StatCol value={String(totalHours)} label="saat" />
       <View style={{ width: 1, backgroundColor: C.border, marginVertical: SPACING.xs }} />
-      <StatCol value={String(trialCount)} label="deneme" color={C.blue} />
+      <StatCol value={String(longestStreak || 0)} label="en uzun seri" color={C.orange} />
     </View>
   );
 }

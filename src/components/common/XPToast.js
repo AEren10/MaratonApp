@@ -95,7 +95,7 @@ function makeStyles(C) {
     text: {
       fontFamily: "SpaceGrotesk_700Bold",
       fontSize: 18,
-      color: "#FFFFFF",
+      color: C.textOnFill,
       letterSpacing: -0.3,
     },
   });

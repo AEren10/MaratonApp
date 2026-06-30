@@ -27,7 +27,7 @@ export function FeedbackCard({ nudge, onAction, delay = 0 }) {
           <View style={s.row}>
             <View style={[s.iconBox, { backgroundColor: colors.solid + "36" }]}>
               <Icon name={nudge.icon || "alert"} size={20} color={colors.solid} />
-              <View style={[s.dot, { backgroundColor: colors.solid }]} />
+              <View style={[s.dot, { backgroundColor: colors.solid, borderColor: C.textOnFill + "10" }]} />
             </View>
             <View style={s.content}>
               <Text style={[s.message, { color: C.text }]} numberOfLines={2}>
@@ -43,8 +43,8 @@ export function FeedbackCard({ nudge, onAction, delay = 0 }) {
           {nudge.actionLabel ? (
             <View style={s.footer}>
               <View style={[s.actionBtn, { backgroundColor: colors.solid }]}>
-                <Text style={s.actionText}>{nudge.actionLabel}</Text>
-                <Icon name="arrowR" size={14} color="#FFFFFF" sw={2.5} />
+                <Text style={[s.actionText, { color: C.textOnFill }]}>{nudge.actionLabel}</Text>
+                <Icon name="arrowR" size={14} color={C.textOnFill} sw={2.5} />
               </View>
             </View>
           ) : null}
@@ -91,7 +91,6 @@ const s = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: "#FFFFFF10",
   },
   content: { flex: 1, gap: 4 },
   message: {
@@ -119,6 +118,5 @@ const s = StyleSheet.create({
   actionText: {
     fontFamily: "Inter_600SemiBold",
     fontSize: 13,
-    color: "#FFFFFF",
   },
 });

@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { View, Text, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown, ZoomIn, BounceIn } from "react-native-reanimated";
-import { Icon, SparkBurst, AnimatedPressable } from "../design";
+import { Icon, SparkBurst, AnimatedPressable, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 
@@ -59,22 +59,9 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
           <Animated.View entering={FadeIn.delay(600)} style={s.btnRow}>
             {onShare && (
-              <AnimatedPressable
-                onPress={onShare}
-                haptic="success"
-                style={[s.shareBtn, { borderColor: C.accent }]}
-              >
-                <Icon name="share" size={16} color={C.accent} />
-                <Text style={[s.shareBtnText, { color: C.accent }]}>Paylaş</Text>
-              </AnimatedPressable>
+              <Button onPress={onShare} variant="outline" icon="share" style={{ flex: 1 }}>Paylaş</Button>
             )}
-            <AnimatedPressable
-              onPress={onDismiss}
-              haptic="tap"
-              style={[s.mainBtn, { backgroundColor: C.green, ...SHADOWS.green }]}
-            >
-              <Text style={s.mainBtnText}>Devam Et</Text>
-            </AnimatedPressable>
+            <Button onPress={onDismiss} variant="success" style={{ flex: 1 }}>Devam Et</Button>
           </Animated.View>
         </Animated.View>
       </View>
@@ -103,15 +90,5 @@ function makeStyles(C) {
     statNum: { ...TYPOGRAPHY.statSmall, fontSize: 28 },
     statLabel: { ...TYPOGRAPHY.micro, marginTop: SPACING.xs },
     btnRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.xxl, width: "100%" },
-    shareBtn: {
-      flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: SPACING.xs, borderRadius: RADIUS.xl, paddingVertical: SPACING.md, borderWidth: 1.5,
-    },
-    shareBtnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15 },
-    mainBtn: {
-      flex: 1, alignItems: "center", justifyContent: "center",
-      borderRadius: RADIUS.xl, paddingVertical: SPACING.md,
-    },
-    mainBtnText: { ...TYPOGRAPHY.bodySemiBold, fontSize: 15, color: "#FFFFFF" },
   });
 }

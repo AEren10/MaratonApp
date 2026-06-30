@@ -6,7 +6,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
@@ -16,7 +16,6 @@ import { useGamification } from "../../hooks/useGamification";
 import { captureError } from "../../lib/errorReporting";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -39,18 +38,18 @@ function SubjectChip({ subject, selected, onPress, C }) {
       style={[
         styles.subjChip,
         {
-          backgroundColor: selected ? color : color + "10",
-          borderColor: selected ? color : color + "24",
+          backgroundColor: selected ? color : color + "20",
+          borderColor: selected ? color : color + "40",
         },
       ]}
     >
       <View style={[
         styles.subjIconBox,
-        { backgroundColor: selected ? "rgba(255,255,255,0.22)" : color + "1A" },
+        { backgroundColor: selected ? C.textOnFill + "40" : color + "20" },
       ]}>
-        <Icon name={subject.icon} size={16} color={selected ? "#FFFFFF" : color} />
+        <Icon name={subject.icon} size={16} color={selected ? C.textOnFill : color} />
       </View>
-      <Text style={[styles.subjName, { color: selected ? "#FFFFFF" : C.text }]} numberOfLines={1}>
+      <Text style={[styles.subjName, { color: selected ? C.textOnFill : C.text }]} numberOfLines={1}>
         {subject.label || subject.name}
       </Text>
     </Pressable>
@@ -64,7 +63,7 @@ export default function StudySaveScreen() {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { reward, xpToast, dismissXP } = useGamification();
   const route = useRoute();
 
   const {
@@ -246,7 +245,7 @@ export default function StudySaveScreen() {
                         borderColor: active ? clr : "transparent",
                       }]}
                     >
-                      <Text style={[styles.tierTitle, { color: active ? "#FFFFFF" : clr }]}>{lbl}</Text>
+                      <Text style={[styles.tierTitle, { color: active ? C.textOnFill : clr }]}>{lbl}</Text>
                     </Pressable>
                   );
                 })}
@@ -323,23 +322,9 @@ export default function StudySaveScreen() {
 
         {/* Bottom save button */}
         <View style={[styles.bottomBar, { backgroundColor: C.bg, borderTopColor: C.border }]}>
-          <Pressable
-            onPress={save}
-            disabled={!canSave || saving}
-            style={({ pressed }) => [
-              styles.submitBtn,
-              {
-                backgroundColor: canSave ? C.accent : C.surface2,
-                shadowColor: canSave ? C.accent : "transparent",
-                opacity: pressed ? 0.92 : saving ? 0.6 : 1,
-              },
-            ]}
-          >
-            <Icon name="check" size={20} color={canSave ? "#FFFFFF" : C.muted} sw={2.5} />
-            <Text style={[styles.submitText, { color: canSave ? "#FFFFFF" : C.muted }]}>
-              {saving ? "Kaydediliyor..." : "Kaydet"}
-            </Text>
-          </Pressable>
+          <Button onPress={save} disabled={!canSave || saving} loading={saving} icon="check" fullWidth>
+            {saving ? "Kaydediliyor..." : "Kaydet"}
+          </Button>
         </View>
       </KeyboardAvoidingView>
 
@@ -352,7 +337,6 @@ export default function StudySaveScreen() {
         />
       )}
       <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
-      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );
 }
@@ -368,10 +352,10 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18 },
   scroll: { padding: SPACING.lg, paddingBottom: 140 },
-  label: { ...TYPOGRAPHY.label, marginBottom: 10, letterSpacing: 0.7 },
+  label: { ...TYPOGRAPHY.label, marginBottom: SPACING.sm, letterSpacing: 0.7 },
 
   durationBadge: {
-    flexDirection: "row", alignItems: "center", gap: 10,
+    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
     alignSelf: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
     borderRadius: RADIUS.full, borderWidth: 1, marginBottom: SPACING.lg,
   },
@@ -385,10 +369,10 @@ const styles = StyleSheet.create({
   },
   tierTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, letterSpacing: -0.3 },
 
-  subjectGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  subjectGrid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
   subjChip: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14, borderWidth: 1,
+    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+    paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderRadius: RADIUS.md, borderWidth: 1,
     minWidth: "47%", flexGrow: 1,
   },
   subjIconBox: {
@@ -398,23 +382,17 @@ const styles = StyleSheet.create({
   subjName: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, flexShrink: 1 },
 
   input: {
-    ...TYPOGRAPHY.body, borderRadius: 14, borderWidth: 1,
-    paddingHorizontal: 14, paddingVertical: 14, fontSize: 15,
+    ...TYPOGRAPHY.body, borderRadius: RADIUS.md, borderWidth: 1,
+    paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, fontSize: 15,
   },
 
   bottomBar: {
     position: "absolute", left: 0, right: 0, bottom: 0,
     padding: SPACING.lg, borderTopWidth: 1,
   },
-  submitBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    borderRadius: 999, paddingVertical: 17,
-    shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.30, shadowRadius: 18, elevation: 6,
-  },
-  submitText: { fontFamily: "Inter_600SemiBold", fontSize: 16 },
 
   noteInput: {
-    borderRadius: 14, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 14,
+    borderRadius: RADIUS.md, borderWidth: 1, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md,
     fontFamily: "Inter_400Regular", fontSize: 15, minHeight: 80, textAlignVertical: "top",
   },
   charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },

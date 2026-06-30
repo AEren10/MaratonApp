@@ -6,7 +6,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../components/design";
+import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
@@ -16,7 +16,6 @@ import { useGamification } from "../../hooks/useGamification";
 import { captureError } from "../../lib/errorReporting";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { BadgeUnlockModal } from "../../components/common/BadgeUnlockModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStreak, updateStreak } from "../../supabase/streaks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -48,14 +47,14 @@ function SubjectCard({ subject, selected, onPress }) {
       }]}
     >
       <View style={[st.subIcon, { backgroundColor: selected ? sid.solid : sid.tint }]}>
-        <Icon name={subject.icon || "bookOpen"} size={16} color={selected ? "#FFF" : sid.solid} />
+        <Icon name={subject.icon || "bookOpen"} size={16} color={selected ? C.textOnFill : sid.solid} />
       </View>
       <Text style={[st.subLabel, { color: selected ? sid.solid : C.text }]} numberOfLines={1}>
         {subject.label || subject.name}
       </Text>
       {selected && (
         <View style={[st.subCheck, { backgroundColor: sid.solid }]}>
-          <Icon name="check" size={9} color="#FFF" sw={3} />
+          <Icon name="check" size={9} color={C.textOnFill} sw={3} />
         </View>
       )}
     </Pressable>
@@ -69,7 +68,7 @@ export default function AddStudyScreen() {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
-  const { reward, xpToast, dismissXP, badgeModal, dismissBadge } = useGamification();
+  const { reward, xpToast, dismissXP } = useGamification();
 
   const [tier, setTier] = useState("TYT");
   const [subjectKey, setSubjectKey] = useState(null);
@@ -189,7 +188,7 @@ export default function AddStudyScreen() {
                 const active = tier === t;
                 return (
                   <Pressable key={t} accessibilityRole="radio" accessibilityLabel={lbl} accessibilityState={{ selected: active }} onPress={() => switchTier(t)} style={[st.tierBtn, { backgroundColor: active ? clr : "transparent", borderColor: active ? clr : "transparent" }]}>
-                    <Text style={[st.tierTitle, { color: active ? "#FFF" : clr }]}>{lbl}</Text>
+                    <Text style={[st.tierTitle, { color: active ? C.textOnFill : clr }]}>{lbl}</Text>
                   </Pressable>
                 );
               })}
@@ -226,7 +225,7 @@ export default function AddStudyScreen() {
                 const active = duration === d && isDurPreset;
                 return (
                   <Pressable key={d} accessibilityRole="radio" accessibilityLabel={`${fmtDur(d)} süre`} accessibilityState={{ selected: active }} onPress={() => pickDuration(d)} style={[st.segPill, { backgroundColor: active ? C.blue : "transparent" }]}>
-                    <Text style={[st.segText, { color: active ? "#FFF" : C.text }]}>{fmtDur(d)}</Text>
+                    <Text style={[st.segText, { color: active ? C.textOnFill : C.text }]}>{fmtDur(d)}</Text>
                   </Pressable>
                 );
               })}
@@ -264,10 +263,9 @@ export default function AddStudyScreen() {
         </ScrollView>
 
         <View style={[st.bottom, { borderTopColor: C.border }]}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Kaydet" accessibilityHint="Çalışma kaydını kaydeder" onPress={save} disabled={!canSave || saving} style={({ pressed }) => [st.saveBtn, { backgroundColor: canSave ? C.accent : C.surface, opacity: pressed ? 0.92 : 1 }]}>
-            <Icon name="check" size={18} color={canSave ? "#FFF" : C.muted} sw={2.5} />
-            <Text style={[st.saveBtnText, { color: canSave ? "#FFF" : C.muted }]}>{saving ? "Kaydediliyor..." : "Çalışmayı Kaydet"}</Text>
-          </Pressable>
+          <Button onPress={save} disabled={!canSave || saving} loading={saving} icon="check" fullWidth>
+            {saving ? "Kaydediliyor..." : "Çalışmayı Kaydet"}
+          </Button>
         </View>
       </KeyboardAvoidingView>
 
@@ -276,7 +274,6 @@ export default function AddStudyScreen() {
       ) : null}
 
       <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
-      <BadgeUnlockModal badge={badgeModal.badge} visible={badgeModal.visible} onClose={dismissBadge} />
     </SafeAreaView>
   );
 }
@@ -312,6 +309,4 @@ const st = StyleSheet.create({
   noteInput: { paddingHorizontal: 14, paddingVertical: 14, borderRadius: RADIUS.xl, borderWidth: 1, fontFamily: "Inter_400Regular", fontSize: 15, minHeight: 80, textAlignVertical: "top" },
   charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },
   bottom: { paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1 },
-  saveBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderRadius: RADIUS.xl },
-  saveBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 16 },
 });

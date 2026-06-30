@@ -5,19 +5,19 @@ export const getProfile = async (userId) => {
   if (!userId) throw new Error("userId is required");
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard, badges, gamification_stats, study_session_count, login_rewarded_date, review_last_asked, last_active, premium_until, trial_started_at")
+    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard, gamification_stats, study_session_count, login_rewarded_date, review_last_asked, last_active, premium_until, trial_started_at")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
   return data;
 };
 
-export const saveGamificationToSupabase = async (userId, badges, stats, claimedMilestones) => {
+export const saveGamificationToSupabase = async (userId, stats, claimedMilestones) => {
   if (!userId || userId === "dev") return;
   const payload = { ...(stats || {}), claimedMilestones: claimedMilestones || [] };
   const { error } = await supabase
     .from("profiles")
-    .update({ badges: badges || [], gamification_stats: payload })
+    .update({ gamification_stats: payload })
     .eq("id", userId);
   if (error) {
     handleSupabaseError(error, "saveGamificationToSupabase");

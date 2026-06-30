@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Icon, AnimatedPressable } from "../../../components/design";
+import { Icon, AnimatedPressable, Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useUserTasks } from "../../../hooks/useUserTasks";
@@ -9,12 +9,17 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-function TaskRow({ item, C, isLast, onToggle }) {
-  const color = getSubjectByKey(item.subject)?.color || C.accent;
+function TaskRow({ item, C, isLast, isNext, onToggle, onStart }) {
+  const subj = getSubjectByKey(item.subject);
+  const color = subj?.color || C.accent;
+  const dersLabel = subj?.label || item.subject;
+  const topicLabel = item.label !== dersLabel ? item.label : null;
+  const estMin = item.count > 0 ? Math.round(item.count * 1.2) : 0;
+
   return (
-    <Pressable onPress={onToggle} hitSlop={4} style={[s.row, !isLast && { borderBottomWidth: 1, borderBottomColor: C.border + "60" }]}>
+    <Pressable onPress={onToggle} hitSlop={4} style={[s.row, !isLast && { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.06)" }]}>
       <View style={[s.checkBox, { borderColor: item.completed ? C.green : C.muted, backgroundColor: item.completed ? C.green : "transparent" }]}>
-        {item.completed ? <Icon name="check" size={12} color="#FFF" sw={2.5} /> : null}
+        {item.completed ? <Icon name="check" size={12} color={C.textOnFill} sw={2.5} /> : null}
       </View>
       <View style={[s.dotMini, { backgroundColor: color }]} />
       <View style={{ flex: 1, gap: 2 }}>
@@ -22,24 +27,18 @@ function TaskRow({ item, C, isLast, onToggle }) {
           style={[s.rowLabel, { color: item.completed ? C.muted : C.text, textDecorationLine: item.completed ? "line-through" : "none" }]}
           numberOfLines={1}
         >
-          {item.label}
+          {dersLabel}{topicLabel ? ` · ${topicLabel}` : ""}
         </Text>
-        {item.badge ? (
-          <Text style={[s.badgeText, { color: item.rkind === "red" ? C.red : C.amber }]}>
-            {item.badge}
-          </Text>
-        ) : null}
+        <Text style={[s.rowMeta, { color: C.muted }]}>
+          {item.count > 0 ? `${item.count} soru` : ""}{item.count > 0 && estMin > 0 ? ` · ~${estMin} dk` : ""}
+          {item.badge ? ` · ${item.badge}` : ""}
+        </Text>
       </View>
-      {item.source === "ai" ? (
-        <View style={[s.aiTag, { backgroundColor: C.blue + "18" }]}>
-          <Text style={[s.aiTagText, { color: C.blue }]}>önerilen</Text>
-        </View>
-      ) : item.source === "plan" ? (
-        <View style={[s.aiTag, { backgroundColor: C.accent + "14" }]}>
-          <Text style={[s.aiTagText, { color: C.accent }]}>öneri</Text>
-        </View>
-      ) : item.count > 0 ? (
-        <Text style={[s.countText, { color: C.sec }]}>{item.count} soru</Text>
+      {isNext && onStart ? (
+        <Pressable onPress={() => onStart(item)} style={[s.startBtn, { backgroundColor: C.accent, shadowColor: C.accent, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.45, shadowRadius: 14, elevation: 8 }]}>
+          <Icon name="play" size={10} color={C.textOnFill} sw={2.5} />
+          <Text style={[s.startBtnText, { color: C.textOnFill }]}>Başla</Text>
+        </Pressable>
       ) : null}
     </Pressable>
   );
@@ -51,6 +50,7 @@ export function TodayPlanCard({
   planSummary,
   onViewAll,
   onAddTask,
+  onStart,
   onAllDone,
   onTaskDone,
 }) {
@@ -108,16 +108,16 @@ export function TodayPlanCard({
     }
   }, [merged, onAllDone]);
 
-  const preview = merged.slice(0, 3);
-  const remaining = Math.max(0, merged.length - 3);
+  const preview = merged.slice(0, 4);
+  const remaining = Math.max(0, merged.length - 4);
   const { total = 0, done = 0, dersler = 0, hours = "" } = planSummary || {};
   const pct = total > 0 ? Math.min(1, done / total) : 0;
 
   if (merged.length === 0) {
     return (
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-        <View style={{ alignItems: "center", paddingVertical: 20, gap: 8 }}>
-          <Icon name="clipboard" size={28} color={C.sec} />
+        <View style={{ alignItems: "center", paddingVertical: SPACING.xl, gap: SPACING.sm }}>
+          <Icon name="book" size={28} color={C.sec} />
           <Text style={[s.emptyTitle, { color: C.text }]}>Bugün planın boş</Text>
           <Text style={[s.emptyMsg, { color: C.sec }]}>
             Bir görev ekleyerek başla
@@ -126,8 +126,8 @@ export function TodayPlanCard({
             onPress={onAddTask}
             style={[s.emptyBtn, { backgroundColor: C.accent }]}
           >
-            <Icon name="plus" size={14} color="#FFF" sw={2.5} />
-            <Text style={s.emptyBtnText}>Görev Ekle</Text>
+            <Icon name="plus" size={14} color={C.textOnFill} sw={2.5} />
+            <Text style={[s.emptyBtnText, { color: C.textOnFill }]}>Görev Ekle</Text>
           </Pressable>
         </View>
       </View>
@@ -137,14 +137,15 @@ export function TodayPlanCard({
   return (
     <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
       <View style={s.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={[s.title, { color: C.text }]}>Bugünkü Planın</Text>
-          <Text style={[s.subtitle, { color: C.sec }]}>
-            {dersler} ders · {hours}
-          </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+          <Text style={[s.title, { color: C.text }]}>Bugünün Planı</Text>
+          <View style={[s.countPill, { backgroundColor: C.surface2 }]}>
+            <Text style={[s.countPillText, { color: C.sec }]}>{merged.filter((t) => t.completed).length}/{merged.length}</Text>
+          </View>
         </View>
-        <Pressable onPress={onViewAll} hitSlop={8}>
-          <Text style={[s.viewAll, { color: C.accent }]}>Tümünü Gör →</Text>
+        <Pressable onPress={onViewAll} hitSlop={8} style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+          <Text style={[s.viewAll, { color: C.accent }]}>Tümü</Text>
+          <Icon name="arrowR" size={11} color={C.accent} />
         </Pressable>
       </View>
 
@@ -157,7 +158,7 @@ export function TodayPlanCard({
         ]}
       >
         <View style={[s.addIcon, { backgroundColor: C.accent }]}>
-          <Icon name="plus" size={14} color="#FFF" sw={2.5} />
+          <Icon name="plus" size={14} color={C.textOnFill} sw={2.5} />
         </View>
         <Text style={[s.addText, { color: C.accent }]}>Görev Ekle</Text>
       </Pressable>
@@ -171,26 +172,28 @@ export function TodayPlanCard({
             ]}
           />
         </View>
-        <Text style={[s.progressText, { color: C.muted }]}>
-          {done}/{total} soru
-        </Text>
       </View>
 
-      <View style={{ marginTop: 10 }}>
-        {preview.map((item, i) => (
-          <TaskRow
-            key={item.id}
-            item={item}
-            C={C}
-            isLast={i === preview.length - 1 && remaining === 0}
-            onToggle={() => {
-              H.select();
-              if (item.source === "user") toggleTask(item.id);
-              else togglePlan(item.id);
-              if (!item.completed) onTaskDone?.();
-            }}
-          />
-        ))}
+      <View style={{ marginTop: SPACING.sm }}>
+        {preview.map((item, i) => {
+          const firstIncompleteIdx = preview.findIndex((t) => !t.completed);
+          return (
+            <TaskRow
+              key={item.id}
+              item={item}
+              C={C}
+              isLast={i === preview.length - 1 && remaining === 0}
+              isNext={!item.completed && i === firstIncompleteIdx}
+              onToggle={() => {
+                H.select();
+                if (item.source === "user") toggleTask(item.id);
+                else togglePlan(item.id);
+                if (!item.completed) onTaskDone?.();
+              }}
+              onStart={onStart}
+            />
+          );
+        })}
       </View>
 
       {remaining > 0 ? (
@@ -223,16 +226,16 @@ const s = StyleSheet.create({
   progressWrap: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 14,
+    gap: SPACING.sm,
+    marginTop: SPACING.md,
   },
   addRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    gap: SPACING.sm,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.lg,
     borderWidth: 1.5,
     borderStyle: "dashed",
@@ -245,33 +248,46 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   addText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
-  progressBg: { flex: 1, height: 6, borderRadius: 3, overflow: "hidden" },
-  progressFill: { height: 6, borderRadius: 3 },
+  progressBg: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
+  progressFill: { height: 3, borderRadius: 2 },
   progressText: { ...TYPOGRAPHY.micro, minWidth: 55 },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 11,
-    gap: 10,
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
   },
-  dotMini: { width: 8, height: 8, borderRadius: 4 },
+  dotMini: { width: 7, height: 7, borderRadius: 2 },
   checkBox: {
     width: 20, height: 20, borderRadius: 6, borderWidth: 2,
     alignItems: "center", justifyContent: "center",
   },
   rowLabel: { fontFamily: "Inter_500Medium", fontSize: 14 },
+  rowMeta: { ...TYPOGRAPHY.micro },
+  headerCount: { ...TYPOGRAPHY.caption },
+  countPill: { paddingHorizontal: 9, paddingVertical: 2, borderRadius: 20 },
+  countPillText: { fontFamily: "Inter_600SemiBold", fontSize: 11, fontVariant: ["tabular-nums"] },
+  startBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 6,
+    borderRadius: RADIUS.md,
+  },
+  startBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
   badgeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 0.3 },
   countText: { fontFamily: "Inter_500Medium", fontSize: 13 },
-  aiTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  aiTag: { paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs, borderRadius: SPACING.sm },
   aiTagText: { fontFamily: "Inter_600SemiBold", fontSize: 11 },
   moreRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    paddingVertical: 10,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
+    borderTopColor: "rgba(255,255,255,0.08)",
   },
   moreText: { fontFamily: "Inter_500Medium", fontSize: 13 },
   emptyTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 },
@@ -279,11 +295,11 @@ const s = StyleSheet.create({
   emptyBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    marginTop: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+    gap: SPACING.sm,
+    marginTop: SPACING.sm,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.sm,
     borderRadius: RADIUS.full,
   },
-  emptyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#FFF" },
+  emptyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
 });

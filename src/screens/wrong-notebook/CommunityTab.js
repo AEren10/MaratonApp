@@ -126,8 +126,8 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
             borderRadius: RADIUS.pill, opacity: pressed ? 0.85 : 1,
           })}
         >
-          <Icon name="edit" size={14} color="#FFFFFF" />
-          <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" }}>
+          <Icon name="edit" size={14} color={C.textOnFill} />
+          <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: C.textOnFill }}>
             Cevap Yaz
           </Text>
         </Pressable>

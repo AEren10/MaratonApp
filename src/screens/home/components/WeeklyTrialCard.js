@@ -1,17 +1,13 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Chip } from "../../../components/design";
+import { Icon, Chip, IconBox, GlassCard } from "../../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { RADIUS, SPACING } from "../../../themes/tokens";
 
 function StatBlock({ value, label, color, C }) {
   return (
     <View style={{ flex: 1, alignItems: "center" }}>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color }}>
-        {value}
-      </Text>
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color, opacity: 0.7, marginTop: 2 }}>
-        {label}
-      </Text>
+      <Text style={{ ...TYPOGRAPHY.statMedium, color }}>{value}</Text>
+      <Text style={{ ...TYPOGRAPHY.label, color, opacity: 0.7, marginTop: 2 }}>{label}</Text>
     </View>
   );
 }
@@ -25,28 +21,16 @@ export function WeeklyTrialCard({ report, onPress }) {
 
   return (
     <Pressable onPress={onPress}>
-      <View style={{
-        padding: 18, borderRadius: RADIUS.xxl,
-        backgroundColor: C.surface,
-        borderWidth: 1, borderColor: C.border,
-      }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <View style={{
-              width: 30, height: 30, borderRadius: 10,
-              backgroundColor: C.accent + "14",
-              alignItems: "center", justifyContent: "center",
-            }}>
-              <Icon name="target" size={15} color={C.accent} />
-            </View>
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
-              Haftalık Deneme
-            </Text>
+      <GlassCard radius={RADIUS.xxl} style={{ padding: SPACING.lg }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: SPACING.lg }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
+            <IconBox icon="target" color={C.accent} size={30} rounded={10} />
+            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Haftalık Deneme</Text>
           </View>
           {report.hasPrev && delta !== 0 && (
             <Chip color={deltaColor}>
               <Icon name={delta > 0 ? "trendUp" : "trendDown"} size={11} color={deltaColor} />
-              <Text style={{ color: deltaColor, fontSize: 11, fontFamily: "Inter_600SemiBold" }}>
+              <Text style={{ ...TYPOGRAPHY.label, color: deltaColor }}>
                 {delta > 0 ? "+" : ""}{report.netDelta} net
               </Text>
             </Chip>
@@ -60,10 +44,10 @@ export function WeeklyTrialCard({ report, onPress }) {
           <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" color={C.orange} />
         </View>
 
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12 }}>
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.md }}>
           Detaylı raporu görmek için dokun
         </Text>
-      </View>
+      </GlassCard>
     </Pressable>
   );
 }
