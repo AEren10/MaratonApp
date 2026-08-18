@@ -13,6 +13,12 @@
 -- tablolarina yapmis ama trial_subjects listesinde LGS anahtarlarini atlamis.
 -- Anahtarlar src/screens/trial/trialTypes.js -> getLGSSubjects ile birebir.
 
+-- Ayrica: profiles_public view'i kaldirildi.
+-- Hicbir migration dosyasinda yoktu, uygulamada da sifir yerde kullaniliyordu
+-- (SQL editorunden elle olusturulup unutulmus). SECURITY DEFINER oldugu icin
+-- RLS'i baypas ediyordu ve Security Advisor'da CRITICAL olarak isaretliydi.
+DROP VIEW IF EXISTS public.profiles_public;
+
 ALTER TABLE public.trial_subjects DROP CONSTRAINT IF EXISTS trial_subjects_subject_check;
 
 ALTER TABLE public.trial_subjects ADD CONSTRAINT trial_subjects_subject_check CHECK (
