@@ -93,7 +93,7 @@ const st = StyleSheet.create({
   trialTitle: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 6 },
   netSection: { alignItems: "center", marginVertical: 24 },
   netNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 72, letterSpacing: -3, lineHeight: 76 },
-  netLabel: { fontFamily: "Inter_700Bold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
+  netLabel: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
   trendPill: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, marginTop: 10 },
   barsWrap: { gap: 10 },
   footer: {

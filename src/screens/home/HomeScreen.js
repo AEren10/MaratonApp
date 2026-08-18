@@ -340,7 +340,7 @@ export default function HomeScreen() {
               <Icon name="target" size={17} color={C.accent} />
             </View>
             <Text style={{ flex: 1, fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 18, color: C.sec }} numberOfLines={2}>
-              <Text style={{ fontFamily: "Inter_700Bold", color: C.text }}>Koç: </Text>
+              <Text style={{ fontFamily: "Inter_600SemiBold", color: C.text }}>Koç: </Text>
               {nudges[0].message || nudges[0].title}
             </Text>
             <Icon name="arrowR" size={14} color={C.muted} />

@@ -273,7 +273,7 @@ export default function WrongNotebookScreen() {
             >
               <Icon name={t.icon} size={16} color={isAccent ? C.textOnFill : active ? C.accent : C.muted} />
               <Text style={{
-                fontFamily: active ? "Inter_700Bold" : "Inter_500Medium",
+                fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
                 fontSize: 14, color: isAccent ? C.textOnFill : active ? C.text : C.muted,
               }}>
                 {t.label}

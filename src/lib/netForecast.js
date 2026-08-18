@@ -60,7 +60,10 @@ function linearRegression(points) {
   return { slope, intercept, r2, ssRes };
 }
 
-export function forecastNet(trials, examDate) {
+// maxNet: deneme tipinin toplam soru sayısı (TYT 120, AYT 80, LGS 90).
+// Verilirse tahmin bu tavanı aşamaz — yoksa yükselen trendde "sınav günü
+// 180 net" gibi imkânsız sonuçlar çıkıyor.
+export function forecastNet(trials, examDate, maxNet = null) {
   if (!examDate || !trials || trials.length < 2) return null;
 
   const sorted = [...trials].sort(
@@ -79,8 +82,13 @@ export function forecastNet(trials, examDate) {
   const { slope, intercept, r2, ssRes } = reg;
   const n = points.length;
 
+  const cap = (v) => {
+    const floored = Math.max(0, v);
+    return maxNet ? Math.min(maxNet, floored) : floored;
+  };
+
   const examDays = daysBetween(firstDate, examDate);
-  const projected = Math.max(0, slope * examDays + intercept);
+  const projected = cap(slope * examDays + intercept);
   const current = sorted[sorted.length - 1].totalNet;
   const first = sorted[0].totalNet;
   const weeklyGain = slope * 7;
@@ -94,8 +102,8 @@ export function forecastNet(trials, examDate) {
   const se = n > 2 ? Math.sqrt(ssRes / (n - 2)) : Math.sqrt(ssRes / 1);
   const margin = 1.96 * se;
   const range = {
-    low: Math.max(0, projected - margin),
-    high: projected + margin,
+    low: cap(projected - margin),
+    high: cap(projected + margin),
   };
 
   const dataPoints = sorted.map((t) => {

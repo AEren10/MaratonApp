@@ -41,6 +41,11 @@ export const selectBranchTrials = createSelector(
   (trials) => trials.filter((t) => t.trialType === "BRANCH"),
 );
 
+export const selectLGSTrials = createSelector(
+  selectTrials,
+  (trials) => trials.filter((t) => t.trialType === "LGS"),
+);
+
 export const selectTrialsBySubject = (state, subject) =>
   state.trials.trials
     .filter((t) => t.subjects && t.subjects[subject])

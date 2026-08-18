@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { selectTrials, selectTYTTrials, selectAYTTrials } from "../../store/slices/trialSlice";
+import { selectTrials, selectTYTTrials, selectAYTTrials, selectLGSTrials } from "../../store/slices/trialSlice";
 import { useExam } from "../../contexts/ExamContext";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, GlassCard } from "../../components/design";
@@ -23,14 +23,31 @@ export default function NetForecastScreen() {
   const navigation = useNavigation();
   const C = useC();
   const trials = useSelector(selectTrials);
-  const { examDate, field } = useExam();
+  const { examDate, field, examType } = useExam();
 
   const tytTrials = useSelector(selectTYTTrials);
   const aytTrials = useSelector(selectAYTTrials);
+  const lgsTrials = useSelector(selectLGSTrials);
 
-  const forecast = useMemo(() => forecastNet(trials, examDate), [trials, examDate]);
-  const tytForecast = useMemo(() => forecastNet(tytTrials, examDate), [tytTrials, examDate]);
-  const aytForecast = useMemo(() => forecastNet(aytTrials, examDate), [aytTrials, examDate]);
+  // Manşet tahmin TEK bir deneme tipinden hesaplanmalı. Önceden tüm denemeler
+  // (TYT 120 net, AYT 80, LGS 90, tek derslik branş) aynı regresyona giriyordu;
+  // tip değiştikçe net doğal olarak düşüp yükseldiği için trend anlamsız çıkıyor
+  // ve "sınav günü 0 net" gibi sonuçlar üretebiliyordu.
+  const { primaryTrials, primaryMax } = useMemo(() => {
+    const groups = examType === "lgs"
+      ? [{ list: lgsTrials, max: 90 }]
+      : [{ list: tytTrials, max: 120 }, { list: aytTrials, max: 80 }];
+    const usable = groups.find((g) => g.list.length >= 2);
+    const chosen = usable || groups.reduce((a, b) => (b.list.length > a.list.length ? b : a));
+    return { primaryTrials: chosen.list, primaryMax: chosen.max };
+  }, [examType, lgsTrials, tytTrials, aytTrials]);
+
+  const forecast = useMemo(
+    () => forecastNet(primaryTrials, examDate, primaryMax),
+    [primaryTrials, examDate, primaryMax],
+  );
+  const tytForecast = useMemo(() => forecastNet(tytTrials, examDate, 120), [tytTrials, examDate]);
+  const aytForecast = useMemo(() => forecastNet(aytTrials, examDate, 80), [aytTrials, examDate]);
   const subjects = useMemo(() => forecastBySubject(trials, examDate), [trials, examDate]);
 
   const type = field === "sayisal" ? "say" : field === "sozel" ? "soz" : field === "ea" ? "ea" : "say";

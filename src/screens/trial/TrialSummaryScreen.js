@@ -228,7 +228,7 @@ const st = StyleSheet.create({
   nameBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999, marginTop: SPACING.sm },
   netBox: { alignItems: "center", marginVertical: SPACING.xl },
   netNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64, letterSpacing: -2.5, lineHeight: 68 },
-  netLabel: { fontFamily: "Inter_700Bold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
+  netLabel: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
   trendPill: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, marginTop: 10 },
   statsRow: { flexDirection: "row", gap: SPACING.sm, width: "100%" },
   stat: { flex: 1, alignItems: "center", gap: 5, padding: SPACING.md, borderRadius: RADIUS.xl, borderWidth: 1 },
