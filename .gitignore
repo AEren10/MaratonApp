@@ -43,3 +43,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# MCP: token env degiskeninden okunur, dosyada secret yok
+# Yine de yerel varyantlari disla
+.mcp.local.json
