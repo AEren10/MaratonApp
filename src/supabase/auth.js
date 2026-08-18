@@ -65,6 +65,15 @@ export const signInWithGoogleToken = async ({ idToken }) => {
 };
 
 export const deleteAccount = async () => {
+  // Depolama temizliği önce ve istemciden — SQL tarafından storage.objects
+  // silinemiyor (Supabase engelliyor), fonksiyon o yüzden patlıyordu.
+  const { data } = await supabase.auth.getUser();
+  const userId = data?.user?.id;
+  if (userId) {
+    const { deleteUserStorage } = require("./storage");
+    await deleteUserStorage(userId);
+  }
+
   const { error } = await supabase.rpc("delete_own_account");
   if (error) throw error;
 };

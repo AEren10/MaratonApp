@@ -15,6 +15,7 @@ import { getTrialTypes, getSubjectsForType, getFieldFromType } from "./trialType
 import { SubjectInput } from "./components/SubjectInput";
 import { useAlert } from "../../contexts/AlertContext";
 import { usePremium } from "../../contexts/PremiumContext";
+import { syncChallengeProgress } from "../../lib/challengeSync";
 import { TotalCard } from "./components/TotalCard";
 import { TrialTypeSelector } from "./components/TrialTypeSelector";
 import { BranchSubjectPicker } from "./components/BranchSubjectPicker";
@@ -226,6 +227,16 @@ export default function TrialEntryScreen() {
 
     if (result.queued) {
       showAlert("Çevrimdışı", "Deneme sonucu bağlantı geldiğinde gönderilecek.");
+    }
+
+    // Denemede çözülen sorular da challenge hedefine saymalı — yoksa 120
+    // soruluk TYT denemesi giren kullanıcı "500 soru" challenge'ında 0 ilerliyor.
+    const solvedCount = subjectsArr.reduce(
+      (sum, s) => sum + (s.correct_count || 0) + (s.wrong_count || 0),
+      0,
+    );
+    if (solvedCount > 0) {
+      syncChallengeProgress(user.id, { questions: solvedCount });
     }
 
     reward("trial_entry", {

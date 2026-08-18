@@ -74,6 +74,29 @@ export const uploadWrongQuestionImage = async (userId, uri) => {
   }
 };
 
+// Hesap silmeden önce kullanıcının dosyalarını temizle.
+// Supabase artık storage.objects üzerinde doğrudan SQL DELETE'e izin vermiyor —
+// bu yüzden temizlik Storage API üzerinden, istemciden yapılmak zorunda.
+export const deleteUserStorage = async (userId) => {
+  if (!userId) return;
+  for (const bucket of ["avatars", "wrong-questions"]) {
+    try {
+      const { data, error } = await supabase.storage.from(bucket).list(userId);
+      if (error) throw error;
+      const paths = (data || [])
+        .filter((f) => f?.name)
+        .map((f) => `${userId}/${f.name}`);
+      if (paths.length) {
+        const { error: rmErr } = await supabase.storage.from(bucket).remove(paths);
+        if (rmErr) throw rmErr;
+      }
+    } catch (e) {
+      // Dosya temizliği başarısız olsa da hesap silme devam etmeli.
+      handleSupabaseError(e, `deleteUserStorage:${bucket}`);
+    }
+  }
+};
+
 export const getWrongQuestionImageUrl = async (path) => {
   try {
     if (!path) return null;
