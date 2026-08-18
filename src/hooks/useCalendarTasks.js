@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../supabase/client";
+import { saveUserTaskOffline } from "../lib/offlineQueue";
+import { handleSupabaseError } from "../supabase/handleError";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 
 const KEY = STORAGE_KEYS.CALENDAR_TASKS;
@@ -59,20 +61,22 @@ export function useCalendarTasks() {
       return next;
     });
     if (user?.id) {
-      supabase.from("user_tasks").insert({
+      // Sunucuya yazılamazsa offline kuyruğa düşsün — önceden hata tamamen
+      // yutuluyordu, görev sadece bu telefonda kalıp yeni cihazda kayboluyordu.
+      saveUserTaskOffline({
         user_id: user.id, task_date: date, subject: CAL_SUBJECT,
         note: task.title, completed: false,
-      }).select("id").single().then(({ data }) => {
-        if (!data) return;
+      }).then((res) => {
+        if (!res?.data?.id) return;
         setTasks((prev) => {
           const list = (prev[date] || []).map((t) =>
-            t.id === localId ? { ...t, remoteId: data.id } : t,
+            t.id === localId ? { ...t, remoteId: res.data.id } : t,
           );
           const next = { ...prev, [date]: list };
           persist(next);
           return next;
         });
-      }).catch(() => {});
+      });
     }
   }, [persist, user?.id]);
 
@@ -83,7 +87,8 @@ export function useCalendarTasks() {
       persist(next);
       const toggled = list.find((t) => t.id === taskId);
       if (toggled?.remoteId) {
-        supabase.from("user_tasks").update({ completed: toggled.done }).eq("id", toggled.remoteId).catch(() => {
+        supabase.from("user_tasks").update({ completed: toggled.done }).eq("id", toggled.remoteId).catch((e) => {
+          handleSupabaseError(e, "calendar:toggleTask");
           setTasks((revert) => {
             const revList = (revert[date] || []).map((t) => t.id === taskId ? { ...t, done: !t.done } : t);
             const revNext = { ...revert, [date]: revList };
@@ -105,7 +110,8 @@ export function useCalendarTasks() {
       else delete next[date];
       persist(next);
       if (removed?.remoteId) {
-        supabase.from("user_tasks").delete().eq("id", removed.remoteId).catch(() => {
+        supabase.from("user_tasks").delete().eq("id", removed.remoteId).catch((e) => {
+          handleSupabaseError(e, "calendar:removeTask");
           setTasks((revert) => {
             const revList = [...(revert[date] || []), removed];
             const revNext = { ...revert, [date]: revList };
