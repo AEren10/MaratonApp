@@ -18,7 +18,7 @@ import { shouldApplyMultiplier, rollMultiplier } from "../lib/variableRewards";
 import { getAllUnclaimedMilestones, claimMilestone } from "../lib/streakMilestones";
 import { useAuth } from "../contexts/AuthContext";
 import { logXP } from "../supabase/xp";
-import { saveGamificationToSupabase, grantPremiumDays } from "../supabase/profiles";
+import { saveGamificationToSupabase, claimStreakMilestoneReward } from "../supabase/profiles";
 
 // Module-level guard: prevents concurrent reward/milestone operations
 // across multiple hook instances mounted simultaneously.
@@ -149,7 +149,7 @@ export function useGamification() {
           totalMilestoneXP += milestone.xp;
           if (user?.id) {
             enqueueXPLog(dispatch, user.id, milestone.xp, "streak_milestone");
-            if (milestone.premiumDays > 0) grantPremiumDays(user.id, milestone.premiumDays).catch(() => {});
+            if (milestone.premiumDays > 0) claimStreakMilestoneReward(milestone.day).catch(() => {});
           }
           showMilestone = milestone;
         }

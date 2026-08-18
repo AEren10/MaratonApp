@@ -42,6 +42,18 @@ export default function PaywallScreen() {
     });
   }, []);
 
+  // Fiyatı her zaman mağazadan gelen gerçek fiyattan göster. Sabit fiyat
+  // yalnızca RevenueCat bağlı değilken (dev/preview) fallback olarak kalır.
+  const displayPlans = useMemo(() => {
+    if (!packages) return PLANS;
+    return PLANS.map((plan) => {
+      const identifier = plan.id === "yearly" ? "$rc_annual" : "$rc_monthly";
+      const pkg = packages.find((p) => p.identifier === identifier);
+      const priceString = pkg?.product?.priceString;
+      return priceString ? { ...plan, price: priceString } : plan;
+    });
+  }, [packages]);
+
   const getSelectedPackage = useCallback(() => {
     if (!packages) return null;
     const identifier = selectedPlan === "yearly" ? "$rc_annual" : "$rc_monthly";
@@ -128,7 +140,7 @@ export default function PaywallScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(500).delay(240)} style={s.plansWrap}>
-          {PLANS.map((plan) => (
+          {displayPlans.map((plan) => (
             <PlanCard
               key={plan.id}
               plan={plan}

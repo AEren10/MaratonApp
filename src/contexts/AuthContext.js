@@ -9,6 +9,27 @@ import { setUserContext } from "../lib/errorReporting";
 
 const AuthContext = createContext(null);
 
+// Hesaba özel her şey — çıkışta temizlenmezse bir sonraki kullanıcıya sızar.
+const PER_USER_KEYS = [
+  STORAGE_KEYS.OFFLINE_QUEUE,
+  STORAGE_KEYS.GOALS,
+  STORAGE_KEYS.LAST_ACTIVE,
+  STORAGE_KEYS.LOGIN_REWARDED,
+  STORAGE_KEYS.COMEBACK_SHOWN,
+  STORAGE_KEYS.NUDGE_POPUP_SHOWN,
+  STORAGE_KEYS.GAMIFICATION,
+  STORAGE_KEYS.PENDING_STREAK,
+  STORAGE_KEYS.CALENDAR_TASKS,
+  STORAGE_KEYS.EXAM_CONFIG,
+  STORAGE_KEYS.CLAIMED_MILESTONES,
+  STORAGE_KEYS.STUDY_HOURS,
+  STORAGE_KEYS.LEAGUE_RESULT,
+  STORAGE_KEYS.ENDOWED_SHOWN,
+  STORAGE_KEYS.WRAPPED_LAST,
+  STORAGE_KEYS.STUDY_SESSION_COUNT,
+  STORAGE_KEYS.PAYWALL_SHOWN_SESSION,
+];
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -46,17 +67,7 @@ export function AuthProvider({ children }) {
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
-    AsyncStorage.multiRemove([
-      STORAGE_KEYS.OFFLINE_QUEUE,
-      STORAGE_KEYS.GOALS,
-      STORAGE_KEYS.LAST_ACTIVE,
-      STORAGE_KEYS.LOGIN_REWARDED,
-      STORAGE_KEYS.COMEBACK_SHOWN,
-      STORAGE_KEYS.NUDGE_POPUP_SHOWN,
-      STORAGE_KEYS.GAMIFICATION,
-      STORAGE_KEYS.PENDING_STREAK,
-      STORAGE_KEYS.CALENDAR_TASKS,
-    ]).catch(() => {});
+    AsyncStorage.multiRemove(PER_USER_KEYS).catch(() => {});
     loggingOut.current = false;
   }, []);
 
@@ -72,17 +83,7 @@ export function AuthProvider({ children }) {
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
-    AsyncStorage.multiRemove([
-      STORAGE_KEYS.OFFLINE_QUEUE,
-      STORAGE_KEYS.GOALS,
-      STORAGE_KEYS.LAST_ACTIVE,
-      STORAGE_KEYS.LOGIN_REWARDED,
-      STORAGE_KEYS.COMEBACK_SHOWN,
-      STORAGE_KEYS.NUDGE_POPUP_SHOWN,
-      STORAGE_KEYS.GAMIFICATION,
-      STORAGE_KEYS.PENDING_STREAK,
-      STORAGE_KEYS.CALENDAR_TASKS,
-    ]).catch(() => {});
+    AsyncStorage.multiRemove(PER_USER_KEYS).catch(() => {});
   }, []);
 
   const value = useMemo(() => ({ session, user, loading, logout, deleteAccount }), [session, user, loading, logout, deleteAccount]);

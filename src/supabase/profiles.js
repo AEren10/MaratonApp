@@ -25,6 +25,24 @@ export const saveGamificationToSupabase = async (userId, stats, claimedMilestone
   }
 };
 
+// Streak ödülü: gün sayısını ve hak edilip edilmediğini sunucu doğrular.
+// Client sadece hangi milestone'u talep ettiğini söyler.
+export const claimStreakMilestoneReward = async (milestoneDay) => {
+  if (!Number.isInteger(milestoneDay)) return null;
+  try {
+    const { data, error } = await supabase.rpc("claim_streak_milestone", {
+      milestone_day: milestoneDay,
+    });
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    handleSupabaseError(e, "claimStreakMilestoneReward");
+    return null;
+  }
+};
+
+// DEPRECATED: grant_premium artık sadece service_role'a açık (migration 038).
+// Yalnızca RevenueCat webhook'u gibi sunucu tarafı çağırmalı.
 export const grantPremiumDays = async (userId, days) => {
   if (!userId || userId === "dev" || !days) return;
   try {

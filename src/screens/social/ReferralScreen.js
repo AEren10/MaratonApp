@@ -121,6 +121,8 @@ export default function ReferralScreen() {
         showAlert("Hata", "Kendi davet kodunu kullanamazsın.");
       } else if (result.reason === "already_used") {
         showAlert("Zaten Kullanıldı", "Daha önce bir davet kodu kullandın.");
+      } else {
+        showAlert("Hata", "Davet kodu uygulanamadı, tekrar dene.");
       }
     } catch {
       showAlert("Hata", "Bir sorun oluştu, tekrar dene.");

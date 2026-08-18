@@ -12,17 +12,25 @@ export async function logXP(userId, amount, action) {
   }
 }
 
+const MAX_XP_ROWS = 5000;
+
+function sumAmounts(rows) {
+  if (!Array.isArray(rows)) return 0;
+  return rows.reduce((acc, r) => acc + (Number(r?.amount) || 0), 0);
+}
+
 export async function getTotalXP(userId) {
   if (!userId || userId === "dev") return 0;
   try {
     const { data, error } = await supabase
       .from("xp_events")
-      .select("amount.sum()")
+      .select("amount")
       .eq("user_id", userId)
-      .single();
-    if (error) return 0;
-    return data?.sum || 0;
-  } catch {
+      .limit(MAX_XP_ROWS);
+    if (error) throw error;
+    return sumAmounts(data);
+  } catch (e) {
+    handleSupabaseError(e, "getTotalXP");
     return 0;
   }
 }
@@ -38,13 +46,14 @@ export async function getWeeklyXP(userId) {
 
     const { data, error } = await supabase
       .from("xp_events")
-      .select("amount.sum()")
+      .select("amount")
       .eq("user_id", userId)
       .gte("created_at", monday.toISOString())
-      .single();
-    if (error) return 0;
-    return data?.sum || 0;
-  } catch {
+      .limit(MAX_XP_ROWS);
+    if (error) throw error;
+    return sumAmounts(data);
+  } catch (e) {
+    handleSupabaseError(e, "getWeeklyXP");
     return 0;
   }
 }

@@ -4,14 +4,23 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import * as Crypto from "expo-crypto";
 import { signInWithAppleToken, signInWithGoogleToken } from "../supabase/auth";
 
+const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+// Client ID yoksa Google girişi çalışmaz — butonu hiç gösterme, aksi halde
+// kullanıcı basıp hata alıyor.
 let GoogleSignin = null;
-try {
-  GoogleSignin = require("@react-native-google-signin/google-signin").GoogleSignin;
-  GoogleSignin.configure({
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-  });
-} catch (_) {}
+if (WEB_CLIENT_ID && (Platform.OS !== "ios" || IOS_CLIENT_ID)) {
+  try {
+    GoogleSignin = require("@react-native-google-signin/google-signin").GoogleSignin;
+    GoogleSignin.configure({
+      iosClientId: IOS_CLIENT_ID,
+      webClientId: WEB_CLIENT_ID,
+    });
+  } catch (_) {
+    GoogleSignin = null;
+  }
+}
 
 export function useSocialAuth() {
   const [busy, setBusy] = useState(false);
