@@ -1,4 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
 import Animated, {
   FadeIn, FadeInDown,
@@ -105,6 +107,7 @@ export default function GoalSetupScreen() {
       }
     }).catch(() => {});
 
+    track(EVENTS.ONBOARDING_COMPLETE, { dailyQuestions });
     navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
   }, [dailyQuestions, dispatch, updateGoal, navigation]);
 

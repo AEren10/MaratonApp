@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import {
   ScrollView, View, Text, Pressable, TextInput,
   KeyboardAvoidingView, Platform,
@@ -239,6 +241,7 @@ export default function TrialEntryScreen() {
       syncChallengeProgress(user.id, { questions: solvedCount });
     }
 
+    track(EVENTS.TRIAL_ENTERED, { trialType, net: netVal });
     reward("trial_entry", {
       statUpdates: [
         { type: "increment", key: "totalTrials" },

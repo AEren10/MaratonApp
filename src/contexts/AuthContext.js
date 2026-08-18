@@ -6,6 +6,7 @@ import { store, RESET_STORE } from "../store/store";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { onAuthError } from "../lib/authEvents";
 import { setUserContext } from "../lib/errorReporting";
+import { initAnalytics, setAnalyticsUser, stopAnalytics, flushAnalytics } from "../lib/analytics";
 
 const AuthContext = createContext(null);
 
@@ -53,14 +54,21 @@ export function AuthProvider({ children }) {
       setSession(s);
       setUser(s?.user ?? null);
       setUserContext(s?.user ?? null);
+      if (s?.user?.id) initAnalytics(s.user.id);
+      else setAnalyticsUser(null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      stopAnalytics();
+    };
   }, []);
 
   const logout = useCallback(async () => {
     if (loggingOut.current) return;
     loggingOut.current = true;
+    // Bekleyen olayları oturum kapanmadan gönder.
+    await flushAnalytics().catch(() => {});
     try {
       await supaSignOut();
     } catch (_) {}

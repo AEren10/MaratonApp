@@ -1,4 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import {
   View, Text, ScrollView, Pressable, TextInput,
   KeyboardAvoidingView, Platform, StyleSheet,
@@ -151,6 +153,7 @@ export default function AddStudyScreen() {
     }
     setSaving(false);
 
+    track(EVENTS.STUDY_COMPLETED, { minutes: duration, questions: qc });
     reward("study_log", { minutes: duration, statUpdates: [
       { type: "increment", key: "totalQuestions", value: qc },
       { type: "increment", key: "totalMinutes", value: duration },

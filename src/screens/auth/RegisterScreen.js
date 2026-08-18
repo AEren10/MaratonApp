@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,6 +38,7 @@ export default function RegisterScreen() {
     setBusy(true);
     try {
       await signUp({ email, password, name });
+      track(EVENTS.AUTH_REGISTER);
       H.success();
       showAlert("Hoş geldin!", "Hesabın oluşturuldu, e-postanı doğrulamayı unutma.");
     } catch (err) {

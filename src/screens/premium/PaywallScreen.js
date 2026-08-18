@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -34,6 +36,10 @@ export default function PaywallScreen() {
   const [packages, setPackages] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
   const s = useMemo(() => makeStyles(C), [C]);
+
+  useEffect(() => {
+    track(EVENTS.PREMIUM_VIEWED);
+  }, []);
 
   useEffect(() => {
     if (!isInitialized()) return;
@@ -83,6 +89,7 @@ export default function PaywallScreen() {
       }
       const isPro = await purchasePackage(pkg);
       if (isPro) {
+        track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan });
         H.success();
         await refreshPremium();
         navigation.goBack();
@@ -93,7 +100,7 @@ export default function PaywallScreen() {
     } finally {
       setPurchasing(false);
     }
-  }, [getSelectedPackage, user?.id, refreshPremium, navigation, showAlert]);
+  }, [getSelectedPackage, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
 
   const handleRestore = useCallback(async () => {
     setPurchasing(true);

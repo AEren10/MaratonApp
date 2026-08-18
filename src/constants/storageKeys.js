@@ -22,6 +22,7 @@ export const STORAGE_KEYS = {
   PENDING_REFERRAL: "@maraton:pending_referral",
   PENDING_FRIEND_CODE: "@maraton:pending_friend_code",
   PENDING_GROUP_CODE: "@maraton:pending_group_code",
+  ANALYTICS_BUFFER: "@maraton:analyticsBuffer",
 };
 
 export function dailyKey(prefix) {
