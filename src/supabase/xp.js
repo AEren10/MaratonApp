@@ -19,41 +19,63 @@ function sumAmounts(rows) {
   return rows.reduce((acc, r) => acc + (Number(r?.amount) || 0), 0);
 }
 
-export async function getTotalXP(userId) {
-  if (!userId || userId === "dev") return 0;
+function isMissingFunction(e) {
+  const msg = e?.message || "";
+  return e?.code === "PGRST202" || msg.includes("Could not find the function");
+}
+
+// Geri düşüş: my_xp_totals RPC'si henüz uygulanmamış bir veritabanında
+// (migration 045) istemci tarafında toplar. Böylece migration sırası ne
+// olursa olsun XP hiçbir zaman 0'a düşmez.
+async function totalsFromClient(userId) {
+  const monday = new Date();
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("xp_events")
+    .select("amount, created_at")
+    .eq("user_id", userId)
+    .limit(MAX_XP_ROWS);
+  if (error) throw error;
+
+  const rows = data || [];
+  return {
+    total: sumAmounts(rows),
+    weekly: sumAmounts(rows.filter((r) => new Date(r.created_at) >= monday)),
+  };
+}
+
+// Tek çağrıda hem toplam hem haftalık XP. Toplama sunucuda yapılır —
+// önceden binlerce satır istemciye indiriliyordu.
+export async function getXPTotals(userId) {
+  if (!userId || userId === "dev") return { total: 0, weekly: 0 };
   try {
-    const { data, error } = await supabase
-      .from("xp_events")
-      .select("amount")
-      .eq("user_id", userId)
-      .limit(MAX_XP_ROWS);
+    const { data, error } = await supabase.rpc("my_xp_totals");
     if (error) throw error;
-    return sumAmounts(data);
+    const row = Array.isArray(data) ? data[0] : data;
+    return {
+      total: Number(row?.total) || 0,
+      weekly: Number(row?.weekly) || 0,
+    };
   } catch (e) {
-    handleSupabaseError(e, "getTotalXP");
-    return 0;
+    if (isMissingFunction(e)) {
+      try {
+        return await totalsFromClient(userId);
+      } catch (inner) {
+        handleSupabaseError(inner, "getXPTotals:fallback");
+        return { total: 0, weekly: 0 };
+      }
+    }
+    handleSupabaseError(e, "getXPTotals");
+    return { total: 0, weekly: 0 };
   }
 }
 
-export async function getWeeklyXP(userId) {
-  if (!userId || userId === "dev") return 0;
-  try {
-    const now = new Date();
-    const day = now.getDay();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - ((day + 6) % 7));
-    monday.setHours(0, 0, 0, 0);
+export async function getTotalXP(userId) {
+  return (await getXPTotals(userId)).total;
+}
 
-    const { data, error } = await supabase
-      .from("xp_events")
-      .select("amount")
-      .eq("user_id", userId)
-      .gte("created_at", monday.toISOString())
-      .limit(MAX_XP_ROWS);
-    if (error) throw error;
-    return sumAmounts(data);
-  } catch (e) {
-    handleSupabaseError(e, "getWeeklyXP");
-    return 0;
-  }
+export async function getWeeklyXP(userId) {
+  return (await getXPTotals(userId)).weekly;
 }

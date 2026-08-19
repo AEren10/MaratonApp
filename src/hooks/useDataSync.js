@@ -9,7 +9,7 @@ import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
-import { getTotalXP, getWeeklyXP } from "../supabase/xp";
+import { getXPTotals } from "../supabase/xp";
 import { updateStreak } from "../supabase/streaks";
 import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
@@ -39,14 +39,13 @@ async function loadAll(userId, dispatch) {
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
 
   const todayDate = todayTR();
-  const [trials, streak, todayLogs, profile, userTasks, serverXP, serverWeeklyXP] = await Promise.allSettled([
+  const [trials, streak, todayLogs, profile, userTasks, xpTotals] = await Promise.allSettled([
     getTrials(userId),
     getStreak(userId),
     getStudyLogsByDate(userId, todayDate),
     getProfile(userId),
     getUserTasksByDate(userId, todayDate),
-    getTotalXP(userId),
-    getWeeklyXP(userId),
+    getXPTotals(userId),
   ]);
 
   if (trials.status === "fulfilled" && trials.value) {
@@ -129,8 +128,8 @@ async function loadAll(userId, dispatch) {
     }
   }
 
-  const xpFromServer = serverXP.status === "fulfilled" ? serverXP.value : 0;
-  const weeklyFromServer = serverWeeklyXP.status === "fulfilled" ? serverWeeklyXP.value : 0;
+  const xpFromServer = xpTotals.status === "fulfilled" ? xpTotals.value.total : 0;
+  const weeklyFromServer = xpTotals.status === "fulfilled" ? xpTotals.value.weekly : 0;
   const serverStats = profile.status === "fulfilled" ? profile.value?.gamification_stats : null;
 
   if (xpFromServer > 0 || serverStats) {
