@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
-import Svg, { Polyline, Line, Defs, LinearGradient, Stop, Polygon } from "react-native-svg";
+import Svg, { Polyline, Line, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from "react-native-svg";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Icon, GlassCard } from "../../../components/design";
 
 const W = 310;
 const H = 160;
-const PAD_L = 4;
+const PAD_L = 30;
 const PAD_R = 4;
 const PAD_T = 16;
 const PAD_B = 24;
@@ -74,6 +74,19 @@ export function TrendChart({ data, labels, color, title = "Net Trendi", compact 
             />
           ))}
 
+          {grids.map((g) => (
+            <SvgText
+              key={`lbl-${g.label}`}
+              x={PAD_L - 6}
+              y={g.y + 3.5}
+              fill={C.muted}
+              fontSize="9"
+              textAnchor="end"
+            >
+              {g.label}
+            </SvgText>
+          ))}
+
           <Polygon points={areaStr} fill="url(#areaGrad)" />
           <Polyline
             points={polyStr}
@@ -85,9 +98,20 @@ export function TrendChart({ data, labels, color, title = "Net Trendi", compact 
           />
         </Svg>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING.sm }}>
+        <View style={{ flexDirection: "row", marginTop: SPACING.sm }}>
           {labels.map((l, i) => (
-            <Text key={`${l}-${i}`} style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{l}</Text>
+            <Text
+              key={`${l}-${i}`}
+              numberOfLines={1}
+              style={{
+                ...TYPOGRAPHY.micro,
+                color: C.muted,
+                flex: 1,
+                textAlign: i === 0 ? "left" : i === labels.length - 1 ? "right" : "center",
+              }}
+            >
+              {i > 0 && labels[i - 1] === l ? "" : l}
+            </Text>
           ))}
         </View>
       </GlassCard>

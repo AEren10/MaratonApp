@@ -62,17 +62,25 @@ export default function ProfileScreen() {
 
   const strengths = useMemo(() => {
     if (!trials.length) return [];
-    const latest = trials[0];
     const subjectMap = {};
     subjects.forEach((s) => { subjectMap[s.key] = s; });
 
+    // Son 5 denemenin toplamı — tek deneme (ör. branş) tüm haritayı daraltmasın
+    const totals = {};
+    trials.slice(0, 5).forEach((trial) => {
+      Object.entries(trial.subjects || {}).forEach(([key, data]) => {
+        const norm = key.replace(/^tyt_/, "").replace(/^ayt_/, "");
+        if (!totals[norm]) totals[norm] = { correct: 0, total: 0 };
+        totals[norm].correct += data.correct || 0;
+        totals[norm].total += (data.correct || 0) + (data.wrong || 0);
+      });
+    });
+
     const entries = [];
-    Object.entries(latest.subjects || {}).forEach(([key, data]) => {
-      const total = (data.correct || 0) + (data.wrong || 0);
-      if (total < 5) return;
-      const acc = Math.round(((data.correct || 0) / total) * 100);
-      const norm = key.replace(/^tyt_/, "").replace(/^ayt_/, "");
-      const subj = subjectMap[norm] || subjectMap[key];
+    Object.entries(totals).forEach(([norm, agg]) => {
+      if (agg.total < 5) return;
+      const acc = Math.round((agg.correct / agg.total) * 100);
+      const subj = subjectMap[norm];
       entries.push({ name: subj?.label || norm, c: subj?.color || C.muted, v: acc });
     });
     return entries.sort((a, b) => b.v - a.v).slice(0, 6);

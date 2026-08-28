@@ -72,10 +72,3 @@ export async function getXPTotals(userId) {
   }
 }
 
-export async function getTotalXP(userId) {
-  return (await getXPTotals(userId)).total;
-}
-
-export async function getWeeklyXP(userId) {
-  return (await getXPTotals(userId)).weekly;
-}

@@ -5,8 +5,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { getStudyLogs } from "../../../supabase/studyLogs";
 
-const CELL_SIZE = 10;
-const CELL_GAP = 3;
+const CELL_GAP = 4;
+const WEEKDAYS = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pa"];
 
 function intensityColor(count, accent) {
   if (count === 0) return accent + "14";
@@ -21,6 +21,7 @@ export function ActivityHeatmap() {
   const { user } = useAuth();
   const [activeDays, setActiveDays] = useState({});
   const [activeCount, setActiveCount] = useState(0);
+  const [gridWidth, setGridWidth] = useState(0);
 
   const load = useCallback(async () => {
     if (!user?.id || user.id === "dev") return;
@@ -47,15 +48,20 @@ export function ActivityHeatmap() {
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const cols = Math.ceil(daysInMonth / 7);
-  const columns = Array.from({ length: cols }, (_, col) =>
-    Array.from({ length: 7 }, (_, row) => {
-      const day = col * 7 + row + 1;
-      if (day > daysInMonth) return null;
+  const firstWeekday = (new Date(now.getFullYear(), now.getMonth(), 1).getDay() + 6) % 7;
+
+  const cells = [
+    ...Array.from({ length: firstWeekday }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1;
       const dateStr = `${year}-${month}-${String(day).padStart(2, "0")}`;
       return { day, count: activeDays[dateStr] || 0 };
-    })
-  );
+    }),
+  ];
+  const rowCount = Math.ceil(cells.length / 7);
+  const rows = Array.from({ length: rowCount }, (_, r) => cells.slice(r * 7, r * 7 + 7));
+
+  const cellSize = gridWidth > 0 ? (gridWidth - CELL_GAP * 6) / 7 : 0;
 
   return (
     <View style={{ marginBottom: SPACING.xxl }}>
@@ -67,29 +73,48 @@ export function ActivityHeatmap() {
         paddingHorizontal: SPACING.xs,
       }}>
         <Text style={[TYPOGRAPHY.label, { color: C.sec, letterSpacing: 1.3 }]}>
-          BU AYIKI AKTİVİTEN
+          BU AYKİ AKTİVİTEN
         </Text>
         <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>
           {activeCount} aktif gün
         </Text>
       </View>
 
-      <View style={{ flexDirection: "row", gap: CELL_GAP }}>
-        {columns.map((col, ci) => (
-          <View key={ci} style={{ gap: CELL_GAP }}>
-            {col.map((cell, ri) => (
-              <View
-                key={ri}
-                style={{
-                  width: CELL_SIZE,
-                  height: CELL_SIZE,
-                  borderRadius: 3,
-                  backgroundColor: cell
-                    ? intensityColor(cell.count, C.accent)
-                    : "transparent",
-                }}
-              />
-            ))}
+      <View onLayout={(e) => setGridWidth(e.nativeEvent.layout.width)}>
+        <View style={{ flexDirection: "row", gap: CELL_GAP, marginBottom: CELL_GAP }}>
+          {WEEKDAYS.map((d) => (
+            <Text
+              key={d}
+              style={{
+                ...TYPOGRAPHY.caption,
+                color: C.muted,
+                width: cellSize,
+                textAlign: "center",
+              }}
+            >
+              {d}
+            </Text>
+          ))}
+        </View>
+
+        {cellSize > 0 && rows.map((row, ri) => (
+          <View key={ri} style={{ flexDirection: "row", gap: CELL_GAP, marginBottom: CELL_GAP }}>
+            {Array.from({ length: 7 }, (_, ci) => {
+              const cell = row[ci];
+              return (
+                <View
+                  key={ci}
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    borderRadius: RADIUS.sm,
+                    backgroundColor: cell
+                      ? intensityColor(cell.count, C.accent)
+                      : "transparent",
+                  }}
+                />
+              );
+            })}
           </View>
         ))}
       </View>

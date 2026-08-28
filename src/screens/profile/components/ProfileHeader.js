@@ -11,19 +11,8 @@ import { getProfile, updateProfile } from "../../../supabase/profiles";
 import { useAlert } from "../../../contexts/AlertContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { avatarColors } from "../../../lib/avatarColor";
 
-function avatarPalette(name = "?", C) {
-  const sum = name.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
-  const palette = [
-    [C.accent, C.accent + "CC"],
-    [C.purple, C.pink + "CC"],
-    [C.blue, C.teal + "CC"],
-    [C.pink, C.purple + "CC"],
-    [C.green, C.teal + "CC"],
-    [C.teal, C.blue + "CC"],
-  ];
-  return palette[sum % palette.length];
-}
 
 export function ProfileHeader({ name = "Öğrenci", exam, streak }) {
   const C = useC();
@@ -32,7 +21,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, streak }) {
   const showAlert = useAlert();
   const [avatarUri, setAvatarUri] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [c1, c2] = avatarPalette(name, C);
+  const [c1, c2] = avatarColors(name, C);
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;

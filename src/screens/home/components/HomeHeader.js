@@ -12,6 +12,8 @@ import { SHADOWS } from "../../../themes/tokens";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getProfile } from "../../../supabase/profiles";
 
+import { avatarColors } from "../../../lib/avatarColor";
+
 function greet() {
   const h = new Date().getHours();
   if (h < 5) return ["İyi geceler", "🌙"];
@@ -20,12 +22,6 @@ function greet() {
   return ["İyi akşamlar", "🌆"];
 }
 
-const AVATAR_PAL = ["purple","orange","blue","green","red","teal"];
-function avatarColors(name = "?", C) {
-  const key = AVATAR_PAL[name.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % AVATAR_PAL.length];
-  const base = C[key] || C.accent;
-  return [base, base + "60"];
-}
 
 export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, lastStudyDate, onStreakPress, onCalendarPress, onProfilePress }) {
   const C = useC();

@@ -431,7 +431,7 @@ export default function AnalysisScreen() {
 function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
+    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 176 },
     title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
     content: { gap: SPACING.xl },
     fab: {

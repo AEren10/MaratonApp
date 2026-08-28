@@ -6,6 +6,13 @@ import { useExam } from "../../../contexts/ExamContext";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 
+const EXAM_LABELS = {
+  tyt: "TYT",
+  tyt_ayt: "YKS",
+  dil: "YKS DİL",
+  lgs: "LGS",
+};
+
 function pad(n) {
   return String(n).padStart(2, "0");
 }
@@ -37,7 +44,8 @@ export function ExamCountdown({ onPress }) {
   const examYear = examDate ? examDate.getFullYear() : new Date().getFullYear();
   const YEAR_SUFFIX = { 0: "'A", 1: "'E", 2: "'YE", 3: "'E", 4: "'E", 5: "'E", 6: "'YA", 7: "'YE", 8: "'E", 9: "'A" };
   const suffix = examYear % 10 === 0 ? "'A" : YEAR_SUFFIX[examYear % 10] || "'A";
-  const label = `${(examType || "YKS").toUpperCase()} ${examYear}${suffix} KALAN`;
+  const examLabel = EXAM_LABELS[examType] || "YKS";
+  const label = `${examLabel} ${examYear}${suffix} KALAN`;
   const clockStr = clock ? `${clock.h}:${clock.m}:${clock.s}` : "--:--:--";
 
   return (

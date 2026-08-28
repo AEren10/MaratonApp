@@ -7,7 +7,8 @@ import { useSelector } from "react-redux";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectStreak, selectTodayLogs, selectFreezeCount, selectLongestStreak, selectFreezeResetAt, selectLastStudyDate } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { selectXP } from "../../store/slices/gamificationSlice";
+import { selectXP, selectWeeklyXP } from "../../store/slices/gamificationSlice";
+import { getTier } from "../../constants/league";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { usePlanContext } from "../../hooks/usePlanContext";
@@ -106,6 +107,7 @@ export default function HomeScreen() {
   const [streakSheetVisible, setStreakSheetVisible] = useState(false);
   const trials = useSelector(selectTrials);
   const xp = useSelector(selectXP);
+  const weeklyXP = useSelector(selectWeeklyXP);
 
   useEffect(() => {
     if (streak > 0) syncStat("streak", streak);
@@ -212,7 +214,7 @@ export default function HomeScreen() {
         const current = nets[nets.length - 1];
         const prev = nets[nets.length - 2];
         return {
-          name: subj?.label || key,
+          name: subj?.name || key,
           color: subj?.color || C.accent,
           nets,
           currentNet: current,
@@ -228,7 +230,10 @@ export default function HomeScreen() {
     const monday = new Date(now);
     monday.setDate(now.getDate() - dayOfWeek);
     monday.setHours(0, 0, 0, 0);
-    const from = monday.toISOString().split("T")[0];
+    const prevMonday = new Date(monday);
+    prevMonday.setDate(monday.getDate() - 7);
+    const from = prevMonday.toISOString().split("T")[0];
+    const mondayStr = monday.toISOString().split("T")[0];
     const to = now.toISOString().split("T")[0];
 
     const counts = [0, 0, 0, 0, 0, 0, 0];
@@ -244,14 +249,24 @@ export default function HomeScreen() {
     getStudyLogs(user.id, { from, to }).then((logs) => {
       if (cancelled) return;
       const weekCounts = [0, 0, 0, 0, 0, 0, 0];
+      let prevTotal = 0;
       (logs || []).forEach((l) => {
+        const dateStr = String(l.study_date || "").slice(0, 10);
+        const q = l.question_count || 0;
+        if (dateStr < mondayStr) {
+          prevTotal += q;
+          return;
+        }
         const d = new Date(l.study_date);
         const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
-        weekCounts[idx] += l.question_count || 0;
+        weekCounts[idx] += q;
       });
       weekCounts[dayOfWeek] = Math.max(weekCounts[dayOfWeek], counts[dayOfWeek]);
       const total = weekCounts.reduce((a, b) => a + b, 0);
-      setWeeklyActivity({ total, counts: weekCounts, percent: 0 });
+      const percent = prevTotal > 0
+        ? Math.round(((total - prevTotal) / prevTotal) * 100)
+        : (total > 0 ? 100 : 0);
+      setWeeklyActivity({ total, counts: weekCounts, percent });
     }).catch(() => {
       const total = counts.reduce((a, b) => a + b, 0);
       setWeeklyActivity({ total, counts, percent: 0 });
@@ -356,7 +371,7 @@ export default function HomeScreen() {
             net={lastDeneme.net}
             trend={lastDeneme.trend}
             xp={xp}
-            tier={xp >= 10000 ? "Obsidyen" : xp >= 5000 ? "Elmas" : xp >= 2000 ? "Altın" : xp >= 500 ? "Gümüş" : "Bronz"}
+            tier={getTier(weeklyXP).name}
             onRingPress={go(SCREENS.ADD_STUDY)}
             onStreak={go(SCREENS.CALENDAR)}
             onNet={go(SCREENS.ANALYSIS)}
