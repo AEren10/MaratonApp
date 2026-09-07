@@ -8,6 +8,7 @@ import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from
 import * as appStorage from "./storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
+const CONTEXT_KEY = STORAGE_KEYS.NOTIF_CONTEXT;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -228,13 +229,39 @@ export async function scheduleTrialReminder() {
   }
 }
 
-export async function applyNotifPrefs(prefs, context = {}) {
+/**
+ * Bildirim bağlamının son bilinen hâli.
+ *
+ * Neden var: applyNotifPrefs her çağrıldığında yönettiği TÜM bildirimleri
+ * iptal edip yeniden kuruyor. Ama üç yer (App.js açılışı, onboarding'de
+ * hedef kaydı, bildirim ayarları) bunu bağlam VERMEDEN çağırıyordu.
+ * Bağlam boş olunca streak=0 ve studiedToday=false varsayılıyor; sonuç:
+ * bugün çalışmış, 40 günlük serisi olan kullanıcı "Bugün hiç çalışma
+ * kaydetmedin, seriyi bozma!" bildirimi alıyordu. Üstelik useDataSync'in
+ * doğru bağlamla kurduğu bildirim de bu sırada siliniyordu.
+ *
+ * Artık bağlam diske yazılıyor ve verilmediğinde oradan okunuyor.
+ */
+async function readNotifContext() {
+  try { return (await appStorage.getJson(CONTEXT_KEY, null)) || {}; } catch { return {}; }
+}
+
+export async function saveNotifContext(context = {}) {
+  try { await appStorage.setJson(CONTEXT_KEY, context); } catch (_) {}
+}
+
+export async function applyNotifPrefs(prefs, context) {
   await cancelScheduledByType(PREF_MANAGED_TYPES);
   if (!prefs) return;
+  if (context) await saveNotifContext(context);
+  else context = await readNotifContext();
   if (prefs.dailyReminderEnabled) {
     await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute);
   }
-  if (prefs.streakRiskEnabled) {
+  // Bağlam hiç bilinmiyorsa (ilk açılış, henüz senkron olmadı) streak-risk
+  // bildirimi KURULMAZ. Kurulsaydı studiedToday=false varsayımıyla yanlış
+  // uyarı giderdi; useDataSync birkaç saniye sonra doğru bağlamla çağırıyor.
+  if (prefs.streakRiskEnabled && context.studiedToday !== undefined) {
     await scheduleStreakRiskReminder(context.streak, context.studiedToday);
   }
   if (prefs.weeklySummaryEnabled !== false) {

@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
   EXAM_CONFIG: "@exam_config",
   HAS_SEEN_ONBOARDING: "@has_seen_onboarding",
   NOTIF_PREFS: "@maraton:notifPrefs",
+  NOTIF_CONTEXT: "@maraton:notifContext",
   OFFLINE_QUEUE: "@maraton:offlineQueue",
   OFFLINE_DEAD_LETTER: "@maraton:dead_letter_queue",
   HAPTICS_ENABLED: "@maraton:haptics_enabled",
