@@ -2,15 +2,40 @@ import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { dateKey, todayTR } from "../lib/dateUtils";
 
+// KENDİ PROFİLİNİ OKUMA
+//
+// profiles üzerindeki sütun SELECT izni artık yalnızca id/name/avatar_url/
+// show_in_leaderboard ile sınırlı (bkz. 20260908120000 migration): tüm
+// kullanıcıların push token'ı, premium durumu ve davet kodu Data API'den
+// okunabiliyordu. Kendi tam profilini almak için definer RPC kullanıyoruz.
+let _myProfileCache = { userId: null, data: null, at: 0 };
+const MY_PROFILE_TTL_MS = 30_000;
+
+async function fetchMyProfile(userId, { force = false } = {}) {
+  const now = Date.now();
+  if (
+    !force &&
+    _myProfileCache.userId === userId &&
+    _myProfileCache.data &&
+    now - _myProfileCache.at < MY_PROFILE_TTL_MS
+  ) {
+    return _myProfileCache.data;
+  }
+  const { data, error } = await supabase.rpc("get_my_profile");
+  if (error) throw error;
+  _myProfileCache = { userId, data: data || null, at: now };
+  return data || null;
+}
+
+/** Profil değiştiğinde önbelleği düşür. */
+export function invalidateMyProfileCache() {
+  _myProfileCache = { userId: null, data: null, at: 0 };
+}
+
+
 export const getProfile = async (userId) => {
   if (!userId) throw new Error("userId is required");
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, name, avatar_url, exam_type, exam_date, field, target_ranking, target_department, daily_question_goal, weekly_trials_goal, weekly_minutes_goal, bio, target_program_id, show_in_leaderboard, gamification_stats, study_session_count, login_rewarded_date, review_last_asked, last_active, premium_until, trial_started_at")
-    .eq("id", userId)
-    .maybeSingle();
-  if (error) throw error;
-  return data;
+  return fetchMyProfile(userId);
 };
 
 export const saveGamificationToSupabase = async (userId, stats, claimedMilestones) => {
@@ -72,12 +97,7 @@ export const startTrial = async (userId) => {
 export const getTrialInfo = async (userId) => {
   if (!userId || userId === "dev") return null;
   try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("trial_started_at, premium_until")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) throw error;
+    const data = await fetchMyProfile(userId);
     if (!data) return null;
     const now = new Date();
     const trialActive = data.trial_started_at &&
@@ -140,12 +160,7 @@ export const updateNotificationPrefs = async (userId, prefs) => {
 export const getNotificationPrefs = async (userId) => {
   if (!userId || userId === "dev") return null;
   try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("notification_prefs")
-      .eq("id", userId)
-      .single();
-    if (error) throw error;
+    const data = await fetchMyProfile(userId);
     return data?.notification_prefs || null;
   } catch (e) {
     handleSupabaseError(e, "getNotificationPrefs");
@@ -159,20 +174,17 @@ export const updateProfile = async (userId, updates) => {
     .from("profiles")
     .update(updates)
     .eq("id", userId)
-    .select()
+    .select("id, name, avatar_url")
     .single();
   if (error) throw error;
+  // Yazma sonrası kendi profil önbelleğini düşür ki eski değer okunmasın.
+  invalidateMyProfileCache();
   return data;
 };
 
 export const getPremiumStatus = async (userId) => {
   try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("premium_until")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) throw error;
+    const data = await fetchMyProfile(userId);
     if (!data?.premium_until) return false;
     return new Date(data.premium_until) > new Date();
   } catch (e) {
@@ -222,12 +234,7 @@ export const markReviewAsked = async (userId) => {
 export const getRetentionData = async (userId) => {
   if (!userId || userId === "dev") return null;
   try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("study_session_count, login_rewarded_date, review_last_asked, last_active")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) throw error;
+    const data = await fetchMyProfile(userId);
     return data;
   } catch (e) {
     handleSupabaseError(e, "getRetentionData");

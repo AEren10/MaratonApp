@@ -242,14 +242,18 @@ export async function sendFriendRequestByCode(code) {
   if (!upper || upper.length < 4) throw new Error("Geçersiz kod");
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Oturum yok");
-  const { data: target, error: lookupErr } = await supabase
-    .from("profiles")
-    .select("id, name")
-    .eq("referral_code", upper)
-    .maybeSingle();
+  // Kod araması SUNUCUDA. Eskiden istemci profiles'ta referral_code ile
+  // arama yapıyordu; bu, davet kodu sütununun tüm kullanıcılar için okunabilir
+  // olmasını gerektiriyordu (kod numaralandırma + profil sızıntısı).
+  const { data: lookup, error: lookupErr } = await supabase
+    .rpc("find_user_by_friend_code", { code: upper });
   if (lookupErr) throw lookupErr;
-  if (!target) throw new Error("Bu koda ait kullanıcı bulunamadı");
-  if (target.id === user.id) throw new Error("Kendi kodunu kullanamazsın");
+  if (!lookup?.ok) {
+    if (lookup?.reason === "self") throw new Error("Kendi kodunu kullanamazsın");
+    if (lookup?.reason === "invalid_code") throw new Error("Geçersiz kod");
+    throw new Error("Bu koda ait kullanıcı bulunamadı");
+  }
+  const target = { id: lookup.id, name: lookup.name };
   const { data: existing } = await supabase
     .from("friendships")
     .select("id, status")

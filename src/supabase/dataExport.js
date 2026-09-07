@@ -17,7 +17,9 @@ import { handleSupabaseError } from "./handleError";
 // Dışa aktarılacak tablolar. Her biri user_id ile filtreleniyor;
 // RLS zaten bunu zorunlu kılıyor ama açıkça yazmak niyeti belli ediyor.
 const EXPORT_TABLES = [
-  { table: "profiles", column: "id", label: "Profil" },
+  // profiles ARTIK doğrudan okunmuyor: sütun SELECT izni id/name/avatar_url ile
+  // sınırlı (profil sızıntısı düzeltmesi). Kendi tam profilimiz definer RPC'den
+  // geliyor; aşağıda ayrıca ekleniyor.
   { table: "study_logs", column: "user_id", label: "Çalışma kayıtları" },
   { table: "trials", column: "user_id", label: "Deneme sonuçları" },
   // SIRA ÖNEMLİ: trial_subjects'in user_id'si yok, kullanıcının denemeleri
@@ -33,6 +35,17 @@ const EXPORT_TABLES = [
   { table: "shared_questions", column: "user_id", label: "Paylaştığın sorular" },
   { table: "question_answers", column: "user_id", label: "Yazdığın cevaplar" },
   { table: "retention_events", column: "user_id", label: "Uygulama içi olaylar" },
+
+  // KVKK/GDPR çıktısı "tüm verilerim" iddiasında bulunduğu için aşağıdakiler de
+  // dahil olmalı; eskiden listede yoktular ve export eksik kalıyordu.
+  { table: "daily_plans", column: "user_id", label: "Günlük planlar" },
+  { table: "plan_tasks", column: "user_id", label: "Plan görevleri" },
+  { table: "friendships", column: null, label: "Arkadaşlıklar" },
+  { table: "challenges", column: null, label: "Meydan okumalar" },
+  { table: "group_members", column: "user_id", label: "Grup üyelikleri" },
+  { table: "referral_logs", column: null, label: "Davet kayıtları" },
+  { table: "route_state", column: "user_id", label: "Rota durumu" },
+  { table: "analytics_events", column: "user_id", label: "Analitik olayları" },
 ];
 
 const PAGE = 1000;
@@ -60,6 +73,13 @@ async function fetchAll(table, column, userId) {
  * @param onProgress (done, total, label) — uzun sürebilir, ilerleme bildir
  * @returns { export: {...}, errors: [] }
  */
+/** Kendi tam profili — sütun izniyle değil definer RPC ile. */
+async function fetchMyProfileRow() {
+  const { data, error } = await supabase.rpc("get_my_profile");
+  if (error) throw error;
+  return data ? [data] : [];
+}
+
 export async function collectUserData(userId, onProgress) {
   if (!userId || userId === "dev") return null;
 
@@ -73,12 +93,40 @@ export async function collectUserData(userId, onProgress) {
     data: {},
   };
   const errors = [];
-  const total = EXPORT_TABLES.length;
+  const total = EXPORT_TABLES.length + 1;
   let done = 0;
+
+  try {
+    result.data.profiles = await fetchMyProfileRow();
+  } catch (e) {
+    errors.push({ table: "profiles", label: "Profil", message: e?.message || "okunamadı" });
+    result.data.profiles = null;
+  }
+  done += 1;
+  onProgress?.(done, total, "Profil");
 
   for (const spec of EXPORT_TABLES) {
     try {
-      if (spec.table === "trial_subjects") {
+      if (spec.table === "friendships") {
+        // İki yönlü: kullanıcı hem isteyen hem istenen olabilir.
+        const { data, error } = await supabase
+          .from("friendships").select("*")
+          .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+        if (error) throw error;
+        result.data.friendships = data || [];
+      } else if (spec.table === "challenges") {
+        const { data, error } = await supabase
+          .from("challenges").select("*")
+          .or(`creator_id.eq.${userId},opponent_id.eq.${userId}`);
+        if (error) throw error;
+        result.data.challenges = data || [];
+      } else if (spec.table === "referral_logs") {
+        const { data, error } = await supabase
+          .from("referral_logs").select("*")
+          .or(`inviter_id.eq.${userId},invitee_id.eq.${userId}`);
+        if (error) throw error;
+        result.data.referral_logs = data || [];
+      } else if (spec.table === "trial_subjects") {
         // Doğrudan user_id yok; kullanıcının denemeleri üzerinden.
         const trialIds = (result.data.trials || []).map((t) => t.id);
         if (trialIds.length) {

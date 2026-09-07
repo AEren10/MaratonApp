@@ -34,12 +34,33 @@ async function readQueue() {
   }
 }
 
+// Yazma BAŞARISIZLIĞI YUTULMAMALI. Eskiden hata yutuluyor, enqueue yine de
+// başarı dönüyordu: depo doluysa ya da AsyncStorage bozuksa kullanıcı
+// "bağlantı gelince gönderilecek" mesajını görüyor ama kayıt hiç
+// saklanmamış oluyordu. Sessiz veri kaybının en kötü türü.
 async function writeQueue(items) {
+  let ok = false;
   try {
-    await appStorage.setJson(QUEUE_KEY, items);
+    ok = await appStorage.setJson(QUEUE_KEY, items);
   } catch (e) {
     if (__DEV__) console.warn("[offlineQueue] writeQueue", e);
+    ok = false;
   }
+  if (!ok) throw new Error("offline_queue_write_failed");
+  return true;
+}
+
+// Kuyruk mutasyonları SIRAYA ALINIR.
+//
+// enqueue ve flushQueue "oku → değiştir → yaz" yapıyor. Kilit olmadığı için
+// aynı anda iki kayıt eklendiğinde (ör. çalışma kaydı + yanlış soru) ikisi de
+// aynı eski listeyi okuyup üstüne yazıyor ve biri sessizce kayboluyordu.
+let _queueLock = Promise.resolve();
+function withQueueLock(fn) {
+  const run = _queueLock.then(fn, fn);
+  // Zincirin bir hatayla kopmaması için yut; hatayı çağırana geri veriyoruz.
+  _queueLock = run.then(() => {}, () => {});
+  return run;
 }
 
 const MAX_QUEUE_SIZE = 200;
@@ -79,6 +100,10 @@ function getOperationFingerprint(op) {
 }
 
 export async function enqueue(op) {
+  return withQueueLock(() => enqueueLocked(op));
+}
+
+async function enqueueLocked(op) {
   let list = await readQueue();
   const clientOperationId = op.clientOperationId || createClientOperationId(op.type);
   const fingerprint = op.fingerprint || getOperationFingerprint(op);
