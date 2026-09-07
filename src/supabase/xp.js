@@ -2,11 +2,25 @@ import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { startOfWeekTR } from "../lib/dateUtils";
 
+/**
+ * XP defterine yazar. Miktar SUNUCUDA kırpılır.
+ *
+ * Eskiden istemci xp_events'e istediği miktarı yazabiliyordu ve lig görünümü
+ * bu defteri topluyordu — sıralama doğrudan manipüle edilebiliyordu. Artık
+ * yazma yalnızca award_xp RPC'siyle: bilinmeyen eylem reddediliyor, miktar
+ * eylem başına tavana ve günlük kotaya kırpılıyor.
+ *
+ * @returns sunucunun gerçekten yazdığı miktar (kırpılmış olabilir)
+ */
 export async function logXP(userId, amount, action) {
-  if (!userId || userId === "dev" || !amount) return;
+  if (!userId || userId === "dev" || !amount) return 0;
   try {
-    const { error } = await supabase.from("xp_events").insert({ user_id: userId, amount, action });
+    const { data, error } = await supabase.rpc("award_xp", {
+      p_action: action,
+      p_amount: Math.round(amount),
+    });
     if (error) throw error;
+    return data?.amount ?? 0;
   } catch (e) {
     handleSupabaseError(e, "logXP");
     throw e;

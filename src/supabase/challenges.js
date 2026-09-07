@@ -1,6 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
-import { dateKey, todayTR } from "../lib/dateUtils";
+import { dateKey } from "../lib/dateUtils";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -81,13 +81,9 @@ export async function cancelChallenge(id, userId) {
   try {
     if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
     if (!userId) throw new Error("userId is required");
-    const { error } = await supabase
-      .from("challenges")
-      .update({ status: "cancelled" })
-      .eq("id", id)
-      .eq("creator_id", userId)
-      .in("status", ["pending", "active"]);
+    const { data, error } = await supabase.rpc("cancel_challenge", { p_id: id });
     if (error) throw error;
+    if (!data?.ok) throw new Error("Challenge iptal edilemedi");
   } catch (e) {
     handleSupabaseError(e, "cancelChallenge");
     throw e;
@@ -98,17 +94,12 @@ export async function respondToChallenge(id, accept, userId) {
   try {
     if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
     if (!userId) throw new Error("userId is required");
-    const newStatus = accept ? "active" : "cancelled";
-    const { data, error } = await supabase
-      .from("challenges")
-      .update({ status: newStatus })
-      .eq("id", id)
-      .eq("opponent_id", userId)
-      .eq("status", "pending")
-      .select()
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("respond_to_challenge", {
+      p_id: id,
+      p_accept: !!accept,
+    });
     if (error) throw error;
-    if (!data) throw new Error("Challenge bulunamadı veya zaten yanıtlanmış");
+    if (!data?.ok) throw new Error("Challenge bulunamadı veya zaten yanıtlanmış");
     return data;
   } catch (e) {
     handleSupabaseError(e, "respondToChallenge");
@@ -116,43 +107,19 @@ export async function respondToChallenge(id, accept, userId) {
   }
 }
 
-export async function completeChallenge(id, winnerId) {
-  try {
-    if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
-    const update = { status: "completed" };
-    if (winnerId) update.winner_id = winnerId;
-    const { error } = await supabase
-      .from("challenges")
-      .update(update)
-      .eq("id", id)
-      .in("status", ["active"]);
-    if (error) throw error;
-  } catch (e) {
-    handleSupabaseError(e, "completeChallenge");
-    throw e;
-  }
-}
+// NOT: Challenge tamamlanması ve kazanan seçimi ayrı bir istemci çağrısı
+// DEĞİL. bump_challenge_progress hedefe ulaşıldığında ikisini de sunucuda
+// yapıyor (bkz. 20260908150000 migration).
 
 export async function checkExpiredChallenges(userId) {
   try {
-    if (!userId) return;
-    const today = todayTR();
-    const { data, error } = await supabase
-      .from("challenges")
-      .select("id, creator_id, opponent_id, creator_progress, opponent_progress, target")
-      .or(`creator_id.eq.${userId},opponent_id.eq.${userId}`)
-      .eq("status", "active")
-      .lt("ends_on", today);
+    if (!userId) return 0;
+    const { data, error } = await supabase.rpc("finalize_expired_challenges");
     if (error) throw error;
-    if (!data?.length) return;
-    for (const c of data) {
-      let winnerId = null;
-      if (c.creator_progress > c.opponent_progress) winnerId = c.creator_id;
-      else if (c.opponent_progress > c.creator_progress) winnerId = c.opponent_id;
-      await completeChallenge(c.id, winnerId).catch(() => {});
-    }
+    return data || 0;
   } catch (e) {
     handleSupabaseError(e, "checkExpiredChallenges");
+    return 0;
   }
 }
 

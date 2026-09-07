@@ -3,13 +3,6 @@ import { handleSupabaseError } from "./handleError";
 
 // F) Grup ligi modülü.
 
-function genCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
-
 // Client-side brute-force throttle for join codes
 const JOIN_THROTTLE = {
   failures: 0,
@@ -52,21 +45,16 @@ export async function createGroup(name) {
     if (!name?.trim()) throw new Error("Grup adı gerekli");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
-    const code = genCode();
-    const { data, error } = await supabase
-      .from("groups")
-      .insert({ name: name.trim(), code, owner_id: user.id })
-      .select()
-      .single();
+    // Grup oluşturma ve sahibin üyeliği TEK İŞLEMDE, sunucuda.
+    // Eskiden iki ayrı istemci INSERT'iydi; group_members INSERT'i açık
+    // olduğu için grup UUID'sini bilen herkes katılım koduna uğramadan
+    // gruba girebiliyordu. O izin kaldırıldı.
+    const { data, error } = await supabase.rpc("create_group", { p_name: name.trim() });
     if (error) throw error;
-    // Sahip otomatik üye olur.
-    const { error: memberErr } = await supabase.from("group_members").insert({ group_id: data.id, user_id: user.id });
-    if (memberErr) {
-      handleSupabaseError(memberErr, "createGroup:addOwner");
-      await supabase.from("groups").delete().eq("id", data.id);
-      throw memberErr;
+    if (!data?.ok) {
+      throw new Error(data?.reason === "invalid_name" ? "Grup adı çok kısa" : "Grup oluşturulamadı");
     }
-    return data;
+    return { id: data.id, name: data.name, code: data.code, owner_id: data.owner_id };
   } catch (e) {
     handleSupabaseError(e, "createGroup");
     throw e;

@@ -1,4 +1,4 @@
-import { listMyChallenges, bumpMyProgress, completeChallenge, checkExpiredChallenges } from "../supabase/challenges";
+import { listMyChallenges, bumpMyProgress, checkExpiredChallenges } from "../supabase/challenges";
 
 export async function syncChallengeProgress(userId, { questions = 0, minutes = 0 }) {
   if (!userId || (questions <= 0 && minutes <= 0)) return;
@@ -17,10 +17,9 @@ export async function syncChallengeProgress(userId, { questions = 0, minutes = 0
       if (value <= 0) continue;
 
       try {
-        const newProgress = await bumpMyProgress(c.id, side, value);
-        if (newProgress >= c.target) {
-          await completeChallenge(c.id, userId).catch(() => {});
-        }
+        // Hedefe ulaşıldığında tamamlama ve kazanan seçimi SUNUCUDA,
+        // bump_challenge_progress'in içinde yapılıyor.
+        await bumpMyProgress(c.id, side, value);
       } catch {}
     }
   } catch (_) {}
