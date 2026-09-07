@@ -8,7 +8,8 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { Icon } from "../../components/design";
 import { useAuth } from "../../contexts/AuthContext";
 import { useGamification } from "../../hooks/useGamification";
-import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
+import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
+import { saveReviewOffline } from "../../lib/offlineQueue";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import * as haptic from "../../lib/haptics";
 import QuizCard from "./QuizCard";
@@ -72,7 +73,8 @@ export default function QuickPracticeScreen() {
     setSelected(answer);
     setFeedback(true);
     const next = computeNextReview(q, correct ? 3 : 0);
-    reviewWrongQuestion(q.id, user.id, { ...next, is_resolved: correct || q.is_resolved });
+    // Eskiden .catch bile yoktu: çevrimdışıyken yakalanmamış promise reddi.
+    saveReviewOffline(q.id, user.id, { ...next, is_resolved: correct || q.is_resolved }).catch(() => {});
     if (correct) reward("wrong_resolved", { subject: q.subject });
     setTimeout(() => {
       setResults((prev) => [...prev, correct]);

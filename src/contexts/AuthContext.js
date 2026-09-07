@@ -7,6 +7,8 @@ import {
   deleteAccount as supaDeleteAccount,
   isRecoveryUrl,
 } from "../supabase/auth";
+import { cancelAllScheduled } from "../lib/notifications";
+import { unregisterPushToken } from "../supabase/profiles";
 import { store, RESET_STORE } from "../store/store";
 import { onAuthError } from "../lib/authEvents";
 import { setUserContext } from "../lib/errorReporting";
@@ -95,6 +97,21 @@ export function AuthProvider({ children }) {
     loggingOut.current = true;
     // Bekleyen olayları oturum kapanmadan gönder.
     await flushAnalytics().catch(() => {});
+
+    // BİLDİRİM TEMİZLİĞİ — oturum kapanmadan ÖNCE, token'ı silmek için
+    // hâlâ yetkimiz varken.
+    //
+    // Eskiden çıkışta hiçbir şey temizlenmiyordu. İki sonucu vardı:
+    //   1) Cihaz, çıkmış kullanıcının planlanmış hatırlatmalarını atmaya
+    //      devam ediyordu — üstelik metinlerinde onun serisi ve çalışma
+    //      verisi yazıyordu.
+    //   2) Aynı cihaza ikinci kullanıcı girince push token iki profilde
+    //      birden duruyor, birinciye atılan push ikincinin telefonunda
+    //      çıkıyordu. Paylaşılan cihazda kullanıcılar arası sızıntı.
+    const leavingUserId = user?.id;
+    await cancelAllScheduled().catch(() => {});
+    if (leavingUserId) await unregisterPushToken(leavingUserId).catch(() => {});
+
     try {
       await supaSignOut();
     } catch (_) {}
@@ -103,7 +120,7 @@ export function AuthProvider({ children }) {
     store.dispatch({ type: RESET_STORE });
     await clearUserScopedStorage();
     loggingOut.current = false;
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     return onAuthError(() => {
@@ -113,6 +130,8 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const deleteAccount = useCallback(async () => {
+    // Hesap silinirken de planlanmış bildirimler kalmamalı.
+    await cancelAllScheduled().catch(() => {});
     const result = await supaDeleteAccount();
     setSession(null);
     setUser(null);

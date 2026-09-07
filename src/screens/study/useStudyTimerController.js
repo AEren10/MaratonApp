@@ -9,6 +9,7 @@ import {
   clearTimerSession,
   loadTimerSession,
   describeRecovery,
+  markTimerSessionPendingSave,
 } from "../../domain/study/timerSession";
 
 import { useAlert } from "../../contexts/AlertContext";
@@ -252,18 +253,20 @@ export function useStudyTimerController(C) {
       return;
     }
 
-    // Oturum kaydetme ekranına devredildi — kurtarma anlık görüntüsü artık
-    // gereksiz. Silinmezse kullanıcı bir dahaki açılışta "yarım oturumun var"
-    // sorusunu boşuna görür.
-    clearTimerSession();
-
-    navigation.replace(SCREENS.STUDY_SAVE, {
+    const savePayload = {
       duration: Math.max(1, Math.round(focusForSave / 60)),
       questions,
       correctCount,
       subjectKey: selectedSubjectKey || undefined,
       topicName: topic || undefined,
-    });
+    };
+
+    // Anlık görüntüyü SİLMİYORUZ; "kaydedilmeyi bekliyor" diye işaretliyoruz.
+    // Eskiden burada clearTimerSession() vardı ve kullanıcı kayıt ekranından
+    // geri çıkarsa bütün oturum kalıcı olarak kayboluyordu.
+    markTimerSessionPendingSave(savePayload);
+
+    navigation.replace(SCREENS.STUDY_SAVE, savePayload);
   }, [
     correctCount,
     elapsed,

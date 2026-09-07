@@ -1,6 +1,6 @@
 import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial } from "../supabase/trials";
-import { addWrongQuestion } from "../supabase/wrongQuestions";
+import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
@@ -23,6 +23,10 @@ export const OP_STUDY_LOG = "STUDY_LOG";
 export const OP_TRIAL = "TRIAL";
 export const OP_WRONG_QUESTION = "WRONG_QUESTION";
 export const OP_USER_TASK = "USER_TASK";
+// Tekrar (spaced repetition) sonuçları. Eskiden kuyrukta YOKTU: çevrimdışı
+// yapılan 20-30 kartlık tekrar oturumu tamamen çöpe gidiyor, ekran ise
+// "Aralıklar güncellendi" diyordu.
+export const OP_REVIEW = "REVIEW";
 
 async function readQueue() {
   try {
@@ -85,6 +89,10 @@ function getOperationFingerprint(op) {
       return trialFingerprint(op.payload?.trial, op.payload?.subjects);
     case OP_USER_TASK:
       return userTaskFingerprint(op.payload);
+    case OP_REVIEW:
+      // Aynı soru için aynı tekrar zamanı tekrar kuyruğa girmesin.
+      return [op.payload?.user_id || "", op.payload?.id || "",
+              op.payload?.updates?.next_review_at || ""].join("|");
     case OP_WRONG_QUESTION:
       return [
         op.payload?.user_id || "",
@@ -179,6 +187,9 @@ async function runOne(item) {
       await addWrongQuestion(p);
       break;
     }
+    case OP_REVIEW:
+      await reviewWrongQuestion(item.payload.id, item.payload.user_id, item.payload.updates);
+      break;
     case OP_USER_TASK:
       await createUserTask(item.payload);
       break;
@@ -464,4 +475,25 @@ export async function removeFromQueue(id) {
   if (next.length === list.length) return false;
   await writeQueue(next);
   return true;
+}
+
+/**
+ * Tekrar sonucunu kaydeder; başarısızsa kuyruğa alır.
+ *
+ * Eskiden üç ekran da `reviewWrongQuestion(...).catch(() => {})` yapıyordu:
+ * çevrimdışı bir tekrar oturumunun tamamı sessizce kayboluyor, ekran yine de
+ * "Aralıklar güncellendi" diye başarı bildiriyordu.
+ */
+export async function saveReviewOffline(id, userId, updates) {
+  try {
+    await reviewWrongQuestion(id, userId, updates);
+    return { saved: true, queued: false };
+  } catch (e) {
+    try {
+      await enqueue({ type: OP_REVIEW, payload: { id, user_id: userId, updates } });
+      return { saved: false, queued: true, error: e };
+    } catch (queueErr) {
+      return { saved: false, queued: false, error: queueErr };
+    }
+  }
 }

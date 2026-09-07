@@ -118,6 +118,28 @@ export const getTrialInfo = async (userId) => {
   }
 };
 
+/**
+ * Push token'ı profilden siler.
+ *
+ * Çıkışta bu yapılmıyordu: aynı cihaza ikinci kullanıcı girdiğinde token
+ * onun profiline de yazılıyor, ama BİRİNCİ kullanıcının profilinde de
+ * duruyordu. Sunucu birinci kullanıcıya push atınca bildirim ikinci
+ * kullanıcının telefonunda çıkıyordu — paylaşılan cihazda kullanıcılar
+ * arası veri sızıntısı.
+ */
+export const unregisterPushToken = async (userId) => {
+  if (!userId || userId === "dev") return;
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ expo_push_token: null })
+      .eq("id", userId);
+    if (error) handleSupabaseError(error, "unregisterPushToken");
+  } catch (e) {
+    handleSupabaseError(e, "unregisterPushToken");
+  }
+};
+
 export const registerPushToken = async (userId, token) => {
   if (!userId || userId === "dev" || !token) return;
   try {

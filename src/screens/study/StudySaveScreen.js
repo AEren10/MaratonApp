@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import {
@@ -21,6 +21,7 @@ import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
 import { syncStreakAfterStudy } from "../../lib/streakSync";
+import { clearTimerSession } from "../../domain/study/timerSession";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
@@ -91,6 +92,37 @@ export default function StudySaveScreen() {
   const [correctCount, setCC] = useState(initCorrect > 0 ? String(initCorrect) : "");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  // Kayıt tamamlandı mı — geri çıkış uyarısı bunun için.
+  const savedRef = useRef(false);
+
+  // GERİ ÇIKIŞ KORUMASI
+  //
+  // Bu ekrana gelindiğinde kronometre çoktan durmuş ve süre/soru sayıları
+  // yalnızca burada duruyor. Android geri tuşu ya da iOS kaydırması
+  // uyarısız çalıştığı için 50 dakikalık oturum sessizce kayboluyordu.
+  useEffect(() => {
+    const sub = navigation.addListener("beforeRemove", (e) => {
+      if (savedRef.current) return;
+      e.preventDefault();
+      showAlert(
+        "Çalışman kaydedilmedi",
+        "Bu ekrandan çıkarsan bu oturum kaybolur. Emin misin?",
+        [
+          { text: "Kalayım", style: "cancel" },
+          {
+            text: "Çık ve sil",
+            style: "destructive",
+            onPress: () => {
+              clearTimerSession();
+              savedRef.current = true;
+              navigation.dispatch(e.data.action);
+            },
+          },
+        ],
+      );
+    });
+    return sub;
+  }, [navigation, showAlert]);
   const { completeForm, markFormDirty } = useFormLifecycleAnalytics("study_log_measured", {
     duration,
     subjectKey,
@@ -161,16 +193,30 @@ export default function StudySaveScreen() {
     }));
 
     setSaving(true);
-    const result = await saveStudyLogOffline({
-      user_id: user.id,
-      subject: subjectKey,
-      topic: topicVal,
-      question_count: qc,
-      correct_count: cc,
-      duration_minutes: duration,
-      study_date: todayStr,
-      ...(notesVal ? { notes: notesVal } : {}),
-    });
+    // saveStudyLogOffline artık depoya yazamazsa FIRLATIYOR (kuyruk sertleştirmesi).
+    // Yakalanmazsa kullanıcı hiçbir geri bildirim görmeden bu ekranda kalırdı.
+    let result;
+    try {
+      result = await saveStudyLogOffline({
+        user_id: user.id,
+        subject: subjectKey,
+        topic: topicVal,
+        question_count: qc,
+        correct_count: cc,
+        duration_minutes: duration,
+        study_date: todayStr,
+        ...(notesVal ? { notes: notesVal } : {}),
+      });
+    } catch (e) {
+      setSaving(false);
+      H.error();
+      captureError(e, { context: "study_save_persist" });
+      showAlert(
+        "Kaydedilemedi",
+        "Cihazda yer kalmamış olabilir. Biraz yer açıp tekrar dene — çalışman bu ekranda duruyor.",
+      );
+      return;
+    }
 
     if (result.saved) {
       try {
@@ -206,6 +252,12 @@ export default function StudySaveScreen() {
       ],
     });
     if (qc > 0) reward("question_solved", { count: qc });
+
+    // Oturum artık güvende (kaydedildi ya da kuyrukta) — kurtarma anlık
+    // görüntüsü ancak BURADA silinir. Kronometre ekranında silinmesi,
+    // bu ekrandan geri çıkan kullanıcının oturumunu yok ediyordu.
+    clearTimerSession();
+    savedRef.current = true;
 
     H.success();
     navigation.replace(SCREENS.STUDY_SUMMARY, {

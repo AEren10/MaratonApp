@@ -7,7 +7,8 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
+import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
+import { saveReviewOffline } from "../../lib/offlineQueue";
 import SignedImage from "../../components/common/SignedImage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
@@ -37,6 +38,8 @@ export default function ReviewSessionScreen() {
   const [revealed, setRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [done, setDone] = useState(0);
+  // Kaç sonuç sunucuya gidemeyip kuyrukta bekliyor — mesaj buna göre.
+  const [queuedCount, setQueuedCount] = useState(0);
 
   useEffect(() => {
     if (!user?.id) { setLoading(false); return; }
@@ -54,7 +57,10 @@ export default function ReviewSessionScreen() {
     else if (g <= 0) haptic.error();
     else haptic.tap();
     const updates = computeNextReview(current, g);
-    reviewWrongQuestion(current.id, user.id, updates).catch(() => {});
+    // Sonuç kaybolmasın: başarısızsa kuyruğa girer.
+    saveReviewOffline(current.id, user.id, updates)
+      .then((r) => { if (r.queued) setQueuedCount((n) => n + 1); })
+      .catch(() => {});
     setDone((d) => d + 1);
     setRevealed(false);
     setIdx((i) => i + 1);
@@ -81,7 +87,13 @@ export default function ReviewSessionScreen() {
           <Icon name="checkCircle" size={56} color={C.green} />
           <Text style={s.doneTitle}>{queue.length ? "Tekrar tamamlandı!" : "Bugün tekrar yok"}</Text>
           <Text style={s.doneSub}>
-            {queue.length ? `${done} soruyu tekrar ettin. Aralıklar güncellendi.` : "Yeni yanlışlar zamanı gelince burada belirir."}
+            {!queue.length
+              ? "Yeni yanlışlar zamanı gelince burada belirir."
+              : queuedCount > 0
+                // Eskiden burada koşulsuz "Aralıklar güncellendi" yazıyordu —
+                // çevrimdışı yapılan tekrarın tamamı kaybolmuşken bile.
+                ? `${done} soruyu tekrar ettin. ${queuedCount} sonuç çevrimdışı kaydedildi, bağlantı gelince gönderilecek.`
+                : `${done} soruyu tekrar ettin. Aralıklar güncellendi.`}
           </Text>
           <Pressable onPress={() => navigation.goBack()} style={s.closeBtn}>
             <Text style={s.closeText}>Bitir</Text>

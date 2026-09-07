@@ -79,6 +79,30 @@ export async function loadTimerSession() {
   }
 }
 
+/**
+ * Oturumu "kayıt ekranına devredildi" diye işaretler ama SİLMEZ.
+ *
+ * Eskiden kronometre bitince clearTimerSession() çağrılıp kayıt ekranına
+ * geçiliyordu. Kullanıcı o ekrandan geri çıkarsa ya da sistem uygulamayı
+ * öldürürse 50 dakikalık oturum, soru ve doğru sayıları KALICI olarak
+ * kayboluyordu — hiçbir uyarı da yoktu.
+ *
+ * Artık anlık görüntü duruyor; yalnızca kayıt gerçekten başarılı olunca
+ * (ya da kullanıcı bilerek vazgeçince) siliniyor.
+ */
+export async function markTimerSessionPendingSave(payload) {
+  try {
+    const s = await getJson(KEY, null);
+    await setJson(KEY, {
+      ...(s || {}),
+      ...(payload || {}),
+      pendingSave: true,
+      startedAt: null,
+      savedAt: Date.now(),
+    });
+  } catch (_) {}
+}
+
 /** Kurtarma sorusu için insan diliyle süre. */
 export function describeRecovery(session) {
   const sec = session?.recoveredElapsed || 0;

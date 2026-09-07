@@ -13,7 +13,8 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { getDueWrongQuestions, reviewWrongQuestion } from "../../supabase/wrongQuestions";
+import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
+import { saveReviewOffline } from "../../lib/offlineQueue";
 import SignedImage from "../../components/common/SignedImage";
 import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
@@ -67,7 +68,7 @@ export default function SwipeReviewScreen() {
       ...computeNextReview(current, g),
       is_resolved: knew || current.is_resolved === true,
     };
-    reviewWrongQuestion(current.id, user.id, updates).catch(() => {});
+    saveReviewOffline(current.id, user.id, updates).catch(() => {});
     if (knew && current.is_resolved !== true) {
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
     }
