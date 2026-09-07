@@ -147,11 +147,19 @@ export const deleteAccount = async () => {
   // silinemiyor (Supabase engelliyor), fonksiyon o yüzden patlıyordu.
   const { data } = await supabase.auth.getUser();
   const userId = data?.user?.id;
+  let storageFailures = [];
   if (userId) {
     const { deleteUserStorage } = require("./storage");
-    await deleteUserStorage(userId);
+    const result = await deleteUserStorage(userId);
+    storageFailures = result?.failures || [];
   }
 
   const { error } = await supabase.rpc("delete_own_account");
   if (error) throw error;
+
+  // Dosya temizliği başarısız olduysa hesap yine de silindi (auth satırı
+  // gittikten sonra geri dönüş yok), ama bunu SESSİZCE geçmiyoruz:
+  // gizlilik metni "tüm veriler kalıcı olarak silinir" diyor. Çağıran
+  // kullanıcıya durumu bildirebilsin.
+  return { storageFailures };
 };

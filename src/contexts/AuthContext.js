@@ -113,11 +113,14 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const deleteAccount = useCallback(async () => {
-    await supaDeleteAccount();
+    const result = await supaDeleteAccount();
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
     await clearUserScopedStorage();
+    // Dosya temizliği kısmen başarısız olduysa çağıran bunu kullanıcıya
+    // söyleyebilsin — "tüm veriler silindi" demek doğru olmaz.
+    return result || { storageFailures: [] };
   }, []);
 
   const value = useMemo(

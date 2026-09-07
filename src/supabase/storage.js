@@ -104,24 +104,68 @@ export const uploadWrongQuestionImage = async (userId, uri) => {
 // Hesap silmeden önce kullanıcının dosyalarını temizle.
 // Supabase artık storage.objects üzerinde doğrudan SQL DELETE'e izin vermiyor —
 // bu yüzden temizlik Storage API üzerinden, istemciden yapılmak zorunda.
+//
+// Üç hata düzeltildi:
+//   1) `community-answers` kovası HİÇ GEZİLMİYORDU. O kova PUBLIC; hesabını
+//      silen kullanıcının topluluk cevap görselleri herkese açık kalıyordu.
+//   2) list() varsayılan olarak yalnızca 100 nesne döndürür ve sayfalama
+//      yoktu. 100'den fazla dosyası olan kullanıcıda kalanlar sonsuza kadar
+//      kalıyordu — auth satırı silindiği için artık kimse temizleyemez.
+//   3) Hatalar yutuluyordu: dosya silme tamamen başarısız olsa bile hesap
+//      siliniyordu. Artık çağırana bildiriliyor.
+
+const STORAGE_BUCKETS = ["avatars", "wrong-questions", "community-answers"];
+const LIST_PAGE = 100;
+
+async function removeAllInBucket(bucket, userId) {
+  let removed = 0;
+  let offset = 0;
+  // Güvenlik tavanı: beklenmedik bir durumda sonsuz döngüye girmesin.
+  for (let guard = 0; guard < 200; guard += 1) {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .list(userId, { limit: LIST_PAGE, offset });
+    if (error) throw error;
+
+    const page = data || [];
+    if (!page.length) break;
+
+    const paths = page.filter((f) => f?.name).map((f) => `${userId}/${f.name}`);
+    if (paths.length) {
+      const { error: rmErr } = await supabase.storage.from(bucket).remove(paths);
+      if (rmErr) throw rmErr;
+      removed += paths.length;
+      // Silinenler listeden düştüğü için offset İLERLETİLMEZ; aynı yerden
+      // devam etmek kalan nesneleri atlatırdı.
+    } else {
+      // Bu sayfada silinebilir bir şey yok (ör. klasör yer tutucusu) —
+      // ilerlemezsek sonsuza kadar aynı sayfayı okuruz.
+      offset += page.length;
+    }
+
+    if (page.length < LIST_PAGE && !paths.length) break;
+    if (page.length < LIST_PAGE && paths.length) break;
+  }
+  return removed;
+}
+
+/**
+ * @returns { removed, failures: [{ bucket, message }] }
+ *          failures boş DEĞİLSE kullanıcı verisi tam silinmemiştir.
+ */
 export const deleteUserStorage = async (userId) => {
-  if (!userId) return;
-  for (const bucket of ["avatars", "wrong-questions"]) {
+  const result = { removed: 0, failures: [] };
+  if (!userId) return result;
+
+  for (const bucket of STORAGE_BUCKETS) {
     try {
-      const { data, error } = await supabase.storage.from(bucket).list(userId);
-      if (error) throw error;
-      const paths = (data || [])
-        .filter((f) => f?.name)
-        .map((f) => `${userId}/${f.name}`);
-      if (paths.length) {
-        const { error: rmErr } = await supabase.storage.from(bucket).remove(paths);
-        if (rmErr) throw rmErr;
-      }
+      result.removed += await removeAllInBucket(bucket, userId);
     } catch (e) {
-      // Dosya temizliği başarısız olsa da hesap silme devam etmeli.
       handleSupabaseError(e, `deleteUserStorage:${bucket}`);
+      result.failures.push({ bucket, message: e?.message || "silinemedi" });
     }
   }
+  return result;
 };
 
 export const getWrongQuestionImageUrl = async (path) => {

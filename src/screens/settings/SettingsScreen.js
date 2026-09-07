@@ -66,9 +66,19 @@ export default function SettingsScreen() {
           text: "Hesabımı Sil",
           style: "destructive",
           onPress: () => {
-            deleteAccount().catch(() =>
-              showAlert("Hata", "Hesap silinemedi. Lütfen tekrar dene.")
-            );
+            deleteAccount()
+              .then((result) => {
+                // Hesap silindi ama bazı dosyalar kalmış olabilir. Sessiz
+                // geçmek gizlilik metnindeki "tümü silinir" ifadesiyle
+                // çelişirdi; kullanıcıya ne yapacağını söylüyoruz.
+                if (result?.storageFailures?.length) {
+                  showAlert(
+                    "Hesabın silindi",
+                    "Bazı dosyaların sunucudan kaldırılamadı. Destek ekibine yazarsan kalanları biz temizleriz: destek@maraton.app",
+                  );
+                }
+              })
+              .catch(() => showAlert("Hata", "Hesap silinemedi. Lütfen tekrar dene."));
           },
         },
       ]

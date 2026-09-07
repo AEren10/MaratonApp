@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { DataExportRow } from "./components/DataExportRow";
 
 const LAST_UPDATED = "18 Haziran 2026";
 
@@ -70,6 +71,8 @@ export default function PrivacyScreen() {
             <Text style={s.sectionBody}>{sec.body}</Text>
           </View>
         ))}
+        {/* Veri taşınabilirliği: KVKK/GDPR hakkı artık kullanıcıya ulaşıyor. */}
+        <DataExportRow />
       </ScrollView>
     </SafeAreaView>
   );
