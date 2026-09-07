@@ -2,6 +2,7 @@ import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial } from "../supabase/trials";
 import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
+import { togglePlanTask } from "../supabase/plans";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getSession } from "../supabase/auth";
@@ -27,6 +28,9 @@ export const OP_USER_TASK = "USER_TASK";
 // yapılan 20-30 kartlık tekrar oturumu tamamen çöpe gidiyor, ekran ise
 // "Aralıklar güncellendi" diyordu.
 export const OP_REVIEW = "REVIEW";
+// Plan görevi tamamlama. Kuyrukta yoktu: çevrimdışı atılan tik cihazda
+// kalıyor ama sunucuya HİÇ ulaşmıyordu.
+export const OP_PLAN_TASK = "PLAN_TASK";
 
 async function readQueue() {
   try {
@@ -89,6 +93,9 @@ function getOperationFingerprint(op) {
       return trialFingerprint(op.payload?.trial, op.payload?.subjects);
     case OP_USER_TASK:
       return userTaskFingerprint(op.payload);
+    case OP_PLAN_TASK:
+      // Aynı görev için son durum neyse o geçerli; tek kayıt yeter.
+      return ["plan_task", op.payload?.taskId || ""].join("|");
     case OP_REVIEW:
       // Aynı soru için aynı tekrar zamanı tekrar kuyruğa girmesin.
       return [op.payload?.user_id || "", op.payload?.id || "",
@@ -187,6 +194,9 @@ async function runOne(item) {
       await addWrongQuestion(p);
       break;
     }
+    case OP_PLAN_TASK:
+      await togglePlanTask(item.payload.taskId, item.payload.completed);
+      break;
     case OP_REVIEW:
       await reviewWrongQuestion(item.payload.id, item.payload.user_id, item.payload.updates);
       break;
@@ -496,4 +506,54 @@ export async function saveReviewOffline(id, userId, updates) {
       return { saved: false, queued: false, error: queueErr };
     }
   }
+}
+
+/** Plan görevi tikini kaydeder; başarısızsa kuyruğa alır. */
+export async function savePlanTaskToggleOffline(taskId, completed) {
+  try {
+    await togglePlanTask(taskId, completed);
+    return { saved: true, queued: false };
+  } catch (e) {
+    try {
+      // Aynı görev için eski kayıt varsa çıkar — son durum geçerli olmalı,
+      // yoksa "işaretle/kaldır" dizisi yanlış sırayla gönderilebilir.
+      await removeFromQueue(`plan_task_${taskId}`);
+      await enqueue({
+        type: OP_PLAN_TASK,
+        payload: { taskId, completed },
+        clientOperationId: `plan_task_${taskId}`,
+      });
+      return { saved: false, queued: true, error: e };
+    } catch (queueErr) {
+      return { saved: false, queued: false, error: queueErr };
+    }
+  }
+}
+
+/**
+ * Kuyrukta BEKLEYEN bir kaydın yükünü günceller.
+ *
+ * Neden gerekli: çevrimdışı oluşturulan görev henüz sunucuda yok, yalnızca
+ * kuyrukta bekleyen bir INSERT. Kullanıcı o görevi tamamlarsa güncellenecek
+ * bir sunucu satırı da yok — eskiden `if (id.startsWith("temp_")) return;`
+ * denip tamamlama KALICI olarak kaybediliyordu.
+ *
+ * Bekleyen INSERT'in yükünü değiştirerek görev en baştan tamamlanmış olarak
+ * oluşturuluyor. Kayıp yok, ikinci bir istek de yok.
+ *
+ * @returns true ise güncellendi (kayıt hâlâ kuyrukta)
+ */
+export async function patchQueuedPayload(clientOperationId, patch) {
+  if (!clientOperationId || !patch) return false;
+  return withQueueLock(async () => {
+    const list = await readQueue();
+    let found = false;
+    const next = list.map((item) => {
+      if ((item.clientOperationId || item.id) !== clientOperationId) return item;
+      found = true;
+      return { ...item, payload: { ...item.payload, ...patch } };
+    });
+    if (found) await writeQueue(next);
+    return found;
+  });
 }

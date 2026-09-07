@@ -28,7 +28,7 @@ export default function ChallengeScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const showAlert = useAlert();
-  const { checkFeature, showPaywall } = usePremium();
+  const { checkFeature, showPaywall, bumpUsage } = usePremium();
   const [tab, setTab] = useState("active");
   const [challenges, setChallenges] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -61,6 +61,7 @@ export default function ChallengeScreen() {
     }
     try {
       await createChallenge({ opponentId: pick.friend.id, metric: pick.metric, target: pick.target });
+      bumpUsage?.("challenge");
       H.success();
       setCreating(false); setStep(0); setPick({ friend: null, metric: null, target: null });
       load();

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import * as H from "../lib/haptics";
 import { todayTR } from "../lib/dateUtils";
-import { getDailyPlan, createDailyPlan, togglePlanTask } from "../supabase/plans";
+import { getDailyPlan, createDailyPlan } from "../supabase/plans";
+import { savePlanTaskToggleOffline } from "../lib/offlineQueue";
 import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
 import { getJson, setJson } from "../lib/storage/appStorage";
 import { useGamification } from "./useGamification";
@@ -121,7 +122,12 @@ export function usePlanCompletion(userId) {
     if (nowDone) H.success();
     setJson(getKey(userId), [...next]);
     const dbId = taskMapRef.current[id];
-    if (dbId) togglePlanTask(dbId, nowDone).catch(() => {});
+    if (dbId) {
+      // Başarısızsa KUYRUĞA girer. Eskiden togglePlanTask hatayı yutuyordu,
+      // buradaki .catch de ölü koddu: tik cihazda duruyor ama sunucuda
+      // completed sonsuza kadar false kalıyordu (yeni telefonda kayıp).
+      savePlanTaskToggleOffline(dbId, nowDone).catch(() => {});
+    }
     if (nowDone) rewardRef.current?.("plan_task_done");
   }, [userId]);
 

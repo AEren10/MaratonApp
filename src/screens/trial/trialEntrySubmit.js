@@ -14,6 +14,7 @@ export async function submitTrialEntry({
   C,
   branchSubject,
   checkFeature,
+  bumpUsage,
   completeForm,
   dispatch,
   mood,
@@ -109,6 +110,10 @@ export async function submitTrialEntry({
     subjectsArr,
   );
   setSaving(false);
+
+  // Kota sayacını ANINDA artır. Yalnızca uygulama öne gelince tazelemek
+  // yetmiyordu: art arda deneme giren kullanıcı ücretsiz sınırı aşabiliyordu.
+  bumpUsage?.("trial");
 
   if (result.queued) {
     showAlert("Çevrimdışı", "Deneme sonucu bağlantı geldiğinde gönderilecek.");

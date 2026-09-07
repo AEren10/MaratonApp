@@ -71,5 +71,10 @@ export const togglePlanTask = async (taskId, completed) => {
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "togglePlanTask");
+    // FIRLATILMALI. Eskiden yutuluyordu ve handleSupabaseError de fırlatmadığı
+    // için promise her zaman başarıyla çözülüyordu: çağırandaki .catch ölü
+    // koddu, plan_tasks.completed sunucuda sonsuza kadar false kalıyordu.
+    // Hemen yukarıdaki completeTask zaten fırlatıyor; tutarlı hale getirildi.
+    throw e;
   }
 };

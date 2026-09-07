@@ -27,7 +27,7 @@ export default function AddWrongScreen() {
   const showAlert = useAlert();
   const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const { reward, xpToast, dismissXP } = useGamification();
-  const { checkFeature, showPaywall } = usePremium();
+  const { checkFeature, showPaywall, bumpUsage } = usePremium();
   const [subject, setSubject] = useState(() => tytSubjects[1] || tytSubjects[0] || { key: "matematik", label: "Matematik", color: C.amber, icon: "hash" });
   const [topic, setTopic] = useState("");
   const [topicSource, setTopicSource] = useState(null);
@@ -110,6 +110,8 @@ export default function AddWrongScreen() {
         ...initialReview(),
       };
       const result = await saveWrongQuestionOffline(payload);
+      // Ücretsiz kota sayacını anında artır (bkz. PremiumContext.bumpUsage).
+      bumpUsage?.("wrong");
       if (result.queued || imageLocalUri) {
         H.tap();
         showAlert(

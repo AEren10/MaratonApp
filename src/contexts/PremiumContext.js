@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import { AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
 import { getTrialInfo } from "../supabase/profiles";
@@ -24,13 +25,17 @@ export function PremiumProvider({ children }) {
   const [isPremium, setIsPremium] = useState(false);
   const [trialDaysLeft, setTrialDaysLeft] = useState(0);
   const [isInTrial, setIsInTrial] = useState(false);
-  const [usage, setUsage] = useState({ trialsThisMonth: 0, wrongEntries: 0, activeChallenges: 0 });
+  // null = HENÜZ BİLİNMİYOR. Eskiden sıfırlarla başlıyordu ve açılıştan
+  // sayım dönene kadar geçen sürede kota kapısı FAIL-OPEN oluyordu:
+  // 30/30 sınırındaki kullanıcı 0 < 30 görüp geçiyordu.
+  const [usage, setUsage] = useState(null);
 
   useEffect(() => {
     if (!user?.id) return;
     initPurchases(user.id).then(fetchPremiumStatus);
     refreshUsage();
   }, [user?.id]);
+
 
   const fetchPremiumStatus = useCallback(async () => {
     if (!user?.id) return;
@@ -82,16 +87,51 @@ export function PremiumProvider({ children }) {
     }
   }, [user?.id]);
 
+  // KOTA SAYAÇLARI TAZELENMELİ.
+  //
+  // Eskiden refreshUsage YALNIZCA mount'ta çağrılıyordu ve dışarıdan hiçbir
+  // ekran çağırmıyordu. Uygulamayı hiç kapatmayan kullanıcının sayacı
+  // sonsuza kadar açılış anındaki değerde kalıyordu: ücretsiz sınır fiilen
+  // yoktu. Uygulama öne geldiğinde yeniden sayıyoruz.
+  useEffect(() => {
+    if (!user?.id) return;
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next === "active") refreshUsage();
+    });
+    return () => sub?.remove?.();
+  }, [user?.id, refreshUsage]);
+
+
+  /**
+   * Kota tüketen bir işlem yapıldığında sayacı ANINDA artırır.
+   *
+   * Yalnızca öne gelme anında tazelemek yetmiyordu: uygulamayı hiç arka
+   * plana atmayan kullanıcı üst üste deneme girip sınırı aşabiliyordu.
+   * Sunucuya sormadan yerel olarak artırıyoruz; bir sonraki tazeleme
+   * gerçek sayıyla üzerine yazar.
+   */
+  const bumpUsage = useCallback((kind) => {
+    setUsage((prev) => {
+      if (!prev) return prev; // henüz bilinmiyor — tahmin yürütme
+      if (kind === "trial") return { ...prev, trialsThisMonth: prev.trialsThisMonth + 1 };
+      if (kind === "wrong") return { ...prev, wrongEntries: prev.wrongEntries + 1 };
+      if (kind === "challenge") return { ...prev, activeChallenges: prev.activeChallenges + 1 };
+      return prev;
+    });
+  }, []);
+
   const checkFeature = useCallback((featureKey) => {
     if (isPremium) return true;
 
     switch (featureKey) {
+      // Sayım henüz gelmediyse KAPALI davran. Açık davranmak, sınırdaki
+      // kullanıcının her soğuk açılışta bir bedava hak kazanması demekti.
       case "unlimited_trials":
-        return usage.trialsThisMonth < FREE_LIMITS.trials_per_month;
+        return !!usage && usage.trialsThisMonth < FREE_LIMITS.trials_per_month;
       case "unlimited_wrongs":
-        return usage.wrongEntries < FREE_LIMITS.wrong_entries;
+        return !!usage && usage.wrongEntries < FREE_LIMITS.wrong_entries;
       case "unlimited_challenges":
-        return usage.activeChallenges < FREE_LIMITS.active_challenges;
+        return !!usage && usage.activeChallenges < FREE_LIMITS.active_challenges;
       // These features are premium-only
       case "ai_suggestions":
       case "advanced_reports":
@@ -110,11 +150,11 @@ export function PremiumProvider({ children }) {
 
   const remainingTrials = isPremium
     ? Infinity
-    : Math.max(0, FREE_LIMITS.trials_per_month - usage.trialsThisMonth);
+    : Math.max(0, FREE_LIMITS.trials_per_month - (usage?.trialsThisMonth ?? FREE_LIMITS.trials_per_month));
 
   const remainingWrongs = isPremium
     ? Infinity
-    : Math.max(0, FREE_LIMITS.wrong_entries - usage.wrongEntries);
+    : Math.max(0, FREE_LIMITS.wrong_entries - (usage?.wrongEntries ?? FREE_LIMITS.wrong_entries));
 
   const showPaywall = useCallback((source = "unknown") => {
     if (user?.id) {
@@ -137,8 +177,9 @@ export function PremiumProvider({ children }) {
     remainingWrongs,
     showPaywall,
     refreshUsage,
+    bumpUsage,
     refreshPremium: fetchPremiumStatus,
-  }), [isPremium, isInTrial, trialDaysLeft, checkFeature, remainingTrials, remainingWrongs, showPaywall, refreshUsage, fetchPremiumStatus]);
+  }), [isPremium, isInTrial, trialDaysLeft, checkFeature, remainingTrials, remainingWrongs, showPaywall, refreshUsage, bumpUsage, fetchPremiumStatus]);
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;
 }

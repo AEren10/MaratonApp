@@ -18,7 +18,7 @@ import {
   deleteUserTask,
   deleteUserTasksByDate,
 } from "../supabase/userTasks";
-import { saveUserTaskOffline } from "../lib/offlineQueue";
+import { saveUserTaskOffline, patchQueuedPayload } from "../lib/offlineQueue";
 import { userTaskSchema } from "../validations/auth";
 import { scheduleTaskNotifications, cancelTaskReminders } from "../lib/notifications";
 import { track } from "../lib/analytics";
@@ -67,8 +67,13 @@ export function useUserTasks() {
       throw new Error(e.errors?.[0]?.message || "Geçersiz görev bilgisi");
     }
     const tempId = `temp_${Date.now()}`;
+    // Kuyruktaki kaydı sonradan bulabilmek için sabit bir kimlik.
+    // Eskiden yoktu: çevrimdışı görev kuyrukta kalıyor, iyimser satır
+    // sonsuza kadar temp_ id'siyle yaşıyordu.
+    const clientOperationId = `usertask_${tempId}`;
     const optimistic = {
       id: tempId,
+      client_operation_id: clientOperationId,
       user_id: user?.id,
       task_date: today(),
       subject: parsed.subject,
@@ -103,7 +108,14 @@ export function useUserTasks() {
     const newCompleted = !previous;
     dispatch(setUserTaskCompleted({ id, completed: newCompleted }));
 
-    if (typeof id === "string" && id.startsWith("temp_")) return;
+    // Henüz sunucuda olmayan görev: güncellenecek satır yok, ama kuyrukta
+    // bekleyen INSERT var. Tamamlama bilgisini ONA yazıyoruz ki görev en
+    // baştan tamamlanmış oluşturulsun. Eskiden burada return ediliyordu ve
+    // tamamlama kalıcı olarak kayboluyordu.
+    if (typeof id === "string" && id.startsWith("temp_")) {
+      patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => {});
+      return;
+    }
 
     updateUserTask(id, { completed: newCompleted }).catch(() => {
       // Geri alma mutlak değerle: arada kullanıcı tekrar dokunmuş olsa bile
