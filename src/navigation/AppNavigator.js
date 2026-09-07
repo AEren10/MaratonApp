@@ -19,6 +19,7 @@ import { screenOptions } from "./screenOptions";
 import {
   APP_STACK_SCREENS,
   AUTH_STACK_SCREENS,
+  RECOVERY_STACK_SCREENS,
   SETUP_STACK_SCREENS,
   SLIDES_STACK_SCREENS,
   TAB_SCREENS,
@@ -64,6 +65,19 @@ function AuthStack() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       {AUTH_STACK_SCREENS.map(renderStackScreen)}
+    </Stack.Navigator>
+  );
+}
+
+// ŞİFRE SIFIRLAMA YIĞINI
+//
+// Sıfırlama linki bir oturum kurduğu için, aşağıdaki seçim yalnızca session'a
+// baksaydı AuthStack anında AppStack ile değişir ve şifre formu kullanıcı
+// yazamadan unmount olurdu. Kurtarma akışı bitene kadar bu yığın gösteriliyor.
+function RecoveryStack() {
+  return (
+    <Stack.Navigator screenOptions={screenOptions}>
+      {RECOVERY_STACK_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
 }
@@ -116,7 +130,7 @@ function Loading() {
 }
 
 export default function AppNavigator() {
-  const { session, loading } = useAuth();
+  const { session, loading, recoveryMode } = useAuth();
   const { onboardingDone, hasSeenSlides, loading: examLoading } = useExam();
   const navigationRef = useNavigationContainerRef();
   const navigationTracker = useMemo(() => createNavigationTracker(track), []);
@@ -144,7 +158,11 @@ export default function AppNavigator() {
   if (loading || examLoading) return <Loading />;
 
   let content;
-  if (!hasSeenSlides) {
+  // Kurtarma modu HER ŞEYDEN ÖNCE gelir: oturum kurulmuş olsa bile kullanıcı
+  // önce yeni şifresini belirlemeli.
+  if (recoveryMode) {
+    content = <RecoveryStack />;
+  } else if (!hasSeenSlides) {
     content = <SlidesStack />;
   } else if (!session) {
     content = <AuthStack />;

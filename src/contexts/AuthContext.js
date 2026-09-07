@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
+import * as Linking from "expo-linking";
 import {
   getSession,
   onAuthStateChange,
   signOut as supaSignOut,
   deleteAccount as supaDeleteAccount,
+  isRecoveryUrl,
 } from "../supabase/auth";
 import { store, RESET_STORE } from "../store/store";
 import { onAuthError } from "../lib/authEvents";
@@ -19,6 +21,35 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const loggingOut = useRef(false);
+
+  // ŞİFRE SIFIRLAMA MODU
+  //
+  // Sıfırlama linki bir OTURUM kuruyor. AppNavigator ekranı yalnızca session'a
+  // bakarak seçtiği için, oturum kurulur kurulmaz AuthStack (ve içindeki
+  // SetNewPassword ekranı) unmount oluyordu: kullanıcı şifresini yazamadan
+  // form ekrandan siliniyordu — şifre sıfırlama fiilen çalışmıyordu.
+  //
+  // Bu bayrak, sıfırlama akışı bitene kadar navigasyonu oturumdan bağımsız
+  // olarak kurtarma yığınında tutuyor.
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoveryUrl, setRecoveryUrl] = useState(null);
+
+  const endRecovery = useCallback(() => {
+    setRecoveryMode(false);
+    setRecoveryUrl(null);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const accept = (url) => {
+      if (!active || !url || !isRecoveryUrl(url)) return;
+      setRecoveryUrl(url);
+      setRecoveryMode(true);
+    };
+    Linking.getInitialURL().then(accept).catch(() => {});
+    const sub = Linking.addEventListener("url", ({ url }) => accept(url));
+    return () => { active = false; sub?.remove?.(); };
+  }, []);
 
   useEffect(() => {
     getSession()
@@ -89,7 +120,10 @@ export function AuthProvider({ children }) {
     await clearUserScopedStorage();
   }, []);
 
-  const value = useMemo(() => ({ session, user, loading, logout, deleteAccount }), [session, user, loading, logout, deleteAccount]);
+  const value = useMemo(
+    () => ({ session, user, loading, logout, deleteAccount, recoveryMode, recoveryUrl, endRecovery }),
+    [session, user, loading, logout, deleteAccount, recoveryMode, recoveryUrl, endRecovery],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

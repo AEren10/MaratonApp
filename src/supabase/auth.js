@@ -1,4 +1,7 @@
 import { supabase } from "./client";
+import { isRecoveryUrl } from "../lib/recoveryLink";
+
+export { isRecoveryUrl };
 
 export const signUp = async ({ email, password, name }) => {
   const { data, error } = await supabase.auth.signUp({
@@ -67,13 +70,21 @@ export const updateEmail = async (email) => {
  * @returns true ise oturum hazır
  */
 export const establishRecoverySession = async (url) => {
-  // Zaten oturum varsa (uygulama açıkken link gelmiş olabilir) yeterli.
-  try {
-    const { data } = await supabase.auth.getSession();
-    if (data?.session) return true;
-  } catch (_) {}
-
-  if (!url) return false;
+  // ÖNEMLİ: "zaten oturum var" DİYE ERKEN DÖNMÜYORUZ.
+  //
+  // Eskiden herhangi bir oturum varsa link hiç doğrulanmadan true dönüyordu.
+  // Yani süresi dolmuş ya da başka hesaba ait bir link, o an giriş yapmış
+  // kullanıcının şifresini değiştirebilecek bir form açıyordu. Link her
+  // zaman kendi başına doğrulanmalı.
+  if (!url) {
+    // Link yok: yalnızca uygulama içinden (girişliyken) gelinmişse anlamlı.
+    try {
+      const { data } = await supabase.auth.getSession();
+      return !!data?.session;
+    } catch (_) {
+      return false;
+    }
+  }
 
   try {
     const qIndex = url.indexOf("?");

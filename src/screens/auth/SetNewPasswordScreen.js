@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 
 import { Button, Input, Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { updatePassword } from "../../supabase/auth";
-import { establishRecoverySession } from "../../supabase/auth";
+import { updatePassword, establishRecoverySession, signOut } from "../../supabase/auth";
 import * as Linking from "expo-linking";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { useAlert } from "../../contexts/AlertContext";
-import { SCREENS } from "../../constants/screens";
+import { useAuth } from "../../contexts/AuthContext";
 import * as H from "../../lib/haptics";
 
 const MIN_LENGTH = 6;
@@ -32,8 +30,8 @@ const MIN_LENGTH = 6;
 export default function SetNewPasswordScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
-  const navigation = useNavigation();
   const showAlert = useAlert();
+  const { recoveryUrl, endRecovery } = useAuth();
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -51,12 +49,14 @@ export default function SetNewPasswordScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const url = await Linking.getInitialURL().catch(() => null);
+      // Link öncelikle AuthContext'in yakaladığı URL'den gelir; uygulama
+      // açıkken gelen linklerde getInitialURL eski değeri döndürebiliyor.
+      const url = recoveryUrl || (await Linking.getInitialURL().catch(() => null));
       const ok = await establishRecoverySession(url);
       if (!cancelled) setSessionState(ok ? "ready" : "invalid");
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [recoveryUrl]);
 
   const submit = useCallback(async () => {
     const e = {};
@@ -69,15 +69,19 @@ export default function SetNewPasswordScreen() {
     try {
       await updatePassword(password);
       H.success();
+      // Kurtarma linki bir oturum kurmuştu. Şifre değiştikten sonra o oturumu
+      // kapatıp temiz girişe yönlendiriyoruz; kullanıcı yeni şifresini
+      // gerçekten kullansın ve eski oturum ortada kalmasın.
+      await signOut().catch(() => {});
+      endRecovery();
       showAlert("Şifren güncellendi", "Yeni şifrenle giriş yapabilirsin.");
-      navigation.reset({ index: 0, routes: [{ name: SCREENS.LOGIN }] });
     } catch (err) {
       H.error();
       showAlert("Değiştirilemedi", authErrorMessage(err));
     } finally {
       setBusy(false);
     }
-  }, [password, confirm, navigation, showAlert]);
+  }, [password, confirm, showAlert, endRecovery]);
 
   // Link geçersiz/süresi dolmuşsa form GÖSTERME — kullanıcı boşuna doldurup
   // anlamsız bir hata almasın, ne yapması gerektiğini söyle.
@@ -91,7 +95,10 @@ export default function SetNewPasswordScreen() {
             Şifre sıfırlama bağlantısının süresi dolmuş ya da daha önce
             kullanılmış olabilir. Yeni bir bağlantı isteyebilirsin.
           </Text>
-          <Button onPress={() => navigation.replace(SCREENS.FORGOT_PASSWORD)} size="lg" fullWidth>
+          {/* Kurtarma yığınında BU EKRAN TEK BAŞINA. navigate/replace ile
+              başka bir ekrana gidilemez; kurtarma modundan çıkmak doğru
+              hareket — navigasyon normal akışına (giriş) geri döner. */}
+          <Button onPress={endRecovery} size="lg" fullWidth>
             Yeni bağlantı iste
           </Button>
         </View>

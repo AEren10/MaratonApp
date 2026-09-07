@@ -86,6 +86,12 @@ export const AUTH_STACK_SCREENS = [
   screen(SCREENS.SET_NEW_PASSWORD, SetNewPasswordScreen),
 ];
 
+// Şifre sıfırlama yığını: link bir oturum kurduğu için normal seçim
+// AuthStack'i anında değiştirip formu unmount ediyordu (bkz. AppNavigator).
+export const RECOVERY_STACK_SCREENS = [
+  screen(SCREENS.SET_NEW_PASSWORD, SetNewPasswordScreen),
+];
+
 export const SLIDES_STACK_SCREENS = [
   screen(SCREENS.ONBOARDING, OnboardingScreen),
 ];
