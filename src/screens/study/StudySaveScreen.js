@@ -13,7 +13,6 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
 import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
-import { computeStreakUpdate } from "../../lib/streakFreeze";
 import { trackStreakTransition } from "../../lib/trackStreakTransition";
 import { useGamification } from "../../hooks/useGamification";
 import { captureError } from "../../lib/errorReporting";
@@ -21,7 +20,7 @@ import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
-import { getStreak, updateStreak } from "../../supabase/streaks";
+import { syncStreakAfterStudy } from "../../lib/streakSync";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
@@ -175,17 +174,11 @@ export default function StudySaveScreen() {
 
     if (result.saved) {
       try {
-        const streakData = await getStreak(user.id);
-        const streakResult = computeStreakUpdate(streakData);
-        const { updates, newStreak, usedFreeze, freezeCount } = streakResult;
-        trackStreakTransition(streakResult);
+        const streakResult = await syncStreakAfterStudy(user.id, { studyDate: todayStr });
+        const { newStreak, usedFreeze, freezeCount } = streakResult;
+        trackStreakTransition(streakResult.local);
         dispatch(setStreak(newStreak));
         dispatch(setFreezeCount(freezeCount));
-        try {
-          await updateStreak(user.id, updates);
-        } catch (_) {
-          setJson(STORAGE_KEYS.PENDING_STREAK, { userId: user.id, updates });
-        }
         if (usedFreeze) {
           showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
         }

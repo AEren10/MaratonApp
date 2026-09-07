@@ -9,7 +9,7 @@ import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
 import { getXPTotals } from "../supabase/xp";
-import { updateStreak } from "../supabase/streaks";
+import { touchStreak } from "../supabase/streaks";
 import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
 import { todayTR } from "../lib/dateUtils";
@@ -29,9 +29,9 @@ async function retryPendingStreak(activeUserId) {
   try {
     const pending = await getJson(STORAGE_KEYS.PENDING_STREAK);
     if (!pending) return;
-    const { userId, updates } = pending;
+    const { userId, studyDate } = pending;
     if (userId !== activeUserId) return;
-    await updateStreak(userId, updates);
+    await touchStreak(userId, studyDate || null);
     await remove(STORAGE_KEYS.PENDING_STREAK);
   } catch (_) {}
 }

@@ -5,8 +5,7 @@ import { createUserTask } from "../supabase/userTasks";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getSession } from "../supabase/auth";
-import { getStreak, updateStreak } from "../supabase/streaks";
-import { computeStreakUpdate } from "./streakFreeze";
+import { touchStreak } from "../supabase/streaks";
 import { syncChallengeProgress } from "./challengeSync";
 import { studyLogFingerprint } from "../domain/study/studyLogModel";
 import { trialFingerprint } from "../domain/trial/trialModel";
@@ -188,16 +187,10 @@ async function runOne(item) {
   }
 }
 
-function dateForStudyDate(studyDate) {
-  if (!studyDate) return new Date();
-  return new Date(`${studyDate}T12:00:00+03:00`);
-}
-
 async function refreshStudySideEffects(userId, { questions = 0, minutes = 0, studyDate } = {}) {
   try {
-    const streakData = await getStreak(userId);
-    const { updates } = computeStreakUpdate(streakData, dateForStudyDate(studyDate));
-    await updateStreak(userId, updates);
+    // Seri sayısını sunucu hesaplıyor; istemci yalnızca tarihi bildiriyor.
+    await touchStreak(userId, studyDate || null);
   } catch (_) {}
 
   try {
