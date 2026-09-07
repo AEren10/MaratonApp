@@ -52,19 +52,17 @@ async function savePendingDeepLink(parsed) {
   else if (parsed.type === "group") await setString(PENDING_GROUP_KEY, parsed.code);
 }
 
-function routeDeepLink(parsed, session, navigation) {
+/**
+ * Oturum AÇIKKEN yönlendirmeyi burada YAPMIYORUZ.
+ *
+ * React Navigation'ın linking yapılandırması (navigation/routes.js) aynı
+ * URL'i zaten işliyor. İkisi birden navigate ederse iki yönlendirme yarışıyor
+ * ve hangisi sonra düşerse o kazanıyordu. Burada yalnızca oturum yokken
+ * kodu saklıyoruz; giriş yapıldığında aşağıdaki effect tüketiyor.
+ */
+function routeDeepLink(parsed, session) {
   if (!parsed) return;
-  if (!session) {
-    savePendingDeepLink(parsed);
-    return;
-  }
-  if (parsed.type === "referral") {
-    navigation.navigate(SCREENS.REFERRAL, { code: parsed.code });
-  } else if (parsed.type === "friend") {
-    navigation.navigate(SCREENS.FRIENDS, { friendCode: parsed.code });
-  } else if (parsed.type === "group") {
-    navigation.navigate(SCREENS.LEAGUE, { groupCode: parsed.code });
-  }
+  if (!session) savePendingDeepLink(parsed);
 }
 
 export async function consumePendingFriendCode() {
@@ -115,7 +113,7 @@ export function useDeepLink() {
       const url = await Linking.getInitialURL();
       if (!url || url === lastUrl.current) return;
       lastUrl.current = url;
-      routeDeepLink(parseDeepLink(url), session, navigation);
+      routeDeepLink(parseDeepLink(url), session);
     }
     handleInitialURL();
   }, [session]);
@@ -124,7 +122,7 @@ export function useDeepLink() {
     const sub = Linking.addEventListener("url", ({ url }) => {
       if (!url) return;
       lastUrl.current = url;
-      routeDeepLink(parseDeepLink(url), session, navigation);
+      routeDeepLink(parseDeepLink(url), session);
     });
     return () => sub.remove();
   }, [session, navigation]);

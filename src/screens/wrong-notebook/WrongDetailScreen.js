@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,7 +9,7 @@ import { Icon, IconBox, Chip } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import SignedImage from "../../components/common/SignedImage";
-import { resolveWrongQuestion } from "../../supabase/wrongQuestions";
+import { resolveWrongQuestion, getWrongQuestionById } from "../../supabase/wrongQuestions";
 import { useAuth } from "../../contexts/AuthContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
@@ -43,19 +43,33 @@ export default function WrongDetailScreen() {
   const route = useRoute();
   const showAlert = useAlert();
   const { user } = useAuth();
-  const { item: passedItem, community } = route.params ?? {};
+  const { item: passedItem, id: linkedId, community } = route.params ?? {};
   const [photoZoom, setPhotoZoom] = useState(false);
   const [resolving, setResolving] = useState(false);
   const [localResolved, setLocalResolved] = useState(false);
   const { reward } = useGamification();
 
-  const item = passedItem || {};
+  // Deep link (`yanlis/:id`) yalnızca id taşıyor; ekran sadece params.item
+  // okuduğu için boş bir kart ve "Invalid Date" gösteriyordu.
+  const [fetched, setFetched] = useState(null);
+  useEffect(() => {
+    if (passedItem || !linkedId || !user?.id) return;
+    let cancelled = false;
+    getWrongQuestionById(linkedId, user.id)
+      .then((d) => { if (!cancelled && d) setFetched(d); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [passedItem, linkedId, user?.id]);
+
+  const item = passedItem || fetched || {};
   const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
   const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.muted, icon: "bookOpen" };
   const hasImage = !!item.image_path;
-  const date = new Date(item.created_at).toLocaleDateString("tr-TR", {
-    day: "numeric", month: "long", year: "numeric",
-  });
+  const date = item.created_at
+    ? new Date(item.created_at).toLocaleDateString("tr-TR", {
+        day: "numeric", month: "long", year: "numeric",
+      })
+    : "";
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 

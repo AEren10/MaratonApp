@@ -72,6 +72,25 @@ export const addWrongQuestion = async (question) => {
   }
 };
 
+// Deep link (`yanlis/:id`) yalnızca id taşıyor. Detay ekranı yalnızca
+// route.params.item okuduğu için link BOŞ bir ekran açıyordu.
+export const getWrongQuestionById = async (id, userId) => {
+  if (!userId) throw new Error("userId is required");
+  try {
+    const { data, error } = await supabase
+      .from("wrong_questions")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  } catch (e) {
+    handleSupabaseError(e, "getWrongQuestionById");
+    throw e;
+  }
+};
+
 export const resolveWrongQuestion = async (id, userId) => {
   if (!userId) throw new Error("userId is required");
   try {

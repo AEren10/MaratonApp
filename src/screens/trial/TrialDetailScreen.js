@@ -12,7 +12,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectTrials, removeTrial, restoreTrial } from "../../store/slices/trialSlice";
 import { useDispatch } from "react-redux";
-import { deleteTrial } from "../../supabase/trials";
+import { deleteTrial, getTrialById } from "../../supabase/trials";
 import { removeFromQueue } from "../../lib/offlineQueue";
 import { useAuth } from "../../contexts/AuthContext";
 import { getMyPercentiles } from "../../supabase/percentile";
@@ -117,6 +117,22 @@ export default function TrialDetailScreen() {
   const trial = route.params?.trial;
   const fromEntry = route.params?.fromEntry;
 
+  // Deep link (`deneme/:id`) yalnızca id taşıyor, trial nesnesi taşımıyor.
+  // Fallback `sorted[0]` olduğu için link SESSİZCE EN SON denemeyi açıyordu:
+  // yanlış veri, hata yok. Artık id'den çözülüyor — önce store'dan, yoksa
+  // sunucudan.
+  const linkedId = route.params?.id;
+  const [fetchedTrial, setFetchedTrial] = useState(null);
+  useEffect(() => {
+    if (trial || !linkedId || !user?.id) return;
+    if (trials.some((t) => String(t.id) === String(linkedId))) return;
+    let cancelled = false;
+    getTrialById(linkedId, user.id)
+      .then((t) => { if (!cancelled && t) setFetchedTrial(t); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [trial, linkedId, user?.id, trials]);
+
   useEffect(() => {
     if (fromEntry) showNudgePopup(2500);
   }, [fromEntry, showNudgePopup]);
@@ -126,9 +142,10 @@ export default function TrialDetailScreen() {
   );
 
   const latest = useMemo(() => {
-    if (!trial) return sorted[0];
-    return trials.find((t) => t.id === trial.id) || trial;
-  }, [trial, trials, sorted]);
+    const wanted = trial?.id ?? linkedId;
+    if (wanted == null) return sorted[0];
+    return trials.find((t) => String(t.id) === String(wanted)) || trial || fetchedTrial || null;
+  }, [trial, linkedId, fetchedTrial, trials, sorted]);
 
   if (!latest) {
     return (

@@ -61,8 +61,8 @@ export const ROUTE_CONFIGS = {
   [SCREENS.TOPIC_CARDS]: { path: "kartlar", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.CARD_DETAIL]: { path: "kartlar/:id", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
 
-  [SCREENS.LEAGUE]: { path: "group/:code?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "code" },
-  [SCREENS.FRIENDS]: { path: "friend/:code?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "code" },
+  [SCREENS.LEAGUE]: { path: "group/:groupCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "groupCode" },
+  [SCREENS.FRIENDS]: { path: "friend/:friendCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "friendCode" },
   [SCREENS.CHALLENGE]: { path: "sosyal/meydan-okuma", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: false },
   [SCREENS.REFERRAL]: { path: "referral/:code?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "code" },
 
@@ -92,12 +92,16 @@ const DEEP_LINK_ROUTE_PATHS = Object.fromEntries(
     .map(([screen, config]) => [screen, config.path]),
 );
 
+// Path parametresinin ADI, ekranın okuduğu param adıyla AYNI olmalı.
+// React Navigation'ın `parse` seçeneği değeri dönüştürür ama param'ı yeniden
+// ADLANDIRAMAZ. Yol `friend/:code?` iken FriendsScreen `route.params.friendCode`
+// okuyordu: gerçek davet linkiyle gelen kod ekrana hiç ulaşmıyordu.
 function withParse(screen, route) {
-  const config = ROUTE_CONFIGS[screen];
-  if (config?.parse !== "code") return route;
+  const key = ROUTE_CONFIGS[screen]?.parse;
+  if (!key) return route;
   return {
     path: route,
-    parse: { code: (c) => c?.toUpperCase() },
+    parse: { [key]: (c) => c?.toUpperCase() },
   };
 }
 
