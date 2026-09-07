@@ -9,12 +9,15 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAuth } from "../../contexts/AuthContext";
-import { getStudyLogs } from "../../supabase/studyLogs";
+import { getStudyLogs, deleteStudyLog } from "../../supabase/studyLogs";
+import { useDispatch } from "react-redux";
+import { removeLog } from "../../store/slices/studyLogSlice";
+import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
 
 const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
-const LogRow = React.memo(function LogRow({ item, s, fallbackColor, onPress }) {
+const LogRow = React.memo(function LogRow({ item, s, fallbackColor, onPress, onLongPress }) {
   const subj = getSubjectByKey(item.subject) || { icon: "bookOpen", color: fallbackColor, label: item.subject };
   const minutes = item.duration_minutes || item.duration || 0;
   const duration = minutes > 0 ? `${minutes} dk` : "";
@@ -23,6 +26,7 @@ const LogRow = React.memo(function LogRow({ item, s, fallbackColor, onPress }) {
   return (
     <AnimPressable
       onPress={() => onPress?.(item.subject)}
+      onLongPress={() => onLongPress?.(item)}
       onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
       style={[s.row, pressStyle]}
@@ -69,6 +73,8 @@ export default function StudyLogScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [logs, setLogs] = useState([]);
+  const dispatch = useDispatch();
+  const showAlert = useAlert();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -114,10 +120,37 @@ export default function StudyLogScreen() {
     if (subjectKey) navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey });
   }, [navigation]);
 
+  // Silme: deleteStudyLog yazılıydı ama hiçbir ekran çağırmıyordu, yani
+  // kullanıcı yanlış girdiği çalışmayı düzeltemiyordu.
+  // TASARIM NOTU: yeni tasarımda muhtemelen kaydırmalı (swipe-to-delete)
+  // olacak; mantık hazır, sadece jest bileşenine bağlanması yeterli.
+  const handleDelete = useCallback((item) => {
+    if (!item?.id || !user?.id) return;
+    const label = item.topic || item.subject || "Bu kayıt";
+    showAlert("Kaydı sil", `"${label}" silinecek. Soru sayısı ve süre istatistiklerinden düşülür.`, [
+      { text: "Vazgeç", style: "cancel" },
+      {
+        text: "Sil",
+        style: "destructive",
+        onPress: async () => {
+          const snapshot = logs;
+          setLogs((prev) => prev.filter((l) => l.id !== item.id));
+          dispatch(removeLog(item.id));
+          try {
+            await deleteStudyLog(item.id, user.id);
+          } catch (_) {
+            setLogs(snapshot);
+            showAlert("Silinemedi", "Kayıt silinemedi, geri alındı. Bağlantını kontrol et.");
+          }
+        },
+      },
+    ]);
+  }, [user?.id, logs, dispatch, showAlert]);
+
   const renderItem = useCallback(({ item }) => {
     if (item.type === "header") return <SectionHeader title={item.title} s={s} />;
-    return <LogRow item={item} s={s} fallbackColor={C.muted} onPress={goSubject} />;
-  }, [s, C, goSubject]);
+    return <LogRow item={item} s={s} fallbackColor={C.muted} onPress={goSubject} onLongPress={handleDelete} />;
+  }, [s, C, goSubject, handleDelete]);
 
   const keyExtractor = useCallback((item) => item.id, []);
 

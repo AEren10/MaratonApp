@@ -1,7 +1,23 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 
-const WQ_COLUMNS = "id, user_id, subject, topic, image_path, note, is_resolved, created_at, my_answer, correct_answer, next_review_at, interval_days, ease, last_reviewed_at, topic_source";
+const WQ_COLUMNS = "id, user_id, subject, topic, image_path, note, is_resolved, created_at, my_answer, correct_answer, next_review_at, interval_days, ease, last_reviewed_at, topic_source, client_operation_id";
+
+function isIdempotencyConflict(error) {
+  return error?.code === "23505" && String(error?.message || "").includes("client_operation_id");
+}
+
+async function getWrongQuestionByClientOperationId(userId, clientOperationId) {
+  if (!userId || !clientOperationId) return null;
+  const { data, error } = await supabase
+    .from("wrong_questions")
+    .select(WQ_COLUMNS)
+    .eq("user_id", userId)
+    .eq("client_operation_id", clientOperationId)
+    .maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
 
 export const getWrongQuestions = async (userId, { subject, resolved } = {}) => {
   try {
@@ -47,6 +63,10 @@ export const addWrongQuestion = async (question) => {
     if (error) throw error;
     return data;
   } catch (e) {
+    if (isIdempotencyConflict(e)) {
+      const existing = await getWrongQuestionByClientOperationId(question.user_id, question.client_operation_id);
+      if (existing) return existing;
+    }
     handleSupabaseError(e, "addWrongQuestion");
     throw e;
   }

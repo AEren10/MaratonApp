@@ -3,8 +3,8 @@ import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
-import { TrendChart } from "../../analysis/components/TrendChart";
-import { TRIAL_TO_CURRICULUM } from "../../trial/trialKeyMap";
+import { TrendChart } from "../../../components/charts/TrendChart";
+import { TRIAL_TO_CURRICULUM } from "../../../domain/trial/trialKeyMap";
 
 // Görev gerekçesi + son denemelerde bu dersin net trendi.
 function trialKeysForCurriculum(curriculumKey) {

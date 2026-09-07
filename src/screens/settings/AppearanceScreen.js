@@ -15,7 +15,7 @@ export default function AppearanceScreen() {
     { key: "light", icon: "sun", label: "Aydınlık", desc: "Gün ışığında daha okunaklı", color: C.amber },
   ]), [C]);
   const navigation = useNavigation();
-  const { pref, setPref } = useTheme();
+  const { pref, setPref, accentKey, setAccent, accentPresets } = useTheme();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
   return (
@@ -55,10 +55,30 @@ export default function AppearanceScreen() {
           );
         })}
 
+        <Text style={[s.sectionLabel, { marginTop: SPACING.xxl }]}>VURGU RENGİ</Text>
+        <View style={s.swatchRow}>
+          {accentPresets.map((preset) => {
+            const swatch = pref === "light" ? preset.light : preset.dark;
+            const active = accentKey === preset.key;
+            return (
+              <Pressable
+                key={preset.key}
+                onPress={() => setAccent(active ? null : preset.key)}
+                accessibilityRole="button"
+                accessibilityLabel={preset.name + (active ? " — seçili" : "")}
+                style={[s.swatch, { backgroundColor: swatch, borderColor: active ? C.text : "transparent" }]}
+              >
+                {active && <Icon name="check" size={16} color="#FFFFFF" />}
+              </Pressable>
+            );
+          })}
+        </View>
+
         <View style={s.infoBox}>
           <Icon name="info" size={16} color={C.sec} />
           <Text style={s.infoText}>
-            Tercihin kaydedildi. Light tema ileri sürümde tüm ekranlara uygulanacak; şu an durum çubuğu ve önizleme alanlarında etkili.
+            Vurgu rengini değiştirdiğinde tüm palet yeniden hesaplanır — kartlar,
+            grafikler ve ısı haritası dahil.
           </Text>
         </View>
       </View>
@@ -76,6 +96,11 @@ function makeStyles(C) {
     headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
     content: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl },
     sectionLabel: { ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.sm },
+    swatchRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.md, marginBottom: SPACING.lg },
+    swatch: {
+      width: 44, height: 44, borderRadius: RADIUS.md, borderWidth: 2,
+      alignItems: "center", justifyContent: "center",
+    },
     card: {
       flexDirection: "row",
       alignItems: "center",

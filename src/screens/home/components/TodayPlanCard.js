@@ -68,7 +68,7 @@ export function TodayPlanCard({
         id: t.id,
         subject: t.subject,
         label: t.topic || subj?.label || t.subject,
-        count: t.question_count || 0,
+        count: t.questionCount ?? t.question_count ?? 0,
         completed: t.completed,
         source: "user",
       });

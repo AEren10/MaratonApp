@@ -9,6 +9,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useAlert } from "../../../contexts/AlertContext";
 import { getMyFriendCode, sendFriendRequestByCode } from "../../../supabase/friends";
 import * as H from "../../../lib/haptics";
+import { SCREENS } from "../../../constants/screens";
+import { appUrl } from "../../../navigation/routes";
 
 export function FriendCodeCard({ onRequestSent, initialCode }) {
   const C = useC();
@@ -39,7 +41,7 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
 
   const shareCode = useCallback(() => {
     if (!myCode) return;
-    Share.share({ message: `Maraton'da benimle çalış! Arkadaşlık kodum: ${myCode}\nmaraton://friend/${myCode}` }).catch(() => {});
+    Share.share({ message: `Maraton'da benimle çalış! Arkadaşlık kodum: ${myCode}\n${appUrl(SCREENS.FRIENDS, { code: myCode })}` }).catch(() => {});
   }, [myCode]);
 
   const addByCode = useCallback(async () => {

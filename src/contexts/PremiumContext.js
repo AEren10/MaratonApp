@@ -7,6 +7,8 @@ import { getWrongQuestionCount } from "../supabase/wrongQuestions";
 import { getActiveChallengeCount } from "../supabase/challenges";
 import { SCREENS } from "../constants/screens";
 import { FREE_LIMITS } from "../constants/premium";
+import { recordRetentionEvent } from "../supabase/retention";
+import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
 import {
   initPurchases,
   getCustomerInfo,
@@ -114,9 +116,17 @@ export function PremiumProvider({ children }) {
     ? Infinity
     : Math.max(0, FREE_LIMITS.wrong_entries - usage.wrongEntries);
 
-  const showPaywall = useCallback(() => {
-    navigation.navigate(SCREENS.PAYWALL);
-  }, [navigation]);
+  const showPaywall = useCallback((source = "unknown") => {
+    if (user?.id) {
+      recordRetentionEvent(
+        user.id,
+        RETENTION_EVENTS.PAYWALL_TRIGGERED,
+        { source },
+        RETENTION_SOURCES.PAYWALL,
+      ).catch(() => {});
+    }
+    navigation.navigate(SCREENS.PAYWALL, { source });
+  }, [navigation, user?.id]);
 
   const value = useMemo(() => ({
     isPremium,

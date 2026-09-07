@@ -15,6 +15,7 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { useGamification } from "../../hooks/useGamification";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { AnswerThread } from "./components/AnswerThread";
 
 function InfoRow({ icon, label, value, color, styles, C }) {
   return (
@@ -160,6 +161,15 @@ export default function WrongDetailScreen() {
                 {resolving ? "İşleniyor..." : "Çözüldü İşaretle"}
               </Text>
             </Pressable>
+          </Animated.View>
+        )}
+
+        {/* Topluluktan gelindiyse cevap akışı. Backend (getAnswers/postAnswer/
+            subscribeToAnswers) zaten yazılıydı ama hiçbir ekran çağırmıyordu —
+            "soruya cevap yaz" özelliği arayüzsüz duruyordu. */}
+        {community && item?.id && (
+          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
+            <AnswerThread sharedQuestionId={item.shared_question_id || item.id} />
           </Animated.View>
         )}
       </ScrollView>

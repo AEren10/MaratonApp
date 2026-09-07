@@ -13,6 +13,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { getProfile } from "../../../supabase/profiles";
 
 import { avatarColors } from "../../../lib/avatarColor";
+import { todayTR } from "../../../lib/dateUtils";
 
 function greet() {
   const h = new Date().getHours();
@@ -71,7 +72,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
   }, [user?.id]);
 
   const [g, gEmoji] = greet();
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = todayTR();
   const studiedToday = lastStudyDate === todayStr;
   const atRisk = streak > 0 && !studiedToday && new Date().getHours() >= 18;
   const avatarShadow = { shadowColor: c1, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.32, shadowRadius: 14, elevation: 5 };

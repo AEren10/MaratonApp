@@ -12,16 +12,20 @@ import SignedImage from "../../components/common/SignedImage";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
+import { useExam } from "../../contexts/ExamContext";
+import { getSubjectsForExam } from "../../themes/subjects";
 
-const FILTERS = [
-  { key: "all", label: "Tümü", icon: "layers" },
-  { key: "turkce", label: "Türkçe", icon: "bookOpen" },
-  { key: "matematik", label: "Matematik", icon: "hash" },
-  { key: "fizik", label: "Fizik", icon: "zap" },
-  { key: "kimya", label: "Kimya", icon: "flask" },
-  { key: "biyoloji", label: "Biyoloji", icon: "activity" },
-  { key: "tarih", label: "Tarih", icon: "clock" },
-];
+// Filtreler SABİT DEĞİL: kullanıcının sınav tipine göre türetiliyor.
+// Önceden sabit YKS listesiydi — LGS öğrencisine Fizik/Kimya/Biyoloji
+// gösteriliyor, kendi dersleri (İnkılap, Din, İngilizce) hiç görünmüyordu.
+function buildFilters(examType, field) {
+  const base = [{ key: "all", label: "Tümü", icon: "layers" }];
+  if (!examType) return base;
+  const subjects = getSubjectsForExam(examType, field) || [];
+  return base.concat(
+    subjects.map((s) => ({ key: s.key, label: s.label, icon: s.icon || "bookOpen" })),
+  );
+}
 
 function relativeTime(iso) {
   if (!iso) return "";
@@ -144,6 +148,8 @@ export function CommunityTab({ visible, onSwitchToMine }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState("all");
+  const { examType, field } = useExam();
+  const filters = useMemo(() => buildFilters(examType, field), [examType, field]);
   const [loadError, setLoadError] = useState(null);
 
   const load = useCallback(async () => {
@@ -193,7 +199,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
     <View style={{ flex: 1 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: SPACING.md, alignItems: "center" }}>
-        {FILTERS.map((f) => {
+        {filters.map((f) => {
           const subj = f.key !== "all" ? getSubjectByKey(f.key) : null;
           const clr = subj?.color || C.accent;
           const on = filter === f.key;

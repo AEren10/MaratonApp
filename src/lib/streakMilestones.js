@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import * as appStorage from "./storage/appStorage";
 
 export const STREAK_MILESTONES = [
   { day: 7, xp: 100, premiumDays: 0, title: "Haftalık Savaşçı", icon: "flame", color: "#fb923c" },
@@ -34,8 +34,7 @@ export function getNextMilestone(currentStreak) {
 
 export async function getClaimedMilestones() {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEYS.CLAIMED_MILESTONES);
-    return raw ? JSON.parse(raw) : [];
+    return await appStorage.getJson(STORAGE_KEYS.CLAIMED_MILESTONES, []);
   } catch {
     return [];
   }
@@ -45,7 +44,7 @@ export async function claimMilestone(day) {
   const claimed = await getClaimedMilestones();
   if (!claimed.includes(day)) {
     claimed.push(day);
-    await AsyncStorage.setItem(STORAGE_KEYS.CLAIMED_MILESTONES, JSON.stringify(claimed));
+    await appStorage.setJson(STORAGE_KEYS.CLAIMED_MILESTONES, claimed);
   }
   return claimed;
 }

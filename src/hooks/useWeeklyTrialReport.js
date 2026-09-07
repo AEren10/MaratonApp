@@ -1,17 +1,10 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../store/slices/trialSlice";
-
-function startOfWeek() {
-  const d = new Date();
-  const day = (d.getDay() + 6) % 7;
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - day);
-  return d;
-}
+import { dateKey, startOfWeek } from "../lib/dateUtils";
 
 function toIso(d) {
-  return d.toISOString().split("T")[0];
+  return dateKey(d);
 }
 
 export function useWeeklyTrialReport() {

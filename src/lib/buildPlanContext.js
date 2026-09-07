@@ -1,7 +1,7 @@
 // C) Plan kişiselleştirme bağlamı — saf yardımcılar.
 // HomeScreen ve PlanDetailScreen aynı bağlamı bu fonksiyonlarla üretir (DRY).
 
-import { trialSubjectsToCurriculumWeakAreas } from "../screens/trial/trialKeyMap";
+import { trialSubjectsToCurriculumWeakAreas } from "../domain/trial/trialKeyMap";
 
 // Son 3 denemenin ağırlıklı ortalamasıyla zayıf alan (curriculum key → başarı %).
 // Ağırlık: en yeni 0.5, sonra 0.3, 0.2. Tek kötü deneme planı saptırmasın.

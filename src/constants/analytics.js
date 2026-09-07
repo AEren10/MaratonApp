@@ -1,4 +1,15 @@
 export const EVENTS = {
+  // Navigation lifecycle
+  SCREEN_VIEW: "screen.view",
+  SCREEN_EXIT: "screen.exit",
+  SCREEN_DURATION: "screen.duration",
+
+  // UI lifecycle
+  BUTTON_TAP: "button.tap",
+  FORM_STARTED: "form.started",
+  FORM_COMPLETED: "form.completed",
+  FORM_ABANDONED: "form.abandoned",
+
   // Auth
   AUTH_LOGIN: "auth.login",
   AUTH_REGISTER: "auth.register",
@@ -22,6 +33,8 @@ export const EVENTS = {
 
   // Trial
   TRIAL_ENTERED: "trial.entered",
+  TRIAL_STARTED: "trial.started",
+  TRIAL_ABANDONED: "trial.abandoned",
   TRIAL_COMPARED: "trial.compared",
 
   // Wrong Notebook
@@ -38,6 +51,8 @@ export const EVENTS = {
 
   // Premium
   PREMIUM_VIEWED: "premium.viewed",
+  PAYWALL_VIEWED: "paywall.viewed",
+  PAYWALL_SOURCE: "paywall.source",
   PREMIUM_PURCHASED: "premium.purchased",
   PREMIUM_DISMISSED: "premium.dismissed",
   PREMIUM_SESSION_TRIGGER: "premium.session_trigger",

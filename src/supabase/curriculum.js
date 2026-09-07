@@ -1,5 +1,5 @@
 import { supabase } from "./client";
-import { getSubjectsForExam } from "../data/curriculum";
+import { getSubjectsForExam, getAllSubjectsFlat } from "../data/curriculum";
 import { handleSupabaseError } from "./handleError";
 
 export async function fetchSubjects(exam, field) {
@@ -44,6 +44,17 @@ export async function fetchSubjects(exam, field) {
   }
 }
 
+// Yerel müfredattan konu listesi — DB'de ders/konu yoksa kullanılır.
+//
+// Önceden üç yerde `getSubjectsForExam("tyt_ayt", "sayisal")` sabitti. Bu
+// havuzda LGS dersleri YOK, dolayısıyla lgs_* anahtarı asla bulunamıyor ve
+// LGS kullanıcısının konu listesi BOŞ dönüyordu. Canlı `subjects` tablosunda
+// da LGS satırı bulunmadığı için bu yol her seferinde çalışıyordu.
+function localTopics(subjectKey) {
+  const local = getAllSubjectsFlat().find((s) => s.key === subjectKey);
+  return local?.topics?.map((name, i) => ({ id: `local_${i}`, name, sort_order: i })) || [];
+}
+
 export async function fetchTopicsForSubject(subjectKey) {
   try {
     const { data: subj } = await supabase
@@ -52,9 +63,7 @@ export async function fetchTopicsForSubject(subjectKey) {
       .eq("key", subjectKey)
       .maybeSingle();
     if (!subj?.id) {
-      const allSubjects = getSubjectsForExam("tyt_ayt", "sayisal");
-      const local = allSubjects.find((s) => s.key === subjectKey);
-      return local?.topics?.map((name, i) => ({ id: `local_${i}`, name, sort_order: i })) || [];
+      return localTopics(subjectKey);
     }
     const { data, error } = await supabase
       .from("topics")
@@ -62,15 +71,11 @@ export async function fetchTopicsForSubject(subjectKey) {
       .eq("subject_id", subj.id)
       .order("sort_order", { ascending: true });
     if (error || !data?.length) {
-      const allSubjects = getSubjectsForExam("tyt_ayt", "sayisal");
-      const local = allSubjects.find((s) => s.key === subjectKey);
-      return local?.topics?.map((name, i) => ({ id: `local_${i}`, name, sort_order: i })) || [];
+      return localTopics(subjectKey);
     }
     return data;
   } catch (e) {
     handleSupabaseError(e, "fetchTopicsForSubject");
-    const allSubjects = getSubjectsForExam("tyt_ayt", "sayisal");
-    const local = allSubjects.find((s) => s.key === subjectKey);
-    return local?.topics?.map((name, i) => ({ id: `local_${i}`, name, sort_order: i })) || [];
+    return localTopics(subjectKey);
   }
 }

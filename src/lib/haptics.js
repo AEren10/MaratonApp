@@ -1,19 +1,20 @@
 import * as Haptics from "expo-haptics";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../constants/storageKeys";
+import * as appStorage from "./storage/appStorage";
 
-const PREF_KEY = "@maraton:haptics_enabled";
+const PREF_KEY = STORAGE_KEYS.HAPTICS_ENABLED;
 let _enabled = true;
 
 export async function loadHapticPref() {
   try {
-    const v = await AsyncStorage.getItem(PREF_KEY);
+    const v = await appStorage.getString(PREF_KEY);
     if (v !== null) _enabled = v === "true";
   } catch {}
 }
 
 export async function setHapticEnabled(val) {
   _enabled = val;
-  try { await AsyncStorage.setItem(PREF_KEY, String(val)); } catch {}
+  try { await appStorage.setString(PREF_KEY, String(val)); } catch {}
 }
 
 export function isHapticEnabled() { return _enabled; }

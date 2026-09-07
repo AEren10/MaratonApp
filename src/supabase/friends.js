@@ -155,28 +155,11 @@ export async function unfriend(friendshipId, userId) {
 }
 
 export async function getMyFriendCode(userId) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("referral_code")
-    .eq("id", userId)
-    .maybeSingle();
+  if (!userId || userId === "dev") return null;
+  const { data, error } = await supabase.rpc("get_or_create_referral_code");
   if (error) throw error;
-  if (data?.referral_code) return data.referral_code;
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  let attempts = 0;
-  while (attempts < 5) {
-    const { error: upErr } = await supabase
-      .from("profiles")
-      .update({ referral_code: code })
-      .eq("id", userId);
-    if (!upErr) return code;
-    code = "";
-    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    attempts++;
-  }
-  throw new Error("Kod oluşturulamadı");
+  if (!data) throw new Error("Kod oluşturulamadı");
+  return data;
 }
 
 export async function blockUser(targetId) {

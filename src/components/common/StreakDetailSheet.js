@@ -6,6 +6,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { nextMondayReset } from "../../lib/streakFreeze";
+import { dateKey, todayTR } from "../../lib/dateUtils";
 
 function dayLabel(offset) {
   const d = new Date();
@@ -17,7 +18,7 @@ function isStudied(lastStudyDate, offset) {
   if (!lastStudyDate) return false;
   const target = new Date();
   target.setDate(target.getDate() - offset);
-  const targetStr = target.toISOString().split("T")[0];
+  const targetStr = dateKey(target);
   if (offset === 0) {
     return lastStudyDate === targetStr;
   }
@@ -26,7 +27,7 @@ function isStudied(lastStudyDate, offset) {
 
 function StreakCalendar({ lastStudyDate, streak, C }) {
   const days = Array.from({ length: 7 }, (_, i) => 6 - i);
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = todayTR();
 
   return (
     <View style={cal.row}>
@@ -34,7 +35,7 @@ function StreakCalendar({ lastStudyDate, streak, C }) {
         const label = dayLabel(offset);
         const d = new Date();
         d.setDate(d.getDate() - offset);
-        const dateStr = d.toISOString().split("T")[0];
+        const dateStr = dateKey(d);
         const isToday = offset === 0;
         const active = lastStudyDate && streak > offset && dateStr <= lastStudyDate;
 
@@ -68,7 +69,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
 
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = todayTR();
   const studiedToday = lastStudyDate === todayStr;
   const hour = new Date().getHours();
   const atRisk = !studiedToday && hour >= 18;

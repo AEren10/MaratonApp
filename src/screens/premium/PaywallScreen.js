@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { track } from "../../lib/analytics";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { track, trackPaywallViewed } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, AnimatedPressable, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
@@ -29,6 +29,7 @@ export default function PaywallScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const route = useRoute();
   const { user } = useAuth();
   const { refreshPremium } = usePremium();
   const showAlert = useAlert();
@@ -37,9 +38,27 @@ export default function PaywallScreen() {
   const [purchasing, setPurchasing] = useState(false);
   const s = useMemo(() => makeStyles(C), [C]);
 
+  // Dönüşümün paydası. PREMIUM_DISMISSED tanımlıydı ama hiç gönderilmiyordu:
+  // görüntüleme sayılıyor, kapatma sayılmıyordu — yani paywall dönüşüm oranı
+  // hesaplanamıyordu. beforeRemove kullanılıyor ki kapatma butonu, donanım
+  // geri tuşu ve kaydırmayla çıkış hepsi yakalansın.
+  const convertedRef = useRef(false);
+
   useEffect(() => {
-    track(EVENTS.PREMIUM_VIEWED);
-  }, []);
+    track(EVENTS.PREMIUM_VIEWED, { source: route.params?.source || "unknown" });
+    trackPaywallViewed(route.params?.source || "unknown");
+  }, [route.params?.source]);
+
+  useEffect(() => {
+    const unsub = navigation.addListener("beforeRemove", () => {
+      if (convertedRef.current) return;
+      track(EVENTS.PREMIUM_DISMISSED, {
+        source: route.params?.source || "unknown",
+        selectedPlan,
+      });
+    });
+    return unsub;
+  }, [navigation, route.params?.source, selectedPlan]);
 
   useEffect(() => {
     if (!isInitialized()) return;
@@ -75,6 +94,8 @@ export default function PaywallScreen() {
         if (user?.id) {
           const started = await startTrial(user.id);
           if (started) {
+            convertedRef.current = true;
+            track(EVENTS.TRIAL_STARTED, { source: route.params?.source || "paywall" });
             H.success();
             await refreshPremium();
             showAlert("Deneme Başladı", "7 günlük ücretsiz denemen başladı!");
@@ -89,6 +110,7 @@ export default function PaywallScreen() {
       }
       const isPro = await purchasePackage(pkg);
       if (isPro) {
+        convertedRef.current = true;
         track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan });
         H.success();
         await refreshPremium();

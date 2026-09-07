@@ -1,13 +1,15 @@
 import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "./AuthContext";
 import { getProfile } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
+import { clearRouteWeeks } from "../supabase/routePlan";
+import { STORAGE_KEYS } from "../constants/storageKeys";
+import * as appStorage from "../lib/storage/appStorage";
 
 const ExamContext = createContext(null);
 
-const STORAGE_KEY = "@exam_config";
-const SLIDES_KEY = "@has_seen_onboarding";
+const STORAGE_KEY = STORAGE_KEYS.EXAM_CONFIG;
+const SLIDES_KEY = STORAGE_KEYS.HAS_SEEN_ONBOARDING;
 
 export function ExamProvider({ children }) {
   const { session } = useAuth();
@@ -24,19 +26,16 @@ export function ExamProvider({ children }) {
 
   useEffect(() => {
     Promise.all([
-      AsyncStorage.getItem(STORAGE_KEY),
-      AsyncStorage.getItem(SLIDES_KEY),
-    ]).then(([raw, seenRaw]) => {
-      if (raw) {
-        try {
-          const d = JSON.parse(raw);
-          setExamType(d.examType);
-          setField(d.field || null);
-          setExamDate(d.examDate ? new Date(d.examDate) : null);
-          setTargetRanking(d.targetRanking || null);
-          setTargetDepartment(d.targetDepartment || null);
-          if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
-        } catch {}
+      appStorage.getJson(STORAGE_KEY, null),
+      appStorage.getString(SLIDES_KEY),
+    ]).then(([d, seenRaw]) => {
+      if (d) {
+        setExamType(d.examType);
+        setField(d.field || null);
+        setExamDate(d.examDate ? new Date(d.examDate) : null);
+        setTargetRanking(d.targetRanking || null);
+        setTargetDepartment(d.targetDepartment || null);
+        if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
       }
       setHasSeenSlides(seenRaw === "true");
     })
@@ -61,18 +60,21 @@ export function ExamProvider({ children }) {
     dbLoaded.current = true;
     setDbLoading(true);
 
+    // Çıkış→giriş yarışı: A'nın profili logout'tan sonra resolve olursa
+    // B'nin sınav tipi/hedef sıralaması A'nınkiyle eziliyor ve diske yazılıyor.
+    // Effect session değişince yeniden çalıştığı için cleanup bunu keser.
+    let cancelled = false;
+
     getProfile(session.user.id).then((p) => {
+      if (cancelled) return;
       if (!p?.exam_type) {
-        AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
-          if (!raw) return;
-          try {
-            const d = JSON.parse(raw);
-            setExamType(d.examType);
-            setField(d.field || null);
-            setExamDate(d.examDate ? new Date(d.examDate) : null);
-            setTargetRanking(d.targetRanking || null);
-            setTargetDepartment(d.targetDepartment || null);
-          } catch {}
+        appStorage.getJson(STORAGE_KEY, null).then((d) => {
+          if (cancelled || !d) return;
+          setExamType(d.examType);
+          setField(d.field || null);
+          setExamDate(d.examDate ? new Date(d.examDate) : null);
+          setTargetRanking(d.targetRanking || null);
+          setTargetDepartment(d.targetDepartment || null);
         }).catch(() => {});
         return;
       }
@@ -90,32 +92,41 @@ export function ExamProvider({ children }) {
       setTargetRanking(config.targetRanking);
       setTargetDepartment(config.targetDepartment);
       if (config.dailyGoalSet) setDailyGoalSet(true);
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+      appStorage.setJson(STORAGE_KEY, {
         examType: config.examType,
         field: config.field,
         examDate: config.examDate?.toISOString() || null,
         targetRanking: config.targetRanking,
         targetDepartment: config.targetDepartment,
         dailyGoalSet: config.dailyGoalSet,
-      })).catch(() => {});
-    }).catch(() => {}).finally(() => setDbLoading(false));
+      }).catch(() => {});
+    }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
+
+    return () => { cancelled = true; };
   }, [session]);
 
   const markSlidesAsSeen = useCallback(() => {
     setHasSeenSlides(true);
-    AsyncStorage.setItem(SLIDES_KEY, "true").catch(() => {});
+    appStorage.setString(SLIDES_KEY, "true").catch(() => {});
   }, []);
 
   const updateExamConfig = useCallback(async (type, selectedField, date) => {
+    const changedExam = !!examType && !!type && examType !== type;
     setExamType(type);
     setField(selectedField || null);
     setExamDate(date);
+
+    // Sınav tipi DEĞİŞTİYSE eski rotayı temizle. YKS'den LGS'ye geçen bir
+    // kullanıcının rota haftaları başka bir müfredata ait; borç hesabı ve
+    // "Plan vs Gerçek" yanlış konularla dolar. Sessizce durmasındansa silinsin.
+    if (changedExam && session?.user?.id) {
+      clearRouteWeeks(session.user.id, { exceptExamType: type }).catch(() => {});
+    }
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      const existing = raw ? JSON.parse(raw) : {};
-      await AsyncStorage.setItem(
+      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      await appStorage.setJson(
         STORAGE_KEY,
-        JSON.stringify({ ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() }),
+        { ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() },
       );
     } catch {}
     if (session?.user?.id && session.user.id) {
@@ -124,16 +135,15 @@ export function ExamProvider({ children }) {
         targetRanking, targetDepartment,
       }).catch(() => {});
     }
-  }, [session, targetRanking, targetDepartment]);
+  }, [session, targetRanking, targetDepartment, examType]);
 
   const updateGoal = useCallback(async (dailyQuestions) => {
     setDailyGoalSet(true);
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      const existing = raw ? JSON.parse(raw) : {};
-      await AsyncStorage.setItem(
+      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      await appStorage.setJson(
         STORAGE_KEY,
-        JSON.stringify({ ...existing, dailyGoalSet: true }),
+        { ...existing, dailyGoalSet: true },
       );
     } catch {}
     if (session?.user?.id) {
@@ -146,11 +156,10 @@ export function ExamProvider({ children }) {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      const existing = raw ? JSON.parse(raw) : {};
-      await AsyncStorage.setItem(
+      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      await appStorage.setJson(
         STORAGE_KEY,
-        JSON.stringify({ ...existing, targetRanking: ranking, targetDepartment: department || null }),
+        { ...existing, targetRanking: ranking, targetDepartment: department || null },
       );
     } catch {}
     if (session?.user?.id) {

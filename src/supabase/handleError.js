@@ -23,11 +23,14 @@ function isAuthError(error) {
   const code = error.code || error.status || "";
   const msg = error.message || "";
   const status = error.status || error.statusCode;
+  // 42501 = RLS politika reddi. PostgREST bunu 403 ile döner ama bu bir
+  // KİMLİK hatası değil, yetki hatası — kullanıcıyı çıkışa zorlamamalı.
+  // Bu yüzden çıplak 403 auth hatası sayılmaz; 401 ve JWT sinyalleri sayılır.
+  if (code === "42501") return false;
   return (
     code === "PGRST301" ||
     code === "AuthApiError" ||
     status === 401 ||
-    status === 403 ||
     msg.includes("JWT") ||
     msg.includes("token is expired") ||
     msg.includes("invalid claim")

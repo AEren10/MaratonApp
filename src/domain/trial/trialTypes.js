@@ -1,7 +1,4 @@
-// Each trial type defines its subject set.
-// `key` is the subject's stable identifier used in DB.
-// `parent` indicates TYT or AYT (used for analysis grouping).
-// Color keys resolve at call time via C parameter — no stale captures.
+// Domain-level trial catalog. UI code should import from here, not screens.
 
 export function getTYTSubjects(C) {
   return [
@@ -58,69 +55,19 @@ export function getAllSubjects(C) {
     ...getTYTSubjects(C),
     ...getAYTSaySubjects(C),
     ...getAYTEASubjects(C).filter((s) => s.key !== "ayt_matematik"),
-    ...getAYTSozSubjects(C).filter(
-      (s) => !["ayt_edebiyat", "ayt_tarih1", "ayt_cografya1"].includes(s.key)
-    ),
+    ...getAYTSozSubjects(C).filter((s) => !["ayt_edebiyat", "ayt_tarih1", "ayt_cografya1"].includes(s.key)),
     ...getLGSSubjects(C),
   ];
 }
 
 export function getTrialTypes(C) {
   return {
-    TYT: {
-      code: "TYT",
-      label: "TYT Denemesi",
-      description: "120 soru · 4 ders",
-      icon: "bookOpen",
-      color: C.blue,
-      subjects: getTYTSubjects(C),
-      totalQuestions: 120,
-    },
-    AYT_SAY: {
-      code: "AYT_SAY",
-      label: "AYT Sayısal",
-      description: "80 soru · Mat-Fizik-Kimya-Biyoloji",
-      icon: "hash",
-      color: C.amber,
-      subjects: getAYTSaySubjects(C),
-      totalQuestions: 80,
-    },
-    AYT_EA: {
-      code: "AYT_EA",
-      label: "AYT Eşit Ağırlık",
-      description: "80 soru · Mat-Ede-Tarih-Coğ",
-      icon: "layers",
-      color: C.purple,
-      subjects: getAYTEASubjects(C),
-      totalQuestions: 80,
-    },
-    AYT_SOZ: {
-      code: "AYT_SOZ",
-      label: "AYT Sözel",
-      description: "80 soru · Ede-Tarih-Coğ-Fel-Din",
-      icon: "bookOpen",
-      color: C.green,
-      subjects: getAYTSozSubjects(C),
-      totalQuestions: 80,
-    },
-    LGS: {
-      code: "LGS",
-      label: "LGS Denemesi",
-      description: "90 soru · 6 ders",
-      icon: "shield",
-      color: C.green,
-      subjects: getLGSSubjects(C),
-      totalQuestions: 90,
-    },
-    BRANCH: {
-      code: "BRANCH",
-      label: "Branş Denemesi",
-      description: "Tek derslik branş denemesi",
-      icon: "target",
-      color: C.teal,
-      subjects: getAllSubjects(C),
-      totalQuestions: null,
-    },
+    TYT: { code: "TYT", label: "TYT Denemesi", description: "120 soru · 4 ders", icon: "bookOpen", color: C.blue, subjects: getTYTSubjects(C), totalQuestions: 120 },
+    AYT_SAY: { code: "AYT_SAY", label: "AYT Sayısal", description: "80 soru · Mat-Fizik-Kimya-Biyoloji", icon: "hash", color: C.amber, subjects: getAYTSaySubjects(C), totalQuestions: 80 },
+    AYT_EA: { code: "AYT_EA", label: "AYT Eşit Ağırlık", description: "80 soru · Mat-Ede-Tarih-Coğ", icon: "layers", color: C.purple, subjects: getAYTEASubjects(C), totalQuestions: 80 },
+    AYT_SOZ: { code: "AYT_SOZ", label: "AYT Sözel", description: "80 soru · Ede-Tarih-Coğ-Fel-Din", icon: "bookOpen", color: C.green, subjects: getAYTSozSubjects(C), totalQuestions: 80 },
+    LGS: { code: "LGS", label: "LGS Denemesi", description: "90 soru · 6 ders", icon: "shield", color: C.green, subjects: getLGSSubjects(C), totalQuestions: 90 },
+    BRANCH: { code: "BRANCH", label: "Branş Denemesi", description: "Tek derslik branş denemesi", icon: "target", color: C.teal, subjects: getAllSubjects(C), totalQuestions: null },
   };
 }
 
@@ -156,8 +103,7 @@ export function getTrialTypesForField(C, field) {
 }
 
 export function getSubjectsForType(C, typeCode, branchSubjectKey = null) {
-  const types = getTrialTypes(C);
-  const type = types[typeCode];
+  const type = getTrialTypes(C)[typeCode];
   if (!type) return [];
   if (typeCode === "BRANCH") {
     if (!branchSubjectKey) return [];
@@ -172,3 +118,4 @@ export function getFieldFromType(typeCode) {
   if (typeCode === "AYT_SOZ") return "Sözel";
   return null;
 }
+

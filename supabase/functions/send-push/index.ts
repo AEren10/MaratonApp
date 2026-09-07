@@ -1,3 +1,5 @@
+/// <reference lib="deno.ns" />
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
@@ -21,23 +23,48 @@ interface ReengagementPayload {
   user_ids?: string[];
 }
 
-const TEMPLATES: Record<string, { title: string; body: string; data: Record<string, string> }> = {
+type PushTemplate = {
+  title: string;
+  body: string;
+  data: Record<string, string>;
+};
+
+// DİKKAT — bu URL'ler istemcideki src/navigation/routes.js yollarına ELLE
+// karşılık gelir (appUrl() burada çalışmıyor, ayrı runtime).
+// Doğrulandı 2026-09-07: home -> "home", weekly-review -> "weekly-review".
+// routes.js'te bir yol değişirse BURASI DA değişmeli; aksi halde push
+// bildirimi sessizce hiçbir ekrana gitmez.
+const TEMPLATES: Record<ReengagementPayload["type"], PushTemplate> = {
   inactive_3d: {
     title: "Seni ozledik!",
     body: "3 gundur calisma kaydetmedin. Hedefe kalan her gun onemli!",
-    data: { url: "maraton://home" },
+    data: { type: "inactive_3d", url: "maraton://home" },
   },
   streak_risk: {
     title: "Streak'in tehlikede!",
     body: "Bugun hic calisma kaydetmedin. Seriyi bozma!",
-    data: { url: "maraton://home" },
+    data: { type: "streak_risk", url: "maraton://home" },
   },
   weekly_summary: {
     title: "Haftalik raporun hazir",
     body: "Bu haftanin ozetine goz at, gelisimini incele!",
-    data: { url: "maraton://weekly-review" },
+    data: { type: "weekly_summary", url: "maraton://weekly-review" },
   },
 };
+
+const DEFAULT_TEMPLATE: PushTemplate = {
+  title: "Maraton",
+  body: "",
+  data: {},
+};
+
+function notificationAllowed(type: ReengagementPayload["type"], prefs: unknown): boolean {
+  const value = prefs && typeof prefs === "object" ? prefs as Record<string, unknown> : {};
+  if (type === "streak_risk") return value.streakRiskEnabled !== false;
+  if (type === "weekly_summary") return value.weeklySummaryEnabled !== false;
+  if (type === "inactive_3d") return value.dailyReminderEnabled !== false;
+  return true;
+}
 
 async function sendBatch(messages: PushMessage[]): Promise<void> {
   const resp = await fetch(EXPO_PUSH_URL, {
@@ -67,7 +94,7 @@ Deno.serve(async (req) => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const payload: ReengagementPayload = await req.json();
+  const payload = await req.json() as ReengagementPayload;
   const { type, title, body, data, user_ids } = payload;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -75,7 +102,7 @@ Deno.serve(async (req) => {
 
   let query = supabase
     .from("profiles")
-    .select("id, expo_push_token")
+    .select("id, expo_push_token, notification_prefs")
     .not("expo_push_token", "is", null);
 
   if (user_ids && user_ids.length > 0) {
@@ -84,8 +111,13 @@ Deno.serve(async (req) => {
     const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
     query = query.lt("last_active", threeDaysAgo);
   } else if (type === "streak_risk") {
-    const today = new Date().toISOString().split("T")[0];
-    query = query.lt("last_active", today);
+    // Gün sınırı TR saatiyle. toISOString() UTC verir; TR = UTC+3 olduğu için
+    // gece 00:00-03:00 arasında aktif olan kullanıcı "dün aktif" sayılıp
+    // seri-riski bildirimi alıyordu. sv-SE formatı YYYY-MM-DD döndürür.
+    const todayTR = new Date().toLocaleDateString("sv-SE", {
+      timeZone: "Europe/Istanbul",
+    });
+    query = query.lt("last_active", `${todayTR}T00:00:00+03:00`);
   }
 
   const { data: users, error } = await query;
@@ -103,13 +135,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  const template = TEMPLATES[type] || {};
+  const template = TEMPLATES[type] ?? DEFAULT_TEMPLATE;
   const msgTitle = title || template.title || "Maraton";
   const msgBody = body || template.body || "";
   const msgData = data || template.data || {};
 
   const messages: PushMessage[] = users
     .filter((u) => u.expo_push_token?.startsWith("ExponentPushToken["))
+    .filter((u) => notificationAllowed(type, u.notification_prefs))
     .map((u) => ({
       to: u.expo_push_token,
       title: msgTitle,

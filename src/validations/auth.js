@@ -1,14 +1,22 @@
 import { z } from "zod";
 
+// Tek e-posta kuralı — tüm ekranlar bunu kullansın.
+// ForgotPassword ve EditEmail elle `includes("@")` yapıyordu ve "a@" gibi
+// girdileri geçiriyordu; kullanıcı sıfırlama e-postasının neden gelmediğini
+// anlayamıyordu.
+export const emailSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta gir"),
+});
+
 export const loginSchema = z.object({
-  email: z.string().email("Gecerli bir e-posta girin"),
-  password: z.string().min(6, "Sifre en az 6 karakter olmali"),
+  email: z.string().email("Geçerli bir e-posta gir"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2, "Isim en az 2 karakter olmali"),
-  email: z.string().email("Gecerli bir e-posta girin"),
-  password: z.string().min(6, "Sifre en az 6 karakter olmali"),
+  name: z.string().min(2, "Adın en az 2 karakter olmalı"),
+  email: z.string().email("Geçerli bir e-posta gir"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
 });
 
 export const trialSubjectSchema = z.object({
@@ -19,9 +27,9 @@ export const trialSubjectSchema = z.object({
 });
 
 export const trialEntrySchema = z.object({
-  name: z.string().min(1, "Deneme adi girin").max(100),
+  name: z.string().min(1, "Deneme adı gir").max(100),
   trial_date: z.string().min(1),
-  exam_type: z.enum(["tyt", "ayt_say", "ayt_ea", "ayt_soz", "lgs", "branch"]),
+  exam_type: z.enum(["TYT", "AYT", "AYT_SAY", "AYT_EA", "AYT_SOZ", "LGS", "BRANCH"]),
   total_net: z.number().min(-200).max(500),
   subjects: z.array(trialSubjectSchema).min(1),
 });
@@ -45,3 +53,23 @@ export const userTaskSchema = z.object({
   targetMinutes: z.number().int().min(0).max(720).optional(),
   note: z.string().max(140).optional(),
 });
+
+/**
+ * Zod hatasını ekranların kullandığı { alan: mesaj } şekline çevirir.
+ *
+ * Auth ekranları elle doğruluyordu ve `email.includes("@")` gibi zayıf
+ * kontroller "a@" gibi girdileri geçiriyordu. AGENTS.md zaten Zod diyor;
+ * şemalar yazılıydı ama hiçbir ekran kullanmıyordu.
+ *
+ *   const { ok, errors } = validate(loginSchema, { email, password });
+ */
+export function validate(schema, values) {
+  const res = schema.safeParse(values);
+  if (res.success) return { ok: true, errors: {}, data: res.data };
+  const errors = {};
+  for (const issue of res.error.issues) {
+    const key = issue.path[0];
+    if (key && !errors[key]) errors[key] = issue.message;
+  }
+  return { ok: false, errors, data: null };
+}

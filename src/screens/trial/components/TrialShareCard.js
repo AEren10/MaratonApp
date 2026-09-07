@@ -70,7 +70,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
       </View>
 
       <View style={[st.divider, { backgroundColor: C.border }]} />
-      <Text style={[st.watermark, { color: C.muted }]}>maraton.app · YKS hazırlık asistanın</Text>
+      <Text style={[st.watermark, { color: C.muted }]}>maraton.app · sınav hazırlık asistanın</Text>
     </View>
   );
 });

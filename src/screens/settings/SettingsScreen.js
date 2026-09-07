@@ -14,8 +14,10 @@ import { usePremium } from "../../contexts/PremiumContext";
 
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
+import { SyncStatusGroup } from "./components/SyncStatusGroup";
 import * as H from "../../lib/haptics";
 import { isHapticEnabled, setHapticEnabled } from "../../lib/haptics";
+import { useExam } from "../../contexts/ExamContext";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -23,6 +25,7 @@ export default function SettingsScreen() {
   const { logout, deleteAccount } = useAuth();
   const showAlert = useAlert();
   const { checkFeature, showPaywall } = usePremium();
+  const { examType } = useExam();
   const [hapticsOn, setHapticsOn] = useState(isHapticEnabled());
 
   const toggleHaptics = useCallback((val) => {
@@ -37,7 +40,7 @@ export default function SettingsScreen() {
   const gatedGo = useCallback((key, screen) => () => {
     H.tap();
     if (checkFeature(key)) navigation.navigate(screen);
-    else showPaywall();
+    else showPaywall(`settings_${key}`);
   }, [checkFeature, showPaywall, navigation]);
 
   const handleHelp = useCallback(() => {
@@ -101,7 +104,11 @@ export default function SettingsScreen() {
             <SettingsRow icon="target" iconColor={C.green} label="Hedeflerim" onPress={go(SCREENS.GOALS)} />
             <SettingsRow icon="clock" iconColor={C.blue} label="Çalışma Geçmişi" onPress={go(SCREENS.STUDY_LOG)} />
             <SettingsRow icon="hash" iconColor={C.brandLight} label="Konu Kartları" onPress={go(SCREENS.TOPIC_CARDS)} />
-            <SettingsRow icon="chart" iconColor={C.pink} label="Net Simülatörü" onPress={gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
+            {/* Net Simülatörü YKS'ye özgü: YKS sıralaması ve üniversite bölümü
+                seçimi içeriyor, LGS'de karşılığı yok. */}
+            {examType !== "lgs" && (
+              <SettingsRow icon="chart" iconColor={C.pink} label="Net Simülatörü" onPress={gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
+            )}
             <SettingsRow icon="layers" iconColor={C.teal} label="Yol Haritası" onPress={gatedGo("detailed_roadmap", SCREENS.ROADMAP)} />
             <SettingsRow icon="calendar" iconColor={C.amber} label="Takvim" onPress={go(SCREENS.CALENDAR)} />
           </SettingsGroup>
@@ -123,6 +130,11 @@ export default function SettingsScreen() {
             <SettingsRow icon="moon" iconColor={C.accent} label="Görünüm" onPress={go(SCREENS.APPEARANCE)} />
             <SettingsRow icon="zap" iconColor={C.amber} label="Titreşim" toggle value={hapticsOn} onToggle={toggleHaptics} />
           </SettingsGroup>
+        </Animated.View>
+
+        {/* SENKRON — yalnızca bekleyen/başarısız kayıt varsa görünür */}
+        <Animated.View entering={FadeInDown.delay(270).duration(400).springify()}>
+          <SyncStatusGroup />
         </Animated.View>
 
         {/* UYGULAMA */}

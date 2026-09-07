@@ -177,7 +177,9 @@ export default function RoadmapScreen() {
   }, [user?.id]);
 
   const roadmap = useMemo(() => {
-    const pool = getSubjectsForExam(examType || "tyt", field);
+    // examType yoksa harita çizme — "tyt" varsayımı LGS kullanıcısına yanlış
+    // konu haritası gösteriyordu.
+    const pool = examType ? getSubjectsForExam(examType, field) : [];
     const weakAreas = weightedWeakAreas(trials);
     return buildRoadmap({ pool, progressByKey, weakAreas, daysLeft: daysUntilExam });
   }, [examType, field, progressByKey, trials, daysUntilExam]);

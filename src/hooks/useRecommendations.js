@@ -4,7 +4,7 @@ import { selectTrials } from "../store/slices/trialSlice";
 import { selectTodayLogs, selectStreak } from "../store/slices/studyLogSlice";
 import { selectDailyQuestionsGoal } from "../store/slices/goalsSlice";
 import { generateNudges } from "../lib/smartNudge";
-import { trialSubjectsToCurriculumWeakAreas } from "../screens/trial/trialKeyMap";
+import { trialSubjectsToCurriculumWeakAreas } from "../domain/trial/trialKeyMap";
 
 export function useRecommendations() {
   const trials = useAppSelector(selectTrials);
@@ -17,7 +17,7 @@ export function useRecommendations() {
     let todayTotal = 0;
     todayLogs.forEach((l) => {
       if (l.subject && l.study_date) recentStudy[l.subject] = l.study_date;
-      todayTotal += l.question_count || 0;
+      todayTotal += l.questionCount ?? l.question_count ?? 0;
     });
 
     let weakAreas = {};

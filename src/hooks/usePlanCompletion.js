@@ -1,27 +1,39 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as H from "../lib/haptics";
 import { todayTR } from "../lib/dateUtils";
 import { getDailyPlan, createDailyPlan, togglePlanTask } from "../supabase/plans";
+import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
+import { getJson, setJson } from "../lib/storage/appStorage";
+import { useGamification } from "./useGamification";
 
-const getKey = () => `@plan_done_${todayTR()}`;
+const getKey = (userId) => datedUserKey(STORAGE_KEYS.PLAN_DONE_PREFIX, todayTR(), userId);
 
 function buildTaskKey(subject, topic) {
   return `plan_${subject}_${topic || "genel"}`;
 }
 
 export function usePlanCompletion(userId) {
+  // Ödül fonksiyonunu ref'te tutuyoruz: toggle'ın useCallback bağımlılığına
+  // girmesin, her render'da yeniden oluşmasın.
+  const { reward } = useGamification();
+  const rewardRef = useRef(reward);
+  rewardRef.current = reward;
+
   const [doneIds, setDoneIds] = useState(new Set());
+  // Yan etkiler updater DIŞINDA çalışsın diye güncel değerin aynası.
+  const doneIdsRef = useRef(doneIds);
+  doneIdsRef.current = doneIds;
   const taskMapRef = useRef({});
   const syncedRef = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(getKey()).then((val) => {
-      if (val) {
-        try { setDoneIds(new Set(JSON.parse(val))); } catch {}
-      }
-    }).catch(() => {});
-  }, []);
+    setDoneIds(new Set());
+    taskMapRef.current = {};
+    syncedRef.current = false;
+    getJson(getKey(userId), []).then((ids) => {
+      if (Array.isArray(ids)) setDoneIds(new Set(ids));
+    });
+  }, [userId]);
 
   useEffect(() => {
     if (!userId || userId === "dev") return;
@@ -39,7 +51,7 @@ export function usePlanCompletion(userId) {
       if (dbDoneIds.length > 0) {
         setDoneIds((prev) => {
           const merged = new Set([...prev, ...dbDoneIds]);
-          AsyncStorage.setItem(getKey(), JSON.stringify([...merged]));
+          setJson(getKey(userId), [...merged]);
           return merged;
         });
       }
@@ -82,18 +94,36 @@ export function usePlanCompletion(userId) {
     }
   }, [userId]);
 
+  // XP ÖDÜLÜ BURADA — ekranda değil.
+  //
+  // Önceden yalnızca HomeScreen'deki `onTaskDone` callback'i ödül veriyordu,
+  // yani aynı görevi Plan Detay ekranından işaretleyen kullanıcı HİÇ XP
+  // almıyordu. "XP bozuk" izlenimi veren tipik bir tutarsızlık.
+  // Ödülü hook'a taşımak tek kaynak sağlıyor: hangi ekrandan işaretlenirse
+  // işaretlensin aynı davranış.
   const toggle = useCallback((id) => {
-    setDoneIds((prev) => {
-      const next = new Set(prev);
-      const nowDone = !next.has(id);
-      if (nowDone) { next.add(id); H.success(); }
-      else next.delete(id);
-      AsyncStorage.setItem(getKey(), JSON.stringify([...next]));
-      const dbId = taskMapRef.current[id];
-      if (dbId) togglePlanTask(dbId, nowDone).catch(() => {});
-      return next;
-    });
-  }, []);
+    // YAN ETKİLER UPDATER'IN DIŞINDA.
+    //
+    // Önceden diske yazma, sunucu çağrısı ve XP ödülü setDoneIds updater'ının
+    // içindeydi. Updater SAF olmalı: React 18 eşzamanlı modda onu yeniden
+    // çalıştırabilir, StrictMode ise iki kez çağırır — bu da çift XP ve çift
+    // ağ isteği demek. useUserTasks.toggleTask bunu zaten doğru yapıyordu.
+    const current = doneIdsRef.current;
+    const nowDone = !current.has(id);
+
+    const next = new Set(current);
+    if (nowDone) next.add(id);
+    else next.delete(id);
+
+    doneIdsRef.current = next;
+    setDoneIds(next);
+
+    if (nowDone) H.success();
+    setJson(getKey(userId), [...next]);
+    const dbId = taskMapRef.current[id];
+    if (dbId) togglePlanTask(dbId, nowDone).catch(() => {});
+    if (nowDone) rewardRef.current?.("plan_task_done");
+  }, [userId]);
 
   const isDone = useCallback((id) => doneIds.has(id), [doneIds]);
 

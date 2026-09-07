@@ -13,6 +13,8 @@ import { resetPassword } from "../../supabase/auth";
 import { AuthInput } from "./components/AuthInput";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { authErrorMessage } from "../../supabase/authErrors";
+import { emailSchema, validate } from "../../validations/auth";
 
 export default function ForgotPasswordScreen() {
   const C = useC();
@@ -27,8 +29,9 @@ export default function ForgotPasswordScreen() {
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
   const submit = async () => {
-    if (!email.includes("@")) {
-      setError("Geçerli bir e-posta gir");
+    const check = validate(emailSchema, { email: email.trim() });
+    if (!check.ok) {
+      setError(check.errors.email);
       return;
     }
     setError("");
@@ -39,7 +42,7 @@ export default function ForgotPasswordScreen() {
       setSent(true);
     } catch (err) {
       H.error();
-      showAlert("Hata", err.message ?? "Bir sorun oldu");
+      showAlert("Hata", authErrorMessage(err));
     } finally {
       setBusy(false);
     }

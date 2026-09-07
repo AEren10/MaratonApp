@@ -125,28 +125,18 @@ export async function leaveGroup(groupId, userId) {
   }
 }
 
-// Grup içi haftalık leaderboard (mevcut leaderboard_weekly view + üyeler).
+// Grup içi haftalık leaderboard.
 export async function groupLeaderboard(groupId, userId) {
   try {
-    const { data: members, error: mErr } = await supabase
-      .from("group_members")
-      .select("user_id")
-      .eq("group_id", groupId);
-    if (mErr) throw mErr;
-    const ids = (members || []).map((m) => m.user_id);
-    if (!ids.length) return { list: [], myRank: null, myScore: 0 };
-
-    const { data, error } = await supabase
-      .from("leaderboard_weekly")
-      .select("user_id, name, avatar_url, weekly_xp, questions, trials")
-      .in("user_id", ids)
-      .order("weekly_xp", { ascending: false });
+    const { data, error } = await supabase.rpc("get_group_leaderboard", {
+      group_uuid: groupId,
+    });
     if (error) throw error;
 
     const list = (data || []).map((r, i) => ({
       ...r,
       weekly_xp: r.weekly_xp || 0,
-      rank: i + 1,
+      rank: Number(r.rank) || i + 1,
       you: r.user_id === userId,
     }));
     const mine = list.find((r) => r.you);

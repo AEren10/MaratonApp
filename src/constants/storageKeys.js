@@ -1,9 +1,16 @@
+import { todayTR } from "../lib/dateUtils";
+
 export const STORAGE_KEYS = {
   THEME_PREF: "@maraton:themePref",
+  THEME_ACCENT: "@maraton:themeAccent",
+  // Çalışan kronometre oturumu — uygulama öldürülürse kurtarmak için.
+  ACTIVE_TIMER_SESSION: "@maraton:activeTimerSession",
   EXAM_CONFIG: "@exam_config",
   HAS_SEEN_ONBOARDING: "@has_seen_onboarding",
   NOTIF_PREFS: "@maraton:notifPrefs",
   OFFLINE_QUEUE: "@maraton:offlineQueue",
+  OFFLINE_DEAD_LETTER: "@maraton:dead_letter_queue",
+  HAPTICS_ENABLED: "@maraton:haptics_enabled",
   GOALS: "@maraton:goals",
   NUDGE_POPUP_SHOWN: "@nudge_popup_shown",
   LAST_ACTIVE: "@maraton:last_active",
@@ -23,8 +30,25 @@ export const STORAGE_KEYS = {
   PENDING_FRIEND_CODE: "@maraton:pending_friend_code",
   PENDING_GROUP_CODE: "@maraton:pending_group_code",
   ANALYTICS_BUFFER: "@maraton:analyticsBuffer",
+  DAILY_GOAL_DONE_PREFIX: "@daily_goal_done",
+  PLAN_DONE_PREFIX: "@plan_done",
 };
 
+// Gün sınırı TR saatiyle. toISOString() UTC verir; TR = UTC+3 olduğu için
+// 00:00-03:00 arasında "bugün" dün sayılıyordu — günlük hedef anahtarı ve
+// giriş ödülü aynı TR gününde ikinci kez tetiklenebiliyordu.
 export function dailyKey(prefix) {
-  return `${prefix}_${new Date().toISOString().split("T")[0]}`;
+  return `${prefix}_${todayTR()}`;
+}
+
+export function datedKey(prefix, date) {
+  return `${prefix}_${date || todayTR()}`;
+}
+
+export function userScopedKey(key, userId) {
+  return userId ? `${key}:${userId}` : key;
+}
+
+export function datedUserKey(prefix, date, userId) {
+  return userScopedKey(datedKey(prefix, date), userId);
 }

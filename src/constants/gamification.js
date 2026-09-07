@@ -33,13 +33,11 @@ export const LEVELS = [
   { level: 17, xp: 23000, title: "Şampiyon" },
   { level: 18, xp: 28000, title: "Dahi" },
   { level: 19, xp: 34000, title: "Efsanevi" },
-  { level: 20, xp: 42000, title: "YKS Tanrısı" },
+  { level: 20, xp: 42000, title: "Maraton Efsanesi" },
 ];
 
-export const LEAGUE_TIERS = [
-  { key: "bronz", name: "Bronz Lig", icon: "shield", color: "#CD7F47", minRank: 0 },
-  { key: "gumus", name: "Gümüş Lig", icon: "shield", color: "#C0C5CE", minRank: 100 },
-  { key: "altin", name: "Altın Lig", icon: "shield", color: "#fbbf24", minRank: 500 },
-  { key: "elmas", name: "Elmas Lig", icon: "shield", color: "#60a5fa", minRank: 2000 },
-  { key: "obsidyen", name: "Obsidyen Lig", icon: "shield", color: "#c084fc", minRank: 5000 },
-];
+// LEAGUE_TIERS burada DEĞİL: src/constants/league.js içinde.
+// Burada minRank tabanlı ikinci bir tanım vardı (0/100/500/2000/5000, shield
+// ikonu, farklı renkler) ve hiçbir yerden kullanılmıyordu. Gerçek lig modeli
+// haftalık XP tabanlı — iki farklı model yan yana durunca hangisinin geçerli
+// olduğu belirsizleşiyordu. Tek kaynak: league.js.

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Image } from "expo-image";
-import { supabase } from "../../supabase/client";
+import { createStorageSignedUrl } from "../../supabase/storage";
 
 const MAX_CACHE = 100;
 const TTL = 5 * 60 * 1000;
@@ -35,14 +35,12 @@ export default function SignedImage({ bucket, path, style, contentFit, ...rest }
   useEffect(() => {
     if (!path || path.startsWith("http") || cached) return;
     let cancelled = false;
-    supabase.storage
-      .from(bucket)
-      .createSignedUrl(path, 3600)
-      .then(({ data }) => {
-        if (!cancelled && data?.signedUrl) {
-          cache.set(`${bucket}/${path}`, { url: data.signedUrl, ts: Date.now() });
+    createStorageSignedUrl(bucket, path, 3600)
+      .then((signedUrl) => {
+        if (!cancelled && signedUrl) {
+          cache.set(`${bucket}/${path}`, { url: signedUrl, ts: Date.now() });
           pruneCache();
-          setUri(data.signedUrl);
+          setUri(signedUrl);
         }
       })
       .catch(() => {});

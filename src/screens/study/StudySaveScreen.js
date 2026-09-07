@@ -14,18 +14,20 @@ import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
 import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
 import { computeStreakUpdate } from "../../lib/streakFreeze";
+import { trackStreakTransition } from "../../lib/trackStreakTransition";
 import { useGamification } from "../../hooks/useGamification";
 import { captureError } from "../../lib/errorReporting";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
 import { getStreak, updateStreak } from "../../supabase/streaks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { setJson } from "../../lib/storage/appStorage";
 import { todayTR } from "../../lib/dateUtils";
-import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
+import { TopicPicker } from "../../components/forms/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
@@ -90,6 +92,10 @@ export default function StudySaveScreen() {
   const [correctCount, setCC] = useState(initCorrect > 0 ? String(initCorrect) : "");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const { completeForm, markFormDirty } = useFormLifecycleAnalytics("study_log_measured", {
+    duration,
+    subjectKey,
+  });
 
   const subjects = useMemo(() => {
     return examTier === "TYT" ? tytSubjects : aytSubjects;
@@ -103,6 +109,7 @@ export default function StudySaveScreen() {
   const canSave = !!subjectKey;
 
   const handleSwitchTier = (tier) => {
+    markFormDirty({ field: "tier", tier });
     setExamTier(tier);
     setSubjectKey(null);
     setTopic("");
@@ -110,12 +117,18 @@ export default function StudySaveScreen() {
 
   const handleSelectSubject = (key) => {
     H.select();
+    markFormDirty({ field: "subject", subjectKey: key });
     setSubjectKey(key);
     setTopic("");
   };
 
   const save = useCallback(async () => {
     if (saving || !canSave) return;
+    if (!user?.id || user.id === "dev") {
+      H.warn();
+      showAlert("Oturum bulunamadı", "Çalışmayı kaydetmek için tekrar giriş yapmalısın.");
+      return;
+    }
 
     const todayStr = todayTR();
     const qc = parseInt(questionCount, 10) || 0;
@@ -163,13 +176,15 @@ export default function StudySaveScreen() {
     if (result.saved) {
       try {
         const streakData = await getStreak(user.id);
-        const { updates, newStreak, usedFreeze, freezeCount } = computeStreakUpdate(streakData);
+        const streakResult = computeStreakUpdate(streakData);
+        const { updates, newStreak, usedFreeze, freezeCount } = streakResult;
+        trackStreakTransition(streakResult);
         dispatch(setStreak(newStreak));
         dispatch(setFreezeCount(freezeCount));
         try {
           await updateStreak(user.id, updates);
         } catch (_) {
-          AsyncStorage.setItem(STORAGE_KEYS.PENDING_STREAK, JSON.stringify({ userId: user.id, updates })).catch(() => {});
+          setJson(STORAGE_KEYS.PENDING_STREAK, { userId: user.id, updates });
         }
         if (usedFreeze) {
           showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
@@ -188,6 +203,7 @@ export default function StudySaveScreen() {
     }
     setSaving(false);
 
+    completeForm({ minutes: duration, questions: qc, subjectKey });
     track(EVENTS.STUDY_COMPLETED, { minutes: duration, questions: qc });
     reward("study_log", {
       minutes: duration,
@@ -207,7 +223,7 @@ export default function StudySaveScreen() {
       duration,
       questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C]);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -294,7 +310,10 @@ export default function StudySaveScreen() {
                 placeholderTextColor={C.muted}
                 keyboardType="number-pad"
                 value={questionCount}
-                onChangeText={setQC}
+                onChangeText={(value) => {
+                  markFormDirty({ field: "question_count" });
+                  setQC(value);
+                }}
               />
               <TextInput
                 style={[styles.input, { backgroundColor: C.surface, borderColor: C.border, color: C.text, flex: 1 }]}
@@ -302,7 +321,10 @@ export default function StudySaveScreen() {
                 placeholderTextColor={C.muted}
                 keyboardType="number-pad"
                 value={correctCount}
-                onChangeText={setCC}
+                onChangeText={(value) => {
+                  markFormDirty({ field: "correct_count" });
+                  setCC(value);
+                }}
               />
             </View>
           </Animated.View>
@@ -312,7 +334,10 @@ export default function StudySaveScreen() {
             <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>NOT (isteğe bağlı)</Text>
             <TextInput
               value={notes}
-              onChangeText={setNotes}
+              onChangeText={(value) => {
+                markFormDirty({ field: "notes" });
+                setNotes(value);
+              }}
               placeholder="Kendine bir not bırak..."
               placeholderTextColor={C.muted}
               multiline
@@ -335,7 +360,11 @@ export default function StudySaveScreen() {
         <TopicPicker
           visible={topicPickerOpen}
           subject={currentSubject}
-          onSelect={(t) => { setTopic(t); setTopicPickerOpen(false); }}
+          onSelect={(t) => {
+            markFormDirty({ field: "topic" });
+            setTopic(t);
+            setTopicPickerOpen(false);
+          }}
           onClose={() => setTopicPickerOpen(false)}
         />
       )}

@@ -14,6 +14,7 @@ import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { XP_REWARDS } from "../../constants/gamification";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
 import { useInAppReview } from "../../hooks/useInAppReview";
+import { ROOT_STACK } from "../../navigation/routes";
 
 export default function StudySummaryScreen() {
   const C = useC();
@@ -72,7 +73,7 @@ export default function StudySummaryScreen() {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "MainTabs", state: { routes: [{ name: SCREENS.HOME }] } }],
+        routes: [{ name: ROOT_STACK.MAIN_TABS, state: { routes: [{ name: SCREENS.HOME }] } }],
       }),
     );
   };

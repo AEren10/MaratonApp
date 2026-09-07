@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { dateKey, todayTR } from "../lib/dateUtils";
 
 export const getProfile = async (userId) => {
   if (!userId) throw new Error("userId is required");
@@ -59,17 +60,9 @@ export const grantPremiumDays = async (userId, days) => {
 export const startTrial = async (userId) => {
   if (!userId || userId === "dev") return false;
   try {
-    const { data } = await supabase
-      .from("profiles")
-      .select("trial_started_at")
-      .eq("id", userId)
-      .maybeSingle();
-    if (data?.trial_started_at) return false;
-    await supabase
-      .from("profiles")
-      .update({ trial_started_at: new Date().toISOString() })
-      .eq("id", userId);
-    return true;
+    const { data, error } = await supabase.rpc("start_trial");
+    if (error) throw error;
+    return !!data;
   } catch (e) {
     handleSupabaseError(e, "startTrial");
     return false;
@@ -118,6 +111,48 @@ export const registerPushToken = async (userId, token) => {
   }
 };
 
+export const updateLastActive = async (userId, at = new Date().toISOString()) => {
+  if (!userId || userId === "dev") return;
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ last_active: at })
+      .eq("id", userId);
+    if (error) handleSupabaseError(error, "updateLastActive");
+  } catch (e) {
+    handleSupabaseError(e, "updateLastActive");
+  }
+};
+
+export const updateNotificationPrefs = async (userId, prefs) => {
+  if (!userId || userId === "dev") return;
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notification_prefs: prefs })
+      .eq("id", userId);
+    if (error) handleSupabaseError(error, "updateNotificationPrefs");
+  } catch (e) {
+    handleSupabaseError(e, "updateNotificationPrefs");
+  }
+};
+
+export const getNotificationPrefs = async (userId) => {
+  if (!userId || userId === "dev") return null;
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("notification_prefs")
+      .eq("id", userId)
+      .single();
+    if (error) throw error;
+    return data?.notification_prefs || null;
+  } catch (e) {
+    handleSupabaseError(e, "getNotificationPrefs");
+    return null;
+  }
+};
+
 export const updateProfile = async (userId, updates) => {
   if (!userId) throw new Error("userId is required");
   const { data, error } = await supabase
@@ -149,25 +184,20 @@ export const getPremiumStatus = async (userId) => {
 export const incrementSessionCount = async (userId) => {
   if (!userId || userId === "dev") return;
   try {
-    const { data } = await supabase
-      .from("profiles")
-      .select("study_session_count")
-      .eq("id", userId)
-      .maybeSingle();
-    const current = data?.study_session_count || 0;
-    await supabase
-      .from("profiles")
-      .update({ study_session_count: current + 1 })
-      .eq("id", userId);
+    const { data, error } = await supabase.rpc("increment_study_session");
+    if (error) throw error;
+    const count = Number(data);
+    return Number.isFinite(count) ? count : null;
   } catch (e) {
     handleSupabaseError(e, "incrementSessionCount");
+    return null;
   }
 };
 
 export const markLoginRewarded = async (userId) => {
   if (!userId || userId === "dev") return;
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayTR();
     await supabase
       .from("profiles")
       .update({ login_rewarded_date: today })
@@ -207,7 +237,7 @@ export const getRetentionData = async (userId) => {
 
 export const updateExamConfig = async (userId, config) => {
   const examDate = config.examDate instanceof Date
-    ? config.examDate.toISOString().split("T")[0]
+    ? dateKey(config.examDate)
     : config.examDate || null;
   return updateProfile(userId, {
     exam_type: config.examType,

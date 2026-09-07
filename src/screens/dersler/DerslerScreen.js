@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, getSubjectIdentity } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC, useTheme } from "../../contexts/ThemeContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
@@ -89,8 +89,11 @@ function EmptyState({ C, onPress }) {
 
 export default function DerslerScreen() {
   const C = useC();
-  const { scheme } = useTheme();
-  const subjectId = useCallback((key) => getSubjectIdentity(scheme, key), [scheme]);
+  // Ders renkleri PALETTEN gelmeli. Bu ekran tek başına tokens.js'in eski
+  // getSubjectIdentity'sini kullanıyordu; diğer 8 ekran useSubjectIdentity
+  // (palette) kullanıyor. İki farklı renk seti aynı anda ekrandaydı ve bu
+  // ekran tema/vurgu rengi değişimine tepki vermiyordu.
+  const { subject: subjectId } = useTheme();
   const navigation = useNavigation();
   const { tytSubjects, aytSubjects, loading: currLoading, group1Label, group2Label } = useCurriculum();
   const { user } = useAuth();

@@ -1,38 +1,13 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 
-function generateCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
-
 
 export async function getOrCreateReferralCode(userId) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("referral_code")
-    .eq("id", userId)
-    .maybeSingle();
+  if (!userId || userId === "dev") return null;
+  const { data, error } = await supabase.rpc("get_or_create_referral_code");
   if (error) throw error;
-
-  if (data?.referral_code) return data.referral_code;
-
-  let code = generateCode();
-  let attempts = 0;
-  while (attempts < 5) {
-    const { error: upErr } = await supabase
-      .from("profiles")
-      .update({ referral_code: code })
-      .eq("id", userId);
-    if (!upErr) return code;
-    code = generateCode();
-    attempts++;
-  }
-  throw new Error("Referral kodu oluşturulamadı");
+  if (!data) throw new Error("Referral kodu oluşturulamadı");
+  return data;
 }
 
 // Tek yol: atomic RPC. Eski client-side fallback kaldirildi — premium artik

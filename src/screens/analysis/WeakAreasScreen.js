@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { getAllSubjects } from "../trial/trialTypes";
+import { getAllSubjects } from "../../domain/trial/trialTypes";
 import { Icon, IconBox, AnimatedPressable } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";

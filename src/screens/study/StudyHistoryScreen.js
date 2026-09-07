@@ -10,14 +10,15 @@ import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
 import { SessionCard } from "./components/SessionCard";
+import { dateKey } from "../../lib/dateUtils";
 
 const formatDateHeader = (dateStr) => {
   const d = new Date(dateStr + "T00:00:00");
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = dateKey(today);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().split("T")[0];
+  const yStr = dateKey(yesterday);
   if (dateStr === todayStr) return "Bugün";
   if (dateStr === yStr) return "Dün";
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "short" });

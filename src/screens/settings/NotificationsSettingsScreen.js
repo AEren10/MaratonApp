@@ -10,6 +10,7 @@ import {
   setNotifPrefs,
   applyNotifPrefs,
   requestNotificationPermissions,
+  ensurePushTokenRegistered,
 } from "../../lib/notifications";
 import { useAlert } from "../../contexts/AlertContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -45,6 +46,10 @@ export default function NotificationsSettingsScreen() {
         const anyEnabled = next.dailyReminderEnabled || next.streakRiskEnabled || next.weeklySummaryEnabled;
         if (anyEnabled) {
           const granted = await requestNotificationPermissions();
+          if (granted) {
+            // İzni burada veren kullanıcının token'ı da hemen kaydedilmeli.
+            await ensurePushTokenRegistered(user?.id);
+          }
           if (!granted) {
             showAlert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
             next.dailyReminderEnabled = false;

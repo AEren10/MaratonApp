@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import * as appStorage from "../../lib/storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.GOALS;
 
@@ -41,12 +41,7 @@ export const selectWeeklyMinutesGoal = (state) => state.goals.weeklyMinutes;
 
 export async function loadGoalsFromStorage(dispatch) {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      dispatch(hydrateGoals(JSON.parse(raw)));
-    } else {
-      dispatch(hydrateGoals({}));
-    }
+    dispatch(hydrateGoals(await appStorage.getJson(STORAGE_KEY, {})));
   } catch (_) {
     dispatch(hydrateGoals({}));
   }
@@ -54,6 +49,6 @@ export async function loadGoalsFromStorage(dispatch) {
 
 export async function saveGoalsToStorage(goals) {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+    await appStorage.setJson(STORAGE_KEY, goals);
   } catch (_) {}
 }

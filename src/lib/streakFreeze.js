@@ -45,19 +45,25 @@ export function computeStreakUpdate(streakData, now = new Date()) {
   let newStreak = 1;
   let usedFreeze = false;
   let lastFreezeAt = streakData?.last_freeze_at || null;
+  // Analytics için geçiş tipi. Saf kalsın diye burada olay GÖNDERİLMİYOR,
+  // sadece ne olduğu bildiriliyor; çağıran taraf track ediyor.
+  let transition = "same_day";
 
   if (lastDate === todayStr) {
     newStreak = current || 1;
   } else if (lastDate === yesterday) {
     newStreak = current + 1;
+    transition = "continued";
   } else if (lastDate === dayBefore && freezeCount > 0) {
     // Tam 1 gün atlandı + joker var → streak korunur
     newStreak = current + 1;
     freezeCount -= 1;
     usedFreeze = true;
     lastFreezeAt = now.toISOString();
+    transition = "freeze_used";
   } else {
     newStreak = 1;
+    transition = current > 1 ? "broken" : "started";
   }
 
   const longest = Math.max(newStreak, streakData?.longest_streak || 0);
@@ -74,5 +80,7 @@ export function computeStreakUpdate(streakData, now = new Date()) {
     newStreak,
     usedFreeze,
     freezeCount,
+    transition,
+    previousStreak: current,
   };
 }

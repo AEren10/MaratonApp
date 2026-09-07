@@ -56,7 +56,7 @@ export default function ChallengeScreen() {
     if (!pick.friend || !pick.metric || !pick.target) return;
     if (!checkFeature("unlimited_challenges")) {
       H.warn();
-      showPaywall();
+      showPaywall("challenge_limit");
       return;
     }
     try {

@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { updatePassword } from "../../supabase/auth";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { authErrorMessage } from "../../supabase/authErrors";
 
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
@@ -40,7 +41,7 @@ export default function ChangePasswordScreen() {
       navigation.goBack();
     } catch (e) {
       H.error();
-      showAlert("Hata", e.message || "Şifre değiştirilemedi.");
+      showAlert("Hata", authErrorMessage(e));
     } finally {
       setSaving(false);
     }

@@ -9,7 +9,7 @@ import { Icon, Chip, GlassCard } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { getTrialTypes, getAllSubjects } from "./trialTypes";
+import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
 import { TrialPickerModal } from "./components/TrialPickerModal";
 import { MotivationCard } from "./components/MotivationCard";
 import { SCREENS } from "../../constants/screens";

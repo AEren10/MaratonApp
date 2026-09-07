@@ -60,7 +60,13 @@ export default function SwipeReviewScreen() {
     if (!current) return;
     const g = knew ? 3 : 0;
     if (knew) haptic.success(); else haptic.error();
-    const updates = computeNextReview(current, g);
+    // is_resolved EKSİKTİ: kullanıcı sağa kaydırıp "bildim" diyor, XP alıyor,
+    // sayacı artıyor — ama soru yanlış defterinde açık kalmaya devam ediyordu.
+    // QuickPracticeScreen aynı işi doğru yapıyor, oradaki desenle hizalandı.
+    const updates = {
+      ...computeNextReview(current, g),
+      is_resolved: knew || current.is_resolved === true,
+    };
     reviewWrongQuestion(current.id, user.id, updates).catch(() => {});
     if (knew && current.is_resolved !== true) {
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });

@@ -4,11 +4,32 @@ import { handleSupabaseError } from "./handleError";
 // React Native + Supabase storage için sağlam yöntem:
 // fetch(uri).blob() bazen size=0 dönüyor → upload boş kalıyor.
 // Çözüm: fetch().arrayBuffer() ile ham byte buffer'ı al ve upload et.
+// Bucket'ların canlıdaki sınırı 5 MB (avatars ve wrong-questions).
+// Aşan dosya sunucudan anlaşılmaz bir hatayla dönüyor ve kullanıcı neden
+// yükleyemediğini bilmiyordu. Yüklemeden ÖNCE kontrol edip anlamlı mesaj
+// vermek, boşuna veri harcamayı da önlüyor.
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
+export class FileTooLargeError extends Error {
+  constructor(bytes) {
+    const mb = (bytes / 1024 / 1024).toFixed(1);
+    super(`Fotoğraf çok büyük (${mb} MB). En fazla 5 MB olabilir.`);
+    this.name = "FileTooLargeError";
+    this.bytes = bytes;
+    this._safeMessage = this.message;
+  }
+}
+
 async function uriToArrayBuffer(uri) {
   try {
     const res = await fetch(uri);
-    return await res.arrayBuffer();
+    const buffer = await res.arrayBuffer();
+    if (buffer.byteLength > MAX_UPLOAD_BYTES) {
+      throw new FileTooLargeError(buffer.byteLength);
+    }
+    return buffer;
   } catch (e) {
+    if (e instanceof FileTooLargeError) throw e;
     handleSupabaseError(e, "uriToArrayBuffer");
     throw e;
   }
@@ -31,9 +52,15 @@ function mimeFor(ext) {
 export const uploadAvatar = async (userId, uri) => {
   if (!userId) throw new Error("userId is required");
   try {
+    // Uzantı SABİT: yol `${userId}/avatar.${ext}` olduğu için PNG'den sonra
+    // JPG yüklenince eski dosya silinmiyor, kullanıcı başına birden fazla
+    // artık dosya kalıyordu. Tek uzantıda upsert her seferinde üzerine yazar.
     const ext = guessExt(uri);
     const contentType = mimeFor(ext);
     const path = `${userId}/avatar.${ext}`;
+    // Diğer uzantılardaki eski avatarları temizle.
+    const stale = ["jpg", "png", "webp"].filter((x) => x !== ext).map((x) => `${userId}/avatar.${x}`);
+    supabase.storage.from("avatars").remove(stale).catch(() => {});
     const buffer = await uriToArrayBuffer(uri);
 
     const { data, error } = await supabase.storage
@@ -109,5 +136,20 @@ export const getWrongQuestionImageUrl = async (path) => {
   } catch (e) {
     handleSupabaseError(e, "getWrongQuestionImageUrl");
     throw e;
+  }
+};
+
+export const createStorageSignedUrl = async (bucket, path, expiresIn = 3600) => {
+  if (!bucket || !path) return null;
+  if (path.startsWith("http")) return path;
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, expiresIn);
+    if (error) throw error;
+    return data?.signedUrl ?? null;
+  } catch (e) {
+    handleSupabaseError(e, "createStorageSignedUrl");
+    return null;
   }
 };

@@ -3,7 +3,7 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
-import { getTrialTypesForExam } from "../trialTypes";
+import { getTrialTypesForExam } from "../../../domain/trial/trialTypes";
 import * as H from "../../../lib/haptics";
 
 export function TrialTypeSelector({ value, onChange }) {

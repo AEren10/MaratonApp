@@ -6,9 +6,11 @@ node_modules/
 # Claude design imports
 .claude-design-import/
 .claude/
+.codex-design-*.png
 
 # Expo
 .expo/
+.expo-export-check*/
 dist/
 web-build/
 expo-env.d.ts
@@ -47,3 +49,4 @@ yarn-error.*
 # MCP: token env degiskeninden okunur, dosyada secret yok
 # Yine de yerel varyantlari disla
 .mcp.local.json
+supabase/.temp/

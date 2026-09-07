@@ -9,8 +9,20 @@ import { getStudyLogs } from "../supabase/studyLogs";
 import { getTopicProgress } from "../supabase/topicProgress";
 import { getDueWrongQuestions } from "../supabase/wrongQuestions";
 import { generateNudges } from "../lib/smartNudge";
-import { TRIAL_TO_CURRICULUM } from "../screens/trial/trialKeyMap";
+import { TRIAL_TO_CURRICULUM } from "../domain/trial/trialKeyMap";
+
+// Çalışma logu penceresi.
+//
+// 7 gündü ve üç şeyi birden kırıyordu:
+//   - smartNudge "14+ gündür ihmal edilmiş ders" arıyor, veri hiç 7 günü
+//     geçmediği için o uyarı ASLA tetiklenemiyordu
+//   - rota kapasitesi "son 4 hafta medyanı" diyor, elinde 1 hafta vardı
+//   - borç hesabı 45 güne (DEBT_DECAY_DAYS) bakıyor, eski haftalar boş
+//     görünüp hayali borç üretiyordu
+// 45 gün, borç penceresini tam kapsıyor.
+const LOG_WINDOW_DAYS = 45;
 import { weightedWeakAreas, buildRecentStudy, buildTopicWeakness } from "../lib/buildPlanContext";
+import { dateKey } from "../lib/dateUtils";
 
 // Net-düşüş nudge'larını curriculum key → gerekçe mesajı haritasına çevir.
 function nudgesToPriorityReasons(nudges) {
@@ -52,8 +64,14 @@ export function usePlanContext() {
     }
     let cancelled = false;
     const to = new Date();
-    const from = new Date(Date.now() - 7 * 86400000);
-    const fmt = (d) => d.toISOString().split("T")[0];
+    // 7 gün YETMİYOR. İki yerde kırıyordu:
+    //   - smartNudge "14+ gündür ihmal edilmiş ders" arıyor ama veri hiç
+    //     7 günü geçmediği için o uyarı ASLA tetiklenemiyordu.
+    //   - rota kapasitesi "son 4 hafta medyanı" diyor, elinde 1 hafta vardı.
+    //   - borç hesabı 45 güne bakıyor, eski haftalar boş görünüp hayali
+    //     borç üretiyordu.
+    const from = new Date(Date.now() - LOG_WINDOW_DAYS * 86400000);
+    const fmt = (d) => dateKey(d);
 
     Promise.allSettled([
       getStudyLogs(uid, { from: fmt(from), to: fmt(to) }),
@@ -80,6 +98,10 @@ export function usePlanContext() {
     const topicWeakness = buildTopicWeakness(topicRows);
     const nudges = generateNudges({ recentStudy, trials, streak: 0, weakAreas });
     const priorityReasons = nudgesToPriorityReasons(nudges);
-    return { examType, field, examDate, weakAreas, recentStudy, topicWeakness, priorityReasons, nudges, srDue, dailyTarget };
+    // weekLogs ve topicRows da dışarı veriliyor: rota motoru (useStudyRoute)
+    // kapasiteyi geçmiş çalışmadan, konu ilerlemesini topic_progress'ten
+    // hesaplıyor. Bunlar zaten burada çekilip önbelleğe alınıyor; ikinci kez
+    // sorgulamak yerine paylaşılıyor.
+    return { examType, field, examDate, weakAreas, recentStudy, topicWeakness, priorityReasons, nudges, srDue, dailyTarget, weekLogs, topicRows };
   }, [trials, weekLogs, todayLogs, topicRows, srDue, examType, field, examDate, dailyTarget]);
 }

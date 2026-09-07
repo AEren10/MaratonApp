@@ -1,35 +1,18 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { supabase } from "../supabase/client";
-import { signOut as supaSignOut, deleteAccount as supaDeleteAccount } from "../supabase/auth";
+import {
+  getSession,
+  onAuthStateChange,
+  signOut as supaSignOut,
+  deleteAccount as supaDeleteAccount,
+} from "../supabase/auth";
 import { store, RESET_STORE } from "../store/store";
-import { STORAGE_KEYS } from "../constants/storageKeys";
 import { onAuthError } from "../lib/authEvents";
 import { setUserContext } from "../lib/errorReporting";
-import { initAnalytics, setAnalyticsUser, stopAnalytics, flushAnalytics } from "../lib/analytics";
+import { initAnalytics, setAnalyticsUser, stopAnalytics, flushAnalytics, track } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
+import { clearUserScopedStorage } from "../lib/storage/userScopedStorage";
 
 const AuthContext = createContext(null);
-
-// Hesaba özel her şey — çıkışta temizlenmezse bir sonraki kullanıcıya sızar.
-const PER_USER_KEYS = [
-  STORAGE_KEYS.OFFLINE_QUEUE,
-  STORAGE_KEYS.GOALS,
-  STORAGE_KEYS.LAST_ACTIVE,
-  STORAGE_KEYS.LOGIN_REWARDED,
-  STORAGE_KEYS.COMEBACK_SHOWN,
-  STORAGE_KEYS.NUDGE_POPUP_SHOWN,
-  STORAGE_KEYS.GAMIFICATION,
-  STORAGE_KEYS.PENDING_STREAK,
-  STORAGE_KEYS.CALENDAR_TASKS,
-  STORAGE_KEYS.EXAM_CONFIG,
-  STORAGE_KEYS.CLAIMED_MILESTONES,
-  STORAGE_KEYS.STUDY_HOURS,
-  STORAGE_KEYS.LEAGUE_RESULT,
-  STORAGE_KEYS.ENDOWED_SHOWN,
-  STORAGE_KEYS.WRAPPED_LAST,
-  STORAGE_KEYS.STUDY_SESSION_COUNT,
-  STORAGE_KEYS.PAYWALL_SHOWN_SESSION,
-];
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
@@ -38,10 +21,12 @@ export function AuthProvider({ children }) {
   const loggingOut = useRef(false);
 
   useEffect(() => {
-    supabase.auth.getSession()
-      .then(({ data: { session: s } }) => {
+    getSession()
+      .then((s) => {
         setSession(s);
         setUser(s?.user ?? null);
+        setUserContext(s?.user ?? null);
+        if (s?.user?.id) initAnalytics(s.user.id);
       })
       .catch((e) => {
         if (__DEV__) console.warn("[Auth] getSession failed", e.message || e);
@@ -50,12 +35,22 @@ export function AuthProvider({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
+    } = onAuthStateChange((event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
       setUserContext(s?.user ?? null);
-      if (s?.user?.id) initAnalytics(s.user.id);
-      else setAnalyticsUser(null);
+      if (s?.user?.id) {
+        initAnalytics(s.user.id).then(() => {
+          // D1/D7 dönüş kohortu bu olay olmadan analytics'ten çıkarılamıyordu;
+          // elde yalnızca profiles.last_active vardı. TOKEN_REFRESHED'de
+          // tetiklenmemesi için olay tipi kontrol ediliyor.
+          if (event === "SIGNED_IN") {
+            track(EVENTS.AUTH_LOGIN, { provider: s.user.app_metadata?.provider || "unknown" });
+          }
+        }).catch(() => {});
+      } else {
+        setAnalyticsUser(null);
+      }
     });
 
     return () => {
@@ -75,7 +70,7 @@ export function AuthProvider({ children }) {
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
-    AsyncStorage.multiRemove(PER_USER_KEYS).catch(() => {});
+    await clearUserScopedStorage();
     loggingOut.current = false;
   }, []);
 
@@ -91,7 +86,7 @@ export function AuthProvider({ children }) {
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
-    AsyncStorage.multiRemove(PER_USER_KEYS).catch(() => {});
+    await clearUserScopedStorage();
   }, []);
 
   const value = useMemo(() => ({ session, user, loading, logout, deleteAccount }), [session, user, loading, logout, deleteAccount]);

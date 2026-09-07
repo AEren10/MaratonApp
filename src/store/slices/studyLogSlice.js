@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { normalizeStudyLog } from "../../domain/study/studyLogModel";
 
 const studyLogSlice = createSlice({
   name: "studyLog",
@@ -16,12 +17,21 @@ const studyLogSlice = createSlice({
       state.todayLogs = action.payload;
     },
     addLog: (state, action) => {
-      const log = action.payload;
+      const log = normalizeStudyLog(action.payload);
       const dup = state.todayLogs.some((l) =>
-        l.subject === log.subject && l.topic === log.topic &&
-        l.questionCount === log.questionCount && l.duration === log.duration,
+        l.id === log.id || (
+          l.subject === log.subject && l.topic === log.topic &&
+          l.questionCount === log.questionCount &&
+          l.correctCount === log.correctCount &&
+          l.duration === log.duration
+        ),
       );
       if (!dup) state.todayLogs.push(log);
+    },
+    // Yanlış girilen çalışma kaydını silmek için. Bugünün listesinden de
+    // düşsün ki ana ekrandaki sayaçlar tutarlı kalsın.
+    removeLog: (state, action) => {
+      state.todayLogs = state.todayLogs.filter((l) => l.id !== action.payload);
     },
     setStreak: (state, action) => {
       state.streak = action.payload;
@@ -44,7 +54,7 @@ const studyLogSlice = createSlice({
   },
 });
 
-export const { setTodayLogs, addLog, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate, setLoading } =
+export const { setTodayLogs, addLog, removeLog, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate, setLoading } =
   studyLogSlice.actions;
 
 export default studyLogSlice.reducer;

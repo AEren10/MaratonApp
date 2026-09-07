@@ -1,77 +1,51 @@
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
+import { trackNotificationOpened, track } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
+import { LINKING_SCREENS } from "./routes";
 
 const prefix = Linking.createURL("/");
 
 export const linkingConfig = {
   prefixes: [prefix, "maraton://", "https://maraton.app"],
   config: {
-    screens: {
-      MainTabs: {
-        screens: {
-          Home: "home",
-          DailyPlan: "dersler",
-          Analysis: "analiz",
-          Profile: "profil",
-        },
-      },
-      PlanDetail: "plan",
-      StudyTimer: "calis/:subjectKey?",
-      TrialEntry: "deneme/yeni",
-      TrialDetail: "deneme/:id",
-      TrialCompare: "deneme/karsilastir",
-      AddWrong: "yanlis/yeni",
-      WrongNotebook: "yanlis",
-      WrongDetail: "yanlis/:id",
-      Calendar: "takvim",
-      Goals: "hedefler",
-      League: {
-        path: "group/:code?",
-        parse: { code: (c) => c?.toUpperCase() },
-      },
-      Friends: {
-        path: "friend/:code?",
-        parse: { code: (c) => c?.toUpperCase() },
-      },
-      Roadmap: "yol-haritasi",
-      RankSimulator: "siralama",
-      NetForecast: "net-tahmini",
-      Comparative: "karsilastirmali-analiz",
-      ReviewSession: "yanlis/tekrar",
-      SubjectDetail: "ders/:subjectKey",
-      WeeklyReview: "weekly-review",
-      Referral: {
-        path: "referral/:code?",
-        parse: { code: (c) => c?.toUpperCase() },
-      },
-      Paywall: "premium",
-      ShareCard: "paylasim",
-      Settings: "ayarlar",
-      NotificationsSettings: "ayarlar/bildirim",
-      Privacy: "gizlilik",
-      Terms: "kosullar",
-      About: "hakkinda",
-    },
+    screens: LINKING_SCREENS,
   },
   // Initial deep link from notification or cold start
   async getInitialURL() {
     const url = await Linking.getInitialURL();
     if (url) return url;
     const response = await Notifications.getLastNotificationResponseAsync();
-    return response?.notification?.request?.content?.data?.url ?? null;
+    const data = response?.notification?.request?.content?.data;
+    if (data?.url) {
+      trackNotificationOpened(data.type || "unknown", { url: data.url, coldStart: true });
+    }
+    return data?.url ?? null;
   },
   subscribe(listener) {
     const onReceiveURL = ({ url }) => listener(url);
     const sub = Linking.addEventListener("url", onReceiveURL);
 
+    // Teslim edilen ama HENÜZ dokunulmamış bildirimler. PUSH_RECEIVED tanımlıydı
+    // ama hiç gönderilmiyordu: elde sadece "açıldı" vardı, yani bildirimlerin
+    // kaçının görülüp kaçının tıklandığı (teslim→açılma oranı) ölçülemiyordu.
+    const receivedSub = Notifications.addNotificationReceivedListener((notification) => {
+      const data = notification?.request?.content?.data;
+      track(EVENTS.PUSH_RECEIVED, { type: data?.type || "unknown" });
+    });
+
     const notifSub = Notifications.addNotificationResponseReceivedListener((response) => {
-      const url = response?.notification?.request?.content?.data?.url;
-      if (url) listener(url);
+      const data = response?.notification?.request?.content?.data;
+      if (data?.url) {
+        trackNotificationOpened(data.type || "unknown", { url: data.url, coldStart: false });
+        listener(data.url);
+      }
     });
 
     return () => {
       sub.remove();
       notifSub.remove();
+      receivedSub.remove();
     };
   },
 };

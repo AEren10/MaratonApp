@@ -4,7 +4,7 @@ import { Icon, IconBox } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
-import { getSubjectsForBranch } from "../trialTypes";
+import { getSubjectsForBranch } from "../../../domain/trial/trialTypes";
 
 const makeStyles = (C) => ({
   wrap: {
@@ -105,4 +105,3 @@ export function BranchSubjectPicker({ value, onChange }) {
     </View>
   );
 }
-

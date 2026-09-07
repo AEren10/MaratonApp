@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { startOfWeekTR } from "../lib/dateUtils";
 
 export async function logXP(userId, amount, action) {
   if (!userId || userId === "dev" || !amount) return;
@@ -27,23 +28,40 @@ function isMissingFunction(e) {
 // Geri düşüş: my_xp_totals RPC'si henüz uygulanmamış bir veritabanında
 // (migration 045) istemci tarafında toplar. Böylece migration sırası ne
 // olursa olsun XP hiçbir zaman 0'a düşmez.
+const PAGE_SIZE = 1000;
+
 async function totalsFromClient(userId) {
-  const monday = new Date();
-  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
+  // Hafta sınırı SUNUCUYLA AYNI olmalı: sunucu date_trunc('week', ... TR)
+  // kullanıyor. Burada cihazın yerel Pazartesi'si hesaplanıyordu; yurtdışındaki
+  // kullanıcıda haftalık XP ile lig sıralaması uyuşmuyordu.
+  const weekStart = startOfWeekTR();
 
-  const { data, error } = await supabase
+  // Haftalık: sunucu tarafında filtrele, küçük sonuç döner.
+  const weeklyRes = await supabase
     .from("xp_events")
-    .select("amount, created_at")
+    .select("amount")
     .eq("user_id", userId)
-    .limit(MAX_XP_ROWS);
-  if (error) throw error;
+    .gte("created_at", weekStart);
+  if (weeklyRes.error) throw weeklyRes.error;
 
-  const rows = data || [];
-  return {
-    total: sumAmounts(rows),
-    weekly: sumAmounts(rows.filter((r) => new Date(r.created_at) >= monday)),
-  };
+  // Toplam: sayfalayarak topla. Önceden tek .limit(5000) vardı ve SIRALAMA
+  // YOKTU — 5000'den fazla olayı olan kullanıcıda Postgres rastgele 5000 satır
+  // döndürüyor, toplam XP sessizce eksik çıkıyordu.
+  let total = 0;
+  for (let from = 0; from < MAX_XP_ROWS; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("xp_events")
+      .select("amount")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    total += sumAmounts(page);
+    if (page.length < PAGE_SIZE) break;
+  }
+
+  return { total, weekly: sumAmounts(weeklyRes.data || []) };
 }
 
 // Tek çağrıda hem toplam hem haftalık XP. Toplama sunucuda yapılır —

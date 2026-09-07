@@ -1,3 +1,5 @@
+import { buildPalette } from "./palette";
+
 // Design System v3 — "Ink & Volt"
 //
 // Felsefe:
@@ -204,55 +206,20 @@ export const ELEVATION = {
   },
 };
 
-// C-shaped palette döndür — eski kod C.bg / C.amber bekliyor.
+// Palet artık themes/palette.js'ten geliyor — yeni tasarımın türetilmiş
+// (oklab color-mix) sistemi. Eski legacyPaletteFromDesignTokens yolu
+// kullanımdan kalktı; aradaki isim farklarını palette.js'teki köprü kapatıyor.
 export function paletteFor(scheme) {
-  const src = scheme === "dark" ? COLORS.dark : COLORS.light;
-  return {
-    bg:         src.background,
-    surface:    src.surface,
-    surface2:   src.surface2,
-    border:     src.border,
-    borderSoft: src.borderSoft,
-    amber:      src.amber,
-    green:      src.green,
-    yellow:     src.yellow,
-    red:        src.red,
-    teal:       src.teal,
-    purple:     src.purple,
-    blue:       src.blue,
-    pink:       src.pink,
-    coral:      src.coral,
-    accent:     src.accent,
-    accentLight:src.accentLight,
-    accentDark: src.accentDark,
-    brandLight: src.brandLight,
-    orange:     src.orange,
-    orangeLight:src.orangeLight,
-    success:    src.success,
-    danger:     src.danger,
-    warning:    src.warning,
-    info:       src.info,
-    text:       src.textPrimary,
-    sec:        src.textSecondary,
-    muted:      src.textMuted,
-    cream:      "#F4F1EA",
-    dormant:    src.dormant,
-    dormantBg:  src.dormantBg,
-    textOnBrand:src.textOnBrand,
-    textOnAccent:src.textOnAccent,
-    textOnFill: src.textOnFill,
-    accentPressed: src.accentPressed,
-    orangePressed: src.orangePressed,
-    surfacePressed:src.surfacePressed,
-  };
+  return buildPalette(scheme === "light" ? "light" : "dark");
 }
 
 // LEGACY — yeni kod `useC()` kullanmalı.
-// Eski 70+ dosya `import { C }` ile çağırıyor. Object.assign ile in-place
-// mutate: setRuntimeScheme() tüm key'leri güncel palette ile değiştirir.
-let _runtimeScheme = "light";
+// Bunu doğrudan import eden 4 dosya kaldı (ScreenErrorBoundary, aiSuggestions,
+// smartNudge, screenOptions). React ağacının dışında çalıştıkları için
+// context'e erişemiyorlar; bu yüzden modül seviyesinde bir kopya duruyor.
+let _runtimeScheme = "dark";
 
-export const C = paletteFor("light");
+export const C = { ...paletteFor("dark") };
 
 export function setRuntimeScheme(scheme) {
   const next = scheme === "dark" ? "dark" : "light";
@@ -337,11 +304,13 @@ export const ANIMATION = {
     enter:   350,
     exit:    250,
   },
+  // Bezier kontrol noktaları — CSS string DEĞİL, React Native'de kullanılabilir olsun diye.
+  // Kullanım: Easing.bezier(...ANIMATION.easing.easeOut)
   easing: {
-    easeOut:    "cubic-bezier(0.16, 1, 0.3, 1)",
-    easeIn:     "cubic-bezier(0.55, 0, 1, 0.45)",
-    easeInOut:  "cubic-bezier(0.45, 0, 0.55, 1)",
-    spring:     "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    easeOut:    [0.16, 1, 0.3, 1],
+    easeIn:     [0.55, 0, 1, 0.45],
+    easeInOut:  [0.45, 0, 0.55, 1],
+    spring:     [0.34, 1.56, 0.64, 1],
   },
   spring: {
     gentle:  { damping: 20, stiffness: 200 },
@@ -358,11 +327,11 @@ function _buildShadows(scheme) {
     card:   e.md,
     lg:     e.lg,
     xl:     e.xl,
-    amber:  { ...e.md, shadowColor: "#ff6b35", shadowOpacity: 0.30 },
-    accent: { ...e.md, shadowColor: "#8b5cf6", shadowOpacity: 0.30 },
-    orange: { ...e.md, shadowColor: "#ff6b35", shadowOpacity: 0.30 },
-    fab:    { ...e.lg, shadowColor: "#ff6b35", shadowOpacity: 0.35 },
+    amber:  { ...e.md, shadowColor: "#FF9F2E", shadowOpacity: 0.30 },
+    accent: { ...e.md, shadowColor: "#EC3347", shadowOpacity: 0.30 },
+    orange: { ...e.md, shadowColor: "#EC3347", shadowOpacity: 0.30 },
+    fab:    { ...e.lg, shadowColor: "#EC3347", shadowOpacity: 0.35 },
     green:  { ...e.md, shadowColor: "#34d399", shadowOpacity: 0.30 },
   };
 }
-export const SHADOWS = _buildShadows("light");
+export const SHADOWS = _buildShadows(_runtimeScheme);

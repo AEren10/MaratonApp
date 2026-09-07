@@ -8,6 +8,7 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { getMastery } from "../../lib/mastery";
+import { getSubjectByKey } from "../../themes/subjects";
 import { TopicNoteCard } from "./components/TopicNoteCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
@@ -206,7 +207,35 @@ export default function TopicStudyScreen() {
   const route = useRoute();
   const { user } = useAuth();
   const showAlert = useAlert();
-  const { topic, subject, subtopics: paramSubtopics } = route.params ?? {};
+  // İKİ PARAMETRE ŞEKLİ destekleniyor.
+  //
+  // Ekran { topic, subject } nesneleri bekliyordu ama üç çağrı noktası
+  // { subjectKey } / { subjectKey, topicName } geçiyordu. Sonuç: Dersler
+  // sekmesinden veya Ders Detayı'ndan bir konuya dokununca
+  // "Cannot read property 'key' of undefined" ile hata ekranı açılıyordu.
+  // Sadece Zayıf Konular'dan girince çalışıyordu.
+  //
+  // Çağıranları tek tek değiştirmek yerine ekranı iki şekli de kabul eder
+  // hale getirdik — yeni bir çağrı noktası eklendiğinde de kırılmaz.
+  const params = route.params ?? {};
+  const { subtopics: paramSubtopics } = params;
+
+  const subject = useMemo(() => {
+    if (params.subject) return params.subject;
+    const key = params.subjectKey;
+    if (!key) return null;
+    const found = getSubjectByKey(key);
+    return found
+      ? { key, name: found.label, color: found.color, icon: found.icon }
+      : { key, name: key, color: null, icon: "bookOpen" };
+  }, [params.subject, params.subjectKey]);
+
+  const topic = useMemo(() => {
+    if (params.topic) return params.topic;
+    const name = params.topicName;
+    return name ? { name } : null;
+  }, [params.topic, params.topicName]);
+
   const mastery = (topic?.acc || 0) / 100;
 
   const [history, setHistory] = useState([]);
@@ -216,7 +245,7 @@ export default function TopicStudyScreen() {
     getStudyLogsByTopic(user.id, subject.key, topic.name)
       .then(setHistory)
       .catch(() => {});
-  }, [user?.id, subject.key, topic.name]);
+  }, [user?.id, subject?.key, topic?.name]);
 
   const handleMarkComplete = async () => {
     if (!user?.id || user.id === "dev") return;
@@ -224,8 +253,8 @@ export default function TopicStudyScreen() {
     try {
       await saveStudyLogOffline({
         user_id: user.id,
-        subject: subject.key,
-        topic: topic.name,
+        subject: subject?.key,
+        topic: topic?.name,
         question_count: 0,
         correct_count: 0,
         duration_minutes: 0,
@@ -245,7 +274,7 @@ export default function TopicStudyScreen() {
     done: i < Math.floor((paramSubtopics?.length || 0) * mastery),
   }));
 
-  const color = subject.color || C.purple;
+  const color = subject?.color || C.purple;
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -254,15 +283,15 @@ export default function TopicStudyScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
-          {topic.name}
+          {topic?.name}
         </Text>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {/* Ders chip */}
         <View style={[s.subjectChip, { backgroundColor: color + "18", borderColor: color + "30" }]}>
-          <Icon name={subject.icon} size={14} color={color} />
-          <Text style={[s.chipText, { color }]}>{subject.name}</Text>
+          <Icon name={subject?.icon || "bookOpen"} size={14} color={color} />
+          <Text style={[s.chipText, { color }]}>{subject?.name}</Text>
         </View>
 
         {/* === Ilerleme header === */}
@@ -270,7 +299,7 @@ export default function TopicStudyScreen() {
 
         {/* === Stat kartlar === */}
         <View style={s.statsRow}>
-          <StatBox C={C} label="Toplam Soru" value={topic.q || 0} color={C.blue} />
+          <StatBox C={C} label="Toplam Soru" value={topic?.q || 0} color={C.blue} />
           <StatBox C={C} label="Başarı" value={`%${topic.acc || 0}`} color={C.green} />
           <StatBox C={C} label="Son Çalışma" value={topic.last || "—"} color={C.amber} />
         </View>

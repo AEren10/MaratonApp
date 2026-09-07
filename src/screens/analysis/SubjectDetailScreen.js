@@ -7,13 +7,13 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
-import { getAllSubjects } from "../trial/trialTypes";
-import { TRIAL_TO_CURRICULUM } from "../trial/trialKeyMap";
+import { getAllSubjects } from "../../domain/trial/trialTypes";
+import { TRIAL_TO_CURRICULUM } from "../../domain/trial/trialKeyMap";
 import { SCREENS } from "../../constants/screens";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { useAuth } from "../../contexts/AuthContext";
 import { getWrongQuestions } from "../../supabase/wrongQuestions";
-import { TrendChart } from "./components/TrendChart";
+import { TrendChart } from "../../components/charts/TrendChart";
 
 function StatBox({ label, value, color, s }) {
   return (

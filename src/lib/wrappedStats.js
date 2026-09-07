@@ -1,3 +1,4 @@
+import { dateKey } from "./dateUtils";
 export function computeWrapped(logs = [], trials = [], streak = 0, xp = 0) {
   if (!Array.isArray(logs)) logs = [];
   if (!Array.isArray(trials)) trials = [];
@@ -51,12 +52,12 @@ export function getWrappedPeriod() {
 
 export function getPeriodRange(period) {
   const now = new Date();
-  const end = now.toISOString().split("T")[0];
+  const end = dateKey(now);
   if (period === "monthly") {
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    return { start: start.toISOString().split("T")[0], end };
+    return { start: dateKey(start), end };
   }
   const start = new Date(now);
   start.setDate(start.getDate() - 7);
-  return { start: start.toISOString().split("T")[0], end };
+  return { start: dateKey(start), end };
 }

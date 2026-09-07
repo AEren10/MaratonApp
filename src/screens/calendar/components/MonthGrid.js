@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { dateKey } from "../../../lib/dateUtils";
 
 const WEEKDAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
@@ -20,7 +21,7 @@ function getCalendarDays(monthDate) {
 }
 
 function isoDate(d) {
-  return d.toISOString().split("T")[0];
+  return dateKey(d);
 }
 
 function isToday(d) {

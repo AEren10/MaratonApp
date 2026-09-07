@@ -7,7 +7,6 @@ import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate } from "../store/slices/studyLogSlice";
 import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
 import { getXPTotals } from "../supabase/xp";
 import { updateStreak } from "../supabase/streaks";
@@ -15,27 +14,31 @@ import { getTrials } from "../supabase/trials";
 import { getStudyLogsByDate } from "../supabase/studyLogs";
 import { todayTR } from "../lib/dateUtils";
 import { getStreak } from "../supabase/streaks";
-import { getProfile } from "../supabase/profiles";
+import { getProfile, updateLastActive } from "../supabase/profiles";
 import { getUserTasksByDate } from "../supabase/userTasks";
-import { flushQueue, getPendingStudyLogs } from "../lib/offlineQueue";
+import { flushQueue, getPendingStudyLogs, getPendingTrials } from "../lib/offlineQueue";
 import { getExpoPushToken, loadNotifPrefsFromServer, applyNotifPrefs, getNotifPrefs } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
-import { supabase } from "../supabase/client";
+import { getSession } from "../supabase/auth";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { normalizeStudyLog } from "../domain/study/studyLogModel";
+import { normalizeTrial } from "../domain/trial/trialModel";
+import { getJson, remove } from "../lib/storage/appStorage";
 
-async function retryPendingStreak() {
+async function retryPendingStreak(activeUserId) {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEYS.PENDING_STREAK);
-    if (!raw) return;
-    const { userId, updates } = JSON.parse(raw);
+    const pending = await getJson(STORAGE_KEYS.PENDING_STREAK);
+    if (!pending) return;
+    const { userId, updates } = pending;
+    if (userId !== activeUserId) return;
     await updateStreak(userId, updates);
-    await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_STREAK);
+    await remove(STORAGE_KEYS.PENDING_STREAK);
   } catch (_) {}
 }
 
 async function loadAll(userId, dispatch) {
   await loadGamificationFromStorage(dispatch);
-  await retryPendingStreak();
+  await retryPendingStreak(userId);
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
 
   const todayDate = todayTR();
@@ -49,28 +52,15 @@ async function loadAll(userId, dispatch) {
   ]);
 
   if (trials.status === "fulfilled" && trials.value) {
-    const mapped = trials.value.map((t) => {
-      const subjects = {};
-      (t.trial_subjects || []).forEach((s) => {
-        subjects[s.subject] = {
-          correct: s.correct_count,
-          wrong: s.wrong_count,
-          net: s.net,
-        };
-      });
-      return {
-        id: t.id,
-        date: t.trial_date,
-        totalNet: parseFloat(t.total_net) || 0,
-        subjects,
-        trialType: t.exam_type,
-        field: t.field,
-        branchSubject: t.branch_subject,
-        name: t.name,
-        mood: t.mood,
-      };
-    });
-    dispatch(setTrials(mapped));
+    const server = trials.value.map(normalizeTrial);
+    // Kuyrukta bekleyen denemeler de listede görünmeli. Görünmedikleri için
+    // çevrimdışı girilen deneme, ilk tazelemede kaybolmuş gibi oluyordu.
+    const queued = await getPendingTrials(userId).catch(() => []);
+    const seen = new Set(server.map((t) => t.client_operation_id).filter(Boolean));
+    const pendingTrials = queued
+      .filter((t) => !t.client_operation_id || !seen.has(t.client_operation_id))
+      .map(normalizeTrial);
+    dispatch(setTrials([...server, ...pendingTrials]));
   }
 
   if (streak.status === "fulfilled" && streak.value) {
@@ -83,31 +73,24 @@ async function loadAll(userId, dispatch) {
     dispatch(setMaxStat({ key: "streak", value: streakVal }));
   }
 
+  let studiedToday = false;
+
   if (todayLogs.status === "fulfilled" && todayLogs.value) {
-    const mapped = todayLogs.value.map((l) => ({
-      id: l.id,
-      subject: l.subject,
-      topic: l.topic,
-      questionCount: l.question_count,
-      duration: l.duration_minutes,
-      study_date: l.study_date,
-    }));
+    const mapped = todayLogs.value.map(normalizeStudyLog);
 
     const todayStr = todayDate;
-    const pending = await getPendingStudyLogs().catch(() => []);
-    const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}_${m.duration}`));
+    const pending = await getPendingStudyLogs(userId).catch(() => []);
+    const existingIds = new Set(mapped.map((m) => `${m.subject}_${m.topic}_${m.questionCount}_${m.correctCount}_${m.duration}`));
     const pendingToday = pending
       .filter((p) => p.study_date === todayStr)
-      .filter((p) => !existingIds.has(`${p.subject}_${p.topic}_${p.question_count}_${p.duration_minutes}`))
+      .map(normalizeStudyLog)
+      .filter((p) => !existingIds.has(`${p.subject}_${p.topic}_${p.questionCount}_${p.correctCount}_${p.duration}`))
       .map((p, i) => ({
+        ...p,
         id: `pending_${i}`,
-        subject: p.subject,
-        topic: p.topic,
-        questionCount: p.question_count,
-        duration: p.duration_minutes,
-        study_date: p.study_date,
       }));
 
+    studiedToday = mapped.length + pendingToday.length > 0;
     dispatch(setTodayLogs([...mapped, ...pendingToday]));
   }
 
@@ -122,10 +105,8 @@ async function loadAll(userId, dispatch) {
     dispatch(setGoals(g));
     saveGoalsToStorage(g);
   } else {
-    const localGoalsRaw = await AsyncStorage.getItem(STORAGE_KEYS.GOALS).catch(() => null);
-    if (localGoalsRaw) {
-      try { dispatch(setGoals(JSON.parse(localGoalsRaw))); } catch {}
-    }
+    const localGoals = await getJson(STORAGE_KEYS.GOALS);
+    if (localGoals) dispatch(setGoals(localGoals));
   }
 
   const xpFromServer = xpTotals.status === "fulfilled" ? xpTotals.value.total : 0;
@@ -155,18 +136,14 @@ async function loadAll(userId, dispatch) {
     if (token) registerPushToken(userId, token);
   }).catch(() => {});
 
+  // studiedToday: seri-riski bildirimi bugün çalışmış kullanıcıya gitmesin.
+  const streakToday = streak.status === "fulfilled" ? (streak.value?.current_streak || 0) : 0;
   loadNotifPrefsFromServer(userId).then(async (serverPrefs) => {
     const prefs = serverPrefs || await getNotifPrefs();
-    applyNotifPrefs(prefs);
+    applyNotifPrefs(prefs, { streak: streakToday, studiedToday });
   }).catch(() => {});
 
-  // Update last_active for server-side push targeting
-  supabase
-    .from("profiles")
-    .update({ last_active: new Date().toISOString() })
-    .eq("id", userId)
-    .then(() => {})
-    .catch(() => {});
+  updateLastActive(userId);
 }
 
 export function useDataSync() {
@@ -179,16 +156,27 @@ export function useDataSync() {
   const mountedRef = useRef(true);
   useEffect(() => () => { mountedRef.current = false; }, []);
 
+  // Çıkış→giriş sırasında uçuşta kalan istekler RESET_STORE'dan SONRA
+  // dönebiliyor. Sadece mountedRef'e bakmak yetmez: eski kullanıcının
+  // denemeleri/çalışma logları yeni kullanıcının store'una düşer.
+  const activeUserIdRef = useRef(null);
+  activeUserIdRef.current = user?.id ?? null;
+
   const safeDispatch = useCallback(
-    (action) => { if (mountedRef.current) dispatch(action); },
+    (action, ownerId) => {
+      if (!mountedRef.current) return;
+      if (ownerId && activeUserIdRef.current !== ownerId) return;
+      dispatch(action);
+    },
     [dispatch],
   );
 
   useEffect(() => {
     if (!user?.id || user.id === "dev") return;
+    const ownerId = user.id;
     let cancelled = false;
     setSyncing(true);
-    loadAll(user.id, safeDispatch)
+    loadAll(ownerId, (action) => safeDispatch(action, ownerId))
       .catch((e) => { if (!cancelled) setError(e); })
       .finally(() => {
         if (!cancelled) setSyncing(false);
@@ -202,11 +190,11 @@ export function useDataSync() {
     const sub = AppState.addEventListener("change", async (next) => {
       if (appStateRef.current.match(/inactive|background/) && next === "active") {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
+          const session = await getSession();
           if (!session) return;
         } catch { return; }
         flushQueue()
-          .then((r) => { if (r.processed > 0) loadAll(user.id, safeDispatch).catch(() => {}); })
+          .then((r) => { if (r.processed > 0) loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {}); })
           .catch(() => {});
       }
       appStateRef.current = next;
@@ -223,7 +211,7 @@ export function useDataSync() {
     if (wasOfflineRef.current && user?.id && user.id !== "dev") {
       wasOfflineRef.current = false;
       flushQueue()
-        .then(() => loadAll(user.id, safeDispatch).catch(() => {}))
+        .then(() => loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {}))
         .catch(() => {});
     }
   }, [isConnected, user?.id, safeDispatch]);
@@ -232,7 +220,7 @@ export function useDataSync() {
     if (!user?.id || user.id === "dev") return;
     setSyncing(true);
     try {
-      await loadAll(user.id, safeDispatch);
+      await loadAll(user.id, (a) => safeDispatch(a, user.id));
     } catch (e) {
       if (mountedRef.current) setError(e);
     } finally {

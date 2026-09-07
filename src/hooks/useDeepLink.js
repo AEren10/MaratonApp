@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../contexts/AuthContext";
 import { SCREENS } from "../constants/screens";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { getString, remove, setString } from "../lib/storage/appStorage";
+import { track } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
 
 const PENDING_KEY = STORAGE_KEYS.PENDING_REFERRAL;
 const PENDING_FRIEND_KEY = STORAGE_KEYS.PENDING_FRIEND_CODE;
@@ -35,27 +37,19 @@ function parseDeepLink(url) {
 
 export async function savePendingReferral(code) {
   if (!code) return;
-  try {
-    await AsyncStorage.setItem(PENDING_KEY, code.toUpperCase());
-  } catch {}
+  await setString(PENDING_KEY, code.toUpperCase());
 }
 
 export async function consumePendingReferral() {
-  try {
-    const code = await AsyncStorage.getItem(PENDING_KEY);
-    if (code) await AsyncStorage.removeItem(PENDING_KEY);
-    return code || null;
-  } catch {
-    return null;
-  }
+  const code = await getString(PENDING_KEY);
+  if (code) await remove(PENDING_KEY);
+  return code || null;
 }
 
 async function savePendingDeepLink(parsed) {
-  try {
-    if (parsed.type === "referral") await savePendingReferral(parsed.code);
-    else if (parsed.type === "friend") await AsyncStorage.setItem(PENDING_FRIEND_KEY, parsed.code);
-    else if (parsed.type === "group") await AsyncStorage.setItem(PENDING_GROUP_KEY, parsed.code);
-  } catch {}
+  if (parsed.type === "referral") await savePendingReferral(parsed.code);
+  else if (parsed.type === "friend") await setString(PENDING_FRIEND_KEY, parsed.code);
+  else if (parsed.type === "group") await setString(PENDING_GROUP_KEY, parsed.code);
 }
 
 function routeDeepLink(parsed, session, navigation) {
@@ -74,19 +68,15 @@ function routeDeepLink(parsed, session, navigation) {
 }
 
 export async function consumePendingFriendCode() {
-  try {
-    const code = await AsyncStorage.getItem(PENDING_FRIEND_KEY);
-    if (code) await AsyncStorage.removeItem(PENDING_FRIEND_KEY);
-    return code || null;
-  } catch { return null; }
+  const code = await getString(PENDING_FRIEND_KEY);
+  if (code) await remove(PENDING_FRIEND_KEY);
+  return code || null;
 }
 
 export async function consumePendingGroupCode() {
-  try {
-    const code = await AsyncStorage.getItem(PENDING_GROUP_KEY);
-    if (code) await AsyncStorage.removeItem(PENDING_GROUP_KEY);
-    return code || null;
-  } catch { return null; }
+  const code = await getString(PENDING_GROUP_KEY);
+  if (code) await remove(PENDING_GROUP_KEY);
+  return code || null;
 }
 
 export function useDeepLink() {
@@ -99,12 +89,24 @@ export function useDeepLink() {
     if (!session || pendingConsumed.current) return;
     pendingConsumed.current = true;
     (async () => {
-      const [friendCode, groupCode] = await Promise.all([
+      // Referral BURADA EKSİKTİ: davet linkiyle kurulum yapan kullanıcının
+      // kodu depoya yazılıyor ama giriş sonrası hiç tüketilmiyordu. Kullanıcı
+      // Davet ekranını elle açmadıkça kod orada kalıyor, davet eden kredi
+      // alamıyordu — büyüme döngüsünün tam da kurulduğu senaryo çalışmıyordu.
+      const [friendCode, groupCode, referralCode] = await Promise.all([
         consumePendingFriendCode(),
         consumePendingGroupCode(),
+        getString(PENDING_KEY).catch(() => null),
       ]);
       if (friendCode) navigation.navigate(SCREENS.FRIENDS, { friendCode });
       else if (groupCode) navigation.navigate(SCREENS.LEAGUE, { groupCode });
+      else if (referralCode) {
+        // remove() ETMİYORUZ: ReferralScreen kodu depodan okuyup alana
+        // dolduruyor ve uygulama başarılı olunca temizleniyor. Burada silersek
+        // kullanıcı ekranı görmeden kod kaybolur.
+        track(EVENTS.REFERRAL_LINK_APPLIED, { source: "deep_link_pending" });
+        navigation.navigate(SCREENS.REFERRAL, { code: referralCode });
+      }
     })().catch(() => {});
   }, [session]);
 

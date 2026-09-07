@@ -8,7 +8,7 @@ import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeeklyTrialReport } from "../../hooks/useWeeklyTrialReport";
-import { getTrialTypes, getAllSubjects } from "./trialTypes";
+import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
 import { TypeBreakdown } from "./components/TypeBreakdown";
 import { TrialDailyActivity } from "./components/TrialDailyActivity";
 import { TrialSubjectBars } from "./components/TrialSubjectBars";

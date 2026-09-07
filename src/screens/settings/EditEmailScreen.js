@@ -10,6 +10,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { updateEmail } from "../../supabase/auth";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { authErrorMessage } from "../../supabase/authErrors";
+import { emailSchema, validate } from "../../validations/auth";
 
 export default function EditEmailScreen() {
   const navigation = useNavigation();
@@ -22,9 +24,10 @@ export default function EditEmailScreen() {
   const save = useCallback(async () => {
     if (saving) return;
     const v = email.trim();
-    if (!v.includes("@")) {
+    const check = validate(emailSchema, { email: v });
+    if (!check.ok) {
       H.error();
-      showAlert("Geçersiz", "Geçerli bir e-posta gir.");
+      showAlert("Geçersiz", check.errors.email);
       return;
     }
     if (v === user?.email) {
@@ -43,7 +46,7 @@ export default function EditEmailScreen() {
       navigation.goBack();
     } catch (e) {
       H.error();
-      showAlert("Hata", e.message || "E-posta değiştirilemedi.");
+      showAlert("Hata", authErrorMessage(e));
     } finally {
       setSaving(false);
     }

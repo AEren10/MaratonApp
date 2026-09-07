@@ -10,10 +10,13 @@ import { useSelector } from "react-redux";
 import { Icon, Chip } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { selectTrials } from "../../store/slices/trialSlice";
+import { selectTrials, removeTrial, restoreTrial } from "../../store/slices/trialSlice";
+import { useDispatch } from "react-redux";
+import { deleteTrial } from "../../supabase/trials";
+import { removeFromQueue } from "../../lib/offlineQueue";
 import { useAuth } from "../../contexts/AuthContext";
 import { getMyPercentiles } from "../../supabase/percentile";
-import { getTrialTypes, getAllSubjects } from "./trialTypes";
+import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
 import { TrialReportCard } from "./components/TrialReportCard";
 import { NudgePopup } from "../../components/common/NudgePopup";
 import { useRecommendations } from "../../hooks/useRecommendations";
@@ -96,6 +99,7 @@ export default function TrialDetailScreen() {
   const route = useRoute();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
+  const dispatch = useDispatch();
   const { user } = useAuth();
   const cardRef = useRef(null);
   const showAlert = useAlert();
@@ -210,6 +214,38 @@ export default function TrialDetailScreen() {
     }
   };
 
+  // Silme: yanlış girilen deneme kullanıcı tarafından düzeltilebilsin.
+  // deleteTrial zaten yazılıydı ama hiçbir ekran çağırmıyordu.
+  const handleDelete = useCallback(() => {
+    if (!latest?.id || !user?.id) return;
+    showAlert(
+      "Denemeyi sil",
+      `"${latest.name || "Bu deneme"}" kalıcı olarak silinecek. Netleri ve analize etkisi geri alınamaz.`,
+      [
+        { text: "Vazgeç", style: "cancel" },
+        {
+          text: "Sil",
+          style: "destructive",
+          onPress: async () => {
+            const snapshot = latest;
+            dispatch(removeTrial(latest.id));       // iyimser
+            navigation.goBack();
+            try {
+              // Henüz gönderilmemiş deneme sunucuda yok; silmek onu
+              // kuyruktan çıkarmak demek. deleteTrial sahte id ile
+              // sessizce başarısız olur, deneme geri gelirdi.
+              if (snapshot.pending) await removeFromQueue(snapshot.id);
+              else await deleteTrial(snapshot.id, user.id);
+            } catch (_) {
+              dispatch(restoreTrial(snapshot));      // başarısızsa geri koy
+              showAlert("Silinemedi", "Deneme silinemedi, geri alındı. Bağlantını kontrol et.");
+            }
+          },
+        },
+      ],
+    );
+  }, [latest, user?.id, dispatch, navigation, showAlert]);
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
@@ -222,6 +258,12 @@ export default function TrialDetailScreen() {
         <Chip color={C.surface2}>{dateStr}</Chip>
         <Pressable onPress={handleShare} hitSlop={12} accessibilityLabel="Paylaş" accessibilityRole="button" style={styles.shareBtn}>
           <Icon name="share" size={18} color={C.accent} />
+        </Pressable>
+        {/* TASARIM NOTU: yeni tasarımda bu üst-sağ aksiyonlar muhtemelen bir
+            "..." menüsüne toplanacak (Kaydı Düzenle / Sil). Mantık burada
+            hazır — menüye taşımak için handleDelete'i bağlaman yeterli. */}
+        <Pressable onPress={handleDelete} hitSlop={12} accessibilityLabel="Denemeyi sil" accessibilityRole="button" style={styles.shareBtn}>
+          <Icon name="trash" size={18} color={C.danger} />
         </Pressable>
       </View>
 

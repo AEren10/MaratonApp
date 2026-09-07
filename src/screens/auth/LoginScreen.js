@@ -13,6 +13,8 @@ import { AuthInput } from "./components/AuthInput";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { loginSchema, validate } from "../../validations/auth";
+import { authErrorMessage } from "../../supabase/authErrors";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -24,11 +26,11 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState({});
 
   const submit = async () => {
-    const e = {};
-    if (!email.includes("@")) e.email = "Geçerli bir e-posta gir";
-    if (password.length < 6) e.password = "Şifre en az 6 karakter";
-    setErrors(e);
-    if (Object.keys(e).length) return;
+    // Zod ile doğrula. Önce elle kontrol vardı ve `email.includes("@")`
+    // "a@" gibi girdileri geçiriyordu.
+    const { ok, errors: fieldErrors } = validate(loginSchema, { email: email.trim(), password });
+    setErrors(fieldErrors);
+    if (!ok) return;
 
     setBusy(true);
     try {
@@ -36,7 +38,7 @@ export default function LoginScreen() {
       H.success();
     } catch (err) {
       H.error();
-      showAlert("Giriş başarısız", err.message ?? "Bir sorun oldu");
+      showAlert("Giriş başarısız", authErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -91,7 +93,7 @@ export default function LoginScreen() {
           color: "rgba(255,255,255,0.92)",
           marginTop: SPACING.sm,
         }}>
-          YKS yolculuğun burada başlıyor.
+          Sınav yolculuğun burada başlıyor.
         </Text>
       </LinearGradient>
 

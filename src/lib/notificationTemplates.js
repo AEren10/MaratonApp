@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import * as appStorage from "./storage/appStorage";
 
 const DAILY = [
   { title: "Bugünkü planın hazır", body: "Küçük adımlar büyük fark yaratır. Planına göz at!" },
@@ -48,18 +48,16 @@ export const getWeekly = (vars) => fill(pick(WEEKLY), vars);
 export async function trackStudyHour() {
   const hour = new Date().getHours();
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEYS.STUDY_HOURS) || "{}";
-    const hours = JSON.parse(raw);
+    const hours = await appStorage.getJson(STORAGE_KEYS.STUDY_HOURS, {});
     hours[hour] = (hours[hour] || 0) + 1;
-    await AsyncStorage.setItem(STORAGE_KEYS.STUDY_HOURS, JSON.stringify(hours));
+    await appStorage.setJson(STORAGE_KEYS.STUDY_HOURS, hours);
   } catch {}
 }
 
 export async function getOptimalHour() {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEYS.STUDY_HOURS);
-    if (!raw) return 19;
-    const hours = JSON.parse(raw);
+    const hours = await appStorage.getJson(STORAGE_KEYS.STUDY_HOURS, null);
+    if (!hours) return 19;
     let best = 19;
     let max = 0;
     for (const [h, c] of Object.entries(hours)) {

@@ -27,9 +27,10 @@ import {
   getReferralStats,
 } from "../../supabase/referrals";
 import { usePremium } from "../../contexts/PremiumContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import * as appStorage from "../../lib/storage/appStorage";
 import * as H from "../../lib/haptics";
+import { useExam } from "../../contexts/ExamContext";
 
 const REWARD_DAYS = 7;
 
@@ -39,6 +40,9 @@ export default function ReferralScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useAuth();
+  const { examType } = useExam();
+  // LGS öğrencisi "YKS'ye hazırlanmak ister misin?" diye davet göndermesin.
+  const examName = examType === "lgs" ? "LGS" : "YKS";
   const showAlert = useAlert();
   const { refreshPremium } = usePremium();
 
@@ -55,7 +59,7 @@ export default function ReferralScreen() {
       setFriendCode(deepCode.toUpperCase());
       return;
     }
-    AsyncStorage.getItem(STORAGE_KEYS.PENDING_REFERRAL)
+    appStorage.getString(STORAGE_KEYS.PENDING_REFERRAL)
       .then((pending) => { if (pending) setFriendCode(pending); })
       .catch(() => {});
   }, [route.params?.code]);
@@ -96,13 +100,13 @@ export default function ReferralScreen() {
     try {
       const link = `https://maraton.app/referral/${code}`;
       await Share.share({
-        message: `Maraton ile birlikte YKS'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
+        message: `Maraton ile birlikte ${examName}'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
         url: link,
       });
     } catch {
       handleCopy();
     }
-  }, [code, handleCopy]);
+  }, [code, handleCopy, examName]);
 
   const handleApply = useCallback(async () => {
     if (!friendCode.trim() || !user?.id) return;
@@ -111,7 +115,7 @@ export default function ReferralScreen() {
       const result = await applyReferralCode(user.id, friendCode);
       if (result.ok) {
         H.success();
-        AsyncStorage.removeItem(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
+        appStorage.remove(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
         await refreshPremium();
         showAlert("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
         setFriendCode("");

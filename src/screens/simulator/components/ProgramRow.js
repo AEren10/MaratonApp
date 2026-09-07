@@ -3,8 +3,8 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { PROGRAM_CATEGORIES } from "../../../data/programs";
+import { formatNumber as fmt } from "../../../lib/format";
 
-const fmt = (n) => n.toLocaleString("tr-TR");
 
 const ProgramRow = React.memo(function ProgramRow({ item, onSelect, C }) {
   const cat = PROGRAM_CATEGORIES.find((x) => x.id === item.category);

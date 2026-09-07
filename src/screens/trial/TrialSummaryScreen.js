@@ -10,7 +10,7 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { getTrialTypes, getAllSubjects } from "./trialTypes";
+import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
 import { TrialShareCard } from "./components/TrialShareCard";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
@@ -101,8 +101,13 @@ export default function TrialSummaryScreen() {
   return (
     <SafeAreaView edges={["top"]} style={[st.safe, { backgroundColor: C.bg }]}>
       <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm }}>
+        {/* "Kapat" GERÇEKTEN KAPATMALI. Önceden bu buton TRIAL_DETAIL'e
+            replace ediyordu — yani kullanıcı karneyi kapatmak isterken daha
+            derin bir ekrana düşüyordu. Alttaki "Detayları Gör" butonu zaten
+            aynı işi yapıyor. Ekran okuyucuya "Kapat" deyip detay açmak ayrıca
+            erişilebilirlik hatasıydı. */}
         <Pressable
-          onPress={() => navigation.replace(SCREENS.TRIAL_DETAIL, { trial, fromEntry: false })}
+          onPress={() => navigation.popToTop()}
           hitSlop={12}
           accessibilityLabel="Kapat"
           accessibilityRole="button"

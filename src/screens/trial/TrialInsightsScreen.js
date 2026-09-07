@@ -12,7 +12,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { getAllSubjects } from "./trialTypes";
+import { getAllSubjects } from "../../domain/trial/trialTypes";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const CHART_W = SCREEN_W - 64;

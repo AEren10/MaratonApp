@@ -25,6 +25,41 @@ import { saveGamificationToSupabase, claimStreakMilestoneReward } from "../supab
 let _opLock = false;
 let _globalSaveTimer = null;
 
+// XP TOAST'I KOPYALAR ARASINDA PAYLAŞILIR.
+//
+// useGamification artık birden fazla yerde çağrılıyor (ekranlar + ödülün
+// taşındığı usePlanCompletion / useUserTasks hook'ları). Her kopyanın kendi
+// useState'i olsaydı, ödül hook'tan tetiklendiğinde toast GÖRÜNMEYEN bir
+// kopyada set edilir ve kullanıcı XP alır ama hiçbir geri bildirim görmezdi.
+// Ekranların render ettiği kopya ile ödülü veren kopya farklı olabildiği için
+// durum modül seviyesinde tutuluyor ve tüm kopyalar bildirim alıyor.
+const _toastIdle = { visible: false, amount: 0, multiplier: 1 };
+let _xpToast = _toastIdle;
+const _toastSubs = new Set();
+
+function _setSharedToast(next) {
+  _xpToast = next;
+  _toastSubs.forEach((fn) => { try { fn(next); } catch (_) {} });
+}
+
+// Seviye atlama ve kilometre taşı modalleri de aynı sebeple paylaşılıyor:
+// reward() içinden tetikleniyorlar ve reward artık hook'lardan da çağrılıyor.
+const _levelIdle = { visible: false, level: 0, title: "" };
+const _milestoneIdle = { visible: false, milestone: null };
+let _levelUpModal = _levelIdle;
+let _milestoneModal = _milestoneIdle;
+const _levelSubs = new Set();
+const _milestoneSubs = new Set();
+
+function _setSharedLevelUp(next) {
+  _levelUpModal = next;
+  _levelSubs.forEach((fn) => { try { fn(next); } catch (_) {} });
+}
+function _setSharedMilestone(next) {
+  _milestoneModal = next;
+  _milestoneSubs.forEach((fn) => { try { fn(next); } catch (_) {} });
+}
+
 // Serialized XP log queue: ensures revert operations execute in order
 // and don't corrupt XP totals when multiple logXP calls overlap.
 let _xpQueue = Promise.resolve();
@@ -44,9 +79,27 @@ export function useGamification() {
 
   const claimedMilestones = useAppSelector(selectClaimedMilestones);
 
-  const [xpToast, setXpToast] = useState({ visible: false, amount: 0, multiplier: 1 });
-  const [levelUpModal, setLevelUpModal] = useState({ visible: false, level: 0, title: "" });
-  const [milestoneModal, setMilestoneModal] = useState({ visible: false, milestone: null });
+  const [xpToast, setLocalToast] = useState(_xpToast);
+  useEffect(() => {
+    _toastSubs.add(setLocalToast);
+    setLocalToast(_xpToast);
+    return () => { _toastSubs.delete(setLocalToast); };
+  }, []);
+  const setXpToast = _setSharedToast;
+  const [levelUpModal, setLocalLevelUp] = useState(_levelUpModal);
+  const [milestoneModal, setLocalMilestone] = useState(_milestoneModal);
+  useEffect(() => {
+    _levelSubs.add(setLocalLevelUp);
+    _milestoneSubs.add(setLocalMilestone);
+    setLocalLevelUp(_levelUpModal);
+    setLocalMilestone(_milestoneModal);
+    return () => {
+      _levelSubs.delete(setLocalLevelUp);
+      _milestoneSubs.delete(setLocalMilestone);
+    };
+  }, []);
+  const setLevelUpModal = _setSharedLevelUp;
+  const setMilestoneModal = _setSharedMilestone;
   const levelUpTimerRef = useRef(null);
   const milestoneTimerRef = useRef(null);
 

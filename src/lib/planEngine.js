@@ -21,6 +21,8 @@ export function generateDailyPlan({
   topicWeakness = {},
   priorityReasons = {},
   dailyTarget = 80,
+  // Haftalık rotanın bu haftaki durakları: [{ subject, topic, ... }]
+  routeWeekStops = [],
 }) {
   const today = new Date();
   const daysLeft = examDate ? differenceInDays(examDate, today) : 180;
@@ -29,6 +31,19 @@ export function generateDailyPlan({
   const pool = getSubjectsForExam(examType, field);
   const subjectMap = {};
   pool.forEach((s) => { subjectMap[s.key] = s; });
+
+  // ROTA ÖNCELİKLİDİR.
+  //
+  // Önceden günlük plan ile haftalık rota BİRBİRİNDEN HABERSİZDİ: rota
+  // "bu hafta Paragraf ve Türev" derken günlük plan kendi skoruyla bambaşka
+  // dersler seçebiliyordu. Öğrenci iki ayrı yerde çelişen yönlendirme
+  // görüyordu — planın güvenilirliğini bitiren bir şey.
+  //
+  // Artık rotanın bu haftaki durakları varsa günlük plan ONLARDAN türetilir.
+  // Rota yoksa (henüz çizilmemiş) eski skorlama devreye girer.
+  const routeSubjects = routeWeekStops.length
+    ? [...new Set(routeWeekStops.map((s) => s.subject).filter((k) => subjectMap[k]))]
+    : null;
 
   const scored = [];
   for (const key of Object.keys(subjectMap)) {
@@ -45,7 +60,19 @@ export function generateDailyPlan({
     scored.push({ key, score: totalScore });
   }
 
-  scored.sort((a, b) => b.score - a.score);
+  // Rota varsa: rotadaki dersler öne, sırası korunarak. Diğerleri arkada
+  // kalır ki gün dolmazsa yine de bir şey önerilsin.
+  if (routeSubjects?.length) {
+    const rank = new Map(routeSubjects.map((k, i) => [k, i]));
+    scored.sort((a, b) => {
+      const ra = rank.has(a.key) ? rank.get(a.key) : Infinity;
+      const rb = rank.has(b.key) ? rank.get(b.key) : Infinity;
+      if (ra !== rb) return ra - rb;
+      return b.score - a.score;
+    });
+  } else {
+    scored.sort((a, b) => b.score - a.score);
+  }
 
   const tasks = [];
   let remaining = dailyTarget;
@@ -60,10 +87,13 @@ export function generateDailyPlan({
     const count = Math.round(dailyTarget * ratio);
     const actual = Math.min(count, remaining);
 
-    // En zayıf konuyu seç (varsa) → görev konu seviyesine iner.
+    // Konu seçimi: ROTA öncelikli.
+    // Rota bu hafta bu derste hangi durağı gösteriyorsa günlük görev de onu
+    // hedefler. Rota yoksa en zayıf konuya düşülür.
+    const routeStop = routeWeekStops.find((st) => st.subject === key);
     const weakTopics = topicWeakness[key];
     const weakestTopic = weakTopics && weakTopics.length ? weakTopics[0] : null;
-    const topicLabel = weakestTopic?.topic || null;
+    const topicLabel = routeStop?.topic || weakestTopic?.topic || null;
 
     // === Urgency tier kararı ===
     // tier:   "critical" | "high" | "medium" | "low"

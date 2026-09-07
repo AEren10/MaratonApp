@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { dateKey, todayTR } from "../lib/dateUtils";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -63,8 +64,8 @@ export async function createChallenge({ opponentId, metric, target, days = 7 }) 
         metric,
         target,
         status: "pending",
-        starts_on: today.toISOString().split("T")[0],
-        ends_on: endsOn.toISOString().split("T")[0],
+        starts_on: dateKey(today),
+        ends_on: dateKey(endsOn),
       })
       .select()
       .single();
@@ -135,7 +136,7 @@ export async function completeChallenge(id, winnerId) {
 export async function checkExpiredChallenges(userId) {
   try {
     if (!userId) return;
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayTR();
     const { data, error } = await supabase
       .from("challenges")
       .select("id, creator_id, opponent_id, creator_progress, opponent_progress, target")

@@ -21,7 +21,7 @@ import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary
 import { AlertProvider } from "./src/contexts/AlertContext";
 import { NetworkProvider } from "./src/contexts/NetworkContext";
 import { ReduxHydrator } from "./src/store/hydrate";
-import { COLORS } from "./src/themes/tokens";
+import { C } from "./src/themes/tokens";
 import { initErrorReporting } from "./src/lib/errorReporting";
 import { useTheme } from "./src/contexts/ThemeContext";
 import { applyNotifPrefs, getNotifPrefs } from "./src/lib/notifications";
@@ -61,10 +61,12 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.root} onLayout={onLayoutRootView}>
       <Provider store={store}>
-        <ReduxHydrator />
         <SafeAreaProvider>
           <NetworkProvider>
           <AuthProvider>
+            {/* AuthProvider İÇİNDE olmalı: hidrasyon kullanıcı kimliğine bağlı,
+                çıkış→giriş sonrası yeniden çalışması gerekiyor. */}
+            <ReduxHydrator />
             <ExamProvider>
               <ThemeProvider>
                 <ThemedRoot />
@@ -79,10 +81,11 @@ export default function App() {
 }
 
 function ThemedRoot() {
-  const { scheme, colors } = useTheme();
+  // Yeni tema motoru `colors` yerine `palette` veriyor (bkz. themes/palette.js).
+  const { scheme, palette } = useTheme();
   return (
     <AlertProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: palette.bg }}>
         <OfflineBanner />
         <StatusBar style={scheme === "light" ? "dark" : "light"} />
         <ScreenErrorBoundary>
@@ -96,6 +99,6 @@ function ThemedRoot() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.light.background,
+    backgroundColor: C.bg,
   },
 });

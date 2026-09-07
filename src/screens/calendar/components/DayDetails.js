@@ -3,8 +3,9 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
-import { getTrialTypes } from "../../trial/trialTypes";
+import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
+import { todayTR } from "../../../lib/dateUtils";
 
 function formatDayLabel(iso) {
   return new Date(iso)
@@ -13,7 +14,7 @@ function formatDayLabel(iso) {
 }
 
 function isToday(iso) {
-  return iso === new Date().toISOString().split("T")[0];
+  return iso === todayTR();
 }
 
 function SectionLabel({ label, C }) {

@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { todayTR } from "../../../lib/dateUtils";
 
 export function DailyHeatmap({ dailyHeatmap }) {
   const C = useC();
@@ -18,7 +19,7 @@ export function DailyHeatmap({ dailyHeatmap }) {
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 6 }}>
         {dailyHeatmap.map((d) => {
           const h = d.active ? Math.max(12, (d.questions / maxQ) * 48) : 6;
-          const today = new Date().toISOString().split("T")[0] === d.date;
+          const today = todayTR() === d.date;
           return (
             <View key={d.date} style={{ flex: 1, alignItems: "center", gap: 6 }}>
               <View style={{

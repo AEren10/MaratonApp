@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { normalizeTrial } from "../../domain/trial/trialModel";
 
 const trialSlice = createSlice({
   name: "trials",
@@ -8,18 +9,32 @@ const trialSlice = createSlice({
   },
   reducers: {
     setTrials: (state, action) => {
-      state.trials = action.payload;
+      state.trials = action.payload.map(normalizeTrial);
     },
     addTrial: (state, action) => {
-      state.trials.unshift(action.payload);
+      const trial = normalizeTrial(action.payload);
+      const exists = state.trials.some((t) => t.id === trial.id);
+      if (!exists) state.trials.unshift(trial);
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
+    // Yanlış girilen denemeyi silmek için. Sunucu çağrısı başarısız olursa
+    // çağıran taraf restoreTrial ile geri koyuyor (iyimser güncelleme).
+    removeTrial: (state, action) => {
+      state.trials = state.trials.filter((t) => t.id !== action.payload);
+    },
+    restoreTrial: (state, action) => {
+      const trial = normalizeTrial(action.payload);
+      if (!state.trials.some((t) => t.id === trial.id)) {
+        state.trials.push(trial);
+        state.trials.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+    },
   },
 });
 
-export const { setTrials, addTrial, setLoading } = trialSlice.actions;
+export const { setTrials, addTrial, setLoading, removeTrial, restoreTrial } = trialSlice.actions;
 
 export default trialSlice.reducer;
 

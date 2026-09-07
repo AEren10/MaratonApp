@@ -14,7 +14,7 @@ import { useCurriculum } from "../../hooks/useCurriculum";
 import { uploadWrongQuestionImage } from "../../supabase/storage";
 import { saveWrongQuestionOffline } from "../../lib/offlineQueue";
 import { initialReview } from "../../lib/spacedRepetition";
-import { TopicPicker } from "./components/TopicPicker";
+import { TopicPicker } from "../../components/forms/TopicPicker";
 import { AnswerSelector } from "./components/AnswerSelector";
 import { useAlert } from "../../contexts/AlertContext";
 import { usePremium } from "../../contexts/PremiumContext";
@@ -77,7 +77,7 @@ export default function AddWrongScreen() {
   const save = async () => {
     if (!checkFeature("unlimited_wrongs")) {
       H.warn();
-      showPaywall();
+      showPaywall("wrong_entry_limit");
       return;
     }
     if (!topic.trim()) {

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../contexts/AuthContext";
-import { supabase } from "../supabase/client";
 import { saveUserTaskOffline } from "../lib/offlineQueue";
+import { getJson, setJson } from "../lib/storage/appStorage";
 import { handleSupabaseError } from "../supabase/handleError";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { getCalendarTasks, updateUserTask, deleteUserTask } from "../supabase/userTasks";
 
 const KEY = STORAGE_KEYS.CALENDAR_TASKS;
 const CAL_SUBJECT = "__calendar";
@@ -16,22 +16,16 @@ export function useCalendarTasks() {
   const synced = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then((raw) => {
-      if (raw) setTasks(JSON.parse(raw));
-    }).catch(() => {});
+    getJson(KEY, {}).then((storedTasks) => {
+      if (storedTasks && typeof storedTasks === "object") setTasks(storedTasks);
+    });
   }, []);
 
   useEffect(() => {
     if (!user?.id || synced.current) return;
     synced.current = true;
-    supabase
-      .from("user_tasks")
-      .select("id, task_date, note, completed")
-      .eq("user_id", user.id)
-      .eq("subject", CAL_SUBJECT)
-      .order("created_at", { ascending: true })
-      .then(({ data, error: fetchErr }) => {
-        if (fetchErr) { setError(fetchErr); return; }
+    getCalendarTasks(user.id, CAL_SUBJECT)
+      .then((data) => {
         if (!data?.length) return;
         setTasks((prev) => {
           const merged = { ...prev };
@@ -42,14 +36,15 @@ export function useCalendarTasks() {
             }
             merged[row.task_date] = list;
           });
-          AsyncStorage.setItem(KEY, JSON.stringify(merged)).catch(() => {});
+          setJson(KEY, merged);
           return merged;
         });
-      });
+      })
+      .catch(setError);
   }, [user?.id]);
 
   const persist = useCallback((next) => {
-    AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
+    setJson(KEY, next);
   }, []);
 
   const addTask = useCallback((date, task) => {
@@ -87,7 +82,7 @@ export function useCalendarTasks() {
       persist(next);
       const toggled = list.find((t) => t.id === taskId);
       if (toggled?.remoteId) {
-        supabase.from("user_tasks").update({ completed: toggled.done }).eq("id", toggled.remoteId).catch((e) => {
+        updateUserTask(toggled.remoteId, { completed: toggled.done }).catch((e) => {
           handleSupabaseError(e, "calendar:toggleTask");
           setTasks((revert) => {
             const revList = (revert[date] || []).map((t) => t.id === taskId ? { ...t, done: !t.done } : t);
@@ -110,7 +105,7 @@ export function useCalendarTasks() {
       else delete next[date];
       persist(next);
       if (removed?.remoteId) {
-        supabase.from("user_tasks").delete().eq("id", removed.remoteId).catch((e) => {
+        deleteUserTask(removed.remoteId, user?.id).catch((e) => {
           handleSupabaseError(e, "calendar:removeTask");
           setTasks((revert) => {
             const revList = [...(revert[date] || []), removed];
@@ -122,7 +117,7 @@ export function useCalendarTasks() {
       }
       return next;
     });
-  }, [persist]);
+  }, [persist, user?.id]);
 
   return { tasks, addTask, toggleTask, removeTask, error };
 }

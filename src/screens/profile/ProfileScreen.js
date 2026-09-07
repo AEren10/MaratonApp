@@ -42,6 +42,7 @@ export default function ProfileScreen() {
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Kullanıcı";
 
   const examLabel = useMemo(() => {
+    if (examType === "lgs") return "LGS";
     if (examType === "tyt") return "Sadece TYT";
     if (examType === "dil") return "YKS Dil";
     if (field === "sayisal") return "TYT + SAY";

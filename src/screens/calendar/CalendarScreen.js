@@ -18,6 +18,7 @@ import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { MonthStats } from "./components/MonthStats";
 import { useCalendarTasks } from "../../hooks/useCalendarTasks";
+import { dateKey } from "../../lib/dateUtils";
 
 function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -26,7 +27,7 @@ function endOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 function toIsoDate(d) {
-  return d.toISOString().split("T")[0];
+  return dateKey(d);
 }
 function monthLabel(date) {
   return date.toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
@@ -67,8 +68,8 @@ function CalendarScreenInner() {
       const d = l.study_date;
       if (!map[d]) map[d] = { logs: [], trials: [], totalMinutes: 0, totalQuestions: 0 };
       map[d].logs.push(l);
-      map[d].totalMinutes += l.duration_minutes || 0;
-      map[d].totalQuestions += l.question_count || 0;
+      map[d].totalMinutes += l.duration ?? l.duration_minutes ?? 0;
+      map[d].totalQuestions += l.questionCount ?? l.question_count ?? 0;
     });
     trials.forEach((t) => {
       const d = t.date;

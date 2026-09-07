@@ -1,14 +1,20 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial } from "../supabase/trials";
 import { addWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
-import { supabase } from "../supabase/client";
+import { getSession } from "../supabase/auth";
+import { getStreak, updateStreak } from "../supabase/streaks";
+import { computeStreakUpdate } from "./streakFreeze";
+import { syncChallengeProgress } from "./challengeSync";
+import { studyLogFingerprint } from "../domain/study/studyLogModel";
+import { trialFingerprint } from "../domain/trial/trialModel";
+import { userTaskFingerprint } from "../domain/tasks/userTaskModel";
+import * as appStorage from "./storage/appStorage";
 
 const QUEUE_KEY = STORAGE_KEYS.OFFLINE_QUEUE;
-const DEAD_LETTER_KEY = "@maraton:dead_letter_queue";
+const DEAD_LETTER_KEY = STORAGE_KEYS.OFFLINE_DEAD_LETTER;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_RETRIES = 10;
 const FLUSH_TIMEOUT_MS = 60_000;
@@ -21,8 +27,7 @@ export const OP_USER_TASK = "USER_TASK";
 
 async function readQueue() {
   try {
-    const raw = await AsyncStorage.getItem(QUEUE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return await appStorage.getJson(QUEUE_KEY, []);
   } catch (e) {
     if (__DEV__) console.warn("[offlineQueue] readQueue", e);
     return [];
@@ -31,7 +36,7 @@ async function readQueue() {
 
 async function writeQueue(items) {
   try {
-    await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(items));
+    await appStorage.setJson(QUEUE_KEY, items);
   } catch (e) {
     if (__DEV__) console.warn("[offlineQueue] writeQueue", e);
   }
@@ -39,17 +44,73 @@ async function writeQueue(items) {
 
 const MAX_QUEUE_SIZE = 200;
 
+function createClientOperationId(type) {
+  return `${type}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function withClientOperationId(payload, clientOperationId) {
+  if (!payload || !clientOperationId) return payload;
+  return { ...payload, client_operation_id: payload.client_operation_id || clientOperationId };
+}
+
+function getOperationUserId(item) {
+  return item?.payload?.user_id || item?.payload?.trial?.user_id || null;
+}
+
+function getOperationFingerprint(op) {
+  switch (op.type) {
+    case OP_STUDY_LOG:
+      return studyLogFingerprint(op.payload);
+    case OP_TRIAL:
+      return trialFingerprint(op.payload?.trial, op.payload?.subjects);
+    case OP_USER_TASK:
+      return userTaskFingerprint(op.payload);
+    case OP_WRONG_QUESTION:
+      return [
+        op.payload?.user_id || "",
+        op.payload?.subject || "",
+        op.payload?.topic || "",
+        op.payload?.question_text || "",
+        op.payload?.image_path || op.payload?.image_local_uri || "",
+      ].join("|");
+    default:
+      return "";
+  }
+}
+
 export async function enqueue(op) {
   let list = await readQueue();
+  const clientOperationId = op.clientOperationId || createClientOperationId(op.type);
+  const fingerprint = op.fingerprint || getOperationFingerprint(op);
+  if (list.some((item) =>
+    item.clientOperationId === clientOperationId ||
+    item.id === clientOperationId ||
+    (fingerprint && item.fingerprint === fingerprint)
+  )) {
+    return clientOperationId;
+  }
+  const payload = op.type === OP_TRIAL
+    ? { ...op.payload, trial: withClientOperationId(op.payload?.trial, clientOperationId) }
+    : withClientOperationId(op.payload, clientOperationId);
   list.push({
     ...op,
+    payload,
     queuedAt: Date.now(),
-    id: `${op.type}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    id: clientOperationId,
+    clientOperationId,
+    fingerprint,
   });
   if (list.length > MAX_QUEUE_SIZE) {
+    // Taşma sessiz veri kaybıydı: en eski kayıtlar hiçbir iz bırakmadan
+    // atılıyordu. Artık dead-letter'a taşınıyorlar — kurtarılabilir kalsın.
+    const dropped = list.slice(0, list.length - MAX_QUEUE_SIZE);
     list = list.slice(-MAX_QUEUE_SIZE);
+    if (dropped.length) {
+      await moveToDeadLetter(dropped.map((d) => ({ ...d, deadReason: "queue_overflow" })));
+    }
   }
   await writeQueue(list);
+  return clientOperationId;
 }
 
 export async function getQueueSize() {
@@ -59,12 +120,32 @@ export async function getQueueSize() {
 
 async function runOne(item) {
   switch (item.type) {
-    case OP_STUDY_LOG:
+    case OP_STUDY_LOG: {
       await addStudyLog(item.payload);
+      const questions = item.payload?.question_count || 0;
+      const minutes = item.payload?.duration_minutes || 0;
+      const userId = item.payload?.user_id;
+      if (userId) {
+        await refreshStudySideEffects(userId, {
+          questions,
+          minutes,
+          studyDate: item.payload?.study_date,
+        });
+      }
       break;
-    case OP_TRIAL:
+    }
+    case OP_TRIAL: {
       await addTrial(item.payload.trial, item.payload.subjects);
+      const userId = item.payload?.trial?.user_id;
+      const solvedCount = (item.payload?.subjects || []).reduce(
+        (sum, s) => sum + (s.correct_count || 0) + (s.wrong_count || 0),
+        0,
+      );
+      if (userId && solvedCount > 0) {
+        await syncChallengeProgress(userId, { questions: solvedCount });
+      }
       break;
+    }
     case OP_WRONG_QUESTION: {
       const p = { ...item.payload };
       if (p.image_local_uri && !p.image_path) {
@@ -82,12 +163,56 @@ async function runOne(item) {
   }
 }
 
+function dateForStudyDate(studyDate) {
+  if (!studyDate) return new Date();
+  return new Date(`${studyDate}T12:00:00+03:00`);
+}
+
+async function refreshStudySideEffects(userId, { questions = 0, minutes = 0, studyDate } = {}) {
+  try {
+    const streakData = await getStreak(userId);
+    const { updates } = computeStreakUpdate(streakData, dateForStudyDate(studyDate));
+    await updateStreak(userId, updates);
+  } catch (_) {}
+
+  try {
+    await syncChallengeProgress(userId, { questions, minutes });
+  } catch (_) {}
+}
+
 let _flushing = false;
 
 function isAuthError(e) {
   const msg = e?.message || "";
   const status = e?.status || e?.statusCode;
+  // 42501 = RLS reddi. PostgREST bunu 403 ile döner ama bu kimlik hatası
+  // değil; auth sayılırsa TÜM kuyruk kalıcı olarak duraklıyordu.
+  if (e?.code === "42501") return false;
   return status === 401 || status === 403 || msg.includes("JWT") || msg.includes("token");
+}
+
+// Tekrar denemenin asla işe yaramayacağı hatalar. Bunlar 10 kez denenip
+// üstel backoff'la pil ve ağ harcıyor, sonunda yine dead-letter'a düşüyordu.
+const PERMANENT_PG_CODES = new Set([
+  "42501", // RLS politika reddi
+  "22P02", // geçersiz metin gösterimi
+  "23502", // not-null ihlali
+  "23503", // yabancı anahtar ihlali
+  "23514", // check kısıtı ihlali
+  "23505", // unique ihlali (idempotency çakışması ayrıca ele alınıyor)
+  "42703", // kolon yok
+  "42P01", // tablo yok
+]);
+
+function isPermanentError(e) {
+  if (!e) return false;
+  if (PERMANENT_PG_CODES.has(e.code)) return true;
+  const status = e.status || e.statusCode;
+  // 4xx (401/403/408/429 hariç) istemci hatasıdır, tekrar denemek düzeltmez.
+  if (typeof status === "number" && status >= 400 && status < 500) {
+    return ![401, 403, 408, 429].includes(status);
+  }
+  return false;
 }
 
 function shouldSkipByBackoff(item) {
@@ -99,17 +224,15 @@ function shouldSkipByBackoff(item) {
 async function moveToDeadLetter(items) {
   if (!items.length) return;
   try {
-    const raw = await AsyncStorage.getItem(DEAD_LETTER_KEY);
-    const existing = raw ? JSON.parse(raw) : [];
+    const existing = await appStorage.getJson(DEAD_LETTER_KEY, []);
     const merged = [...existing, ...items].slice(-50);
-    await AsyncStorage.setItem(DEAD_LETTER_KEY, JSON.stringify(merged));
+    await appStorage.setJson(DEAD_LETTER_KEY, merged);
   } catch {}
 }
 
 export async function getDeadLetterCount() {
   try {
-    const raw = await AsyncStorage.getItem(DEAD_LETTER_KEY);
-    return raw ? JSON.parse(raw).length : 0;
+    return (await appStorage.getJson(DEAD_LETTER_KEY, [])).length;
   } catch { return 0; }
 }
 
@@ -118,61 +241,72 @@ export async function flushQueue() {
   _flushing = true;
   const startTime = Date.now();
   try {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return { processed: 0, failed: 0, types: [] };
+    const session = await getSession();
+    if (!session) return { processed: 0, failed: 0, types: [] };
+    const activeUserId = session.user?.id;
 
-  const list = await readQueue();
-  if (!list.length) return { processed: 0, failed: 0, types: [] };
+    const list = await readQueue();
+    if (!list.length) return { processed: 0, failed: 0, types: [] };
 
-  const now = Date.now();
-  const remaining = [];
-  const dead = [];
-  let processed = 0;
-  let failed = 0;
-  const processedTypes = [];
+    const now = Date.now();
+    const remaining = [];
+    const dead = [];
+    let processed = 0;
+    let failed = 0;
+    const processedTypes = [];
 
-  const valid = [];
-  for (const item of list) {
-    if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) {
-      dead.push(item);
-    } else if ((item.retryCount || 0) >= MAX_RETRIES) {
-      dead.push(item);
-    } else {
-      valid.push(item);
-    }
-  }
-
-  for (let i = 0; i < valid.length; i++) {
-    if (Date.now() - startTime > FLUSH_TIMEOUT_MS) {
-      for (let j = i; j < valid.length; j++) remaining.push(valid[j]);
-      break;
-    }
-
-    const item = valid[i];
-    if (shouldSkipByBackoff(item)) {
-      remaining.push(item);
-      continue;
+    const valid = [];
+    for (const item of list) {
+      const itemUserId = getOperationUserId(item);
+      if (activeUserId && itemUserId && itemUserId !== activeUserId) {
+        remaining.push(item);
+        continue;
+      }
+      if (item.queuedAt && now - item.queuedAt > MAX_AGE_MS) {
+        dead.push(item);
+      } else if ((item.retryCount || 0) >= MAX_RETRIES) {
+        dead.push(item);
+      } else {
+        valid.push(item);
+      }
     }
 
-    try {
-      await runOne(item);
-      processed += 1;
-      if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
-    } catch (e) {
-      const bumped = { ...item, retryCount: (item.retryCount || 0) + 1, lastAttempt: Date.now() };
-      if (isAuthError(e)) {
-        remaining.push(bumped);
-        for (let j = i + 1; j < valid.length; j++) remaining.push(valid[j]);
+    for (let i = 0; i < valid.length; i++) {
+      if (Date.now() - startTime > FLUSH_TIMEOUT_MS) {
+        for (let j = i; j < valid.length; j++) remaining.push(valid[j]);
         break;
       }
-      remaining.push(bumped);
-      failed += 1;
-    }
-  }
 
-  if (dead.length) await moveToDeadLetter(dead);
-  await writeQueue(remaining);
-  return { processed, failed, types: processedTypes };
+      const item = valid[i];
+      if (shouldSkipByBackoff(item)) {
+        remaining.push(item);
+        continue;
+      }
+
+      try {
+        await runOne(item);
+        processed += 1;
+        if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
+      } catch (e) {
+        const bumped = { ...item, retryCount: (item.retryCount || 0) + 1, lastAttempt: Date.now() };
+        if (isAuthError(e)) {
+          remaining.push(bumped);
+          for (let j = i + 1; j < valid.length; j++) remaining.push(valid[j]);
+          break;
+        }
+        if (isPermanentError(e)) {
+          dead.push({ ...item, deadReason: e?.code || e?.status || "permanent" });
+          failed += 1;
+          continue;
+        }
+        remaining.push(bumped);
+        failed += 1;
+      }
+    }
+
+    if (dead.length) await moveToDeadLetter(dead);
+    await writeQueue(remaining);
+    return { processed, failed, types: processedTypes };
   } finally { _flushing = false; }
 }
 
@@ -180,50 +314,136 @@ export async function clearQueue() {
   await writeQueue([]);
 }
 
-// Save with offline fallback. Returns { saved: boolean, queued: boolean }
-export async function getPendingStudyLogs() {
+export async function getPendingStudyLogs(userId) {
   const list = await readQueue();
   return list
     .filter((item) => item.type === OP_STUDY_LOG)
+    .filter((item) => !userId || item.payload?.user_id === userId)
     .map((item) => item.payload);
 }
 
 export async function saveStudyLogOffline(payload) {
+  const clientOperationId = payload?.client_operation_id || createClientOperationId(OP_STUDY_LOG);
+  const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
-    await addStudyLog(payload);
+    await addStudyLog(payloadWithId);
     return { saved: true, queued: false };
   } catch (e) {
-    await enqueue({ type: OP_STUDY_LOG, payload });
+    await enqueue({ type: OP_STUDY_LOG, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e };
   }
 }
 
 export async function saveTrialOffline(trial, subjects) {
+  const clientOperationId = trial?.client_operation_id || createClientOperationId(OP_TRIAL);
+  const trialWithId = withClientOperationId(trial, clientOperationId);
   try {
-    await addTrial(trial, subjects);
+    await addTrial(trialWithId, subjects);
     return { saved: true, queued: false };
   } catch (e) {
-    await enqueue({ type: OP_TRIAL, payload: { trial, subjects } });
+    await enqueue({ type: OP_TRIAL, payload: { trial: trialWithId, subjects }, clientOperationId });
     return { saved: false, queued: true, error: e };
   }
 }
 
 export async function saveWrongQuestionOffline(payload) {
+  const clientOperationId = payload?.client_operation_id || createClientOperationId(OP_WRONG_QUESTION);
+  const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
-    const saved = await addWrongQuestion(payload);
+    const saved = await addWrongQuestion(payloadWithId);
     return { saved: true, queued: false, data: saved };
   } catch (e) {
-    await enqueue({ type: OP_WRONG_QUESTION, payload });
+    await enqueue({ type: OP_WRONG_QUESTION, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e };
   }
 }
 
 export async function saveUserTaskOffline(payload) {
+  const clientOperationId = payload?.client_operation_id || createClientOperationId(OP_USER_TASK);
+  const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
-    const saved = await createUserTask(payload);
+    const saved = await createUserTask(payloadWithId);
     return { saved: true, queued: false, data: saved };
   } catch (e) {
-    await enqueue({ type: OP_USER_TASK, payload });
+    await enqueue({ type: OP_USER_TASK, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e };
   }
+}
+
+// KUYRUKTAKİ KAYITLARI EKRANDA GÖSTERMEK İÇİN OKUYUCULAR
+//
+// Sorun: çevrimdışı deneme girildiğinde "bağlantı gelince gönderilecek"
+// deniyordu ama liste yalnızca sunucudan besleniyordu. Kullanıcı ekranı bir
+// kez tazeleyince deneme listeden yok oluyordu — veri aslında kuyruktaydı,
+// ama kullanıcı için kaybolmuş demekti. Çalışma logları için bu köprü
+// (getPendingStudyLogs) zaten vardı; deneme ve yanlış soru için yoktu.
+
+/** Kuyruktaki denemeler — sunucu listesine eklenmek üzere. */
+export async function getPendingTrials(userId) {
+  const list = await readQueue();
+  return list
+    .filter((item) => item.type === OP_TRIAL)
+    .filter((item) => !userId || item.payload?.trial?.user_id === userId)
+    .map((item) => ({
+      ...item.payload.trial,
+      // normalizeTrial trial_subjects'i bekliyor; kuyrukta ayrı duruyor.
+      trial_subjects: item.payload.subjects || [],
+      id: item.clientOperationId || item.id,
+      pending: true,
+    }));
+}
+
+/** Kuyruktaki yanlış sorular. */
+export async function getPendingWrongQuestions(userId) {
+  const list = await readQueue();
+  return list
+    .filter((item) => item.type === OP_WRONG_QUESTION)
+    .filter((item) => !userId || item.payload?.user_id === userId)
+    .map((item) => ({
+      ...item.payload,
+      id: item.clientOperationId || item.id,
+      pending: true,
+    }));
+}
+
+/** Kalıcı olarak başarısız olmuş kayıtlar — kullanıcıya gösterilebilir. */
+export async function getDeadLetterItems() {
+  try {
+    return await appStorage.getJson(DEAD_LETTER_KEY, []);
+  } catch { return []; }
+}
+
+/**
+ * Dead-letter'daki kayıtları kuyruğa geri koyar.
+ * Sayaçlar sıfırlanır ki backoff/retry limiti baştan başlasın.
+ */
+export async function retryDeadLetter() {
+  const items = await getDeadLetterItems();
+  if (!items.length) return { requeued: 0 };
+  const list = await readQueue();
+  const known = new Set(list.map((i) => i.clientOperationId || i.id));
+  const requeued = [];
+  for (const item of items) {
+    const id = item.clientOperationId || item.id;
+    if (id && known.has(id)) continue;
+    requeued.push({ ...item, retryCount: 0, lastAttempt: null, queuedAt: Date.now(), deadReason: undefined });
+  }
+  await writeQueue([...list, ...requeued].slice(-MAX_QUEUE_SIZE));
+  await appStorage.setJson(DEAD_LETTER_KEY, []);
+  return { requeued: requeued.length };
+}
+
+/** Kullanıcı "vazgeç" derse — kayıtları kalıcı olarak siler. */
+export async function clearDeadLetter() {
+  try { await appStorage.setJson(DEAD_LETTER_KEY, []); } catch {}
+}
+
+/** Kuyruktan tek bir kaydı çıkarır (kullanıcı henüz gönderilmemiş kaydı silerse). */
+export async function removeFromQueue(id) {
+  if (!id) return false;
+  const list = await readQueue();
+  const next = list.filter((item) => (item.clientOperationId || item.id) !== id);
+  if (next.length === list.length) return false;
+  await writeQueue(next);
+  return true;
 }

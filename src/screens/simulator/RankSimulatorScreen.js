@@ -17,14 +17,18 @@ import * as H from "../../lib/haptics";
 import SubjectInputRow from "./components/SubjectInputRow";
 import ProgramPickerModal from "./components/ProgramPickerModal";
 import { FIELD_TO_TYPE, TYT_SUBJECTS, AYT_SUBJECTS_BY_TYPE, SUBJECT_COLORS, calcNet, initialFrom } from "./simulatorConstants";
+import { formatNumber as fmt } from "../../lib/format";
 
-const fmt = (n) => n.toLocaleString("tr-TR");
 
 export default function RankSimulatorScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const { field } = useExam();
+  const { field, examType } = useExam();
   const { user } = useAuth();
+  // LGS'de field null kalıyor ve "say" varsayılıyordu; LGS öğrencisine AYT
+  // Fizik/Kimya net girişi ve üniversite bölümü seçimi çıkıyordu. Ekran
+  // ana sayfadan ve ayarlardan gizli ama deep-link ile hâlâ açılabilir.
+  const isLGS = examType === "lgs";
   const type = FIELD_TO_TYPE[field] || "say";
   const latestTYT = useSelector(selectLatestTYT);
   const latestAYT = useSelector(selectLatestAYT);
@@ -64,6 +68,30 @@ export default function RankSimulatorScreen() {
     setPickerOpen(false);
     if (user?.id && user.id !== "dev") updateProfile(user.id, { target_program_id: program.id }).catch(() => {});
   }, [user?.id]);
+
+  // Deep-link koruması: bu ekran YKS sıralaması ve üniversite bölümü üzerine
+  // kurulu, LGS'de karşılığı yok. Yanlış veri göstermektense açıkça söyle.
+  if (isLGS) {
+    return (
+      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
+            <Icon name="arrowL" size={22} color={C.text} />
+          </Pressable>
+          <Text style={[styles.title, { color: C.text }]}>Net Simülatörü</Text>
+          <View style={{ width: 22 }} />
+        </View>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xxxl, gap: SPACING.md }}>
+          <Icon name="info" size={32} color={C.muted} />
+          <Text style={[styles.title, { color: C.text, textAlign: "center" }]}>LGS'de kullanılmıyor</Text>
+          <Text style={{ color: C.sec, textAlign: "center", lineHeight: 20 }}>
+            Bu araç YKS sıralaması ve üniversite tercihi için. LGS hedefini
+            Hedeflerim ekranından takip edebilirsin.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>

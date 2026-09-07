@@ -14,18 +14,20 @@ import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAppDispatch } from "../../store/hooks";
 import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
 import { computeStreakUpdate } from "../../lib/streakFreeze";
+import { trackStreakTransition } from "../../lib/trackStreakTransition";
 import { useGamification } from "../../hooks/useGamification";
 import { captureError } from "../../lib/errorReporting";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
 import { getStreak, updateStreak } from "../../supabase/streaks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveStudyLogOffline } from "../../lib/offlineQueue";
 import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { setJson } from "../../lib/storage/appStorage";
 import { todayTR } from "../../lib/dateUtils";
-import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
+import { TopicPicker } from "../../components/forms/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
@@ -82,21 +84,42 @@ export default function AddStudyScreen() {
   const [correctCount, setCC] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const { completeForm, markFormDirty } = useFormLifecycleAnalytics("study_log_manual", {
+    tier,
+    subjectKey,
+  });
 
   const subjects = tier === "TYT" ? tytSubjects : aytSubjects;
   const current = useMemo(() => subjects.find((s) => s.key === subjectKey), [subjects, subjectKey]);
   const canSave = !!subjectKey && topic.trim() && duration;
 
-  const switchTier = (t) => { H.select(); setTier(t); setSubjectKey(null); setTopic(""); };
-  const pickSubject = (key) => { H.select(); setSubjectKey(key); setTopic(""); };
+  const switchTier = (t) => {
+    H.select();
+    markFormDirty({ field: "tier", tier: t });
+    setTier(t);
+    setSubjectKey(null);
+    setTopic("");
+  };
+  const pickSubject = (key) => {
+    H.select();
+    markFormDirty({ field: "subject", subjectKey: key });
+    setSubjectKey(key);
+    setTopic("");
+  };
 
   const openTopicPicker = () => {
     if (!current) { H.warn(); showAlert("Önce ders seç", ""); return; }
     H.select(); setTopicOpen(true);
   };
 
-  const pickDuration = (d) => { H.tap(); setDuration(d); setCustomDur(""); };
+  const pickDuration = (d) => {
+    H.tap();
+    markFormDirty({ field: "duration", duration: d });
+    setDuration(d);
+    setCustomDur("");
+  };
   const handleCustomDur = (t) => {
+    markFormDirty({ field: "duration" });
     const num = t.replace(/[^0-9]/g, "");
     setCustomDur(num);
     const v = parseInt(num, 10);
@@ -105,6 +128,11 @@ export default function AddStudyScreen() {
 
   const save = useCallback(async () => {
     if (saving || !canSave) return;
+    if (!user?.id || user.id === "dev") {
+      H.warn();
+      showAlert("Oturum bulunamadı", "Çalışmayı kaydetmek için tekrar giriş yapmalısın.");
+      return;
+    }
     const todayStr = todayTR();
     const qc = parseInt(qCount, 10) || 0;
     const cc = parseInt(correctCount, 10) || 0;
@@ -135,13 +163,15 @@ export default function AddStudyScreen() {
     if (result.saved) {
       try {
         const streakData = await getStreak(user.id);
-        const { updates, newStreak, usedFreeze, freezeCount } = computeStreakUpdate(streakData);
+        const streakResult = computeStreakUpdate(streakData);
+        const { updates, newStreak, usedFreeze, freezeCount } = streakResult;
+        trackStreakTransition(streakResult);
         dispatch(setStreak(newStreak));
         dispatch(setFreezeCount(freezeCount));
         try {
           await updateStreak(user.id, updates);
         } catch (_) {
-          AsyncStorage.setItem(STORAGE_KEYS.PENDING_STREAK, JSON.stringify({ userId: user.id, updates })).catch(() => {});
+          setJson(STORAGE_KEYS.PENDING_STREAK, { userId: user.id, updates });
         }
         if (usedFreeze) showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
       } catch (e) { captureError(e, { context: "streak_update_addStudy" }); }
@@ -153,6 +183,7 @@ export default function AddStudyScreen() {
     }
     setSaving(false);
 
+    completeForm({ minutes: duration, questions: qc, subjectKey });
     track(EVENTS.STUDY_COMPLETED, { minutes: duration, questions: qc });
     reward("study_log", { minutes: duration, statUpdates: [
       { type: "increment", key: "totalQuestions", value: qc },
@@ -167,7 +198,7 @@ export default function AddStudyScreen() {
       subjectIcon: current?.icon || "bookOpen",
       topic: topic.trim(), duration, questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, duration, qCount, correctCount, notes, tier, user, dispatch, reward, navigation]);
+  }, [saving, canSave, subjectKey, topic, duration, qCount, correctCount, notes, tier, user, dispatch, reward, navigation, showAlert, completeForm]);
 
   const fmtDur = (d) => d >= 60 ? `${d / 60}sa` : `${d}dk`;
   const isDurPreset = D_PRESETS.includes(duration) && !customDur;
@@ -243,14 +274,14 @@ export default function AddStudyScreen() {
             <View style={[st.inlineRow, { backgroundColor: C.surface, borderColor: C.border }]}>
               <View style={st.inlineField}>
                 <Text style={[st.inlineLabel, { color: C.muted }]}>Soru</Text>
-                <TextInput value={qCount} onChangeText={(t) => { setQCount(t.replace(/[^0-9]/g, "")); if (!t) setCC(""); }} placeholder="0" placeholderTextColor={C.muted} keyboardType="number-pad" maxLength={4} style={[st.inlineInput, { color: C.text }]} />
+              <TextInput value={qCount} onChangeText={(t) => { markFormDirty({ field: "question_count" }); setQCount(t.replace(/[^0-9]/g, "")); if (!t) setCC(""); }} placeholder="0" placeholderTextColor={C.muted} keyboardType="number-pad" maxLength={4} style={[st.inlineInput, { color: C.text }]} />
               </View>
               {parseInt(qCount, 10) > 0 && (
                 <>
                   <View style={[st.inlineDivider, { backgroundColor: C.border }]} />
                   <View style={st.inlineField}>
                     <Text style={[st.inlineLabel, { color: C.muted }]}>Doğru</Text>
-                    <TextInput value={correctCount} onChangeText={(t) => setCC(t.replace(/[^0-9]/g, ""))} placeholder="0" placeholderTextColor={C.muted} keyboardType="number-pad" maxLength={4} style={[st.inlineInput, { color: C.text }]} />
+                    <TextInput value={correctCount} onChangeText={(t) => { markFormDirty({ field: "correct_count" }); setCC(t.replace(/[^0-9]/g, "")); }} placeholder="0" placeholderTextColor={C.muted} keyboardType="number-pad" maxLength={4} style={[st.inlineInput, { color: C.text }]} />
                   </View>
                 </>
               )}
@@ -260,7 +291,7 @@ export default function AddStudyScreen() {
           {/* Note */}
           <Animated.View entering={FadeInDown.delay(350).duration(420).springify()}>
             <Text style={[st.sectionLabel, { color: C.muted }]}>NOT (opsiyonel)</Text>
-            <TextInput value={notes} onChangeText={setNotes} placeholder="Kendine bir not bırak..." placeholderTextColor={C.muted} multiline maxLength={140} style={[st.noteInput, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]} />
+            <TextInput value={notes} onChangeText={(value) => { markFormDirty({ field: "notes" }); setNotes(value); }} placeholder="Kendine bir not bırak..." placeholderTextColor={C.muted} multiline maxLength={140} style={[st.noteInput, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]} />
             <Text style={[st.charCount, { color: C.muted }]}>{notes.length}/140</Text>
           </Animated.View>
         </ScrollView>
@@ -273,7 +304,7 @@ export default function AddStudyScreen() {
       </KeyboardAvoidingView>
 
       {topicOpen && current ? (
-        <TopicPicker subject={current} visible={topicOpen} onSelect={(t) => { setTopic(t); setTopicOpen(false); }} onClose={() => setTopicOpen(false)} />
+        <TopicPicker subject={current} visible={topicOpen} onSelect={(t) => { markFormDirty({ field: "topic" }); setTopic(t); setTopicOpen(false); }} onClose={() => setTopicOpen(false)} />
       ) : null}
 
       <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />

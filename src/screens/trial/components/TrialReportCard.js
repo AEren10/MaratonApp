@@ -87,7 +87,7 @@ export const TrialReportCard = forwardRef(function TrialReportCard(
         ))}
       </View>
 
-      <Text style={s.footer}>maraton.app · YKS hazırlık asistanın</Text>
+      <Text style={s.footer}>maraton.app · sınav hazırlık asistanın</Text>
     </View>
   );
 });

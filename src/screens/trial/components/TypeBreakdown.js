@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { getTrialTypes } from "../trialTypes";
+import { getTrialTypes } from "../../../domain/trial/trialTypes";
 
 const TYPE_COLORS = {
   TYT: "blue", AYT_SAY: "amber", AYT_EA: "purple",

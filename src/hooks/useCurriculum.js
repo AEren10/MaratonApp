@@ -5,7 +5,10 @@ import { getSubjectsForExam } from "../data/curriculum";
 
 export function useCurriculum() {
   const { examType, field } = useExam();
-  const [subjects, setSubjects] = useState(() => getSubjectsForExam(examType || "tyt", field));
+  // examType HENÜZ YÜKLENMEMİŞKEN "tyt" varsaymak, LGS kullanıcısına bir kare
+  // TYT derslerini gösteriyordu (Dersler, Çalışma Ekle, Durak Ekle, Yanlış
+  // Ekle ekranlarında). Bilinmiyorsa boş dön — çağıran taraf loading gösterir.
+  const [subjects, setSubjects] = useState(() => (examType ? getSubjectsForExam(examType, field) : []));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

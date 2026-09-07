@@ -1,8 +1,11 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { SCREENS } from "../constants/screens";
+import { appUrl } from "../navigation/routes";
 import { getDaily, getStreakRisk, getWeekly, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
+import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from "../supabase/profiles";
+import * as appStorage from "./storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 
@@ -42,8 +45,8 @@ export async function requestNotificationPermissions() {
 
 export async function getNotifPrefs() {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    const prefs = await appStorage.getJson(STORAGE_KEY, null);
+    if (prefs) return prefs;
   } catch (_) {}
   return {
     dailyReminderEnabled: true,
@@ -58,24 +61,20 @@ export async function getNotifPrefs() {
 
 export async function setNotifPrefs(prefs, userId) {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    await appStorage.setJson(STORAGE_KEY, prefs);
   } catch (_) {}
   if (userId && userId !== "dev") {
-    try {
-      const { supabase } = require("../supabase/client");
-      await supabase.from("profiles").update({ notification_prefs: prefs }).eq("id", userId);
-    } catch {}
+    await updateNotificationPrefs(userId, prefs);
   }
 }
 
 export async function loadNotifPrefsFromServer(userId) {
   if (!userId || userId === "dev") return null;
   try {
-    const { supabase } = require("../supabase/client");
-    const { data } = await supabase.from("profiles").select("notification_prefs").eq("id", userId).single();
-    if (data?.notification_prefs) {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data.notification_prefs));
-      return data.notification_prefs;
+    const prefs = await getNotificationPrefs(userId);
+    if (prefs) {
+      await appStorage.setJson(STORAGE_KEY, prefs);
+      return prefs;
     }
   } catch {}
   return null;
@@ -87,6 +86,31 @@ export async function cancelAllScheduled() {
   } catch (_) {}
 }
 
+// Sadece verilen tipleri iptal eder. applyNotifPrefs'in her açılışta
+// cancelAllScheduled çağırması, plan akışının kurduğu task_reminder
+// bildirimlerini de siliyordu — retention'ın en güçlü kancası sessizce
+// ölüyordu. Tercih uygulaması artık yalnızca kendi kurduklarına dokunur.
+export async function cancelScheduledByType(types) {
+  if (Platform.OS === "web") return;
+  const wanted = new Set(types);
+  try {
+    const all = await Notifications.getAllScheduledNotificationsAsync();
+    for (const n of all) {
+      if (wanted.has(n.content?.data?.type)) {
+        await Notifications.cancelScheduledNotificationAsync(n.identifier);
+      }
+    }
+  } catch (_) {}
+}
+
+// applyNotifPrefs'in yönettiği tipler. task_reminder BİLEREK yok.
+const PREF_MANAGED_TYPES = [
+  "daily_reminder",
+  "streak_risk",
+  "weekly_summary",
+  "trial_reminder",
+];
+
 export async function scheduleDailyReminder(hour = 19, minute = 0) {
   if (Platform.OS === "web") return null;
   try {
@@ -97,7 +121,7 @@ export async function scheduleDailyReminder(hour = 19, minute = 0) {
       content: {
         title,
         body,
-        data: { type: "daily_reminder", url: "maraton://plan" },
+        data: { type: "daily_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -110,7 +134,33 @@ export async function scheduleDailyReminder(hour = 19, minute = 0) {
   }
 }
 
-export async function scheduleStreakRiskReminder(streak = 0) {
+// Bir sonraki 22:00'ı döndürür. O gün 22:00 geçtiyse yarını verir.
+// studiedToday ise bugünü atlayıp doğrudan yarını hedefler.
+function nextStreakRiskDate(studiedToday) {
+  const target = new Date();
+  target.setSeconds(0, 0);
+  target.setMinutes(0);
+  if (studiedToday || target.getHours() >= 22) {
+    target.setDate(target.getDate() + 1);
+  }
+  target.setHours(22);
+  return target;
+}
+
+/**
+ * Seri-riski hatırlatması.
+ *
+ * Önceden DAILY tetikleyiciydi: her gün 22:00'da, o gün çalışılmış olsa bile
+ * "serin tehlikede" diye bildirim gidiyordu. DAILY tetikleyici tek bir günü
+ * atlayamadığı için yanlış-pozitif kaçınılmazdı — ve yanlış-pozitif bildirim,
+ * kullanıcının bildirimleri tamamen kapatmasının en hızlı yolu.
+ *
+ * Artık TEK SEFERLİK: her senkronda yeniden kuruluyor, o gün çalışıldıysa
+ * yarına atılıyor. Uygulamayı hiç açmayan kullanıcılar için sunucu tarafındaki
+ * push (send-push / streak_risk) devrede — o zaten "bugün aktif olmayan"ları
+ * hedefliyor, yani ikisi çakışmaz.
+ */
+export async function scheduleStreakRiskReminder(streak = 0, studiedToday = false) {
   if (Platform.OS === "web") return null;
   try {
     const { title, body } = streak > 0
@@ -120,12 +170,11 @@ export async function scheduleStreakRiskReminder(streak = 0) {
       content: {
         title,
         body,
-        data: { type: "streak_risk", url: "maraton://home" },
+        data: { type: "streak_risk", url: appUrl(SCREENS.HOME) },
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: 22,
-        minute: 0,
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: nextStreakRiskDate(studiedToday),
       },
     });
   } catch (_) {
@@ -144,7 +193,7 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
       content: {
         title,
         body,
-        data: { type: "weekly_summary", url: "maraton://weekly-review" },
+        data: { type: "weekly_summary", url: appUrl(SCREENS.WEEKLY_REVIEW) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
@@ -165,7 +214,7 @@ export async function scheduleTrialReminder() {
       content: {
         title: "Deneme zamanı 📝",
         body: "Bu hafta henüz deneme girmedin. Kendini test et!",
-        data: { type: "trial_reminder", url: "maraton://trial-entry" },
+        data: { type: "trial_reminder", url: appUrl(SCREENS.TRIAL_ENTRY) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
@@ -180,13 +229,13 @@ export async function scheduleTrialReminder() {
 }
 
 export async function applyNotifPrefs(prefs, context = {}) {
-  await cancelAllScheduled();
+  await cancelScheduledByType(PREF_MANAGED_TYPES);
   if (!prefs) return;
   if (prefs.dailyReminderEnabled) {
     await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute);
   }
   if (prefs.streakRiskEnabled) {
-    await scheduleStreakRiskReminder(context.streak);
+    await scheduleStreakRiskReminder(context.streak, context.studiedToday);
   }
   if (prefs.weeklySummaryEnabled !== false) {
     await scheduleWeeklySummary(context.weeklyVars);
@@ -207,7 +256,7 @@ export async function scheduleTaskNotifications(taskCount) {
       content: {
         title: zContent.title || "Yarım kalan görevlerin var",
         body: zContent.body || `${taskCount} görev tamamlanmamış. Geri dön ve bitir!`,
-        data: { type: "task_reminder", url: "maraton://plan" },
+        data: { type: "task_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -220,7 +269,7 @@ export async function scheduleTaskNotifications(taskCount) {
         content: {
           title: "Bugünkü hedeflerine ulaşmadın 🎯",
           body: "Hâlâ tamamlanmamış görevlerin var. Son bir hamle!",
-          data: { type: "task_reminder", url: "maraton://plan" },
+          data: { type: "task_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -242,6 +291,28 @@ export async function cancelTaskReminders() {
       }
     }
   } catch (_) {}
+}
+
+/**
+ * İzin verildikten HEMEN SONRA push token'ı sunucuya yazar.
+ *
+ * Boşluk şuydu: registerPushToken yalnızca useDataSync'teki loadAll içinde
+ * çağrılıyordu. Onboarding'de kullanıcı izni verdiğinde loadAll çoktan
+ * çalışmış oluyor ve o an izin yokken getExpoPushToken() null dönmüştü —
+ * yani yeni kullanıcının token'ı hiç kaydedilmiyordu. Sonuç: sunucu
+ * tarafındaki re-engagement push'u (send-push) o kullanıcıya ulaşamıyordu;
+ * token ancak uygulama arka plana alınıp geri açılınca yazılıyordu.
+ */
+export async function ensurePushTokenRegistered(userId) {
+  if (!userId || userId === "dev" || Platform.OS === "web") return false;
+  try {
+    const token = await getExpoPushToken();
+    if (!token) return false;
+    await registerPushToken(userId, token);
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 export async function getExpoPushToken() {

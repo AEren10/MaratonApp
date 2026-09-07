@@ -118,7 +118,7 @@ export default function LeagueScreen() {
   const C = useC();
   const { user } = useAuth();
   const [tab, setTab] = useState(route.params?.groupCode ? "groups" : "friends");
-  const [data, setData] = useState({ list: [], myRank: null, myScore: 0 });
+  const [data, setData] = useState({ list: [], total: null, myRank: null, myScore: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
@@ -164,7 +164,13 @@ export default function LeagueScreen() {
 
   const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
 
-  const totalUsers = data.list.length;
+  // Gerçek kohort büyüklüğü sunucudan gelir. list.length kullanılırsa global
+  // sıralamada liste 50 satırla sınırlı olduğu için 46-50. sıradakiler
+  // "düşme bölgesi" görünüyordu — oysa onlar global ilk 50.
+  const totalUsers = data.total ?? data.list.length;
+  // Toplam bilinmiyorsa bölge gösterme; yanlış bölge göstermektense hiç
+  // göstermemek doğru.
+  const showZones = data.total != null;
 
   const listData = useMemo(() => {
     if (!data.list.length) return [];
@@ -172,12 +178,12 @@ export default function LeagueScreen() {
     let addedDemotionLabel = false;
     let addedMidDivider = false;
     data.list.forEach((item) => {
-      const zone = getZone(item.rank, totalUsers);
-      if (!addedMidDivider && zone !== ZONE.PROMOTION) {
+      const zone = showZones ? getZone(item.rank, totalUsers) : ZONE.SAFE;
+      if (showZones && !addedMidDivider && zone !== ZONE.PROMOTION) {
         items.push({ _type: "divider", _id: "div-mid" });
         addedMidDivider = true;
       }
-      if (!addedDemotionLabel && zone === ZONE.DEMOTION) {
+      if (showZones && !addedDemotionLabel && zone === ZONE.DEMOTION) {
         items.push({ _type: "demotionLabel", _id: "demotion-label" });
         addedDemotionLabel = true;
       }

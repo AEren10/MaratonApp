@@ -1,12 +1,10 @@
 import { useMemo, useState, useCallback } from "react";
 import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet, Platform, KeyboardAvoidingView } from "react-native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
-import { useC } from "../../../contexts/ThemeContext";
-import { Icon } from "../../../components/design";
-import { getSubjectByKey } from "../../../themes/subjects";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
+import { Icon } from "../design";
+import { getSubjectByKey } from "../../themes/subjects";
 
-// B) Yanlış soru konu seçici — curriculum'dan dropdown + "elle yaz" seçeneği.
-// onSelect(topicName, source) → source: 'curriculum' | 'custom'
 export function TopicPicker({ visible, subject, onClose, onSelect }) {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
@@ -25,17 +23,17 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
     return topics.filter((t) => t.toLocaleLowerCase("tr").includes(q));
   }, [topics, query]);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setQuery("");
     setCustomMode(false);
     setCustomText("");
-  };
+  }, []);
 
-  const pick = (name, source) => {
+  const pick = useCallback((name, source) => {
     onSelect(name, source);
     reset();
     onClose();
-  };
+  }, [onSelect, onClose, reset]);
 
   const renderTopicItem = useCallback(({ item }) => (
     <Pressable onPress={() => pick(item, "curriculum")} style={s.row}>
@@ -47,65 +45,60 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <Pressable style={s.backdrop} onPress={onClose}>
-        <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
-          <View style={s.handle} />
-          <Text style={s.title}>{subject?.label || "Ders"} · Konu Seç</Text>
+        <Pressable style={s.backdrop} onPress={onClose}>
+          <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={s.handle} />
+            <Text style={s.title}>{subject?.label || "Ders"} · Konu Seç</Text>
 
-          {customMode ? (
-            <View style={{ gap: SPACING.md }}>
-              <TextInput
-                value={customText}
-                onChangeText={setCustomText}
-                placeholder="Konu adını yaz"
-                placeholderTextColor={C.muted}
-                autoFocus
-                style={s.input}
-              />
-              <Pressable
-                onPress={() => customText.trim() && pick(customText.trim(), "custom")}
-                style={s.primaryBtn}
-              >
-                <Text style={s.primaryBtnText}>Ekle</Text>
-              </Pressable>
-              <Pressable onPress={() => setCustomMode(false)} style={s.linkBtn}>
-                <Text style={s.linkText}>Listeden seç</Text>
-              </Pressable>
-            </View>
-          ) : (
-            <>
-              <View style={s.searchRow}>
-                <Icon name="search" size={16} color={C.muted} />
+            {customMode ? (
+              <View style={{ gap: SPACING.md }}>
                 <TextInput
-                  value={query}
-                  onChangeText={setQuery}
-                  placeholder="Konu ara"
+                  value={customText}
+                  onChangeText={setCustomText}
+                  placeholder="Konu adını yaz"
                   placeholderTextColor={C.muted}
-                  style={s.searchInput}
+                  autoFocus
+                  style={s.input}
                 />
+                <Pressable onPress={() => customText.trim() && pick(customText.trim(), "custom")} style={s.primaryBtn}>
+                  <Text style={s.primaryBtnText}>Ekle</Text>
+                </Pressable>
+                <Pressable onPress={() => setCustomMode(false)} style={s.linkBtn}>
+                  <Text style={s.linkText}>Listeden seç</Text>
+                </Pressable>
               </View>
+            ) : (
+              <>
+                <View style={s.searchRow}>
+                  <Icon name="search" size={16} color={C.muted} />
+                  <TextInput
+                    value={query}
+                    onChangeText={setQuery}
+                    placeholder="Konu ara"
+                    placeholderTextColor={C.muted}
+                    style={s.searchInput}
+                  />
+                </View>
 
-              <FlatList
-                data={filtered}
-                keyExtractor={(item, i) => `${item}-${i}`}
-                style={{ maxHeight: 320 }}
-                keyboardShouldPersistTaps="handled"
-                windowSize={5}
-                maxToRenderPerBatch={10}
-                renderItem={renderTopicItem}
-                ListEmptyComponent={
-                  <Text style={s.emptyText}>Eşleşen konu yok</Text>
-                }
-              />
+                <FlatList
+                  data={filtered}
+                  keyExtractor={(item, i) => `${item}-${i}`}
+                  style={{ maxHeight: 320 }}
+                  keyboardShouldPersistTaps="handled"
+                  windowSize={5}
+                  maxToRenderPerBatch={10}
+                  renderItem={renderTopicItem}
+                  ListEmptyComponent={<Text style={s.emptyText}>Eşleşen konu yok</Text>}
+                />
 
-              <Pressable onPress={() => setCustomMode(true)} style={s.customRow}>
-                <Icon name="edit" size={15} color={C.accent} />
-                <Text style={s.customText}>Listede yok, elle yaz</Text>
-              </Pressable>
-            </>
-          )}
+                <Pressable onPress={() => setCustomMode(true)} style={s.customRow}>
+                  <Icon name="edit" size={15} color={C.accent} />
+                  <Text style={s.customText}>Listede yok, elle yaz</Text>
+                </Pressable>
+              </>
+            )}
+          </Pressable>
         </Pressable>
-      </Pressable>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -173,7 +166,8 @@ const makeStyles = (C) => StyleSheet.create({
     paddingVertical: SPACING.md,
     alignItems: "center",
   },
-  primaryBtnText: { ...TYPOGRAPHY.button, color: C.bg },
+  primaryBtnText: { ...TYPOGRAPHY.button, color: C.textOnAccent },
   linkBtn: { alignItems: "center", paddingVertical: SPACING.sm },
   linkText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
 });
+

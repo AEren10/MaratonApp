@@ -1,7 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLevelForXP } from "../../lib/xpEngine";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import * as appStorage from "../../lib/storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.GAMIFICATION;
 
@@ -110,19 +110,17 @@ export default gamificationSlice.reducer;
 
 export async function saveGamificationToStorage(state) {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+    await appStorage.setJson(STORAGE_KEY, {
       xp: state.xp, weeklyXP: state.weeklyXP,
       stats: state.stats,
       claimedMilestones: state.claimedMilestones || [],
-    }));
+    });
   } catch (_) {}
 }
 
 export async function loadGamificationFromStorage(dispatch) {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (raw) dispatch(hydrateGamification(JSON.parse(raw)));
-    else dispatch(hydrateGamification({}));
+    dispatch(hydrateGamification(await appStorage.getJson(STORAGE_KEY, {})));
   } catch (_) {
     dispatch(hydrateGamification({}));
   }

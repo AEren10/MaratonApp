@@ -1,6 +1,6 @@
 // AI study suggestions — rule-based engine (no API keys, runs locally).
 
-import { getAllSubjects } from "../screens/trial/trialTypes";
+import { getAllSubjects } from "../domain/trial/trialTypes";
 import { C } from "../themes/tokens";
 
 function ruleBasedSuggestions({ weakAreas }) {

@@ -15,6 +15,8 @@ import { Icon, Button } from "../../components/design";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { registerSchema, validate } from "../../validations/auth";
+import { authErrorMessage } from "../../supabase/authErrors";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
@@ -28,12 +30,13 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState({});
 
   const submit = async () => {
-    const e = {};
-    if (name.trim().length < 2) e.name = "Adın en az 2 karakter olmalı";
-    if (!email.includes("@")) e.email = "Geçerli bir e-posta gir";
-    if (password.length < 6) e.password = "Şifre en az 6 karakter";
-    setErrors(e);
-    if (Object.keys(e).length) return;
+    const { ok, errors: fieldErrors } = validate(registerSchema, {
+      name: name.trim(),
+      email: email.trim(),
+      password,
+    });
+    setErrors(fieldErrors);
+    if (!ok) return;
 
     setBusy(true);
     try {
@@ -43,7 +46,7 @@ export default function RegisterScreen() {
       showAlert("Hoş geldin!", "Hesabın oluşturuldu, e-postanı doğrulamayı unutma.");
     } catch (err) {
       H.error();
-      showAlert("Kayıt başarısız", err.message ?? "Bir sorun oldu");
+      showAlert("Kayıt başarısız", authErrorMessage(err));
     } finally {
       setBusy(false);
     }

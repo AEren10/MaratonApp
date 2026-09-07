@@ -14,9 +14,11 @@ import { useDispatch } from "react-redux";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
-import { requestNotificationPermissions, applyNotifPrefs, getNotifPrefs } from "../../lib/notifications";
+import { requestNotificationPermissions, applyNotifPrefs, getNotifPrefs, ensurePushTokenRegistered } from "../../lib/notifications";
 import * as H from "../../lib/haptics";
+import { ROOT_STACK } from "../../navigation/routes";
 
 const MIN_Q = 20;
 const MAX_Q = 200;
@@ -87,6 +89,7 @@ export default function GoalSetupScreen() {
   const { width } = useWindowDimensions();
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { user } = useAuth();
   const { updateGoal } = useExam();
   const [dailyQuestions, setDailyQuestions] = useState(80);
 
@@ -104,12 +107,16 @@ export default function GoalSetupScreen() {
       if (granted) {
         const prefs = await getNotifPrefs();
         await applyNotifPrefs(prefs);
+        // İzin verildiği AN token'ı kaydet. Aksi halde sunucu tarafındaki
+        // re-engagement push'u yeni kullanıcıya hiç ulaşmıyor: loadAll bu
+        // noktadan önce çalışmış ve izin yokken token null dönmüş oluyor.
+        await ensurePushTokenRegistered(user?.id);
       }
     }).catch(() => {});
 
     track(EVENTS.ONBOARDING_COMPLETE, { dailyQuestions });
-    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
-  }, [dailyQuestions, dispatch, updateGoal, navigation]);
+    navigation.reset({ index: 0, routes: [{ name: ROOT_STACK.MAIN_TABS }] });
+  }, [dailyQuestions, dispatch, updateGoal, navigation, user?.id]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>

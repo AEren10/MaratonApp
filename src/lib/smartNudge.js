@@ -1,6 +1,6 @@
 import { differenceInDays } from "./dateUtils";
 import { TYT_SUBJECTS, getSubjectByKey } from "../themes/subjects";
-import { getAllSubjects } from "../screens/trial/trialTypes";
+import { getAllSubjects } from "../domain/trial/trialTypes";
 import { C } from "../themes/tokens";
 
 export const NUDGE_TYPES = {
@@ -34,7 +34,10 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
   for (const [key, lastDate] of Object.entries(recentStudy || {})) {
     const days = differenceInDays(today, new Date(lastDate));
     studyDays[key] = days;
-    const subject = TYT_SUBJECTS[key];
+    // getSubjectByKey TÜM sınav tiplerini kapsar; TYT_SUBJECTS yalnızca TYT.
+    // Öncekiyle LGS anahtarları (lgs_*) hiçbir zaman eşleşmiyordu, yani LGS
+    // kullanıcısı "ihmal edilen ders" uyarısını HİÇ almıyordu.
+    const subject = getSubjectByKey(key);
     if (!subject) continue;
 
     if (days >= 14) {

@@ -3,14 +3,7 @@ import { useSelector } from "react-redux";
 import { selectTrials } from "../store/slices/trialSlice";
 import { useAuth } from "../contexts/AuthContext";
 import { getStudyLogs } from "../supabase/studyLogs";
-
-function startOfWeek() {
-  const d = new Date();
-  const day = (d.getDay() + 6) % 7; // monday=0
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - day);
-  return d;
-}
+import { dateKey, startOfWeek } from "../lib/dateUtils";
 
 function endOfWeek() {
   const start = startOfWeek();
@@ -21,7 +14,7 @@ function endOfWeek() {
 }
 
 function toIso(d) {
-  return d.toISOString().split("T")[0];
+  return dateKey(d);
 }
 
 export function useWeeklyReport() {
@@ -73,14 +66,14 @@ export function useWeeklyReport() {
       return d >= weekStart && d <= weekEnd;
     });
 
-    const totalQuestions = logs.reduce((s, l) => s + (l.question_count || 0), 0);
-    const totalMinutes = logs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
+    const totalQuestions = logs.reduce((s, l) => s + (l.questionCount ?? l.question_count ?? 0), 0);
+    const totalMinutes = logs.reduce((s, l) => s + (l.duration ?? l.duration_minutes ?? 0), 0);
 
     const days = new Set(logs.map((l) => l.study_date));
     const activeDays = days.size;
 
-    const prevTotalQuestions = prevLogs.reduce((s, l) => s + (l.question_count || 0), 0);
-    const prevTotalMinutes = prevLogs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
+    const prevTotalQuestions = prevLogs.reduce((s, l) => s + (l.questionCount ?? l.question_count ?? 0), 0);
+    const prevTotalMinutes = prevLogs.reduce((s, l) => s + (l.duration ?? l.duration_minutes ?? 0), 0);
 
     const weekNetAvg = weekTrials.length > 0
       ? weekTrials.reduce((s, t) => s + (t.totalNet || 0), 0) / weekTrials.length
@@ -103,8 +96,8 @@ export function useWeeklyReport() {
     logs.forEach((l) => {
       const key = l.subject || "other";
       if (!subjectMap[key]) subjectMap[key] = { questions: 0, minutes: 0 };
-      subjectMap[key].questions += l.question_count || 0;
-      subjectMap[key].minutes += l.duration_minutes || 0;
+      subjectMap[key].questions += l.questionCount ?? l.question_count ?? 0;
+      subjectMap[key].minutes += l.duration ?? l.duration_minutes ?? 0;
     });
     const subjects = Object.entries(subjectMap)
       .map(([key, v]) => ({ key, ...v }))
@@ -117,7 +110,7 @@ export function useWeeklyReport() {
       const dateStr = toIso(d);
       const active = days.has(dateStr);
       const q = logs.filter((l) => l.study_date === dateStr)
-        .reduce((s, l) => s + (l.question_count || 0), 0);
+        .reduce((s, l) => s + (l.questionCount ?? l.question_count ?? 0), 0);
       return { label, date: dateStr, active, questions: q };
     });
 

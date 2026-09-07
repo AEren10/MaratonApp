@@ -6,9 +6,10 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { TaskInputPanel } from "./TaskInputPanel";
 import * as H from "../../../lib/haptics";
+import { todayTR } from "../../../lib/dateUtils";
 
 function todayIso() {
-  return new Date().toISOString().split("T")[0];
+  return todayTR();
 }
 
 function TaskRow({ task, onToggle, onRemove, C }) {

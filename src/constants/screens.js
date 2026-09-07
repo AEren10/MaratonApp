@@ -3,6 +3,7 @@ export const SCREENS = {
   LOGIN: "Login",
   REGISTER: "Register",
   FORGOT_PASSWORD: "ForgotPassword",
+  SET_NEW_PASSWORD: "SetNewPassword",
 
   // Onboarding
   ONBOARDING: "Onboarding",

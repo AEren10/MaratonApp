@@ -7,6 +7,8 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { SCREENS } from "../../constants/screens";
+import { appUrl } from "../../navigation/routes";
 
 const MemberRow = React.memo(function MemberRow({ item }) {
   const C = useC();
@@ -118,7 +120,7 @@ export function GroupsTab({ user, initialGroupCode }) {
   };
 
   const shareCode = (g) => {
-    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\nmaraton://group/${g.code}` }).catch(() => {});
+    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { code: g.code })}` }).catch(() => {});
   };
 
   const renderGroupChip = useCallback(({ item }) => {

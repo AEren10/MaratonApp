@@ -11,7 +11,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { useUserTasks } from "../../hooks/useUserTasks";
-import { TopicPicker } from "../wrong-notebook/components/TopicPicker";
+import { TopicPicker } from "../../components/forms/TopicPicker";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -98,10 +98,10 @@ export default function AddTaskScreen() {
   const switchTier = (t) => { setTier(t); setSubjectKey(null); setTopic(""); };
   const pickSubject = (key) => { H.select(); setSubjectKey(key); setTopic(""); };
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
     if (!canSave) return;
     try {
-      createTask({
+      await createTask({
         subject: subjectKey,
         topic: topic.trim() || undefined,
         questionCount: parseInt(qCount, 10) || undefined,

@@ -9,6 +9,7 @@ import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { generateDailyPlan } from "../../lib/planEngine";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
@@ -34,8 +35,14 @@ export default function PlanDetailScreen() {
   const { toggleTask: toggleUserTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlanDone, syncPlan } = usePlanCompletion(user?.id);
   const ctx = usePlanContext();
+  // Günlük plan haftalık rotadan besleniyor — ikisi çelişmesin diye.
+  // persist: false çünkü bu ekran rotayı ÇİZMİYOR, sadece okuyor.
+  const { currentWeek } = useStudyRoute({ persist: false });
 
-  const plan = useMemo(() => generateDailyPlan(ctx), [ctx]);
+  const plan = useMemo(
+    () => generateDailyPlan({ ...ctx, routeWeekStops: currentWeek?.stops || [] }),
+    [ctx, currentWeek],
+  );
 
   useEffect(() => {
     if (plan?.tasks?.length) syncPlan(plan);
@@ -77,7 +84,7 @@ export default function PlanDetailScreen() {
         s: subj || { key: t.subject, label: t.subject, color: C.accent, icon: "bookOpen" },
         topic: t.topic || "Genel çalışma",
         topicKey: t.topic,
-        q: t.question_count,
+        q: t.questionCount ?? t.question_count ?? 0,
         reason: t.note || "Senin eklediğin görev",
         rkind: "blue",
         done: t.completed,

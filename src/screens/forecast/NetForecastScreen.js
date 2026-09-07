@@ -16,8 +16,8 @@ import { estimateRank, RANKING_DISCLAIMER } from "../../data/rankingTable";
 import { ForecastHero } from "./components/ForecastHero";
 import { TrajectoryChart } from "./components/TrajectoryChart";
 import { SubjectForecast } from "./components/SubjectForecast";
+import { formatNumber as fmt } from "../../lib/format";
 
-const fmt = (n) => n.toLocaleString("tr-TR");
 
 export default function NetForecastScreen() {
   const navigation = useNavigation();
@@ -152,9 +152,13 @@ export default function NetForecastScreen() {
             </View>
           )}
 
-          <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.xl, lineHeight: 16 }}>
-            {RANKING_DISCLAIMER}
-          </Text>
+          {/* Dipnot YKS sıralamasından bahsediyor; sıralama kartı LGS'de zaten
+              gösterilmiyor, dipnot da onunla birlikte gizlensin. */}
+          {projectedRank ? (
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.xl, lineHeight: 16 }}>
+              {RANKING_DISCLAIMER}
+            </Text>
+          ) : null}
         </ScrollView>
       )}
     </SafeAreaView>
