@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0A0808}
+  a{color:#FF3B47;text-decoration:none}
+  a:hover{color:#FF8A93}
+</style>
+</helmet>
+
+<section style="--accent:#FF3B47;--ink:#22090B;--canvas:#0A0808;--bg:#0F0C0B;--text:#F7EFE9;--text2:#D3C4BE;--text3:#B0A09A;--text4:#94837C;--text5:#8A7873;--surface:color-mix(in oklab, var(--bg) 93%, var(--text));--elev:color-mix(in oklab, var(--bg) 86%, var(--text));--border:color-mix(in oklab, var(--bg) 77%, var(--text));--line:color-mix(in oklab, var(--bg) 90%, var(--text));--track:color-mix(in oklab, var(--bg) 86%, var(--text));--stop:color-mix(in oklab, var(--accent) 42%, var(--bg));--brand-tint:color-mix(in oklab, var(--accent) 13%, var(--bg));--up:#4ADE80;padding:44px;font-family:'Archivo',sans-serif;color:var(--text);background:var(--canvas);min-height:100vh">
+
+<div style="display:flex;align-items:baseline;gap:14px;padding-bottom:6px">
+  <span style="font:700 11px 'Archivo';letter-spacing:.22em;color:var(--accent)">PAYLAŞ AKIŞI</span>
+  <span style="font:400 13px 'Archivo';color:var(--text3)">Tek ekran, iki mod: hazır kart ya da kendi fotoğrafının üstüne etiket. Aynı veri seçimi ikisini de besliyor.</span>
+</div>
+
+<div style="display:flex;gap:26px;padding-top:32px;align-items:flex-start">
+
+  <div style="display:flex;flex-direction:column;gap:11px">
+    <div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text3)">MOD 1 · KART</div>
+    <div data-screen-label="Paylaş · Kart" style="width:390px;height:844px;flex:none;border-radius:42px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+      <div style="height:50px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid var(--text3);border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:var(--text);border-radius:1px;display:block"></span></span></div>
+
+      <div style="display:flex;align-items:center;gap:14px;padding:4px 22px 0;flex:none">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" style="cursor:pointer;flex:none"><path d="M7 1.5 2 7.5l5 6" stroke="var(--text2)" stroke-width="1.9" stroke-linecap="round"></path></svg>
+        <span style="flex:1;font:400 22px 'Bricolage Grotesque'">Paylaş</span>
+        <span style="font:600 11px 'Archivo';letter-spacing:.14em;color:var(--text4)">GÜNLÜK</span>
+      </div>
+
+      <div style="display:flex;gap:5px;margin:18px 22px 0;padding:5px;background:var(--surface);border:1px solid var(--elev);border-radius:6px;flex:none">
+        <div style="flex:1;height:38px;border-radius:6px;background:var(--elev);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="3" y="1.5" width="8" height="11" rx="2" stroke="var(--text)" stroke-width="1.6"></rect></svg>
+          <span style="font:700 12.5px 'Archivo';color:var(--text)">Kart</span>
+        </div>
+        <div style="flex:1;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="var(--text3)" stroke-width="1.6"></rect><circle cx="5" cy="6" r="1.2" fill="var(--text3)"></circle><path d="M2.5 10.5 6 7.5l5 3.5" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"></path></svg>
+          <span style="font:700 12.5px 'Archivo';color:var(--text3)">Fotoğrafımın üstüne</span>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;padding:22px 22px 0;flex:none">
+        <div style="width:190px;height:338px;border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;background:var(--bg)">
+          <div style="position:absolute;left:0;top:0;transform:scale(.469);transform-origin:top left">
+            <dc-import name="Maraton Story Karti" variant="gun" hint-size="405px,720px" style="width:405px;height:720px"></dc-import>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;padding:12px 22px 0;flex:none">
+        <span style="font:400 12px/1.5 'Archivo';color:var(--text4);text-align:center;text-wrap:pretty">Hazır kart tam ekran gider. Fotoğraf gerekmez.</span>
+      </div>
+
+      <div style="padding:22px 22px 0;flex:1;min-height:0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <span style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text2)">NELER GÖRÜNSÜN</span>
+          <span style="font:600 11px 'Archivo';color:var(--text4);font-variant-numeric:tabular-nums">3 / 4 seçili</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:6px;background:{{ c.bg }};border:1px solid {{ c.bd }};cursor:pointer">
+              <span style="font:600 12.5px 'Archivo';color:{{ c.tc }}">{{ c.n }}</span>
+              <span style="font:500 12px 'Archivo';color:{{ c.vc }};font-variant-numeric:tabular-nums">{{ c.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:14px 22px 26px;flex:none">
+        <button style="width:100%;height:52px;border:0;border-radius:6px;background:var(--accent);color:var(--ink);font:700 15.5px 'Archivo';cursor:pointer" style-active="transform:scale(.985)">Story'ye at</button>
+        <div style="display:flex;justify-content:center;padding-top:15px">
+          <span style="font:500 13px 'Archivo';color:var(--text3);border-bottom:1px solid var(--border);padding-bottom:2px;cursor:pointer">Galeriye kaydet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:11px">
+    <div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text3)">MOD 2 · FOTOĞRAFIN ÜSTÜNE</div>
+    <div data-screen-label="Paylaş · Fotoğraf" style="width:390px;height:844px;flex:none;border-radius:42px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+      <div style="height:50px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid var(--text3);border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:var(--text);border-radius:1px;display:block"></span></span></div>
+
+      <div style="display:flex;align-items:center;gap:14px;padding:4px 22px 0;flex:none">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" style="cursor:pointer;flex:none"><path d="M7 1.5 2 7.5l5 6" stroke="var(--text2)" stroke-width="1.9" stroke-linecap="round"></path></svg>
+        <span style="flex:1;font:400 22px 'Bricolage Grotesque'">Paylaş</span>
+        <span style="font:600 11px 'Archivo';letter-spacing:.14em;color:var(--text4)">GÜNLÜK</span>
+      </div>
+
+      <div style="display:flex;gap:5px;margin:18px 22px 0;padding:5px;background:var(--surface);border:1px solid var(--elev);border-radius:6px;flex:none">
+        <div style="flex:1;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="3" y="1.5" width="8" height="11" rx="2" stroke="var(--text3)" stroke-width="1.6"></rect></svg>
+          <span style="font:700 12.5px 'Archivo';color:var(--text3)">Kart</span>
+        </div>
+        <div style="flex:1;height:38px;border-radius:6px;background:var(--elev);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="2" stroke="var(--text)" stroke-width="1.6"></rect><circle cx="5" cy="6" r="1.2" fill="var(--text)"></circle><path d="M2.5 10.5 6 7.5l5 3.5" stroke="var(--text)" stroke-width="1.5" stroke-linecap="round"></path></svg>
+          <span style="font:700 12.5px 'Archivo';color:var(--text)">Fotoğrafımın üstüne</span>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;padding:22px 22px 0;flex:none">
+        <div style="width:190px;height:338px;border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative">
+          <image-slot id="mrt-share-photo" shape="rect" placeholder="Fotoğraf bırak"></image-slot>
+          <div style="position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;pointer-events:none">
+            <div style="transform:scale(.33);transform-origin:bottom center">
+              <div style="width:500px;border-radius:30px;background:rgba(12,10,9,.74);border:1px solid rgba(255,255,255,.15);padding:22px 26px">
+                <div style="display:flex;align-items:center;gap:20px">
+                  <svg viewBox="0 0 96 48" width="96" height="48" style="flex:none;display:block">
+                    <path d="M4 41L28 35L52 26L74 16" fill="none" stroke="rgba(255,255,255,.34)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M74 16L92 10" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="4" stroke-dasharray="2 8" stroke-linecap="round"></path>
+                    <circle cx="74" cy="16" r="13" fill="rgba(255,59,71,.26)"></circle>
+                    <circle cx="74" cy="16" r="6.5" fill="var(--accent)"></circle>
+                  </svg>
+                  <div style="flex:1;min-width:0;display:flex;align-items:baseline;gap:10px">
+                    <span style="font:400 46px/.9 'Bricolage Grotesque';letter-spacing:-.04em;color:#fff;font-variant-numeric:tabular-nums">118</span>
+                    <span style="font:600 12px 'Archivo';letter-spacing:.18em;color:rgba(255,255,255,.62)">SORU</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:11px;flex:none;padding-left:18px;border-left:1px solid rgba(255,255,255,.16)">
+                    <span style="width:30px;height:30px;flex:none;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 14C6 14 7 4 9 4s3 10 7 10" stroke="#22090B" stroke-width="2.2" stroke-linecap="round"></path></svg></span>
+                    <span style="font:500 19px 'Bricolage Grotesque';color:#fff;letter-spacing:-.01em">maraton</span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:30px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14)">
+                  <div><div style="font:600 10.5px 'Archivo';letter-spacing:.16em;color:rgba(255,255,255,.55)">SÜRE</div><div style="font:400 20px 'Bricolage Grotesque';color:#fff;margin-top:5px;font-variant-numeric:tabular-nums">3s 12dk</div></div>
+                  <div><div style="font:600 10.5px 'Archivo';letter-spacing:.16em;color:rgba(255,255,255,.55)">SERİ</div><div style="font:400 20px 'Bricolage Grotesque';color:#fff;margin-top:5px;font-variant-numeric:tabular-nums">118 gün</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;padding:12px 22px 0;flex:none">
+        <span style="font:400 12px/1.5 'Archivo';color:var(--text4);text-align:center;text-wrap:pretty">Etiket panoya kopyalanır, fotoğrafı Instagram'da sen seçersin.</span>
+      </div>
+
+      <div style="padding:22px 22px 0;flex:1;min-height:0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <span style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text2)">NELER GÖRÜNSÜN</span>
+          <span style="font:600 11px 'Archivo';color:var(--text4);font-variant-numeric:tabular-nums">3 / 4 seçili</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:6px;background:{{ c.bg }};border:1px solid {{ c.bd }};cursor:pointer">
+              <span style="font:600 12.5px 'Archivo';color:{{ c.tc }}">{{ c.n }}</span>
+              <span style="font:500 12px 'Archivo';color:{{ c.vc }};font-variant-numeric:tabular-nums">{{ c.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:14px 22px 26px;flex:none">
+        <button style="width:100%;height:52px;border:0;border-radius:6px;background:var(--accent);color:var(--ink);font:700 15.5px 'Archivo';cursor:pointer" style-active="transform:scale(.985)">Kopyala ve Instagram'ı aç</button>
+        <div style="display:flex;justify-content:center;padding-top:15px">
+          <span style="font:500 13px 'Archivo';color:var(--text3);border-bottom:1px solid var(--border);padding-bottom:2px;cursor:pointer">Galeriye kaydet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const chip=function(a){return {n:a[0],v:a[1],
+      bg:a[2]?'var(--brand-tint)':'transparent',bd:a[2]?'var(--accent)':'var(--border)',
+      tc:a[2]?'var(--text)':'var(--text3)',vc:a[2]?'var(--accent)':'var(--text5)'};};
+    return {
+      chips:[['Soru','118',1],['Süre','3s 12dk',1],['Seri','118 gün',1],
+        ['İsabet','%78',0],['Durak','4',0],['Sınava kalan','47 gün',0]].map(chip),
+      storyCards:[
+        {label:'GÜNLÜK',variant:'gun'},
+        {label:'HAFTALIK',variant:'hafta'},
+        {label:'AYLIK',variant:'ay'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

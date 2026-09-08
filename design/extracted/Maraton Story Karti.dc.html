@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0A0808}
+  a{color:#FF3B47;text-decoration:none}
+  a:hover{color:#FF8A93}
+</style>
+</helmet>
+
+<div style="--accent:#FF3B47;--ink:#22090B;--bg:#0F0C0B;--text:#F7EFE9;--text2:#D3C4BE;--text3:#B0A09A;--text4:#94837C;--border:color-mix(in oklab, var(--bg) 77%, var(--text));--track:color-mix(in oklab, var(--bg) 86%, var(--text));--stop:color-mix(in oklab, var(--accent) 42%, var(--bg));--up:#4ADE80;position:relative;width:405px;height:720px;border-radius:22px;overflow:hidden;background:var(--bg);font-family:'Archivo',sans-serif;color:var(--text);padding:94px 34px 120px;display:flex;flex-direction:column">
+
+  <div style="position:absolute;left:-130px;top:-160px;width:470px;height:470px;border-radius:6px;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 32%, transparent), transparent 66%)"></div>
+  <div style="position:absolute;right:-170px;bottom:-190px;width:520px;height:520px;border-radius:6px;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 20%, transparent), transparent 68%)"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.16), transparent 32%, transparent 74%, rgba(0,0,0,.22))"></div>
+  <div style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg, transparent, rgba(247,239,233,.22), transparent)"></div>
+
+  <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between">
+    <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 12px;border-radius:6px;background:color-mix(in oklab, var(--accent) 15%, transparent);border:1px solid color-mix(in oklab, var(--accent) 45%, transparent);font:700 11px 'Archivo';letter-spacing:.2em;color:var(--accent)"><span style="width:5px;height:5px;border-radius:1px;background:var(--accent);display:block"></span>{{ kicker }}</span>
+    <span style="font:600 11px 'Archivo';letter-spacing:.16em;color:var(--text4)">{{ meta }}</span>
+  </div>
+
+  <div style="flex:1;min-height:0"></div>
+
+  <div style="position:relative;display:flex;align-items:baseline;gap:12px">
+    <span style="font:400 132px/.8 'Bricolage Grotesque';letter-spacing:-.052em;font-variant-numeric:tabular-nums">{{ value }}</span>
+    <sc-if value="{{ prev }}" hint-placeholder-val="{{ true }}">
+      <span style="font:400 24px 'Bricolage Grotesque';color:var(--text4);font-variant-numeric:tabular-nums">{{ prev }}</span>
+    </sc-if>
+  </div>
+  <div style="position:relative;font:400 22px 'Bricolage Grotesque';color:var(--text2);margin-top:12px">{{ unit }}</div>
+  <div style="position:relative;font:400 15px/1.55 'Archivo';color:var(--text3);margin-top:12px;max-width:290px;text-wrap:pretty">{{ line }}</div>
+
+  <div style="position:relative;margin:18px -34px 0;flex:none">
+    <svg viewBox="0 0 360 96" style="width:100%;display:block">
+      <defs>
+        <linearGradient id="mrtArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--accent)" stop-opacity=".3"></stop>
+          <stop offset="1" stop-color="var(--accent)" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <path d="{{ areaD }}" fill="url(#mrtArea)" stroke="none"></path>
+      <sc-if value="{{ target }}" hint-placeholder-val="{{ true }}">
+        <line x1="0" y1="22" x2="360" y2="22" stroke="color-mix(in oklab, var(--accent) 20%, var(--bg))" stroke-width="1.4" stroke-dasharray="4 7"></line>
+      </sc-if>
+      <path d="{{ trackD }}" fill="none" stroke="var(--track)" stroke-width="2.6"></path>
+      <path d="{{ accentD }}" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"></path>
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="4">
+        <circle cx="{{ n.x }}" cy="{{ n.y }}" r="4.6" fill="var(--bg)" stroke="{{ n.c }}" stroke-width="2.4"></circle>
+      </sc-for>
+      <circle cx="{{ lastX }}" cy="{{ lastY }}" r="17" fill="color-mix(in srgb, var(--accent) 20%, transparent)"></circle>
+      <circle cx="{{ lastX }}" cy="{{ lastY }}" r="8" fill="var(--accent)"></circle>
+      <text x="{{ labelX }}" y="{{ labelY }}" text-anchor="{{ labelAnchor }}" font-family="Archivo" font-size="9" font-weight="700" letter-spacing="1.8" fill="{{ labelFill }}">{{ labelText }}</text>
+    </svg>
+  </div>
+
+  <div style="position:relative;display:flex;border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
+    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+      <div style="flex:1;min-width:0">
+        <div style="font:600 10px 'Archivo';letter-spacing:.18em;color:var(--text3)">{{ s.k }}</div>
+        <div style="font:400 20px 'Bricolage Grotesque';margin-top:6px;color:{{ s.c }};font-variant-numeric:tabular-nums">{{ s.v }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:28px;height:28px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M2 14C6 14 7 4 9 4s3 10 7 10" stroke="#22090B" stroke-width="2.2" stroke-linecap="round"></path></svg>
+      </span>
+      <span style="font:500 19px 'Bricolage Grotesque';letter-spacing:-.01em">maraton</span>
+    </div>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">{{ footRight }}</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:405,&quot;height&quot;:720},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gun&quot;,&quot;hafta&quot;,&quot;ay&quot;],&quot;default&quot;:&quot;gun&quot;,&quot;tsType&quot;:&quot;'gun'|'hafta'|'ay'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const A='var(--accent)', S='var(--stop)';
+    const V={
+      gun:{
+        kicker:'GÜN 118',meta:'23 HAZİRAN SALI',
+        value:'118',unit:'soru çözüldü',line:'118 gündür ara vermedin.',
+        trackD:'M0 80 C 58 76 96 60 140 48 C 196 33 262 22 360 12',
+        accentD:'M0 80 C 58 76 96 60 140 48',
+        nodes:[{x:34,y:78,c:A},{x:86,y:65,c:A},{x:232,y:27,c:S},{x:318,y:16,c:S}],
+        lastX:140,lastY:48,
+        labelText:'BUGÜN',labelX:140,labelY:72,labelAnchor:'middle',labelFill:A,
+        stats:[{k:'DURAK',v:'4'},{k:'SÜRE',v:'3s 12dk'},{k:'İSABET',v:'%78'}],
+        footRight:'SINAVA 47 GÜN',target:false
+      },
+      hafta:{
+        kicker:'HAFTA 17',meta:'17 – 23 HAZİRAN',
+        value:'612',unit:'soru bu hafta',line:'Bu hafta 5 durak geçtin, ikisi Matematik.',
+        trackD:'M0 82 C 54 78 92 64 138 52 C 200 36 268 22 360 10',
+        accentD:'M0 82 C 54 78 92 64 138 52 C 178 42 214 33 248 26',
+        nodes:[{x:30,y:80,c:A},{x:80,y:68,c:A},{x:138,y:52,c:A},{x:194,y:38,c:A}],
+        lastX:248,lastY:26,
+        labelText:'BU HAFTA',labelX:248,labelY:52,labelAnchor:'middle',labelFill:A,
+        stats:[{k:'DURAK',v:'5'},{k:'GÜN',v:'6/7'},{k:'NET',v:'+3,2',c:'var(--up)'}],
+        footRight:'SINAVA 47 GÜN',target:false
+      },
+      ay:{
+        kicker:'HAZİRAN',meta:'4 DENEME · 19 DURAK',
+        value:'68',prev:"64'ten",unit:'net tahmini',line:'Bir ayda dört net. Rota yukarı kırıldı.',
+        trackD:'M0 84 C 56 80 94 66 140 54 C 204 37 272 20 360 6',
+        accentD:'M0 84 C 56 80 94 66 140 54 C 188 44 232 38 276 34',
+        nodes:[{x:52,y:79,c:S},{x:140,y:54,c:A}],
+        lastX:276,lastY:34,
+        labelText:'HEDEF 71',labelX:8,labelY:16,labelAnchor:'start',
+        labelFill:'color-mix(in oklab, var(--accent) 58%, var(--text2))',
+        stats:[{k:'SORU',v:'2.418'},{k:'DURAK',v:'19'},{k:'GÜN',v:'26/30'}],
+        footRight:'SINAVA 47 GÜN',target:true
+      }
+    };
+    const v=V[this.props.variant]||V.gun;
+    const areaD=v.accentD+' L'+v.lastX+' 96 L0 96 Z';
+    return Object.assign({prev:'',areaD:areaD},v);
+  }
+}
+</script>
+</body>
+</html>

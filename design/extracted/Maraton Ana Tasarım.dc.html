@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#100D0C}
+  a{color:#FF4B26;text-decoration:none}
+  a:hover{color:#FFC15E}
+  .sc::-webkit-scrollbar{display:none}
+  .u{animation:up .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .pl{animation:pl 2.2s ease-in-out infinite}
+  @keyframes pl{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.5);opacity:0}}
+  .bt{animation:bt 2.2s ease-in-out infinite}
+  @keyframes bt{0%,100%{opacity:1}50%{opacity:.35}}
+  .ln{stroke-dasharray:220;stroke-dashoffset:220;animation:dr 1.2s cubic-bezier(.2,.7,.2,1) .2s both}
+  @keyframes dr{to{stroke-dashoffset:0}}
+</style>
+</helmet>
+
+<section style="padding:44px;font-family:'Archivo',sans-serif;color:#F7EFE9;background:#100D0C;min-height:100vh">
+<div style="display:flex;align-items:baseline;gap:14px;padding-bottom:6px">
+  <span style="font:700 11px 'Archivo';letter-spacing:.22em;color:#FF4B26">ANA TASARIM · ŞAFAK ROTASI</span>
+  <span style="font:400 13px 'Archivo';color:#8C7C74">Yön A (Yolculuk) iskeleti + Varyasyon 2 (Şafak) dili</span>
+</div>
+<p style="margin:0 0 34px;max-width:760px;font:400 13.5px/1.7 'Archivo';color:#BFAEA6;text-wrap:pretty">İmza rengi vermilyona döndü, zemin sıcak kömürde kaldı. Hattın altındaki sıradaki satırı ve hızlı işlem pill'leri kalktı; tek aksiyon var, nabız animasyonları kapandı. Bugünün planı durak kartlarına, ders ivmesi sütunlu tabloya, filtreler tek gövdeli segment kontrole, geçmiş denemeler dikey kayıt listesine dönüştü. "Daha derine" çip kalabalığı yerine üç satırlık liste var. XP kadranı ise ayrı bir Seviye ekranına taşındı.</p>
+
+<div style="display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap">
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:#8C7C74">ANA SAYFA</div>
+<div style="width:390px;flex:none;border-radius:42px;overflow:hidden;background:#14100F;border:1px solid #322A27;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+<div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid #8C7C74;border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:#F7EFE9;border-radius:1px;display:block"></span></span></div>
+
+<div class="u" style="display:flex;align-items:center;gap:13px;padding:2px 24px 0">
+  <div style="width:40px;height:40px;border-radius:999px;background:#1F1A18;border:1px solid #322A27;display:flex;align-items:center;justify-content:center;font:600 14px 'Archivo';color:#BFAEA6">AY</div>
+  <div style="flex:1;min-width:0">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74">İYİ AKŞAMLAR</div>
+    <div style="font:400 17px 'Bricolage Grotesque';margin-top:3px">Ahmet Yılmaz</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:999px;background:#1F1A18">
+    <span style="width:6px;height:6px;border-radius:999px;background:#FF4B26;display:block"></span>
+    <span style="font:600 11.5px 'Archivo';letter-spacing:.06em">47 GÜN</span>
+  </div>
+</div>
+
+<div style="position:relative;height:326px;margin-top:10px">
+  <svg viewBox="0 0 390 300" style="position:absolute;inset:0;width:100%;height:100%">
+    <path d="M -10 268 C 70 262 140 236 196 190 C 252 144 300 74 368 40" pathLength="100" fill="none" stroke="#332723" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"></path>
+    <path d="M -10 268 C 70 262 140 236 196 190 C 252 144 300 74 368 40" pathLength="100" fill="none" stroke="#FF4B26" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{ dashRoute }}"></path>
+    <circle cx="48" cy="260" r="6" fill="#FF4B26"></circle>
+    <circle cx="102" cy="244" r="6" fill="#FF4B26"></circle>
+    <circle cx="142" cy="226" r="9" fill="#FF4B26"></circle>
+    <circle cx="368" cy="40" r="7" fill="none" stroke="#4A3A34" stroke-width="3"></circle>
+  </svg>
+  <div class="u" style="position:absolute;left:24px;top:0;animation-delay:.06s">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">BUGÜN ÇÖZÜLEN</div>
+    <div style="display:flex;align-items:flex-end;gap:8px;margin-top:8px">
+      <span style="font:400 102px/.8 'Bricolage Grotesque';letter-spacing:-.035em;font-variant-numeric:tabular-nums">{{ q63 }}</span>
+      <span style="font:500 18px 'Archivo';color:#8C7C74;padding-bottom:12px">/{{ goal }}</span>
+    </div>
+    <div style="font:400 13px 'Archivo';color:#BFAEA6;margin-top:6px">soru · hedefe {{ q100 }} kaldı</div>
+  </div>
+  <div class="u" style="position:absolute;right:22px;top:108px;text-align:right;animation-delay:.14s">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74">{{ exam }}</div>
+    <div style="font:400 28px 'Bricolage Grotesque';margin-top:4px">{{ days }} gün</div>
+    <div style="font:500 11.5px 'Archivo';color:#8C7C74;font-variant-numeric:tabular-nums;margin-top:3px">{{ clock }}</div>
+  </div>
+  <div style="position:absolute;left:162px;top:214px;font:700 9.5px 'Archivo';letter-spacing:.18em;color:#FF4B26">BUGÜN</div>
+  <div style="position:absolute;left:26px;top:280px;font:600 9.5px 'Archivo';letter-spacing:.18em;color:#6B5B55">SON İKİ DENEME</div>
+</div>
+
+<div class="u" style="padding:0 24px;animation-delay:.2s">
+  <button style="width:100%;height:60px;border:0;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 17px 'Archivo';cursor:pointer;transition:transform .12s ease,background .12s ease" style-active="transform:scale(.98);background:#E03D1B">Çalışmaya Başla</button>
+</div>
+
+<div class="u" style="display:flex;gap:12px;margin:24px 24px 0;padding:16px 18px;background:#1F1A18;border-radius:22px;animation-delay:.26s">
+  <span style="width:3px;border-radius:999px;background:#FF4B26;display:block"></span>
+  <span style="flex:1;font:400 13.5px/1.5 'Archivo';text-wrap:pretty">Sosyal Bilimler'de 10.8 net düştün. Bugünün ilk iki durağı oradaydı.</span>
+</div>
+
+<div style="padding:32px 24px 0">
+  <div style="display:flex;align-items:center;gap:12px;padding-bottom:14px">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">BUGÜNÜN DURAKLARI</span>
+    <div style="flex:1;display:flex;gap:4px">
+      <sc-for list="{{ seg }}" as="s" hint-placeholder-count="5">
+        <span style="flex:1;height:4px;border-radius:999px;background:{{ s.bg }};display:block"></span>
+      </sc-for>
+    </div>
+    <span style="font:600 11.5px 'Archivo';font-variant-numeric:tabular-nums">{{ planLabel }}</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <sc-for list="{{ plan }}" as="t" hint-placeholder-count="5">
+      <div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:20px;background:{{ t.bg }};border:1px solid {{ t.bd }};cursor:pointer;transition:background .16s ease">
+        <span style="width:26px;height:26px;flex:none;border-radius:999px;border:2px solid {{ t.ring }};background:{{ t.fill }};display:flex;align-items:center;justify-content:center;position:relative">
+          <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7.4l2.6 2.6L11 4.4" stroke="#1A0805" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </sc-if>
+        </span>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9.5px 'Archivo';letter-spacing:.16em;color:{{ t.color }}">{{ t.sub }}</div>
+          <div style="font:400 16.5px 'Bricolage Grotesque';margin-top:3px;color:{{ t.txt }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.topic }}</div>
+        </div>
+        <div style="text-align:right;flex:none">
+          <div style="font:500 11px 'Archivo';color:#8C7C74">{{ t.meta }}</div>
+          <sc-if value="{{ t.isNext }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:6px;height:28px;padding:0 14px;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 11.5px 'Archivo';display:flex;align-items:center">Başla</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;gap:18px;padding:16px 6px 0">
+    <span style="font:700 13px 'Archivo';color:#FF4B26;cursor:pointer">Durak Ekle</span>
+    <span style="font:500 13px 'Archivo';color:#BFAEA6;cursor:pointer">Rotayı düzenle</span>
+  </div>
+</div>
+
+<div style="padding:34px 24px 0">
+  <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:4px">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">DERS İVMESİ</span>
+    <span style="flex:1;height:1px;background:#241E1B;display:block"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;padding:12px 0 8px">
+    <span style="flex:1;font:600 9px 'Archivo';letter-spacing:.18em;color:#6B5B55">DERS</span>
+    <span style="width:86px;flex:none;font:600 9px 'Archivo';letter-spacing:.18em;color:#6B5B55;text-align:center">SON 5</span>
+    <span style="width:52px;flex:none;font:600 9px 'Archivo';letter-spacing:.18em;color:#6B5B55;text-align:right">NET</span>
+    <span style="width:42px;flex:none;font:600 9px 'Archivo';letter-spacing:.18em;color:#6B5B55;text-align:right">DEĞİŞİM</span>
+  </div>
+  <sc-for list="{{ mom }}" as="m" hint-placeholder-count="4">
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid #241E1B">
+      <span style="width:8px;height:8px;border-radius:999px;background:{{ m.color }};display:block;flex:none"></span>
+      <span style="flex:1;font:500 14px 'Archivo';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+      <svg width="86" height="22" viewBox="0 0 86 22" style="flex:none;overflow:visible">
+        <polyline class="ln" points="{{ m.pts }}" fill="none" stroke="{{ m.color }}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        <circle cx="{{ m.lx }}" cy="{{ m.ly }}" r="4" fill="{{ m.color }}"></circle>
+      </svg>
+      <span style="width:52px;flex:none;text-align:right;font:400 20px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">{{ m.net }}</span>
+      <span style="width:42px;flex:none;text-align:right;font:600 11.5px 'Archivo';color:{{ m.dc }};font-variant-numeric:tabular-nums">{{ m.delta }}</span>
+    </div>
+  </sc-for>
+</div>
+
+<div style="padding:32px 24px 34px">
+  <div style="display:flex;align-items:baseline;justify-content:space-between">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">BU HAFTA</span>
+    <span style="font:600 12px 'Archivo';color:#4ADE80">+%18</span>
+  </div>
+  <div style="display:flex;align-items:baseline;gap:9px;margin-top:8px">
+    <span style="font:400 36px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">412</span>
+    <span style="font:400 13.5px 'Archivo';color:#8C7C74">soru · geçen haftaya göre</span>
+  </div>
+  <div style="display:flex;align-items:flex-end;gap:8px;height:76px;margin-top:18px">
+    <sc-for list="{{ week }}" as="w" hint-placeholder-count="7">
+      <div style="flex:1;height:100%;display:flex;align-items:flex-end"><div style="width:100%;height:{{ w.h }};background:{{ w.bg }};border-radius:8px"></div></div>
+    </sc-for>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:9px">
+    <sc-for list="{{ week }}" as="w" hint-placeholder-count="7">
+      <span style="flex:1;text-align:center;font:600 10px 'Archivo';letter-spacing:.08em;color:{{ w.dc }}">{{ w.d }}</span>
+    </sc-for>
+  </div>
+</div>
+
+<div style="height:74px;background:#14100F;border-top:1px solid #251F1D;display:flex;align-items:center;padding:0 6px">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#FF4B26"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 6.5 8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.7"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ROTA</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 13V8M8 13V3M13.5 13V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ANALİZ</span></div>
+  <div style="flex:none;width:60px;display:flex;justify-content:center"><div style="width:54px;height:54px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 10px 26px rgba(255,75,38,.32);cursor:pointer"><svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"></path></svg></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="2.5" width="10" height="11" rx="1.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">DEFTER</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 13.5c.8-2.3 2.6-3.4 5-3.4s4.2 1.1 5 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">PROFİL</span></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:#8C7C74">ANALİZ</div>
+<div style="width:390px;flex:none;border-radius:42px;overflow:hidden;background:#14100F;border:1px solid #322A27;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+<div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid #8C7C74;border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:#F7EFE9;border-radius:1px;display:block"></span></span></div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 24px 0">
+  <span style="font:400 26px 'Bricolage Grotesque'">Analiz</span>
+  <button style="height:44px;padding:0 20px;border:0;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 13.5px 'Archivo';cursor:pointer;transition:transform .12s ease" style-active="transform:scale(.97)">Deneme Gir</button>
+</div>
+
+<div style="padding:20px 24px 0">
+  <div style="display:flex;gap:4px;padding:4px;background:#1F1A18;border-radius:999px">
+    <div onClick="{{ f0 }}" style="flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ f0bg }};transition:background .16s ease"><span style="font:700 12.5px 'Archivo';color:{{ f0c }}">Tümü</span></div>
+    <div onClick="{{ f1 }}" style="flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ f1bg }};transition:background .16s ease"><span style="font:700 12.5px 'Archivo';color:{{ f1c }}">TYT</span></div>
+    <div onClick="{{ f2 }}" style="flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ f2bg }};transition:background .16s ease"><span style="font:700 12.5px 'Archivo';color:{{ f2c }}">AYT</span></div>
+    <div onClick="{{ f3 }}" style="flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ f3bg }};transition:background .16s ease"><span style="font:700 12.5px 'Archivo';color:{{ f3c }}">Branş</span></div>
+  </div>
+</div>
+
+<div class="u" style="padding:26px 24px 0;animation-delay:.06s">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">TYT DENEMESİ · 23 HAZİRAN 2026</div>
+  <div style="display:flex;align-items:flex-end;gap:12px;margin-top:8px">
+    <span style="font:400 88px/.8 'Bricolage Grotesque';letter-spacing:-.035em;font-variant-numeric:tabular-nums">{{ net }}</span>
+    <span style="display:flex;align-items:center;gap:5px;padding-bottom:14px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0 4 4M6 2 2 6" stroke="#4ADE80" stroke-width="1.9" stroke-linecap="round"></path></svg><span style="font:600 15px 'Archivo';color:#4ADE80">2.3</span></span>
+  </div>
+</div>
+
+<div style="position:relative;margin-top:18px">
+  <svg viewBox="0 0 300 132" preserveAspectRatio="none" style="width:100%;height:200px;display:block">
+    <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4B26" stop-opacity=".3"></stop><stop offset="1" stop-color="#FF4B26" stop-opacity="0"></stop></linearGradient></defs>
+    <line x1="0" y1="9" x2="300" y2="9" stroke="#241E1B" stroke-width="1"></line>
+    <line x1="0" y1="50" x2="300" y2="50" stroke="#241E1B" stroke-width="1"></line>
+    <line x1="0" y1="91" x2="300" y2="91" stroke="#241E1B" stroke-width="1"></line>
+    <line x1="0" y1="131" x2="300" y2="131" stroke="#241E1B" stroke-width="1"></line>
+    <path d="{{ trendA }}" fill="url(#mg)"></path>
+    <path class="ln" d="{{ trendD }}" fill="none" stroke="#FF4B26" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
+  </svg>
+  <div style="position:absolute;left:8px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0 16px;font:500 10px 'Archivo';color:#6B5B55;font-variant-numeric:tabular-nums"><span>77</span><span>70</span><span>63</span><span>56</span></div>
+  <div style="position:absolute;left:24px;right:24px;bottom:-2px;display:flex;justify-content:space-between;font:500 10px 'Archivo';color:#6B5B55"><span>22 Haz</span><span>5 Tem</span><span>19 Tem</span></div>
+</div>
+
+<div style="padding:28px 24px 0">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;padding-bottom:4px">DERS BAZLI · SON DENEME</div>
+  <sc-for list="{{ subj }}" as="s" hint-placeholder-count="4">
+    <div style="padding:15px 0;border-bottom:1px solid #241E1B;cursor:pointer">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span style="width:8px;height:8px;border-radius:999px;background:{{ s.color }};display:block"></span>
+        <span style="flex:1;font:500 14.5px 'Archivo'">{{ s.name }}</span>
+        <span style="font:400 17px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">{{ s.val }}</span>
+      </div>
+      <div style="height:5px;border-radius:999px;background:#241E1B;margin-top:10px;position:relative;overflow:hidden"><div style="position:absolute;inset:0 auto 0 0;border-radius:999px;background:{{ s.color }};width:{{ s.w }}"></div></div>
+    </div>
+  </sc-for>
+</div>
+
+<div style="padding:30px 24px 0">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:6px">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">DENEME KAYITLARI</span>
+    <span style="font:600 11.5px 'Archivo';color:#FF4B26;cursor:pointer">Tümü</span>
+  </div>
+  <sc-for list="{{ hist }}" as="h" hint-placeholder-count="5">
+    <div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid #241E1B;cursor:pointer">
+      <div style="width:3px;height:34px;border-radius:999px;background:{{ h.edge }};flex:none;display:block"></div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:700 9.5px 'Archivo';letter-spacing:.16em;color:#BFAEA6">{{ h.type }}</span>
+          <span style="font:500 10.5px 'Archivo';color:#6B5B55">{{ h.date }}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:9px;margin-top:4px">
+          <span style="font:400 24px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">{{ h.net }}</span>
+          <span style="font:600 12px 'Archivo';color:{{ h.dc }};font-variant-numeric:tabular-nums">{{ h.delta }}</span>
+        </div>
+      </div>
+      <span style="font:600 9.5px 'Archivo';letter-spacing:.14em;color:#6B5B55;flex:none">{{ h.moodTxt }}</span>
+      <svg width="7" height="12" viewBox="0 0 8 13" fill="none" style="flex:none"><path d="M1.5 1.5 6.5 6.5l-5 5" stroke="#4A3A34" stroke-width="1.8" stroke-linecap="round"></path></svg>
+    </div>
+  </sc-for>
+</div>
+
+<div style="padding:30px 24px 34px">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;padding-bottom:6px">DAHA DERİNE</div>
+  <div style="display:flex;align-items:center;gap:14px;padding:18px 0;border-top:1px solid #241E1B;cursor:pointer">
+    <div style="flex:1"><div style="font:400 16.5px 'Bricolage Grotesque'">Detaylı Analiz</div><div style="font:400 11.5px 'Archivo';color:#8C7C74;margin-top:3px">Konu konu doğru, yanlış, boş</div></div>
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><path d="M1.5 1.5 6.5 6.5l-5 5" stroke="#6B5B55" stroke-width="1.8" stroke-linecap="round"></path></svg>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;padding:18px 0;border-top:1px solid #241E1B;cursor:pointer">
+    <div style="flex:1"><div style="font:400 16.5px 'Bricolage Grotesque'">Net Tahmini</div><div style="font:400 11.5px 'Archivo';color:#8C7C74;margin-top:3px">Bu hızla sınav günü nerede olursun</div></div>
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><path d="M1.5 1.5 6.5 6.5l-5 5" stroke="#6B5B55" stroke-width="1.8" stroke-linecap="round"></path></svg>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;padding:18px 0;border-top:1px solid #241E1B;cursor:pointer">
+    <div style="flex:1"><div style="font:400 16.5px 'Bricolage Grotesque'">Yanlış Defteri</div><div style="font:400 11.5px 'Archivo';color:#8C7C74;margin-top:3px">128 soru · 14 tekrar bekliyor</div></div>
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><path d="M1.5 1.5 6.5 6.5l-5 5" stroke="#6B5B55" stroke-width="1.8" stroke-linecap="round"></path></svg>
+  </div>
+</div>
+
+<div style="height:74px;background:#14100F;border-top:1px solid #251F1D;display:flex;align-items:center;padding:0 6px">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 6.5 8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.7"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ROTA</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#FF4B26"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 13V8M8 13V3M13.5 13V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ANALİZ</span></div>
+  <div style="flex:none;width:60px;display:flex;justify-content:center"><div style="width:54px;height:54px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 10px 26px rgba(255,75,38,.32);cursor:pointer"><svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"></path></svg></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="2.5" width="10" height="11" rx="1.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">DEFTER</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 13.5c.8-2.3 2.6-3.4 5-3.4s4.2 1.1 5 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">PROFİL</span></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:#8C7C74">PROFİL</div>
+<div style="width:390px;flex:none;border-radius:42px;overflow:hidden;background:#14100F;border:1px solid #322A27;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+<div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid #8C7C74;border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:#F7EFE9;border-radius:1px;display:block"></span></span></div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 24px 0">
+  <span style="font:400 26px 'Bricolage Grotesque'">Profil</span>
+  <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;cursor:pointer">AYARLAR</span>
+</div>
+
+<div class="u" style="display:flex;align-items:center;gap:15px;padding:20px 24px 0">
+  <div style="width:60px;height:60px;border-radius:999px;background:#1F1A18;border:1px solid #322A27;display:flex;align-items:center;justify-content:center;font:600 20px 'Archivo';color:#BFAEA6;position:relative">AY<span style="position:absolute;right:-2px;bottom:-2px;width:22px;height:22px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;font:700 13px 'Archivo'">+</span></div>
+  <div>
+    <div style="font:400 20px 'Bricolage Grotesque'">Ahmet Yılmaz</div>
+    <div style="font:600 10px 'Archivo';letter-spacing:.18em;color:#8C7C74;margin-top:5px">TYT + SAY · 47 GÜN SERİ</div>
+  </div>
+</div>
+
+<div style="position:relative;height:272px;margin-top:6px">
+  <svg viewBox="0 0 390 250" style="position:absolute;inset:0;width:100%;height:100%">
+    <path d="M -10 214 C 70 208 140 184 196 142 C 252 100 300 44 368 20" pathLength="100" fill="none" stroke="#332723" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"></path>
+    <path d="M -10 214 C 70 208 140 184 196 142 C 252 100 300 44 368 20" pathLength="100" fill="none" stroke="#FF4B26" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{ dashXp }}"></path>
+    <circle cx="60" cy="206" r="4" fill="#FF4B26"></circle>
+    <circle cx="130" cy="184" r="4" fill="#FF4B26"></circle>
+    <circle cx="190" cy="148" r="4" fill="#FF4B26"></circle>
+    <circle cx="216" cy="126" r="9" fill="#FF4B26"></circle>
+    <circle cx="266" cy="84" r="4" fill="#4A3A34"></circle>
+    <circle cx="312" cy="50" r="4" fill="#4A3A34"></circle>
+    <circle cx="368" cy="20" r="7" fill="none" stroke="#4A3A34" stroke-width="3"></circle>
+  </svg>
+  <div class="u" style="position:absolute;left:24px;top:0;animation-delay:.08s">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">SEVİYE 7 · ODAKLI</div>
+    <div style="display:flex;align-items:flex-end;gap:8px;margin-top:8px">
+      <span style="font:400 88px/.82 'Bricolage Grotesque';letter-spacing:-.035em;font-variant-numeric:tabular-nums">{{ xp }}</span>
+      <span style="font:500 15px 'Archivo';color:#8C7C74;padding-bottom:12px">/ 2200 XP</span>
+    </div>
+    <div style="font:400 13px 'Archivo';color:#BFAEA6;margin-top:6px">Hırslı'ya 960 XP kaldı</div>
+  </div>
+  <div style="position:absolute;right:20px;top:152px;text-align:right">
+    <div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:#6B5B55">15. SEVİYE</div>
+    <div style="font:400 15px 'Bricolage Grotesque';color:#8C7C74;margin-top:3px">Maratoncu</div>
+  </div>
+</div>
+
+<div style="display:flex;padding:6px 24px 0">
+  <div style="flex:1"><div style="font:400 28px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">{{ tot }}</div><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:#8C7C74;margin-top:5px">SORU</div></div>
+  <div style="flex:1;padding-left:16px;border-left:1px solid #251F1D"><div style="font:400 28px 'Bricolage Grotesque'">61</div><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:#8C7C74;margin-top:5px">SAAT</div></div>
+  <div style="flex:1;padding-left:16px;border-left:1px solid #251F1D"><div style="font:400 28px 'Bricolage Grotesque'">47</div><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:#8C7C74;margin-top:5px">EN UZUN SERİ</div></div>
+</div>
+
+<div style="padding:32px 24px 0">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">AĞUSTOS 2026</span>
+    <span style="font:600 12px 'Archivo'">18 aktif gün</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+    <sc-for list="{{ cal }}" as="d" hint-placeholder-count="31"><div style="aspect-ratio:1;border-radius:8px;background:{{ d.bg }}"></div></sc-for>
+  </div>
+</div>
+
+<div style="padding:32px 24px 0">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;padding-bottom:4px">GÜÇ HARİTASI</div>
+  <sc-for list="{{ strength }}" as="s" hint-placeholder-count="6">
+    <div style="padding:14px 0;border-bottom:1px solid #241E1B">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span style="width:8px;height:8px;border-radius:999px;background:{{ s.color }};display:block"></span>
+        <span style="flex:1;font:500 14.5px 'Archivo'">{{ s.name }}</span>
+        <span style="font:400 17px 'Bricolage Grotesque';font-variant-numeric:tabular-nums">{{ s.pct }}</span>
+      </div>
+      <div style="height:5px;border-radius:999px;background:#241E1B;margin-top:10px;position:relative;overflow:hidden"><div style="position:absolute;inset:0 auto 0 0;border-radius:999px;background:{{ s.color }};width:{{ s.w }}"></div></div>
+    </div>
+  </sc-for>
+</div>
+
+<div style="margin:28px 24px 34px;padding:20px;background:#1F1A18;border-radius:22px">
+  <div style="display:flex;align-items:baseline;justify-content:space-between">
+    <span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">HAFTALIK LİG</span>
+    <span style="font:600 12.5px 'Archivo';color:#FF4B26">Üst lige 160 XP</span>
+  </div>
+  <div style="font:400 24px 'Bricolage Grotesque';margin-top:8px">Gümüş</div>
+  <div style="display:flex;gap:5px;margin-top:14px">
+    <span style="flex:1;height:5px;border-radius:999px;background:#FF4B26;display:block"></span>
+    <span style="flex:1;height:5px;border-radius:999px;background:#FF4B26;display:block"></span>
+    <span style="flex:1;height:5px;border-radius:999px;background:#332723;display:block"></span>
+    <span style="flex:1;height:5px;border-radius:999px;background:#332723;display:block"></span>
+    <span style="flex:1;height:5px;border-radius:999px;background:#332723;display:block"></span>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:9px;font:600 9.5px 'Archivo';letter-spacing:.12em;color:#6B5B55"><span>BRONZ</span><span style="color:#F7EFE9">GÜMÜŞ</span><span>ALTIN</span><span>ELMAS</span><span>OBSİDYEN</span></div>
+</div>
+
+<div style="height:74px;background:#14100F;border-top:1px solid #251F1D;display:flex;align-items:center;padding:0 6px">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 6.5 8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.7"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ROTA</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 13V8M8 13V3M13.5 13V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ANALİZ</span></div>
+  <div style="flex:none;width:60px;display:flex;justify-content:center"><div style="width:54px;height:54px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 10px 26px rgba(255,75,38,.32);cursor:pointer"><svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"></path></svg></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="2.5" width="10" height="11" rx="1.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">DEFTER</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#FF4B26"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 13.5c.8-2.3 2.6-3.4 5-3.4s4.2 1.1 5 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">PROFİL</span></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:#8C7C74">SEVİYE · KADRAN BURADA YAŞIYOR</div>
+<div style="width:390px;flex:none;border-radius:42px;overflow:hidden;background:#14100F;border:1px solid #322A27;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+<div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid #8C7C74;border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:#F7EFE9;border-radius:1px;display:block"></span></span></div>
+
+<div style="display:flex;align-items:center;gap:14px;padding:4px 24px 0">
+  <svg width="9" height="15" viewBox="0 0 9 15" fill="none" style="cursor:pointer"><path d="M7 1.5 2 7.5l5 6" stroke="#BFAEA6" stroke-width="1.9" stroke-linecap="round"></path></svg>
+  <span style="font:400 22px 'Bricolage Grotesque'">Seviye</span>
+</div>
+
+<div style="position:relative;height:290px;margin-top:14px;display:flex;align-items:center;justify-content:center">
+  <svg width="290" height="290" viewBox="0 0 100 100" style="position:absolute;transform:rotate(135deg)">
+    <circle cx="50" cy="50" r="42" pathLength="100" fill="none" stroke="#251F1D" stroke-width="7" stroke-linecap="round" stroke-dasharray="75 100"></circle>
+    <circle cx="50" cy="50" r="42" pathLength="100" fill="none" stroke="#FF4B26" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ gauge }}"></circle>
+  </svg>
+  <div style="text-align:center;position:relative">
+    <div style="font:700 10px 'Archivo';letter-spacing:.22em;color:#FF4B26">SEVİYE 7</div>
+    <div style="font:400 62px/1 'Bricolage Grotesque';letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:8px">{{ xp }}</div>
+    <div style="font:500 13px 'Archivo';color:#8C7C74;margin-top:6px">/ 2200 XP</div>
+  </div>
+  <div style="position:absolute;bottom:16px;font:400 13px 'Archivo';color:#BFAEA6">Hırslı'ya 960 XP kaldı</div>
+</div>
+
+<div style="padding:8px 24px 0">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;padding-bottom:12px">BU HAFTA KAZANILAN</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;background:#1F1A18;border-radius:20px">
+      <span style="width:8px;height:8px;border-radius:999px;background:#FF4B26;display:block"></span>
+      <span style="flex:1;font:500 14px 'Archivo'">412 soru çözüldü</span>
+      <span style="font:400 18px 'Bricolage Grotesque';color:#FF4B26">+206</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;background:#1F1A18;border-radius:20px">
+      <span style="width:8px;height:8px;border-radius:999px;background:#FF4B26;display:block"></span>
+      <span style="flex:1;font:500 14px 'Archivo'">2 deneme girildi</span>
+      <span style="font:400 18px 'Bricolage Grotesque';color:#FF4B26">+120</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;background:#1F1A18;border-radius:20px">
+      <span style="width:8px;height:8px;border-radius:999px;background:#FF4B26;display:block"></span>
+      <span style="flex:1;font:500 14px 'Archivo'">7 gün seri korundu</span>
+      <span style="font:400 18px 'Bricolage Grotesque';color:#FF4B26">+70</span>
+    </div>
+  </div>
+</div>
+
+<div style="padding:32px 24px 34px">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6;padding-bottom:14px">SEVİYE YOLU</div>
+  <sc-for list="{{ levels }}" as="l" hint-placeholder-count="4">
+    <div style="display:flex;gap:16px">
+      <div style="width:18px;flex:none;display:flex;flex-direction:column;align-items:center">
+        <span style="width:3px;flex:1;border-radius:999px;background:{{ l.up }};display:block"></span>
+        <span style="width:14px;height:14px;flex:none;border-radius:999px;border:3px solid {{ l.ring }};background:{{ l.fill }};display:block"></span>
+        <span style="width:3px;flex:1;border-radius:999px;background:{{ l.dn }};display:block"></span>
+      </div>
+      <div style="flex:1;display:flex;align-items:baseline;gap:10px;padding:14px 0">
+        <span style="font:400 16.5px 'Bricolage Grotesque';color:{{ l.txt }}">{{ l.name }}</span>
+        <span style="flex:1"></span>
+        <span style="font:500 11.5px 'Archivo';color:#8C7C74;font-variant-numeric:tabular-nums">{{ l.xp }}</span>
+      </div>
+    </div>
+  </sc-for>
+</div>
+
+<div style="height:74px;background:#14100F;border-top:1px solid #251F1D;display:flex;align-items:center;padding:0 6px">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 6.5 8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.7"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ROTA</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 13V8M8 13V3M13.5 13V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ANALİZ</span></div>
+  <div style="flex:none;width:60px;display:flex;justify-content:center"><div style="width:54px;height:54px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 10px 26px rgba(255,75,38,.32);cursor:pointer"><svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"></path></svg></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="2.5" width="10" height="11" rx="1.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">DEFTER</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#FF4B26"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 13.5c.8-2.3 2.6-3.4 5-3.4s4.2 1.1 5 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">PROFİL</span></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:#8C7C74">ANA SAYFA · BOŞ DURUM</div>
+<div style="width:390px;height:844px;flex:none;position:relative;border-radius:42px;overflow:hidden;background:#14100F;border:1px solid #322A27;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+<div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:600 13px 'Archivo'"><span>21:42</span><span style="display:flex;gap:5px;align-items:center"><span style="width:17px;height:9px;border:1px solid #8C7C74;border-radius:2px;display:block"></span><span style="width:11px;height:9px;background:#F7EFE9;border-radius:1px;display:block"></span></span></div>
+
+<div style="display:flex;align-items:center;gap:13px;padding:2px 24px 0">
+  <div style="width:40px;height:40px;border-radius:999px;background:#1F1A18;border:1px solid #322A27;display:flex;align-items:center;justify-content:center;font:600 14px 'Archivo';color:#6B5B55">AY</div>
+  <div style="flex:1;min-width:0">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74">İYİ AKŞAMLAR</div>
+    <div style="font:400 17px 'Bricolage Grotesque';margin-top:3px">Ahmet Yılmaz</div>
+  </div>
+</div>
+
+<div style="position:relative;height:340px;margin-top:14px">
+  <svg viewBox="0 0 390 300" style="position:absolute;inset:0;width:100%;height:100%">
+    <path d="M -10 268 C 70 262 140 236 196 190 C 252 144 300 74 368 40" pathLength="100" fill="none" stroke="#332723" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"></path>
+    <circle cx="16" cy="266" r="9" fill="#FF4B26"></circle>
+    <circle cx="368" cy="40" r="7" fill="none" stroke="#4A3A34" stroke-width="3"></circle>
+  </svg>
+  <div style="position:absolute;left:24px;top:6px">
+    <div style="font:700 10px 'Archivo';letter-spacing:.2em;color:#FF4B26">BAŞLANGIÇ NOKTASIN</div>
+    <div style="font:400 42px/1.1 'Bricolage Grotesque';letter-spacing:-.03em;margin-top:14px;max-width:290px;text-wrap:pretty">{{ days }} günlük yol buradan başlıyor.</div>
+    <div style="font:400 14px/1.5 'Archivo';color:#BFAEA6;margin-top:14px;max-width:266px;text-wrap:pretty">İlk çalışmanı kaydet — bu hat senin ilerlemenle dolacak.</div>
+  </div>
+  <div style="position:absolute;right:22px;top:126px;text-align:right">
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74">{{ exam }}</div>
+    <div style="font:400 24px 'Bricolage Grotesque';margin-top:4px">{{ days }} gün</div>
+    <div style="font:500 11.5px 'Archivo';color:#6B5B55;font-variant-numeric:tabular-nums;margin-top:3px">{{ clock }}</div>
+  </div>
+  <div style="position:absolute;left:26px;top:296px;font:700 9.5px 'Archivo';letter-spacing:.18em;color:#8C7C74">BUGÜN</div>
+</div>
+
+<div style="padding:0 24px">
+  <button style="width:100%;height:60px;border:0;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 17px 'Archivo';cursor:pointer">İlk çalışmanı kaydet</button>
+  <div style="display:flex;gap:8px;padding-top:12px">
+    <div style="flex:1;height:46px;border:1px solid #322A27;border-radius:999px;display:flex;align-items:center;justify-content:center;font:500 13px 'Archivo';cursor:pointer">Rota oluştur</div>
+    <div style="flex:1;height:46px;border:1px solid #322A27;border-radius:999px;display:flex;align-items:center;justify-content:center;font:500 13px 'Archivo';cursor:pointer">Deneme gir</div>
+  </div>
+</div>
+
+<div style="padding:34px 24px 0">
+  <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">BUGÜNÜN DURAKLARI</div>
+  <div style="display:flex;align-items:center;gap:14px;margin-top:14px;padding:16px;border-radius:20px;border:1px dashed #332723">
+    <span style="width:26px;height:26px;flex:none;border-radius:999px;border:2px dashed #4A3A34;display:block"></span>
+    <div style="flex:1">
+      <div style="font:400 16.5px 'Bricolage Grotesque';color:#BFAEA6">Rotanda henüz durak yok</div>
+      <div style="font:400 12px 'Archivo';color:#6B5B55;margin-top:4px">İlk durağını ekle, hat dolmaya başlasın.</div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:0;height:74px;background:#14100F;border-top:1px solid #251F1D;display:flex;align-items:center;padding:0 6px">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#FF4B26"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 6.5 8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.7"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ROTA</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 13V8M8 13V3M13.5 13V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">ANALİZ</span></div>
+  <div style="flex:none;width:60px;display:flex;justify-content:center"><div style="width:54px;height:54px;border-radius:999px;background:#FF4B26;color:#1A0805;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 10px 26px rgba(255,75,38,.32);cursor:pointer"><svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"></path></svg></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="2.5" width="10" height="11" rx="1.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">DEFTER</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8C7C74"><svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 13.5c.8-2.3 2.6-3.4 5-3.4s4.2 1.1 5 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg><span style="font:700 9px 'Archivo';letter-spacing:.14em">PROFİL</span></div>
+</div>
+</div>
+</div>
+
+</div>
+
+<div style="margin-top:40px;padding-top:28px;border-top:1px solid #251F1D;display:flex;gap:44px;flex-wrap:wrap">
+  <div style="width:400px">
+    <div style="font:700 10.5px 'Archivo';letter-spacing:.22em;color:#FF4B26">SİSTEM · ŞAFAK · VERMİLYON</div>
+    <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding:20px 0 8px">RENK ROLLERİ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 22px">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#14100F;border:1px solid #3A2D29;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">bg</span><span style="font:500 11.5px 'Archivo'">#14100F</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#1F1A18;border:1px solid #3A2D29;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">surface</span><span style="font:500 11.5px 'Archivo'">#1F1A18</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#322A27;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">border</span><span style="font:500 11.5px 'Archivo'">#322A27</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#F7EFE9;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">text</span><span style="font:500 11.5px 'Archivo'">#F7EFE9</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#BFAEA6;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">textSecondary</span><span style="font:500 11.5px 'Archivo'">#BFAEA6</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#8C7C74;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">textMuted</span><span style="font:500 11.5px 'Archivo'">#8C7C74</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:24px;height:24px;border-radius:6px;background:#FF4B26;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#FF4B26">accent</span><span style="font:500 11.5px 'Archivo'">#FF4B26</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #241E1B"><span style="width:12px;height:24px;border-radius:6px 0 0 6px;background:#4ADE80;flex:none;display:block"></span><span style="width:12px;height:24px;border-radius:0 6px 6px 0;background:#E8674C;flex:none;display:block"></span><span style="flex:1;font:500 11.5px 'Archivo';color:#BFAEA6">success / danger</span></div>
+    </div>
+    <div style="font:400 12.5px/1.7 'Archivo';color:#BFAEA6;padding-top:14px;text-wrap:pretty">Tek imza rengi vermilyon: hat, birincil buton, aktif segment, ekleme aksiyonu. Ders renkleri yalnız veri yerlerinde — durak etiketi, ivme tablosu, güç haritası. Butonda ders rengi yok.</div>
+  </div>
+
+  <div style="flex:1;min-width:320px">
+    <div style="display:flex;gap:40px;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding-bottom:12px">TİPOGRAFİ · BRICOLAGE GROTESQUE + ARCHIVO</div>
+        <div style="display:flex;align-items:baseline;gap:14px;padding:6px 0;border-bottom:1px solid #241E1B"><span style="width:112px;font:500 10px 'Archivo';color:#6B5B55">102 / Bricolage</span><span style="font:400 48px 'Bricolage Grotesque';letter-spacing:-.035em">63</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid #241E1B"><span style="width:112px;font:500 10px 'Archivo';color:#6B5B55">28 / Bricolage</span><span style="font:400 28px 'Bricolage Grotesque'">299 gün</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid #241E1B"><span style="width:112px;font:500 10px 'Archivo';color:#6B5B55">16.5 / Bricolage</span><span style="font:400 16.5px 'Bricolage Grotesque'">İlk Çağ Uygarlıkları</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid #241E1B"><span style="width:112px;font:500 10px 'Archivo';color:#6B5B55">14 / 500 Archivo</span><span style="font:500 14px 'Archivo'">Sosyal Bilimler</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0"><span style="width:112px;font:500 10px 'Archivo';color:#6B5B55">10 / 600 · .2em</span><span style="font:600 10px 'Archivo';letter-spacing:.2em;color:#BFAEA6">BUGÜNÜN DURAKLARI</span></div>
+      </div>
+      <div style="width:260px;flex:none">
+        <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding-bottom:12px">BUTON · h60 / h46 / segment</div>
+        <div style="height:60px;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 17px 'Archivo';display:flex;align-items:center;justify-content:center">Birincil</div>
+        <div style="height:46px;border-radius:999px;border:1px solid #322A27;font:500 13px 'Archivo';display:flex;align-items:center;justify-content:center;margin-top:10px">İkincil</div>
+        <div style="display:flex;gap:4px;padding:4px;background:#1F1A18;border-radius:999px;margin-top:10px">
+          <div style="flex:1;height:34px;border-radius:999px;background:#FF4B26;color:#1A0805;font:700 12px 'Archivo';display:flex;align-items:center;justify-content:center">Tümü</div>
+          <div style="flex:1;height:34px;border-radius:999px;color:#8C7C74;font:700 12px 'Archivo';display:flex;align-items:center;justify-content:center">TYT</div>
+          <div style="flex:1;height:34px;border-radius:999px;color:#8C7C74;font:700 12px 'Archivo';display:flex;align-items:center;justify-content:center">AYT</div>
+        </div>
+        <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding:18px 0 12px">YARIÇAP · 8 / 20 / 22 / 999</div>
+        <div style="display:flex;gap:9px">
+          <div style="text-align:center"><div style="width:44px;height:44px;background:#1F1A18;border:1px solid #322A27;border-radius:8px"></div><div style="font:500 9.5px 'Archivo';color:#6B5B55;margin-top:6px">8</div></div>
+          <div style="text-align:center"><div style="width:44px;height:44px;background:#1F1A18;border:1px solid #322A27;border-radius:20px"></div><div style="font:500 9.5px 'Archivo';color:#6B5B55;margin-top:6px">20</div></div>
+          <div style="text-align:center"><div style="width:44px;height:44px;background:#1F1A18;border:1px solid #322A27;border-radius:999px"></div><div style="font:500 9.5px 'Archivo';color:#6B5B55;margin-top:6px">999</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:40px;padding-top:26px;margin-top:24px;border-top:1px solid #251F1D;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding-bottom:12px">ROTA ANATOMİSİ</div>
+        <div style="font:400 12.5px/1.7 'Archivo';color:#BFAEA6;text-wrap:pretty">Kalın vermilyon gövde geçmişi, 3px noktalı iz geleceği taşır. Geçilen duraklar dolu 6px nokta, bugünkü durak nefes alan halka, sınav günü içi boş hedef. Aynı hat Profil'de seviye yolu, Analiz'de net trendi olarak tekrar eder.</div>
+      </div>
+      <div style="width:260px;flex:none">
+        <div style="font:600 10px 'Archivo';letter-spacing:.2em;color:#8C7C74;padding-bottom:12px">HAREKET DİLİ</div>
+        <div style="font:400 12.5px/1.7 'Archivo';color:#BFAEA6;text-wrap:pretty">Hat açılışta 1.2 s soldan sağa çizilir, baş nokta yerinde nefes alır — ekranda tek sürekli hareket bu. Sayılar 1 s sayar, barlar aşağıdan dolar, bloklar 60 ms arayla gelir. Dokunuşta 0.98 küçülme.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:2200,&quot;height&quot;:2400},&quot;exam&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;YKS 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;days&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:299,&quot;min&quot;:1,&quot;max&quot;:400,&quot;tsType&quot;:&quot;number&quot;},&quot;goal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:100,&quot;min&quot;:20,&quot;max&quot;:300,&quot;step&quot;:10,&quot;tsType&quot;:&quot;number&quot;}}">
+const SUB={'Türkçe':'#60a5fa','Matematik':'#fb923c','Fizik':'#22d3ee','Kimya':'#f472b6','Biyoloji':'#34d399','Tarih':'#fbbf24','Coğrafya':'#2dd4bf','Felsefe':'#c084fc','Fen Bilimleri':'#22d3ee','Sosyal Bilimler':'#fbbf24'};
+const PLAN=[
+ {sub:'Tarih',topic:'İlk Çağ Uygarlıkları',meta:'35 soru · ~42 dk'},
+ {sub:'Coğrafya',topic:'İklim ve Bitki Örtüsü',meta:'30 soru · ~36 dk'},
+ {sub:'Felsefe',topic:'Bilgi Felsefesi',meta:'20 soru · ~24 dk'},
+ {sub:'Matematik',topic:'Permütasyon',meta:'24 soru · ~29 dk'},
+ {sub:'Türkçe',topic:'Paragraf (Ana Düşünce)',meta:'28 soru · ~34 dk'}];
+const MOM=[
+ {name:'Türkçe',net:'26.0',delta:'+2.5',v:[21,22.5,23,24.8,26]},
+ {name:'Matematik',net:'16.8',delta:'+3.0',v:[11,13.5,12.8,14.9,16.8]},
+ {name:'Fen Bilimleri',net:'7.5',delta:'−5.0',v:[13,12.4,11,10.2,7.5]},
+ {name:'Sosyal Bilimler',net:'10.5',delta:'+3.8',v:[6.2,7.4,7,9.1,10.5]}];
+const HIST=[
+ {type:'TYT',date:'23 Haziran 2026',net:'58.25',delta:'+2.3',mood:3},
+ {type:'AYT SAY',date:'16 Haziran 2026',net:'55.95',delta:'−1.4',mood:1},
+ {type:'TYT',date:'9 Haziran 2026',net:'57.35',delta:'+3.1',mood:3},
+ {type:'BRANŞ',date:'2 Haziran 2026',net:'54.25',delta:'+0.8',mood:2},
+ {type:'AYT SÖZ',date:'26 Mayıs 2026',net:'53.45',delta:'−2.0',mood:1}];
+const SUBJ=[{name:'Türkçe',got:26.0,max:40},{name:'Matematik',got:16.8,max:40},{name:'Fen Bilimleri',got:7.5,max:20},{name:'Sosyal Bilimler',got:10.5,max:20}];
+const STR=[['Tarih',83],['Türkçe',78],['Biyoloji',71],['Matematik',64],['Fizik',52],['Kimya',46]];
+const CALV=[2,0,3,1,2,0,0,3,2,1,0,2,3,3,0,1,2,0,0,2,3,1,2,0,1,3,2,0,1,2,1];
+const TREND=[54.2,56.8,59.4,62.7,55.95,58.25];
+const WEEK=[{d:'Pzt',v:48},{d:'Sal',v:72},{d:'Çar',v:55},{d:'Per',v:90},{d:'Cum',v:63},{d:'Cmt',v:42},{d:'Paz',v:42}];
+const LEV=[['Acemi','0 XP',1],['Kararlı','600 XP',1],['Odaklı','1200 XP',2],['Hırslı','2200 XP',0],['Maratoncu','5000 XP',0]];
+
+function sparkPts(v,w,h){const mn=Math.min.apply(null,v),mx=Math.max.apply(null,v),r=(mx-mn)||1;
+ return v.map((n,i)=>({x:+((i/(v.length-1))*w).toFixed(1),y:+(h-((n-mn)/r)*h).toFixed(1)}));}
+function dashBg(c){return 'repeating-linear-gradient(180deg,'+c+' 0 3px,transparent 3px 8px)';}
+function chartPath(v,w,h,lo,hi){
+  const pts=v.map((n,i)=>[(i/(v.length-1))*w,h-((n-lo)/(hi-lo))*h]);
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  return {d:d,area:d+' L '+w+' '+h+' L 0 '+h+' Z'};
+}
+
+class Component extends DCLogic {
+  state={done:[true,true,false,false,false],f:0,p:0};
+  componentDidMount(){
+    const t0=Date.now();
+    this.anim=setInterval(()=>{const e=Math.min(1,(Date.now()-t0)/1000);this.setState({p:e});if(e>=1)clearInterval(this.anim);},33);
+    this.clk=setInterval(()=>this.forceUpdate(),1000);
+  }
+  componentWillUnmount(){clearInterval(this.clk);clearInterval(this.anim);}
+  tog(i){return()=>this.setState(st=>{const d=st.done.slice();d[i]=!d[i];return{done:d};});}
+  filt(i){return()=>this.setState({f:i});}
+  renderVals(){
+    const e=1-Math.pow(1-this.state.p,3), dn=this.state.done, f=this.state.f;
+    const now=new Date(), end=new Date(now); end.setHours(24,0,0,0);
+    const ms=end-now, pad=n=>String(n).padStart(2,'0');
+    const goal=this.props.goal??100, days=this.props.days??299;
+    const nextIdx=dn.indexOf(false)<0?0:dn.indexOf(false);
+    const v={
+      clock:pad(Math.floor(ms/36e5))+':'+pad(Math.floor(ms/6e4)%60)+':'+pad(Math.floor(ms/1000)%60),
+      exam:this.props.exam??'YKS 2027', days:days, goal:goal,
+      q63:Math.round(63*e), q100:Math.round(goal-63*e),
+      dashRoute:(34*e).toFixed(1)+' 100',
+      dashXp:((1240/2200)*100*e).toFixed(1)+' 100',
+      gauge:((1240/2200)*75*e).toFixed(1)+' 100',
+      xp:Math.round(1240*e).toLocaleString('tr-TR'),
+      tot:Math.round(3480*e).toLocaleString('tr-TR'),
+      net:(58.25*e).toFixed(2),
+      planLabel:dn.filter(Boolean).length+'/5',
+      seg:dn.map(d=>({bg:d?'#FF4B26':'#332723'})),
+      plan:PLAN.map((t,i)=>({sub:t.sub,topic:t.topic,meta:t.meta,color:dn[i]?'#6B5B55':SUB[t.sub],
+        done:dn[i], isNext:i===nextIdx, toggle:this.tog(i),
+        bg:i===nextIdx?'#1F1A18':'transparent',
+        bd:i===nextIdx?'#3A2D29':'#251F1D',
+        ring:dn[i]?'#FF4B26':(i===nextIdx?'#FF4B26':'#4A3A34'),
+        fill:dn[i]?'#FF4B26':'transparent',
+        txt:dn[i]?'#8C7C74':'#F7EFE9'})),
+      nextTopic:PLAN[nextIdx].topic, nextMeta:PLAN[nextIdx].meta, nextColor:SUB[PLAN[nextIdx].sub],
+      mom:MOM.map(m=>{const p=sparkPts(m.v,86,22),l=p[p.length-1];
+        return {name:m.name,net:m.net,delta:m.delta,color:SUB[m.name],
+          dc:m.delta.charAt(0)==='+'?'#4ADE80':'#E8674C',
+          pts:p.map(q=>q.x+','+q.y).join(' '),lx:l.x,ly:l.y};}),
+      week:WEEK.map(x=>({d:x.d,h:(x.v/90*100*e).toFixed(1)+'%',
+        bg:x.v===90?'#FF4B26':'#332723', dc:x.v===90?'#F7EFE9':'#6B5B55'})),
+      subj:SUBJ.map(x=>({name:x.name,color:SUB[x.name],val:x.got.toFixed(1)+' / '+x.max,
+        w:((x.got/x.max)*100*e).toFixed(1)+'%'})),
+      hist:HIST.map((h,i)=>({type:h.type,date:h.date,net:h.net,delta:h.delta,
+        dc:h.delta.charAt(0)==='+'?'#4ADE80':'#E8674C',
+        edge:i===0?'#FF4B26':'transparent',
+        moodTxt:h.mood===3?'İYİ':(h.mood===2?'ORTA':'ZOR')})),
+      strength:STR.map(x=>({name:x[0],color:SUB[x[0]],pct:'%'+x[1],w:(x[1]*e).toFixed(1)+'%'})),
+      cal:CALV.map(n=>({bg:n===0?'#1E1917':'rgba(255,75,38,'+(0.2+n*0.26)+')'})),
+      levels:LEV.map((l,i)=>({name:l[0],xp:l[1],
+        up:i===0?'transparent':(l[2]>0?'#FF4B26':dashBg('#3A2D29')),
+        dn:i===LEV.length-1?'transparent':(l[2]===1?'#FF4B26':dashBg('#3A2D29')),
+        ring:l[2]?'#FF4B26':'#4A3A34', fill:l[2]===1?'#FF4B26':(l[2]===2?'#FF4B26':'transparent'),
+        txt:l[2]===2?'#F7EFE9':(l[2]===1?'#8C7C74':'#BFAEA6')}))
+    };
+    const ch=chartPath(TREND,300,132,52,79); v.trendD=ch.d; v.trendA=ch.area;
+    for(let i=0;i<4;i++){v['f'+i]=this.filt(i);v['f'+i+'bg']=f===i?'#FF4B26':'transparent';v['f'+i+'c']=f===i?'#1A0805':'#8C7C74';}
+    return v;
+  }
+}
+</script>
+</body>
+</html>
