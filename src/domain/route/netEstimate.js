@@ -12,7 +12,7 @@
 //
 // Hâlâ tahmin, ama artık DERSE ve KONUYA duyarlı ve dayanağı var.
 
-import { wrongPenaltyForTrialType } from "../trial/trialModel";
+import { wrongPenaltyForTrialType } from "../trial/trialModel.js";
 
 // Ustalık hedefi: mastery.js "%80 üstü doğruluk" diyor.
 const MASTERY_ACCURACY = 0.8;

@@ -1,4 +1,4 @@
-import { dateKey } from "../../lib/dateUtils";
+import { dateKey } from "../../lib/dateUtils.js";
 
 // SINAV GÜNÜ DURUMLARI — tasarım AKIŞ 14.
 //

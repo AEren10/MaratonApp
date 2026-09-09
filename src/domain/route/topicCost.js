@@ -1,5 +1,6 @@
-import { getTopicDifficulty } from "../../lib/topicDifficulty";
-import { getMastery } from "../../lib/mastery";
+import { getTopicDifficulty } from "../../lib/topicDifficulty.js";
+import { getMastery } from "../../lib/mastery.js";
+import { netGainForTopic } from "./netEstimate.js";
 
 // Bir konuyu "ustalaştırmanın" tahmini maliyeti ve getirisi.
 //
@@ -19,10 +20,10 @@ const DIFFICULTY_EFFORT = { kolay: 0.75, orta: 1, zor: 1.6 };
  * @param topic      { subject, topic, q, acc }  — q: çözülen soru, acc: doğruluk %
  * @param subjectWeight  o dersin sınavdaki soru sayısı (getiri ağırlığı)
  */
-export function estimateTopicCost(topic, subjectWeight = 10) {
+export function estimateTopicCost(topic, subject = {}, trialType) {
   const q = Number(topic.q) || 0;
   const acc = Number(topic.acc) || 0;
-  const { difficulty, correctRate } = getTopicDifficulty(topic.topic);
+  const { difficulty } = getTopicDifficulty(topic.topic);
   const mastery = getMastery({ q, acc });
 
   if (mastery.level === "mastered") {
@@ -42,17 +43,12 @@ export function estimateTopicCost(topic, subjectWeight = 10) {
   const minutesPerQuestion = difficulty === "zor" ? 2.4 : difficulty === "kolay" ? 1.1 : 1.6;
   const minutes = Math.round(questions * minutesPerQuestion);
 
-  // Getiri: sınavdaki ağırlık × kazanılacak mesafe × ayırt edicilik.
-  //
-  // DİKKAT: correctRate "öğrencilerin yüzde kaçı doğru yapıyor" demektir.
-  // Bunu çarpan yapmak zor konuyu CEZALANDIRIR — oysa YKS'de sıralamayı
-  // belirleyen tam da az kişinin yaptığı sorulardır. Bu yüzden ayırt edicilik
-  // (1 - correctRate) ödüllendiriliyor, ama tamamen değil: çok zor bir konuya
-  // hiç temeli olmayan öğrenciyi göndermek de doğru değil, o yüzden 0.7-1.3
-  // aralığında ılımlı bir çarpan.
-  const discrimination = 0.7 + (1 - correctRate / 100) * 0.6;
-  const gain = mastery.level === "starter" ? 1 : 0.55;
-  const yieldScore = Math.round(subjectWeight * gain * discrimination * 10) / 10;
+  // Getiri ile hedef-net hesabı aynı kaynaktan gelir. Dersin tüm soru
+  // sayısını her konuya yazmak, çok konulu dersleri katlayarak şişiriyordu.
+  const yieldScore = netGainForTopic(subject, {
+    total_questions: q,
+    correct_count: Math.round(q * acc / 100),
+  }, trialType);
 
   return {
     questions,
@@ -82,7 +78,19 @@ export function priorityScore({
   isWeakArea = false,
   unpreparedBefore = 0,
 }) {
-  if (cost.done) return -1;
+  return priorityScoreDetails({
+    cost, neglectedDays, daysLeft, isWeakArea, unpreparedBefore,
+  }).score;
+}
+
+export function priorityScoreDetails({
+  cost,
+  neglectedDays = 0,
+  daysLeft = 180,
+  isWeakArea = false,
+  unpreparedBefore = 0,
+}) {
+  if (cost.done) return { score: -1, components: {} };
 
   const yieldPart = cost.yield;
   const costPart = Math.max(1, cost.questions) / 20;        // ~1 civarı
@@ -104,5 +112,15 @@ export function priorityScore({
   const sequencePenalty = Math.max(0.3, 1 - unpreparedBefore * 0.12);
 
   const score = (yieldPart / costPart) * urgency * decay * weakBoost * sequencePenalty;
-  return Math.round(score * 100) / 100;
+  return {
+    score: Math.round(score * 100) / 100,
+    components: {
+      expectedNetGain: yieldPart,
+      effortQuestions: cost.questions,
+      urgency: Math.round(urgency * 100) / 100,
+      retention: Math.round(decay * 100) / 100,
+      weakAreaBoost: weakBoost,
+      sequenceReadiness: Math.round(sequencePenalty * 100) / 100,
+    },
+  };
 }

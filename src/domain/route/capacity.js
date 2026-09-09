@@ -1,4 +1,4 @@
-import { dateKey, startOfWeekTR } from "../../lib/dateUtils";
+import { dateKey, startOfWeekTR } from "../../lib/dateUtils.js";
 
 // Kullanıcının GERÇEK haftalık kapasitesi.
 //
@@ -29,30 +29,44 @@ function fallbackCapacity(dailyQuestionGoal) {
  * @param logs  study_logs kayıtları: { study_date, question_count, duration_minutes }
  * @param dailyQuestionGoal  profildeki günlük soru hedefi (yedek)
  */
-export function estimateWeeklyCapacity(logs = [], dailyQuestionGoal = 20, now = new Date()) {
+export function estimateWeeklyCapacity(
+  logs = [],
+  dailyQuestionGoal = 20,
+  now = new Date(),
+  { dataState = "ready" } = {},
+) {
+  if (dataState === "error") {
+    return { ...fallbackCapacity(dailyQuestionGoal), missingData: true };
+  }
   if (!Array.isArray(logs) || logs.length === 0) {
     return fallbackCapacity(dailyQuestionGoal);
   }
 
-  const since = new Date(new Date(startOfWeekTR(now)).getTime() - LOOKBACK_WEEKS * MS_WEEK);
+  const currentWeek = new Date(startOfWeekTR(now));
+  const since = new Date(currentWeek.getTime() - LOOKBACK_WEEKS * MS_WEEK);
   const buckets = new Map(); // haftaBaşı -> { q, m, days:Set }
+  for (let index = LOOKBACK_WEEKS; index > 0; index -= 1) {
+    const key = startOfWeekTR(new Date(currentWeek.getTime() - index * MS_WEEK));
+    buckets.set(key, { q: 0, m: 0, days: new Set() });
+  }
 
   for (const log of logs) {
     const raw = log.study_date || log.studyDate;
     if (!raw) continue;
     const when = new Date(raw);
-    if (Number.isNaN(when.getTime()) || when < since) continue;
+    if (Number.isNaN(when.getTime()) || when < since || when >= currentWeek) continue;
 
     const wk = startOfWeekTR(when);
-    if (!buckets.has(wk)) buckets.set(wk, { q: 0, m: 0, days: new Set() });
+    if (!buckets.has(wk)) continue;
     const b = buckets.get(wk);
-    b.q += Number(log.question_count ?? log.questionCount ?? 0) || 0;
-    b.m += Number(log.duration_minutes ?? log.duration ?? 0) || 0;
+    b.q += Math.max(0, Number(log.question_count ?? log.questionCount ?? 0) || 0);
+    b.m += Math.max(0, Number(log.duration_minutes ?? log.duration ?? 0) || 0);
     b.days.add(dateKey(when));
   }
 
   const weeks = [...buckets.values()];
-  if (weeks.length === 0) return fallbackCapacity(dailyQuestionGoal);
+  const observedWeeks = weeks.filter((week) => week.q > 0 || week.m > 0).length;
+  if (observedWeeks === 0) return fallbackCapacity(dailyQuestionGoal);
 
   // Ortalama değil MEDYAN: tek bir maraton hafta ya da tek boş hafta
   // kapasiteyi yanıltmasın.
@@ -66,25 +80,15 @@ export function estimateWeeklyCapacity(logs = [], dailyQuestionGoal = 20, now = 
   const minutes = med(weeks.map((w) => w.m));
   const activeDays = med(weeks.map((w) => w.days.size));
 
-  // Tek haftalık veri zayıf sinyal — beyan edilen hedefle harmanla.
-  if (weeks.length === 1) {
-    const fb = fallbackCapacity(dailyQuestionGoal);
-    return {
-      questionsPerWeek: Math.max(10, Math.round((questions + fb.questionsPerWeek) / 2)),
-      minutesPerWeek: Math.max(30, Math.round((minutes + fb.minutesPerWeek) / 2)),
-      activeDaysPerWeek: Math.max(1, activeDays || fb.activeDaysPerWeek),
-      source: "mixed",
-      confidence: "low",
-    };
-  }
-
   return {
     questionsPerWeek: Math.max(10, questions),
     minutesPerWeek: Math.max(30, minutes),
     activeDaysPerWeek: Math.max(1, Math.min(7, activeDays || 4)),
     source: "history",
-    confidence: weeks.length >= 3 ? "high" : "medium",
-    weeksObserved: weeks.length,
+    confidence: observedWeeks >= 3 ? "high" : observedWeeks >= 2 ? "medium" : "low",
+    weeksObserved: observedWeeks,
+    calendarWeeks: weeks.length,
+    zeroWeeks: weeks.length - observedWeeks,
   };
 }
 
@@ -93,9 +97,9 @@ export function estimateWeeklyCapacity(logs = [], dailyQuestionGoal = 20, now = 
  * Bir kişi 3 hafta ara verdiyse ilk hafta eski temposuna dönemez; rota
  * bunu varsayarsa daha ilk günden borç birikir ve kullanıcı vazgeçer.
  */
-export function rampedCapacity(base, weeksSincePause = 0) {
-  if (!weeksSincePause || weeksSincePause <= 0) return base;
-  const ramp = Math.min(1, 0.55 + 0.15 * weeksSincePause); // %55 → %100
+export function rampedCapacity(base, recoveryWeek = null) {
+  if (recoveryWeek == null || recoveryWeek < 0) return base;
+  const ramp = Math.min(1, 0.55 + 0.15 * recoveryWeek); // %55 → %100
   return {
     ...base,
     questionsPerWeek: Math.round(base.questionsPerWeek * ramp),

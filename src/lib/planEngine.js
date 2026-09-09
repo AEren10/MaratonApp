@@ -1,5 +1,16 @@
-import { differenceInDays, todayTR } from "./dateUtils";
-import { getSubjectsForExam } from "../data/curriculum";
+import { differenceInDays, todayTR } from "./dateUtils.js";
+import { getSubjectsForExam } from "../data/curriculum.js";
+
+const ROUTE_REASON_TEXT = {
+  REVIEW_DUE: "Tekrar zamanı geldi",
+  NET_DROP: "Son denemelerde düşüş var",
+  LOW_ACCURACY: "Doğruluk açığı öncelikli",
+  NEGLECTED: "Uzun süredir çalışılmadı",
+  HIGH_EXAM_WEIGHT: "Sınav getirisi yüksek",
+  PREREQUISITE: "Temel sırayı güçlendirir",
+  DEBT_RECOVERY: "Konu borcunu kapatır",
+  ROUTE_COMMITMENT: "Rotandaki sıradaki durak",
+};
 
 /**
  * Gunluk plan olusturma algoritmasi.
@@ -41,9 +52,7 @@ export function generateDailyPlan({
   //
   // Artık rotanın bu haftaki durakları varsa günlük plan ONLARDAN türetilir.
   // Rota yoksa (henüz çizilmemiş) eski skorlama devreye girer.
-  const routeSubjects = routeWeekStops.length
-    ? [...new Set(routeWeekStops.map((s) => s.subject).filter((k) => subjectMap[k]))]
-    : null;
+  const validRouteStops = routeWeekStops.filter((stop) => subjectMap[stop.subject]);
 
   const scored = [];
   for (const key of Object.keys(subjectMap)) {
@@ -60,37 +69,38 @@ export function generateDailyPlan({
     scored.push({ key, score: totalScore });
   }
 
-  // Rota varsa: rotadaki dersler öne, sırası korunarak. Diğerleri arkada
-  // kalır ki gün dolmazsa yine de bir şey önerilsin.
-  if (routeSubjects?.length) {
-    const rank = new Map(routeSubjects.map((k, i) => [k, i]));
-    scored.sort((a, b) => {
-      const ra = rank.has(a.key) ? rank.get(a.key) : Infinity;
-      const rb = rank.has(b.key) ? rank.get(b.key) : Infinity;
-      if (ra !== rb) return ra - rb;
-      return b.score - a.score;
-    });
-  } else {
-    scored.sort((a, b) => b.score - a.score);
-  }
+  scored.sort((a, b) => b.score - a.score);
+  const scoreBySubject = new Map(scored.map((item) => [item.key, item.score]));
+  // Her rota durağı ayrı adaydır. Subject bazında tekilleştirmek, aynı dersteki
+  // ikinci konuyu görünmez yapıyor ve tamamlamayı yanlış durağa yazıyordu.
+  const candidates = validRouteStops.length
+    ? validRouteStops.map((routeStop) => ({
+      key: routeStop.subject,
+      score: scoreBySubject.get(routeStop.subject) || 0,
+      routeStop,
+    }))
+    : scored;
 
   const tasks = [];
   let remaining = dailyTarget;
-  const subjectCount = Math.min(scored.length, daysLeft < 30 ? 3 : 4);
+  const subjectCount = Math.min(candidates.length, daysLeft < 30 ? 3 : 4);
+  const selected = candidates.slice(0, subjectCount);
+  const weights = [0.35, 0.3, 0.2, 0.15].slice(0, selected.length);
+  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0) || 1;
 
   for (let i = 0; i < subjectCount && remaining > 0; i++) {
-    const { key } = scored[i];
+    const { key, routeStop = null } = selected[i];
     const subject = subjectMap[key];
     if (!subject) continue;
 
-    const ratio = i === 0 ? 0.35 : i === 1 ? 0.3 : i === 2 ? 0.2 : 0.15;
-    const count = Math.round(dailyTarget * ratio);
+    const count = i === subjectCount - 1
+      ? remaining
+      : Math.round(dailyTarget * (weights[i] / weightTotal));
     const actual = Math.min(count, remaining);
 
     // Konu seçimi: ROTA öncelikli.
     // Rota bu hafta bu derste hangi durağı gösteriyorsa günlük görev de onu
     // hedefler. Rota yoksa en zayıf konuya düşülür.
-    const routeStop = routeWeekStops.find((st) => st.subject === key);
     const weakTopics = topicWeakness[key];
     const weakestTopic = weakTopics && weakTopics.length ? weakTopics[0] : null;
     const topicLabel = routeStop?.topic || weakestTopic?.topic || null;
@@ -108,7 +118,13 @@ export function generateDailyPlan({
       : null;
     const acc = weakAreas[key] ?? 50;
 
-    if (priorityReasons[key]) {
+    const routeReasonCode = routeStop?.reasonCodes?.[0];
+    if (routeReasonCode) {
+      reason = ROUTE_REASON_TEXT[routeReasonCode] || "Rotandaki öncelikli durak";
+      rkind = routeReasonCode === "LOW_ACCURACY" ? "red" : "blue";
+      tier = routeReasonCode === "LOW_ACCURACY" ? "high" : "medium";
+      badge = routeReasonCode === "REVIEW_DUE" ? "TEKRAR" : "ROTA";
+    } else if (priorityReasons[key]) {
       // smartNudge net düşüş sinyali — en yüksek aciliyet.
       reason = priorityReasons[key];
       rkind = "red";
@@ -157,7 +173,10 @@ export function generateDailyPlan({
       subject: key,
       subjectLabel: subject.label,
       topicLabel,
-      topic: weakestTopic?.topic || null,
+      topic: topicLabel,
+      routeStopId: routeStop?.id || routeStop?.stopId || null,
+      logicalStopKey: routeStop?.logicalStopKey || null,
+      rootStopKey: routeStop?.rootStopKey || null,
       color: subject.color,
       questionCount: actual,
       priority: i + 1,

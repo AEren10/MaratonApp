@@ -1,4 +1,4 @@
-import { EXAM_PHASE, examPhaseBehavior } from "../exam/examPhase";
+import { EXAM_PHASE, examPhaseBehavior } from "../exam/examPhase.js";
 
 // PAYWALL KAPISI — paywall'ın GÖSTERİLMEMESİ gereken durumlar.
 //
@@ -11,6 +11,14 @@ import { EXAM_PHASE, examPhaseBehavior } from "../exam/examPhase";
 
 /** İlk 7 gün muafiyeti. */
 export const FIRST_WEEK_DAYS = 7;
+
+export const ACCESS_MODE = Object.freeze({
+  LOADING: "loading",
+  ERROR: "error",
+  FREE: "free",
+  ONBOARDING_GRACE: "onboarding_grace",
+  PREMIUM: "premium",
+});
 
 /**
  * @param createdAt kullanıcı kaydının oluşturulma tarihi (profiles.created_at)
@@ -55,6 +63,29 @@ export function canShowPaywall({ isPremium, createdAt, examPhase, now = new Date
   }
 
   return { allowed: true, reason: null };
+}
+
+/**
+ * Saf istemci kararı. Sunucudan snapshot gelene kadar Pro alanları açılmaz;
+ * ağ hatası ise "ücretsiz" sayılmaz ve yanlış paywall üretmez.
+ */
+export function canAccessProductFeature({ accessState, features, featureKey } = {}) {
+  if (!featureKey) return false;
+  if (accessState !== "ready") return false;
+  return features?.[featureKey] === true;
+}
+
+export function trialQuotaDecision({ accessState, quota } = {}) {
+  if (accessState !== "ready" || !quota) {
+    return { allowed: false, reason: "access_unknown", remaining: null };
+  }
+  if (quota.unlimited) return { allowed: true, reason: null, remaining: Infinity };
+  const remaining = Math.max(0, Number(quota.remaining) || 0);
+  return {
+    allowed: remaining > 0,
+    reason: remaining > 0 ? null : "quota_exhausted",
+    remaining,
+  };
 }
 
 export { EXAM_PHASE };

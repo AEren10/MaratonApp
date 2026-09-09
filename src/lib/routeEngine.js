@@ -1,9 +1,10 @@
 import { estimateWeeklyCapacity, rampedCapacity } from "../domain/route/capacity";
-import { estimateTopicCost, priorityScore } from "../domain/route/topicCost";
+import { estimateTopicCost, priorityScoreDetails } from "../domain/route/topicCost";
 import { scheduleWeeks, weeksUntilExam } from "../domain/route/scheduler";
 import { computeDebt, distributeDebt, debtInWeeks } from "../domain/route/debt";
 import { reviewStatus, reviewCost, reviewPriority } from "../domain/route/retention";
 import { topicsNeededForNet } from "../domain/route/netEstimate";
+import { decorateScheduledRoute, createRouteRevision } from "../domain/route/routeIdentity";
 import { startOfWeekTR, dateKey } from "./dateUtils";
 
 // KİŞİYE ÖZEL ROTA MOTORU
@@ -21,7 +22,7 @@ import { startOfWeekTR, dateKey } from "./dateUtils";
 //   Rotanın tamamı    → route.weeks
 //   Durak Detayı      → week.stops[i]
 //   Ara Verme/Donduruldu → buildRoute({ pausedWeeks })
-//   Senaryolar        → simulateScenario()
+//   Senaryolar        → domain/forecast/tempoScenario
 //   Bölüm Eşiği       → thresholdGap()
 //   Rotayı Yeniden Çiz → buildRoute() yeniden çağır
 
@@ -32,11 +33,15 @@ export function buildRoute({
   dailyQuestionGoal = 20,
   daysLeft = null,
   weakSubjectKeys = [],
-  pausedWeeks = 0,           // ara verildiyse kaç hafta
+  pausedWeeks = null,        // dönüşten sonra kaçıncı toparlanma haftası
+  examType = "unknown",
   now = new Date(),
+  studyLogDataState = "ready",
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
-  const baseCapacity = estimateWeeklyCapacity(studyLogs, dailyQuestionGoal, now);
+  const baseCapacity = estimateWeeklyCapacity(
+    studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState },
+  );
   const capacity = rampedCapacity(baseCapacity, pausedWeeks);
 
   const weakSet = new Set(weakSubjectKeys);
@@ -52,6 +57,7 @@ export function buildRoute({
     // ve topicCost'taki "sınav ağırlığı" mantığı tamamen ölüydü:
     // 40 soruluk Matematik ile 5 soruluk Felsefe aynı getiriyi alıyordu.
     const subjectWeight = Number(subject.questionCount ?? subject.weight) || 10;
+    const topicShare = subjectWeight / Math.max(1, subject.topics?.length || 1);
 
     // Müfredat sırası = öğretim sırası. Bir konudan ÖNCE gelen kaç konu
     // henüz hazır değil, onu sayıyoruz; priorityScore bunu ağırlık olarak
@@ -84,7 +90,11 @@ export function buildRoute({
         neglectedDays,
       };
 
-      const cost = estimateTopicCost(entry, subjectWeight);
+      const cost = estimateTopicCost(
+        entry,
+        { ...subject, questionCount: subjectWeight },
+        examType === "lgs" ? "LGS" : "TYT",
+      );
 
       if (cost.done) {
         masteredCount += 1;
@@ -108,41 +118,64 @@ export function buildRoute({
               minutes: Math.round(rCost * 1.4),
               mastery: "review",
               difficulty: cost.difficulty,
-              yield: subjectWeight,
+              yield: topicShare,
               done: false,
             },
             unpreparedBefore: 0, // tekrar sıraya tabi değil
             score: reviewPriority({
               retention: rs.retention,
-              subjectWeight,
+              subjectWeight: topicShare,
               daysLeft: daysLeft ?? 180,
             }),
+            reasonCodes: ["REVIEW_DUE"],
+            scoreComponents: {
+              retention: rs.retention,
+              examShare: Math.round(topicShare * 100) / 100,
+            },
+            dataConfidence: q >= 20 ? "high" : "medium",
           });
           reviewCount += 1;
         }
         continue;
       }
 
+      const priority = priorityScoreDetails({
+        cost,
+        neglectedDays,
+        daysLeft: daysLeft ?? 180,
+        isWeakArea: weakSet.has(subject.key),
+        unpreparedBefore,
+      });
+      const reasonCodes = [];
+      if (weakSet.has(subject.key)) reasonCodes.push("LOW_ACCURACY");
+      if (neglectedDays >= 14) reasonCodes.push("NEGLECTED");
+      if (cost.yield >= 0.5) reasonCodes.push("HIGH_EXAM_WEIGHT");
+      if (unpreparedBefore > 0) reasonCodes.push("PREREQUISITE");
+      if (!reasonCodes.length) reasonCodes.push("ROUTE_COMMITMENT");
       items.push({
         ...entry,
         isReview: false,
         cost,
         unpreparedBefore,
-        score: priorityScore({
-          cost,
-          neglectedDays,
-          daysLeft: daysLeft ?? 180,
-          isWeakArea: weakSet.has(subject.key),
-          unpreparedBefore,
-        }),
+        score: priority.score,
+        scoreComponents: priority.components,
+        reasonCodes,
+        dataConfidence: q >= 20 ? "high" : q >= 5 ? "medium" : "low",
       });
     }
   }
 
   items.sort((a, b) => b.score - a.score);
 
-  const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft);
+  const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft, { daysLeft });
   const stamped = stampWeekDates(weeks, now);
+  const scheduled = decorateScheduledRoute(stamped, { examType });
+  const revision = createRouteRevision({
+    weeks: scheduled,
+    examType,
+    capacity,
+    weekStart: scheduled[0]?.weekStart || dateKey(startOfWeekTR(now)),
+  });
 
   const remainingQuestions = items.reduce((n, i) => n + i.cost.questions, 0);
   const overflowQuestions = overflow.reduce((n, i) => n + i.cost.questions, 0);
@@ -150,7 +183,8 @@ export function buildRoute({
   return {
     capacity,
     weeksLeft,
-    weeks: stamped,
+    weeks: scheduled,
+    revision,
     overflow,
     totals: {
       topics: totalCount,
@@ -181,27 +215,6 @@ function stampWeekDates(weeks, now) {
     const end = new Date(start.getTime() + 6 * 86400000);
     return { ...w, weekStart: dateKey(start), weekEnd: dateKey(end) };
   });
-}
-
-/**
- * SENARYO — "haftada X soru çözersem ne olur?"
- * Tasarımda AKIŞ 2 · Senaryolar.
- */
-export function simulateScenario(route, questionsPerWeek) {
-  const perWeek = Math.max(1, questionsPerWeek);
-  const need = route.totals.remainingQuestions;
-  const weeksNeeded = Math.ceil(need / perWeek);
-  const fits = weeksNeeded <= route.weeksLeft;
-  return {
-    questionsPerWeek: perWeek,
-    weeksNeeded,
-    weeksLeft: route.weeksLeft,
-    fits,
-    // Sığmıyorsa kaç hafta eksik / sığıyorsa kaç hafta pay kalıyor
-    weeksDelta: route.weeksLeft - weeksNeeded,
-    requiredPerWeek: route.weeksLeft > 0 ? Math.ceil(need / route.weeksLeft) : need,
-    dailyEquivalent: Math.ceil(perWeek / 7),
-  };
 }
 
 /**
@@ -244,3 +257,4 @@ export function thresholdGap({
 }
 
 export { computeDebt, distributeDebt, debtInWeeks };
+export { simulateTempoScenario as simulateScenario } from "../domain/forecast/tempoScenario";

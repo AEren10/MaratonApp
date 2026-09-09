@@ -1,0 +1,59 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  canAccessProductFeature,
+  canShowPaywall,
+  firstWeekStatus,
+  trialQuotaDecision,
+} from "../../src/domain/premium/paywallGate.js";
+
+test("first week includes days one through seven and closes at the boundary", () => {
+  const createdAt = new Date("2026-09-01T09:00:00.000Z");
+  assert.equal(firstWeekStatus(createdAt, new Date("2026-09-08T08:59:59.999Z")).inFirstWeek, true);
+  assert.equal(firstWeekStatus(createdAt, new Date("2026-09-08T09:00:00.000Z")).inFirstWeek, false);
+});
+
+test("paywall stays suppressed during the first week", () => {
+  const result = canShowPaywall({
+    isPremium: false,
+    createdAt: "2026-09-01T09:00:00.000Z",
+    now: new Date("2026-09-07T09:00:00.000Z"),
+  });
+  assert.deepEqual(result, { allowed: false, reason: "first_week", dayNumber: 7, daysLeft: 1 });
+});
+
+test("product features fail closed until the server snapshot is ready", () => {
+  assert.equal(canAccessProductFeature({
+    accessState: "loading", features: { route: true }, featureKey: "route",
+  }), false);
+  assert.equal(canAccessProductFeature({
+    accessState: "error", features: { route: true }, featureKey: "route",
+  }), false);
+  assert.equal(canAccessProductFeature({
+    accessState: "ready", features: { route: true }, featureKey: "route",
+  }), true);
+});
+
+test("trial quota permits four, then blocks the fifth", () => {
+  assert.deepEqual(trialQuotaDecision({
+    accessState: "ready", quota: { remaining: 1, unlimited: false },
+  }), { allowed: true, reason: null, remaining: 1 });
+  assert.deepEqual(trialQuotaDecision({
+    accessState: "ready", quota: { remaining: 0, unlimited: false },
+  }), { allowed: false, reason: "quota_exhausted", remaining: 0 });
+});
+
+test("grace or premium quota is unlimited", () => {
+  assert.deepEqual(trialQuotaDecision({
+    accessState: "ready", quota: { remaining: null, unlimited: true },
+  }), { allowed: true, reason: null, remaining: Infinity });
+});
+
+test("unknown quota never fails open", () => {
+  assert.deepEqual(trialQuotaDecision({ accessState: "ready", quota: null }), {
+    allowed: false,
+    reason: "access_unknown",
+    remaining: null,
+  });
+});

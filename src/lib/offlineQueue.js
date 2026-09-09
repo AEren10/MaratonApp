@@ -1,5 +1,5 @@
 import { addStudyLog } from "../supabase/studyLogs";
-import { addTrial } from "../supabase/trials";
+import { addTrial, isPermanentTrialError } from "../supabase/trials";
 import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
 import { togglePlanTask } from "../supabase/plans";
@@ -245,6 +245,7 @@ const PERMANENT_PG_CODES = new Set([
 
 function isPermanentError(e) {
   if (!e) return false;
+  if (isPermanentTrialError(e)) return true;
   if (PERMANENT_PG_CODES.has(e.code)) return true;
   const status = e.status || e.statusCode;
   // 4xx (401/403/408/429 hariç) istemci hatasıdır, tekrar denemek düzeltmez.
@@ -377,9 +378,13 @@ export async function saveTrialOffline(trial, subjects) {
   const clientOperationId = trial?.client_operation_id || createClientOperationId(OP_TRIAL);
   const trialWithId = withClientOperationId(trial, clientOperationId);
   try {
-    await addTrial(trialWithId, subjects);
-    return { saved: true, queued: false };
+    const saved = await addTrial(trialWithId, subjects);
+    return { saved: true, queued: false, data: saved };
   } catch (e) {
+    // Kota/validasyon reddi bağlantı hatası değildir. Kuyruğa alınırsa her
+    // reconnect'te sonsuza kadar yeniden denenir ve kullanıcıya yanlışlıkla
+    // "gönderilecek" denir.
+    if (isPermanentTrialError(e)) throw e;
     await enqueue({ type: OP_TRIAL, payload: { trial: trialWithId, subjects }, clientOperationId });
     return { saved: false, queued: true, error: e };
   }

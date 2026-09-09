@@ -1,179 +1,139 @@
 const SUBJECT_NAMES = {
-  tyt_turkce: 'Türkçe',
-  tyt_matematik: 'TYT Mat',
-  tyt_fen: 'Fen',
-  tyt_sosyal: 'Sosyal',
-  ayt_matematik: 'AYT Mat',
-  ayt_fizik: 'Fizik',
-  ayt_kimya: 'Kimya',
-  ayt_biyoloji: 'Biyoloji',
-  ayt_edebiyat: 'Edebiyat',
-  ayt_tarih1: 'Tarih-1',
-  ayt_cografya1: 'Coğrafya-1',
-  ayt_tarih2: 'Tarih-2',
-  ayt_cografya2: 'Coğrafya-2',
-  ayt_felsefe: 'Felsefe',
-  ayt_din: 'Din',
+  tyt_turkce: "Türkçe", tyt_matematik: "TYT Mat", tyt_fen: "Fen",
+  tyt_sosyal: "Sosyal", ayt_matematik: "AYT Mat", ayt_fizik: "Fizik",
+  ayt_kimya: "Kimya", ayt_biyoloji: "Biyoloji", ayt_edebiyat: "Edebiyat",
+  ayt_tarih1: "Tarih-1", ayt_cografya1: "Coğrafya-1",
+  ayt_tarih2: "Tarih-2", ayt_cografya2: "Coğrafya-2",
+  ayt_felsefe: "Felsefe", ayt_din: "Din",
 };
-
 const MS_PER_DAY = 86400000;
-
-function daysBetween(a, b) {
-  return Math.round((b - a) / MS_PER_DAY);
-}
-
-function formatDD_MM(date) {
-  const d = date.getDate().toString().padStart(2, '0');
-  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+const Z_95 = 1.96;
+const round = (value, digits = 4) => {
+  const scale = 10 ** digits;
+  return Math.round(value * scale) / scale;
+};
+const daysBetween = (a, b) => Math.round((b - a) / MS_PER_DAY);
+const formatDDMM = (date) => {
+  const d = String(date.getDate()).padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
   return `${d}/${m}`;
+};
+const finite = (value) => {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+export const forecastNetValue = (trial = {}) => finite(
+  trial.normalizedTotalNet ?? trial.normalized_total_net,
+) ?? finite(trial.rawTotalNet ?? trial.raw_total_net)
+  ?? finite(trial.totalNet ?? trial.total_net);
+
+function dominantTrialGroup(trials, expectedType = null) {
+  const groups = new Map();
+  for (const trial of trials || []) {
+    const date = new Date(trial.date || trial.trial_date);
+    const net = forecastNetValue(trial);
+    if (!Number.isFinite(date.getTime()) || net == null) continue;
+    const type = String(trial.trialType || trial.exam_type || "UNKNOWN").toUpperCase();
+    if (expectedType && type !== String(expectedType).toUpperCase()) continue;
+    if (!groups.has(type)) groups.set(type, []);
+    groups.get(type).push({ ...trial, __date: date, __net: net, __type: type });
+  }
+  return [...groups.values()].sort((a, b) => b.length - a.length)[0] || [];
 }
 
-// Ordinary least squares with R²
 function linearRegression(points) {
   const n = points.length;
-  if (n < 2) return null;
-
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  for (let i = 0; i < n; i++) {
-    sumX += points[i].x;
-    sumY += points[i].y;
-    sumXY += points[i].x * points[i].y;
-    sumX2 += points[i].x * points[i].x;
-  }
-
-  const denom = n * sumX2 - sumX * sumX;
-  if (denom === 0) return null;
-
-  const slope = (n * sumXY - sumX * sumY) / denom;
-  const intercept = (sumY - slope * sumX) / n;
-
-  const yMean = sumY / n;
-  let ssTot = 0, ssRes = 0;
-  for (let i = 0; i < n; i++) {
-    const predicted = slope * points[i].x + intercept;
-    ssRes += (points[i].y - predicted) ** 2;
-    ssTot += (points[i].y - yMean) ** 2;
-  }
-
-  const r2 = ssTot === 0 ? 1 : 1 - ssRes / ssTot;
-
-  return { slope, intercept, r2, ssRes };
+  const sumX = points.reduce((sum, p) => sum + p.x, 0);
+  const sumY = points.reduce((sum, p) => sum + p.y, 0);
+  const meanX = sumX / n;
+  const meanY = sumY / n;
+  const sxx = points.reduce((sum, p) => sum + (p.x - meanX) ** 2, 0);
+  if (sxx === 0) return null;
+  const slope = points.reduce(
+    (sum, p) => sum + (p.x - meanX) * (p.y - meanY), 0,
+  ) / sxx;
+  const intercept = meanY - slope * meanX;
+  const residuals = points.map((p) => p.y - (slope * p.x + intercept));
+  const ssRes = residuals.reduce((sum, value) => sum + value ** 2, 0);
+  const ssTot = points.reduce((sum, p) => sum + (p.y - meanY) ** 2, 0);
+  return { slope, intercept, meanX, sxx, ssRes, r2: ssTot ? 1 - ssRes / ssTot : 1 };
 }
 
-// maxNet: deneme tipinin toplam soru sayısı (TYT 120, AYT 80, LGS 90).
-// Verilirse tahmin bu tavanı aşamaz — yoksa yükselen trendde "sınav günü
-// 180 net" gibi imkânsız sonuçlar çıkıyor.
-export function forecastNet(trials, examDate, maxNet = null) {
-  if (!examDate || !trials || trials.length < 2) return null;
-
-  const sorted = [...trials].sort(
-    (a, b) => new Date(a.date) - new Date(b.date),
-  );
-
-  const firstDate = new Date(sorted[0].date);
-  const points = sorted.map((t) => ({
-    x: daysBetween(firstDate, new Date(t.date)),
-    y: t.totalNet,
+export function forecastNet(trials, examDate, maxNet = null, expectedType = null) {
+  const exam = new Date(examDate);
+  if (!Number.isFinite(exam.getTime())) return null;
+  const sameType = dominantTrialGroup(trials, expectedType)
+    .sort((a, b) => a.__date - b.__date).slice(-5);
+  if (sameType.length < 3) return null;
+  const firstDate = sameType[0].__date;
+  const points = sameType.map((trial) => ({
+    x: daysBetween(firstDate, trial.__date), y: trial.__net, trial,
   }));
-
-  const reg = linearRegression(points);
-  if (!reg) return null;
-
-  const { slope, intercept, r2, ssRes } = reg;
+  const regression = linearRegression(points);
+  if (!regression) return null;
+  const { slope, intercept, meanX, sxx, ssRes, r2 } = regression;
   const n = points.length;
-
-  const cap = (v) => {
-    const floored = Math.max(0, v);
-    return maxNet ? Math.min(maxNet, floored) : floored;
-  };
-
-  const examDays = daysBetween(firstDate, examDate);
+  const examDays = daysBetween(firstDate, exam);
+  const cap = (value) => Math.min(maxNet ?? Infinity, Math.max(0, value));
   const projected = cap(slope * examDays + intercept);
-  const current = sorted[sorted.length - 1].totalNet;
-  const first = sorted[0].totalNet;
-  const weeklyGain = slope * 7;
-
-  let confidence;
-  if (n < 3 || r2 < 0.3) confidence = 'low';
-  else if (r2 < 0.6) confidence = 'medium';
-  else confidence = 'high';
-
-  // se = sqrt(ssRes / (n - 2)), interval = projected ± 1.96 * se
-  const se = n > 2 ? Math.sqrt(ssRes / (n - 2)) : Math.sqrt(ssRes / 1);
-  const margin = 1.96 * se;
-  const range = {
-    low: cap(projected - margin),
-    high: cap(projected + margin),
-  };
-
-  const dataPoints = sorted.map((t) => {
-    const d = new Date(t.date);
-    return {
-      dayIndex: daysBetween(firstDate, d),
-      net: t.totalNet,
-      dateStr: formatDD_MM(d),
-    };
-  });
-
-  const projectionEnd = { dayIndex: examDays, net: projected };
-  const daysLeft = daysBetween(new Date(), examDate);
-
+  const mse = ssRes / (n - 2);
+  const leverage = 1 + 1 / n + ((examDays - meanX) ** 2 / sxx);
+  const standardError = Math.sqrt(Math.max(0, mse * leverage));
+  // Kusursuz doğrusal 3-5 nokta gerçek hayatta "sıfır belirsizlik" değildir.
+  // Ölçüm gürültüsü görünmese bile küçük örneklem için muhafazakâr taban tut.
+  const uncertaintyFloor = (maxNet ? maxNet * 0.01 : 1) * (n < 5 ? 2 : 1);
+  const margin = Math.max(Z_95 * standardError, uncertaintyFloor);
+  const confidence = n < 4 || r2 < 0.3 ? "low"
+    : n < 5 || r2 < 0.6 ? "medium" : "high";
+  const dataPoints = points.map(({ x, y, trial }) => ({
+    dayIndex: x, net: y, rawNet: finite(
+      trial.rawTotalNet ?? trial.raw_total_net ?? trial.totalNet ?? trial.total_net,
+    ), dateStr: formatDDMM(trial.__date),
+  }));
   return {
-    projected,
-    current,
-    first,
-    weeklyGain,
-    r2,
-    confidence,
-    range,
-    dataPoints,
-    projectionEnd,
-    daysLeft,
+    projected, current: points[n - 1].y, first: points[0].y,
+    weeklyGain: slope * 7, r2, confidence,
+    range: { low: cap(projected - margin), high: cap(projected + margin) },
+    dataPoints, projectionEnd: { dayIndex: examDays, net: projected },
+    daysLeft: daysBetween(new Date(), exam), sampleSize: n,
+    trialType: sameType[0].__type,
+    valueBasis: sameType.some((t) => finite(
+      t.normalizedTotalNet ?? t.normalized_total_net,
+    ) != null) ? "normalized" : "raw",
+    regression: { slope, intercept, meanX, sxx, mse },
+    predictionInterval: {
+      level: 0.95, method: "ols_prediction", criticalValue: Z_95,
+      standardError, margin, leverage,
+      uncertaintyFloor,
+      floorApplied: margin === uncertaintyFloor,
+    },
   };
 }
 
 export function forecastBySubject(trials, examDate) {
-  if (!examDate || !trials || trials.length < 2) return [];
-
-  const sorted = [...trials].sort(
+  const exam = new Date(examDate);
+  if (!Number.isFinite(exam.getTime())) return [];
+  const sorted = [...(trials || [])].sort(
     (a, b) => new Date(a.date) - new Date(b.date),
   );
-
+  if (sorted.length < 2) return [];
   const firstDate = new Date(sorted[0].date);
-
-  const subjectMap = {};
-  for (const trial of sorted) {
-    if (!trial.subjects) continue;
-    for (const [key, val] of Object.entries(trial.subjects)) {
-      if (val.net == null) continue;
-      if (!subjectMap[key]) subjectMap[key] = [];
-      subjectMap[key].push({
-        x: daysBetween(firstDate, new Date(trial.date)),
-        y: val.net,
-      });
-    }
+  const map = {};
+  for (const trial of sorted) for (const [key, value] of Object.entries(trial.subjects || {})) {
+    if (finite(value.net) == null) continue;
+    (map[key] ||= []).push({ x: daysBetween(firstDate, new Date(trial.date)), y: value.net });
   }
-
-  const results = [];
-  for (const [key, points] of Object.entries(subjectMap)) {
-    if (points.length < 2) continue;
-    const reg = linearRegression(points);
-    if (!reg) continue;
-
-    const examDays = daysBetween(firstDate, examDate);
-    const projected = Math.max(0, reg.slope * examDays + reg.intercept);
-    const current = points[points.length - 1].y;
-
-    results.push({
-      key,
-      name: SUBJECT_NAMES[key] || key,
-      current,
-      projected,
-      weeklyGain: reg.slope * 7,
-      improving: reg.slope > 0,
-    });
-  }
-
-  results.sort((a, b) => b.weeklyGain - a.weeklyGain);
-  return results;
+  return Object.entries(map).flatMap(([key, points]) => {
+    if (points.length < 2) return [];
+    const regression = linearRegression(points);
+    if (!regression) return [];
+    const current = points.at(-1).y;
+    const projected = Math.max(0, regression.slope
+      * daysBetween(firstDate, exam) + regression.intercept);
+    return [{
+      key, name: SUBJECT_NAMES[key] || key, current, projected,
+      weeklyGain: regression.slope * 7, improving: regression.slope > 0,
+    }];
+  }).sort((a, b) => b.weeklyGain - a.weeklyGain);
 }

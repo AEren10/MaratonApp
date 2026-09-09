@@ -14,26 +14,34 @@ const NEW_TOPIC_SHARE = 0.65;
  * @param capacity  { questionsPerWeek, minutesPerWeek }
  * @param weeksLeft kaç hafta planlanacak
  */
-export function scheduleWeeks(items, capacity, weeksLeft) {
-  const weeklyQuestionBudget = Math.max(10, Math.round(capacity.questionsPerWeek * NEW_TOPIC_SHARE));
+export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = {}) {
+  const fullQuestionBudget = Math.max(1, Math.round(capacity.questionsPerWeek * NEW_TOPIC_SHARE));
+  const fullMinuteBudget = Math.max(1, Math.round(capacity.minutesPerWeek * NEW_TOPIC_SHARE));
   const weeks = [];
   const queue = [...items];
   let overflow = [];
 
   for (let w = 0; w < weeksLeft; w++) {
-    let budget = weeklyQuestionBudget;
+    const isPartialLastWeek = daysLeft != null && w === weeksLeft - 1 && daysLeft % 7 > 0;
+    const fraction = isPartialLastWeek ? (daysLeft % 7) / 7 : 1;
+    const questionBudget = Math.max(1, Math.floor(fullQuestionBudget * fraction));
+    const minuteBudget = Math.max(1, Math.floor(fullMinuteBudget * fraction));
+    let questionsLeft = questionBudget;
+    let minutesLeft = minuteBudget;
     const stops = [];
 
     // Öncelik sırasını koruyarak bütçeye SIĞAN ilk konuyu al. Sığmayan ilk
     // konuda döngüyü kırmak haftaları yarı boş bırakıyordu (78 bütçelik
     // haftada 36 soru), yani rota gereksiz uzuyordu.
     let idx = 0;
-    while (idx < queue.length && budget > 0) {
-      const cost = queue[idx].cost.questions;
-      if (cost <= budget) {
+    while (idx < queue.length && questionsLeft > 0 && minutesLeft > 0) {
+      const questionCost = Math.max(1, Number(queue[idx].cost.questions) || 1);
+      const minuteCost = Math.max(1, Number(queue[idx].cost.minutes) || 1);
+      if (questionCost <= questionsLeft && minuteCost <= minutesLeft) {
         const [picked] = queue.splice(idx, 1);
-        stops.push(picked);
-        budget -= cost;
+        stops.push({ ...picked, position: stops.length });
+        questionsLeft -= questionCost;
+        minutesLeft -= minuteCost;
         idx = 0; // baştan tara: öncelik sırası korunsun
         continue;
       }
@@ -44,17 +52,33 @@ export function scheduleWeeks(items, capacity, weeksLeft) {
     // Bölerek koy ki plan tıkanmasın (tasarımda "devam eden durak").
     if (stops.length === 0 && queue.length > 0) {
       const next = queue.shift();
-      const cost = next.cost.questions;
-      stops.push({ ...next, partial: true, plannedQuestions: weeklyQuestionBudget });
-      const remaining = cost - weeklyQuestionBudget;
-      if (remaining > 0) {
+      const questionCost = Math.max(1, Number(next.cost.questions) || 1);
+      const minuteCost = Math.max(1, Number(next.cost.minutes) || 1);
+      const ratio = Math.min(1, questionsLeft / questionCost, minutesLeft / minuteCost);
+      const allocatedQuestions = Math.min(questionsLeft, Math.max(1, Math.floor(questionCost * ratio)));
+      const allocatedMinutes = Math.min(minutesLeft, Math.max(1, Math.ceil(minuteCost * ratio)));
+      stops.push({
+        ...next,
+        cost: { ...next.cost, questions: allocatedQuestions, minutes: allocatedMinutes },
+        partial: allocatedQuestions < questionCost || allocatedMinutes < minuteCost,
+        plannedQuestions: allocatedQuestions,
+        position: 0,
+      });
+      const remainingQuestions = questionCost - allocatedQuestions;
+      const remainingMinutes = minuteCost - allocatedMinutes;
+      if (remainingQuestions > 0 || remainingMinutes > 0) {
         queue.unshift({
           ...next,
-          cost: { ...next.cost, questions: remaining },
+          cost: {
+            ...next.cost,
+            questions: Math.max(0, remainingQuestions),
+            minutes: Math.max(0, remainingMinutes),
+          },
           continued: true,
         });
       }
-      budget = 0;
+      questionsLeft -= allocatedQuestions;
+      minutesLeft -= allocatedMinutes;
     }
 
     if (stops.length === 0 && queue.length === 0) break;
@@ -63,8 +87,14 @@ export function scheduleWeeks(items, capacity, weeksLeft) {
       weekNo: w + 1,
       isCurrent: w === 0,
       stops,
-      plannedQuestions: weeklyQuestionBudget - budget,
-      budgetQuestions: weeklyQuestionBudget,
+      plannedQuestions: questionBudget - questionsLeft,
+      plannedMinutes: stops.reduce(
+        (sum, stop) => sum + Number(stop.cost?.minutes || 0),
+        0,
+      ),
+      budgetQuestions: questionBudget,
+      budgetMinutes: minuteBudget,
+      capacityFraction: fraction,
       focusSubjects: topFocus(stops),
     });
   }
