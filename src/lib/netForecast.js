@@ -30,14 +30,18 @@ export const forecastNetValue = (trial = {}) => finite(
 
 function dominantTrialGroup(trials, expectedType = null) {
   const groups = new Map();
+  const allowedTypes = Array.isArray(expectedType)
+    ? new Set(expectedType.map((type) => String(type).toUpperCase()))
+    : expectedType ? new Set([String(expectedType).toUpperCase()]) : null;
   for (const trial of trials || []) {
     const date = new Date(trial.date || trial.trial_date);
     const net = forecastNetValue(trial);
     if (!Number.isFinite(date.getTime()) || net == null) continue;
     const type = String(trial.trialType || trial.exam_type || "UNKNOWN").toUpperCase();
-    if (expectedType && type !== String(expectedType).toUpperCase()) continue;
-    if (!groups.has(type)) groups.set(type, []);
-    groups.get(type).push({ ...trial, __date: date, __net: net, __type: type });
+    if (allowedTypes && !allowedTypes.has(type)) continue;
+    const key = allowedTypes ? [...allowedTypes].join("|") : type;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ ...trial, __date: date, __net: net, __type: type });
   }
   return [...groups.values()].sort((a, b) => b.length - a.length)[0] || [];
 }

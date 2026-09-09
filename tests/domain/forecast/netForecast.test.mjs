@@ -48,3 +48,13 @@ test("does not claim zero uncertainty for a tiny perfectly linear sample", () =>
   assert.equal(result.predictionInterval.floorApplied, true);
   assert.ok(result.predictionInterval.margin >= 2.4);
 });
+
+test("can forecast compatible legacy and field-specific trial types together", () => {
+  const result = forecastNet([
+    trial("2026-01-01", 30, null, "AYT"),
+    trial("2026-01-08", 34, null, "AYT_SAY"),
+    trial("2026-01-15", 38, null, "AYT"),
+  ], "2026-02-01", 80, ["AYT_SAY", "AYT"]);
+  assert.equal(result.sampleSize, 3);
+  assert.equal(result.current, 38);
+});

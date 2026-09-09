@@ -19,6 +19,12 @@ import { TempoScenarioSection } from "./components/TempoScenarioSection";
 import { TrajectoryChart } from "./components/TrajectoryChart";
 import { SubjectForecast } from "./components/SubjectForecast";
 
+function aytTypeForField(field) {
+  if (field === "sayisal") return "AYT_SAY";
+  if (field === "ea") return "AYT_EA";
+  if (field === "sozel") return "AYT_SOZ";
+  return "AYT_SAY";
+}
 
 export default function NetForecastScreen() {
   const navigation = useNavigation();
@@ -36,20 +42,24 @@ export default function NetForecastScreen() {
   // tip değiştikçe net doğal olarak düşüp yükseldiği için trend anlamsız çıkıyor
   // ve "sınav günü 0 net" gibi sonuçlar üretebiliyordu.
   const { primaryTrials, primaryMax, primaryType } = useMemo(() => {
+    const aytType = aytTypeForField(field);
     const groups = examType === "lgs"
       ? [{ list: lgsTrials, max: 90, type: "LGS" }]
-      : [{ list: tytTrials, max: 120, type: "TYT" }, { list: aytTrials, max: 80, type: null }];
+      : [{ list: tytTrials, max: 120, type: "TYT" }, { list: aytTrials, max: 80, type: [aytType, "AYT"] }];
     const usable = groups.find((g) => g.list.length >= 3);
     const chosen = usable || groups.reduce((a, b) => (b.list.length > a.list.length ? b : a));
     return { primaryTrials: chosen.list, primaryMax: chosen.max, primaryType: chosen.type };
-  }, [examType, lgsTrials, tytTrials, aytTrials]);
+  }, [examType, field, lgsTrials, tytTrials, aytTrials]);
 
   const forecast = useMemo(
     () => forecastNet(primaryTrials, examDate, primaryMax, primaryType),
     [primaryTrials, examDate, primaryMax, primaryType],
   );
-  const tytForecast = useMemo(() => forecastNet(tytTrials, examDate, 120), [tytTrials, examDate]);
-  const aytForecast = useMemo(() => forecastNet(aytTrials, examDate, 80), [aytTrials, examDate]);
+  const tytForecast = useMemo(() => forecastNet(tytTrials, examDate, 120, "TYT"), [tytTrials, examDate]);
+  const aytForecast = useMemo(
+    () => forecastNet(aytTrials, examDate, 80, [aytTypeForField(field), "AYT"]),
+    [aytTrials, examDate, field],
+  );
   const subjects = useMemo(() => forecastBySubject(trials, examDate), [trials, examDate]);
 
   const type = field === "sayisal" ? "say" : field === "sozel" ? "soz" : field === "ea" ? "ea" : "say";
@@ -85,7 +95,7 @@ export default function NetForecastScreen() {
         <EmptyState
           icon="trendUp"
           title="Tahmin için veriye ihtiyacın var"
-          message="En az 3 deneme girdiğinde sınav günü net tahminin burada görünecek."
+          message="En az 3 aynı tip deneme girdiğinde sınav günü net tahminin burada görünecek."
           actionLabel="Deneme Gir"
           onAction={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
           color="accent"

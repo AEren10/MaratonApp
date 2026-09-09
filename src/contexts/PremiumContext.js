@@ -11,6 +11,7 @@ import { getActiveChallengeCount } from "../supabase/challenges";
 import { getWrongQuestionCount } from "../supabase/wrongQuestions";
 import { getProductAccessSnapshot } from "../supabase/productAccess";
 import { canAccessProductFeature, trialQuotaDecision } from "../domain/premium/paywallGate";
+import { DEV_ACCESS_SNAPSHOT } from "../domain/premium/devAccessSnapshot";
 import { initPurchases } from "../lib/purchases";
 
 const PremiumContext = createContext(null);
@@ -24,9 +25,9 @@ export function PremiumProvider({ children }) {
 
   const refreshAccess = useCallback(async () => {
     if (!user?.id || user.id === "dev") {
-      setSnapshot(null);
+      setSnapshot(user?.id === "dev" ? DEV_ACCESS_SNAPSHOT : null);
       setAccessState("ready");
-      return null;
+      return user?.id === "dev" ? DEV_ACCESS_SNAPSHOT : null;
     }
     setAccessState((current) => current === "ready" ? current : "loading");
     try {
@@ -42,7 +43,8 @@ export function PremiumProvider({ children }) {
   }, [user?.id]);
 
   const refreshUsage = useCallback(async () => {
-    if (!user?.id || user.id === "dev") return;
+    if (!user?.id) return;
+    if (user.id === "dev") return refreshAccess();
     const [access, wrongs, challenges] = await Promise.allSettled([
       refreshAccess(),
       getWrongQuestionCount(user.id),

@@ -33,7 +33,7 @@ function ScenarioRow({ item }) {
           </Text>
         </View>
         <View style={{ alignItems: "flex-end" }}>
-          <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: accent }}>
+          <Text style={{ ...TYPOGRAPHY.statSmall, color: accent }}>
             {item.projectedNet.toFixed(1)}
           </Text>
           <Text style={{ ...TYPOGRAPHY.micro, color: positive ? C.green : item.deltaNet < 0 ? C.red : C.sec }}>
@@ -60,7 +60,7 @@ export function TempoScenarioSection({ scenarios }) {
           <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Tempo Senaryoları</Text>
         </View>
         <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, marginBottom: SPACING.sm }}>
-          Çıktı hafta değil; sınav günü net tahmini ve güven bandı.
+          Sınav günü net tahmini ve güven bandı
         </Text>
         {scenarios.map((item) => <ScenarioRow key={item.id} item={item} />)}
       </GlassCard>

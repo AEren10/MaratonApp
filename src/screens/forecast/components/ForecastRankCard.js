@@ -18,7 +18,7 @@ export function ForecastRankCard({ projectedRank, currentRank }) {
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <View>
             <Text style={{ ...TYPOGRAPHY.label, color: C.sec }}>TAHMİNİ SIRALAMA</Text>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.accent, marginTop: SPACING.xs }}>
+            <Text style={{ ...TYPOGRAPHY.statSmall, color: C.accent, marginTop: SPACING.xs }}>
               ~{fmt(projectedRank)}
             </Text>
           </View>
@@ -26,7 +26,7 @@ export function ForecastRankCard({ projectedRank, currentRank }) {
           {currentRank ? (
             <View style={{ alignItems: "flex-end" }}>
               <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Şu anki</Text>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.sec }}>
+              <Text style={{ ...TYPOGRAPHY.statMedium, color: C.sec }}>
                 ~{fmt(currentRank)}
               </Text>
               {currentRank !== projectedRank ? (

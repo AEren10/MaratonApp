@@ -7,7 +7,7 @@ import { useC } from "../../../contexts/ThemeContext";
 export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
-  const REASON_COLORS = { gray: C.muted, red: C.red, amber: C.amber };
+  const REASON_COLORS = { gray: C.muted, red: C.red, amber: C.amber, blue: C.blue, green: C.green };
   const { s, topic, q, reason, rkind, done, id } = task;
   const reasonColor = REASON_COLORS[rkind] || C.muted;
   const handleToggle = useCallback(() => onToggle(id), [onToggle, id]);
@@ -16,7 +16,12 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
 
   return (
     <View style={[styles.card, { borderLeftColor: s.color }]}>
-      <Pressable onPress={handleToggle} hitSlop={8} style={styles.checkArea}>
+      <Pressable
+        accessibilityLabel={done ? "Görevi tamamlandı olarak işaretle" : "Görevi tamamla"}
+        accessibilityRole="button"
+        onPress={handleToggle}
+        style={styles.checkArea}
+      >
         <Icon
           name={done ? "checkCircle" : "circle"}
           size={24}
@@ -24,7 +29,12 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
         />
       </Pressable>
 
-      <Pressable onPress={done ? handleInfo : handleStart} style={styles.middle}>
+      <Pressable
+        accessibilityLabel={`${topic}, ${q} soru`}
+        accessibilityRole="button"
+        onPress={done ? handleInfo : handleStart}
+        style={styles.middle}
+      >
         <Text style={[TYPOGRAPHY.micro, { color: s.color, textTransform: "uppercase", letterSpacing: 0.8 }]}>
           {s.label || s.name}
         </Text>
@@ -40,13 +50,23 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
       </Pressable>
 
       <View style={styles.right}>
-        <Pressable onPress={handleInfo} hitSlop={6}>
+        <Pressable
+          accessibilityLabel="Görev nedenini göster"
+          accessibilityRole="button"
+          onPress={handleInfo}
+          style={styles.reasonAction}
+        >
           <Chip color={reasonColor} style={styles.reasonChip}>
             {reason}
           </Chip>
         </Pressable>
         {!done && (
-          <Pressable onPress={handleStart} hitSlop={6} style={styles.playBtn}>
+          <Pressable
+            accessibilityLabel="Çalışmayı başlat"
+            accessibilityRole="button"
+            onPress={handleStart}
+            style={styles.playBtn}
+          >
             <Icon name="play" size={14} color={s.color} />
           </Pressable>
         )}
@@ -68,21 +88,26 @@ const makeStyles = (C) => StyleSheet.create({
   checkArea: {
     justifyContent: "center",
     alignItems: "center",
-    width: 32,
+    width: 48,
+    height: 48,
   },
   middle: { flex: 1 },
   right: {
     alignItems: "flex-end",
     gap: SPACING.sm,
   },
+  reasonAction: {
+    minHeight: 44,
+    justifyContent: "center",
+  },
   reasonChip: {
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
   playBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: RADIUS.pill,
     backgroundColor: C.surface2,
     justifyContent: "center",
     alignItems: "center",

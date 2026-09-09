@@ -1,16 +1,15 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import { useMemo, useEffect } from "react";
+import { ScrollView, View, Text, Pressable } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { generateDailyPlan } from "../../lib/planEngine";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
-import { getSubjectByKey } from "../../themes/subjects";
 import { useAppSelector } from "../../store/hooks";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { selectAdHocTasks } from "../../store/slices/planSlice";
@@ -19,15 +18,16 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
-import * as haptic from "../../lib/haptics";
 import { PlanHeader } from "./components/PlanHeader";
 import { PlanTaskItem } from "./components/PlanTaskItem";
 import { TaskReasonSheet } from "./components/TaskReasonSheet";
 import { useAlert } from "../../contexts/AlertContext";
+import { makePlanDetailStyles } from "./planDetailStyles";
+import { usePlanDetailTasks } from "./usePlanDetailTasks";
 
 export default function PlanDetailScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
+  const styles = useMemo(() => makePlanDetailStyles(C), [C]);
   const navigation = useNavigation();
   const showAlert = useAlert();
   const { user } = useAuth();
@@ -50,108 +50,25 @@ export default function PlanDetailScreen() {
     if (plan?.tasks?.length) syncPlan(plan);
   }, [plan, syncPlan]);
 
-  const initialTasks = useMemo(() => {
-    const generated = plan.tasks.map((t) => {
-      const pid = `plan_${t.subject}_${t.topic || "genel"}`;
-      const subj = getSubjectByKey(t.subject);
-      return {
-        id: pid,
-        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color, icon: "bookOpen" },
-        topic: t.topicLabel || "Genel çalışma",
-        topicKey: t.topic,
-        q: t.questionCount,
-        reason: t.reason,
-        rkind: t.rkind || "gray",
-        done: isPlanDone(pid),
-        routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
-      };
-    });
-    const adHoc = adHocTasks.map((t) => {
-      const subj = getSubjectByKey(t.subject);
-      return {
-        id: t.id,
-        s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || C.amber, icon: "bookOpen" },
-        topic: t.topic || "Genel çalışma",
-        topicKey: t.topic,
-        q: t.questionCount,
-        reason: t.reason,
-        rkind: "red",
-        done: false,
-        adHoc: true,
-      };
-    });
-    const userMapped = userTasks.map((t) => {
-      const subj = getSubjectByKey(t.subject);
-      return {
-        id: t.id,
-        s: subj || { key: t.subject, label: t.subject, color: C.accent, icon: "bookOpen" },
-        topic: t.topic || "Genel çalışma",
-        topicKey: t.topic,
-        q: t.questionCount ?? t.question_count ?? 0,
-        reason: t.note || "Senin eklediğin görev",
-        rkind: "blue",
-        done: t.completed,
-        userTask: true,
-      };
-    });
-    return [...userMapped, ...adHoc, ...generated];
-  }, [plan, adHocTasks, userTasks, isPlanDone]);
-
-  const [tasks, setTasks] = useState(initialTasks);
-  const tasksRef = useRef(tasks);
-  tasksRef.current = tasks;
-  const [reasonTask, setReasonTask] = useState(null);
-
-  // Plan/ad-hoc değişince listeyi tazele ama mevcut done durumlarını koru.
-  const taskSig = initialTasks.map((t) => t.id).join("|");
-  useEffect(() => {
-    setTasks((prev) => {
-      const doneById = {};
-      prev.forEach((t) => { doneById[t.id] = t.done; });
-      return initialTasks.map((t) => ({ ...t, done: doneById[t.id] ?? t.done }));
-    });
-  }, [taskSig]); // eslint-disable-line react-hooks/exhaustive-deps
-  const doneCount = tasks.filter((t) => t.done).length;
+  const {
+    doneCount, reasonTask, setReasonTask, showReason,
+    startTask, tasks, toggleTask,
+  } = usePlanDetailTasks({
+    C,
+    plan,
+    adHocTasks,
+    userTasks,
+    isPlanDone,
+    navigation,
+    showAlert,
+    togglePlanDone,
+    toggleUserTask,
+    transitionStop,
+  });
   const dateLabel = new Date().toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
   const estHours = plan.estimatedMinutes >= 60
     ? `~${Math.round(plan.estimatedMinutes / 60)} saat`
     : `~${plan.estimatedMinutes} dk`;
-
-  const toggleTask = useCallback(async (id) => {
-    const task = tasksRef.current.find((item) => item.id === id);
-    if (!task || (task.routeStop && task.done)) return;
-    if (task.routeStop && !task.done) {
-      try {
-        await transitionStop(task.routeStop, "completed", { source: "daily_plan" });
-      } catch {
-        showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
-        return;
-      }
-    }
-    if (task.userTask) toggleUserTask(id);
-    else togglePlanDone(id);
-    if (!task.done) haptic.success();
-    setTasks((prev) => prev.map((item) => (
-      item.id === id ? { ...item, done: !item.done } : item
-    )));
-  }, [showAlert, toggleUserTask, togglePlanDone, transitionStop]);
-
-  const startTask = useCallback(
-    (id) => {
-      const task = tasksRef.current.find((t) => t.id === id);
-      navigation.navigate(SCREENS.STUDY_TIMER, {
-        taskId: id,
-        subjectKey: task?.s?.key,
-        topicName: task?.topic,
-      });
-    },
-    [navigation]
-  );
-
-  const showReason = useCallback((id) => {
-    const task = tasksRef.current.find((t) => t.id === id);
-    if (task) setReasonTask(task);
-  }, []);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
@@ -229,47 +146,4 @@ export default function PlanDetailScreen() {
       <TaskReasonSheet task={reasonTask} trials={trials} onClose={() => setReasonTask(null)} />
     </SafeAreaView>
   );
-}
-
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
-      gap: SPACING.md,
-    },
-    title: { ...TYPOGRAPHY.subheading, color: C.text, flex: 1 },
-    addBtn: {
-      width: 36, height: 36, borderRadius: 12,
-      backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "30",
-      alignItems: "center", justifyContent: "center",
-    },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 90 },
-    listLabel: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: SPACING.sm,
-      marginBottom: SPACING.md,
-    },
-    taskList: { gap: SPACING.md },
-    addRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      marginBottom: SPACING.md,
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-      borderRadius: 16,
-      borderWidth: 1.5,
-      borderStyle: "dashed",
-    },
-    addIcon: {
-      width: 26, height: 26, borderRadius: 8,
-      alignItems: "center", justifyContent: "center",
-    },
-    addText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
-  });
 }

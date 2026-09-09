@@ -174,6 +174,8 @@ export function generateDailyPlan({
       subjectLabel: subject.label,
       topicLabel,
       topic: topicLabel,
+      stopId: routeStop?.id || routeStop?.stopId || null,
+      version: routeStop?.version ?? null,
       routeStopId: routeStop?.id || routeStop?.stopId || null,
       logicalStopKey: routeStop?.logicalStopKey || null,
       rootStopKey: routeStop?.rootStopKey || null,
