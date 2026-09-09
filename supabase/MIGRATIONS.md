@@ -66,3 +66,46 @@ düzeltmeleri ve baseline alınırken zaten canlıda olacaklar:
 
 (Baseline bunları zaten içereceği için arşive alınabilirler; karar baseline
 alındıktan sonra verilir.)
+
+---
+
+## Güncelleme (2026-09-09)
+
+İki yeni migration'da iki sorun vardı ve düzeltildi:
+
+1. `20260908120000` versiyonu iki dosyada birden kullanılıyordu
+   (`profiles_column_level_select` ve `route_stop_lifecycle`). CLI versiyonu
+   dosya adı önekinden okuduğu için ikisi tek migration sayılacaktı.
+2. Yeni dosyalar canlıda uygulanmış olanlardan daha eski bir versiyona
+   sahipti, dolayısıyla sıraya doğru yerden girmiyorlardı.
+
+Yeni adlar:
+
+    20260909100000_product_access_companionship.sql
+    20260909110000_route_stop_lifecycle.sql
+
+Her ikisi de canlıya uygulandı ve doğrulandı: 7 tablo, 17 fonksiyon girdisi,
+`public.trials` üzerinde 6 yeni kolon.
+
+`schema_migrations` artık 5 değil 12 kayıt tutuyor. Canlıda olduğu halde
+kayıtsız duran 8 Eylül migration'ları da kayda geçirildi:
+
+    20260908120000  profiles_column_level_select
+    20260908130000  server_authoritative_streak
+    20260908140000  harden_challenges_groups_xp
+    20260908150000  fix_challenge_rpcs
+    20260908160000  answer_count_trigger
+    20260909100000  product_access_companionship
+    20260909110000  route_stop_lifecycle
+
+Bu, kaydı gerçeğe yaklaştırır ama baseline ihtiyacını ORTADAN KALDIRMAZ:
+`002_*` … `20260907100000_*` serisi hâlâ kayıtsız ve alfabetik sıralaması
+bozuk. `supabase db reset` hâlâ çalışmaz. Yukarıdaki baseline adımı
+proje sahibi tarafından yapılmalı.
+
+### Açık kalan güvenlik maddesi
+
+Auth advisor `auth_leaked_password_protection` uyarısı veriyor: Supabase
+Auth'un HaveIBeenPwned kontrolü kapalı. Dashboard > Authentication >
+Policies üzerinden açılabilir. Karar ürün sahibinin: açılırsa ihlal
+listesindeki parolalarla kayıt/parola değişimi reddedilir.

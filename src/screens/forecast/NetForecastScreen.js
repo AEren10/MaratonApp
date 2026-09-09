@@ -1,22 +1,23 @@
 import React, { useMemo } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials, selectTYTTrials, selectAYTTrials, selectLGSTrials } from "../../store/slices/trialSlice";
 import { useExam } from "../../contexts/ExamContext";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, GlassCard } from "../../components/design";
+import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { forecastNet, forecastBySubject } from "../../lib/netForecast";
 import { estimateRank, RANKING_DISCLAIMER } from "../../data/rankingTable";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
+import { ForecastRankCard } from "./components/ForecastRankCard";
 import { ForecastHero } from "./components/ForecastHero";
+import { TempoScenarioSection } from "./components/TempoScenarioSection";
 import { TrajectoryChart } from "./components/TrajectoryChart";
 import { SubjectForecast } from "./components/SubjectForecast";
-import { formatNumber as fmt } from "../../lib/format";
 
 
 export default function NetForecastScreen() {
@@ -28,23 +29,24 @@ export default function NetForecastScreen() {
   const tytTrials = useSelector(selectTYTTrials);
   const aytTrials = useSelector(selectAYTTrials);
   const lgsTrials = useSelector(selectLGSTrials);
+  const { tempoScenarios, hasRouteAccess } = useStudyRoute({ persist: false });
 
   // Manşet tahmin TEK bir deneme tipinden hesaplanmalı. Önceden tüm denemeler
   // (TYT 120 net, AYT 80, LGS 90, tek derslik branş) aynı regresyona giriyordu;
   // tip değiştikçe net doğal olarak düşüp yükseldiği için trend anlamsız çıkıyor
   // ve "sınav günü 0 net" gibi sonuçlar üretebiliyordu.
-  const { primaryTrials, primaryMax } = useMemo(() => {
+  const { primaryTrials, primaryMax, primaryType } = useMemo(() => {
     const groups = examType === "lgs"
-      ? [{ list: lgsTrials, max: 90 }]
-      : [{ list: tytTrials, max: 120 }, { list: aytTrials, max: 80 }];
-    const usable = groups.find((g) => g.list.length >= 2);
+      ? [{ list: lgsTrials, max: 90, type: "LGS" }]
+      : [{ list: tytTrials, max: 120, type: "TYT" }, { list: aytTrials, max: 80, type: null }];
+    const usable = groups.find((g) => g.list.length >= 3);
     const chosen = usable || groups.reduce((a, b) => (b.list.length > a.list.length ? b : a));
-    return { primaryTrials: chosen.list, primaryMax: chosen.max };
+    return { primaryTrials: chosen.list, primaryMax: chosen.max, primaryType: chosen.type };
   }, [examType, lgsTrials, tytTrials, aytTrials]);
 
   const forecast = useMemo(
-    () => forecastNet(primaryTrials, examDate, primaryMax),
-    [primaryTrials, examDate, primaryMax],
+    () => forecastNet(primaryTrials, examDate, primaryMax, primaryType),
+    [primaryTrials, examDate, primaryMax, primaryType],
   );
   const tytForecast = useMemo(() => forecastNet(tytTrials, examDate, 120), [tytTrials, examDate]);
   const aytForecast = useMemo(() => forecastNet(aytTrials, examDate, 80), [aytTrials, examDate]);
@@ -83,7 +85,7 @@ export default function NetForecastScreen() {
         <EmptyState
           icon="trendUp"
           title="Tahmin için veriye ihtiyacın var"
-          message="En az 2 deneme girdiğinde sınav günü net tahminin burada görünecek."
+          message="En az 3 deneme girdiğinde sınav günü net tahminin burada görünecek."
           actionLabel="Deneme Gir"
           onAction={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
           color="accent"
@@ -99,40 +101,8 @@ export default function NetForecastScreen() {
             weeklyGain={forecast.weeklyGain}
           />
 
-          {projectedRank && (
-            <Animated.View entering={FadeInDown.delay(100).duration(420).springify()}>
-              <GlassCard radius={RADIUS.xxl} style={{ marginTop: SPACING.lg, padding: SPACING.lg }}>
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                  <View>
-                    <Text style={{ ...TYPOGRAPHY.label, color: C.sec, letterSpacing: 0.6 }}>TAHMİNİ SIRALAMA</Text>
-                    <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.accent, marginTop: SPACING.xs }}>
-                      ~{fmt(projectedRank)}
-                    </Text>
-                  </View>
-                  {currentRank && (
-                    <View style={{ alignItems: "flex-end" }}>
-                      <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>Şu anki</Text>
-                      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, color: C.sec }}>
-                        ~{fmt(currentRank)}
-                      </Text>
-                      {currentRank !== projectedRank && (
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: 3, marginTop: 2 }}>
-                          <Icon
-                            name={projectedRank < currentRank ? "trendUp" : "trendDown"}
-                            size={11}
-                            color={projectedRank < currentRank ? C.green : C.red}
-                          />
-                          <Text style={{ ...TYPOGRAPHY.micro, color: projectedRank < currentRank ? C.green : C.red }}>
-                            {fmt(Math.abs(currentRank - projectedRank))} sıra
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
-                </View>
-              </GlassCard>
-            </Animated.View>
-          )}
+          <ForecastRankCard projectedRank={projectedRank} currentRank={currentRank} />
+          {hasRouteAccess ? <TempoScenarioSection scenarios={tempoScenarios} /> : null}
 
           <View style={{ marginTop: SPACING.xl }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.md }}>
