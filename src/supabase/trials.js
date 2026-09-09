@@ -1,35 +1,18 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
-import { normalizeTrial, toTrialRow, toTrialSubjectRows } from "../domain/trial/trialModel";
+import { normalizeTrial, toTrialSubjectRows } from "../domain/trial/trialModel";
 
-function isIdempotencyConflict(error) {
-  return error?.code === "23505" && String(error?.message || "").includes("client_operation_id");
+export class TrialWriteError extends Error {
+  constructor(reason, details = {}) {
+    super(reason || "Deneme kaydedilemedi");
+    this.name = "TrialWriteError";
+    this.code = reason;
+    this.details = details;
+    this.retryable = false;
+  }
 }
 
-async function getTrialByClientOperationId(userId, clientOperationId) {
-  if (!userId || !clientOperationId) return null;
-  const { data, error } = await supabase
-    .from("trials")
-    .select("*, trial_subjects(*)")
-    .eq("user_id", userId)
-    .eq("client_operation_id", clientOperationId)
-    .maybeSingle();
-  if (error) throw error;
-  return data ? normalizeTrial(data) : null;
-}
-
-async function upsertTrialSubjects(trialId, trialType, subjects) {
-  const subjectsWithTrialId = toTrialSubjectRows(subjects, trialType).map((s) => ({
-    ...s,
-    trial_id: trialId,
-  }));
-  if (!subjectsWithTrialId.length) return;
-
-  const { error } = await supabase
-    .from("trial_subjects")
-    .upsert(subjectsWithTrialId, { onConflict: "trial_id,subject" });
-  if (error) throw error;
-}
+export const isPermanentTrialError = (error) => error?.retryable === false;
 
 export const getTrials = async (userId) => {
   try {
@@ -81,30 +64,22 @@ export const getTrialById = async (id, userId) => {
 
 export const addTrial = async (trial, subjects) => {
   try {
-    const { data: trialData, error: trialError } = await supabase
-      .from("trials")
-      .insert(toTrialRow(trial))
-      .select()
-      .single();
-    if (trialError) {
-      if (isIdempotencyConflict(trialError)) {
-        const existing = await getTrialByClientOperationId(trial.user_id, trial.client_operation_id);
-        if (existing) {
-          await upsertTrialSubjects(existing.id, existing.exam_type, subjects);
-          return getTrialById(existing.id, trial.user_id);
-        }
-      }
-      throw trialError;
-    }
-
-    try {
-      await upsertTrialSubjects(trialData.id, trialData.exam_type, subjects);
-    } catch (subError) {
-      await supabase.from("trials").delete().eq("id", trialData.id);
-      throw subError;
-    }
-
-    const result = await getTrialById(trialData.id, trial.user_id);
+    const operationId = trial.client_operation_id ?? trial.clientOperationId;
+    const { data, error } = await supabase.rpc("create_trial", {
+      p_client_operation_id: operationId,
+      p_name: trial.name,
+      p_trial_date: trial.trial_date ?? trial.date,
+      p_exam_type: trial.exam_type ?? trial.trialType,
+      p_field: trial.field ?? null,
+      p_branch_subject: trial.branch_subject ?? trial.branchSubject ?? null,
+      p_mood: trial.mood ?? null,
+      p_publisher_id: trial.publisher_id ?? trial.publisherId ?? null,
+      p_difficulty_level: trial.difficulty_level ?? trial.difficultyLevel ?? "standard",
+      p_subjects: toTrialSubjectRows(subjects, trial.exam_type ?? trial.trialType),
+    });
+    if (error) throw error;
+    if (!data?.ok) throw new TrialWriteError(data?.reason, data);
+    const result = normalizeTrial(data.trial);
     import("./percentile").then((m) => m.refreshPercentilesIfStale()).catch(() => {});
     return result;
   } catch (e) {

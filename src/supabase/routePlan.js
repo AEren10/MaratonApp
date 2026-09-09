@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { createRouteRevision } from "../domain/route/routeIdentity";
 
 // Rota planının kalıcılığı.
 //
@@ -13,7 +14,7 @@ const TABLE = "route_weeks";
 const STATE_TABLE = "route_state";
 
 /** Rota çizildiğinde haftaları yaz. Aynı hafta varsa üzerine yazar. */
-export async function saveRouteWeeks(userId, weeks, examType = null) {
+export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRevision = null) {
   if (!userId || userId === "dev" || !Array.isArray(weeks) || weeks.length === 0) return 0;
 
   const rows = weeks
@@ -31,6 +32,15 @@ export async function saveRouteWeeks(userId, weeks, examType = null) {
         questions: s.cost?.questions ?? s.plannedQuestions ?? 0,
         difficulty: s.cost?.difficulty ?? null,
         partial: !!s.partial,
+        isReview: !!s.isReview,
+        logicalStopKey: s.logicalStopKey,
+        rootStopKey: s.rootStopKey,
+        segmentIndex: s.segmentIndex ?? 0,
+        position: s.position ?? 0,
+        lifecycleStatus: s.lifecycleStatus,
+        reasonCodes: s.reasonCodes || [],
+        scoreComponents: s.scoreComponents || {},
+        dataConfidence: s.dataConfidence || "low",
       })),
       exam_type: examType,
       generated_at: new Date().toISOString(),
@@ -43,10 +53,90 @@ export async function saveRouteWeeks(userId, weeks, examType = null) {
       .from(TABLE)
       .upsert(rows, { onConflict: "user_id,week_start" });
     if (error) throw error;
+
+    const revision = suppliedRevision || createRouteRevision({
+      weeks,
+      examType: examType || "unknown",
+      weekStart: weeks[0]?.weekStart,
+    });
+    const { error: revisionError } = await supabase.rpc("persist_route_revision", {
+      p_revision_key: revision.revisionKey,
+      p_exam_type: examType,
+      p_algorithm_version: revision.algorithmVersion,
+      p_input_hash: revision.inputHash,
+      p_weeks: rows,
+    });
+    if (revisionError) throw revisionError;
     return rows.length;
   } catch (e) {
     handleSupabaseError(e, "saveRouteWeeks");
     return 0;
+  }
+}
+
+export async function getLatestRouteStops(userId, examType = null) {
+  if (!userId || userId === "dev") return [];
+  try {
+    let query = supabase
+      .from("route_revisions")
+      .select("id")
+      .eq("user_id", userId)
+      .order("generated_at", { ascending: false })
+      .limit(1);
+    if (examType) query = query.eq("exam_type", examType);
+    const { data, error } = await query.maybeSingle();
+    if (error) throw error;
+    return data?.id ? getRouteStops(userId, data.id) : [];
+  } catch (e) {
+    handleSupabaseError(e, "getLatestRouteStops");
+    throw e;
+  }
+}
+
+export async function getRouteStops(userId, revisionId = null) {
+  if (!userId || userId === "dev") return [];
+  try {
+    let query = supabase
+      .from("route_stops")
+      .select("*")
+      .eq("user_id", userId)
+      .order("week_start", { ascending: true })
+      .order("position", { ascending: true });
+    if (revisionId) query = query.eq("revision_id", revisionId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    handleSupabaseError(e, "getRouteStops");
+    throw e;
+  }
+}
+
+export async function transitionRouteStop({
+  stopId,
+  transition,
+  expectedVersion,
+  clientOperationId,
+  occurredAt = new Date().toISOString(),
+  payload = {},
+}) {
+  if (!stopId || !transition || !clientOperationId) {
+    throw new Error("stopId, transition and clientOperationId are required");
+  }
+  try {
+    const { data, error } = await supabase.rpc("transition_route_stop", {
+      p_stop_id: stopId,
+      p_transition: transition,
+      p_expected_version: expectedVersion,
+      p_client_operation_id: clientOperationId,
+      p_occurred_at: occurredAt,
+      p_payload: payload,
+    });
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] || null : data;
+  } catch (e) {
+    handleSupabaseError(e, "transitionRouteStop");
+    throw e;
   }
 }
 
@@ -138,4 +228,4 @@ export const pauseRoute = (userId) =>
   setRouteState(userId, { paused_at: new Date().toISOString(), resumed_at: null });
 
 export const resumeRoute = (userId) =>
-  setRouteState(userId, { resumed_at: new Date().toISOString(), paused_at: null });
+  setRouteState(userId, { resumed_at: new Date().toISOString() });
