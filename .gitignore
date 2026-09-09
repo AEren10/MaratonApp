@@ -50,3 +50,7 @@ yarn-error.*
 # Yine de yerel varyantlari disla
 .mcp.local.json
 supabase/.temp/
+
+# build ve gecici cikti
+output/
+tmp/
