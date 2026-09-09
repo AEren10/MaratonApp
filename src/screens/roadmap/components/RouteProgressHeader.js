@@ -2,8 +2,16 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
+import RouteIntelligenceCard from "./RouteIntelligenceCard";
 
-export default function RouteProgressHeader({ totals, daysLeft, isPaused, onTogglePause, C }) {
+export default function RouteProgressHeader({
+  totals,
+  daysLeft,
+  isPaused,
+  intelligence,
+  onTogglePause,
+  C,
+}) {
   const progress = Math.round((totals?.progress || 0) * 100);
   const stopCount = Number(totals?.pending || 0);
 
@@ -37,6 +45,7 @@ export default function RouteProgressHeader({ totals, daysLeft, isPaused, onTogg
       {isPaused ? (
         <Text accessibilityLiveRegion="polite" style={[styles.frozen, { color: C.sec }]}>Rota donduruldu; geçmişin korunuyor.</Text>
       ) : null}
+      <RouteIntelligenceCard intelligence={intelligence} C={C} />
     </View>
   );
 }

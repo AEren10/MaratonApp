@@ -41,6 +41,7 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
         reasonCodes: s.reasonCodes || [],
         scoreComponents: s.scoreComponents || {},
         dataConfidence: s.dataConfidence || "low",
+        insight: s.insight || null,
       })),
       exam_type: examType,
       generated_at: new Date().toISOString(),

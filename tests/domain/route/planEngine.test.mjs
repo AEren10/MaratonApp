@@ -21,3 +21,25 @@ test("keeps multiple stops from the same subject and assigns the full target", (
   assert.deepEqual(plan.tasks.map((task) => task.version), [1, 2, 3]);
   assert.equal(plan.tasks.reduce((sum, task) => sum + task.questionCount, 0), 80);
 });
+
+test("carries route insight into the daily assignment reason", () => {
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 40,
+    routeWeekStops: [{
+      id: "a",
+      subject: "matematik",
+      topic: "Problemler",
+      logicalStopKey: "math:a",
+      insight: {
+        reasonCode: "LOW_ACCURACY",
+        reasonText: "Son denemelerde zayıf kalan alana denk geliyor.",
+        confidence: "medium",
+      },
+    }],
+  });
+
+  assert.equal(plan.tasks[0].reason, "Son denemelerde zayıf kalan alana denk geliyor.");
+  assert.equal(plan.tasks[0].routeConfidence, "medium");
+  assert.equal(plan.tasks[0].routeInsight.reasonCode, "LOW_ACCURACY");
+});

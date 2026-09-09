@@ -118,9 +118,12 @@ export function generateDailyPlan({
       : null;
     const acc = weakAreas[key] ?? 50;
 
-    const routeReasonCode = routeStop?.reasonCodes?.[0];
+    const routeInsight = routeStop?.insight || null;
+    const routeReasonCode = routeInsight?.reasonCode || routeStop?.reasonCodes?.[0];
     if (routeReasonCode) {
-      reason = ROUTE_REASON_TEXT[routeReasonCode] || "Rotandaki öncelikli durak";
+      reason = routeInsight?.reasonText
+        || ROUTE_REASON_TEXT[routeReasonCode]
+        || "Rotandaki öncelikli durak";
       rkind = routeReasonCode === "LOW_ACCURACY" ? "red" : "blue";
       tier = routeReasonCode === "LOW_ACCURACY" ? "high" : "medium";
       badge = routeReasonCode === "REVIEW_DUE" ? "TEKRAR" : "ROTA";
@@ -189,6 +192,8 @@ export function generateDailyPlan({
       daysSince,
       accuracy: acc,
       completed: false,
+      routeConfidence: routeInsight?.confidence || routeStop?.dataConfidence || null,
+      routeInsight,
     });
 
     remaining -= actual;

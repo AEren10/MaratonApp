@@ -26,6 +26,7 @@ function StopNode({ stop, frozen, C, isLast }) {
   const dashed = [ROUTE_STOP_STATUS.UPCOMING, ROUTE_STOP_STATUS.RESCHEDULED, ROUTE_STOP_STATUS.FROZEN].includes(status);
   const color = completed ? (stop.color || C.up) : active ? C.accent : C.muted;
   const icon = ICON_BY_STATUS[status];
+  const insight = stop.insight;
 
   return (
     <View style={styles.stopRow} accessible accessibilityLabel={`${stop.subjectLabel || stop.subject}, ${stop.topic}, ${label}`}>
@@ -49,6 +50,14 @@ function StopNode({ stop, frozen, C, isLast }) {
           {stop.subjectLabel || stop.subject} · {stop.cost?.questions ?? stop.plannedQuestions ?? 0} soru
         </Text>
         <Text style={[styles.status, { color }]}>{label}</Text>
+        {insight?.reasonText ? (
+          <View style={[styles.insight, { backgroundColor: C.accent + "12" }]}>
+            <Icon name="info" size={12} color={C.accent} />
+            <Text style={[styles.insightText, { color: C.sec }]} numberOfLines={2}>
+              {insight.reasonText}
+            </Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -105,4 +114,14 @@ const styles = StyleSheet.create({
   topic: { ...TYPOGRAPHY.bodySemiBold },
   meta: { ...TYPOGRAPHY.caption, marginTop: SPACING.xs },
   status: { ...TYPOGRAPHY.micro, marginTop: SPACING.xs, textTransform: "uppercase" },
+  insight: {
+    marginTop: SPACING.sm,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    flexDirection: "row",
+    gap: SPACING.xs,
+    alignItems: "center",
+  },
+  insightText: { ...TYPOGRAPHY.micro, flex: 1 },
 });

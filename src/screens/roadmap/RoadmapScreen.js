@@ -20,6 +20,7 @@ export default function RoadmapScreen() {
   const {
     weeks, totals, daysLeft, hasRouteAccess, routeAccessError,
     routeAccessLoading, refreshRouteAccess, isPaused, pause, resume,
+    intelligence,
   } = useStudyRoute({ persist: false });
 
   const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
@@ -33,10 +34,11 @@ export default function RoadmapScreen() {
       totals={totals}
       daysLeft={daysLeft}
       isPaused={isPaused}
+      intelligence={intelligence}
       onTogglePause={togglePause}
       C={C}
     />
-  ), [C, daysLeft, isPaused, togglePause, totals]);
+  ), [C, daysLeft, intelligence, isPaused, togglePause, totals]);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>

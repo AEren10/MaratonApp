@@ -137,6 +137,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             stopId: saved.id,
             lifecycleStatus: saved.lifecycle_status,
             version: saved.version,
+            insight: saved.metadata?.insight || stop.insight,
           } : stop;
         }),
       }))),
@@ -273,6 +274,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     feasible: route.feasible,
     shortfall: route.shortfall,
     totals: route.totals,
+    intelligence: route.intelligence,
     daysLeft,
     scenario,
     tempoScenarios,

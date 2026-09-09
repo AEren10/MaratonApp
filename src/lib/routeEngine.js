@@ -1,11 +1,12 @@
-import { estimateWeeklyCapacity, rampedCapacity } from "../domain/route/capacity";
-import { estimateTopicCost, priorityScoreDetails } from "../domain/route/topicCost";
-import { scheduleWeeks, weeksUntilExam } from "../domain/route/scheduler";
-import { computeDebt, distributeDebt, debtInWeeks } from "../domain/route/debt";
-import { reviewStatus, reviewCost, reviewPriority } from "../domain/route/retention";
-import { topicsNeededForNet } from "../domain/route/netEstimate";
-import { decorateScheduledRoute, createRouteRevision } from "../domain/route/routeIdentity";
-import { startOfWeekTR, dateKey } from "./dateUtils";
+import { estimateWeeklyCapacity, rampedCapacity } from "../domain/route/capacity.js";
+import { estimateTopicCost, priorityScoreDetails } from "../domain/route/topicCost.js";
+import { scheduleWeeks, weeksUntilExam } from "../domain/route/scheduler.js";
+import { computeDebt, distributeDebt, debtInWeeks } from "../domain/route/debt.js";
+import { reviewStatus, reviewCost, reviewPriority } from "../domain/route/retention.js";
+import { topicsNeededForNet } from "../domain/route/netEstimate.js";
+import { decorateScheduledRoute, createRouteRevision } from "../domain/route/routeIdentity.js";
+import { attachStopInsights, buildRouteIntelligence } from "../domain/route/routeIntelligence.js";
+import { startOfWeekTR, dateKey } from "./dateUtils.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -15,7 +16,7 @@ import { startOfWeekTR, dateKey } from "./dateUtils";
 //   - 12 hafta sınırı yok, sınava kalan süre kadar planlar
 //   - borç kavramı var (yapılmayan iş kaybolmuyor, dağıtılıyor)
 //   - ara verme/dondurma sonrası kapasite kademeli geri geliyor
-//   - senaryo: "haftada X soru çözersem nereye varırım"
+//   - senaryo: "%90/%100/%110 tempo ile sınav günü netim nereye gelir"
 //
 // TASARIM NOTU: AKIŞ 2'deki ekranlar bu çıktının parçalarına doğrudan oturur —
 //   Rota Detay        → route.weeks[0]
@@ -169,7 +170,7 @@ export function buildRoute({
 
   const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft, { daysLeft });
   const stamped = stampWeekDates(weeks, now);
-  const scheduled = decorateScheduledRoute(stamped, { examType });
+  const scheduled = attachStopInsights(decorateScheduledRoute(stamped, { examType }));
   const revision = createRouteRevision({
     weeks: scheduled,
     examType,
@@ -179,6 +180,21 @@ export function buildRoute({
 
   const remainingQuestions = items.reduce((n, i) => n + i.cost.questions, 0);
   const overflowQuestions = overflow.reduce((n, i) => n + i.cost.questions, 0);
+  const shortfall = {
+    topics: overflow.length,
+    questions: overflowQuestions,
+    extraQuestionsPerWeek: weeksLeft > 0 ? Math.ceil(overflowQuestions / weeksLeft) : 0,
+  };
+  const intelligence = buildRouteIntelligence({
+    capacity,
+    items,
+    weeks: scheduled,
+    overflow,
+    shortfall,
+    weakSubjectKeys,
+    daysLeft,
+    studyLogDataState,
+  });
 
   return {
     capacity,
@@ -199,11 +215,8 @@ export function buildRoute({
     },
     // Süreye sığmayan iş — kullanıcıya dürüstçe söylenmeli.
     feasible: overflow.length === 0,
-    shortfall: {
-      topics: overflow.length,
-      questions: overflowQuestions,
-      extraQuestionsPerWeek: weeksLeft > 0 ? Math.ceil(overflowQuestions / weeksLeft) : 0,
-    },
+    shortfall,
+    intelligence,
   };
 }
 
@@ -257,4 +270,4 @@ export function thresholdGap({
 }
 
 export { computeDebt, distributeDebt, debtInWeeks };
-export { simulateTempoScenario as simulateScenario } from "../domain/forecast/tempoScenario";
+export { simulateTempoScenario as simulateScenario } from "../domain/forecast/tempoScenario.js";

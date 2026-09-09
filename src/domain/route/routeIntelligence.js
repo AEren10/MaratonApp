@@ -1,0 +1,153 @@
+export const ROUTE_INTELLIGENCE_VERSION = "route-intelligence-v1";
+
+const CONFIDENCE_WEIGHT = { high: 1, medium: 0.7, low: 0.35 };
+
+const REASON_TEXT = {
+  REVIEW_DUE: "Unutma eğrisi yükseldi; kısa tekrar neti korur.",
+  LOW_ACCURACY: "Son denemelerde zayıf kalan alana denk geliyor.",
+  NEGLECTED: "Uzun süredir temas edilmediği için öne alındı.",
+  HIGH_EXAM_WEIGHT: "Sınavda soru payı yüksek olduğu için getirisi iyi.",
+  PREREQUISITE: "Sonraki konuların temelini güçlendiren durak.",
+  ROUTE_COMMITMENT: "Haftalık rota dengesini tamamlayan sıradaki iş.",
+};
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function round(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function confidenceLabel(score) {
+  if (score >= 75) return "high";
+  if (score >= 50) return "medium";
+  return "low";
+}
+
+function capacityScore(capacity = {}) {
+  if (capacity.confidence === "high") return 35;
+  if (capacity.confidence === "medium") return 26;
+  if (capacity.source === "history") return 20;
+  return 14;
+}
+
+function itemSignalScore(items = []) {
+  if (!items.length) return 8;
+  const total = items.reduce(
+    (sum, item) => sum + (CONFIDENCE_WEIGHT[item.dataConfidence] || 0.35),
+    0,
+  );
+  return round((total / items.length) * 25, 1);
+}
+
+function feasibilityScore({ overflow = [], shortfall = {}, capacity = {} }) {
+  if (!overflow.length) return 20;
+  const weekly = Math.max(1, Number(capacity.questionsPerWeek) || 1);
+  const pressure = Number(shortfall.extraQuestionsPerWeek || 0) / weekly;
+  return clamp(Math.round(20 - pressure * 40), 0, 12);
+}
+
+function forecastSignalScore({ weakSubjectKeys = [], daysLeft = null }) {
+  let score = 0;
+  score += weakSubjectKeys.length ? 10 : 4;
+  score += daysLeft != null ? 10 : 4;
+  return score;
+}
+
+function dominantReason(stop = {}) {
+  const codes = stop.reasonCodes || [];
+  return codes.find((code) => REASON_TEXT[code]) || codes[0] || "ROUTE_COMMITMENT";
+}
+
+export function explainRouteStop(stop = {}) {
+  const reasonCode = dominantReason(stop);
+  const components = stop.scoreComponents || {};
+  const confidence = stop.dataConfidence || "low";
+  return {
+    reasonCode,
+    reasonText: REASON_TEXT[reasonCode] || REASON_TEXT.ROUTE_COMMITMENT,
+    confidence,
+    expectedNetGain: round(Number(components.expectedNetGain) || 0),
+    effortQuestions: Number(components.effortQuestions) || Number(stop.cost?.questions) || 0,
+    sequenceReadiness: components.sequenceReadiness ?? null,
+  };
+}
+
+export function attachStopInsights(weeks = []) {
+  return weeks.map((week) => ({
+    ...week,
+    stops: (week.stops || []).map((stop) => ({
+      ...stop,
+      insight: explainRouteStop(stop),
+    })),
+  }));
+}
+
+export function buildRouteIntelligence({
+  capacity = {},
+  items = [],
+  weeks = [],
+  overflow = [],
+  shortfall = {},
+  weakSubjectKeys = [],
+  daysLeft = null,
+  studyLogDataState = "ready",
+} = {}) {
+  const lowSignalItems = items.filter((item) => item.dataConfidence === "low").length;
+  const prerequisiteItems = items.filter((item) => item.unpreparedBefore > 0).length;
+  const reviewItems = items.filter((item) => item.isReview).length;
+
+  const score = clamp(Math.round(
+    capacityScore(capacity)
+    + itemSignalScore(items)
+    + feasibilityScore({ overflow, shortfall, capacity })
+    + forecastSignalScore({ weakSubjectKeys, daysLeft }),
+  ), 0, 100);
+
+  const risks = [];
+  if (studyLogDataState === "error" || capacity.missingData) {
+    risks.push({ code: "study_log_unavailable", level: "high" });
+  }
+  if (capacity.confidence === "low") {
+    risks.push({ code: "capacity_low_confidence", level: "medium" });
+  }
+  if (overflow.length) {
+    risks.push({
+      code: "route_overflow",
+      level: shortfall.extraQuestionsPerWeek > capacity.questionsPerWeek * 0.25
+        ? "high" : "medium",
+      extraQuestionsPerWeek: shortfall.extraQuestionsPerWeek || 0,
+    });
+  }
+  if (lowSignalItems > Math.max(3, items.length * 0.35)) {
+    risks.push({ code: "topic_signal_sparse", level: "medium" });
+  }
+  if (prerequisiteItems > 0) {
+    risks.push({ code: "prerequisite_debt", level: "low", count: prerequisiteItems });
+  }
+
+  const nextBestAction = overflow.length
+    ? "Haftalık hedefi artır veya düşük getirili durakları sonraki revizyona bırak."
+    : reviewItems > 0
+      ? "İlk hafta tekrar duraklarını bitir; net kaybını hızlıca kilitler."
+      : "Bu haftanın aktif durağını tamamla ve rotayı yeni veriye göre güncelle.";
+
+  return {
+    version: ROUTE_INTELLIGENCE_VERSION,
+    confidence: confidenceLabel(score),
+    confidenceScore: score,
+    nextBestAction,
+    signals: {
+      capacitySource: capacity.source || "unknown",
+      capacityConfidence: capacity.confidence || "low",
+      plannedWeeks: weeks.length,
+      pendingStops: items.length,
+      reviewStops: reviewItems,
+      lowSignalStops: lowSignalItems,
+      prerequisiteStops: prerequisiteItems,
+    },
+    risks,
+  };
+}
