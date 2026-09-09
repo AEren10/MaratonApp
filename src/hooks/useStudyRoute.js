@@ -1,16 +1,31 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { buildRoute, simulateScenario, thresholdGap, computeDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
+import { buildRoute, thresholdGap, computeDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
 import { usePlanContext } from "./usePlanContext";
 import { useExam } from "../contexts/ExamContext";
 import { getSubjectsForExam } from "../data/curriculum";
 import { selectTrials } from "../store/slices/trialSlice";
 import { selectGoals } from "../store/slices/goalsSlice";
 import { startOfWeekTR } from "../lib/dateUtils";
-import { TRIAL_TO_CURRICULUM } from "../domain/trial/trialKeyMap";
 import { useAuth } from "../contexts/AuthContext";
-import { saveRouteWeeks, getRouteWeeks, getRouteState, pauseRoute, resumeRoute } from "../supabase/routePlan";
+import { usePremium } from "../contexts/PremiumContext";
+import { ensureSingleActiveRouteStop } from "../domain/route/stopStatus";
+import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, pauseRoute, resumeRoute, transitionRouteStop } from "../supabase/routePlan";
+import * as Crypto from "expo-crypto";
+import { track } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
+import { weightedWeakAreas } from "../lib/buildPlanContext";
+import { forecastNet } from "../lib/netForecast";
+import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
+
+function trialTypesForRoute(examType, field) {
+  if (examType === "lgs") return ["LGS"];
+  if (examType !== "tyt_ayt") return ["TYT"];
+  const ayt = field === "sayisal" ? "AYT_SAY"
+    : field === "ea" ? "AYT_EA" : field === "sozel" ? "AYT_SOZ" : null;
+  return ayt ? ["TYT", ayt] : ["TYT"];
+}
 
 /**
  * Kişiye özel rota — ekranların tek giriş noktası.
@@ -32,14 +47,29 @@ import { saveRouteWeeks, getRouteWeeks, getRouteState, pauseRoute, resumeRoute }
  *   Borç Dağıtıldı    → debtPlan.weeks
  *   Plan vs Gerçek    → debt.items[i].completion
  */
-export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
+export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const { examType, field, examDate } = useExam();
   const { user } = useAuth();
+  const { accessError, accessLoading, checkFeature, refreshUsage } = usePremium();
+  const hasRouteAccess = !accessLoading && checkFeature("detailed_roadmap");
   const [pastWeeks, setPastWeeks] = useState([]);
   const [routeState, setRouteStateLocal] = useState(null);
-  const { weekLogs, topicRows } = usePlanContext();
+  const isPaused = !!routeState?.paused_at && (!routeState?.resumed_at
+    || new Date(routeState.paused_at) > new Date(routeState.resumed_at));
+  const recoveryWeek = useMemo(() => {
+    if (pausedWeeks != null) return pausedWeeks;
+    if (!routeState?.paused_at || !routeState?.resumed_at || isPaused) return null;
+    const pauseWeeks = (new Date(routeState.resumed_at) - new Date(routeState.paused_at)) / 604800000;
+    if (pauseWeeks < 1) return null;
+    return Math.max(0, Math.floor((Date.now() - new Date(routeState.resumed_at)) / 604800000));
+  }, [isPaused, pausedWeeks, routeState?.paused_at, routeState?.resumed_at]);
+  const [persistedStops, setPersistedStops] = useState([]);
+  const { dataHealth, weekLogs, topicRows } = usePlanContext();
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
+  const allowedTrialTypes = useMemo(
+    () => trialTypesForRoute(examType, field), [examType, field],
+  );
 
   const daysLeft = useMemo(() => {
     if (!examDate) return null;
@@ -62,49 +92,76 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
 
   // Son denemelerde zayıf kalan dersler — önceliğe girdi.
   const weakSubjectKeys = useMemo(() => {
-    const recent = [...(trials || [])].slice(0, 5);
+    const recent = (trials || [])
+      .filter((trial) => allowedTrialTypes.includes(trial.trialType)).slice(0, 5);
     if (!recent.length) return [];
-    const acc = {};
-    for (const t of recent) {
-      for (const [key, val] of Object.entries(t.subjects || {})) {
-        if (val?.net == null) continue;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(val.net);
-      }
-    }
-    // Deneme anahtarları (tyt_matematik, ayt_fizik) MÜFREDAT anahtarlarına
-    // çevrilmeli. Çevrilmezse weakSet.has(subject.key) hiçbir TYT/LGS dersinde
-    // eşleşmez ve zayıf-alan önceliği fiilen devre dışı kalır.
-    const weakest = Object.entries(acc)
-      .map(([key, nets]) => [key, nets.reduce((a, b) => a + b, 0) / nets.length])
+    return Object.entries(weightedWeakAreas(recent))
       .sort((a, b) => a[1] - b[1])
       .slice(0, 3)
       .map(([key]) => key);
+  }, [allowedTrialTypes, trials]);
 
-    const curriculumKeys = new Set();
-    for (const trialKey of weakest) {
-      const mapped = TRIAL_TO_CURRICULUM[trialKey];
-      if (mapped?.length) mapped.forEach((k) => curriculumKeys.add(k));
-      else curriculumKeys.add(trialKey); // eşleme yoksa olduğu gibi dene
-    }
-    return [...curriculumKeys];
-  }, [trials]);
-
-  const route = useMemo(() => buildRoute({
+  const computedRoute = useMemo(() => buildRoute({
     // examType yoksa rota HESAPLANMAZ. "tyt" varsaymak LGS kullanıcısının
     // rotasını yanlış müfredatla çizerdi.
-    pool: examType ? getSubjectsForExam(examType, field) : [],
+    pool: examType && hasRouteAccess ? getSubjectsForExam(examType, field) : [],
     progressByKey,
     studyLogs: weekLogs || [],
     dailyQuestionGoal: goals?.dailyQuestions || 20,
     daysLeft,
     weakSubjectKeys,
-    pausedWeeks,
-  }), [examType, field, progressByKey, weekLogs, goals?.dailyQuestions, daysLeft, weakSubjectKeys, pausedWeeks]);
+    pausedWeeks: recoveryWeek,
+    examType,
+    studyLogDataState: dataHealth?.logs,
+  }), [dataHealth?.logs, examType, field, hasRouteAccess, progressByKey, weekLogs,
+    goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek]);
 
-  const scenario = useMemo(
-    () => (questionsPerWeek) => simulateScenario(route, questionsPerWeek),
-    [route],
+  const route = useMemo(() => {
+    const byKey = new Map((persistedStops || []).map((stop) => [stop.logical_key, stop]));
+    return {
+      ...computedRoute,
+      weeks: ensureSingleActiveRouteStop(computedRoute.weeks.map((week) => ({
+        ...week,
+        stops: week.stops.map((stop) => {
+          const saved = byKey.get(stop.logicalStopKey);
+          return saved ? {
+            ...stop,
+            stopId: saved.id,
+            lifecycleStatus: saved.lifecycle_status,
+            version: saved.version,
+          } : stop;
+        }),
+      }))),
+    };
+  }, [computedRoute, persistedStops]);
+
+  const forecastType = useMemo(() => allowedTrialTypes
+    .map((type) => ({
+      type,
+      count: (trials || []).filter((trial) => trial.trialType === type).length,
+    }))
+    .sort((a, b) => b.count - a.count)[0]?.type, [allowedTrialTypes, trials]);
+  const forecastTrials = useMemo(
+    () => (trials || []).filter((trial) => trial.trialType === forecastType),
+    [forecastType, trials],
+  );
+  const forecastMax = forecastType === "LGS" ? 90 : forecastType === "TYT" ? 120 : 80;
+  const forecast = useMemo(() => forecastNet(
+    forecastTrials, examDate, forecastMax, forecastType,
+  ), [examDate, forecastMax, forecastTrials, forecastType]);
+  const tempoScenarios = useMemo(() => buildTempoScenarios({
+    forecast,
+    questionsPerWeek: route.capacity?.questionsPerWeek,
+    stopsPerWeek: route.currentWeek?.stops?.length || route.weeks?.[0]?.stops?.length || 0,
+    trials: forecastTrials,
+    studyLogs: weekLogs,
+    examDate,
+    maxNet: forecastMax,
+  }), [examDate, forecast, forecastMax, forecastTrials,
+    route.capacity?.questionsPerWeek, route.weeks, weekLogs]);
+  const scenario = useCallback(
+    (multiplier = 1) => tempoScenarios.find((item) => item.multiplier === multiplier) || null,
+    [tempoScenarios],
   );
 
   // Eşik hesabı artık müfredat havuzunu ve ilerlemeyi de alıyor —
@@ -125,7 +182,7 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
   // examType filtresi kritik: kullanıcı YKS↔LGS geçtiyse eski müfredatın
   // planı borç sayılmamalı.
   useEffect(() => {
-    if (!user?.id || !examType) return;
+    if (!user?.id || !examType || !hasRouteAccess) return;
     let cancelled = false;
     getRouteWeeks(user.id, { examType })
       .then((rows) => { if (!cancelled) setPastWeeks(rows); })
@@ -133,15 +190,22 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
     getRouteState(user.id)
       .then((st) => { if (!cancelled) setRouteStateLocal(st); })
       .catch(() => {});
+    getLatestRouteStops(user.id, examType)
+      .then((rows) => { if (!cancelled) setPersistedStops(rows); })
+      .catch(() => {});
     return () => { cancelled = true; };
-  }, [user?.id, examType]);
+  }, [user?.id, examType, hasRouteAccess]);
 
   // Rota çizildiğinde haftaları sakla. Bu olmadan borç her zaman sıfır çıkar.
   useEffect(() => {
-    if (!persist || !user?.id || !examType) return;
-    if (!route.weeks?.length) return;
-    saveRouteWeeks(user.id, route.weeks, examType).catch(() => {});
-  }, [persist, user?.id, examType, route.weeks]);
+    if (!persist || !user?.id || !examType || !hasRouteAccess || isPaused) return;
+    if (!computedRoute.weeks?.length) return;
+    saveRouteWeeks(user.id, computedRoute.weeks, examType, computedRoute.revision)
+      .then(() => getLatestRouteStops(user.id, examType))
+      .then(setPersistedStops)
+      .catch(() => {});
+  }, [persist, user?.id, examType, hasRouteAccess, isPaused,
+    computedRoute.weeks, computedRoute.revision]);
 
   // Borç: geçmiş haftaların planı ile gerçekleşeni karşılaştır.
   const debt = useMemo(() => {
@@ -159,10 +223,6 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
     return computeDebt(finished, actualByWeek);
   }, [weekLogs, pastWeeks]);
 
-  // Ara verme / dondurma. Hook'lar return nesnesinin içinde tanımlanamaz —
-  // sıraları bozulmasa da okunması ve bakımı kırılgan olur.
-  const isPaused = !!routeState?.paused_at && !routeState?.resumed_at;
-
   const pause = useCallback(async () => {
     if (!user?.id) return;
     const next = await pauseRoute(user.id);
@@ -175,6 +235,28 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
     if (next) setRouteStateLocal(next);
   }, [user?.id]);
 
+  const transitionStop = useCallback(async (stop, transition, payload = {}) => {
+    if (!stop?.stopId) throw new Error("route_stop_not_persisted");
+    const updated = await transitionRouteStop({
+      stopId: stop.stopId,
+      transition,
+      expectedVersion: stop.version ?? 1,
+      clientOperationId: Crypto.randomUUID(),
+      payload,
+    });
+    if (updated) {
+      setPersistedStops((current) => current.map((item) => (
+        item.id === updated.id ? updated : item
+      )));
+      track(EVENTS.ROUTE_STOP_TRANSITIONED, {
+        transition,
+        subject: updated.subject,
+        source: payload.source || "unknown",
+      });
+    }
+    return updated;
+  }, []);
+
   return {
     route,
     capacity: route.capacity,
@@ -185,6 +267,12 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
     totals: route.totals,
     daysLeft,
     scenario,
+    tempoScenarios,
+    forecast,
+    hasRouteAccess,
+    routeAccessError: accessError,
+    routeAccessLoading: accessLoading,
+    refreshRouteAccess: refreshUsage,
     threshold,
     debt,
     debtWeeks: debtInWeeks(debt.totalQuestions, route.capacity),
@@ -192,6 +280,7 @@ export function useStudyRoute({ pausedWeeks = 0, persist = true } = {}) {
     isPaused,
     pause,
     resume,
+    transitionStop,
     distributeDebt: (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
   };
 }

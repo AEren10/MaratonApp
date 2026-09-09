@@ -37,8 +37,8 @@ export const PREMIUM_FEATURES = {
   },
   detailed_roadmap: {
     key: "detailed_roadmap",
-    title: "Detaylı Yol Haritası",
-    desc: "Konu bazlı ilerleme ve öneri sistemi",
+    title: "Kişisel Rota",
+    desc: "Bugünün durakları, tahmin bandı ve tempo senaryoları",
   },
   league_priority: {
     key: "league_priority",
@@ -63,9 +63,30 @@ export const PREMIUM_FEATURES = {
 };
 
 export const FREE_LIMITS = {
-  trials_per_month: 3,
-  wrong_entries: 30,
+  trials_per_month: 4,
+  // Yanlış defteri yeni ürün sınırında ücretsiz ve sınırsızdır.
+  wrong_entries: Number.POSITIVE_INFINITY,
   active_challenges: 1,
+};
+
+// İstemci bu kataloğu yalnızca görünüm ve fail-closed kararları için kullanır.
+// Asıl erişim kararı get_product_access_snapshot/create_trial RPC'lerindedir.
+export const PRODUCT_FEATURES = {
+  route: "route",
+  route_forecast: "routeForecast",
+  route_scenarios: "routeScenarios",
+  route_priorities: "routePriorities",
+  trial_compare: "trialCompare",
+  ocr: "ocr",
+  monthly_report: "monthlyReport",
+};
+
+export const PREMIUM_TO_PRODUCT_FEATURE = {
+  detailed_roadmap: PRODUCT_FEATURES.route,
+  ai_suggestions: PRODUCT_FEATURES.route_priorities,
+  advanced_reports: PRODUCT_FEATURES.monthly_report,
+  rank_simulator: PRODUCT_FEATURES.route_forecast,
+  deep_analytics: PRODUCT_FEATURES.route_priorities,
 };
 
 export const PLANS = [

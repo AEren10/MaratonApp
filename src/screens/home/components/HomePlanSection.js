@@ -12,6 +12,7 @@ export function HomePlanSection({
   onAddTask,
   onAllDone,
   onReview,
+  onRouteComplete,
   onStartTask,
   onTaskDone,
   onViewPlan,
@@ -28,6 +29,7 @@ export function HomePlanSection({
           onViewAll={onViewPlan}
           onAddTask={onAddTask}
           onStart={onStartTask}
+          onRouteComplete={onRouteComplete}
           onTaskDone={onTaskDone}
           onAllDone={onAllDone}
         />

@@ -36,7 +36,10 @@ function nudgesToPriorityReasons(nudges) {
 }
 
 // Module-level cache — paylaşılan veri, her instance sıfırdan fetch etmesin.
-let _cache = { uid: null, weekLogs: [], topicRows: [], srDue: 0 };
+let _cache = {
+  uid: null, weekLogs: [], topicRows: [], srDue: 0,
+  dataHealth: { logs: "idle", topics: "idle", wrongs: "idle" },
+};
 
 // C) HomeScreen ve PlanDetailScreen için ortak plan bağlamı.
 // Son 3 deneme ağırlıklı zayıflık + 7 günlük çalışma + konu zayıflığı + nudge sinyalleri.
@@ -53,6 +56,9 @@ export function usePlanContext() {
   const [weekLogs, setWeekLogs] = useState(cached ? (_cache.weekLogs || []) : []);
   const [topicRows, setTopicRows] = useState(cached ? (_cache.topicRows || []) : []);
   const [srDue, setSrDue] = useState(cached ? (_cache.srDue || 0) : 0);
+  const [dataHealth, setDataHealth] = useState(cached
+    ? _cache.dataHealth
+    : { logs: "loading", topics: "loading", wrongs: "loading" });
 
   useEffect(() => {
     if (!uid || uid === "dev") return;
@@ -60,6 +66,7 @@ export function usePlanContext() {
       setWeekLogs(_cache.weekLogs);
       setTopicRows(_cache.topicRows);
       setSrDue(_cache.srDue);
+      setDataHealth(_cache.dataHealth);
       return;
     }
     let cancelled = false;
@@ -83,10 +90,16 @@ export function usePlanContext() {
       const tr = topicRes.status === "fulfilled" ? (topicRes.value || []) : [];
       const dueVal = dueRes.status === "fulfilled" ? (dueRes.value || []) : [];
       const sd = Array.isArray(dueVal) ? dueVal.length : 0;
-      _cache = { uid, weekLogs: wl, topicRows: tr, srDue: sd };
+      const health = {
+        logs: logsRes.status === "fulfilled" ? "ready" : "error",
+        topics: topicRes.status === "fulfilled" ? "ready" : "error",
+        wrongs: dueRes.status === "fulfilled" ? "ready" : "error",
+      };
+      _cache = { uid, weekLogs: wl, topicRows: tr, srDue: sd, dataHealth: health };
       setWeekLogs(wl);
       setTopicRows(tr);
       setSrDue(sd);
+      setDataHealth(health);
     });
     return () => { cancelled = true; };
   }, [uid]);
@@ -102,6 +115,6 @@ export function usePlanContext() {
     // kapasiteyi geçmiş çalışmadan, konu ilerlemesini topic_progress'ten
     // hesaplıyor. Bunlar zaten burada çekilip önbelleğe alınıyor; ikinci kez
     // sorgulamak yerine paylaşılıyor.
-    return { examType, field, examDate, weakAreas, recentStudy, topicWeakness, priorityReasons, nudges, srDue, dailyTarget, weekLogs, topicRows };
-  }, [trials, weekLogs, todayLogs, topicRows, srDue, examType, field, examDate, dailyTarget]);
+    return { examType, field, examDate, weakAreas, recentStudy, topicWeakness, priorityReasons, nudges, srDue, dailyTarget, weekLogs, topicRows, dataHealth };
+  }, [trials, weekLogs, todayLogs, topicRows, srDue, examType, field, examDate, dailyTarget, dataHealth]);
 }

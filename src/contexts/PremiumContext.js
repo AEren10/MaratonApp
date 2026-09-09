@@ -1,185 +1,142 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
 import { useAuth } from "./AuthContext";
-import { getTrialInfo } from "../supabase/profiles";
-import { getTrialCountSince } from "../supabase/trials";
-import { getWrongQuestionCount } from "../supabase/wrongQuestions";
-import { getActiveChallengeCount } from "../supabase/challenges";
 import { SCREENS } from "../constants/screens";
-import { FREE_LIMITS } from "../constants/premium";
+import { FREE_LIMITS, PREMIUM_TO_PRODUCT_FEATURE } from "../constants/premium";
 import { recordRetentionEvent } from "../supabase/retention";
 import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
-import {
-  initPurchases,
-  getCustomerInfo,
-  isPremiumFromInfo,
-  isInitialized,
-} from "../lib/purchases";
+import { getActiveChallengeCount } from "../supabase/challenges";
+import { getWrongQuestionCount } from "../supabase/wrongQuestions";
+import { getProductAccessSnapshot } from "../supabase/productAccess";
+import { canAccessProductFeature, trialQuotaDecision } from "../domain/premium/paywallGate";
+import { initPurchases } from "../lib/purchases";
 
 const PremiumContext = createContext(null);
 
 export function PremiumProvider({ children }) {
   const { user } = useAuth();
   const navigation = useNavigation();
-  const [isPremium, setIsPremium] = useState(false);
-  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
-  const [isInTrial, setIsInTrial] = useState(false);
-  // null = HENÜZ BİLİNMİYOR. Eskiden sıfırlarla başlıyordu ve açılıştan
-  // sayım dönene kadar geçen sürede kota kapısı FAIL-OPEN oluyordu:
-  // 30/30 sınırındaki kullanıcı 0 < 30 görüp geçiyordu.
+  const [accessState, setAccessState] = useState("loading");
+  const [snapshot, setSnapshot] = useState(null);
   const [usage, setUsage] = useState(null);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    initPurchases(user.id).then(fetchPremiumStatus);
-    refreshUsage();
-  }, [user?.id]);
-
-
-  const fetchPremiumStatus = useCallback(async () => {
-    if (!user?.id) return;
+  const refreshAccess = useCallback(async () => {
+    if (!user?.id || user.id === "dev") {
+      setSnapshot(null);
+      setAccessState("ready");
+      return null;
+    }
+    setAccessState((current) => current === "ready" ? current : "loading");
     try {
-      if (isInitialized()) {
-        const info = await getCustomerInfo();
-        if (info && isPremiumFromInfo(info)) {
-          setIsPremium(true);
-          setIsInTrial(false);
-          return;
-        }
-      }
-      const trial = await getTrialInfo(user.id);
-      if (trial) {
-        if (trial.isPremium) {
-          setIsPremium(true);
-          setIsInTrial(false);
-          return;
-        }
-        if (trial.isInTrial) {
-          setIsPremium(true);
-          setIsInTrial(true);
-          setTrialDaysLeft(trial.trialDaysLeft);
-          return;
-        }
-      }
-      setIsPremium(false);
-      setIsInTrial(false);
-      setTrialDaysLeft(0);
-    } catch (e) {
-      if (__DEV__) console.warn("[PremiumContext] fetchPremiumStatus", e);
+      const next = await getProductAccessSnapshot();
+      setSnapshot(next);
+      setAccessState("ready");
+      return next;
+    } catch (error) {
+      setAccessState("error");
+      if (__DEV__) console.warn("[PremiumContext] refreshAccess", error);
+      return null;
     }
   }, [user?.id]);
 
   const refreshUsage = useCallback(async () => {
-    if (!user?.id) return;
-    try {
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+    if (!user?.id || user.id === "dev") return;
+    const [access, wrongs, challenges] = await Promise.allSettled([
+      refreshAccess(),
+      getWrongQuestionCount(user.id),
+      getActiveChallengeCount(user.id),
+    ]);
+    setUsage({
+      wrongEntries: wrongs.status === "fulfilled" ? wrongs.value : null,
+      activeChallenges: challenges.status === "fulfilled" ? challenges.value : null,
+    });
+    return access.status === "fulfilled" ? access.value : null;
+  }, [refreshAccess, user?.id]);
 
-      const [trialsThisMonth, wrongEntries, activeChallenges] = await Promise.all([
-        getTrialCountSince(user.id, monthStart),
-        getWrongQuestionCount(user.id),
-        getActiveChallengeCount(user.id),
-      ]);
-
-      setUsage({ trialsThisMonth, wrongEntries, activeChallenges });
-    } catch (e) {
-      if (__DEV__) console.warn("[PremiumContext] refreshUsage", e);
-    }
-  }, [user?.id]);
-
-  // KOTA SAYAÇLARI TAZELENMELİ.
-  //
-  // Eskiden refreshUsage YALNIZCA mount'ta çağrılıyordu ve dışarıdan hiçbir
-  // ekran çağırmıyordu. Uygulamayı hiç kapatmayan kullanıcının sayacı
-  // sonsuza kadar açılış anındaki değerde kalıyordu: ücretsiz sınır fiilen
-  // yoktu. Uygulama öne geldiğinde yeniden sayıyoruz.
   useEffect(() => {
+    setSnapshot(null);
+    setAccessState("loading");
     if (!user?.id) return;
+    initPurchases(user.id).finally(refreshUsage);
+  }, [refreshUsage, user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return undefined;
     const sub = AppState.addEventListener("change", (next) => {
       if (next === "active") refreshUsage();
     });
     return () => sub?.remove?.();
-  }, [user?.id, refreshUsage]);
+  }, [refreshUsage, user?.id]);
 
+  const isPremium = snapshot?.isPremium === true;
+  const isInGrace = snapshot?.isFirstWeek === true;
+  const trialQuota = snapshot?.quotas?.trialEntry || null;
+  const trialDecision = trialQuotaDecision({ accessState, quota: trialQuota });
 
-  /**
-   * Kota tüketen bir işlem yapıldığında sayacı ANINDA artırır.
-   *
-   * Yalnızca öne gelme anında tazelemek yetmiyordu: uygulamayı hiç arka
-   * plana atmayan kullanıcı üst üste deneme girip sınırı aşabiliyordu.
-   * Sunucuya sormadan yerel olarak artırıyoruz; bir sonraki tazeleme
-   * gerçek sayıyla üzerine yazar.
-   */
+  const checkFeature = useCallback((featureKey) => {
+    if (featureKey === "unlimited_trials") return trialDecision.allowed;
+    if (featureKey === "unlimited_wrongs") return true;
+    if (featureKey === "unlimited_challenges") {
+      return isPremium || (!!usage && usage.activeChallenges < FREE_LIMITS.active_challenges);
+    }
+    const productKey = PREMIUM_TO_PRODUCT_FEATURE[featureKey];
+    if (productKey) {
+      return canAccessProductFeature({
+        accessState,
+        features: snapshot?.features,
+        featureKey: productKey,
+      });
+    }
+    return isPremium;
+  }, [accessState, isPremium, snapshot?.features, trialDecision.allowed, usage]);
+
+  const remainingTrials = trialDecision.remaining ?? 0;
+  const remainingWrongs = Infinity;
+
   const bumpUsage = useCallback((kind) => {
-    setUsage((prev) => {
-      if (!prev) return prev; // henüz bilinmiyor — tahmin yürütme
-      if (kind === "trial") return { ...prev, trialsThisMonth: prev.trialsThisMonth + 1 };
-      if (kind === "wrong") return { ...prev, wrongEntries: prev.wrongEntries + 1 };
-      if (kind === "challenge") return { ...prev, activeChallenges: prev.activeChallenges + 1 };
-      return prev;
+    if (kind !== "trial") return;
+    setSnapshot((current) => {
+      const quota = current?.quotas?.trialEntry;
+      if (!quota || quota.unlimited) return current;
+      const used = Math.min(quota.limit, quota.used + 1);
+      return {
+        ...current,
+        quotas: {
+          ...current.quotas,
+          trialEntry: { ...quota, used, remaining: Math.max(0, quota.limit - used) },
+        },
+      };
     });
   }, []);
 
-  const checkFeature = useCallback((featureKey) => {
-    if (isPremium) return true;
-
-    switch (featureKey) {
-      // Sayım henüz gelmediyse KAPALI davran. Açık davranmak, sınırdaki
-      // kullanıcının her soğuk açılışta bir bedava hak kazanması demekti.
-      case "unlimited_trials":
-        return !!usage && usage.trialsThisMonth < FREE_LIMITS.trials_per_month;
-      case "unlimited_wrongs":
-        return !!usage && usage.wrongEntries < FREE_LIMITS.wrong_entries;
-      case "unlimited_challenges":
-        return !!usage && usage.activeChallenges < FREE_LIMITS.active_challenges;
-      // These features are premium-only
-      case "ai_suggestions":
-      case "advanced_reports":
-      case "exam_simulator":
-      case "rank_simulator":
-      case "detailed_roadmap":
-      case "league_priority":
-      case "deep_analytics":
-      case "ad_free":
-      case "custom_reminders":
-        return false;
-      default:
-        return true;
-    }
-  }, [isPremium, usage]);
-
-  const remainingTrials = isPremium
-    ? Infinity
-    : Math.max(0, FREE_LIMITS.trials_per_month - (usage?.trialsThisMonth ?? FREE_LIMITS.trials_per_month));
-
-  const remainingWrongs = isPremium
-    ? Infinity
-    : Math.max(0, FREE_LIMITS.wrong_entries - (usage?.wrongEntries ?? FREE_LIMITS.wrong_entries));
-
   const showPaywall = useCallback((source = "unknown") => {
     if (user?.id) {
-      recordRetentionEvent(
-        user.id,
-        RETENTION_EVENTS.PAYWALL_TRIGGERED,
-        { source },
-        RETENTION_SOURCES.PAYWALL,
-      ).catch(() => {});
+      recordRetentionEvent(user.id, RETENTION_EVENTS.PAYWALL_TRIGGERED, { source }, RETENTION_SOURCES.PAYWALL)
+        .catch(() => {});
     }
     navigation.navigate(SCREENS.PAYWALL, { source });
   }, [navigation, user?.id]);
 
   const value = useMemo(() => ({
+    accessError: accessState === "error",
+    accessLoading: accessState === "loading",
+    accessMode: snapshot?.accessMode || null,
+    accessSnapshot: snapshot,
     isPremium,
-    isInTrial,
-    trialDaysLeft,
+    isInGrace,
+    isInTrial: snapshot?.accessMode === "premium" && snapshot?.trialDaysLeft > 0,
+    trialDaysLeft: snapshot?.trialDaysLeft || 0,
     checkFeature,
     remainingTrials,
     remainingWrongs,
     showPaywall,
     refreshUsage,
     bumpUsage,
-    refreshPremium: fetchPremiumStatus,
-  }), [isPremium, isInTrial, trialDaysLeft, checkFeature, remainingTrials, remainingWrongs, showPaywall, refreshUsage, bumpUsage, fetchPremiumStatus]);
+    refreshPremium: refreshAccess,
+  }), [accessState, bumpUsage, checkFeature, isInGrace, isPremium, refreshAccess,
+    refreshUsage, remainingTrials, showPaywall, snapshot]);
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;
 }

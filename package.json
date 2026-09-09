@@ -9,7 +9,8 @@
     "check:design": "node scripts/check-design-drift.js",
     "check:runtime": "node scripts/check-runtime-risks.js",
     "check": "npm run check:design && npm run check:runtime && npm run check:undefined",
-    "check:undefined": "node scripts/check-undefined.js"
+    "check:undefined": "node scripts/check-undefined.js",
+    "test": "node --experimental-default-type=module --test \"tests/**/*.test.mjs\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

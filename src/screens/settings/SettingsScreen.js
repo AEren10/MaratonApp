@@ -128,6 +128,7 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
           <SettingsGroup title="SOSYAL">
             <SettingsRow icon="users" iconColor={C.pink} label="Arkadaşlar" onPress={go(SCREENS.FRIENDS)} />
+            <SettingsRow icon="users" iconColor={C.accent} label="Yol Arkadaşın" onPress={go(SCREENS.ROUTE_COMPANION)} />
             <SettingsRow icon="users" iconColor={C.blue} label="Challenge" onPress={go(SCREENS.CHALLENGE)} />
             <SettingsRow icon="mail" iconColor={C.green} label="Davet Et" onPress={go(SCREENS.REFERRAL)} />
           </SettingsGroup>

@@ -62,6 +62,7 @@ const FriendsScreen = React.lazy(() => import("../screens/social/FriendsScreen")
 const ChallengeScreen = React.lazy(() => import("../screens/social/ChallengeScreen"));
 const ShareCardScreen = React.lazy(() => import("../screens/social/ShareCardScreen"));
 const ReferralScreen = React.lazy(() => import("../screens/social/ReferralScreen"));
+const RouteCompanionScreen = React.lazy(() => import("../screens/social/RouteCompanionScreen"));
 const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
@@ -151,6 +152,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.QUICK_PRACTICE, QuickPracticeScreen),
   screen(SCREENS.SHARE_CARD, ShareCardScreen),
   screen(SCREENS.REFERRAL, ReferralScreen),
+  screen(SCREENS.ROUTE_COMPANION, RouteCompanionScreen),
   screen(SCREENS.EXAM_SIMULATOR, ExamSimulatorScreen),
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
   screen(SCREENS.PAYWALL, PaywallScreen, modalOptions),

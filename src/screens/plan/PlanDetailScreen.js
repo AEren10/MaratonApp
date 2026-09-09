@@ -23,11 +23,13 @@ import * as haptic from "../../lib/haptics";
 import { PlanHeader } from "./components/PlanHeader";
 import { PlanTaskItem } from "./components/PlanTaskItem";
 import { TaskReasonSheet } from "./components/TaskReasonSheet";
+import { useAlert } from "../../contexts/AlertContext";
 
 export default function PlanDetailScreen() {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const showAlert = useAlert();
   const { user } = useAuth();
   const trials = useAppSelector(selectTrials);
   const adHocTasks = useAppSelector(selectAdHocTasks);
@@ -37,7 +39,7 @@ export default function PlanDetailScreen() {
   const ctx = usePlanContext();
   // Günlük plan haftalık rotadan besleniyor — ikisi çelişmesin diye.
   // persist: false çünkü bu ekran rotayı ÇİZMİYOR, sadece okuyor.
-  const { currentWeek } = useStudyRoute({ persist: false });
+  const { currentWeek, transitionStop } = useStudyRoute({ persist: false });
 
   const plan = useMemo(
     () => generateDailyPlan({ ...ctx, routeWeekStops: currentWeek?.stops || [] }),
@@ -61,6 +63,7 @@ export default function PlanDetailScreen() {
         reason: t.reason,
         rkind: t.rkind || "gray",
         done: isPlanDone(pid),
+        routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
       };
     });
     const adHoc = adHocTasks.map((t) => {
@@ -114,22 +117,24 @@ export default function PlanDetailScreen() {
     ? `~${Math.round(plan.estimatedMinutes / 60)} saat`
     : `~${plan.estimatedMinutes} dk`;
 
-  const toggleTask = useCallback((id) => {
-    setTasks((prev) => {
-      const task = prev.find((t) => t.id === id);
-      if (task?.userTask) {
-        if (!task.done) haptic.success();
-        toggleUserTask(id);
-      } else {
-        togglePlanDone(id);
+  const toggleTask = useCallback(async (id) => {
+    const task = tasksRef.current.find((item) => item.id === id);
+    if (!task || (task.routeStop && task.done)) return;
+    if (task.routeStop && !task.done) {
+      try {
+        await transitionStop(task.routeStop, "completed", { source: "daily_plan" });
+      } catch {
+        showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
+        return;
       }
-      return prev.map((t) => {
-        if (t.id !== id) return t;
-        if (!t.done) haptic.success();
-        return { ...t, done: !t.done };
-      });
-    });
-  }, [toggleUserTask, togglePlanDone]);
+    }
+    if (task.userTask) toggleUserTask(id);
+    else togglePlanDone(id);
+    if (!task.done) haptic.success();
+    setTasks((prev) => prev.map((item) => (
+      item.id === id ? { ...item, done: !item.done } : item
+    )));
+  }, [showAlert, toggleUserTask, togglePlanDone, transitionStop]);
 
   const startTask = useCallback(
     (id) => {

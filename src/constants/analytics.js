@@ -36,6 +36,14 @@ export const EVENTS = {
   TRIAL_STARTED: "trial.started",
   TRIAL_ABANDONED: "trial.abandoned",
   TRIAL_COMPARED: "trial.compared",
+  TRIAL_QUOTA_BLOCKED: "trial.quota_blocked",
+  TRIAL_NORMALIZED: "trial.normalized",
+
+  // Route
+  ROUTE_STOP_TRANSITIONED: "route.stop_transitioned",
+  ROUTE_COMPANION_REQUESTED: "route.companion_requested",
+  ROUTE_COMPANION_RESPONDED: "route.companion_responded",
+  ROUTE_COMPANION_ENDED: "route.companion_ended",
 
   // Wrong Notebook
   WRONG_ADDED: "wrong.added",

@@ -22,6 +22,7 @@ import { NudgePopup } from "../../components/common/NudgePopup";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { SCREENS } from "../../constants/screens";
+import { NormalizedNetNote } from "./components/NormalizedNetNote";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 
@@ -306,6 +307,7 @@ export default function TrialDetailScreen() {
             </View>
           )}
           <ScoreRing net={net} max={totalMax || 120} C={C} />
+          <NormalizedNetNote C={C} trial={latest} />
           <View style={[styles.trendBadge, { backgroundColor: trendColor + "16" }]}>
             <Icon name={trend >= 0 ? "trendUp" : "trendDown"} size={14} color={trendColor} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: trendColor }]}>

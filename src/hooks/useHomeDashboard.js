@@ -85,7 +85,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
   // Ana sayfa rotanın SAHİBİ: rota burada çiziliyor ve kalıcılaştırılıyor
   // (route_weeks). Diğer ekranlar persist:false ile sadece okuyor, böylece
   // aynı hafta iki yerden yazılmıyor.
-  const { currentWeek: routeCurrentWeek } = useStudyRoute();
+  const { currentWeek: routeCurrentWeek, transitionStop } = useStudyRoute();
   const [weeklyActivity, setWeeklyActivity] = useState(EMPTY_WEEKLY_ACTIVITY);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
@@ -186,6 +186,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
     plan,
     solvedToday,
     subjectMomentum,
+    transitionStop,
     weeklyActivity,
   };
 }

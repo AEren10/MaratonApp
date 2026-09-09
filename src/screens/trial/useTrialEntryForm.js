@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -13,6 +13,7 @@ import { useAppDispatch } from "../../store/hooks";
 import { getRecentDays } from "./trialEntryDates";
 import { submitTrialEntry } from "./trialEntrySubmit";
 import * as H from "../../lib/haptics";
+import { getTrialPublishers } from "../../supabase/productAccess";
 
 export function useTrialEntryForm({ C, navigation }) {
   const dispatch = useAppDispatch();
@@ -27,6 +28,9 @@ export function useTrialEntryForm({ C, navigation }) {
   const [values, setValues] = useState({});
   const [mood, setMood] = useState(null);
   const [title, setTitle] = useState("");
+  const [publishers, setPublishers] = useState([]);
+  const [publisherId, setPublisherId] = useState(null);
+  const [difficultyLevel, setDifficultyLevel] = useState("standard");
   const [trialDate, setTrialDate] = useState(() => new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const recentDays = useMemo(() => getRecentDays(14), []);
@@ -41,6 +45,14 @@ export function useTrialEntryForm({ C, navigation }) {
   );
   const wrongPenalty = useMemo(() => wrongPenaltyForTrialType(trialType), [trialType]);
   const showSubjectInputs = trialType !== "BRANCH" || branchSubject;
+
+  useEffect(() => {
+    let cancelled = false;
+    getTrialPublishers()
+      .then((rows) => { if (!cancelled) setPublishers(rows); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const totalNet = useMemo(() => {
     const { subjectsArr } = buildTrialSubjectScores(subjects, values, wrongPenalty);
@@ -95,9 +107,11 @@ export function useTrialEntryForm({ C, navigation }) {
       bumpUsage,
       completeForm,
       dispatch,
+      difficultyLevel,
       mood,
       navigation,
       reward,
+      publisherId,
       setSaving,
       showAlert,
       showPaywall,
@@ -117,8 +131,10 @@ export function useTrialEntryForm({ C, navigation }) {
     bumpUsage,
     completeForm,
     dispatch,
+    difficultyLevel,
     mood,
     navigation,
+    publisherId,
     reward,
     saving,
     showAlert,
@@ -144,6 +160,11 @@ export function useTrialEntryForm({ C, navigation }) {
     handleTitleChange,
     handleTypeChange,
     mood,
+    difficultyLevel,
+    handleDifficultyChange: setDifficultyLevel,
+    handlePublisherChange: setPublisherId,
+    publisherId,
+    publishers,
     recentDays,
     saving,
     setShowDatePicker,

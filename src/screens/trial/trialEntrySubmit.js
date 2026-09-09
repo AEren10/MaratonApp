@@ -9,6 +9,7 @@ import { trialEntrySchema } from "../../validations/auth";
 import { addTrial } from "../../store/slices/trialSlice";
 import { formatDateISO } from "./trialEntryDates";
 import * as H from "../../lib/haptics";
+import { trialDifficultyMultiplier } from "../../domain/trial/trialModel";
 
 export async function submitTrialEntry({
   C,
@@ -17,9 +18,11 @@ export async function submitTrialEntry({
   bumpUsage,
   completeForm,
   dispatch,
+  difficultyLevel,
   mood,
   navigation,
   reward,
+  publisherId,
   setSaving,
   showAlert,
   showPaywall,
@@ -91,25 +94,43 @@ export async function submitTrialEntry({
     trialType,
     field,
     branchSubject,
+    publisherId,
+    difficultyLevel,
+    difficultyMultiplier: trialDifficultyMultiplier(difficultyLevel),
     mood,
   };
-  dispatch(addTrial(localTrial));
-
   setSaving(true);
-  const result = await saveTrialOffline(
-    {
-      user_id: user.id,
-      name: trialName,
-      trial_date: trialDateISO,
-      exam_type: trialType,
-      field,
-      branch_subject: branchSubject,
-      total_net: netVal,
-      mood,
-    },
-    subjectsArr,
-  );
+  let result;
+  try {
+    result = await saveTrialOffline(
+      {
+        user_id: user.id,
+        name: trialName,
+        trial_date: trialDateISO,
+        exam_type: trialType,
+        field,
+        branch_subject: branchSubject,
+        total_net: netVal,
+        mood,
+        publisher_id: publisherId,
+        difficulty_level: difficultyLevel,
+      },
+      subjectsArr,
+    );
+  } catch (error) {
+    setSaving(false);
+    H.warn();
+    if (error?.code === "quota_exhausted") {
+      track(EVENTS.TRIAL_QUOTA_BLOCKED, { source: "server" });
+      await bumpUsage?.("trial");
+      showPaywall("trial_entry_limit");
+    } else {
+      showAlert("Kaydedilemedi", "Deneme sonucu güvenle saklanamadı. Bağlantını kontrol edip yeniden dene.");
+    }
+    return;
+  }
   setSaving(false);
+  dispatch(addTrial(result.data || localTrial));
 
   // Kota sayacını ANINDA artır. Yalnızca uygulama öne gelince tazelemek
   // yetmiyordu: art arda deneme giren kullanıcı ücretsiz sınırı aşabiliyordu.
@@ -124,6 +145,11 @@ export async function submitTrialEntry({
 
   completeForm({ net: netVal, trialType });
   track(EVENTS.TRIAL_ENTERED, { net: netVal, trialType });
+  track(EVENTS.TRIAL_NORMALIZED, {
+    difficultyLevel,
+    hasPublisher: !!publisherId,
+    queued: result.queued,
+  });
   reward("trial_entry", {
     statUpdates: [
       { type: "increment", key: "totalTrials" },

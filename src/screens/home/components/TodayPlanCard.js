@@ -8,6 +8,7 @@ import { usePlanCompletion } from "../../../hooks/usePlanCompletion";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { useAlert } from "../../../contexts/AlertContext";
 
 function TaskRow({ item, C, isLast, isNext, onToggle, onStart }) {
   const subj = getSubjectByKey(item.subject);
@@ -51,10 +52,12 @@ export function TodayPlanCard({
   onViewAll,
   onAddTask,
   onStart,
+  onRouteComplete,
   onAllDone,
   onTaskDone,
 }) {
   const C = useC();
+  const showAlert = useAlert();
   const { user } = useAuth();
   const { tasks: userTasks, toggleTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlan } = usePlanCompletion(user?.id);
@@ -84,6 +87,7 @@ export function TodayPlanCard({
         badge: t.badge,
         rkind: t.rkind,
         source: "plan",
+        routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
       });
     });
     if (aiSuggestion) {
@@ -184,8 +188,17 @@ export function TodayPlanCard({
               C={C}
               isLast={i === preview.length - 1 && remaining === 0}
               isNext={!item.completed && i === firstIncompleteIdx}
-              onToggle={() => {
+              onToggle={async () => {
                 H.select();
+                if (item.routeStop && item.completed) return;
+                if (item.routeStop) {
+                  try {
+                    await onRouteComplete?.(item.routeStop);
+                  } catch {
+                    showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
+                    return;
+                  }
+                }
                 if (item.source === "user") toggleTask(item.id);
                 else togglePlan(item.id);
                 if (!item.completed) onTaskDone?.();

@@ -71,6 +71,7 @@ export const SCREENS = {
   // Social
   FRIENDS: "Friends",
   REFERRAL: "Referral",
+  ROUTE_COMPANION: "RouteCompanion",
 
   // Study Save (post-timer)
   STUDY_SAVE: "StudySave",

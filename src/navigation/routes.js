@@ -65,6 +65,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.FRIENDS]: { path: "friend/:friendCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "friendCode" },
   [SCREENS.CHALLENGE]: { path: "sosyal/meydan-okuma", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: false },
   [SCREENS.REFERRAL]: { path: "referral/:code?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "code" },
+  [SCREENS.ROUTE_COMPANION]: { path: "yol-arkadasi", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true },
 
   [SCREENS.WEEKLY_REVIEW]: { path: "weekly-review", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
   [SCREENS.SHARE_CARD]: { path: "paylasim", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },

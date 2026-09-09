@@ -127,6 +127,7 @@ export default function HomeScreen() {
     plan,
     solvedToday,
     subjectMomentum,
+    transitionStop,
     weeklyActivity,
   } = dashboard;
   const { dismissGoalComplete, goalCompleteVisible } = useDailyGoalReward({
@@ -216,6 +217,7 @@ export default function HomeScreen() {
             });
             navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: task.subject });
           }}
+          onRouteComplete={(stop) => transitionStop(stop, "completed", { source: "home_plan" })}
           onViewPlan={go(SCREENS.PLAN_DETAIL)}
           plan={plan}
           srDue={planCtx.srDue}
