@@ -59,8 +59,8 @@ export function ExamCountdown({ onPress }) {
             gap: SPACING.md,
             borderRadius: 18,
             borderWidth: 1,
-            borderColor: C.orange + "33",
-            backgroundColor: C.orange + "12",
+            borderColor: C.accent + "33",
+            backgroundColor: C.accent + "12",
             padding: SPACING.md,
           },
           pressed && { opacity: 0.92 },
@@ -72,12 +72,12 @@ export function ExamCountdown({ onPress }) {
             width: 44,
             height: 44,
             borderRadius: 13,
-            backgroundColor: C.orange + "29",
+            backgroundColor: C.accent + "29",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Icon name="target" size={22} color={C.orange} />
+          <Icon name="target" size={22} color={C.accent} />
         </View>
 
         {/* Content */}
@@ -122,7 +122,7 @@ export function ExamCountdown({ onPress }) {
               fontFamily: "Bricolage_400",
               fontSize: 12,
               letterSpacing: 0.5,
-              color: C.orange,
+              color: C.accent,
             }}
           >
             {clockStr}

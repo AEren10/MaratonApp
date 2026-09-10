@@ -19,7 +19,7 @@ import { EVENTS } from "../../constants/analytics";
 export default function LevelTestScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { daysUntilExam } = useExam();
+  const { daysUntilExam, markLevelTestDone } = useExam();
   const { subjects, values, setSubjectNet, hasAnyEntry, totalNet, targetNet, gapMonths, saving, submit } =
     useLevelTestForm();
   const { threshold } = useStudyRoute({ persist: false });
@@ -39,8 +39,9 @@ export default function LevelTestScreen() {
   const handleSkip = useCallback(() => {
     H.select();
     track(EVENTS.LEVEL_TEST_SKIPPED);
+    markLevelTestDone({ skipped: true }).catch(() => {});
     goNext();
-  }, [goNext]);
+  }, [goNext, markLevelTestDone]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>

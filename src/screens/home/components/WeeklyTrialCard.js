@@ -39,10 +39,10 @@ export function WeeklyTrialCard({ report, onPress }) {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <StatBlock C={C} value={String(report.count)} label="Deneme" color={C.blue} />
-          <StatBlock C={C} value={report.avgNet} label="Ort. Net" color={C.purple} />
+          <StatBlock C={C} value={String(report.count)} label="Deneme" />
+          <StatBlock C={C} value={report.avgNet} label="Ort. Net" />
           <StatBlock C={C} value={report.bestNet} label="En İyi" color={C.green} />
-          <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" color={C.orange} />
+          <StatBlock C={C} value={String(report.totalCorrect)} label="Doğru" />
         </View>
 
         <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.md }}>

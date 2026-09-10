@@ -99,7 +99,7 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
               <Text style={[s.ringTop, { color: C.accent }]}>BUGÜN</Text>
               <View style={s.ringValRow}>
                 <AnimatedNumber value={solved} style={[s.ringVal, { color: C.text }]} />
-                {pct > 0.05 && <Icon name="flame" size={14 + Math.round(Math.min(1, pct) * 12)} color={C.orange} sw={2} style={{ marginLeft: -4, marginTop: 6 }} />}
+                {pct > 0.05 && <Icon name="flame" size={14 + Math.round(Math.min(1, pct) * 12)} color={C.accent} sw={2} style={{ marginLeft: -4, marginTop: 6 }} />}
               </View>
               <Text style={[s.ringSub, { color: C.sec }]}>/ {safeGoal} soru {done ? "🏁" : ""}</Text>
               <Text style={[s.ringHint, { color: C.muted }]}>dokunarak kaydet</Text>
@@ -109,7 +109,7 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
       </Pressable>
 
       <View style={s.rail}>
-        <StatCell label="gün seri" value={streak} color={C.orange} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
+        <StatCell label="gün seri" value={streak} color={C.accent} valueColor={C.text} icon="activity" delay={120} onPress={onStreak} dormantHint={isNewUser ? "Başlat" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />
         <StatCell label="son net" value={net} decimals color={C.blue} valueColor={C.text} icon="chart" trend={trend} trendColor={trend > 0 ? C.green : C.red} delay={200} onPress={onNet} dormantHint={isNewUser ? "İlk deneme" : null} />
         <View style={[s.div, { backgroundColor: C.border }]} />

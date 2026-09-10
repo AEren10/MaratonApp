@@ -15,11 +15,13 @@ import { ROOT_STACK } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
+import { useExam } from "../../contexts/ExamContext";
 
 export default function RouteReadyScreen() {
   const C = useC();
   const navigation = useNavigation();
   const [starting, setStarting] = useState(false);
+  const { completeOnboarding } = useExam();
   const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, createRoute } =
     useRouteReadySummary();
 
@@ -31,18 +33,19 @@ export default function RouteReadyScreen() {
   // atiliyordu ama kurulum orada bitmiyor — tasarim dort adim tanimliyor ve
   // gercek tamamlanma noktasi burasi. GoalSetup'ta biraksaydik huni son iki
   // adimi hic gormezdi.
-  const finishOnboarding = useCallback(() => {
+  const finishOnboarding = useCallback(async () => {
     track(EVENTS.ONBOARDING_COMPLETE, {
       daysUntilExam,
       stopCount,
       hasTargetNet: targetNet != null,
       hasBaselineNet: currentNet != null,
     });
+    await completeOnboarding();
     navigation.reset({
       index: 0,
       routes: [{ name: ROOT_STACK.MAIN_TABS, params: { screen: SCREENS.ROADMAP } }],
     });
-  }, [navigation, daysUntilExam, stopCount, targetNet, currentNet]);
+  }, [completeOnboarding, navigation, daysUntilExam, stopCount, targetNet, currentNet]);
 
   const handleStart = useCallback(async () => {
     setStarting(true);
@@ -53,7 +56,7 @@ export default function RouteReadyScreen() {
       H.warn();
     } finally {
       setStarting(false);
-      finishOnboarding();
+      finishOnboarding().catch(() => {});
     }
   }, [createRoute, finishOnboarding]);
 

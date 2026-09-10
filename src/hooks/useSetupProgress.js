@@ -4,13 +4,6 @@ import { SCREENS } from "../constants/screens";
 
 // Tasarim AKIS 12'nin dort adimi (bkz constants/screens.js yorumu):
 // Sinav secimi -> Hedef net -> Baslangic noktasi -> Rotan.
-//
-// DOGRULANMADI: "Baslangic noktasi" (LevelTest) ve "Rotan" (RouteReady)
-// icin ExamContext'te henuz bir tamamlanma bayragi yok — bu iki ekran
-// baska bir ajan tarafindan simdi yaziliyor. Su an itibariyle onboardingDone
-// examType + dailyGoalSet ikilisiyle true olduguna gore, canli akiste bu
-// ekran pratikte yalnizca ilk iki adimdan birini eksik gosterebilir.
-// LevelTest/RouteReady tamamlanma durumu netlesince buraya eklenmeli.
 const STEPS = [
   {
     key: "exam",
@@ -32,15 +25,13 @@ const STEPS = [
     key: "levelTest",
     label: "Başlangıç noktası",
     screen: SCREENS.LEVEL_TEST,
-    // DOGRULANMADI: gercek tamamlanma bayragi yok, onboardingDone'a dayanir.
-    isDone: (ctx) => !!ctx.onboardingDone,
+    isDone: (ctx) => !!ctx.levelTestDone,
   },
   {
     key: "route",
     label: "Rotan",
     screen: SCREENS.ROUTE_READY,
-    // DOGRULANMADI: gercek tamamlanma bayragi yok, onboardingDone'a dayanir.
-    isDone: (ctx) => !!ctx.onboardingDone,
+    isDone: (ctx) => !!ctx.setupCompleted,
   },
 ];
 

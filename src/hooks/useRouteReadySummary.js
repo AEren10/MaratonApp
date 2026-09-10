@@ -6,19 +6,21 @@ import { useStudyRoute } from "./useStudyRoute";
 import { selectLatestTrial } from "../store/slices/trialSlice";
 import { getAllSubjectsFlat } from "../data/curriculum";
 import { firstRouteAction } from "../domain/route/routeStartAction";
+import { resolveRouteReadyCurrentNet } from "../domain/route/routeReadySummary";
 
 const SUBJECT_LABELS = Object.fromEntries(
   getAllSubjectsFlat().map((s) => [s.key, s.label]),
 );
 
-// "Rota Hazır" ekraninin veri montaji. Kaynaklar: useExam (kalan gun/hedef),
-// useStudyRoute (durak listesi + kapasite), trials (guncel net).
+// "Rota Hazır" ekraninin veri montaji. Kaynaklar: useExam (kalan gun/hedef
+// ve seviye testinden gelen baslangic neti), useStudyRoute (durak listesi +
+// kapasite), trials (varsa gercek guncel net).
 // Route henuz olusturulmadigi icin (persist:false) computedRoute onizlemesi
 // kullanilir — createRoute() ekranin "Ilk duraga basla" aksiyonunda cagrilir.
 export function useRouteReadySummary() {
-  const { daysUntilExam, targetNet } = useExam();
+  const { daysUntilExam, targetNet, baselineNet } = useExam();
   const latestTrial = useSelector(selectLatestTrial);
-  const currentNet = latestTrial?.normalizedTotalNet ?? latestTrial?.totalNet ?? null;
+  const currentNet = resolveRouteReadyCurrentNet(latestTrial, baselineNet);
   const route = useStudyRoute({ persist: false });
 
   const allStops = useMemo(

@@ -53,10 +53,10 @@ export function WeeklyReportCard({ report, onPress }) {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <StatBlock C={C} value={report.totalQuestions} label="Soru" color={C.orange} />
-          <StatBlock C={C} value={hoursStr} label="Süre" color={C.purple} />
-          <StatBlock C={C} value={report.activeDays} label="Aktif Gün" color={C.teal} />
-          <StatBlock C={C} value={report.trialCount} label="Deneme" color={C.blue} />
+          <StatBlock C={C} value={report.totalQuestions} label="Soru" />
+          <StatBlock C={C} value={hoursStr} label="Süre" />
+          <StatBlock C={C} value={report.activeDays} label="Aktif Gün" />
+          <StatBlock C={C} value={report.trialCount} label="Deneme" />
         </View>
 
         <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.md }}>
