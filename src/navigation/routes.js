@@ -17,6 +17,10 @@ export const ROUTE_CONFIGS = {
   [SCREENS.ONBOARDING]: { path: "karsilama", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
   [SCREENS.EXAM_SETUP]: { path: "kurulum/sinav", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
   [SCREENS.GOAL_SETUP]: { path: "kurulum/hedef", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
+  [SCREENS.LEVEL_TEST]: { path: "kurulum/seviye", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
+  [SCREENS.ROUTE_READY]: { path: "kurulum/rota-hazir", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
+  [SCREENS.NOTIFICATION_PERMISSION]: { path: "kurulum/bildirim", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
+  [SCREENS.SETUP_INCOMPLETE]: { path: "kurulum/yarim", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
 
   [SCREENS.HOME]: { path: "home", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: true, tab: true },
   [SCREENS.DAILY_PLAN]: { path: "dersler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },

@@ -8,6 +8,7 @@ import { ExamOption } from "./components/ExamOption";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
+import { useExamSetupPrefill } from "../../hooks/useExamSetupPrefill";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 
@@ -48,6 +49,14 @@ export default function ExamSetupScreen() {
   const [category, setCategory] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [examDate, setExamDate] = useState(MONTHS[0]);
+
+  useExamSetupPrefill({
+    options: YKS_OPTIONS,
+    months: MONTHS,
+    setCategory,
+    setSelectedId,
+    setExamDate,
+  });
 
   const isLGS = category === "lgs";
   const canContinue = isLGS ? category !== null : selectedId !== null;

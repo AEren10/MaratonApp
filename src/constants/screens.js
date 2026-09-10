@@ -5,10 +5,15 @@ export const SCREENS = {
   FORGOT_PASSWORD: "ForgotPassword",
   SET_NEW_PASSWORD: "SetNewPassword",
 
-  // Onboarding
+  // Onboarding — tasarim AKIS 12, dort adim:
+  // Karsilama -> Hedef Sec -> Seviye Testi -> Rota Hazir
   ONBOARDING: "Onboarding",
   EXAM_SETUP: "ExamSetup",
   GOAL_SETUP: "GoalSetup",
+  LEVEL_TEST: "LevelTest",
+  ROUTE_READY: "RouteReady",
+  NOTIFICATION_PERMISSION: "NotificationPermission",
+  SETUP_INCOMPLETE: "SetupIncomplete",
 
   // Main Tabs
   HOME: "Home",
