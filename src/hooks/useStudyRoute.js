@@ -18,6 +18,7 @@ import { EVENTS } from "../constants/analytics";
 import { weightedWeakAreas } from "../lib/buildPlanContext";
 import { forecastNet } from "../lib/netForecast";
 import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
+import { routeReadinessSummary } from "../domain/route/routeCreation";
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
@@ -174,6 +175,15 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     (multiplier = 1) => tempoScenarios.find((item) => item.multiplier === multiplier) || null,
     [tempoScenarios],
   );
+  const routeCreated = persistedStops.length > 0;
+  const routeReadiness = useMemo(() => routeReadinessSummary({
+    weeks: route.weeks,
+    intelligence: route.intelligence,
+    daysLeft,
+    forecast,
+    tempoScenarios,
+    dataHealth,
+  }), [dataHealth, daysLeft, forecast, route.intelligence, route.weeks, tempoScenarios]);
 
   // Eşik hesabı artık müfredat havuzunu ve ilerlemeyi de alıyor —
   // net kazancı derse göre değişiyor.
@@ -326,7 +336,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     routeAccessError: accessError,
     routeAccessLoading: accessLoading,
     refreshRouteAccess: refreshUsage,
-    routeCreated: persistedStops.length > 0,
+    routeCreated,
+    routeReadiness,
     routeCreating,
     routeCreationError,
     createRoute,

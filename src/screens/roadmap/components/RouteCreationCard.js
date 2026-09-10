@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button, Icon } from "../../../components/design";
 import { routeCreationSummary } from "../../../domain/route/routeCreation";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
+import RouteReadinessPanel from "./RouteReadinessPanel";
 
 function StatPill({ label, value, C }) {
   return (
@@ -22,6 +23,7 @@ function RouteCreationCard({
   intelligence,
   loading,
   onCreate,
+  readiness,
   routeCreated,
   weeks,
 }) {
@@ -31,11 +33,21 @@ function RouteCreationCard({
     daysLeft,
     routeCreated,
   }), [daysLeft, intelligence, routeCreated, weeks]);
+  const accessibilityLabel = useMemo(() => {
+    const readinessCopy = readiness
+      ? ` Kalite kontrol ${readiness.title}, skor yüzde ${readiness.score}. ${readiness.summary}`
+      : "";
+    const warningCopy = readiness?.checks
+      ?.filter((check) => check.status !== "ok")
+      .map((check) => `${check.label}: ${check.detail}`)
+      .join(" ");
+    return `${summary.title}. Güven ${summary.confidenceLabel}. ${summary.riskLabel}.${readinessCopy} ${warningCopy || ""}`;
+  }, [readiness, summary.confidenceLabel, summary.riskLabel, summary.title]);
 
   return (
     <View
       accessible
-      accessibilityLabel={`${summary.title}. Güven ${summary.confidenceLabel}. ${summary.riskLabel}.`}
+      accessibilityLabel={accessibilityLabel}
       style={[styles.card, { backgroundColor: C.surface, borderColor: C.accent + "35" }]}
     >
       <View style={styles.top}>
@@ -59,6 +71,8 @@ function RouteCreationCard({
         <Icon name="lightbulb" size={16} color={C.orange} />
         <Text style={[styles.reasonText, { color: C.sec }]}>{summary.nextBestAction}</Text>
       </View>
+
+      <RouteReadinessPanel C={C} readiness={readiness} />
 
       {error ? <Text style={[styles.error, { color: C.red }]}>{error}</Text> : null}
       <Button

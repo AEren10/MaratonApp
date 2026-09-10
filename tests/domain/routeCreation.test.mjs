@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { routeCreationSummary } from "../../src/domain/route/routeCreation.js";
+import {
+  routeCreationSummary,
+  routeReadinessSummary,
+} from "../../src/domain/route/routeCreation.js";
 
 test("summarizes a route creation preview before persistence", () => {
   const summary = routeCreationSummary({
@@ -32,4 +35,34 @@ test("summarizes an existing route as re-analysis", () => {
   assert.equal(summary.actionLabel, "Yeniden analiz et");
   assert.equal(summary.daysLeftLabel, "Tarih eksik");
   assert.equal(summary.hasPreview, false);
+});
+
+test("summarizes route readiness with actionable warnings", () => {
+  const readiness = routeReadinessSummary({
+    weeks: [{ stops: [{}, {}] }],
+    daysLeft: 82,
+    intelligence: {
+      confidenceScore: 72,
+      risks: [{ code: "capacity_low_confidence" }],
+    },
+    forecast: { sampleSize: 3 },
+    tempoScenarios: [{}, {}, {}],
+  });
+
+  assert.equal(readiness.status, "partial");
+  assert.equal(readiness.warnings, 1);
+  assert.equal(readiness.blockers, 0);
+  assert.ok(readiness.score < 80);
+  assert.equal(readiness.checks.find((check) => check.key === "tempo").status, "warn");
+});
+
+test("blocks route readiness when no first-week preview exists", () => {
+  const readiness = routeReadinessSummary({
+    weeks: [],
+    intelligence: { confidenceScore: 40, risks: [] },
+  });
+
+  assert.equal(readiness.status, "blocked");
+  assert.equal(readiness.blockers, 1);
+  assert.equal(readiness.checks.find((check) => check.key === "first_week").status, "block");
 });
