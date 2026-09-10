@@ -38,8 +38,8 @@ export function firstRouteAction(stops = []) {
   return {
     ...first,
     title: `${first.subjectLabel} · ${first.topicName}`,
-    actionLabel: "İlk durağa başla",
-    message: "İlk çalışma oturumunu bu duraktan başlatırsan rota geçmişin doğru bağlanır.",
+    actionLabel: "Sıradaki durağa başla",
+    message: "Çalışma oturumunu bu duraktan başlatırsan rota geçmişin doğru bağlanır.",
   };
 }
 

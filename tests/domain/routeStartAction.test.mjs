@@ -52,6 +52,21 @@ test("falls back to the earliest upcoming route stop", () => {
   assert.equal(action.subjectLabel, "turkce");
 });
 
+test("accepts persisted stopId shape from the route screen", () => {
+  const action = firstRouteAction([
+    { stopId: "persisted-1", lifecycleStatus: "active", subject: "fen", topic: "Basınç", version: 3 },
+  ]);
+
+  assert.deepEqual(routeActionTimerParams(action), {
+    subjectKey: "fen",
+    topicName: "Basınç",
+    routeSubjectKey: "fen",
+    routeTopicName: "Basınç",
+    routeStopId: "persisted-1",
+    routeStopVersion: 3,
+  });
+});
+
 test("ignores terminal route stops", () => {
   const action = firstRouteAction([
     { id: "done", lifecycle_status: "completed", subject: "matematik", topic: "Problemler" },

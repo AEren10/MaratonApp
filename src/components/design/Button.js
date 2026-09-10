@@ -35,6 +35,8 @@ export function Button({
   disabled,
   fullWidth,
   style,
+  accessibilityLabel,
+  accessibilityHint,
 }) {
   const C = useC();
   const v = (VARIANTS[variant] || VARIANTS.primary)(C);
@@ -50,6 +52,10 @@ export function Button({
       onPressIn={() => { scale.value = withSpring(0.97, ANIMATION.spring.default); }}
       onPressOut={() => { scale.value = withSpring(1, ANIMATION.spring.default); }}
       disabled={isDisabled}
+      accessibilityHint={accessibilityHint}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled }}
       style={[
         animStyle,
         styles.base,

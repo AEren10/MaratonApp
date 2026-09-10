@@ -16,6 +16,8 @@ import { usePremium } from "../../contexts/PremiumContext";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { showRouteCreatedAlert } from "./routeCreatedAlert";
+import RouteNextActionPanel from "./components/RouteNextActionPanel";
+import { useRoadmapNextAction } from "./useRoadmapNextAction";
 
 export default function RoadmapScreen() {
   const C = useC();
@@ -30,6 +32,7 @@ export default function RoadmapScreen() {
   } = useStudyRoute({ persist: false });
 
   const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
+  const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
   const handleCreateRoute = useCallback(async () => {
     try {
       const result = await createRoute();
@@ -60,6 +63,12 @@ export default function RoadmapScreen() {
         routeCreated={routeCreated}
         weeks={weeks}
       />
+      <RouteNextActionPanel
+        C={C}
+        action={nextRouteAction}
+        disabled={isPaused}
+        onStart={startNextRouteAction}
+      />
       <RouteProgressHeader
         totals={totals}
         daysLeft={daysLeft}
@@ -69,7 +78,8 @@ export default function RoadmapScreen() {
         C={C}
       />
     </>
-  ), [C, daysLeft, handleCreateRoute, intelligence, isPaused, routeCreated,
+  ), [C, daysLeft, handleCreateRoute, intelligence, isPaused, nextRouteAction, routeCreated,
+    startNextRouteAction,
     routeCreating, routeCreationError, routeReadiness, togglePause, totals, weeks]);
 
   return (
