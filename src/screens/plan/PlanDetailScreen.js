@@ -21,6 +21,7 @@ import { usePlanContext } from "../../hooks/usePlanContext";
 import { PlanHeader } from "./components/PlanHeader";
 import { PlanTaskItem } from "./components/PlanTaskItem";
 import { TaskReasonSheet } from "./components/TaskReasonSheet";
+import PlanSummaryCard from "./components/PlanSummaryCard";
 import { useAlert } from "../../contexts/AlertContext";
 import { makePlanDetailStyles } from "./planDetailStyles";
 import { usePlanDetailTasks } from "./usePlanDetailTasks";
@@ -94,6 +95,10 @@ export default function PlanDetailScreen() {
             soru={plan.totalQuestions}
             hours={estHours}
           />
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(60).duration(420).springify()}>
+          <PlanSummaryCard C={C} summary={plan.summary} />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
