@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   buildDailyRouteTaskAllocations,
+  DAILY_TASK_ALLOCATOR_VERSION,
   isDailyAssignableRouteStop,
 } from "../../src/domain/plan/dailyTaskAllocator.js";
 
@@ -29,6 +30,7 @@ test("daily route allocation prioritizes active high-signal stops", () => {
   ], 40);
 
   assert.equal(allocations[0].key, "matematik");
+  assert.equal(allocations[0].allocation.version, DAILY_TASK_ALLOCATOR_VERSION);
   assert.equal(allocations[0].allocation.reasonCode, "LOW_ACCURACY");
   assert.equal(allocations.reduce((sum, item) => sum + item.questionCount, 0), 40);
 });

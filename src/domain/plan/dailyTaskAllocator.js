@@ -1,5 +1,7 @@
 import { getEffectiveRouteStopStatus } from "../route/stopStatus.js";
 
+export const DAILY_TASK_ALLOCATOR_VERSION = "daily-task-allocator-v1";
+
 const REASON_PRIORITY = Object.freeze({
   REVIEW_DUE: 1.35,
   LOW_ACCURACY: 1.3,
@@ -138,6 +140,7 @@ export function buildDailyRouteTaskAllocations(candidates = [], dailyTarget = 0,
       questionCount: row.questionCount,
       priority: index + 1,
       allocation: {
+        version: DAILY_TASK_ALLOCATOR_VERSION,
         score: row.score,
         reasonCode: reasonCode(row.candidate.routeStop),
         maxQuestions: row.maxQuestions,
