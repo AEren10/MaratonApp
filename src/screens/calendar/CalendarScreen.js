@@ -210,7 +210,7 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     title: {
-      fontFamily: "SpaceGrotesk_600SemiBold",
+      fontFamily: "Bricolage_400",
       fontSize: 19,
       lineHeight: 24,
       letterSpacing: -0.3,
@@ -237,7 +237,7 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     monthLabel: {
-      fontFamily: "SpaceGrotesk_600SemiBold",
+      fontFamily: "Bricolage_400",
       fontSize: 17,
       lineHeight: 22,
       color: C.text,

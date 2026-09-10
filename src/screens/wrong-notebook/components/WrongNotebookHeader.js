@@ -16,7 +16,7 @@ export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
           <Icon name="arrowL" size={18} color={C.text} />
         </Pressable>
         <View>
-          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: C.muted }}>
+          <Text style={{ fontFamily: "Archivo_400", fontSize: 12, color: C.muted }}>
             {counts.open} çözülmemiş · {counts.total} toplam
           </Text>
           <Text style={[styles.title, { color: C.text }]}>Yanlış Defteri</Text>

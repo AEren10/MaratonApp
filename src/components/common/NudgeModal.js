@@ -107,7 +107,7 @@ function makeStyles(C) {
       borderRadius: 6,
     },
     badgeText: {
-      fontFamily: "Inter_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11,
     },
     message: {
@@ -124,7 +124,7 @@ function makeStyles(C) {
       borderWidth: 1,
     },
     actionText: {
-      fontFamily: "Inter_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 12,
     },
   });

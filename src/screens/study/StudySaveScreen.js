@@ -309,7 +309,7 @@ export default function StudySaveScreen() {
           <Animated.View entering={FadeInDown.delay(0).duration(420).springify()}>
             <View style={[styles.durationBadge, { backgroundColor: C.green + "14", borderColor: C.green + "30" }]}>
               <Icon name="clock" size={18} color={C.green} />
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: C.green, letterSpacing: -0.3 }}>
+              <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color: C.green, letterSpacing: -0.3 }}>
                 {duration} dk
               </Text>
               <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>çalışıldı</Text>
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 12,
     alignItems: "center", justifyContent: "center", borderWidth: 1,
   },
-  title: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18 },
+  title: { fontFamily: "Bricolage_400", fontSize: 18 },
   scroll: { padding: SPACING.lg, paddingBottom: 140 },
   label: { ...TYPOGRAPHY.label, marginBottom: SPACING.sm, letterSpacing: 0.7 },
 
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     flex: 1, paddingVertical: 14, borderRadius: RADIUS.lg, borderWidth: 1.5,
     alignItems: "center",
   },
-  tierTitle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, letterSpacing: -0.3 },
+  tierTitle: { fontFamily: "Bricolage_400", fontSize: 18, letterSpacing: -0.3 },
 
   subjectGrid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
   subjChip: {
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
 
   noteInput: {
     borderRadius: RADIUS.md, borderWidth: 1, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md,
-    fontFamily: "Inter_400Regular", fontSize: 15, minHeight: 80, textAlignVertical: "top",
+    fontFamily: "Archivo_400", fontSize: 15, minHeight: 80, textAlignVertical: "top",
   },
   charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },
 });

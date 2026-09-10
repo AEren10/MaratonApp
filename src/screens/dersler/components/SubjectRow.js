@@ -57,7 +57,7 @@ export const SubjectRow = React.memo(function SubjectRow({ subject, identity, te
 
           <Text
             style={{
-              fontFamily: "Inter_500Medium",
+              fontFamily: "Archivo_500",
               fontSize: 11,
               lineHeight: 14,
               color: mutedColor,
@@ -72,7 +72,7 @@ export const SubjectRow = React.memo(function SubjectRow({ subject, identity, te
 
       <Text
         style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: 16,
           lineHeight: 20,
           color: solid,

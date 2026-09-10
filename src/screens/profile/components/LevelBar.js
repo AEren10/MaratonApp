@@ -15,14 +15,14 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
     }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-          <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.accent }}>
+          <Text style={{ fontFamily: "Bricolage_400", fontSize: 28, color: C.accent }}>
             Lv.{level}
           </Text>
-          <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
+          <Text style={{ fontFamily: "Archivo_500", fontSize: 14, color: C.sec }}>
             {title}
           </Text>
         </View>
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: C.muted }}>
+        <Text style={{ fontFamily: "Archivo_400", fontSize: 12, color: C.muted }}>
           {xpInLevel}/{xpForNext} XP
         </Text>
       </View>
@@ -49,7 +49,7 @@ export function LevelBar({ level, title, progress, xpInLevel, xpForNext }) {
       {xpForNext > 0 && (
         <Text
           style={{
-            fontFamily: "Inter_400Regular",
+            fontFamily: "Archivo_400",
             fontSize: 11,
             color: C.muted,
             marginTop: SPACING.xs,

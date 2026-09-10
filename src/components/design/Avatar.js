@@ -55,7 +55,7 @@ export function Avatar({ init = "??", size = 26, ring = 0, color, image, style }
     >
       <Text
         style={{
-          fontFamily: "Inter_600SemiBold",
+          fontFamily: "Archivo_600",
           fontSize: size * 0.4,
           color: bg,
         }}

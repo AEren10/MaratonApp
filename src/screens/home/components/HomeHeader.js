@@ -84,14 +84,14 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
           <Image source={{ uri: avatarUri }} style={{ width: 52, height: 52, borderRadius: 18, ...avatarShadow }} cachePolicy="memory-disk" transition={200} />
         ) : (
           <LinearGradient colors={[c1, c2]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 52, height: 52, borderRadius: 18, alignItems: "center", justifyContent: "center", ...avatarShadow }}>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 19, color: C.textOnFill, letterSpacing: -0.5 }}>{initials}</Text>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 19, color: C.textOnFill, letterSpacing: -0.5 }}>{initials}</Text>
           </LinearGradient>
         )}
       </Pressable>
 
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.sec, letterSpacing: 0.2 }}>{g} {gEmoji}</Text>
-        <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: C.text, letterSpacing: -0.4, marginTop: 1 }} numberOfLines={1}>{name}</Text>
+        <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.sec, letterSpacing: 0.2 }}>{g} {gEmoji}</Text>
+        <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color: C.text, letterSpacing: -0.4, marginTop: 1 }} numberOfLines={1}>{name}</Text>
       </View>
 
       {/* Calendar */}
@@ -131,7 +131,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
                 <Icon name={atRisk ? "alert" : "flame"} size={18} color={C.textOnFill} sw={2.6} />
               </Animated.View>
               <Text style={{
-                fontFamily: "SpaceGrotesk_700Bold", fontSize: 17,
+                fontFamily: "Bricolage_400", fontSize: 17,
                 color: C.textOnFill, letterSpacing: -0.3,
               }}>
                 {streak}
@@ -157,7 +157,7 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
           }}>
             <Icon name="flame" size={16} color={C.muted} sw={2} />
             <Text style={{
-              fontFamily: "Inter_500Medium", fontSize: 13,
+              fontFamily: "Archivo_500", fontSize: 13,
               color: C.muted, letterSpacing: -0.1,
             }}>
               Başla

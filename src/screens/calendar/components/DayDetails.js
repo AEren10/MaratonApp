@@ -21,7 +21,7 @@ function SectionLabel({ label, C }) {
   return (
     <Text
       style={{
-        fontFamily: "Inter_600SemiBold",
+        fontFamily: "Archivo_600",
         fontSize: 11,
         lineHeight: 14,
         letterSpacing: 1.3,
@@ -67,11 +67,11 @@ function LogCard({ log, C }) {
         }}
       />
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, lineHeight: 18, color: C.text }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 14, lineHeight: 18, color: C.text }}>
           {subj.label}
         </Text>
         {detail ? (
-          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
+          <Text style={{ fontFamily: "Archivo_400", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
             {detail}
           </Text>
         ) : null}
@@ -101,10 +101,10 @@ function TrialCard({ trial, C, onPress }) {
     >
       <View style={{ width: 8, height: 38, borderRadius: 4, backgroundColor: color }} />
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, lineHeight: 18, color: C.text }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 14, lineHeight: 18, color: C.text }}>
           {meta?.label || trial.name || "Deneme"}
         </Text>
-        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
+        <Text style={{ fontFamily: "Archivo_400", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
           {trial.totalNet?.toFixed(1) || "0.0"} net
         </Text>
       </View>
@@ -126,7 +126,7 @@ export function DayDetails({ day, data, onTrialPress, calendarTasks = [], onAddT
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm }}>
         <Text
           style={{
-            fontFamily: "Inter_600SemiBold",
+            fontFamily: "Archivo_600",
             fontSize: 11,
             lineHeight: 14,
             letterSpacing: 1.3,
@@ -144,7 +144,7 @@ export function DayDetails({ day, data, onTrialPress, calendarTasks = [], onAddT
               backgroundColor: C.accentLight,
             }}
           >
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 10, color: C.accent }}>BUGÜN</Text>
+            <Text style={{ fontFamily: "Archivo_600", fontSize: 10, color: C.accent }}>BUGÜN</Text>
           </View>
         )}
       </View>

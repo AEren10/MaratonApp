@@ -24,7 +24,7 @@ export function Chip({ children, color = "#8b5cf6", bg, style }) {
       {typeof children === "string" ? (
         <Text
           style={{
-            fontFamily: "Inter_600SemiBold",
+            fontFamily: "Archivo_600",
             fontSize: 11,
             color,
             letterSpacing: 0.6,

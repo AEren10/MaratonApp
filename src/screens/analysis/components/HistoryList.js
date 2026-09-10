@@ -46,7 +46,7 @@ function HistoryRow({ item, onPress, C }) {
 
         <Text
           style={{
-            fontFamily: "SpaceGrotesk_700Bold",
+            fontFamily: "Bricolage_400",
             fontSize: 18,
             color: C.text,
             marginRight: SPACING.md,

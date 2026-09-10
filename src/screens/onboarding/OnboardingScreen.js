@@ -138,7 +138,7 @@ export default function OnboardingScreen() {
             borderColor: C.border,
             opacity: pressed ? 0.7 : 1,
           })}>
-            <Text style={{ ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.muted, letterSpacing: 0.4 }}>
+            <Text style={{ ...TYPOGRAPHY.micro, fontFamily: "Archivo_600", fontSize: 12, color: C.muted, letterSpacing: 0.4 }}>
               Atla
             </Text>
           </Pressable>

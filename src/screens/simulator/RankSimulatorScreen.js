@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
   rankCard: { padding: 22, alignItems: "center", borderRadius: 26, borderWidth: 1 },
   rankLabel: { ...TYPOGRAPHY.label, letterSpacing: 0.8 },
-  rankBig: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 44, marginTop: 6, letterSpacing: -1.5 },
+  rankBig: { fontFamily: "Bricolage_400", fontSize: 44, marginTop: 6, letterSpacing: -1.5 },
   deltaChip: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 8 },
   deltaText: { ...TYPOGRAPHY.captionMedium },
   netSummary: { ...TYPOGRAPHY.caption, marginTop: 10 },

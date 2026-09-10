@@ -184,7 +184,7 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     modeLabel: {
-      fontFamily: "Inter_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11,
       letterSpacing: 0.2,
     },

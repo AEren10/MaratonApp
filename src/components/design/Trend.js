@@ -22,8 +22,8 @@ export function Trend({ v = 0, size = 12 }) {
         alignSelf: "flex-start",
       }}
     >
-      <Text style={{ color, fontSize: size, fontFamily: "Inter_600SemiBold" }}>{arrow}</Text>
-      <Text style={{ color, fontSize: size, fontFamily: "Inter_600SemiBold" }}>{text}</Text>
+      <Text style={{ color, fontSize: size, fontFamily: "Archivo_600" }}>{arrow}</Text>
+      <Text style={{ color, fontSize: size, fontFamily: "Archivo_600" }}>{text}</Text>
     </View>
   );
 }

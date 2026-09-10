@@ -135,7 +135,7 @@ export default function TrialSummaryScreen() {
         )}
 
         <Animated.View entering={FadeInUp.delay(280)} style={[st.nameBadge, { backgroundColor: typeColor + "14" }]}>
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: typeColor }}>
+          <Text style={{ fontFamily: "Archivo_600", fontSize: 13, color: typeColor }}>
             {trial.name || typeMeta?.label || "Deneme"}
           </Text>
         </Animated.View>
@@ -146,7 +146,7 @@ export default function TrialSummaryScreen() {
           {trend !== 0 && (
             <View style={[st.trendPill, { backgroundColor: (trend > 0 ? C.green : C.red) + "16" }]}>
               <Icon name={trend > 0 ? "trendUp" : "trendDown"} size={14} color={trend > 0 ? C.green : C.red} />
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: trend > 0 ? C.green : C.red }}>
+              <Text style={{ fontFamily: "Archivo_600", fontSize: 13, color: trend > 0 ? C.green : C.red }}>
                 {trend > 0 ? "+" : ""}{trend.toFixed(1)} net
               </Text>
             </View>
@@ -232,19 +232,19 @@ const st = StyleSheet.create({
   improveSub: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, marginTop: 4 },
   nameBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999, marginTop: SPACING.sm },
   netBox: { alignItems: "center", marginVertical: SPACING.xl },
-  netNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64, letterSpacing: -2.5, lineHeight: 68 },
-  netLabel: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
+  netNum: { fontFamily: "Bricolage_400", fontSize: 64, letterSpacing: -2.5, lineHeight: 68 },
+  netLabel: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2, marginTop: -2 },
   trendPill: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, marginTop: 10 },
   statsRow: { flexDirection: "row", gap: SPACING.sm, width: "100%" },
   stat: { flex: 1, alignItems: "center", gap: 5, padding: SPACING.md, borderRadius: RADIUS.xl, borderWidth: 1 },
   statIcon: { width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center" },
-  statVal: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 20 },
+  statVal: { fontFamily: "Bricolage_400", fontSize: 20 },
   barsCard: { width: "100%", borderRadius: RADIUS.xl, padding: SPACING.lg, marginTop: SPACING.lg, borderWidth: 1, gap: 12 },
   barRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   barDot: { width: 8, height: 8, borderRadius: 4 },
   barName: { ...TYPOGRAPHY.bodyMedium, fontSize: 13, width: 64 },
   barTrack: { flex: 1, height: 6, borderRadius: 3, overflow: "hidden" },
-  barNet: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, width: 42, textAlign: "right" },
+  barNet: { fontFamily: "Bricolage_400", fontSize: 13, width: 42, textAlign: "right" },
   actions: { flexDirection: "row", gap: 12, width: "100%", marginTop: SPACING.xxl },
   wrongBanner: { flexDirection: "row", alignItems: "center", gap: SPACING.md, padding: SPACING.md, borderRadius: RADIUS.xl, borderWidth: 1 },
   wrongIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },

@@ -34,10 +34,10 @@ export function TypeBreakdown({ types }) {
               <Text style={{ ...TYPOGRAPHY.bodyMedium, fontSize: 13, color: C.text }}>{label}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>
+              <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.muted }}>
                 {t.count} deneme
               </Text>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, color }}>
+              <Text style={{ fontFamily: "Bricolage_400", fontSize: 14, color }}>
                 {t.avgNet.toFixed(1)}
               </Text>
             </View>

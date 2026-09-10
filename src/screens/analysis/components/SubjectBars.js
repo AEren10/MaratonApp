@@ -49,7 +49,7 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
         />
       </View>
 
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color: C.text, width: 60, textAlign: "right", letterSpacing: -0.3 }}>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.text, width: 60, textAlign: "right", letterSpacing: -0.3 }}>
         {Number(net).toFixed(1)}<Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>/{max}</Text>
       </Text>
       <Icon name="chevR" size={12} color={C.muted} />

@@ -10,8 +10,8 @@ function SubjectBar({ name, net, max, color, bestNet }) {
   return (
     <View style={{ gap: 3 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ fontFamily: "Inter_500Medium", fontSize: 11, color: C.sec }}>{name}</Text>
-        <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 12, color }}>{net.toFixed(1)}</Text>
+        <Text style={{ fontFamily: "Archivo_500", fontSize: 11, color: C.sec }}>{name}</Text>
+        <Text style={{ fontFamily: "Bricolage_400", fontSize: 12, color }}>{net.toFixed(1)}</Text>
       </View>
       <View style={{ height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden" }}>
         <View style={{ width: `${Math.min(100, pct * 100)}%`, height: 6, borderRadius: 3, backgroundColor: color }} />
@@ -51,7 +51,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
         <Text style={[st.netLabel, { color: C.accent }]}>TOPLAM NET</Text>
         {trend !== 0 && (
           <View style={[st.trendPill, { backgroundColor: trendColor + "18" }]}>
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, color: trendColor }}>
+            <Text style={{ fontFamily: "Archivo_600", fontSize: 12, color: trendColor }}>
               {trend > 0 ? "▲" : "▼"} {Math.abs(trend).toFixed(1)} net
             </Text>
           </View>
@@ -86,21 +86,21 @@ const st = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
   },
   brand: {
-    fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, color: "#8b5cf6", letterSpacing: 1.5,
+    fontFamily: "Bricolage_400", fontSize: 20, color: "#8b5cf6", letterSpacing: 1.5,
   },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  typeText: { fontFamily: "Inter_600SemiBold", fontSize: 11, letterSpacing: 0.5 },
-  trialTitle: { fontFamily: "Inter_500Medium", fontSize: 13, marginTop: 6 },
+  typeText: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 0.5 },
+  trialTitle: { fontFamily: "Archivo_500", fontSize: 13, marginTop: 6 },
   netSection: { alignItems: "center", marginVertical: 24 },
-  netNum: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 72, letterSpacing: -3, lineHeight: 76 },
-  netLabel: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 2, marginTop: -2 },
+  netNum: { fontFamily: "Bricolage_400", fontSize: 72, letterSpacing: -3, lineHeight: 76 },
+  netLabel: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2, marginTop: -2 },
   trendPill: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, marginTop: 10 },
   barsWrap: { gap: 10 },
   footer: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 20,
   },
-  footerUser: { fontFamily: "Inter_600SemiBold", fontSize: 13 },
-  footerDate: { fontFamily: "Inter_400Regular", fontSize: 12 },
+  footerUser: { fontFamily: "Archivo_600", fontSize: 13 },
+  footerDate: { fontFamily: "Archivo_400", fontSize: 12 },
   divider: { height: 1, marginTop: 14, marginBottom: 10 },
-  watermark: { fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center" },
+  watermark: { fontFamily: "Archivo_400", fontSize: 11, textAlign: "center" },
 });

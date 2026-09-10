@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   stepDot: { width: 8, height: 8, borderRadius: 4 },
   hero: { alignItems: "center", paddingVertical: SPACING.xl },
   heroTitle: {
-    fontFamily: "SpaceGrotesk_700Bold", fontSize: 24,
+    fontFamily: "Bricolage_400", fontSize: 24,
     letterSpacing: -0.5, marginTop: SPACING.lg,
   },
   heroDesc: {

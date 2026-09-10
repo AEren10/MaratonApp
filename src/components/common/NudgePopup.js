@@ -127,12 +127,12 @@ const s = StyleSheet.create({
   },
   body: { flex: 1, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.md },
   message: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 13,
     lineHeight: 18,
   },
   action: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 11,
     marginTop: 2,
   },

@@ -100,7 +100,7 @@ export default function ComparativeScreen() {
                   </Text>
                 </View>
                 <View style={{ alignItems: "center" }}>
-                  <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, color: C.purple }}>
+                  <Text style={{ fontFamily: "Bricolage_400", fontSize: 28, color: C.purple }}>
                     {Math.round(consistency.score)}
                   </Text>
                   <Text style={{ ...TYPOGRAPHY.micro, color: C.purple, opacity: 0.6 }}>/100</Text>

@@ -116,33 +116,65 @@ export const RADIUS = {
   full: 999,
 };
 
+
+// Tasarimin kendi olcu kademeleri. Yeni ekranlar bunlari kullanir; yukaridaki
+// SPACING/RADIUS eski ekranlar icin duruyor ve ekranlar tasindikca dusecek.
+export const STEP = { s1: 8, s2: 12, s3: 20, s4: 34, s5: 52 };
+export const GUTTER = 22;
+
+export const SHAPE = {
+  chip: 6,
+  segment: 6,
+  button: 12,
+  iconBox: 12,
+  card: 20,
+  cardTight: 16,
+  panel: 20,
+  sheet: 24,
+  phone: 42,
+};
+
+export const CONTROL = {
+  buttonPrimary: 52,
+  buttonSecondary: 52,
+  buttonTertiary: 44,
+  chip: 38,
+  segment: 36,
+  tapMin: 44,
+};
+
 export const TYPOGRAPHY = {
-  // Display (büyük başlık) — Space Grotesk
-  display:       { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 34, lineHeight: 40, letterSpacing: -0.8 },
-  heading:       { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 28, lineHeight: 34, letterSpacing: -0.5 },
-  subheading:    { fontFamily: "SpaceGrotesk_600SemiBold", fontSize: 20, lineHeight: 26 },
+  // Display — Bricolage Grotesque, tasarimda display'in tamami 400 agirlik
+  display:       { fontFamily: "Bricolage_400", fontSize: 34,  lineHeight: 40, letterSpacing: -1.0 },
+  heading:       { fontFamily: "Bricolage_400", fontSize: 28,  lineHeight: 34, letterSpacing: -0.8 },
+  subheading:    { fontFamily: "Bricolage_400", fontSize: 22,  lineHeight: 28, letterSpacing: -0.5 },
 
-  // Body — Inter
-  body:          { fontFamily: "Inter_400Regular",       fontSize: 15, lineHeight: 22 },
-  bodyMedium:    { fontFamily: "Inter_500Medium",        fontSize: 15, lineHeight: 22 },
-  bodySemiBold:  { fontFamily: "Inter_600SemiBold",      fontSize: 15, lineHeight: 22 },
+  // Govde — Archivo, line-height 1.55-1.65
+  body:          { fontFamily: "Archivo_400", fontSize: 14, lineHeight: 22 },
+  bodyMedium:    { fontFamily: "Archivo_500", fontSize: 14, lineHeight: 22 },
+  bodySemiBold:  { fontFamily: "Archivo_600", fontSize: 14, lineHeight: 22 },
 
-  caption:       { fontFamily: "Inter_400Regular",       fontSize: 13, lineHeight: 18 },
-  captionMedium: { fontFamily: "Inter_500Medium",        fontSize: 13, lineHeight: 18 },
-  micro:         { fontFamily: "Inter_500Medium",        fontSize: 11, lineHeight: 14 },
+  caption:       { fontFamily: "Archivo_400", fontSize: 13,   lineHeight: 20 },
+  captionMedium: { fontFamily: "Archivo_500", fontSize: 13,   lineHeight: 20 },
+  meta:          { fontFamily: "Archivo_500", fontSize: 12.5, lineHeight: 18 },
+  micro:         { fontFamily: "Archivo_500", fontSize: 11.5, lineHeight: 16 },
 
-  // Stats — Space Grotesk bold, oversized
-  stat:          { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 46, lineHeight: 50, letterSpacing: -1 },
-  statLarge:     { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 56, lineHeight: 60, letterSpacing: -1.5 },
-  statMedium:    { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 22, lineHeight: 26, letterSpacing: -0.6 },
-  statSmall:     { fontFamily: "SpaceGrotesk_700Bold",   fontSize: 26, lineHeight: 30, letterSpacing: -0.5 },
+  // Sayilar — Bricolage 400, tabular
+  statHero:      { fontFamily: "Bricolage_400", fontSize: 96, lineHeight: 96, letterSpacing: -3.84, fontVariant: ["tabular-nums"] },
+  stat:          { fontFamily: "Bricolage_400", fontSize: 46, lineHeight: 50, letterSpacing: -1.4,  fontVariant: ["tabular-nums"] },
+  statLarge:     { fontFamily: "Bricolage_400", fontSize: 56, lineHeight: 60, letterSpacing: -2.0,  fontVariant: ["tabular-nums"] },
+  statSmall:     { fontFamily: "Bricolage_400", fontSize: 26, lineHeight: 32, letterSpacing: -0.6,  fontVariant: ["tabular-nums"] },
+  statMedium:    { fontFamily: "Bricolage_400", fontSize: 22, lineHeight: 28, letterSpacing: -0.4,  fontVariant: ["tabular-nums"] },
 
-  button:        { fontFamily: "Inter_600SemiBold",      fontSize: 15, lineHeight: 20 },
+  // Konu adi — Bricolage, govde olcusunde
+  topicName:     { fontFamily: "Bricolage_400", fontSize: 16, lineHeight: 22 },
+
+  button:        { fontFamily: "Archivo_700", fontSize: 16, lineHeight: 20 },
   label: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 11,
-    lineHeight: 14,
-    letterSpacing: 0.6,
+    fontFamily: "Archivo_600",
+    fontSize: 11.5,
+    lineHeight: 15,
+    letterSpacing: 1.84,
     textTransform: "uppercase",
   },
 };

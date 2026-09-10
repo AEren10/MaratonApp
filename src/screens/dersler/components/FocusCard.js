@@ -45,7 +45,7 @@ export const FocusCard = React.memo(function FocusCard({ subject, identity, text
 
         <Text
           style={{
-            fontFamily: "SpaceGrotesk_700Bold",
+            fontFamily: "Bricolage_400",
             fontSize: 30,
             lineHeight: 34,
             color: solid,

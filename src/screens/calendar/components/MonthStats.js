@@ -16,7 +16,7 @@ function StatItem({ value, label, isLast, C }) {
     >
       <Text
         style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: 18,
           lineHeight: 22,
           color: C.text,
@@ -26,7 +26,7 @@ function StatItem({ value, label, isLast, C }) {
       </Text>
       <Text
         style={{
-          fontFamily: "Inter_500Medium",
+          fontFamily: "Archivo_500",
           fontSize: 10,
           lineHeight: 13,
           color: C.muted,

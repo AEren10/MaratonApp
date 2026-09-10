@@ -35,14 +35,14 @@ export function HomeCoachNudge({ C, nudge, onPress }) {
       <Text
         style={{
           flex: 1,
-          fontFamily: "Inter_500Medium",
+          fontFamily: "Archivo_500",
           fontSize: 13,
           lineHeight: 18,
           color: C.sec,
         }}
         numberOfLines={2}
       >
-        <Text style={{ fontFamily: "Inter_600SemiBold", color: C.text }}>Koç: </Text>
+        <Text style={{ fontFamily: "Archivo_600", color: C.text }}>Koç: </Text>
         {nudge.message || nudge.title}
       </Text>
       <Icon name="arrowR" size={14} color={C.muted} />

@@ -25,7 +25,7 @@ export function AuthInput({
     <View style={{ marginBottom: 14 }}>
       <Text
         style={{
-          fontFamily: "Inter_600SemiBold",
+          fontFamily: "Archivo_600",
           fontSize: 11,
           color: focused ? C.accent : C.muted,
           letterSpacing: 0.6,
@@ -63,7 +63,7 @@ export function AuthInput({
             flex: 1,
             paddingHorizontal: 14,
             paddingVertical: 15,
-            fontFamily: "Inter_500Medium",
+            fontFamily: "Archivo_500",
             fontSize: 15,
             color: C.text,
           }}
@@ -75,7 +75,7 @@ export function AuthInput({
         ) : null}
       </View>
       {error ? (
-        <Text style={{ color: C.red, fontSize: 12, marginTop: 6, fontFamily: "Inter_500Medium", marginLeft: 4 }}>
+        <Text style={{ color: C.red, fontSize: 12, marginTop: 6, fontFamily: "Archivo_500", marginLeft: 4 }}>
           ⚠ {error}
         </Text>
       ) : null}

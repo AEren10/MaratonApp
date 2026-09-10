@@ -27,7 +27,7 @@ export function StrengthBars({ strengths }) {
           <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 13 }}>
             <Text style={{
               width: 52,
-              fontFamily: "Inter_500Medium",
+              fontFamily: "Archivo_500",
               fontSize: 13,
               color: C.sec,
             }} numberOfLines={1}>
@@ -50,7 +50,7 @@ export function StrengthBars({ strengths }) {
             <Text style={{
               width: 46,
               textAlign: "right",
-              fontFamily: "SpaceGrotesk_600SemiBold",
+              fontFamily: "Bricolage_400",
               fontSize: 13,
               color: C.text,
             }}>

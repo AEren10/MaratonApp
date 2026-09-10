@@ -74,16 +74,16 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
 
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text }}>
+            <Text style={{ fontFamily: "Archivo_600", fontSize: 14, color: C.text }}>
               {subj.label}
             </Text>
             <Text style={{ color: C.muted, fontSize: 13 }}>·</Text>
-            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.muted }}>
+            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.muted }}>
               {relativeDate(item.created_at)}
             </Text>
           </View>
           {item.topic ? (
-            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: C.sec, marginTop: 1 }} numberOfLines={1}>
+            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.sec, marginTop: 1 }} numberOfLines={1}>
               {item.topic}
             </Text>
           ) : null}
@@ -108,7 +108,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           }}
         >
           <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.green : C.amber} sw={item.is_resolved ? 3 : 1.5} />
-          <Text style={{ fontSize: 12, fontFamily: "Inter_600SemiBold", color: item.is_resolved ? C.green : C.amber }}>
+          <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: item.is_resolved ? C.green : C.amber }}>
             {item.is_resolved ? "Çözüldü" : "Çözdüm"}
           </Text>
         </Pressable>
@@ -118,7 +118,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
       {item.note ? (
         <Text
           style={{
-            fontFamily: "Inter_500Medium",
+            fontFamily: "Archivo_500",
             fontSize: 15,
             color: C.text,
             lineHeight: 21,
@@ -159,9 +159,9 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             backgroundColor: C.surface2,
             paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
           }}>
-            <Text style={{ fontSize: 12, color: C.red, fontFamily: "Inter_600SemiBold" }}>{myA}</Text>
+            <Text style={{ fontSize: 12, color: C.red, fontFamily: "Archivo_600" }}>{myA}</Text>
             <Icon name="arrowR" size={11} color={C.muted} />
-            <Text style={{ fontSize: 12, color: C.green, fontFamily: "Inter_600SemiBold" }}>{corA}</Text>
+            <Text style={{ fontSize: 12, color: C.green, fontFamily: "Archivo_600" }}>{corA}</Text>
           </View>
         ) : null}
 
@@ -172,7 +172,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
           }}>
             <Icon name="users" size={10} color={C[diff.colorKey]} />
-            <Text style={{ fontSize: 11, color: C[diff.colorKey], fontFamily: "Inter_600SemiBold" }}>
+            <Text style={{ fontSize: 11, color: C[diff.colorKey], fontFamily: "Archivo_600" }}>
               ~%{diff.correctRate} doğru · -{diff.netLoss}
             </Text>
           </View>
@@ -197,7 +197,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             })}
           >
             <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.green : C.accent} />
-            <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: shared ? C.green : C.accent }}>
+            <Text style={{ fontSize: 13, fontFamily: "Archivo_600", color: shared ? C.green : C.accent }}>
               {shared ? "Paylaşıldı" : "Paylaş"}
             </Text>
           </Pressable>

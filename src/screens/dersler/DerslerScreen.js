@@ -161,14 +161,14 @@ export default function DerslerScreen() {
         >
           {/* Header */}
           <View style={{ paddingTop: SPACING.lg, paddingBottom: SPACING.lg, gap: SPACING.sm }}>
-            <Text style={{ fontFamily: "SpaceGrotesk_600SemiBold", fontSize: 26, lineHeight: 32, letterSpacing: -0.6, color: C.text }}>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 26, lineHeight: 32, letterSpacing: -0.6, color: C.text }}>
               Dersler
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
               <View style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden" }}>
                 <View style={{ height: 6, borderRadius: 3, backgroundColor: C.accent, width: `${Math.round(progressPct * 100)}%` }} />
               </View>
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 12, lineHeight: 16, color: C.sec }}>
+              <Text style={{ fontFamily: "Archivo_600", fontSize: 12, lineHeight: 16, color: C.sec }}>
                 {totalDone}/{totalAll} konu
               </Text>
             </View>
@@ -200,7 +200,7 @@ export default function DerslerScreen() {
                 <View style={{ marginBottom: SPACING.xl }}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.md }}>
                     <Icon name="alert" size={14} color={C.orange} />
-                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 14, letterSpacing: 1, color: C.orange, textTransform: "uppercase" }}>
+                    <Text style={{ fontFamily: "Archivo_600", fontSize: 11, lineHeight: 14, letterSpacing: 1, color: C.orange, textTransform: "uppercase" }}>
                       {"Önce Buna Odaklan"}
                     </Text>
                   </View>
@@ -217,7 +217,7 @@ export default function DerslerScreen() {
 
               {/* All subjects */}
               <View style={{ marginBottom: SPACING.xxl }}>
-                <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 14, letterSpacing: 1.3, color: C.muted, textTransform: "uppercase", marginBottom: SPACING.md }}>
+                <Text style={{ fontFamily: "Archivo_600", fontSize: 11, lineHeight: 14, letterSpacing: 1.3, color: C.muted, textTransform: "uppercase", marginBottom: SPACING.md }}>
                   {"Tüm Dersler"}
                 </Text>
                 <View>

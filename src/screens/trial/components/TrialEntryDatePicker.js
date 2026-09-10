@@ -48,7 +48,7 @@ export function TrialEntryDatePicker({
               >
                 <Text
                   style={{
-                    fontFamily: "Inter_500Medium",
+                    fontFamily: "Archivo_500",
                     fontSize: 11,
                     color: active ? C.accent : C.muted,
                   }}
@@ -57,7 +57,7 @@ export function TrialEntryDatePicker({
                 </Text>
                 <Text
                   style={{
-                    fontFamily: "SpaceGrotesk_700Bold",
+                    fontFamily: "Bricolage_400",
                     fontSize: 18,
                     color: active ? C.accent : C.text,
                   }}

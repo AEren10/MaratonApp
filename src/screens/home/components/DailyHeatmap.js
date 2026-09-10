@@ -34,7 +34,7 @@ export function DailyHeatmap({ dailyHeatmap }) {
               <Text style={{
                 ...TYPOGRAPHY.micro, fontSize: 11,
                 color: today ? C.accent : d.active ? C.text : C.muted,
-                fontFamily: today ? "Inter_600SemiBold" : "Inter_500Medium",
+                fontFamily: today ? "Archivo_600" : "Archivo_500",
               }}>
                 {d.label}
               </Text>

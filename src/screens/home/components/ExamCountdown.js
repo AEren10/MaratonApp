@@ -86,7 +86,7 @@ export function ExamCountdown({ onPress }) {
             style={{
               ...TYPOGRAPHY.label,
               fontSize: 10,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Archivo_600",
               letterSpacing: 1.3,
               color: C.muted,
             }}
@@ -97,7 +97,7 @@ export function ExamCountdown({ onPress }) {
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 4 }}>
             <Text
               style={{
-                fontFamily: "SpaceGrotesk_700Bold",
+                fontFamily: "Bricolage_400",
                 fontSize: 27,
                 letterSpacing: -1,
                 color: C.text,
@@ -108,7 +108,7 @@ export function ExamCountdown({ onPress }) {
             </Text>
             <Text
               style={{
-                fontFamily: "Inter_600SemiBold",
+                fontFamily: "Archivo_600",
                 fontSize: 13,
                 color: C.sec,
               }}
@@ -119,7 +119,7 @@ export function ExamCountdown({ onPress }) {
 
           <Text
             style={{
-              fontFamily: "SpaceGrotesk_600SemiBold",
+              fontFamily: "Bricolage_400",
               fontSize: 12,
               letterSpacing: 0.5,
               color: C.orange,

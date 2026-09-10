@@ -109,7 +109,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   label: { ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.xs },
   codeRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-  codeValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: C.accent, letterSpacing: 4, flex: 1 },
+  codeValue: { fontFamily: "Bricolage_400", fontSize: 22, color: C.accent, letterSpacing: 4, flex: 1 },
   btn: {
     width: 36, height: 36, borderRadius: 10,
     backgroundColor: C.accent + "18",
@@ -136,7 +136,7 @@ const makeStyles = (C) => StyleSheet.create({
     ...TYPOGRAPHY.body,
     color: C.text,
     letterSpacing: 3,
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
   },
   sendBtn: {
     width: 42, height: 42, borderRadius: RADIUS.md,

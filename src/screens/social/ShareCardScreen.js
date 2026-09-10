@@ -135,7 +135,7 @@ const makeStyles = (C) => StyleSheet.create({
   heroLabel: { ...TYPOGRAPHY.captionMedium, color: C.muted, textAlign: "center", marginTop: -SPACING.xs },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
   gridItem: { width: "47%", backgroundColor: C.bg, borderRadius: RADIUS.md, padding: SPACING.md, alignItems: "center", gap: SPACING.xs },
-  gridValue: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color: C.text },
+  gridValue: { fontFamily: "Bricolage_400", fontSize: 22, color: C.text },
   gridLabel: { ...TYPOGRAPHY.micro, color: C.muted },
   bottom: { flexDirection: "row", justifyContent: "center", gap: SPACING.sm },
   pill: { backgroundColor: C.bg, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: RADIUS.pill },

@@ -43,11 +43,11 @@ initNotifications();
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular: require("./assets/fonts/Inter_400Regular.ttf"),
-    Inter_500Medium: require("./assets/fonts/Inter_500Medium.ttf"),
-    Inter_600SemiBold: require("./assets/fonts/Inter_600SemiBold.ttf"),
-    SpaceGrotesk_600SemiBold: require("./assets/fonts/SpaceGrotesk_600SemiBold.ttf"),
-    SpaceGrotesk_700Bold: require("./assets/fonts/SpaceGrotesk_700Bold.ttf"),
+    Archivo_400: require("./assets/fonts/Archivo_400.ttf"),
+    Archivo_500: require("./assets/fonts/Archivo_500.ttf"),
+    Archivo_600: require("./assets/fonts/Archivo_600.ttf"),
+    Archivo_700: require("./assets/fonts/Archivo_700.ttf"),
+    Bricolage_400: require("./assets/fonts/Bricolage_400.ttf"),
   });
 
   const onLayoutRootView = useCallback(async () => {

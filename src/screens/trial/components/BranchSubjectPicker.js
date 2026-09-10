@@ -28,7 +28,7 @@ const makeStyles = (C) => ({
   parent: {
     ...TYPOGRAPHY.micro,
     letterSpacing: 0.6,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
   },
   name: {
     ...TYPOGRAPHY.bodySemiBold,
@@ -42,14 +42,14 @@ const makeStyles = (C) => ({
     minWidth: 48,
   },
   maxText: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
     fontSize: 16,
     letterSpacing: -0.4,
   },
   maxSub: {
     ...TYPOGRAPHY.micro,
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Archivo_500",
   },
 });
 

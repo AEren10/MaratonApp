@@ -84,7 +84,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
               })}
             >
               <Text style={{
-                fontFamily: "SpaceGrotesk_700Bold",
+                fontFamily: "Bricolage_400",
                 fontSize: 15,
                 color: isBoth ? C.green : isMyAnswer ? C.orange : isCorrect ? C.green : C.sec,
               }}>

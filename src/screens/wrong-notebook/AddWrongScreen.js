@@ -162,7 +162,7 @@ export default function AddWrongScreen() {
         >
           <Icon name="arrowL" size={20} color={C.text} />
         </Pressable>
-        <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, color: C.text }}>
+        <Text style={{ fontFamily: "Bricolage_400", fontSize: 17, color: C.text }}>
           Yanlış Ekle
         </Text>
         <View style={{ width: 36 }} />
@@ -214,7 +214,7 @@ export default function AddWrongScreen() {
             onPress={() => setPickerOpen(true)}
             style={[makeInputStyle(C), { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
           >
-            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }}>
+            <Text style={{ fontFamily: "Archivo_400", fontSize: 15, color: topic ? C.text : C.muted }}>
               {topic || "Konu seç"}
             </Text>
             <Icon name="chevDown" size={16} color={C.muted} />
@@ -268,13 +268,13 @@ export default function AddWrongScreen() {
                   flexDirection: "row", alignItems: "center", gap: 4,
                 }}>
                   <Icon name="camera" size={12} color={C.sec} />
-                  <Text style={{ fontFamily: "Inter_500Medium", fontSize: 11, color: C.sec }}>Değiştir</Text>
+                  <Text style={{ fontFamily: "Archivo_500", fontSize: 11, color: C.sec }}>Değiştir</Text>
                 </View>
               </>
             ) : (
               <>
                 <Icon name="camera" size={26} color={C.muted} />
-                <Text style={{ fontFamily: "Inter_500Medium", fontSize: 13, color: C.muted }}>
+                <Text style={{ fontFamily: "Archivo_500", fontSize: 13, color: C.muted }}>
                   Foto ekle
                 </Text>
               </>
@@ -310,7 +310,7 @@ export default function AddWrongScreen() {
           }}
         >
           {saving && <ActivityIndicator size="small" color={C.muted} />}
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: saving ? C.muted : C.bg }}>
+          <Text style={{ fontFamily: "Archivo_600", fontSize: 15, color: saving ? C.muted : C.bg }}>
             {saving ? "Kaydediliyor..." : "Kaydet"}
           </Text>
         </AnimatedPressable>
@@ -334,7 +334,7 @@ const makeInputStyle = (C) => ({
   borderRadius: 14,
   paddingHorizontal: 14,
   paddingVertical: 14,
-  fontFamily: "Inter_400Regular",
+  fontFamily: "Archivo_400",
   fontSize: 15,
   color: C.text,
 });
@@ -343,7 +343,7 @@ function Label({ children, C }) {
   return (
     <Text
       style={{
-        fontFamily: "Inter_600SemiBold",
+        fontFamily: "Archivo_600",
         fontSize: 12,
         color: C.sec,
         marginTop: 18,
@@ -371,7 +371,7 @@ function SectionLabel({ children, color }) {
       <View style={{ width: 4, height: 14, borderRadius: 2, backgroundColor: color }} />
       <Text
         style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: 13,
           color,
           letterSpacing: 0.8,
@@ -402,7 +402,7 @@ function SubjectChip({ s, active, onPress, C }) {
       <Icon name={s.icon} size={18} color={active ? s.color : C.sec} />
       <Text
         style={{
-          fontFamily: "Inter_600SemiBold",
+          fontFamily: "Archivo_600",
           fontSize: 13,
           color: active ? s.color : C.sec,
         }}

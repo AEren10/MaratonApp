@@ -164,7 +164,7 @@ export default function AddTaskScreen() {
             <Text style={[st.sectionLabel, { color: C.muted }]}>KONU (opsiyonel)</Text>
             <Pressable onPress={openTopicPicker} style={[st.topicBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Icon name={topic ? "checkCircle" : "search"} size={16} color={topic ? C.green : C.muted} />
-              <Text style={{ flex: 1, fontFamily: "Inter_400Regular", fontSize: 15, color: topic ? C.text : C.muted }} numberOfLines={1}>
+              <Text style={{ flex: 1, fontFamily: "Archivo_400", fontSize: 15, color: topic ? C.text : C.muted }} numberOfLines={1}>
                 {topic || "Konu seç..."}
               </Text>
               <Icon name="chevDown" size={14} color={C.muted} />
@@ -211,23 +211,23 @@ const st = StyleSheet.create({
   sectionLabel: { ...TYPOGRAPHY.label, marginTop: 24, marginBottom: 10 },
   tierRow: { flexDirection: "row", borderRadius: RADIUS.xl, borderWidth: 1, padding: 4, gap: 4 },
   tierBtn: { flex: 1, paddingVertical: 12, borderRadius: RADIUS.lg, alignItems: "center" },
-  tierTitle: { fontFamily: "Inter_600SemiBold", fontSize: 15 },
+  tierTitle: { fontFamily: "Archivo_600", fontSize: 15 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   subCard: {
     width: "48%", flexDirection: "row", alignItems: "center", gap: 10,
     paddingVertical: 14, paddingHorizontal: 12, borderRadius: RADIUS.xl,
   },
   subIcon: { width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center" },
-  subLabel: { fontFamily: "Inter_500Medium", fontSize: 13, flex: 1 },
+  subLabel: { fontFamily: "Archivo_500", fontSize: 13, flex: 1 },
   subCheck: { width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center" },
   topicBtn: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, paddingVertical: 14, borderRadius: RADIUS.xl, borderWidth: 1 },
   segContainer: { flexDirection: "row", alignItems: "center", borderRadius: RADIUS.xl, borderWidth: 1, padding: 4, gap: 4 },
   segPill: { flex: 1, paddingVertical: 10, borderRadius: RADIUS.lg, alignItems: "center" },
-  segText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
+  segText: { fontFamily: "Archivo_600", fontSize: 14 },
   segDivider: { width: 1, height: 24, borderRadius: 1 },
-  segInput: { width: 44, fontFamily: "Inter_500Medium", fontSize: 14, textAlign: "center", paddingVertical: 8 },
-  segSuffix: { fontFamily: "Inter_400Regular", fontSize: 12, marginRight: 6 },
-  noteInput: { paddingHorizontal: 14, paddingVertical: 14, borderRadius: RADIUS.xl, borderWidth: 1, fontFamily: "Inter_400Regular", fontSize: 15, minHeight: 80, textAlignVertical: "top" },
+  segInput: { width: 44, fontFamily: "Archivo_500", fontSize: 14, textAlign: "center", paddingVertical: 8 },
+  segSuffix: { fontFamily: "Archivo_400", fontSize: 12, marginRight: 6 },
+  noteInput: { paddingHorizontal: 14, paddingVertical: 14, borderRadius: RADIUS.xl, borderWidth: 1, fontFamily: "Archivo_400", fontSize: 15, minHeight: 80, textAlignVertical: "top" },
   charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },
   bottom: { paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1 },
 });

@@ -26,11 +26,11 @@ export function FilterPill({ label, count, active, color, onPress }) {
         borderColor: active ? color : color + "30",
       }}
     >
-      <Text style={{ fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium", fontSize: 12, color }}>
+      <Text style={{ fontFamily: active ? "Archivo_600" : "Archivo_500", fontSize: 12, color }}>
         {label}
       </Text>
       {count != null && count > 0 ? (
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: color + "99" }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: color + "99" }}>
           {count}
         </Text>
       ) : null}

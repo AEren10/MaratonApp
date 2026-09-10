@@ -46,7 +46,7 @@ export function WrongNotebookTabs({ C, activeTab, onChange }) {
             <Icon name={tab.icon} size={16} color={isAccent ? C.textOnFill : active ? C.accent : C.muted} />
             <Text
               style={{
-                fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
+                fontFamily: active ? "Archivo_600" : "Archivo_500",
                 fontSize: 14,
                 color: isAccent ? C.textOnFill : active ? C.text : C.muted,
               }}

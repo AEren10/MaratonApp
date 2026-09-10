@@ -28,7 +28,7 @@ export function TrialSubjectBars({ subjects, allSubjects }) {
             <View style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden" }}>
               <View style={{ width: `${Math.min(100, pct * 100)}%`, height: 6, borderRadius: 3, backgroundColor: color }} />
             </View>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 12, color, width: 38, textAlign: "right" }}>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 12, color, width: 38, textAlign: "right" }}>
               {s.avgNet.toFixed(1)}
             </Text>
           </View>

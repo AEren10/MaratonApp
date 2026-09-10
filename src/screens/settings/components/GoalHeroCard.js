@@ -76,14 +76,14 @@ const editBtn = {
   backgroundColor: "rgba(255,255,255,0.18)", borderRadius: RADIUS.pill,
   paddingHorizontal: 10, paddingVertical: 5,
 };
-const editText = { fontFamily: "Inter_600SemiBold", fontSize: 12 };
-const ringPct = { fontFamily: "SpaceGrotesk_700Bold", fontSize: 20 };
-const rankText = { fontFamily: "SpaceGrotesk_700Bold", fontSize: 28, letterSpacing: -0.5 };
+const editText = { fontFamily: "Archivo_600", fontSize: 12 };
+const ringPct = { fontFamily: "Bricolage_400", fontSize: 20 };
+const rankText = { fontFamily: "Bricolage_400", fontSize: 28, letterSpacing: -0.5 };
 const deptText = { ...TYPOGRAPHY.caption, color: "rgba(255,255,255,0.8)" };
 const motivStyle = { ...TYPOGRAPHY.micro, color: "rgba(255,255,255,0.65)", marginTop: 4 };
 const statBox = {
   flex: 1, backgroundColor: "rgba(255,255,255,0.15)",
   borderRadius: RADIUS.md, padding: SPACING.sm, alignItems: "center",
 };
-const statNum = { fontFamily: "SpaceGrotesk_700Bold", fontSize: 20 };
+const statNum = { fontFamily: "Bricolage_400", fontSize: 20 };
 const statLabel = { ...TYPOGRAPHY.micro, color: "rgba(255,255,255,0.7)" };

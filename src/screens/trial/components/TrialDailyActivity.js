@@ -21,7 +21,7 @@ export function TrialDailyActivity({ dailyActivity }) {
           return (
             <View key={d.label} style={{ flex: 1, alignItems: "center", gap: 6 }}>
               <Text style={{
-                fontFamily: "SpaceGrotesk_700Bold", fontSize: 11,
+                fontFamily: "Bricolage_400", fontSize: 11,
                 color: active ? C.accent : "transparent",
               }}>
                 {d.count}
@@ -31,7 +31,7 @@ export function TrialDailyActivity({ dailyActivity }) {
                 backgroundColor: active ? C.accent : C.surface2,
               }} />
               <Text style={{
-                fontFamily: "Inter_500Medium", fontSize: 11,
+                fontFamily: "Archivo_500", fontSize: 11,
                 color: active ? C.text : C.muted,
               }}>
                 {d.label}

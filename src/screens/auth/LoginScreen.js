@@ -152,7 +152,7 @@ export default function LoginScreen() {
               style={{ alignSelf: "flex-end", marginBottom: 8, marginTop: -4 }}
               hitSlop={6}
             >
-              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.brandLight }}>
+              <Text style={{ fontFamily: "Archivo_600", fontSize: 13, color: C.brandLight }}>
                 Şifremi unuttum
               </Text>
             </Pressable>
@@ -175,7 +175,7 @@ export default function LoginScreen() {
             {/* Divider */}
             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 22, gap: 12 }}>
               <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>
+              <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.muted }}>
                 veya
               </Text>
               <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
@@ -188,9 +188,9 @@ export default function LoginScreen() {
               style={{ marginTop: 20, alignItems: "center" }}
               hitSlop={6}
             >
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
+              <Text style={{ fontFamily: "Archivo_500", fontSize: 14, color: C.sec }}>
                 Hesabın yok mu?{" "}
-                <Text style={{ color: C.brandLight, fontFamily: "Inter_600SemiBold" }}>Hesap Oluştur</Text>
+                <Text style={{ color: C.brandLight, fontFamily: "Archivo_600" }}>Hesap Oluştur</Text>
               </Text>
             </Pressable>
           </Animated.View>

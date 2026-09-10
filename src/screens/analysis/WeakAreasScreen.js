@@ -145,7 +145,7 @@ function makeStyles(C) {
       borderRadius: RADIUS.full,
       borderWidth: 1,
     },
-    studyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 13 },
+    studyBtnText: { fontFamily: "Archivo_600", fontSize: 13 },
     footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: SPACING.xl, gap: SPACING.sm },
     footerText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
     empty: { alignItems: "center", justifyContent: "center", marginTop: 80 },

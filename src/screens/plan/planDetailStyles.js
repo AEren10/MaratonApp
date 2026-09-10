@@ -49,6 +49,6 @@ export function makePlanDetailStyles(C) {
       alignItems: "center",
       justifyContent: "center",
     },
-    addText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
+    addText: { fontFamily: "Archivo_600", fontSize: 14 },
   });
 }

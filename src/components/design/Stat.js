@@ -5,7 +5,7 @@ export function Stat({ children, size = 46, color = "#FFFFFF", style }) {
     <Text
       style={[
         {
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: size,
           lineHeight: size * 1.05,
           letterSpacing: -size * 0.025,

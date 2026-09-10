@@ -33,12 +33,12 @@ const FIXED = {
     text2: "#A3A0A8",
     // AA: bg 5.92 / surface 5.11 / elev 4.26.
     // elev uzerinde 4.5 alti — text3 ucuncu seviye yuzeyde METIN olarak kullanilmaz.
-    text3: "#9A97A4",
+    text3: "#9794A0",
     text4: "#6B6870",
     text5: "#3B3941",
     accentInk: "#F7F2F0",
     accentBright: "#FF4D57",
-    down: "#93A7B5",
+    down: "#8A8790",
     warn: "#E0A93F",
     danger: "#F0555F",
   },
@@ -72,15 +72,15 @@ const LIGHT_SURFACES = {
 // LGS kullanıcısında TÜM dersler aynı kızıl renkte görünüyordu.
 export const SUBJECT_COLORS = {
   dark: {
-    turkce: "#60a5fa",
-    matematik: "#fb923c",
-    fizik: "#22d3ee",
-    kimya: "#f472b6",
-    biyoloji: "#34d399",
-    tarih: "#fbbf24",
-    cografya: "#818cf8",
-    felsefe: "#c084fc",
-    din: "#84cc16",
+    turkce: "#74A9E8",
+    matematik: "#E0A570",
+    fizik: "#6ECFC0",
+    kimya: "#E8A0C4",
+    biyoloji: "#86CE92",
+    tarih: "#C9BE6A",
+    cografya: "#8B5CF6",
+    felsefe: "#A78BFA",
+    din: "#B5D97A",
     // Tasarım paletinde karşılığı olmayanlar — ayırt edilebilir tonlar.
     edebiyat: "#f0abfc",
     ingilizce: "#7dd3fc",
@@ -158,7 +158,8 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     ...fixed,
 
     // Marka türevleri
-    brandFill: isDark ? mix(accent, 87, "#2A0A0D") : accent,
+    brandFill: accent,
+    accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: mix(accent, 86, "#000000"),
     accentGlow: alpha(accent, isDark ? 30 : 26),
@@ -167,9 +168,9 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     proj: mix(accent, isDark ? 52 : 62, bg),
     projNode: mix(accent, isDark ? 44 : 60, fixed.text2),
     stop: mix(accent, isDark ? 44 : 58, bg),
-    past: mix(accent, 56, down),
+    past: accent,
     bandEdge: mix(accent, isDark ? 32 : 30, bg),
-    targetLine: mix(accent, isDark ? 20 : 26, bg),
+    targetLine: mix(accent, isDark ? 22 : 26, bg),
     targetLabel: mix(accent, isDark ? 28 : 34, fixed.text2),
     barIdle: mix(accent, isDark ? 22 : 20, bg),
 

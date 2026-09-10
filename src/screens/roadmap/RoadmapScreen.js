@@ -7,6 +7,7 @@ import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SPACING, TYPOGRAPHY } from "../../themes/tokens";
+import { firstRouteAction } from "../../domain/route/routeStartAction";
 import RouteProgressHeader from "./components/RouteProgressHeader";
 import RouteCreationCard from "./components/RouteCreationCard";
 import RouteWeekCard from "./components/RouteWeekCard";
@@ -14,6 +15,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { showRouteCreatedAlert } from "./routeCreatedAlert";
 
 export default function RoadmapScreen() {
   const C = useC();
@@ -30,17 +32,15 @@ export default function RoadmapScreen() {
   const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
   const handleCreateRoute = useCallback(async () => {
     try {
-      await createRoute();
+      const result = await createRoute();
+      const nextAction = firstRouteAction(result?.stops);
       H.success();
-      showAlert(
-        routeCreated ? "Rota yeniden analiz edildi" : "Rota oluşturuldu",
-        "İlk hafta durakların kilitlendi. Tamamladıkların sonraki revizyonlarda korunacak.",
-      );
+      showRouteCreatedAlert({ action: nextAction, navigation, routeCreated, showAlert });
     } catch {
       H.error();
       showAlert("Rota oluşturulamadı", "Bağlantını kontrol edip tekrar dene. Önizlemen kaybolmadı.");
     }
-  }, [createRoute, routeCreated, showAlert]);
+  }, [createRoute, navigation, routeCreated, showAlert]);
   const renderWeek = useCallback(
     ({ item }) => <RouteWeekCard week={item} frozen={isPaused} C={C} />,
     [C, isPaused],

@@ -58,7 +58,7 @@ const makeStyles = (C) => ({
     marginBottom: 4,
   },
   weekLabel: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 10,
     lineHeight: 14,
     color: C.muted,
@@ -84,7 +84,7 @@ const makeStyles = (C) => ({
     borderColor: "transparent",
   },
   dayText: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 12,
     lineHeight: 16,
   },

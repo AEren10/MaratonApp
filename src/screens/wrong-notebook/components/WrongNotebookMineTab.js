@@ -88,7 +88,7 @@ export function WrongNotebookMineTab({
             >
               <Text
                 style={{
-                  fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
+                  fontFamily: active ? "Archivo_600" : "Archivo_500",
                   fontSize: 13,
                   color: active ? color : C.muted,
                 }}

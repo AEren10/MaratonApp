@@ -63,5 +63,5 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14, borderWidth: 1 },
   searchInput: { ...TYPOGRAPHY.body, flex: 1, paddingVertical: 0 },
   chip: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 11, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
-  chipText: { ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold" },
+  chipText: { ...TYPOGRAPHY.micro, fontFamily: "Archivo_600" },
 });

@@ -58,7 +58,7 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
       {/* Tier name + chevron */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs }}>
         <Text style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: 13,
           color: C.accent,
           letterSpacing: 0.5,

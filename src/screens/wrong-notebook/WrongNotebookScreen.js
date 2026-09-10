@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   title: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
     fontSize: 24,
     letterSpacing: -0.5,
     marginTop: 1,

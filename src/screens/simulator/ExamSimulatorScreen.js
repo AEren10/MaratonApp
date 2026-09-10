@@ -194,7 +194,7 @@ function makeStyles(C) {
     configText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     configMeta: { ...TYPOGRAPHY.micro, color: C.muted, marginTop: 2 },
     timerArea: { alignItems: "center", paddingVertical: SPACING.xxxl, gap: SPACING.sm },
-    timerText: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 64 },
+    timerText: { fontFamily: "Bricolage_400", fontSize: 64 },
     timerSub: { ...TYPOGRAPHY.caption, color: C.muted },
     barBg: { width: "80%", height: 4, borderRadius: 2, backgroundColor: C.surface2, marginTop: SPACING.md },
     barFill: { height: 4, borderRadius: 2 },
@@ -202,7 +202,7 @@ function makeStyles(C) {
     controlBtn: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl, borderRadius: RADIUS.xl },
     pauseBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, paddingVertical: SPACING.lg, marginTop: SPACING.xl },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    doneStat: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 36, color: C.green },
+    doneStat: { fontFamily: "Bricolage_400", fontSize: 36, color: C.green },
     doneSub: { ...TYPOGRAPHY.caption, color: C.muted },
     secondaryBtn: { paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl },
   });

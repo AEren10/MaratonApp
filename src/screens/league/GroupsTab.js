@@ -24,7 +24,7 @@ const MemberRow = React.memo(function MemberRow({ item }) {
       <Text style={{ flex: 1, marginLeft: 10, ...TYPOGRAPHY.bodyMedium, color: isYou ? C.accent : C.text }} numberOfLines={1}>
         {isYou ? "Sen" : item.name || "Öğrenci"}
       </Text>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 15, color: C.text }}>{item.weekly_xp}</Text>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 15, color: C.text }}>{item.weekly_xp}</Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
     </View>
   );

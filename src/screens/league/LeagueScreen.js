@@ -86,7 +86,7 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
       <View style={{ flex: 1, marginLeft: SPACING.sm }}>
         <Text
           style={{
-            fontFamily: isYou ? "Inter_600SemiBold" : "Inter_500Medium",
+            fontFamily: isYou ? "Archivo_600" : "Archivo_500",
             fontSize: 14,
             color: isYou ? C.accent : C.text,
           }}
@@ -103,7 +103,7 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
         <Icon name={zone === ZONE.PROMOTION ? "trendUp" : "trendDown"} size={12} color={zoneColor} style={{ marginRight: SPACING.xs }} />
       )}
 
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text }}>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, color: C.text }}>
         {item.weekly_xp}
       </Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: SPACING.xs }]}>XP</Text>

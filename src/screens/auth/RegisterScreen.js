@@ -178,7 +178,7 @@ export default function RegisterScreen() {
           <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 18, gap: 12 }}>
               <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: C.muted }}>veya</Text>
+              <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.muted }}>veya</Text>
               <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
             </View>
             <SocialAuthButtons />
@@ -190,9 +190,9 @@ export default function RegisterScreen() {
               style={{ marginTop: 20, alignItems: "center" }}
               hitSlop={6}
             >
-              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: C.sec }}>
+              <Text style={{ fontFamily: "Archivo_500", fontSize: 14, color: C.sec }}>
                 Zaten hesabın var mı?{" "}
-                <Text style={{ color: C.brandLight, fontFamily: "Inter_600SemiBold" }}>Giriş Yap</Text>
+                <Text style={{ color: C.brandLight, fontFamily: "Archivo_600" }}>Giriş Yap</Text>
               </Text>
             </Pressable>
           </Animated.View>

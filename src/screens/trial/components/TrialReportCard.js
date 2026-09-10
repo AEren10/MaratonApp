@@ -25,7 +25,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: "space-between",
   },
   brand: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
     fontSize: 18,
     color: C.accent,
     letterSpacing: 1,
@@ -34,7 +34,7 @@ const makeStyles = (C) => StyleSheet.create({
   owner: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: SPACING.xs },
   netWrap: { alignItems: "center", marginVertical: SPACING.xl },
   netValue: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
     fontSize: 64,
     color: C.accent,
     letterSpacing: -2,

@@ -70,7 +70,7 @@ export function SocialAuthButtons() {
       {googleAvailable && (
         <Pressable onPress={handleGoogle} disabled={busy} style={({ pressed }) => btnStyle(pressed)}>
           <GoogleIcon />
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
+          <Text style={{ fontFamily: "Archivo_600", fontSize: 15, color: C.text }}>
             Google ile devam et
           </Text>
         </Pressable>
@@ -87,7 +87,7 @@ export function SocialAuthButtons() {
           })}
         >
           <AppleIcon />
-          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: C.text }}>
+          <Text style={{ fontFamily: "Archivo_600", fontSize: 15, color: C.text }}>
             Apple ile devam et
           </Text>
         </Pressable>

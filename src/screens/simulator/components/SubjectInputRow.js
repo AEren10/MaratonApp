@@ -51,10 +51,10 @@ const styles = StyleSheet.create({
   body: { padding: 12 },
   head: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
   name: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, flex: 1 },
-  netBadge: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, overflow: "hidden" },
+  netBadge: { fontFamily: "Bricolage_400", fontSize: 13, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, overflow: "hidden" },
   inputs: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
   inputWrap: { width: 64 },
-  inputLabel: { ...TYPOGRAPHY.micro, fontFamily: "Inter_600SemiBold", marginBottom: 3, textAlign: "center", letterSpacing: 0.5 },
-  input: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, borderRadius: RADIUS.md, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 7, textAlign: "center", letterSpacing: -0.3 },
+  inputLabel: { ...TYPOGRAPHY.micro, fontFamily: "Archivo_600", marginBottom: 3, textAlign: "center", letterSpacing: 0.5 },
+  input: { fontFamily: "Bricolage_400", fontSize: 18, borderRadius: RADIUS.md, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 7, textAlign: "center", letterSpacing: -0.3 },
   maxLabel: { ...TYPOGRAPHY.caption, marginLeft: 4, marginBottom: 8 },
 });

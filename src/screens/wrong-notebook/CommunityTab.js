@@ -79,7 +79,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
               borderRadius: RADIUS.pill,
             }}>
               <Icon name={icon} size={10} color={color} />
-              <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color }}>
+              <Text style={{ fontSize: 11, fontFamily: "Archivo_600", color }}>
                 {subj?.label || item.subject}
               </Text>
             </View>
@@ -116,7 +116,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
             borderRadius: RADIUS.pill,
           }}>
             <Icon name="chat" size={13} color={C.sec} />
-            <Text style={{ fontSize: 12, fontFamily: "Inter_600SemiBold", color: C.sec }}>
+            <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: C.sec }}>
               {item.answer_count} cevap
             </Text>
           </View>
@@ -131,7 +131,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
           })}
         >
           <Icon name="edit" size={14} color={C.textOnFill} />
-          <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: C.textOnFill }}>
+          <Text style={{ fontSize: 13, fontFamily: "Archivo_600", color: C.textOnFill }}>
             Cevap Yaz
           </Text>
         </Pressable>
@@ -211,7 +211,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
               borderWidth: 1, borderColor: on ? clr + "40" : C.border,
             }}>
               <Icon name={f.icon} size={13} color={on ? clr : C.muted} />
-              <Text style={{ fontSize: 13, fontFamily: on ? "Inter_600SemiBold" : "Inter_500Medium", color: on ? clr : C.sec }}>
+              <Text style={{ fontSize: 13, fontFamily: on ? "Archivo_600" : "Archivo_500", color: on ? clr : C.sec }}>
                 {f.label}
               </Text>
             </Pressable>

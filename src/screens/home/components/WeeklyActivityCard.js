@@ -116,12 +116,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 13,
     lineHeight: 18,
   },
   subtitle: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Archivo_400",
     fontSize: 11,
     lineHeight: 14,
   },
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   dayLabel: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 9,
     lineHeight: 11,
   },

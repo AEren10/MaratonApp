@@ -103,7 +103,7 @@ function makeStyles(C) {
       zIndex: 1,
     },
     heroValue: {
-      fontFamily: "SpaceGrotesk_700Bold",
+      fontFamily: "Bricolage_400",
       fontSize: 46,
       color: C.textOnFill,
       zIndex: 1,

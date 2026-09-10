@@ -107,7 +107,7 @@ function makeStyles(C, safeTop) {
       paddingVertical: 2,
     },
     pillText: {
-      fontFamily: "SpaceGrotesk_700Bold",
+      fontFamily: "Bricolage_400",
       fontSize: 13,
       color: "#000000",
       letterSpacing: -0.3,

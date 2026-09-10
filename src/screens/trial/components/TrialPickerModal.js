@@ -34,7 +34,7 @@ function PickerRow({ item, onSelect, isSelected, C }) {
       <Chip color={C.accent} style={{ marginRight: SPACING.sm }}>
         {label}
       </Chip>
-      <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, color: C.text, minWidth: 36, textAlign: "right" }}>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, color: C.text, minWidth: 36, textAlign: "right" }}>
         {(item.totalNet ?? 0).toFixed(1)}
       </Text>
       {isSelected && (

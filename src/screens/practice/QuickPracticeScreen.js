@@ -167,9 +167,9 @@ const makeStyles = (C) =>
     emptyText: { ...TYPOGRAPHY.body, color: C.sec, marginTop: SPACING.sm },
     backBtn: { marginTop: SPACING.md, paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.md },
     backBtnText: { ...TYPOGRAPHY.body, color: C.accent, fontWeight: "600" },
-    summaryScore: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 56, color: C.accent },
+    summaryScore: { fontFamily: "Bricolage_400", fontSize: 56, color: C.accent },
     summaryLabel: { ...TYPOGRAPHY.body, color: C.sec },
-    summaryTime: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
+    summaryTime: { fontFamily: "Bricolage_400", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
     finishBtn: { marginTop: SPACING.xl, backgroundColor: C.orange, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
     finishText: { ...TYPOGRAPHY.body, color: C.textOnFill, fontWeight: "700" },
   });

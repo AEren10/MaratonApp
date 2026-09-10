@@ -306,7 +306,7 @@ function makeStyles(C) {
       marginBottom: SPACING.sm,
     },
     codeText: {
-      fontFamily: "SpaceGrotesk_700Bold",
+      fontFamily: "Bricolage_400",
       fontSize: 36,
       letterSpacing: 4,
     },
@@ -326,7 +326,7 @@ function makeStyles(C) {
       borderRadius: RADIUS.xl,
       borderWidth: 1,
     },
-    actionBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14 },
+    actionBtnText: { fontFamily: "Archivo_600", fontSize: 14 },
     statCard: {
       width: "100%",
       flexDirection: "row",
@@ -355,7 +355,7 @@ function makeStyles(C) {
     inputRow: { flexDirection: "row", gap: SPACING.sm },
     input: {
       flex: 1,
-      fontFamily: "SpaceGrotesk_700Bold",
+      fontFamily: "Bricolage_400",
       fontSize: 18,
       letterSpacing: 3,
       textAlign: "center",
@@ -372,7 +372,7 @@ function makeStyles(C) {
       ...SHADOWS.card,
     },
     applyBtnText: {
-      fontFamily: "Inter_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 14,
       color: C.textOnFill,
     },

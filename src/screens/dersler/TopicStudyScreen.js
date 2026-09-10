@@ -169,7 +169,7 @@ function makeProgressStyles(C) {
       fontSize: 14,
     },
     barPct: {
-      fontFamily: "SpaceGrotesk_700Bold",
+      fontFamily: "Bricolage_400",
       fontSize: 15,
       letterSpacing: -0.3,
     },
@@ -315,7 +315,7 @@ export default function TopicStudyScreen() {
                 transform="rotate(-90 60 60)" />
             </Svg>
             <Text style={{
-              fontFamily: "SpaceGrotesk_700Bold",
+              fontFamily: "Bricolage_400",
               fontSize: (topic?.q || 0) === 0 ? 22 : 26,
               color: (topic?.q || 0) === 0 ? C.muted : C.text,
               letterSpacing: -0.5,
@@ -410,11 +410,11 @@ const s = StyleSheet.create({
     borderRadius: 18, borderWidth: 1,
   },
   statValue: {
-    fontFamily: "SpaceGrotesk_700Bold",
+    fontFamily: "Bricolage_400",
     fontSize: 22,
     letterSpacing: -0.4,
   },
-  statLabel: { ...TYPOGRAPHY.caption, fontSize: 11, marginTop: 4, fontFamily: "Inter_600SemiBold" },
+  statLabel: { ...TYPOGRAPHY.caption, fontSize: 11, marginTop: 4, fontFamily: "Archivo_600" },
   ringWrapper: { alignItems: "center", marginTop: SPACING.xxxl },
   ringLabel: { ...TYPOGRAPHY.caption, marginTop: SPACING.md },
   masteryBadge: {

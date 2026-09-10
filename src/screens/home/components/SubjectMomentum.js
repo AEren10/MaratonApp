@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.4,
   },
   subtitle: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Archivo_400",
     fontSize: 11,
     lineHeight: 14,
   },
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   dot:   { width: 9, height: 9, borderRadius: RADIUS.full },
-  name:  { fontFamily: "Inter_500Medium", fontSize: 14, lineHeight: 20, flex: 1 },
-  net:   { fontFamily: "SpaceGrotesk_700Bold", fontSize: 14, lineHeight: 20, minWidth: 40, textAlign: "right" },
+  name:  { fontFamily: "Archivo_500", fontSize: 14, lineHeight: 20, flex: 1 },
+  net:   { fontFamily: "Bricolage_400", fontSize: 14, lineHeight: 20, minWidth: 40, textAlign: "right" },
   trend: { flexDirection: "row", alignItems: "center", gap: 2, minWidth: 46 },
-  delta: { fontFamily: "Inter_600SemiBold", fontSize: 11, lineHeight: 18 },
+  delta: { fontFamily: "Archivo_600", fontSize: 11, lineHeight: 18 },
 });

@@ -61,7 +61,7 @@ export const SubjectListCard = React.memo(function SubjectListCard({ item, index
           <View style={s.cardTop}>
             <View style={[s.dot, { backgroundColor: color }]} />
             <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]} numberOfLines={1}>{name}</Text>
-            <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 22, color, letterSpacing: -0.5 }}>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color, letterSpacing: -0.5 }}>
               {Number(net).toFixed(1)}
               <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>/{max}</Text>
             </Text>
@@ -70,15 +70,15 @@ export const SubjectListCard = React.memo(function SubjectListCard({ item, index
           <NetBar pct={max > 0 ? Math.min(net / max, 1) : 0} color={color} delay={index * 60} />
           <View style={s.cardBottom}>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color }}>{Number(avgNet).toFixed(1)}</Text>
+              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color }}>{Number(avgNet).toFixed(1)}</Text>
               <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>ort net</Text>
             </View>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color: C.green }}>{accuracy}%</Text>
+              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.green }}>{accuracy}%</Text>
               <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>doğruluk</Text>
             </View>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, color: C.text }}>{trialCount}</Text>
+              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.text }}>{trialCount}</Text>
               <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>deneme</Text>
             </View>
             <MiniTrend data={trend} color={color} />

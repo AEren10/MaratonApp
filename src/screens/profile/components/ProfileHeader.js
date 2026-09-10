@@ -106,7 +106,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, streak }) {
               style={{ width: 74, height: 74, alignItems: "center", justifyContent: "center" }}
             >
               <Text style={{
-                fontFamily: "SpaceGrotesk_700Bold",
+                fontFamily: "Bricolage_400",
                 fontSize: 27, color: C.textOnFill, letterSpacing: -0.5,
               }}>
                 {initials}
@@ -137,7 +137,7 @@ export function ProfileHeader({ name = "Öğrenci", exam, streak }) {
       {/* Name + pills */}
       <View style={{ flex: 1, gap: SPACING.sm }}>
         <Text style={{
-          fontFamily: "SpaceGrotesk_700Bold",
+          fontFamily: "Bricolage_400",
           fontSize: 22, color: C.text, letterSpacing: -0.4,
         }} numberOfLines={1}>
           {name}

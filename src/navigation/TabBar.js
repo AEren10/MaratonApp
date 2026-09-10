@@ -116,7 +116,7 @@ function TabItem({ tab, active, onPress, C }) {
       <Text
         style={{
           ...TYPOGRAPHY.micro,
-          fontFamily: active ? "Inter_600SemiBold" : "Inter_500Medium",
+          fontFamily: active ? "Archivo_600" : "Archivo_500",
           color: active ? C.orange : C.muted,
           marginTop: active ? 0 : 4,
         }}

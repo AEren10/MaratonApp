@@ -76,7 +76,7 @@ function NetChart({ data, color, height = CHART_H, width = CHART_W, C, showLabel
       {showLabels && grids.map((g) => (
         <React.Fragment key={g.label}>
           <Line x1={PAD.l} y1={g.y} x2={width - PAD.r} y2={g.y} stroke={C.border} strokeWidth={0.5} strokeDasharray="4,4" />
-          <SvgText x={PAD.l - 6} y={g.y + 4} textAnchor="end" fill={C.muted} fontSize={9} fontFamily="Inter_400Regular">
+          <SvgText x={PAD.l - 6} y={g.y + 4} textAnchor="end" fill={C.muted} fontSize={9} fontFamily="Archivo_400">
             {g.label}
           </SvgText>
         </React.Fragment>
