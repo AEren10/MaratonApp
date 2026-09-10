@@ -1,12 +1,13 @@
 import { SCREENS } from "../../constants/screens";
 import { EVENTS } from "../../constants/analytics";
 import { routeActionTimerParams } from "../../domain/route/routeStartAction";
+import { buildRouteCreatedAlertCopy } from "../../domain/route/routeCreatedAlertCopy";
 import { track } from "../../lib/analytics";
 
-export function showRouteCreatedAlert({ action, navigation, routeCreated, showAlert }) {
-  const title = routeCreated ? "Rota yeniden analiz edildi" : "Rota oluşturuldu";
+export function showRouteCreatedAlert({ action, navigation, routeCreated, revisionSummary, showAlert }) {
+  const copy = buildRouteCreatedAlertCopy({ action, routeCreated, revisionSummary });
   if (!action) {
-    showAlert(title, "İlk hafta durakların kilitlendi. Tamamladıkların sonraki revizyonlarda korunacak.");
+    showAlert(copy.title, copy.message);
     return;
   }
   track(EVENTS.ROUTE_FIRST_ACTION_OFFERED, {
@@ -14,7 +15,7 @@ export function showRouteCreatedAlert({ action, navigation, routeCreated, showAl
     subject: action.subjectKey,
     stopId: action.stopId || null,
   });
-  showAlert(title, `${action.title}\n${action.message}`, [
+  showAlert(copy.title, copy.message, [
     { text: "Sonra", style: "cancel" },
     {
       text: action.actionLabel,

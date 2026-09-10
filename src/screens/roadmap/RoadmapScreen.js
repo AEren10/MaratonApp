@@ -38,7 +38,13 @@ export default function RoadmapScreen() {
       const result = await createRoute();
       const nextAction = firstRouteAction(result?.stops);
       H.success();
-      showRouteCreatedAlert({ action: nextAction, navigation, routeCreated, showAlert });
+      showRouteCreatedAlert({
+        action: nextAction,
+        navigation,
+        revisionSummary: result?.revisionSummary,
+        routeCreated,
+        showAlert,
+      });
     } catch {
       H.error();
       showAlert("Rota oluşturulamadı", "Bağlantını kontrol edip tekrar dene. Önizlemen kaybolmadı.");
