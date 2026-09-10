@@ -8,37 +8,68 @@ import { useC } from "../../contexts/ThemeContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SPACING, TYPOGRAPHY } from "../../themes/tokens";
 import RouteProgressHeader from "./components/RouteProgressHeader";
+import RouteCreationCard from "./components/RouteCreationCard";
 import RouteWeekCard from "./components/RouteWeekCard";
 import { EmptyState } from "../../components/common/EmptyState";
 import { usePremium } from "../../contexts/PremiumContext";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
 
 export default function RoadmapScreen() {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const { showPaywall } = usePremium();
+  const showAlert = useAlert();
   const {
     weeks, totals, daysLeft, hasRouteAccess, routeAccessError,
     routeAccessLoading, refreshRouteAccess, isPaused, pause, resume,
-    intelligence,
+    intelligence, routeCreated, routeCreating, routeCreationError, createRoute,
   } = useStudyRoute({ persist: false });
 
   const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
+  const handleCreateRoute = useCallback(async () => {
+    try {
+      await createRoute();
+      H.success();
+      showAlert(
+        routeCreated ? "Rota yeniden analiz edildi" : "Rota oluşturuldu",
+        "İlk hafta durakların kilitlendi. Tamamladıkların sonraki revizyonlarda korunacak.",
+      );
+    } catch {
+      H.error();
+      showAlert("Rota oluşturulamadı", "Bağlantını kontrol edip tekrar dene. Önizlemen kaybolmadı.");
+    }
+  }, [createRoute, routeCreated, showAlert]);
   const renderWeek = useCallback(
     ({ item }) => <RouteWeekCard week={item} frozen={isPaused} C={C} />,
     [C, isPaused],
   );
   const keyExtractor = useCallback((item) => item.weekStart || `week-${item.weekNo}`, []);
   const header = useMemo(() => (
-    <RouteProgressHeader
-      totals={totals}
-      daysLeft={daysLeft}
-      isPaused={isPaused}
-      intelligence={intelligence}
-      onTogglePause={togglePause}
-      C={C}
-    />
-  ), [C, daysLeft, intelligence, isPaused, togglePause, totals]);
+    <>
+      <RouteCreationCard
+        C={C}
+        daysLeft={daysLeft}
+        disabled={isPaused}
+        error={routeCreationError}
+        intelligence={intelligence}
+        loading={routeCreating}
+        onCreate={handleCreateRoute}
+        routeCreated={routeCreated}
+        weeks={weeks}
+      />
+      <RouteProgressHeader
+        totals={totals}
+        daysLeft={daysLeft}
+        isPaused={isPaused}
+        intelligence={intelligence}
+        onTogglePause={togglePause}
+        C={C}
+      />
+    </>
+  ), [C, daysLeft, handleCreateRoute, intelligence, isPaused, routeCreated,
+    routeCreating, routeCreationError, togglePause, totals, weeks]);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>

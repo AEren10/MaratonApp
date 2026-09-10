@@ -62,6 +62,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const hasRouteAccess = !accessLoading && checkFeature("detailed_roadmap");
   const [pastWeeks, setPastWeeks] = useState([]);
   const [routeState, setRouteStateLocal] = useState(null);
+  const [routeCreating, setRouteCreating] = useState(false);
+  const [routeCreationError, setRouteCreationError] = useState(null);
   const isPaused = !!routeState?.paused_at && (!routeState?.resumed_at
     || new Date(routeState.paused_at) > new Date(routeState.resumed_at));
   const recoveryWeek = useMemo(() => {
@@ -216,6 +218,47 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   }, [persist, user?.id, examType, hasRouteAccess, isPaused,
     computedRoute.weeks, computedRoute.revision]);
 
+  const createRoute = useCallback(async () => {
+    if (!user?.id || !examType || !hasRouteAccess) {
+      throw new Error("route_access_unavailable");
+    }
+    if (!computedRoute.weeks?.length) {
+      throw new Error("route_preview_unavailable");
+    }
+    setRouteCreating(true);
+    setRouteCreationError(null);
+    try {
+      const savedWeekCount = await saveRouteWeeks(
+        user.id,
+        computedRoute.weeks,
+        examType,
+        computedRoute.revision,
+      );
+      if (savedWeekCount <= 0) {
+        throw new Error("route_persist_failed");
+      }
+      const [stops, rows] = await Promise.all([
+        getLatestRouteStops(user.id, examType),
+        getRouteWeeks(user.id, { examType }),
+      ]);
+      setPersistedStops(stops);
+      setPastWeeks(rows);
+      track(EVENTS.ROUTE_CREATED, {
+        examType,
+        confidence: computedRoute.intelligence?.confidence || "low",
+        weeks: computedRoute.weeks.length,
+      });
+      return { stops, weeks: rows };
+    } catch (e) {
+      setRouteCreationError("Rota oluşturulamadı. Bağlantını kontrol edip tekrar dene.");
+      track(EVENTS.ROUTE_CREATION_FAILED, { examType });
+      throw e;
+    } finally {
+      setRouteCreating(false);
+    }
+  }, [computedRoute.intelligence?.confidence, computedRoute.revision,
+    computedRoute.weeks, examType, hasRouteAccess, user?.id]);
+
   // Borç: geçmiş haftaların planı ile gerçekleşeni karşılaştır.
   const debt = useMemo(() => {
     const actualByWeek = {};
@@ -283,6 +326,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     routeAccessError: accessError,
     routeAccessLoading: accessLoading,
     refreshRouteAccess: refreshUsage,
+    routeCreated: persistedStops.length > 0,
+    routeCreating,
+    routeCreationError,
+    createRoute,
     threshold,
     debt,
     debtWeeks: debtInWeeks(debt.totalQuestions, route.capacity),

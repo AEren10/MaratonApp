@@ -40,6 +40,8 @@ export const EVENTS = {
   TRIAL_NORMALIZED: "trial.normalized",
 
   // Route
+  ROUTE_CREATED: "route.created",
+  ROUTE_CREATION_FAILED: "route.creation_failed",
   ROUTE_STOP_TRANSITIONED: "route.stop_transitioned",
   ROUTE_COMPANION_REQUESTED: "route.companion_requested",
   ROUTE_COMPANION_RESPONDED: "route.companion_responded",
