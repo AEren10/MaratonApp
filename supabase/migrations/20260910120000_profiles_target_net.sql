@@ -1,4 +1,5 @@
--- UYGULANMADI. Canli DB'ye elle uygulanmasi gerekiyor.
+-- UYGULANDI ve DOGRULANDI (2026-09-10, Supabase SQL editoru).
+-- Dogrulama: information_schema.columns -> target_net numeric(5,2), nullable.
 --
 -- BULGU (FAZ 1.2 sema farki, 2026-09-10):
 -- Tasarimin onboarding 1. adimi HEDEF NET soruyor — slider 40-120, varsayilan 72,
@@ -27,8 +28,8 @@
 -- UYGULAMADAN ONCE yine de RLS politikalarinin kullanicinin kendi satirini
 -- guncellemeye izin verdigini DOGRULA.
 
--- ALTER TABLE public.profiles
---   ADD COLUMN IF NOT EXISTS target_net numeric(5,2);
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS target_net numeric(5,2);
 --
 -- Tasarimdaki slider araligi: 40-120. Sinav turune gore ust sinir degisiyor
 -- (TYT 120, AYT ders sayisina bagli), o yuzden kisit uygulama tarafinda

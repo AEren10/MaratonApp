@@ -79,16 +79,28 @@ export const PRODUCT_FEATURES = {
   trial_compare: "trialCompare",
   ocr: "ocr",
   monthly_report: "monthlyReport",
+  // Sunucuda ayri anahtar yok — ayni kurali paylastiklari icin eslenmis.
+  // Gerekce yukarida.
+  topic_progress: "routePriorities",
+  department_threshold: "routePriorities",
 };
 
-// EKSIK — tasarimin 8 paywall tetik noktasindan ikisinin karsiligi yok:
-//   "konu ilerlemesi" ve "hedef bolum karsilastirmasi" (Bolum Esigi ekrani).
-// Anahtarlar buraya EKLENMEDI cunku canAccessProductFeature fail-closed:
-// sunucunun get_product_access_snapshot'i su an 7 anahtar donduruyor
-// (bkz. supabase/migrations/20260909100000_product_access_companionship.sql:195),
-// istemciye tek tarafli anahtar eklemek o ozellikleri PREMIUM kullanici icin
-// bile kilitli yapardi. Once sunucu tarafi genisletilmeli —
-// hazir dosya: supabase/migrations/pending/20260910_product_features_extend.sql
+// Tasarimin 8 paywall tetik noktasindan ikisinin sunucuda AYRI anahtari yok:
+// "konu ilerlemesi" ve "hedef bolum karsilastirmasi" (Bolum Esigi ekrani).
+//
+// CANLI DOGRULAMA (2026-09-10): private.get_product_access_snapshot'in
+// features jsonb'si su 7 anahtari donduruyor — route, routeForecast,
+// routeScenarios, routePriorities, trialCompare, ocr, monthlyReport.
+// topicProgress ve departmentThreshold YOK.
+//
+// Ancak canlida HEPSININ kurali BIREBIR AYNI: `first_week OR pro`.
+// Yani bugun ayri bir anahtar fonksiyonel olarak hicbir sey katmiyor.
+// O yuzden production'daki erisim fonksiyonuna DOKUNMADAN bu ikisi
+// routePriorities'e esleniyor — erisim davranisi ozdes, risk sifir.
+//
+// SUNUCU BU IKISINI AYRI KURALA BAGLAMAK ISTERSE gercek anahtar gerekir:
+// supabase/migrations/pending/20260910_product_features_extend.sql hazir,
+// degisiklik PUBLIC sarmalayiciya degil PRIVATE fonksiyona yapilmali.
 
 
 export const PREMIUM_TO_PRODUCT_FEATURE = {
