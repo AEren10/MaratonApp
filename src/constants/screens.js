@@ -64,6 +64,9 @@ export const SCREENS = {
 
   // New flows
   STUDY_SUMMARY: "StudySummary",
+  // Tasarimin uc ozet artboardi (Gunun/Haftalik/Ayin Ozeti) tek parametreli
+  // ekran: period = "day" | "week" | "month". Ayni iskelet, farkli donem.
+  SUMMARY: "Summary",
   TRIAL_INSIGHTS: "TrialInsights",
   WEEKLY_REVIEW: "WeeklyReview",
   WEEKLY_TRIAL_REVIEW: "WeeklyTrialReview",
