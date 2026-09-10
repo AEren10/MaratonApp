@@ -75,11 +75,23 @@ export default function PlanDetailScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <GlowBackground blobs={WARM_GLOW} />
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Pressable
+          accessibilityLabel="Geri"
+          accessibilityRole="button"
+          hitSlop={12}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={styles.title}>Günlük Plan</Text>
-        <Pressable onPress={() => navigation.navigate(SCREENS.ADD_TASK)} hitSlop={12} style={styles.addBtn}>
+        <Pressable
+          accessibilityHint="Yeni görev ekleme ekranını açar"
+          accessibilityLabel="Görev ekle"
+          accessibilityRole="button"
+          hitSlop={12}
+          onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+          style={styles.addBtn}
+        >
           <Icon name="plus" size={18} color={C.accent} sw={2.5} />
         </Pressable>
       </View>
@@ -109,6 +121,9 @@ export default function PlanDetailScreen() {
             </Text>
           </View>
           <Pressable
+            accessibilityHint="Yeni görev ekleme ekranını açar"
+            accessibilityLabel="Görev ekle"
+            accessibilityRole="button"
             onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
             style={({ pressed }) => [
               styles.addRow,
