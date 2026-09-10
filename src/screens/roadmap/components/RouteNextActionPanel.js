@@ -1,11 +1,20 @@
 import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button, Icon } from "../../../components/design";
+import { Button, Chip, Icon } from "../../../components/design";
+import { buildRouteActionInsightChips } from "../../../domain/route/routeActionInsightChips";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
+
+function chipColor(tone, C) {
+  if (tone === "confidence") return C.accent;
+  if (tone === "impact") return C.up;
+  if (tone === "review") return C.warn;
+  return C.sec;
+}
 
 function RouteNextActionPanel({ action, C, disabled, onStart }) {
   if (!action) return null;
+  const chips = buildRouteActionInsightChips(action);
   return (
     <View style={[styles.card, { backgroundColor: C.accent + "12", borderColor: C.accent + "35" }]}>
       <View style={styles.row}>
@@ -17,6 +26,15 @@ function RouteNextActionPanel({ action, C, disabled, onStart }) {
           <Text style={[styles.title, { color: C.text }]} numberOfLines={1}>
             {action.title}
           </Text>
+          {chips.length > 0 ? (
+            <View style={styles.chips}>
+              {chips.map((item) => (
+                <Chip color={chipColor(item.tone, C)} key={item.key} style={styles.chip}>
+                  {item.label}
+                </Chip>
+              ))}
+            </View>
+          ) : null}
           <Text style={[styles.body, { color: C.sec }]}>{action.message}</Text>
         </View>
       </View>
@@ -59,5 +77,12 @@ const styles = StyleSheet.create({
   copy: { flex: 1 },
   eyebrow: { ...TYPOGRAPHY.micro },
   title: { ...TYPOGRAPHY.bodySemiBold, marginTop: 2 },
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: SPACING.xs,
+    marginTop: SPACING.xs,
+  },
+  chip: { flexShrink: 1 },
   body: { ...TYPOGRAPHY.caption, marginTop: 2 },
 });
