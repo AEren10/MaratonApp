@@ -1,6 +1,6 @@
-import { SCREENS } from "../constants/screens";
-import { PRODUCT_FLOW_IDS } from "../constants/productFlows";
-import { TAB_KEYS, TAB_STACKS } from "./tabAssignment";
+import { SCREENS } from "../constants/screens.js";
+import { PRODUCT_FLOW_IDS } from "../constants/productFlows.js";
+import { TAB_KEYS, TAB_STACKS } from "./tabAssignment.js";
 
 export const ROOT_STACK = {
   MAIN_TABS: "MainTabs",

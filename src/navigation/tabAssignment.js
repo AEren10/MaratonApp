@@ -1,4 +1,4 @@
-import { SCREENS } from "../constants/screens";
+import { SCREENS } from "../constants/screens.js";
 
 // SEKME ATAMASI — tasarimin "Tabbar bozulmaz" kurali.
 //
