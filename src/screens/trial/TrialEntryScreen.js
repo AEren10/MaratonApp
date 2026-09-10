@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useTrialEntryForm } from "./useTrialEntryForm";
+import { useTrialEntrySteps } from "./useTrialEntrySteps";
 import { TrialEntryFormContent } from "./components/TrialEntryFormContent";
 import { makeTrialEntryStyles } from "./trialEntryStyles";
 
@@ -22,7 +23,8 @@ export default function TrialEntryScreen() {
   } = usePremium();
   const showAlert = useAlert();
   const trialEntry = useTrialEntryForm({ C, navigation });
-  const goBack = useCallback(() => navigation.goBack(), [navigation]);
+  const exitScreen = useCallback(() => navigation.goBack(), [navigation]);
+  const steps = useTrialEntrySteps({ form: trialEntry, onExit: exitScreen });
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
@@ -81,13 +83,15 @@ export default function TrialEntryScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.safe}>
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
+          <Pressable onPress={steps.goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Deneme Gir</Text>
           <View style={styles.headerSpacer} />
         </View>
-        <TrialEntryFormContent C={C} form={trialEntry} styles={styles} />
+        <TrialEntryFormContent C={C} form={trialEntry} styles={styles}
+          step={steps.step} totalSteps={steps.totalSteps}
+          goNext={steps.goNext} goBack={steps.goBack} overflow={steps.overflow} />
         <XPBoostToast amount={trialEntry.xpToast.amount} visible={trialEntry.xpToast.visible}
           multiplier={trialEntry.xpToast.multiplier} onDismiss={trialEntry.dismissXP} />
       </KeyboardAvoidingView>

@@ -6,7 +6,7 @@ import { Icon } from "../../../components/design";
 import * as H from "../../../lib/haptics";
 
 // Ders satırı: kimlik renkli sol şerit + ad + 3 input (D/Y/B otomatik) + net
-export function SubjectInput({ subject, values, onChange, wrongPenalty = 0.25 }) {
+export function SubjectInput({ subject, values, onChange, wrongPenalty = 0.25, error = false }) {
   const C = useC();
   const id = useSubjectIdentity(subject.key);
   const { name, icon, max } = subject;
@@ -46,7 +46,8 @@ export function SubjectInput({ subject, values, onChange, wrongPenalty = 0.25 })
   const setEmpty = useCallback((t) => onChange({ ...values, empty: cap(t, max) }), [values, onChange, max, cap]);
 
   return (
-    <View accessible accessibilityLabel={`${name} dersi, ${net} net`} style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+    <View accessible accessibilityLabel={`${name} dersi, ${net} net`}
+      style={[s.card, { backgroundColor: C.surface, borderColor: error ? C.danger : C.border }, error && s.cardError]}>
       <View style={s.body}>
         {/* Header: ikon + ad + max + net */}
         <View style={s.head}>
@@ -107,6 +108,7 @@ const s = StyleSheet.create({
     marginBottom: 12,
     overflow: "hidden",
   },
+  cardError: { borderWidth: 1.5 },
   body: { padding: 14 },
   head: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
   iconBox: {
