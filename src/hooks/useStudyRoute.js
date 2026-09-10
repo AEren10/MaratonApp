@@ -19,6 +19,7 @@ import { weightedWeakAreas } from "../lib/buildPlanContext";
 import { forecastNet } from "../lib/netForecast";
 import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
 import { routeReadinessSummary } from "../domain/route/routeCreation";
+import { summarizeRouteRevision } from "../domain/route/routeRevisionSummary";
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
@@ -180,6 +181,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     [tempoScenarios],
   );
   const routeCreated = persistedStops.length > 0;
+  const routeRevisionPreview = useMemo(() => summarizeRouteRevision({
+    previousWeeks: pastWeeks,
+    nextWeeks: computedRoute.weeks,
+    nextRevision: computedRoute.revision,
+  }), [computedRoute.revision, computedRoute.weeks, pastWeeks]);
   const routeReadiness = useMemo(() => routeReadinessSummary({
     weeks: route.weeks,
     intelligence: route.intelligence,
@@ -242,6 +248,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     setRouteCreating(true);
     setRouteCreationError(null);
     try {
+      const revisionSummary = summarizeRouteRevision({
+        previousWeeks: pastWeeks,
+        nextWeeks: computedRoute.weeks,
+        nextRevision: computedRoute.revision,
+      });
       const savedWeekCount = await saveRouteWeeks(
         user.id,
         computedRoute.weeks,
@@ -261,8 +272,13 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         examType,
         confidence: computedRoute.intelligence?.confidence || "low",
         weeks: computedRoute.weeks.length,
+        changed: revisionSummary.changed,
+        added: revisionSummary.counts.added,
+        removed: revisionSummary.counts.removed,
+        moved: revisionSummary.counts.moved,
+        resized: revisionSummary.counts.resized,
       });
-      return { stops, weeks: rows };
+      return { stops, weeks: rows, revisionSummary };
     } catch (e) {
       setRouteCreationError("Rota oluşturulamadı. Bağlantını kontrol edip tekrar dene.");
       track(EVENTS.ROUTE_CREATION_FAILED, { examType });
@@ -271,7 +287,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       setRouteCreating(false);
     }
   }, [computedRoute.intelligence?.confidence, computedRoute.revision,
-    computedRoute.weeks, examType, hasRouteAccess, user?.id]);
+    computedRoute.weeks, examType, hasRouteAccess, pastWeeks, user?.id]);
 
   // Borç: geçmiş haftaların planı ile gerçekleşeni karşılaştır.
   const debt = useMemo(() => {
@@ -341,6 +357,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     routeAccessLoading: accessLoading,
     refreshRouteAccess: refreshUsage,
     routeCreated,
+    routeRevisionPreview,
     routeReadiness,
     routeCreating,
     routeCreationError,
