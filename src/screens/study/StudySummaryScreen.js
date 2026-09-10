@@ -17,6 +17,7 @@ import { useInAppReview } from "../../hooks/useInAppReview";
 import { ROOT_STACK } from "../../navigation/routes";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
+import RouteNextActionPanel from "../roadmap/components/RouteNextActionPanel";
 import { StudySummaryStats } from "./components/StudySummaryStats";
 
 export default function StudySummaryScreen() {
@@ -121,9 +122,12 @@ export default function StudySummaryScreen() {
 
         <Animated.View entering={FadeInDown.delay(320).duration(500)} style={{ gap: STEP.s1 }}>
           {nextRouteAction ? (
-            <Button onPress={startNextRouteAction} fullWidth>
-              Sıradaki durağı başlat
-            </Button>
+            <RouteNextActionPanel
+              C={C}
+              action={nextRouteAction}
+              disabled={false}
+              onStart={startNextRouteAction}
+            />
           ) : null}
           <Button onPress={dismiss} variant={nextRouteAction ? "outline" : "primary"} fullWidth>
             {nextRouteAction ? "Ana sayfaya dön" : "Devam Et"}
