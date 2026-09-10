@@ -48,4 +48,8 @@ test("carries route insight into the daily assignment reason", () => {
   assert.equal(plan.tasks[0].routeInsight.reasonCode, "LOW_ACCURACY");
   assert.equal(plan.tasks[0].assignment.title, "Rota motoru seçti");
   assert.equal(plan.tasks[0].assignment.confidenceLabel, "orta");
+  assert.equal(plan.summary.source, "route");
+  assert.equal(plan.summary.routeTaskCount, 1);
+  assert.equal(plan.summary.confidenceLabel, "orta");
+  assert.equal(plan.summary.primaryTaskKey, "plan_math:a");
 });

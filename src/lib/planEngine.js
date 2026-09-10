@@ -2,6 +2,7 @@ import { differenceInDays, todayTR } from "./dateUtils.js";
 import { getSubjectsForExam } from "../data/curriculum.js";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity.js";
 import { buildDailyAssignmentNarrative } from "../domain/plan/dailyAssignment.js";
+import { buildDailyPlanSummary } from "../domain/plan/dailyPlanSummary.js";
 
 const ROUTE_REASON_TEXT = {
   REVIEW_DUE: "Tekrar zamanı geldi",
@@ -216,10 +217,14 @@ export function generateDailyPlan({
     remaining -= actual;
   }
 
+  const totalQuestions = dailyTarget - remaining;
+  const estimatedMinutes = tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0);
+
   return {
     date: todayTR(),
     tasks,
-    totalQuestions: dailyTarget - remaining,
-    estimatedMinutes: tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0),
+    totalQuestions,
+    estimatedMinutes,
+    summary: buildDailyPlanSummary({ tasks, totalQuestions, estimatedMinutes }),
   };
 }
