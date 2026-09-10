@@ -65,6 +65,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     // turetiyor; dakika yoksa 0 gelir ve serit borcu hic gostermez —
     // uydurma bir soru/saat orani kullanilmaz.
     debtHours: debt?.totalMinutes ? Math.round(debt.totalMinutes / 60) : 0,
+    hasDebt: !!debt?.hasDebt,
     nextTask,
     ctaSubtitle,
   };

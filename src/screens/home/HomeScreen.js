@@ -187,6 +187,9 @@ export default function HomeScreen() {
             solvedToday={solvedToday}
             dailyGoal={dailyGoal}
             generatedTasks={generatedTasks}
+            weeklyDailyCounts={weeklyActivity.counts}
+            comeback={comeback}
+            onDismissComeback={dismissComeback}
             onStartTask={(task) => {
               if (!task) { go(SCREENS.ADD_STUDY)(); return; }
               trackButtonTap("home_hero_cta_start", { subject: task.subject, targetScreen: SCREENS.STUDY_TIMER });
