@@ -48,6 +48,8 @@ export function routeActionTimerParams(action) {
   return {
     subjectKey: action.subjectKey,
     topicName: action.topicName,
+    routeSubjectKey: action.subjectKey,
+    routeTopicName: action.topicName,
     routeStopId: action.stopId || undefined,
     routeStopVersion: action.version ?? undefined,
   };

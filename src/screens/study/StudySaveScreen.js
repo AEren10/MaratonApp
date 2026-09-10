@@ -82,6 +82,8 @@ export default function StudySaveScreen() {
     planTopicName,
     routeStopId,
     routeStopVersion,
+    routeSubjectKey,
+    routeTopicName,
   } = route.params ?? {};
 
   const [examTier, setExamTier] = useState(() => {
@@ -256,6 +258,8 @@ export default function StudySaveScreen() {
       planTaskKey,
       routeStopId,
       routeStopVersion,
+      routeSubjectKey,
+      routeTopicName,
     });
     if (planCompletion.planCompleted) reward("plan_task_done");
     if (planCompletion.planError || planCompletion.routeError) {
@@ -291,7 +295,7 @@ export default function StudySaveScreen() {
       duration,
       questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion]);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>

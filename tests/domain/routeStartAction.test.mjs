@@ -35,6 +35,8 @@ test("selects the active route stop before upcoming stops", () => {
   assert.deepEqual(routeActionTimerParams(action), {
     subjectKey: "matematik",
     topicName: "Problemler",
+    routeSubjectKey: "matematik",
+    routeTopicName: "Problemler",
     routeStopId: "active-1",
     routeStopVersion: 5,
   });

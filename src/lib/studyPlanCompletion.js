@@ -1,6 +1,10 @@
 import * as Crypto from "expo-crypto";
 
-import { planTaskMatchesStudy, findPlanTaskByStudyContext } from "../domain/plan/planTaskIdentity";
+import { findPlanTaskByStudyContext } from "../domain/plan/planTaskIdentity";
+import {
+  expectedStudyContextMatches,
+  resolveStudyCompletionScope,
+} from "../domain/study/studyPlanCompletionModel";
 import { savePlanTaskToggleOffline } from "./offlineQueue";
 import { getDailyPlan } from "../supabase/plans";
 import { transitionRouteStop } from "../supabase/routePlan";
@@ -15,12 +19,17 @@ export async function completeStudyPlanContext({
   planTaskKey,
   routeStopId,
   routeStopVersion,
+  routeSubjectKey,
+  routeTopicName,
 } = {}) {
-  if (!userId || userId === "dev" || !planTaskKey) return { skipped: "missing_context" };
+  const scope = resolveStudyCompletionScope({ userId, planTaskKey, routeStopId });
+  if (scope.skipped) return { skipped: scope.skipped };
 
-  const matches = planTaskMatchesStudy({
-    planSubject: planSubjectKey,
-    planTopic: planTopicName,
+  const expectedSubject = scope.shouldCompletePlan ? planSubjectKey : routeSubjectKey;
+  const expectedTopic = scope.shouldCompletePlan ? planTopicName : routeTopicName;
+  const matches = expectedStudyContextMatches({
+    expectedSubject,
+    expectedTopic,
     studySubject: subjectKey,
     studyTopic: topic,
   });
@@ -37,7 +46,7 @@ export async function completeStudyPlanContext({
         clientOperationId: Crypto.randomUUID(),
         payload: {
           source: "study_save",
-          plan_task_key: planTaskKey,
+          plan_task_key: planTaskKey || null,
         },
       });
       result.routeCompleted = true;
@@ -45,6 +54,11 @@ export async function completeStudyPlanContext({
       result.routeError = e;
       return result;
     }
+  }
+
+  if (!scope.shouldCompletePlan) {
+    result.planSkipped = "missing_plan_task";
+    return result;
   }
 
   try {
@@ -62,7 +76,7 @@ export async function completeStudyPlanContext({
       result.planSkipped = "task_not_found";
     }
   } catch (e) {
-      result.planError = e;
+    result.planError = e;
   }
 
   return result;

@@ -35,6 +35,8 @@ export function useStudyTimerController(C) {
     planTopicName,
     routeStopId,
     routeStopVersion,
+    routeSubjectKey: routeActionSubjectKey,
+    routeTopicName: routeActionTopicName,
   } = route.params ?? {};
   const modes = useMemo(() => buildStudyTimerModes(C), [C]);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState(routeSubjectKey || null);
@@ -44,6 +46,8 @@ export function useStudyTimerController(C) {
     planTopicName,
     routeStopId,
     routeStopVersion,
+    routeSubjectKey: routeActionSubjectKey,
+    routeTopicName: routeActionTopicName,
   });
   const [modeKey, setModeKey] = useState("FREE");
   const [phase, setPhase] = useState(STUDY_TIMER_PHASE.FOCUS);
