@@ -161,7 +161,7 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     brandFill: accent,
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
-    accentPress: mix(accent, 86, "#000000"),
+    accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
     accentGlow: alpha(accent, isDark ? 30 : 26),
 
     // Rota / grafik türevleri

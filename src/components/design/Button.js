@@ -2,7 +2,7 @@ import { Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "./Icon";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, RADIUS, ANIMATION } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL, ANIMATION } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
 const ReanimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -17,10 +17,11 @@ const VARIANTS = {
   success:   (C) => ({ bg: C.success, text: C.textOnBrand, pressed: C.green }),
 };
 
+// Tasarimin uc kademesi: birincil/ikincil h52, ucuncul h44. Pill yok.
 const SIZES = {
-  sm: { py: 8,  px: 14, fontSize: 13, iconSize: 14, radius: RADIUS.md },
-  md: { py: 13, px: 22, fontSize: 15, iconSize: 16, radius: RADIUS.xl },
-  lg: { py: 16, px: 28, fontSize: 16, iconSize: 18, radius: RADIUS.pill },
+  sm: { height: CONTROL.chip,           px: 14, fontSize: 13, iconSize: 14, radius: SHAPE.chip },
+  md: { height: CONTROL.buttonTertiary, px: 20, fontSize: 15, iconSize: 16, radius: SHAPE.button },
+  lg: { height: CONTROL.buttonPrimary,  px: 24, fontSize: 16, iconSize: 18, radius: SHAPE.button },
 };
 
 export function Button({
@@ -54,7 +55,7 @@ export function Button({
         styles.base,
         {
           backgroundColor: v.bg,
-          paddingVertical: s.py,
+          height: s.height,
           paddingHorizontal: s.px,
           borderRadius: s.radius,
           opacity: isDisabled ? 0.5 : 1,
@@ -86,8 +87,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: SPACING.sm,
-    minHeight: 44,
+    gap: STEP.s1,
+    minHeight: CONTROL.tapMin,
   },
   fullWidth: { width: "100%" },
   label: { ...TYPOGRAPHY.button },

@@ -18,6 +18,7 @@ export { GlowBackground, WARM_GLOW } from "./GlowBackground";
 export { SparkBurst } from "./SparkBurst";
 export { AnimatedPressable } from "./AnimatedPressable";
 export { Button } from "./Button";
+export { LockedValue } from "./LockedValue";
 export { Input } from "./Input";
 export { Loading } from "./Loading";
 export { Screen, SCREEN_PADDING } from "./Screen";
