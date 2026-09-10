@@ -1,41 +1,51 @@
 import { View, Text, Pressable } from "react-native";
 
-import { Icon } from "../../../components/design";
-import { TYPOGRAPHY } from "../../../themes/tokens";
-import { formatTimerDuration } from "../../../domain/study/studyTimerModel";
+import { Button } from "../../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 
+// Tasarım: birincil "Duraklat/Başlat" (outline), altında ince metin linkleri.
 export function StudyTimerControls({
   C,
   hasSubject,
   isPomodoro,
-  phaseColor,
   running,
-  styles,
-  totalFocusSeconds,
+  onFinish,
   onSkip,
   onToggle,
 }) {
   return (
-    <View style={styles.controls}>
-      {isPomodoro && (
-        <Pressable onPress={onSkip} accessibilityLabel="Fazı Atla" accessibilityRole="button" style={styles.sideBtn}>
-          <Icon name="chevR" size={20} color={C.muted} />
-        </Pressable>
-      )}
-      <Pressable
-        onPress={hasSubject ? onToggle : undefined}
+    <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s4 }}>
+      <Button
+        onPress={onToggle}
+        disabled={!hasSubject}
+        variant="outline"
+        size="lg"
+        fullWidth
         accessibilityLabel={running ? "Duraklat" : "Başlat"}
-        accessibilityRole="button"
-        style={[styles.mainBtn, { backgroundColor: hasSubject ? phaseColor : C.border }]}
       >
-        <Icon name={running ? "pause" : "play"} size={28} color={hasSubject ? C.bg : C.muted} />
+        {running ? "Duraklat" : "Başlat"}
+      </Button>
+
+      <Pressable
+        onPress={onFinish}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="Durağı bitir"
+        style={{ height: CONTROL.buttonTertiary, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 }}
+      >
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>Durağı bitir</Text>
       </Pressable>
+
       {isPomodoro && (
-        <View style={styles.sideBtn}>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.muted }}>
-            {formatTimerDuration(totalFocusSeconds)}
-          </Text>
-        </View>
+        <Pressable
+          onPress={onSkip}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Fazı atla"
+          style={{ height: CONTROL.buttonTertiary, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text style={[TYPOGRAPHY.caption, { color: C.text4 }]}>Fazı atla</Text>
+        </Pressable>
       )}
     </View>
   );

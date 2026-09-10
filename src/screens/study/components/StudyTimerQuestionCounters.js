@@ -1,19 +1,41 @@
 import { View, Text, Pressable } from "react-native";
 
-import { TYPOGRAPHY } from "../../../themes/tokens";
+import { Card, Icon } from "../../../components/design";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../../themes/tokens";
 
-function Stepper({ C, tone, value, onAdd, onRemove, styles }) {
+function StepBtn({ C, icon, onPress, disabled }) {
   return (
-    <View style={styles.stepper}>
-      <Pressable onPress={onRemove} hitSlop={8} style={styles.stepBtn}>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.muted }]}>-</Text>
-      </Pressable>
-      <Text style={[TYPOGRAPHY.statSmall, { color: C.text, minWidth: 40, textAlign: "center" }]}>
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel={icon === "plus" ? "Ekle" : "Çıkar"}
+      style={{
+        width: CONTROL.buttonTertiary,
+        height: CONTROL.buttonTertiary,
+        borderRadius: SHAPE.iconBox,
+        borderWidth: 1,
+        borderColor: C.border,
+        alignItems: "center",
+        justifyContent: "center",
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <Icon name={icon} size={14} color={C.text2} sw={2} />
+    </Pressable>
+  );
+}
+
+function Row({ C, label, value, tone, onAdd, onRemove, addDisabled }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s3 }}>
+      <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, flex: 1 }]}>{label}</Text>
+      <StepBtn C={C} icon="minus" onPress={onRemove} disabled={value <= 0} />
+      <Text style={[TYPOGRAPHY.statMedium, { color: C.text, minWidth: 40, textAlign: "center" }]} allowFontScaling={false}>
         {value}
       </Text>
-      <Pressable onPress={onAdd} hitSlop={8} style={styles.stepBtn}>
-        <Text style={[TYPOGRAPHY.subheading, { color: tone }]}>+</Text>
-      </Pressable>
+      <StepBtn C={C} icon="plus" onPress={onAdd} disabled={addDisabled} />
     </View>
   );
 }
@@ -21,40 +43,29 @@ function Stepper({ C, tone, value, onAdd, onRemove, styles }) {
 export function StudyTimerQuestionCounters({
   C,
   correctCount,
-  phaseColor,
   questions,
-  styles,
   onAddCorrect,
   onAddQuestion,
   onRemoveCorrect,
   onRemoveQuestion,
 }) {
   return (
-    <>
-      <View style={styles.questionRow}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>Çözülen soru</Text>
-        <Stepper
-          C={C}
-          tone={phaseColor}
-          value={questions}
-          onAdd={onAddQuestion}
-          onRemove={onRemoveQuestion}
-          styles={styles}
-        />
-      </View>
+    <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s3, gap: STEP.s2 }}>
+      <Card tone="void">
+        <Row C={C} label="Çözülen soru" value={questions} onAdd={onAddQuestion} onRemove={onRemoveQuestion} />
+      </Card>
       {questions > 0 && (
-        <View style={styles.questionRow}>
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>Doğru sayısı</Text>
-          <Stepper
+        <Card tone="void">
+          <Row
             C={C}
-            tone={C.green}
+            label="Doğru sayısı"
             value={correctCount}
             onAdd={onAddCorrect}
             onRemove={onRemoveCorrect}
-            styles={styles}
+            addDisabled={correctCount >= questions}
           />
-        </View>
+        </Card>
       )}
-    </>
+    </View>
   );
 }

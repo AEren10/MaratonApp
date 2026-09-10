@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { Card } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { formatTimerDuration } from "../../domain/study/studyTimerModel";
 import { SubjectPicker } from "./components/SubjectPicker";
@@ -11,13 +12,13 @@ import { StudyTimerControls } from "./components/StudyTimerControls";
 import { StudyTimerHeader } from "./components/StudyTimerHeader";
 import { StudyTimerModeSelector } from "./components/StudyTimerModeSelector";
 import { StudyTimerQuestionCounters } from "./components/StudyTimerQuestionCounters";
+import { SubjectTopicCard } from "./components/SubjectTopicCard";
 import { TimerRing } from "./components/TimerRing";
 import { useStudyTimerController } from "./useStudyTimerController";
 import { useAlert } from "../../contexts/AlertContext";
 
 export default function StudyTimerScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
   const timer = useStudyTimerController(C);
   const showAlert = useAlert();
 
@@ -65,163 +66,78 @@ export default function StudyTimerScreen() {
     subject,
     toggle,
     topic,
-    totalFocusSeconds,
   } = timer;
 
+  const eyebrow = isPomodoro
+    ? `${phaseLabel.toUpperCase()} · TUR ${cycleIndex + 1}/${mode.cycles}`
+    : hasSubject
+      ? "SERBEST ÇALIŞMA"
+      : "ODAK";
+
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <StudyTimerHeader
         C={C}
-        hasSubject={hasSubject}
+        eyebrow={eyebrow}
+        eyebrowColor={isPomodoro ? phaseColor : C.text3}
         onBack={exit}
         onHistory={openHistory}
-        styles={styles}
-        subject={subject}
       />
 
-      <StudyTimerModeSelector
-        C={C}
-        modeKey={modeKey}
-        modes={modes}
-        onChange={handleModeChange}
-        styles={styles}
-      />
+      <StudyTimerModeSelector C={C} modeKey={modeKey} modes={modes} onChange={handleModeChange} />
 
-      {/* Subject picker — visible only before timer starts */}
       {!running && elapsed === 0 && (
         <SubjectPicker selected={selectedSubjectKey} onSelect={setSelectedSubjectKey} />
       )}
 
-      <View style={styles.center}>
-        <Text style={[TYPOGRAPHY.label, { color: phaseColor, marginBottom: 4 }]}>
-          {isPomodoro ? `${phaseLabel.toUpperCase()}  ·  Tur ${cycleIndex + 1}/${mode.cycles}` : ""}
-        </Text>
-        {topic ? (
-          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec, marginBottom: SPACING.lg }]}>
-            {topic}
-          </Text>
-        ) : (
-          <View style={{ marginBottom: SPACING.lg }} />
-        )}
-
-        <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
-          <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{formatTimerDuration(elapsed)}</Text>
-          {isPomodoro && (
-            <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 4 }]}>
-              {`${Math.floor(phaseTargetSec / 60)} dk`}
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: STEP.s4 }}>
+        <Animated.View entering={FadeIn.duration(500)} style={{ alignItems: "center" }}>
+          <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
+            <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]} allowFontScaling={false}>
+              {formatTimerDuration(elapsed)}
             </Text>
-          )}
-        </TimerRing>
+            <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>
+              {isPomodoro
+                ? `${Math.floor(phaseTargetSec / 60)} dk ${phaseLabel.includes("Mola") ? "mola" : "odak"}`
+                : hasSubject ? "serbest çalışma" : "ders seçilmedi"}
+            </Text>
+          </TimerRing>
+        </Animated.View>
 
-        <StudyTimerControls
-          C={C}
-          hasSubject={hasSubject}
-          isPomodoro={isPomodoro}
-          phaseColor={phaseColor}
-          running={running}
-          styles={styles}
-          totalFocusSeconds={totalFocusSeconds}
-          onSkip={skipPhase}
-          onToggle={toggle}
-        />
+        {hasSubject && (
+          <>
+            <SubjectTopicCard C={C} subject={subject} topic={topic} />
+
+            <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s2 }}>
+              <Card tone="void">
+                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
+                  Çözdüğün soruyu bitişte soracağız. Şimdi sadece çalış.
+                </Text>
+              </Card>
+            </View>
+          </>
+        )}
 
         <StudyTimerQuestionCounters
           C={C}
           correctCount={correctCount}
-          phaseColor={phaseColor}
           questions={questions}
-          styles={styles}
           onAddCorrect={addCorrect}
           onAddQuestion={addQuestion}
           onRemoveCorrect={removeCorrect}
           onRemoveQuestion={removeQuestion}
         />
-      </View>
 
-      <Pressable onPress={finish} style={styles.finishBtn}>
-        <Icon name="check" size={20} color={C.bg} />
-        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Bitir</Text>
-      </Pressable>
+        <StudyTimerControls
+          C={C}
+          hasSubject={hasSubject}
+          isPomodoro={isPomodoro}
+          running={running}
+          onFinish={finish}
+          onSkip={skipPhase}
+          onToggle={toggle}
+        />
+      </View>
     </SafeAreaView>
   );
-}
-
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-    },
-    subjectBadge: {
-      flexDirection: "row", alignItems: "center", gap: 6,
-      backgroundColor: C.surface, borderRadius: RADIUS.full,
-      paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
-    },
-    dot: { width: 8, height: 8, borderRadius: 4 },
-    modeContainer: {
-      flexDirection: "row",
-      marginHorizontal: SPACING.lg,
-      marginVertical: SPACING.sm,
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      padding: 4,
-      gap: 4,
-    },
-    modeSegment: {
-      flex: 1,
-      alignItems: "center",
-      gap: 4,
-      paddingVertical: 10,
-      borderRadius: RADIUS.lg,
-      borderWidth: 1.5,
-    },
-    modeIconWrap: {
-      width: 28,
-      height: 28,
-      borderRadius: 10,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    modeLabel: {
-      fontFamily: "Archivo_600",
-      fontSize: 11,
-      letterSpacing: 0.2,
-    },
-    modeDesc: {
-      ...TYPOGRAPHY.caption,
-      textAlign: "center",
-      marginTop: 8,
-      marginBottom: 4,
-    },
-    center: { flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: 40 },
-    controls: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.xl, marginTop: SPACING.xxxl,
-    },
-    sideBtn: {
-      width: 48, height: 48, borderRadius: 24,
-      backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
-    },
-    mainBtn: {
-      width: 72, height: 72, borderRadius: 36,
-      alignItems: "center", justifyContent: "center",
-      ...SHADOWS.card,
-    },
-    questionRow: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.lg,
-      marginTop: SPACING.xxxl, backgroundColor: C.surface,
-      borderRadius: RADIUS.xl, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
-    },
-    stepper: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-    stepBtn: {
-      width: 36, height: 36, borderRadius: 18,
-      backgroundColor: C.surface2, alignItems: "center", justifyContent: "center",
-    },
-    finishBtn: {
-      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-      backgroundColor: C.accent, borderRadius: RADIUS.xl,
-      marginHorizontal: SPACING.lg, marginBottom: SPACING.xxl, paddingVertical: SPACING.lg,
-      ...SHADOWS.accent,
-    },
-  });
 }

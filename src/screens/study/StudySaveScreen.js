@@ -1,503 +1,82 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { track } from "../../lib/analytics";
-import { EVENTS } from "../../constants/analytics";
-import {
-  View, Text, ScrollView, Pressable, TextInput,
-  KeyboardAvoidingView, Platform, StyleSheet,
-} from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Icon, Button } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
-import { useAppDispatch } from "../../store/hooks";
-import { addLog, setStreak, setFreezeCount } from "../../store/slices/studyLogSlice";
-import { trackStreakTransition } from "../../lib/trackStreakTransition";
-import { useGamification } from "../../hooks/useGamification";
-import { captureError } from "../../lib/errorReporting";
-import { useCurriculum } from "../../hooks/useCurriculum";
-import { XPBoostToast } from "../../components/common/XPBoostToast";
-import { useAuth } from "../../contexts/AuthContext";
-import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
-import { syncStreakAfterStudy } from "../../lib/streakSync";
-import { clearTimerSession } from "../../domain/study/timerSession";
-import { saveStudyLogOffline } from "../../lib/offlineQueue";
-import { syncChallengeProgress } from "../../lib/challengeSync";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
-import { setJson } from "../../lib/storage/appStorage";
-import { todayTR } from "../../lib/dateUtils";
-import { completeStudyPlanContext } from "../../lib/studyPlanCompletion";
-import { TopicPicker } from "../../components/forms/TopicPicker";
-import { studyLogSchema } from "../../validations/auth";
-import { SCREENS } from "../../constants/screens";
-import { useAlert } from "../../contexts/AlertContext";
-import * as H from "../../lib/haptics";
 
-function SubjectChip({ subject, selected, onPress, C }) {
-  const id = useSubjectIdentity(subject.key);
-  const color = id?.solid || subject.color || C.purple;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[
-        styles.subjChip,
-        {
-          backgroundColor: selected ? color : color + "20",
-          borderColor: selected ? color : color + "40",
-        },
-      ]}
-    >
-      <View style={[
-        styles.subjIconBox,
-        { backgroundColor: selected ? C.textOnFill + "40" : color + "20" },
-      ]}>
-        <Icon name={subject.icon} size={16} color={selected ? C.textOnFill : color} />
-      </View>
-      <Text style={[styles.subjName, { color: selected ? C.textOnFill : C.text }]} numberOfLines={1}>
-        {subject.label || subject.name}
-      </Text>
-    </Pressable>
-  );
-}
+import { Button } from "../../components/design";
+import { STEP, GUTTER } from "../../themes/tokens";
+import { TopicPicker } from "../../components/forms/TopicPicker";
+import { XPBoostToast } from "../../components/common/XPBoostToast";
+import { SaveHeader } from "./components/SaveHeader";
+import { SaveSubjectSection } from "./components/SaveSubjectSection";
+import { SaveTopicQuestionSection } from "./components/SaveTopicQuestionSection";
+import { SaveNotesSection } from "./components/SaveNotesSection";
+import { useStudySaveController } from "./useStudySaveController";
 
 export default function StudySaveScreen() {
-  const navigation = useNavigation();
-  const C = useC();
-  const showAlert = useAlert();
-  const dispatch = useAppDispatch();
-  const { user } = useAuth();
-  const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
-  const { reward, xpToast, dismissXP } = useGamification();
-  const route = useRoute();
-
-  const {
-    duration = 0,
-    questions: initQuestions = 0,
-    correctCount: initCorrect = 0,
-    subjectKey: preSubjectKey,
-    topicName: preTopic,
-    planTaskKey,
-    planSubjectKey,
-    planTopicName,
-    routeStopId,
-    routeStopVersion,
-    routeSubjectKey,
-    routeTopicName,
-  } = route.params ?? {};
-
-  const [examTier, setExamTier] = useState(() => {
-    if (preSubjectKey) {
-      const isAyt = aytSubjects.some((s) => s.key === preSubjectKey);
-      return isAyt ? "AYT" : "TYT";
-    }
-    return "TYT";
-  });
-  const [subjectKey, setSubjectKey] = useState(preSubjectKey || null);
-  const [topic, setTopic] = useState(preTopic || "");
-  const [topicPickerOpen, setTopicPickerOpen] = useState(false);
-  const [questionCount, setQC] = useState(initQuestions > 0 ? String(initQuestions) : "");
-  const [correctCount, setCC] = useState(initCorrect > 0 ? String(initCorrect) : "");
-  const [notes, setNotes] = useState("");
-  const [saving, setSaving] = useState(false);
-  // Kayıt tamamlandı mı — geri çıkış uyarısı bunun için.
-  const savedRef = useRef(false);
-
-  // GERİ ÇIKIŞ KORUMASI
-  //
-  // Bu ekrana gelindiğinde kronometre çoktan durmuş ve süre/soru sayıları
-  // yalnızca burada duruyor. Android geri tuşu ya da iOS kaydırması
-  // uyarısız çalıştığı için 50 dakikalık oturum sessizce kayboluyordu.
-  useEffect(() => {
-    const sub = navigation.addListener("beforeRemove", (e) => {
-      if (savedRef.current) return;
-      e.preventDefault();
-      showAlert(
-        "Çalışman kaydedilmedi",
-        "Bu ekrandan çıkarsan bu oturum kaybolur. Emin misin?",
-        [
-          { text: "Kalayım", style: "cancel" },
-          {
-            text: "Çık ve sil",
-            style: "destructive",
-            onPress: () => {
-              clearTimerSession();
-              savedRef.current = true;
-              navigation.dispatch(e.data.action);
-            },
-          },
-        ],
-      );
-    });
-    return sub;
-  }, [navigation, showAlert]);
-  const { completeForm, markFormDirty } = useFormLifecycleAnalytics("study_log_measured", {
-    duration,
-    subjectKey,
-  });
-
-  const subjects = useMemo(() => {
-    return examTier === "TYT" ? tytSubjects : aytSubjects;
-  }, [examTier, tytSubjects, aytSubjects]);
-
-  const currentSubject = useMemo(
-    () => subjects.find((s) => s.key === subjectKey) || null,
-    [subjects, subjectKey],
-  );
-
-  const canSave = !!subjectKey;
-
-  const handleSwitchTier = (tier) => {
-    markFormDirty({ field: "tier", tier });
-    setExamTier(tier);
-    setSubjectKey(null);
-    setTopic("");
-  };
-
-  const handleSelectSubject = (key) => {
-    H.select();
-    markFormDirty({ field: "subject", subjectKey: key });
-    setSubjectKey(key);
-    setTopic("");
-  };
-
-  const save = useCallback(async () => {
-    if (saving || !canSave) return;
-    if (!user?.id || user.id === "dev") {
-      H.warn();
-      showAlert("Oturum bulunamadı", "Çalışmayı kaydetmek için tekrar giriş yapmalısın.");
-      return;
-    }
-
-    const todayStr = todayTR();
-    const qc = parseInt(questionCount, 10) || 0;
-    const cc = parseInt(correctCount, 10) || 0;
-    const topicVal = topic.trim() || (currentSubject?.label || subjectKey);
-
-    const notesVal = notes.trim() || undefined;
-    const parsed = studyLogSchema.safeParse({
-      subject: subjectKey,
-      topic: topicVal,
-      questionCount: qc,
-      correctCount: cc,
-      duration,
-      notes: notesVal,
-    });
-    if (!parsed.success) {
-      H.warn();
-      showAlert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
-      return;
-    }
-
-    dispatch(addLog({
-      id: Date.now().toString(),
-      subject: subjectKey,
-      topic: topicVal,
-      questionCount: qc,
-      correctCount: cc,
-      duration,
-      notes: notesVal,
-      study_date: todayStr,
-    }));
-
-    setSaving(true);
-    // saveStudyLogOffline artık depoya yazamazsa FIRLATIYOR (kuyruk sertleştirmesi).
-    // Yakalanmazsa kullanıcı hiçbir geri bildirim görmeden bu ekranda kalırdı.
-    let result;
-    try {
-      result = await saveStudyLogOffline({
-        user_id: user.id,
-        subject: subjectKey,
-        topic: topicVal,
-        question_count: qc,
-        correct_count: cc,
-        duration_minutes: duration,
-        study_date: todayStr,
-        ...(notesVal ? { notes: notesVal } : {}),
-      });
-    } catch (e) {
-      setSaving(false);
-      H.error();
-      captureError(e, { context: "study_save_persist" });
-      showAlert(
-        "Kaydedilemedi",
-        "Cihazda yer kalmamış olabilir. Biraz yer açıp tekrar dene — çalışman bu ekranda duruyor.",
-      );
-      return;
-    }
-
-    if (result.saved) {
-      try {
-        const streakResult = await syncStreakAfterStudy(user.id, { studyDate: todayStr });
-        const { newStreak, usedFreeze, freezeCount } = streakResult;
-        trackStreakTransition(streakResult.local);
-        dispatch(setStreak(newStreak));
-        dispatch(setFreezeCount(freezeCount));
-        if (usedFreeze) {
-          showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
-        }
-      } catch (e) { captureError(e, { context: "streak_update_studySave" }); }
-      syncChallengeProgress(user.id, { questions: qc, minutes: duration });
-    } else if (result.queued) {
-      const msg = result.error?.message || "";
-      const isNetwork = msg.includes("network") || msg.includes("fetch");
-      showAlert(
-        isNetwork ? "Çevrimdışı" : "Kayıt beklemede",
-        isNetwork
-          ? "İnternet yok, kayıt bağlantı geldiğinde otomatik gönderilecek."
-          : "Kayıt sıraya alındı, kısa süre içinde gönderilecek.",
-      );
-    }
-    const planCompletion = await completeStudyPlanContext({
-      userId: user.id,
-      studyDate: todayStr,
-      subjectKey,
-      topic: topicVal,
-      planSubjectKey,
-      planTopicName,
-      planTaskKey,
-      routeStopId,
-      routeStopVersion,
-      routeSubjectKey,
-      routeTopicName,
-    });
-    if (planCompletion.planCompleted) reward("plan_task_done");
-    if (planCompletion.planError || planCompletion.routeError) {
-      captureError(planCompletion.planError || planCompletion.routeError, {
-        context: "study_save_plan_completion",
-      });
-    }
-    setSaving(false);
-
-    completeForm({ minutes: duration, questions: qc, subjectKey });
-    track(EVENTS.STUDY_COMPLETED, { minutes: duration, questions: qc });
-    reward("study_log", {
-      minutes: duration,
-      statUpdates: [
-        { type: "increment", key: "totalQuestions", value: qc },
-        { type: "increment", key: "totalMinutes", value: duration },
-      ],
-    });
-    if (qc > 0) reward("question_solved", { count: qc });
-
-    // Oturum artık güvende (kaydedildi ya da kuyrukta) — kurtarma anlık
-    // görüntüsü ancak BURADA silinir. Kronometre ekranında silinmesi,
-    // bu ekrandan geri çıkan kullanıcının oturumunu yok ediyordu.
-    clearTimerSession();
-    savedRef.current = true;
-
-    H.success();
-    navigation.replace(SCREENS.STUDY_SUMMARY, {
-      subjectLabel: currentSubject?.label || currentSubject?.name || subjectKey,
-      subjectColor: currentSubject?.color || C.purple,
-      subjectIcon: currentSubject?.icon || "bookOpen",
-      topic: topicVal,
-      duration,
-      questions: qc,
-    });
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName]);
+  const s = useStudySaveController();
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: s.C.bg }}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={[styles.closeBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
-            <Icon name="arrowL" size={18} color={C.text} />
-          </Pressable>
-          <Text style={[styles.title, { color: C.text }]}>Ne çalıştın?</Text>
-          <View style={{ width: 36 }} />
-        </View>
+        <SaveHeader C={s.C} duration={s.duration} onBack={s.goBack} />
 
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          {/* Duration badge */}
-          <Animated.View entering={FadeInDown.delay(0).duration(420).springify()}>
-            <View style={[styles.durationBadge, { backgroundColor: C.green + "14", borderColor: C.green + "30" }]}>
-              <Icon name="clock" size={18} color={C.green} />
-              <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color: C.green, letterSpacing: -0.3 }}>
-                {duration} dk
-              </Text>
-              <Text style={{ ...TYPOGRAPHY.caption, color: C.sec }}>çalışıldı</Text>
-            </View>
-          </Animated.View>
-
-          {/* Exam tier */}
-          {!preSubjectKey && (
-            <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
-              <Text style={[styles.label, { color: C.muted }]}>SINAV TİPİ</Text>
-              <View style={[styles.tierRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-                {[["TYT", group1Label, C.blue], ["AYT", group2Label, C.purple]].map(([t, lbl, clr]) => {
-                  const active = examTier === t;
-                  return (
-                    <Pressable
-                      key={t}
-                      onPress={() => handleSwitchTier(t)}
-                      style={[styles.tierBtn, {
-                        backgroundColor: active ? clr : "transparent",
-                        borderColor: active ? clr : "transparent",
-                      }]}
-                    >
-                      <Text style={[styles.tierTitle, { color: active ? C.textOnFill : clr }]}>{lbl}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </Animated.View>
-          )}
-
-          {/* Subject grid */}
-          <Animated.View entering={FadeInDown.delay(preSubjectKey ? 70 : 140).duration(420).springify()}>
-            <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>DERS *</Text>
-            <View style={styles.subjectGrid}>
-              {subjects.map((sub) => (
-                <SubjectChip key={sub.key} subject={sub} selected={subjectKey === sub.key} onPress={() => handleSelectSubject(sub.key)} C={C} />
-              ))}
-            </View>
-          </Animated.View>
-
-          {/* Topic */}
-          <Animated.View entering={FadeInDown.delay(preSubjectKey ? 140 : 210).duration(420).springify()}>
-            <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>KONU (isteğe bağlı)</Text>
-            <Pressable
-              onPress={() => {
-                if (!currentSubject) { H.warn(); showAlert("Önce ders seç", "Konu listesi için ders seçmelisin."); return; }
-                H.select();
-                setTopicPickerOpen(true);
-              }}
-              style={[styles.input, { backgroundColor: C.surface, borderColor: C.border, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
-            >
-              <Text style={{ ...TYPOGRAPHY.body, color: topic ? C.text : C.muted, fontSize: 15 }}>
-                {topic || "Konu seç..."}
-              </Text>
-              <Icon name="chevDown" size={16} color={C.muted} />
-            </Pressable>
-          </Animated.View>
-
-          {/* Questions */}
-          <Animated.View entering={FadeInDown.delay(preSubjectKey ? 210 : 280).duration(420).springify()}>
-            <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>SORU SAYISI (isteğe bağlı)</Text>
-            <View style={{ flexDirection: "row", gap: 12 }}>
-              <TextInput
-                style={[styles.input, { backgroundColor: C.surface, borderColor: C.border, color: C.text, flex: 1 }]}
-                placeholder="0"
-                placeholderTextColor={C.muted}
-                keyboardType="number-pad"
-                value={questionCount}
-                onChangeText={(value) => {
-                  markFormDirty({ field: "question_count" });
-                  setQC(value);
-                }}
-              />
-              <TextInput
-                style={[styles.input, { backgroundColor: C.surface, borderColor: C.border, color: C.text, flex: 1 }]}
-                placeholder="Doğru"
-                placeholderTextColor={C.muted}
-                keyboardType="number-pad"
-                value={correctCount}
-                onChangeText={(value) => {
-                  markFormDirty({ field: "correct_count" });
-                  setCC(value);
-                }}
-              />
-            </View>
-          </Animated.View>
-
-          {/* Notes */}
-          <Animated.View entering={FadeInDown.delay(preSubjectKey ? 280 : 350).duration(420).springify()}>
-            <Text style={[styles.label, { color: C.muted, marginTop: 22 }]}>NOT (isteğe bağlı)</Text>
-            <TextInput
-              value={notes}
-              onChangeText={(value) => {
-                markFormDirty({ field: "notes" });
-                setNotes(value);
-              }}
-              placeholder="Kendine bir not bırak..."
-              placeholderTextColor={C.muted}
-              multiline
-              maxLength={140}
-              style={[styles.noteInput, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]}
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: 140 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Animated.View entering={FadeInDown.delay(60).duration(420)}>
+            <SaveSubjectSection
+              C={s.C}
+              showTier={!s.preSubjectKey}
+              examTier={s.examTier}
+              onSwitchTier={s.handleSwitchTier}
+              tierOptions={[["TYT", s.group1Label, s.C.blue], ["AYT", s.group2Label, s.C.purple]]}
+              subjects={s.subjects}
+              subjectKey={s.subjectKey}
+              onSelectSubject={s.handleSelectSubject}
             />
-            <Text style={[styles.charCount, { color: C.muted }]}>{notes.length}/140</Text>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(120).duration(420)}>
+            <SaveTopicQuestionSection
+              C={s.C}
+              topic={s.topic}
+              onOpenTopicPicker={s.openTopicPicker}
+              questionCount={s.questionCount}
+              onChangeQuestionCount={s.setQuestionCount}
+              correctCount={s.correctCount}
+              onChangeCorrectCount={s.setCorrectCount}
+            />
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(180).duration(420)}>
+            <SaveNotesSection C={s.C} notes={s.notes} onChangeNotes={s.setNotes} />
           </Animated.View>
         </ScrollView>
 
-        {/* Bottom save button */}
-        <View style={[styles.bottomBar, { backgroundColor: C.bg, borderTopColor: C.border }]}>
-          <Button onPress={save} disabled={!canSave || saving} loading={saving} icon="check" fullWidth>
-            {saving ? "Kaydediliyor..." : "Kaydet"}
+        <View
+          style={{
+            position: "absolute", left: 0, right: 0, bottom: 0,
+            padding: GUTTER, paddingTop: STEP.s3,
+            borderTopWidth: 1, borderTopColor: s.C.border, backgroundColor: s.C.bg,
+          }}
+        >
+          <Button onPress={s.save} disabled={!s.canSave || s.saving} loading={s.saving} icon="check" size="lg" fullWidth>
+            {s.saving ? "Kaydediliyor..." : "Kaydet"}
           </Button>
         </View>
       </KeyboardAvoidingView>
 
-      {currentSubject && topicPickerOpen && (
+      {s.currentSubject && s.topicPickerOpen && (
         <TopicPicker
-          visible={topicPickerOpen}
-          subject={currentSubject}
-          onSelect={(t) => {
-            markFormDirty({ field: "topic" });
-            setTopic(t);
-            setTopicPickerOpen(false);
-          }}
-          onClose={() => setTopicPickerOpen(false)}
+          visible={s.topicPickerOpen}
+          subject={s.currentSubject}
+          onSelect={(t) => { s.setTopic(t); s.setTopicPickerOpen(false); }}
+          onClose={() => s.setTopicPickerOpen(false)}
         />
       )}
-      <XPBoostToast amount={xpToast.amount} visible={xpToast.visible} multiplier={xpToast.multiplier} onDismiss={dismissXP} />
+      <XPBoostToast amount={s.xpToast.amount} visible={s.xpToast.visible} multiplier={s.xpToast.multiplier} onDismiss={s.dismissXP} />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  closeBtn: {
-    width: 36, height: 36, borderRadius: 12,
-    alignItems: "center", justifyContent: "center", borderWidth: 1,
-  },
-  title: { fontFamily: "Bricolage_400", fontSize: 18 },
-  scroll: { padding: SPACING.lg, paddingBottom: 140 },
-  label: { ...TYPOGRAPHY.label, marginBottom: SPACING.sm, letterSpacing: 0.7 },
-
-  durationBadge: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-    alignSelf: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
-    borderRadius: RADIUS.full, borderWidth: 1, marginBottom: SPACING.lg,
-  },
-
-  tierRow: {
-    flexDirection: "row", borderRadius: RADIUS.xl, borderWidth: 1, padding: 4, gap: 4,
-  },
-  tierBtn: {
-    flex: 1, paddingVertical: 14, borderRadius: RADIUS.lg, borderWidth: 1.5,
-    alignItems: "center",
-  },
-  tierTitle: { fontFamily: "Bricolage_400", fontSize: 18, letterSpacing: -0.3 },
-
-  subjectGrid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
-  subjChip: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-    paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderRadius: RADIUS.md, borderWidth: 1,
-    minWidth: "47%", flexGrow: 1,
-  },
-  subjIconBox: {
-    width: 28, height: 28, borderRadius: 9,
-    alignItems: "center", justifyContent: "center",
-  },
-  subjName: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14, flexShrink: 1 },
-
-  input: {
-    ...TYPOGRAPHY.body, borderRadius: RADIUS.md, borderWidth: 1,
-    paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, fontSize: 15,
-  },
-
-  bottomBar: {
-    position: "absolute", left: 0, right: 0, bottom: 0,
-    padding: SPACING.lg, borderTopWidth: 1,
-  },
-
-  noteInput: {
-    borderRadius: RADIUS.md, borderWidth: 1, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md,
-    fontFamily: "Archivo_400", fontSize: 15, minHeight: 80, textAlignVertical: "top",
-  },
-  charCount: { ...TYPOGRAPHY.micro, textAlign: "right", marginTop: 4 },
-});

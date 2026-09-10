@@ -1,35 +1,38 @@
-import { useEffect, useMemo, useRef } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useEffect, useMemo } from "react";
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
 import { useSelector } from "react-redux";
-import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 import * as H from "../../lib/haptics";
-import { Icon, Spot, Button } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { Button, StatBlock } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { XP_REWARDS } from "../../constants/gamification";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
 import { useInAppReview } from "../../hooks/useInAppReview";
 import { ROOT_STACK } from "../../navigation/routes";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
+import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
+import { StudySummaryStats } from "./components/StudySummaryStats";
 
 export default function StudySummaryScreen() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
 
   const {
     subjectLabel = "Çalışma",
     subjectColor = C.accent,
-    subjectIcon = "bookOpen",
     topic = "",
     duration = 0,
     questions = 0,
+    correctCount = 0,
   } = route.params ?? {};
+  const wrongCount = Math.max(0, questions - correctCount);
 
   const streak = useSelector((state) => state.studyLog.streak);
   const todayLogs = useSelector((state) => state.studyLog.todayLogs);
@@ -52,6 +55,8 @@ export default function StudySummaryScreen() {
 
   const { incrementAndCheck, showDelayedPaywall, cleanup } = usePaywallTrigger();
   const { maybeRequestReview } = useInAppReview();
+  const { routeCreated, weeks } = useStudyRoute();
+  const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
 
   useEffect(() => {
     H.success();
@@ -66,7 +71,6 @@ export default function StudySummaryScreen() {
   }, []);
 
   const safeGoal = dailyGoal > 0 ? dailyGoal : 100;
-  const goalPct = Math.min(todaySolved / safeGoal, 1);
   const goalReached = todaySolved >= safeGoal;
 
   const dismiss = () => {
@@ -79,129 +83,53 @@ export default function StudySummaryScreen() {
   };
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <View style={s.container}>
-        {/* Success icon */}
-        <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.successCircle, { backgroundColor: subjectColor + "20" }]}>
-          <View style={[s.successInner, { backgroundColor: subjectColor }]}>
-            <Icon name="check" size={36} color={C.textOnFill} sw={3} />
-          </View>
-        </Animated.View>
-
-        {/* Title */}
-        <Animated.Text entering={FadeInUp.delay(200)} style={s.title}>
-          Harika!
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={{ flex: 1, paddingHorizontal: GUTTER, paddingTop: STEP.s5, paddingBottom: STEP.s3 }}>
+        <Animated.Text entering={FadeInUp.duration(500)} style={[TYPOGRAPHY.label, { color: C.accentBright ?? C.accent }]}>
+          DURAK TAMAMLANDI
         </Animated.Text>
-        <Animated.View entering={FadeInUp.delay(250)} style={s.topicRow}>
-          <View style={[s.dot, { backgroundColor: subjectColor }]} />
-          <Text style={s.topicText}>{subjectLabel}{topic ? ` · ${topic}` : ""}</Text>
+
+        <Animated.View entering={FadeInUp.delay(80).duration(500)}>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text, marginTop: STEP.s2 }]}>Rota ilerledi</Text>
         </Animated.View>
 
-        {/* Stats grid */}
-        <Animated.View entering={FadeInDown.delay(350)} style={s.statsGrid}>
-          <StatBox icon="clock" label="Süre" value={`${duration} dk`} color={C.purple} C={C} />
-          <StatBox icon="hash" label="Soru" value={String(questions)} color={C.orange} C={C} />
-          <StatBox icon="zap" label="XP" value={`+${xpEarned}`} color={C.amber} C={C} />
-          <StatBox icon="activity" label="Streak" value={`${streak} gün`} color={C.green} C={C} />
+        <Animated.View entering={FadeInDown.delay(140).duration(500)} style={{ marginTop: STEP.s2 }}>
+          <StatBlock value={String(duration)} unit="dakikalık çalışma tamamlandı" size="large" />
         </Animated.View>
 
-        {/* Daily goal progress */}
-        <Animated.View entering={FadeInDown.delay(450)} style={s.goalCard}>
-          <View style={s.goalHeader}>
-            <Text style={s.goalLabel}>Günlük Hedef</Text>
-            <Text style={[s.goalCount, { color: goalReached ? C.green : C.text }]}>
-              {todaySolved}/{safeGoal} soru
-            </Text>
-          </View>
-          <View style={s.goalBarBg}>
-            <View style={[s.goalBarFill, { width: `${goalPct * 100}%`, backgroundColor: goalReached ? C.green : C.accent }]} />
-          </View>
-          {goalReached && (
-            <Animated.View entering={ZoomIn.delay(550).springify()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: SPACING.sm }}>
-              <Spot name="trophy" size={40} color={C.green} />
-              <Text style={[s.goalDone, { color: C.green, marginTop: 0 }]}>Hedefini tamamladın!</Text>
-            </Animated.View>
-          )}
+        <Animated.View
+          entering={FadeInDown.delay(180).duration(500)}
+          style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s2 }}
+        >
+          <View style={{ width: 7, height: 7, borderRadius: 1, backgroundColor: subjectColor }} />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]} numberOfLines={1}>
+            {subjectLabel}{topic ? ` · ${topic}` : ""}{questions > 0 ? ` · ${questions} soru · ${wrongCount} yanlış` : ""}
+          </Text>
         </Animated.View>
 
-        {/* Today totals */}
-        <Animated.View entering={FadeInDown.delay(500)} style={s.todayRow}>
-          <Text style={s.todayLabel}>Bugün toplam</Text>
-          <Text style={s.todayValue}>{todayMinutes} dk · {todaySolved} soru</Text>
+        <Animated.View entering={FadeInDown.delay(240).duration(500)} style={{ marginTop: STEP.s4 }}>
+          <StudySummaryStats
+            C={C}
+            todaySolved={todaySolved}
+            safeGoal={safeGoal}
+            goalReached={goalReached}
+            todayMinutes={todayMinutes}
+          />
         </Animated.View>
 
         <View style={{ flex: 1 }} />
 
-        {/* Dismiss button */}
-        <Animated.View entering={FadeInDown.delay(600)} style={{ width: "100%" }}>
-          <Button onPress={dismiss} variant="orange" fullWidth>Devam Et</Button>
+        <Animated.View entering={FadeInDown.delay(320).duration(500)} style={{ gap: STEP.s1 }}>
+          {nextRouteAction ? (
+            <Button onPress={startNextRouteAction} fullWidth>
+              Sıradaki durağı başlat
+            </Button>
+          ) : null}
+          <Button onPress={dismiss} variant={nextRouteAction ? "outline" : "primary"} fullWidth>
+            {nextRouteAction ? "Ana sayfaya dön" : "Devam Et"}
+          </Button>
         </Animated.View>
       </View>
     </SafeAreaView>
   );
-}
-
-function StatBox({ icon, label, value, color, C }) {
-  return (
-    <View style={{
-      flex: 1, backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      padding: SPACING.md, alignItems: "center", gap: 6,
-      borderWidth: 1, borderColor: C.border,
-    }}>
-      <View style={{
-        width: 36, height: 36, borderRadius: 12,
-        backgroundColor: color + "18", alignItems: "center", justifyContent: "center",
-      }}>
-        <Icon name={icon} size={18} color={color} />
-      </View>
-      <Text style={{ ...TYPOGRAPHY.stat, fontSize: 20, color }}>{value}</Text>
-      <Text style={{ ...TYPOGRAPHY.caption, color, opacity: 0.7 }}>{label}</Text>
-    </View>
-  );
-}
-
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    container: { flex: 1, alignItems: "center", paddingHorizontal: SPACING.xl, paddingTop: 40, paddingBottom: SPACING.xxl },
-    successCircle: {
-      width: 100, height: 100, borderRadius: 50,
-      alignItems: "center", justifyContent: "center",
-    },
-    successInner: {
-      width: 68, height: 68, borderRadius: 34,
-      alignItems: "center", justifyContent: "center",
-      ...SHADOWS.card,
-    },
-    title: { ...TYPOGRAPHY.heading, color: C.text, fontSize: 28, marginTop: SPACING.lg },
-    topicRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: SPACING.sm },
-    dot: { width: 8, height: 8, borderRadius: 4 },
-    topicText: { ...TYPOGRAPHY.bodyMedium, color: C.sec },
-
-    statsGrid: {
-      flexDirection: "row", gap: SPACING.sm, width: "100%", marginTop: SPACING.xxxl,
-    },
-
-    goalCard: {
-      width: "100%", backgroundColor: C.surface,
-      borderRadius: RADIUS.xl, padding: SPACING.lg,
-      marginTop: SPACING.lg, borderWidth: 1, borderColor: C.border,
-    },
-    goalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-    goalLabel: { ...TYPOGRAPHY.captionMedium, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5 },
-    goalCount: { ...TYPOGRAPHY.bodySemiBold, fontSize: 14 },
-    goalBarBg: {
-      height: 8, borderRadius: 4, backgroundColor: C.surface2, marginTop: SPACING.sm, overflow: "hidden",
-    },
-    goalBarFill: { height: 8, borderRadius: 4 },
-    goalDone: { ...TYPOGRAPHY.captionMedium, marginTop: SPACING.xs, textAlign: "center" },
-
-    todayRow: {
-      flexDirection: "row", justifyContent: "space-between", width: "100%",
-      marginTop: SPACING.md, paddingVertical: SPACING.sm,
-    },
-    todayLabel: { ...TYPOGRAPHY.caption, color: C.muted },
-    todayValue: { ...TYPOGRAPHY.captionMedium, color: C.sec },
-
-  });
 }
