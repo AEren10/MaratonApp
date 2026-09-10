@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { buildRoute, thresholdGap, computeDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
+import { buildRoute, thresholdGap, computeDebt, capDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
 import { usePlanContext } from "./usePlanContext";
 import { useExam } from "../contexts/ExamContext";
 import { getSubjectsForExam } from "../data/curriculum";
@@ -302,8 +302,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     const thisWeek = startOfWeekTR(new Date());
     // Sadece BİTMİŞ haftalar borç üretir; içinde bulunulan hafta henüz açık.
     const finished = pastWeeks.filter((w) => w.weekStart < thisWeek);
-    return computeDebt(finished, actualByWeek);
-  }, [weekLogs, pastWeeks]);
+    return capDebt(computeDebt(finished, actualByWeek), route.capacity);
+  }, [route.capacity, weekLogs, pastWeeks]);
 
   const pause = useCallback(async () => {
     if (!user?.id) return;

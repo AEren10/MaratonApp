@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { computeDebt } from "../../src/domain/route/debt.js";
+import { capDebt, computeDebt } from "../../src/domain/route/debt.js";
 
 // Tasarim borcu SAAT gosteriyor ("12 sa borc"), computeDebt ise yalniz soru
 // sayiyordu. Dakika hafta verisindeki plannedMinutes'tan ORANLA turetiliyor.
@@ -37,4 +37,17 @@ test("borc yoksa dakika da sifir", () => {
   );
   assert.equal(debt.hasDebt, false);
   assert.equal(debt.totalMinutes, 0);
+});
+
+test("borc tavani soru ve dakikayi ayni oranda sinirlar", () => {
+  const capped = capDebt(
+    { totalQuestions: 600, totalMinutes: 1200, items: [], hasDebt: true },
+    { questionsPerWeek: 100 },
+  );
+
+  assert.equal(capped.capped, true);
+  assert.equal(capped.totalQuestions, 300);
+  assert.equal(capped.totalMinutes, 600);
+  assert.equal(capped.originalQuestions, 600);
+  assert.equal(capped.originalMinutes, 1200);
 });

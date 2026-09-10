@@ -87,11 +87,14 @@ export function capDebt(debt, capacity) {
   const perWeek = Math.max(1, capacity?.questionsPerWeek || 1);
   const ceiling = Math.round(perWeek * MAX_DEBT_WEEKS);
   if (!debt || debt.totalQuestions <= ceiling) return { ...debt, capped: false };
+  const ratio = ceiling / Math.max(1, debt.totalQuestions);
   return {
     ...debt,
     totalQuestions: ceiling,
+    totalMinutes: Math.round((debt.totalMinutes || 0) * ratio),
     capped: true,
     originalQuestions: debt.totalQuestions,
+    originalMinutes: debt.totalMinutes || 0,
   };
 }
 

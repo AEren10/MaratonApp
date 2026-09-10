@@ -1,7 +1,7 @@
 import { estimateWeeklyCapacity, rampedCapacity } from "../domain/route/capacity.js";
 import { estimateTopicCost, priorityScoreDetails } from "../domain/route/topicCost.js";
 import { scheduleWeeks, weeksUntilExam } from "../domain/route/scheduler.js";
-import { computeDebt, distributeDebt, debtInWeeks } from "../domain/route/debt.js";
+import { computeDebt, capDebt, distributeDebt, debtInWeeks } from "../domain/route/debt.js";
 import { reviewStatus, reviewCost, reviewPriority } from "../domain/route/retention.js";
 import { topicsNeededForNet } from "../domain/route/netEstimate.js";
 import { decorateScheduledRoute, createRouteRevision } from "../domain/route/routeIdentity.js";
@@ -269,5 +269,5 @@ export function thresholdGap({
   };
 }
 
-export { computeDebt, distributeDebt, debtInWeeks };
+export { computeDebt, capDebt, distributeDebt, debtInWeeks };
 export { simulateTempoScenario as simulateScenario } from "../domain/forecast/tempoScenario.js";
