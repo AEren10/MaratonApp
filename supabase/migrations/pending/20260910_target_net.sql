@@ -1,0 +1,36 @@
+-- UYGULANMADI. Canli DB'ye elle uygulanmasi gerekiyor.
+--
+-- BULGU (FAZ 1.2 sema farki, 2026-09-10):
+-- Tasarimin onboarding 1. adimi HEDEF NET soruyor — slider 40-120, varsayilan 72,
+-- etiket "net · TYT" (artboard "Hedef Sec", ilerleme gostergesi "1 / 4").
+-- Sonraki adimlar bu degeri kullaniyor:
+--   "Seviye Testi": "Hedefe 13,75 net var. Bu mesafe 9 aylik bir rota demek."
+--   "Rota Hazir":   "BUGUN · 58,25"  /  "HEDEF · 72"
+--
+-- Kodda bu deger HICBIR YERDE SAKLANMIYOR:
+--   - profiles'ta target_ranking ve daily_question_goal var, target_net YOK
+--   - ExamContext targetRanking/targetDepartment tutuyor, targetNet tutmuyor
+--   - targetNet yalnizca thresholdGap(routeEngine.js:239) parametresi olarak
+--     yasiyor, cagiran taraftan geciyor ve hicbir yere yazilmiyor
+--
+-- Not: "gunluk soru 20-200" (daily_question_goal) bunun karsiligi DEGIL —
+-- o buildRoute'a kapasite girdisi olarak gidiyor. Ikisi ayri sey, ikisi de gerekli.
+
+-- UYGULAMADAN ONCE: profiles'in canli tanimini oku, kolon adinin cakismadigini
+-- ve RLS politikalarinin kendi satirini guncellemeye izin verdigini DOGRULA.
+-- Migration dosyalari canli DB ile senkron degil (bkz. supabase/MIGRATIONS.md).
+
+-- ALTER TABLE public.profiles
+--   ADD COLUMN IF NOT EXISTS target_net numeric(5,2);
+--
+-- Tasarimdaki slider araligi: 40-120. Sinav turune gore ust sinir degisiyor
+-- (TYT 120, AYT ders sayisina bagli), o yuzden kisit uygulama tarafinda
+-- kalabilir; DB'de yalnizca makul bir taban:
+-- ALTER TABLE public.profiles
+--   ADD CONSTRAINT profiles_target_net_range
+--   CHECK (target_net IS NULL OR (target_net >= 0 AND target_net <= 500));
+
+-- SONRA istemci tarafi:
+--   ExamContext: targetNet state + updateTargetNet, profiles.target_net'e yaz
+--   Hedef Sec ekrani: slider degerini oraya bagla
+--   Rota Hazir / Seviye Testi: hedefi oradan oku (su an sabit deger gosteriyor)
