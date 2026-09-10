@@ -16,9 +16,16 @@
 -- Not: "gunluk soru 20-200" (daily_question_goal) bunun karsiligi DEGIL —
 -- o buildRoute'a kapasite girdisi olarak gidiyor. Ikisi ayri sey, ikisi de gerekli.
 
--- UYGULAMADAN ONCE: profiles'in canli tanimini oku, kolon adinin cakismadigini
--- ve RLS politikalarinin kendi satirini guncellemeye izin verdigini DOGRULA.
--- Migration dosyalari canli DB ile senkron degil (bkz. supabase/MIGRATIONS.md).
+-- CANLI DOGRULAMA (2026-09-10, Supabase SQL editoru, proje zrycqfehhyjrsujmajpf):
+--   profiles = 30 kolon. Hedefle ilgili olanlar TAM OLARAK sunlar:
+--     daily_question_goal integer · daily_target integer
+--     target_department text   · target_ranking text
+--   target_net YOK. Dogrulandi, varsayim degil.
+--   (Ayrica not: daily_target ve daily_question_goal ikisi de duruyor —
+--    biri muhtemelen olu, ayri bir temizlik isi.)
+--
+-- UYGULAMADAN ONCE yine de RLS politikalarinin kullanicinin kendi satirini
+-- guncellemeye izin verdigini DOGRULA.
 
 -- ALTER TABLE public.profiles
 --   ADD COLUMN IF NOT EXISTS target_net numeric(5,2);

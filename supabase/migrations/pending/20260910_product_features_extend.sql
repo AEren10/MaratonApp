@@ -10,9 +10,14 @@
 -- canAccessProductFeature fail-closed calisiyor, sunucu anahtari dondurmezse
 -- ozellik premium kullanici icin de kapali kalir. Sira: once sunucu, sonra istemci.
 --
--- UYGULAMADAN ONCE: get_product_access_snapshot'in canli tanimini oku ve
--- asagidaki 7 anahtarli blogun hala birebir ayni oldugunu DOGRULA.
--- Migration dosyalari canli DB ile senkron degil (bkz. supabase/MIGRATIONS.md).
+-- CANLI DOGRULAMA (2026-09-10, Supabase SQL editoru, proje zrycqfehhyjrsujmajpf):
+--   Gercek mantik private.get_product_access_snapshot'ta (1795 karakter);
+--   public.get_product_access_snapshot yalnizca 212 karakterlik sarmalayici.
+--   features jsonb'sinde MEVCUT: route, routeForecast, routeScenarios,
+--   routePriorities, trialCompare, ocr, monthlyReport  (7 anahtar).
+--   YOK: topicProgress, departmentThreshold. Dogrulandi, varsayim degil.
+--
+-- DIKKAT: degisiklik public sarmalayiciya degil PRIVATE fonksiyona yapilmali.
 
 -- 1) Izin verilen ozellik adlari listesini genislet
 --    (20260909100000_product_access_companionship.sql:154 civarindaki kisit)
