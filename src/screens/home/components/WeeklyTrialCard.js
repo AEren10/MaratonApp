@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Chip, IconBox, GlassCard } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Icon, Chip, IconBox } from "../../../components/design";
+import { Card } from "../../../components/design/Card";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
 function StatBlock({ value, label, color, C }) {
@@ -21,7 +22,7 @@ export function WeeklyTrialCard({ report, onPress }) {
 
   return (
     <Pressable onPress={onPress}>
-      <GlassCard radius={RADIUS.xxl} style={{ padding: SPACING.lg }}>
+      <Card tone="surface">
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: SPACING.lg }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
             <IconBox icon="target" color={C.accent} size={30} rounded={10} />
@@ -47,7 +48,7 @@ export function WeeklyTrialCard({ report, onPress }) {
         <Text style={{ ...TYPOGRAPHY.micro, color: C.muted, textAlign: "center", marginTop: SPACING.md }}>
           Detaylı raporu görmek için dokun
         </Text>
-      </GlassCard>
+      </Card>
     </Pressable>
   );
 }

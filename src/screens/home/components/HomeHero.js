@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, {
   FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
 } from "react-native-reanimated";
-import { ProgressRing, AnimatedNumber, Icon, SparkBurst } from "../../../components/design";
+import { ProgressRing, AnimatedNumber, Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as haptic from "../../../lib/haptics";
@@ -44,13 +44,6 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
   const done = timeOnly ? minutes >= 60 : solved >= safeGoal;
   const ringColor = done ? C.green : C.accent;
   const isNewUser = solved === 0 && minutes === 0 && streak === 0 && net === 0 && xp === 0;
-
-  const [sparkVisible, setSparkVisible] = useState(false);
-  const prevDone = useRef(done);
-  useEffect(() => {
-    if (done && !prevDone.current) setSparkVisible(true);
-    prevDone.current = done;
-  }, [done]);
 
   // Yeni kullanıcı play icon pulse
   const pulse = useSharedValue(1);
@@ -113,7 +106,6 @@ export function HomeHero({ solved = 0, goal = 100, minutes = 0, streak = 0, net 
             </>
           )}
         </ProgressRing>
-        <SparkBurst trigger={sparkVisible} onDone={() => setSparkVisible(false)} />
       </Pressable>
 
       <View style={s.rail}>

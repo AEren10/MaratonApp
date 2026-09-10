@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle,
   withRepeat, withSequence, withTiming, withSpring, Easing,
 } from "react-native-reanimated";
-import { Icon, SparkBurst } from "../../../components/design";
+import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHADOWS } from "../../../themes/tokens";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -51,11 +51,13 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
   }, []);
 
   useEffect(() => {
-    if (!streakBurst) return;
+    if (!streakBurst) return undefined;
     flameBoost.value = withSequence(
       withSpring(1.6, { damping: 8, stiffness: 200 }),
       withSpring(1, { damping: 12, stiffness: 180 }),
     );
+    const timer = setTimeout(() => setStreakBurst(false), 600);
+    return () => clearTimeout(timer);
   }, [streakBurst]);
 
   const flameAnim = useAnimatedStyle(() => ({
@@ -147,7 +149,6 @@ export function HomeHeader({ name = "Öğrenci", streak = 0, freezeCount = 1, la
                 <Icon name="shield" size={10} color={C.textOnFill} sw={2.5} />
               </View>
             )}
-            <SparkBurst trigger={streakBurst} onDone={() => setStreakBurst(false)} />
           </View>
         ) : (
           <View style={{

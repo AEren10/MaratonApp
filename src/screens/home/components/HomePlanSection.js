@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 
-import { Icon, IconBox, GlassCard } from "../../../components/design";
+import { Icon, IconBox } from "../../../components/design";
+import { Card } from "../../../components/design/Card";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { TodayPlanCard } from "./TodayPlanCard";
@@ -43,15 +44,12 @@ export function HomePlanSection({
             accessibilityLabel={`${srDue} yanlışın tekrar zamanı geldi`}
             accessibilityHint="Tekrar oturumuna gider"
           >
-            <GlassCard
-              radius={RADIUS.xxl}
+            <Card
+              tone="surface"
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 gap: SPACING.md,
-                padding: SPACING.lg,
-                backgroundColor: C.coral + "14",
-                borderColor: C.coral + "28",
               }}
             >
               <IconBox icon="refresh" color={C.coral} size={44} rounded={RADIUS.md} />
@@ -62,7 +60,7 @@ export function HomePlanSection({
                 </Text>
               </View>
               <Icon name="arrowR" size={18} color={C.coral} />
-            </GlassCard>
+            </Card>
           </Pressable>
         </AnimatedCard>
       ) : null}

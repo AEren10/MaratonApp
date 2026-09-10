@@ -15,7 +15,6 @@ import { SCREENS } from "../../constants/screens";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { SyncProblemBanner } from "../../components/common/SyncProblemBanner";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
-import { GlowBackground, WARM_GLOW } from "../../components/design";
 
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useWeeklyReport } from "../../hooks/useWeeklyReport";
@@ -152,7 +151,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
