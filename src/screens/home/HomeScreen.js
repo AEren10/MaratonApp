@@ -184,18 +184,22 @@ export default function HomeScreen() {
 
         <View style={{ marginTop: 22 }}>
           <HomeHero
-            solved={solvedToday}
-            goal={dailyGoal}
-            minutes={minutesToday}
-            streak={streak}
-            net={latestTrial.net}
-            trend={latestTrial.trend}
-            xp={xp}
-            tier={leagueTier}
-            onRingPress={go(SCREENS.ADD_STUDY)}
-            onStreak={go(SCREENS.CALENDAR)}
-            onNet={go(SCREENS.ANALYSIS)}
-            onLeague={go(SCREENS.LEAGUE)}
+            solvedToday={solvedToday}
+            dailyGoal={dailyGoal}
+            generatedTasks={generatedTasks}
+            onStartTask={(task) => {
+              if (!task) { go(SCREENS.ADD_STUDY)(); return; }
+              trackButtonTap("home_hero_cta_start", { subject: task.subject, targetScreen: SCREENS.STUDY_TIMER });
+              navigation.navigate(SCREENS.STUDY_TIMER, {
+                taskId: task.id,
+                planTaskKey: task.source === "plan" ? task.id : undefined,
+                subjectKey: task.subject,
+                topicName: task.label,
+                routeStopId: task.routeStop?.stopId,
+                routeStopVersion: task.routeStop?.version,
+              });
+            }}
+            onViewRoute={go(SCREENS.ROADMAP)}
           />
         </View>
 

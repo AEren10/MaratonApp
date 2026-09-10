@@ -23,6 +23,10 @@ const MAX_WEEKLY_DEBT_SHARE = 0.35; // bir haftaya eklenen borç, bütçenin %35
 export function computeDebt(plannedWeeks = [], actualByWeek = {}, now = new Date()) {
   const items = [];
   let totalQuestions = 0;
+  // Tasarim borcu SAAT olarak gosteriyor ("12 sa borc"), soru olarak degil.
+  // Hafta verisinde plannedMinutes var (scheduler.js), o yuzden kacirilan
+  // sorunun dakika karsiligi ayni oranla turetiliyor.
+  let totalMinutes = 0;
 
   for (const week of plannedWeeks) {
     if (!week.weekStart) continue;
@@ -40,6 +44,13 @@ export function computeDebt(plannedWeeks = [], actualByWeek = {}, now = new Date
     const weighted = Math.round(missed * weight);
     if (weighted <= 0) continue;
 
+    // Kacirilan sorunun dakika karsiligi: haftanin dakika/soru oraniyla.
+    // plannedMinutes yoksa 0 kalir — uydurma oran kullanilmaz.
+    const weekMinutes = week.plannedMinutes || 0;
+    const weightedMinutes = planned > 0
+      ? Math.round((weekMinutes / planned) * weighted)
+      : 0;
+
     items.push({
       weekStart: week.weekStart,
       weekNo: week.weekNo,
@@ -47,16 +58,19 @@ export function computeDebt(plannedWeeks = [], actualByWeek = {}, now = new Date
       doneQuestions: done,
       missedQuestions: missed,
       weightedQuestions: weighted,
+      weightedMinutes,
       ageDays,
       completion: planned > 0 ? Math.round((done / planned) * 100) : 100,
       subjects: (week.stops || []).map((s) => s.subjectLabel || s.subject).filter(Boolean),
     });
     totalQuestions += weighted;
+    totalMinutes += weightedMinutes;
   }
 
   return {
     items,
     totalQuestions,
+    totalMinutes,
     hasDebt: totalQuestions > 0,
     // Kaç haftalık işe denk geldiğini çağıran taraf kapasiteyle hesaplar.
   };
