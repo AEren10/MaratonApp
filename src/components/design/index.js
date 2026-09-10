@@ -22,3 +22,10 @@ export { LockedValue } from "./LockedValue";
 export { Input } from "./Input";
 export { Loading } from "./Loading";
 export { Screen, SCREEN_PADDING } from "./Screen";
+
+// Yeni tasarim bilesenleri (FAZ 3.2)
+export { Card } from "./Card";
+export { StatBlock } from "./StatBlock";
+export { EmptyState } from "./EmptyState";
+export { ErrorState } from "./ErrorState";
+export { Skeleton } from "./Skeleton";

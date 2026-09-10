@@ -5,6 +5,8 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withTiming,
+  useReducedMotion,
+  cancelAnimation,
   Easing,
 } from "react-native-reanimated";
 import { SPACING, RADIUS } from "../../themes/tokens";
@@ -12,20 +14,28 @@ import { useC } from "../../contexts/ThemeContext";
 
 export function SkeletonCard({ width = "100%", height = 80, rounded = RADIUS.xl }) {
   const C = useC();
-  const opacity = useSharedValue(0.3);
+  const reduced = useReducedMotion();
+  const opacity = useSharedValue(reduced ? 0.5 : 0.3);
 
   useEffect(() => {
+    if (reduced) {
+      opacity.value = 0.5;
+      return;
+    }
     opacity.value = withRepeat(
       withTiming(0.7, { duration: 900, easing: Easing.inOut(Easing.quad) }),
       -1,
       true
     );
-  }, [opacity]);
+    return () => cancelAnimation(opacity);
+  }, [reduced, opacity]);
 
   const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
     <Animated.View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
       style={[
         { backgroundColor: C.surface2, width, height, borderRadius: rounded },
         animStyle,
