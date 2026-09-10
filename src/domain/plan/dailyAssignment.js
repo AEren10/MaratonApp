@@ -18,10 +18,25 @@ function round(value, digits = 1) {
   return Math.round(value * factor) / factor;
 }
 
-function effortLabel(questionCount) {
+function roundMinutes(value) {
+  const minutes = Math.round(Number(value) || 0);
+  return minutes > 0 ? Math.max(5, minutes) : null;
+}
+
+export function estimateAssignmentMinutes({ questionCount = 0, routeStop = null } = {}) {
   const questions = Math.max(0, Math.round(Number(questionCount) || 0));
-  const minutes = Math.max(5, Math.round(questions * 1.2));
-  return `${questions} soru · ~${minutes} dk`;
+  const stopQuestions = Number(routeStop?.cost?.questions ?? routeStop?.questions ?? 0);
+  const stopMinutes = Number(routeStop?.cost?.minutes ?? routeStop?.minutes ?? 0);
+  if (questions > 0 && stopQuestions > 0 && stopMinutes > 0) {
+    return roundMinutes(stopMinutes * (questions / stopQuestions));
+  }
+  if (stopMinutes > 0) return roundMinutes(stopMinutes);
+  return roundMinutes(questions * 1.2) || 5;
+}
+
+function effortLabel(questionCount, estimatedMinutes) {
+  const questions = Math.max(0, Math.round(Number(questionCount) || 0));
+  return `${questions} soru · ~${estimatedMinutes} dk`;
 }
 
 function fallbackTitle(tier) {
@@ -51,6 +66,7 @@ export function buildDailyAssignmentNarrative({
   const expectedNetGain = Number(routeInsight?.expectedNetGain) || 0;
   const source = routeStop ? "route" : "adaptive";
   const primaryReason = reason || "Bugünkü programa dengeli dağıtım için eklendi.";
+  const estimatedMinutes = estimateAssignmentMinutes({ questionCount, routeStop });
   const impact = expectedNetGain > 0
     ? `~+${round(expectedNetGain)} net potansiyeli`
     : IMPACT_BY_REASON[routeReasonCode] || fallbackImpact({ accuracy, daysSince });
@@ -60,7 +76,8 @@ export function buildDailyAssignmentNarrative({
     title: routeStop ? "Rota motoru seçti" : fallbackTitle(tier),
     confidenceLabel: confidence ? CONFIDENCE_LABELS[confidence] || CONFIDENCE_LABELS.low : "veri topluyor",
     impact,
-    effort: effortLabel(questionCount),
+    estimatedMinutes,
+    effort: effortLabel(questionCount, estimatedMinutes),
     bullets: [
       primaryReason,
       routeStop

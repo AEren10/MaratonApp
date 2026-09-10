@@ -32,6 +32,7 @@ test("carries route insight into the daily assignment reason", () => {
       subject: "matematik",
       topic: "Problemler",
       logicalStopKey: "math:a",
+      cost: { questions: 80, minutes: 160 },
       insight: {
         reasonCode: "LOW_ACCURACY",
         reasonText: "Son denemelerde zayıf kalan alana denk geliyor.",
@@ -41,6 +42,8 @@ test("carries route insight into the daily assignment reason", () => {
   });
 
   assert.equal(plan.tasks[0].reason, "Son denemelerde zayıf kalan alana denk geliyor.");
+  assert.equal(plan.tasks[0].estimatedMinutes, 80);
+  assert.equal(plan.estimatedMinutes, 80);
   assert.equal(plan.tasks[0].routeConfidence, "medium");
   assert.equal(plan.tasks[0].routeInsight.reasonCode, "LOW_ACCURACY");
   assert.equal(plan.tasks[0].assignment.title, "Rota motoru seçti");

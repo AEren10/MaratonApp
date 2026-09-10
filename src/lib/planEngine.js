@@ -207,7 +207,11 @@ export function generateDailyPlan({
       accuracy: acc,
       daysSince,
     });
-    tasks.push({ ...task, planTaskKey: buildPlanTaskKey(task) });
+    tasks.push({
+      ...task,
+      estimatedMinutes: task.assignment.estimatedMinutes,
+      planTaskKey: buildPlanTaskKey(task),
+    });
 
     remaining -= actual;
   }
@@ -216,6 +220,6 @@ export function generateDailyPlan({
     date: todayTR(),
     tasks,
     totalQuestions: dailyTarget - remaining,
-    estimatedMinutes: Math.round(((dailyTarget - remaining) / 80) * 120),
+    estimatedMinutes: tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0),
   };
 }
