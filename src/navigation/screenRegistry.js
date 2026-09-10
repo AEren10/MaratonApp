@@ -20,6 +20,10 @@ import SetNewPasswordScreen from "../screens/auth/SetNewPasswordScreen";
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 import ExamSetupScreen from "../screens/onboarding/ExamSetupScreen";
 import GoalSetupScreen from "../screens/onboarding/GoalSetupScreen";
+import LevelTestScreen from "../screens/onboarding/LevelTestScreen";
+import RouteReadyScreen from "../screens/onboarding/RouteReadyScreen";
+import NotificationPermissionScreen from "../screens/onboarding/NotificationPermissionScreen";
+import SetupIncompleteScreen from "../screens/onboarding/SetupIncompleteScreen";
 import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
 import AddWrongScreen from "../screens/wrong-notebook/AddWrongScreen";
 import WrongDetailScreen from "../screens/wrong-notebook/WrongDetailScreen";
@@ -103,9 +107,15 @@ export const SLIDES_STACK_SCREENS = [
   screen(SCREENS.ONBOARDING, OnboardingScreen),
 ];
 
+// Tasarim AKIS 12, dort adim: Karsilama -> Hedef Sec -> Seviye Testi -> Rota Hazir.
+// Kurulum Yarim ve Bildirim Izni bu yiginda yan ekranlar.
 export const SETUP_STACK_SCREENS = [
+  screen(SCREENS.SETUP_INCOMPLETE, SetupIncompleteScreen),
   screen(SCREENS.EXAM_SETUP, ExamSetupScreen),
   screen(SCREENS.GOAL_SETUP, GoalSetupScreen),
+  screen(SCREENS.LEVEL_TEST, LevelTestScreen),
+  screen(SCREENS.ROUTE_READY, RouteReadyScreen),
+  screen(SCREENS.NOTIFICATION_PERMISSION, NotificationPermissionScreen),
 ];
 
 export const APP_STACK_SCREENS = [

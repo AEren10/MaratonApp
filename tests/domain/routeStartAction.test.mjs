@@ -67,6 +67,42 @@ test("accepts persisted stopId shape from the route screen", () => {
   });
 });
 
+test("adds reasoning, confidence and effort metadata to the next route action", () => {
+  const action = firstRouteAction([
+    {
+      id: "active-2",
+      lifecycleStatus: "active",
+      subject: "matematik",
+      subjectLabel: "Matematik",
+      topic: "Problemler",
+      cost: { questions: 72, minutes: 120 },
+      dataConfidence: "medium",
+      insight: {
+        reasonCode: "LOW_ACCURACY",
+        reasonText: "Son denemelerde zayıf kalan alana denk geliyor.",
+        expectedNetGain: 1.24,
+      },
+    },
+  ]);
+
+  assert.equal(action.reasonCode, "LOW_ACCURACY");
+  assert.equal(action.confidenceLabel, "orta");
+  assert.equal(action.effort, "72 soru · ~120 dk");
+  assert.equal(action.impact, "~+1.2 net potansiyeli");
+  assert.match(action.message, /Son denemelerde zayıf kalan/);
+});
+
+test("skips locked and frozen route stops because they are not startable", () => {
+  const action = firstRouteAction([
+    { id: "locked", lifecycleStatus: "active", locked: true, subject: "matematik", topic: "Problemler" },
+    { id: "frozen", lifecycleStatus: "upcoming", frozenUntil: "2026-09-17", subject: "turkce", topic: "Paragraf" },
+    { id: "next", lifecycleStatus: "upcoming", subject: "fen", topic: "Basınç", weekStart: "2026-09-14" },
+  ]);
+
+  assert.equal(action.stopId, "next");
+  assert.equal(action.status, "upcoming");
+});
+
 test("ignores terminal route stops", () => {
   const action = firstRouteAction([
     { id: "done", lifecycle_status: "completed", subject: "matematik", topic: "Problemler" },

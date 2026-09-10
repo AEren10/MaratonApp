@@ -137,8 +137,17 @@ function SlidesStack() {
 }
 
 function SetupStack() {
+  // "Kurulum Yarim" YALNIZCA yarim kalmis kuruluma donen kullaniciya gosterilir.
+  // Yeni kaydolan kullanicinin ilk gordugu ekran Hedef Sec olmali; tasarimin
+  // Kurulum Yarim metni ("Sinavini secmissin ama hedefini belirlememissin")
+  // zaten ilerleme oldugunu varsayiyor.
+  const { examType } = useExam();
+  const resuming = !!examType;
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Navigator
+      screenOptions={screenOptions}
+      initialRouteName={resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP}
+    >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
     </Stack.Navigator>

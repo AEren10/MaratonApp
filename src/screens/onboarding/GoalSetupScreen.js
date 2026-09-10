@@ -1,6 +1,4 @@
 import { useState, useCallback, useMemo } from "react";
-import { track } from "../../lib/analytics";
-import { EVENTS } from "../../constants/analytics";
 import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +14,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
 import { requestNotificationPermissions, applyNotifPrefs, getNotifPrefs, ensurePushTokenRegistered } from "../../lib/notifications";
 import * as H from "../../lib/haptics";
-import { ROOT_STACK } from "../../navigation/routes";
+import { SCREENS } from "../../constants/screens";
 
 const MIN_Q = 20;
 const MAX_Q = 200;
@@ -57,20 +55,29 @@ export default function GoalSetupScreen() {
       }
     }).catch(() => {});
 
-    track(EVENTS.ONBOARDING_COMPLETE, { dailyQuestions });
-    navigation.reset({ index: 0, routes: [{ name: ROOT_STACK.MAIN_TABS }] });
+    // Kurulum BURADA BITMIYOR. Tasarim AKIS 12 dort adim:
+    // Karsilama -> Hedef Sec -> Seviye Testi -> Rota Hazir.
+    // Onceden burada MAIN_TABS'a reset ediliyordu, yani son iki adima
+    // hic ulasilmiyordu. ONBOARDING_COMPLETE olayi da buradan kaldirildi:
+    // kurulum gercekten Rota Hazir'da tamamlaniyor.
+    navigation.navigate(SCREENS.LEVEL_TEST);
   }, [dailyQuestions, dispatch, updateGoal, navigation, user?.id]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* Tasarim dort adim gosteriyor ("2 / 4"); bu ikinci adim. */}
       <View style={styles.progressRow}>
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
+        {[0, 1, 2, 3].map((i) => (
+          <View
+            key={i}
+            style={[styles.segment, { backgroundColor: i <= 1 ? C.accent : C.track }]}
+          />
+        ))}
       </View>
 
       <View style={styles.content}>
         <Animated.View entering={FadeIn.delay(100)}>
-          <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>HEDEF NET</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GÜNLÜK TEMPO</Text>
           <Text style={[styles.title, { color: C.text }]}>Günlük hedefin?</Text>
           <Text style={[styles.subtitle, { color: C.text3 }]}>
             Sonra istediğin zaman değiştirebilirsin.

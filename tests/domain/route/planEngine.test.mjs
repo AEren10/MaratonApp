@@ -53,3 +53,70 @@ test("carries route insight into the daily assignment reason", () => {
   assert.equal(plan.summary.confidenceLabel, "orta");
   assert.equal(plan.summary.primaryTaskKey, "plan_math:a");
 });
+
+test("daily plan skips non-actionable route stops and caps route task cost", () => {
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 30,
+    routeWeekStops: [
+      {
+        id: "done",
+        subject: "matematik",
+        topic: "Tamamlanan Konu",
+        lifecycleStatus: "completed",
+        cost: { questions: 90, minutes: 180 },
+        score: 999,
+      },
+      {
+        id: "active",
+        subject: "matematik",
+        topic: "Problemler",
+        lifecycleStatus: "active",
+        cost: { questions: 5, minutes: 10 },
+        score: 120,
+        insight: { reasonCode: "LOW_ACCURACY", confidence: "medium" },
+      },
+      {
+        id: "next",
+        subject: "turkce",
+        topic: "Paragraf",
+        lifecycleStatus: "upcoming",
+        cost: { questions: 80, minutes: 100 },
+        score: 30,
+      },
+    ],
+  });
+
+  assert.deepEqual(plan.tasks.map((task) => task.stopId), ["active", "next"]);
+  assert.deepEqual(plan.tasks.map((task) => task.questionCount), [5, 25]);
+  assert.equal(plan.tasks[0].routeAllocation.cappedByRouteCost, true);
+  assert.equal(plan.summary.totalQuestions, 30);
+});
+
+test("daily plan fills route cost leftovers with adaptive tasks", () => {
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 30,
+    weakAreas: { turkce: 35, sosyal: 90 },
+    routeWeekStops: [
+      {
+        id: "active",
+        subject: "matematik",
+        topic: "Problemler",
+        lifecycleStatus: "active",
+        cost: { questions: 5, minutes: 10 },
+        score: 120,
+        insight: { reasonCode: "LOW_ACCURACY", confidence: "medium" },
+      },
+    ],
+  });
+
+  assert.equal(plan.tasks[0].stopId, "active");
+  assert.equal(plan.tasks[0].questionCount, 5);
+  assert.equal(plan.tasks[1].stopId, null);
+  assert.equal(
+    plan.tasks.slice(1).reduce((sum, task) => sum + task.questionCount, 0),
+    25,
+  );
+  assert.equal(plan.totalQuestions, 30);
+});

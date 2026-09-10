@@ -3,6 +3,7 @@ import { getSubjectsForExam } from "../data/curriculum.js";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity.js";
 import { buildDailyAssignmentNarrative } from "../domain/plan/dailyAssignment.js";
 import { buildDailyPlanSummary } from "../domain/plan/dailyPlanSummary.js";
+import { buildDailyRouteTaskAllocations } from "../domain/plan/dailyTaskAllocator.js";
 
 const ROUTE_REASON_TEXT = {
   REVIEW_DUE: "Tekrar zamanı geldi",
@@ -14,6 +15,19 @@ const ROUTE_REASON_TEXT = {
   DEBT_RECOVERY: "Konu borcunu kapatır",
   ROUTE_COMMITMENT: "Rotandaki sıradaki durak",
 };
+
+function allocateAdaptiveCandidates(candidates, target, maxTasks, startingPriority = 1) {
+  const selected = candidates.slice(0, Math.max(0, maxTasks));
+  const weights = [0.35, 0.3, 0.2, 0.15].slice(0, selected.length);
+  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+
+  return selected.map((candidate, index) => {
+    const questionCount = index === selected.length - 1
+      ? null
+      : Math.round(target * (weights[index] / weightTotal));
+    return { ...candidate, questionCount, priority: startingPriority + index };
+  });
+}
 
 /**
  * Gunluk plan olusturma algoritmasi.
@@ -76,29 +90,49 @@ export function generateDailyPlan({
   const scoreBySubject = new Map(scored.map((item) => [item.key, item.score]));
   // Her rota durağı ayrı adaydır. Subject bazında tekilleştirmek, aynı dersteki
   // ikinci konuyu görünmez yapıyor ve tamamlamayı yanlış durağa yazıyordu.
-  const candidates = validRouteStops.length
-    ? validRouteStops.map((routeStop) => ({
+  const routeCandidates = validRouteStops.map((routeStop) => ({
       key: routeStop.subject,
-      score: scoreBySubject.get(routeStop.subject) || 0,
+      score: routeStop.score || scoreBySubject.get(routeStop.subject) || 0,
       routeStop,
-    }))
-    : scored;
+    }));
+
+  const maxTaskCount = daysLeft < 30 ? 3 : 4;
+  const routeAllocations = buildDailyRouteTaskAllocations(routeCandidates, dailyTarget, {
+    maxTasks: maxTaskCount,
+  });
+  const routeAllocatedQuestions = routeAllocations.reduce((sum, item) => sum + item.questionCount, 0);
+  const routeKeys = new Set(routeAllocations.map((item) => item.key));
+  const adaptivePool = scored.filter((candidate) => !routeKeys.has(candidate.key));
+  const fallbackPool = adaptivePool.length ? adaptivePool : scored;
+  const fallbackTarget = Math.max(0, dailyTarget - routeAllocatedQuestions);
+  const fallbackSlots = fallbackTarget > 0 && routeAllocations.length
+    ? Math.max(1, maxTaskCount - routeAllocations.length)
+    : 0;
+  const adaptiveFallback = allocateAdaptiveCandidates(
+    fallbackPool,
+    fallbackTarget,
+    fallbackSlots,
+    routeAllocations.length + 1,
+  );
+
+  const candidates = routeAllocations.length
+    ? [...routeAllocations, ...adaptiveFallback]
+    : allocateAdaptiveCandidates(scored, dailyTarget, maxTaskCount);
 
   const tasks = [];
   let remaining = dailyTarget;
-  const subjectCount = Math.min(candidates.length, daysLeft < 30 ? 3 : 4);
-  const selected = candidates.slice(0, subjectCount);
-  const weights = [0.35, 0.3, 0.2, 0.15].slice(0, selected.length);
-  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0) || 1;
-
-  for (let i = 0; i < subjectCount && remaining > 0; i++) {
-    const { key, routeStop = null } = selected[i];
+  for (let i = 0; i < candidates.length && remaining > 0; i++) {
+    const {
+      key,
+      routeStop = null,
+      questionCount,
+      allocation = null,
+      priority = i + 1,
+    } = candidates[i];
     const subject = subjectMap[key];
     if (!subject) continue;
 
-    const count = i === subjectCount - 1
-      ? remaining
-      : Math.round(dailyTarget * (weights[i] / weightTotal));
+    const count = questionCount == null ? remaining : questionCount;
     const actual = Math.min(count, remaining);
 
     // Konu seçimi: ROTA öncelikli.
@@ -187,7 +221,7 @@ export function generateDailyPlan({
       rootStopKey: routeStop?.rootStopKey || null,
       color: subject.color,
       questionCount: actual,
-      priority: i + 1,
+      priority,
       reason,
       rkind,
       tier,
@@ -197,6 +231,7 @@ export function generateDailyPlan({
       completed: false,
       routeConfidence: routeInsight?.confidence || routeStop?.dataConfidence || null,
       routeInsight,
+      routeAllocation: allocation,
     };
     task.assignment = buildDailyAssignmentNarrative({
       reason,
