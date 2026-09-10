@@ -20,6 +20,8 @@ export function ExamProvider({ children }) {
   const [targetDepartment, setTargetDepartment] = useState(null);
   // Tasarimin onboarding 1. adimi: HEDEF NET (slider 40-120). profiles.target_net.
   const [targetNet, setTargetNet] = useState(null);
+  // Rotanin baslangic noktasi (Seviye Testi 3/4). profiles.baseline_net.
+  const [baselineNet, setBaselineNet] = useState(null);
   const [dailyGoalSet, setDailyGoalSet] = useState(false);
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,7 @@ export function ExamProvider({ children }) {
         setTargetRanking(d.targetRanking || null);
         setTargetDepartment(d.targetDepartment || null);
         setTargetNet(d.targetNet ?? null);
+        setBaselineNet(d.baselineNet ?? null);
         if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
       }
       setHasSeenSlides(seenRaw === "true");
@@ -56,6 +59,7 @@ export function ExamProvider({ children }) {
         setTargetRanking(null);
         setTargetDepartment(null);
         setTargetNet(null);
+        setBaselineNet(null);
         setDailyGoalSet(false);
       }
       return;
@@ -80,6 +84,7 @@ export function ExamProvider({ children }) {
           setTargetRanking(d.targetRanking || null);
           setTargetDepartment(d.targetDepartment || null);
           setTargetNet(d.targetNet ?? null);
+          setBaselineNet(d.baselineNet ?? null);
         }).catch(() => {});
         return;
       }
@@ -90,6 +95,7 @@ export function ExamProvider({ children }) {
         targetRanking: p.target_ranking || null,
         targetDepartment: p.target_department || null,
         targetNet: p.target_net == null ? null : Number(p.target_net),
+        baselineNet: p.baseline_net == null ? null : Number(p.baseline_net),
         dailyGoalSet: !!p.daily_question_goal || !!p.target_ranking,
       };
       setExamType(config.examType);
@@ -98,6 +104,7 @@ export function ExamProvider({ children }) {
       setTargetRanking(config.targetRanking);
       setTargetDepartment(config.targetDepartment);
       setTargetNet(config.targetNet);
+      setBaselineNet(config.baselineNet);
       if (config.dailyGoalSet) setDailyGoalSet(true);
       appStorage.setJson(STORAGE_KEY, {
         examType: config.examType,
@@ -106,6 +113,7 @@ export function ExamProvider({ children }) {
         targetRanking: config.targetRanking,
         targetDepartment: config.targetDepartment,
         targetNet: config.targetNet,
+        baselineNet: config.baselineNet,
         dailyGoalSet: config.dailyGoalSet,
       }).catch(() => {});
     }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
@@ -176,6 +184,24 @@ export function ExamProvider({ children }) {
     }
   }, [session]);
 
+  // Rotanin baslangic neti. targetNet ile ayni deseni izliyor.
+  // NOT: profiles.baseline_net kolonu HENUZ UYGULANMADI
+  // (bkz. supabase/migrations/pending/20260910_profiles_baseline_net.sql).
+  // Kolon gelene kadar sunucu yazimi basarisiz oluyor ve deger yalnizca
+  // cihazda tutuluyor — sessizce kaybolmuyor, yerelden geri dolduruluyor.
+  const updateBaselineNet = useCallback(async (net) => {
+    const value = net == null ? null : Number(net);
+    setBaselineNet(value);
+    try {
+      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      await appStorage.setJson(STORAGE_KEY, { ...existing, baselineNet: value });
+    } catch {}
+    if (session?.user?.id) {
+      const { updateProfile: updateProf } = require("../supabase/profiles");
+      updateProf(session.user.id, { baseline_net: value }).catch(() => {});
+    }
+  }, [session]);
+
   const updateRanking = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
@@ -207,13 +233,13 @@ export function ExamProvider({ children }) {
   const combinedLoading = loading || dbLoading;
 
   const value = useMemo(() => ({
-    examType, field, examDate, targetRanking, targetDepartment, targetNet,
+    examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
-    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, updateTargetNet,
+    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markSlidesAsSeen,
-  }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
+  }), [examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
-    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, updateTargetNet,
+    dailyGoalSet, updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markSlidesAsSeen]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;

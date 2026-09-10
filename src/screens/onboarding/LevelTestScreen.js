@@ -13,6 +13,8 @@ import { useLevelTestForm } from "../../hooks/useLevelTestForm";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 
 export default function LevelTestScreen() {
   const C = useC();
@@ -32,8 +34,11 @@ export default function LevelTestScreen() {
     submit(goNext);
   }, [submit, goNext]);
 
+  // Atlamak da bir sinyal: kullanicinin elinde deneme yok demek, rota
+  // baslangic noktasi olmadan ciziliyor. Huni bunu gormeli.
   const handleSkip = useCallback(() => {
     H.select();
+    track(EVENTS.LEVEL_TEST_SKIPPED);
     goNext();
   }, [goNext]);
 

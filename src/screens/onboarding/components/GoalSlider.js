@@ -11,7 +11,7 @@ function snap(val, step) {
 }
 
 // Hedef Seç · günlük soru hedefi sürgüsü — sınırlar arasında snap'lenir.
-export function GoalSlider({ value, onChange, C, trackWidth, min, max, step }) {
+export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, accessibilityLabel }) {
   const pct = (value - min) / (max - min);
   const thumbX = useSharedValue(pct * trackWidth);
   const startX = useSharedValue(0);
@@ -38,7 +38,13 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step }) {
 
   return (
     <GestureDetector gesture={gesture}>
-      <View style={[styles.trackWrap, { height: hitArea }]}>
+      <View
+        style={[styles.trackWrap, { height: hitArea }]}
+        accessible
+        accessibilityRole="adjustable"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityValue={{ min, max, now: value }}
+      >
         <View style={[styles.trackBg, { backgroundColor: C.track, width: trackWidth }]}>
           <Animated.View style={[styles.trackFill, { backgroundColor: C.accent }, fillStyle]} />
         </View>

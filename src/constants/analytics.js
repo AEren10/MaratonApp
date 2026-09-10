@@ -17,6 +17,9 @@ export const EVENTS = {
 
   // Onboarding
   ONBOARDING_COMPLETE: "onboarding.complete",
+  // Seviye Testi (kurulum 3/4) — rotanin baslangic neti girildi ya da atlandi.
+  LEVEL_TEST_SUBMITTED: "onboarding.level_test_submitted",
+  LEVEL_TEST_SKIPPED: "onboarding.level_test_skipped",
   EXAM_TYPE_SELECTED: "exam.type_selected",
 
   // Daily Plan
