@@ -1,6 +1,7 @@
 import { differenceInDays, todayTR } from "./dateUtils.js";
 import { getSubjectsForExam } from "../data/curriculum.js";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity.js";
+import { buildDailyAssignmentNarrative } from "../domain/plan/dailyAssignment.js";
 
 const ROUTE_REASON_TEXT = {
   REVIEW_DUE: "Tekrar zamanı geldi",
@@ -196,6 +197,16 @@ export function generateDailyPlan({
       routeConfidence: routeInsight?.confidence || routeStop?.dataConfidence || null,
       routeInsight,
     };
+    task.assignment = buildDailyAssignmentNarrative({
+      reason,
+      routeInsight,
+      routeReasonCode,
+      routeStop,
+      questionCount: actual,
+      tier,
+      accuracy: acc,
+      daysSince,
+    });
     tasks.push({ ...task, planTaskKey: buildPlanTaskKey(task) });
 
     remaining -= actual;

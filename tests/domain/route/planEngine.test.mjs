@@ -43,4 +43,6 @@ test("carries route insight into the daily assignment reason", () => {
   assert.equal(plan.tasks[0].reason, "Son denemelerde zayıf kalan alana denk geliyor.");
   assert.equal(plan.tasks[0].routeConfidence, "medium");
   assert.equal(plan.tasks[0].routeInsight.reasonCode, "LOW_ACCURACY");
+  assert.equal(plan.tasks[0].assignment.title, "Rota motoru seçti");
+  assert.equal(plan.tasks[0].assignment.confidenceLabel, "orta");
 });

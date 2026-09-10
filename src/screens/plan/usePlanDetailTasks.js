@@ -16,6 +16,7 @@ function mapGeneratedTask(t, C, isPlanDone) {
     q: t.questionCount,
     reason: t.reason,
     rkind: t.rkind || "gray",
+    assignment: t.assignment || null,
     done: isPlanDone(pid),
     routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
     planTask: true,

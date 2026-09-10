@@ -5,6 +5,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { Icon } from "../../../components/design";
 import { TrendChart } from "../../../components/charts/TrendChart";
 import { TRIAL_TO_CURRICULUM } from "../../../domain/trial/trialKeyMap";
+import AssignmentInsightPanel from "./AssignmentInsightPanel";
 
 // Görev gerekçesi + son denemelerde bu dersin net trendi.
 function trialKeysForCurriculum(curriculumKey) {
@@ -16,6 +17,7 @@ function trialKeysForCurriculum(curriculumKey) {
 export function TaskReasonSheet({ task, trials, onClose }) {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
+  const assignment = task?.assignment || null;
   const trend = useMemo(() => {
     if (!task) return { data: [], labels: [] };
     const trialKeys = trialKeysForCurriculum(task.s?.key);
@@ -47,6 +49,8 @@ export function TaskReasonSheet({ task, trials, onClose }) {
                 <Icon name="info" size={16} color={C.accent} />
                 <Text style={s.reasonText}>{task.reason}</Text>
               </View>
+
+              <AssignmentInsightPanel assignment={assignment} C={C} />
 
               <Text style={s.sub}>{task.q} soru hedeflendi</Text>
 
