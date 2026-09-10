@@ -81,6 +81,16 @@ export const PRODUCT_FEATURES = {
   monthly_report: "monthlyReport",
 };
 
+// EKSIK — tasarimin 8 paywall tetik noktasindan ikisinin karsiligi yok:
+//   "konu ilerlemesi" ve "hedef bolum karsilastirmasi" (Bolum Esigi ekrani).
+// Anahtarlar buraya EKLENMEDI cunku canAccessProductFeature fail-closed:
+// sunucunun get_product_access_snapshot'i su an 7 anahtar donduruyor
+// (bkz. supabase/migrations/20260909100000_product_access_companionship.sql:195),
+// istemciye tek tarafli anahtar eklemek o ozellikleri PREMIUM kullanici icin
+// bile kilitli yapardi. Once sunucu tarafi genisletilmeli —
+// hazir dosya: supabase/migrations/pending/20260910_product_features_extend.sql
+
+
 export const PREMIUM_TO_PRODUCT_FEATURE = {
   detailed_roadmap: PRODUCT_FEATURES.route,
   ai_suggestions: PRODUCT_FEATURES.route_priorities,
@@ -89,15 +99,21 @@ export const PREMIUM_TO_PRODUCT_FEATURE = {
   deep_analytics: PRODUCT_FEATURES.route_priorities,
 };
 
+// Fiyatlar tasarimdan (Premium + Abonelik artboardlari): aylik ₺149,
+// yillik ₺1.068 (= ₺89/ay, %40 avantaj), 7 gun ucretsiz deneme.
+// Bunlar YEDEK gosterim degerleri — PaywallScreen magaza paketleri
+// geldiginde uzerine yazar. Nihai kaynak App Store / Play Store urunleri.
+export const FREE_TRIAL_DAYS = 7;
+
 export const PLANS = [
-  { id: "monthly", price: "₺79.99", period: "ay", popular: false },
+  { id: "monthly", price: "₺149", period: "ay", popular: false },
   {
     id: "yearly",
-    price: "₺549.99",
+    price: "₺1.068",
     period: "yıl",
     popular: true,
-    savings: "42%",
-    monthlyEquiv: "₺45.83",
+    savings: "%40",
+    monthlyEquiv: "₺89",
   },
 ];
 

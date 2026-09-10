@@ -23,7 +23,7 @@ function PlanCard({ plan, selected, onSelect }) {
             {plan.id === "yearly" ? "Yıllık Plan" : "Aylık Plan"}
           </Text>
           {plan.savings && (
-            <Text style={s.savings}>{plan.savings} tasarruf</Text>
+            <Text style={s.savings}>{plan.savings} avantaj</Text>
           )}
         </View>
         <View style={s.priceCol}>

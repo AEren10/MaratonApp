@@ -1,0 +1,42 @@
+-- UYGULANMADI. Canli DB'ye elle uygulanmasi gerekiyor (DB parolasi kullanicida).
+--
+-- NEDEN: Tasarim (Maraton Uygulama.dc.html, "Deneme Kotasi Doldu" artboardindaki
+-- "PAYWALL NEREDE CIKAR" listesi) sekiz paywall tetik noktasi tanimliyor.
+-- Bunlardan ikisinin sunucu tarafinda ozellik anahtari yok:
+--   4 · "Ucten fazla oncelikli alan gorulmek istendiginde"  -> topicProgress
+--   8 · "Hedef bolum karsilastirmasi istendiginde"           -> departmentThreshold
+--
+-- Istemci (src/constants/premium.js) bu anahtarlari BILEREK tanimlamiyor:
+-- canAccessProductFeature fail-closed calisiyor, sunucu anahtari dondurmezse
+-- ozellik premium kullanici icin de kapali kalir. Sira: once sunucu, sonra istemci.
+--
+-- UYGULAMADAN ONCE: get_product_access_snapshot'in canli tanimini oku ve
+-- asagidaki 7 anahtarli blogun hala birebir ayni oldugunu DOGRULA.
+-- Migration dosyalari canli DB ile senkron degil (bkz. supabase/MIGRATIONS.md).
+
+-- 1) Izin verilen ozellik adlari listesini genislet
+--    (20260909100000_product_access_companionship.sql:154 civarindaki kisit)
+--    Mevcut: 'route','route_forecast','route_scenarios','route_priorities',
+--            'trial_compare','ocr','monthly_report'
+--    Eklenecek: 'topic_progress','department_threshold'
+
+-- 2) features jsonb'sine iki anahtar ekle.
+--    Ikisi de rota zekasi sinifinda, yani route_priorities ile ayni kural:
+--    ilk hafta muafiyeti VEYA pro.
+--
+--    features := jsonb_build_object(
+--      'route',                first_week OR pro,
+--      'routeForecast',        first_week OR pro,
+--      'routeScenarios',       first_week OR pro,
+--      'routePriorities',      first_week OR pro,
+--      'trialCompare',         first_week OR pro,
+--      'ocr',                  first_week OR pro,
+--      'monthlyReport',        first_week OR pro,
+--      'topicProgress',        first_week OR pro,   -- YENI
+--      'departmentThreshold',  first_week OR pro    -- YENI
+--    )
+
+-- 3) Uygulandiktan SONRA istemciye ekle:
+--    src/constants/premium.js -> PRODUCT_FEATURES:
+--      topic_progress: "topicProgress",
+--      department_threshold: "departmentThreshold",
