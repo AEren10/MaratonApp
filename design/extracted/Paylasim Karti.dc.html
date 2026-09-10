@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0A0808}
+  a{color:#FF3B47;text-decoration:none}
+  a:hover{color:#FF8A93}
+</style>
+</helmet>
+
+<section style="--accent:#FF3B47;--ink:#22090B;--canvas:#0A0808;--bg:#0F0C0B;--text:#F7EFE9;--text2:#D3C4BE;--text3:#B0A09A;--text4:#94837C;--border:color-mix(in oklab, var(--bg) 77%, var(--text));--track:color-mix(in oklab, var(--bg) 86%, var(--text));--stop:color-mix(in oklab, var(--accent) 42%, var(--bg));--up:#4ADE80;padding:44px;font-family:'Archivo',sans-serif;color:var(--text);background:var(--canvas);min-height:100vh">
+
+<div style="display:flex;align-items:baseline;gap:14px;padding-bottom:8px">
+  <span style="font:700 11px 'Archivo';letter-spacing:.22em;color:var(--accent)">PAYLAŞIM KARTLARI · A + B</span>
+  <span style="font:400 13px 'Archivo';color:var(--text3)">A'nın dev sayısı, B'nin rota şeridi alt bantta imza olarak. Altta marka kilidi.</span>
+</div>
+
+<div style="display:flex;gap:26px;padding-top:26px">
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text3)">GÜNLÜK</div>
+<div data-screen-label="Günlük Paylaşım" style="position:relative;width:360px;height:640px;flex:none;border-radius:30px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;padding:32px 30px 28px;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+  <div style="position:absolute;left:-120px;top:-150px;width:440px;height:440px;border-radius:6px;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 30%, transparent), transparent 66%)"></div>
+  <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between">
+    <span style="font:700 10px 'Archivo';letter-spacing:.24em;color:var(--accent)">GÜN 118</span>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">23 HAZİRAN SALI</span>
+  </div>
+
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div style="font:400 158px/.8 'Bricolage Grotesque';letter-spacing:-.055em;font-variant-numeric:tabular-nums">118</div>
+    <div style="font:400 27px 'Bricolage Grotesque';color:var(--text2);margin-top:15px">soru çözüldü</div>
+    <div style="font:400 15px/1.6 'Archivo';color:var(--text3);margin-top:11px;max-width:250px;text-wrap:pretty">118 gündür ara vermedin.</div>
+  </div>
+
+  <div style="position:relative;margin:0 -30px 4px;height:96px">
+    <svg viewBox="0 0 360 96" style="position:absolute;inset:0;width:100%;height:100%">
+      <path d="M0 80 C 58 76 96 60 140 48 C 196 33 262 22 360 12" fill="none" stroke="var(--track)" stroke-width="2.6"></path>
+      <path d="M0 80 C 58 76 96 60 140 48" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"></path>
+      <circle cx="34" cy="78" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="86" cy="65" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="140" cy="48" r="17" fill="color-mix(in srgb, var(--accent) 20%, transparent)"></circle>
+      <circle cx="140" cy="48" r="8" fill="var(--accent)"></circle>
+      <circle cx="232" cy="27" r="4.6" fill="var(--bg)" stroke="var(--stop)" stroke-width="2.4"></circle>
+      <circle cx="318" cy="16" r="4.6" fill="var(--bg)" stroke="var(--stop)" stroke-width="2.4"></circle>
+      <text x="140" y="72" text-anchor="middle" font-family="Archivo" font-size="9" font-weight="700" letter-spacing="1.8" fill="var(--accent)">BUGÜN</text>
+    </svg>
+  </div>
+
+  <div style="position:relative;display:flex;border-top:1px solid var(--border);padding-top:18px">
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">DURAK</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">4</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">SÜRE</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">3s 12dk</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">İSABET</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">%78</div></div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding-top:20px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:26px;height:26px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+        <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M2 14C6 14 7 4 9 4s3 10 7 10" stroke="var(--ink)" stroke-width="2.1" stroke-linecap="round"></path></svg>
+      </span>
+      <span style="font:500 18px 'Bricolage Grotesque';letter-spacing:-.01em">maraton</span>
+    </div>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">SINAVA 47 GÜN</span>
+  </div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text3)">HAFTALIK</div>
+<div data-screen-label="Haftalık Paylaşım" style="position:relative;width:360px;height:640px;flex:none;border-radius:30px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;padding:32px 30px 28px;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+  <div style="position:absolute;left:-120px;top:-150px;width:440px;height:440px;border-radius:6px;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 30%, transparent), transparent 66%)"></div>
+  <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between">
+    <span style="font:700 10px 'Archivo';letter-spacing:.24em;color:var(--accent)">HAFTA 17</span>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">17 – 23 HAZİRAN</span>
+  </div>
+
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div style="font:400 158px/.8 'Bricolage Grotesque';letter-spacing:-.055em;font-variant-numeric:tabular-nums">612</div>
+    <div style="font:400 27px 'Bricolage Grotesque';color:var(--text2);margin-top:15px">soru bu hafta</div>
+    <div style="font:400 15px/1.6 'Archivo';color:var(--text3);margin-top:11px;max-width:250px;text-wrap:pretty">Geçen haftaya göre 94 soru fazla.</div>
+  </div>
+
+  <div style="position:relative;margin:0 -30px 4px;height:96px">
+    <svg viewBox="0 0 360 96" style="position:absolute;inset:0;width:100%;height:100%">
+      <path d="M0 82 C 54 78 92 64 138 52 C 200 36 268 22 360 10" fill="none" stroke="var(--track)" stroke-width="2.6"></path>
+      <path d="M0 82 C 54 78 92 64 138 52 C 178 42 214 33 248 26" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"></path>
+      <circle cx="30" cy="80" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="80" cy="68" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="138" cy="52" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="194" cy="38" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="248" cy="26" r="17" fill="color-mix(in srgb, var(--accent) 20%, transparent)"></circle>
+      <circle cx="248" cy="26" r="8" fill="var(--accent)"></circle>
+      <text x="248" y="52" text-anchor="middle" font-family="Archivo" font-size="9" font-weight="700" letter-spacing="1.8" fill="var(--accent)">BU HAFTA</text>
+    </svg>
+  </div>
+
+  <div style="position:relative;display:flex;border-top:1px solid var(--border);padding-top:18px">
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">DURAK</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">5</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">GÜN</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">6/7</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">NET</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;color:var(--up);font-variant-numeric:tabular-nums">+3,2</div></div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding-top:20px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:26px;height:26px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+        <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M2 14C6 14 7 4 9 4s3 10 7 10" stroke="var(--ink)" stroke-width="2.1" stroke-linecap="round"></path></svg>
+      </span>
+      <span style="font:500 18px 'Bricolage Grotesque';letter-spacing:-.01em">maraton</span>
+    </div>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">SINAVA 47 GÜN</span>
+  </div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="font:600 10.5px 'Archivo';letter-spacing:.2em;color:var(--text3)">AYLIK</div>
+<div data-screen-label="Aylık Paylaşım" style="position:relative;width:360px;height:640px;flex:none;border-radius:30px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;padding:32px 30px 28px;box-shadow:0 30px 70px rgba(0,0,0,.6)">
+  <div style="position:absolute;left:-120px;top:-150px;width:440px;height:440px;border-radius:6px;background:radial-gradient(circle, color-mix(in oklab, var(--accent) 30%, transparent), transparent 66%)"></div>
+  <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between">
+    <span style="font:700 10px 'Archivo';letter-spacing:.24em;color:var(--accent)">HAZİRAN</span>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">4 DENEME · 19 DURAK</span>
+  </div>
+
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div style="display:flex;align-items:baseline;gap:15px">
+      <span style="font:400 158px/.8 'Bricolage Grotesque';letter-spacing:-.055em;font-variant-numeric:tabular-nums">68</span>
+      <span style="font:400 30px 'Bricolage Grotesque';color:var(--text4);font-variant-numeric:tabular-nums">64'ten</span>
+    </div>
+    <div style="font:400 27px 'Bricolage Grotesque';color:var(--text2);margin-top:15px">net tahmini</div>
+    <div style="font:400 15px/1.6 'Archivo';color:var(--text3);margin-top:11px;max-width:250px;text-wrap:pretty">Bir ayda dört net. Rota yukarı kırıldı.</div>
+  </div>
+
+  <div style="position:relative;margin:0 -30px 4px;height:96px">
+    <svg viewBox="0 0 360 96" style="position:absolute;inset:0;width:100%;height:100%">
+      <line x1="0" y1="22" x2="360" y2="22" stroke="color-mix(in oklab, var(--accent) 20%, var(--bg))" stroke-width="1.4" stroke-dasharray="4 7"></line>
+      <path d="M0 84 C 56 80 94 66 140 54 C 204 37 272 20 360 6" fill="none" stroke="var(--track)" stroke-width="2.6"></path>
+      <path d="M0 84 C 56 80 94 66 140 54 C 188 44 232 38 276 34" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"></path>
+      <circle cx="52" cy="79" r="4.6" fill="var(--bg)" stroke="var(--stop)" stroke-width="2.4"></circle>
+      <circle cx="140" cy="54" r="4.6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"></circle>
+      <circle cx="276" cy="34" r="17" fill="color-mix(in srgb, var(--accent) 20%, transparent)"></circle>
+      <circle cx="276" cy="34" r="8" fill="var(--accent)"></circle>
+      <text x="8" y="16" font-family="Archivo" font-size="9" font-weight="700" letter-spacing="1.8" fill="color-mix(in oklab, var(--accent) 58%, var(--text2))">HEDEF 71</text>
+    </svg>
+  </div>
+
+  <div style="position:relative;display:flex;border-top:1px solid var(--border);padding-top:18px">
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">SORU</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">2.418</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">DURAK</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">19</div></div>
+    <div style="flex:1"><div style="font:600 9.5px 'Archivo';letter-spacing:.18em;color:var(--text4)">GÜN</div><div style="font:400 21px 'Bricolage Grotesque';margin-top:6px;font-variant-numeric:tabular-nums">26/30</div></div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding-top:20px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:26px;height:26px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+        <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M2 14C6 14 7 4 9 4s3 10 7 10" stroke="var(--ink)" stroke-width="2.1" stroke-linecap="round"></path></svg>
+      </span>
+      <span style="font:500 18px 'Bricolage Grotesque';letter-spacing:-.01em">maraton</span>
+    </div>
+    <span style="font:600 10px 'Archivo';letter-spacing:.16em;color:var(--text4)">SINAVA 47 GÜN</span>
+  </div>
+</div>
+</div>
+
+</div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const SUB={tur:'#60a5fa',mat:'#fb923c',fen:'#34d399',sos:'#c084fc',fiz:'#22d3ee',kim:'#f472b6',tar:'#fbbf24',cog:'#2dd4bf',din:'#84cc16'};
+    const NAME={tur:'Türkçe',mat:'Matematik',fen:'Fen',sos:'Sosyal',fiz:'Fizik',kim:'Kimya',tar:'Tarih',cog:'Coğrafya',din:'Din'};
+    const W=540;
+
+    function trace(days,futureN,H,px){
+      const PX=px===undefined?0:px, PT=26, PB=26;
+      let t=0; const cum=days.map(function(d){t+=d.q;return {v:t,s:d.s};});
+      const n=cum.length;
+      const maxV=Math.max(t*(1+futureN/Math.max(n,1)),1);
+      const steps=n+futureN;
+      const stepX=(W-PX*2)/Math.max(steps,1);
+      const X=function(i){return PX+stepX*i;};
+      const Y=function(v){return H-PB-(v/maxV)*(H-PB-PT);};
+      const pts=[{x:X(0),y:Y(0)}];
+      cum.forEach(function(c,i){pts.push({x:X(i+1),y:Y(c.v)});});
+      const segs=[];let nodes=[];
+      for(var i=1;i<pts.length;i++){
+        segs.push({d:'M'+pts[i-1].x.toFixed(1)+' '+pts[i-1].y.toFixed(1)+'L'+pts[i].x.toFixed(1)+' '+pts[i].y.toFixed(1),c:SUB[cum[i-1].s]});
+        if(i<pts.length-1&&cum[i].s!==cum[i-1].s) nodes.push({x:pts[i].x.toFixed(1),y:pts[i].y.toFixed(1),c:SUB[cum[i-1].s]});
+      }
+      if(nodes.length>8){var keep=[];for(var j=0;j<8;j++)keep.push(nodes[Math.round(j*(nodes.length-1)/7)]);nodes=keep;}
+      const last=pts[pts.length-1];
+      return {segs:segs,nodes:nodes,total:t,
+        lastX:last.x.toFixed(1),lastY:last.y.toFixed(1),
+        future:'M'+last.x.toFixed(1)+' '+last.y.toFixed(1)+'L'+X(steps).toFixed(1)+' '+Y(maxV).toFixed(1)};
+    }
+
+    function qr(seed){
+      var h=7; for(var i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))>>>0;
+      var N=21,d='';
+      var fin=function(x,y){return (x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);};
+      var finOn=function(x,y){var cx=x<7?x:x-14,cy=y<7?y:y-14,k=Math.max(Math.abs(cx-3),Math.abs(cy-3));return k===3||k<=1;};
+      for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+        var on;
+        if(fin(x,y)) on=finOn(x,y);
+        else if((x<8&&y<8)||(x>12&&y<8)||(x<8&&y>12)) on=false;
+        else {h=(h*1103515245+12345)>>>0; on=((h>>>13)&1)===1;}
+        if(on) d+='M'+x+' '+y+'h1v1h-1z';
+      }
+      return d;
+    }
+    const QR=qr('K7X2QP');
+
+    const D={
+      gun:[{q:14,s:'mat'},{q:14,s:'mat'},{q:0,s:'mat'},{q:18,s:'mat'},{q:8,s:'mat'},{q:0,s:'mat'},{q:16,s:'tur'},{q:16,s:'tur'},{q:0,s:'tur'},{q:12,s:'fiz'},{q:10,s:'fiz'},{q:10,s:'fiz'}],
+      hafta:[{q:74,s:'mat'},{q:96,s:'tur'},{q:58,s:'fiz'},{q:112,s:'mat'},{q:88,s:'kim'},{q:102,s:'tur'},{q:82,s:'fen'}],
+      yeni:[{q:24,s:'tur'},{q:41,s:'mat'},{q:18,s:'fen'}],
+      deneme:[{q:96,s:'mat'},{q:74,s:'tur'},{q:0,s:'tur'},{q:118,s:'fiz'},{q:88,s:'mat'},{q:102,s:'kim'},{q:64,s:'tur'},{q:0,s:'tur'},{q:126,s:'mat'},{q:94,s:'fen'}]
+    };
+    const cyc=['mat','tur','fiz','mat','kim','tur','fen','mat','sos','tar'];
+    const av=[62,88,0,104,76,92,58,0,110,84,96,70,102,64,0,88,116,74,90,58,106,82,0,94,120,68,86,100,78,92];
+    D.ay=av.map(function(q,i){return {q:q,s:cyc[i%10]};});
+
+    const RH=286;
+    const mk=function(o){
+      const t=trace(o.days,o.future,o.h||RH);
+      return Object.assign({h:o.h||RH,qr:QR,glow:'color-mix(in srgb, '+o.accent+' 22%, transparent)'},o,t);
+    };
+
+    const fmt=function(n){return n.toLocaleString('tr-TR');};
+
+    const cards=[
+      mk({label:'Günlük',accent:'#FF3B47',kicker:'GÜN 118',meta:'23 HAZİRAN SALI',
+        days:D.gun,future:2,value:'118',unit:'soru çözüldü',
+        line:'118 gündür ara vermedin.',
+        stats:[{k:'DURAK',v:'4'},{k:'SÜRE',v:'3s 12dk'},{k:'İSABET',v:'%78'}]}),
+      mk({label:'Haftalık · #FF3B47',accent:'#FF3B47',kicker:'HAFTA 17',meta:'17 – 23 HAZİRAN',
+        days:D.hafta,future:3,value:'612',unit:'soru bu hafta',
+        line:'Bu hafta 5 durak geçtin, ikisi Matematik.',
+        stats:[{k:'DURAK',v:'5'},{k:'GÜN',v:'6/7'},{k:'NET',v:'+3,2',c:'#4ADE80'}]}),
+      mk({label:'Haftalık · #FF6B35',accent:'#FF6B35',kicker:'HAFTA 17',meta:'17 – 23 HAZİRAN',
+        days:D.hafta,future:3,value:'612',unit:'soru bu hafta',
+        line:'Bu hafta 5 durak geçtin, ikisi Matematik.',
+        stats:[{k:'DURAK',v:'5'},{k:'GÜN',v:'6/7'},{k:'NET',v:'+3,2',c:'#4ADE80'}]}),
+      mk({label:'Aylık',accent:'#FF3B47',kicker:'HAZİRAN',meta:'SINAVA 47 GÜN',
+        days:D.ay,future:6,value:'68',prev:"64'ten",unit:'net tahmini',
+        line:'Bir ayda dört net. Rota yukarı kırıldı.',
+        stats:[{k:'SORU',v:fmt(av.reduce(function(a,b){return a+b;},0))},{k:'DURAK',v:'19'},{k:'GÜN',v:'26/30'}]}),
+      mk({label:'Deneme',accent:'#FF3B47',kicker:'DENEME · 3D YAYINLARI',meta:'22 HAZİRAN',
+        days:D.deneme,future:3,h:220,value:'58,25',prev:'+2,30',prevUp:true,unit:'net',
+        line:'Matematik altı net yukarı. Türkçe yerinde sayıyor.',
+        breakdown:[{s:'tur',n:'Türkçe',v:'32,50'},{s:'mat',n:'Matematik',v:'27,75'},{s:'fen',n:'Fen',v:'14,00'},{s:'sos',n:'Sosyal',v:'16,25'}].map(function(b){return {name:b.n,val:b.v,c:SUB[b.s]};})}),
+      mk({label:'Yeni kullanıcı · 3 gün',accent:'#FF3B47',kicker:'GÜN 3',meta:'ROTA YENİ ÇİZİLDİ',
+        days:D.yeni,future:14,value:'83',unit:'soru · ilk üç gün',
+        line:'Rotanın başındasın. Hat buradan uzayacak.',
+        stats:[{k:'DURAK',v:'1'},{k:'SÜRE',v:'2s 04dk'},{k:'GÜN',v:'3/3'}]})
+    ];
+
+    const seriDots=[];
+    for(var i=0;i<100;i++){var q=av[(i*7)%30];seriDots.push({c:SUB[cyc[(i*3)%10]],h:(28+Math.round((q/120)*72))+'%'});}
+
+    const st=function(o){
+      const t=trace(o.days,o.future,210,10);
+      return Object.assign({qr:QR,glow:'color-mix(in srgb, '+o.accent+' 24%, transparent)'},o,t);
+    };
+    const stickers=[
+      st({label:'Günlük',accent:'#FF3B47',days:D.gun,future:2,value:'118',unit:'SORU',meta:'GÜN 118 · 4 DURAK'}),
+      st({label:'Haftalık',accent:'#FF3B47',days:D.hafta,future:3,value:'612',unit:'SORU',meta:'HAFTA 17 · 6/7 GÜN'}),
+      st({label:'Aylık',accent:'#FF3B47',days:D.ay,future:6,value:'68',unit:'NET',meta:'HAZİRAN · 64→68'}),
+      st({label:'Deneme',accent:'#FF3B47',days:D.deneme,future:3,value:'58,25',unit:'NET',meta:'DENEME · +2,30'}),
+      st({label:'Seri',accent:'#FF3B47',days:D.hafta,future:3,value:'100',unit:'GÜN',meta:'KESİNTİSİZ SERİ'})
+    ];
+
+    const roles=[
+      {n:'Zemin',h:'#0F0C0B',c:'#0F0C0B'},{n:'Metin',h:'#F7EFE9',c:'#F7EFE9'},
+      {n:'İkincil metin',h:'#B0A09A',c:'#B0A09A'},{n:'Vurgu A',h:'#FF3B47',c:'#FF3B47'},
+      {n:'Vurgu B',h:'#FF6B35',c:'#FF6B35'},{n:'Yükseliş',h:'#4ADE80',c:'#4ADE80'},{n:'Düşüş',h:'#93A7B5',c:'#93A7B5'}
+    ];
+    const subs=Object.keys(SUB).map(function(k){return {n:NAME[k],h:SUB[k],c:SUB[k]};});
+    const scale=[
+      {n:'Kahraman sayı',v:'152 px',f:'Bricolage Grotesque 400'},
+      {n:'Önceki değer',v:'56 px',f:'Bricolage 400 · %40 opak'},
+      {n:'Birim',v:'40 px',f:'Bricolage 400'},
+      {n:'Duygusal cümle',v:'30 px',f:'Bricolage 400'},
+      {n:'İstatistik değeri',v:'48 px',f:'Bricolage 400 · tabular'},
+      {n:'Etiket',v:'22 px',f:'Archivo 600 · .18em'},
+      {n:'Davet kodu',v:'30 px',f:'Archivo 600 · .22em'}
+    ];
+
+    return {cards:cards,stickers:stickers,seriDots:seriDots,seriQr:QR,roles:roles,subs:subs,scale:scale};
+  }
+}
+</script>
+</body>
+</html>
