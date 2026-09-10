@@ -5,6 +5,7 @@ import { useExam } from "../contexts/ExamContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { selectLatestTrial } from "../store/slices/trialSlice";
 import { getAllSubjectsFlat } from "../data/curriculum";
+import { firstRouteAction } from "../domain/route/routeStartAction";
 
 const SUBJECT_LABELS = Object.fromEntries(
   getAllSubjectsFlat().map((s) => [s.key, s.label]),
@@ -34,14 +35,17 @@ export function useRouteReadySummary() {
   })), [allStops]);
 
   const firstStop = useMemo(() => {
-    const stop = allStops[0];
+    const stop = firstRouteAction(allStops);
     if (!stop) return null;
     return {
-      subjectLabel: (SUBJECT_LABELS[stop.subject] || stop.subject || "").toUpperCase(),
-      topicName: stop.topic,
-      questions: stop.cost?.questions || 0,
-      minutes: stop.cost?.minutes || 0,
-      subjectKey: stop.subject,
+      subjectLabel: (SUBJECT_LABELS[stop.subjectKey] || stop.subjectLabel || stop.subjectKey || "").toUpperCase(),
+      topicName: stop.topicName,
+      questions: stop.questions,
+      minutes: stop.minutes,
+      subjectKey: stop.subjectKey,
+      reasonText: stop.reasonText,
+      confidenceLabel: stop.confidenceLabel,
+      impact: stop.impact,
     };
   }, [allStops]);
 

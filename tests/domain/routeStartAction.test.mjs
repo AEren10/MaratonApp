@@ -88,6 +88,8 @@ test("adds reasoning, confidence and effort metadata to the next route action", 
   assert.equal(action.reasonCode, "LOW_ACCURACY");
   assert.equal(action.confidenceLabel, "orta");
   assert.equal(action.effort, "72 soru · ~120 dk");
+  assert.equal(action.questions, 72);
+  assert.equal(action.minutes, 120);
   assert.equal(action.impact, "~+1.2 net potansiyeli");
   assert.match(action.message, /Son denemelerde zayıf kalan/);
 });

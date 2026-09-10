@@ -49,6 +49,8 @@ function normalizeActionStop(stop) {
   const confidence = insight?.confidence || stop.dataConfidence || null;
   const reasonText = insight?.reasonText || stop.reason_text || stop.reasonText || null;
   const effort = effortLabel(stop);
+  const questions = Number(stop.cost?.questions ?? stop.questions ?? 0);
+  const minutes = Number(stop.cost?.minutes ?? stop.minutes ?? 0);
   return {
     stopId: stop.id || stop.stopId || null,
     version: stop.version ?? null,
@@ -63,6 +65,8 @@ function normalizeActionStop(stop) {
     confidence,
     confidenceLabel: confidence ? CONFIDENCE_LABELS[confidence] || CONFIDENCE_LABELS.low : "veri topluyor",
     effort,
+    questions: Math.round(questions) || 0,
+    minutes: Math.round(minutes) || 0,
     impact: netGainLabel(insight),
     isReview: Boolean(stop.isReview),
   };
