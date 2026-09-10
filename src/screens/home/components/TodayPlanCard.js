@@ -5,6 +5,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useUserTasks } from "../../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../../hooks/usePlanCompletion";
+import { buildPlanTaskKey } from "../../../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
@@ -60,8 +61,18 @@ export function TodayPlanCard({
   const showAlert = useAlert();
   const { user } = useAuth();
   const { tasks: userTasks, toggleTask } = useUserTasks();
-  const { isDone: isPlanDone, toggle: togglePlan } = usePlanCompletion(user?.id);
+  const { isDone: isPlanDone, toggle: togglePlan, syncPlan } = usePlanCompletion(user?.id);
   const rewardedRef = useRef(false);
+
+  useEffect(() => {
+    if (!generatedTasks.length) return;
+    const totalQuestions = generatedTasks.reduce((sum, task) => sum + (task.questionCount || 0), 0);
+    syncPlan({
+      tasks: generatedTasks,
+      totalQuestions,
+      estimatedMinutes: Math.round((totalQuestions / 80) * 120),
+    });
+  }, [generatedTasks, syncPlan]);
 
   const merged = useMemo(() => {
     const items = [];
@@ -77,11 +88,12 @@ export function TodayPlanCard({
       });
     });
     generatedTasks.forEach((t) => {
-      const pid = `plan_${t.subject}_${t.topic || "genel"}`;
+      const pid = t.planTaskKey || buildPlanTaskKey(t);
       items.push({
         id: pid,
         subject: t.subject,
         label: t.topicLabel || t.subjectLabel,
+        planTopicName: t.topic || null,
         count: t.questionCount || 0,
         completed: isPlanDone(pid),
         badge: t.badge,

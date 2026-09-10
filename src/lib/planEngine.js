@@ -1,5 +1,6 @@
 import { differenceInDays, todayTR } from "./dateUtils.js";
 import { getSubjectsForExam } from "../data/curriculum.js";
+import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity.js";
 
 const ROUTE_REASON_TEXT = {
   REVIEW_DUE: "Tekrar zamanı geldi",
@@ -172,7 +173,7 @@ export function generateDailyPlan({
       tier = "low";
     }
 
-    tasks.push({
+    const task = {
       subject: key,
       subjectLabel: subject.label,
       topicLabel,
@@ -194,7 +195,8 @@ export function generateDailyPlan({
       completed: false,
       routeConfidence: routeInsight?.confidence || routeStop?.dataConfidence || null,
       routeInsight,
-    });
+    };
+    tasks.push({ ...task, planTaskKey: buildPlanTaskKey(task) });
 
     remaining -= actual;
   }

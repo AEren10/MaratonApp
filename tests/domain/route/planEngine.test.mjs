@@ -19,6 +19,7 @@ test("keeps multiple stops from the same subject and assigns the full target", (
   assert.deepEqual(plan.tasks.map((task) => task.routeStopId), ["a", "b", "c"]);
   assert.deepEqual(plan.tasks.map((task) => task.stopId), ["a", "b", "c"]);
   assert.deepEqual(plan.tasks.map((task) => task.version), [1, 2, 3]);
+  assert.deepEqual(plan.tasks.map((task) => task.planTaskKey), ["plan_math:a", "plan_math:b", "plan_tr:c"]);
   assert.equal(plan.tasks.reduce((sum, task) => sum + task.questionCount, 0), 80);
 });
 

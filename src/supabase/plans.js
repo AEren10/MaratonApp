@@ -46,6 +46,26 @@ export const createDailyPlan = async (plan, tasks) => {
   }
 };
 
+export const createPlanTasks = async (plan, tasks) => {
+  try {
+    if (!plan?.id || !Array.isArray(tasks) || tasks.length === 0) return plan;
+    const tasksWithPlanId = tasks.map((t) => ({
+      ...t,
+      plan_id: plan.id,
+    }));
+
+    const { error } = await supabase
+      .from("plan_tasks")
+      .insert(tasksWithPlanId);
+    if (error) throw error;
+
+    return getDailyPlan(plan.user_id, plan.plan_date);
+  } catch (e) {
+    handleSupabaseError(e, "createPlanTasks");
+    throw e;
+  }
+};
+
 export const completeTask = async (taskId) => {
   try {
     const { data, error } = await supabase

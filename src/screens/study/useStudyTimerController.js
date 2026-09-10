@@ -27,9 +27,24 @@ export function useStudyTimerController(C) {
   const showAlert = useAlert();
   const navigation = useNavigation();
   const route = useRoute();
-  const { subjectKey: routeSubjectKey, topicName } = route.params ?? {};
+  const {
+    subjectKey: routeSubjectKey,
+    topicName,
+    planTaskKey,
+    planSubjectKey,
+    planTopicName,
+    routeStopId,
+    routeStopVersion,
+  } = route.params ?? {};
   const modes = useMemo(() => buildStudyTimerModes(C), [C]);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState(routeSubjectKey || null);
+  const [taskContext, setTaskContext] = useState({
+    planTaskKey,
+    planSubjectKey,
+    planTopicName,
+    routeStopId,
+    routeStopVersion,
+  });
   const [modeKey, setModeKey] = useState("FREE");
   const [phase, setPhase] = useState(STUDY_TIMER_PHASE.FOCUS);
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -145,8 +160,9 @@ export function useStudyTimerController(C) {
       questions,
       correctCount,
       totalFocusSeconds,
+      taskContext,
     });
-  }, [running, modeKey, phase, cycleIndex, selectedSubjectKey, topic, questions, correctCount, totalFocusSeconds]);
+  }, [running, modeKey, phase, cycleIndex, selectedSubjectKey, topic, questions, correctCount, totalFocusSeconds, taskContext]);
 
   // Uygulama arka plandan dönünce süreyi duvar saatinden TAZELE.
   // Bu olmadan ekran, arka planda duran tick'in kaldığı yerden devam ediyormuş
@@ -183,6 +199,7 @@ export function useStudyTimerController(C) {
     setQuestions(r.questions || 0);
     setCorrectCount(r.correctCount || 0);
     setTotalFocusSeconds(r.totalFocusSeconds || 0);
+    if (r.taskContext) setTaskContext(r.taskContext);
     setRunning(false);
     setRecovery(null);
   }, [recovery]);
@@ -259,6 +276,7 @@ export function useStudyTimerController(C) {
       correctCount,
       subjectKey: selectedSubjectKey || undefined,
       topicName: topic || undefined,
+      ...taskContext,
     };
 
     // Anlık görüntüyü SİLMİYORUZ; "kaydedilmeyi bekliyor" diye işaretliyoruz.
@@ -278,6 +296,7 @@ export function useStudyTimerController(C) {
     showAlert,
     topic,
     totalFocusSeconds,
+    taskContext,
   ]);
 
   const exit = useCallback(() => {

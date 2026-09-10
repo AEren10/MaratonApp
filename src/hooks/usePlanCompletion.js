@@ -1,16 +1,35 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import * as H from "../lib/haptics";
 import { todayTR } from "../lib/dateUtils";
-import { getDailyPlan, createDailyPlan } from "../supabase/plans";
+import { getDailyPlan, createDailyPlan, createPlanTasks } from "../supabase/plans";
 import { savePlanTaskToggleOffline } from "../lib/offlineQueue";
 import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
 import { getJson, setJson } from "../lib/storage/appStorage";
 import { useGamification } from "./useGamification";
+import { buildPlanTaskKey, normalizePlanTopic } from "../domain/plan/planTaskIdentity";
 
 const getKey = (userId) => datedUserKey(STORAGE_KEYS.PLAN_DONE_PREFIX, todayTR(), userId);
 
-function buildTaskKey(subject, topic) {
-  return `plan_${subject}_${topic || "genel"}`;
+function mapRemotePlanTasks(dbTasks = [], generatedTasks = []) {
+  const map = {};
+  const doneIds = [];
+  dbTasks.forEach((task) => {
+    const key = buildPlanTaskKey(task.subject, task.topic);
+    map[key] = task.id;
+    if (task.completed) doneIds.push(key);
+  });
+
+  generatedTasks.forEach((task) => {
+    const dbTask = dbTasks.find((row) =>
+      row.subject === task.subject && normalizePlanTopic(row.topic) === normalizePlanTopic(task.topic)
+    );
+    if (!dbTask) return;
+    const key = task.planTaskKey || buildPlanTaskKey(task);
+    map[key] = dbTask.id;
+    if (dbTask.completed) doneIds.push(key);
+  });
+
+  return { map, doneIds };
 }
 
 export function usePlanCompletion(userId) {
@@ -41,13 +60,7 @@ export function usePlanCompletion(userId) {
     getDailyPlan(userId, todayTR()).then((dbPlan) => {
       if (!dbPlan?.plan_tasks?.length) return;
       syncedRef.current = true;
-      const map = {};
-      const dbDoneIds = [];
-      dbPlan.plan_tasks.forEach((t) => {
-        const fid = buildTaskKey(t.subject, t.topic);
-        map[fid] = t.id;
-        if (t.completed) dbDoneIds.push(fid);
-      });
+      const { map, doneIds: dbDoneIds } = mapRemotePlanTasks(dbPlan.plan_tasks);
       taskMapRef.current = map;
       if (dbDoneIds.length > 0) {
         setDoneIds((prev) => {
@@ -60,12 +73,13 @@ export function usePlanCompletion(userId) {
   }, [userId]);
 
   const syncPlan = useCallback(async (plan) => {
-    if (!userId || userId === "dev" || syncedRef.current) return;
+    if (!userId || userId === "dev") return;
     if (!plan?.tasks?.length) return;
-    syncedRef.current = true;
     try {
       let dbPlan = await getDailyPlan(userId, todayTR());
       if (!dbPlan) {
+        if (syncedRef.current) return;
+        syncedRef.current = true;
         dbPlan = await createDailyPlan(
           {
             user_id: userId,
@@ -82,13 +96,30 @@ export function usePlanCompletion(userId) {
             completed: false,
           })),
         );
+      } else if (!dbPlan.plan_tasks?.length) {
+        dbPlan = await createPlanTasks(
+          dbPlan,
+          plan.tasks.map((t, i) => ({
+            subject: t.subject,
+            topic: t.topic || null,
+            question_count: t.questionCount,
+            priority: t.priority || i + 1,
+            reason: t.reason || null,
+            completed: false,
+          })),
+        );
       }
+      syncedRef.current = true;
       if (dbPlan?.plan_tasks) {
-        const map = {};
-        dbPlan.plan_tasks.forEach((t) => {
-          map[buildTaskKey(t.subject, t.topic)] = t.id;
-        });
+        const { map, doneIds: dbDoneIds } = mapRemotePlanTasks(dbPlan.plan_tasks, plan.tasks);
         taskMapRef.current = map;
+        if (dbDoneIds.length > 0) {
+          setDoneIds((prev) => {
+            const merged = new Set([...prev, ...dbDoneIds]);
+            setJson(getKey(userId), [...merged]);
+            return merged;
+          });
+        }
       }
     } catch {
       syncedRef.current = false;

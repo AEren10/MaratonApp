@@ -27,6 +27,7 @@ import { syncChallengeProgress } from "../../lib/challengeSync";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
 import { setJson } from "../../lib/storage/appStorage";
 import { todayTR } from "../../lib/dateUtils";
+import { completeStudyPlanContext } from "../../lib/studyPlanCompletion";
 import { TopicPicker } from "../../components/forms/TopicPicker";
 import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
@@ -76,6 +77,11 @@ export default function StudySaveScreen() {
     correctCount: initCorrect = 0,
     subjectKey: preSubjectKey,
     topicName: preTopic,
+    planTaskKey,
+    planSubjectKey,
+    planTopicName,
+    routeStopId,
+    routeStopVersion,
   } = route.params ?? {};
 
   const [examTier, setExamTier] = useState(() => {
@@ -240,6 +246,23 @@ export default function StudySaveScreen() {
           : "Kayıt sıraya alındı, kısa süre içinde gönderilecek.",
       );
     }
+    const planCompletion = await completeStudyPlanContext({
+      userId: user.id,
+      studyDate: todayStr,
+      subjectKey,
+      topic: topicVal,
+      planSubjectKey,
+      planTopicName,
+      planTaskKey,
+      routeStopId,
+      routeStopVersion,
+    });
+    if (planCompletion.planCompleted) reward("plan_task_done");
+    if (planCompletion.planError || planCompletion.routeError) {
+      captureError(planCompletion.planError || planCompletion.routeError, {
+        context: "study_save_plan_completion",
+      });
+    }
     setSaving(false);
 
     completeForm({ minutes: duration, questions: qc, subjectKey });
@@ -268,7 +291,7 @@ export default function StudySaveScreen() {
       duration,
       questions: qc,
     });
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm]);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>

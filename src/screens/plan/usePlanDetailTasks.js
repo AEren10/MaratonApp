@@ -2,12 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
+import { buildPlanTaskKey } from "../../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../../themes/subjects";
 
 function mapGeneratedTask(t, C, isPlanDone) {
-  const pid = t.logicalStopKey
-    ? `plan_${t.logicalStopKey}`
-    : `plan_${t.subject}_${t.topic || "genel"}`;
+  const pid = t.planTaskKey || buildPlanTaskKey(t);
   const subj = getSubjectByKey(t.subject);
   return {
     id: pid,
@@ -19,6 +18,9 @@ function mapGeneratedTask(t, C, isPlanDone) {
     rkind: t.rkind || "gray",
     done: isPlanDone(pid),
     routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
+    planTask: true,
+    planSubjectKey: t.subject,
+    planTopicName: t.topic || null,
   };
 }
 
@@ -107,8 +109,13 @@ export function usePlanDetailTasks({
     const task = tasksRef.current.find((t) => t.id === id);
     navigation.navigate(SCREENS.STUDY_TIMER, {
       taskId: id,
+      planTaskKey: task?.planTask ? id : undefined,
       subjectKey: task?.s?.key,
       topicName: task?.topic,
+      planSubjectKey: task?.planSubjectKey,
+      planTopicName: task?.planTopicName,
+      routeStopId: task?.routeStop?.stopId,
+      routeStopVersion: task?.routeStop?.version,
     });
   }, [navigation]);
 

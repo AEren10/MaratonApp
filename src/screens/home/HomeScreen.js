@@ -215,7 +215,16 @@ export default function HomeScreen() {
               subject: task.subject,
               targetScreen: SCREENS.STUDY_TIMER,
             });
-            navigation.navigate(SCREENS.STUDY_TIMER, { subjectKey: task.subject });
+            navigation.navigate(SCREENS.STUDY_TIMER, {
+              taskId: task.id,
+              planTaskKey: task.source === "plan" ? task.id : undefined,
+              subjectKey: task.subject,
+              topicName: task.label,
+              planSubjectKey: task.source === "plan" ? task.subject : undefined,
+              planTopicName: task.source === "plan" ? task.planTopicName : undefined,
+              routeStopId: task.routeStop?.stopId,
+              routeStopVersion: task.routeStop?.version,
+            });
           }}
           onRouteComplete={(stop) => transitionStop(stop, "completed", { source: "home_plan" })}
           onViewPlan={go(SCREENS.PLAN_DETAIL)}
