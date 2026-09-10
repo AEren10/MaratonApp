@@ -16,7 +16,7 @@ export const SEEDS = {
     bg: "#1C1C23",
     canvas: "#1C1C23",
     text: "#F5F2EF",
-    up: "#4ADE80",
+    up: "#34D399",
   },
   light: {
     accent: "#DE2E39",
@@ -31,7 +31,9 @@ export const SEEDS = {
 const FIXED = {
   dark: {
     text2: "#A3A0A8",
-    text3: "#8C8996",
+    // AA: bg 5.92 / surface 5.11 / elev 4.26.
+    // elev uzerinde 4.5 alti — text3 ucuncu seviye yuzeyde METIN olarak kullanilmaz.
+    text3: "#9A97A4",
     text4: "#6B6870",
     text5: "#3B3941",
     accentInk: "#F7F2F0",
@@ -202,7 +204,7 @@ function legacyAliases(p) {
     // Metin basamakları
     sec: p.text2,
     muted: p.text3,
-    textMuted: p.text4,
+    textMuted: p.text3,
     textPrimary: p.text,
     textSecondary: p.text2,
 

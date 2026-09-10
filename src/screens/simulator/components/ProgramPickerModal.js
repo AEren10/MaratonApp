@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { View, Text, Pressable, Modal, FlatList, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, COLORS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, C as THEME } from "../../../themes/tokens";
 import { PROGRAM_CATEGORIES, searchPrograms } from "../../../data/programs";
 import ProgramRow from "./ProgramRow";
 
 const progKeyExtractor = (item) => item.id;
-const ProgEmpty = <View style={{ padding: 24, alignItems: "center" }}><Text style={{ color: COLORS.dark.textMuted }}>Sonuç bulunamadı</Text></View>;
+const ProgEmpty = <View style={{ padding: 24, alignItems: "center" }}><Text style={{ color: THEME.muted }}>Sonuç bulunamadı</Text></View>;
 
 export default function ProgramPickerModal({ visible, onClose, onSelect, type, C }) {
   const [query, setQuery] = useState("");

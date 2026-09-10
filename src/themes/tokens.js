@@ -1,145 +1,11 @@
 import { buildPalette } from "./palette";
 
-// Design System v3 — "Ink & Volt"
+// Tasarim tokenlari.
 //
-// Felsefe:
-//   - Jenerik mor-cam (glassmorphism + glow) dilini bıraktık. O görünüm "AI yapmış
-//     gibi" duruyordu. Yerine editöryal / atletik bir dil: mürekkep + kağıt + tek imza.
-//   - Renk = ANLAM + ENERJİ. Brand sinyali SUNSET CORAL (sıcak mercan) birincil aksiyon
-//     ve hero'da. Kategori rengi ders kimliğinden gelir.
-//   - CANLI: dolu/doygun sıcak renkler (mercan-turuncu-pembe-amber), sönük tint değil.
-//     Hero kartlar dolu renk dolgusu + beyaz metin; 3'lü istatistik baloncukları solid.
-//   - Güven; glow/blur'dan değil, boşluk ritmi + güçlü tipografi + nötr yüzeylerden.
-//   - Hem light hem dark tam set; system theme respect.
-//
-// Renk seçimleri:
-//   light = "sıcak kağıt + mürekkep" — beyaz kart, kağıt zemin, nötr ink metin
-//   dark  = "gece antrenmanı" — sıcak-nötr mürekkep-siyahı zemin
-//   Brand iki ton: MOR (#8b5cf6) = CTA/aksiyon, TURUNCU (#ff6b35) = enerji/streak
-//   "Mor YOK" eski glassmorphism glow efektleri içindi, solid accent olarak kullanılır
+// Renk paleti burada DEGIL: src/themes/palette.js icinde, uc tohumdan
+// (accent / bg / text) turetiliyor. Eski mor COLORS blogu kaldirildi;
+// calisma zamani paleti icin paletteFor() / C kullanilir.
 
-export const COLORS = {
-  light: {
-    // Surface stack
-    background:    "#F4F1EA",  // warm paper
-    surface:       "#FFFFFF",  // white card
-    surface2:      "#ECE8DE",  // warm sand chip
-    surfaceLight:  "#FAF8F3",
-    card:          "#FFFFFF",
-    cardHover:     "#F6F3EC",
-
-    // Borders & dividers
-    border:        "rgba(20, 18, 12, 0.12)",
-    borderSoft:    "rgba(20, 18, 12, 0.06)",
-    borderLight:   "rgba(20, 18, 12, 0.18)",
-
-    // Text stack — nötr ink (mor değil)
-    textPrimary:   "#15161A",  // near-black ink
-    textSecondary: "#56585F",
-    textMuted:     "#5C5E66",
-    textInverse:   "#FFFFFF",  // sıcak dolgu üstünde beyaz okunur
-
-    // Semantic (vurgu için, accent değil)
-    success:       "#1FA567",  // green
-    successLight:  "rgba(31,165,103,0.12)",
-    warning:       "#E08A1E",  // amber (uyarı için)
-    warningLight:  "rgba(224,138,30,0.14)",
-    danger:        "#E23B43",  // red (acil)
-    dangerLight:   "rgba(226,59,67,0.12)",
-    info:          "#2D6FE0",  // blue
-    infoLight:     "rgba(45,111,224,0.12)",
-
-    // Brand — MOR primary, TURUNCU energy/streak
-    accent:        "#8b5cf6",  // brand primary (mor)
-    accentLight:   "rgba(139,92,246,0.14)",
-    accentDark:    "#7c3aed",  // brand deep
-    brandLight:    "#a78bfa",
-    orange:        "#ff6b35",
-    orangeLight:   "rgba(255,107,53,0.14)",
-
-    // Generic palette (geri uyumlu — eski kodda C.amber vb. var)
-    amber:         "#E8841A",
-    green:         "#15A86A",
-    yellow:        "#E0A81E",
-    red:           "#E23B49",
-    teal:          "#0FA595",
-    purple:        "#6B4FE0",
-    blue:          "#2E7DEB",
-    pink:          "#E24F8C",
-    coral:         "#E8612F",
-
-    // On-fill — renkli dolgu üstüne beyaz metin/ikon
-    textOnBrand:   "#FFFFFF",
-    textOnAccent:  "#FFFFFF",
-    textOnFill:    "#FFFFFF",
-
-    // Pressed / focus states
-    accentPressed: "#7c3aed",
-    orangePressed: "#e55a2b",
-    surfacePressed:"rgba(20, 18, 12, 0.06)",
-
-    // Dormant — "henüz başlanmadı" durumu (kırmızı/danger DEĞİL)
-    dormant:       "rgba(20, 18, 12, 0.25)",
-    dormantBg:     "rgba(20, 18, 12, 0.05)",
-  },
-  dark: {
-    background:    "#0C0D11",  // warm-neutral ink night
-    surface:       "#15171C",  // charcoal card
-    surface2:      "#1E2128",
-    surfaceLight:  "#191B21",
-    card:          "#15171C",
-    cardHover:     "#1E2128",
-
-    border:        "rgba(255, 255, 255, 0.08)",
-    borderSoft:    "rgba(255, 255, 255, 0.04)",
-    borderLight:   "rgba(255, 255, 255, 0.14)",
-
-    textPrimary:   "#F4F5F7",
-    textSecondary: "#B0B4BD",
-    textMuted:     "#8E929B",
-    textInverse:   "#0C0D11",
-
-    success:       "#34d399",
-    successLight:  "rgba(52,211,153,0.16)",
-    warning:       "#fbbf24",
-    warningLight:  "rgba(251,191,36,0.18)",
-    danger:        "#f87171",
-    dangerLight:   "rgba(248,113,113,0.16)",
-    info:          "#60a5fa",
-    infoLight:     "rgba(96,165,250,0.16)",
-
-    // Brand — MOR primary, TURUNCU energy/streak
-    accent:        "#8b5cf6",  // brand primary (mor) — CTA, başla, kaydet
-    accentLight:   "rgba(139,92,246,0.16)",
-    accentDark:    "#7c3aed",  // brand deep — pressed state
-    brandLight:    "#a78bfa",  // link rengi, hover, secondary brand
-    orange:        "#ff6b35",  // streak, FAB, finalize (bitir/çık)
-    orangeLight:   "rgba(255,107,53,0.16)",
-
-    amber:         "#fbbf24",
-    green:         "#34d399",
-    yellow:        "#fbbf24",
-    red:           "#f87171",
-    teal:          "#2dd4bf",
-    purple:        "#8b5cf6",
-    blue:          "#60a5fa",
-    pink:          "#f472b6",
-    coral:         "#ff6b35",
-
-    // On-fill — renkli dolgu üstüne beyaz metin/ikon
-    textOnBrand:   "#FFFFFF",
-    textOnAccent:  "#FFFFFF",
-    textOnFill:    "#FFFFFF",
-
-    // Pressed / focus states
-    accentPressed: "#6d28d9",
-    orangePressed: "#cc5520",
-    surfacePressed:"rgba(255, 255, 255, 0.06)",
-
-    dormant:       "rgba(255, 255, 255, 0.25)",
-    dormantBg:     "rgba(255, 255, 255, 0.05)",
-  },
-};
 
 // Subject identity palette — her ders kendi rengi.
 // Light + dark için ayrı: hem solid (ikon/buton) hem tint (background wash).
@@ -229,19 +95,6 @@ export function setRuntimeScheme(scheme) {
   Object.assign(SHADOWS, _buildShadows(next));
 }
 
-// ===== Pastel chips (eski) =====
-export const PASTEL = {
-  peach:   { solid: "#F08568", tint: "rgba(240,133,104,0.14)" },
-  coral:   { solid: "#F08568", tint: "rgba(240,133,104,0.14)" },
-  blue:    { solid: "#4F8DF2", tint: "rgba(79,141,242,0.14)" },
-  violet:  { solid: "#6B4FE0", tint: "rgba(107,79,224,0.14)" },
-  mint:    { solid: "#22B47A", tint: "rgba(34,180,122,0.14)" },
-  teal:    { solid: "#26B8A6", tint: "rgba(38,184,166,0.14)" },
-  gold:    { solid: "#F0C648", tint: "rgba(240,198,72,0.14)" },
-  rose:    { solid: "#EC6FA0", tint: "rgba(236,111,160,0.14)" },
-  amber:   { solid: "#F0A038", tint: "rgba(240,160,56,0.14)" },
-};
-
 export const SPACING = {
   xs:  4,
   sm:  8,
@@ -328,9 +181,9 @@ function _buildShadows(scheme) {
     lg:     e.lg,
     xl:     e.xl,
     amber:  { ...e.md, shadowColor: "#FF9F2E", shadowOpacity: 0.30 },
-    accent: { ...e.md, shadowColor: "#EC3347", shadowOpacity: 0.30 },
-    orange: { ...e.md, shadowColor: "#EC3347", shadowOpacity: 0.30 },
-    fab:    { ...e.lg, shadowColor: "#EC3347", shadowOpacity: 0.35 },
+    accent: { ...e.md, shadowColor: "#E5343F", shadowOpacity: 0.30 },
+    orange: { ...e.md, shadowColor: "#E5343F", shadowOpacity: 0.30 },
+    fab:    { ...e.lg, shadowColor: "#E5343F", shadowOpacity: 0.35 },
     green:  { ...e.md, shadowColor: "#34d399", shadowOpacity: 0.30 },
   };
 }
