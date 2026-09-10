@@ -338,6 +338,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     }
     return updated;
   }, []);
+  const distributeRouteDebt = useCallback(
+    (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
+    [debt.totalQuestions, route.capacity, route.weeks],
+  );
 
   return {
     route,
@@ -370,6 +374,6 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     pause,
     resume,
     transitionStop,
-    distributeDebt: (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
+    distributeDebt: distributeRouteDebt,
   };
 }

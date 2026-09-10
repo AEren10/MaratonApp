@@ -17,6 +17,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { showRouteCreatedAlert } from "./routeCreatedAlert";
 import RouteNextActionPanel from "./components/RouteNextActionPanel";
+import RouteDebtCard from "./components/RouteDebtCard";
 import { useRoadmapNextAction } from "./useRoadmapNextAction";
 
 export default function RoadmapScreen() {
@@ -29,10 +30,12 @@ export default function RoadmapScreen() {
     weeks, totals, daysLeft, hasRouteAccess, routeAccessError,
     routeAccessLoading, refreshRouteAccess, isPaused, pause, resume,
     intelligence, routeCreated, routeCreating, routeCreationError, routeReadiness, createRoute,
+    debt, debtWeeks, distributeDebt,
   } = useStudyRoute({ persist: false });
 
   const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
   const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
+  const debtPlan = useMemo(() => distributeDebt(weeks), [debt?.totalQuestions, distributeDebt, weeks]);
   const handleCreateRoute = useCallback(async () => {
     try {
       const result = await createRoute();
@@ -75,6 +78,7 @@ export default function RoadmapScreen() {
         disabled={isPaused}
         onStart={startNextRouteAction}
       />
+      <RouteDebtCard C={C} debt={debt} debtPlan={debtPlan} debtWeeks={debtWeeks} />
       <RouteProgressHeader
         totals={totals}
         daysLeft={daysLeft}
@@ -84,7 +88,7 @@ export default function RoadmapScreen() {
         C={C}
       />
     </>
-  ), [C, daysLeft, handleCreateRoute, intelligence, isPaused, nextRouteAction, routeCreated,
+  ), [C, daysLeft, debt, debtPlan, debtWeeks, handleCreateRoute, intelligence, isPaused, nextRouteAction, routeCreated,
     startNextRouteAction,
     routeCreating, routeCreationError, routeReadiness, togglePause, totals, weeks]);
 
