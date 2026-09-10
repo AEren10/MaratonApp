@@ -26,12 +26,12 @@ function stopWeekStart(stop) {
 }
 
 function routeInsight(stop = {}) {
-  return stop.insight || stop.routeInsight || null;
+  return stop.insight || stop.routeInsight || stop.metadata?.insight || null;
 }
 
 function effortLabel(stop = {}) {
-  const questions = Number(stop.cost?.questions ?? stop.questions ?? 0);
-  const minutes = Number(stop.cost?.minutes ?? stop.minutes ?? 0);
+  const questions = Number(stop.cost?.questions ?? stop.questions ?? stop.metadata?.questions ?? 0);
+  const minutes = Number(stop.cost?.minutes ?? stop.minutes ?? stop.metadata?.minutes ?? 0);
   if (questions > 0 && minutes > 0) return `${Math.round(questions)} soru · ~${Math.round(minutes)} dk`;
   if (questions > 0) return `${Math.round(questions)} soru`;
   if (minutes > 0) return `~${Math.round(minutes)} dk`;
@@ -46,21 +46,21 @@ function netGainLabel(insight) {
 function normalizeActionStop(stop) {
   if (!stop?.subject || !stop?.topic) return null;
   const insight = routeInsight(stop);
-  const confidence = insight?.confidence || stop.dataConfidence || null;
+  const confidence = insight?.confidence || stop.dataConfidence || stop.metadata?.dataConfidence || null;
   const reasonText = insight?.reasonText || stop.reason_text || stop.reasonText || null;
   const effort = effortLabel(stop);
-  const questions = Number(stop.cost?.questions ?? stop.questions ?? 0);
-  const minutes = Number(stop.cost?.minutes ?? stop.minutes ?? 0);
+  const questions = Number(stop.cost?.questions ?? stop.questions ?? stop.metadata?.questions ?? 0);
+  const minutes = Number(stop.cost?.minutes ?? stop.minutes ?? stop.metadata?.minutes ?? 0);
   return {
     stopId: stop.id || stop.stopId || null,
     version: stop.version ?? null,
     subjectKey: stop.subject,
-    subjectLabel: stop.subject_label || stop.subjectLabel || stop.subject,
+    subjectLabel: stop.subject_label || stop.subjectLabel || stop.metadata?.subjectLabel || stop.subject,
     topicName: stop.topic,
     status: stopStatus(stop),
     weekStart: stopWeekStart(stop),
     position: stopPosition(stop),
-    reasonCode: insight?.reasonCode || stop.reasonCodes?.[0] || null,
+    reasonCode: insight?.reasonCode || stop.reasonCodes?.[0] || stop.metadata?.reasonCodes?.[0] || null,
     reasonText,
     confidence,
     confidenceLabel: confidence ? CONFIDENCE_LABELS[confidence] || CONFIDENCE_LABELS.low : "veri topluyor",
@@ -68,7 +68,7 @@ function normalizeActionStop(stop) {
     questions: Math.round(questions) || 0,
     minutes: Math.round(minutes) || 0,
     impact: netGainLabel(insight),
-    isReview: Boolean(stop.isReview),
+    isReview: Boolean(stop.isReview || stop.metadata?.isReview),
   };
 }
 

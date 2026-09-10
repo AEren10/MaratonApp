@@ -30,6 +30,7 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
         subjectLabel: s.subjectLabel,
         topic: s.topic,
         questions: s.cost?.questions ?? s.plannedQuestions ?? 0,
+        minutes: s.cost?.minutes ?? s.plannedMinutes ?? 0,
         difficulty: s.cost?.difficulty ?? null,
         partial: !!s.partial,
         isReview: !!s.isReview,

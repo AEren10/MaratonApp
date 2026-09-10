@@ -67,6 +67,41 @@ test("accepts persisted stopId shape from the route screen", () => {
   });
 });
 
+test("reads insight and effort from persisted route stop metadata", () => {
+  const action = firstRouteAction([
+    {
+      id: "db-stop-1",
+      lifecycle_status: "active",
+      subject: "matematik",
+      topic: "Problemler",
+      version: 4,
+      metadata: {
+        subjectLabel: "Matematik",
+        questions: 36,
+        minutes: 54,
+        dataConfidence: "high",
+        reasonCodes: ["LOW_ACCURACY"],
+        insight: {
+          reasonCode: "LOW_ACCURACY",
+          reasonText: "Metadata içindeki zayıf alan gerekçesi.",
+          confidence: "high",
+          expectedNetGain: 0.86,
+        },
+      },
+    },
+  ]);
+
+  assert.equal(action.stopId, "db-stop-1");
+  assert.equal(action.subjectLabel, "Matematik");
+  assert.equal(action.reasonCode, "LOW_ACCURACY");
+  assert.equal(action.reasonText, "Metadata içindeki zayıf alan gerekçesi.");
+  assert.equal(action.confidenceLabel, "yüksek");
+  assert.equal(action.questions, 36);
+  assert.equal(action.minutes, 54);
+  assert.equal(action.effort, "36 soru · ~54 dk");
+  assert.equal(action.impact, "~+0.9 net potansiyeli");
+});
+
 test("adds reasoning, confidence and effort metadata to the next route action", () => {
   const action = firstRouteAction([
     {
