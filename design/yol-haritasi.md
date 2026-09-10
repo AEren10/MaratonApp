@@ -1,3 +1,21 @@
+> **DURUM (2026-09-10): BU BELGE KISMEN BAYAT.**
+> Guncel gercek su uc dosyada:
+> - `design/ekran-envanteri.md` — 166 artboard -> 95 nav hedefi
+> - `design/akis-denetimi.md` — 22 dogrulanmis akis hatasi + 10 fazli kodlama sirasi
+> - `.claude/.../memory/project_tasarim-aktarimi.md` — kararlar ve faz durumu
+>
+> Bu belgedeki DOGRULANMIS hatalar:
+> - **FAZ 0 bitti.** Round-2 dondu, olculdu: 11px alti metin 1392 -> 0.
+> - **FAZ 1.3 / 1.4 bitti** (tokenlar + Archivo/Bricolage fontlari).
+> - **FAZ 2'nin tamami fiilen bitti** (2.1 durak durumlari, 2.2 zorluk katsayisi,
+>   2.3 tempoScenario, 2.4 kota, 2.7 testler 55/55). Kalan: LOCKED durumu (2.5'e bagli).
+> - **FAZ 2.6 (yol arkadasi) IPTAL** — sosyal v1 disi.
+> - **FAZ 3.1 sirasi YANLIS.** "Once olu bilesenleri sil" diyor; GlassCard 23
+>   dosyada, simdi silmek 23 ekrani kirar. Silme ekran gocunden SONRA.
+> - **5 sekme varsayimi YANLIS.** Tasarim 4 sekme + orta FAB
+>   (ROTA · PROGRAM · [+] · ANALIZ · PROFIL). Mevcut kod zaten boyle.
+> - **Fiyatlar** kodda duzeltildi: aylik ₺149, yillik ₺1.068 (₺89/ay).
+
 # Maraton · Tasarımdan Çıkışa Yol Haritası
 
 Bu belge "ne yapacağım" sorusunun tam cevabı. Sıra önemli — üstteki bitmeden alttakine başlamak geri dönüş yaratır.

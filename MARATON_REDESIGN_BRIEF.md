@@ -1,3 +1,9 @@
+> **ARSIV — ESKI TASARIM DONEMI. TALIMAT OLARAK OKUNMAZ.**
+> Bu belge tasarimciya gonderilmis tarihsel bir brief. Icindeki renk, font ve
+> bilesen kurallari (mor #8b5cf6, Inter, Space Grotesk, glassmorphism) ARTIK
+> GECERSIZ. Guncel tasarim sistemi: `AGENTS.md` > Styling Rules ve
+> `design/extracted2/tokens.md`.
+
 # Maraton — Tasarım Revizyonu (Tur 2)
 
 ## ÖNCE: GERİ BİLDİRİM
