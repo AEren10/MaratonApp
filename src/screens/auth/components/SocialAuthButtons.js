@@ -3,6 +3,7 @@ import Svg, { Path } from "react-native-svg";
 import { useC } from "../../../contexts/ThemeContext";
 import { useAlert } from "../../../contexts/AlertContext";
 import { useSocialAuth } from "../../../hooks/useSocialAuth";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
 function GoogleIcon({ size = 18 }) {
@@ -56,21 +57,21 @@ export function SocialAuthButtons() {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    borderRadius: 999,
-    paddingVertical: 15,
-    borderWidth: 1.5,
+    gap: STEP.s1 + 2,
+    borderRadius: SHAPE.button,
+    height: CONTROL.buttonSecondary,
+    borderWidth: 1,
     borderColor: C.border,
-    backgroundColor: C.surface,
-    opacity: busy ? 0.6 : pressed ? 0.85 : 1,
+    backgroundColor: pressed ? C.surface : "transparent",
+    opacity: busy ? 0.6 : 1,
   });
 
   return (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: STEP.s1 + 2 }}>
       {googleAvailable && (
         <Pressable onPress={handleGoogle} disabled={busy} style={({ pressed }) => btnStyle(pressed)}>
           <GoogleIcon />
-          <Text style={{ fontFamily: "Archivo_600", fontSize: 15, color: C.text }}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>
             Google ile devam et
           </Text>
         </Pressable>
@@ -80,14 +81,10 @@ export function SocialAuthButtons() {
         <Pressable
           onPress={handleApple}
           disabled={busy}
-          style={({ pressed }) => ({
-            ...btnStyle(pressed),
-            backgroundColor: C.surface,
-            borderColor: C.surface,
-          })}
+          style={({ pressed }) => btnStyle(pressed)}
         >
           <AppleIcon />
-          <Text style={{ fontFamily: "Archivo_600", fontSize: 15, color: C.text }}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>
             Apple ile devam et
           </Text>
         </Pressable>

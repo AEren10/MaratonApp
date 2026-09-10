@@ -3,14 +3,15 @@ import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
+import { PasswordStrength } from "./components/PasswordStrength";
+import { TermsCheckbox } from "./components/TermsCheckbox";
 import { Icon, Button } from "../../components/design";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
@@ -21,11 +22,11 @@ import { authErrorMessage } from "../../supabase/authErrors";
 export default function RegisterScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const insets = useSafeAreaInsets();
   const showAlert = useAlert();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -37,6 +38,10 @@ export default function RegisterScreen() {
     });
     setErrors(fieldErrors);
     if (!ok) return;
+    if (!agreed) {
+      showAlert("Onay gerekli", "Devam etmek için Kullanım Şartları ve Gizlilik Politikası'nı onaylamalısın.");
+      return;
+    }
 
     setBusy(true);
     try {
@@ -53,151 +58,71 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <LinearGradient
-        colors={[C.accent, C.orange + "80"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          paddingTop: insets.top + SPACING.md,
-          paddingBottom: 50,
-          paddingHorizontal: SPACING.xxl,
-          borderBottomLeftRadius: 40,
-          borderBottomRightRadius: 40,
-        }}
-      >
-        <View style={{
-          position: "absolute", top: -30, right: -30,
-          width: 150, height: 150, borderRadius: 75,
-          backgroundColor: "rgba(255,255,255,0.12)",
-        }} />
-        <View style={{
-          position: "absolute", bottom: -40, left: -40,
-          width: 120, height: 120, borderRadius: 60,
-          backgroundColor: "rgba(255,255,255,0.08)",
-        }} />
-
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={10}
-          style={({ pressed }) => ({
-            width: 40, height: 40, borderRadius: 14,
-            backgroundColor: "rgba(255,255,255,0.22)",
-            alignItems: "center", justifyContent: "center",
-            marginBottom: SPACING.xxl,
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <Icon name="arrowL" size={18} color={C.textOnFill} sw={2.5} />
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={{ padding: STEP.s1, minWidth: 44, minHeight: 44, justifyContent: "center" }}>
+          <Icon name="arrowL" size={18} color={C.text2} />
         </Pressable>
+      </View>
 
-        <View style={{
-          width: 56, height: 56, borderRadius: 18,
-          backgroundColor: "rgba(255,255,255,0.22)",
-          alignItems: "center", justifyContent: "center",
-          marginBottom: SPACING.md,
-        }}>
-          <Icon name="user" size={26} color={C.textOnFill} sw={2.4} />
-        </View>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 }} keyboardShouldPersistTaps="handled">
+          <Animated.View entering={FadeInDown.delay(80).duration(350)}>
+            <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 280 }]}>
+              Hesap oluştur.
+            </Text>
+            <Text style={[TYPOGRAPHY.body, { fontSize: 13.5, color: C.text3, marginTop: STEP.s2, maxWidth: 302 }]}>
+              Rotan hazır. Hesap yalnızca onu buluta almak için — hangi telefondan girersen aynı yerden devam eder.
+            </Text>
+          </Animated.View>
 
-        <Text style={{
-          ...TYPOGRAPHY.heading,
-          fontSize: 30,
-          color: C.textOnFill,
-          letterSpacing: -0.7,
-        }}>
-          Aramıza katıl
-        </Text>
-        <Text style={{
-          ...TYPOGRAPHY.captionMedium,
-          fontSize: 14,
-          color: "rgba(255,255,255,0.92)",
-          marginTop: SPACING.sm,
-        }}>
-          Bugün başla, sınava hazır gel.
-        </Text>
-      </LinearGradient>
+          <View style={{ marginTop: STEP.s4 }}>
+            <Animated.View entering={FadeInDown.delay(140).duration(350)}>
+              <AuthInput label="AD SOYAD" value={name} onChangeText={setName} placeholder="Arda Karaca" autoCapitalize="words" error={errors.name} />
+            </Animated.View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          contentContainerStyle={{ padding: 24, paddingTop: 32 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
-            <AuthInput
-              label="Ad"
-              value={name}
-              onChangeText={setName}
-              placeholder="Eren"
-              autoCapitalize="words"
-              error={errors.name}
-              icon="user"
+            <Animated.View entering={FadeInDown.delay(190).duration(350)}>
+              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(240).duration(350)}>
+              <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••••" secureTextEntry error={errors.password} />
+              <PasswordStrength password={password} />
+            </Animated.View>
+          </View>
+
+          <Animated.View entering={FadeInDown.delay(290).duration(350)} style={{ marginTop: STEP.s2 }}>
+            <TermsCheckbox
+              checked={agreed}
+              onToggle={() => setAgreed((v) => !v)}
+              onOpenTerms={() => navigation.navigate(SCREENS.TERMS)}
+              onOpenPrivacy={() => navigation.navigate(SCREENS.PRIVACY)}
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(170).duration(400).springify()}>
-            <AuthInput
-              label="E-posta"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="ornek@mail.com"
-              keyboardType="email-address"
-              error={errors.email}
-              icon="mail"
-            />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
-            <AuthInput
-              label="Şifre"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry
-              error={errors.password}
-              icon="lock"
-            />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-            <Button
-              onPress={submit}
-              loading={busy}
-              iconRight={busy ? undefined : "arrowR"}
-              size="lg"
-              fullWidth
-              style={{ marginTop: 12, ...SHADOWS.accent }}
-            >
-              {busy ? "Hesap açılıyor..." : "Kayıt Ol"}
+          <Animated.View entering={FadeInDown.delay(330).duration(350)}>
+            <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s3 }}>
+              {busy ? "Hesap açılıyor..." : "Hesabı oluştur"}
             </Button>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 18, gap: 12 }}>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
-              <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.muted }}>veya</Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
+          <Animated.View entering={FadeInDown.delay(370).duration(350)}>
+            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+              <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
+              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
             </View>
             <SocialAuthButtons />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(420).duration(400).springify()}>
-            <Pressable
-              onPress={() => navigation.navigate(SCREENS.LOGIN)}
-              style={{ marginTop: 20, alignItems: "center" }}
-              hitSlop={6}
-            >
-              <Text style={{ fontFamily: "Archivo_500", fontSize: 14, color: C.sec }}>
-                Zaten hesabın var mı?{" "}
-                <Text style={{ color: C.brandLight, fontFamily: "Archivo_600" }}>Giriş Yap</Text>
-              </Text>
+          <Animated.View entering={FadeInDown.delay(410).duration(350)}>
+            <Pressable onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
+              <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın var mı?</Text>
+              <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Giriş yap</Text>
             </Pressable>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,16 +1,14 @@
-import { useState, useCallback, useMemo } from "react";
-import {
-  View, Text, Pressable,
-  KeyboardAvoidingView, Platform, ScrollView, StyleSheet,
-} from "react-native";
+import { useState, useCallback } from "react";
+import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { Icon, Button } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { resetPassword } from "../../supabase/auth";
 import { AuthInput } from "./components/AuthInput";
+import { EmailSentPanel } from "./components/EmailSentPanel";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { authErrorMessage } from "../../supabase/authErrors";
@@ -19,7 +17,6 @@ import { emailSchema, validate } from "../../validations/auth";
 export default function ForgotPasswordScreen() {
   const C = useC();
   const showAlert = useAlert();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -49,65 +46,38 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          contentContainerStyle={s.scroll}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={s.back}>
-            <Icon name="arrowL" size={22} color={C.text} />
-          </Pressable>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={{ padding: STEP.s1, minWidth: 44, minHeight: 44, justifyContent: "center" }}>
+          <Icon name="arrowL" size={18} color={C.text2} />
+        </Pressable>
+      </View>
 
-          <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
-            <View style={s.iconWrap}>
-              <Icon name="lock" size={56} color={C.accent} />
-            </View>
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
-            <Text style={s.title}>Şifreni Sıfırla</Text>
-            <Text style={s.subtitle}>
-              E-posta adresini gir, şifre sıfırlama bağlantısı gönderelim.
-            </Text>
-          </Animated.View>
-
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 }} keyboardShouldPersistTaps="handled">
           {sent ? (
-            <Animated.View entering={FadeInDown.delay(260).duration(400).springify()}>
-              <View style={s.successBox}>
-                <Icon name="checkCircle" size={28} color={C.green} />
-                <Text style={s.successText}>
-                  E-posta gönderildi! Gelen kutunu kontrol et.
-                </Text>
-              </View>
-            </Animated.View>
+            <EmailSentPanel email={email.trim()} onResend={submit} />
           ) : (
             <>
-              <Animated.View entering={FadeInDown.delay(260).duration(400).springify()}>
-                <AuthInput
-                  label="E-posta"
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="ornek@mail.com"
-                  keyboardType="email-address"
-                  error={error}
-                />
+              <Animated.View entering={FadeInDown.delay(80).duration(350)}>
+                <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 270 }]}>
+                  Şifreni sıfırlayalım.
+                </Text>
+                <Text style={[TYPOGRAPHY.body, { fontSize: 13.5, color: C.text3, marginTop: STEP.s2, maxWidth: 302 }]}>
+                  Hesabının e-posta adresini yaz, sıfırlama bağlantısını göndeririz.
+                </Text>
               </Animated.View>
-              <Animated.View entering={FadeInDown.delay(340).duration(400).springify()}>
-                <Pressable
-                  onPress={submit}
-                  disabled={busy}
-                  style={({ pressed }) => [
-                    s.btn,
-                    { opacity: busy ? 0.6 : pressed ? 0.85 : 1 },
-                  ]}
-                >
-                  <Text style={s.btnText}>
-                    {busy ? "Gönderiliyor..." : "Sıfırlama Linki Gönder"}
-                  </Text>
+
+              <Animated.View entering={FadeInDown.delay(150).duration(350)} style={{ marginTop: STEP.s4 }}>
+                <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={error} />
+              </Animated.View>
+
+              <Animated.View entering={FadeInDown.delay(210).duration(350)}>
+                <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s1 }}>
+                  {busy ? "Gönderiliyor..." : "Bağlantıyı gönder"}
+                </Button>
+                <Pressable onPress={goBack} style={{ alignItems: "center", justifyContent: "center", minHeight: 44, marginTop: STEP.s2 }} hitSlop={6}>
+                  <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Giriş ekranına dön</Text>
                 </Pressable>
               </Animated.View>
             </>
@@ -116,30 +86,4 @@ export default function ForgotPasswordScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    scroll: { padding: SPACING.xxl, flexGrow: 1 },
-    back: { marginBottom: SPACING.xxxl },
-    iconWrap: { alignItems: "center", marginBottom: SPACING.xxl },
-    title: { ...TYPOGRAPHY.heading, color: C.text, textAlign: "center" },
-    subtitle: {
-      ...TYPOGRAPHY.body, color: C.sec,
-      textAlign: "center", marginTop: SPACING.sm, marginBottom: SPACING.xxxl,
-    },
-    btn: {
-      backgroundColor: C.accent, borderRadius: RADIUS.lg,
-      paddingVertical: SPACING.lg, alignItems: "center", marginTop: SPACING.sm,
-      ...SHADOWS.fab,
-    },
-    btnText: { ...TYPOGRAPHY.button, color: C.bg },
-    successBox: {
-      alignItems: "center", gap: SPACING.md,
-      backgroundColor: C.green + "18", borderWidth: 1, borderColor: C.green + "40",
-      borderRadius: RADIUS.xl, padding: SPACING.xxl, marginTop: SPACING.lg,
-    },
-    successText: { ...TYPOGRAPHY.bodySemiBold, color: C.green, textAlign: "center" },
-  });
 }

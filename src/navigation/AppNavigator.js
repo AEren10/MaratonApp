@@ -14,6 +14,7 @@ import { flushAnalytics, track } from "../lib/analytics";
 import { TabBar } from "./TabBar";
 import { createNavigationTracker } from "./analytics/navigationTracker";
 import { linkingConfig } from "./linking";
+import { SCREENS } from "../constants/screens";
 import { ROOT_STACK } from "./routes";
 import { ROOT_ONLY, TAB_KEYS, TAB_STACKS } from "./tabAssignment";
 import { screenOptions } from "./screenOptions";
@@ -26,6 +27,7 @@ import {
   TAB_SCREENS,
 } from "./screenRegistry";
 import { useDeepLink } from "../hooks/useDeepLink";
+import { consumeAuthIntent } from "../lib/authIntent";
 
 const Stack = createNativeStackNavigator();
 
@@ -100,8 +102,14 @@ function MainTabs() {
 }
 
 function AuthStack() {
+  // Karsilama'daki "Rotami kur" -> Kayit, "Hesabim var" -> Giris.
+  // Niyet yoksa varsayilan Giris (donen kullanici).
+  const intent = consumeAuthIntent();
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Navigator
+      screenOptions={screenOptions}
+      initialRouteName={intent === "register" ? SCREENS.REGISTER : SCREENS.LOGIN}
+    >
       {AUTH_STACK_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );

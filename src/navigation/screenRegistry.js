@@ -85,6 +85,12 @@ export const AUTH_STACK_SCREENS = [
   screen(SCREENS.REGISTER, RegisterScreen),
   screen(SCREENS.FORGOT_PASSWORD, ForgotPasswordScreen),
   screen(SCREENS.SET_NEW_PASSWORD, SetNewPasswordScreen),
+  // Kayit ekranindaki "Kullanim Sartlari" / "Gizlilik Politikasi" linkleri.
+  // Bu iki ekran PROFIL sekmesinde de kayitli ama orasi MainTabs'in icinde;
+  // kullanici henuz giris yapmadigi icin MainTabs mount DEGIL ve oradan
+  // navigate sessizce basarisiz olurdu.
+  screen(SCREENS.TERMS, TermsScreen),
+  screen(SCREENS.PRIVACY, PrivacyScreen),
 ];
 
 // Şifre sıfırlama yığını: link bir oturum kurduğu için normal seçim

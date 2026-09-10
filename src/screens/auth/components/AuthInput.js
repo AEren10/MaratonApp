@@ -2,6 +2,7 @@ import { View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 
 export function AuthInput({
   label,
@@ -12,71 +13,51 @@ export function AuthInput({
   keyboardType,
   autoCapitalize = "none",
   error,
-  icon,
 }) {
   const C = useC();
   const [focused, setFocused] = useState(false);
   const [show, setShow] = useState(false);
   const isPassword = !!secureTextEntry;
 
-  const borderColor = error ? C.red : focused ? C.accent : C.border;
+  const borderColor = error ? C.danger : focused ? C.accent : C.elev;
 
   return (
-    <View style={{ marginBottom: 14 }}>
-      <Text
-        style={{
-          fontFamily: "Archivo_600",
-          fontSize: 11,
-          color: focused ? C.accent : C.muted,
-          letterSpacing: 0.6,
-          marginBottom: 8,
-          textTransform: "uppercase",
-        }}
-      >
+    <View style={{ marginBottom: STEP.s2 }}>
+      <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s1 }]}>
         {label}
       </Text>
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: C.surface,
-        borderRadius: 16,
-        borderWidth: 1.5,
+        borderRadius: SHAPE.card,
+        borderWidth: 1,
         borderColor,
-        paddingLeft: icon ? 14 : 0,
-        paddingRight: isPassword ? 10 : 0,
+        height: CONTROL.buttonPrimary + 2,
+        paddingHorizontal: STEP.s2 + STEP.s1 / 2,
       }}>
-        {icon ? (
-          <Icon name={icon} size={17} color={focused ? C.accent : C.muted} sw={1.8} />
-        ) : null}
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={C.muted}
+          placeholderTextColor={C.text3}
           secureTextEntry={isPassword && !show}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           autoCorrect={false}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={{
-            flex: 1,
-            paddingHorizontal: 14,
-            paddingVertical: 15,
-            fontFamily: "Archivo_500",
-            fontSize: 15,
-            color: C.text,
-          }}
+          style={[TYPOGRAPHY.bodyMedium, { flex: 1, color: C.text }]}
         />
         {isPassword ? (
-          <Pressable onPress={() => setShow((v) => !v)} hitSlop={8} style={{ padding: 10 }}>
-            <Icon name={show ? "eye" : "lock"} size={16} color={C.muted} />
+          <Pressable onPress={() => setShow((v) => !v)} hitSlop={10} style={{ padding: STEP.s1 }} accessibilityRole="button" accessibilityLabel={show ? "Şifreyi gizle" : "Şifreyi göster"}>
+            <Icon name={show ? "eyeOff" : "eye"} size={17} color={C.text4} />
           </Pressable>
         ) : null}
       </View>
       {error ? (
-        <Text style={{ color: C.red, fontSize: 12, marginTop: 6, fontFamily: "Archivo_500", marginLeft: 4 }}>
-          ⚠ {error}
+        <Text style={[TYPOGRAPHY.micro, { color: C.danger, marginTop: STEP.s1 / 2, marginLeft: 4 }]}>
+          {error}
         </Text>
       ) : null}
     </View>

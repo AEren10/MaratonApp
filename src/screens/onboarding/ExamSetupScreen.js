@@ -3,27 +3,28 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, IconBox } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { Icon, Button } from "../../components/design";
+import { ExamOption } from "./components/ExamOption";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 
-function buildCategoryOptions(C) {
+function buildCategoryOptions() {
   return [
-    { id: "lgs", label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)", icon: "shield", color: C.green },
-    { id: "yks", label: "YKS", desc: "Yükseköğretim Kurumları Sınavı", icon: "target", color: C.amber },
+    { id: "lgs", label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)" },
+    { id: "yks", label: "YKS", desc: "Yükseköğretim Kurumları Sınavı" },
   ];
 }
 
-function buildYKSOptions(C) {
+function buildYKSOptions() {
   return [
-    { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi", icon: "target", color: C.amber },
-    { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen", icon: "hash", color: C.green },
-    { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji", icon: "layers", color: C.blue },
-    { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat", icon: "bookOpen", color: C.purple },
-    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi", icon: "globe", color: C.teal },
+    { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi" },
+    { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen" },
+    { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji" },
+    { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat" },
+    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi" },
   ];
 }
 
@@ -32,39 +33,16 @@ function buildExamMonthOptions() {
   const currentYear = now.getFullYear();
   const beforeExamThisYear = now.getMonth() < 5 || (now.getMonth() === 5 && now.getDate() < 20);
   const startYear = beforeExamThisYear ? currentYear : currentYear + 1;
-  return [
-    `Haziran ${startYear}`,
-    `Haziran ${startYear + 1}`,
-    `Haziran ${startYear + 2}`,
-  ];
+  return [`Haziran ${startYear}`, `Haziran ${startYear + 1}`, `Haziran ${startYear + 2}`];
 }
 
 const MONTHS = buildExamMonthOptions();
 
-function ExamOption({ item, selected, onPress, C }) {
-  const active = selected === item.id;
-  return (
-    <Pressable
-      onPress={() => onPress(item.id)}
-      style={[styles.optionCard, { backgroundColor: C.surface, borderColor: active ? item.color : C.border }]}
-    >
-      <IconBox icon={item.icon} color={item.color} size={44} rounded={14} />
-      <View style={{ flex: 1 }}>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: active ? C.text : C.sec }]}>{item.label}</Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 2 }]}>{item.desc}</Text>
-      </View>
-      <View style={[styles.radio, { borderColor: active ? item.color : C.border }]}>
-        {active && <View style={[styles.radioInner, { backgroundColor: item.color }]} />}
-      </View>
-    </Pressable>
-  );
-}
-
 export default function ExamSetupScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const CATEGORIES = useMemo(() => buildCategoryOptions(C), [C]);
-  const YKS_OPTIONS = useMemo(() => buildYKSOptions(C), [C]);
+  const CATEGORIES = useMemo(() => buildCategoryOptions(), []);
+  const YKS_OPTIONS = useMemo(() => buildYKSOptions(), []);
   const { updateExamConfig } = useExam();
 
   const [category, setCategory] = useState(null);
@@ -97,110 +75,65 @@ export default function ExamSetupScreen() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={styles.progressRow}>
+        <View style={[styles.segment, { backgroundColor: C.accent }]} />
+        <View style={[styles.segment, { backgroundColor: C.track }]} />
+      </View>
+
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.stepRow}>
-          <View style={[styles.stepDot, { backgroundColor: C.accent }]} />
-          <View style={[styles.stepDot, { backgroundColor: C.border }]} />
+        <Text style={[styles.title, { color: C.text }]}>Hangi sınava hazırlanıyorsun?</Text>
+
+        <View style={{ gap: STEP.s1, marginTop: STEP.s3 }}>
+          {CATEGORIES.map((opt) => (
+            <ExamOption key={opt.id} item={opt} selected={category} onPress={handleCategorySelect} C={C} />
+          ))}
         </View>
-
-        <View style={styles.hero}>
-          <IconBox icon="shield" color={C.accent} size={56} rounded={18} />
-          <Text style={[styles.heroTitle, { color: C.text }]}>Sınav Bilgilerin</Text>
-          <Text style={[styles.heroDesc, { color: C.sec }]}>
-            Sana özel çalışma planı oluşturabilmemiz için sınav türünü ve tarihini seç.
-          </Text>
-        </View>
-
-        <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>
-          SINAV KATEGORİSİ
-        </Text>
-
-        {CATEGORIES.map((opt) => (
-          <ExamOption key={opt.id} item={opt} selected={category} onPress={handleCategorySelect} C={C} />
-        ))}
 
         {category === "yks" && (
-          <>
-            <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xl, marginBottom: SPACING.md }]}>
-              ALAN SEÇİMİ
-            </Text>
+          <View style={{ gap: STEP.s1, marginTop: STEP.s3 }}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ALAN SEÇİMİ</Text>
             {YKS_OPTIONS.map((opt) => (
               <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={(id) => { H.select(); setSelectedId(id); }} C={C} />
             ))}
-          </>
+          </View>
         )}
 
         {category && (
-          <>
-            <Text style={[TYPOGRAPHY.label, { color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }]}>
-              SINAV TARİHİ
-            </Text>
+          <View style={{ marginTop: STEP.s4 }}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>SINAV TARİHİ</Text>
             <View style={styles.dateRow}>
               {MONTHS.map((m) => (
                 <Pressable
                   key={m}
                   onPress={() => setExamDate(m)}
-                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.border },
-                    examDate === m && { backgroundColor: C.accent + "10" }]}
+                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.elev }]}
                 >
-                  <Icon name="calendar" size={14} color={examDate === m ? C.accent : C.muted} />
-                  <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.sec }]}>
-                    {m}
-                  </Text>
+                  <Icon name="calendar" size={14} color={examDate === m ? C.accent : C.text3} />
+                  <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.text2 }]}>{m}</Text>
                 </Pressable>
               ))}
             </View>
-          </>
+          </View>
         )}
       </ScrollView>
 
-      <Pressable
-        onPress={finish}
-        style={[styles.continueBtn, { backgroundColor: C.accent, ...SHADOWS.fab }, !canContinue && { opacity: 0.4 }]}
-        disabled={!canContinue}
-      >
-        <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>Devam Et</Text>
-        <Icon name="arrowR" size={18} color={C.bg} />
-      </Pressable>
+      <View style={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s3 }}>
+        <Button onPress={finish} iconRight="arrowR" size="lg" fullWidth disabled={!canContinue}>
+          Devam
+        </Button>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 30 },
-  stepRow: {
-    flexDirection: "row", justifyContent: "center", gap: 8,
-    paddingVertical: SPACING.lg,
-  },
-  stepDot: { width: 8, height: 8, borderRadius: 4 },
-  hero: { alignItems: "center", paddingVertical: SPACING.xl },
-  heroTitle: {
-    fontFamily: "Bricolage_400", fontSize: 24,
-    letterSpacing: -0.5, marginTop: SPACING.lg,
-  },
-  heroDesc: {
-    ...TYPOGRAPHY.body, textAlign: "center",
-    marginTop: SPACING.sm, maxWidth: 300, lineHeight: 22,
-  },
-  optionCard: {
-    flexDirection: "row", alignItems: "center", gap: SPACING.md,
-    borderRadius: RADIUS.xl, padding: SPACING.lg,
-    marginBottom: SPACING.md, borderWidth: 1.5,
-  },
-  radio: {
-    width: 22, height: 22, borderRadius: 11,
-    borderWidth: 2, alignItems: "center", justifyContent: "center",
-  },
-  radioInner: { width: 12, height: 12, borderRadius: 6 },
-  dateRow: { flexDirection: "row", gap: SPACING.md },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: 30 },
+  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
+  segment: { flex: 1, height: 3, borderRadius: 1.5 },
+  title: { ...TYPOGRAPHY.heading, fontSize: 28, maxWidth: 280 },
+  dateRow: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s2 },
   dateChip: {
     flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
-    borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
-    borderWidth: 1.5,
-  },
-  continueBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-    borderRadius: RADIUS.xl,
-    marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, paddingVertical: SPACING.lg,
+    borderRadius: SHAPE.card, paddingVertical: STEP.s2, borderWidth: 1, minHeight: 44,
   },
 });
