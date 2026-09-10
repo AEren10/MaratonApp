@@ -2,6 +2,7 @@ import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
+import { dailyPlanRiskCopy } from "../../../domain/plan/dailyPlanRiskCopy";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
 
 const SOURCE_LABELS = Object.freeze({
@@ -25,6 +26,7 @@ function PlanSummaryCard({ C, summary }) {
   const s = makeStyles(C);
   const source = SOURCE_LABELS[summary.source] || SOURCE_LABELS.empty;
   const routeCount = summary.routeTaskCount > 0 ? `${summary.routeTaskCount} rota` : "rota yok";
+  const risk = dailyPlanRiskCopy(summary.risks);
 
   return (
     <View style={s.card}>
@@ -50,6 +52,16 @@ function PlanSummaryCard({ C, summary }) {
         <Icon name="target" size={15} color={C.accent} />
         <Text style={s.nextText}>{summary.nextAction}</Text>
       </View>
+
+      {risk ? (
+        <View style={s.riskBox}>
+          <Icon name="info" size={15} color={C.warn} />
+          <View style={s.riskCopy}>
+            <Text style={s.riskTitle}>{risk.title}</Text>
+            <Text style={s.riskBody}>{risk.body}</Text>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -100,4 +112,17 @@ const makeStyles = (C) => StyleSheet.create({
     padding: SPACING.md,
   },
   nextText: { ...TYPOGRAPHY.captionMedium, color: C.text, flex: 1 },
+  riskBox: {
+    alignItems: "flex-start",
+    backgroundColor: C.warn + "10",
+    borderColor: C.warn + "35",
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: SPACING.sm,
+    padding: SPACING.md,
+  },
+  riskCopy: { flex: 1 },
+  riskTitle: { ...TYPOGRAPHY.captionMedium, color: C.text },
+  riskBody: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
 });
