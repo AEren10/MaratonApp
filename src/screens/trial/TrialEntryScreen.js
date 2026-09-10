@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -8,6 +8,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useC } from "../../contexts/ThemeContext";
 import { usePremium } from "../../contexts/PremiumContext";
+import { useAlert } from "../../contexts/AlertContext";
 import { useTrialEntryForm } from "./useTrialEntryForm";
 import { TrialEntryFormContent } from "./components/TrialEntryFormContent";
 import { makeTrialEntryStyles } from "./trialEntryStyles";
@@ -19,8 +20,36 @@ export default function TrialEntryScreen() {
   const {
     accessError, accessLoading, checkFeature, refreshUsage, showPaywall,
   } = usePremium();
+  const showAlert = useAlert();
   const trialEntry = useTrialEntryForm({ C, navigation });
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (!trialEntry.isDirty || trialEntry.saving) return;
+      e.preventDefault();
+      showAlert(
+        "Deneme kaydedilmedi",
+        "Girdiklerin taslak olarak saklanacak, dilediğin zaman kaldığın yerden devam edebilirsin.",
+        [
+          { text: "Düzenlemeye devam et", style: "cancel" },
+          {
+            text: "Taslağı sil ve çık",
+            style: "destructive",
+            onPress: () => {
+              trialEntry.clearDraft();
+              navigation.dispatch(e.data.action);
+            },
+          },
+          {
+            text: "Taslak olarak çık",
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ],
+      );
+    });
+    return unsubscribe;
+  }, [navigation, showAlert, trialEntry]);
 
   if (accessLoading) {
     return <SafeAreaView edges={["top"]} style={styles.safe}>

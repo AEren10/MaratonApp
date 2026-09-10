@@ -14,6 +14,7 @@ import { getRecentDays } from "./trialEntryDates";
 import { submitTrialEntry } from "./trialEntrySubmit";
 import * as H from "../../lib/haptics";
 import { getTrialPublishers } from "../../supabase/productAccess";
+import { loadTrialEntryDraft, saveTrialEntryDraft, clearTrialEntryDraft } from "../../lib/trialEntryDraft";
 
 export function useTrialEntryForm({ C, navigation }) {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ export function useTrialEntryForm({ C, navigation }) {
   const [trialDate, setTrialDate] = useState(() => new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const recentDays = useMemo(() => getRecentDays(14), []);
+  const [draftReady, setDraftReady] = useState(false);
   const { completeForm, markFormDirty } = useFormLifecycleAnalytics("trial_entry", {
     trialType,
     branchSubject,
@@ -53,6 +55,43 @@ export function useTrialEntryForm({ C, navigation }) {
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadTrialEntryDraft(user?.id).then((draft) => {
+      if (cancelled || !draft) { setDraftReady(true); return; }
+      if (draft.trialType) setTrialType(draft.trialType);
+      if (draft.branchSubject !== undefined) setBranchSubject(draft.branchSubject);
+      if (draft.values) setValues(draft.values);
+      if (draft.mood !== undefined) setMood(draft.mood);
+      if (draft.title) setTitle(draft.title);
+      if (draft.publisherId !== undefined) setPublisherId(draft.publisherId);
+      if (draft.difficultyLevel) setDifficultyLevel(draft.difficultyLevel);
+      if (draft.trialDate) setTrialDate(new Date(draft.trialDate));
+      setDraftReady(true);
+    }).catch(() => setDraftReady(true));
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const isDirty = useMemo(() => {
+    const { hasAny } = buildTrialSubjectScores(subjects, values, wrongPenalty);
+    return hasAny || !!title.trim() || !!mood || !!publisherId;
+  }, [subjects, values, wrongPenalty, title, mood, publisherId]);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    if (!isDirty) return;
+    const timeout = setTimeout(() => {
+      saveTrialEntryDraft(user?.id, {
+        trialType, branchSubject, values, mood, title, publisherId, difficultyLevel,
+        trialDate: trialDate.toISOString(),
+      });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [draftReady, isDirty, user?.id, trialType, branchSubject, values, mood, title, publisherId, difficultyLevel, trialDate]);
+
+  const clearDraft = useCallback(() => clearTrialEntryDraft(user?.id), [user?.id]);
 
   const totalNet = useMemo(() => {
     const { subjectsArr } = buildTrialSubjectScores(subjects, values, wrongPenalty);
@@ -110,6 +149,7 @@ export function useTrialEntryForm({ C, navigation }) {
       difficultyLevel,
       mood,
       navigation,
+      onSaved: clearDraft,
       reward,
       publisherId,
       setSaving,
@@ -147,11 +187,14 @@ export function useTrialEntryForm({ C, navigation }) {
     user,
     values,
     wrongPenalty,
+    clearDraft,
   ]);
 
   return {
     branchSubject,
+    clearDraft,
     dismissXP,
+    isDirty,
     handleBranchChange,
     handleDateChange,
     handleMoodChange,

@@ -21,6 +21,7 @@ export async function submitTrialEntry({
   difficultyLevel,
   mood,
   navigation,
+  onSaved,
   reward,
   publisherId,
   setSaving,
@@ -157,5 +158,6 @@ export async function submitTrialEntry({
     ],
   });
   H.success();
+  await onSaved?.();
   navigation.replace(SCREENS.TRIAL_SUMMARY, { trial: localTrial });
 }
