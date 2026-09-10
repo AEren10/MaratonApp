@@ -34,6 +34,7 @@ import StudyTimerScreen from "../screens/study/StudyTimerScreen";
 import StudySaveScreen from "../screens/study/StudySaveScreen";
 import StudyLogScreen from "../screens/study/StudyLogScreen";
 import StudySummaryScreen from "../screens/study/StudySummaryScreen";
+import SummaryScreen from "../screens/study/SummaryScreen";
 import StudyHistoryScreen from "../screens/study/StudyHistoryScreen";
 import TrialEntryScreen from "../screens/trial/TrialEntryScreen";
 import TrialSummaryScreen from "../screens/trial/TrialSummaryScreen";
@@ -160,6 +161,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
   screen(SCREENS.ROADMAP, RoadmapScreen),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
+  screen(SCREENS.SUMMARY, SummaryScreen),
   screen(SCREENS.TRIAL_INSIGHTS, TrialInsightsScreen, detailOptions),
   screen(SCREENS.WEEKLY_REVIEW, WeeklyReviewScreen, celebrationOptions),
   screen(SCREENS.WEEKLY_TRIAL_REVIEW, WeeklyTrialReviewScreen, celebrationOptions),

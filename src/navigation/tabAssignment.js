@@ -30,7 +30,8 @@ export const ROTA_STACK = [
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
   SCREENS.EXAM_SIMULATOR,   // Deneme Provasi
-  SCREENS.WEEKLY_REVIEW,    // Haftalik Ozet
+  SCREENS.SUMMARY,          // Gunun/Haftalik/Ayin Ozeti (period parametresi)
+  SCREENS.WEEKLY_REVIEW,    // Haftalik Ozet (eski, SUMMARY week moduna gocecek)
   SCREENS.WEEKLY_TRIAL_REVIEW,
 ];
 

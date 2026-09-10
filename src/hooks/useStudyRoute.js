@@ -139,6 +139,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             ...stop,
             stopId: saved.id,
             lifecycleStatus: saved.lifecycle_status,
+            // Duragin son guncellenme zamani. "Bugun kac durak tamamlandi"
+            // sorusu buna dayaniyor (bkz. useSummary). Tamamlanmis bir durak
+            // icin son guncelleme pratikte tamamlanma anidir.
+            completedAt: saved.updated_at || null,
             version: saved.version,
             insight: saved.metadata?.insight || stop.insight,
           } : stop;
