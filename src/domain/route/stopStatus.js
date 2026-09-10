@@ -74,6 +74,17 @@ export function getEffectiveRouteStopStatus(
   return status;
 }
 
+export function routeStopEffectiveStatus(stop = {}, { routeFrozen = false } = {}) {
+  const lifecycleStatus = stop.lifecycle_status
+    || stop.lifecycleStatus
+    || stop.status
+    || ROUTE_STOP_STATUS.UPCOMING;
+  return getEffectiveRouteStopStatus(lifecycleStatus, {
+    locked: Boolean(stop.locked || stop.isLocked),
+    frozen: Boolean(routeFrozen || stop.frozen || stop.isFrozen || stop.frozen_until || stop.frozenUntil),
+  });
+}
+
 export function routeStopStatusLabel(status) {
   return ROUTE_STOP_LABELS[status] || ROUTE_STOP_LABELS[ROUTE_STOP_STATUS.UPCOMING];
 }

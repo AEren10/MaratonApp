@@ -8,6 +8,7 @@ import {
   isPersistedRouteStopStatus,
   PERSISTED_ROUTE_STOP_STATUSES,
   ROUTE_STOP_STATUS,
+  routeStopEffectiveStatus,
   routeStopStatusLabel,
 } from "../../src/domain/route/stopStatus.js";
 
@@ -42,6 +43,25 @@ test("frozen only overlays actionable stops", () => {
   assert.equal(
     getEffectiveRouteStopStatus(ROUTE_STOP_STATUS.COMPLETED, { frozen: true }),
     ROUTE_STOP_STATUS.COMPLETED,
+  );
+});
+
+test("route stop effective status reads row overlay fields", () => {
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycle_status: "active", locked: true }),
+    ROUTE_STOP_STATUS.LOCKED,
+  );
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycleStatus: "upcoming", frozenUntil: "2026-09-17" }),
+    ROUTE_STOP_STATUS.FROZEN,
+  );
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycleStatus: "completed", frozenUntil: "2026-09-17" }),
+    ROUTE_STOP_STATUS.COMPLETED,
+  );
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycleStatus: "active" }, { routeFrozen: true }),
+    ROUTE_STOP_STATUS.FROZEN,
   );
 });
 

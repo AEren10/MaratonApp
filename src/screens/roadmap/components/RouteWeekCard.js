@@ -3,8 +3,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import {
-  getEffectiveRouteStopStatus,
   ROUTE_STOP_STATUS,
+  routeStopEffectiveStatus,
   routeStopStatusLabel,
 } from "../../../domain/route/stopStatus";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
@@ -18,7 +18,7 @@ const ICON_BY_STATUS = {
 };
 
 function StopNode({ stop, frozen, C, isLast }) {
-  const status = getEffectiveRouteStopStatus(stop.lifecycleStatus, { frozen });
+  const status = routeStopEffectiveStatus(stop, { routeFrozen: frozen });
   const label = routeStopStatusLabel(status);
   const active = status === ROUTE_STOP_STATUS.ACTIVE;
   const upcoming = status === ROUTE_STOP_STATUS.UPCOMING;
