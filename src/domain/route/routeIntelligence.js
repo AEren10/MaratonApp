@@ -1,4 +1,5 @@
 export const ROUTE_INTELLIGENCE_VERSION = "route-intelligence-v1";
+export const ROUTE_STRATEGY_VERSION = "route-strategy-v1";
 
 const CONFIDENCE_WEIGHT = { high: 1, medium: 0.7, low: 0.35 };
 
@@ -59,6 +60,82 @@ function forecastSignalScore({ weakSubjectKeys = [], daysLeft = null }) {
 function dominantReason(stop = {}) {
   const codes = stop.reasonCodes || [];
   return codes.find((code) => REASON_TEXT[code]) || codes[0] || "ROUTE_COMMITMENT";
+}
+
+function sumStopCost(stops = [], field) {
+  return stops.reduce((sum, stop) => sum + (Number(stop.cost?.[field]) || 0), 0);
+}
+
+function firstWeekStats(weeks = []) {
+  const stops = weeks[0]?.stops || [];
+  return {
+    stopCount: stops.length,
+    questions: Math.round(sumStopCost(stops, "questions")),
+    minutes: Math.round(sumStopCost(stops, "minutes")),
+    reviewStops: stops.filter((stop) => stop.isReview).length,
+    weakStops: stops.filter((stop) => dominantReason(stop) === "LOW_ACCURACY").length,
+  };
+}
+
+function pressureLabel({ overflow = [], shortfall = {}, capacity = {} }) {
+  if (!overflow.length) return "dengeli";
+  const weekly = Math.max(1, Number(capacity.questionsPerWeek) || 1);
+  const pressure = Number(shortfall.extraQuestionsPerWeek || 0) / weekly;
+  if (pressure >= 0.35) return "çok sıkışık";
+  if (pressure >= 0.15) return "sıkışık";
+  return "hafif sıkışık";
+}
+
+function focusAreas(items = []) {
+  return [...items]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => ({
+      subject: item.subject,
+      subjectLabel: item.subjectLabel || item.subject,
+      topic: item.topic,
+      reasonCode: dominantReason(item),
+      reasonText: REASON_TEXT[dominantReason(item)] || REASON_TEXT.ROUTE_COMMITMENT,
+      confidence: item.dataConfidence || "low",
+      expectedNetGain: round(Number(item.scoreComponents?.expectedNetGain) || 0),
+    }));
+}
+
+function strategyHeadline({ overflow = [], reviewItems = 0, weakSubjectKeys = [] }) {
+  if (overflow.length) return "Hedefe yetişmek için tempo kararı gerekiyor";
+  if (reviewItems > 0) return "İlk hafta neti koruyan tekrarlarla açılıyor";
+  if (weakSubjectKeys.length) return "Zayıf sinyaller ilk haftaya çekildi";
+  return "Müfredat sürdürülebilir haftalara bölündü";
+}
+
+function buildRouteStrategy({
+  capacity = {},
+  items = [],
+  weeks = [],
+  overflow = [],
+  shortfall = {},
+  weakSubjectKeys = [],
+  reviewItems = 0,
+} = {}) {
+  const firstWeek = firstWeekStats(weeks);
+  const pressure = pressureLabel({ overflow, shortfall, capacity });
+  const topFocus = focusAreas(items);
+
+  return {
+    version: ROUTE_STRATEGY_VERSION,
+    headline: strategyHeadline({ overflow, reviewItems, weakSubjectKeys }),
+    firstWeek,
+    pacing: {
+      pressure,
+      weeklyQuestions: Math.round(Number(capacity.questionsPerWeek) || 0),
+      weeklyMinutes: Math.round(Number(capacity.minutesPerWeek) || 0),
+      extraQuestionsPerWeek: Math.round(Number(shortfall.extraQuestionsPerWeek) || 0),
+    },
+    focusAreas: topFocus,
+    narrative: firstWeek.stopCount > 0
+      ? `İlk hafta ${firstWeek.stopCount} durak, ${firstWeek.questions} soru ve yaklaşık ${firstWeek.minutes} dakika ile başlıyor.`
+      : "İlk hafta için durak çıkmadı; hedef, tarih veya müfredat verisi tamamlanmalı.",
+  };
 }
 
 export function explainRouteStop(stop = {}) {
@@ -139,6 +216,15 @@ export function buildRouteIntelligence({
     confidence: confidenceLabel(score),
     confidenceScore: score,
     nextBestAction,
+    strategy: buildRouteStrategy({
+      capacity,
+      items,
+      weeks,
+      overflow,
+      shortfall,
+      weakSubjectKeys,
+      reviewItems,
+    }),
     signals: {
       capacitySource: capacity.source || "unknown",
       capacityConfidence: capacity.confidence || "low",
