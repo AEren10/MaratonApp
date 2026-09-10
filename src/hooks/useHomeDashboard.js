@@ -6,6 +6,7 @@ import { generateDailyPlan } from "../lib/planEngine";
 import { useStudyRoute } from "./useStudyRoute";
 import { getStudyLogs } from "../supabase/studyLogs";
 import { dateKey } from "../lib/dateUtils";
+import { displayNameOf } from "../lib/displayName";
 
 const EMPTY_WEEKLY_ACTIVITY = { total: 0, counts: [0, 0, 0, 0, 0, 0, 0], percent: 0 };
 
@@ -88,7 +89,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
   const { currentWeek: routeCurrentWeek, transitionStop } = useStudyRoute();
   const [weeklyActivity, setWeeklyActivity] = useState(EMPTY_WEEKLY_ACTIVITY);
 
-  const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
+  const displayName = displayNameOf(user);
 
   const solvedToday = useMemo(
     () => todayLogs.reduce((sum, log) => sum + (log.questionCount || 0), 0),
