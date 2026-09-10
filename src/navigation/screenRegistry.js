@@ -157,3 +157,19 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
   screen(SCREENS.PAYWALL, PaywallScreen, modalOptions),
 ];
+
+// Sekme stack'leri ada gore ekran tanimi ariyor (bkz. tabAssignment.js).
+const BY_NAME = new Map(APP_STACK_SCREENS.map((route) => [route.name, route]));
+
+export function screensByName(names) {
+  return names.map((name) => {
+    const route = BY_NAME.get(name);
+    if (!route) {
+      throw new Error(
+        `screensByName: "${name}" APP_STACK_SCREENS'te yok. ` +
+        "tabAssignment.js ile screenRegistry.js arasinda kayma var.",
+      );
+    }
+    return route;
+  });
+}

@@ -1,5 +1,6 @@
 import { SCREENS } from "../constants/screens";
 import { PRODUCT_FLOW_IDS } from "../constants/productFlows";
+import { TAB_KEYS, TAB_STACKS } from "./tabAssignment";
 
 export const ROOT_STACK = {
   MAIN_TABS: "MainTabs",
@@ -119,19 +120,47 @@ const TAB_SCREEN_KEYS = Object.entries(ROUTE_CONFIGS)
   .filter(([, config]) => config.tab)
   .map(([screen]) => screen);
 
+// NESTED LINKING — sekmeler artik kendi stack'i (bkz. tabAssignment.js).
+// Ekranlar kokte degil sekme stack'lerinin ICINDE, o yuzden linking agaci
+// da ayni sekli almali; yoksa deep link var olmayan bir konumu isaret eder.
+//
+// PAYLASIMLI EKRAN TUZAGI: bir ekran birden fazla sekme stack'ine kayitli
+// (ornek ROADMAP: ROTA + PROGRAM). Path'i her ikisinde de tanimlarsak
+// React Navigation "Found conflicting screens with the same pattern" firlatir
+// ve TUM deep linkler oluyor — bu hata projede bir kez yasandi.
+// Cozum: path YALNIZ kanonik sekmede tanimlanir. Kanonik = ekrani iceren
+// ilk sekme, su sabit sirada. navigate() zaten her sekmede calisiyor.
+const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
+
+function canonicalTabFor(screen) {
+  return TAB_ORDER.find((tab) => (TAB_STACKS[tab] || []).includes(screen)) || null;
+}
+
+const NESTED_BY_TAB = new Map(TAB_ORDER.map((tab) => [tab, {}]));
+const ROOT_LEVEL = {};
+
+for (const [screen, path] of Object.entries(DEEP_LINK_ROUTE_PATHS)) {
+  if (TAB_SCREEN_KEYS.includes(screen)) continue; // sekme kokleri asagida
+  const tab = canonicalTabFor(screen);
+  if (tab) NESTED_BY_TAB.get(tab)[screen] = withParse(screen, path);
+  else ROOT_LEVEL[screen] = withParse(screen, path);
+}
+
 export const LINKING_SCREENS = {
   [ROOT_STACK.MAIN_TABS]: {
     screens: Object.fromEntries(
       TAB_SCREEN_KEYS
         .filter((screen) => DEEP_LINK_ROUTE_PATHS[screen])
-        .map((screen) => [screen, DEEP_LINK_ROUTE_PATHS[screen]]),
+        .map((screen) => [
+          screen,
+          {
+            path: DEEP_LINK_ROUTE_PATHS[screen],
+            screens: NESTED_BY_TAB.get(screen) || {},
+          },
+        ]),
     ),
   },
-  ...Object.fromEntries(
-    Object.entries(DEEP_LINK_ROUTE_PATHS)
-      .filter(([screen]) => !TAB_SCREEN_KEYS.includes(screen))
-      .map(([screen, path]) => [screen, withParse(screen, path)]),
-  ),
+  ...ROOT_LEVEL,
 };
 
 export function getRouteConfig(screen) {

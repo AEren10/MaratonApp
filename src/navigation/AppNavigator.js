@@ -15,9 +15,10 @@ import { TabBar } from "./TabBar";
 import { createNavigationTracker } from "./analytics/navigationTracker";
 import { linkingConfig } from "./linking";
 import { ROOT_STACK } from "./routes";
+import { ROOT_ONLY, TAB_KEYS, TAB_STACKS } from "./tabAssignment";
 import { screenOptions } from "./screenOptions";
 import {
-  APP_STACK_SCREENS,
+  screensByName,
   AUTH_STACK_SCREENS,
   RECOVERY_STACK_SCREENS,
   SETUP_STACK_SCREENS,
@@ -27,6 +28,9 @@ import {
 import { useDeepLink } from "../hooks/useDeepLink";
 
 const Stack = createNativeStackNavigator();
+
+// Kokte kalanlar: tabbar'in BILEREK gizlendigi tam ekran ortuler.
+const ROOT_SCREENS = screensByName(ROOT_ONLY);
 const Tab = createBottomTabNavigator();
 
 function AddStub() {
@@ -48,15 +52,49 @@ function renderTabScreen(route) {
   return <Tab.Screen key={route.name} name={route.name} component={route.component} />;
 }
 
+// Her sekme kendi stack'i — tasarimin "Tabbar bozulmaz" kurali.
+// Bilesenler modul seviyesinde BIR KEZ uretiliyor; render icinde uretilse
+// her render'da yeni tip olusur ve sekme her dokunusta state'ini kaybederdi.
+const TAB_STACK_COMPONENTS = new Map(
+  TAB_SCREENS.map((root) => {
+    const inner = screensByName(TAB_STACKS[root.name] || []);
+    function TabStack() {
+      return (
+        <Stack.Navigator screenOptions={screenOptions}>
+          <Stack.Screen name={root.name} component={root.component} options={root.options} />
+          {inner.map(renderStackScreen)}
+        </Stack.Navigator>
+      );
+    }
+    TabStack.displayName = `TabStack(${root.name})`;
+    return [root.name, TabStack];
+  }),
+);
+
+function renderTabStack(root) {
+  return (
+    <Tab.Screen
+      key={root.name}
+      name={root.name}
+      component={TAB_STACK_COMPONENTS.get(root.name)}
+    />
+  );
+}
+
+// Tabbar'in kendi sirasi: ROTA · PROGRAM · [+] · ANALIZ · PROFIL
+const TABS_BEFORE_FAB = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM];
+
 function MainTabs() {
+  const before = TAB_SCREENS.filter((route) => TABS_BEFORE_FAB.includes(route.name));
+  const after = TAB_SCREENS.filter((route) => !TABS_BEFORE_FAB.includes(route.name));
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <TabBar {...props} />}
     >
-      {TAB_SCREENS.slice(0, 2).map(renderTabScreen)}
+      {before.map(renderTabStack)}
       <Tab.Screen name={ROOT_STACK.CENTER_ACTION} component={AddStub} />
-      {TAB_SCREENS.slice(2).map(renderTabScreen)}
+      {after.map(renderTabStack)}
     </Tab.Navigator>
   );
 }
@@ -105,7 +143,7 @@ function AppStackInner() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
-      {APP_STACK_SCREENS.map(renderStackScreen)}
+      {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
 }
