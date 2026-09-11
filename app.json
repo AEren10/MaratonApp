@@ -92,6 +92,13 @@
           "photosPermission": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
           "cameraPermission": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli."
         }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Paylaşım kartını galerine kaydetmek için izin gerekli.",
+          "isAccessMediaLocationEnabled": false
+        }
       ]
     ],
     "extra": {

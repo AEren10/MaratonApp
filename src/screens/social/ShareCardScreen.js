@@ -51,10 +51,30 @@ export default function ShareCardScreen() {
     }
   }, [showAlert]);
 
-  // "Galeriye kaydet" YAZILMADI: expo-media-library package.json'da yok,
-  // yani buton her basista "kullanilamiyor" derdi. Calismayan bir kontrol
-  // gostermek olmayan veriyi gostermekle ayni sey. Paket eklenince buraya
-  // gelir; paylasim (expo-sharing + view-shot) gercekten calisiyor.
+  // Galeriye kaydet. expo-media-library kuruldu (SDK 54: ~18.2.1) ve
+  // app.json'a savePhotosPermission ile eklendi, yani buton gercekten
+  // calisiyor. Yalniz KAYDETME izni isteniyor ("writeOnly"): kullanicinin
+  // tum galerisini okumaya gerek yok, kart yazmak yeterli.
+  const handleSaveGallery = useCallback(async () => {
+    try {
+      const { captureRef } = require("react-native-view-shot");
+      const MediaLibrary = require("expo-media-library");
+
+      const perm = await MediaLibrary.requestPermissionsAsync(true);
+      if (!perm.granted) {
+        H.warn();
+        showAlert("Galeri izni gerekiyor", "Kartı kaydetmek için izin vermen gerekiyor.");
+        return;
+      }
+      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
+      await MediaLibrary.saveToLibraryAsync(uri);
+      H.success();
+      showAlert("Kaydedildi", "Kart galerine kaydedildi.");
+    } catch {
+      H.warn();
+      showAlert("Hata", "Kart kaydedilemedi.");
+    }
+  }, [showAlert]);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -94,6 +114,17 @@ export default function ShareCardScreen() {
             <Button onPress={handleShare} icon="share" fullWidth size="lg">
               Paylaş
             </Button>
+            <Pressable
+              onPress={handleSaveGallery}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Kartı galerine kaydet"
+              style={({ pressed }) => [s.saveRow, { opacity: pressed ? 0.7 : 1 }]}
+            >
+              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
+                Galeriye kaydet
+              </Text>
+            </Pressable>
           </View>
         </>
       )}
