@@ -29,24 +29,6 @@ export function RouteChartLayers({ areaD, bandD, targetY, futD, width, C }) {
             strokeDasharray="2 8"
           />
         ) : null}
-        {pastD ? (
-          <AnimatedPath
-            d={pastD}
-            fill="none"
-            stroke={C.past}
-            strokeWidth={4.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            animatedProps={animatedProps}
-          />
-        ) : null}
-
-        {/* Veri noktalari. TASARIM BUNLARI TEK BICIMDE ciziyor:
-            r 4.6, bg dolgu, accent kenar 2.6 (Rota Detay) — bunlar DENEME
-            veri noktalari, rota duraklari DEGIL. 7 durak durumunun ayri
-            dugum sekilleri grafige degil DURAK LISTESINE ait
-            (bkz. RouteWeekCard). Ilk uygulama status'e gore sekil
-            degistiriyordu, tasarimda oyle bir sey yok. */}
     </>
   );
 }

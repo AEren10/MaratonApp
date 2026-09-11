@@ -102,6 +102,21 @@ export function RouteLineChart({ stops = [], todayIndex, projection = [], band, 
 
         <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD} width={W} C={C} />
 
+        {/* Gecmis hat. Tasarimda class="ln" — uc imza aninin biri, hat
+            cizilerek beliriyor. Animasyonlu oldugu icin katman bileseninde
+            degil burada. */}
+        {pastD ? (
+          <AnimatedPath
+            d={pastD}
+            fill="none"
+            stroke={C.past}
+            strokeWidth={4.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            animatedProps={animatedProps}
+          />
+        ) : null}
+
         {pastPoints.slice(0, -1).map((p, i) => (
           <Circle
             key={`pt-${i}`}
@@ -113,6 +128,13 @@ export function RouteLineChart({ stops = [], todayIndex, projection = [], band, 
             strokeWidth={2.6}
           />
         ))}
+
+        {todayPoint ? (
+          <>
+            <Circle cx={todayPoint.x} cy={todayPoint.y} r={9} fill={C.accent} fillOpacity={0.18} />
+            <Circle cx={todayPoint.x} cy={todayPoint.y} r={7} fill={C.accent} />
+          </>
+        ) : null}
 
         {endPoint && !projection.length ? null : endPoint ? (
           <Circle cx={endPoint.x} cy={endPoint.y} r={6.5} fill={C.bg} stroke={C.projNode} strokeWidth={2.4} />
