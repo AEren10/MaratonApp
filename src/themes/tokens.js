@@ -158,11 +158,17 @@ export const TYPOGRAPHY = {
   captionMedium: { fontFamily: "Archivo_500", fontSize: 13,   lineHeight: 20 },
   meta:          { fontFamily: "Archivo_500", fontSize: 12.5, lineHeight: 18 },
   micro:         { fontFamily: "Archivo_500", fontSize: 11.5, lineHeight: 16 },
+  metaSemiBold:  { fontFamily: "Archivo_600", fontSize: 12.5, lineHeight: 18 },
+  // Tablo/liste sayisi — tasarimda 13.5px Archivo, tabular
+  tableValue:    { fontFamily: "Archivo_500", fontSize: 13.5, lineHeight: 20, fontVariant: ["tabular-nums"] },
+  tableName:     { fontFamily: "Archivo_500", fontSize: 13.5, lineHeight: 20 },
+  tableHead:     { fontFamily: "Archivo_600", fontSize: 11,   lineHeight: 15, letterSpacing: 1.32 },
 
   // Sayilar — Bricolage 400, tabular
   statHero:      { fontFamily: "Bricolage_400", fontSize: 96, lineHeight: 96, letterSpacing: -3.84, fontVariant: ["tabular-nums"] },
   stat:          { fontFamily: "Bricolage_400", fontSize: 46, lineHeight: 50, letterSpacing: -1.4,  fontVariant: ["tabular-nums"] },
   statLarge:     { fontFamily: "Bricolage_400", fontSize: 56, lineHeight: 60, letterSpacing: -2.0,  fontVariant: ["tabular-nums"] },
+  statPair:      { fontFamily: "Bricolage_400", fontSize: 40, lineHeight: 36, letterSpacing: -1.6,  fontVariant: ["tabular-nums"] },
   statSmall:     { fontFamily: "Bricolage_400", fontSize: 26, lineHeight: 32, letterSpacing: -0.6,  fontVariant: ["tabular-nums"] },
   statMedium:    { fontFamily: "Bricolage_400", fontSize: 22, lineHeight: 28, letterSpacing: -0.4,  fontVariant: ["tabular-nums"] },
 

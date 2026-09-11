@@ -1,187 +1,123 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useSelector } from "react-redux";
 
-import { Icon, Chip, GlassCard } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { Icon, Card, EmptyState } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { selectTrials } from "../../store/slices/trialSlice";
-import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
+import { useTrialCompare } from "../../hooks/useTrialCompare";
 import { TrialPickerModal } from "./components/TrialPickerModal";
-import { MotivationCard } from "./components/MotivationCard";
-import { SCREENS } from "../../constants/screens";
-
-const fmtDate = (d) => d ? new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) : "—";
-
-function CompareBar({ label, v1, v2, max, color, styles, C }) {
-  const p1 = max > 0 ? (v1 / max) * 100 : 0;
-  const p2 = max > 0 ? (v2 / max) * 100 : 0;
-  const diff = v2 - v1;
-  const diffColor = diff > 0 ? C.green : diff < 0 ? C.red : C.muted;
-  return (
-    <View style={styles.compareRow}>
-      <Text style={[TYPOGRAPHY.captionMedium, { color, width: 70 }]}>{label}</Text>
-      <View style={{ flex: 1, gap: 6 }}>
-        <View style={styles.barBg}>
-          <View style={[styles.barFill, { width: `${p1}%`, backgroundColor: color, opacity: 0.4 }]} />
-        </View>
-        <View style={styles.barBg}>
-          <View style={[styles.barFill, { width: `${p2}%`, backgroundColor: color }]} />
-        </View>
-      </View>
-      <View style={{ alignItems: "flex-end", minWidth: 50 }}>
-        <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{v1}</Text>
-        <Text style={[TYPOGRAPHY.captionMedium, { color }]}>{v2}</Text>
-      </View>
-      <View style={[styles.diffBadge, { backgroundColor: diffColor + "20" }]}>
-        <Text style={[TYPOGRAPHY.micro, { color: diffColor }]}>
-          {diff > 0 ? "+" : ""}{diff.toFixed(1)}
-        </Text>
-      </View>
-    </View>
-  );
-}
+import { TrialCompareHero } from "./components/TrialCompareHero";
+import { TrialCompareTable } from "./components/TrialCompareTable";
+import { TrialComparePill } from "./components/TrialComparePill";
 
 export default function TrialCompareScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
+  const [pickerTarget, setPickerTarget] = useState(null);
+
+  const {
+    newer, older, setNewer, setOlder, sameTypeTrials,
+    rows, canCompare, publisherMismatch, titles, hero,
+  } = useTrialCompare(C, route.params || {});
+
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
-  const trials = useSelector(selectTrials);
-
-  const sorted = useMemo(() => [...trials].sort((a, b) => new Date(b.date) - new Date(a.date)), [trials]);
-  const trialTypes = useMemo(() => getTrialTypes(C), [C]);
-  const allSubjects = useMemo(() => getAllSubjects(C), [C]);
-
-  const defaultNewer = sorted[0];
-  const defaultOlder = sorted.find((t, i) => i > 0 && t.trialType === defaultNewer?.trialType) || sorted[1] || sorted[0];
-
-  const [newer, setNewer] = useState(() => route.params?.trial1Id ? sorted.find(t => t.id === route.params.trial1Id) ?? defaultNewer : defaultNewer);
-  const [older, setOlder] = useState(() => route.params?.trial2Id ? sorted.find(t => t.id === route.params.trial2Id) ?? defaultOlder : defaultOlder);
-  const [pickerTarget, setPickerTarget] = useState(null); // "newer" | "older"
-
-  const sameTypeTrials = useMemo(() =>
-    sorted.filter(t => t.trialType === (newer?.trialType ?? sorted[0]?.trialType)),
-    [sorted, newer]
-  );
-
-  const typeMeta = trialTypes[newer?.trialType];
-  const subjects = typeMeta?.subjects ||
-    (newer?.trialType === "BRANCH" && newer?.branchSubject
-      ? allSubjects.filter((s) => s.key === newer.branchSubject) : []);
-
-  const newerNet = newer?.totalNet || 0;
-  const olderNet = older?.totalNet || 0;
-  const diff = newerNet - olderNet;
-
-  const subjectPairs = subjects.map((s) => ({
-    key: s.key, name: s.name, c: s.color,
-    v1: older?.subjects?.[s.key]?.net || 0,
-    v2: newer?.subjects?.[s.key]?.net || 0,
-    max: s.max,
-  }));
-
-  if (!newer) return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karşılaştırma</Text>
-      </View>
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Icon name="chart" size={40} color={C.muted} />
-        <Text style={[TYPOGRAPHY.body, { color: C.muted, marginTop: SPACING.md }]}>Karşılaştırma için en az 2 deneme gerekli</Text>
-      </View>
-    </SafeAreaView>
+  const pick = useCallback(
+    (t) => (pickerTarget === "newer" ? setNewer(t) : setOlder(t)),
+    [pickerTarget, setNewer, setOlder],
   );
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Karşılaştırma</Text>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Icon name="arrowL" size={18} color={C.text2} />
+        </Pressable>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>KARŞILAŞTIRMA</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(100).duration(420).springify()} style={styles.dateCards}>
-          <Pressable onPress={() => setPickerTarget("older")} style={{ flex: 1 }}>
-            <View style={[styles.dateCard, { opacity: 0.7, borderColor: C.border, borderWidth: 1 }]}>
-              <Icon name="calendar" size={14} color={C.muted} />
-              <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>{fmtDate(older?.date)}</Text>
-              <Text style={[TYPOGRAPHY.statSmall, { color: C.muted }]}>{olderNet}</Text>
-              <Chip color={C.muted}>değiştir</Chip>
-            </View>
-          </Pressable>
-          <Icon name="arrowR" size={20} color={C.accent} />
-          <Pressable onPress={() => setPickerTarget("newer")} style={{ flex: 1 }}>
-            <View style={[styles.dateCard, { borderColor: C.accent + "40", borderWidth: 1 }]}>
-              <Icon name="calendar" size={14} color={C.accent} />
-              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>{fmtDate(newer?.date)}</Text>
-              <Text style={[TYPOGRAPHY.statSmall, { color: C.accent }]}>{newerNet}</Text>
-              <Chip color={C.accent}>değiştir</Chip>
-            </View>
-          </Pressable>
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(170).duration(420).springify()} style={styles.totalDiff}>
-          <Text style={[TYPOGRAPHY.caption, { color: C.sec }]}>Toplam değişim</Text>
-          <View style={styles.totalRow}>
-            <Text style={[TYPOGRAPHY.stat, { color: diff >= 0 ? C.green : C.red }]}>{diff.toFixed(1)}</Text>
-            <Chip color={diff >= 0 ? C.green : C.red}>{diff >= 0 ? "Artış" : "Düşüş"}</Chip>
+      {!canCompare ? (
+        <EmptyState
+          title="Karşılaştırma için en az 2 deneme gerekli"
+          body="İkinci denemeni girdiğinde iki sonucu ders ders yan yana koyarız."
+          style={{ paddingHorizontal: GUTTER }}
+        />
+      ) : (
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <View style={styles.pills}>
+            <TrialComparePill C={C} label={titles.older} onPress={() => setPickerTarget("older")} />
+            <TrialComparePill C={C} label={titles.newer} active onPress={() => setPickerTarget("newer")} />
           </View>
-        </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).duration(420).springify()}>
-          <Text style={[TYPOGRAPHY.label, { color: C.muted, marginBottom: SPACING.md }]}>DERS BAZLI KARŞILAŞTIRMA</Text>
-          {subjectPairs.map((s) => (
-            <CompareBar key={s.key} label={s.name} v1={s.v1} v2={s.v2} max={s.max} color={s.c} styles={styles} C={C} />
-          ))}
-          <View style={styles.legendRow}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { opacity: 0.4 }]} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{fmtDate(older?.date)}</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={styles.legendDot} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{fmtDate(newer?.date)}</Text>
-            </View>
-          </View>
-        </Animated.View>
+          <Animated.View entering={FadeInDown.duration(520)} style={{ marginTop: 30 }}>
+            <TrialCompareHero C={C} {...hero} />
+          </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(310).duration(420).springify()} style={{ marginTop: SPACING.xxl }}>
-          <MotivationCard diff={diff} C={C} onNavigate={() => navigation.navigate(SCREENS.ANALYSIS)} />
-        </Animated.View>
-      </ScrollView>
+          <Animated.View entering={FadeInDown.delay(120).duration(520)} style={{ marginTop: 28 }}>
+            <TrialCompareTable
+              C={C}
+              rows={rows}
+              olderLabel={hero.olderLabel}
+              newerLabel={hero.newerLabel}
+            />
+          </Animated.View>
+
+          {publisherMismatch && (
+            <Card tone="surface" radius="panel" style={{ marginTop: 26 }}>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
+                İki deneme aynı yayından değil. Zorluk farkı netlere yansır; bu yüzden
+                karşılaştırma tek başına tempo göstergesi sayılmaz.
+              </Text>
+            </Card>
+          )}
+
+          <Pressable
+            onPress={() => setPickerTarget("older")}
+            accessibilityRole="button"
+            accessibilityLabel="Başka deneme seç"
+            style={({ pressed }) => [
+              styles.footerBtn,
+              { borderColor: C.border, opacity: pressed ? 0.7 : 1 },
+            ]}
+          >
+            <Text style={[TYPOGRAPHY.tableName, { fontFamily: "Archivo_600", color: C.text2 }]}>
+              Başka deneme seç
+            </Text>
+          </Pressable>
+        </ScrollView>
+      )}
 
       <TrialPickerModal
         visible={pickerTarget !== null}
         trials={sameTypeTrials}
         selectedId={pickerTarget === "newer" ? newer?.id : older?.id}
-        onSelect={(t) => pickerTarget === "newer" ? setNewer(t) : setOlder(t)}
+        onSelect={pick}
         onClose={() => setPickerTarget(null)}
       />
     </SafeAreaView>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: { flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-    dateCards: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.md, marginBottom: SPACING.xxl },
-    dateCard: { alignItems: "center", gap: SPACING.xs, backgroundColor: C.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg },
-    totalDiff: { alignItems: "center", backgroundColor: C.surface, borderRadius: RADIUS.xxl, padding: SPACING.xxl, marginBottom: SPACING.xxl },
-    totalRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md, marginTop: SPACING.sm },
-    compareRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.lg, borderBottomWidth: 1, borderBottomColor: C.border },
-    barBg: { height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: "hidden" },
-    barFill: { height: 6, borderRadius: 3 },
-    diffBadge: { borderRadius: RADIUS.full, paddingHorizontal: 8, paddingVertical: 2, minWidth: 40, alignItems: "center" },
-    legendRow: { flexDirection: "row", justifyContent: "center", gap: SPACING.xl, marginTop: SPACING.xl },
-    legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-    legendDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.accent },
-  });
-}
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    paddingHorizontal: GUTTER,
+    height: CONTROL.tapMin,
+  },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: 26, paddingBottom: 40 },
+  pills: { flexDirection: "row", gap: STEP.s1 },
+  footerBtn: {
+    height: CONTROL.buttonPrimary,
+    borderRadius: SHAPE.button,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 26,
+  },
+});
