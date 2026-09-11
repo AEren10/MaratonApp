@@ -1,3 +1,5 @@
+import { routeRevisionDecision } from "./routeRevisionDecision.js";
+
 export const ROUTE_REVISION_SUMMARY_VERSION = "route-revision-summary-v1";
 
 function stopKey(stop = {}) {
@@ -136,6 +138,7 @@ export function summarizeRouteRevision({
     nextAction: nextAction(counts),
     counts,
     totalChanges: changes.length,
+    decision: routeRevisionDecision({ counts, totalChanges: changes.length }),
     changes: changes.slice(0, 8),
   };
 }

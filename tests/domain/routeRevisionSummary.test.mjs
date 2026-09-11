@@ -43,6 +43,8 @@ test("summarizes added, removed, moved and resized route revision changes", () =
   assert.equal(summary.counts.moved, 1);
   assert.equal(summary.counts.resized, 1);
   assert.equal(summary.counts.unchanged, 0);
+  assert.equal(summary.decision.urgency, "high");
+  assert.equal(summary.decision.shouldNotify, true);
   assert.match(summary.headline, /yeniden dengelendi/);
   assert.ok(summary.changes.some((change) => change.type === "resized" && change.delta.questions === 10));
 });
@@ -53,6 +55,7 @@ test("keeps a quiet summary when the route did not materially change", () => {
 
   assert.equal(summary.changed, false);
   assert.equal(summary.totalChanges, 0);
+  assert.equal(summary.decision.shouldCreateRevision, false);
   assert.equal(summary.counts.unchanged, 1);
   assert.match(summary.nextAction, /Mevcut plana devam/);
 });
