@@ -1,7 +1,8 @@
 # Tasarım aktarımı — durum notu
 
-**Tarih:** 2026-09-11 · **Dal:** `main` (push edilmiş) · **Toplam:** 46 CLD commit, bu oturumda 12
-**Kapılar:** 150/150 test geçiyor · `npm run check` üç kapı temiz · sapma her eksende düştü
+**Tarih:** 2026-09-11 · **Dal:** `main` (push edilmiş) · **Toplam:** 56 CLD commit, bu oturumda 22
+**Kapılar:** 179/179 test · `npm run check` üç kapı temiz · sapma her eksende düştü
+(fontSize −44 · fontFamily −42 · spacing −79 · radius −21 · hex −10)
 
 ---
 
@@ -11,107 +12,127 @@
 
 | Faz | Konu | Durum |
 |-----|------|-------|
-| 1–1.5 | Envanter, akış denetimi, tasarım sistemi | ✅ bitti |
-| 2 | Sekme iskeleti, Ana Sayfa, rota grafiği | ✅ bitti |
-| 3 | Veri girişi (Deneme Gir, Hızlı Ekle) | ✅ bitti (OCR hariç) |
-| 4 | Rota derinliği | ✅ bitti |
-| 5 | Analiz ve yanlış defteri | ✅ bitti |
-| 6 | Plan ve duraklar | ⚠️ 8/10 — Konu Detayı + Ders Konuları kaldı |
-| 7 | Profil ve ayarlar | ⚠️ 1/15 — Profil kökü bitti |
-| 8 | Premium ve ödeme | ⬜ başlanmadı |
-| 9 | Zamana bağlı durumlar, kutlamalar | ⬜ başlanmadı |
-| 10 | Boş/hata bileşenleri | ⬜ başlanmadı |
+| 1–1.5 | Envanter, akış denetimi, tasarım sistemi | ✅ |
+| 2 | Sekme iskeleti, Ana Sayfa, rota grafiği | ✅ |
+| 3 | Veri girişi | ✅ (OCR hariç) |
+| 4 | Rota derinliği | ✅ |
+| 5 | Analiz ve yanlış defteri | ✅ |
+| 6 | Plan ve duraklar | ✅ **10/10** |
+| 7 | Profil ve ayarlar | ⚠️ **7/15** |
+| 8 | Premium ve ödeme | ⬜ |
+| 9 | Zamana bağlı durumlar, kutlamalar | ⬜ |
+| 10 | Boş/hata bileşenleri | ⬜ |
+
+---
+
+## FAZ 7 — biten 7
+
+Profil kökü · Ayarlar · Gizlilik hub'ı · Belge (yeni) · Görünüm ·
+Profil Düzenle · Hedef Düzenle · Şifre/E-posta Değiştir
+
+## FAZ 7 — kalan 8
+
+| Hedef | Durum | Not |
+|--------|-------|-----|
+| **Bildirimler** (gelen kutusu) | 🔴 engelli | tablo yok, aşağıya bak |
+| **Bildirim ayarları** | ekran var, taşınmadı | `NotificationsSettingsScreen` |
+| **Paylaşım Kartı** | ekran var, taşınmadı | `SHARE_CARD` kayıtlı |
+| **Seviye** | ekran yok | `LEVEL` tanımlı değil |
+| **Kilometre Taşı** | ekran yok | `MILESTONE` tanımlı değil |
+| **Neye Göre Öneriyoruz** | ekran yok | `WHY_RECOMMEND` tanımlı değil |
+| **Tarih Seçici** (sheet) | yok | sınav tarihi düzenlemeyi açar |
+| **Ders Programı** | yok | Ayarlar'da satırı yazılmadı |
+| **8 Story kartı** | — | organik büyüme, Paylaşım Kartı ile |
 
 ---
 
 ## Bu oturumda yapılanlar
 
-**Yeni ekranlar**
-- **Deneme Kayıtları** — filtreli, aya gruplu liste; 8 haftalık ücretsiz pencere + `trial_compare` paywall
-- **Konu Borcu** — geçilmeyen durakların saat karşılığı; "dağıt" atlanan durakları `RESCHEDULED`'a taşıyor (sunucuda kalıcı)
-- **Plan vs Gerçek** — plan/gerçek durak hattı, "PLANDA n / GERÇEKTE n", boşluk kapanma süresi
-- **Arama** + **Arama Sonuç Yok** — konu ve yanlış defterinde yerel arama, son aramalar, düzeltme önerisi
-- **Gün Detayı** — takvimde güne dokununca açılan alt sayfa
+**Yeni ekranlar (8):** Deneme Kayıtları · Konu Borcu · Plan vs Gerçek · Arama +
+Sonuç Yok · Gün Detayı · Belge
 
-**Yeniden yazılanlar**
-- **Deneme Karşılaştırma** — GlassCard'dan çıktı, ikili net başlığı + ders tablosu
-- **Program Hub** (PROGRAM kökü) — 94 satır
-- **Takvim** — ay ızgarası `React.memo`, ölü mor HEATMAP gitti
-- **Durak Ekle** — 233 → 142 satır, Zod doğrulaması bağlandı
-- **Profil kökü** — 137 satır, 6 ölü bileşen silindi
-- **Konu İlerlemesi**, **Öncelikli Konular**
+**Yeniden yazılanlar (12):** Deneme Karşılaştırma · Program Hub · Takvim ·
+Durak Ekle · Profil · Konu İlerlemesi · Öncelikli Konular · Ders Konuları ·
+Konu Detayı · Ayarlar · Gizlilik · Görünüm · Profil Düzenle · Hedef Düzenle ·
+Şifre/E-posta Değiştir
 
-**Altyapı**
-- `src/themes/subjectPalette.js` — ders anahtarı → yeni palet köprüsü (4 test)
-- `src/domain/route/planVsActual.js` (6 test), `src/lib/searchIndex.js` (7 test)
-- `TYPOGRAPHY.statPair/tableValue/tableHead/metaSemiBold`, `StatBlock size="page"`
+**Altyapı:** `subjectPalette.js` (ders anahtarı → yeni palet köprüsü) ·
+`legalDocs.js` (yasal metin tek kaynak) · `planVsActual.js` · `searchIndex.js` ·
+palette'e `scrim`/`scrimSoft` · `StatBlock` `page`/`count` boyutları ·
+`TYPOGRAPHY.statPair`/`tableValue`/`tableHead`/`metaSemiBold` ·
+`changePasswordSchema` · `editProfileSchema`
 
----
+**Denetim raporu (tasarım tarafı) kapandı:** hedef net kalıcılığı (P1) ·
+11px tabanı (P2) · satır içi `rgba` (P2) · çift ders paleti (P3) ·
+AGENTS.md state dokümanı (P2)
 
-## Sırada ne var
-
-**1. FAZ 6'nın kalanı** (ajanlar oturum limitine takıldı, limit 17:10'da açılıyor)
-- **Konu Detayı** (`TopicStudyScreen.js`) — ~277. satırda `C.purple`, ~302'de `C.blue` ölü takma adları var
-- **Ders Konuları** (`SubjectDetailScreen.js`, 321 satır) — ünite gruplaması müfredatta YOK, düz liste olacak
-
-**2. FAZ 7 — Ayarlar ve belgeler (14 hedef)**
-Ayarlar · Profil Düzenle · Bildirimler · Görünüm · Gizlilik · Belge · Hedef Düzenle · Paylaşım Kartı · Seviye · Kilometre Taşı · Neye Göre Öneriyoruz · Veri İndir · Hesap Silme · Şifre/E-posta değiştir.
-KVKK belgeleri, hesap silme ve veri indirme **yayın için zorunlu**.
-
-**3. FAZ 8 — Premium** · **FAZ 9 — Zamana bağlı** · **FAZ 10 — Boş/hata**
-
-**4. Animasyonlar** — `animate-expo` + `emil-design-eng`, tasarım oturduktan sonra tek geçişte (anlaşıldığı gibi)
+**Migration'lar:** ikisi de canlıya uygulandı ve doğrulandı
+(`user_tasks.task_time`+`series_id`, `product_features` iki paywall anahtarı).
+`pending/` boş.
 
 ---
 
-## Migration'lar: ikisi de uygulandı ✅
+## Sende duran kararlar
 
-Chrome bağlantısı geldiği an tarayıcıdan Supabase SQL editörüne bağlanıp
-ikisini de uyguladım (2026-09-11, proje `zrycqfehhyjrsujmajpf`).
-
-### A) `user_tasks` — `task_time` + `series_id`
-`supabase/migrations/20260911120000_user_tasks_time_and_repeat.sql`
-"Success. No rows returned." REST ile bağımsız doğrulandı: sorgu 42703
-(kolon yok) yerine 42501 (anon yetkisi yok) dönüyor — kolonlar var, RLS hâlâ kapalı.
-
-### B) `product_features` — iki paywall anahtarı
-`supabase/migrations/20260911130000_product_features_extend.sql`
-Üzerine yazmadan önce canlı fonksiyonun yerel dosyayla birebir aynı olduğu
-doğrulandı (uzunluk 1795, `monthlyReport` var, `topicProgress` yok,
-`first_week OR pro` 9 kez). Sonrasında: dört kontrol de `true`,
-`first_week OR pro` 9 → 11 (tam olarak eklenen iki özellik).
-
-`src/constants/premium.js` artık gerçek anahtarları kullanıyor —
-`topic_progress` ve `department_threshold` `routePriorities`'e eşlenmiş
-değil. Bekleyen migration kalmadı.
-
-**Kalan tek iş:** Durak Ekle'nin Saat + "Her hafta tekrarla" satırlarını
-yazmak. Kolonlar artık hazır.
+1. **KVKK aydınlatma metni — yayın engeli.** Tasarım satırı gösteriyor, içerik
+   yok. Yasal metin uyduramam. `src/constants/legalDocs.js`'e eklediğin an satır
+   kendiliğinden görünür.
+2. **Bildirim gelen kutusu.** Tasarımın "Bildirimler"i ayar değil gelen kutusu.
+   Arkasında hiçbir şey yok: tablo, RLS, üreticiler (rota değişti / tekrar
+   zamanı / hafta kapandı), okundu durumu. UI aktarımı değil, yeni sistem →
+   Codex. `EMPTY_COPY.notifications` hazır bekliyor.
+3. **Bölüm seçici yok.** `target_department` yazılabilir ama onu değiştiren
+   arayüz hiçbir yerde yok (grep'le doğrulandı). `useThresholdView` ve band notu
+   ona bağlı. Seçici yazılsın mı, yoksa kurulumda mı sorulsun?
 
 ---
 
 ## Bilinen borç
 
-- **`curriculum.js` ölü palet taşıyor** — her dersin yanında eski hex (`#60a5fa`, `#fb923c`). `getSubjectColor` ölü renk döndürüyor, ~18 çağrı yeri. Köprü kuruldu, süpürme açık.
-- **`HomeScreen.js` 307 satır** (limit 150)
-- **Yanlış defteri token borcu** — satır içi hex+alpha, `SHADOWS.orange`
-- **OCR** (Fotoğraftan Oku / Okuma Onayı) — arkasında çalışan bir özellik yok
-- **Topluluk kodu wrong-notebook'ta hâlâ duruyor** — App Store 1.2 kullanıcı içeriği varsa bildirme/engelleme istiyor. Yayın öncesi karar.
+- **`curriculum.js` ölü palet taşıyor** — her dersin yanında eski hex
+  (`#60a5fa`, `#fb923c`). `getSubjectColor` ölü renk döndürüyor, ~18 çağrı yeri.
+  Köprü kuruldu (`subjectPalette.js`), süpürme açık.
+- **`GlassCard` 3 dosyada kaldı** — hepsi `src/screens/analytics/`
+  (`ComparativeScreen`, `PersonalBests`, `SubjectProgress`). Tasarımda bu ekranın
+  karşılığı yok, o yüzden sıraya alınmadı.
+- **150 satır üstü:** `HomeScreen` 307 · `TodayPlanCard` 330 ·
+  `AddWrongScreen` 414 · `AddStudyScreen` 344 · `TrialInsightsScreen` 316.
+  Sosyal olanlar (`FriendsScreen` 415, `ReferralScreen` 399) v1 dışı.
+- **OCR** — arkasında çalışan özellik yok.
+- **`updateRanking` ölü** — sıralama seçici kaldırıldı, çağrı yeri kalmadı.
+  ExamContext'te duruyor (Codex alanı).
+- **Topluluk kodu wrong-notebook'ta** — App Store 1.2 kullanıcı içeriği varsa
+  bildirme/engelleme istiyor. Yayın öncesi karar.
 - **Hiçbir şey cihazda çalıştırılmadı** — Expo'yu sen açana kadar beklemede.
 
 ---
 
 ## Uydurma veri yerine çıkarılanlar
 
-Tasarımda görünen ama arkasında veri olmayan alanlar — sayı uydurmak yerine gösterilmedi:
+Tasarımda görünüp arkasında hesap olmayan alanlar. Sayı uydurmak yerine
+gösterilmedi:
 
 | Alan | Neden |
 |------|-------|
 | Program Hub "12/18 durak" | geçmiş günlerin planlanan durak sayısı saklanmıyor |
 | Takvim "Planlanan" süre | rastgele bir günün planlanan süresi yok |
 | Durak Ekle "N konu kaldı" | ders başı kalan konu sayısı kaynağı yok |
-| Öncelikli Konular "Uzun süredir yok" | **doğruluk** kademesini **tazelik** iddiası gibi gösteriyordu |
-| Konu Borcu "%18 azaldı" | bunu üretecek hesap yok |
-| Konu Borcu "Sayfayı temizle" | ne bayrak ne RPC var |
+| Durak Ekle Saat + haftalık tekrar | **artık kolonlar var**, yazılabilir |
+| Öncelikli Konular "Uzun süredir yok" | doğruluk kademesini tazelik gibi gösteriyordu |
+| Konu Borcu "%18 azaldı" / "Sayfayı temizle" | hesap yok / bayrak-RPC yok |
+| Ders Konuları ünite başlıkları | curriculum'da ünite kavramı yok |
+| Konu Detayı "Geçilen durak" | konu başı durak sayısı kaynağı yok |
+| Profil Düzenle SINIF + KULLANICI ADI | `grade`/`username` kolonu yok |
+| Hedef Düzenle "5 duraktan 6 durağa" | böyle bir simülasyon yok |
+| Gizlilik "Kullanım verisi paylaşımı" | analytics opt-out tercihi yok |
+| Görünüm "Gece 23.00'ten sonra koyu" | zamanlayıcı/tercih yok |
 
-Ayrıca düzeltilen iki yanlış eşleme: `TrialInsightsScreen` ≠ Deneme Kayıtları, `ComparativeScreen` ≠ Plan vs Gerçek. İkisi de ayrı gerçek ekranlar; tasarımın karşılıkları yeni dosya olarak yazıldı.
+Düzeltilen yanlış eşlemeler: `TrialInsightsScreen` ≠ Deneme Kayıtları ·
+`ComparativeScreen` ≠ Plan vs Gerçek. İkisi de ayrı gerçek ekranlar; tasarımın
+karşılıkları yeni dosya olarak yazıldı.
+
+**Ajan çıktılarında yakalanan sessiz işlev kayıpları:** Hedef Düzenle'de günlük
+soru hedefi düzenlemesi (Ayarlar satırı çıkmaz sokak oluyordu) · Ayarlar'da 8
+ekranın tek giriş noktasının silinmesi · senkron notunun `goBack`'ten önce set
+edilip hiç görünmemesi (iki ayrı ekranda) · `TrialPickerModal` zemininin
+şeffaf kalması.
