@@ -6,6 +6,8 @@ const source = readFileSync(new URL("../../src/supabase/xp.js", import.meta.url)
 
 test("XP totals fallback paginates until exhausted instead of capping rows", () => {
   assert.doesNotMatch(source, /MAX_XP_ROWS/);
+  assert.match(source, /async function sumXpAmountsForUser/);
   assert.match(source, /for \(let from = 0; ; from \+= PAGE_SIZE\)/);
   assert.match(source, /if \(page\.length < PAGE_SIZE\) break/);
+  assert.match(source, /sumXpAmountsForUser\(userId, \(query\) => query\.gte\("created_at", weekStart\)\)/);
 });

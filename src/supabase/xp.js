@@ -42,29 +42,15 @@ function isMissingFunction(e) {
 // olursa olsun XP hiçbir zaman 0'a düşmez.
 const PAGE_SIZE = 1000;
 
-async function totalsFromClient(userId) {
-  // Hafta sınırı SUNUCUYLA AYNI olmalı: sunucu date_trunc('week', ... TR)
-  // kullanıyor. Burada cihazın yerel Pazartesi'si hesaplanıyordu; yurtdışındaki
-  // kullanıcıda haftalık XP ile lig sıralaması uyuşmuyordu.
-  const weekStart = startOfWeekTR();
-
-  // Haftalık: sunucu tarafında filtrele, küçük sonuç döner.
-  const weeklyRes = await supabase
-    .from("xp_events")
-    .select("amount")
-    .eq("user_id", userId)
-    .gte("created_at", weekStart);
-  if (weeklyRes.error) throw weeklyRes.error;
-
-  // Toplam: sayfalayarak topla. Önceden tek .limit(5000) vardı ve SIRALAMA
-  // YOKTU — 5000'den fazla olayı olan kullanıcıda Postgres rastgele 5000 satır
-  // döndürüyor, toplam XP sessizce eksik çıkıyordu.
+async function sumXpAmountsForUser(userId, configure = (query) => query) {
   let total = 0;
   for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from("xp_events")
-      .select("amount")
-      .eq("user_id", userId)
+    const { data, error } = await configure(
+      supabase
+        .from("xp_events")
+        .select("amount")
+        .eq("user_id", userId),
+    )
       .order("created_at", { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
@@ -72,8 +58,23 @@ async function totalsFromClient(userId) {
     total += sumAmounts(page);
     if (page.length < PAGE_SIZE) break;
   }
+  return total;
+}
 
-  return { total, weekly: sumAmounts(weeklyRes.data || []) };
+async function totalsFromClient(userId) {
+  // Hafta sınırı SUNUCUYLA AYNI olmalı: sunucu date_trunc('week', ... TR)
+  // kullanıyor. Burada cihazın yerel Pazartesi'si hesaplanıyordu; yurtdışındaki
+  // kullanıcıda haftalık XP ile lig sıralaması uyuşmuyordu.
+  const weekStart = startOfWeekTR();
+
+  // Toplam ve haftalık: ikisi de sayfalanmalı. PostgREST proje row limit'i tek
+  // select'i kesebilir; haftalık değer de çok aktif kullanıcıda eksik kalabilir.
+  const [total, weekly] = await Promise.all([
+    sumXpAmountsForUser(userId),
+    sumXpAmountsForUser(userId, (query) => query.gte("created_at", weekStart)),
+  ]);
+
+  return { total, weekly };
 }
 
 // Tek çağrıda hem toplam hem haftalık XP. Toplama sunucuda yapılır —

@@ -31,6 +31,8 @@ test("trial subject export chunks and paginates in-filters", () => {
   assert.match(source, /async function fetchInAll/);
   assert.match(source, /values\.slice\(i, i \+ IN_FILTER_CHUNK\)/);
   assert.match(source, /\.in\(column, chunk\)/);
+  assert.match(source, /\.order\(column, \{ ascending: true \}\)/);
+  assert.match(source, /\.order\("id", \{ ascending: true \}\)/);
   assert.match(source, /\.range\(from, from \+ PAGE - 1\)/);
   assert.match(source, /fetchInAll\("trial_subjects", "trial_id", trialIds\)/);
 });

@@ -60,3 +60,5 @@
 
 - Sunucu RPC yokken kullanılan XP fallback'i “geçici” olsa bile satır limitiyle toplam üretmemeli. Kullanıcı çok aktifse 5000 kayıt üstü toplamlar eksik görünür.
 - Fallback kodlarında yorum ile gerçek kontrol koşulu birlikte denetlenmeli; “sayfaladık” deyip döngüyü üst sınırla kesmek sessiz veri eksiltir.
+- Haftalık toplam da tek select olmamalı; PostgREST row limit haftalık XP'yi de kesebilir.
+- Offset pagination kullanılan export okumasında stabil `order(...)` yoksa aynı export içinde sayfa atlama/tekrar riski doğar.

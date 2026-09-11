@@ -103,6 +103,8 @@ async function fetchInAll(table, column, values) {
         .from(table)
         .select("*")
         .in(column, chunk)
+        .order(column, { ascending: true })
+        .order("id", { ascending: true })
         .range(from, from + PAGE - 1);
       if (error) throw error;
       const page = data || [];
