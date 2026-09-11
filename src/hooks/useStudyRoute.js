@@ -20,6 +20,7 @@ import { forecastNet } from "../lib/netForecast";
 import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
 import { routeReadinessSummary } from "../domain/route/routeCreation";
 import { summarizeRouteRevision } from "../domain/route/routeRevisionSummary";
+import { routePersistenceDecision } from "../domain/route/routePersistenceDecision";
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
@@ -231,12 +232,18 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   useEffect(() => {
     if (!persist || !user?.id || !examType || !hasRouteAccess || isPaused) return;
     if (!computedRoute.weeks?.length) return;
+    const persistence = routePersistenceDecision({
+      mode: "auto",
+      routeCreated,
+      revisionSummary: routeRevisionPreview,
+    });
+    if (!persistence.shouldPersist) return;
     saveRouteWeeks(user.id, computedRoute.weeks, examType, computedRoute.revision)
       .then(() => getLatestRouteStops(user.id, examType))
       .then(setPersistedStops)
       .catch(() => {});
   }, [persist, user?.id, examType, hasRouteAccess, isPaused,
-    computedRoute.weeks, computedRoute.revision]);
+    computedRoute.weeks, computedRoute.revision, routeCreated, routeRevisionPreview]);
 
   const createRoute = useCallback(async () => {
     if (!user?.id || !examType || !hasRouteAccess) {
