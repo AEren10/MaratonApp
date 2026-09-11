@@ -195,7 +195,7 @@ async function runOne(item) {
       break;
     }
     case OP_PLAN_TASK:
-      await togglePlanTask(item.payload.taskId, item.payload.completed);
+      await togglePlanTask(item.payload.taskId, item.payload.completed, item.payload.user_id);
       break;
     case OP_REVIEW:
       await reviewWrongQuestion(item.payload.id, item.payload.user_id, item.payload.updates);
@@ -514,9 +514,9 @@ export async function saveReviewOffline(id, userId, updates) {
 }
 
 /** Plan görevi tikini kaydeder; başarısızsa kuyruğa alır. */
-export async function savePlanTaskToggleOffline(taskId, completed) {
+export async function savePlanTaskToggleOffline(taskId, completed, userId = null) {
   try {
-    await togglePlanTask(taskId, completed);
+    await togglePlanTask(taskId, completed, userId);
     return { saved: true, queued: false };
   } catch (e) {
     try {
@@ -525,7 +525,7 @@ export async function savePlanTaskToggleOffline(taskId, completed) {
       await removeFromQueue(`plan_task_${taskId}`);
       await enqueue({
         type: OP_PLAN_TASK,
-        payload: { taskId, completed },
+        payload: { taskId, completed, user_id: userId },
         clientOperationId: `plan_task_${taskId}`,
       });
       return { saved: false, queued: true, error: e };

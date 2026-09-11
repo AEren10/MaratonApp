@@ -157,7 +157,7 @@ export function usePlanCompletion(userId) {
       // Başarısızsa KUYRUĞA girer. Eskiden togglePlanTask hatayı yutuyordu,
       // buradaki .catch de ölü koddu: tik cihazda duruyor ama sunucuda
       // completed sonsuza kadar false kalıyordu (yeni telefonda kayıp).
-      savePlanTaskToggleOffline(dbId, nowDone).catch(() => {});
+      savePlanTaskToggleOffline(dbId, nowDone, userId).catch(() => {});
     }
     if (nowDone) rewardRef.current?.("plan_task_done");
   }, [userId]);

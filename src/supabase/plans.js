@@ -82,13 +82,16 @@ export const completeTask = async (taskId) => {
   }
 };
 
-export const togglePlanTask = async (taskId, completed) => {
+export const togglePlanTask = async (taskId, completed, userId = null) => {
   try {
-    const { error } = await supabase
+    let query = supabase
       .from("plan_tasks")
       .update({ completed })
       .eq("id", taskId);
+    if (userId) query = query.eq("user_id", userId);
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("plan_task_not_found");
   } catch (e) {
     handleSupabaseError(e, "togglePlanTask");
     // FIRLATILMALI. Eskiden yutuluyordu ve handleSupabaseError de fırlatmadığı
