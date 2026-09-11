@@ -8,12 +8,21 @@ const migration = readFileSync(
   new URL("../../supabase/migrations/20260911233239_cdx_scope_route_state_by_exam.sql", import.meta.url),
   "utf8",
 );
+const primaryKeyMigration = readFileSync(
+  new URL("../../supabase/migrations/20260911234250_cdx_restore_route_state_primary_key.sql", import.meta.url),
+  "utf8",
+);
 
 test("route state storage is scoped by user and exam type", () => {
   assert.match(migration, /DROP CONSTRAINT IF EXISTS route_state_pkey/);
   assert.match(migration, /idx_route_state_user_exam/);
   assert.match(migration, /ON public\.route_state \(user_id, exam_type\) NULLS NOT DISTINCT/);
   assert.match(routePlan, /onConflict: "user_id,exam_type"/);
+});
+
+test("route state keeps a surrogate primary key for tooling compatibility", () => {
+  assert.match(primaryKeyMigration, /ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid\(\)/);
+  assert.match(primaryKeyMigration, /ADD CONSTRAINT route_state_pkey PRIMARY KEY \(id\)/);
 });
 
 test("route state reads prefer the current exam state with legacy fallback", () => {

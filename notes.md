@@ -67,6 +67,7 @@
 
 - `route_state` tek `user_id` satırı olarak kalırsa bir sınav tipindeki pause/resume işlemi başka sınav tipinin durumunu ezebilir. Yeni yazımlar `(user_id, exam_type)` scope'uyla yapılmalı.
 - Legacy `exam_type IS NULL` state okunabilir kalmalı; aksi halde eski canlı kullanıcıların dondurulmuş/geri dönüş bilgisi bir anda görünmez olur.
+- `(user_id, exam_type)` unique index yazım scope'u için yeterli olsa da tablo PK'siz bırakılmamalı; PostgREST/tooling/replication gibi yüzeyler için ayrı surrogate `id` primary key daha güvenli.
 
 ## 2026-09-12 — Eski rota haftası temizliği
 
