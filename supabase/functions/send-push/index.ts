@@ -34,7 +34,7 @@ type PushTemplate = {
 // Doğrulandı 2026-09-07: home -> "home", weekly-review -> "weekly-review".
 // routes.js'te bir yol değişirse BURASI DA değişmeli; aksi halde push
 // bildirimi sessizce hiçbir ekrana gitmez.
-const TEMPLATES: Record<ReengagementPayload["type"], PushTemplate> = {
+const TEMPLATES: Partial<Record<ReengagementPayload["type"], PushTemplate>> = {
   inactive_3d: {
     title: "Seni ozledik!",
     body: "3 gundur calisma kaydetmedin. Hedefe kalan her gun onemli!",
@@ -82,6 +82,11 @@ async function sendBatch(messages: PushMessage[]): Promise<void> {
   }
 }
 
+function isExpoPushToken(token: unknown): token is string {
+  return typeof token === "string"
+    && (token.startsWith("ExponentPushToken[") || token.startsWith("ExpoPushToken["));
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -89,12 +94,23 @@ Deno.serve(async (req) => {
 
   const authHeader = req.headers.get("Authorization");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceKey) {
+    console.error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    return new Response("Server not configured", { status: 500 });
+  }
+
   const expectedAuth = `Bearer ${serviceKey}`;
   if (authHeader !== expectedAuth) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const payload = await req.json() as ReengagementPayload;
+  let payload: ReengagementPayload;
+  try {
+    payload = await req.json() as ReengagementPayload;
+  } catch (_) {
+    return new Response("Invalid JSON", { status: 400 });
+  }
+
   const { type, title, body, data, user_ids } = payload;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -141,7 +157,7 @@ Deno.serve(async (req) => {
   const msgData = data || template.data || {};
 
   const messages: PushMessage[] = users
-    .filter((u) => u.expo_push_token?.startsWith("ExponentPushToken["))
+    .filter((u) => isExpoPushToken(u.expo_push_token))
     .filter((u) => notificationAllowed(type, u.notification_prefs))
     .map((u) => ({
       to: u.expo_push_token,
