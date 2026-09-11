@@ -46,6 +46,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.TRIAL_SUMMARY]: { path: "deneme/ozet", flow: PRODUCT_FLOW_IDS.TRIAL_CAPTURE, deepLink: false },
   [SCREENS.TRIAL_COMPARE]: { path: "deneme/karsilastir", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.TRIAL_DETAIL]: { path: "deneme/:id", flow: PRODUCT_FLOW_IDS.QUICK_ENTRY, deepLink: true },
+  [SCREENS.TRIAL_RECORDS]: { path: "deneme/kayitlar", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.TRIAL_INSIGHTS]: { path: "deneme/icgoru", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.WEEKLY_TRIAL_REVIEW]: { path: "deneme/haftalik", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: false },
 

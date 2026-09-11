@@ -105,6 +105,8 @@ export default function AnalysisScreen() {
                   history={analysis.history}
                   onPress={(trial) => go(screens.TRIAL_DETAIL, { trial }, "analysis_history_trial")}
                   onCompare={() => go(screens.TRIAL_COMPARE, undefined, "analysis_trial_compare")}
+                  totalCount={analysis.filteredTrials?.length ?? 0}
+                  onSeeAll={() => go(screens.TRIAL_RECORDS, undefined, "analysis_trial_records")}
                 />
               </AnimatedCard>
 

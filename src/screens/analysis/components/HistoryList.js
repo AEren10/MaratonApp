@@ -46,13 +46,24 @@ function HistoryRow({ item, onPress, C }) {
   );
 }
 
-export function HistoryList({ history, onPress, onCompare }) {
+export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount }) {
   const C = useC();
   return (
     <View style={{ gap: STEP.s2 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 }}>
         <Icon name="clock" size={18} color={C.text2} />
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Geçmiş Denemeler</Text>
+        {onSeeAll && totalCount > history.length && (
+          <Pressable
+            onPress={onSeeAll}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Tüm deneme kayıtları"
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+          >
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Tümü</Text>
+          </Pressable>
+        )}
       </View>
 
       <Card tone="surface" radius="sheet" padded={false}>

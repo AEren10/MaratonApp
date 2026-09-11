@@ -35,6 +35,7 @@ export const SCREENS = {
   TRIAL_SUMMARY: "TrialSummary",
   TRIAL_DETAIL: "TrialDetail",
   TRIAL_COMPARE: "TrialCompare",
+  TRIAL_RECORDS: "TrialRecords",
   SUBJECT_DETAIL: "SubjectDetail",
   SUBJECT_LIST: "SubjectList",
   WEAK_AREAS: "WeakAreas",

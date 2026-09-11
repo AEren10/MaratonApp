@@ -45,7 +45,8 @@ export const PROGRAM_STACK = [
 ];
 
 export const ANALIZ_STACK = [
-  SCREENS.TRIAL_INSIGHTS,   // Deneme Kayitlari
+  SCREENS.TRIAL_RECORDS,    // Deneme Kayitlari (tasarim: filtreli, aya gruplu liste)
+  SCREENS.TRIAL_INSIGHTS,   // Deneme Icgorusu (ayri ekran, tasarim karsiligi yok)
   SCREENS.SUBJECT_LIST,     // Konu Ilerlemesi
   SCREENS.TRIAL_COMPARE,    // Deneme Karsilastirma
   SCREENS.TRIAL_DETAIL,     // Deneme Detayi
