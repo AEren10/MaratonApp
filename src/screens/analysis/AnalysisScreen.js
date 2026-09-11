@@ -1,13 +1,10 @@
 import React, { useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, RefreshControl } from "react-native";
+import { View, Text, StyleSheet, RefreshControl } from "react-native";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TYPOGRAPHY, SPACING, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
-import { EmptyState } from "../../components/common/EmptyState";
-import { SectionLabel } from "../../components/design";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { SectionLabel, Button, EmptyState, Skeleton } from "../../components/design";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { AnimatedCard } from "../../components/design/AnimatedCard";
 
@@ -24,12 +21,12 @@ import { useAnalysisController } from "./useAnalysisController";
 
 function AnalysisSkeleton() {
   return (
-    <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.xl }}>
-      <SkeletonCard height={28} width={80} rounded={8} />
-      <SkeletonCard height={48} />
-      <SkeletonCard height={120} />
-      <SkeletonCard height={160} />
-      <SkeletonCard height={200} />
+    <View style={{ paddingHorizontal: STEP.s3, paddingTop: STEP.s5, gap: STEP.s4 }}>
+      <Skeleton height={28} width={80} radius={8} />
+      <Skeleton height={48} />
+      <Skeleton height={120} />
+      <Skeleton height={160} />
+      <Skeleton height={200} />
     </View>
   );
 }
@@ -63,7 +60,6 @@ export default function AnalysisScreen() {
   return (
     <SwipeToHome>
     <SafeAreaView edges={["top"]} style={s.safe}>
-      <GlowBackground blobs={WARM_GLOW} />
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
@@ -76,12 +72,8 @@ export default function AnalysisScreen() {
         <View style={s.content}>
           {analysis.empty ? (
             <EmptyState
-              icon="chart"
-              title="İlk deneme sonucunu gir"
-              message={filter === "ALL" ? "Net trendin, ders bazlı analizin ve gelişim grafiklerin burada olacak" : `${filter} denemeni gir, karşılaştırmaya başlayalım`}
-              actionLabel="Deneme Gir"
-              onAction={() => go(screens.TRIAL_ENTRY, undefined, "analysis_empty_trial_entry")}
-              color="accent"
+              preset="analysisThin"
+              onPrimary={() => go(screens.TRIAL_ENTRY, undefined, "analysis_empty_trial_entry")}
             />
           ) : (
             <>
@@ -138,16 +130,17 @@ export default function AnalysisScreen() {
         onAction={handleNudgeAction}
       />
 
-      <Pressable
-        accessibilityRole="button"
+      <Button
+        variant="primary"
+        size="lg"
+        icon="plus"
+        onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_fab_trial_entry")}
         accessibilityLabel="Deneme Gir"
         accessibilityHint="Yeni deneme sonucu giriş ekranına gider"
-        onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_fab_trial_entry")}
-        style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
+        style={s.fab}
       >
-        <Icon name="plus" size={22} color={C.textOnFill} sw={2.5} />
-        <Text style={s.fabText}>Deneme Gir</Text>
-      </Pressable>
+        Deneme Gir
+      </Button>
     </SafeAreaView>
     </SwipeToHome>
   );
@@ -156,23 +149,13 @@ export default function AnalysisScreen() {
 function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 176 },
-    title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: SPACING.lg, marginBottom: SPACING.xl },
-    content: { gap: SPACING.xl },
+    scroll: { paddingHorizontal: STEP.s3, paddingBottom: 176 },
+    title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: STEP.s3, marginBottom: STEP.s4 },
+    content: { gap: STEP.s4 },
     fab: {
       position: "absolute",
       bottom: 90,
-      right: SPACING.md,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: SPACING.sm,
-      backgroundColor: C.accent,
-      paddingHorizontal: SPACING.xl,
-      paddingVertical: SPACING.md,
-      borderRadius: 999,
-      ...SHADOWS.fab,
+      right: STEP.s2,
     },
-    fabPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
-    fabText: { ...TYPOGRAPHY.button, color: C.textOnFill },
   });
 }
