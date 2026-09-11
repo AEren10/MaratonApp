@@ -3,10 +3,9 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon } from "../../components/design";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { Icon, Skeleton, ErrorState } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getStudyLogs } from "../../supabase/studyLogs";
@@ -16,6 +15,7 @@ import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { SCREENS } from "../../constants/screens";
 import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
+import { DayDetailSheet } from "./components/DayDetailSheet";
 import { MonthStats } from "./components/MonthStats";
 import { useCalendarTasks } from "../../hooks/useCalendarTasks";
 import { dateKey } from "../../lib/dateUtils";
@@ -45,6 +45,8 @@ function CalendarScreenInner() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [selectedDay, setSelectedDay] = useState(() => toIsoDate(new Date()));
+  const [sheetDay, setSheetDay] = useState(null);
+  const [reloadTick, setReloadTick] = useState(0);
   const { tasks: calendarTasks, addTask, toggleTask, removeTask } = useCalendarTasks();
 
   const monthStart = useMemo(() => startOfMonth(monthDate), [monthDate]);
@@ -60,7 +62,7 @@ function CalendarScreenInner() {
       .catch((e) => { if (!cancelled) { setLogs([]); setLoadError(e?.message || "Veriler yüklenemedi"); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [user?.id, monthStart, monthEnd]);
+  }, [user?.id, monthStart, monthEnd, reloadTick]);
 
   const dayMap = useMemo(() => {
     const map = {};
@@ -98,54 +100,37 @@ function CalendarScreenInner() {
   const nextMonth = useCallback(() => {
     setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
   }, []);
+  const closeSheet = useCallback(() => setSheetDay(null), []);
 
   const selectedDayData = dayMap[selectedDay];
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
-      {/* Header */}
       <View style={s.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={12}
-          accessibilityLabel="Geri"
-          accessibilityRole="button"
-          style={s.backBtn}
-        >
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={s.backBtn}>
           <Icon name="arrowL" size={18} color={C.text} />
         </Pressable>
         <Text style={s.title}>Takvim</Text>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        {/* Month navigation */}
         <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.monthHeader}>
-          <Pressable
-            onPress={prevMonth}
-            hitSlop={12}
-            accessibilityLabel="Önceki ay"
-            accessibilityRole="button"
-            style={s.monthBtn}
-          >
-            <Icon name="arrowL" size={16} color={C.sec} />
+          <Pressable onPress={prevMonth} hitSlop={12} accessibilityLabel="Önceki ay" accessibilityRole="button" style={s.monthBtn}>
+            <Icon name="arrowL" size={16} color={C.text3} />
           </Pressable>
           <Text style={s.monthLabel}>{monthLabel(monthDate)}</Text>
-          <Pressable
-            onPress={nextMonth}
-            hitSlop={12}
-            accessibilityLabel="Sonraki ay"
-            accessibilityRole="button"
-            style={s.monthBtn}
-          >
-            <Icon name="arrowR" size={16} color={C.sec} />
+          <Pressable onPress={nextMonth} hitSlop={12} accessibilityLabel="Sonraki ay" accessibilityRole="button" style={s.monthBtn}>
+            <Icon name="arrowR" size={16} color={C.text3} />
           </Pressable>
         </Animated.View>
 
         {loading ? (
-          <View style={{ gap: SPACING.md }}>
-            <SkeletonCard height={240} />
-            <SkeletonCard height={80} />
+          <View style={{ gap: STEP.s2 }}>
+            <Skeleton height={280} radius={SHAPE.panel} />
+            <Skeleton height={80} radius={SHAPE.panel} />
           </View>
+        ) : loadError ? (
+          <ErrorState preset="server" onPrimary={() => setReloadTick((n) => n + 1)} />
         ) : (
           <>
             <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
@@ -155,19 +140,19 @@ function CalendarScreenInner() {
                 selectedDay={selectedDay}
                 onSelect={setSelectedDay}
                 dailyGoal={dailyGoal}
-                calendarTasks={calendarTasks}
               />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()}>
+            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={{ marginTop: STEP.s3 }}>
               <MonthStats stats={monthStats} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
+            <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={{ marginTop: STEP.s3 }}>
               <DayDetails
                 day={selectedDay}
                 data={selectedDayData}
                 onTrialPress={(t) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: t })}
+                onOpenDetail={setSheetDay}
                 calendarTasks={calendarTasks[selectedDay] || []}
                 onAddTask={addTask}
                 onToggleTask={toggleTask}
@@ -177,6 +162,20 @@ function CalendarScreenInner() {
           </>
         )}
       </ScrollView>
+
+      {sheetDay ? (
+        <DayDetailSheet
+          key={sheetDay}
+          day={sheetDay}
+          data={dayMap[sheetDay]}
+          calendarTasks={calendarTasks[sheetDay] || []}
+          visible={!!sheetDay}
+          onClose={closeSheet}
+          onAddTask={addTask}
+          onToggleTask={toggleTask}
+          onRemoveTask={removeTask}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -195,14 +194,14 @@ function makeStyles(C) {
     header: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 14,
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
+      gap: STEP.s2,
+      paddingHorizontal: GUTTER,
+      paddingVertical: STEP.s2,
     },
     backBtn: {
       width: 38,
       height: 38,
-      borderRadius: 12,
+      borderRadius: SHAPE.iconBox,
       backgroundColor: C.surface,
       borderWidth: 1,
       borderColor: C.border,
@@ -210,26 +209,23 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     title: {
-      fontFamily: "Bricolage_400",
-      fontSize: 19,
-      lineHeight: 24,
-      letterSpacing: -0.3,
+      ...TYPOGRAPHY.subheading,
       color: C.text,
     },
     scroll: {
-      paddingHorizontal: SPACING.lg,
+      paddingHorizontal: GUTTER,
       paddingBottom: 100,
     },
     monthHeader: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: SPACING.lg,
+      marginBottom: STEP.s3,
     },
     monthBtn: {
       width: 34,
       height: 34,
-      borderRadius: 10,
+      borderRadius: SHAPE.iconBox,
       backgroundColor: C.surface,
       borderWidth: 1,
       borderColor: C.border,
@@ -237,9 +233,7 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     monthLabel: {
-      fontFamily: "Bricolage_400",
-      fontSize: 17,
-      lineHeight: 22,
+      ...TYPOGRAPHY.topicName,
       color: C.text,
       textTransform: "capitalize",
     },

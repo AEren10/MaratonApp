@@ -1,6 +1,7 @@
+import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
-import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Card, Icon, EmptyState } from "../../../components/design";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../../domain/trial/trialTypes";
@@ -13,181 +14,100 @@ function formatDayLabel(iso) {
     .toUpperCase();
 }
 
-function isToday(iso) {
-  return iso === todayTR();
+function formatTime(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function SectionLabel({ label, C }) {
-  return (
-    <Text
-      style={{
-        fontFamily: "Archivo_600",
-        fontSize: 11,
-        lineHeight: 14,
-        letterSpacing: 1.3,
-        color: C.muted,
-        marginBottom: 12,
-        marginTop: 22,
-      }}
-    >
-      {label}
-    </Text>
-  );
+function totalMinutesLabel(min) {
+  if (!min) return null;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h > 0) return `${h} sa${m ? ` ${m} dk` : ""}`;
+  return `${m} dk`;
 }
 
-function LogCard({ log, C }) {
-  const subj = getSubjectByKey(log.subject) || { label: log.subject, color: C.amber };
-  const detail = [
-    log.question_count > 0 ? `${log.question_count} soru` : null,
-    log.duration_minutes > 0 ? `${log.duration_minutes}dk` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
+function SlotRow({ time, color, name, dur, muted, C }) {
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-        borderRadius: 14,
-        paddingVertical: 13,
-        paddingHorizontal: 14,
-        gap: 12,
-      }}
-    >
-      <View
-        style={{
-          width: 8,
-          height: 38,
-          borderRadius: 4,
-          backgroundColor: subj.color,
-        }}
-      />
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 14, lineHeight: 18, color: C.text }}>
-          {subj.label}
-        </Text>
-        {detail ? (
-          <Text style={{ fontFamily: "Archivo_400", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
-            {detail}
-          </Text>
-        ) : null}
-      </View>
+    <View style={[rowStyle, { borderTopColor: C.line }]}>
+      <Text style={[TYPOGRAPHY.micro, { color: C.text3, width: 40, fontVariant: ["tabular-nums"] }]}>{time}</Text>
+      <View style={{ width: 7, height: 7, borderRadius: 1, backgroundColor: color }} />
+      <Text style={[TYPOGRAPHY.tableName, { color: muted ? C.text3 : C.text, flex: 1 }]} numberOfLines={1}>
+        {name}
+      </Text>
+      {dur ? <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{dur}</Text> : null}
     </View>
   );
 }
 
-function TrialCard({ trial, C, onPress }) {
-  const meta = getTrialTypes(C)[trial.trialType];
-  const color = meta?.color || C.amber;
-  return (
-    <Pressable
-      onPress={() => onPress?.(trial)}
-      style={({ pressed }) => ({
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-        borderRadius: 14,
-        padding: SPACING.md,
-        paddingHorizontal: 14,
-        gap: 9,
-        opacity: pressed ? 0.65 : 1,
-      })}
-    >
-      <View style={{ width: 8, height: 38, borderRadius: 4, backgroundColor: color }} />
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 14, lineHeight: 18, color: C.text }}>
-          {meta?.label || trial.name || "Deneme"}
-        </Text>
-        <Text style={{ fontFamily: "Archivo_400", fontSize: 12, lineHeight: 16, color: C.muted, marginTop: 2 }}>
-          {trial.totalNet?.toFixed(1) || "0.0"} net
-        </Text>
-      </View>
-      <Icon name="chevR" size={14} color={C.muted} />
-    </Pressable>
-  );
-}
+const rowStyle = { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingVertical: 11, borderTopWidth: 1 };
 
-export function DayDetails({ day, data, onTrialPress, calendarTasks = [], onAddTask, onToggleTask, onRemoveTask }) {
+export function DayDetails({ day, data, onTrialPress, onOpenDetail, calendarTasks = [], onAddTask, onToggleTask, onRemoveTask }) {
   const C = useC();
-  const today = isToday(day);
-  const hasLogs = data?.logs?.length > 0;
-  const hasTrials = data?.trials?.length > 0;
-  const isEmpty = !hasLogs && !hasTrials && !calendarTasks.length;
+  const today = day === todayTR();
+  const trialTypes = useMemo(() => getTrialTypes(C), [C]);
+
+  const slots = useMemo(() => {
+    const logSlots = (data?.logs || []).map((l) => {
+      const subj = getSubjectByKey(l.subject);
+      return {
+        key: `l_${l.id}`,
+        time: formatTime(l.created_at),
+        color: subj?.color || C.accent,
+        name: `${subj?.label || l.subject}${l.topic ? ` · ${l.topic}` : ""}`,
+        dur: totalMinutesLabel(l.duration_minutes ?? l.duration),
+      };
+    });
+    const trialSlots = (data?.trials || []).map((t) => ({
+      key: `t_${t.id}`,
+      time: formatTime(t.created_at),
+      color: trialTypes[t.trialType]?.color || C.accent,
+      name: trialTypes[t.trialType]?.label || t.name || "Deneme",
+      dur: `${t.totalNet?.toFixed(1) || "0.0"} net`,
+      trial: t,
+    }));
+    return [...logSlots, ...trialSlots];
+  }, [data, trialTypes, C.accent]);
+
+  const isEmpty = slots.length === 0 && !calendarTasks.length;
+  const totalMin = data?.totalMinutes || 0;
 
   return (
-    <View style={{ marginTop: 22 }}>
-      {/* Section date label */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.sm }}>
-        <Text
-          style={{
-            fontFamily: "Archivo_600",
-            fontSize: 11,
-            lineHeight: 14,
-            letterSpacing: 1.3,
-            color: C.muted,
-          }}
-        >
-          {formatDayLabel(day)}
-        </Text>
-        {today && (
-          <View
-            style={{
-              paddingHorizontal: SPACING.sm,
-              paddingVertical: 3,
-              borderRadius: RADIUS.pill,
-              backgroundColor: C.accentLight,
-            }}
-          >
-            <Text style={{ fontFamily: "Archivo_600", fontSize: 10, color: C.accent }}>BUGÜN</Text>
-          </View>
-        )}
+    <Card tone="surface" radius="panel">
+      <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1 }}>
+        <Text style={[TYPOGRAPHY.topicName, { color: C.text, flex: 1 }]}>{formatDayLabel(day)}</Text>
+        {today ? <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>BUGÜN</Text> : null}
+        {onOpenDetail ? (
+          <Pressable onPress={() => onOpenDetail(day)} hitSlop={10} accessibilityLabel="Gün detayını aç" accessibilityRole="button">
+            <Icon name="chevR" size={16} color={C.text3} />
+          </Pressable>
+        ) : null}
       </View>
 
-      {isEmpty && (
-        <View style={{ alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.xl }}>
-          <Icon name="moon" size={22} color={C.muted} />
-          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.muted }]}>Kayıt yok</Text>
-          <Text style={[TYPOGRAPHY.caption, { color: C.muted, textAlign: "center" }]}>
-            Bu gün çalışma veya deneme kaydın yok
-          </Text>
+      {!isEmpty && (
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 4 }]}>
+          {slots.length} kayıt{totalMin ? ` · ${totalMinutesLabel(totalMin)}` : ""}
+        </Text>
+      )}
+
+      {isEmpty ? (
+        <EmptyState
+          preset="calendarEmptyDay"
+          primary=""
+          secondary=""
+          style={{ paddingVertical: STEP.s3, alignItems: "center" }}
+        />
+      ) : (
+        <View style={{ marginTop: STEP.s1 }}>
+          {slots.map((s) => (
+            <Pressable key={s.key} disabled={!s.trial} onPress={() => s.trial && onTrialPress?.(s.trial)}>
+              <SlotRow time={s.time} color={s.color} name={s.name} dur={s.dur} C={C} />
+            </Pressable>
+          ))}
         </View>
       )}
 
-      {hasTrials && (
-        <>
-          <SectionLabel label="DENEMELER" C={C} />
-          <View style={{ gap: 12 }}>
-            {data.trials.map((t) => (
-              <TrialCard key={t.id} trial={t} C={C} onPress={onTrialPress} />
-            ))}
-          </View>
-        </>
-      )}
-
-      {hasLogs && (
-        <>
-          <SectionLabel label="ÇALIŞMALAR" C={C} />
-          <View style={{ gap: 12 }}>
-            {data.logs.map((l) => (
-              <LogCard key={l.id} log={l} C={C} />
-            ))}
-          </View>
-        </>
-      )}
-
-      <DayTasks
-        date={day}
-        tasks={calendarTasks}
-        onAdd={onAddTask}
-        onToggle={onToggleTask}
-        onRemove={onRemoveTask}
-      />
-    </View>
+      <DayTasks date={day} tasks={calendarTasks} onAdd={onAddTask} onToggle={onToggleTask} onRemove={onRemoveTask} />
+    </Card>
   );
 }

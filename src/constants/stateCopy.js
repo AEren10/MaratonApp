@@ -39,6 +39,12 @@ export const EMPTY_COPY = {
     primary: "Bugünün durağına başla",
     secondary: "Seri nasıl işler",
   },
+  calendarEmptyDay: {
+    title: "Bu gün için henüz durak yok.",
+    body: "İstersen 20 dakikalık bir dönüş durağı ekleyebilirsin.",
+    primary: "Bugüne durak ekle",
+    secondary: "Bu günü boş bırak",
+  },
 };
 
 export const ERROR_COPY = {

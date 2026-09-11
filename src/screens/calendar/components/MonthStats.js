@@ -1,62 +1,35 @@
+import React from "react";
 import { View, Text } from "react-native";
 import { useSelector } from "react-redux";
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { Card } from "../../../components/design";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { selectStreak } from "../../../store/slices/studyLogSlice";
 
-function StatItem({ value, label, isLast, C }) {
+function StatCell({ value, label, C, last }) {
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 14,
-      }}
-    >
-      <Text
-        style={{
-          fontFamily: "Bricolage_400",
-          fontSize: 18,
-          lineHeight: 22,
-          color: C.text,
-        }}
-      >
-        {value}
-      </Text>
-      <Text
-        style={{
-          fontFamily: "Archivo_500",
-          fontSize: 10,
-          lineHeight: 13,
-          color: C.muted,
-          marginTop: 3,
-        }}
-      >
-        {label}
-      </Text>
+    <View style={[styles.cell, !last && { borderRightWidth: 1, borderRightColor: C.line }]}>
+      <Text style={[TYPOGRAPHY.statMedium, { color: C.text, fontVariant: ["tabular-nums"] }]}>{value}</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{label}</Text>
     </View>
   );
 }
 
-export function MonthStats({ stats }) {
+export const MonthStats = React.memo(function MonthStats({ stats }) {
   const C = useC();
   const streak = useSelector(selectStreak);
 
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: C.border,
-        marginBottom: SPACING.lg,
-      }}
-    >
-      <StatItem value={stats.totalQuestions} label="soru" C={C} />
-      <StatItem value={stats.totalTrials} label="deneme" C={C} />
-      <StatItem value={stats.activeDays} label="aktif gün" C={C} />
-      <StatItem value={streak} label="seri" isLast C={C} />
-    </View>
+    <Card tone="surface" radius="panel" padded={false} style={styles.card}>
+      <StatCell value={stats.totalQuestions} label="soru" C={C} />
+      <StatCell value={stats.totalTrials} label="deneme" C={C} />
+      <StatCell value={stats.activeDays} label="aktif gün" C={C} />
+      <StatCell value={streak ?? 0} label="seri" C={C} last />
+    </Card>
   );
-}
+});
+
+const styles = {
+  card: { flexDirection: "row", paddingVertical: STEP.s2 },
+  cell: { flex: 1, alignItems: "center" },
+};

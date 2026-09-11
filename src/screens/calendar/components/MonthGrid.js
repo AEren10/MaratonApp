@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
-import { View, Text, Pressable } from "react-native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import React, { useMemo, useCallback } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { dateKey } from "../../../lib/dateUtils";
+import { getSubjectByKey } from "../../../themes/subjects";
+import { dateKey, todayTR } from "../../../lib/dateUtils";
 
-const WEEKDAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
 function getCalendarDays(monthDate) {
   const year = monthDate.getFullYear();
@@ -20,20 +21,7 @@ function getCalendarDays(monthDate) {
   return days;
 }
 
-function isoDate(d) {
-  return dateKey(d);
-}
-
-function isToday(d) {
-  const t = new Date();
-  return (
-    d.getFullYear() === t.getFullYear() &&
-    d.getMonth() === t.getMonth() &&
-    d.getDate() === t.getDate()
-  );
-}
-
-// Returns 0–3: 0 = no activity, 1 = light, 2 = medium, 3 = heavy
+// 0 = kayit yok, 1 = hafif, 2 = orta, 3 = hedefi tuttu
 function activityLevel(data, dailyGoal) {
   if (!data || data.totalQuestions === 0) return 0;
   const pct = data.totalQuestions / (dailyGoal || 80);
@@ -42,114 +30,102 @@ function activityLevel(data, dailyGoal) {
   return 1;
 }
 
-const HEATMAP = [
-  "transparent",
-  "rgba(139,92,246,0.15)",
-  "rgba(139,92,246,0.35)",
-  "rgba(139,92,246,0.6)",
-];
+// Gunun calisilan derslerinden en fazla 2 nokta — ders baglaminda renk,
+// gun durumunu boyamaz.
+function subjectDots(data) {
+  if (!data?.logs?.length) return [];
+  const seen = [];
+  for (const l of data.logs) {
+    const subj = getSubjectByKey(l.subject);
+    const color = subj?.color;
+    if (color && !seen.includes(color)) seen.push(color);
+    if (seen.length === 2) break;
+  }
+  return seen;
+}
 
-const makeStyles = (C) => ({
-  wrap: {
-    marginBottom: SPACING.lg,
-  },
-  weekRow: {
-    flexDirection: "row",
-    marginBottom: 4,
-  },
-  weekLabel: {
-    fontFamily: "Archivo_600",
-    fontSize: 10,
-    lineHeight: 14,
-    color: C.muted,
-    flex: 1,
-    textAlign: "center",
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  cell: {
-    width: `${100 / 7}%`,
-    aspectRatio: 1,
-    padding: 2,
-  },
-  dayCell: {
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-  dayText: {
-    fontFamily: "Archivo_600",
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  trialDot: {
-    position: "absolute",
-    bottom: 4,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-  },
-});
-
-export function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80, calendarTasks = {} }) {
-  const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
-  const days = getCalendarDays(monthDate);
+function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, onSelect, C, heat }) {
+  const lvl = activityLevel(data, dailyGoal);
+  const dots = subjectDots(data);
+  const bg = lvl > 0 ? heat[lvl] : "transparent";
+  const textColor = lvl > 0 ? C.text : C.text3;
 
   return (
-    <View style={styles.wrap}>
+    <Pressable
+      onPress={() => onSelect(iso)}
+      hitSlop={2}
+      accessibilityRole="button"
+      accessibilityLabel={`${date.getDate()} — güne git`}
+      style={[
+        styles.dayCell,
+        { backgroundColor: bg, borderColor: isSelected ? C.accent : "transparent" },
+        isToday && !isSelected && { borderColor: C.accent, borderStyle: "dashed" },
+      ]}
+    >
+      <Text style={[styles.dayText, { color: textColor }]}>{date.getDate()}</Text>
+      <View style={styles.dotRow}>
+        {dots.map((c) => (
+          <View key={c} style={[styles.dot, { backgroundColor: c }]} />
+        ))}
+      </View>
+    </Pressable>
+  );
+}
+
+export const MonthGrid = React.memo(function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80 }) {
+  const C = useC();
+  const heat = useMemo(() => [null, C.heat1, C.heat3, C.heat4], [C]);
+  const days = useMemo(() => getCalendarDays(monthDate), [monthDate]);
+  const today = todayTR();
+
+  const handleSelect = useCallback((iso) => onSelect(iso), [onSelect]);
+
+  return (
+    <View>
       <View style={styles.weekRow}>
         {WEEKDAYS.map((w) => (
-          <Text key={w} style={styles.weekLabel}>{w}</Text>
+          <Text key={w} style={[styles.weekLabel, { color: C.text3 }]}>{w}</Text>
         ))}
       </View>
       <View style={styles.grid}>
         {days.map((d, i) => {
           if (!d) return <View key={i} style={styles.cell} />;
-          const iso = isoDate(d);
-          const data = dayMap[iso];
-          const lvl = activityLevel(data, dailyGoal);
-          const isSelected = selectedDay === iso;
-          const today = isToday(d);
-          const hasTrial = data?.trials?.length > 0;
-          const hasTask = calendarTasks[iso]?.length > 0;
+          const iso = dateKey(d);
           return (
-            <Pressable
-              key={i}
-              onPress={() => onSelect(iso)}
-              style={[
-                styles.cell,
-                styles.dayCell,
-                { backgroundColor: isSelected ? C.accent : HEATMAP[lvl] },
-                today && !isSelected && { borderWidth: 1, borderColor: C.accent },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.dayText,
-                  { color: isSelected ? C.textOnFill : lvl > 0 ? C.text : C.muted },
-                ]}
-              >
-                {d.getDate()}
-              </Text>
-              <View style={{ position: "absolute", bottom: 4, flexDirection: "row", gap: 3 }}>
-                {hasTrial && (
-                  <View style={[styles.trialDot, { backgroundColor: isSelected ? C.textOnFill : C.teal }]} />
-                )}
-                {hasTask && (
-                  <View style={[styles.trialDot, { backgroundColor: isSelected ? C.textOnFill : C.accent }]} />
-                )}
-              </View>
-            </Pressable>
+            <View key={iso} style={styles.cell}>
+              <DayCell
+                date={d}
+                iso={iso}
+                data={dayMap[iso]}
+                dailyGoal={dailyGoal}
+                isSelected={selectedDay === iso}
+                isToday={iso === today}
+                onSelect={handleSelect}
+                C={C}
+                heat={heat}
+              />
+            </View>
           );
         })}
       </View>
     </View>
   );
-}
+});
+
+const styles = StyleSheet.create({
+  weekRow: { flexDirection: "row", marginBottom: STEP.s1 },
+  weekLabel: { flex: 1, textAlign: "center", ...TYPOGRAPHY.tableHead, letterSpacing: 1.1 },
+  grid: { flexDirection: "row", flexWrap: "wrap" },
+  cell: { width: `${100 / 7}%`, aspectRatio: 1, padding: 2.5 },
+  dayCell: {
+    flex: 1,
+    borderRadius: 13,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  dayText: { ...TYPOGRAPHY.captionMedium, fontVariant: ["tabular-nums"] },
+  dotRow: { flexDirection: "row", gap: 2.5, height: 5, alignItems: "center" },
+  dot: { width: 5, height: 5, borderRadius: 1 },
+});
