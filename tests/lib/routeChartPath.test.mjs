@@ -10,6 +10,7 @@ import {
   splitPastFuture,
   buildMiniChart,
   makeScale,
+  buildChartSummary,
 } from "../../src/lib/routeChartPath.js";
 
 test("scalePoints maps values into viewBox height range", () => {
@@ -100,4 +101,18 @@ test("makeScale bozuk degerleri yok sayar, cokmez", () => {
   assert.equal(sc.min, 5);
   assert.equal(sc.max, 15);
   assert.equal(sc.toY("abc"), null);
+});
+
+// Grafik bir NET grafigi; ozet egilimi anlatmali, dugumleri degil.
+test("buildChartSummary egilimi ve tahmini anlatir", () => {
+  const s = buildChartSummary({ values: [50, 55, 58.25], projection: [71], target: 72 });
+  assert.match(s, /3 ölçüm/);
+  assert.match(s, /8.3 net artış/);
+  assert.match(s, /Tahmin 71 net/);
+  assert.match(s, /Hedef 72 net/);
+});
+
+test("buildChartSummary veri yoksa sakin bir cumle doner", () => {
+  assert.equal(buildChartSummary({ values: [] }), "Net grafiği: henüz veri yok.");
+  assert.equal(buildChartSummary({}), "Net grafiği: henüz veri yok.");
 });

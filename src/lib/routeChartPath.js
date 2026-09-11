@@ -122,3 +122,27 @@ export function makeScale(domainValues, { width, height, padTop = 12, padBottom 
 
   return { min, max, toY, toPoints };
 }
+
+// Net grafiginin ekran okuyucu ozeti. Grafik bir NET grafigi (y ekseni net,
+// x zaman); dugumler tek tek okunmaz, egilim bir cumleyle anlatilir.
+export function buildChartSummary({ values = [], projection = [], target } = {}) {
+  const nums = values
+    .map((v) => (typeof v === "number" ? v : v?.y))
+    .filter((v) => typeof v === "number" && Number.isFinite(v));
+  if (!nums.length) return "Net grafiği: henüz veri yok.";
+
+  const first = nums[0];
+  const last = nums[nums.length - 1];
+  const diff = Math.round((last - first) * 10) / 10;
+  const yon = diff > 0 ? `${diff} net artış`
+    : diff < 0 ? `${Math.abs(diff)} net düşüş`
+    : "değişim yok";
+
+  const son = projection.length ? projection[projection.length - 1] : null;
+  const projeksiyon = typeof son === "number"
+    ? ` Tahmin ${Math.round(son * 10) / 10} net.`
+    : "";
+  const hedef = typeof target === "number" ? ` Hedef ${target} net.` : "";
+
+  return `Net grafiği: ${nums.length} ölçüm, ${first} netten ${last} nete, ${yon}.${projeksiyon}${hedef}`;
+}

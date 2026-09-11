@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { View } from "react-native";
-import Svg, { Path, Circle, Line, Defs, LinearGradient, Stop } from "react-native-svg";
+import Svg, { Path, Circle, Defs, LinearGradient, Stop } from "react-native-svg";
+import { RouteChartLayers } from "./components/RouteChartLayers";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -9,16 +10,15 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
-import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../../domain/route/stopStatus";
 import {
   makeScale,
+  buildChartSummary,
   buildLinePath,
   buildAreaPath,
   buildBandPath,
   estimatePathLength,
   splitPastFuture,
 } from "../../lib/routeChartPath";
-import { RouteChartNode } from "./components/RouteChartNode";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -85,10 +85,10 @@ export function RouteLineChart({ stops = [], todayIndex, projection = [], band, 
   const todayPoint = pastPoints[pastPoints.length - 1];
   const endPoint = futurePoints[futurePoints.length - 1] || todayPoint;
 
-  const summary = useMemo(() => {
-    const done = stops.filter((s) => getEffectiveRouteStopStatus(s.status) === ROUTE_STOP_STATUS.COMPLETED).length;
-    return `Rota ilerlemesi: ${stops.length} duraktan ${done} tanesi tamamlandı.`;
-  }, [stops]);
+  const summary = useMemo(
+    () => buildChartSummary({ values, projection, target }),
+    [values.join(","), projection.join(","), target],
+  );
 
   return (
     <View style={{ width: "100%", aspectRatio: W / H, height, display: "flex" }} accessible accessibilityLabel={summary}>
@@ -100,49 +100,19 @@ export function RouteLineChart({ stops = [], todayIndex, projection = [], band, 
           </LinearGradient>
         </Defs>
 
-        <Path d={areaD} fill="url(#hglow)" />
-        {bandD ? <Path d={bandD} fill={C.accent} fillOpacity={0.1} /> : null}
-        {targetY != null ? (
-          <Line
-            x1={0}
-            y1={targetY}
-            x2={W}
-            y2={targetY}
-            stroke={C.targetLine}
-            strokeWidth={1.5}
-            strokeDasharray="4 6"
-          />
-        ) : null}
-        {futD ? (
-          <Path
-            d={futD}
-            fill="none"
-            stroke={C.proj}
-            strokeWidth={2.4}
-            strokeLinecap="round"
-            strokeDasharray="2 8"
-          />
-        ) : null}
-        {pastD ? (
-          <AnimatedPath
-            d={pastD}
-            fill="none"
-            stroke={C.past}
-            strokeWidth={4.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            animatedProps={animatedProps}
-          />
-        ) : null}
+        <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD} width={W} C={C} />
 
-        {points.map((p, i) => {
-          const stop = stops[i];
-          const isToday = todayIndex != null && i === todayIndex;
-          const effective = isToday
-            ? ROUTE_STOP_STATUS.ACTIVE
-            : getEffectiveRouteStopStatus(stop?.status, { locked: stop?.locked, frozen: stop?.frozen });
-          return <RouteChartNode key={`stop-${i}`} x={p.x} y={p.y} status={effective} C={C} />;
-        })}
+        {pastPoints.slice(0, -1).map((p, i) => (
+          <Circle
+            key={`pt-${i}`}
+            cx={p.x}
+            cy={p.y}
+            r={4.6}
+            fill={C.bg}
+            stroke={C.past}
+            strokeWidth={2.6}
+          />
+        ))}
 
         {endPoint && !projection.length ? null : endPoint ? (
           <Circle cx={endPoint.x} cy={endPoint.y} r={6.5} fill={C.bg} stroke={C.projNode} strokeWidth={2.4} />
