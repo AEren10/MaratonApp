@@ -79,28 +79,25 @@ export const PRODUCT_FEATURES = {
   trial_compare: "trialCompare",
   ocr: "ocr",
   monthly_report: "monthlyReport",
-  // Sunucuda ayri anahtar yok — ayni kurali paylastiklari icin eslenmis.
-  // Gerekce yukarida.
-  topic_progress: "routePriorities",
-  department_threshold: "routePriorities",
+  topic_progress: "topicProgress",
+  department_threshold: "departmentThreshold",
 };
 
-// Tasarimin 8 paywall tetik noktasindan ikisinin sunucuda AYRI anahtari yok:
-// "konu ilerlemesi" ve "hedef bolum karsilastirmasi" (Bolum Esigi ekrani).
+// Tasarimin 8 paywall tetik noktasinin hepsinin artik sunucuda AYRI
+// anahtari var: "konu ilerlemesi" (topicProgress) ve "hedef bolum
+// karsilastirmasi" (departmentThreshold) 2026-09-11'de eklendi.
 //
-// CANLI DOGRULAMA (2026-09-10): private.get_product_access_snapshot'in
-// features jsonb'si su 7 anahtari donduruyor — route, routeForecast,
-// routeScenarios, routePriorities, trialCompare, ocr, monthlyReport.
-// topicProgress ve departmentThreshold YOK.
+// CANLI DOGRULAMA (2026-09-11, SQL editoru, proje zrycqfehhyjrsujmajpf):
+// private.get_product_access_snapshot ve private.has_feature_access
+// ikisi de yeni anahtarlari iceriyor; 'first_week OR pro' sayisi 9'dan
+// 11'e cikti (eklenen tam iki ozellik).
+// Migration: supabase/migrations/20260911130000_product_features_extend.sql
 //
-// Ancak canlida HEPSININ kurali BIREBIR AYNI: `first_week OR pro`.
-// Yani bugun ayri bir anahtar fonksiyonel olarak hicbir sey katmiyor.
-// O yuzden production'daki erisim fonksiyonuna DOKUNMADAN bu ikisi
-// routePriorities'e esleniyor — erisim davranisi ozdes, risk sifir.
-//
-// SUNUCU BU IKISINI AYRI KURALA BAGLAMAK ISTERSE gercek anahtar gerekir:
-// supabase/migrations/pending/20260910_product_features_extend.sql hazir,
-// degisiklik PUBLIC sarmalayiciya degil PRIVATE fonksiyona yapilmali.
+// Onceden bu ikisi routePriorities'e eslenmisti: canAccessProductFeature
+// fail-closed calisiyor, sunucu anahtari dondurmezse ozellik premium
+// kullanici icin de kapali kalirdi. Artik gercek anahtarlar kullaniliyor,
+// yani sunucu bu ikisini ayri bir kurala baglamak isterse istemci
+// tarafinda degisiklik gerekmiyor.
 
 
 export const PREMIUM_TO_PRODUCT_FEATURE = {

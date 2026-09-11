@@ -64,26 +64,29 @@ KVKK belgeleri, hesap silme ve veri indirme **yayın için zorunlu**.
 
 ---
 
-## Senden bekleyen: 2 migration
+## Migration'lar: ikisi de uygulandı ✅
 
-Supabase MCP yetkisiz, Chrome eklentisi bağlı değil. Publishable key ile **şema okunabiliyor ama değiştirilemiyor** (DDL service role ister).
+Chrome bağlantısı geldiği an tarayıcıdan Supabase SQL editörüne bağlanıp
+ikisini de uyguladım (2026-09-11, proje `zrycqfehhyjrsujmajpf`).
 
-### A) `user_tasks` — Durak Ekle'nin Saat + haftalık tekrar satırları
-
-Canlıda **yok**, REST üzerinden doğrulandı (`task_time`, `series_id` → hata 42703):
-
-```sql
-ALTER TABLE public.user_tasks ADD COLUMN IF NOT EXISTS task_time TIME;
-ALTER TABLE public.user_tasks ADD COLUMN IF NOT EXISTS series_id UUID;
-CREATE INDEX IF NOT EXISTS idx_user_tasks_series
-  ON public.user_tasks(user_id, series_id) WHERE series_id IS NOT NULL;
-```
+### A) `user_tasks` — `task_time` + `series_id`
+`supabase/migrations/20260911120000_user_tasks_time_and_repeat.sql`
+"Success. No rows returned." REST ile bağımsız doğrulandı: sorgu 42703
+(kolon yok) yerine 42501 (anon yetkisi yok) dönüyor — kolonlar var, RLS hâlâ kapalı.
 
 ### B) `product_features` — iki paywall anahtarı
-`supabase/migrations/pending/20260910_product_features_extend.sql`
-`topic_progress` ve `department_threshold` sunucuda yok. **Değişiklik `private.get_product_access_snapshot`'a yapılmalı**, `public` olan yalnızca sarmalayıcı.
+`supabase/migrations/20260911130000_product_features_extend.sql`
+Üzerine yazmadan önce canlı fonksiyonun yerel dosyayla birebir aynı olduğu
+doğrulandı (uzunluk 1795, `monthlyReport` var, `topicProgress` yok,
+`first_week OR pro` 9 kez). Sonrasında: dört kontrol de `true`,
+`first_week OR pro` 9 → 11 (tam olarak eklenen iki özellik).
 
-**Kalıcı çözüm:** supabase.com/dashboard/account/tokens'tan personal access token → MCP'ye `SUPABASE_ACCESS_TOKEN`. O zaman migration'ları ben uygularım.
+`src/constants/premium.js` artık gerçek anahtarları kullanıyor —
+`topic_progress` ve `department_threshold` `routePriorities`'e eşlenmiş
+değil. Bekleyen migration kalmadı.
+
+**Kalan tek iş:** Durak Ekle'nin Saat + "Her hafta tekrarla" satırlarını
+yazmak. Kolonlar artık hazır.
 
 ---
 
