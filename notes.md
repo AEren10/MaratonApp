@@ -80,3 +80,4 @@
 
 - Çalışma kaydı offline kuyruğa alınırken ona bağlı rota durağı lifecycle RPC'si de kuyruklanmalı. Aksi halde log daha sonra sync olsa bile rota durağı açık kalır ve günlük rota/borç sinyali kullanıcıyı yanlış yönlendirir.
 - Route transition kuyruğu yalnızca tekrar denenebilir hatalar için kullanılmalı; version conflict, invalid transition ve stop not found gibi kalıcı domain hataları kuyruğa girerse sonradan sync edilemeyecek gürültü üretir.
+- Plan/home/topic-debt gibi doğrudan route stop transition yapan UI yolları da aynı offline-safe helper'ı kullanmalı; yalnızca study-save yolunu korumak tutarsızlık bırakır.

@@ -11,7 +11,8 @@ import { startOfWeekTR } from "../lib/dateUtils";
 import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
 import { ensureSingleActiveRouteStop } from "../domain/route/stopStatus";
-import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, pauseRoute, resumeRoute, transitionRouteStop } from "../supabase/routePlan";
+import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, pauseRoute, resumeRoute } from "../supabase/routePlan";
+import { saveRouteStopTransitionOffline } from "../lib/offlineQueue";
 import * as Crypto from "expo-crypto";
 import { track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
@@ -328,13 +329,16 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
   const transitionStop = useCallback(async (stop, transition, payload = {}) => {
     if (!stop?.stopId) throw new Error("route_stop_not_persisted");
-    const updated = await transitionRouteStop({
+    const routeResult = await saveRouteStopTransitionOffline({
+      userId: user?.id,
       stopId: stop.stopId,
       transition,
       expectedVersion: stop.version ?? 1,
       clientOperationId: Crypto.randomUUID(),
       payload,
     });
+    if (routeResult.error && !routeResult.queued) throw routeResult.error;
+    const updated = routeResult.data;
     if (updated) {
       setPersistedStops((current) => current.map((item) => (
         item.id === updated.id ? updated : item
@@ -346,7 +350,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       });
     }
     return updated;
-  }, []);
+  }, [user?.id]);
   const distributeRouteDebt = useCallback(
     (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
     [debt.totalQuestions, route.capacity, route.weeks],

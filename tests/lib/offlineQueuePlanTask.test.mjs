@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = readFileSync(new URL("../../src/lib/offlineQueue.js", import.meta.url), "utf8");
+const useStudyRouteSource = readFileSync(new URL("../../src/hooks/useStudyRoute.js", import.meta.url), "utf8");
 
 test("queued plan task toggles carry user ownership", () => {
   assert.match(source, /togglePlanTask\(item\.payload\.taskId, item\.payload\.completed, item\.payload\.user_id\)/);
@@ -15,4 +16,10 @@ test("queued route stop transitions replay through the lifecycle RPC", () => {
   assert.match(source, /saveRouteStopTransitionOffline\(\{/);
   assert.match(source, /payload: routePayload/);
   assert.match(source, /isPermanentError\(e\) \|\| e\?\.code === "40001"/);
+});
+
+test("route stop UI transitions use the offline-safe helper", () => {
+  assert.match(useStudyRouteSource, /saveRouteStopTransitionOffline\(\{\s*userId: user\?\.id,/);
+  assert.match(useStudyRouteSource, /if \(routeResult\.error && !routeResult\.queued\) throw routeResult\.error/);
+  assert.doesNotMatch(useStudyRouteSource, /const updated = await transitionRouteStop\(/);
 });
