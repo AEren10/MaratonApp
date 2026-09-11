@@ -65,6 +65,21 @@ test("route stop effective status reads row overlay fields", () => {
   );
 });
 
+test("route stop effective status prefers explicit effective status", () => {
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycleStatus: "active", effectiveStatus: "locked" }),
+    ROUTE_STOP_STATUS.LOCKED,
+  );
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycle_status: "upcoming", effective_status: "frozen" }),
+    ROUTE_STOP_STATUS.FROZEN,
+  );
+  assert.equal(
+    routeStopEffectiveStatus({ lifecycleStatus: "active", effectiveStatus: "unknown" }),
+    ROUTE_STOP_STATUS.ACTIVE,
+  );
+});
+
 test("transition table rejects terminal and overlay transitions", () => {
   assert.equal(canTransitionRouteStop("upcoming", "active"), true);
   assert.equal(canTransitionRouteStop("active", "completed"), true);

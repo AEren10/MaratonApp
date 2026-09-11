@@ -75,6 +75,8 @@ export function getEffectiveRouteStopStatus(
 }
 
 export function routeStopEffectiveStatus(stop = {}, { routeFrozen = false } = {}) {
+  const explicitStatus = stop.effective_status || stop.effectiveStatus;
+  if (Object.values(ROUTE_STOP_STATUS).includes(explicitStatus)) return explicitStatus;
   const lifecycleStatus = stop.lifecycle_status
     || stop.lifecycleStatus
     || stop.status
