@@ -90,3 +90,38 @@ test("stop explanation prefers the dominant route reason", () => {
   assert.equal(insight.confidence, "medium");
   assert.equal(insight.expectedNetGain, 1.23);
 });
+
+test("route treats topic-level low accuracy as a weak signal without subject flag", () => {
+  const route = buildRoute({
+    pool: pool(["Temel Kavramlar", "Problemler", "Oran Orantı"]),
+    progressByKey: {
+      matematik: {
+        "Temel Kavramlar": { total_questions: 12, correct_count: 10 },
+        Problemler: { total_questions: 10, correct_count: 3 },
+        "Oran Orantı": { total_questions: 8, correct_count: 0 },
+      },
+    },
+    studyLogs: historyLogs(),
+    weakSubjectKeys: [],
+    dailyQuestionGoal: 30,
+    daysLeft: 90,
+    now: NOW,
+    examType: "tyt",
+  });
+
+  const problemStop = route.weeks
+    .flatMap((week) => week.stops)
+    .find((stop) => stop.topic === "Problemler");
+
+  assert.ok(problemStop);
+  assert.equal(problemStop.insight.reasonCode, "LOW_ACCURACY");
+  assert.equal(problemStop.scoreComponents.weakAreaBoost, 1.35);
+
+  const zeroCorrectStop = route.weeks
+    .flatMap((week) => week.stops)
+    .find((stop) => stop.topic === "Oran Orantı");
+
+  assert.ok(zeroCorrectStop);
+  assert.equal(zeroCorrectStop.insight.reasonCode, "LOW_ACCURACY");
+  assert.equal(zeroCorrectStop.scoreComponents.weakAreaBoost, 1.35);
+});

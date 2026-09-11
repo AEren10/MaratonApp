@@ -96,6 +96,7 @@ export function buildRoute({
         { ...subject, questionCount: subjectWeight },
         examType === "lgs" ? "LGS" : "TYT",
       );
+      const topicHasAccuracyGap = hasTopicAccuracyGap({ q, acc });
 
       if (cost.done) {
         masteredCount += 1;
@@ -144,11 +145,11 @@ export function buildRoute({
         cost,
         neglectedDays,
         daysLeft: daysLeft ?? 180,
-        isWeakArea: weakSet.has(subject.key),
+        isWeakArea: weakSet.has(subject.key) || topicHasAccuracyGap,
         unpreparedBefore,
       });
       const reasonCodes = [];
-      if (weakSet.has(subject.key)) reasonCodes.push("LOW_ACCURACY");
+      if (weakSet.has(subject.key) || topicHasAccuracyGap) reasonCodes.push("LOW_ACCURACY");
       if (neglectedDays >= 14) reasonCodes.push("NEGLECTED");
       if (cost.yield >= 0.5) reasonCodes.push("HIGH_EXAM_WEIGHT");
       if (unpreparedBefore > 0) reasonCodes.push("PREREQUISITE");
@@ -218,6 +219,10 @@ export function buildRoute({
     shortfall,
     intelligence,
   };
+}
+
+function hasTopicAccuracyGap({ q, acc }) {
+  return Number(q) >= 5 && Number(acc) < 60;
 }
 
 /** Haftalara gerçek tarih damgası bas — borç hesabı buna dayanıyor. */
