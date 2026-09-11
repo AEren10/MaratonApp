@@ -7,10 +7,21 @@ const CONFIDENCE_LABELS = Object.freeze({
 const IMPACT_BY_REASON = Object.freeze({
   REVIEW_DUE: "Net kaybını koruma",
   LOW_ACCURACY: "Zayıf alanda hızlı kazanım",
+  NET_DROP: "Düşüşü erken yakalama",
   NEGLECTED: "Unutma riskini düşürme",
   HIGH_EXAM_WEIGHT: "Sınav getirisi yüksek",
   PREREQUISITE: "Temeli güçlendirme",
   ROUTE_COMMITMENT: "Rota ritmini koruma",
+});
+
+const SIGNAL_LABELS = Object.freeze({
+  REVIEW_DUE: "tekrar zamanı",
+  LOW_ACCURACY: "düşük doğruluk",
+  NET_DROP: "net düşüşü",
+  NEGLECTED: "uzun ara",
+  HIGH_EXAM_WEIGHT: "yüksek katsayı",
+  PREREQUISITE: "ön koşul",
+  ROUTE_COMMITMENT: "rota sırası",
 });
 
 function round(value, digits = 1) {
@@ -52,11 +63,33 @@ function fallbackImpact({ accuracy, daysSince }) {
   return "Çalışma ritmini sürdürme";
 }
 
+function buildSignalChips({ routeReasonCode, routeStop, routeAllocation, accuracy, daysSince }) {
+  const chips = [];
+  const reason = SIGNAL_LABELS[routeReasonCode];
+  if (reason) chips.push(reason);
+  if (routeStop?.status === "active" || routeStop?.lifecycleStatus === "active"
+      || routeStop?.lifecycle_status === "active") {
+    chips.push("aktif durak");
+  }
+  if (Number.isFinite(daysSince) && daysSince >= 10) chips.push(`${daysSince} gün ara`);
+  if (Number.isFinite(accuracy) && accuracy < 60) chips.push(`%${Math.round(accuracy)} doğruluk`);
+  if (routeAllocation?.cappedByRouteCost) chips.push("yük tavana yakın");
+  return [...new Set(chips)].slice(0, 4);
+}
+
+function decisionSummary({ source, signalChips, confidenceLabel }) {
+  const signalText = signalChips.length
+    ? signalChips.join(" + ")
+    : source === "route" ? "rota sırası" : "günlük denge";
+  return `${signalText}; güven ${confidenceLabel}.`;
+}
+
 export function buildDailyAssignmentNarrative({
   reason,
   routeInsight = null,
   routeReasonCode = null,
   routeStop = null,
+  routeAllocation = null,
   questionCount = 0,
   tier = "low",
   accuracy = null,
@@ -67,6 +100,12 @@ export function buildDailyAssignmentNarrative({
   const source = routeStop ? "route" : "adaptive";
   const primaryReason = reason || "Bugünkü programa dengeli dağıtım için eklendi.";
   const estimatedMinutes = estimateAssignmentMinutes({ questionCount, routeStop });
+  const confidenceLabel = confidence
+    ? CONFIDENCE_LABELS[confidence] || CONFIDENCE_LABELS.low
+    : "veri topluyor";
+  const signalChips = buildSignalChips({
+    routeReasonCode, routeStop, routeAllocation, accuracy, daysSince,
+  });
   const impact = expectedNetGain > 0
     ? `~+${round(expectedNetGain)} net potansiyeli`
     : IMPACT_BY_REASON[routeReasonCode] || fallbackImpact({ accuracy, daysSince });
@@ -74,12 +113,17 @@ export function buildDailyAssignmentNarrative({
   return {
     source,
     title: routeStop ? "Rota motoru seçti" : fallbackTitle(tier),
-    confidenceLabel: confidence ? CONFIDENCE_LABELS[confidence] || CONFIDENCE_LABELS.low : "veri topluyor",
+    confidenceLabel,
     impact,
     estimatedMinutes,
     effort: effortLabel(questionCount, estimatedMinutes),
+    signalChips,
+    decisionSummary: decisionSummary({ source, signalChips, confidenceLabel }),
     bullets: [
       primaryReason,
+      signalChips.length
+        ? `Karar sinyalleri: ${signalChips.join(", ")}.`
+        : "Karar sinyalleri dengeli dağıtım ve günlük hedefe göre tartıldı.",
       routeStop
         ? "Bu görev haftalık rotadaki sırayı bozmaz; tamamlanınca durak geçmişine işlenir."
         : "Rota durağı yoksa zayıflık, ihmal ve sınava kalan süre sinyalleriyle seçilir.",

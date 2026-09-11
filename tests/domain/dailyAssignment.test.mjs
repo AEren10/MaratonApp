@@ -19,7 +19,9 @@ test("explains a route-backed daily assignment with impact and confidence", () =
   assert.equal(assignment.estimatedMinutes, 60);
   assert.equal(assignment.effort, "36 soru · ~60 dk");
   assert.equal(assignment.confidenceLabel, "orta");
-  assert.equal(assignment.bullets.length, 3);
+  assert.deepEqual(assignment.signalChips, ["düşük doğruluk"]);
+  assert.equal(assignment.decisionSummary, "düşük doğruluk; güven orta.");
+  assert.equal(assignment.bullets.length, 4);
 });
 
 test("keeps adaptive fallback effort on the old question-based estimate", () => {
@@ -54,4 +56,25 @@ test("explains an adaptive fallback assignment while data is still being collect
   assert.equal(assignment.title, "Bugünün kritik hamlesi");
   assert.equal(assignment.impact, "Uzun ara riskini azaltma");
   assert.equal(assignment.confidenceLabel, "veri topluyor");
+  assert.deepEqual(assignment.signalChips, ["18 gün ara"]);
+  assert.equal(assignment.decisionSummary, "18 gün ara; güven veri topluyor.");
+});
+
+test("adds bounded route allocation and accuracy signals without duplicating chips", () => {
+  const assignment = buildDailyAssignmentNarrative({
+    routeReasonCode: "NET_DROP",
+    routeStop: { id: "stop-3", lifecycleStatus: "active", cost: { questions: 20, minutes: 40 } },
+    routeAllocation: { cappedByRouteCost: true },
+    questionCount: 20,
+    accuracy: 42,
+    daysSince: 12,
+  });
+
+  assert.deepEqual(assignment.signalChips, [
+    "net düşüşü",
+    "aktif durak",
+    "12 gün ara",
+    "%42 doğruluk",
+  ]);
+  assert.equal(assignment.impact, "Düşüşü erken yakalama");
 });

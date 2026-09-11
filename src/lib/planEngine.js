@@ -238,6 +238,7 @@ export function generateDailyPlan({
       routeInsight,
       routeReasonCode,
       routeStop,
+      routeAllocation: allocation,
       questionCount: actual,
       tier,
       accuracy: acc,
