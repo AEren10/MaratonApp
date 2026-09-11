@@ -14,13 +14,15 @@ export async function syncChallengeProgress(
     await checkExpiredChallenges(userId);
 
     if (sourceOperationId) {
-      const applied = await syncMyChallengeProgress({
+      await syncMyChallengeProgress({
         source,
         sourceOperationId,
         questions,
         minutes,
       });
-      if (applied !== null) return;
+      // sourceOperationId replay güvenliği demek. RPC canlıda yoksa bile eski
+      // istemci fallback'ine düşmek aynı offline operasyonu iki kez sayabilir.
+      return;
     }
 
     const challenges = await listMyChallenges(userId);

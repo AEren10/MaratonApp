@@ -16,7 +16,8 @@ const migration = readFileSync(
 test("challenge sync uses server-resolved idempotent RPC before legacy fallback", () => {
   assert.match(challenges, /rpc\("sync_challenge_progress"/);
   assert.match(challengeSync, /syncMyChallengeProgress/);
-  assert.match(challengeSync, /if \(applied !== null\) return/);
+  assert.match(challengeSync, /sourceOperationId[\s\S]*await syncMyChallengeProgress/);
+  assert.match(challengeSync, /sourceOperationId[\s\S]*return;\s*}\s*const challenges = await listMyChallenges/);
 });
 
 test("study and trial offline saves return client operation ids for replay-safe challenge sync", () => {

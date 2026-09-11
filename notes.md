@@ -45,3 +45,8 @@
 
 - `user_id` taşımayan ilişki tabloları export edilirken tek büyük `.in(...)` çağrısı kullanılmamalı; ID listesi chunk'lanmalı ve her chunk ayrıca sayfalanmalı.
 - Export kodu "az kayıtla çalışıyor" diye tamam sayılmamalı; çok deneme/çok detay kaydı olan gerçek kullanıcı senaryosu testle korunmalı.
+
+## 2026-09-12 — Challenge idempotency fallback kuralı
+
+- `sourceOperationId` taşıyan challenge progress olayları replay-sensitive kabul edilmeli. İdempotent RPC yoksa eski client fallback'e düşmek yerine fail-closed davranmalı; aksi halde offline replay aynı çalışmayı/denemeyi tekrar sayabilir.
+- Legacy `bump_challenge_progress` fallback'i sadece operasyon kimliği olmayan eski çağrılar için güvenli kabul edilmeli.
