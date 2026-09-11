@@ -118,3 +118,18 @@ test("daily route allocation uses remaining route stop questions", () => {
   assert.equal(allocations[0].allocation.maxQuestions, 6);
   assert.equal(allocations[0].allocation.cappedByRouteCost, true);
 });
+
+test("daily route allocation backfills capped top stops to cover the daily target", () => {
+  const allocations = buildDailyRouteTaskAllocations([
+    { key: "a", score: 100, routeStop: { lifecycleStatus: "active", cost: { questions: 2 } } },
+    { key: "b", score: 90, routeStop: { lifecycleStatus: "active", cost: { questions: 2 } } },
+    { key: "c", score: 80, routeStop: { lifecycleStatus: "active", cost: { questions: 2 } } },
+    { key: "d", score: 75, routeStop: { lifecycleStatus: "active", cost: { questions: 2 } } },
+    { key: "e", score: 70, routeStop: { lifecycleStatus: "upcoming", cost: { questions: 80 } } },
+  ], 40, { maxTasks: 4 });
+
+  assert.deepEqual(allocations.map((item) => item.key), ["a", "b", "c", "e"]);
+  assert.equal(allocations.reduce((sum, item) => sum + item.questionCount, 0), 40);
+  assert.equal(allocations[3].questionCount, 34);
+  assert.equal(allocations[3].allocation.undistributedQuestions, 0);
+});

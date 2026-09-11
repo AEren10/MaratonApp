@@ -98,6 +98,36 @@ function distributeRemainder(rows, remaining) {
   return left;
 }
 
+function selectedCapacity(rows = []) {
+  return rows.reduce((sum, row) => sum + row.maxQuestions, 0);
+}
+
+function lowestHeadroomIndex(rows = []) {
+  return rows.reduce((lowest, row, index) => {
+    const current = rows[lowest];
+    if (row.maxQuestions < current.maxQuestions) return index;
+    if (row.maxQuestions === current.maxQuestions && row.score < current.score) return index;
+    return lowest;
+  }, 0);
+}
+
+function selectRankedRows(ranked = [], target = 0, maxTasks = 4) {
+  const limit = Math.max(1, maxTasks);
+  const selected = ranked.slice(0, limit);
+  let capacity = selectedCapacity(selected);
+
+  for (const row of ranked.slice(limit)) {
+    if (capacity >= target) break;
+    const replaceIndex = lowestHeadroomIndex(selected);
+    const replaced = selected[replaceIndex];
+    if (!replaced || row.maxQuestions <= replaced.maxQuestions) continue;
+    selected[replaceIndex] = row;
+    capacity += row.maxQuestions - replaced.maxQuestions;
+  }
+
+  return selected.sort((a, b) => b.score - a.score || a.index - b.index);
+}
+
 export function buildDailyRouteTaskAllocations(candidates = [], dailyTarget = 0, { maxTasks = 4 } = {}) {
   const target = Math.max(0, Math.round(Number(dailyTarget) || 0));
   if (!target) return [];
@@ -107,24 +137,25 @@ export function buildDailyRouteTaskAllocations(candidates = [], dailyTarget = 0,
       candidate,
       index,
       score: scoreDailyRouteCandidate(candidate, index),
+      maxQuestions: routeCostLimit(candidate.routeStop, target),
     }))
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score || a.index - b.index)
-    .slice(0, Math.max(1, maxTasks));
+    .filter((row) => row.maxQuestions > 0);
 
-  const scoreTotal = ranked.reduce((sum, row) => sum + row.score, 0) || 1;
+  const selected = selectRankedRows(ranked, target, maxTasks);
+
+  const scoreTotal = selected.reduce((sum, row) => sum + row.score, 0) || 1;
   let allocated = 0;
-  const rows = ranked.map((row, index) => {
-    const rawShare = index === ranked.length - 1
+  const rows = selected.map((row, index) => {
+    const rawShare = index === selected.length - 1
       ? target - allocated
       : Math.round(target * (row.score / scoreTotal));
-    const maxQuestions = routeCostLimit(row.candidate.routeStop, target);
-    const questionCount = Math.min(maxQuestions, Math.max(1, rawShare));
+    const questionCount = Math.min(row.maxQuestions, Math.max(1, rawShare));
     allocated += questionCount;
 
     return {
       ...row,
-      maxQuestions,
       questionCount,
     };
   });
