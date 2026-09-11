@@ -49,6 +49,9 @@ test("route intelligence exposes confidence, signals and stop explanations", () 
   assert.equal(route.intelligence.strategy.firstWeek.stopCount, route.weeks[0].stops.length);
   assert.ok(route.intelligence.strategy.firstWeek.questions > 0);
   assert.ok(route.intelligence.strategy.focusAreas.length > 0);
+  assert.ok(route.intelligence.strategy.qualityHeadline.includes("tempo"));
+  assert.ok(route.intelligence.qualityChecks.some((check) => check.key === "first_week_action"));
+  assert.ok(route.intelligence.decisionTrace.length >= 3);
 });
 
 test("route intelligence flags overflow when the route does not fit", () => {
@@ -64,10 +67,16 @@ test("route intelligence flags overflow when the route does not fit", () => {
   });
 
   assert.equal(route.feasible, false);
+  assert.equal(route.intelligence.risks[0].code, "route_overflow");
   assert.ok(route.intelligence.risks.some((risk) => risk.code === "route_overflow"));
   assert.ok(route.intelligence.confidenceScore < 75);
   assert.match(route.intelligence.strategy.headline, /tempo/);
   assert.notEqual(route.intelligence.strategy.pacing.pressure, "dengeli");
+  assert.ok(route.intelligence.decisionTrace.some((line) => line.includes("süre baskısı")));
+  assert.equal(
+    route.intelligence.qualityChecks.find((check) => check.key === "deadline_fit").status,
+    "warn",
+  );
 });
 
 test("stop explanation prefers the dominant route reason", () => {

@@ -12,6 +12,16 @@ const REASON_TEXT = {
   ROUTE_COMMITMENT: "Haftalık rota dengesini tamamlayan sıradaki iş.",
 };
 
+const RISK_TRACE_TEXT = {
+  route_overflow: "süre baskısı var, rota tempo veya revizyon isteyebilir",
+  capacity_low_confidence: "tempo verisi az, motor güvenli yedek kapasiteye yaslanıyor",
+  topic_signal_sparse: "konu verisi seyrek, yeni kayıtlarla karar keskinleşecek",
+  prerequisite_debt: "temel sıra hassas, ön koşullar korunmalı",
+  study_log_unavailable: "çalışma kayıtları okunamadı, kapasite tahmini sınırlı",
+};
+
+const RISK_LEVEL_WEIGHT = { high: 3, medium: 2, low: 1 };
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -108,6 +118,99 @@ function strategyHeadline({ overflow = [], reviewItems = 0, weakSubjectKeys = []
   return "Müfredat sürdürülebilir haftalara bölündü";
 }
 
+function qualityItem(key, status, label, detail) {
+  return { key, status, label, detail };
+}
+
+function buildRouteQualityChecks({
+  capacity = {},
+  weeks = [],
+  overflow = [],
+  weakSubjectKeys = [],
+  lowSignalItems = 0,
+  reviewItems = 0,
+} = {}) {
+  const firstWeek = firstWeekStats(weeks);
+  const firstWeekReasons = new Set((weeks[0]?.stops || []).map(dominantReason));
+  const checks = [
+    firstWeek.stopCount > 0
+      ? qualityItem(
+        "first_week_action",
+        "ok",
+        "İlk hafta aksiyonu",
+        `${firstWeek.stopCount} durak bugünden çalışılabilir sıraya girdi.`,
+      )
+      : qualityItem(
+        "first_week_action",
+        "block",
+        "İlk hafta aksiyonu",
+        "İlk hafta boş; hedef, tarih veya müfredat sinyali tamamlanmalı.",
+      ),
+    capacity.confidence === "low"
+      ? qualityItem(
+        "capacity_fit",
+        "warn",
+        "Tempo uyumu",
+        "Kişisel tempo verisi az; motor hedef tempoya güvenli yedekle yaslanıyor.",
+      )
+      : qualityItem(
+        "capacity_fit",
+        "ok",
+        "Tempo uyumu",
+        `${Math.round(Number(capacity.questionsPerWeek) || 0)} soru/hafta bütçesi kullanıldı.`,
+      ),
+    overflow.length
+      ? qualityItem(
+        "deadline_fit",
+        "warn",
+        "Sınava sığma",
+        `${overflow.length} durak revizyon veya tempo artışı isteyebilir.`,
+      )
+      : qualityItem("deadline_fit", "ok", "Sınava sığma", "Plan mevcut süreye sığıyor."),
+    weakSubjectKeys.length && firstWeekReasons.has("LOW_ACCURACY")
+      ? qualityItem("weak_signal", "ok", "Zayıf alan", "Zayıf sinyal ilk haftaya çekildi.")
+      : weakSubjectKeys.length
+        ? qualityItem("weak_signal", "warn", "Zayıf alan", "Zayıf alan var; bütçe veya sıra nedeniyle ilk hafta dışına kayabilir.")
+        : qualityItem("weak_signal", "ok", "Zayıf alan", "Belirgin zayıf alan sinyali yok."),
+    reviewItems > 0
+      ? qualityItem("review_balance", "ok", "Tekrar dengesi", `${reviewItems} tekrar durağı unutma riskini düşürmek için rotaya eklendi.`)
+      : qualityItem("review_balance", "ok", "Tekrar dengesi", "Tekrar borcu görünmüyor."),
+  ];
+
+  if (lowSignalItems > Math.max(3, (weeks.length || 1))) {
+    checks.push(qualityItem(
+      "data_depth",
+      "warn",
+      "Veri derinliği",
+      "Bazı duraklar az veriyle seçildi; deneme ve çalışma kaydı geldikçe karar keskinleşir.",
+    ));
+  }
+
+  return checks;
+}
+
+function buildDecisionTrace({ topFocus = [], pressure, score, risks = [] }) {
+  const focus = topFocus[0];
+  const risk = risks[0];
+  const riskText = RISK_TRACE_TEXT[risk?.code] || "ek kontrol isteyen sinyal var";
+
+  return [
+    focus
+      ? `${focus.subjectLabel} / ${focus.topic} ilk odak çünkü ${focus.reasonText}`
+      : "İlk odak için yeterli konu sinyali yok.",
+    `Haftalık yük ${pressure}; kalite güveni ${confidenceLabel(score)}.`,
+    risk
+      ? `Ana dikkat noktası: ${riskText}.`
+      : "Kritik rota riski görünmüyor.",
+  ];
+}
+
+function rankRisks(risks = []) {
+  return [...risks].sort((a, b) => (
+    (RISK_LEVEL_WEIGHT[b.level] || 0) - (RISK_LEVEL_WEIGHT[a.level] || 0)
+  ));
+}
+
 function buildRouteStrategy({
   capacity = {},
   items = [],
@@ -135,6 +238,7 @@ function buildRouteStrategy({
     narrative: firstWeek.stopCount > 0
       ? `İlk hafta ${firstWeek.stopCount} durak, ${firstWeek.questions} soru ve yaklaşık ${firstWeek.minutes} dakika ile başlıyor.`
       : "İlk hafta için durak çıkmadı; hedef, tarih veya müfredat verisi tamamlanmalı.",
+    qualityHeadline: `${pressure} tempo · ${topFocus.length} odak alan`,
   };
 }
 
@@ -204,6 +308,7 @@ export function buildRouteIntelligence({
   if (prerequisiteItems > 0) {
     risks.push({ code: "prerequisite_debt", level: "low", count: prerequisiteItems });
   }
+  const rankedRisks = rankRisks(risks);
 
   const nextBestAction = overflow.length
     ? "Haftalık hedefi artır veya düşük getirili durakları sonraki revizyona bırak."
@@ -211,19 +316,36 @@ export function buildRouteIntelligence({
       ? "İlk hafta tekrar duraklarını bitir; net kaybını hızlıca kilitler."
       : "Bu haftanın aktif durağını tamamla ve rotayı yeni veriye göre güncelle.";
 
+  const qualityChecks = buildRouteQualityChecks({
+    capacity,
+    weeks,
+    overflow,
+    weakSubjectKeys,
+    lowSignalItems,
+    reviewItems,
+  });
+  const strategy = buildRouteStrategy({
+    capacity,
+    items,
+    weeks,
+    overflow,
+    shortfall,
+    weakSubjectKeys,
+    reviewItems,
+  });
+
   return {
     version: ROUTE_INTELLIGENCE_VERSION,
     confidence: confidenceLabel(score),
     confidenceScore: score,
     nextBestAction,
-    strategy: buildRouteStrategy({
-      capacity,
-      items,
-      weeks,
-      overflow,
-      shortfall,
-      weakSubjectKeys,
-      reviewItems,
+    strategy,
+    qualityChecks,
+    decisionTrace: buildDecisionTrace({
+      topFocus: strategy.focusAreas,
+      pressure: strategy.pacing.pressure,
+      score,
+      risks: rankedRisks,
     }),
     signals: {
       capacitySource: capacity.source || "unknown",
@@ -234,6 +356,6 @@ export function buildRouteIntelligence({
       lowSignalStops: lowSignalItems,
       prerequisiteStops: prerequisiteItems,
     },
-    risks,
+    risks: rankedRisks,
   };
 }
