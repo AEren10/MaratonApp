@@ -35,3 +35,8 @@
 
 - Hesap silme öncesi Storage temizliği kısmen başarısızsa auth hesabı silinmemeli. Auth satırı gittikten sonra istemci kalan public/private dosyaları kendi yetkisiyle temizleyemeyebilir.
 - Storage cleanup hataları kullanıcıya güvenli mesajla gösterilmeli; sessizce “hesap silindi ama bazı dosyalar kaldı” durumuna düşmemeli.
+
+## 2026-09-12 — Storage RLS policy hijyeni
+
+- Storage mutating policy'leri `TO authenticated` ile açıkça sınırlandırılmalı.
+- `UPDATE` policy mutlaka hem `USING` hem `WITH CHECK` içermeli; aksi halde kullanıcı satırı okuyabildiği halde yeni değerin sahiplik şartı yeterince ifade edilmemiş olur.
