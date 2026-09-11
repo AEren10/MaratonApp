@@ -50,3 +50,8 @@
 
 - `sourceOperationId` taşıyan challenge progress olayları replay-sensitive kabul edilmeli. İdempotent RPC yoksa eski client fallback'e düşmek yerine fail-closed davranmalı; aksi halde offline replay aynı çalışmayı/denemeyi tekrar sayabilir.
 - Legacy `bump_challenge_progress` fallback'i sadece operasyon kimliği olmayan eski çağrılar için güvenli kabul edilmeli.
+
+## 2026-09-12 — Rota hafta snapshot sınav tipi scope'u
+
+- `route_weeks` hem okuma hem yazma tarafında sınav tipine göre ayrılmalı. `exam_type` kolonu olup conflict target hâlâ `(user_id, week_start)` kalırsa aynı haftadaki YKS/LGS rotaları birbirini ezebilir.
+- Rota revizyonları, durakları ve hafta özetleri aynı scope kuralıyla ilerlemeli; sınav tipi değişimi yalnız pause/resume değil persisted haftalar için de veri bütünlüğü meselesi.
