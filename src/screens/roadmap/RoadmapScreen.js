@@ -5,20 +5,19 @@ import { useNavigation } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SPACING, TYPOGRAPHY } from "../../themes/tokens";
-import { firstRouteAction } from "../../domain/route/routeStartAction";
 import RouteProgressHeader from "./components/RouteProgressHeader";
 import RouteCreationCard from "./components/RouteCreationCard";
 import RouteWeekCard from "./components/RouteWeekCard";
 import { EmptyState } from "../../components/common/EmptyState";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useAlert } from "../../contexts/AlertContext";
-import * as H from "../../lib/haptics";
-import { showRouteCreatedAlert } from "./routeCreatedAlert";
 import RouteNextActionPanel from "./components/RouteNextActionPanel";
 import RouteDebtCard from "./components/RouteDebtCard";
 import { useRoadmapNextAction } from "./useRoadmapNextAction";
+import { useRoadmapConfirmations } from "./useRoadmapConfirmations";
 
 export default function RoadmapScreen() {
   const C = useC();
@@ -26,33 +25,19 @@ export default function RoadmapScreen() {
   const navigation = useNavigation();
   const { showPaywall } = usePremium();
   const showAlert = useAlert();
+  const { targetNet } = useExam();
   const {
     weeks, totals, daysLeft, hasRouteAccess, routeAccessError,
     routeAccessLoading, refreshRouteAccess, isPaused, pause, resume,
     intelligence, routeCreated, routeCreating, routeCreationError, routeReadiness, createRoute,
-    debt, debtWeeks, distributeDebt,
+    debt, debtWeeks, distributeDebt, forecast,
   } = useStudyRoute({ persist: false });
 
-  const togglePause = useCallback(() => (isPaused ? resume() : pause()), [isPaused, pause, resume]);
   const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
   const debtPlan = useMemo(() => distributeDebt(weeks), [debt?.totalQuestions, distributeDebt, weeks]);
-  const handleCreateRoute = useCallback(async () => {
-    try {
-      const result = await createRoute();
-      const nextAction = firstRouteAction(result?.stops);
-      H.success();
-      showRouteCreatedAlert({
-        action: nextAction,
-        navigation,
-        revisionSummary: result?.revisionSummary,
-        routeCreated,
-        showAlert,
-      });
-    } catch {
-      H.error();
-      showAlert("Rota oluşturulamadı", "Bağlantını kontrol edip tekrar dene. Önizlemen kaybolmadı.");
-    }
-  }, [createRoute, navigation, routeCreated, showAlert]);
+  const { togglePause, handleCreateRoute } = useRoadmapConfirmations({
+    isPaused, pause, resume, createRoute, routeCreated, navigation, showAlert,
+  });
   const renderWeek = useCallback(
     ({ item }) => <RouteWeekCard week={item} frozen={isPaused} C={C} />,
     [C, isPaused],
@@ -85,11 +70,13 @@ export default function RoadmapScreen() {
         isPaused={isPaused}
         intelligence={intelligence}
         onTogglePause={togglePause}
+        forecast={forecast}
+        targetNet={targetNet}
         C={C}
       />
     </>
-  ), [C, daysLeft, debt, debtPlan, debtWeeks, handleCreateRoute, intelligence, isPaused, nextRouteAction, routeCreated,
-    startNextRouteAction,
+  ), [C, daysLeft, debt, debtPlan, debtWeeks, forecast, handleCreateRoute, intelligence, isPaused, nextRouteAction,
+    routeCreated, startNextRouteAction, targetNet,
     routeCreating, routeCreationError, routeReadiness, togglePause, totals, weeks]);
 
   return (

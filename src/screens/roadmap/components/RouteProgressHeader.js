@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
 import RouteIntelligenceCard from "./RouteIntelligenceCard";
+import RouteNetChart from "./RouteNetChart";
 
 export default function RouteProgressHeader({
   totals,
@@ -10,6 +11,8 @@ export default function RouteProgressHeader({
   isPaused,
   intelligence,
   onTogglePause,
+  forecast,
+  targetNet,
   C,
 }) {
   const progress = Math.round((totals?.progress || 0) * 100);
@@ -45,6 +48,7 @@ export default function RouteProgressHeader({
       {isPaused ? (
         <Text accessibilityLiveRegion="polite" style={[styles.frozen, { color: C.sec }]}>Rota donduruldu; geçmişin korunuyor.</Text>
       ) : null}
+      <RouteNetChart forecast={forecast} targetNet={targetNet} C={C} />
       <RouteIntelligenceCard intelligence={intelligence} C={C} />
     </View>
   );
