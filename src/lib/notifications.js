@@ -197,9 +197,13 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
         data: { type: "weekly_summary", url: appUrl(SCREENS.WEEKLY_REVIEW) },
       },
       trigger: {
+        // Tasarim: "Haftalik rapor · Pazar 20:00". weekday 1 = Pazar
+        // (Calendar.DAY_OF_WEEK). Saat 10 yaziliydi, yani ekranin metni ile
+        // gercek gonderim saati uyusmuyordu. Aksam secimi bilincli: hafta
+        // kapanirken okunur, sonraki haftanin rotasi onunde durur.
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday: 1,
-        hour: 10,
+        hour: 20,
         minute: 0,
       },
     });

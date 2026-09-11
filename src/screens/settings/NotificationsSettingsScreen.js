@@ -1,226 +1,134 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, Pressable, Switch, StyleSheet, ActivityIndicator } from "react-native";
+import { useCallback } from "react";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Linking, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon, IconBox } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import Animated, { FadeInDown } from "react-native-reanimated";
+
+import { Icon, ErrorState } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import {
-  getNotifPrefs,
-  setNotifPrefs,
-  applyNotifPrefs,
-  requestNotificationPermissions,
-  ensurePushTokenRegistered,
-} from "../../lib/notifications";
-import { useAlert } from "../../contexts/AlertContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { SettingsGroup } from "./components/SettingsGroup";
+import { SettingsRow } from "./components/SettingsRow";
+import { ReminderHourPicker } from "./components/ReminderHourPicker";
+import { useNotificationPrefs } from "../../hooks/useNotificationPrefs";
+import * as H from "../../lib/haptics";
 
-const HOUR_OPTIONS = [
-  { h: 8, label: "08:00 Sabah" },
-  { h: 13, label: "13:00 Öğlen" },
-  { h: 19, label: "19:00 Akşam" },
-  { h: 21, label: "21:00 Gece" },
-];
-
-export default function NotificationsSettingsScreen() {
+function NotificationsSettingsContent() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
-  const [prefs, setPrefs] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const showAlert = useAlert();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    getNotifPrefs().then(setPrefs);
-  }, []);
-
-  const update = useCallback(
-    async (patch) => {
-      if (!prefs) return;
-      const next = { ...prefs, ...patch };
-      setPrefs(next);
-      setBusy(true);
-      try {
-        const anyEnabled = next.dailyReminderEnabled || next.streakRiskEnabled || next.weeklySummaryEnabled;
-        if (anyEnabled) {
-          const granted = await requestNotificationPermissions();
-          if (granted) {
-            // İzni burada veren kullanıcının token'ı da hemen kaydedilmeli.
-            await ensurePushTokenRegistered(user?.id);
-          }
-          if (!granted) {
-            showAlert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
-            next.dailyReminderEnabled = false;
-            next.streakRiskEnabled = false;
-            next.weeklySummaryEnabled = false;
-            setPrefs(next);
-          }
-        }
-        await setNotifPrefs(next, user?.id);
-        await applyNotifPrefs(next);
-      } finally {
-        setBusy(false);
-      }
-    },
-    [prefs]
-  );
+  const { prefs, busy, permissionDenied, update, dismissDenied } = useNotificationPrefs();
 
   if (!prefs) {
     return (
-      <SafeAreaView edges={["top"]} style={s.safe}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
         <ActivityIndicator style={{ flex: 1 }} color={C.accent} />
       </SafeAreaView>
     );
   }
 
+  if (permissionDenied) {
+    return (
+      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <View style={styles.header}>
+          <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+            <Icon name="arrowL" size={18} color={C.text2} />
+          </Pressable>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Bildirimler</Text>
+        </View>
+        <ErrorState
+          preset="notificationDenied"
+          style={{ flex: 1, justifyContent: "center", paddingHorizontal: GUTTER }}
+          onPrimary={() => Linking.openSettings()}
+          onSecondary={() => {
+            H.tap();
+            dismissDenied();
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <View style={s.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={styles.header}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Icon name="arrowL" size={18} color={C.text2} />
         </Pressable>
-        <Text style={s.headerTitle}>Bildirimler</Text>
-        <View style={{ width: 22 }} />
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Bildirimler</Text>
       </View>
 
-      <View style={s.list}>
-        <View style={s.row}>
-          <IconBox icon="clock" color={C.accent} size={38} rounded={12} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.label}>Günlük Hatırlatıcı</Text>
-            <Text style={s.hint}>Çalışmayı unutmamak için bir hatırlatma</Text>
-          </View>
-          <Switch
-            value={prefs.dailyReminderEnabled}
-            onValueChange={(v) => update({ dailyReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.accent + "80" }}
-            thumbColor={prefs.dailyReminderEnabled ? C.accent : C.muted}
-          />
-        </View>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Animated.View entering={FadeInDown.duration(500)}>
+          <SettingsGroup title="BİLDİRİMLER">
+            <SettingsRow
+              first
+              label="Günlük Hatırlatıcı"
+              hint="Çalışmayı unutmamak için bir hatırlatma"
+              toggle
+              value={prefs.dailyReminderEnabled}
+              onToggle={(v) => update({ dailyReminderEnabled: v })}
+            />
+            {prefs.dailyReminderEnabled ? (
+              <ReminderHourPicker
+                hour={prefs.dailyReminderHour}
+                onSelect={(h) => update({ dailyReminderHour: h, dailyReminderMinute: 0 })}
+              />
+            ) : null}
 
-        {prefs.dailyReminderEnabled && (
-          <View style={s.subBox}>
-            <Text style={s.subLabel}>HATIRLATMA SAATİ</Text>
-            <View style={s.chipRow}>
-              {HOUR_OPTIONS.map((o) => {
-                const active = prefs.dailyReminderHour === o.h;
-                return (
-                  <Pressable
-                    key={o.h}
-                    onPress={() => update({ dailyReminderHour: o.h, dailyReminderMinute: 0 })}
-                    style={[
-                      s.chip,
-                      { borderColor: active ? C.accent : C.border, backgroundColor: active ? C.accent + "20" : "transparent" },
-                    ]}
-                  >
-                    <Text style={[s.chipText, { color: active ? C.accent : C.sec }]}>
-                      {o.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        )}
+            <SettingsRow
+              label="Streak Uyarısı"
+              hint="Streak'in tehlikedeyse gece bildirilir"
+              toggle
+              value={prefs.streakRiskEnabled}
+              onToggle={(v) => update({ streakRiskEnabled: v })}
+            />
+            <SettingsRow
+              label="Deneme Hatırlatıcı"
+              hint="Haftada bir deneme girmen için"
+              toggle
+              value={prefs.trialReminderEnabled}
+              onToggle={(v) => update({ trialReminderEnabled: v })}
+            />
+            <SettingsRow
+              label="Görev Hatırlatıcı"
+              hint="Çalışma listen yarım kalırsa bildirir"
+              toggle
+              value={prefs.taskReminderEnabled !== false}
+              onToggle={(v) => update({ taskReminderEnabled: v })}
+            />
+            <SettingsRow
+              label="Haftalık Rapor"
+              hint="Pazar 20:00"
+              toggle
+              value={prefs.weeklySummaryEnabled !== false}
+              onToggle={(v) => update({ weeklySummaryEnabled: v })}
+            />
+          </SettingsGroup>
+        </Animated.View>
 
-        <View style={s.row}>
-          <IconBox icon="flame" color={C.red} size={38} rounded={12} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.label}>Streak Uyarısı</Text>
-            <Text style={s.hint}>Streak'in tehlikedeyse gece bildirilir</Text>
-          </View>
-          <Switch
-            value={prefs.streakRiskEnabled}
-            onValueChange={(v) => update({ streakRiskEnabled: v })}
-            trackColor={{ false: C.border, true: C.accent + "80" }}
-            thumbColor={prefs.streakRiskEnabled ? C.accent : C.muted}
-          />
-        </View>
-
-        <View style={s.row}>
-          <IconBox icon="chart" color={C.blue} size={38} rounded={12} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.label}>Deneme Hatırlatıcı</Text>
-            <Text style={s.hint}>Haftada bir deneme girmen için</Text>
-          </View>
-          <Switch
-            value={prefs.trialReminderEnabled}
-            onValueChange={(v) => update({ trialReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.accent + "80" }}
-            thumbColor={prefs.trialReminderEnabled ? C.accent : C.muted}
-          />
-        </View>
-
-        <View style={s.row}>
-          <IconBox icon="layers" color={C.accent} size={38} rounded={12} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.label}>Görev Hatırlatıcı</Text>
-            <Text style={s.hint}>Çalışma listen yarım kalırsa bildirir</Text>
-          </View>
-          <Switch
-            value={prefs.taskReminderEnabled !== false}
-            onValueChange={(v) => update({ taskReminderEnabled: v })}
-            trackColor={{ false: C.border, true: C.accent + "80" }}
-            thumbColor={prefs.taskReminderEnabled !== false ? C.accent : C.muted}
-          />
-        </View>
-
-        <View style={s.row}>
-          <IconBox icon="chart" color={C.teal} size={38} rounded={12} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.label}>Haftalık Özet</Text>
-            <Text style={s.hint}>Her pazartesi haftalık raporunu bildirir</Text>
-          </View>
-          <Switch
-            value={prefs.weeklySummaryEnabled !== false}
-            onValueChange={(v) => update({ weeklySummaryEnabled: v })}
-            trackColor={{ false: C.border, true: C.accent + "80" }}
-            thumbColor={prefs.weeklySummaryEnabled !== false ? C.accent : C.muted}
-          />
-        </View>
-
-        {busy && <ActivityIndicator color={C.accent} style={{ marginTop: SPACING.lg }} />}
-      </View>
+        {busy ? <ActivityIndicator color={C.accent} style={{ marginTop: STEP.s3 }} /> : null}
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-    },
-    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    list: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
-    row: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.md,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      padding: SPACING.lg, marginBottom: SPACING.sm,
-    },
-    label: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-    hint: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 },
-    subBox: {
-      backgroundColor: C.surface + "80",
-      borderRadius: RADIUS.lg,
-      padding: SPACING.md,
-      marginBottom: SPACING.sm,
-    },
-    subLabel: {
-      ...TYPOGRAPHY.label,
-      color: C.muted,
-      marginBottom: SPACING.sm,
-    },
-    chipRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.xs },
-    chip: {
-      paddingHorizontal: SPACING.md,
-      paddingVertical: SPACING.xs,
-      borderWidth: 1,
-      borderRadius: 999,
-    },
-    chipText: { ...TYPOGRAPHY.captionMedium },
-  });
+export default function NotificationsSettingsScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <NotificationsSettingsContent />
+    </ScreenErrorBoundary>
+  );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s2,
+  },
+  scroll: { paddingBottom: 60 },
+});
