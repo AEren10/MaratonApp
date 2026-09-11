@@ -5,10 +5,10 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { getAllSubjects } from "../../domain/trial/trialTypes";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { Icon, GlowBackground } from "../../components/design";
+import { Icon, EmptyState } from "../../components/design";
 import { SubjectListCard } from "./components/SubjectListCard";
 
 function filterTrials(trials, filter) {
@@ -31,6 +31,12 @@ function buildItems(allSubjects, trials, filter, accent) {
       const avgNet = history.reduce((s, h) => s + (h.net || 0), 0) / history.length;
       const accuracy = totalC + totalW > 0 ? Math.round((totalC / (totalC + totalW)) * 100) : 0;
       const trend = sorted.slice(0, 5).reverse().map((t) => t.subjects[sub.key]?.net ?? 0);
+      const prevNet = sorted[1]?.subjects[sub.key]?.net;
+      // Onceki kayit yoksa delta 0 DEGIL null: "0,0" degisim olmadigini
+      // soyler, oysa karsilastirilacak bir onceki deneme hic yok.
+      const delta = prevNet == null ? null : net - prevNet;
+      const lo = Math.min(...trend);
+      const hi = Math.max(...trend);
       return {
         key: sub.key,
         name: sub.name,
@@ -41,6 +47,9 @@ function buildItems(allSubjects, trials, filter, accent) {
         accuracy,
         trialCount: history.length,
         trend,
+        delta,
+        lo,
+        hi,
       };
     })
     .filter(Boolean)
@@ -79,7 +88,6 @@ export default function SubjectListScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground />
       <View style={[s.header, { borderBottomColor: C.border }]}>
         <Pressable
           onPress={() => navigation.goBack()}
@@ -89,7 +97,7 @@ export default function SubjectListScreen() {
         >
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginLeft: SPACING.md }]}>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginLeft: STEP.s2 }]}>
           Ders Analizi
         </Text>
       </View>
@@ -100,9 +108,7 @@ export default function SubjectListScreen() {
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <Text style={[TYPOGRAPHY.body, { color: C.muted, textAlign: "center", marginTop: 60 }]}>
-            Bu filtre için deneme verisi yok.
-          </Text>
+          <EmptyState title="Bu filtre için deneme verisi yok." />
         }
       />
     </SafeAreaView>
@@ -113,9 +119,9 @@ const s = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s2,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  list: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: 100 },
+  list: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 2 },
 });
