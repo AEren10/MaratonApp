@@ -27,8 +27,6 @@ export async function logXP(userId, amount, action) {
   }
 }
 
-const MAX_XP_ROWS = 5000;
-
 function sumAmounts(rows) {
   if (!Array.isArray(rows)) return 0;
   return rows.reduce((acc, r) => acc + (Number(r?.amount) || 0), 0);
@@ -62,7 +60,7 @@ async function totalsFromClient(userId) {
   // YOKTU — 5000'den fazla olayı olan kullanıcıda Postgres rastgele 5000 satır
   // döndürüyor, toplam XP sessizce eksik çıkıyordu.
   let total = 0;
-  for (let from = 0; from < MAX_XP_ROWS; from += PAGE_SIZE) {
+  for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
       .from("xp_events")
       .select("amount")

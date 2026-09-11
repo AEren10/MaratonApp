@@ -55,3 +55,8 @@
 
 - `route_weeks` hem okuma hem yazma tarafında sınav tipine göre ayrılmalı. `exam_type` kolonu olup conflict target hâlâ `(user_id, week_start)` kalırsa aynı haftadaki YKS/LGS rotaları birbirini ezebilir.
 - Rota revizyonları, durakları ve hafta özetleri aynı scope kuralıyla ilerlemeli; sınav tipi değişimi yalnız pause/resume değil persisted haftalar için de veri bütünlüğü meselesi.
+
+## 2026-09-12 — XP fallback toplamları
+
+- Sunucu RPC yokken kullanılan XP fallback'i “geçici” olsa bile satır limitiyle toplam üretmemeli. Kullanıcı çok aktifse 5000 kayıt üstü toplamlar eksik görünür.
+- Fallback kodlarında yorum ile gerçek kontrol koşulu birlikte denetlenmeli; “sayfaladık” deyip döngüyü üst sınırla kesmek sessiz veri eksiltir.
