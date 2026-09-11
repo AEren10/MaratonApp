@@ -19,7 +19,7 @@ function TaskRow({ item, C, isLast, isNext, onToggle, onStart }) {
   const estMin = item.count > 0 ? Math.round(item.count * 1.2) : 0;
 
   return (
-    <Pressable onPress={onToggle} hitSlop={4} style={[s.row, !isLast && { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.06)" }]}>
+    <Pressable onPress={onToggle} hitSlop={4} style={[s.row, !isLast && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
       <View style={[s.checkBox, { borderColor: item.completed ? C.green : C.muted, backgroundColor: item.completed ? C.green : "transparent" }]}>
         {item.completed ? <Icon name="check" size={12} color={C.textOnFill} sw={2.5} /> : null}
       </View>

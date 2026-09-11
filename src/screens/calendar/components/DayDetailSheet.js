@@ -111,7 +111,7 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
 
 const makeStyles = (C) =>
   StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+    backdrop: { flex: 1, backgroundColor: C.scrim, justifyContent: "flex-end" },
     sheet: {
       backgroundColor: C.bg,
       borderTopLeftRadius: SHAPE.sheet,

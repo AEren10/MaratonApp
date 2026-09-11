@@ -84,11 +84,11 @@ export function ExamCountdown({ onPress }) {
         <View style={{ flex: 1, gap: 2 }}>
           <Text
             style={{
+              // 11px tasarim tabani: fontSize kaldirildi, TYPOGRAPHY.label
+              // (11.5px) kendi olcusunu kullaniyor.
               ...TYPOGRAPHY.label,
-              fontSize: 10,
-              fontFamily: "Archivo_600",
               letterSpacing: 1.3,
-              color: C.muted,
+              color: C.text3,
             }}
           >
             {label}

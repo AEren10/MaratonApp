@@ -180,6 +180,11 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     heat3: mix(accent, isDark ? 62 : 56, bg),
     heat4: mix(accent, isDark ? 82 : 80, bg),
 
+    // Modal zemini ve gorsel ustu karartma. Satir ici rgba() yerine tek
+    // kaynak: acik temada da dogru koyulukta kaliyor.
+    scrim: alpha("#000000", isDark ? 74 : 52),
+    scrimSoft: alpha("#000000", isDark ? 45 : 32),
+
     subjects: SUBJECT_COLORS[isDark ? "dark" : "light"],
   };
 

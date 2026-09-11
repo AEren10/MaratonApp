@@ -2,8 +2,10 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 
 export const SubjectRow = React.memo(function SubjectRow({ subject, identity, textColor, mutedColor, surface2Color, onPress, isLast }) {
+  const C = useC();
   const { solid, tint } = identity;
   const pct = subject.pct || 0;
 
@@ -16,7 +18,7 @@ export const SubjectRow = React.memo(function SubjectRow({ subject, identity, te
         paddingVertical: 13,
         gap: 14,
         borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: "rgba(255,255,255,0.06)",
+        borderBottomColor: C.line,
         opacity: pressed ? 0.75 : 1,
       })}
     >

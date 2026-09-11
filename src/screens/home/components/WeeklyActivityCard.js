@@ -146,8 +146,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   dayLabel: {
+    // Tasarim tabani 11px; 9px okunur alt sinirin altindaydi.
     fontFamily: "Archivo_600",
-    fontSize: 9,
-    lineHeight: 11,
+    fontSize: 11,
+    lineHeight: 14,
   },
 });

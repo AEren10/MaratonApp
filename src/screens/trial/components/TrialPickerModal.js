@@ -45,7 +45,7 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
   const C = useC();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Kapat">
+      <Pressable style={[styles.backdrop, { backgroundColor: C.scrim }]} onPress={onClose} accessibilityLabel="Kapat">
         <Pressable onPress={() => {}} style={[styles.sheet, { backgroundColor: C.surface, borderColor: C.border }]}>
           <View style={styles.head}>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Deneme seç</Text>
@@ -79,7 +79,7 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "flex-end" },
+  backdrop: { flex: 1, justifyContent: "flex-end" },
   sheet: { borderTopLeftRadius: SHAPE.sheet, borderTopRightRadius: SHAPE.sheet, borderWidth: 1, borderBottomWidth: 0 },
   head: {
     flexDirection: "row",

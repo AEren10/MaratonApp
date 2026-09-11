@@ -33,7 +33,7 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
             <Text style={{ fontFamily: "Archivo_600", fontSize: 20, color: C.text2 }}>{initials}</Text>
           )}
           {uploading ? (
-            <View style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.45)", alignItems: "center", justifyContent: "center" }}>
+            <View style={{ position: "absolute", inset: 0, backgroundColor: C.scrimSoft, alignItems: "center", justifyContent: "center" }}>
               <ActivityIndicator color={C.accentInk} size="small" />
             </View>
           ) : null}

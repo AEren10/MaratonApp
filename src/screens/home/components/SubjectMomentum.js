@@ -48,7 +48,7 @@ function SubjectRow({ item, C, isLast }) {
     <View
       style={[
         styles.row,
-        !isLast && { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.06)" },
+        !isLast && { borderBottomWidth: 1, borderBottomColor: C.line },
       ]}
     >
       <View style={[styles.dot, { backgroundColor: item.color }]} />

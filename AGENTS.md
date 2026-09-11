@@ -26,10 +26,28 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before 
 9. Ders renkleri src/themes/palette.js'ten (subjects.js eski isimleri esliyor)
 
 ## State Management
-- Redux: studyLog (daily logs, streak), trials (deneme sonuclari)
-- Context: AuthContext (session/user), ThemeContext (colors), ExamContext (exam type/date)
-- AsyncStorage: preferences, offline queue
+
+Store'un GERCEK hali (src/store/store.js) -- doküman bununla senkron tutulmali,
+yoksa Redux / AsyncStorage / Supabase arasinda cift otorite olusur.
+
+- Redux (6 dilim):
+  - `studyLog` — gunluk kayitlar, seri
+  - `trials` — deneme sonuclari
+  - `gamification` — XP, seviye (sunucu otorite; istemci yalniz gosterim)
+  - `goals` — gunluk/haftalik hedefler (AsyncStorage'a da yaziliyor)
+  - `plan` — gunun plani
+  - `userTasks` — kullanicinin kendi ekledigi duraklar
+- Context: AuthContext (session/user), ThemeContext (colors), ExamContext
+  (exam type/date + target/baseline net), PremiumContext (erisim anlik
+  goruntusu), DataSyncContext
+- AsyncStorage: preferences, offline queue, exam config yedegi
 - SecureStore: auth tokens ONLY
+
+**Otorite kurali:** bir veri hem Redux'ta hem Supabase'de tutuluyorsa SUNUCU
+otoritedir; yerel kopya yalniz cevrimdisi dayaniklilik icindir ve baglanti
+gelince sunucuya yeniden denenmelidir (bkz. ExamContext.retryPendingNetSync).
+Tek istisna: kullanicinin AZ ONCE girdigi ve sunucuya yazilamamis deger --
+bekleyen bayrak varsa yerel kazanir, cunku sunucudaki deger eskidir.
 
 ## Styling Rules
 

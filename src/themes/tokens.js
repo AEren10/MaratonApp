@@ -7,54 +7,14 @@ import { buildPalette } from "./palette";
 // calisma zamani paleti icin paletteFor() / C kullanilir.
 
 
-// Subject identity palette — her ders kendi rengi.
-// Light + dark için ayrı: hem solid (ikon/buton) hem tint (background wash).
-export const SUBJECT_COLORS = {
-  light: {
-    turkce:       { solid: "#3b82f6", tint: "#dbeafe", soft: "#93c5fd" }, // mavi
-    matematik:    { solid: "#f97316", tint: "#ffedd5", soft: "#fdba74" }, // turuncu
-    fen:          { solid: "#10b981", tint: "#d1fae5", soft: "#6ee7b7" }, // yeşil
-    sosyal:       { solid: "#a855f7", tint: "#f3e8ff", soft: "#c4b5fd" }, // violet
-    fizik:        { solid: "#06b6d4", tint: "#cffafe", soft: "#67e8f9" }, // cyan
-    kimya:        { solid: "#ec4899", tint: "#fce7f3", soft: "#f9a8d4" }, // pembe
-    biyoloji:     { solid: "#10b981", tint: "#d1fae5", soft: "#6ee7b7" },
-    tarih:        { solid: "#eab308", tint: "#fef9c3", soft: "#fde047" }, // amber
-    cografya:     { solid: "#14b8a6", tint: "#ccfbf1", soft: "#5eead4" }, // teal
-    felsefe:      { solid: "#a855f7", tint: "#f3e8ff", soft: "#c4b5fd" },
-    din:          { solid: "#84cc16", tint: "#ecfccb", soft: "#bef264" }, // lime
-    edebiyat:     { solid: "#ec4899", tint: "#fce7f3", soft: "#f9a8d4" }, // pembe
-    ydt_ingilizce:{ solid: "#8b5cf6", tint: "#ede9fe", soft: "#c4b5fd" },
-  },
-  dark: {
-    turkce:       { solid: "#60a5fa", tint: "rgba(96,165,250,0.16)",   soft: "rgba(96,165,250,0.32)" },
-    matematik:    { solid: "#fb923c", tint: "rgba(251,146,60,0.16)",   soft: "rgba(251,146,60,0.32)" },
-    fen:          { solid: "#34d399", tint: "rgba(52,211,153,0.16)",   soft: "rgba(52,211,153,0.32)" },
-    sosyal:       { solid: "#c084fc", tint: "rgba(192,132,252,0.16)",  soft: "rgba(192,132,252,0.32)" },
-    fizik:        { solid: "#22d3ee", tint: "rgba(34,211,238,0.16)",   soft: "rgba(34,211,238,0.32)" },
-    kimya:        { solid: "#f472b6", tint: "rgba(244,114,182,0.16)",  soft: "rgba(244,114,182,0.32)" },
-    biyoloji:     { solid: "#34d399", tint: "rgba(52,211,153,0.16)",   soft: "rgba(52,211,153,0.32)" },
-    tarih:        { solid: "#fbbf24", tint: "rgba(251,191,36,0.16)",   soft: "rgba(251,191,36,0.32)" },
-    cografya:     { solid: "#2dd4bf", tint: "rgba(45,212,191,0.16)",   soft: "rgba(45,212,191,0.32)" },
-    felsefe:      { solid: "#c084fc", tint: "rgba(192,132,252,0.16)",  soft: "rgba(192,132,252,0.32)" },
-    din:          { solid: "#84cc16", tint: "rgba(132,204,22,0.16)",   soft: "rgba(132,204,22,0.32)" },
-    edebiyat:     { solid: "#f472b6", tint: "rgba(244,114,182,0.16)",  soft: "rgba(244,114,182,0.32)" },
-    ydt_ingilizce:{ solid: "#a78bfa", tint: "rgba(167,139,250,0.16)",  soft: "rgba(167,139,250,0.32)" },
-  },
-};
-
-// Helper — şu anki temaya göre ders kimliğini ver
-export function getSubjectIdentity(scheme, key) {
-  const map = SUBJECT_COLORS[scheme] || SUBJECT_COLORS.light;
-  // Trial keys (tyt_*, ayt_*) için curriculum key'e indir
-  const norm = key
-    ?.replace(/^tyt_/, "")
-    .replace(/^ayt_/, "")
-    .replace(/_(ea|soz|say|sozel|sayisal)$/, "")
-    .replace(/^ayt_ea_/, "")
-    .replace(/^ayt_say_/, "")
-    .replace(/^ayt_sozel_/, "");
-  return map[norm] || map[key] || { solid: "#9B7BFF", tint: "rgba(155,123,255,0.16)", soft: "rgba(155,123,255,0.32)" };
-}
+// Ders renkleri ARTIK BURADA DEGIL: tek kaynak src/themes/palette.js
+// icindeki SUBJECT_COLORS (turetilmis oklab paleti).
+//
+// Burada ayni haritanin eski palet degerleriyle ikinci bir kopyasi ve bir
+// `getSubjectIdentity(scheme, key)` yardimcisi vardi. Hicbir yer import
+// etmiyordu -- `useSubjectIdentity` ThemeContext'teki subjectIdentity()
+// uzerinden palette.subjects'i okuyor. Iki harita zamanla ayrisabilecegi
+// icin olu kopya silindi (yedek rengi de olu mor #9B7BFF idi).
 
 // Surface elevation (gölge) — light için belirgin, dark için minimal
 export const ELEVATION = {
