@@ -7,9 +7,9 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { GlassCard, Icon } from "../../../components/design";
+import { Card, Icon } from "../../../components/design";
 
 function Bar({ name, color, net, max, delay, onPress, C }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
@@ -27,7 +27,12 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
   }));
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: SPACING.sm, opacity: pressed ? 0.7 : 1 }]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${name}: ${Number(net).toFixed(1)} / ${max}`}
+      style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: STEP.s1, opacity: pressed ? 0.7 : 1 }]}
+    >
       <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
       <Text
         style={{ ...TYPOGRAPHY.captionMedium, color, width: 74 }}
@@ -49,10 +54,10 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
         />
       </View>
 
-      <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.text, width: 60, textAlign: "right", letterSpacing: -0.3 }}>
-        {Number(net).toFixed(1)}<Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>/{max}</Text>
+      <Text style={{ ...TYPOGRAPHY.statMedium, fontSize: 13, lineHeight: 16, color: C.text, width: 60, textAlign: "right" }}>
+        {Number(net).toFixed(1)}<Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>/{max}</Text>
       </Text>
-      <Icon name="chevR" size={12} color={C.muted} />
+      <Icon name="chevR" size={12} color={C.text3} />
     </Pressable>
   );
 }
@@ -60,13 +65,14 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
 export function SubjectBars({ bars, onBarPress }) {
   const C = useC();
   return (
-    <View style={{ gap: SPACING.md }}>
+    <View style={{ gap: STEP.s2 }}>
       <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Ders Bazlı</Text>
-      <GlassCard
-        radius={24}
+      <Card
+        tone="surface"
+        radius="sheet"
         style={{
-          padding: SPACING.lg,
-          gap: SPACING.md,
+          padding: STEP.s3,
+          gap: STEP.s2,
         }}
       >
         {bars.map((b, i) => (
@@ -81,7 +87,7 @@ export function SubjectBars({ bars, onBarPress }) {
             C={C}
           />
         ))}
-      </GlassCard>
+      </Card>
     </View>
   );
 }

@@ -8,8 +8,8 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
-import { GlassCard, Icon } from "../../../components/design";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { Card, Icon } from "../../../components/design";
 
 function MiniTrend({ data, color }) {
   if (!data || data.length < 2) return null;
@@ -46,7 +46,7 @@ function NetBar({ pct, color, delay }) {
   }, [pct, delay]);
   const fillStyle = useAnimatedStyle(() => ({ width: `${width.value * 100}%` }));
   return (
-    <View style={{ height: 6, borderRadius: 3, backgroundColor: color + "20", overflow: "hidden", marginTop: SPACING.xs }}>
+    <View style={{ height: 6, borderRadius: 3, backgroundColor: color + "20", overflow: "hidden", marginTop: STEP.s1 }}>
       <Animated.View style={[{ height: 6, borderRadius: 3, backgroundColor: color }, fillStyle]} />
     </View>
   );
@@ -56,43 +56,48 @@ export const SubjectListCard = React.memo(function SubjectListCard({ item, index
   const { name, color, net, max, avgNet, accuracy, trialCount, trend } = item;
   return (
     <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
-      <Pressable onPress={onPress} style={({ pressed }) => [{ opacity: pressed ? 0.75 : 1, marginBottom: SPACING.sm }]}>
-        <GlassCard style={s.card}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${name}, ${Number(net).toFixed(1)} net`}
+        style={({ pressed }) => [{ opacity: pressed ? 0.75 : 1, marginBottom: STEP.s1 }]}
+      >
+        <Card tone="surface" radius="cardTight" style={s.card}>
           <View style={s.cardTop}>
             <View style={[s.dot, { backgroundColor: color }]} />
             <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]} numberOfLines={1}>{name}</Text>
-            <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color, letterSpacing: -0.5 }}>
+            <Text style={[TYPOGRAPHY.statMedium, { color, fontSize: 22, lineHeight: 26 }]}>
               {Number(net).toFixed(1)}
-              <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>/{max}</Text>
+              <Text style={{ ...TYPOGRAPHY.caption, color: C.text3 }}>/{max}</Text>
             </Text>
-            <Icon name="chevR" size={13} color={C.muted} />
+            <Icon name="chevR" size={13} color={C.text3} />
           </View>
           <NetBar pct={max > 0 ? Math.min(net / max, 1) : 0} color={color} delay={index * 60} />
           <View style={s.cardBottom}>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color }}>{Number(avgNet).toFixed(1)}</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>ort net</Text>
+              <Text style={[TYPOGRAPHY.statSmall, { color: C.text, fontSize: 13, lineHeight: 16 }]}>{Number(avgNet).toFixed(1)}</Text>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>ort net</Text>
             </View>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.green }}>{accuracy}%</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>doğruluk</Text>
+              <Text style={[TYPOGRAPHY.statSmall, { color: C.text, fontSize: 13, lineHeight: 16 }]}>{accuracy}%</Text>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>doğruluk</Text>
             </View>
             <View style={s.statChip}>
-              <Text style={{ fontFamily: "Bricolage_400", fontSize: 13, color: C.text }}>{trialCount}</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>deneme</Text>
+              <Text style={[TYPOGRAPHY.statSmall, { color: C.text, fontSize: 13, lineHeight: 16 }]}>{trialCount}</Text>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>deneme</Text>
             </View>
             <MiniTrend data={trend} color={color} />
           </View>
-        </GlassCard>
+        </Card>
       </Pressable>
     </Animated.View>
   );
 });
 
 const s = StyleSheet.create({
-  card: { padding: SPACING.md, gap: SPACING.xs },
-  cardTop: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+  card: { gap: STEP.s1 },
+  cardTop: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  cardBottom: { flexDirection: "row", alignItems: "center", gap: SPACING.md, marginTop: SPACING.sm },
+  cardBottom: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s1 },
   statChip: { alignItems: "center", gap: 1 },
 });

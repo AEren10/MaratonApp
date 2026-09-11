@@ -3,7 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TrendChart } from "../../../components/charts/TrendChart";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 
 export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
   if (!analysis.heroLine || analysis.heroLine.length <= 1) return null;
@@ -28,11 +28,12 @@ export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
-            marginTop: SPACING.lg,
-            paddingVertical: 12,
-            paddingHorizontal: SPACING.lg,
-            backgroundColor: C.accent + "18",
-            borderRadius: RADIUS.lg,
+            marginTop: STEP.s3,
+            minHeight: CONTROL.tapMin,
+            paddingVertical: STEP.s2,
+            paddingHorizontal: STEP.s3,
+            backgroundColor: C.brandTint,
+            borderRadius: SHAPE.button,
             borderWidth: 1,
             borderColor: C.accent + "30",
           }}

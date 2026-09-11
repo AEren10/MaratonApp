@@ -1,65 +1,46 @@
 import { View, Text, Pressable } from "react-native";
-import { Icon, Trend, GlassCard } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Icon, Trend, Card, StatBlock } from "../../../components/design";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-const getTypeBadge = (C) => ({
-  TYT: { label: "TYT", color: C.blue },
-  AYT_SAY: { label: "AYT SAY", color: C.amber },
-  AYT_EA: { label: "AYT EA", color: C.purple },
-  AYT_SOZ: { label: "AYT SOZ", color: C.green },
-  BRANCH: { label: "Branş", color: C.teal },
-  AYT: { label: "AYT", color: C.amber },
-});
+const TYPE_LABEL = {
+  TYT: "TYT",
+  AYT_SAY: "AYT SAY",
+  AYT_EA: "AYT EA",
+  AYT_SOZ: "AYT SOZ",
+  BRANCH: "Branş",
+  AYT: "AYT",
+};
 
 function HistoryRow({ item, onPress, C }) {
-  const badge = getTypeBadge(C)[item.trialType] || null;
+  const label = TYPE_LABEL[item.trialType] || null;
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
-        paddingVertical: SPACING.md,
-        paddingHorizontal: SPACING.lg,
+        minHeight: CONTROL.tapMin,
+        paddingVertical: STEP.s2,
+        paddingHorizontal: STEP.s3,
         opacity: pressed ? 0.8 : 1,
       })}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
-          {badge && (
-            <View
-              style={{
-                alignSelf: "flex-start",
-                backgroundColor: badge.color + "25",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-                borderRadius: 6,
-                marginBottom: 4,
-              }}
-            >
-              <Text style={{ ...TYPOGRAPHY.micro, color: badge.color, letterSpacing: 0.5 }}>
-                {badge.label}
-              </Text>
-            </View>
+          {label && (
+            <Text style={{ ...TYPOGRAPHY.label, color: C.text2, marginBottom: 4 }}>
+              {label}
+            </Text>
           )}
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.sec }}>{item.date}</Text>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text2 }}>{item.date}</Text>
         </View>
 
-        <Text
-          style={{
-            fontFamily: "Bricolage_400",
-            fontSize: 18,
-            color: C.text,
-            marginRight: SPACING.md,
-          }}
-        >
-          {item.net}
-        </Text>
+        <StatBlock value={item.net} size="value" color={C.text} style={{ marginRight: STEP.s2 }} />
 
-        <View style={{ marginRight: SPACING.md }}>
+        <View style={{ marginRight: STEP.s2 }}>
           <Trend v={item.trend} size={11} />
         </View>
 
-        <Icon name="chevR" size={16} color={C.sec} />
+        <Icon name="chevR" size={16} color={C.text2} />
       </View>
     </Pressable>
   );
@@ -68,61 +49,64 @@ function HistoryRow({ item, onPress, C }) {
 export function HistoryList({ history, onPress, onCompare }) {
   const C = useC();
   return (
-    <View style={{ gap: SPACING.md }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
-        <Icon name="clock" size={18} color={C.sec} />
+    <View style={{ gap: STEP.s2 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 }}>
+        <Icon name="clock" size={18} color={C.text2} />
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Geçmiş Denemeler</Text>
       </View>
 
-      <GlassCard radius={RADIUS.xxl}>
+      <Card tone="surface" radius="sheet" padded={false}>
         {history.map((h, i) => (
           <View key={h.id || h.date}>
             {i > 0 && (
-              <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: SPACING.lg }} />
+              <View style={{ height: 1, backgroundColor: C.line, marginHorizontal: STEP.s3 }} />
             )}
             <HistoryRow item={h} onPress={() => onPress?.(h)} C={C} />
           </View>
         ))}
-      </GlassCard>
+      </Card>
 
       {history.length >= 2 && onCompare && (
         <Pressable
           onPress={onCompare}
+          accessibilityRole="button"
+          accessibilityLabel="Denemeleri Karşılaştır"
           style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
         >
-          <GlassCard radius={RADIUS.xxl} color={C.accent}>
+          <Card
+            tone="surface"
+            radius="sheet"
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: STEP.s3,
+              paddingVertical: STEP.s3,
+              gap: STEP.s2,
+              borderColor: C.accent + "30",
+            }}
+          >
             <View
               style={{
-                flexDirection: "row",
+                width: 44,
+                height: 44,
+                borderRadius: SHAPE.iconBox,
+                backgroundColor: C.brandTint,
                 alignItems: "center",
-                paddingHorizontal: SPACING.xl,
-                paddingVertical: SPACING.lg,
-                gap: SPACING.md,
+                justifyContent: "center",
               }}
             >
-              <View
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: RADIUS.xl,
-                  backgroundColor: C.accent + "22",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon name="barChart" size={20} color={C.accent} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
-                  Denemeleri Karşılaştır
-                </Text>
-                <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 }}>
-                  Son iki denemeni kıyasla
-                </Text>
-              </View>
-              <Icon name="chevR" size={18} color={C.accent} />
+              <Icon name="barChart" size={20} color={C.accent} />
             </View>
-          </GlassCard>
+            <View style={{ flex: 1 }}>
+              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
+                Denemeleri Karşılaştır
+              </Text>
+              <Text style={{ ...TYPOGRAPHY.caption, color: C.text2, marginTop: 2 }}>
+                Son iki denemeni kıyasla
+              </Text>
+            </View>
+            <Icon name="chevR" size={18} color={C.accent} />
+          </Card>
         </Pressable>
       )}
     </View>

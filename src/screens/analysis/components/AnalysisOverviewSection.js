@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
 
-import { Icon, GlassCard, Stat, Trend, Chip, SectionLabel } from "../../../components/design";
+import { Icon, Card, StatBlock, Trend, Chip, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { LatestScore } from "./LatestScore";
 
 export function AnalysisOverviewSection({ C, analysis, filter }) {
@@ -10,19 +10,19 @@ export function AnalysisOverviewSection({ C, analysis, filter }) {
     <>
       <SectionLabel>GENEL</SectionLabel>
       {filter === "ALL" && analysis.typeBreakdown?.length > 1 ? (
-        <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+        <View style={{ flexDirection: "row", gap: STEP.s1 }}>
           {analysis.typeBreakdown.map((breakdown) => (
             <AnimatedCard key={breakdown.type} delay={80} style={{ flex: 1 }}>
-              <GlassCard style={{ padding: SPACING.lg, alignItems: "center", gap: SPACING.sm }}>
+              <Card tone="surface" radius="sheet" style={{ padding: STEP.s3, alignItems: "center", gap: STEP.s1 }}>
                 <Chip color={breakdown.color}>{breakdown.label}</Chip>
-                <Stat size={36} color={C.text}>{breakdown.net}</Stat>
-                <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }}>toplam net</Text>
+                <StatBlock value={breakdown.net} size="value" color={C.text} align="center" />
+                <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>toplam net</Text>
                 <Trend v={breakdown.trend} size={12} />
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
-                  <Icon name="calendar" size={11} color={C.muted} />
-                  <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>{breakdown.date}</Text>
+                  <Icon name="calendar" size={11} color={C.text3} />
+                  <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>{breakdown.date}</Text>
                 </View>
-              </GlassCard>
+              </Card>
             </AnimatedCard>
           ))}
         </View>
