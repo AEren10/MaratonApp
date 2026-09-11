@@ -25,3 +25,10 @@ test("explains sparse route signals without blocking the plan", () => {
   assert.equal(copy.title, "Güven başlangıçta");
   assert.match(copy.body, /Rota kullanılabilir/);
 });
+
+test("explains an underfilled daily plan as a safe route limitation", () => {
+  const copy = dailyPlanRiskCopy([{ code: "plan_underfilled", level: "medium" }]);
+
+  assert.equal(copy.title, "Hedef tam dolmadı");
+  assert.match(copy.body, /güvenli görev havuzu/);
+});

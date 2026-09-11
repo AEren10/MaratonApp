@@ -261,6 +261,11 @@ export function generateDailyPlan({
     tasks,
     totalQuestions,
     estimatedMinutes,
-    summary: buildDailyPlanSummary({ tasks, totalQuestions, estimatedMinutes }),
+    summary: buildDailyPlanSummary({
+      tasks,
+      totalQuestions,
+      estimatedMinutes,
+      dailyTarget,
+    }),
   };
 }

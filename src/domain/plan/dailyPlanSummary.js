@@ -68,12 +68,33 @@ function buildNextAction({ source, primaryTask }) {
   return `Önce ${label} görevini bitir; yeni kayıtlar geldikçe program keskinleşir.`;
 }
 
-function collectRisks({ source, routeTaskCount, confidenceLevel }) {
+function underfilledRiskLevel(totalQuestions = 0, dailyTarget = 0) {
+  const missing = Math.max(0, Math.round(Number(dailyTarget) || 0) - Math.round(Number(totalQuestions) || 0));
+  const target = Math.max(1, Math.round(Number(dailyTarget) || 0));
+  if (!missing) return null;
+  return missing / target >= 0.25 ? "medium" : "low";
+}
+
+function collectRisks({
+  source,
+  routeTaskCount,
+  confidenceLevel,
+  totalQuestions = 0,
+  dailyTarget = 0,
+}) {
   const risks = [];
   if (source === "empty") risks.push({ code: "plan_data_missing", level: "medium" });
   if (source === "adaptive") risks.push({ code: "route_not_attached", level: "low" });
   if (routeTaskCount > 0 && confidenceLevel === "low") {
     risks.push({ code: "route_signal_sparse", level: "medium" });
+  }
+  const underfilledLevel = underfilledRiskLevel(totalQuestions, dailyTarget);
+  if (underfilledLevel) {
+    risks.push({
+      code: "plan_underfilled",
+      level: underfilledLevel,
+      missingQuestions: Math.max(0, Math.round(Number(dailyTarget) || 0) - Math.round(Number(totalQuestions) || 0)),
+    });
   }
   return risks;
 }
@@ -82,6 +103,7 @@ export function buildDailyPlanSummary({
   tasks = [],
   totalQuestions = 0,
   estimatedMinutes = 0,
+  dailyTarget = 0,
 } = {}) {
   const routeTaskCount = tasks.filter((task) => task.assignment?.source === "route" || task.routeStopId).length;
   const adaptiveTaskCount = Math.max(0, tasks.length - routeTaskCount);
@@ -103,10 +125,18 @@ export function buildDailyPlanSummary({
     routeTaskCount,
     adaptiveTaskCount,
     totalQuestions,
+    targetQuestions: Math.max(0, Math.round(Number(dailyTarget) || 0)),
+    missingQuestions: Math.max(0, Math.round(Number(dailyTarget) || 0) - Math.round(Number(totalQuestions) || 0)),
     estimatedMinutes: Math.round(Number(estimatedMinutes) || 0),
     primaryTaskKey: primaryTask?.planTaskKey || null,
     primarySubject: primaryTask?.subject || null,
     primaryTopic: primaryTask ? taskTopic(primaryTask) : null,
-    risks: collectRisks({ source, routeTaskCount, confidenceLevel: confidence.confidenceLevel }),
+    risks: collectRisks({
+      source,
+      routeTaskCount,
+      confidenceLevel: confidence.confidenceLevel,
+      totalQuestions,
+      dailyTarget,
+    }),
   };
 }

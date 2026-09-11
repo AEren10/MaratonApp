@@ -11,6 +11,10 @@ const RISK_COPY = Object.freeze({
     title: "Güven başlangıçta",
     body: "Rota kullanılabilir; birkaç deneme ve çalışma kaydı daha geldikçe kararlar keskinleşir.",
   },
+  plan_underfilled: {
+    title: "Hedef tam dolmadı",
+    body: "Bugünkü güvenli görev havuzu hedefin altında kaldı; rota ilerledikçe veya adaptif veri arttıkça plan tamamlanır.",
+  },
 });
 
 const LEVEL_ORDER = Object.freeze({ high: 3, medium: 2, low: 1 });

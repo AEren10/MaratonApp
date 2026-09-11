@@ -57,3 +57,25 @@ test("returns an actionable empty state when no task can be generated", () => {
   assert.ok(summary.risks.some((risk) => risk.code === "plan_data_missing"));
   assert.match(summary.nextAction, /İlk hedef veya deneme/);
 });
+
+test("flags a daily plan that cannot safely fill the target", () => {
+  const summary = buildDailyPlanSummary({
+    totalQuestions: 42,
+    dailyTarget: 80,
+    estimatedMinutes: 50,
+    tasks: [{
+      subject: "matematik",
+      subjectLabel: "Matematik",
+      topicLabel: "Problemler",
+      routeStopId: "stop-1",
+      routeConfidence: "high",
+      assignment: { source: "route" },
+    }],
+  });
+
+  const risk = summary.risks.find((item) => item.code === "plan_underfilled");
+  assert.equal(summary.targetQuestions, 80);
+  assert.equal(summary.missingQuestions, 38);
+  assert.equal(risk.level, "medium");
+  assert.equal(risk.missingQuestions, 38);
+});
