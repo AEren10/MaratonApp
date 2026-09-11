@@ -1,182 +1,116 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import React from "react";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { Icon, Card, Button } from "../../components/design";
+import { EmptyState } from "../../components/design/EmptyState";
+import { GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useExam } from "../../contexts/ExamContext";
-import { useAuth } from "../../contexts/AuthContext";
-import { selectLatestTYT, selectLatestAYT } from "../../store/slices/trialSlice";
-import { estimateRank, RANKING_DISCLAIMER } from "../../data/rankingTable";
-import { getProgramById } from "../../data/programs";
-import { getProfile, updateProfile } from "../../supabase/profiles";
-import * as H from "../../lib/haptics";
-import SubjectInputRow from "./components/SubjectInputRow";
-import ProgramPickerModal from "./components/ProgramPickerModal";
-import { FIELD_TO_TYPE, TYT_SUBJECTS, AYT_SUBJECTS_BY_TYPE, SUBJECT_COLORS, calcNet, initialFrom } from "./simulatorConstants";
-import { formatNumber as fmt } from "../../lib/format";
+import { SCREENS } from "../../constants/screens";
+import { useThresholdView } from "../../hooks/useThresholdView";
+import { ThresholdContributorRow } from "./components/ThresholdContributorRow";
 
-
+// AKIŞ 2 · Bölüm Eşiği — Rota Detay'daki "72 net ≈ hangi bölümler?" bağlantısı.
+//
+// DOĞRULANMADI: mockup geçen yılın bölüm taban netlerini gösteriyor
+// (örn. "Hacettepe · 65 net"). Kodda böyle bir taban-net veri kaynağı yok
+// (src/data/programs.js sadece başarı sırası tutuyor). O blok bilerek
+// render edilmiyor; onun yerine hedefe olan net açığı ve açığı kapatan
+// gerçek konu verisi gösteriliyor.
 export default function RankSimulatorScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const { field, examType } = useExam();
-  const { user } = useAuth();
-  // LGS'de field null kalıyor ve "say" varsayılıyordu; LGS öğrencisine AYT
-  // Fizik/Kimya net girişi ve üniversite bölümü seçimi çıkıyordu. Ekran
-  // ana sayfadan ve ayarlardan gizli ama deep-link ile hâlâ açılabilir.
-  const isLGS = examType === "lgs";
-  const type = FIELD_TO_TYPE[field] || "say";
-  const latestTYT = useSelector(selectLatestTYT);
-  const latestAYT = useSelector(selectLatestAYT);
-  const aytSubjects = AYT_SUBJECTS_BY_TYPE[type] || AYT_SUBJECTS_BY_TYPE.say;
+  const { targetNet, currentNet, daysUntilExam, gapResult, canAccess, requestAccess } = useThresholdView();
 
-  const [tytValues, setTytValues] = useState(() => initialFrom(TYT_SUBJECTS, latestTYT));
-  const [aytValues, setAytValues] = useState(() => initialFrom(aytSubjects, latestAYT));
-  const [touched, setTouched] = useState(false);
-  const [targetId, setTargetId] = useState(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  useEffect(() => {
-    if (touched) return;
-    setTytValues(initialFrom(TYT_SUBJECTS, latestTYT));
-    setAytValues(initialFrom(aytSubjects, latestAYT));
-  }, [latestTYT, latestAYT, touched, type]); // eslint-disable-line
-
-  useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
-    getProfile(user.id).then((p) => { if (p?.target_program_id) setTargetId(p.target_program_id); }).catch(() => {});
-  }, [user?.id]);
-
-  const totalNet = (values) => Object.values(values).reduce((s, v) => s + calcNet(v.c, v.w), 0);
-  const tytNet = useMemo(() => totalNet(tytValues), [tytValues]);
-  const aytNet = useMemo(() => totalNet(aytValues), [aytValues]);
-  const baseTytNet = latestTYT?.totalNet || 0;
-  const baseAytNet = latestAYT?.totalNet || 0;
-  const baseRank = useMemo(() => estimateRank({ tytNet: baseTytNet, aytNet: baseAytNet, type }), [baseTytNet, baseAytNet, type]);
-  const simRank = useMemo(() => estimateRank({ tytNet, aytNet, type }), [tytNet, aytNet, type]);
-  const delta = baseRank - simRank;
-  const target = getProgramById(targetId);
-  const reachable = target ? simRank <= target.rank : null;
-
-  const selectTarget = useCallback(async (program) => {
-    H.select();
-    setTargetId(program.id);
-    setPickerOpen(false);
-    if (user?.id && user.id !== "dev") updateProfile(user.id, { target_program_id: program.id }).catch(() => {});
-  }, [user?.id]);
-
-  // Deep-link koruması: bu ekran YKS sıralaması ve üniversite bölümü üzerine
-  // kurulu, LGS'de karşılığı yok. Yanlış veri göstermektense açıkça söyle.
-  if (isLGS) {
+  if (targetNet == null || currentNet == null) {
     return (
-      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-            <Icon name="arrowL" size={22} color={C.text} />
-          </Pressable>
-          <Text style={[styles.title, { color: C.text }]}>Net Simülatörü</Text>
-          <View style={{ width: 22 }} />
-        </View>
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xxxl, gap: SPACING.md }}>
-          <Icon name="info" size={32} color={C.muted} />
-          <Text style={[styles.title, { color: C.text, textAlign: "center" }]}>LGS'de kullanılmıyor</Text>
-          <Text style={{ color: C.sec, textAlign: "center", lineHeight: 20 }}>
-            Bu araç YKS sıralaması ve üniversite tercihi için. LGS hedefini
-            Hedeflerim ekranından takip edebilirsin.
-          </Text>
-        </View>
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <Header onBack={() => navigation.goBack()} C={C} />
+        <EmptyState
+          eyebrow="NET EŞİĞİ"
+          title="Eşik için hedef net gerekiyor"
+          body="Hedef netini Hedeflerim'den belirle, en az bir deneme gir; açığı burada göreceksin."
+          style={{ paddingHorizontal: GUTTER }}
+        />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={[styles.title, { color: C.text }]}>Net Simülatörü</Text>
-        <Pressable onPress={() => { H.tap(); setTouched(false); }} hitSlop={12}><Icon name="refresh" size={20} color={C.muted} /></Pressable>
-      </View>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <Header onBack={() => navigation.goBack()} C={C} />
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(420).springify()} style={[styles.rankCard, { backgroundColor: C.accent + "14", borderColor: C.accent + "30" }]}>
-          <Text style={[styles.rankLabel, { color: C.accent }]}>TAHMİNİ SIRALAMAN</Text>
-          <Text style={[styles.rankBig, { color: C.text }]}>{fmt(simRank)}</Text>
-          {baseRank !== simRank && (
-            <View style={[styles.deltaChip, { backgroundColor: (delta > 0 ? C.green : C.red) + "20" }]}>
-              <Icon name={delta > 0 ? "trendUp" : "trendDown"} size={12} color={delta > 0 ? C.green : C.red} />
-              <Text style={[styles.deltaText, { color: delta > 0 ? C.green : C.red }]}>{delta > 0 ? "↑" : "↓"} {fmt(Math.abs(delta))} sıra</Text>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s4 }} showsVerticalScrollIndicator={false}>
+        <Animated.View entering={FadeInDown.duration(420)} style={{ marginTop: STEP.s2 }}>
+          <Text style={{ ...TYPOGRAPHY.heading, color: C.text, maxWidth: 300 }}>
+            {targetNet} net nereye yeter?
+          </Text>
+          <Text style={{ ...TYPOGRAPHY.body, color: C.text3, marginTop: STEP.s2, maxWidth: 306 }}>
+            {gapResult?.reached
+              ? `Şu an ${currentNet.toFixed(1)} nettesin, hedefi zaten geçtin.`
+              : `Şu an ${currentNet.toFixed(1)} net, hedefe ${gapResult?.gap ?? 0} net kaldı${daysUntilExam ? ` · ${daysUntilExam} gün` : ""}.`}
+          </Text>
+        </Animated.View>
+
+        <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3 }}>
+          <Text style={{ ...TYPOGRAPHY.label, color: C.text3 }}>DOĞRULANMADI</Text>
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.text2, marginTop: STEP.s1 }}>
+            Bölümlerin geçen yılki taban netleri bu sürümde veri kaynağı olarak yok.
+            O yüzden burada bölüm listesi yerine hedefe olan gerçek net açığın var.
+          </Text>
+        </Card>
+
+        {!gapResult?.reached && gapResult?.topContributors?.length > 0 ? (
+          <View style={{ marginTop: STEP.s3 }}>
+            <Text style={{ ...TYPOGRAPHY.label, color: C.text2, marginBottom: STEP.s2 }}>
+              AÇIĞI KAPATAN KONULAR
+            </Text>
+            <View style={{ gap: STEP.s1 }}>
+              {gapResult.topContributors.slice(0, 6).map((item, i) => (
+                <Animated.View key={`${item.subject}-${item.topic}`} entering={FadeInDown.delay(60 + i * 50).duration(360)}>
+                  <ThresholdContributorRow item={item} locked={!canAccess} />
+                </Animated.View>
+              ))}
             </View>
-          )}
-          <Text style={[styles.netSummary, { color: C.sec }]}>TYT {tytNet.toFixed(1)} · AYT {aytNet.toFixed(1)} net</Text>
-        </Animated.View>
+            {!canAccess ? (
+              <Pressable onPress={requestAccess} accessibilityRole="button" accessibilityLabel="Kilidi aç" style={{ marginTop: STEP.s2, minHeight: 44, justifyContent: "center" }}>
+                <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textAlign: "center" }}>Kilidi açmak için dokun</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
 
-        <Animated.View entering={FadeInDown.delay(70).duration(420).springify()}>
-          <Pressable onPress={() => { H.tap(); setPickerOpen(true); }} style={{ marginTop: 14 }}>
-            <View style={[styles.targetCard, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.targetLabel, { color: C.muted }]}>HEDEF BÖLÜM</Text>
-                {target ? (
-                  <>
-                    <Text style={[styles.targetName, { color: C.text }]} numberOfLines={1}>{target.name}</Text>
-                    <Text style={[styles.targetUni, { color: C.sec }]} numberOfLines={1}>{target.uni}</Text>
-                    <View style={styles.targetStatus}>
-                      <Icon name={reachable ? "check" : "alert"} size={13} color={reachable ? C.green : C.red} />
-                      <Text style={[styles.targetHint, { color: reachable ? C.green : C.red }]}>
-                        {reachable ? `Ulaştın! (kabul ~${fmt(target.rank)})` : `Kabul için ~${fmt(target.rank)} gerek`}
-                      </Text>
-                    </View>
-                  </>
-                ) : <Text style={[styles.targetName, { color: C.muted }]}>Bölüm seç</Text>}
-              </View>
-              <View style={[styles.targetIcon, { backgroundColor: C.accent + "1A" }]}><Icon name="chevR" size={18} color={C.accent} /></View>
-            </View>
-          </Pressable>
-        </Animated.View>
+        {!gapResult?.reached && gapResult && !gapResult.reachable ? (
+          <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3, borderColor: C.red }}>
+            <Text style={{ ...TYPOGRAPHY.caption, color: C.red }}>
+              Tüm konular ustalaşılsa bile ulaşılabilir en yüksek net ~{gapResult.maxPossibleNet}.
+              Hedef netini gözden geçirmek isteyebilirsin.
+            </Text>
+          </Card>
+        ) : null}
 
-        <Animated.View entering={FadeInDown.delay(140).duration(420).springify()}>
-          <Text style={[styles.sectionTitle, { color: C.muted }]}>TYT NETLERİN</Text>
-          {TYT_SUBJECTS.map((subj) => (
-            <SubjectInputRow key={subj.key} subject={subj} values={tytValues[subj.key] || { c: "", w: "" }} onChange={(v) => { setTouched(true); setTytValues((p) => ({ ...p, [subj.key]: v })); }} color={C[SUBJECT_COLORS[subj.key]] || C.purple} C={C} />
-          ))}
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(210).duration(420).springify()}>
-          <Text style={[styles.sectionTitle, { color: C.muted }]}>AYT NETLERİN ({type.toUpperCase()})</Text>
-          {aytSubjects.map((subj) => (
-            <SubjectInputRow key={subj.key} subject={subj} values={aytValues[subj.key] || { c: "", w: "" }} onChange={(v) => { setTouched(true); setAytValues((p) => ({ ...p, [subj.key]: v })); }} color={C[SUBJECT_COLORS[subj.key]] || C.purple} C={C} />
-          ))}
-        </Animated.View>
-
-        <Text style={[styles.disclaimer, { color: C.muted }]}>{RANKING_DISCLAIMER}</Text>
+        <Button
+          variant="outline"
+          size="lg"
+          fullWidth
+          style={{ marginTop: STEP.s4 }}
+          onPress={() => navigation.navigate(SCREENS.ROADMAP)}
+        >
+          Rotanın tamamını gör
+        </Button>
       </ScrollView>
-
-      <ProgramPickerModal visible={pickerOpen} onClose={() => setPickerOpen(false)} onSelect={selectTarget} type={type} C={C} />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  title: { ...TYPOGRAPHY.subheading },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  rankCard: { padding: 22, alignItems: "center", borderRadius: 26, borderWidth: 1 },
-  rankLabel: { ...TYPOGRAPHY.label, letterSpacing: 0.8 },
-  rankBig: { fontFamily: "Bricolage_400", fontSize: 44, marginTop: 6, letterSpacing: -1.5 },
-  deltaChip: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 8 },
-  deltaText: { ...TYPOGRAPHY.captionMedium },
-  netSummary: { ...TYPOGRAPHY.caption, marginTop: 10 },
-  targetCard: { flexDirection: "row", alignItems: "center", padding: 16, borderRadius: 22, borderWidth: 1 },
-  targetLabel: { ...TYPOGRAPHY.label, letterSpacing: 0.6 },
-  targetName: { ...TYPOGRAPHY.bodySemiBold, marginTop: 4, fontSize: 16 },
-  targetUni: { ...TYPOGRAPHY.caption, marginTop: 2 },
-  targetStatus: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 },
-  targetHint: { ...TYPOGRAPHY.captionMedium },
-  targetIcon: { width: 32, height: 32, borderRadius: 11, alignItems: "center", justifyContent: "center" },
-  sectionTitle: { ...TYPOGRAPHY.label, marginTop: 24, marginBottom: 10 },
-  disclaimer: { ...TYPOGRAPHY.micro, marginTop: SPACING.xl, textAlign: "center", lineHeight: 16 },
-});
+function Header({ onBack, C }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 }}>
+      <Pressable onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
+        <Icon name="arrowL" size={22} color={C.text} />
+      </Pressable>
+      <Text style={{ ...TYPOGRAPHY.label, color: C.text3, marginLeft: STEP.s1 }}>NET EŞİĞİ</Text>
+    </View>
+  );
+}

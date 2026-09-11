@@ -12,7 +12,7 @@ export function AnalysisShortcutRow({ C, go, screens }) {
           C={C}
           color={C.accent}
           icon="trendUp"
-          label="Net Tahmini"
+          label="Senaryolar"
           onPress={() => go(screens.NET_FORECAST, undefined, "analysis_net_forecast")}
         />
         <Shortcut

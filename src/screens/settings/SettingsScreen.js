@@ -117,7 +117,7 @@ export default function SettingsScreen() {
             {/* Net Simülatörü YKS'ye özgü: YKS sıralaması ve üniversite bölümü
                 seçimi içeriyor, LGS'de karşılığı yok. */}
             {examType !== "lgs" && (
-              <SettingsRow icon="chart" iconColor={C.pink} label="Net Simülatörü" onPress={gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
+              <SettingsRow icon="chart" iconColor={C.pink} label="Net Eşiği" onPress={gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
             )}
             <SettingsRow icon="layers" iconColor={C.teal} label="Yol Haritası" onPress={gatedGo("detailed_roadmap", SCREENS.ROADMAP)} />
             <SettingsRow icon="calendar" iconColor={C.amber} label="Takvim" onPress={go(SCREENS.CALENDAR)} />
