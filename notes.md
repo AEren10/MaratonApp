@@ -75,3 +75,8 @@
 ## 2026-09-12 — Rota durak lifecycle carryover scope'u
 
 - `route_stops` exam_type'ı doğrudan taşımıyor; kapsam `route_revisions` üzerinden geliyor. Terminal durumlar yeni revizyona taşınırken `logical_key` tek başına yeterli görülmemeli, aynı sınav tipindeki revision'lardan taşınmalı.
+
+## 2026-09-12 — Offline çalışma kaydı ve rota durağı
+
+- Çalışma kaydı offline kuyruğa alınırken ona bağlı rota durağı lifecycle RPC'si de kuyruklanmalı. Aksi halde log daha sonra sync olsa bile rota durağı açık kalır ve günlük rota/borç sinyali kullanıcıyı yanlış yönlendirir.
+- Route transition kuyruğu yalnızca tekrar denenebilir hatalar için kullanılmalı; version conflict, invalid transition ve stop not found gibi kalıcı domain hataları kuyruğa girerse sonradan sync edilemeyecek gürültü üretir.

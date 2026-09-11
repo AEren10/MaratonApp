@@ -21,3 +21,11 @@ test("offline plan task toggles carry user id through enqueue and replay", () =>
   assert.match(planCompletionSource, /savePlanTaskToggleOffline\(dbId, nowDone, userId\)/);
   assert.match(studyCompletionSource, /savePlanTaskToggleOffline\(dbTask\.id, true, userId\)/);
 });
+
+test("study completion queues route stop transitions when offline", () => {
+  assert.match(offlineQueueSource, /saveRouteStopTransitionOffline\(\{/);
+  assert.match(offlineQueueSource, /type: OP_ROUTE_STOP_TRANSITION/);
+  assert.match(studyCompletionSource, /saveRouteStopTransitionOffline\(\{\s*userId,/);
+  assert.match(studyCompletionSource, /result\.routeQueued = routeResult\.queued/);
+  assert.match(studyCompletionSource, /routeResult\.error && !routeResult\.queued/);
+});

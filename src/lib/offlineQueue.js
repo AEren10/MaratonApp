@@ -3,6 +3,7 @@ import { addTrial, isPermanentTrialError } from "../supabase/trials";
 import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
 import { createUserTask } from "../supabase/userTasks";
 import { togglePlanTask } from "../supabase/plans";
+import { transitionRouteStop } from "../supabase/routePlan";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getSession } from "../supabase/auth";
@@ -31,6 +32,9 @@ export const OP_REVIEW = "REVIEW";
 // Plan görevi tamamlama. Kuyrukta yoktu: çevrimdışı atılan tik cihazda
 // kalıyor ama sunucuya HİÇ ulaşmıyordu.
 export const OP_PLAN_TASK = "PLAN_TASK";
+// Rota durağı lifecycle geçişi. Çalışma kaydı offline kuyruklanırken bu RPC
+// kuyruklanmazsa log sonradan gider ama rota durağı tamamlanmamış kalır.
+export const OP_ROUTE_STOP_TRANSITION = "ROUTE_STOP_TRANSITION";
 
 async function readQueue() {
   try {
@@ -96,6 +100,14 @@ function getOperationFingerprint(op) {
     case OP_PLAN_TASK:
       // Aynı görev için son durum neyse o geçerli; tek kayıt yeter.
       return ["plan_task", op.payload?.taskId || ""].join("|");
+    case OP_ROUTE_STOP_TRANSITION:
+      return [
+        "route_stop",
+        op.payload?.user_id || "",
+        op.payload?.stopId || "",
+        op.payload?.transition || "",
+        op.payload?.expectedVersion ?? "",
+      ].join("|");
     case OP_REVIEW:
       // Aynı soru için aynı tekrar zamanı tekrar kuyruğa girmesin.
       return [op.payload?.user_id || "", op.payload?.id || "",
@@ -202,6 +214,16 @@ async function runOne(item) {
     case OP_PLAN_TASK:
       await togglePlanTask(item.payload.taskId, item.payload.completed, item.payload.user_id);
       break;
+    case OP_ROUTE_STOP_TRANSITION:
+      await transitionRouteStop({
+        stopId: item.payload.stopId,
+        transition: item.payload.transition,
+        expectedVersion: item.payload.expectedVersion,
+        clientOperationId: item.clientOperationId || item.id || item.payload.client_operation_id,
+        occurredAt: item.payload.occurredAt,
+        payload: item.payload.payload,
+      });
+      break;
     case OP_REVIEW:
       await reviewWrongQuestion(item.payload.id, item.payload.user_id, item.payload.updates);
       break;
@@ -254,6 +276,7 @@ const PERMANENT_PG_CODES = new Set([
   "23505", // unique ihlali (idempotency çakışması ayrıca ele alınıyor)
   "42703", // kolon yok
   "42P01", // tablo yok
+  "P0002", // no_data_found / route stop not found gibi kalıcı domain hataları
 ]);
 
 function isPermanentError(e) {
@@ -544,6 +567,52 @@ export async function savePlanTaskToggleOffline(taskId, completed, userId = null
       return { saved: false, queued: true, error: e };
     } catch (queueErr) {
       return { saved: false, queued: false, error: queueErr };
+    }
+  }
+}
+
+/** Rota durağı lifecycle geçişini kaydeder; başarısızsa replay için kuyruğa alır. */
+export async function saveRouteStopTransitionOffline({
+  userId,
+  stopId,
+  transition,
+  expectedVersion,
+  clientOperationId,
+  occurredAt,
+  payload = {},
+} = {}) {
+  const operationId = clientOperationId || createClientOperationId(OP_ROUTE_STOP_TRANSITION);
+  const routePayload = {
+    user_id: userId,
+    stopId,
+    transition,
+    expectedVersion,
+    occurredAt,
+    payload,
+  };
+  try {
+    const saved = await transitionRouteStop({
+      stopId,
+      transition,
+      expectedVersion,
+      clientOperationId: operationId,
+      occurredAt,
+      payload,
+    });
+    return { saved: true, queued: false, data: saved, clientOperationId: operationId };
+  } catch (e) {
+    if (isPermanentError(e) || e?.code === "40001") {
+      return { saved: false, queued: false, error: e, clientOperationId: operationId };
+    }
+    try {
+      await enqueue({
+        type: OP_ROUTE_STOP_TRANSITION,
+        payload: routePayload,
+        clientOperationId: operationId,
+      });
+      return { saved: false, queued: true, error: e, clientOperationId: operationId };
+    } catch (queueErr) {
+      return { saved: false, queued: false, error: queueErr, clientOperationId: operationId };
     }
   }
 }

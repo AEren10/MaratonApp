@@ -6,8 +6,8 @@ import {
   resolveStudyCompletionScope,
 } from "../domain/study/studyPlanCompletionModel";
 import { savePlanTaskToggleOffline } from "./offlineQueue";
+import { saveRouteStopTransitionOffline } from "./offlineQueue";
 import { getDailyPlan } from "../supabase/plans";
-import { transitionRouteStop } from "../supabase/routePlan";
 
 export async function completeStudyPlanContext({
   userId,
@@ -39,7 +39,8 @@ export async function completeStudyPlanContext({
 
   if (routeStopId) {
     try {
-      await transitionRouteStop({
+      const routeResult = await saveRouteStopTransitionOffline({
+        userId,
         stopId: routeStopId,
         transition: "completed",
         expectedVersion: routeStopVersion ?? 1,
@@ -49,7 +50,12 @@ export async function completeStudyPlanContext({
           plan_task_key: planTaskKey || null,
         },
       });
-      result.routeCompleted = true;
+      result.routeCompleted = routeResult.saved;
+      result.routeQueued = routeResult.queued;
+      if (routeResult.error && !routeResult.queued) {
+        result.routeError = routeResult.error;
+        return result;
+      }
     } catch (e) {
       result.routeError = e;
       return result;
