@@ -401,6 +401,13 @@ const ICONS = {
       <Line x1="3" y1="18" x2="3.01" y2="18" />
     </>
   ),
+  more: (
+    <>
+      <Circle cx="5" cy="12" r="1.7" />
+      <Circle cx="12" cy="12" r="1.7" />
+      <Circle cx="19" cy="12" r="1.7" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, color = "#FFFFFF", sw = 2, fill = "none" }) {

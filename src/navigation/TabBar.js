@@ -11,7 +11,7 @@ import * as Haptics from "expo-haptics";
 import { useC } from "../contexts/ThemeContext";
 import { TYPOGRAPHY } from "../themes/tokens";
 import { Icon } from "../components/design";
-import { QuickActionSheet } from "../components/common/QuickActionSheet";
+import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 
 const TABS = [
@@ -135,10 +135,11 @@ export function TabBar({ state, navigation }) {
 
   return (
     <>
-      <QuickActionSheet
+      {/* Tasarim: "Tabbar'in ortasindaki + her kok ekrandan acilir." */}
+      <QuickAddSheet
         visible={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        onAction={(screen) => navigation.navigate(screen)}
+        onAction={(screen, params) => navigation.navigate(screen, params)}
       />
       <LinearGradient
         colors={["transparent", C.surface + "CC", C.surface]}
