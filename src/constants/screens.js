@@ -93,6 +93,7 @@ export const SCREENS = {
   ADD_TASK: "AddTask",
   TOPIC_DEBT: "TopicDebt",
   PLAN_VS_ACTUAL: "PlanVsActual",
+  SEARCH: "Search",
 
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",

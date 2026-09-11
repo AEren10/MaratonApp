@@ -43,6 +43,7 @@ export const PROGRAM_STACK = [
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari (ANALIZ'de de var)
   SCREENS.TOPIC_DEBT,       // Konu Borcu
   SCREENS.PLAN_VS_ACTUAL,   // Plan vs Gercek
+  SCREENS.SEARCH,           // Arama (konu + yanlis defteri)
   SCREENS.COMPARATIVE,      // Plan vs Gercek
 ];
 

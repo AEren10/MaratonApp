@@ -45,6 +45,7 @@ import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
 import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
 import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
+import SearchScreen from "../screens/search/SearchScreen";
 import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
 import AddTaskScreen from "../screens/plan/AddTaskScreen";
@@ -171,6 +172,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
   screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
+  screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.WEEKLY_REVIEW, WeeklyReviewScreen, celebrationOptions),
   screen(SCREENS.WEEKLY_TRIAL_REVIEW, WeeklyTrialReviewScreen, celebrationOptions),
   screen(SCREENS.SWIPE_REVIEW, SwipeReviewScreen),
