@@ -92,6 +92,7 @@ export const SCREENS = {
   // User Tasks
   ADD_TASK: "AddTask",
   TOPIC_DEBT: "TopicDebt",
+  PLAN_VS_ACTUAL: "PlanVsActual",
 
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",

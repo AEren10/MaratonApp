@@ -54,6 +54,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SUBJECT_LIST]: { path: "dersler/liste", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.WEAK_AREAS]: { path: "analiz/zayif-konular", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.NET_FORECAST]: { path: "net-tahmini", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
+  [SCREENS.PLAN_VS_ACTUAL]: { path: "program/plan-gercek", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.COMPARATIVE]: { path: "karsilastirmali-analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.RANK_SIMULATOR]: { path: "siralama", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
