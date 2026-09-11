@@ -13,6 +13,19 @@ test("export catalog includes durable route lifecycle tables", () => {
   assert.match(source, /label: "Rota durak geçmişi"/);
 });
 
+test("export catalog includes private product and companionship data through RPC", () => {
+  assert.match(source, /table: "user_entitlements"/);
+  assert.match(source, /table: "feature_usage_events"/);
+  assert.match(source, /table: "route_companionships"/);
+  assert.match(source, /get_private_export_data/);
+});
+
+test("social export queries are paginated", () => {
+  assert.match(source, /async function fetchOrAll/);
+  assert.match(source, /\.or\(orFilter\)/);
+  assert.match(source, /\.range\(from, from \+ PAGE - 1\)/);
+});
+
 test("export summary includes the profile row collected outside the table catalog", () => {
   assert.match(source, /PROFILE_EXPORT_SPEC = \{ table: "profiles", label: "Profil" \}/);
   assert.match(source, /\[PROFILE_EXPORT_SPEC, \.\.\.EXPORT_TABLES\]\.map/);

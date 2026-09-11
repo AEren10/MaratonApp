@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "./AuthContext";
-import { getProfile } from "../supabase/profiles";
+import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS } from "../constants/storageKeys";
@@ -10,6 +10,15 @@ const ExamContext = createContext(null);
 
 const STORAGE_KEY = STORAGE_KEYS.EXAM_CONFIG;
 const SLIDES_KEY = STORAGE_KEYS.HAS_SEEN_ONBOARDING;
+
+function coerceNet(value) {
+  return value == null ? null : Number(value);
+}
+
+async function persistExamConfigPatch(patch) {
+  const existing = await appStorage.getJson(STORAGE_KEY, {});
+  await appStorage.setJson(STORAGE_KEY, { ...existing, ...patch });
+}
 
 export function ExamProvider({ children }) {
   const { session } = useAuth();
@@ -96,16 +105,18 @@ export function ExamProvider({ children }) {
         }
         return;
       }
+      const targetNetValue = p.target_net == null ? local.targetNet ?? null : Number(p.target_net);
+      const baselineNetValue = p.baseline_net == null ? local.baselineNet ?? null : Number(p.baseline_net);
       const config = {
         examType: p.exam_type,
         field: p.field || null,
         examDate: p.exam_date ? new Date(p.exam_date) : null,
         targetRanking: p.target_ranking || null,
         targetDepartment: p.target_department || null,
-        targetNet: p.target_net == null ? null : Number(p.target_net),
-        baselineNet: p.baseline_net == null ? null : Number(p.baseline_net),
+        targetNet: targetNetValue,
+        baselineNet: baselineNetValue,
         dailyGoalSet: !!p.daily_question_goal || !!p.target_ranking,
-        levelTestDone: !!local.levelTestDone || p.baseline_net != null,
+        levelTestDone: !!local.levelTestDone || baselineNetValue != null,
         setupCompleted: !!local.setupCompleted,
       };
       setExamType(config.examType);
@@ -131,6 +142,12 @@ export function ExamProvider({ children }) {
         levelTestDone: config.levelTestDone,
         setupCompleted: config.setupCompleted,
       }).catch(() => {});
+      const pending = {};
+      if (p.target_net == null && local.targetNet != null) pending.target_net = Number(local.targetNet);
+      if (p.baseline_net == null && local.baselineNet != null) pending.baseline_net = Number(local.baselineNet);
+      if (Object.keys(pending).length) {
+        updateProf(session.user.id, pending).catch(() => {});
+      }
     }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
 
     return () => { cancelled = true; };
@@ -178,7 +195,6 @@ export function ExamProvider({ children }) {
       );
     } catch {}
     if (session?.user?.id) {
-      const { updateProfile: updateProf } = require("../supabase/profiles");
       updateProf(session.user.id, { daily_question_goal: dailyQuestions }).catch(() => {});
     }
   }, [session]);
@@ -187,16 +203,22 @@ export function ExamProvider({ children }) {
   // ve bir sonraki profil okumasinda geri dolduruluyor (getProfile dalindaki
   // "profil yoksa yerelden oku" yolu). Cevrimdisi girilen hedef kaybolmasin.
   const updateTargetNet = useCallback(async (net) => {
-    const value = net == null ? null : Number(net);
+    const value = coerceNet(net);
     setTargetNet(value);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
-      await appStorage.setJson(STORAGE_KEY, { ...existing, targetNet: value });
+      await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false });
     } catch {}
     if (session?.user?.id) {
-      const { updateProfile: updateProf } = require("../supabase/profiles");
-      updateProf(session.user.id, { target_net: value }).catch(() => {});
+      try {
+        await updateProf(session.user.id, { target_net: value });
+        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false });
+        return { synced: true };
+      } catch (e) {
+        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: true }).catch(() => {});
+        return { synced: false, error: e };
+      }
     }
+    return { synced: false, offline: true };
   }, [session]);
 
   // Rotanin baslangic neti. targetNet ile ayni deseni izliyor.
@@ -204,20 +226,28 @@ export function ExamProvider({ children }) {
   // Sunucu yazimi basarisiz olursa deger yerelde kaliyor ve profil
   // okunamadiginda yerelden geri dolduruluyor — sessizce kaybolmuyor.
   const updateBaselineNet = useCallback(async (net) => {
-    const value = net == null ? null : Number(net);
+    const value = coerceNet(net);
     setBaselineNet(value);
     setLevelTestDone(true);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
-      await appStorage.setJson(
-        STORAGE_KEY,
-        { ...existing, baselineNet: value, levelTestDone: true, levelTestSkipped: false },
-      );
+      await persistExamConfigPatch({
+        baselineNet: value,
+        levelTestDone: true,
+        levelTestSkipped: false,
+        baselineNetSyncPending: false,
+      });
     } catch {}
     if (session?.user?.id) {
-      const { updateProfile: updateProf } = require("../supabase/profiles");
-      updateProf(session.user.id, { baseline_net: value }).catch(() => {});
+      try {
+        await updateProf(session.user.id, { baseline_net: value });
+        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: false });
+        return { synced: true };
+      } catch (e) {
+        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: true }).catch(() => {});
+        return { synced: false, error: e };
+      }
     }
+    return { synced: false, offline: true };
   }, [session]);
 
   const markLevelTestDone = useCallback(async ({ skipped = false } = {}) => {

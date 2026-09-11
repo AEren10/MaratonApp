@@ -131,8 +131,11 @@ export function AuthProvider({ children }) {
 
   const deleteAccount = useCallback(async () => {
     // Hesap silinirken de planlanmış bildirimler kalmamalı.
+    const leavingUserId = user?.id;
     await cancelAllScheduled().catch(() => {});
+    if (leavingUserId) await unregisterPushToken(leavingUserId).catch(() => {});
     const result = await supaDeleteAccount();
+    await supaSignOut().catch(() => {});
     setSession(null);
     setUser(null);
     store.dispatch({ type: RESET_STORE });
@@ -140,7 +143,7 @@ export function AuthProvider({ children }) {
     // Dosya temizliği kısmen başarısız olduysa çağıran bunu kullanıcıya
     // söyleyebilsin — "tüm veriler silindi" demek doğru olmaz.
     return result || { storageFailures: [] };
-  }, []);
+  }, [user?.id]);
 
   const value = useMemo(
     () => ({ session, user, loading, logout, deleteAccount, recoveryMode, recoveryUrl, endRecovery }),

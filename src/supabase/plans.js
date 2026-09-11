@@ -29,6 +29,7 @@ export const createDailyPlan = async (plan, tasks) => {
     const tasksWithPlanId = tasks.map((t) => ({
       ...t,
       plan_id: planData.id,
+      user_id: plan.user_id,
     }));
 
     const { error: taskError } = await supabase
@@ -52,6 +53,7 @@ export const createPlanTasks = async (plan, tasks) => {
     const tasksWithPlanId = tasks.map((t) => ({
       ...t,
       plan_id: plan.id,
+      user_id: plan.user_id,
     }));
 
     const { error } = await supabase

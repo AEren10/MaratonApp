@@ -51,11 +51,6 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
   if (!rows.length) return 0;
 
   try {
-    const { error } = await supabase
-      .from(TABLE)
-      .upsert(rows, { onConflict: "user_id,week_start" });
-    if (error) throw error;
-
     const revision = suppliedRevision || createRouteRevision({
       weeks,
       examType: examType || "unknown",

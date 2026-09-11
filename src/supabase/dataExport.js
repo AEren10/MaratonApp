@@ -51,6 +51,9 @@ const EXPORT_TABLES = [
   { table: "referral_logs", column: null, label: "Davet kayıtları" },
   { table: "route_state", column: "user_id", label: "Rota durumu" },
   { table: "analytics_events", column: "user_id", label: "Analitik olayları" },
+  { table: "user_entitlements", column: null, label: "Üyelik hakları", privateExportKey: "user_entitlements" },
+  { table: "feature_usage_events", column: null, label: "Özellik kullanım kayıtları", privateExportKey: "feature_usage_events" },
+  { table: "route_companionships", column: null, label: "Rota yoldaşlığı", privateExportKey: "route_companionships" },
 ];
 
 const PAGE = 1000;
@@ -63,6 +66,23 @@ async function fetchAll(table, column, userId) {
       .from(table)
       .select("*")
       .eq(column, userId)
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE) break;
+  }
+  return rows;
+}
+
+/** OR filtreli sosyal tablolar da büyüyebilir; tek sayfada bırakma. */
+async function fetchOrAll(table, orFilter) {
+  const rows = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .or(orFilter)
       .range(from, from + PAGE - 1);
     if (error) throw error;
     const page = data || [];
@@ -85,6 +105,12 @@ async function fetchMyProfileRow() {
   return data ? [data] : [];
 }
 
+async function fetchPrivateExportData() {
+  const { data, error } = await supabase.rpc("get_private_export_data");
+  if (error) throw error;
+  return data || {};
+}
+
 export async function collectUserData(userId, onProgress) {
   if (!userId || userId === "dev") return null;
 
@@ -100,6 +126,7 @@ export async function collectUserData(userId, onProgress) {
   const errors = [];
   const total = EXPORT_TABLES.length + 1;
   let done = 0;
+  let privateExportData = null;
 
   try {
     result.data.profiles = await fetchMyProfileRow();
@@ -112,25 +139,25 @@ export async function collectUserData(userId, onProgress) {
 
   for (const spec of EXPORT_TABLES) {
     try {
-      if (spec.table === "friendships") {
+      if (spec.privateExportKey) {
+        if (!privateExportData) privateExportData = await fetchPrivateExportData();
+        result.data[spec.table] = privateExportData[spec.privateExportKey] || [];
+      } else if (spec.table === "friendships") {
         // İki yönlü: kullanıcı hem isteyen hem istenen olabilir.
-        const { data, error } = await supabase
-          .from("friendships").select("*")
-          .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
-        if (error) throw error;
-        result.data.friendships = data || [];
+        result.data.friendships = await fetchOrAll(
+          "friendships",
+          `requester_id.eq.${userId},addressee_id.eq.${userId}`,
+        );
       } else if (spec.table === "challenges") {
-        const { data, error } = await supabase
-          .from("challenges").select("*")
-          .or(`creator_id.eq.${userId},opponent_id.eq.${userId}`);
-        if (error) throw error;
-        result.data.challenges = data || [];
+        result.data.challenges = await fetchOrAll(
+          "challenges",
+          `creator_id.eq.${userId},opponent_id.eq.${userId}`,
+        );
       } else if (spec.table === "referral_logs") {
-        const { data, error } = await supabase
-          .from("referral_logs").select("*")
-          .or(`inviter_id.eq.${userId},invitee_id.eq.${userId}`);
-        if (error) throw error;
-        result.data.referral_logs = data || [];
+        result.data.referral_logs = await fetchOrAll(
+          "referral_logs",
+          `inviter_id.eq.${userId},invitee_id.eq.${userId}`,
+        );
       } else if (spec.table === "trial_subjects") {
         // Doğrudan user_id yok; kullanıcının denemeleri üzerinden.
         const trialIds = (result.data.trials || []).map((t) => t.id);
