@@ -3,10 +3,9 @@
 // Tasarım AKIŞ 15: "Ödeme · Kart → Ödeme İşleniyor → Ödeme Başarılı /
 // Ödeme Başarısız → Deneme Bitti".
 //
-// SAĞLAYICIDAN BAĞIMSIZ. RevenueCat şu an devre dışı (anahtarlar placeholder)
-// ama akışın kendisi sağlayıcıya bağlı değil: her mağaza satın alması aynı
-// durumlardan geçer. Sağlayıcı geldiğinde `purchases.js` bu makineye olay
-// besler, ekranlar değişmez.
+// SAĞLAYICIDAN BAĞIMSIZ. RevenueCat anahtarları build env'den geldiğinde
+// `purchases.js` bu makineye mağaza olaylarını besler; anahtar yoksa üretimde
+// dev deneme fallback'i açılmaz. Ekranlar sağlayıcıya değil bu durumlara bakar.
 //
 // Neden durum makinesi: satın alma en kırılgan akış. Kullanıcı ödeme
 // sayfasını kapatır, ağ kopar, mağaza "pending" döner (aile onayı), ya da
