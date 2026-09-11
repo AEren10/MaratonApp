@@ -123,6 +123,18 @@ export const updatePassword = async (password) => {
   if (error) throw error;
 };
 
+export class StorageCleanupFailedError extends Error {
+  constructor(failures = []) {
+    const buckets = failures.map((f) => f.bucket).filter(Boolean).join(", ");
+    super(buckets
+      ? `Dosyaların temizlenemedi: ${buckets}. Hesap silinmedi, tekrar deneyebilirsin.`
+      : "Dosyaların temizlenemedi. Hesap silinmedi, tekrar deneyebilirsin.");
+    this.name = "StorageCleanupFailedError";
+    this.failures = failures;
+    this._safeMessage = this.message;
+  }
+}
+
 export const signInWithAppleToken = async ({ idToken, nonce }) => {
   const { data, error } = await supabase.auth.signInWithIdToken({
     provider: "apple",
@@ -152,14 +164,15 @@ export const deleteAccount = async () => {
     const { deleteUserStorage } = require("./storage");
     const result = await deleteUserStorage(userId);
     storageFailures = result?.failures || [];
+    if (storageFailures.length) {
+      throw new StorageCleanupFailedError(storageFailures);
+    }
   }
 
   const { error } = await supabase.rpc("delete_own_account");
   if (error) throw error;
 
-  // Dosya temizliği başarısız olduysa hesap yine de silindi (auth satırı
-  // gittikten sonra geri dönüş yok), ama bunu SESSİZCE geçmiyoruz:
-  // gizlilik metni "tüm veriler kalıcı olarak silinir" diyor. Çağıran
-  // kullanıcıya durumu bildirebilsin.
+  // Dosya temizliği başarısızsa buraya gelinmez; auth satırı silinmeden önce
+  // kullanıcıya tekrar deneme şansı verilir.
   return { storageFailures };
 };

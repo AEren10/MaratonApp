@@ -44,7 +44,10 @@ export function useSettingsActions() {
                   );
                 }
               })
-              .catch(() => showAlert("Hata", "Hesap silinemedi. Lütfen tekrar dene."));
+              .catch((error) => showAlert(
+                "Hesap silinemedi",
+                error?._safeMessage || "Hesap silinemedi. Lütfen tekrar dene.",
+              ));
           },
         },
       ]

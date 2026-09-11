@@ -30,3 +30,8 @@
 
 - Runtime okumalarda `select("*")` yerine ihtiyaç duyulan kolon listesi kullanılmalı. KVKK export gibi bilinçli “tüm veriyi indir” akışları bunun istisnası.
 - Rota durakları ve route state için kolon listesi geniş ama açık tutuldu; yeni UI/logic alanı bu satırlara ihtiyaç duyarsa önce listeye bilinçli eklenmeli.
+
+## 2026-09-12 — hesap silme storage cleanup sırası
+
+- Hesap silme öncesi Storage temizliği kısmen başarısızsa auth hesabı silinmemeli. Auth satırı gittikten sonra istemci kalan public/private dosyaları kendi yetkisiyle temizleyemeyebilir.
+- Storage cleanup hataları kullanıcıya güvenli mesajla gösterilmeli; sessizce “hesap silindi ama bazı dosyalar kaldı” durumuna düşmemeli.
