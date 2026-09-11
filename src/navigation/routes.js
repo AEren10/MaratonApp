@@ -54,6 +54,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SUBJECT_LIST]: { path: "dersler/liste", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.WEAK_AREAS]: { path: "analiz/zayif-konular", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.NET_FORECAST]: { path: "net-tahmini", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
+  [SCREENS.HOW_IT_WORKS]: { path: "nasil-calisir", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.DOCUMENT]: { path: "belge/:docKey", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.SEARCH]: { path: "ara", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.PLAN_VS_ACTUAL]: { path: "program/plan-gercek", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },

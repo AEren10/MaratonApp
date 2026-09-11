@@ -81,8 +81,21 @@ export default function RoadmapScreen() {
         targetNet={targetNet}
         C={C}
       />
+      {/* Tasarim: "Bu siralama neye gore?" -> Neye Gore Oneriyoruz.
+          Rotanin neye dayandigini ve konu bazli net tahmini YAPILMADIGINI
+          aciklayan ekran; giris noktasi olmadan erisilemezdi. */}
+      <Pressable
+        onPress={() => navigation.navigate(SCREENS.HOW_IT_WORKS)}
+        accessibilityRole="button"
+        accessibilityLabel="Bu sıralama neye göre"
+        hitSlop={8}
+        style={({ pressed }) => [styles.whyRow, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <Text style={styles.whyText}>Bu sıralama neye göre?</Text>
+        <Icon name="chevR" size={13} color={C.text3} />
+      </Pressable>
     </>
-  ), [C, daysLeft, debt, debtPlan, debtWeeks, forecast, handleCreateRoute, intelligence, isPaused, nextRouteAction,
+  ), [C, daysLeft, navigation, debt, debtPlan, debtWeeks, forecast, handleCreateRoute, intelligence, isPaused, nextRouteAction,
     routeCreated, startNextRouteAction, targetNet,
     routeCreating, routeCreationError, routeReadiness, togglePause, totals, weeks]);
 
@@ -139,6 +152,15 @@ export default function RoadmapScreen() {
 }
 
 const makeStyles = (C) => StyleSheet.create({
+  whyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: SPACING.xs,
+    minHeight: 44,
+    marginTop: SPACING.md,
+  },
+  whyText: { ...TYPOGRAPHY.metaSemiBold, color: C.text3 },
   safe: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",

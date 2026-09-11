@@ -33,6 +33,7 @@ export const ROTA_STACK = [
   SCREENS.SUMMARY,          // Gunun/Haftalik/Ayin Ozeti (period parametresi)
   SCREENS.WEEKLY_REVIEW,    // Haftalik Ozet (eski, SUMMARY week moduna gocecek)
   SCREENS.WEEKLY_TRIAL_REVIEW,
+  SCREENS.HOW_IT_WORKS,     // (paylasimli)
 ];
 
 export const PROGRAM_STACK = [
@@ -74,6 +75,7 @@ export const PROFIL_STACK = [
   SCREENS.PRIVACY,
   SCREENS.TERMS,
   SCREENS.DOCUMENT,         // Belge (gizlilik / kullanim sartlari metni)
+  SCREENS.HOW_IT_WORKS,     // Neye Gore Oneriyoruz (ROTA'da da var)
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.SHARE_CARD,       // Paylasim Karti

@@ -95,6 +95,7 @@ export const SCREENS = {
   PLAN_VS_ACTUAL: "PlanVsActual",
   SEARCH: "Search",
   DOCUMENT: "Document",
+  HOW_IT_WORKS: "HowItWorks",
 
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",
