@@ -58,15 +58,18 @@ export const uploadAvatar = async (userId, uri) => {
     const ext = guessExt(uri);
     const contentType = mimeFor(ext);
     const path = `${userId}/avatar.${ext}`;
-    // Diğer uzantılardaki eski avatarları temizle.
-    const stale = ["jpg", "png", "webp"].filter((x) => x !== ext).map((x) => `${userId}/avatar.${x}`);
-    supabase.storage.from("avatars").remove(stale).catch(() => {});
     const buffer = await uriToArrayBuffer(uri);
 
     const { data, error } = await supabase.storage
       .from("avatars")
       .upload(path, buffer, { contentType, upsert: true });
     if (error) throw error;
+
+    // Diğer uzantılardaki eski avatarları yalnızca yeni upload başarıyla
+    // tamamlandıktan sonra temizle. Aksi halde ağ/Storage hatasında çalışan
+    // eski avatar kaybolurdu.
+    const stale = ["jpg", "png", "webp"].filter((x) => x !== ext).map((x) => `${userId}/avatar.${x}`);
+    supabase.storage.from("avatars").remove(stale).catch(() => {});
     return data?.path ?? null;
   } catch (e) {
     handleSupabaseError(e, "uploadAvatar");
