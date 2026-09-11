@@ -128,6 +128,7 @@ function buildRouteQualityChecks({
   overflow = [],
   weakSubjectKeys = [],
   lowSignalItems = 0,
+  neglectedItems = 0,
   reviewItems = 0,
 } = {}) {
   const firstWeek = firstWeekStats(weeks);
@@ -172,6 +173,14 @@ function buildRouteQualityChecks({
       : weakSubjectKeys.length
         ? qualityItem("weak_signal", "warn", "Zayıf alan", "Zayıf alan var; bütçe veya sıra nedeniyle ilk hafta dışına kayabilir.")
         : qualityItem("weak_signal", "ok", "Zayıf alan", "Belirgin zayıf alan sinyali yok."),
+    neglectedItems > 0
+      ? qualityItem(
+        "recency_balance",
+        "ok",
+        "Veri tazeliği",
+        `${neglectedItems} uzun ara verilen konu rotada görünür sebep olarak işlendi.`,
+      )
+      : qualityItem("recency_balance", "ok", "Veri tazeliği", "Uzun ara verilen konu sinyali görünmüyor."),
     reviewItems > 0
       ? qualityItem("review_balance", "ok", "Tekrar dengesi", `${reviewItems} tekrar durağı unutma riskini düşürmek için rotaya eklendi.`)
       : qualityItem("review_balance", "ok", "Tekrar dengesi", "Tekrar borcu görünmüyor."),
@@ -279,6 +288,7 @@ export function buildRouteIntelligence({
   const lowSignalItems = items.filter((item) => item.dataConfidence === "low").length;
   const prerequisiteItems = items.filter((item) => item.unpreparedBefore > 0).length;
   const reviewItems = items.filter((item) => item.isReview).length;
+  const neglectedItems = items.filter((item) => Number(item.neglectedDays) >= 14).length;
 
   const score = clamp(Math.round(
     capacityScore(capacity)
@@ -322,6 +332,7 @@ export function buildRouteIntelligence({
     overflow,
     weakSubjectKeys,
     lowSignalItems,
+    neglectedItems,
     reviewItems,
   });
   const strategy = buildRouteStrategy({
@@ -354,6 +365,7 @@ export function buildRouteIntelligence({
       pendingStops: items.length,
       reviewStops: reviewItems,
       lowSignalStops: lowSignalItems,
+      neglectedStops: neglectedItems,
       prerequisiteStops: prerequisiteItems,
     },
     risks: rankedRisks,

@@ -125,3 +125,32 @@ test("route treats topic-level low accuracy as a weak signal without subject fla
   assert.equal(zeroCorrectStop.insight.reasonCode, "LOW_ACCURACY");
   assert.equal(zeroCorrectStop.scoreComponents.weakAreaBoost, 1.35);
 });
+
+test("route intelligence exposes neglected topic recency as an explainable signal", () => {
+  const route = buildRoute({
+    pool: pool(["Temel Kavramlar", "Problemler"]),
+    progressByKey: {
+      matematik: {
+        "Temel Kavramlar": {
+          total_questions: 12,
+          correct_count: 10,
+          last_studied_at: "2026-08-10T09:00:00+03:00",
+        },
+        Problemler: { total_questions: 4, correct_count: 1 },
+      },
+    },
+    studyLogs: historyLogs(),
+    weakSubjectKeys: [],
+    dailyQuestionGoal: 20,
+    daysLeft: 90,
+    now: NOW,
+    examType: "tyt",
+  });
+
+  const recency = route.intelligence.qualityChecks
+    .find((check) => check.key === "recency_balance");
+
+  assert.equal(route.intelligence.signals.neglectedStops, 1);
+  assert.equal(recency.status, "ok");
+  assert.match(recency.detail, /uzun ara verilen/);
+});
