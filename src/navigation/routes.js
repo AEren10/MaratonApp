@@ -60,6 +60,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.WRONG_NOTEBOOK]: { path: "yanlis", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.ADD_WRONG]: { path: "yanlis/yeni", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: true },
   [SCREENS.REVIEW_SESSION]: { path: "yanlis/tekrar", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: true },
+  [SCREENS.REVIEW_DONE]: { path: "yanlis/tekrar/bitti", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: false },
   [SCREENS.WRONG_DETAIL]: { path: "yanlis/:id", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: true },
   [SCREENS.SWIPE_REVIEW]: { path: "yanlis/kart", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: false },
   [SCREENS.QUICK_PRACTICE]: { path: "pratik", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: false },

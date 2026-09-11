@@ -10,6 +10,7 @@ import { WrongNotebookHeader } from "./components/WrongNotebookHeader";
 import { WrongNotebookMineTab } from "./components/WrongNotebookMineTab";
 import { WrongNotebookModals } from "./components/WrongNotebookModals";
 import { WrongNotebookTabs } from "./components/WrongNotebookTabs";
+import { PhotoLostBanner } from "./components/PhotoLostBanner";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
 export default function WrongNotebookScreen() {
@@ -18,6 +19,7 @@ export default function WrongNotebookScreen() {
   const {
     closeErrorModal,
     closeShareModal,
+    dismissLostPhotos,
     dismissXP,
     doShare,
     errorModal,
@@ -29,6 +31,7 @@ export default function WrongNotebookScreen() {
     handleDelete,
     handleShare,
     loading,
+    lostPhotoCount,
     mainTab,
     onRefresh,
     refreshing,
@@ -84,6 +87,9 @@ export default function WrongNotebookScreen() {
         styles={styles}
       />
       <WrongNotebookTabs C={C} activeTab={mainTab} onChange={setTab} />
+      {mainTab === WRONG_NOTEBOOK_TAB.MINE ? (
+        <PhotoLostBanner C={C} count={lostPhotoCount} onRetry={dismissLostPhotos} />
+      ) : null}
 
       {mainTab === WRONG_NOTEBOOK_TAB.COMMUNITY ? (
         <CommunityTab visible onSwitchToMine={() => setTab(WRONG_NOTEBOOK_TAB.MINE)} />

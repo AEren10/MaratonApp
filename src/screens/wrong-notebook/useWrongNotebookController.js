@@ -14,7 +14,13 @@ import {
   getWrongSubjectKey,
 } from "../../domain/wrongNotebook/wrongNotebookModel";
 import { getWrongQuestions, resolveWrongQuestion, deleteWrongQuestion } from "../../supabase/wrongQuestions";
-import { getPendingWrongQuestions, removeFromQueue } from "../../lib/offlineQueue";
+import {
+  getPendingWrongQuestions,
+  removeFromQueue,
+  getDeadLetterItems,
+  retryDeadLetter,
+  OP_WRONG_QUESTION,
+} from "../../lib/offlineQueue";
 import { shareQuestion, getSharedQuestionIds } from "../../supabase/community";
 
 export function useWrongNotebookController() {
@@ -32,6 +38,10 @@ export function useWrongNotebookController() {
   const [sharedIds, setSharedIds] = useState(new Set());
   const [shareModal, setShareModal] = useState({ visible: false, item: null });
   const [errorModal, setErrorModal] = useState({ visible: false, message: "" });
+  // Bilinen açık: image_local_uri OS önbelleğine işaret eder, önbellek temizlenince
+  // 10 denemeden sonra dead-letter'a düşer — soru kalır, fotoğraf sessizce kaybolur.
+  // Bunu kullanıcıya görünür kılıyoruz.
+  const [lostPhotoCount, setLostPhotoCount] = useState(0);
 
   const viewModel = useMemo(
     () => buildWrongNotebookViewModel({ items, status, subject, topicFilter }),
@@ -54,6 +64,12 @@ export function useWrongNotebookController() {
       setItems(merged);
       const ids = await getSharedQuestionIds((data || []).map((item) => item.id));
       setSharedIds(ids);
+
+      const dead = await getDeadLetterItems().catch(() => []);
+      const lost = dead.filter(
+        (d) => d.type === OP_WRONG_QUESTION && d.payload?.image_local_uri && !d.payload?.image_path,
+      );
+      setLostPhotoCount(lost.length);
     } catch (error) {
       setErrorModal({ visible: true, message: error?.message || "Yanlış defteri yüklenemedi." });
     } finally {
@@ -198,6 +214,13 @@ export function useWrongNotebookController() {
     ]);
   }, [loadItems, showAlert, user?.id, isPendingId]);
 
+  const dismissLostPhotos = useCallback(async () => {
+    trackButtonTap("wrong_lost_photo_retry");
+    await retryDeadLetter().catch(() => {});
+    setLostPhotoCount(0);
+    loadItems();
+  }, [loadItems]);
+
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const goAddWrong = useCallback(() => {
     trackButtonTap("wrong_add_open", { targetScreen: SCREENS.ADD_WRONG });
@@ -210,6 +233,7 @@ export function useWrongNotebookController() {
     closeErrorModal,
     closeShareModal,
     dismissXP,
+    dismissLostPhotos,
     doShare,
     errorModal,
     goAddWrong,
@@ -220,6 +244,7 @@ export function useWrongNotebookController() {
     handleDelete,
     handleShare,
     loading,
+    lostPhotoCount,
     mainTab,
     onRefresh,
     refreshing,

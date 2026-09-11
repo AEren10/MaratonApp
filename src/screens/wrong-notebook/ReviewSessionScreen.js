@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
 import { saveReviewOffline } from "../../lib/offlineQueue";
@@ -38,6 +39,10 @@ export default function ReviewSessionScreen() {
   const [revealed, setRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [done, setDone] = useState(0);
+  // Tasarimin "Tekrar Bitti" ekrani BILDIM/BILEMEDIM ayrimi istiyor.
+  // Notlar: 0 Hatirlamiyorum · 1 Zorlandim · 3 Biliyorum.
+  // Yalniz "Biliyorum" bildim sayilir; Zorlandim henuz kapanmis degil.
+  const [remembered, setRemembered] = useState(0);
   // Kaç sonuç sunucuya gidemeyip kuyrukta bekliyor — mesaj buna göre.
   const [queuedCount, setQueuedCount] = useState(0);
 
@@ -62,6 +67,7 @@ export default function ReviewSessionScreen() {
       .then((r) => { if (r.queued) setQueuedCount((n) => n + 1); })
       .catch(() => {});
     setDone((d) => d + 1);
+    if (g >= 3) setRemembered((r) => r + 1);
     setRevealed(false);
     setIdx((i) => i + 1);
   }, [current, user.id]);
@@ -71,6 +77,20 @@ export default function ReviewSessionScreen() {
   }
 
   const finished = idx >= queue.length;
+
+  // Tasarim bitisi ayri bir ekran olarak tanimliyor ("Tekrar Bitti").
+  // replace kullaniliyor: geri tusu bitmis oturuma donmemeli.
+  // Kuyruk bostaysa gecilmez — "Bugun tekrar yok" bir kutlama ani degil.
+  useEffect(() => {
+    if (!loading && finished && queue.length > 0) {
+      navigation.replace(SCREENS.REVIEW_DONE, {
+        reviewedCount: done,
+        rememberedCount: remembered,
+        forgotCount: Math.max(0, done - remembered),
+        queuedCount,
+      });
+    }
+  }, [loading, finished, queue.length, done, remembered, queuedCount, navigation]);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>

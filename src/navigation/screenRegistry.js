@@ -28,6 +28,7 @@ import WrongNotebookScreen from "../screens/wrong-notebook/WrongNotebookScreen";
 import AddWrongScreen from "../screens/wrong-notebook/AddWrongScreen";
 import WrongDetailScreen from "../screens/wrong-notebook/WrongDetailScreen";
 import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
+import ReviewDoneScreen from "../screens/wrong-notebook/ReviewDoneScreen";
 import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
 import AddStudyScreen from "../screens/study/AddStudyScreen";
 import StudyTimerScreen from "../screens/study/StudyTimerScreen";
@@ -159,6 +160,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.NET_FORECAST, NetForecastScreen),
   screen(SCREENS.COMPARATIVE, ComparativeScreen),
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
+  screen(SCREENS.REVIEW_DONE, ReviewDoneScreen, celebrationOptions),
   screen(SCREENS.ROADMAP, RoadmapScreen),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
   screen(SCREENS.SUMMARY, SummaryScreen),

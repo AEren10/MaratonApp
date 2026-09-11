@@ -55,6 +55,7 @@ export const SCREENS = {
   RANK_SIMULATOR: "RankSimulator",
   ROADMAP: "Roadmap",
   REVIEW_SESSION: "ReviewSession",
+  REVIEW_DONE: "ReviewDone",
 
   // Calendar
   CALENDAR: "Calendar",
