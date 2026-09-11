@@ -211,30 +211,42 @@ export async function clearRouteWeeks(userId, { exceptExamType } = {}) {
 
 // ---- Rota durumu: ara verme / dondurma ----
 
-export async function getRouteState(userId) {
+export async function getRouteState(userId, examType = null) {
   if (!userId || userId === "dev") return null;
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from(STATE_TABLE)
       .select(ROUTE_STATE_COLUMNS)
       .eq("user_id", userId)
-      .maybeSingle();
+      .order("updated_at", { ascending: false });
+    if (examType) {
+      query = query.or(`exam_type.eq.${examType},exam_type.is.null`).limit(2);
+    } else {
+      query = query.limit(1);
+    }
+    const { data, error } = await query;
     if (error) throw error;
-    return data || null;
+    const rows = data || [];
+    return rows.find((row) => row.exam_type === examType) || rows[0] || null;
   } catch (e) {
     handleSupabaseError(e, "getRouteState");
     return null;
   }
 }
 
-export async function setRouteState(userId, patch) {
+export async function setRouteState(userId, patch, examType = null) {
   if (!userId || userId === "dev" || !patch) return null;
   try {
     const { data, error } = await supabase
       .from(STATE_TABLE)
       .upsert(
-        { user_id: userId, ...patch, updated_at: new Date().toISOString() },
-        { onConflict: "user_id" },
+        {
+          user_id: userId,
+          ...patch,
+          exam_type: examType ?? patch.exam_type ?? null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,exam_type" },
       )
       .select()
       .maybeSingle();
@@ -250,8 +262,7 @@ export const pauseRoute = (userId, examType = null) =>
   setRouteState(userId, {
     paused_at: new Date().toISOString(),
     resumed_at: null,
-    exam_type: examType,
-  });
+  }, examType);
 
 export const resumeRoute = (userId, examType = null) =>
-  setRouteState(userId, { resumed_at: new Date().toISOString(), exam_type: examType });
+  setRouteState(userId, { resumed_at: new Date().toISOString() }, examType);

@@ -62,3 +62,8 @@
 - Fallback kodlarında yorum ile gerçek kontrol koşulu birlikte denetlenmeli; “sayfaladık” deyip döngüyü üst sınırla kesmek sessiz veri eksiltir.
 - Haftalık toplam da tek select olmamalı; PostgREST row limit haftalık XP'yi de kesebilir.
 - Offset pagination kullanılan export okumasında stabil `order(...)` yoksa aynı export içinde sayfa atlama/tekrar riski doğar.
+
+## 2026-09-12 — Rota pause/resume sınav tipi scope'u
+
+- `route_state` tek `user_id` satırı olarak kalırsa bir sınav tipindeki pause/resume işlemi başka sınav tipinin durumunu ezebilir. Yeni yazımlar `(user_id, exam_type)` scope'uyla yapılmalı.
+- Legacy `exam_type IS NULL` state okunabilir kalmalı; aksi halde eski canlı kullanıcıların dondurulmuş/geri dönüş bilgisi bir anda görünmez olur.

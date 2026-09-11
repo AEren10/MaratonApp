@@ -221,7 +221,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     getRouteWeeks(user.id, { examType })
       .then((rows) => { if (!cancelled) setPastWeeks(rows); })
       .catch(() => {});
-    getRouteState(user.id)
+    getRouteState(user.id, examType)
       .then((st) => { if (!cancelled) setRouteStateLocal(st); })
       .catch(() => {});
     getLatestRouteStops(user.id, examType)
