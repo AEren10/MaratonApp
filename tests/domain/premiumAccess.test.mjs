@@ -2,6 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  PRODUCT_FEATURES,
+  PREMIUM_TO_PRODUCT_FEATURE,
+} from "../../src/constants/premium.js";
+
+import {
   canAccessProductFeature,
   canShowPaywall,
   firstWeekStatus,
@@ -56,4 +61,11 @@ test("unknown quota never fails open", () => {
     reason: "access_unknown",
     remaining: null,
   });
+});
+
+test("premium feature catalog uses dedicated product access keys", () => {
+  assert.equal(PRODUCT_FEATURES.topic_progress, "topicProgress");
+  assert.equal(PRODUCT_FEATURES.department_threshold, "departmentThreshold");
+  assert.notEqual(PRODUCT_FEATURES.topic_progress, PRODUCT_FEATURES.route_priorities);
+  assert.equal(PREMIUM_TO_PRODUCT_FEATURE.rank_simulator, PRODUCT_FEATURES.route_forecast);
 });
