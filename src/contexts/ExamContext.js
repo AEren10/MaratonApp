@@ -15,6 +15,34 @@ function coerceNet(value) {
   return value == null ? null : Number(value);
 }
 
+/**
+ * Bekleyen hedef/baslangic net yazimini sunucuya yeniden dener.
+ *
+ * updateTargetNet/updateBaselineNet sunucu yazimi basarisiz olunca degeri
+ * yerelde tutup `*SyncPending` bayragini kaldiriyordu, ama bu bayragi HICBIR
+ * YER OKUMUYORDU: deger cihazda kaliyor, sunucuya hicbir zaman gitmiyordu.
+ * Kullanici hedefini kaydettigini saniyor, baska cihazda yok.
+ *
+ * Yerelde bekleyen deger sunucudakinden YENIdir (kullanici az once girdi),
+ * bu yuzden catisma halinde yerel kazanir.
+ */
+async function retryPendingNetSync(userId, local, isCancelled) {
+  const jobs = [
+    { flag: "targetNetSyncPending", value: local?.targetNet, column: "target_net", patchKey: "targetNet" },
+    { flag: "baselineNetSyncPending", value: local?.baselineNet, column: "baseline_net", patchKey: "baselineNet" },
+  ];
+  for (const job of jobs) {
+    if (!local?.[job.flag] || job.value == null) continue;
+    try {
+      await updateProf(userId, { [job.column]: job.value });
+      if (isCancelled()) return;
+      await persistExamConfigPatch({ [job.patchKey]: job.value, [job.flag]: false });
+    } catch {
+      // Hala basarisiz: bayrak duruyor, sonraki acilista yine denenir.
+    }
+  }
+}
+
 async function persistExamConfigPatch(patch) {
   const existing = await appStorage.getJson(STORAGE_KEY, {});
   await appStorage.setJson(STORAGE_KEY, { ...existing, ...patch });
@@ -103,10 +131,23 @@ export function ExamProvider({ children }) {
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
           setSetupCompleted(!!local.setupCompleted);
         }
+        await retryPendingNetSync(session.user.id, local, () => cancelled);
         return;
       }
-      const targetNetValue = p.target_net == null ? local.targetNet ?? null : Number(p.target_net);
-      const baselineNetValue = p.baseline_net == null ? local.baselineNet ?? null : Number(p.baseline_net);
+      // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
+      //
+      // Bekleyen bayragi yoksa sunucu kazanir (baska cihazdaki degisiklik
+      // gecerlidir). Bayrak varsa YEREL kazanir: kullanici az once degistirdi,
+      // sunucu yazimi basarisiz oldu ve sunucudaki deger eskidir. Onceki hal
+      // bayragi hic sormuyordu, bu yuzden sunucu null OLMADIGINDA -- ornegin
+      // hedef 60'tan 75'e cekilip yazim basarisiz olduysa -- 75 sessizce
+      // 60'a geri doner ve backfill de devreye girmezdi.
+      const targetNetValue = local.targetNetSyncPending && local.targetNet != null
+        ? Number(local.targetNet)
+        : (p.target_net == null ? local.targetNet ?? null : Number(p.target_net));
+      const baselineNetValue = local.baselineNetSyncPending && local.baselineNet != null
+        ? Number(local.baselineNet)
+        : (p.baseline_net == null ? local.baselineNet ?? null : Number(p.baseline_net));
       const config = {
         examType: p.exam_type,
         field: p.field || null,
@@ -142,12 +183,15 @@ export function ExamProvider({ children }) {
         levelTestDone: config.levelTestDone,
         setupCompleted: config.setupCompleted,
       }).catch(() => {});
+      // Sunucuda hic deger yoksa yerelden doldur (ilk kurulum / eski surum).
       const pending = {};
       if (p.target_net == null && local.targetNet != null) pending.target_net = Number(local.targetNet);
       if (p.baseline_net == null && local.baselineNet != null) pending.baseline_net = Number(local.baselineNet);
       if (Object.keys(pending).length) {
         updateProf(session.user.id, pending).catch(() => {});
       }
+      // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
+      await retryPendingNetSync(session.user.id, local, () => cancelled);
     }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
 
     return () => { cancelled = true; };

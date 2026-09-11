@@ -13,6 +13,7 @@ import {
 } from "../../lib/notifications";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
+import { SYNC_PENDING_COPY } from "../../constants/stateCopy";
 
 export const TARGET_NET_MIN = 40;
 export const TARGET_NET_MAX = 120;
@@ -47,6 +48,7 @@ export function useGoalSetupForm() {
   const [targetNetValue, setTargetNetValue] = useState(TARGET_NET_DEFAULT);
   const [dailyQuestions, setDailyQuestions] = useState(80);
   const seeded = useRef(false);
+  const [targetNetPending, setTargetNetPending] = useState(false);
 
   useEffect(() => {
     if (seeded.current) return;
@@ -64,7 +66,16 @@ export function useGoalSetupForm() {
     dispatch(setGoals(goals));
     saveGoalsToStorage(goals).catch(() => {});
     updateGoal(dailyQuestions).catch(() => {});
-    updateTargetNet(targetNetValue).catch(() => {});
+
+    // updateTargetNet HIC reject etmiyor: hatayi kendi icinde yakalayip
+    // { synced, error } donduruyor. Eski hali `.catch(() => {})` ile bu
+    // sonucu tamamen atiyordu, yani sunucu yazimi basarisiz olsa bile akis
+    // "kaydedildi" gibi devam ediyordu. Sonuc artik okunuyor; deger yerelde
+    // ve bekleyen bayrakla duruyor, ExamContext sonraki acilista yeniden
+    // deniyor. Kurulum akisi bu yuzden BLOKLANMIYOR, sadece dogru soyluyor.
+    updateTargetNet(targetNetValue).then((res) => {
+      if (res && res.synced === false) setTargetNetPending(true);
+    });
 
     requestNotificationPermissions().then(async (granted) => {
       if (granted) {
@@ -83,6 +94,8 @@ export function useGoalSetupForm() {
   }, [dailyQuestions, targetNetValue, dispatch, updateGoal, updateTargetNet, navigation, user?.id]);
 
   return {
+    targetNetPending,
+    targetNetPendingNote: targetNetPending ? SYNC_PENDING_COPY.targetNet : null,
     targetNetValue,
     setTargetNetValue,
     dailyQuestions,

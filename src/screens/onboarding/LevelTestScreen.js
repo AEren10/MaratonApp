@@ -20,14 +20,21 @@ export default function LevelTestScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { daysUntilExam, markLevelTestDone } = useExam();
-  const { subjects, values, setSubjectNet, hasAnyEntry, totalNet, targetNet, gapMonths, saving, submit } =
-    useLevelTestForm();
+  const {
+    subjects, values, setSubjectNet, hasAnyEntry, totalNet, targetNet,
+    gapMonths, saving, submit, syncPendingNote,
+  } = useLevelTestForm();
   const { threshold } = useStudyRoute({ persist: false });
 
   const gap = targetNet != null ? threshold(totalNet, targetNet) : null;
   const months = gapMonths(daysUntilExam);
 
-  const goNext = useCallback(() => navigation.navigate(SCREENS.ROUTE_READY), [navigation]);
+  // Bu ekran submit'ten hemen sonra kapaniyor, bu yuzden bekleyen senkron
+  // notu BURADA gosterilemez -- olu UI olur. Not varis ekranina tasiniyor.
+  const goNext = useCallback(
+    () => navigation.navigate(SCREENS.ROUTE_READY, { syncPendingNote: syncPendingNote || undefined }),
+    [navigation, syncPendingNote],
+  );
 
   const handleContinue = useCallback(() => {
     H.tap();

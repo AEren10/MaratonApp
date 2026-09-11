@@ -29,6 +29,7 @@ export default function GoalSetupScreen() {
     hours,
     netLabel,
     finish,
+    targetNetPendingNote,
   } = useGoalSetupForm();
 
   return (
@@ -76,6 +77,11 @@ export default function GoalSetupScreen() {
         <Button onPress={finish} size="lg" fullWidth>
           Devam
         </Button>
+        {targetNetPendingNote ? (
+          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>
+            {targetNetPendingNote}
+          </Text>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -86,4 +92,5 @@ const styles = StyleSheet.create({
   segment:     { flex: 1, height: 3, borderRadius: 1.5 },
   content:     { flex: 1, paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   cta:         { paddingTop: STEP.s2, paddingHorizontal: GUTTER, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  pendingNote: { marginTop: STEP.s1, textAlign: "center" },
 });

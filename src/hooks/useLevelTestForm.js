@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { SYNC_PENDING_COPY } from "../constants/stateCopy";
 
 import { useC } from "../contexts/ThemeContext";
 import { useExam } from "../contexts/ExamContext";
@@ -16,6 +17,7 @@ export function useLevelTestForm() {
   const { examType, targetNet, updateBaselineNet } = useExam();
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
+  const [syncPending, setSyncPending] = useState(false);
 
   const trialTypeCode = examType === "lgs" ? "LGS" : "TYT";
   const subjects = useMemo(
@@ -69,7 +71,12 @@ export function useLevelTestForm() {
     setSaving(true);
     const netVal = Math.round(totalNet * 100) / 100;
     try {
-      await updateBaselineNet(netVal);
+      // updateBaselineNet reject etmez, { synced } donduru. Sonuc yok
+      // sayilirsa sunucu yazimi basarisiz olsa bile akis basarili gorunur.
+      // Deger yerelde ve bekleyen bayrakla duruyor; ExamContext sonraki
+      // acilista yeniden deniyor, bu yuzden akis bloklanmiyor.
+      const res = await updateBaselineNet(netVal);
+      if (res && res.synced === false) setSyncPending(true);
       track(EVENTS.LEVEL_TEST_SUBMITTED, { net: netVal, trialType: trialTypeCode });
       H.success();
     } catch {
@@ -81,6 +88,8 @@ export function useLevelTestForm() {
   }, [hasAnyEntry, totalNet, trialTypeCode, updateBaselineNet]);
 
   return {
+    syncPending,
+    syncPendingNote: syncPending ? SYNC_PENDING_COPY.baselineNet : null,
     subjects,
     values,
     setSubjectNet,

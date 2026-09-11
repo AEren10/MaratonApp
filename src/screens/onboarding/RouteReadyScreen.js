@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { Button, StatBlock } from "../../components/design";
@@ -18,6 +18,9 @@ import { EVENTS } from "../../constants/analytics";
 import { useExam } from "../../contexts/ExamContext";
 
 export default function RouteReadyScreen() {
+  // Seviye Testi sunucuya yazamadiysa notu buraya tasiyor (o ekran submit
+  // sonrasi kapandigi icin orada gosterilemiyor).
+  const syncPendingNote = useRoute().params?.syncPendingNote || null;
   const C = useC();
   const navigation = useNavigation();
   const [starting, setStarting] = useState(false);
@@ -107,6 +110,11 @@ export default function RouteReadyScreen() {
         <Button onPress={handleStart} size="lg" fullWidth loading={starting} disabled={!firstStop}>
           İlk durağa başla
         </Button>
+        {syncPendingNote ? (
+          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>
+            {syncPendingNote}
+          </Text>
+        ) : null}
         <Button onPress={handleViewRoute} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
           Rotanın tamamını gör
         </Button>
@@ -127,5 +135,6 @@ const styles = StyleSheet.create({
   taskBlock: { marginTop: STEP.s3, marginBottom: STEP.s2 },
   cta: { paddingHorizontal: GUTTER, paddingBottom: STEP.s2, paddingTop: STEP.s1 },
   secondaryBtn: { marginTop: STEP.s1 },
+  pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
 });

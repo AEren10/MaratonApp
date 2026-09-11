@@ -47,6 +47,15 @@ export const EMPTY_COPY = {
   },
 };
 
+// Sunucuya yazilamamis ama cihazda duran deger icin kisa bilgi satiri.
+// Tasarimda bu duruma ait ayri bir artboard yok; metin "Cevrimdisi Kuyruk"
+// ekraninin kendi soz dagarcigindan uyarlandi ("Girdigin her sey cihazinda
+// tutuluyor", "baglanti gelince yuklenecek") -- sifirdan uydurulmadi.
+export const SYNC_PENDING_COPY = {
+  targetNet: "Hedefin cihazında tutuluyor, bağlantı gelince yüklenecek.",
+  baselineNet: "Sonucun cihazında tutuluyor, bağlantı gelince yüklenecek.",
+};
+
 export const ERROR_COPY = {
   server: {
     title: "Bizde bir sorun var.",
