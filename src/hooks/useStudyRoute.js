@@ -21,6 +21,7 @@ import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
 import { routeReadinessSummary } from "../domain/route/routeCreation";
 import { summarizeRouteRevision } from "../domain/route/routeRevisionSummary";
 import { routePersistenceDecision } from "../domain/route/routePersistenceDecision";
+import { isRoutePausedForExam, routePausedAtForExam } from "../domain/route/routePauseState";
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
@@ -67,15 +68,16 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const [routeState, setRouteStateLocal] = useState(null);
   const [routeCreating, setRouteCreating] = useState(false);
   const [routeCreationError, setRouteCreationError] = useState(null);
-  const isPaused = !!routeState?.paused_at && (!routeState?.resumed_at
-    || new Date(routeState.paused_at) > new Date(routeState.resumed_at));
+  const isPaused = isRoutePausedForExam(routeState, examType);
   const recoveryWeek = useMemo(() => {
     if (pausedWeeks != null) return pausedWeeks;
     if (!routeState?.paused_at || !routeState?.resumed_at || isPaused) return null;
+    if (routeState.exam_type && routeState.exam_type !== examType) return null;
     const pauseWeeks = (new Date(routeState.resumed_at) - new Date(routeState.paused_at)) / 604800000;
     if (pauseWeeks < 1) return null;
     return Math.max(0, Math.floor((Date.now() - new Date(routeState.resumed_at)) / 604800000));
-  }, [isPaused, pausedWeeks, routeState?.paused_at, routeState?.resumed_at]);
+  }, [examType, isPaused, pausedWeeks, routeState?.exam_type,
+    routeState?.paused_at, routeState?.resumed_at]);
   const [persistedStops, setPersistedStops] = useState([]);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
   const trials = useSelector(selectTrials);
@@ -314,15 +316,15 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
   const pause = useCallback(async () => {
     if (!user?.id) return;
-    const next = await pauseRoute(user.id);
+    const next = await pauseRoute(user.id, examType);
     if (next) setRouteStateLocal(next);
-  }, [user?.id]);
+  }, [examType, user?.id]);
 
   const resume = useCallback(async () => {
     if (!user?.id) return;
-    const next = await resumeRoute(user.id);
+    const next = await resumeRoute(user.id, examType);
     if (next) setRouteStateLocal(next);
-  }, [user?.id]);
+  }, [examType, user?.id]);
 
   const transitionStop = useCallback(async (stop, transition, payload = {}) => {
     if (!stop?.stopId) throw new Error("route_stop_not_persisted");
@@ -380,7 +382,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     isPaused,
     // Donma ani. Deger zaten routeState'te vardi ama disa verilmiyordu;
     // "Rotan N gundur duruyor" cumlesi buna dayaniyor (Rota Donduruldu hero'su).
-    pausedAt: routeState?.paused_at || null,
+    pausedAt: routePausedAtForExam(routeState, examType),
     pause,
     resume,
     transitionStop,

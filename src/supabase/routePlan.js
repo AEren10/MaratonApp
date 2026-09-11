@@ -226,8 +226,12 @@ export async function setRouteState(userId, patch) {
   }
 }
 
-export const pauseRoute = (userId) =>
-  setRouteState(userId, { paused_at: new Date().toISOString(), resumed_at: null });
+export const pauseRoute = (userId, examType = null) =>
+  setRouteState(userId, {
+    paused_at: new Date().toISOString(),
+    resumed_at: null,
+    exam_type: examType,
+  });
 
-export const resumeRoute = (userId) =>
-  setRouteState(userId, { resumed_at: new Date().toISOString() });
+export const resumeRoute = (userId, examType = null) =>
+  setRouteState(userId, { resumed_at: new Date().toISOString(), exam_type: examType });
