@@ -19,12 +19,18 @@ function revisionMessage(revisionSummary) {
 
   const countLine = revisionCountLine(revisionSummary.counts);
   const detail = countLine ? `: ${countLine}` : "";
+  if (revisionSummary.decision?.urgency === "low") {
+    return `${revisionSummary.decision.reason}${detail}. ${revisionSummary.nextAction}`;
+  }
   return `${revisionSummary.headline}${detail}. ${revisionSummary.nextAction}`;
 }
 
 export function buildRouteCreatedAlertCopy({ action, routeCreated, revisionSummary } = {}) {
+  const urgency = revisionSummary?.decision?.urgency || null;
   const title = routeCreated
-    ? revisionSummary?.changed === false ? "Rota aynı kaldı" : "Rota güncellendi"
+    ? revisionSummary?.changed === false
+      ? "Rota aynı kaldı"
+      : urgency === "low" ? "Rota ince ayar aldı" : "Rota güncellendi"
     : "Rota oluşturuldu";
   const baseMessage = routeCreated
     ? revisionMessage(revisionSummary)

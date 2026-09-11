@@ -42,3 +42,23 @@ test("stays quiet when a revision did not change the plan", () => {
   assert.equal(copy.title, "Rota aynı kaldı");
   assert.match(copy.message, /Mevcut plana güvenle devam/);
 });
+
+test("describes low urgency revisions as a soft adjustment", () => {
+  const copy = buildRouteCreatedAlertCopy({
+    routeCreated: true,
+    revisionSummary: {
+      changed: true,
+      headline: "Rota sırası güncellendi",
+      nextAction: "Mevcut aktif durağı bitir.",
+      counts: { added: 0, moved: 1, resized: 0, removed: 0 },
+      decision: {
+        urgency: "low",
+        reason: "Duraklar aynı kalıyor ama öncelik sırası yeni veriye göre yumuşakça değişiyor.",
+      },
+    },
+  });
+
+  assert.equal(copy.title, "Rota ince ayar aldı");
+  assert.match(copy.message, /yumuşakça değişiyor/);
+  assert.match(copy.message, /1 taşınan durak/);
+});
