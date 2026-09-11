@@ -18,6 +18,7 @@ import {
   purchasePackage,
   restorePurchases,
   isInitialized,
+  getPurchasesStatus,
 } from "../../lib/purchases";
 import { startTrial } from "../../supabase/profiles";
 import { useAuth } from "../../contexts/AuthContext";
@@ -91,7 +92,8 @@ export default function PaywallScreen() {
     try {
       const pkg = getSelectedPackage();
       if (!pkg) {
-        if (user?.id) {
+        const purchasesStatus = getPurchasesStatus();
+        if (__DEV__ && user?.id && !purchasesStatus.configured) {
           const started = await startTrial(user.id);
           if (started) {
             convertedRef.current = true;
@@ -105,7 +107,10 @@ export default function PaywallScreen() {
           showAlert("Deneme Kullanıldı", "Ücretsiz deneme hakkını zaten kullandın.");
           return;
         }
-        showAlert("Henüz Hazır Değil", "Satın alma şu an kullanılamıyor.");
+        showAlert(
+          "Satın alma hazır değil",
+          "Mağaza paketleri yüklenemedi. Biraz sonra tekrar dene.",
+        );
         return;
       }
       const isPro = await purchasePackage(pkg);
