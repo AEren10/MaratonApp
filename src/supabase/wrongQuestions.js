@@ -79,7 +79,7 @@ export const getWrongQuestionById = async (id, userId) => {
   try {
     const { data, error } = await supabase
       .from("wrong_questions")
-      .select("*")
+      .select(WQ_COLUMNS)
       .eq("id", id)
       .eq("user_id", userId)
       .maybeSingle();

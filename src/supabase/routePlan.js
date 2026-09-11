@@ -12,6 +12,31 @@ import { createRouteRevision } from "../domain/route/routeIdentity";
 
 const TABLE = "route_weeks";
 const STATE_TABLE = "route_state";
+const ROUTE_STOP_COLUMNS = [
+  "id",
+  "user_id",
+  "revision_id",
+  "logical_key",
+  "root_key",
+  "week_start",
+  "position",
+  "segment_index",
+  "subject",
+  "subject_label",
+  "topic",
+  "stop_kind",
+  "lifecycle_status",
+  "locked_until",
+  "frozen_at",
+  "effective_status",
+  "predecessor_stop_id",
+  "replacement_stop_id",
+  "version",
+  "metadata",
+  "created_at",
+  "updated_at",
+].join(", ");
+const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, reason, exam_type, updated_at";
 
 /** Rota çizildiğinde haftaları yaz. Aynı hafta varsa üzerine yazar. */
 export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRevision = null) {
@@ -95,7 +120,7 @@ export async function getRouteStops(userId, revisionId = null) {
   try {
     let query = supabase
       .from("route_stops")
-      .select("*")
+      .select(ROUTE_STOP_COLUMNS)
       .eq("user_id", userId)
       .order("week_start", { ascending: true })
       .order("position", { ascending: true });
@@ -191,7 +216,7 @@ export async function getRouteState(userId) {
   try {
     const { data, error } = await supabase
       .from(STATE_TABLE)
-      .select("*")
+      .select(ROUTE_STATE_COLUMNS)
       .eq("user_id", userId)
       .maybeSingle();
     if (error) throw error;
