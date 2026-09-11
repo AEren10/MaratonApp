@@ -71,3 +71,7 @@
 ## 2026-09-12 — Eski rota haftası temizliği
 
 - Sınav tipi değişiminde `neq("exam_type", current)` tek başına `NULL` exam_type'lı legacy haftaları yakalamaz; Postgres'te `NULL != value` true değildir. Temizlik current exam'i korurken `exam_type IS NULL` kayıtları da kapsamalı.
+
+## 2026-09-12 — Rota durak lifecycle carryover scope'u
+
+- `route_stops` exam_type'ı doğrudan taşımıyor; kapsam `route_revisions` üzerinden geliyor. Terminal durumlar yeni revizyona taşınırken `logical_key` tek başına yeterli görülmemeli, aynı sınav tipindeki revision'lardan taşınmalı.
