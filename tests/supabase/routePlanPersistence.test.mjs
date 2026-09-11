@@ -19,3 +19,8 @@ test("route week snapshots are scoped by exam type", () => {
   assert.match(examScopeMigration, /DROP INDEX IF EXISTS public\.idx_route_weeks_user_week/);
   assert.match(examScopeMigration, /ON CONFLICT \(user_id, exam_type, week_start\) DO UPDATE/);
 });
+
+test("route week cleanup removes legacy unscoped rows when preserving current exam", () => {
+  assert.match(source, /q\.or\(`exam_type\.is\.null,exam_type\.neq\.\$\{exceptExamType\}`\)/);
+  assert.doesNotMatch(source, /q = q\.neq\("exam_type", exceptExamType\)/);
+});

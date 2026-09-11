@@ -201,7 +201,7 @@ export async function clearRouteWeeks(userId, { exceptExamType } = {}) {
   if (!userId || userId === "dev") return;
   try {
     let q = supabase.from(TABLE).delete().eq("user_id", userId);
-    if (exceptExamType) q = q.neq("exam_type", exceptExamType);
+    if (exceptExamType) q = q.or(`exam_type.is.null,exam_type.neq.${exceptExamType}`);
     const { error } = await q;
     if (error) throw error;
   } catch (e) {

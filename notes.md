@@ -67,3 +67,7 @@
 
 - `route_state` tek `user_id` satırı olarak kalırsa bir sınav tipindeki pause/resume işlemi başka sınav tipinin durumunu ezebilir. Yeni yazımlar `(user_id, exam_type)` scope'uyla yapılmalı.
 - Legacy `exam_type IS NULL` state okunabilir kalmalı; aksi halde eski canlı kullanıcıların dondurulmuş/geri dönüş bilgisi bir anda görünmez olur.
+
+## 2026-09-12 — Eski rota haftası temizliği
+
+- Sınav tipi değişiminde `neq("exam_type", current)` tek başına `NULL` exam_type'lı legacy haftaları yakalamaz; Postgres'te `NULL != value` true değildir. Temizlik current exam'i korurken `exam_type IS NULL` kayıtları da kapsamalı.
