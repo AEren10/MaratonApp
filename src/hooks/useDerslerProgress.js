@@ -5,7 +5,7 @@ import { captureError } from "../lib/errorReporting";
 
 const EXPECTED_QUESTIONS = 30;
 
-function calcTopicProgress(tp) {
+export function calcTopicProgress(tp) {
   const qScore = Math.min((tp.total_questions || 0) / EXPECTED_QUESTIONS, 1) * 40;
   const accScore = tp.total_questions > 0 ? ((tp.correct_count || 0) / tp.total_questions) * 30 : 0;
   const freqScore = Math.min((tp.study_count || 0) / 3, 1) * 30;
