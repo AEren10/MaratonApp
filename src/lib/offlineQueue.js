@@ -169,6 +169,7 @@ async function runOne(item) {
           questions,
           minutes,
           studyDate: item.payload?.study_date,
+          sourceOperationId: item.clientOperationId || item.id || item.payload?.client_operation_id,
         });
       }
       break;
@@ -181,7 +182,11 @@ async function runOne(item) {
         0,
       );
       if (userId && solvedCount > 0) {
-        await syncChallengeProgress(userId, { questions: solvedCount });
+        await syncChallengeProgress(userId, {
+          questions: solvedCount,
+          source: "trial_entry",
+          sourceOperationId: item.clientOperationId || item.id || item.payload?.trial?.client_operation_id,
+        });
       }
       break;
     }
@@ -208,14 +213,22 @@ async function runOne(item) {
   }
 }
 
-async function refreshStudySideEffects(userId, { questions = 0, minutes = 0, studyDate } = {}) {
+async function refreshStudySideEffects(
+  userId,
+  { questions = 0, minutes = 0, studyDate, sourceOperationId = null } = {},
+) {
   try {
     // Seri sayısını sunucu hesaplıyor; istemci yalnızca tarihi bildiriyor.
     await touchStreak(userId, studyDate || null);
   } catch (_) {}
 
   try {
-    await syncChallengeProgress(userId, { questions, minutes });
+    await syncChallengeProgress(userId, {
+      questions,
+      minutes,
+      source: "study_log",
+      sourceOperationId,
+    });
   } catch (_) {}
 }
 
@@ -366,11 +379,11 @@ export async function saveStudyLogOffline(payload) {
   const clientOperationId = payload?.client_operation_id || createClientOperationId(OP_STUDY_LOG);
   const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
-    await addStudyLog(payloadWithId);
-    return { saved: true, queued: false };
+    const saved = await addStudyLog(payloadWithId);
+    return { saved: true, queued: false, data: saved, clientOperationId };
   } catch (e) {
     await enqueue({ type: OP_STUDY_LOG, payload: payloadWithId, clientOperationId });
-    return { saved: false, queued: true, error: e };
+    return { saved: false, queued: true, error: e, clientOperationId };
   }
 }
 
@@ -379,14 +392,14 @@ export async function saveTrialOffline(trial, subjects) {
   const trialWithId = withClientOperationId(trial, clientOperationId);
   try {
     const saved = await addTrial(trialWithId, subjects);
-    return { saved: true, queued: false, data: saved };
+    return { saved: true, queued: false, data: saved, clientOperationId };
   } catch (e) {
     // Kota/validasyon reddi bağlantı hatası değildir. Kuyruğa alınırsa her
     // reconnect'te sonsuza kadar yeniden denenir ve kullanıcıya yanlışlıkla
     // "gönderilecek" denir.
     if (isPermanentTrialError(e)) throw e;
     await enqueue({ type: OP_TRIAL, payload: { trial: trialWithId, subjects }, clientOperationId });
-    return { saved: false, queued: true, error: e };
+    return { saved: false, queued: true, error: e, clientOperationId };
   }
 }
 

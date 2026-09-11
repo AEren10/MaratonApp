@@ -1,9 +1,27 @@
-import { listMyChallenges, bumpMyProgress, checkExpiredChallenges } from "../supabase/challenges";
+import {
+  listMyChallenges,
+  bumpMyProgress,
+  checkExpiredChallenges,
+  syncMyChallengeProgress,
+} from "../supabase/challenges";
 
-export async function syncChallengeProgress(userId, { questions = 0, minutes = 0 }) {
+export async function syncChallengeProgress(
+  userId,
+  { questions = 0, minutes = 0, source = "study_log", sourceOperationId = null } = {},
+) {
   if (!userId || (questions <= 0 && minutes <= 0)) return;
   try {
     await checkExpiredChallenges(userId);
+
+    if (sourceOperationId) {
+      const applied = await syncMyChallengeProgress({
+        source,
+        sourceOperationId,
+        questions,
+        minutes,
+      });
+      if (applied !== null) return;
+    }
 
     const challenges = await listMyChallenges(userId);
     const active = challenges.filter((c) => c.status === "active");

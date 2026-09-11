@@ -168,7 +168,12 @@ export default function AddStudyScreen() {
         dispatch(setFreezeCount(freezeCount));
         if (usedFreeze) showAlert("🛡 Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
       } catch (e) { captureError(e, { context: "streak_update_addStudy" }); }
-      syncChallengeProgress(user.id, { questions: qc, minutes: duration });
+      syncChallengeProgress(user.id, {
+        questions: qc,
+        minutes: duration,
+        source: "study_log",
+        sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
+      });
     } else if (result.queued) {
       const msg = result.error?.message || "";
       const isNet = msg.includes("network") || msg.includes("fetch");

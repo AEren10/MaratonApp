@@ -141,7 +141,11 @@ export async function submitTrialEntry({
     showAlert("Çevrimdışı", "Deneme sonucu bağlantı geldiğinde gönderilecek.");
   }
   if (solvedCount > 0) {
-    syncChallengeProgress(user.id, { questions: solvedCount });
+    syncChallengeProgress(user.id, {
+      questions: solvedCount,
+      source: "trial_entry",
+      sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
+    });
   }
 
   completeForm({ net: netVal, trialType });

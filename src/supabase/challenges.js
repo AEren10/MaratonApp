@@ -123,6 +123,34 @@ export async function checkExpiredChallenges(userId) {
   }
 }
 
+function isMissingFunction(e) {
+  const msg = e?.message || "";
+  return e?.code === "PGRST202" || msg.includes("Could not find the function");
+}
+
+export async function syncMyChallengeProgress({
+  source,
+  sourceOperationId,
+  questions = 0,
+  minutes = 0,
+} = {}) {
+  try {
+    if (!sourceOperationId) return null;
+    const { data, error } = await supabase.rpc("sync_challenge_progress", {
+      p_source: source,
+      p_source_operation_id: sourceOperationId,
+      p_questions: Math.max(0, Math.round(questions || 0)),
+      p_minutes: Math.max(0, Math.round(minutes || 0)),
+    });
+    if (error) throw error;
+    return data ?? 0;
+  } catch (e) {
+    if (isMissingFunction(e)) return null;
+    handleSupabaseError(e, "syncMyChallengeProgress");
+    throw e;
+  }
+}
+
 export async function bumpMyProgress(id, side, value) {
   try {
     if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
