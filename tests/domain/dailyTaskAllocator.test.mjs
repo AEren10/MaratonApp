@@ -79,3 +79,42 @@ test("daily route allocation skips non-actionable route statuses", () => {
   assert.deepEqual(allocations.map((item) => item.key), ["c"]);
   assert.equal(allocations[0].questionCount, 20);
 });
+
+test("daily route allocation uses remaining route stop questions", () => {
+  const allocations = buildDailyRouteTaskAllocations([
+    {
+      key: "matematik",
+      score: 100,
+      routeStop: {
+        lifecycleStatus: "active",
+        cost: { questions: 30 },
+        completedQuestions: 24,
+        reasonCodes: ["LOW_ACCURACY"],
+      },
+    },
+    {
+      key: "turkce",
+      score: 80,
+      routeStop: {
+        lifecycleStatus: "upcoming",
+        cost: { questions: 50 },
+        reasonCodes: ["ROUTE_COMMITMENT"],
+      },
+    },
+    {
+      key: "fen",
+      score: 70,
+      routeStop: {
+        lifecycleStatus: "upcoming",
+        questions: 20,
+        completed_questions: 20,
+        reasonCodes: ["ROUTE_COMMITMENT"],
+      },
+    },
+  ], 30);
+
+  assert.deepEqual(allocations.map((item) => item.key), ["matematik", "turkce"]);
+  assert.deepEqual(allocations.map((item) => item.questionCount), [6, 24]);
+  assert.equal(allocations[0].allocation.maxQuestions, 6);
+  assert.equal(allocations[0].allocation.cappedByRouteCost, true);
+});

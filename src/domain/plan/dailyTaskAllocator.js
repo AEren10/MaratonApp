@@ -1,4 +1,4 @@
-import { getEffectiveRouteStopStatus } from "../route/stopStatus.js";
+import { routeStopEffectiveStatus } from "../route/stopStatus.js";
 
 export const DAILY_TASK_ALLOCATOR_VERSION = "daily-task-allocator-v1";
 
@@ -34,22 +34,28 @@ function positiveNumber(value, fallback = 0) {
 }
 
 function stopStatus(stop = {}) {
-  if (stop.effectiveStatus || stop.effective_status) {
-    return stop.effectiveStatus || stop.effective_status;
-  }
-  const lifecycleStatus = stop.lifecycleStatus || stop.lifecycle_status || stop.status || "upcoming";
-  return getEffectiveRouteStopStatus(lifecycleStatus, {
-    locked: Boolean(stop.locked || stop.isLocked),
-    frozen: Boolean(stop.frozen || stop.isFrozen || stop.frozenUntil || stop.frozen_until),
-  });
+  return routeStopEffectiveStatus(stop);
 }
 
 function reasonCode(stop = {}) {
   return stop.insight?.reasonCode || stop.reasonCodes?.[0] || "ROUTE_COMMITMENT";
 }
 
+function completedQuestions(stop = {}) {
+  return Math.max(0, Math.round(positiveNumber(
+    stop.completedQuestions ?? stop.completed_questions ?? stop.doneQuestions ?? stop.done_questions,
+  )));
+}
+
+function routeQuestionTotal(stop = {}) {
+  return Math.max(0, Math.round(positiveNumber(
+    stop.cost?.questions ?? stop.questions ?? stop.plannedQuestions ?? stop.planned_questions,
+  )));
+}
+
 function routeCostLimit(stop = {}, fallback) {
-  return Math.max(1, Math.round(positiveNumber(stop.cost?.questions, fallback)));
+  const total = routeQuestionTotal(stop) || Math.max(0, Math.round(positiveNumber(fallback)));
+  return Math.max(0, total - completedQuestions(stop));
 }
 
 export function isDailyAssignableRouteStop(stop = {}) {
@@ -59,6 +65,8 @@ export function isDailyAssignableRouteStop(stop = {}) {
 export function scoreDailyRouteCandidate(candidate = {}, index = 0) {
   const stop = candidate.routeStop || {};
   if (!isDailyAssignableRouteStop(stop)) return 0;
+  const total = routeQuestionTotal(stop);
+  if (total > 0 && completedQuestions(stop) >= total) return 0;
 
   const base = Math.max(0.1, positiveNumber(stop.score, positiveNumber(candidate.score, 1)));
   const statusBoost = STATUS_PRIORITY[stopStatus(stop)] ?? 1;
