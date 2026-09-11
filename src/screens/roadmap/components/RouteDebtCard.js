@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { buildRouteDebtSummary } from "../../../domain/route/routeDebtSummary";
@@ -14,13 +14,19 @@ function Stat({ item, s }) {
   );
 }
 
-function RouteDebtCard({ C, debt, debtPlan, debtWeeks }) {
+function RouteDebtCard({ C, debt, debtPlan, debtWeeks, onPress }) {
   const summary = buildRouteDebtSummary({ debt, debtPlan, debtWeeks });
   if (!summary) return null;
   const s = makeStyles(C, summary);
 
   return (
-    <View style={s.card}>
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={onPress ? "Konu borcunu aç" : undefined}
+      style={({ pressed }) => [s.card, pressed && onPress ? { opacity: 0.8 } : null]}
+    >
       <View style={s.header}>
         <View style={s.iconBox}>
           <Icon name={summary.uncovered > 0 ? "alertCircle" : "repeat"} size={17} color={C.warn} />
@@ -30,11 +36,12 @@ function RouteDebtCard({ C, debt, debtPlan, debtWeeks }) {
           <Text style={s.title}>{summary.title}</Text>
           <Text style={s.body}>{summary.body}</Text>
         </View>
+        {onPress ? <Icon name="chevR" size={15} color={C.text3} /> : null}
       </View>
       <View style={s.stats}>
         {summary.stats.map((item) => <Stat item={item} key={item.label} s={s} />)}
       </View>
-    </View>
+    </Pressable>
   );
 }
 

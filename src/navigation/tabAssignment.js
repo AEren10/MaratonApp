@@ -41,6 +41,7 @@ export const PROGRAM_STACK = [
   SCREENS.CALENDAR,         // Takvim ve Seri · Takvim
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari (ANALIZ'de de var)
+  SCREENS.TOPIC_DEBT,       // Konu Borcu
   SCREENS.COMPARATIVE,      // Plan vs Gercek
 ];
 

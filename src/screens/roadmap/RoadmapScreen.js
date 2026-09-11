@@ -8,6 +8,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SPACING, TYPOGRAPHY } from "../../themes/tokens";
+import { SCREENS } from "../../constants/screens";
 import RouteProgressHeader from "./components/RouteProgressHeader";
 import RouteCreationCard from "./components/RouteCreationCard";
 import RouteWeekCard from "./components/RouteWeekCard";
@@ -63,7 +64,13 @@ export default function RoadmapScreen() {
         disabled={isPaused}
         onStart={startNextRouteAction}
       />
-      <RouteDebtCard C={C} debt={debt} debtPlan={debtPlan} debtWeeks={debtWeeks} />
+      <RouteDebtCard
+        C={C}
+        debt={debt}
+        debtPlan={debtPlan}
+        debtWeeks={debtWeeks}
+        onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)}
+      />
       <RouteProgressHeader
         totals={totals}
         daysLeft={daysLeft}
