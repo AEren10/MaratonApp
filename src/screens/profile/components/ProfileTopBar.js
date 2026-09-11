@@ -1,12 +1,12 @@
 import { View, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
 
-export function MinimalHeader() {
+export function ProfileTopBar() {
   const C = useC();
   const nav = useNavigation();
 
@@ -15,23 +15,26 @@ export function MinimalHeader() {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
+      paddingHorizontal: GUTTER,
+      paddingTop: STEP.s1,
     }}>
-      <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Profil</Text>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 26, color: C.text }}>
+        Profil
+      </Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Ayarlar"
-        hitSlop={8}
+        hitSlop={STEP.s1}
         onPress={() => { H.tap(); nav.navigate(SCREENS.SETTINGS); }}
         style={({ pressed }) => ({
-          width: 40, height: 40, borderRadius: 20,
-          backgroundColor: C.surface,
+          width: CONTROL.tapMin, height: CONTROL.tapMin,
+          borderRadius: SHAPE.iconBox,
+          borderWidth: 1, borderColor: C.border,
           alignItems: "center", justifyContent: "center",
           opacity: pressed ? 0.7 : 1,
         })}
       >
-        <Icon name="settings" size={18} color={C.sec} />
+        <Icon name="settings" size={18} color={C.text2} />
       </Pressable>
     </View>
   );

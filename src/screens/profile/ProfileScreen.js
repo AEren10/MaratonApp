@@ -1,38 +1,40 @@
 import { useMemo } from "react";
-import { ScrollView, View, Text, Pressable } from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
-import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { useAppSelector } from "../../store/hooks";
-import { selectLevel, selectXP, selectStats, selectWeeklyXP } from "../../store/slices/gamificationSlice";
+import { selectLevel, selectStats, selectWeeklyXP } from "../../store/slices/gamificationSlice";
 import { selectStreak, selectLongestStreak } from "../../store/slices/studyLogSlice";
-import { useCurriculum } from "../../hooks/useCurriculum";
-import { Icon, SectionLabel } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { getTier, getNextTier } from "../../constants/league";
 import { selectTrials } from "../../store/slices/trialSlice";
+import { useCurriculum } from "../../hooks/useCurriculum";
+import { subjectColorOf } from "../../themes/subjectPalette";
+import { getTier, getNextTier } from "../../constants/league";
+import { STEP, GUTTER } from "../../themes/tokens";
 
-import { MinimalHeader } from "./components/MinimalHeader";
-import { ProfileHeader } from "./components/ProfileHeader";
-import { CareerStats } from "./components/CareerStats";
-import { StrengthBars } from "./components/StrengthBars";
-import { LevelBar } from "./components/LevelBar";
+import { ProfileTopBar } from "./components/ProfileTopBar";
+import { ProfileHero } from "./components/ProfileHero";
+import { TargetDepartmentCard } from "./components/TargetDepartmentCard";
+import { RouteCredentialsList } from "./components/RouteCredentialsList";
+import { YearRouteChart } from "./components/YearRouteChart";
+import { StrengthMap } from "./components/StrengthMap";
+import { ProfileLinkRow } from "./components/ProfileLinkRow";
+import { LevelRow } from "./components/LevelRow";
 import { LeagueMiniCard } from "./components/LeagueMiniCard";
-import { ActivityHeatmap } from "./components/ActivityHeatmap";
+
+const FADE = (delay) => FadeInDown.delay(delay).duration(350).springify();
 
 export default function ProfileScreen() {
   const C = useC();
-  const nav = useNavigation();
   const { user } = useAuth();
-  const { examType, field } = useExam();
+  const { examType, field, targetDepartment } = useExam();
+  const { showPaywall } = usePremium();
   const { subjects = [] } = useCurriculum();
   const level = useAppSelector(selectLevel);
-  const totalXP = useAppSelector(selectXP);
   const gStats = useAppSelector(selectStats);
   const streak = useAppSelector(selectStreak);
   const longestStreak = useAppSelector(selectLongestStreak);
@@ -43,8 +45,8 @@ export default function ProfileScreen() {
 
   const examLabel = useMemo(() => {
     if (examType === "lgs") return "LGS";
-    if (examType === "tyt") return "Sadece TYT";
-    if (examType === "dil") return "YKS Dil";
+    if (examType === "tyt") return "SADECE TYT";
+    if (examType === "dil") return "YKS DİL";
     if (field === "sayisal") return "TYT + SAY";
     if (field === "ea") return "TYT + EA";
     if (field === "sozel") return "TYT + SÖZ";
@@ -57,8 +59,7 @@ export default function ProfileScreen() {
   const careerStats = useMemo(() => {
     const totalQ = gStats.totalQuestions || 0;
     const totalMin = gStats.totalMinutes || 0;
-    const hours = Math.floor(totalMin / 60);
-    return { totalQuestions: totalQ, totalHours: hours };
+    return { totalQuestions: totalQ, totalHours: Math.floor(totalMin / 60) };
   }, [gStats]);
 
   const strengths = useMemo(() => {
@@ -66,7 +67,6 @@ export default function ProfileScreen() {
     const subjectMap = {};
     subjects.forEach((s) => { subjectMap[s.key] = s; });
 
-    // Son 5 denemenin toplamı — tek deneme (ör. branş) tüm haritayı daraltmasın
     const totals = {};
     trials.slice(0, 5).forEach((trial) => {
       Object.entries(trial.subjects || {}).forEach(([key, data]) => {
@@ -82,7 +82,7 @@ export default function ProfileScreen() {
       if (agg.total < 5) return;
       const acc = Math.round((agg.correct / agg.total) * 100);
       const subj = subjectMap[norm];
-      entries.push({ name: subj?.label || norm, c: subj?.color || C.muted, v: acc });
+      entries.push({ name: subj?.label || norm, c: subjectColorOf(C, norm), v: acc });
     });
     return entries.sort((a, b) => b.v - a.v).slice(0, 6);
   }, [subjects, trials, C]);
@@ -90,85 +90,48 @@ export default function ProfileScreen() {
   return (
     <SwipeToHome>
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <MinimalHeader />
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 90 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Hero */}
-          <Animated.View entering={FadeInDown.duration(350).springify()}>
-            <ProfileHeader
-              name={displayName}
-              exam={examLabel}
-              streak={streak}
-            />
+        <ProfileTopBar />
+        <ScrollView contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
+          <Animated.View entering={FADE(0)}>
+            <ProfileHero name={displayName} exam={examLabel} streak={streak} />
           </Animated.View>
 
-          {/* Level bar */}
-          <Animated.View entering={FadeInDown.delay(60).duration(350).springify()}>
-            <LevelBar
-              level={level?.level}
-              title={level?.title}
-              progress={level?.progress}
-              xpInLevel={level?.xpInLevel}
-              xpForNext={level?.xpForNext}
-            />
+          <Animated.View entering={FADE(50)}>
+            <TargetDepartmentCard targetDepartment={targetDepartment} />
           </Animated.View>
 
-          {/* Career stats */}
-          <Animated.View entering={FadeInDown.delay(100).duration(350).springify()}>
-            <CareerStats
+          <Animated.View entering={FADE(100)}>
+            <RouteCredentialsList
               totalQuestions={careerStats.totalQuestions}
               totalHours={careerStats.totalHours}
               longestStreak={longestStreak}
             />
           </Animated.View>
 
-          {/* League mini-card */}
-          <Animated.View entering={FadeInDown.delay(160).duration(350).springify()}>
-            <LeagueMiniCard
-              tier={leagueTier}
-              nextTier={leagueNextTier}
-              weeklyXP={weeklyXP}
+          <Animated.View entering={FADE(150)}>
+            <YearRouteChart />
+          </Animated.View>
+
+          <Animated.View entering={FADE(200)}>
+            <StrengthMap strengths={strengths} />
+          </Animated.View>
+
+          <Animated.View entering={FADE(250)} style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
+            <ProfileLinkRow
+              label="Premium"
+              meta="7 gün ücretsiz"
+              onPress={() => showPaywall("profile_premium_row")}
+              first
             />
           </Animated.View>
 
-          {/* Monthly activity heatmap */}
-          <Animated.View entering={FadeInDown.delay(220).duration(350).springify()}>
-            <ActivityHeatmap />
+          <Animated.View entering={FADE(280)}>
+            <LevelRow level={level?.level} xpInLevel={level?.xpInLevel} xpForNext={level?.xpForNext} />
           </Animated.View>
 
-          {/* Strength bars */}
-          {strengths.length > 0 ? (
-            <Animated.View entering={FadeInDown.delay(300).duration(350).springify()}>
-              <StrengthBars strengths={strengths} />
-            </Animated.View>
-          ) : (
-            <Animated.View entering={FadeInDown.delay(300).duration(350).springify()}
-              style={{ marginTop: SPACING.xl }}
-            >
-              <Text style={{ ...TYPOGRAPHY.label, color: C.sec, marginBottom: SPACING.md }}>
-                GÜÇ HARİTASI
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => nav.navigate(SCREENS.TRIAL_ENTRY)}
-                style={({ pressed }) => ({
-                  backgroundColor: C.surface,
-                  borderRadius: RADIUS.xxl,
-                  borderWidth: 1, borderColor: C.border,
-                  padding: SPACING.xl,
-                  alignItems: "center",
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Icon name="chart" size={24} color={C.muted} style={{ marginBottom: SPACING.sm }} />
-                <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center" }}>
-                  Denemeni gir, güçlerin burada görünsün
-                </Text>
-              </Pressable>
-            </Animated.View>
-          )}
+          <Animated.View entering={FADE(320)} style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
+            <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </SwipeToHome>
