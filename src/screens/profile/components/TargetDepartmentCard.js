@@ -7,9 +7,13 @@ import { SCREENS } from "../../../constants/screens";
 import { useThresholdView } from "../../../hooks/useThresholdView";
 import * as H from "../../../lib/haptics";
 
-// Tasarim "bölümleri gör"e RankSimulator'a değil GoalsScreen'in bölüm
-// seçicisine bağlanıyor — o ekran zaten PROFIL_STACK'te ve tasarımın
-// gösterdiği bölüm-seçme deneyimini karşılıyor.
+// GoalsScreen'e baglaniyor: hedef net oradan duzenleniyor ve band notu
+// hedef bolume gore ciziliyor.
+//
+// DIKKAT: uygulamada bolum SECICI yok. target_department yazilabilir bir
+// kolon ama onu degistiren bir arayuz hicbir yerde bulunmuyor (grep ile
+// dogrulandi: yalniz okunuyor/gosteriliyor). Bu kartin eski yorumu var
+// olmayan bir seciciye isaret ediyordu. Secici yazilinca hedef burasi.
 export function TargetDepartmentCard({ targetDepartment }) {
   const C = useC();
   const nav = useNavigation();

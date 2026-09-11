@@ -1,140 +1,102 @@
-import { useState, useCallback, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon, IconBox, GlassCard, AnimatedPressable } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
-import { useC } from "../../contexts/ThemeContext";
-import { useAppDispatch } from "../../store/hooks";
-import { selectGoals, setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
-import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
-import { updateProfile } from "../../supabase/profiles";
-import { useAlert } from "../../contexts/AlertContext";
-import { captureError } from "../../lib/errorReporting";
-import * as H from "../../lib/haptics";
-import { GoalHeroCard } from "./components/GoalHeroCard";
+import { Icon, Button } from "../../components/design";
+import { SettingsGroup } from "./components/SettingsGroup";
+import { SettingsRow } from "./components/SettingsRow";
+import { GoalNetStepper } from "./components/GoalNetStepper";
+import { GoalBandNote } from "./components/GoalBandNote";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
+import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 
-const RANKINGS = [
-  { id: "1k", label: "İlk 1.000", icon: "flame", color: "#E8841A" },
-  { id: "5k", label: "İlk 5.000", icon: "target", color: "#15A86A" },
-  { id: "10k", label: "İlk 10.000", icon: "chart", color: "#15A86A" },
-  { id: "25k", label: "İlk 25.000", icon: "hash", color: "#2E7DEB" },
-  { id: "50k", label: "İlk 50.000", icon: "layers", color: "#2E7DEB" },
-  { id: "100k", label: "İlk 100.000", icon: "bookOpen", color: "#6B4FE0" },
-  { id: "100k+", label: "100.000+", icon: "shield", color: "#6B4FE0" },
-];
-
-function GoalRow({ icon, color, label, value, onChange, suffix, C }) {
-  return (
-    <GlassCard radius={RADIUS.xl} style={{ padding: SPACING.md, marginBottom: SPACING.md }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md }}>
-        <IconBox icon={icon} color={color} size={36} rounded={10} />
-        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, flex: 1 }}>{label}</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: C.surface2, borderRadius: RADIUS.md, borderWidth: 1, borderColor: C.border, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs }}>
-          <TextInput
-            value={String(value)}
-            onChangeText={(t) => onChange(parseInt(t.replace(/[^0-9]/g, ""), 10) || 0)}
-            keyboardType="number-pad"
-            style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, minWidth: 40, textAlign: "right" }}
-            maxLength={5}
-          />
-          <Text style={{ ...TYPOGRAPHY.caption, color: C.muted }}>{suffix}</Text>
-        </View>
-      </View>
-    </GlassCard>
-  );
-}
-
+// Tasarim: "Hedef Duzenle" artboard'i — Ayarlar > Hedef net satirindan
+// acilan duzenleyici.
+//
+// Tasarim yalniz hedef neti gosteriyor ama gunluk soru hedefi de burada:
+// Ayarlar'daki "Gunluk soru hedefi" satiri bu ekrana geliyor ve tek alana
+// indirmek o satiri cikmaz sokaga cevirirdi. daily_question_goal gercek ve
+// yazilabilir bir kolon, ustelik rotanin kapasite girdisi.
+//
+// Sinav tarihi dokunulamaz kaliyor: duzenlemek icin Tarih Secici ekrani
+// gerekiyor ve o henuz yok -- var olmayan bir akisi uydurmamak icin.
 export default function GoalsScreen() {
   const C = useC();
-  const nav = useNavigation();
-  const dispatch = useAppDispatch();
-  const goals = useSelector(selectGoals);
-  const { user } = useAuth();
-  const { targetRanking, targetDepartment, daysUntilExam, updateRanking } = useExam();
-  const showAlert = useAlert();
-  const [showPicker, setShowPicker] = useState(false);
-  const [draft, setDraft] = useState({ dailyQuestions: goals.dailyQuestions, weeklyTrials: goals.weeklyTrials, weeklyMinutes: goals.weeklyMinutes });
+  const { examDate } = useExam();
+  const {
+    value, dec, inc, save, cancel, saving, pendingNote,
+    netLabel, currentNet, gapResult, targetDepartment, min, max,
+    daily, decDaily, incDaily, dailyMin, dailyMax,
+  } = useGoalNetEditor();
 
-  useEffect(() => {
-    setDraft({ dailyQuestions: goals.dailyQuestions, weeklyTrials: goals.weeklyTrials, weeklyMinutes: goals.weeklyMinutes });
-  }, [goals.dailyQuestions, goals.weeklyTrials, goals.weeklyMinutes]);
-
-  const pickRanking = useCallback((id) => {
-    updateRanking(id, targetDepartment);
-    H.success();
-    setShowPicker(false);
-  }, [updateRanking, targetDepartment]);
-
-  const save = useCallback(async () => {
-    dispatch(setGoals(draft));
-    saveGoalsToStorage(draft);
-    if (user?.id && user.id !== "dev") {
-      try { await updateProfile(user.id, {
-        daily_question_goal: draft.dailyQuestions,
-        weekly_trials_goal: draft.weeklyTrials,
-        weekly_minutes_goal: draft.weeklyMinutes,
-      }); } catch (e) { captureError(e, { context: "goals_sync" }); }
-    }
-    H.success();
-    showAlert("Kaydedildi", "Hedeflerin güncellendi.");
-    nav.goBack();
-  }, [draft, dispatch, nav, user?.id, showAlert]);
+  const examDateLabel = examDate
+    ? examDate.toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })
+    : null;
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md }}>
-        <Pressable onPress={() => nav.goBack()} hitSlop={12}><Icon name="arrowL" size={22} color={C.text} /></Pressable>
-        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>Hedeflerim</Text>
-        <View style={{ width: 22 }} />
+      <View style={styles.header}>
+        <Pressable onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={styles.closeBtn}>
+          <Icon name="x" size={14} color={C.text2} />
+        </Pressable>
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 60 }}>
-        <GoalHeroCard targetRanking={targetRanking} targetDepartment={targetDepartment} daysUntilExam={daysUntilExam} onEdit={() => setShowPicker((p) => !p)} />
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>Hedef net</Text>
+        <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
+          Rota bu sayıya göre çizilir. Değiştirince haftalık yük yeniden hesaplanır.
+        </Text>
 
-        {showPicker && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ marginTop: SPACING.md }}>
-            <Text style={{ ...TYPOGRAPHY.label, color: C.muted, marginBottom: SPACING.sm }}>HEDEF SIRALAMA SEÇ</Text>
-            {RANKINGS.map((r) => {
-              const active = targetRanking === r.id;
-              return (
-                <Pressable key={r.id} onPress={() => pickRanking(r.id)} style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md, borderRadius: RADIUS.xl, padding: SPACING.md, marginBottom: SPACING.sm, borderWidth: 1.5, backgroundColor: C.surface, borderColor: active ? r.color : C.border }}>
-                  <IconBox icon={r.icon} color={r.color} size={36} rounded={10} />
-                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: active ? C.text : C.sec, flex: 1 }}>{r.label}</Text>
-                  {active && <Icon name="check" size={18} color={r.color} />}
-                </Pressable>
-              );
-            })}
-          </Animated.View>
-        )}
+        <GoalNetStepper
+          value={value} min={min} max={max} netLabel={netLabel}
+          currentNet={currentNet} onDec={dec} onInc={inc}
+        />
 
-        <Text style={{ ...TYPOGRAPHY.label, color: C.muted, marginTop: SPACING.xxl, marginBottom: SPACING.md }}>GÜNLÜK & HAFTALIK</Text>
+        <GoalBandNote value={value} targetDepartment={targetDepartment} gapResult={gapResult} />
 
-        <GoalRow icon="target" color={C.accent} label="Günlük Soru" value={draft.dailyQuestions} onChange={(v) => setDraft((d) => ({ ...d, dailyQuestions: v }))} suffix="soru" C={C} />
-        <View style={{ flexDirection: "row", gap: SPACING.sm, marginTop: -SPACING.xs, marginBottom: SPACING.md }}>
-          {[50, 100, 150, 200].map((n) => {
-            const on = draft.dailyQuestions === n;
-            return (
-              <Pressable key={n} onPress={() => setDraft((d) => ({ ...d, dailyQuestions: n }))} style={{ flex: 1, alignItems: "center", paddingVertical: SPACING.sm, backgroundColor: on ? C.accent + "20" : C.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: on ? C.accent : C.border }}>
-                <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: on ? C.accent : C.sec }}>{n}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Text style={[TYPOGRAPHY.label, styles.section, { color: C.text2 }]}>
+          GÜNLÜK SORU HEDEFİ
+        </Text>
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
+          Rotanın haftalık kapasitesi bu sayıdan hesaplanır.
+        </Text>
+        <GoalNetStepper
+          value={daily}
+          min={dailyMin}
+          max={dailyMax}
+          unit="soru · günde"
+          label="günlük soru hedefini"
+          currentNet={null}
+          onDec={decDaily}
+          onInc={incDaily}
+        />
 
-        <GoalRow icon="chart" color={C.teal} label="Haftalık Deneme" value={draft.weeklyTrials} onChange={(v) => setDraft((d) => ({ ...d, weeklyTrials: v }))} suffix="adet" C={C} />
-        <GoalRow icon="clock" color={C.blue} label="Haftalık Süre" value={draft.weeklyMinutes} onChange={(v) => setDraft((d) => ({ ...d, weeklyMinutes: v }))} suffix="dk" C={C} />
-
-        <AnimatedPressable onPress={save} haptic="medium" style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, backgroundColor: C.accent, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg, marginTop: SPACING.lg, ...SHADOWS.accent }}>
-          <Icon name="check" size={20} color={C.bg} />
-          <Text style={{ ...TYPOGRAPHY.button, color: C.bg }}>Kaydet</Text>
-        </AnimatedPressable>
+        <SettingsGroup title="Aynı ekrandan">
+          <SettingsRow first label="Sınav tarihi" value={examDateLabel} />
+        </SettingsGroup>
       </ScrollView>
-      </KeyboardAvoidingView>
+
+      <View style={[styles.cta, { borderTopColor: C.line }]}>
+        <Button onPress={save} size="lg" fullWidth loading={saving}>
+          Kaydet
+        </Button>
+        <Pressable onPress={cancel} style={styles.cancelBtn} accessibilityRole="button">
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
+        </Pressable>
+        {pendingNote ? (
+          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{pendingNote}</Text>
+        ) : null}
+      </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  header:      { flexDirection: "row", alignItems: "center", paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
+  closeBtn:    { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginLeft: -STEP.s2 },
+  scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 },
+  cta:         { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  section:     { marginTop: STEP.s5, marginBottom: STEP.s1 },
+  cancelBtn:   { height: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
+  pendingNote: { marginTop: STEP.s1, textAlign: "center" },
+});
