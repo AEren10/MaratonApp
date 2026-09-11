@@ -26,6 +26,15 @@ test("social export queries are paginated", () => {
   assert.match(source, /\.range\(from, from \+ PAGE - 1\)/);
 });
 
+test("trial subject export chunks and paginates in-filters", () => {
+  assert.match(source, /const IN_FILTER_CHUNK = 200/);
+  assert.match(source, /async function fetchInAll/);
+  assert.match(source, /values\.slice\(i, i \+ IN_FILTER_CHUNK\)/);
+  assert.match(source, /\.in\(column, chunk\)/);
+  assert.match(source, /\.range\(from, from \+ PAGE - 1\)/);
+  assert.match(source, /fetchInAll\("trial_subjects", "trial_id", trialIds\)/);
+});
+
 test("export summary includes the profile row collected outside the table catalog", () => {
   assert.match(source, /PROFILE_EXPORT_SPEC = \{ table: "profiles", label: "Profil" \}/);
   assert.match(source, /\[PROFILE_EXPORT_SPEC, \.\.\.EXPORT_TABLES\]\.map/);

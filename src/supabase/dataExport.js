@@ -57,6 +57,7 @@ const EXPORT_TABLES = [
 ];
 
 const PAGE = 1000;
+const IN_FILTER_CHUNK = 200;
 
 /** Bir tablonun tamamını sayfalayarak çeker. */
 async function fetchAll(table, column, userId) {
@@ -88,6 +89,26 @@ async function fetchOrAll(table, orFilter) {
     const page = data || [];
     rows.push(...page);
     if (page.length < PAGE) break;
+  }
+  return rows;
+}
+
+/** Büyük `.in(...)` filtrelerini URL/limit riskine sokmadan parçalara böler. */
+async function fetchInAll(table, column, values) {
+  const rows = [];
+  for (let i = 0; i < values.length; i += IN_FILTER_CHUNK) {
+    const chunk = values.slice(i, i + IN_FILTER_CHUNK);
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from(table)
+        .select("*")
+        .in(column, chunk)
+        .range(from, from + PAGE - 1);
+      if (error) throw error;
+      const page = data || [];
+      rows.push(...page);
+      if (page.length < PAGE) break;
+    }
   }
   return rows;
 }
@@ -162,12 +183,7 @@ export async function collectUserData(userId, onProgress) {
         // Doğrudan user_id yok; kullanıcının denemeleri üzerinden.
         const trialIds = (result.data.trials || []).map((t) => t.id);
         if (trialIds.length) {
-          const { data, error } = await supabase
-            .from("trial_subjects")
-            .select("*")
-            .in("trial_id", trialIds);
-          if (error) throw error;
-          result.data.trial_subjects = data || [];
+          result.data.trial_subjects = await fetchInAll("trial_subjects", "trial_id", trialIds);
         } else {
           result.data.trial_subjects = [];
         }

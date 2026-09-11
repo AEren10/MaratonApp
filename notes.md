@@ -40,3 +40,8 @@
 
 - Storage mutating policy'leri `TO authenticated` ile açıkça sınırlandırılmalı.
 - `UPDATE` policy mutlaka hem `USING` hem `WITH CHECK` içermeli; aksi halde kullanıcı satırı okuyabildiği halde yeni değerin sahiplik şartı yeterince ifade edilmemiş olur.
+
+## 2026-09-12 — KVKK export büyük veri dayanıklılığı
+
+- `user_id` taşımayan ilişki tabloları export edilirken tek büyük `.in(...)` çağrısı kullanılmamalı; ID listesi chunk'lanmalı ve her chunk ayrıca sayfalanmalı.
+- Export kodu "az kayıtla çalışıyor" diye tamam sayılmamalı; çok deneme/çok detay kaydı olan gerçek kullanıcı senaryosu testle korunmalı.
