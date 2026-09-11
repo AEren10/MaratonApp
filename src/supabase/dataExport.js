@@ -14,6 +14,8 @@ import { handleSupabaseError } from "./handleError.js";
 // verisi zaten RLS ile korunuyor ve istemciden okunabiliyor; ek bir Edge
 // Function ya da zamanlanmış iş, bakımı olan yeni bir yüzey demek.
 
+const PROFILE_EXPORT_SPEC = { table: "profiles", label: "Profil" };
+
 // Dışa aktarılacak tablolar. Her biri user_id ile filtreleniyor;
 // RLS zaten bunu zorunlu kılıyor ama açıkça yazmak niyeti belli ediyor.
 const EXPORT_TABLES = [
@@ -163,7 +165,7 @@ export async function collectUserData(userId, onProgress) {
 /** Özet — kullanıcıya "ne indiriyorsun" demek için. */
 export function summarizeExport(exportData) {
   if (!exportData?.data) return [];
-  return EXPORT_TABLES.map((spec) => {
+  return [PROFILE_EXPORT_SPEC, ...EXPORT_TABLES].map((spec) => {
     const rows = exportData.data[spec.table];
     return {
       label: spec.label,

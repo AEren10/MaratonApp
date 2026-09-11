@@ -42,7 +42,7 @@ export function DataExportRow() {
         // kullanıcı bunu bilmeli.
         showAlert(
           "Verilerin indirildi",
-          `${summary} Ancak ${result.errors.length} bölüm alınamadı; dosyada not düşüldü.`,
+          `${formatExportSummary(summary)} Ancak ${result.errors.length} bölüm alınamadı; dosyada not düşüldü.`,
         );
       }
     } catch (e) {
@@ -78,6 +78,16 @@ export function DataExportRow() {
       </View>
     </Pressable>
   );
+}
+
+function formatExportSummary(summary = []) {
+  const visible = summary
+    .filter((item) => !item.failed && item.count != null)
+    .slice(0, 4)
+    .map((item) => `${item.label}: ${item.count}`);
+  if (!visible.length) return "";
+  const rest = Math.max(0, summary.filter((item) => !item.failed).length - visible.length);
+  return rest ? `${visible.join(", ")} ve ${rest} bölüm daha.` : `${visible.join(", ")}.`;
 }
 
 const makeStyles = (C) =>

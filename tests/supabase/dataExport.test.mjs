@@ -12,3 +12,8 @@ test("export catalog includes durable route lifecycle tables", () => {
   assert.match(source, /label: "Rota durakları"/);
   assert.match(source, /label: "Rota durak geçmişi"/);
 });
+
+test("export summary includes the profile row collected outside the table catalog", () => {
+  assert.match(source, /PROFILE_EXPORT_SPEC = \{ table: "profiles", label: "Profil" \}/);
+  assert.match(source, /\[PROFILE_EXPORT_SPEC, \.\.\.EXPORT_TABLES\]\.map/);
+});
