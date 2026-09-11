@@ -1,5 +1,5 @@
-import { supabase } from "./client";
-import { handleSupabaseError } from "./handleError";
+import { supabase } from "./client.js";
+import { handleSupabaseError } from "./handleError.js";
 
 // KVKK / GDPR — VERİ İNDİRME.
 //
@@ -32,6 +32,9 @@ const EXPORT_TABLES = [
   { table: "streaks", column: "user_id", label: "Seri" },
   { table: "xp_events", column: "user_id", label: "XP geçmişi" },
   { table: "route_weeks", column: "user_id", label: "Rota planı" },
+  { table: "route_revisions", column: "user_id", label: "Rota revizyonları" },
+  { table: "route_stops", column: "user_id", label: "Rota durakları" },
+  { table: "route_stop_events", column: "user_id", label: "Rota durak geçmişi" },
   { table: "shared_questions", column: "user_id", label: "Paylaştığın sorular" },
   { table: "question_answers", column: "user_id", label: "Yazdığın cevaplar" },
   { table: "retention_events", column: "user_id", label: "Uygulama içi olaylar" },
