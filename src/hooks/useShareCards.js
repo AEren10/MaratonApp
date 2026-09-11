@@ -97,5 +97,9 @@ export function useShareCards() {
     allCards,       // hepsi (available bayrağıyla)
     context: ctx,   // tek kart için özelleştirme gerekirse
     getCard: (id, override) => getShareCard(id, override ? { ...ctx, ...override } : ctx),
+    // Kartların altındaki veri kaynağı haftalık raporun ta kendisi —
+    // yükleniyor/hata durumu ekranın state'lerini bundan okur.
+    loading: report.loading,
+    error: report.error,
   };
 }

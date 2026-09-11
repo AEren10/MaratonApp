@@ -33,6 +33,14 @@ export const EMPTY_COPY = {
     body: "Rotan değiştiğinde, defterinde tekrar zamanı geldiğinde ve hafta kapandığında burada görürsün.",
     secondary: "Bildirim ayarlarına bak",
   },
+  // Paylasilacak kart yok. Tasarimda bu duruma ait artboard yok; metin
+  // "Yeni haber yok" ve rota sozlugunden uyarlandi -- sifirdan uydurulmadi.
+  shareCards: {
+    title: "Paylaşacak bir şey birikmedi.",
+    body: "Bir durak tamamladığında ya da deneme girdiğinde kart burada hazır olur.",
+    primary: "Geri dön",
+  },
+
   streakZero: {
     title: "Seri henüz başlamadı.",
     body: "Bugün tek durak tamamlaman yeterli. Seri, kaçırdığın günde sıfırlanmaz — donar.",
