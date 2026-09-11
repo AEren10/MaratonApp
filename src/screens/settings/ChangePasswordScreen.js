@@ -1,41 +1,42 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { View, Text, ScrollView, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, Button } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { Icon, Button, Input, Card } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { updatePassword } from "../../supabase/auth";
 import { useAlert } from "../../contexts/AlertContext";
-import * as H from "../../lib/haptics";
 import { authErrorMessage } from "../../supabase/authErrors";
+import { changePasswordSchema, validate } from "../../validations/auth";
+import * as H from "../../lib/haptics";
 
+// Tasarimda bu ekranin ayri bir artboard'u yok (akista aniliyor, 4/1).
+// Duzen uydurulmadi: tasarim SISTEMI uygulandi -- Input, Button, token
+// olcekleri ve bolum etiketi.
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const [next, setNext] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [show, setShow] = useState(false);
-  const [saving, setSaving] = useState(false);
   const showAlert = useAlert();
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   const save = useCallback(async () => {
     if (saving) return;
-    if (next.length < 6) {
+    // Elle uzunluk/eslesme kontrolu yerine Zod (AGENTS.md).
+    const res = validate(changePasswordSchema, { password, confirm });
+    if (!res.ok) {
       H.error();
-      showAlert("Şifre kısa", "En az 6 karakter olmalı.");
+      setErrors(res.errors);
       return;
     }
-    if (next !== confirm) {
-      H.error();
-      showAlert("Eşleşmiyor", "Şifre tekrarı doğru değil.");
-      return;
-    }
+    setErrors({});
     setSaving(true);
     try {
-      await updatePassword(next);
+      await updatePassword(password);
       H.success();
       showAlert("Güncellendi", "Şifren başarıyla değiştirildi.");
       navigation.goBack();
@@ -45,90 +46,73 @@ export default function ChangePasswordScreen() {
     } finally {
       setSaving(false);
     }
-  }, [next, confirm, navigation, saving]);
+  }, [password, confirm, navigation, saving, showAlert]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
+      <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Icon name="arrowL" size={18} color={C.text2} />
         </Pressable>
-        <Text style={[s.title, { color: C.text }]}>Şifre Değiştir</Text>
-        <View style={{ width: 22 }} />
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Şifre değiştir</Text>
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={s.scroll}>
-        <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
-          <Text style={[s.label, { color: C.muted }]}>YENİ ŞİFRE</Text>
-          <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-            <TextInput
-              value={next}
-              onChangeText={setNext}
-              placeholder="En az 6 karakter"
-              placeholderTextColor={C.muted}
-              style={[s.input, { color: C.text }]}
-              secureTextEntry={!show}
-              autoCapitalize="none"
-            />
-            <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
-              <Icon name={show ? "eye" : "lock"} size={18} color={C.muted} />
-            </Pressable>
-          </View>
-        </Animated.View>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <Input
+            label="YENİ ŞİFRE"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="En az 6 karakter"
+            secureTextEntry
+            error={errors.password}
+            textContentType="newPassword"
+          />
+          <Input
+            label="ŞİFRE TEKRARI"
+            value={confirm}
+            onChangeText={setConfirm}
+            placeholder="Yeni şifreyi yeniden yaz"
+            secureTextEntry
+            error={errors.confirm}
+            textContentType="newPassword"
+            style={styles.second}
+          />
 
-        <Animated.View entering={FadeInDown.delay(160).duration(400).springify()}>
-          <Text style={[s.label, { color: C.muted, marginTop: SPACING.lg }]}>TEKRAR</Text>
-          <View style={[s.inputRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-            <TextInput
-              value={confirm}
-              onChangeText={setConfirm}
-              placeholder="Yeniden gir"
-              placeholderTextColor={C.muted}
-              style={[s.input, { color: C.text }]}
-              secureTextEntry={!show}
-              autoCapitalize="none"
-            />
-          </View>
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()}>
-          <View style={[s.info, { backgroundColor: C.blue + "10", borderColor: C.blue + "30" }]}>
-            <Icon name="info" size={14} color={C.blue} />
-            <Text style={[s.infoText, { color: C.sec }]}>
-              Şifreni değiştirdikten sonra diğer cihazlarda tekrar giriş yapman gerekebilir.
+          <Card tone="surface" radius="panel" style={styles.note}>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
+              Şifreni değiştirdikten sonra diğer cihazlarda yeniden giriş yapman
+              gerekebilir.
             </Text>
-          </View>
-        </Animated.View>
+          </Card>
 
-        <Animated.View entering={FadeInDown.delay(320).duration(400).springify()}>
-          <Button onPress={save} loading={saving} icon="check" fullWidth style={{ marginTop: SPACING.xl }}>
-            {saving ? "Değiştiriliyor..." : "Şifreyi Değiştir"}
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            onPress={save}
+            loading={saving}
+            disabled={!password || !confirm}
+            style={styles.cta}
+          >
+            Kaydet
           </Button>
-        </Animated.View>
-      </ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s2,
   },
-  title: { ...TYPOGRAPHY.subheading },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
-  label: { ...TYPOGRAPHY.label, marginBottom: SPACING.sm },
-  inputRow: {
-    flexDirection: "row", alignItems: "center",
-    borderRadius: RADIUS.lg, borderWidth: 1,
-    paddingHorizontal: SPACING.md,
-  },
-  input: { ...TYPOGRAPHY.body, flex: 1, paddingVertical: SPACING.md },
-  info: {
-    flexDirection: "row", alignItems: "flex-start", gap: 8,
-    padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, marginTop: SPACING.xl,
-  },
-  infoText: { ...TYPOGRAPHY.caption, flex: 1 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: 60 },
+  second: { marginTop: STEP.s3 },
+  note: { marginTop: STEP.s3 },
+  cta: { marginTop: STEP.s4 },
 });

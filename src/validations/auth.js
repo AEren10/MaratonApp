@@ -19,6 +19,20 @@ export const registerSchema = z.object({
   password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
 });
 
+// Sifre degistirme: ChangePasswordScreen uzunlugu ve eslesmeyi ELLE
+// kontrol ediyordu, sema yoktu (AGENTS.md Zod diyor). Eslesme kontrolu
+// semanin icinde: iki alan ayri ayri gecerli olup birbirinden farkli
+// olabilir, bu yuzden refine gerekiyor.
+export const changePasswordSchema = z
+  .object({
+    password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
+    confirm: z.string().min(1, "Şifre tekrarını gir"),
+  })
+  .refine((d) => d.password === d.confirm, {
+    message: "Şifre tekrarı doğru değil",
+    path: ["confirm"],
+  });
+
 export const trialSubjectSchema = z.object({
   subject: z.string().min(1),
   correct_count: z.number().int().min(0).max(120),
