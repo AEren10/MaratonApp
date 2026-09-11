@@ -22,12 +22,21 @@ function Header({ C, navigation }) {
       </Text>
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel="Konu ya da yanlış ara"
+        hitSlop={10}
+        onPress={() => navigation.navigate(SCREENS.SEARCH)}
+        style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+      >
+        <Icon name="search" size={17} color={C.text3} />
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
         accessibilityLabel="Takvim ve seri"
         hitSlop={10}
         onPress={() => navigation.navigate(SCREENS.CALENDAR)}
         style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
       >
-        <Icon name="calendar" size={17} color={C.muted} />
+        <Icon name="calendar" size={17} color={C.text3} />
       </Pressable>
     </View>
   );
