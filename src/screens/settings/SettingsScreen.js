@@ -97,7 +97,7 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.delay(60).duration(420)}>
           <SettingsGroup title="ROTA">
             <SettingsRow first label="Hedef net" value={targetNetLabel} onPress={go(SCREENS.GOALS)} />
-            <SettingsRow label="Sınav tarihi" value={examDateLabel} onPress={go(SCREENS.GOALS)} />
+            <SettingsRow label="Sınav tarihi" value={examDateLabel} onPress={go(SCREENS.EXAM_DATE)} />
             <SettingsRow label="Günlük soru hedefi" value={dailyGoalLabel} onPress={go(SCREENS.GOALS)} />
             <SettingsRow label="Yol haritası" onPress={go(SCREENS.ROADMAP)} />
             {examType !== "lgs" ? (

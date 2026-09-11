@@ -48,6 +48,7 @@ import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
+import ExamDateScreen from "../screens/settings/ExamDateScreen";
 import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
 import AddTaskScreen from "../screens/plan/AddTaskScreen";
@@ -177,6 +178,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),
+  screen(SCREENS.EXAM_DATE, ExamDateScreen, modalOptions),
   screen(SCREENS.WEEKLY_REVIEW, WeeklyReviewScreen, celebrationOptions),
   screen(SCREENS.WEEKLY_TRIAL_REVIEW, WeeklyTrialReviewScreen, celebrationOptions),
   screen(SCREENS.SWIPE_REVIEW, SwipeReviewScreen),

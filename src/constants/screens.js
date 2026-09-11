@@ -96,6 +96,7 @@ export const SCREENS = {
   SEARCH: "Search",
   DOCUMENT: "Document",
   HOW_IT_WORKS: "HowItWorks",
+  EXAM_DATE: "ExamDate",
 
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",

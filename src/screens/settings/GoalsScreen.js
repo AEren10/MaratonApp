@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import { useExam } from "../../contexts/ExamContext";
 import { Icon, Button } from "../../components/design";
 import { SettingsGroup } from "./components/SettingsGroup";
@@ -8,6 +9,7 @@ import { GoalNetStepper } from "./components/GoalNetStepper";
 import { GoalBandNote } from "./components/GoalBandNote";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 
 // Tasarim: "Hedef Duzenle" artboard'i — Ayarlar > Hedef net satirindan
@@ -18,10 +20,10 @@ import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 // indirmek o satiri cikmaz sokaga cevirirdi. daily_question_goal gercek ve
 // yazilabilir bir kolon, ustelik rotanin kapasite girdisi.
 //
-// Sinav tarihi dokunulamaz kaliyor: duzenlemek icin Tarih Secici ekrani
-// gerekiyor ve o henuz yok -- var olmayan bir akisi uydurmamak icin.
+// Sinav tarihi artik Tarih Secici ekranina aciliyor (SCREENS.EXAM_DATE).
 export default function GoalsScreen() {
   const C = useC();
+  const navigation = useNavigation();
   const { examDate } = useExam();
   const {
     value, dec, inc, save, cancel, saving, pendingNote,
@@ -72,7 +74,12 @@ export default function GoalsScreen() {
         />
 
         <SettingsGroup title="Aynı ekrandan">
-          <SettingsRow first label="Sınav tarihi" value={examDateLabel} />
+          <SettingsRow
+            first
+            label="Sınav tarihi"
+            value={examDateLabel}
+            onPress={() => navigation.navigate(SCREENS.EXAM_DATE)}
+          />
         </SettingsGroup>
       </ScrollView>
 

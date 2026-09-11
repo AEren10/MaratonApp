@@ -76,6 +76,7 @@ export const PROFIL_STACK = [
   SCREENS.TERMS,
   SCREENS.DOCUMENT,         // Belge (gizlilik / kullanim sartlari metni)
   SCREENS.HOW_IT_WORKS,     // Neye Gore Oneriyoruz (ROTA'da da var)
+  SCREENS.EXAM_DATE,        // Tarih Secici
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.SHARE_CARD,       // Paylasim Karti
