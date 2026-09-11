@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { View, Text } from "react-native";
 
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { usePendingWrites } from "../../../hooks/usePendingWrites";
 import { flushQueue, retryDeadLetter, clearDeadLetter } from "../../../lib/offlineQueue";
@@ -92,7 +92,7 @@ export function SyncStatusGroup() {
           />
         </>
       )}
-      <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md }}>
+      <View style={{ paddingHorizontal: STEP.s3, paddingBottom: STEP.s2 }}>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>
           {failed > 0
             ? "Bu kayıtlar sunucuya iletilemedi. Silmediğin sürece cihazında duruyor."
