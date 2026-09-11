@@ -72,7 +72,8 @@ export const PROFIL_STACK = [
   SCREENS.APPEARANCE,       // Gorunum
   SCREENS.NOTIFICATIONS_SETTINGS,
   SCREENS.PRIVACY,
-  SCREENS.TERMS,            // Belge
+  SCREENS.TERMS,
+  SCREENS.DOCUMENT,         // Belge (gizlilik / kullanim sartlari metni)
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.SHARE_CARD,       // Paylasim Karti

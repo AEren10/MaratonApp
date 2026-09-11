@@ -94,6 +94,7 @@ export const SCREENS = {
   TOPIC_DEBT: "TopicDebt",
   PLAN_VS_ACTUAL: "PlanVsActual",
   SEARCH: "Search",
+  DOCUMENT: "Document",
 
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",

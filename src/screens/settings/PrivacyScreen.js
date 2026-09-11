@@ -1,95 +1,91 @@
-import { useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+
+import { Icon, Card } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
+import { LEGAL_DOCS } from "../../constants/legalDocs";
+import { SettingsGroup } from "./components/SettingsGroup";
+import { SettingsRow } from "./components/SettingsRow";
 import { DataExportRow } from "./components/DataExportRow";
+import { useSettingsActions } from "./useSettingsActions";
 
-const LAST_UPDATED = "18 Haziran 2026";
-
-const SECTIONS = [
-  {
-    title: "Veri Toplama",
-    body: "Maraton, hizmetlerini sunabilmek için ad, e-posta adresi ve çalışma verilerinizi toplar. Bu veriler yalnızca uygulamanın işlevselliğini sağlamak amacıyla kullanılır.",
-  },
-  {
-    title: "Veri Kullanımı",
-    body: "Toplanan veriler, kişiselleştirilmiş çalışma planları oluşturmak, ilerlemenizi takip etmek ve istatistiklerinizi göstermek için kullanılır. Verileriniz üçüncü taraflarla paylaşılmaz.",
-  },
-  {
-    title: "Üçüncü Taraf Hizmetleri",
-    body: "Uygulama altyapısı Supabase (veritabanı ve kimlik doğrulama), Sentry (hata takibi) ve Expo (uygulama güncellemeleri) hizmetlerini kullanmaktadır. Bu hizmetler yalnızca teknik altyapı amacıyla veri işler.",
-  },
-  {
-    title: "Veri Güvenliği",
-    body: "Tüm veriler şifrelenmiş bağlantı (TLS) üzerinden iletilir ve güvenli sunucularda saklanır. Erişim kontrolleri, satır düzeyinde güvenlik (RLS) ve düzenli güvenlik denetimleri uygulanmaktadır.",
-  },
-  {
-    title: "Veri Saklama Süresi",
-    body: "Kişisel verileriniz hesabınız aktif olduğu sürece saklanır. Hesabınızı sildiğinizde tüm verileriniz kalıcı olarak silinir.",
-  },
-  {
-    title: "Yaş Sınırı",
-    body: "Maraton, 13 yaş ve üzeri kullanıcılar için tasarlanmıştır. 13 yaşından küçük bireylerin kişisel verilerini bilerek toplamıyoruz.",
-  },
-  {
-    title: "Haklarınız",
-    body: "Verilerinize erişim talep edebilir, düzeltme isteyebilir veya Ayarlar ekranından hesabınızı silebilirsiniz. Talepleriniz 30 gün içerisinde işleme alınır.",
-  },
-  {
-    title: "İletişim",
-    body: "Gizlilik politikamızla ilgili sorularınız için destek@maraton.app adresine e-posta gönderebilirsiniz.",
-  },
-];
-
+// Tasarimin "Gizlilik" ekrani bir HUB: belge satirlari + VERILERIN grubu.
+// Politika METNI artik burada degil, "Belge" ekraninda (DocumentScreen);
+// icerik src/constants/legalDocs.js icinde tek kaynakta.
 export default function PrivacyScreen() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
+  const { handleDeleteAccount } = useSettingsActions();
+
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
+  const openDoc = useCallback(
+    (docKey) => () => navigation.navigate(SCREENS.DOCUMENT, { docKey }),
+    [navigation],
+  );
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <View style={s.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={styles.header}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Icon name="arrowL" size={18} color={C.text2} />
         </Pressable>
-        <Text style={s.headerTitle}>Gizlilik Politikası</Text>
-        <View style={{ width: 22 }} />
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>
+          Gizlilik ve şartlar
+        </Text>
       </View>
 
-      <ScrollView
-        contentContainerStyle={s.scroll}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={s.updated}>Son güncelleme: {LAST_UPDATED}</Text>
-        {SECTIONS.map((sec) => (
-          <View key={sec.title} style={s.section}>
-            <Text style={s.sectionTitle}>{sec.title}</Text>
-            <Text style={s.sectionBody}>{sec.body}</Text>
-          </View>
-        ))}
-        {/* Veri taşınabilirliği: KVKK/GDPR hakkı artık kullanıcıya ulaşıyor. */}
-        <DataExportRow />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Tasarim ucuncu bir satir daha gosteriyor: "KVKK aydinlatma metni".
+            Icerik saglanmadan cizilmiyor -- yasal metin uydurulamaz ve bos
+            bir belge yayin riski olurdu. legalDocs.js'e eklendigi an burada
+            kendiliginden gorunecek. */}
+        <SettingsGroup>
+          <SettingsRow
+            first
+            label={LEGAL_DOCS.privacy.title}
+            hint={`Son güncelleme ${LEGAL_DOCS.privacy.lastUpdated}`}
+            onPress={openDoc("privacy")}
+          />
+          <SettingsRow
+            label={LEGAL_DOCS.terms.title}
+            hint={`Son güncelleme ${LEGAL_DOCS.terms.lastUpdated}`}
+            onPress={openDoc("terms")}
+          />
+        </SettingsGroup>
+
+        <SettingsGroup title="VERİLERİN">
+          <SettingsRow first label="Hesabımı sil" danger onPress={handleDeleteAccount} />
+        </SettingsGroup>
+
+        {/* Veri indirme kendi ilerleme/hata halini tasiyor. */}
+        <View style={styles.exportWrap}>
+          <DataExportRow />
+        </View>
+
+        <Card tone="surface" radius="panel" style={styles.note}>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
+            Rota verisi hesabında sunucuda tutulur. Telefon değişse de 362 günlük
+            kaydın kaybolmaz.
+          </Text>
+        </Card>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-    },
-    headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: 60 },
-    updated: { ...TYPOGRAPHY.caption, color: C.muted, marginBottom: SPACING.xl },
-    section: { marginBottom: SPACING.xxl },
-    sectionTitle: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginBottom: SPACING.sm },
-    sectionBody: { ...TYPOGRAPHY.body, color: C.sec },
-  });
-}
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s2,
+  },
+  scroll: { paddingBottom: 60 },
+  exportWrap: { paddingHorizontal: GUTTER, marginTop: STEP.s3 },
+  note: { marginHorizontal: GUTTER, marginTop: STEP.s4 },
+});
