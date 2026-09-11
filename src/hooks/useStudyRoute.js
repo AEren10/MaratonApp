@@ -371,6 +371,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     debtWeeks: debtInWeeks(debt.totalQuestions, route.capacity),
     // Ara verme / dondurma — tasarım AKIŞ 2.
     isPaused,
+    // Donma ani. Deger zaten routeState'te vardi ama disa verilmiyordu;
+    // "Rotan N gundur duruyor" cumlesi buna dayaniyor (Rota Donduruldu hero'su).
+    pausedAt: routeState?.paused_at || null,
     pause,
     resume,
     transitionStop,

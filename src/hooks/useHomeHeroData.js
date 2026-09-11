@@ -13,6 +13,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     debt,
     hasRouteAccess,
     routeAccessLoading,
+    isPaused,
+    pausedAt,
   } = useStudyRoute();
 
   const stopCounts = useMemo(() => {
@@ -26,6 +28,23 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     }
     return { total, done };
   }, [weeks]);
+
+  // Rota dondurulduginda "kacinci durakta birakildi" bilgisi - hero'nun
+  // "Rota Donduruldu" varyaminda kullaniliyor. Duraklar hafta-hafta duz
+  // sirali oldugundan ilk ACTIVE durak, birakilan noktadir.
+  const frozenAtStop = useMemo(() => {
+    if (!isPaused) return null;
+    let index = 0;
+    for (const week of weeks || []) {
+      for (const stop of week.stops || []) {
+        index += 1;
+        if (getEffectiveRouteStopStatus(stop.lifecycleStatus) === ROUTE_STOP_STATUS.ACTIVE) {
+          return { number: index, subjectLabel: stop.subjectLabel, topic: stop.topic };
+        }
+      }
+    }
+    return null;
+  }, [isPaused, weeks]);
 
   const chartData = useMemo(() => {
     if (!forecast?.dataPoints?.length) return null;
@@ -58,6 +77,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     targetNet,
     hasRouteAccess,
     routeAccessLoading,
+    isPaused,
+    frozenAtStop,
     chartData,
     stopCounts,
     // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
@@ -65,6 +86,10 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     // turetiyor; dakika yoksa 0 gelir ve serit borcu hic gostermez —
     // uydurma bir soru/saat orani kullanilmaz.
     debtHours: debt?.totalMinutes ? Math.round(debt.totalMinutes / 60) : 0,
+    // Rota kac gundur donuk. pausedAt yoksa null kalir, cumle sayisiz yazilir.
+    frozenDays: pausedAt
+      ? Math.max(0, Math.floor((Date.now() - new Date(pausedAt).getTime()) / 86400000))
+      : null,
     hasDebt: !!debt?.hasDebt,
     nextTask,
     ctaSubtitle,

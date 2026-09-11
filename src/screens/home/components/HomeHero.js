@@ -12,6 +12,7 @@ import { HomeHeroFinalWeek } from "./heroVariants/HomeHeroFinalWeek";
 import { HomeHeroFinalWeekDebt } from "./heroVariants/HomeHeroFinalWeekDebt";
 import { HomeHeroComeback } from "./heroVariants/HomeHeroComeback";
 import { HomeHeroExamDay } from "./heroVariants/HomeHeroExamDay";
+import { HomeHeroFrozen } from "./heroVariants/HomeHeroFrozen";
 import { getExamPhase } from "../../../domain/exam/examPhase";
 
 // Yeni tasarim hero'su: dev "bugün çözülen" sayısı + rota grafiği + özet
@@ -42,9 +43,20 @@ export function HomeHero({
     hasDebt,
     nextTask,
     ctaSubtitle,
+    isPaused,
+    frozenAtStop,
+    frozenDays,
   } = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks });
-  const mode = useHomeHeroMode({ examDate, hasDebt, comeback });
+  const mode = useHomeHeroMode({ examDate, hasDebt, comeback, isPaused });
   const trialStats = useTrialSummaryStats();
+
+  if (mode === HOME_HERO_MODE.FROZEN) {
+    return (
+      <View style={s.wrap}>
+        <HomeHeroFrozen daysUntilExam={daysUntilExam} frozenAtStop={frozenAtStop} frozenDays={frozenDays} />
+      </View>
+    );
+  }
 
   if (mode === HOME_HERO_MODE.EXAM_DAY) {
     return (
