@@ -343,6 +343,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       setPersistedStops((current) => current.map((item) => (
         item.id === updated.id ? updated : item
       )));
+      if (user?.id && examType) {
+        getLatestRouteStops(user.id, examType)
+          .then(setPersistedStops)
+          .catch(() => {});
+      }
       track(EVENTS.ROUTE_STOP_TRANSITIONED, {
         transition,
         subject: updated.subject,
@@ -350,7 +355,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       });
     }
     return updated;
-  }, [user?.id]);
+  }, [examType, user?.id]);
   const distributeRouteDebt = useCallback(
     (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
     [debt.totalQuestions, route.capacity, route.weeks],

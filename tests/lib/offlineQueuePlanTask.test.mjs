@@ -21,5 +21,6 @@ test("queued route stop transitions replay through the lifecycle RPC", () => {
 test("route stop UI transitions use the offline-safe helper", () => {
   assert.match(useStudyRouteSource, /saveRouteStopTransitionOffline\(\{\s*userId: user\?\.id,/);
   assert.match(useStudyRouteSource, /if \(routeResult\.error && !routeResult\.queued\) throw routeResult\.error/);
+  assert.match(useStudyRouteSource, /getLatestRouteStops\(user\.id, examType\)/);
   assert.doesNotMatch(useStudyRouteSource, /const updated = await transitionRouteStop\(/);
 });
