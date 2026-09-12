@@ -24,12 +24,20 @@ export function useRetention(reward) {
 
   useEffect(() => {
     const activeUserId = user?.id || "anonymous";
-    if (processedFor.current === activeUserId || !retentionData) return;
-    processedFor.current = activeUserId;
+    if (!retentionData) return;
+
+    const today = todayStr();
+    const processKey = [
+      activeUserId,
+      today,
+      retentionData.lastActive || "",
+      retentionData.loginRewardedDate || "",
+    ].join("|");
+    if (processedFor.current === processKey) return;
+    processedFor.current = processKey;
     let alive = true;
     let timer;
 
-    const today = todayStr();
     const lastActive = retentionData.lastActive;
     const loginRewarded = retentionData.loginRewardedDate;
 

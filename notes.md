@@ -109,3 +109,8 @@
 - Paywall gösterme kararı tek domain kapısından geçmeli; otomatik tetikleyici ile manuel `showPaywall` farklı davranırsa kullanıcı yanlış anda satış baskısı görebilir.
 - İlk hafta, sınav arifesi, sınav günü ve sınav sonrası kısa dönem “satış yok” kuralı retention için de önemli. Bu dönemlerde güven kazanmak, kısa vadeli premium denemesinden daha değerli.
 - Bastırılan paywall olayları analytics/retention tarafına `PAYWALL_SUPPRESSED` olarak yazılmalı; böylece ileride dönüşüm hunisi incelenirken “gösterilmedi” ile “gösterildi ama almadı” karışmaz.
+
+## 2026-09-13 — Retention karar anahtarı
+
+- Retention hook'u yalnız `userId` ile “işlendi” sayılmamalı; local/cache veri geldikten sonra Supabase’ten taze `lastActive` veya `loginRewardedDate` gelirse karar tekrar değerlendirilmelidir.
+- Aksi durumda comeback gösterimi veya günlük giriş ödülü sessizce kaçabilir. Kullanıcıyı geri kazanma mantığında stale veriyle tek sefer karar vermek risklidir.
