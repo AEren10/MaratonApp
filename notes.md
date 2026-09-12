@@ -87,9 +87,9 @@
 
 - `route_stops` runtime select listesi migration'da gerçekten var olan kolonlarla aynı kalmalı. Lock/freeze/effective durumları tablo kolonu değil, lifecycle + route state/access overlay'inden türetilen sunum bilgisidir.
 - `select("*")` yerine açık kolon listesi kullanırken schema dışı bir kolon eklemek de wildcard kadar riskli: canlı Supabase `column does not exist` ile tüm rota okumasını düşürür.
+- `route_state` için de aynı kural geçerli: pause/resume okuması yalnız migration'daki kalıcı kolonları seçmeli. Sunum nedeni/overlay gibi alanlar tabloya eklenmeden select listesine girmemeli.
 
 ## 2026-09-13 — Route lifecycle sonrası yerel görünüm
 
 - `transition_route_stop` yalnızca dokunulan durağı değil, bazı geçişlerde sıradaki durağı da otomatik `active` yapar. Client yalnız dönen eski durağı patch'lerse ekrandaki aktif durak bayatlar.
 - Başarılı route stop geçişinden sonra latest stops yeniden çekilmeli; queued/offline durumda ise yerel optimistic patch yapılmamalı, sync sonrası sunucu otoritesi kazanmalı.
-- `route_state` için de aynı kural geçerli: pause/resume okuması yalnız migration'daki kalıcı kolonları seçmeli. Sunum nedeni/overlay gibi alanlar tabloya eklenmeden select listesine girmemeli.
