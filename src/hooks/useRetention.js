@@ -19,6 +19,9 @@ function daysBetween(dateA, dateB) {
 export function useRetention(reward) {
   const [comeback, setComeback] = useState(null);
   const processedFor = useRef(null);
+  const comebackShownFor = useRef(null);
+  const dailyRewardScheduledFor = useRef(null);
+  const dailyRewardCompletedFor = useRef(null);
   const retentionData = useAppSelector(selectRetentionData);
   const { user } = useAuth();
 
@@ -37,6 +40,7 @@ export function useRetention(reward) {
     processedFor.current = processKey;
     let alive = true;
     let timer;
+    let scheduledDailyKey = null;
 
     const lastActive = retentionData.lastActive;
     const loginRewarded = retentionData.loginRewardedDate;
@@ -45,21 +49,36 @@ export function useRetention(reward) {
       const lastDate = lastActive.split("T")[0];
       const daysAway = daysBetween(lastDate, today);
       if (daysAway >= 2) {
-        setComeback({ daysAway, xpBonus: 50 });
-        if (user?.id) {
-          recordRetentionEvent(
-            user.id,
-            RETENTION_EVENTS.COMEBACK_SHOWN,
-            { daysAway, xpBonus: 50 },
-            RETENTION_SOURCES.HOME,
-          ).catch(() => {});
+        const comebackKey = [activeUserId, today, lastDate].join("|");
+        if (comebackShownFor.current !== comebackKey) {
+          comebackShownFor.current = comebackKey;
+          setComeback({ daysAway, xpBonus: 50 });
+          if (user?.id) {
+            recordRetentionEvent(
+              user.id,
+              RETENTION_EVENTS.COMEBACK_SHOWN,
+              { daysAway, xpBonus: 50 },
+              RETENTION_SOURCES.HOME,
+            ).catch(() => {});
+          }
         }
       }
     }
 
     if (loginRewarded !== today && reward && alive) {
+      const dailyKey = [activeUserId, today].join("|");
+      if (
+        dailyRewardScheduledFor.current === dailyKey ||
+        dailyRewardCompletedFor.current === dailyKey
+      ) {
+        return undefined;
+      }
+      scheduledDailyKey = dailyKey;
+      dailyRewardScheduledFor.current = dailyKey;
       timer = setTimeout(() => {
         if (!alive) return;
+        dailyRewardCompletedFor.current = dailyKey;
+        dailyRewardScheduledFor.current = null;
         reward("daily_login");
         if (user?.id) markLoginRewarded(user.id).catch(() => {});
         if (user?.id) {
@@ -73,7 +92,13 @@ export function useRetention(reward) {
       }, 3500);
     }
 
-    return () => { alive = false; clearTimeout(timer); };
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+      if (scheduledDailyKey && dailyRewardScheduledFor.current === scheduledDailyKey) {
+        dailyRewardScheduledFor.current = null;
+      }
+    };
   }, [retentionData, reward, user?.id]);
 
   const dismissComeback = useCallback(() => {

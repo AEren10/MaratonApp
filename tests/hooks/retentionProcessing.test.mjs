@@ -18,3 +18,12 @@ test("daily login is marked on the server only after the local reward fires", ()
   assert.notEqual(markIndex, -1);
   assert.ok(markIndex > rewardIndex);
 });
+
+test("comeback and daily reward processing are deduped separately", () => {
+  assert.match(source, /const comebackShownFor = useRef\(null\);/);
+  assert.match(source, /const dailyRewardScheduledFor = useRef\(null\);/);
+  assert.match(source, /const dailyRewardCompletedFor = useRef\(null\);/);
+  assert.match(source, /const comebackKey = \[activeUserId, today, lastDate\]\.join\("\|"\);/);
+  assert.match(source, /dailyRewardScheduledFor\.current === dailyKey/);
+  assert.match(source, /dailyRewardCompletedFor\.current === dailyKey/);
+});

@@ -115,3 +115,4 @@
 - Retention hook'u yalnız `userId` ile “işlendi” sayılmamalı; local/cache veri geldikten sonra Supabase’ten taze `lastActive` veya `loginRewardedDate` gelirse karar tekrar değerlendirilmelidir.
 - Aksi durumda comeback gösterimi veya günlük giriş ödülü sessizce kaçabilir. Kullanıcıyı geri kazanma mantığında stale veriyle tek sefer karar vermek risklidir.
 - Günlük giriş ödülünde sunucuya “ödüllendi” işareti, yerel ödül verildikten sonra atılmalı. Tersi sırada app kapanması veya taze profil yüklenmesi kullanıcıya ödül düşmeden günü kapatabilir.
+- Comeback gösterimi ve günlük giriş ödülü aynı `processed` anahtarına bağlanmamalı. Profil snapshot'ı değişince karar tekrar çalışabilir; comeback event'i kullanıcı/gün/son aktif tarih bazında ayrıca tekilleştirilmelidir.
