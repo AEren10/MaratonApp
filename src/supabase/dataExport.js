@@ -15,6 +15,7 @@ import { handleSupabaseError } from "./handleError.js";
 // Function ya da zamanlanmış iş, bakımı olan yeni bir yüzey demek.
 
 const PROFILE_EXPORT_SPEC = { table: "profiles", label: "Profil" };
+const ORDER_BY_ID = [{ column: "id", ascending: true }];
 
 // Dışa aktarılacak tablolar. Her biri user_id ile filtreleniyor;
 // RLS zaten bunu zorunlu kılıyor ama açıkça yazmak niyeti belli ediyor.
@@ -22,35 +23,45 @@ const EXPORT_TABLES = [
   // profiles ARTIK doğrudan okunmuyor: sütun SELECT izni id/name/avatar_url ile
   // sınırlı (profil sızıntısı düzeltmesi). Kendi tam profilimiz definer RPC'den
   // geliyor; aşağıda ayrıca ekleniyor.
-  { table: "study_logs", column: "user_id", label: "Çalışma kayıtları" },
-  { table: "trials", column: "user_id", label: "Deneme sonuçları" },
+  { table: "study_logs", column: "user_id", label: "Çalışma kayıtları", order: ORDER_BY_ID },
+  { table: "trials", column: "user_id", label: "Deneme sonuçları", order: ORDER_BY_ID },
   // SIRA ÖNEMLİ: trial_subjects'in user_id'si yok, kullanıcının denemeleri
   // üzerinden çekiliyor. Bu yüzden "trials"tan SONRA gelmeli.
   { table: "trial_subjects", column: null, label: "Deneme ders detayları" },
-  { table: "wrong_questions", column: "user_id", label: "Yanlış defteri" },
-  { table: "topic_progress", column: "user_id", label: "Konu ilerlemesi" },
-  { table: "topic_notes", column: "user_id", label: "Konu notları" },
-  { table: "user_tasks", column: "user_id", label: "Plan durakları" },
-  { table: "streaks", column: "user_id", label: "Seri" },
-  { table: "xp_events", column: "user_id", label: "XP geçmişi" },
-  { table: "route_weeks", column: "user_id", label: "Rota planı" },
-  { table: "route_revisions", column: "user_id", label: "Rota revizyonları" },
-  { table: "route_stops", column: "user_id", label: "Rota durakları" },
-  { table: "route_stop_events", column: "user_id", label: "Rota durak geçmişi" },
-  { table: "shared_questions", column: "user_id", label: "Paylaştığın sorular" },
-  { table: "question_answers", column: "user_id", label: "Yazdığın cevaplar" },
-  { table: "retention_events", column: "user_id", label: "Uygulama içi olaylar" },
+  { table: "wrong_questions", column: "user_id", label: "Yanlış defteri", order: ORDER_BY_ID },
+  { table: "topic_progress", column: "user_id", label: "Konu ilerlemesi", order: ORDER_BY_ID },
+  {
+    table: "topic_notes",
+    column: "user_id",
+    label: "Konu notları",
+    order: [{ column: "subject_key", ascending: true }, { column: "topic_name", ascending: true }],
+  },
+  { table: "user_tasks", column: "user_id", label: "Plan durakları", order: ORDER_BY_ID },
+  { table: "streaks", column: "user_id", label: "Seri", order: [{ column: "user_id", ascending: true }] },
+  { table: "xp_events", column: "user_id", label: "XP geçmişi", order: ORDER_BY_ID },
+  { table: "route_weeks", column: "user_id", label: "Rota planı", order: ORDER_BY_ID },
+  { table: "route_revisions", column: "user_id", label: "Rota revizyonları", order: ORDER_BY_ID },
+  { table: "route_stops", column: "user_id", label: "Rota durakları", order: ORDER_BY_ID },
+  { table: "route_stop_events", column: "user_id", label: "Rota durak geçmişi", order: ORDER_BY_ID },
+  { table: "shared_questions", column: "user_id", label: "Paylaştığın sorular", order: ORDER_BY_ID },
+  { table: "question_answers", column: "user_id", label: "Yazdığın cevaplar", order: ORDER_BY_ID },
+  { table: "retention_events", column: "user_id", label: "Uygulama içi olaylar", order: ORDER_BY_ID },
 
   // KVKK/GDPR çıktısı "tüm verilerim" iddiasında bulunduğu için aşağıdakiler de
   // dahil olmalı; eskiden listede yoktular ve export eksik kalıyordu.
-  { table: "daily_plans", column: "user_id", label: "Günlük planlar" },
-  { table: "plan_tasks", column: "user_id", label: "Plan görevleri" },
-  { table: "friendships", column: null, label: "Arkadaşlıklar" },
-  { table: "challenges", column: null, label: "Meydan okumalar" },
-  { table: "group_members", column: "user_id", label: "Grup üyelikleri" },
-  { table: "referral_logs", column: null, label: "Davet kayıtları" },
-  { table: "route_state", column: "user_id", label: "Rota durumu" },
-  { table: "analytics_events", column: "user_id", label: "Analitik olayları" },
+  { table: "daily_plans", column: "user_id", label: "Günlük planlar", order: ORDER_BY_ID },
+  { table: "plan_tasks", column: "user_id", label: "Plan görevleri", order: ORDER_BY_ID },
+  { table: "friendships", column: null, label: "Arkadaşlıklar", order: ORDER_BY_ID },
+  { table: "challenges", column: null, label: "Meydan okumalar", order: ORDER_BY_ID },
+  {
+    table: "group_members",
+    column: "user_id",
+    label: "Grup üyelikleri",
+    order: [{ column: "group_id", ascending: true }, { column: "user_id", ascending: true }],
+  },
+  { table: "referral_logs", column: null, label: "Davet kayıtları", order: ORDER_BY_ID },
+  { table: "route_state", column: "user_id", label: "Rota durumu", order: ORDER_BY_ID },
+  { table: "analytics_events", column: "user_id", label: "Analitik olayları", order: ORDER_BY_ID },
   { table: "user_entitlements", column: null, label: "Üyelik hakları", privateExportKey: "user_entitlements" },
   { table: "feature_usage_events", column: null, label: "Özellik kullanım kayıtları", privateExportKey: "feature_usage_events" },
   { table: "route_companionships", column: null, label: "Rota yoldaşlığı", privateExportKey: "route_companionships" },
@@ -59,15 +70,22 @@ const EXPORT_TABLES = [
 const PAGE = 1000;
 const IN_FILTER_CHUNK = 200;
 
+function applyOrder(query, order = []) {
+  return order.reduce((q, item) => (
+    q.order(item.column, { ascending: item.ascending !== false })
+  ), query);
+}
+
 /** Bir tablonun tamamını sayfalayarak çeker. */
-async function fetchAll(table, column, userId) {
+async function fetchAll(table, column, userId, order) {
   const rows = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
+    const query = supabase
       .from(table)
       .select("*")
       .eq(column, userId)
       .range(from, from + PAGE - 1);
+    const { data, error } = await applyOrder(query, order);
     if (error) throw error;
     const page = data || [];
     rows.push(...page);
@@ -77,14 +95,15 @@ async function fetchAll(table, column, userId) {
 }
 
 /** OR filtreli sosyal tablolar da büyüyebilir; tek sayfada bırakma. */
-async function fetchOrAll(table, orFilter) {
+async function fetchOrAll(table, orFilter, order) {
   const rows = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
+    const query = supabase
       .from(table)
       .select("*")
       .or(orFilter)
       .range(from, from + PAGE - 1);
+    const { data, error } = await applyOrder(query, order);
     if (error) throw error;
     const page = data || [];
     rows.push(...page);
@@ -170,16 +189,19 @@ export async function collectUserData(userId, onProgress) {
         result.data.friendships = await fetchOrAll(
           "friendships",
           `requester_id.eq.${userId},addressee_id.eq.${userId}`,
+          spec.order,
         );
       } else if (spec.table === "challenges") {
         result.data.challenges = await fetchOrAll(
           "challenges",
           `creator_id.eq.${userId},opponent_id.eq.${userId}`,
+          spec.order,
         );
       } else if (spec.table === "referral_logs") {
         result.data.referral_logs = await fetchOrAll(
           "referral_logs",
           `inviter_id.eq.${userId},invitee_id.eq.${userId}`,
+          spec.order,
         );
       } else if (spec.table === "trial_subjects") {
         // Doğrudan user_id yok; kullanıcının denemeleri üzerinden.
@@ -190,7 +212,7 @@ export async function collectUserData(userId, onProgress) {
           result.data.trial_subjects = [];
         }
       } else {
-        result.data[spec.table] = await fetchAll(spec.table, spec.column, userId);
+        result.data[spec.table] = await fetchAll(spec.table, spec.column, userId, spec.order);
       }
     } catch (e) {
       // Bir tablo alınamazsa dışa aktarma TAMAMEN başarısız olmasın;

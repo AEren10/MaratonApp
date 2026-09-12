@@ -23,7 +23,16 @@ test("export catalog includes private product and companionship data through RPC
 test("social export queries are paginated", () => {
   assert.match(source, /async function fetchOrAll/);
   assert.match(source, /\.or\(orFilter\)/);
+  assert.match(source, /fetchOrAll\(\s*"friendships",[\s\S]*?spec\.order/);
   assert.match(source, /\.range\(from, from \+ PAGE - 1\)/);
+});
+
+test("paged export queries use stable per-table ordering", () => {
+  assert.match(source, /function applyOrder/);
+  assert.match(source, /fetchAll\(spec\.table, spec\.column, userId, spec\.order\)/);
+  assert.match(source, /table: "study_logs"[\s\S]*?order: ORDER_BY_ID/);
+  assert.match(source, /table: "topic_notes"[\s\S]*?column: "subject_key"[\s\S]*?column: "topic_name"/);
+  assert.match(source, /table: "group_members"[\s\S]*?column: "group_id"[\s\S]*?column: "user_id"/);
 });
 
 test("trial subject export chunks and paginates in-filters", () => {

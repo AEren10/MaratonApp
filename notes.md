@@ -93,3 +93,8 @@
 
 - `transition_route_stop` yalnızca dokunulan durağı değil, bazı geçişlerde sıradaki durağı da otomatik `active` yapar. Client yalnız dönen eski durağı patch'lerse ekrandaki aktif durak bayatlar.
 - Başarılı route stop geçişinden sonra latest stops yeniden çekilmeli; queued/offline durumda ise yerel optimistic patch yapılmamalı, sync sonrası sunucu otoritesi kazanmalı.
+
+## 2026-09-13 — KVKK export sayfalama sırası
+
+- Offset/range pagination kullanılan export sorgularında stabil `order` zorunlu. Sırasız sayfalama büyük kullanıcı datasında aynı export içinde satır atlayabilir veya tekrar edebilir.
+- Generic export helper'ı her tabloya kör `id` sırası vermemeli; `topic_notes` ve `group_members` gibi composite-key tablolarda tabloya özel sıralama kullanılmalı.
