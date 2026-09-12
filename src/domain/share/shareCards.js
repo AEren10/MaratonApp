@@ -1,4 +1,4 @@
-import { formatMinutes, formatNumber, formatDelta, formatWeekday } from "../../lib/format";
+import { formatMinutes, formatNumber, formatDelta, formatWeekday } from "../../lib/format.js";
 
 // STORY PAYLAŞIM KARTLARI — içerik katmanı.
 //
@@ -27,6 +27,7 @@ export const SHARE_CARD_IDS = {
   RHYTHM: "rhythm",
   NEXT_STOP: "next_stop",
   ROUTE_MOVE: "route_move",
+  FLAT_WEEK: "flat_week",
 };
 
 /**
@@ -49,6 +50,7 @@ export function buildShareCards(ctx = {}) {
     rhythmCard(ctx),
     nextStopCard(ctx),
     routeMoveCard(ctx),
+    flatWeekCard(ctx),
   ];
 }
 
@@ -127,6 +129,45 @@ function weeklyRouteCard({ route = {}, week = {} }) {
     ],
     caption: null,
     available: planned > 0,
+  };
+}
+
+/**
+ * DUZLESEN HAFTA — "KOTU HAFTA DA PAYLASILIR" (tasarim: Kart Modlari).
+ *
+ * Diger sekiz kartin hepsi ilerleme kutluyor. Tasarim bilincli olarak bir
+ * de duz haftayi paylasilabilir kiliyor: "Duzlesen rota da bir hikaye.
+ * Kotu haftayi paylasmak seriyi bozmak degil."
+ *
+ * Bu bir teselli metni degil, urun durusu: seri kirilmasin diye kotu
+ * haftayi saklamak, uygulamanin kendi dilinde yalan soylemek olurdu.
+ *
+ * Yalniz gercekten duz hafta icin cikiyor -- iyi bir hafta "duzlesti"
+ * diye paylasilmaz.
+ */
+function flatWeekCard({ week = {}, route = {} }) {
+  const stops = route.currentWeek?.completedStops ?? 0;
+  const trials = week.trials ?? 0;
+  const activeDays = week.activeDays ?? 0;
+  const weekNo = route.currentWeek?.weekNo ?? null;
+
+  // Duz hafta: aktif gun 3'un altinda VE deneme yok. Ikisi birden
+  // olmadikca kart cikmaz; yogun ama denemesiz bir hafta duz degildir.
+  const isFlat = activeDays > 0 && activeDays < 3 && trials === 0;
+
+  return {
+    id: SHARE_CARD_IDS.FLAT_WEEK,
+    title: weekNo ? `${weekNo}. hafta` : "Bu hafta",
+    heroValue: `${formatNumber(stops)} durak`,
+    heroLabel: "bu hafta rotam düzleşti",
+    stats: [
+      { label: "Durak", value: formatNumber(stops) },
+      { label: "Deneme", value: formatNumber(trials) },
+    ],
+    caption:
+      "Olur böyle. Bu hafta ara verdim, rota yerinde duruyor. " +
+      "Kaldığım duraktan devam.",
+    available: isFlat,
   };
 }
 
