@@ -18,6 +18,12 @@ test("runtime route stop selects only persisted columns", () => {
   assert.doesNotMatch(routePlan, /"effective_status"/);
 });
 
+test("runtime route state selects only persisted columns", () => {
+  assert.match(routePlan, /const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, exam_type, updated_at"/);
+  assert.doesNotMatch(routePlan, /ROUTE_STATE_COLUMNS = "[^"]*reason/);
+  assert.match(routePlan, /\.select\(ROUTE_STATE_COLUMNS\)\s*\.maybeSingle\(\)/);
+});
+
 test("wrong question detail uses the shared column list", () => {
   assert.match(wrongQuestions, /getWrongQuestionById/);
   assert.doesNotMatch(wrongQuestions, /getWrongQuestionById[\s\S]*?\.select\("\*"\)/);

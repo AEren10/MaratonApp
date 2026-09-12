@@ -33,7 +33,7 @@ const ROUTE_STOP_COLUMNS = [
   "created_at",
   "updated_at",
 ].join(", ");
-const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, reason, exam_type, updated_at";
+const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, exam_type, updated_at";
 
 /** Rota çizildiğinde haftaları yaz. Aynı hafta varsa üzerine yazar. */
 export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRevision = null) {
@@ -245,7 +245,7 @@ export async function setRouteState(userId, patch, examType = null) {
         },
         { onConflict: "user_id,exam_type" },
       )
-      .select()
+      .select(ROUTE_STATE_COLUMNS)
       .maybeSingle();
     if (error) throw error;
     return data || null;
