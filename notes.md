@@ -103,3 +103,9 @@
 
 - Offset/range pagination kullanılan export sorgularında stabil `order` zorunlu. Sırasız sayfalama büyük kullanıcı datasında aynı export içinde satır atlayabilir veya tekrar edebilir.
 - Generic export helper'ı her tabloya kör `id` sırası vermemeli; `topic_notes` ve `group_members` gibi composite-key tablolarda tabloya özel sıralama kullanılmalı.
+
+## 2026-09-13 — Paywall baskısı ve sınav hassasiyeti
+
+- Paywall gösterme kararı tek domain kapısından geçmeli; otomatik tetikleyici ile manuel `showPaywall` farklı davranırsa kullanıcı yanlış anda satış baskısı görebilir.
+- İlk hafta, sınav arifesi, sınav günü ve sınav sonrası kısa dönem “satış yok” kuralı retention için de önemli. Bu dönemlerde güven kazanmak, kısa vadeli premium denemesinden daha değerli.
+- Bastırılan paywall olayları analytics/retention tarafına `PAYWALL_SUPPRESSED` olarak yazılmalı; böylece ileride dönüşüm hunisi incelenirken “gösterilmedi” ile “gösterildi ama almadı” karışmaz.

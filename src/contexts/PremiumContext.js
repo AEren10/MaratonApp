@@ -3,6 +3,7 @@ import { AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { useAuth } from "./AuthContext";
+import { useExam } from "./ExamContext";
 import { SCREENS } from "../constants/screens";
 import { FREE_LIMITS, PREMIUM_TO_PRODUCT_FEATURE } from "../constants/premium";
 import { recordRetentionEvent } from "../supabase/retention";
@@ -10,7 +11,8 @@ import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
 import { getActiveChallengeCount } from "../supabase/challenges";
 import { getWrongQuestionCount } from "../supabase/wrongQuestions";
 import { getProductAccessSnapshot } from "../supabase/productAccess";
-import { canAccessProductFeature, trialQuotaDecision } from "../domain/premium/paywallGate";
+import { getExamPhase } from "../domain/exam/examPhase";
+import { canAccessProductFeature, canShowPaywall, trialQuotaDecision } from "../domain/premium/paywallGate";
 import { DEV_ACCESS_SNAPSHOT } from "../domain/premium/devAccessSnapshot";
 import { initPurchases } from "../lib/purchases";
 
@@ -18,6 +20,7 @@ const PremiumContext = createContext(null);
 
 export function PremiumProvider({ children }) {
   const { user } = useAuth();
+  const { examDate } = useExam();
   const navigation = useNavigation();
   const [accessState, setAccessState] = useState("loading");
   const [snapshot, setSnapshot] = useState(null);
@@ -114,12 +117,30 @@ export function PremiumProvider({ children }) {
   }, []);
 
   const showPaywall = useCallback((source = "unknown") => {
+    const gate = canShowPaywall({
+      isPremium,
+      createdAt: user?.created_at,
+      examPhase: getExamPhase(examDate).phase,
+    });
+
+    if (!gate.allowed) {
+      if (user?.id && gate.reason !== "already_premium") {
+        recordRetentionEvent(user.id, RETENTION_EVENTS.PAYWALL_SUPPRESSED, {
+          source,
+          reason: gate.reason,
+          dayNumber: gate.dayNumber ?? null,
+        }, RETENTION_SOURCES.PAYWALL).catch(() => {});
+      }
+      return false;
+    }
+
     if (user?.id) {
       recordRetentionEvent(user.id, RETENTION_EVENTS.PAYWALL_TRIGGERED, { source }, RETENTION_SOURCES.PAYWALL)
         .catch(() => {});
     }
     navigation.navigate(SCREENS.PAYWALL, { source });
-  }, [navigation, user?.id]);
+    return true;
+  }, [examDate, isPremium, navigation, user?.created_at, user?.id]);
 
   const value = useMemo(() => ({
     accessError: accessState === "error",

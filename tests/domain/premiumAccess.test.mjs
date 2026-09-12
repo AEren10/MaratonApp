@@ -9,6 +9,7 @@ import {
 import {
   canAccessProductFeature,
   canShowPaywall,
+  EXAM_PHASE,
   firstWeekStatus,
   trialQuotaDecision,
 } from "../../src/domain/premium/paywallGate.js";
@@ -26,6 +27,26 @@ test("paywall stays suppressed during the first week", () => {
     now: new Date("2026-09-07T09:00:00.000Z"),
   });
   assert.deepEqual(result, { allowed: false, reason: "first_week", dayNumber: 7, daysLeft: 1 });
+});
+
+test("paywall stays suppressed during exam eve, exam day and aftermath", () => {
+  for (const phase of [EXAM_PHASE.EXAM_EVE, EXAM_PHASE.EXAM_DAY, EXAM_PHASE.AFTERMATH]) {
+    assert.deepEqual(canShowPaywall({
+      isPremium: false,
+      createdAt: "2026-08-01T09:00:00.000Z",
+      examPhase: phase,
+      now: new Date("2026-09-12T09:00:00.000Z"),
+    }), { allowed: false, reason: `exam_phase_${phase}` });
+  }
+});
+
+test("paywall is allowed outside grace and protected exam phases", () => {
+  assert.deepEqual(canShowPaywall({
+    isPremium: false,
+    createdAt: "2026-08-01T09:00:00.000Z",
+    examPhase: EXAM_PHASE.APPROACHING,
+    now: new Date("2026-09-12T09:00:00.000Z"),
+  }), { allowed: true, reason: null });
 });
 
 test("product features fail closed until the server snapshot is ready", () => {
