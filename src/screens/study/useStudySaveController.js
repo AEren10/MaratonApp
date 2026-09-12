@@ -210,7 +210,7 @@ export function useStudySaveController() {
         minutes: duration,
         source: "study_log",
         sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
-      });
+      }).catch(() => {});
     } else if (result.queued) {
       const msg = result.error?.message || "";
       const isNetwork = msg.includes("network") || msg.includes("fetch");

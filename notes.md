@@ -128,3 +128,8 @@
 
 - Deneme sonucu offline kuyruğa alındıysa challenge progress anında ayrıca tetiklenmemeli; offlineQueue replay sırasında aynı `clientOperationId` ile server-resolved sync yapar.
 - Queued durumda hem anlık sync hem replay denenirse idempotency çoğu hasarı önler ama gereksiz ağ/Promise hatası ve ölçüm gürültüsü üretir. Anlık sync yalnız canlı kayıt başarıyla kaydedildiğinde çalışmalı.
+
+## 2026-09-13 — Manuel çalışma kaydı persist hatası
+
+- `saveStudyLogOffline` artık kuyruk yazımı başarısızsa hata fırlatıyor; tüm çalışma kaydı ekranları bunu yakalamalı. Aksi halde kullanıcı formda loading state'te kalabilir ve çalışmanın saklanıp saklanmadığını anlayamaz.
+- Challenge sync gibi arka plan yan etkileri kayıt akışını düşürmemeli; canlı kayıt başarılıysa denenmeli ama Promise hatası yakalanmalıdır. Offline queued kayıtlar replay sırasında yan etkilerini tekrar üretir.

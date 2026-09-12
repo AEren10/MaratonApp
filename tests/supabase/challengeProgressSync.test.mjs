@@ -32,6 +32,17 @@ test("entry screens pass source operation ids to challenge sync", () => {
   }
 });
 
+test("study entry screens catch background challenge sync failures", () => {
+  for (const source of [studyMeasured, studyManual]) {
+    assert.match(source, /syncChallengeProgress\(user\.id[\s\S]*\)\.catch\(\(\) => \{\}\)/);
+  }
+});
+
+test("manual study save reports persist failures instead of leaving the form stuck", () => {
+  assert.match(studyManual, /try \{\s*result = await saveStudyLogOffline/);
+  assert.match(studyManual, /catch \(e\) \{[\s\S]*setSaving\(false\);[\s\S]*study_save_persist_manual/);
+});
+
 test("queued trial entries leave challenge replay to the offline queue", () => {
   assert.match(trialSubmit, /solvedCount > 0 && !result\.queued/);
   assert.match(trialSubmit, /syncChallengeProgress\(user\.id[\s\S]*\)\.catch\(\(\) => \{\}\)/);

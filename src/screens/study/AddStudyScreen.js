@@ -153,11 +153,23 @@ export default function AddStudyScreen() {
     }));
 
     setSaving(true);
-    const result = await saveStudyLogOffline({
-      user_id: user.id, subject: subjectKey, topic: topic.trim(),
-      question_count: qc, correct_count: cc, duration_minutes: duration,
-      study_date: todayStr, notes: notes.trim() || null,
-    });
+    let result;
+    try {
+      result = await saveStudyLogOffline({
+        user_id: user.id, subject: subjectKey, topic: topic.trim(),
+        question_count: qc, correct_count: cc, duration_minutes: duration,
+        study_date: todayStr, notes: notes.trim() || null,
+      });
+    } catch (e) {
+      setSaving(false);
+      H.error();
+      captureError(e, { context: "study_save_persist_manual" });
+      showAlert(
+        "Kaydedilemedi",
+        "Cihazda yer kalmamış olabilir. Biraz yer açıp tekrar dene — çalışman bu ekranda duruyor.",
+      );
+      return;
+    }
 
     if (result.saved) {
       try {
@@ -173,7 +185,7 @@ export default function AddStudyScreen() {
         minutes: duration,
         source: "study_log",
         sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
-      });
+      }).catch(() => {});
     } else if (result.queued) {
       const msg = result.error?.message || "";
       const isNet = msg.includes("network") || msg.includes("fetch");
