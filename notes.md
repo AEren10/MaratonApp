@@ -94,6 +94,11 @@
 - `transition_route_stop` yalnızca dokunulan durağı değil, bazı geçişlerde sıradaki durağı da otomatik `active` yapar. Client yalnız dönen eski durağı patch'lerse ekrandaki aktif durak bayatlar.
 - Başarılı route stop geçişinden sonra latest stops yeniden çekilmeli; queued/offline durumda ise yerel optimistic patch yapılmamalı, sync sonrası sunucu otoritesi kazanmalı.
 
+## 2026-09-13 — KVKK analytics export erişimi
+
+- Export kataloğuna tablo eklemek tek başına yetmez; RLS/GRANT o tablonun kullanıcıya kendi satırlarını okuma hakkı verip vermediğiyle birlikte kontrol edilmeli.
+- `analytics_events` normal uygulama kullanımında insert-only kalabilir, ama “verilerimi indir” akışı için dar `SELECT own rows` policy'si gerekir. Aksi halde export eksik/incomplete döner.
+
 ## 2026-09-13 — KVKK export sayfalama sırası
 
 - Offset/range pagination kullanılan export sorgularında stabil `order` zorunlu. Sırasız sayfalama büyük kullanıcı datasında aynı export içinde satır atlayabilir veya tekrar edebilir.

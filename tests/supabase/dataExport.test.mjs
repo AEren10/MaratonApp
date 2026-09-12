@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = readFileSync(new URL("../../src/supabase/dataExport.js", import.meta.url), "utf8");
+const analyticsExportMigration = readFileSync(
+  new URL("../../supabase/migrations/20260912213933_cdx_allow_analytics_export.sql", import.meta.url),
+  "utf8",
+);
 
 test("export catalog includes durable route lifecycle tables", () => {
   assert.match(source, /table: "route_revisions"/);
@@ -49,4 +53,12 @@ test("trial subject export chunks and paginates in-filters", () => {
 test("export summary includes the profile row collected outside the table catalog", () => {
   assert.match(source, /PROFILE_EXPORT_SPEC = \{ table: "profiles", label: "Profil" \}/);
   assert.match(source, /\[PROFILE_EXPORT_SPEC, \.\.\.EXPORT_TABLES\]\.map/);
+});
+
+test("analytics events export has matching own-row select access", () => {
+  assert.match(source, /table: "analytics_events"/);
+  assert.match(analyticsExportMigration, /CREATE POLICY "analytics select own"/);
+  assert.match(analyticsExportMigration, /FOR SELECT\s+TO authenticated/);
+  assert.match(analyticsExportMigration, /USING \(\(select auth\.uid\(\)\) = user_id\)/);
+  assert.match(analyticsExportMigration, /GRANT SELECT, INSERT ON public\.analytics_events TO authenticated/);
 });
