@@ -31,6 +31,9 @@ export const STORAGE_KEYS = {
   PENDING_FRIEND_CODE: "@maraton:pending_friend_code",
   PENDING_GROUP_CODE: "@maraton:pending_group_code",
   ANALYTICS_BUFFER: "@maraton:analyticsBuffer",
+  // Gun/hafta/rota tamamlama anlarinin gorulme kaydi. userScopedKey ile
+  // kullaniciya ayrisir; cikista SILINMEZ, yoksa rota kapanisi tekrar gelir.
+  COMPLETION_SHOWN: "@maraton:completion_shown",
   DAILY_GOAL_DONE_PREFIX: "@daily_goal_done",
   PLAN_DONE_PREFIX: "@plan_done",
 };

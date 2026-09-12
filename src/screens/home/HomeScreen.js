@@ -26,6 +26,7 @@ import { useRetention } from "../../hooks/useRetention";
 import { useGamification } from "../../hooks/useGamification";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
+import { useCompletionMoments } from "../../hooks/useCompletionMoments";
 import { useHomeDashboard } from "../../hooks/useHomeDashboard";
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeHero } from "./components/HomeHero";
@@ -118,12 +119,15 @@ export default function HomeScreen() {
     weeklyXP,
   });
   const {
+    daysLeft,
     displayName,
     generatedTasks,
     latestTrial,
     leagueTier,
     minutesToday,
     plan,
+    routeCurrentWeek,
+    routeTotals,
     solvedToday,
     subjectMomentum,
     transitionStop,
@@ -135,6 +139,13 @@ export default function HomeScreen() {
     userId: user?.id,
     reward,
   });
+
+  const completion = useCompletionMoments({
+    currentWeek: routeCurrentWeek,
+    totals: routeTotals,
+    userId: user?.id,
+  });
+  const { markDayDone } = completion;
 
   useEffect(() => {
     setLoading(false);
@@ -211,9 +222,12 @@ export default function HomeScreen() {
           dailyAction={dailyAction}
           generatedTasks={generatedTasks}
           onAddTask={go(SCREENS.ADD_TASK)}
-          onAllDone={() => reward("perfect_plan", {
-            statUpdates: [{ type: "increment", key: "perfectPlans" }],
-          })}
+          onAllDone={(items) => {
+            reward("perfect_plan", {
+              statUpdates: [{ type: "increment", key: "perfectPlans" }],
+            });
+            markDayDone(items);
+          }}
           onReview={go(SCREENS.REVIEW_SESSION)}
           onStartTask={(task) => {
             trackButtonTap("home_plan_task_start", {
@@ -277,7 +291,9 @@ export default function HomeScreen() {
 
       <HomeOverlays
         comeback={comeback}
+        completion={completion}
         dailyGoal={dailyGoal}
+        daysLeft={daysLeft}
         dismissComeback={dismissComeback}
         dismissGoalComplete={dismissGoalComplete}
         dismissLevelUp={dismissLevelUp}
@@ -291,12 +307,15 @@ export default function HomeScreen() {
         levelUpModal={levelUpModal}
         longestStreak={longestStreak}
         milestoneModal={milestoneModal}
+        minutesToday={minutesToday}
         navigation={navigation}
         nudgePopup={nudgePopup}
         nudgeVisible={nudgeVisible}
         nudges={nudges}
         onCloseNudgeModal={() => setNudgeVisible(false)}
         onCloseStreakSheet={() => setStreakSheetVisible(false)}
+        routeCurrentWeek={routeCurrentWeek}
+        routeTotals={routeTotals}
         solvedToday={solvedToday}
         streak={streak}
         streakSheetVisible={streakSheetVisible}

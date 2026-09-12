@@ -120,7 +120,7 @@ export function TodayPlanCard({
     const allDone = merged.every((t) => t.completed);
     if (allDone) {
       rewardedRef.current = true;
-      onAllDone?.();
+      onAllDone?.(merged);
     }
   }, [merged, onAllDone]);
 

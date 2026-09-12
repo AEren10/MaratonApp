@@ -1,7 +1,8 @@
 import { SCREENS } from "../../../constants/screens";
 import { trackButtonTap } from "../../../lib/analytics";
 import { XPBoostToast } from "../../../components/common/XPBoostToast";
-import { ComebackModal } from "../../../components/common/ComebackModal";
+import { HomeComebackOverlay } from "./HomeComebackOverlay";
+import { HomeCompletionOverlays } from "./HomeCompletionOverlays";
 import { GoalCompleteModal } from "../../../components/common/GoalCompleteModal";
 import { LevelUpModal } from "../../../components/common/LevelUpModal";
 import { NudgePopup } from "../../../components/common/NudgePopup";
@@ -11,7 +12,9 @@ import { NudgeModal } from "../../../components/common/NudgeModal";
 
 export function HomeOverlays({
   comeback,
+  completion,
   dailyGoal,
+  daysLeft,
   dismissComeback,
   dismissGoalComplete,
   dismissLevelUp,
@@ -24,12 +27,15 @@ export function HomeOverlays({
   levelUpModal,
   longestStreak,
   milestoneModal,
+  minutesToday,
   navigation,
   nudgePopup,
   nudgeVisible,
   nudges,
   onCloseNudgeModal,
   onCloseStreakSheet,
+  routeCurrentWeek,
+  routeTotals,
   solvedToday,
   streak,
   streakSheetVisible,
@@ -45,11 +51,23 @@ export function HomeOverlays({
         onDismiss={dismissXP}
       />
 
-      <ComebackModal
-        visible={!!comeback}
-        daysAway={comeback?.daysAway}
-        xpBonus={comeback?.xpBonus || 50}
-        onDismiss={dismissComeback}
+      <HomeComebackOverlay
+        comeback={comeback}
+        dismissComeback={dismissComeback}
+        minutesToday={minutesToday}
+        navigation={navigation}
+        routeCurrentWeek={routeCurrentWeek}
+        routeTotals={routeTotals}
+        solvedToday={solvedToday}
+      />
+      <HomeCompletionOverlays
+        blocked={Boolean(comeback || goalCompleteVisible || levelUpModal.visible
+          || milestoneModal.visible || nudgePopup || nudgeVisible || streakSheetVisible)}
+        completion={completion}
+        daysLeft={daysLeft}
+        minutesToday={minutesToday}
+        navigation={navigation}
+        solvedToday={solvedToday}
       />
 
       <GoalCompleteModal
