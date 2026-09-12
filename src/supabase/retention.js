@@ -89,6 +89,7 @@ export const recordRetentionEvent = async (userId, event, props = {}, source = n
     await flushRetentionEvents(userId);
     return await insertRetentionRow(row);
   } catch (e) {
+    if (e?.code === "23505") return null;
     handleSupabaseError(e, "recordRetentionEvent");
     await bufferRow(row);
     return null;

@@ -14,7 +14,7 @@ test("retention events are buffered and retried instead of being dropped on inse
 });
 
 test("retention event replay treats unique client event conflicts as already processed", () => {
-  assert.match(retention, /e\?\.code === "23505"/);
+  assert.match(retention, /if \(e\?\.code === "23505"\) \{/);
   assert.match(retention, /processed \+= 1/);
+  assert.match(retention, /if \(e\?\.code === "23505"\) return null;/);
 });
-

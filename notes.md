@@ -122,3 +122,4 @@
 - Comeback, nudge ve paywall retention olayları yalnız canlı Supabase insert'e bağlı kalmamalı. Bağlantı hatasında event düşerse kullanıcı kazanma/premium hunisi eksik ölçülür.
 - Retention olayları küçük, kullanıcı scope'lu local buffer'a alınmalı ve sonraki event geldiğinde önce buffer flush edilmelidir.
 - `client_event_id` duplicate hatası replay başarısı gibi ele alınmalı; aksi halde belirsiz ağ denemesinde Supabase'e yazılmış event buffer'da takılı kalır ve arkadaki event'leri geciktirir.
+- Aynı duplicate kuralı canlı insert için de geçerli: istemci aynı `client_event_id` ile tekrar denerse buffer'a almak yerine “zaten yazılmış” kabul edilmeli.
