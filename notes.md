@@ -116,3 +116,9 @@
 - Aksi durumda comeback gösterimi veya günlük giriş ödülü sessizce kaçabilir. Kullanıcıyı geri kazanma mantığında stale veriyle tek sefer karar vermek risklidir.
 - Günlük giriş ödülünde sunucuya “ödüllendi” işareti, yerel ödül verildikten sonra atılmalı. Tersi sırada app kapanması veya taze profil yüklenmesi kullanıcıya ödül düşmeden günü kapatabilir.
 - Comeback gösterimi ve günlük giriş ödülü aynı `processed` anahtarına bağlanmamalı. Profil snapshot'ı değişince karar tekrar çalışabilir; comeback event'i kullanıcı/gün/son aktif tarih bazında ayrıca tekilleştirilmelidir.
+
+## 2026-09-13 — Retention event dayanıklılığı
+
+- Comeback, nudge ve paywall retention olayları yalnız canlı Supabase insert'e bağlı kalmamalı. Bağlantı hatasında event düşerse kullanıcı kazanma/premium hunisi eksik ölçülür.
+- Retention olayları küçük, kullanıcı scope'lu local buffer'a alınmalı ve sonraki event geldiğinde önce buffer flush edilmelidir.
+- `client_event_id` duplicate hatası replay başarısı gibi ele alınmalı; aksi halde belirsiz ağ denemesinde Supabase'e yazılmış event buffer'da takılı kalır ve arkadaki event'leri geciktirir.
