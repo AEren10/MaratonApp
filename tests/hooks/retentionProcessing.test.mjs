@@ -11,3 +11,10 @@ test("retention processing key changes when fresh retention data arrives", () =>
   assert.doesNotMatch(source, /processedFor\.current === activeUserId/);
 });
 
+test("daily login is marked on the server only after the local reward fires", () => {
+  const rewardIndex = source.indexOf('reward("daily_login")');
+  const markIndex = source.indexOf("markLoginRewarded(user.id)");
+  assert.notEqual(rewardIndex, -1);
+  assert.notEqual(markIndex, -1);
+  assert.ok(markIndex > rewardIndex);
+});

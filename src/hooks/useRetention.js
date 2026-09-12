@@ -58,10 +58,10 @@ export function useRetention(reward) {
     }
 
     if (loginRewarded !== today && reward && alive) {
-      if (user?.id) markLoginRewarded(user.id).catch(() => {});
       timer = setTimeout(() => {
         if (!alive) return;
         reward("daily_login");
+        if (user?.id) markLoginRewarded(user.id).catch(() => {});
         if (user?.id) {
           recordRetentionEvent(
             user.id,
