@@ -3,11 +3,12 @@ import { track, trackPaywallViewed } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, AnimatedPressable, Button } from "../../components/design";
+import { PaywallContextBlock } from "./components/PaywallContextBlock";
+import { paywallContextFor, PAYWALL_FOOTNOTE } from "../../constants/paywallContexts";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { PLANS, PREMIUM_FEATURE_LIST } from "../../constants/premium";
 import { SCREENS } from "../../constants/screens";
@@ -25,128 +26,25 @@ import { useAuth } from "../../contexts/AuthContext";
 import PlanCard from "./components/PlanCard";
 import FeatureRow from "./components/FeatureRow";
 import * as H from "../../lib/haptics";
+import { usePaywallPurchase } from "../../hooks/usePaywallPurchase";
 
 export default function PaywallScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const route = useRoute();
-  const { user } = useAuth();
-  const { refreshPremium } = usePremium();
-  const showAlert = useAlert();
-  const [selectedPlan, setSelectedPlan] = useState("yearly");
-  const [packages, setPackages] = useState(null);
-  const [purchasing, setPurchasing] = useState(false);
   const s = useMemo(() => makeStyles(C), [C]);
 
-  // Dönüşümün paydası. PREMIUM_DISMISSED tanımlıydı ama hiç gönderilmiyordu:
-  // görüntüleme sayılıyor, kapatma sayılmıyordu — yani paywall dönüşüm oranı
-  // hesaplanamıyordu. beforeRemove kullanılıyor ki kapatma butonu, donanım
-  // geri tuşu ve kaydırmayla çıkış hepsi yakalansın.
-  const convertedRef = useRef(false);
+  // Satin alma, geri yukleme ve olcum mantigi hook'ta (AGENTS.md:
+  // is mantigi ekran dosyasinda durmaz).
+  const {
+    selectedPlan, setSelectedPlan, purchasing, displayPlans,
+    handlePurchase, handleRestore, source,
+  } = usePaywallPurchase();
 
-  useEffect(() => {
-    track(EVENTS.PREMIUM_VIEWED, { source: route.params?.source || "unknown" });
-    trackPaywallViewed(route.params?.source || "unknown");
-  }, [route.params?.source]);
-
-  useEffect(() => {
-    const unsub = navigation.addListener("beforeRemove", () => {
-      if (convertedRef.current) return;
-      track(EVENTS.PREMIUM_DISMISSED, {
-        source: route.params?.source || "unknown",
-        selectedPlan,
-      });
-    });
-    return unsub;
-  }, [navigation, route.params?.source, selectedPlan]);
-
-  useEffect(() => {
-    if (!isInitialized()) return;
-    getOfferings().then((offering) => {
-      if (offering?.availablePackages) setPackages(offering.availablePackages);
-    });
-  }, []);
-
-  // Fiyatı her zaman mağazadan gelen gerçek fiyattan göster. Sabit fiyat
-  // yalnızca RevenueCat bağlı değilken (dev/preview) fallback olarak kalır.
-  const displayPlans = useMemo(() => {
-    if (!packages) return PLANS;
-    return PLANS.map((plan) => {
-      const identifier = plan.id === "yearly" ? "$rc_annual" : "$rc_monthly";
-      const pkg = packages.find((p) => p.identifier === identifier);
-      const priceString = pkg?.product?.priceString;
-      return priceString ? { ...plan, price: priceString } : plan;
-    });
-  }, [packages]);
-
-  const getSelectedPackage = useCallback(() => {
-    if (!packages) return null;
-    const identifier = selectedPlan === "yearly" ? "$rc_annual" : "$rc_monthly";
-    return packages.find((p) => p.identifier === identifier) || packages[0];
-  }, [packages, selectedPlan]);
-
-  const handlePurchase = useCallback(async () => {
-    H.medium();
-    setPurchasing(true);
-    try {
-      const pkg = getSelectedPackage();
-      if (!pkg) {
-        const purchasesStatus = getPurchasesStatus();
-        if (__DEV__ && user?.id && !purchasesStatus.configured) {
-          const started = await startTrial(user.id);
-          if (started) {
-            convertedRef.current = true;
-            track(EVENTS.TRIAL_STARTED, { source: route.params?.source || "paywall" });
-            H.success();
-            await refreshPremium();
-            showAlert("Deneme Başladı", "7 günlük ücretsiz denemen başladı!");
-            navigation.goBack();
-            return;
-          }
-          showAlert("Deneme Kullanıldı", "Ücretsiz deneme hakkını zaten kullandın.");
-          return;
-        }
-        showAlert(
-          "Satın alma hazır değil",
-          "Mağaza paketleri yüklenemedi. Biraz sonra tekrar dene.",
-        );
-        return;
-      }
-      const isPro = await purchasePackage(pkg);
-      if (isPro) {
-        convertedRef.current = true;
-        track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan });
-        H.success();
-        await refreshPremium();
-        navigation.goBack();
-      }
-    } catch (e) {
-      if (e.userCancelled) return;
-      showAlert("Hata", "Satın alma işlemi başarısız oldu. Lütfen tekrar dene.");
-    } finally {
-      setPurchasing(false);
-    }
-  }, [getSelectedPackage, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
-
-  const handleRestore = useCallback(async () => {
-    setPurchasing(true);
-    try {
-      const isPro = await restorePurchases();
-      if (isPro) {
-        H.success();
-        await refreshPremium();
-        showAlert("Başarılı", "Premium üyeliğin geri yüklendi!");
-        navigation.goBack();
-      } else {
-        showAlert("Bulunamadı", "Aktif bir abonelik bulunamadı.");
-      }
-    } catch {
-      showAlert("Hata", "Geri yükleme başarısız oldu.");
-    } finally {
-      setPurchasing(false);
-    }
-  }, [user?.id, refreshPremium, navigation, showAlert]);
+  // Tasarim tek bir paywall degil, GELDIGIN ISE gore degisen bir ekran.
+  // Karsiligi olmayan kaynak null doner ve genel Premium icerigi
+  // gosterilir -- yanlis baglam gostermektense baglamsiz gostermek dogru.
+  const context = paywallContextFor(source);
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
@@ -155,23 +53,27 @@ export default function PaywallScreen() {
       </Pressable>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(500)} style={s.heroWrap}>
-          <LinearGradient
-            colors={[C.accent + "22", C.accent + "12", "transparent"]}
-            style={s.heroBg}
-          />
-          <View style={s.crownWrap}>
-            <Icon name="crown" size={40} color={C.accent} fill={C.accent} />
-          </View>
-          <Text style={s.heroTitle}>Maraton Pro</Text>
-          <Text style={s.heroSub}>Sınırsız eriş, tam performans</Text>
-        </Animated.View>
+        {context ? (
+          <Animated.View entering={FadeInDown.duration(500)}>
+            <PaywallContextBlock C={C} context={context} />
+          </Animated.View>
+        ) : (
+          <>
+            <Animated.View entering={FadeInDown.duration(500)} style={s.heroWrap}>
+              <View style={s.crownWrap}>
+                <Icon name="crown" size={40} color={C.accent} fill={C.accent} />
+              </View>
+              <Text style={s.heroTitle}>Maraton Pro</Text>
+              <Text style={s.heroSub}>Sınırsız eriş, tam performans</Text>
+            </Animated.View>
 
-        <Animated.View entering={FadeInDown.duration(500).delay(120)} style={s.featuresWrap}>
-          {PREMIUM_FEATURE_LIST.map((f, i) => (
-            <FeatureRow key={f.key} title={f.title} index={i} />
-          ))}
-        </Animated.View>
+            <Animated.View entering={FadeInDown.duration(500).delay(120)} style={s.featuresWrap}>
+              {PREMIUM_FEATURE_LIST.map((f, i) => (
+                <FeatureRow key={f.key} title={f.title} index={i} />
+              ))}
+            </Animated.View>
+          </>
+        )}
 
         <Animated.View entering={FadeInDown.duration(500).delay(240)} style={s.plansWrap}>
           {displayPlans.map((plan) => (
@@ -192,10 +94,9 @@ export default function PaywallScreen() {
             fullWidth
             style={{ ...SHADOWS.fab }}
           >
-            Hemen Başla
+            {context?.primary || "Hemen Başla"}
           </Button>
-          <Text style={s.socialProof}>7 gün ücretsiz dene, beğenmezsen iptal et</Text>
-          <Text style={s.cancelText}>İstediğin zaman iptal edebilirsin</Text>
+          <Text style={s.socialProof}>{PAYWALL_FOOTNOTE}</Text>
           <Pressable onPress={handleRestore} style={s.restoreBtn}>
             <Text style={[s.restoreText, { color: C.accent }]}>Satın almayı geri yükle</Text>
           </Pressable>
@@ -226,10 +127,6 @@ function makeStyles(C) {
     },
     scroll: { paddingHorizontal: SPACING.xl },
     heroWrap: { alignItems: "center", paddingTop: SPACING.huge, paddingBottom: SPACING.xxl },
-    heroBg: {
-      position: "absolute", top: 0, left: -SPACING.xl, right: -SPACING.xl,
-      height: 200, borderRadius: RADIUS.xxl,
-    },
     crownWrap: {
       width: 72, height: 72, borderRadius: RADIUS.full,
       backgroundColor: C.accent + "1A", alignItems: "center", justifyContent: "center",
@@ -242,10 +139,6 @@ function makeStyles(C) {
     socialProof: {
       ...TYPOGRAPHY.caption, color: C.green, textAlign: "center",
       marginTop: SPACING.md,
-    },
-    cancelText: {
-      ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center",
-      marginTop: SPACING.xs,
     },
     linksRow: {
       flexDirection: "row", justifyContent: "center", alignItems: "center",

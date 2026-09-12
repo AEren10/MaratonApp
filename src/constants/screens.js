@@ -52,6 +52,9 @@ export const SCREENS = {
   // League
   LEAGUE: "League",
 
+  // Gamification
+  LEVEL: "Level",
+
   // Simülatör / Roadmap / SR
   RANK_SIMULATOR: "RankSimulator",
   ROADMAP: "Roadmap",
@@ -77,6 +80,7 @@ export const SCREENS = {
   CHALLENGE: "Challenge",
   EXAM_SIMULATOR: "ExamSimulator",
   SHARE_CARD: "ShareCard",
+  MILESTONE: "Milestone",
 
   // Social
   FRIENDS: "Friends",

@@ -83,6 +83,8 @@ export const ROUTE_CONFIGS = {
 
   [SCREENS.WEEKLY_REVIEW]: { path: "weekly-review", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
   [SCREENS.SHARE_CARD]: { path: "paylasim", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },
+  [SCREENS.MILESTONE]: { path: "kilometre-tasi", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: false },
+  [SCREENS.LEVEL]: { path: "seviye", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },
 
   [SCREENS.PAYWALL]: { path: "premium", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: true },
 

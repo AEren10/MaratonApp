@@ -49,6 +49,7 @@ import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
 import ExamDateScreen from "../screens/settings/ExamDateScreen";
+import LevelScreen from "../screens/profile/LevelScreen";
 import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
 import AddTaskScreen from "../screens/plan/AddTaskScreen";
@@ -74,6 +75,7 @@ const AboutScreen = React.lazy(() => import("../screens/settings/AboutScreen"));
 const FriendsScreen = React.lazy(() => import("../screens/social/FriendsScreen"));
 const ChallengeScreen = React.lazy(() => import("../screens/social/ChallengeScreen"));
 const ShareCardScreen = React.lazy(() => import("../screens/social/ShareCardScreen"));
+const MilestoneScreen = React.lazy(() => import("../screens/profile/MilestoneScreen"));
 const ReferralScreen = React.lazy(() => import("../screens/social/ReferralScreen"));
 const RouteCompanionScreen = React.lazy(() => import("../screens/social/RouteCompanionScreen"));
 const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
@@ -185,6 +187,8 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.CHALLENGE, ChallengeScreen),
   screen(SCREENS.QUICK_PRACTICE, QuickPracticeScreen),
   screen(SCREENS.SHARE_CARD, ShareCardScreen),
+  screen(SCREENS.MILESTONE, MilestoneScreen),
+  screen(SCREENS.LEVEL, LevelScreen),
   screen(SCREENS.REFERRAL, ReferralScreen),
   screen(SCREENS.ROUTE_COMPANION, RouteCompanionScreen),
   screen(SCREENS.EXAM_SIMULATOR, ExamSimulatorScreen),

@@ -80,6 +80,8 @@ export const PROFIL_STACK = [
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.SHARE_CARD,       // Paylasim Karti
+  SCREENS.MILESTONE,        // Kilometre Tasi
+  SCREENS.LEVEL,            // Seviye
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,
   // Sosyal — v1'de yeni is yapilmiyor, mevcut ekranlar erisilebilir kaliyor.

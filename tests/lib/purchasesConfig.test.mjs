@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const purchases = readFileSync(new URL("../../src/lib/purchases.js", import.meta.url), "utf8");
-const paywall = readFileSync(new URL("../../src/screens/premium/PaywallScreen.js", import.meta.url), "utf8");
+// Satin alma mantigi PaywallScreen'den usePaywallPurchase'a tasindi
+// (AGENTS.md: is mantigi ekran dosyasinda durmaz). Degismez olan kural
+// ayni: uretimde ucretsiz denemeye DUSULMEZ.
+const paywall = readFileSync(new URL("../../src/hooks/usePaywallPurchase.js", import.meta.url), "utf8");
 
 test("RevenueCat keys come from Expo public env instead of placeholders", () => {
   assert.match(purchases, /EXPO_PUBLIC_REVENUECAT_IOS_API_KEY/);
