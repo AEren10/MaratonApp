@@ -82,3 +82,8 @@
 - Çalışma kaydı offline kuyruğa alınırken ona bağlı rota durağı lifecycle RPC'si de kuyruklanmalı. Aksi halde log daha sonra sync olsa bile rota durağı açık kalır ve günlük rota/borç sinyali kullanıcıyı yanlış yönlendirir.
 - Route transition kuyruğu yalnızca tekrar denenebilir hatalar için kullanılmalı; version conflict, invalid transition ve stop not found gibi kalıcı domain hataları kuyruğa girerse sonradan sync edilemeyecek gürültü üretir.
 - Plan/home/topic-debt gibi doğrudan route stop transition yapan UI yolları da aynı offline-safe helper'ı kullanmalı; yalnızca study-save yolunu korumak tutarsızlık bırakır.
+
+## 2026-09-13 — Runtime route stop kolon uyumu
+
+- `route_stops` runtime select listesi migration'da gerçekten var olan kolonlarla aynı kalmalı. Lock/freeze/effective durumları tablo kolonu değil, lifecycle + route state/access overlay'inden türetilen sunum bilgisidir.
+- `select("*")` yerine açık kolon listesi kullanırken schema dışı bir kolon eklemek de wildcard kadar riskli: canlı Supabase `column does not exist` ile tüm rota okumasını düşürür.

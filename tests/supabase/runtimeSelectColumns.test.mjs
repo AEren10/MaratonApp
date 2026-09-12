@@ -12,6 +12,12 @@ test("runtime route reads avoid wildcard selects", () => {
   assert.doesNotMatch(routePlan, /from\(STATE_TABLE\)[\s\S]{0,80}\.select\("\*"\)/);
 });
 
+test("runtime route stop selects only persisted columns", () => {
+  assert.doesNotMatch(routePlan, /"locked_until"/);
+  assert.doesNotMatch(routePlan, /"frozen_at"/);
+  assert.doesNotMatch(routePlan, /"effective_status"/);
+});
+
 test("wrong question detail uses the shared column list", () => {
   assert.match(wrongQuestions, /getWrongQuestionById/);
   assert.doesNotMatch(wrongQuestions, /getWrongQuestionById[\s\S]*?\.select\("\*"\)/);
