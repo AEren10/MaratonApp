@@ -32,7 +32,7 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const C = useC();
   const { handleHelp, handleLogout, handleDeleteAccount } = useSettingsActions();
-  const { checkFeature, showPaywall } = usePremium();
+  const { checkFeature, showPaywall, isPremium, isInGrace } = usePremium();
   const { examType, field, examDate, targetNet } = useExam();
   const { pref } = useTheme();
   const goals = useSelector(selectGoals);
@@ -51,6 +51,7 @@ export default function SettingsScreen() {
     : null;
   const dailyGoalLabel = goals?.dailyQuestions ? String(goals.dailyQuestions) : null;
   const themeLabel = THEME_LABELS[pref] || null;
+  const hasSubscription = isPremium || isInGrace;
   const appVersion = appConfig?.expo?.version || null;
 
   const toggleHaptics = useCallback((val) => {
@@ -150,7 +151,17 @@ export default function SettingsScreen() {
 
         <Animated.View entering={FadeInDown.delay(360).duration(420)}>
           <SettingsGroup title="HESAP">
-            <SettingsRow first label="E-posta değiştir" onPress={go(SCREENS.EDIT_EMAIL)} />
+            {/* Abonelik satiri yalniz abone olanda: tasarimin Abonelik ekrani
+                aktif aboneligi anlatiyor, ucretsiz kullanicinin yolu Profil'deki
+                Premium satiri. */}
+            {hasSubscription ? (
+              <SettingsRow first label="Abonelik ve hesap" onPress={go(SCREENS.SUBSCRIPTION)} />
+            ) : null}
+            <SettingsRow
+              first={!hasSubscription}
+              label="E-posta değiştir"
+              onPress={go(SCREENS.EDIT_EMAIL)}
+            />
             <SettingsRow label="Şifre değiştir" onPress={go(SCREENS.CHANGE_PASSWORD)} />
             <SettingsRow label="Çıkış yap" danger onPress={handleLogout} />
             <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />

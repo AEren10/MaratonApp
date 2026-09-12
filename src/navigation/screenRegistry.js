@@ -5,6 +5,7 @@ import {
   celebrationOptions,
   detailOptions,
   modalOptions,
+  overlayOptions,
   withScreenBoundary,
 } from "./screenOptions";
 
@@ -49,6 +50,8 @@ import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
 import ExamDateScreen from "../screens/settings/ExamDateScreen";
+import SubscriptionScreen from "../screens/premium/SubscriptionScreen";
+import CancelSubscriptionScreen from "../screens/premium/CancelSubscriptionScreen";
 import LevelScreen from "../screens/profile/LevelScreen";
 import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
@@ -85,6 +88,8 @@ const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"
 const QuickPracticeScreen = React.lazy(() => import("../screens/practice/QuickPracticeScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
 const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
+const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
+const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
 
 const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(Comp), options });
 
@@ -194,6 +199,10 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.EXAM_SIMULATOR, ExamSimulatorScreen),
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
   screen(SCREENS.PAYWALL, PaywallScreen, modalOptions),
+  screen(SCREENS.SUBSCRIPTION, SubscriptionScreen),
+  screen(SCREENS.SUBSCRIPTION_CANCEL, CancelSubscriptionScreen, modalOptions),
+  screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
+  screen(SCREENS.PRO_PREVIEW, ProPreviewScreen, overlayOptions),
 ];
 
 // Sekme stack'leri ada gore ekran tanimi ariyor (bkz. tabAssignment.js).

@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 
 import { Icon, Button } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -163,9 +163,9 @@ export default function ExamSimulatorScreen() {
           <Icon name={paused ? "play" : "pause"} size={22} color={paused ? C.green : C.accent} />
           <Text style={{ ...TYPOGRAPHY.captionMedium, color: paused ? C.green : C.accent }}>{paused ? "Devam" : "Duraklat"}</Text>
         </Pressable>
-        <Pressable onPress={finishEarly} style={[s.controlBtn, { backgroundColor: C.red + "18" }]}>
+        <Pressable onPress={finishEarly} style={[s.controlBtn, { backgroundColor: C.brandTint }]}>
           <Icon name="check" size={22} color={C.red} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Bitir</Text>
+          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text2 }}>Bitir</Text>
         </Pressable>
       </View>
 
@@ -182,28 +182,28 @@ export default function ExamSimulatorScreen() {
 function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
-    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.md },
-    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: STEP.s3, gap: STEP.s2 },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: STEP.s3, paddingVertical: STEP.s2 },
     title: { ...TYPOGRAPHY.subheading, color: C.text },
     typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-    setupBody: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.lg },
+    setupBody: { flex: 1, alignItems: "center", justifyContent: "center", padding: STEP.s3, gap: STEP.s3 },
     setupTitle: { ...TYPOGRAPHY.subheading, color: C.text, textAlign: "center" },
-    setupSub: { ...TYPOGRAPHY.body, color: C.sec, textAlign: "center" },
-    configRow: { flexDirection: "row", gap: SPACING.md },
-    configBtn: { flex: 1, alignItems: "center", padding: SPACING.lg, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
+    setupSub: { ...TYPOGRAPHY.body, color: C.text2, textAlign: "center" },
+    configRow: { flexDirection: "row", gap: STEP.s2 },
+    configBtn: { flex: 1, alignItems: "center", padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
     configText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-    configMeta: { ...TYPOGRAPHY.micro, color: C.muted, marginTop: 2 },
-    timerArea: { alignItems: "center", paddingVertical: SPACING.xxxl, gap: SPACING.sm },
+    configMeta: { ...TYPOGRAPHY.micro, color: C.text3, marginTop: 2 },
+    timerArea: { alignItems: "center", paddingVertical: STEP.s5, gap: STEP.s1 },
     timerText: { fontFamily: "Bricolage_400", fontSize: 64 },
-    timerSub: { ...TYPOGRAPHY.caption, color: C.muted },
-    barBg: { width: "80%", height: 4, borderRadius: 2, backgroundColor: C.surface2, marginTop: SPACING.md },
+    timerSub: { ...TYPOGRAPHY.caption, color: C.text3 },
+    barBg: { width: "80%", height: 4, borderRadius: 2, backgroundColor: C.surface2, marginTop: STEP.s2 },
     barFill: { height: 4, borderRadius: 2 },
-    controls: { flexDirection: "row", gap: SPACING.lg, justifyContent: "center", paddingHorizontal: SPACING.xl },
-    controlBtn: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl, borderRadius: RADIUS.xl },
-    pauseBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm, paddingVertical: SPACING.lg, marginTop: SPACING.xl },
+    controls: { flexDirection: "row", gap: STEP.s3, justifyContent: "center", paddingHorizontal: STEP.s3 },
+    controlBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingVertical: STEP.s2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.card },
+    pauseBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: STEP.s1, paddingVertical: STEP.s3, marginTop: STEP.s3 },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
     doneStat: { fontFamily: "Bricolage_400", fontSize: 36, color: C.green },
-    doneSub: { ...TYPOGRAPHY.caption, color: C.muted },
-    secondaryBtn: { paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl },
+    doneSub: { ...TYPOGRAPHY.caption, color: C.text3 },
+    secondaryBtn: { paddingVertical: STEP.s2, paddingHorizontal: STEP.s3 },
   });
 }

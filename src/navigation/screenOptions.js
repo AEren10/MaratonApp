@@ -27,6 +27,15 @@ export const celebrationOptions = {
   gestureEnabled: false,
 };
 
+// Icerigi ORTEN degil, uzerine OTURAN yari saydam katman (Pro Onizleme).
+// Altindaki ekran gorunur kalir; tasarimin "kilitli alan bulanik" dili.
+export const overlayOptions = {
+  animation: isWeb ? "none" : "fade",
+  presentation: "transparentModal",
+  animationDuration: 240,
+  contentStyle: { backgroundColor: "transparent" },
+};
+
 export const detailOptions = {
   animation: isWeb ? "none" : "fade",
   animationDuration: 280,

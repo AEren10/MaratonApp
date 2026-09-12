@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
-import { usePremium } from "../../contexts/PremiumContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { useAppSelector } from "../../store/hooks";
 import { selectLevel, selectStats, selectWeeklyXP } from "../../store/slices/gamificationSlice";
@@ -14,6 +14,7 @@ import { selectTrials } from "../../store/slices/trialSlice";
 import { useCurriculum } from "../../hooks/useCurriculum";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { getTier, getNextTier } from "../../constants/league";
+import { SCREENS } from "../../constants/screens";
 import { STEP, GUTTER } from "../../themes/tokens";
 
 import { ProfileTopBar } from "./components/ProfileTopBar";
@@ -32,7 +33,7 @@ export default function ProfileScreen() {
   const C = useC();
   const { user } = useAuth();
   const { examType, field, targetDepartment } = useExam();
-  const { showPaywall } = usePremium();
+  const navigation = useNavigation();
   const { subjects = [] } = useCurriculum();
   const level = useAppSelector(selectLevel);
   const gStats = useAppSelector(selectStats);
@@ -120,7 +121,7 @@ export default function ProfileScreen() {
             <ProfileLinkRow
               label="Premium"
               meta="7 gün ücretsiz"
-              onPress={() => showPaywall("profile_premium_row")}
+              onPress={() => navigation.navigate(SCREENS.PREMIUM, { source: "profile_premium_row" })}
               first
             />
           </Animated.View>

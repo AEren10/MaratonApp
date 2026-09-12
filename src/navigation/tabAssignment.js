@@ -77,11 +77,14 @@ export const PROFIL_STACK = [
   SCREENS.DOCUMENT,         // Belge (gizlilik / kullanim sartlari metni)
   SCREENS.HOW_IT_WORKS,     // Neye Gore Oneriyoruz (ROTA'da da var)
   SCREENS.EXAM_DATE,        // Tarih Secici
+  SCREENS.SUBSCRIPTION,     // Abonelik ve Hesap
+  SCREENS.SUBSCRIPTION_CANCEL, // Abonelik Iptali (onay)
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.MILESTONE,        // Kilometre Tasi
   SCREENS.LEVEL,            // Seviye
+  SCREENS.PREMIUM,          // Maraton Pro (tam sunum)
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,
   // Sosyal — v1'de yeni is yapilmiyor, mevcut ekranlar erisilebilir kaliyor.
@@ -103,6 +106,9 @@ export const ROOT_ONLY = [
   SCREENS.ADD_STUDY,
   SCREENS.ADD_TASK,
   SCREENS.PAYWALL,
+  // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
+  // sekme stack'ine koymak sekme atlatirdi.
+  SCREENS.PRO_PREVIEW,
   SCREENS.EDIT_PROFILE,
   SCREENS.CHANGE_PASSWORD,
   SCREENS.EDIT_EMAIL,

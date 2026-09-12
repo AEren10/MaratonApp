@@ -108,6 +108,10 @@ export const SCREENS = {
 
   // Premium
   PAYWALL: "Paywall",
+  SUBSCRIPTION: "Subscription",
+  SUBSCRIPTION_CANCEL: "SubscriptionCancel",
+  PREMIUM: "Premium",
+  PRO_PREVIEW: "ProPreview",
 
   // Settings
   SETTINGS: "Settings",

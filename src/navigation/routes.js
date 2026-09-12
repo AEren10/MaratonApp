@@ -87,6 +87,12 @@ export const ROUTE_CONFIGS = {
   [SCREENS.LEVEL]: { path: "seviye", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },
 
   [SCREENS.PAYWALL]: { path: "premium", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: true },
+  [SCREENS.SUBSCRIPTION]: { path: "abonelik", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.SUBSCRIPTION_CANCEL]: { path: "abonelik/iptal", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.PREMIUM]: { path: "pro", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: true },
+  // Baglamsiz acilmasi anlamsiz: kaynak param olmadan hangi ozelligin
+  // onizlemesi oldugu belirsiz kalir, o yuzden deep link yok.
+  [SCREENS.PRO_PREVIEW]: { path: "pro/onizleme", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
 
   [SCREENS.SETTINGS]: { path: "ayarlar", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.APPEARANCE]: { path: "ayarlar/gorunum", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
