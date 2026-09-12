@@ -140,12 +140,12 @@ export async function submitTrialEntry({
   if (result.queued) {
     showAlert("Çevrimdışı", "Deneme sonucu bağlantı geldiğinde gönderilecek.");
   }
-  if (solvedCount > 0) {
+  if (solvedCount > 0 && !result.queued) {
     syncChallengeProgress(user.id, {
       questions: solvedCount,
       source: "trial_entry",
       sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
-    });
+    }).catch(() => {});
   }
 
   completeForm({ net: netVal, trialType });

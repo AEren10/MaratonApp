@@ -123,3 +123,8 @@
 - Retention olayları küçük, kullanıcı scope'lu local buffer'a alınmalı ve sonraki event geldiğinde önce buffer flush edilmelidir.
 - `client_event_id` duplicate hatası replay başarısı gibi ele alınmalı; aksi halde belirsiz ağ denemesinde Supabase'e yazılmış event buffer'da takılı kalır ve arkadaki event'leri geciktirir.
 - Aynı duplicate kuralı canlı insert için de geçerli: istemci aynı `client_event_id` ile tekrar denerse buffer'a almak yerine “zaten yazılmış” kabul edilmeli.
+
+## 2026-09-13 — Offline deneme ve challenge replay
+
+- Deneme sonucu offline kuyruğa alındıysa challenge progress anında ayrıca tetiklenmemeli; offlineQueue replay sırasında aynı `clientOperationId` ile server-resolved sync yapar.
+- Queued durumda hem anlık sync hem replay denenirse idempotency çoğu hasarı önler ama gereksiz ağ/Promise hatası ve ölçüm gürültüsü üretir. Anlık sync yalnız canlı kayıt başarıyla kaydedildiğinde çalışmalı.

@@ -32,6 +32,11 @@ test("entry screens pass source operation ids to challenge sync", () => {
   }
 });
 
+test("queued trial entries leave challenge replay to the offline queue", () => {
+  assert.match(trialSubmit, /solvedCount > 0 && !result\.queued/);
+  assert.match(trialSubmit, /syncChallengeProgress\(user\.id[\s\S]*\)\.catch\(\(\) => \{\}\)/);
+});
+
 test("challenge progress migration records duplicate source operations", () => {
   assert.match(migration, /CREATE TABLE IF NOT EXISTS public\.challenge_progress_events/);
   assert.match(migration, /UNIQUE \(user_id, challenge_id, source, source_operation_id, metric\)/);
