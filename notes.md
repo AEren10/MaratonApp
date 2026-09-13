@@ -159,3 +159,9 @@
 
 - `temp_` id'li user task henüz Supabase satırı değildir; silinirken server delete çağırmak yerine offline queue'daki `usertask_<tempId>` insert kaydı çıkarılmalı.
 - Aksi halde UUID olmayan temp id Supabase delete yolunda hata üretir, UI rollback yapar ve kullanıcı çevrimdışı eklediği görevi silemez.
+
+## 2026-09-13 — Offline takvim görevi queue kimliği
+
+- Takvim görevi offline oluşturulunca local task, offline queue operation id'sini taşımalı; Supabase remote id dönene kadar bu id tek kaynak olur.
+- Kullanıcı sync öncesi görevi tamamlarsa queued insert payload'ı güncellenmeli. Aksi halde bağlantı gelince görev eski `completed` değeriyle oluşur.
+- Kullanıcı sync öncesi görevi silerse queued insert kuyruktan kaldırılmalı. Aksi halde kullanıcı sildiğini sanarken bağlantı gelince takvim görevi geri doğar.

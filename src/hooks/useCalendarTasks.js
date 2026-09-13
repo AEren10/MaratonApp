@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { saveUserTaskOffline } from "../lib/offlineQueue";
+import { saveUserTaskOffline, patchQueuedPayload, removeFromQueue } from "../lib/offlineQueue";
 import { getJson, setJson } from "../lib/storage/appStorage";
 import { handleSupabaseError } from "../supabase/handleError";
 import { STORAGE_KEYS } from "../constants/storageKeys";
@@ -49,8 +49,9 @@ export function useCalendarTasks() {
 
   const addTask = useCallback((date, task) => {
     const localId = Date.now().toString();
+    const clientOperationId = `calendartask_${localId}`;
     setTasks((prev) => {
-      const list = [...(prev[date] || []), { ...task, id: localId, done: false }];
+      const list = [...(prev[date] || []), { ...task, id: localId, done: false, pendingOperationId: clientOperationId }];
       const next = { ...prev, [date]: list };
       persist(next);
       return next;
@@ -60,14 +61,25 @@ export function useCalendarTasks() {
       // yutuluyordu, görev sadece bu telefonda kalıp yeni cihazda kayboluyordu.
       saveUserTaskOffline({
         user_id: user.id, task_date: date, subject: CAL_SUBJECT,
-        note: task.title, completed: false,
+        note: task.title, completed: false, client_operation_id: clientOperationId,
       }).then((res) => {
         if (!res?.data?.id) return;
         setTasks((prev) => {
           const list = (prev[date] || []).map((t) =>
-            t.id === localId ? { ...t, remoteId: res.data.id } : t,
+            t.id === localId ? { ...t, remoteId: res.data.id, pendingOperationId: null } : t,
           );
           const next = { ...prev, [date]: list };
+          persist(next);
+          return next;
+        });
+      }).catch((e) => {
+        handleSupabaseError(e, "calendar:addTask");
+        setError(e);
+        setTasks((prev) => {
+          const list = (prev[date] || []).filter((t) => t.id !== localId);
+          const next = { ...prev };
+          if (list.length) next[date] = list;
+          else delete next[date];
           persist(next);
           return next;
         });
@@ -91,6 +103,11 @@ export function useCalendarTasks() {
             return revNext;
           });
         });
+      } else if (toggled?.pendingOperationId) {
+        patchQueuedPayload(toggled.pendingOperationId, { completed: toggled.done }).catch((e) => {
+          handleSupabaseError(e, "calendar:toggleQueuedTask");
+          setError(e);
+        });
       }
       return next;
     });
@@ -107,6 +124,17 @@ export function useCalendarTasks() {
       if (removed?.remoteId) {
         deleteUserTask(removed.remoteId, user?.id).catch((e) => {
           handleSupabaseError(e, "calendar:removeTask");
+          setTasks((revert) => {
+            const revList = [...(revert[date] || []), removed];
+            const revNext = { ...revert, [date]: revList };
+            persist(revNext);
+            return revNext;
+          });
+        });
+      } else if (removed?.pendingOperationId) {
+        removeFromQueue(removed.pendingOperationId).catch((e) => {
+          handleSupabaseError(e, "calendar:removeQueuedTask");
+          setError(e);
           setTasks((revert) => {
             const revList = [...(revert[date] || []), removed];
             const revNext = { ...revert, [date]: revList };
