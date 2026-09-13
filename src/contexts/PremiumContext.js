@@ -101,19 +101,28 @@ export function PremiumProvider({ children }) {
   const remainingWrongs = Infinity;
 
   const bumpUsage = useCallback((kind) => {
-    if (kind !== "trial") return;
-    setSnapshot((current) => {
-      const quota = current?.quotas?.trialEntry;
-      if (!quota || quota.unlimited) return current;
-      const used = Math.min(quota.limit, quota.used + 1);
-      return {
+    if (kind === "trial") {
+      setSnapshot((current) => {
+        const quota = current?.quotas?.trialEntry;
+        if (!quota || quota.unlimited) return current;
+        const used = Math.min(quota.limit, quota.used + 1);
+        return {
+          ...current,
+          quotas: {
+            ...current.quotas,
+            trialEntry: { ...quota, used, remaining: Math.max(0, quota.limit - used) },
+          },
+        };
+      });
+      return;
+    }
+
+    if (kind === "challenge") {
+      setUsage((current) => ({
         ...current,
-        quotas: {
-          ...current.quotas,
-          trialEntry: { ...quota, used, remaining: Math.max(0, quota.limit - used) },
-        },
-      };
-    });
+        activeChallenges: Math.max(0, Number(current?.activeChallenges) || 0) + 1,
+      }));
+    }
   }, []);
 
   const showPaywall = useCallback((source = "unknown") => {

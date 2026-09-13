@@ -148,3 +148,8 @@
 
 - Tarih aralığıyla okunan çalışma kayıtları PostgREST row limit'ine bırakılmamalı. Year activity, wrapped ve haftalık rapor gibi istatistikler yoğun kullanıcıda 1000+ satırı eksik okuyabilir.
 - Limitsiz geçmiş liste ekranı ayrı tutulmalı; mobil performans için son 500 kayıt davranışı korunabilir, ama tarih-scope'lu analitik/rapor okumaları sayfalanmalıdır.
+
+## 2026-09-13 — Challenge ücretsiz slot hesabı
+
+- Ücretsiz challenge kotası yalnız `active` kayıtları değil, kullanıcının gönderdiği `pending` davetleri de saymalı. Aksi halde kullanıcı çok sayıda bekleyen davet açarak premium sınırını aşabilir.
+- Challenge oluşturma sonrası local kullanım snapshot'ı hemen artmalı; server refresh beklenirse aynı oturumda ikinci oluşturma butonu yanlışlıkla açık kalabilir.

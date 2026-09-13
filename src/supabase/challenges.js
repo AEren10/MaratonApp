@@ -27,7 +27,7 @@ export async function getActiveChallengeCount(userId) {
       .from("challenges")
       .select("id", { count: "exact", head: true })
       .eq("creator_id", userId)
-      .eq("status", "active");
+      .in("status", ["active", "pending"]);
     if (error) throw error;
     return count ?? 0;
   } catch (e) {
