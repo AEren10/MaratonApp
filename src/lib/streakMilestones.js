@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "./storage/appStorage";
 
 export const STREAK_MILESTONES = [
@@ -32,19 +32,19 @@ export function getNextMilestone(currentStreak) {
   return null;
 }
 
-export async function getClaimedMilestones() {
+export async function getClaimedMilestones(userId = null) {
   try {
-    return await appStorage.getJson(STORAGE_KEYS.CLAIMED_MILESTONES, []);
+    return await appStorage.getJson(userScopedKey(STORAGE_KEYS.CLAIMED_MILESTONES, userId), []);
   } catch {
     return [];
   }
 }
 
-export async function claimMilestone(day) {
-  const claimed = await getClaimedMilestones();
+export async function claimMilestone(day, userId = null) {
+  const claimed = await getClaimedMilestones(userId);
   if (!claimed.includes(day)) {
     claimed.push(day);
-    await appStorage.setJson(STORAGE_KEYS.CLAIMED_MILESTONES, claimed);
+    await appStorage.setJson(userScopedKey(STORAGE_KEYS.CLAIMED_MILESTONES, userId), claimed);
   }
   return claimed;
 }

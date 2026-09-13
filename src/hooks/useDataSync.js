@@ -38,7 +38,7 @@ async function retryPendingStreak(activeUserId) {
 }
 
 async function loadAll(userId, dispatch) {
-  await loadGamificationFromStorage(dispatch);
+  await loadGamificationFromStorage(dispatch, userId);
   await retryPendingStreak(userId);
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
   await flushRetentionEvents(userId).catch(() => ({ processed: 0 }));

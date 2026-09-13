@@ -167,3 +167,9 @@
 - Kullanıcı sync öncesi görevi silerse queued insert kuyruktan kaldırılmalı. Aksi halde kullanıcı sildiğini sanarken bağlantı gelince takvim görevi geri doğar.
 - Queue replay sonrası takvim refresh'i `client_operation_id` ile pending local satırı remote satıra yükseltmeli; yalnız `remoteId` eşleşmesi aranırsa aynı görev ikinci kez listelenir.
 - Calendar task cache'i kullanıcıya göre ayrışmalı ve kullanıcı değişince sync guard resetlenmeli. Global AsyncStorage anahtarı, A kullanıcısının takvim notunu B kullanıcısına gösterebilir.
+
+## 2026-09-13 — Gamification cache kullanıcı izolasyonu
+
+- `USER_SCOPED_KEYS` listesine bir anahtar eklemek tek başına yeterli değil; okuma/yazma tarafı da `userScopedKey` kullanmalı.
+- XP, haftalık XP, istatistikler ve streak milestone claim listesi global cache'te kalırsa çıkış-giriş sonrası kullanıcılar arası ilerleme/ödül izi karışabilir.
+- Streak milestone ödülleri premium gün verebildiği için local claim izi kullanıcıya bağlı kalmalı; aksi halde bir kullanıcının claim durumu diğerinin premium ödül akışını bastırabilir.

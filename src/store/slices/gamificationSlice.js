@@ -1,6 +1,6 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { getLevelForXP } from "../../lib/xpEngine";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../../constants/storageKeys";
 import * as appStorage from "../../lib/storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.GAMIFICATION;
@@ -108,9 +108,9 @@ export const selectLevel = createSelector(
 
 export default gamificationSlice.reducer;
 
-export async function saveGamificationToStorage(state) {
+export async function saveGamificationToStorage(state, userId = null) {
   try {
-    await appStorage.setJson(STORAGE_KEY, {
+    await appStorage.setJson(userScopedKey(STORAGE_KEY, userId), {
       xp: state.xp, weeklyXP: state.weeklyXP,
       stats: state.stats,
       claimedMilestones: state.claimedMilestones || [],
@@ -118,9 +118,9 @@ export async function saveGamificationToStorage(state) {
   } catch (_) {}
 }
 
-export async function loadGamificationFromStorage(dispatch) {
+export async function loadGamificationFromStorage(dispatch, userId = null) {
   try {
-    dispatch(hydrateGamification(await appStorage.getJson(STORAGE_KEY, {})));
+    dispatch(hydrateGamification(await appStorage.getJson(userScopedKey(STORAGE_KEY, userId), {})));
   } catch (_) {
     dispatch(hydrateGamification({}));
   }

@@ -122,7 +122,7 @@ export function useGamification() {
         stats: statsRef.current,
         claimedMilestones: claimedRef.current,
       };
-      saveGamificationToStorage(state);
+      saveGamificationToStorage(state, user?.id);
       saveGamificationToSupabase(user?.id, state.stats, state.claimedMilestones).catch(() => {});
     }, 500);
   }, [user?.id]);
@@ -197,7 +197,7 @@ export function useGamification() {
         for (const milestone of unclaimed) {
           claimedRef.current = [...claimedRef.current, milestone.day];
           dispatch(claimStreakMilestone(milestone.day));
-          claimMilestone(milestone.day).catch(() => {});
+          claimMilestone(milestone.day, user?.id).catch(() => {});
           dispatch(earnXP({ amount: milestone.xp }));
           totalMilestoneXP += milestone.xp;
           if (user?.id) {
