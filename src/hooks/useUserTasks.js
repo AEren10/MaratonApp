@@ -18,7 +18,7 @@ import {
   deleteUserTask,
   deleteUserTasksByDate,
 } from "../supabase/userTasks";
-import { saveUserTaskOffline, patchQueuedPayload } from "../lib/offlineQueue";
+import { saveUserTaskOffline, patchQueuedPayload, removeFromQueue } from "../lib/offlineQueue";
 import { userTaskSchema } from "../validations/auth";
 import { scheduleTaskNotifications, cancelTaskReminders } from "../lib/notifications";
 import { track } from "../lib/analytics";
@@ -144,6 +144,12 @@ export function useUserTasks() {
   const removeTask = useCallback(async (id) => {
     const task = tasks.find((t) => t.id === id);
     dispatch(removeAction(id));
+    if (typeof id === "string" && id.startsWith("temp_")) {
+      removeFromQueue(`usertask_${id}`).catch(() => {
+        if (task) dispatch(addUserTask(task));
+      });
+      return;
+    }
     deleteUserTask(id, user?.id).catch(() => {
       if (task) dispatch(addUserTask(task));
     });
