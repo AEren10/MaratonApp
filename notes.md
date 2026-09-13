@@ -235,5 +235,8 @@
 ## 2026-09-14 — Sosyal ekran auth geçişleri
 
 - Arkadaşlık ve challenge ekranları büyüme/retention yüzeyi olduğu için logout/token refresh sırasında beyaz ekrana düşmemeli.
+- `PENDING_STREAK` ve `ANALYTICS_BUFFER` UI cache değil, dayanıklı retry/tampon verisi gibi davranmalı.
+- `onAuthError -> logout -> clearUserScopedStorage` zinciri bu anahtarları silerse çevrimdışı seri dokunuşu ve push/paywall/login funnel olayları kalıcı kaybolur.
+- Bu tamponlar içeride `userId` taşıdığı ve okuma sırasında aktif kullanıcıya filtrelendiği için offline queue ile aynı sınıfta korunmalı; kullanıcıya görünen cache'ler ayrı temizlenmeli.
 - Callback dependency array'lerinde `user.id` kullanımı render anında patlar; auth geçişine dayanıklı yerlerde `user?.id` + erken dönüş guard'ı kullanılmalı.
 - Yanlış defteri tekrar ekranları da retention yüzeyi: kullanıcı hızlı pratikteyken token refresh/logout arası kısa boşluk, tekrar algoritmasını değil ekranı düşürmemeli.
