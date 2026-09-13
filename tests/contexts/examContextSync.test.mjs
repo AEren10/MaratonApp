@@ -13,7 +13,7 @@ test("ExamContext retries pending target/baseline net sync", () => {
   assert.match(source, /async function retryPendingNetSync/);
   assert.match(source, /targetNetSyncPending/);
   assert.match(source, /baselineNetSyncPending/);
-  assert.match(source, /await retryPendingNetSync\(session\.user\.id, local/);
+  assert.match(source, /await retryPendingNetSync\(userId, local/);
 });
 
 test("pending local net values win over stale server values", () => {
@@ -29,4 +29,17 @@ test("onboarding and level-test flows surface pending net sync", () => {
   assert.match(levelTestForm, /syncPendingNote/);
   assert.match(levelTestScreen, /syncPendingNote: syncPendingNote \|\| undefined/);
   assert.match(routeReadyScreen, /useRoute\(\)\.params\?\.syncPendingNote/);
+});
+
+test("exam config local cache is scoped to the active user and reloads when user changes", () => {
+  assert.match(source, /import \{ STORAGE_KEYS, userScopedKey \} from "\.\.\/constants\/storageKeys"/);
+  assert.match(source, /function examConfigKey\(userId\) \{/);
+  assert.match(source, /return userScopedKey\(STORAGE_KEY, userId\);/);
+  assert.match(source, /const storageKey = useMemo\(\(\) => examConfigKey\(userId\), \[userId\]\);/);
+  assert.match(source, /const dbLoadedFor = useRef\(null\);/);
+  assert.match(source, /if \(dbLoadedFor\.current === userId\) return;/);
+  assert.match(source, /dbLoadedFor\.current = userId;/);
+  assert.match(source, /appStorage\.getJson\(storageKey, \{\}\)/);
+  assert.match(source, /appStorage\.setJson\(storageKey/);
+  assert.doesNotMatch(source, /appStorage\.(getJson|setJson)\(STORAGE_KEY/);
 });

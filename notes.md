@@ -178,3 +178,9 @@
 
 - Günlük soru hedefi rota kapasitesinin girdisi olduğu için local fallback global kalmamalı. Kullanıcı değişiminde eski kullanıcının hedefi yeni kullanıcının günlük planını/rota temposunu bozabilir.
 - `ReduxHydrator`, onboarding, hedef düzenleme, senaryo uygulama ve `useDataSync` fallback yolu aynı user-scoped storage anahtarını kullanmalı; aksi halde sunucu geç gelince ekranda yanlış hedefle kısa süreli karar üretilebilir.
+
+## 2026-09-13 — Exam config kullanıcı izolasyonu
+
+- Sınav tipi, alan, sınav tarihi, hedef net ve baseline net rota motorunun ana girdileridir; local fallback global kalırsa farklı kullanıcının sınav rotası/kapasitesi yeni kullanıcıya sızabilir.
+- DB load guard boolean değil kullanıcı kimliği bazlı olmalı. A kullanıcısı yüklendikten sonra B oturumu gelirse boolean guard B profilini tamamen atlayabilir.
+- Bekleyen hedef/baseline net sync bayrakları da user-scoped config içinde kalmalı; aksi halde bir kullanıcının offline hedef değişikliği başka kullanıcı profilini backfill etmeye çalışabilir.

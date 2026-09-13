@@ -3,13 +3,17 @@ import { useAuth } from "./AuthContext";
 import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
 
 const ExamContext = createContext(null);
 
 const STORAGE_KEY = STORAGE_KEYS.EXAM_CONFIG;
 const SLIDES_KEY = STORAGE_KEYS.HAS_SEEN_ONBOARDING;
+
+function examConfigKey(userId) {
+  return userScopedKey(STORAGE_KEY, userId);
+}
 
 function coerceNet(value) {
   return value == null ? null : Number(value);
@@ -36,20 +40,23 @@ async function retryPendingNetSync(userId, local, isCancelled) {
     try {
       await updateProf(userId, { [job.column]: job.value });
       if (isCancelled()) return;
-      await persistExamConfigPatch({ [job.patchKey]: job.value, [job.flag]: false });
+      await persistExamConfigPatch({ [job.patchKey]: job.value, [job.flag]: false }, userId);
     } catch {
       // Hala basarisiz: bayrak duruyor, sonraki acilista yine denenir.
     }
   }
 }
 
-async function persistExamConfigPatch(patch) {
-  const existing = await appStorage.getJson(STORAGE_KEY, {});
-  await appStorage.setJson(STORAGE_KEY, { ...existing, ...patch });
+async function persistExamConfigPatch(patch, userId = null) {
+  const key = examConfigKey(userId);
+  const existing = await appStorage.getJson(key, {});
+  await appStorage.setJson(key, { ...existing, ...patch });
 }
 
 export function ExamProvider({ children }) {
   const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
+  const storageKey = useMemo(() => examConfigKey(userId), [userId]);
   const [examType, setExamType] = useState(null);
   const [field, setField] = useState(null);
   const [examDate, setExamDate] = useState(null);
@@ -65,13 +72,15 @@ export function ExamProvider({ children }) {
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dbLoading, setDbLoading] = useState(false);
-  const dbLoaded = useRef(false);
+  const dbLoadedFor = useRef(null);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
-      appStorage.getJson(STORAGE_KEY, null),
+      userId ? appStorage.getJson(storageKey, null) : Promise.resolve(null),
       appStorage.getString(SLIDES_KEY),
     ]).then(([d, seenRaw]) => {
+      if (cancelled) return;
       if (d) {
         setExamType(d.examType);
         setField(d.field || null);
@@ -87,13 +96,14 @@ export function ExamProvider({ children }) {
       setHasSeenSlides(seenRaw === "true");
     })
     .catch(() => {})
-    .finally(() => setLoading(false));
-  }, []);
+    .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [storageKey, userId]);
 
   useEffect(() => {
-    if (!session?.user?.id) {
+    if (!userId) {
       if (!session && !loading) {
-        dbLoaded.current = false;
+        dbLoadedFor.current = null;
         setExamType(null);
         setField(null);
         setExamDate(null);
@@ -107,8 +117,8 @@ export function ExamProvider({ children }) {
       }
       return;
     }
-    if (dbLoaded.current) return;
-    dbLoaded.current = true;
+    if (dbLoadedFor.current === userId) return;
+    dbLoadedFor.current = userId;
     setDbLoading(true);
 
     // Çıkış→giriş yarışı: A'nın profili logout'tan sonra resolve olursa
@@ -116,9 +126,9 @@ export function ExamProvider({ children }) {
     // Effect session değişince yeniden çalıştığı için cleanup bunu keser.
     let cancelled = false;
 
-    getProfile(session.user.id).then(async (p) => {
+    getProfile(userId).then(async (p) => {
       if (cancelled) return;
-      const local = await appStorage.getJson(STORAGE_KEY, {});
+      const local = await appStorage.getJson(storageKey, {});
       if (!p?.exam_type) {
         if (local && !cancelled) {
           setExamType(local.examType);
@@ -131,7 +141,7 @@ export function ExamProvider({ children }) {
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
           setSetupCompleted(!!local.setupCompleted);
         }
-        await retryPendingNetSync(session.user.id, local, () => cancelled);
+        await retryPendingNetSync(userId, local, () => cancelled);
         return;
       }
       // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
@@ -170,7 +180,7 @@ export function ExamProvider({ children }) {
       if (config.dailyGoalSet) setDailyGoalSet(true);
       setLevelTestDone(config.levelTestDone);
       setSetupCompleted(config.setupCompleted);
-      appStorage.setJson(STORAGE_KEY, {
+      appStorage.setJson(storageKey, {
         ...local,
         examType: config.examType,
         field: config.field,
@@ -188,14 +198,14 @@ export function ExamProvider({ children }) {
       if (p.target_net == null && local.targetNet != null) pending.target_net = Number(local.targetNet);
       if (p.baseline_net == null && local.baselineNet != null) pending.baseline_net = Number(local.baselineNet);
       if (Object.keys(pending).length) {
-        updateProf(session.user.id, pending).catch(() => {});
+        updateProf(userId, pending).catch(() => {});
       }
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
-      await retryPendingNetSync(session.user.id, local, () => cancelled);
+      await retryPendingNetSync(userId, local, () => cancelled);
     }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
 
     return () => { cancelled = true; };
-  }, [session]);
+  }, [loading, session, storageKey, userId]);
 
   const markSlidesAsSeen = useCallback(() => {
     setHasSeenSlides(true);
@@ -215,9 +225,9 @@ export function ExamProvider({ children }) {
       clearRouteWeeks(session.user.id, { exceptExamType: type }).catch(() => {});
     }
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
-        STORAGE_KEY,
+        storageKey,
         { ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() },
       );
     } catch {}
@@ -227,21 +237,21 @@ export function ExamProvider({ children }) {
         targetRanking, targetDepartment,
       }).catch(() => {});
     }
-  }, [session, targetRanking, targetDepartment, examType]);
+  }, [session, storageKey, targetRanking, targetDepartment, examType]);
 
   const updateGoal = useCallback(async (dailyQuestions) => {
     setDailyGoalSet(true);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
-        STORAGE_KEY,
+        storageKey,
         { ...existing, dailyGoalSet: true },
       );
     } catch {}
     if (session?.user?.id) {
       updateProf(session.user.id, { daily_question_goal: dailyQuestions }).catch(() => {});
     }
-  }, [session]);
+  }, [session, storageKey]);
 
   // Hedef net. Sunucu yazimi sessizce yutulMUYOR: basarisizsa yerelde kaliyor
   // ve bir sonraki profil okumasinda geri dolduruluyor (getProfile dalindaki
@@ -250,20 +260,20 @@ export function ExamProvider({ children }) {
     const value = coerceNet(net);
     setTargetNet(value);
     try {
-      await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false });
+      await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
         await updateProf(session.user.id, { target_net: value });
-        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false });
+        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false }, userId);
         return { synced: true };
       } catch (e) {
-        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: true }).catch(() => {});
+        await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: true }, userId).catch(() => {});
         return { synced: false, error: e };
       }
     }
     return { synced: false, offline: true };
-  }, [session]);
+  }, [session, userId]);
 
   // Rotanin baslangic neti. targetNet ile ayni deseni izliyor.
   // profiles.baseline_net kolonu uygulandi (2026-09-10), sunucu senkronu acik.
@@ -279,47 +289,47 @@ export function ExamProvider({ children }) {
         levelTestDone: true,
         levelTestSkipped: false,
         baselineNetSyncPending: false,
-      });
+      }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
         await updateProf(session.user.id, { baseline_net: value });
-        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: false });
+        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: false }, userId);
         return { synced: true };
       } catch (e) {
-        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: true }).catch(() => {});
+        await persistExamConfigPatch({ baselineNet: value, baselineNetSyncPending: true }, userId).catch(() => {});
         return { synced: false, error: e };
       }
     }
     return { synced: false, offline: true };
-  }, [session]);
+  }, [session, userId]);
 
   const markLevelTestDone = useCallback(async ({ skipped = false } = {}) => {
     setLevelTestDone(true);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
-        STORAGE_KEY,
+        storageKey,
         { ...existing, levelTestDone: true, levelTestSkipped: !!skipped },
       );
     } catch {}
-  }, []);
+  }, [storageKey]);
 
   const completeOnboarding = useCallback(async () => {
     setSetupCompleted(true);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
-      await appStorage.setJson(STORAGE_KEY, { ...existing, setupCompleted: true });
+      const existing = await appStorage.getJson(storageKey, {});
+      await appStorage.setJson(storageKey, { ...existing, setupCompleted: true });
     } catch {}
-  }, []);
+  }, [storageKey]);
 
   const updateRanking = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
     try {
-      const existing = await appStorage.getJson(STORAGE_KEY, {});
+      const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
-        STORAGE_KEY,
+        storageKey,
         { ...existing, targetRanking: ranking, targetDepartment: department || null },
       );
     } catch {}
@@ -329,7 +339,7 @@ export function ExamProvider({ children }) {
         targetRanking: ranking, targetDepartment: department || null,
       }).catch(() => {});
     }
-  }, [session, examType, field, examDate]);
+  }, [session, storageKey, examType, field, examDate]);
 
   const onboardingDone = !!examType && dailyGoalSet && setupCompleted;
 
