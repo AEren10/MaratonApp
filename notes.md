@@ -138,3 +138,8 @@
 
 - `transition_route_stop` RPC tarafında `client_operation_id` UUID bekliyor. Route stop transition için fallback operation id de `Crypto.randomUUID()` üretmeli; string prefix'li offline id'ler RPC'ye ulaşınca `22P02` ile düşer.
 - Çalışma/rota UI çağrıları şu an kendi UUID'sini geçse bile helper fallback'i schema ile uyumlu kalmalı. İleride yeni bir çağrı `clientOperationId` vermeyi unutursa offline replay sessizce bozulmamalı.
+
+## 2026-09-13 — Retention buffer flush zamanı
+
+- Retention event buffer yalnız yeni event kaydedilirken boşaltılmamalı. Kullanıcı app'i yeniden açtığında veya ağ geri geldiğinde data sync hattı da buffer'ı Supabase'e göndermeli.
+- Premium/retention hunisinde gecikmiş event veri kaybı kadar tehlikeli olabilir: kullanıcı davranışı ölçümü bayat kalırsa paywall/nudge kararları yanlış optimize edilir.

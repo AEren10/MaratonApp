@@ -17,6 +17,7 @@ import { getStreak } from "../supabase/streaks";
 import { getProfile, updateLastActive } from "../supabase/profiles";
 import { getUserTasksByDate } from "../supabase/userTasks";
 import { flushQueue, getPendingStudyLogs, getPendingTrials } from "../lib/offlineQueue";
+import { flushRetentionEvents } from "../supabase/retention";
 import { getExpoPushToken, loadNotifPrefsFromServer, applyNotifPrefs, getNotifPrefs } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
 import { getSession } from "../supabase/auth";
@@ -40,6 +41,7 @@ async function loadAll(userId, dispatch) {
   await loadGamificationFromStorage(dispatch);
   await retryPendingStreak(userId);
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
+  await flushRetentionEvents(userId).catch(() => ({ processed: 0 }));
 
   const todayDate = todayTR();
   const [trials, streak, todayLogs, profile, userTasks, xpTotals] = await Promise.allSettled([
@@ -194,7 +196,10 @@ export function useDataSync() {
           if (!session) return;
         } catch { return; }
         flushQueue()
-          .then((r) => { if (r.processed > 0) loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {}); })
+          .then(async (r) => {
+            await flushRetentionEvents(user.id).catch(() => ({ processed: 0 }));
+            if (r.processed > 0) loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {});
+          })
           .catch(() => {});
       }
       appStateRef.current = next;
@@ -211,7 +216,10 @@ export function useDataSync() {
     if (wasOfflineRef.current && user?.id && user.id !== "dev") {
       wasOfflineRef.current = false;
       flushQueue()
-        .then(() => loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {}))
+        .then(async () => {
+          await flushRetentionEvents(user.id).catch(() => ({ processed: 0 }));
+          loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {});
+        })
         .catch(() => {});
     }
   }, [isConnected, user?.id, safeDispatch]);
