@@ -1,74 +1,41 @@
-import { View, Text, Pressable } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Icon, IconBox } from "../../../components/design";
-import { formatDateISO, formatDateLong } from "../trialEntryDates";
+import { useC } from "../../../contexts/ThemeContext";
+import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { formatDateISO } from "../trialEntryDates";
 
-export function TrialEntryDatePicker({
-  C,
-  recentDays,
-  showDatePicker,
-  styles,
-  trialDate,
-  onChangeDate,
-  onToggle,
-}) {
+// TARIH satirinin acilan son 14 gun seridi.
+export function TrialEntryDatePicker({ recentDays, trialDate, onChangeDate }) {
+  const C = useC();
+  const selected = formatDateISO(trialDate);
   return (
-    <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`Tarih: ${formatDateLong(trialDate)}`}
-        accessibilityHint="Tarih seçiciyi açar veya kapatır"
-        onPress={onToggle}
-        style={styles.dateRow}
-      >
-        <IconBox icon="calendar" color={C.accent} size={34} rounded={10} />
-        <Text style={styles.dateText}>{formatDateLong(trialDate)}</Text>
-        <Icon name={showDatePicker ? "chevUp" : "chevDown"} size={16} color={C.muted} />
-      </Pressable>
-
-      {showDatePicker && (
-        <Animated.View entering={FadeIn.duration(200)} style={styles.datePicker}>
-          {recentDays.map((day) => {
-            const active = formatDateISO(trialDate) === day.iso;
-            return (
-              <Pressable
-                key={day.iso}
-                accessibilityRole="radio"
-                accessibilityLabel={`${day.dayName} ${day.day}`}
-                accessibilityState={{ selected: active }}
-                onPress={() => onChangeDate(day.date)}
-                style={[
-                  styles.dateChip,
-                  {
-                    backgroundColor: active ? C.accent + "1A" : C.surface,
-                    borderColor: active ? C.accent : C.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Archivo_500",
-                    fontSize: 11,
-                    color: active ? C.accent : C.muted,
-                  }}
-                >
-                  {day.dayName}
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "Bricolage_400",
-                    fontSize: 18,
-                    color: active ? C.accent : C.text,
-                  }}
-                >
-                  {day.day}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </Animated.View>
-      )}
-    </>
+    <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
+      {recentDays.map((day) => {
+        const active = selected === day.iso;
+        return (
+          <Pressable key={day.iso} onPress={() => onChangeDate(day.date)}
+            accessibilityRole="radio" accessibilityLabel={`${day.dayName} ${day.day}`}
+            accessibilityState={{ selected: active }}
+            style={[styles.chip, {
+              backgroundColor: active ? C.brandTint : C.void,
+              borderColor: active ? C.accent : C.border,
+            }]}>
+            <Text style={[TYPOGRAPHY.tableHead, { color: active ? C.accentBright : C.text3, letterSpacing: 0 }]}>
+              {day.dayName}
+            </Text>
+            <Text style={[TYPOGRAPHY.topicName, { color: C.text, fontVariant: ["tabular-nums"] }]}>{day.day}</Text>
+          </Pressable>
+        );
+      })}
+    </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrap: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s1, marginTop: STEP.s2 },
+  chip: {
+    minWidth: CONTROL.buttonPrimary, minHeight: CONTROL.buttonPrimary, paddingHorizontal: STEP.s1,
+    borderRadius: SHAPE.button, borderWidth: 1, alignItems: "center", justifyContent: "center",
+  },
+});

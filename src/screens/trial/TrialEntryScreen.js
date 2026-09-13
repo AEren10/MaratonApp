@@ -1,34 +1,36 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon } from "../../components/design";
-import { EmptyState } from "../../components/common/EmptyState";
+import { ErrorState } from "../../components/design";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { useC } from "../../contexts/ThemeContext";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useTrialEntryForm } from "./useTrialEntryForm";
 import { useTrialEntrySteps } from "./useTrialEntrySteps";
+import { useTrialQuotaGate } from "./useTrialQuotaGate";
 import { TrialEntryFormContent } from "./components/TrialEntryFormContent";
+import { TrialQuotaSheet } from "./components/TrialQuotaSheet";
 import { makeTrialEntryStyles } from "./trialEntryStyles";
 
 export default function TrialEntryScreen() {
   const navigation = useNavigation();
   const C = useC();
   const styles = useMemo(() => makeTrialEntryStyles(C), [C]);
-  const {
-    accessError, accessLoading, checkFeature, refreshUsage, showPaywall,
-  } = usePremium();
+  const { refreshUsage, showPaywall } = usePremium();
+  const quotaGate = useTrialQuotaGate();
   const showAlert = useAlert();
   const trialEntry = useTrialEntryForm({ C, navigation });
   const exitScreen = useCallback(() => navigation.goBack(), [navigation]);
   const steps = useTrialEntrySteps({ form: trialEntry, onExit: exitScreen });
+  const quotaBlocked = quotaGate.blocked;
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-      if (!trialEntry.isDirty || trialEntry.saving) return;
+      if (e.data.action.type === "REPLACE") return;
+      if (quotaBlocked || !trialEntry.isDirty || trialEntry.saving) return;
       e.preventDefault();
       showAlert(
         "Deneme kaydedilmedi",
@@ -51,45 +53,35 @@ export default function TrialEntryScreen() {
       );
     });
     return unsubscribe;
-  }, [navigation, showAlert, trialEntry]);
+  }, [navigation, quotaBlocked, showAlert, trialEntry]);
 
-  if (accessLoading) {
+  if (quotaGate.loading) {
     return <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.center}><ActivityIndicator size="large" color={C.accent} /></View>
     </SafeAreaView>;
   }
 
-  if (accessError) {
+  if (quotaGate.error) {
     return <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.center}>
-        <EmptyState icon="refresh" title="Deneme hakkın doğrulanamadı"
-          message="Bağlantını kontrol edip yeniden deneyebilirsin. Henüz kotandan kullanım düşülmedi."
-          actionLabel="Tekrar dene" onAction={refreshUsage} />
+        <ErrorState title="Deneme hakkın doğrulanamadı"
+          body="Bağlantını kontrol edip yeniden deneyebilirsin. Henüz kotandan kullanım düşülmedi."
+          primary="Tekrar dene" onPrimary={refreshUsage} />
       </View>
     </SafeAreaView>;
   }
 
-  if (!checkFeature("unlimited_trials")) {
+  if (quotaGate.blocked && quotaGate.sheet) {
     return <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.center}>
-        <EmptyState icon="lock" title="Bu ayki 4 denemeni girdin"
-          message="Yeni kota gelecek ay Türkiye saatine göre yenilenir. Pro ile sınırsız devam edebilirsin."
-          actionLabel="Pro'yu incele" onAction={() => showPaywall("trial_entry_limit")} />
-      </View>
+      <TrialQuotaSheet sheet={quotaGate.sheet} onClose={exitScreen}
+        onPro={() => showPaywall("trial_entry_limit")} />
     </SafeAreaView>;
   }
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.safe}>
-        <View style={styles.header}>
-          <Pressable onPress={steps.goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-            <Icon name="arrowL" size={22} color={C.text} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Deneme Gir</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-        <TrialEntryFormContent C={C} form={trialEntry} styles={styles}
+        <TrialEntryFormContent form={trialEntry} styles={styles}
           step={steps.step} totalSteps={steps.totalSteps}
           goNext={steps.goNext} goBack={steps.goBack} overflow={steps.overflow} />
         <XPBoostToast amount={trialEntry.xpToast.amount} visible={trialEntry.xpToast.visible}

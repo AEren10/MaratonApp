@@ -1,22 +1,18 @@
-import { RADIUS, SPACING, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 
+// Deneme Gir zincirinin ortak olculeri (tasarim: 22px kenar, 20-26px bolum araligi).
 export const makeTrialEntryStyles = (C) => ({
   safe: { flex: 1, backgroundColor: C.bg },
-  center: { flex: 1, justifyContent: "center", paddingHorizontal: SPACING.lg },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  headerSpacer: { width: SPACING.xxl },
-  scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: SPACING.huge },
-  dateRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginBottom: SPACING.xl },
-  dateText: { ...TYPOGRAPHY.bodyMedium, color: C.sec, flex: 1 },
-  datePicker: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.lg, flexWrap: "wrap" },
-  dateChip: { alignItems: "center", gap: SPACING.xs, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderRadius: RADIUS.lg, borderWidth: 1, minWidth: SPACING.huge },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, backgroundColor: C.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.border, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, marginBottom: SPACING.lg },
-  titleInput: { flex: 1, ...TYPOGRAPHY.bodyMedium, color: C.text, paddingVertical: SPACING.md },
-  moodWrap: { marginTop: SPACING.lg, marginBottom: SPACING.sm },
-  moodTitle: { ...TYPOGRAPHY.captionMedium, color: C.sec, marginBottom: SPACING.sm },
-  moodRow: { flexDirection: "row", gap: SPACING.sm },
-  moodBtn: { flex: 1, alignItems: "center", gap: SPACING.xs, paddingVertical: SPACING.md, backgroundColor: C.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.border },
-  moodBtnActive: { borderColor: C.accent, backgroundColor: C.accent + "18" },
-  moodLabel: { ...TYPOGRAPHY.micro, color: C.muted },
+  center: { flex: 1, justifyContent: "center", paddingHorizontal: GUTTER },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s4 + STEP.s1 },
+  section: { marginTop: STEP.s3 + 2 },
+  title: { ...TYPOGRAPHY.heading, color: C.text, maxWidth: 290 },
+  body: { ...TYPOGRAPHY.caption, color: C.text2, marginTop: STEP.s1 + 2, maxWidth: 300 },
+  label: { ...TYPOGRAPHY.label, color: C.text2 },
+  panel: { padding: STEP.s3, borderRadius: SHAPE.sheet, backgroundColor: C.surface, borderWidth: 1, borderColor: C.elev },
+  actions: { marginTop: STEP.s3 + 6 },
+  tertiary: {
+    height: CONTROL.buttonTertiary, marginTop: STEP.s2, alignItems: "center", justifyContent: "center",
+  },
+  tertiaryText: { ...TYPOGRAPHY.captionMedium, fontFamily: "Archivo_600", color: C.text3 },
 });

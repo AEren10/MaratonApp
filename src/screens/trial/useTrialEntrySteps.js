@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { findSubjectOverflow } from "./components/trialEntryValidation";
+import { findSubjectOverflow } from "../../validations/trialScoreOverflow";
 import * as H from "../../lib/haptics";
 
 const TOTAL_STEPS = 3;
