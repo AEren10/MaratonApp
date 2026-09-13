@@ -66,6 +66,7 @@ export function useStudyTimerController(C) {
   // planda kısıldığı için 45 dakika çalışan öğrenci 12 dakika kaydediyordu.
   const startedAtRef = useRef(null);   // en son başlat anı (ms), duraklıysa null
   const accumulatedRef = useRef(0);    // duraklamalardan önce biriken saniye
+  const sessionStartedAtRef = useRef(null); // oturumun ILK başlat anı (ms) — saat aralığı gösterimi
   const [recovery, setRecovery] = useState(null); // kurtarılabilir oturum
   const topic = topicName || "";
   const mode = useMemo(() => modes.find((item) => item.key === modeKey), [modeKey, modes]);
@@ -93,6 +94,7 @@ export function useStudyTimerController(C) {
     setCycleIndex(0);
     setRunning(false);
     setTotalFocusSeconds(0);
+    sessionStartedAtRef.current = null;
   }, []);
 
   const advancePhase = useCallback(() => {
@@ -155,6 +157,7 @@ export function useStudyTimerController(C) {
     if (!running && accumulatedRef.current === 0) return;
     saveTimerSession({
       startedAt: startedAtRef.current,
+      sessionStartedAt: sessionStartedAtRef.current,
       accumulated: accumulatedRef.current,
       modeKey,
       phase,
@@ -204,9 +207,30 @@ export function useStudyTimerController(C) {
     setCorrectCount(r.correctCount || 0);
     setTotalFocusSeconds(r.totalFocusSeconds || 0);
     if (r.taskContext) setTaskContext(r.taskContext);
+    sessionStartedAtRef.current = r.sessionStartedAt || null;
     setRunning(false);
     setRecovery(null);
   }, [recovery]);
+
+  // "Oturum Kurtarıldı" onayı: (düzeltilmiş) süreyle bitir akışının aynısı —
+  // anlık görüntü "kaydedilmeyi bekliyor" işaretlenir, kayıt ekranına geçilir.
+  const confirmRecovered = useCallback((minutes) => {
+    const r = recovery;
+    if (!r) return;
+    const savePayload = {
+      duration: Math.min(720, Math.max(1, Math.round(Number(minutes) || 0))),
+      questions: r.questions || 0,
+      correctCount: r.correctCount || 0,
+      subjectKey: r.subjectKey || undefined,
+      topicName: r.topic || undefined,
+      ...(r.taskContext || {}),
+      startedAtMs: r.sessionStartedAt || undefined,
+      endedAtMs: r.startedAt ? Date.now() : r.savedAt,
+    };
+    markTimerSessionPendingSave(savePayload);
+    setRecovery(null);
+    navigation.replace(SCREENS.STUDY_SAVE, savePayload);
+  }, [recovery, navigation]);
 
   const discardRecovered = useCallback(() => {
     clearTimerSession();
@@ -219,6 +243,7 @@ export function useStudyTimerController(C) {
       if (next) {
         // Başlat: şu andan itibaren say.
         startedAtRef.current = Date.now();
+        if (!sessionStartedAtRef.current) sessionStartedAtRef.current = startedAtRef.current;
       } else {
         // Duraklat: o ana kadarki süreyi biriktir, çapayı bırak.
         accumulatedRef.current = elapsedFrom(accumulatedRef.current, startedAtRef.current);
@@ -281,6 +306,8 @@ export function useStudyTimerController(C) {
       subjectKey: selectedSubjectKey || undefined,
       topicName: topic || undefined,
       ...taskContext,
+      startedAtMs: sessionStartedAtRef.current || undefined,
+      endedAtMs: Date.now(),
     };
 
     // Anlık görüntüyü SİLMİYORUZ; "kaydedilmeyi bekliyor" diye işaretliyoruz.
@@ -323,6 +350,7 @@ export function useStudyTimerController(C) {
     recovery,
     recoveryLabel: recovery ? describeRecovery(recovery) : null,
     resumeRecovered,
+    confirmRecovered,
     discardRecovered,
 
     addCorrect,

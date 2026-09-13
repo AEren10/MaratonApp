@@ -33,10 +33,10 @@ import ReviewDoneScreen from "../screens/wrong-notebook/ReviewDoneScreen";
 import AddStudyScreen from "../screens/study/AddStudyScreen";
 import StudyTimerScreen from "../screens/study/StudyTimerScreen";
 import StudySaveScreen from "../screens/study/StudySaveScreen";
-import StudyLogScreen from "../screens/study/StudyLogScreen";
 import StudySummaryScreen from "../screens/study/StudySummaryScreen";
 import SummaryScreen from "../screens/study/SummaryScreen";
 import StudyHistoryScreen from "../screens/study/StudyHistoryScreen";
+import EditStudyLogScreen from "../screens/study/EditStudyLogScreen";
 import TrialEntryScreen from "../screens/trial/TrialEntryScreen";
 import TrialSummaryScreen from "../screens/trial/TrialSummaryScreen";
 import TrialDetailScreen from "../screens/trial/TrialDetailScreen";
@@ -148,6 +148,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.STUDY_TIMER, StudyTimerScreen),
   screen(SCREENS.STUDY_SAVE, StudySaveScreen),
   screen(SCREENS.STUDY_HISTORY, StudyHistoryScreen),
+  screen(SCREENS.EDIT_STUDY_LOG, EditStudyLogScreen),
   screen(SCREENS.TRIAL_ENTRY, TrialEntryScreen),
   screen(SCREENS.TRIAL_SUMMARY, TrialSummaryScreen, celebrationOptions),
   screen(SCREENS.TRIAL_DETAIL, TrialDetailScreen, detailOptions),
@@ -158,7 +159,8 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.ONBOARDING, OnboardingScreen),
   screen(SCREENS.EXAM_SETUP, ExamSetupScreen),
   screen(SCREENS.GOAL_SETUP, GoalSetupScreen),
-  screen(SCREENS.STUDY_LOG, StudyLogScreen),
+  // Eski StudyLog rotasi (Ayarlar satiri, calisma/gecmis deep linki) birlesik ekrana bagli.
+  screen(SCREENS.STUDY_LOG, StudyHistoryScreen),
   screen(SCREENS.SUBJECT_DETAIL, SubjectDetailScreen, detailOptions),
   screen(SCREENS.SUBJECT_LIST, SubjectListScreen),
   screen(SCREENS.WEAK_AREAS, WeakAreasScreen),

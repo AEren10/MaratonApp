@@ -101,6 +101,7 @@ export const SCREENS = {
 
   // Study History
   STUDY_HISTORY: "StudyHistory",
+  EDIT_STUDY_LOG: "EditStudyLog",
 
   // User Tasks
   ADD_TASK: "AddTask",

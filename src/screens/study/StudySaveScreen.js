@@ -11,12 +11,24 @@ import { SaveSubjectSection } from "./components/SaveSubjectSection";
 import { SaveTopicQuestionSection } from "./components/SaveTopicQuestionSection";
 import { SaveNotesSection } from "./components/SaveNotesSection";
 import { useStudySaveController } from "./useStudySaveController";
+import { MeasuredRecordForm } from "./components/record/MeasuredRecordForm";
+import { UnsavedSessionView } from "./components/record/UnsavedSessionView";
 
 export default function StudySaveScreen() {
   const s = useStudySaveController();
 
+  if (s.unsaved.pending) {
+    return (
+      <>
+        <UnsavedSessionView unsaved={s.unsaved} onBack={s.unsaved.later} />
+        <XPBoostToast amount={s.xpToast.amount} visible={s.xpToast.visible} multiplier={s.xpToast.multiplier} onDismiss={s.dismissXP} />
+      </>
+    );
+  }
+
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: s.C.bg }}>
+      {s.measured ? <MeasuredRecordForm s={s} /> : (
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <SaveHeader C={s.C} duration={s.duration} onBack={s.goBack} />
 
@@ -67,6 +79,7 @@ export default function StudySaveScreen() {
           </Button>
         </View>
       </KeyboardAvoidingView>
+      )}
 
       {s.currentSubject && s.topicPickerOpen && (
         <TopicPicker

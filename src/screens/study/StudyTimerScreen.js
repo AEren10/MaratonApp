@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -15,27 +14,24 @@ import { StudyTimerQuestionCounters } from "./components/StudyTimerQuestionCount
 import { SubjectTopicCard } from "./components/SubjectTopicCard";
 import { TimerRing } from "./components/TimerRing";
 import { useStudyTimerController } from "./useStudyTimerController";
-import { useAlert } from "../../contexts/AlertContext";
+import { RecoveredSessionView } from "./components/record/RecoveredSessionView";
 
 export default function StudyTimerScreen() {
   const C = useC();
   const timer = useStudyTimerController(C);
-  const showAlert = useAlert();
 
-  // YARIM KALAN OTURUM KURTARMA.
+  // YARIM KALAN OTURUM KURTARMA ("Oturum Kurtarıldı").
   // Uygulama arka planda öldürüldüyse (iOS'ta rutin) oturum diskten geri
-  // gelir. Önceden sayaç sıfırlanıyor ve emek sessizce yok oluyordu.
-  useEffect(() => {
-    if (!timer.recovery) return;
-    showAlert(
-      "Yarım kalan oturumun var",
-      `${timer.recoveryLabel} bir çalışma kaydedilmemiş. Kaldığın yerden devam etmek ister misin?`,
-      [
-        { text: "Sil", style: "destructive", onPress: timer.discardRecovered },
-        { text: "Devam et", onPress: timer.resumeRecovered },
-      ],
+  // gelir; süre onaylanır ya da düzeltilir, sonra kayıt ekranına geçilir.
+  if (timer.recovery) {
+    return (
+      <RecoveredSessionView
+        session={timer.recovery}
+        onConfirm={timer.confirmRecovered}
+        onDiscard={timer.discardRecovered}
+      />
     );
-  }, [timer.recovery]);
+  }
 
   const {
     addCorrect,

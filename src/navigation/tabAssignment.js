@@ -96,7 +96,7 @@ export const PROFIL_STACK = [
   SCREENS.FORECAST_ACCURACY, // (paylasimli)
   SCREENS.PREMIUM,          // Maraton Pro (tam sunum)
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
-  SCREENS.STUDY_LOG,
+  SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
   // Sosyal — v1'de yeni is yapilmiyor, mevcut ekranlar erisilebilir kaliyor.
   SCREENS.LEAGUE,
   SCREENS.FRIENDS,
@@ -114,6 +114,7 @@ export const ROOT_ONLY = [
   SCREENS.TRIAL_ENTRY,
   SCREENS.TRIAL_SUMMARY,
   SCREENS.ADD_STUDY,
+  SCREENS.EDIT_STUDY_LOG,   // Kaydi Duzenle (tam ekran form)
   SCREENS.ADD_TASK,
   SCREENS.ROUTE_PAUSE,      // Ara Verme (tam ekran onay)
   SCREENS.ROUTE_REDRAW,     // Rotayi Yeniden Ciz (tam ekran onay)

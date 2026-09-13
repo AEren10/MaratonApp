@@ -1,130 +1,93 @@
-import { useState, useCallback, useMemo } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { useCallback, useMemo } from "react";
+import { View, Text, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Icon } from "../../components/design";
-import { EmptyState } from "../../components/common/EmptyState";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import Animated, { FadeIn } from "react-native-reanimated";
+
+import { ErrorState, Skeleton } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
-import { useAuth } from "../../contexts/AuthContext";
-import { getStudyLogs } from "../../supabase/studyLogs";
-import { SessionCard } from "./components/SessionCard";
-import { dateKey } from "../../lib/dateUtils";
+import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { RecordHeader } from "./components/record/RecordHeader";
+import { HistoryEmpty } from "./components/history/HistoryEmpty";
+import { HistoryRow } from "./components/history/HistoryRow";
+import { HistoryTotals } from "./components/history/HistoryTotals";
+import { useStudyHistoryController } from "./useStudyHistoryController";
 
-const formatDateHeader = (dateStr) => {
-  const d = new Date(dateStr + "T00:00:00");
-  const today = new Date();
-  const todayStr = dateKey(today);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = dateKey(yesterday);
-  if (dateStr === todayStr) return "Bugün";
-  if (dateStr === yStr) return "Dün";
-  return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "short" });
-};
-
+// "Çalışma Geçmişi" — eski StudyHistory ve StudyLog ekranlarinin birlesimi.
+// Iki rota adi da bu ekrana bagli (Ayarlar satiri, sayac linki, deep link).
 export default function StudyHistoryScreen() {
   const C = useC();
-  const navigation = useNavigation();
-  const { user } = useAuth();
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const h = useStudyHistoryController();
+  const { sections, totals } = h.history;
 
-  const fetchLogs = useCallback(async (isRefresh = false) => {
-    if (!user?.id) return;
-    if (isRefresh) setRefreshing(true); else setLoading(true);
-    try {
-      const data = await getStudyLogs(user.id);
-      setLogs((data || []).slice(0, 50));
-    } catch (_) { /* silent */ }
-    setLoading(false);
-    setRefreshing(false);
-  }, [user?.id]);
-
-  useFocusEffect(useCallback(() => { fetchLogs(); }, [fetchLogs]));
-
-  const sections = useMemo(() => {
-    const map = {};
-    logs.forEach((l) => {
-      const key = l.study_date || l.created_at?.split("T")[0] || "unknown";
-      if (!map[key]) map[key] = { date: key, data: [] };
-      map[key].data.push(l);
+  const items = useMemo(() => {
+    const out = [];
+    sections.forEach((section, si) => {
+      out.push({ type: "header", key: `h-${section.key}`, title: section.title, first: si === 0 });
+      section.rows.forEach((row, ri) => out.push({
+        type: "row", key: String(row.log.id), row,
+        last: si === sections.length - 1 && ri === section.rows.length - 1,
+      }));
     });
-    const result = [];
-    Object.values(map)
-      .sort((a, b) => b.date.localeCompare(a.date))
-      .forEach((s) => {
-        result.push({ type: "header", date: s.date, id: `h_${s.date}` });
-        s.data.forEach((d) => result.push({ type: "item", ...d }));
-      });
-    return result;
-  }, [logs]);
+    return out;
+  }, [sections]);
 
   const renderItem = useCallback(({ item }) => {
     if (item.type === "header") {
       return (
-        <Text style={[styles.dateHeader, { color: C.sec }]}>
-          {formatDateHeader(item.date)}
+        <Text style={[TYPOGRAPHY.label, styles.section, !item.first && styles.sectionGap, { color: C.text2 }]}>
+          {item.title}
         </Text>
       );
     }
-    return <SessionCard item={item} C={C} />;
-  }, [C]);
+    return <HistoryRow row={item.row} last={item.last} onOpen={h.openLog} onDelete={h.deleteLog} />;
+  }, [C, h.openLog, h.deleteLog]);
 
-  const keyExtractor = useCallback((item) =>
-    item.type === "header" ? item.id : String(item.id), []);
+  let body;
+  if (h.loading) {
+    body = (
+      <View style={styles.skeleton}>
+        <Skeleton height={48} width="70%" radius={SHAPE.chip} />
+        {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} height={56} radius={SHAPE.chip} />)}
+      </View>
+    );
+  } else if (h.failed && !totals.count) {
+    body = <ErrorState preset="server" secondary="" onPrimary={h.retry} style={styles.gutter} />;
+  } else if (h.isEmpty) {
+    body = <HistoryEmpty onStart={h.startTimer} onManual={h.addManual} />;
+  } else {
+    body = (
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.key}
+        renderItem={renderItem}
+        ListHeaderComponent={<Animated.View entering={FadeIn.duration(500)}><HistoryTotals totals={totals} /></Animated.View>}
+        ListFooterComponent={
+          <Text style={[TYPOGRAPHY.caption, styles.hint, { color: C.text3 }]}>Satıra dokun düzenle, sola kaydır sil.</Text>
+        }
+        contentContainerStyle={styles.list}
+        windowSize={7}
+        maxToRenderPerBatch={12}
+        initialNumToRender={14}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
+      />
+    );
+  }
 
   return (
-    <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Çalışma Geçmişi</Text>
-        <View style={{ width: 22 }} />
-      </View>
-
-      {loading ? (
-        <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.md }}>
-          {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} height={64} />)}
-        </View>
-      ) : sections.length === 0 ? (
-        <EmptyState
-          icon="clock"
-          title="Henüz kayıt yok"
-          message="Çalışma zamanlayıcısıyla bir oturum tamamladığında burada görünecek."
-          color="accent"
-        />
-      ) : (
-        <FlatList
-          data={sections}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          contentContainerStyle={styles.list}
-          windowSize={5}
-          maxToRenderPerBatch={10}
-          refreshing={refreshing}
-          onRefresh={() => fetchLogs(true)}
-        />
-      )}
+    <SafeAreaView edges={["top"]} style={[styles.fill, { backgroundColor: C.bg }]}>
+      <RecordHeader title="Çalışma geçmişi" onBack={h.goBack} />
+      {body}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-  },
-  loader: { flex: 1, alignItems: "center", justifyContent: "center" },
-  list: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.huge },
-  dateHeader: {
-    ...TYPOGRAPHY.captionMedium,
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.sm,
-    textTransform: "capitalize",
-  },
+  fill: { flex: 1 },
+  gutter: { paddingHorizontal: GUTTER },
+  list: { paddingBottom: STEP.s4 + 6 },
+  section: { paddingHorizontal: GUTTER, marginTop: STEP.s3 + 6, marginBottom: STEP.s1 },
+  sectionGap: { marginTop: STEP.s3 + 4 },
+  hint: { textAlign: "center", marginTop: STEP.s2 + 4, paddingHorizontal: GUTTER, fontSize: TYPOGRAPHY.meta.fontSize - 0.5 },
+  skeleton: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 2, gap: STEP.s2 },
 });

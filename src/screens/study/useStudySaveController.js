@@ -21,6 +21,8 @@ import { studyLogSchema } from "../../validations/auth";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
+import { useUnsavedSession } from "../../hooks/useUnsavedSession";
+import { clockLabel } from "../../domain/study/studyHistoryModel";
 
 export function useStudySaveController() {
   const navigation = useNavigation();
@@ -45,7 +47,11 @@ export function useStudySaveController() {
     routeStopVersion,
     routeSubjectKey,
     routeTopicName,
+    startedAtMs,
+    endedAtMs,
   } = route.params ?? {};
+  const unsaved = useUnsavedSession();
+  const showUnsaved = unsaved.show;
 
   const [examTier, setExamTier] = useState(() => {
     if (preSubjectKey) {
@@ -211,15 +217,6 @@ export function useStudySaveController() {
         source: "study_log",
         sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
       }).catch(() => {});
-    } else if (result.queued) {
-      const msg = result.error?.message || "";
-      const isNetwork = msg.includes("network") || msg.includes("fetch");
-      showAlert(
-        isNetwork ? "Çevrimdışı" : "Kayıt beklemede",
-        isNetwork
-          ? "İnternet yok, kayıt bağlantı geldiğinde otomatik gönderilecek."
-          : "Kayıt sıraya alındı, kısa süre içinde gönderilecek.",
-      );
     }
     const planCompletion = await completeStudyPlanContext({
       userId: user.id,
@@ -259,8 +256,7 @@ export function useStudySaveController() {
     clearTimerSession();
     savedRef.current = true;
 
-    H.success();
-    navigation.replace(SCREENS.STUDY_SUMMARY, {
+    const summaryParams = {
       subjectLabel: currentSubject?.label || currentSubject?.name || subjectKey,
       subjectColor: currentSubject?.color || C.accent,
       subjectIcon: currentSubject?.icon || "bookOpen",
@@ -268,8 +264,23 @@ export function useStudySaveController() {
       duration,
       questions: qc,
       correctCount: cc,
-    });
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName]);
+    };
+    // Sunucuya yazilamadi, kuyrukta: "Oturum Kaydedilemedi" hali.
+    if (result.queued) {
+      showUnsaved({
+        clientOperationId: result.clientOperationId,
+        minutes: duration,
+        questions: qc,
+        topic: topicVal,
+        studyDate: todayStr,
+        clock: clockLabel(Date.now()),
+        onContinue: () => navigation.replace(SCREENS.STUDY_SUMMARY, summaryParams),
+      });
+      return;
+    }
+    H.success();
+    navigation.replace(SCREENS.STUDY_SUMMARY, summaryParams);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName, showUnsaved]);
 
   return {
     C,
@@ -297,6 +308,19 @@ export function useStudySaveController() {
     setCorrectCount: (v) => { markFormDirty({ field: "correct_count" }); setCC(v); },
     setNotes: (v) => { markFormDirty({ field: "notes" }); setNotes(v); },
     save,
+    // Kayit · Olculmus hali: zamanlayici dersle baslatildiysa form satirlari.
+    measured: !!preSubjectKey,
+    measuredRange: startedAtMs && endedAtMs ? `${clockLabel(startedAtMs)} – ${clockLabel(endedAtMs)}` : null,
+    studyDate: todayTR(),
+    subjectGroups: [
+      { tier: "TYT", label: group1Label, subjects: tytSubjects },
+      { tier: "AYT", label: group2Label, subjects: aytSubjects },
+    ],
+    pickSubject: (key, tier) => {
+      if (tier !== examTier) handleSwitchTier(tier);
+      handleSelectSubject(key);
+    },
+    unsaved,
     xpToast,
     dismissXP,
     goBack: () => navigation.goBack(),

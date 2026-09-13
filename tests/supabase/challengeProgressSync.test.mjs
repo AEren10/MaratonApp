@@ -6,7 +6,7 @@ const challengeSync = readFileSync(new URL("../../src/lib/challengeSync.js", imp
 const challenges = readFileSync(new URL("../../src/supabase/challenges.js", import.meta.url), "utf8");
 const offlineQueue = readFileSync(new URL("../../src/lib/offlineQueue.js", import.meta.url), "utf8");
 const studyMeasured = readFileSync(new URL("../../src/screens/study/useStudySaveController.js", import.meta.url), "utf8");
-const studyManual = readFileSync(new URL("../../src/screens/study/AddStudyScreen.js", import.meta.url), "utf8");
+const studyManual = readFileSync(new URL("../../src/screens/study/useAddStudyController.js", import.meta.url), "utf8");
 const trialSubmit = readFileSync(new URL("../../src/screens/trial/trialEntrySubmit.js", import.meta.url), "utf8");
 const migration = readFileSync(
   new URL("../../supabase/migrations/20260911143115_cdx_challenge_progress_idempotency.sql", import.meta.url),

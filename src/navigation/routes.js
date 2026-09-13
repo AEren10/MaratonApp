@@ -45,6 +45,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.STUDY_SUMMARY]: { path: "calisma/ozet", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: false },
   [SCREENS.SUMMARY]: { path: "ozet/:period?", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: true },
   [SCREENS.STUDY_HISTORY]: { path: "calisma/gecmis/detay", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: false },
+  [SCREENS.EDIT_STUDY_LOG]: { path: "calisma/gecmis/duzenle", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: false },
 
   [SCREENS.TRIAL_ENTRY]: { path: "deneme/yeni", flow: PRODUCT_FLOW_IDS.QUICK_ENTRY, deepLink: true },
   [SCREENS.TRIAL_SUMMARY]: { path: "deneme/ozet", flow: PRODUCT_FLOW_IDS.TRIAL_CAPTURE, deepLink: false },
