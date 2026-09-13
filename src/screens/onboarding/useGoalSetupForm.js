@@ -79,8 +79,8 @@ export function useGoalSetupForm() {
 
     requestNotificationPermissions().then(async (granted) => {
       if (granted) {
-        const prefs = await getNotifPrefs();
-        await applyNotifPrefs(prefs);
+        const prefs = await getNotifPrefs(user?.id);
+        await applyNotifPrefs(prefs, undefined, user?.id);
         // İzin verildiği AN token'ı kaydet. Aksi halde sunucu tarafındaki
         // re-engagement push'u yeni kullanıcıya hiç ulaşmıyor: loadAll bu
         // noktadan önce çalışmış ve izin yokken token null dönmüş oluyor.

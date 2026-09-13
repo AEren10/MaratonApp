@@ -184,3 +184,9 @@
 - Sınav tipi, alan, sınav tarihi, hedef net ve baseline net rota motorunun ana girdileridir; local fallback global kalırsa farklı kullanıcının sınav rotası/kapasitesi yeni kullanıcıya sızabilir.
 - DB load guard boolean değil kullanıcı kimliği bazlı olmalı. A kullanıcısı yüklendikten sonra B oturumu gelirse boolean guard B profilini tamamen atlayabilir.
 - Bekleyen hedef/baseline net sync bayrakları da user-scoped config içinde kalmalı; aksi halde bir kullanıcının offline hedef değişikliği başka kullanıcı profilini backfill etmeye çalışabilir.
+
+## 2026-09-13 — Bildirim tercihi ve çalışma saati izolasyonu
+
+- Notification prefs, notification context ve çalışma saati histogramı aktif kullanıcıya göre saklanmalı. A'nın bildirim kapatma kararı veya çalışma saati B'nin retention bildirimlerini etkilememeli.
+- `applyNotifPrefs` bağlam verilmediğinde son context'i okuyor; bu context global kalırsa B kullanıcısına A'nın streak/studiedToday durumuyla bildirim kurulabilir.
+- Optimal saat kişiselleştirmesi kullanıcı bazlı olmalı. Retention bildirimi doğru kişiye yanlış saatte giderse bildirim kapatma ve churn riski artar.

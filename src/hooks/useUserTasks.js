@@ -93,7 +93,7 @@ export function useUserTasks() {
         }
         const newTotal = tasks.length + 1;
         const newDone = tasks.filter((t) => t.completed).length;
-        if (newDone < newTotal) scheduleTaskNotifications(newTotal).catch(() => {});
+        if (newDone < newTotal) scheduleTaskNotifications(newTotal, user?.id).catch(() => {});
       })
       .catch(() => {
         dispatch(removeAction(tempId));

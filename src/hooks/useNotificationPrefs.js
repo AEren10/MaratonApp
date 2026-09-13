@@ -22,8 +22,8 @@ export function useNotificationPrefs() {
   const { user } = useAuth();
 
   useEffect(() => {
-    getNotifPrefs().then(setPrefs);
-  }, []);
+    getNotifPrefs(user?.id).then(setPrefs);
+  }, [user?.id]);
 
   const checkPermission = useCallback(async () => {
     try {
@@ -60,7 +60,7 @@ export function useNotificationPrefs() {
           await checkPermission();
         }
         await setNotifPrefs(next, user?.id);
-        await applyNotifPrefs(next);
+        await applyNotifPrefs(next, undefined, user?.id);
       } finally {
         setBusy(false);
       }

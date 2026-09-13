@@ -31,8 +31,8 @@ function NotificationPermissionContent() {
     if (granted) {
       H.success();
       try {
-        const prefs = await getNotifPrefs();
-        await applyNotifPrefs(prefs);
+        const prefs = await getNotifPrefs(user?.id);
+        await applyNotifPrefs(prefs, undefined, user?.id);
         await ensurePushTokenRegistered(user?.id);
       } catch {}
       setBusy(false);

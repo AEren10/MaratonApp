@@ -141,8 +141,8 @@ async function loadAll(userId, dispatch) {
   // studiedToday: seri-riski bildirimi bugün çalışmış kullanıcıya gitmesin.
   const streakToday = streak.status === "fulfilled" ? (streak.value?.current_streak || 0) : 0;
   loadNotifPrefsFromServer(userId).then(async (serverPrefs) => {
-    const prefs = serverPrefs || await getNotifPrefs();
-    applyNotifPrefs(prefs, { streak: streakToday, studiedToday });
+    const prefs = serverPrefs || await getNotifPrefs(userId);
+    applyNotifPrefs(prefs, { streak: streakToday, studiedToday }, userId);
   }).catch(() => {});
 
   updateLastActive(userId);

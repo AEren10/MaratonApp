@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "./storage/appStorage";
 
 const DAILY = [
@@ -45,18 +45,19 @@ export const getStreakRisk = (streak) => fill(pick(STREAK_RISK), { streak });
 export const getZeigarnik = (vars) => fill(pick(ZEIGARNIK), vars);
 export const getWeekly = (vars) => fill(pick(WEEKLY), vars);
 
-export async function trackStudyHour() {
+export async function trackStudyHour(userId = null) {
   const hour = new Date().getHours();
   try {
-    const hours = await appStorage.getJson(STORAGE_KEYS.STUDY_HOURS, {});
+    const key = userScopedKey(STORAGE_KEYS.STUDY_HOURS, userId);
+    const hours = await appStorage.getJson(key, {});
     hours[hour] = (hours[hour] || 0) + 1;
-    await appStorage.setJson(STORAGE_KEYS.STUDY_HOURS, hours);
+    await appStorage.setJson(key, hours);
   } catch {}
 }
 
-export async function getOptimalHour() {
+export async function getOptimalHour(userId = null) {
   try {
-    const hours = await appStorage.getJson(STORAGE_KEYS.STUDY_HOURS, null);
+    const hours = await appStorage.getJson(userScopedKey(STORAGE_KEYS.STUDY_HOURS, userId), null);
     if (!hours) return 19;
     let best = 19;
     let max = 0;

@@ -1,6 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { SCREENS } from "../constants/screens";
 import { appUrl } from "../navigation/routes";
 import { getDaily, getStreakRisk, getWeekly, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
@@ -9,6 +9,14 @@ import * as appStorage from "./storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 const CONTEXT_KEY = STORAGE_KEYS.NOTIF_CONTEXT;
+
+function notifPrefsKey(userId) {
+  return userScopedKey(STORAGE_KEY, userId);
+}
+
+function notifContextKey(userId) {
+  return userScopedKey(CONTEXT_KEY, userId);
+}
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -44,9 +52,9 @@ export async function requestNotificationPermissions() {
   }
 }
 
-export async function getNotifPrefs() {
+export async function getNotifPrefs(userId = null) {
   try {
-    const prefs = await appStorage.getJson(STORAGE_KEY, null);
+    const prefs = await appStorage.getJson(notifPrefsKey(userId), null);
     if (prefs) return prefs;
   } catch (_) {}
   return {
@@ -62,7 +70,7 @@ export async function getNotifPrefs() {
 
 export async function setNotifPrefs(prefs, userId) {
   try {
-    await appStorage.setJson(STORAGE_KEY, prefs);
+    await appStorage.setJson(notifPrefsKey(userId), prefs);
   } catch (_) {}
   if (userId && userId !== "dev") {
     await updateNotificationPrefs(userId, prefs);
@@ -74,7 +82,7 @@ export async function loadNotifPrefsFromServer(userId) {
   try {
     const prefs = await getNotificationPrefs(userId);
     if (prefs) {
-      await appStorage.setJson(STORAGE_KEY, prefs);
+      await appStorage.setJson(notifPrefsKey(userId), prefs);
       return prefs;
     }
   } catch {}
@@ -112,10 +120,10 @@ const PREF_MANAGED_TYPES = [
   "trial_reminder",
 ];
 
-export async function scheduleDailyReminder(hour = 19, minute = 0) {
+export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null) {
   if (Platform.OS === "web") return null;
   try {
-    const optHour = await getOptimalHour().catch(() => hour);
+    const optHour = await getOptimalHour(userId).catch(() => hour);
     const useHour = Math.abs(optHour - hour) <= 3 ? optHour : hour;
     const { title, body } = getDaily();
     return await Notifications.scheduleNotificationAsync({
@@ -246,21 +254,21 @@ export async function scheduleTrialReminder() {
  *
  * Artık bağlam diske yazılıyor ve verilmediğinde oradan okunuyor.
  */
-async function readNotifContext() {
-  try { return (await appStorage.getJson(CONTEXT_KEY, null)) || {}; } catch { return {}; }
+async function readNotifContext(userId = null) {
+  try { return (await appStorage.getJson(notifContextKey(userId), null)) || {}; } catch { return {}; }
 }
 
-export async function saveNotifContext(context = {}) {
-  try { await appStorage.setJson(CONTEXT_KEY, context); } catch (_) {}
+export async function saveNotifContext(context = {}, userId = null) {
+  try { await appStorage.setJson(notifContextKey(userId), context); } catch (_) {}
 }
 
-export async function applyNotifPrefs(prefs, context) {
+export async function applyNotifPrefs(prefs, context, userId = null) {
   await cancelScheduledByType(PREF_MANAGED_TYPES);
   if (!prefs) return;
-  if (context) await saveNotifContext(context);
-  else context = await readNotifContext();
+  if (context) await saveNotifContext(context, userId);
+  else context = await readNotifContext(userId);
   if (prefs.dailyReminderEnabled) {
-    await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute);
+    await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute, userId);
   }
   // Bağlam hiç bilinmiyorsa (ilk açılış, henüz senkron olmadı) streak-risk
   // bildirimi KURULMAZ. Kurulsaydı studiedToday=false varsayımıyla yanlış
@@ -276,9 +284,9 @@ export async function applyNotifPrefs(prefs, context) {
   }
 }
 
-export async function scheduleTaskNotifications(taskCount) {
+export async function scheduleTaskNotifications(taskCount, userId = null) {
   if (Platform.OS === "web") return;
-  const prefs = await getNotifPrefs();
+  const prefs = await getNotifPrefs(userId);
   if (prefs.taskReminderEnabled === false) return;
   await cancelTaskReminders();
   try {

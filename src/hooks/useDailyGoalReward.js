@@ -14,9 +14,9 @@ export function useDailyGoalReward({ solvedToday, dailyGoal, userId, reward }) {
   useEffect(() => {
     if (solvedToday > 0 && !trackedHourRef.current) {
       trackedHourRef.current = true;
-      trackStudyHour();
+      trackStudyHour(userId);
     }
-  }, [solvedToday]);
+  }, [solvedToday, userId]);
 
   useEffect(() => {
     const today = todayTR();
