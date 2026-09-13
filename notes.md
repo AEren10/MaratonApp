@@ -220,3 +220,8 @@
 
 - `respond_to_challenge(false)` tablo constraint'inde olmayan `declined` değerini yazmamalı. `challenges.status` izinli değerleri `pending/active/completed/cancelled`; aksi halde reddetme butonu Supabase CHECK constraint hatasıyla düşer.
 - Friendship tablosundaki `declined` ayrı bir model; challenge UI ve geçmiş filtreleri `cancelled` durumuyla zaten uyumlu.
+
+## 2026-09-14 — Challenge auth geçişi dayanıklılığı
+
+- Sosyal/challenge ekranlarında auth state kısa süre boş olabilir; dependency array'de `user.id` kullanmak render anında crash üretir.
+- İptal ve yanıt callback'leri `user?.id` ile guard'lanmalı. Bu, logout/token refresh gibi geçişlerde kullanıcıyı sosyal ekranda beyaz ekrana düşürmez.

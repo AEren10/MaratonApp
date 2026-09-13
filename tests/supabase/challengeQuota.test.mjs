@@ -32,3 +32,9 @@ test("challenge decline writes a status allowed by the challenges check constrai
   assert.match(hardeningMigration, /SET status = CASE WHEN p_accept THEN 'active' ELSE 'cancelled' END/);
   assert.doesNotMatch(hardeningMigration, /ELSE 'declined' END[\s\S]*WHERE id = p_id AND opponent_id = uid/);
 });
+
+test("challenge action callbacks tolerate an empty auth user during session transitions", () => {
+  assert.match(screen, /if \(!user\?\.id\) return;\s+try \{ await cancelChallenge\(id, user\.id\);/);
+  assert.match(screen, /if \(!user\?\.id\) return;\s+try \{\s+await respondToChallenge\(id, accept, user\.id\);/);
+  assert.match(screen, /\}, \[load, showAlert, user\?\.id\]\);/);
+});

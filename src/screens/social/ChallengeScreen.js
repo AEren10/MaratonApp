@@ -69,17 +69,19 @@ export default function ChallengeScreen() {
   }, [pick, checkFeature, showPaywall, bumpUsage, load]);
 
   const handleCancel = useCallback(async (id) => {
+    if (!user?.id) return;
     try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Challenge iptal edilemedi."); }
-  }, [load, user.id]);
+  }, [load, showAlert, user?.id]);
 
   const handleRespond = useCallback(async (id, accept) => {
+    if (!user?.id) return;
     try {
       await respondToChallenge(id, accept, user.id);
       H.success();
       showAlert(accept ? "Kabul edildi!" : "Reddedildi", accept ? "Challenge başladı, bol şans!" : "Challenge reddedildi.");
       load();
     } catch (e) { showAlert("Hata", e.message || "İşlem başarısız."); }
-  }, [load, user.id]);
+  }, [load, showAlert, user?.id]);
 
   const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);
   const past = useMemo(() => challenges.filter((c) => c.status !== "active" && c.status !== "pending"), [challenges]);
