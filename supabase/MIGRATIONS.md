@@ -119,3 +119,31 @@ listesindeki parolalarla kayıt/parola değişimi reddedilir.
 - Challenge oluşturma server tarafında accepted friendship, pending+active free quota ve premium/grace durumuna göre karar veriyor.
 - `public.challenges` için authenticated `INSERT` ve `DELETE` grant'leri kaldırıldı.
 - Eski `"Users create challenges"` insert policy'si düşürüldü.
+
+### Güncelleme (2026-09-14)
+
+Canlı registry ile repo dosyaları karşılaştırıldı. Bazı 10–12 Eylül dosyaları
+canlı şemada uygulanmış olsa da `schema_migrations` içinde görünmüyordu; bu
+baseline ihtiyacını devam ettiriyor. CDX'in canlıda gerçekten eksik çıkan
+kritik parçaları Supabase migration aracıyla tamamlandı:
+
+- `cdx_challenge_progress_idempotency`: `challenge_progress_events` tablosu ve
+  `public.sync_challenge_progress` RPC eklendi; offline study/trial replay artık
+  challenge progress'i idempotent sayabiliyor.
+- `cdx_scope_route_weeks_and_carryover`: `persist_route_revision` canlıda
+  yeniden hizalandı; `route_weeks` yazımı geri geldi, conflict target
+  `(user_id, exam_type, week_start)` oldu ve route stop carryover aynı sınav
+  tipine scope'landı.
+- `cdx_scope_route_state_by_exam`: `route_state` için `(user_id, exam_type)`
+  unique index ve surrogate primary key eklendi.
+- `cdx_allow_analytics_export`: `analytics_events` için dar own-row SELECT
+  policy'si eklendi; KVKK/GDPR export retention/paywall olaylarını okuyabilir.
+- `cdx_lock_function_search_path`: CDX-owned kritik RPC'ler canlıda
+  `search_path = ''` ile kilitlendi.
+
+Doğrulandı: `challenge_progress_events`, `sync_challenge_progress`,
+`route_weeks` exam index'i, route week yazan/scoped `persist_route_revision`,
+`route_state` primary key + exam index ve `analytics select own` policy'si
+canlıda mevcut. `create_challenge`, `sync_challenge_progress`,
+`persist_route_revision`, `private.has_feature_access` ve
+`private.get_product_access_snapshot` fonksiyonlarında `search_path=""`.

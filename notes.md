@@ -250,4 +250,10 @@
 ## 2026-09-14 — Challenge RPC search_path kilidi
 
 - `create_challenge` gibi `SECURITY DEFINER` RPC'ler schema-qualified yazılmalı ve `search_path = ''` ile kilitlenmeli; aksi halde ileride aynı isimli obje/function shadowing riskleri doğar.
-- Challenge create RPC repo migration'ı boş search_path hedefiyle hizalandı. Canlıya daha önce `public, pg_temp` hali uygulanmışsa ayrıca `ALTER FUNCTION ... SET search_path = ''` patch'i çalıştırılmalı.
+- Challenge create RPC repo migration'ı boş search_path hedefiyle hizalandı ve canlıya `ALTER FUNCTION ... SET search_path = ''` patch'i uygulandı.
+
+## 2026-09-14 — Canlı Supabase migration drift kapatma
+
+- Canlı `schema_migrations` listesi repo ile birebir değil; baseline işi hâlâ gerekli. Ancak read-only canlı sorgular gerçek eksikleri ayırdı.
+- Gerçek eksikler kapatıldı: idempotent challenge progress RPC/tablosu, route week exam scope yazımı, route state exam scope + primary key, analytics export policy ve CDX RPC search_path kilitleri.
+- Bundan sonra rota/challenge/retention tarafında “local test geçiyor” tek başına yeterli değil; canlı registry + canlı schema kontrolü birlikte yapılmalı.
