@@ -134,6 +134,16 @@ export function PremiumProvider({ children }) {
   }, []);
 
   const showPaywall = useCallback((source = "unknown") => {
+    if (accessState !== "ready") {
+      if (user?.id) {
+        recordRetentionEvent(user.id, RETENTION_EVENTS.PAYWALL_SUPPRESSED, {
+          source,
+          reason: `access_${accessState}`,
+        }, RETENTION_SOURCES.PAYWALL).catch(() => {});
+      }
+      return false;
+    }
+
     const gate = canShowPaywall({
       isPremium,
       createdAt: user?.created_at,
@@ -157,7 +167,7 @@ export function PremiumProvider({ children }) {
     }
     navigation.navigate(SCREENS.PAYWALL, { source });
     return true;
-  }, [examDate, isPremium, navigation, user?.created_at, user?.id]);
+  }, [accessState, examDate, isPremium, navigation, user?.created_at, user?.id]);
 
   const value = useMemo(() => ({
     accessError: accessState === "error",

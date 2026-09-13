@@ -203,3 +203,9 @@
 - Ücretsiz challenge hakkı, aktif challenge sayısı okunamadığında açık sayılmamalı. JS'te `null < limit` true döndüğü için count hatası premium limit bypass'ına dönüşebilir.
 - Kullanıcı değişiminde premium usage snapshot'ı temizlenmeli; eski kullanıcının aktif challenge sayısı yeni kullanıcının monetization kararını etkilememeli.
 - Sunucu yine nihai otorite olmalı, ama istemci kapısı da ağ/snapshot belirsizliğinde güvenli tarafa düşmeli.
+
+## 2026-09-13 — Paywall access snapshot bekleme
+
+- `showPaywall` premium access snapshot hazır olmadan açılmamalı. Aksi halde cold-start'ta gerçek premium kullanıcı `isPremium=false` varsayımıyla paywall görebilir.
+- Feature check fail-closed kaldığında manuel paywall da aynı prensibi izlemeli: access `loading/error` iken yanlış satış ekranı göstermek yerine bastırılmalı ve suppression event'i yazılmalı.
+- Monetization güveni için “fazla paywall” da bypass kadar riskli; premium kullanıcıya yanlış kapı göstermek iptal/churn tetikleyebilir.

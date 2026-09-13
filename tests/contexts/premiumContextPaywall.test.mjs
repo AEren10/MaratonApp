@@ -27,3 +27,9 @@ test("challenge quota fails closed when active challenge count is unknown", () =
 test("premium usage snapshot is cleared when the signed-in user changes", () => {
   assert.match(source, /setSnapshot\(null\);\s+setUsage\(null\);\s+setAccessState\("loading"\);/);
 });
+
+test("manual paywall does not open before premium access snapshot is ready", () => {
+  assert.match(source, /if \(accessState !== "ready"\) \{/);
+  assert.match(source, /reason: `access_\$\{accessState\}`/);
+  assert.match(source, /\}, \[accessState, examDate, isPremium, navigation, user\?\.created_at, user\?\.id\]\);/);
+});
