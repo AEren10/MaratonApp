@@ -48,6 +48,8 @@ test("challenge creation goes through the server-authoritative RPC", () => {
   assert.match(source, /if \(!data\?\.ok\) throw new Error\(data\?\.reason \|\| "Challenge oluşturulamadı"\)/);
   assert.doesNotMatch(source, /\.from\("challenges"\)\s+\.insert\(/);
   assert.match(createChallengeMigration, /CREATE OR REPLACE FUNCTION private\.create_challenge/);
+  assert.match(createChallengeMigration, /SECURITY DEFINER\s+SET search_path = ''/);
+  assert.match(createChallengeMigration, /ALTER FUNCTION private\.create_challenge\(UUID, TEXT, INTEGER, INTEGER\)\s+SET search_path = ''/);
   assert.match(createChallengeMigration, /f\.status = 'accepted'/);
   assert.match(createChallengeMigration, /status IN \('pending', 'active'\)/);
   assert.match(createChallengeMigration, /REVOKE INSERT, DELETE ON public\.challenges FROM authenticated/);

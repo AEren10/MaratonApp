@@ -246,3 +246,8 @@
 - Bu, normal client kapısı iyi olsa bile kötü niyetli istemcinin accepted friendship ve ücretsiz kota kontrolünü bypass etmesine izin verirdi.
 - `public.create_challenge` RPC canlıya uygulandı ve client bu RPC'ye taşındı; accepted friendship, pending+active quota ve premium/grace kontrolü artık server tarafında.
 - Migration sonrası canlı grant doğrulamasında `public.challenges` için `authenticated` yalnız `SELECT` kaldı.
+
+## 2026-09-14 — Challenge RPC search_path kilidi
+
+- `create_challenge` gibi `SECURITY DEFINER` RPC'ler schema-qualified yazılmalı ve `search_path = ''` ile kilitlenmeli; aksi halde ileride aynı isimli obje/function shadowing riskleri doğar.
+- Challenge create RPC repo migration'ı boş search_path hedefiyle hizalandı. Canlıya daha önce `public, pg_temp` hali uygulanmışsa ayrıca `ALTER FUNCTION ... SET search_path = ''` patch'i çalıştırılmalı.

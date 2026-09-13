@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION private.create_challenge(
   p_days INTEGER DEFAULT 7
 )
 RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER
-SET search_path TO 'public', 'pg_temp' AS $fn$
+SET search_path = '' AS $fn$
 DECLARE
   uid UUID := auth.uid();
   today_tr DATE := (now() AT TIME ZONE 'Europe/Istanbul')::date;
@@ -68,8 +68,13 @@ CREATE OR REPLACE FUNCTION public.create_challenge(
   p_target INTEGER,
   p_days INTEGER DEFAULT 7
 )
-RETURNS JSONB LANGUAGE sql SET search_path TO 'public', 'pg_temp'
+RETURNS JSONB LANGUAGE sql SET search_path = ''
 AS $fn$ SELECT private.create_challenge(p_opponent_id, p_metric, p_target, p_days); $fn$;
+
+ALTER FUNCTION private.create_challenge(UUID, TEXT, INTEGER, INTEGER)
+  SET search_path = '';
+ALTER FUNCTION public.create_challenge(UUID, TEXT, INTEGER, INTEGER)
+  SET search_path = '';
 
 REVOKE ALL ON FUNCTION private.create_challenge(UUID, TEXT, INTEGER, INTEGER) FROM PUBLIC, anon;
 REVOKE ALL ON FUNCTION public.create_challenge(UUID, TEXT, INTEGER, INTEGER) FROM PUBLIC, anon;
