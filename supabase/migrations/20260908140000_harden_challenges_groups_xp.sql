@@ -20,7 +20,7 @@ DECLARE uid UUID := auth.uid(); c RECORD;
 BEGIN
   IF uid IS NULL THEN RETURN jsonb_build_object('ok', false, 'reason', 'unauthenticated'); END IF;
   UPDATE public.challenges
-     SET status = CASE WHEN p_accept THEN 'active' ELSE 'declined' END
+     SET status = CASE WHEN p_accept THEN 'active' ELSE 'cancelled' END
    WHERE id = p_id AND opponent_id = uid AND status = 'pending'
    RETURNING * INTO c;
   IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'reason', 'not_pending'); END IF;

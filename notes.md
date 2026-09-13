@@ -215,3 +215,8 @@
 - Challenge oluşturma callback'i `checkFeature`, `showPaywall` ve `bumpUsage` bağımlılıklarını taşımalı. Premium snapshot loading→ready geçince eski closure ücretsiz/premium kararını bayat bırakabilir.
 - `challenges` INSERT hâlâ client-side ve authenticated role'a açık görünüyor. UI kapısı güçlendirildi ama nihai kota server-authoritative RPC'ye taşınmalı; Supabase CLI bu ortamda yokken migration dosyası adı uydurulmamalı.
 - Server tarafında hedef: `create_challenge` RPC, arkadaşlık/blocked kontrolü, free active+pending quota kontrolü ve doğrudan `public.challenges` INSERT yetkisinin kaldırılması.
+
+## 2026-09-14 — Challenge reddetme status uyumu
+
+- `respond_to_challenge(false)` tablo constraint'inde olmayan `declined` değerini yazmamalı. `challenges.status` izinli değerleri `pending/active/completed/cancelled`; aksi halde reddetme butonu Supabase CHECK constraint hatasıyla düşer.
+- Friendship tablosundaki `declined` ayrı bir model; challenge UI ve geçmiş filtreleri `cancelled` durumuyla zaten uyumlu.
