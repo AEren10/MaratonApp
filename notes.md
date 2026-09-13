@@ -133,3 +133,8 @@
 
 - `saveStudyLogOffline` artık kuyruk yazımı başarısızsa hata fırlatıyor; tüm çalışma kaydı ekranları bunu yakalamalı. Aksi halde kullanıcı formda loading state'te kalabilir ve çalışmanın saklanıp saklanmadığını anlayamaz.
 - Challenge sync gibi arka plan yan etkileri kayıt akışını düşürmemeli; canlı kayıt başarılıysa denenmeli ama Promise hatası yakalanmalıdır. Offline queued kayıtlar replay sırasında yan etkilerini tekrar üretir.
+
+## 2026-09-13 — Route transition operation id şekli
+
+- `transition_route_stop` RPC tarafında `client_operation_id` UUID bekliyor. Route stop transition için fallback operation id de `Crypto.randomUUID()` üretmeli; string prefix'li offline id'ler RPC'ye ulaşınca `22P02` ile düşer.
+- Çalışma/rota UI çağrıları şu an kendi UUID'sini geçse bile helper fallback'i schema ile uyumlu kalmalı. İleride yeni bir çağrı `clientOperationId` vermeyi unutursa offline replay sessizce bozulmamalı.

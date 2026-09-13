@@ -12,6 +12,8 @@ test("queued plan task toggles carry user ownership", () => {
 
 test("queued route stop transitions replay through the lifecycle RPC", () => {
   assert.match(source, /OP_ROUTE_STOP_TRANSITION = "ROUTE_STOP_TRANSITION"/);
+  assert.match(source, /import \* as Crypto from "expo-crypto"/);
+  assert.match(source, /if \(type === OP_ROUTE_STOP_TRANSITION\) return Crypto\.randomUUID\(\)/);
   assert.match(source, /transitionRouteStop\(\{\s*stopId: item\.payload\.stopId/);
   assert.match(source, /saveRouteStopTransitionOffline\(\{/);
   assert.match(source, /payload: routePayload/);

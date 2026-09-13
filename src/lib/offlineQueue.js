@@ -1,6 +1,7 @@
 import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial, isPermanentTrialError } from "../supabase/trials";
 import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
+import * as Crypto from "expo-crypto";
 import { createUserTask } from "../supabase/userTasks";
 import { togglePlanTask } from "../supabase/plans";
 import { transitionRouteStop } from "../supabase/routePlan";
@@ -77,6 +78,7 @@ function withQueueLock(fn) {
 const MAX_QUEUE_SIZE = 200;
 
 function createClientOperationId(type) {
+  if (type === OP_ROUTE_STOP_TRANSITION) return Crypto.randomUUID();
   return `${type}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
