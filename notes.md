@@ -153,3 +153,4 @@
 
 - Ücretsiz challenge kotası yalnız `active` kayıtları değil, kullanıcının gönderdiği `pending` davetleri de saymalı. Aksi halde kullanıcı çok sayıda bekleyen davet açarak premium sınırını aşabilir.
 - Challenge oluşturma sonrası local kullanım snapshot'ı hemen artmalı; server refresh beklenirse aynı oturumda ikinci oluşturma butonu yanlışlıkla açık kalabilir.
+- Daha sağlam nihai adım: challenge oluşturma da trial gibi server-authoritative RPC'ye taşınmalı ve doğrudan `challenges` INSERT yetkisi kapatılmalı. Bu migration gerektiriyor; Supabase CLI bu ortamda bulunmadığı için migration dosyası elle uydurulmadı.
