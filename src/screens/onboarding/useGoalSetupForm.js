@@ -64,7 +64,7 @@ export function useGoalSetupForm() {
     H.success();
     const goals = { dailyQuestions, weeklyTrials: 2, weeklyMinutes: 1200 };
     dispatch(setGoals(goals));
-    saveGoalsToStorage(goals).catch(() => {});
+    saveGoalsToStorage(goals, user?.id).catch(() => {});
     updateGoal(dailyQuestions).catch(() => {});
 
     // updateTargetNet HIC reject etmiyor: hatayi kendi icinde yakalayip

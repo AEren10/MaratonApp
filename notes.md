@@ -173,3 +173,8 @@
 - `USER_SCOPED_KEYS` listesine bir anahtar eklemek tek başına yeterli değil; okuma/yazma tarafı da `userScopedKey` kullanmalı.
 - XP, haftalık XP, istatistikler ve streak milestone claim listesi global cache'te kalırsa çıkış-giriş sonrası kullanıcılar arası ilerleme/ödül izi karışabilir.
 - Streak milestone ödülleri premium gün verebildiği için local claim izi kullanıcıya bağlı kalmalı; aksi halde bir kullanıcının claim durumu diğerinin premium ödül akışını bastırabilir.
+
+## 2026-09-13 — Goals cache kullanıcı izolasyonu
+
+- Günlük soru hedefi rota kapasitesinin girdisi olduğu için local fallback global kalmamalı. Kullanıcı değişiminde eski kullanıcının hedefi yeni kullanıcının günlük planını/rota temposunu bozabilir.
+- `ReduxHydrator`, onboarding, hedef düzenleme, senaryo uygulama ve `useDataSync` fallback yolu aynı user-scoped storage anahtarını kullanmalı; aksi halde sunucu geç gelince ekranda yanlış hedefle kısa süreli karar üretilebilir.

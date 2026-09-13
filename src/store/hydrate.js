@@ -22,7 +22,7 @@ export function ReduxHydrator() {
     if (!userId) return;
     let cancelled = false;
     const guard = (action) => { if (!cancelled) dispatch(action); };
-    loadGoalsFromStorage(guard).catch(() => {});
+    loadGoalsFromStorage(guard, userId).catch(() => {});
     loadGamificationFromStorage(guard, userId).catch(() => {});
     return () => { cancelled = true; };
   }, [dispatch, userId]);

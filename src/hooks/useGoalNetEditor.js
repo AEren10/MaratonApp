@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { useAuth } from "../contexts/AuthContext";
 import { useExam } from "../contexts/ExamContext";
 import { setGoals, saveGoalsToStorage, selectGoals } from "../store/slices/goalsSlice";
 import { useThresholdView } from "./useThresholdView";
@@ -18,6 +19,7 @@ const DAILY_STEP = 10;
 // senkron sonucunu okuma (updateTargetNet HIC reject etmiyor).
 export function useGoalNetEditor() {
   const navigation = useNavigation();
+  const { user } = useAuth();
   const { targetNet, targetDepartment, daysUntilExam, examType, updateTargetNet, updateGoal } = useExam();
   const dispatch = useDispatch();
   const goals = useSelector(selectGoals);
@@ -68,7 +70,7 @@ export function useGoalNetEditor() {
     if (daily !== goals?.dailyQuestions) {
       const next = { ...goals, dailyQuestions: daily };
       dispatch(setGoals(next));
-      saveGoalsToStorage(next).catch(() => {});
+      saveGoalsToStorage(next, user?.id).catch(() => {});
       updateGoal(daily);
     }
 
@@ -81,7 +83,7 @@ export function useGoalNetEditor() {
     // gosterilmeden ekran kapanir ve kullanici hedefinin sunucuya
     // yazilmadigini hic gormez.
     if (!pending) navigation.goBack();
-  }, [value, daily, goals, dispatch, updateGoal, updateTargetNet, navigation]);
+  }, [value, daily, goals, dispatch, updateGoal, updateTargetNet, navigation, user?.id]);
 
   const cancel = useCallback(() => {
     navigation.goBack();

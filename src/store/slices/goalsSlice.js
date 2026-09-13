@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../../constants/storageKeys";
 import * as appStorage from "../../lib/storage/appStorage";
 
 const STORAGE_KEY = STORAGE_KEYS.GOALS;
@@ -39,16 +39,16 @@ export const selectDailyQuestionsGoal = (state) => state.goals.dailyQuestions;
 export const selectWeeklyTrialsGoal = (state) => state.goals.weeklyTrials;
 export const selectWeeklyMinutesGoal = (state) => state.goals.weeklyMinutes;
 
-export async function loadGoalsFromStorage(dispatch) {
+export async function loadGoalsFromStorage(dispatch, userId = null) {
   try {
-    dispatch(hydrateGoals(await appStorage.getJson(STORAGE_KEY, {})));
+    dispatch(hydrateGoals(await appStorage.getJson(userScopedKey(STORAGE_KEY, userId), {})));
   } catch (_) {
     dispatch(hydrateGoals({}));
   }
 }
 
-export async function saveGoalsToStorage(goals) {
+export async function saveGoalsToStorage(goals, userId = null) {
   try {
-    await appStorage.setJson(STORAGE_KEY, goals);
+    await appStorage.setJson(userScopedKey(STORAGE_KEY, userId), goals);
   } catch (_) {}
 }

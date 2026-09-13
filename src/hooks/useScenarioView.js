@@ -59,7 +59,7 @@ export function useScenarioView() {
     const nextDaily = Math.max(1, Math.round(selectedScenario.questionsPerWeek / 7));
     try {
       dispatch(setGoals({ dailyQuestions: nextDaily }));
-      saveGoalsToStorage({ ...goals, dailyQuestions: nextDaily });
+      saveGoalsToStorage({ ...goals, dailyQuestions: nextDaily }, user?.id);
       if (user?.id && user.id !== "dev") {
         await updateProfile(user.id, { daily_question_goal: nextDaily });
       }

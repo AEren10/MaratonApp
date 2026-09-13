@@ -21,7 +21,7 @@ import { flushRetentionEvents } from "../supabase/retention";
 import { getExpoPushToken, loadNotifPrefsFromServer, applyNotifPrefs, getNotifPrefs } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
 import { getSession } from "../supabase/auth";
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { normalizeStudyLog } from "../domain/study/studyLogModel";
 import { normalizeTrial } from "../domain/trial/trialModel";
 import { getJson, remove } from "../lib/storage/appStorage";
@@ -105,9 +105,9 @@ async function loadAll(userId, dispatch) {
     if (profile.value.weekly_trials_goal != null) g.weeklyTrials = profile.value.weekly_trials_goal;
     if (profile.value.weekly_minutes_goal != null) g.weeklyMinutes = profile.value.weekly_minutes_goal;
     dispatch(setGoals(g));
-    saveGoalsToStorage(g);
+    saveGoalsToStorage(g, userId);
   } else {
-    const localGoals = await getJson(STORAGE_KEYS.GOALS);
+    const localGoals = await getJson(userScopedKey(STORAGE_KEYS.GOALS, userId));
     if (localGoals) dispatch(setGoals(localGoals));
   }
 
