@@ -216,6 +216,7 @@ export default function HomeScreen() {
               });
             }}
             onViewRoute={go(SCREENS.ROADMAP)}
+            onViewFullRoute={go(SCREENS.ROUTE_FULL)} onRedrawRoute={go(SCREENS.ROUTE_REDRAW)}
           />
         </View>
 

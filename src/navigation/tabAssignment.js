@@ -26,7 +26,11 @@ export const TAB_KEYS = Object.freeze({
 
 export const ROTA_STACK = [
   SCREENS.ROADMAP,          // Rota Detay  (PROGRAM'da da var: Yol Haritasi)
-  SCREENS.PLAN_DETAIL,      // Durak Detayi (PROGRAM'da da var)
+  SCREENS.ROUTE_FULL,       // Rotanin tamami
+  SCREENS.ROUTE_STOP_DETAIL, // Durak Detayi (tek durak)
+  SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
+  SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
+  SCREENS.PLAN_VS_ACTUAL,   // Soz ve gercek (Rota Detay satiri; PROGRAM'da da var)
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
   SCREENS.EXAM_SIMULATOR,   // Deneme Provasi
@@ -111,6 +115,8 @@ export const ROOT_ONLY = [
   SCREENS.TRIAL_SUMMARY,
   SCREENS.ADD_STUDY,
   SCREENS.ADD_TASK,
+  SCREENS.ROUTE_PAUSE,      // Ara Verme (tam ekran onay)
+  SCREENS.ROUTE_REDRAW,     // Rotayi Yeniden Ciz (tam ekran onay)
   SCREENS.PAYWALL,
   // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
   // sekme stack'ine koymak sekme atlatirdi.

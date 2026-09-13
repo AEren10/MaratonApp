@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { Pressable, View, StyleSheet } from "react-native";
 import { STEP } from "../../../themes/tokens";
 import { useExam } from "../../../contexts/ExamContext";
 import { useHomeHeroData } from "../../../hooks/useHomeHeroData";
@@ -28,7 +28,7 @@ export function HomeHero({
   comeback = null,
   onDismissComeback,
   onStartTask,
-  onViewRoute,
+  onViewRoute, onViewFullRoute, onRedrawRoute,
 }) {
   const { examDate } = useExam();
   const {
@@ -103,7 +103,7 @@ export function HomeHero({
           nextTask={nextTask}
           onStartTask={onStartTask}
           onDismiss={onDismissComeback}
-          onViewRoute={onViewRoute}
+          onViewRoute={onRedrawRoute || onViewRoute}
         />
       </View>
     );
@@ -119,16 +119,17 @@ export function HomeHero({
         examType={examType}
       />
 
-      <View style={s.chart}>
+      <Pressable style={s.chart} onPress={onViewRoute} disabled={!hasRouteAccess}
+        accessibilityRole="button" accessibilityLabel="Rota detayını gör">
         <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} target={targetNet} />
-      </View>
+      </Pressable>
 
       <HomeRouteSummaryBar
         hasAccess={hasRouteAccess}
         total={stopCounts.total}
         done={stopCounts.done}
         debtHours={debtHours}
-        onPress={onViewRoute}
+        onPress={stopCounts.total > 0 && onViewFullRoute ? onViewFullRoute : onViewRoute}
       />
 
       <HomeHeroCTA

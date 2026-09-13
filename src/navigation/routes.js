@@ -32,6 +32,10 @@ export const ROUTE_CONFIGS = {
   [SCREENS.ADD_TASK]: { path: "plan/durak-ekle", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_STUDY]: { path: "konu/calis/:subjectKey?", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.ROADMAP]: { path: "yol-haritasi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
+  [SCREENS.ROUTE_FULL]: { path: "rota/tamami", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
+  [SCREENS.ROUTE_STOP_DETAIL]: { path: "rota/durak", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
+  [SCREENS.ROUTE_PAUSE]: { path: "rota/ara-ver", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
+  [SCREENS.ROUTE_REDRAW]: { path: "rota/yeniden-ciz", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
   [SCREENS.CALENDAR]: { path: "takvim", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.GOALS]: { path: "hedefler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
 

@@ -3,7 +3,7 @@ import { ScrollView, View, Text, Pressable } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Icon, GlowBackground, WARM_GLOW } from "../../components/design";
+import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -73,7 +73,6 @@ export default function PlanDetailScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
-      <GlowBackground blobs={WARM_GLOW} />
       <View style={styles.header}>
         <Pressable
           accessibilityLabel="Geri"

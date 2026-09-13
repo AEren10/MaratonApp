@@ -95,7 +95,7 @@ export default function RankSimulatorScreen() {
           size="lg"
           fullWidth
           style={{ marginTop: STEP.s4 }}
-          onPress={() => navigation.navigate(SCREENS.ROADMAP)}
+          onPress={() => navigation.navigate(SCREENS.ROUTE_FULL)}
         >
           Rotanın tamamını gör
         </Button>

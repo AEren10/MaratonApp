@@ -84,6 +84,10 @@ const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSi
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
 const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
+const RouteFullScreen = React.lazy(() => import("../screens/roadmap/RouteFullScreen"));
+const RouteStopDetailScreen = React.lazy(() => import("../screens/roadmap/RouteStopDetailScreen"));
+const RoutePauseScreen = React.lazy(() => import("../screens/roadmap/RoutePauseScreen"));
+const RouteRedrawScreen = React.lazy(() => import("../screens/roadmap/RouteRedrawScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
 const ExamDayPlanScreen = React.lazy(() => import("../screens/exam/ExamDayPlanScreen"));
 const ExamResultScreen = React.lazy(() => import("../screens/exam/ExamResultScreen"));
@@ -177,6 +181,10 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
   screen(SCREENS.REVIEW_DONE, ReviewDoneScreen, celebrationOptions),
   screen(SCREENS.ROADMAP, RoadmapScreen),
+  screen(SCREENS.ROUTE_FULL, RouteFullScreen),
+  screen(SCREENS.ROUTE_STOP_DETAIL, RouteStopDetailScreen),
+  screen(SCREENS.ROUTE_PAUSE, RoutePauseScreen, modalOptions),
+  screen(SCREENS.ROUTE_REDRAW, RouteRedrawScreen, modalOptions),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
   screen(SCREENS.SUMMARY, SummaryScreen),
   screen(SCREENS.TRIAL_INSIGHTS, TrialInsightsScreen, detailOptions),

@@ -58,6 +58,11 @@ export const SCREENS = {
   // Simülatör / Roadmap / SR
   RANK_SIMULATOR: "RankSimulator",
   ROADMAP: "Roadmap",
+  // Rota derinligi (AKIS 2): Rotanin tamami, Durak Detayi, Ara Verme, Rotayi Yeniden Ciz
+  ROUTE_FULL: "RouteFull",
+  ROUTE_STOP_DETAIL: "RouteStopDetail",
+  ROUTE_PAUSE: "RoutePause",
+  ROUTE_REDRAW: "RouteRedraw",
   REVIEW_SESSION: "ReviewSession",
   REVIEW_DONE: "ReviewDone",
 

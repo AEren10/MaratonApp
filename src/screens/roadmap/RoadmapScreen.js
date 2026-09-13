@@ -1,176 +1,110 @@
-import { useCallback, useMemo } from "react";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
-import { useExam } from "../../contexts/ExamContext";
-import { useStudyRoute } from "../../hooks/useStudyRoute";
-import { SPACING, TYPOGRAPHY } from "../../themes/tokens";
-import { SCREENS } from "../../constants/screens";
-import RouteProgressHeader from "./components/RouteProgressHeader";
-import RouteCreationCard from "./components/RouteCreationCard";
-import RouteWeekCard from "./components/RouteWeekCard";
-import { EmptyState } from "../../components/common/EmptyState";
-import { usePremium } from "../../contexts/PremiumContext";
-import { useAlert } from "../../contexts/AlertContext";
-import RouteNextActionPanel from "./components/RouteNextActionPanel";
-import RouteDebtCard from "./components/RouteDebtCard";
-import { useRoadmapNextAction } from "./useRoadmapNextAction";
-import { useRoadmapConfirmations } from "./useRoadmapConfirmations";
+import { useRouteDetail } from "../../hooks/useRouteDetail";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { RouteAccessGate } from "./components/RouteAccessGate";
+import { RouteDetailChart } from "./components/RouteDetailChart";
+import { RouteEmptyChart } from "./components/RouteEmptyChart";
+import { RouteEmptyState } from "./components/RouteEmptyState";
+import { RouteHeader } from "./components/RouteHeader";
+import RouteLinkRow from "./components/RouteLinkRow";
+import { RouteProjectionCard } from "./components/RouteProjectionCard";
+import { RouteTempoSection } from "./components/RouteTempoSection";
+import { RouteUpcomingStops } from "./components/RouteUpcomingStops";
 
+const enter = (i) => FadeInDown.delay(i * 80).duration(600);
+
+// Tasarim AKIS 2 · "Rota Detay" (bos hali: "Boş Rota").
 export default function RoadmapScreen() {
   const C = useC();
-  const styles = useMemo(() => makeStyles(C), [C]);
-  const navigation = useNavigation();
-  const { showPaywall } = usePremium();
-  const showAlert = useAlert();
-  const { targetNet } = useExam();
-  const {
-    weeks, totals, daysLeft, hasRouteAccess, routeAccessError,
-    routeAccessLoading, refreshRouteAccess, isPaused, pause, resume,
-    intelligence, routeCreated, routeCreating, routeCreationError, routeReadiness, createRoute,
-    debt, debtWeeks, distributeDebt, forecast,
-  } = useStudyRoute({ persist: false });
-
-  const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
-  const debtPlan = useMemo(() => distributeDebt(weeks), [debt?.totalQuestions, distributeDebt, weeks]);
-  const { togglePause, handleCreateRoute } = useRoadmapConfirmations({
-    isPaused, pause, resume, createRoute, routeCreated, navigation, showAlert,
-  });
-  const renderWeek = useCallback(
-    ({ item }) => <RouteWeekCard week={item} frozen={isPaused} C={C} />,
-    [C, isPaused],
-  );
-  const keyExtractor = useCallback((item) => item.weekStart || `week-${item.weekNo}`, []);
-  const header = useMemo(() => (
-    <>
-      <RouteCreationCard
-        C={C}
-        daysLeft={daysLeft}
-        disabled={isPaused}
-        error={routeCreationError}
-        intelligence={intelligence}
-        loading={routeCreating}
-        onCreate={handleCreateRoute}
-        readiness={routeReadiness}
-        routeCreated={routeCreated}
-        weeks={weeks}
-      />
-      <RouteNextActionPanel
-        C={C}
-        action={nextRouteAction}
-        disabled={isPaused}
-        onStart={startNextRouteAction}
-      />
-      <RouteDebtCard
-        C={C}
-        debt={debt}
-        debtPlan={debtPlan}
-        debtWeeks={debtWeeks}
-        onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)}
-      />
-      <RouteProgressHeader
-        totals={totals}
-        daysLeft={daysLeft}
-        isPaused={isPaused}
-        intelligence={intelligence}
-        onTogglePause={togglePause}
-        forecast={forecast}
-        targetNet={targetNet}
-        C={C}
-      />
-      {/* Tasarim: "Bu siralama neye gore?" -> Neye Gore Oneriyoruz.
-          Rotanin neye dayandigini ve konu bazli net tahmini YAPILMADIGINI
-          aciklayan ekran; giris noktasi olmadan erisilemezdi. */}
-      <Pressable
-        onPress={() => navigation.navigate(SCREENS.HOW_IT_WORKS)}
-        accessibilityRole="button"
-        accessibilityLabel="Bu sıralama neye göre"
-        hitSlop={8}
-        style={({ pressed }) => [styles.whyRow, { opacity: pressed ? 0.7 : 1 }]}
-      >
-        <Text style={styles.whyText}>Bu sıralama neye göre?</Text>
-        <Icon name="chevR" size={13} color={C.text3} />
-      </Pressable>
-    </>
-  ), [C, daysLeft, navigation, debt, debtPlan, debtWeeks, forecast, handleCreateRoute, intelligence, isPaused, nextRouteAction,
-    routeCreated, startNextRouteAction, targetNet,
-    routeCreating, routeCreationError, routeReadiness, togglePause, totals, weeks]);
+  const d = useRouteDetail();
+  const { view } = d;
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable
-          accessibilityLabel="Geri"
-          accessibilityRole="button"
-          hitSlop={12}
-          onPress={() => navigation.goBack()}
-          style={styles.headerAction}
-        >
-          <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>Yol Haritası</Text>
-        <View style={styles.headerAction} />
-      </View>
-
-      {routeAccessLoading ? (
-        <View style={styles.locked}><ActivityIndicator color={C.accent} size="large" /></View>
-      ) : routeAccessError ? (
-        <View style={styles.locked}>
-          <EmptyState icon="refresh" title="Rota erişimi doğrulanamadı"
-            message="Bağlantını kontrol edip yeniden deneyebilirsin. Rotan ve geçmiş ilerlemen güvende."
-            actionLabel="Tekrar dene" onAction={refreshRouteAccess} />
-        </View>
-      ) : !hasRouteAccess ? (
-        <View style={styles.locked}>
-          <EmptyState icon="lock" title="Kişisel rota Pro'da"
-            message="İlk 7 günden sonra rota, tahmin bandı ve tempo senaryoları Pro ile devam eder. Geçmiş rotan silinmez."
-            actionLabel="Pro'yu incele" onAction={() => showPaywall("route_gate")} />
-        </View>
-      ) : <FlatList
-        contentContainerStyle={styles.content}
-        data={weeks}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={header}
-        ListEmptyComponent={(
-          <View style={styles.empty}>
-            <Icon name="flag" size={28} color={C.muted} />
-            <Text style={styles.emptyTitle}>Rotan hazırlanıyor</Text>
-            <Text style={styles.emptyText}>Sınav ve hedef bilgilerin tamamlandığında ilk durakların burada görünür.</Text>
-          </View>
-        )}
-        renderItem={renderWeek}
-        showsVerticalScrollIndicator={false}
-        windowSize={7}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-      />}
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <RouteHeader title="Rota" onBack={d.goBack} />
+      <RouteAccessGate
+        loading={d.access.loading}
+        error={d.access.error}
+        hasAccess={d.access.hasAccess}
+        onRetry={d.access.retry}
+        onPaywall={d.access.paywall}
+      >
+        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+          {d.isEmpty ? (
+            <RouteEmptyState
+              daysLeft={d.daysLeft}
+              examDateTag={d.examDateTag}
+              loading={d.creating}
+              onAddFirstStop={d.addFirstStop}
+            />
+          ) : (
+            <>
+              <Animated.View entering={enter(0)} style={s.intro}>
+                <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>NET ORTALAMASI</Text>
+                {view.caption ? (
+                  <Text style={[TYPOGRAPHY.caption, s.caption, { color: C.text3 }]}>{view.caption}</Text>
+                ) : null}
+              </Animated.View>
+              <View style={s.chart}>
+                {view.chart ? (
+                  <RouteDetailChart chart={view.chart} target={d.targetNet} examDateTag={d.examDateTag} />
+                ) : (
+                  <RouteEmptyChart examDateTag={d.examDateTag} emptyLabel="TAHMİN YOK" />
+                )}
+              </View>
+              <Animated.View entering={enter(1)}>
+                <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
+              </Animated.View>
+              <Animated.View entering={enter(2)} style={s.section}>
+                {view.tempoRows.length ? (
+                  <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
+                ) : null}
+                <View style={s.links}>
+                  {d.targetNet != null ? (
+                    <RouteLinkRow
+                      title={`${d.targetNet} net ≈ hangi bölümler?`}
+                      subtitle="Hedef netinin karşılığı"
+                      onPress={d.openThreshold}
+                    />
+                  ) : null}
+                  <RouteLinkRow title="Söz ve gerçek" subtitle={d.promiseText} onPress={d.openPromise} />
+                </View>
+              </Animated.View>
+              <Animated.View entering={enter(3)} style={s.section}>
+                <RouteUpcomingStops items={d.upcoming} onStop={d.openStop} />
+                <Pressable
+                  onPress={d.openHowItWorks}
+                  accessibilityRole="button"
+                  accessibilityLabel="Bu sıralama neye göre"
+                  style={({ pressed }) => [s.why, { opacity: pressed ? 0.7 : 1 }]}
+                >
+                  <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>Bu sıralama neye göre?</Text>
+                  <Icon name="chevR" size={13} color={C.text3} />
+                </Pressable>
+              </Animated.View>
+            </>
+          )}
+        </ScrollView>
+      </RouteAccessGate>
     </SafeAreaView>
   );
 }
 
-const makeStyles = (C) => StyleSheet.create({
-  whyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.xs,
-    minHeight: 44,
-    marginTop: SPACING.md,
+const s = StyleSheet.create({
+  safe: { flex: 1 },
+  scroll: { paddingBottom: STEP.s5 },
+  intro: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  caption: { marginTop: STEP.s1 / 2 },
+  chart: { marginTop: STEP.s2 },
+  section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  links: { gap: STEP.s1, marginTop: STEP.s2 },
+  why: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: STEP.s1 / 2, minHeight: CONTROL.tapMin, marginTop: STEP.s3,
   },
-  whyText: { ...TYPOGRAPHY.metaSemiBold, color: C.text3 },
-  safe: { flex: 1, backgroundColor: C.bg },
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm,
-  },
-  headerAction: { width: 48, height: 48, alignItems: "center", justifyContent: "center" },
-  headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-  content: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.huge },
-  empty: { alignItems: "center", paddingVertical: SPACING.huge, gap: SPACING.sm },
-  emptyTitle: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-  emptyText: { ...TYPOGRAPHY.caption, color: C.sec, textAlign: "center", maxWidth: 280 },
-  locked: { flex: 1, justifyContent: "center", paddingHorizontal: SPACING.lg },
 });
