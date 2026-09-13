@@ -3,6 +3,13 @@
 // tasarimdan birebir alinir. Ton kurali: sucu kullaniciya atmaz.
 
 export const EMPTY_COPY = {
+  // Tahmin Dogrulugu sonucsuz acilirsa: "Sınav Sonucu" artboardinin basligi
+  // ve butonu (AKIS 14). Ayri bir bos durum artboardi yok.
+  examResultMissing: {
+    eyebrow: "SINAV BİTTİ",
+    title: "Hazır olduğunda sonucunu gir.",
+    primary: "Sonucumu kaydet",
+  },
   trialRecords: {
     title: "Henüz deneme kaydın yok.",
     body: "İlk denemeni gir — rota o andan sonra netlerinle çizilmeye başlar.",

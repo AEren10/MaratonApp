@@ -7,6 +7,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { getStudyLogs } from "../supabase/studyLogs";
 import { dateKey } from "../lib/dateUtils";
 import { displayNameOf } from "../lib/displayName";
+import { useRehearsalToday } from "./useRehearsalToday";
 
 const EMPTY_WEEKLY_ACTIVITY = { total: 0, counts: [0, 0, 0, 0, 0, 0, 0], percent: 0 };
 
@@ -90,6 +91,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
     currentWeek: routeCurrentWeek, totals: routeTotals, daysLeft, transitionStop,
   } = useStudyRoute();
   const [weeklyActivity, setWeeklyActivity] = useState(EMPTY_WEEKLY_ACTIVITY);
+  const rehearsalToday = useRehearsalToday(user?.id);
 
   const displayName = displayNameOf(user);
 
@@ -105,10 +107,10 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
 
   const { plan, generatedTasks } = useMemo(() => {
     // Rota bu haftaki durakları veriyorsa günlük plan onlardan türesin.
-    const generated = generateDailyPlan({
-      ...planCtx,
-      routeWeekStops: routeCurrentWeek?.stops || [],
-    });
+    // Deneme provasi gunu: "O gün başka durak açılmaz" (AKIS 14).
+    const generated = rehearsalToday
+      ? { tasks: [], totalQuestions: 0, estimatedMinutes: 0 }
+      : generateDailyPlan({ ...planCtx, routeWeekStops: routeCurrentWeek?.stops || [] });
     const estHours = generated.estimatedMinutes >= 60
       ? `~${Math.round(generated.estimatedMinutes / 60)} saat`
       : `~${generated.estimatedMinutes} dk`;
@@ -122,7 +124,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user, weeklyXP
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),

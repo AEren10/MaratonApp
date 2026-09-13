@@ -1,4 +1,6 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { SCREENS } from "../../../../constants/screens";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
@@ -7,7 +9,8 @@ import { HomeHeroTrialSummaryCard } from "./HomeHeroTrialSummaryCard";
 import { HomeHeroClosedCard } from "./HomeHeroClosedCard";
 import { HomeHeroCTA } from "../HomeHeroCTA";
 
-const CLOSED_ITEMS = ["Hedef net", "Tahmini net", "Sıralama", "Konu borcu", "Projeksiyon çizgisi"];
+const CLOSED_ITEMS = ["Hedef net", "Tahmini net", "Sıralama", "Konu borcu", "Projeksiyon çizgisi", "Lig"];
+const CLOSED_NOTE = "Değiştiremediğin bir sayıyı göstermek yardım etmez. Son 48 saatte performans bildirimi de gelmez, \"hedefe ulaşamadın\" ekranı hiç yok.";
 
 function formatExamDate(examDate) {
   if (!examDate) return null;
@@ -24,6 +27,8 @@ function formatExamDate(examDate) {
 // tahmin bu hafta kapali; is tekrar setine odaklanir.
 export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartTask }) {
   const C = useC();
+  const navigation = useNavigation();
+  const openPlan = () => navigation.navigate(SCREENS.EXAM_DAY_PLAN);
   const proofNote = trialStats
     ? `Sınav günü işin: bu aralığın üst ucunu yakalamak. ${trialStats.best}'i bir kez yaptın — o gün yapılabilir olduğunu biliyoruz.`
     : null;
@@ -45,11 +50,11 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
         </Animated.View>
       ) : null}
 
-      {nextTask ? (
-        <Animated.View entering={FadeInDown.delay(140).duration(480).springify().damping(18)} style={s.block}>
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
-            BUGÜNÜN İŞİ
-          </Text>
+      <Animated.View entering={FadeInDown.delay(140).duration(480).springify().damping(18)} style={s.block}>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
+          BUGÜNÜN İŞİ
+        </Text>
+        {nextTask ? (
           <View style={[s.taskCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <View style={[s.dot, { backgroundColor: C.accent }]} />
             <View style={s.taskInfo}>
@@ -64,14 +69,35 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
               <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{nextTask.estimatedMinutes} dk</Text>
             ) : null}
           </View>
-        </Animated.View>
-      ) : null}
-
-      <Animated.View entering={FadeInDown.delay(200).duration(480).springify().damping(18)} style={s.block}>
-        <HomeHeroClosedCard items={CLOSED_ITEMS} />
+        ) : null}
+        <Pressable
+          onPress={openPlan}
+          accessibilityRole="button"
+          accessibilityLabel="Sınav günü planı"
+          style={[s.taskCard, { backgroundColor: C.surface, borderColor: C.elev }]}
+        >
+          <View style={[s.dot, { backgroundColor: C.subjects.turkce }]} />
+          <View style={s.taskInfo}>
+            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>Sınav günü planı</Text>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 4 }]}>Saat, çanta, yol · şimdi hazırla</Text>
+          </View>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>10 dk</Text>
+        </Pressable>
       </Animated.View>
 
-      <HomeHeroCTA label="Tekrara başla" onPress={() => onStartTask?.(nextTask)} delay={260} />
+      <Animated.View entering={FadeInDown.delay(200).duration(480).springify().damping(18)} style={s.block}>
+        <HomeHeroClosedCard items={CLOSED_ITEMS} note={CLOSED_NOTE} />
+      </Animated.View>
+
+      <HomeHeroCTA
+        label={nextTask?.estimatedMinutes
+          ? `${nextTask.topicLabel || nextTask.label} · ${nextTask.estimatedMinutes} dk`
+          : "Tekrara başla"}
+        onPress={() => onStartTask?.(nextTask)}
+        secondaryLabel="Sınav günü planı"
+        onSecondary={openPlan}
+        delay={260}
+      />
     </View>
   );
 }

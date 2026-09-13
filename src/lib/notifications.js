@@ -258,6 +258,66 @@ async function readNotifContext(userId = null) {
   try { return (await appStorage.getJson(notifContextKey(userId), null)) || {}; } catch { return {}; }
 }
 
+const EXAM_EVE_TYPE = "exam_eve_reminder";
+
+// Sinav gunu planinin "Bir gün önce hatırlat" anahtari. PREF_MANAGED_TYPES'a
+// BILEREK eklenmedi: tercih uygulamasi kendi kurduklarini iptal ediyor, bu
+// tek seferlik hatirlatma o temizlige takilmamali. Once eski kayit iptal
+// edilir — tarih degisince iki bildirim kalmasin.
+// Metin tasarimdan: Sinav Gunu Plani basligi + "Son Hafta Geride" satiri.
+export async function scheduleExamEveReminder(date) {
+  if (Platform.OS === "web") return null;
+  await cancelScheduledByType([EXAM_EVE_TYPE]);
+  if (!date) return null;
+  const when = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) return null;
+  try {
+    return await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Sınav günü planı",
+        body: "Saat, çanta, yol · şimdi hazırla",
+        data: { type: EXAM_EVE_TYPE, url: appUrl(SCREENS.EXAM_DAY_PLAN) },
+      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: when },
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function cancelExamEveReminder() {
+  if (Platform.OS === "web") return;
+  await cancelScheduledByType([EXAM_EVE_TYPE]);
+}
+
+const REHEARSAL_TYPE = "exam_rehearsal_reminder";
+
+// Deneme provasi: "Sabah 09:45'te tek hatırlatma". Metin tasarimin prova
+// ekranindan. Tek seferlik, tercih temizligine takilmaz (bkz. yukarisi).
+export async function scheduleRehearsalReminder(date) {
+  if (Platform.OS === "web") return null;
+  await cancelScheduledByType([REHEARSAL_TYPE]);
+  const when = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) return null;
+  try {
+    return await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Sınav saatinde prova.",
+        body: "Gerçek oturum uzunluğu, gerçek saat.",
+        data: { type: REHEARSAL_TYPE, url: appUrl(SCREENS.EXAM_SIMULATOR) },
+      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: when },
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function cancelRehearsalReminder() {
+  if (Platform.OS === "web") return;
+  await cancelScheduledByType([REHEARSAL_TYPE]);
+}
+
 export async function saveNotifContext(context = {}, userId = null) {
   try { await appStorage.setJson(notifContextKey(userId), context); } catch (_) {}
 }

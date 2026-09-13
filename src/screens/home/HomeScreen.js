@@ -35,6 +35,7 @@ import { HomeOverlays } from "./components/HomeOverlays";
 import { HomePlanSection } from "./components/HomePlanSection";
 import { HomeQuickActionsSection } from "./components/HomeQuickActionsSection";
 import { ExamCountdown } from "./components/ExamCountdown";
+import { HomeExamAftermathRow } from "./components/HomeExamAftermathRow";
 import { HomeWeeklySection } from "./components/HomeWeeklySection";
 import SubjectMomentum from "./components/SubjectMomentum";
 import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
@@ -181,6 +182,7 @@ export default function HomeScreen() {
 
         <View style={{ marginTop: SPACING.lg }}>
           <ExamCountdown onPress={go(SCREENS.GOALS)} />
+          <HomeExamAftermathRow />
         </View>
 
         <HomeCoachNudge

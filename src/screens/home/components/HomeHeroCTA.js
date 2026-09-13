@@ -5,7 +5,9 @@ import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
 // Birincil CTA: "Çalışmaya Başla" + sıradaki duraktan turetilen alt satir.
-export function HomeHeroCTA({ label = "Çalışmaya Başla", subtitle, onPress, delay = 200 }) {
+// Zamana bagli modlarda altinda ikincil cerceve buton olabilir (tasarim
+// "Son Hafta": "Deneme provası kur", "Son Hafta Geride": "Sınav günü planı").
+export function HomeHeroCTA({ label = "Çalışmaya Başla", subtitle, onPress, delay = 200, secondaryLabel, onSecondary }) {
   const C = useC();
   return (
     <Animated.View entering={FadeInDown.delay(delay).duration(480).springify().damping(18)} style={s.wrap}>
@@ -17,10 +19,18 @@ export function HomeHeroCTA({ label = "Çalışmaya Başla", subtitle, onPress, 
           {subtitle}
         </Text>
       ) : null}
+      {secondaryLabel ? (
+        <View style={s.secondary}>
+          <Button variant="outline" size="md" fullWidth onPress={onSecondary}>
+            {secondaryLabel}
+          </Button>
+        </View>
+      ) : null}
     </Animated.View>
   );
 }
 
 const s = StyleSheet.create({
   wrap: { marginTop: STEP.s3 },
+  secondary: { marginTop: STEP.s2 },
 });

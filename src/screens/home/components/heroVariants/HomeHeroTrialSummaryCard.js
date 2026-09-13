@@ -5,11 +5,14 @@ import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 
 // "EN İYİ DENEMEN / SON 5 ORTALAMAN" - son hafta modlarinin ortak kanit
 // karti. Trial verisi yoksa hic render edilmemeli (cagiran taraf kontrol eder).
-export function HomeHeroTrialSummaryCard({ best, average, note }) {
+export function HomeHeroTrialSummaryCard({ lead, best, average, note }) {
   const C = useC();
   return (
     <Card tone="surface">
-      <View style={s.row}>
+      {lead ? (
+        <Text style={[TYPOGRAPHY.topicName, s.lead, { color: C.text }]}>{lead}</Text>
+      ) : null}
+      <View style={[s.row, lead && [s.leadGap, { borderTopColor: C.line }]]}>
         <View style={s.col}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3, letterSpacing: 1.5 }]}>
             EN İYİ DENEMEN
@@ -46,5 +49,7 @@ const s = StyleSheet.create({
     marginTop: 10,
   },
   divider: { width: 1 },
+  lead: { fontSize: 17, lineHeight: 25, maxWidth: 280 },
+  leadGap: { marginTop: STEP.s3, paddingTop: STEP.s3, borderTopWidth: 1 },
   hr: { height: 1, marginVertical: STEP.s3 },
 });

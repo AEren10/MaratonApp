@@ -25,6 +25,7 @@ import { YearRouteChart } from "./components/YearRouteChart";
 import { StrengthMap } from "./components/StrengthMap";
 import { ProfileLinkRow } from "./components/ProfileLinkRow";
 import { LevelRow } from "./components/LevelRow";
+import { ExamFlowRow } from "./components/ExamFlowRow";
 import { LeagueMiniCard } from "./components/LeagueMiniCard";
 
 const FADE = (delay) => FadeInDown.delay(delay).duration(350).springify();
@@ -124,6 +125,7 @@ export default function ProfileScreen() {
               onPress={() => navigation.navigate(SCREENS.PREMIUM, { source: "profile_premium_row" })}
               first
             />
+            <ExamFlowRow />
           </Animated.View>
 
           <Animated.View entering={FADE(280)}>

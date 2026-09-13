@@ -1,35 +1,38 @@
 import { View, Text, Share, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon } from "../../../../components/design/Icon";
+import Svg, { Path, Circle } from "react-native-svg";
 import { Button } from "../../../../components/design/Button";
 import { useC } from "../../../../contexts/ThemeContext";
+import { useAuth } from "../../../../contexts/AuthContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
+import { buildExamRecap } from "../../../../domain/exam/examRecap";
+import { TR_MONTHS } from "../../../../domain/exam/examDayPlan";
+import { useExamDayBag } from "../../../../hooks/useExamDayBag";
+import { ExamCheckRow } from "../../../exam/components/ExamCheckRow";
 import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
+import { HomeHeroExamDayVenue } from "./HomeHeroExamDayVenue";
 
-const CHECKLIST = [
-  { text: "Kimlik", meta: "zorunlu", done: true },
-  { text: "Kurşun kalem, silgi, kalemtıraş", done: true },
-  { text: "Analog saat", done: false },
-  { text: "Şeffaf pet su", done: false },
-];
+// Tasarim AKIS 14 · "Sınav Günü": bugün sayı yok, istatistik yok. Canta ve
+// sinav yeri kullanicinin Sınav günü planından; plan yoksa hicbir kalem
+// isaretli gelmez ve yer karti cizilmez. Rota cizgisi olcek tasimayan bir
+// imza: son duragin varildigini gosterir, sayi iddia etmez.
+const FADE = (delay) => FadeInDown.delay(delay).duration(480).springify().damping(18);
 
-function formatExamDate(examDate) {
-  if (!examDate) return null;
-  try {
-    return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "long", year: "numeric" })
-      .format(examDate)
-      .toUpperCase();
-  } catch {
-    return null;
-  }
+function dateLabel(examDate) {
+  const d = examDate instanceof Date ? examDate : new Date(examDate);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}`.toLocaleUpperCase("tr-TR");
 }
 
-// Tasarim AKIS 14 · "Sınav Günü": bugün sayı yok, istatistik yok. Hero'nun
-// dev sayısı ve grafiği burada BİLEREK yok — o gün ölçüm değil, teslimat var.
-// Sınav yeri/saat bilgisi kaynağı yok, o blok DOĞRULANMADI: render edilmiyor.
 export function HomeHeroExamDay({ examDate }) {
   const C = useC();
-  const dateLabel = formatExamDate(examDate);
+  const { user } = useAuth();
+  const bag = useExamDayBag();
+  const label = examDate ? dateLabel(examDate) : null;
+  const { days } = buildExamRecap({ startedAt: user?.created_at, examDate });
+  const body = days != null && days > 1
+    ? `Bugün sayı yok, istatistik yok. ${days} gün önce çizmeye başladığın rota tamamlandı.`
+    : "Bugün sayı yok, istatistik yok. Çizmeye başladığın rota tamamlandı.";
 
   const handleShare = () => {
     Share.share({ message: "Rotam tamam. Bugün sınav günü." }).catch(() => {});
@@ -37,41 +40,38 @@ export function HomeHeroExamDay({ examDate }) {
 
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(480).springify().damping(18)}>
-        <HomeHeroEyebrow label={dateLabel ? `${dateLabel} · SINAV GÜNÜ` : "SINAV GÜNÜ"} />
+      <Animated.View entering={FADE(0)}>
+        <HomeHeroEyebrow label={label ? `${label} · SINAV GÜNÜ` : "SINAV GÜNÜ"} />
         <Text style={[s.title, { color: C.text }]}>Yolun sonundasın.</Text>
-        <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>
-          Bugün sayı yok, istatistik yok. Çizmeye başladığın rota tamamlandı.
-        </Text>
+        <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>{body}</Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(100).duration(480).springify().damping(18)} style={s.block}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
-          ÇANTANDA OLMASI GEREKENLER
-        </Text>
-        {CHECKLIST.map((item, i) => (
-          <View key={item.text} style={[s.row, i > 0 && { borderTopWidth: 1, borderTopColor: C.line }]}>
-            <View
-              style={[
-                s.box,
-                item.done
-                  ? { backgroundColor: C.accent, borderColor: C.accent }
-                  : { borderColor: C.border, borderWidth: 1.8 },
-              ]}
-            >
-              {item.done ? <Icon name="check" size={12} color={C.textOnBrand} sw={2.2} /> : null}
-            </View>
-            <Text style={[TYPOGRAPHY.bodyMedium, { color: item.done ? C.text : C.text2, flex: 1 }]}>
-              {item.text}
-            </Text>
-            {item.meta ? (
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{item.meta}</Text>
-            ) : null}
-          </View>
-        ))}
+      <Animated.View entering={FADE(100)} style={s.route}>
+        <Svg viewBox="0 0 390 150" style={s.svg}>
+          <Path d="M 26 126 C 92 118 128 100 176 82 C 240 58 300 40 356 28" fill="none" stroke={C.accent} strokeWidth={4.8} strokeLinecap="round" />
+          {[[26, 126], [110, 112], [176, 82], [262, 52]].map(([cx, cy]) => (
+            <Circle key={cx} cx={cx} cy={cy} r={4.4} fill={C.bg} stroke={C.accent} strokeWidth={2.4} />
+          ))}
+          <Circle cx={356} cy={28} r={16} fill={C.accent} fillOpacity={0.16} />
+          <Circle cx={356} cy={28} r={9} fill={C.accent} />
+        </Svg>
+        <Text style={[TYPOGRAPHY.label, s.stop, { color: C.accentBright }]}>SON DURAK</Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(180).duration(480).springify().damping(18)} style={s.block}>
+      <Animated.View entering={FADE(180)} style={s.bag}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ÇANTANDA OLMASI GEREKENLER</Text>
+        <View style={s.list}>
+          {bag.items.map((item) => <ExamCheckRow key={item.key} item={item} onToggle={bag.toggle} />)}
+        </View>
+      </Animated.View>
+
+      {bag.venue ? (
+        <Animated.View entering={FADE(240)} style={s.block}>
+          <HomeHeroExamDayVenue venue={bag.venue} place={bag.place} />
+        </Animated.View>
+      ) : null}
+
+      <Animated.View entering={FADE(300)} style={s.block}>
         <Button variant="primary" size="lg" fullWidth onPress={handleShare}>
           Rotamı paylaş
         </Button>
@@ -84,14 +84,11 @@ export function HomeHeroExamDay({ examDate }) {
 }
 
 const s = StyleSheet.create({
-  title: {
-    fontFamily: "Bricolage_400",
-    fontSize: 40,
-    lineHeight: 44,
-    letterSpacing: -1,
-    marginTop: STEP.s3,
-  },
-  block: { marginTop: STEP.s4 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2 },
-  box: { width: 22, height: 22, borderRadius: 4, alignItems: "center", justifyContent: "center" },
+  title: { ...TYPOGRAPHY.display, fontSize: 44, lineHeight: 48, marginTop: STEP.s3 },
+  route: { marginTop: STEP.s4 },
+  svg: { width: "100%", aspectRatio: 390 / 150 },
+  stop: { position: "absolute", right: "5%", top: "6%" },
+  bag: { marginTop: STEP.s3 - 2 },
+  list: { marginTop: STEP.s1 },
+  block: { marginTop: STEP.s3 + 6 },
 });

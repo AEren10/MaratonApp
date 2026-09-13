@@ -1,209 +1,105 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 
-import { Icon, Button } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
+import { Button, Icon, Skeleton } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useExam } from "../../contexts/ExamContext";
-import { useAuth } from "../../contexts/AuthContext";
-import * as haptic from "../../lib/haptics";
 import { useAlert } from "../../contexts/AlertContext";
-import { addStudyLog } from "../../supabase/studyLogs";
 import { SCREENS } from "../../constants/screens";
-import { todayTR } from "../../lib/dateUtils";
+import { useExamRehearsalSetup } from "../../hooks/useExamRehearsalSetup";
+import { useRehearsalTimer } from "../../hooks/useRehearsalTimer";
+import * as H from "../../lib/haptics";
+import { RehearsalSetup } from "./components/RehearsalSetup";
+import { RehearsalRunning } from "./components/RehearsalRunning";
+import { RehearsalDone } from "./components/RehearsalDone";
 
-const TYT_CONFIG = { time: 165, label: "TYT", sections: ["turkce", "sosyal", "matematik", "fen"] };
-const AYT_CONFIG = { time: 180, label: "AYT", sections: ["mat", "fizik", "kimya", "biyoloji", "edebiyat", "tarih1", "cografya1"] };
-const LGS_CONFIG = { time: 155, label: "LGS", sections: ["turkce", "matematik", "fen", "inkilap", "din", "ingilizce"] };
-
+// Tasarim AKIS 14 · "Deneme Provası". Girisler: Son Hafta "Deneme provası
+// kur", Analiz pratik satiri, Ana Sayfa hizli eylem ve prova sabahi bildirimi.
+// Kurulum → (prova gunu) oturum → bitis. Mantik hook'larda.
 export default function ExamSimulatorScreen() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
-  const { examType } = useExam();
-  const { user } = useAuth();
   const showAlert = useAlert();
+  const r = useExamRehearsalSetup();
+  const t = useRehearsalTimer({ userId: r.userId, session: r.session });
 
-  const [phase, setPhase] = useState("setup");
-  const [config, setConfig] = useState(
-    examType === "lgs" ? LGS_CONFIG : examType === "ayt" ? AYT_CONFIG : TYT_CONFIG
-  );
-  const [elapsed, setElapsed] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const timerRef = useRef(null);
-  const savedRef = useRef(false);
+  const saveAndClose = useCallback(async () => {
+    if (await r.save()) navigation.goBack();
+  }, [r, navigation]);
 
-  const startExam = useCallback(() => {
-    setPhase("running");
-    setElapsed(0);
-    setPaused(false);
-  }, []);
-
-  useEffect(() => {
-    if (phase !== "running" || paused) return;
-    timerRef.current = setInterval(() => {
-      setElapsed((e) => {
-        if (e + 1 >= config.time * 60) {
-          clearInterval(timerRef.current);
-          haptic.success();
-          setPhase("done");
-          return config.time * 60;
-        }
-        return e + 1;
-      });
-    }, 1000);
-    return () => clearInterval(timerRef.current);
-  }, [phase, paused, config.time]);
-
-  const finishEarly = useCallback(() => {
-    haptic.warn();
+  const confirmFinish = useCallback(() => {
+    H.warn();
     showAlert("Bitir", "Simülasyonu bitirmek istiyor musun?", [
       { text: "İptal", style: "cancel" },
-      { text: "Bitir", onPress: () => { clearInterval(timerRef.current); setPhase("done"); haptic.success(); } },
+      { text: "Bitir", onPress: t.finishEarly },
     ]);
-  }, []);
+  }, [showAlert, t.finishEarly]);
 
-  const togglePause = useCallback(() => setPaused((p) => !p), []);
-
-  useEffect(() => {
-    if (phase !== "done" || savedRef.current) return;
-    savedRef.current = true;
-    if (user?.id && user.id !== "dev") {
-      addStudyLog({
-        user_id: user.id,
-        subject: config.label,
-        topic: "Sınav Simülasyonu",
-        question_count: 0,
-        correct_count: 0,
-        duration_minutes: Math.max(1, Math.ceil(elapsed / 60)),
-        study_date: todayTR(),
-      }).catch(() => {});
-    }
-  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const remaining = config.time * 60 - elapsed;
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
-  const pct = elapsed / (config.time * 60);
-  const urgency = remaining <= 600 ? C.red : remaining <= 1800 ? C.amber : C.green;
-
-  if (phase === "setup") {
+  if (t.phase === "running") {
     return (
-      <SafeAreaView edges={["top"]} style={s.safe}>
-        <View style={s.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12}><Icon name="arrowL" size={20} color={C.text} /></Pressable>
-          <Text style={s.title}>Sınav Simülasyonu</Text>
-          <View style={{ width: 20 }} />
-        </View>
-        <View style={s.setupBody}>
-          <Animated.View entering={FadeInDown}>
-            <Icon name="clock" size={48} color={C.accent} />
-          </Animated.View>
-          <Text style={s.setupTitle}>Gerçek sınav koşullarında çalış</Text>
-          <Text style={s.setupSub}>Zamanlayıcı sınavdaki süreyi simüle eder. Kendi kitapçığınla çöz, süreyi buradan takip et.</Text>
-          <View style={[s.configRow, examType === "lgs" && { justifyContent: "center" }]}>
-            {(examType === "lgs" ? [LGS_CONFIG] : [TYT_CONFIG, AYT_CONFIG]).map((cfg) => (
-              <Pressable key={cfg.label} onPress={() => setConfig(cfg)}
-                style={[s.configBtn, examType === "lgs" && { flex: 0, minWidth: 140 }, config.label === cfg.label && { borderColor: C.accent, backgroundColor: C.accent + "12" }]}>
-                <Text style={[s.configText, config.label === cfg.label && { color: C.accent }]}>{cfg.label}</Text>
-                <Text style={s.configMeta}>{cfg.time} dk</Text>
-              </Pressable>
-            ))}
-          </View>
-          <Button onPress={startExam} icon="play" fullWidth>Başla</Button>
-        </View>
+      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <RehearsalRunning session={r.session} remaining={t.remaining} total={t.total} onFinish={confirmFinish} />
       </SafeAreaView>
     );
   }
 
-  if (phase === "done") {
-    const usedMins = Math.floor(elapsed / 60);
-    const timeOut = elapsed >= config.time * 60;
+  if (t.phase === "done") {
     return (
-      <SafeAreaView edges={["top"]} style={s.safe}>
-        <View style={s.center}>
-          <Animated.View entering={ZoomIn}><Icon name="checkCircle" size={56} color={C.green} /></Animated.View>
-          <Text style={s.doneTitle}>Simülasyon Tamamlandı!</Text>
-          <Text style={s.doneStat}>{usedMins} dk {elapsed % 60} sn</Text>
-          <Text style={s.doneSub}>{timeOut ? "Süre doldu!" : "Erken bitirdin"}</Text>
-          <Button onPress={() => { haptic.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }} icon="chart" fullWidth>
-            Sonuçlarını Gir
-          </Button>
-          <Button onPress={() => navigation.goBack()} variant="ghost" fullWidth>
-            Kapat
-          </Button>
-        </View>
+      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <RehearsalDone
+          full={t.full}
+          elapsed={t.elapsed}
+          onEnterResults={() => { H.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }}
+          onClose={navigation.goBack}
+        />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
-        <View style={[s.typeBadge, { backgroundColor: C.amber + "18" }]}>
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.amber }}>{config.label}</Text>
-        </View>
-        <Text style={s.title}>Simülasyon</Text>
-        <Pressable onPress={finishEarly} hitSlop={12}><Icon name="x" size={20} color={C.red} /></Pressable>
-      </View>
-
-      <View style={s.timerArea}>
-        <Text style={[s.timerText, { color: urgency }]}>
-          {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
-        </Text>
-        <Text style={s.timerSub}>kalan süre</Text>
-        <View style={s.barBg}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: urgency }]} /></View>
-      </View>
-
-      <View style={s.controls}>
-        <Pressable onPress={togglePause} style={[s.controlBtn, { backgroundColor: (paused ? C.green : C.accent) + "18" }]}>
-          <Icon name={paused ? "play" : "pause"} size={22} color={paused ? C.green : C.accent} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: paused ? C.green : C.accent }}>{paused ? "Devam" : "Duraklat"}</Text>
-        </Pressable>
-        <Pressable onPress={finishEarly} style={[s.controlBtn, { backgroundColor: C.brandTint }]}>
-          <Icon name="check" size={22} color={C.red} />
-          <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text2 }}>Bitir</Text>
+        <Pressable onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Kapat" style={s.close}>
+          <Icon name="x" size={14} color={C.text2} />
         </Pressable>
       </View>
-
-      {paused && (
-        <Animated.View entering={FadeInDown} style={s.pauseBanner}>
-          <Icon name="pause" size={16} color={C.accent} />
-          <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.accent }}>Duraklatıldı</Text>
-        </Animated.View>
-      )}
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {r.status === "loading" ? (
+            <View style={s.skel}>
+              <Skeleton height={34} width={240} />
+              <Skeleton height={232} radius={SHAPE.sheet} style={s.skelGap} />
+            </View>
+          ) : (
+            <RehearsalSetup r={r} />
+          )}
+          <View style={s.cta}>
+            {r.startableToday ? (
+              <Button size="lg" fullWidth onPress={t.start}>Başla</Button>
+            ) : (
+              <Button size="lg" fullWidth onPress={saveAndClose} loading={r.saving} disabled={!r.valid}>
+                Provayı kur
+              </Button>
+            )}
+            <Pressable onPress={navigation.goBack} accessibilityRole="button" accessibilityLabel="Vazgeç" style={s.cancel}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: STEP.s3, gap: STEP.s2 },
-    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: STEP.s3, paddingVertical: STEP.s2 },
-    title: { ...TYPOGRAPHY.subheading, color: C.text },
-    typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-    setupBody: { flex: 1, alignItems: "center", justifyContent: "center", padding: STEP.s3, gap: STEP.s3 },
-    setupTitle: { ...TYPOGRAPHY.subheading, color: C.text, textAlign: "center" },
-    setupSub: { ...TYPOGRAPHY.body, color: C.text2, textAlign: "center" },
-    configRow: { flexDirection: "row", gap: STEP.s2 },
-    configBtn: { flex: 1, alignItems: "center", padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
-    configText: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
-    configMeta: { ...TYPOGRAPHY.micro, color: C.text3, marginTop: 2 },
-    timerArea: { alignItems: "center", paddingVertical: STEP.s5, gap: STEP.s1 },
-    timerText: { fontFamily: "Bricolage_400", fontSize: 64 },
-    timerSub: { ...TYPOGRAPHY.caption, color: C.text3 },
-    barBg: { width: "80%", height: 4, borderRadius: 2, backgroundColor: C.surface2, marginTop: STEP.s2 },
-    barFill: { height: 4, borderRadius: 2 },
-    controls: { flexDirection: "row", gap: STEP.s3, justifyContent: "center", paddingHorizontal: STEP.s3 },
-    controlBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingVertical: STEP.s2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.card },
-    pauseBanner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: STEP.s1, paddingVertical: STEP.s3, marginTop: STEP.s3 },
-    doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    doneStat: { fontFamily: "Bricolage_400", fontSize: 36, color: C.green },
-    doneSub: { ...TYPOGRAPHY.caption, color: C.text3 },
-    secondaryBtn: { paddingVertical: STEP.s2, paddingHorizontal: STEP.s3 },
-  });
-}
+const s = StyleSheet.create({
+  flex: { flex: 1 },
+  header: { flexDirection: "row", paddingLeft: GUTTER - 10, paddingTop: 4 },
+  close: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s4 + 6 },
+  skel: { paddingTop: STEP.s4 },
+  skelGap: { marginTop: STEP.s4 },
+  cta: { marginTop: STEP.s3 + 6 },
+  cancel: { height: 48, marginTop: STEP.s1, alignItems: "center", justifyContent: "center" },
+});

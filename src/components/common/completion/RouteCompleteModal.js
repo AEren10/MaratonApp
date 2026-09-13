@@ -18,7 +18,8 @@ function buildBody(daysLeft) {
 // Cikarilanlar: "359 gun" (rota baslangic tarihi tutulmuyor), "214 durak"
 // (tamamlanan durak toplami yalniz son revizyonda var), eksen netleri
 // (deneme listesi son 30 kayitla sinirli; "ilk deneme" guvenilir degil).
-// "Sinav gunu planina bak" icin kayitli ekran yok; hedef verilmezse cizilmez.
+// "Sinav gunu planina bak" -> SCREENS.EXAM_DAY_PLAN; sinav tarihi yoksa ya da
+// gectiyse cagiran hedef vermez ve buton cizilmez.
 export const RouteCompleteModal = memo(function RouteCompleteModal({
   visible,
   totalQuestions = 0,

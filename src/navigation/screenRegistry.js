@@ -85,6 +85,9 @@ const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForeca
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
 const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
+const ExamDayPlanScreen = React.lazy(() => import("../screens/exam/ExamDayPlanScreen"));
+const ExamResultScreen = React.lazy(() => import("../screens/exam/ExamResultScreen"));
+const ForecastAccuracyScreen = React.lazy(() => import("../screens/exam/ForecastAccuracyScreen"));
 const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
@@ -197,6 +200,9 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.REFERRAL, ReferralScreen),
   screen(SCREENS.ROUTE_COMPANION, RouteCompanionScreen),
   screen(SCREENS.EXAM_SIMULATOR, ExamSimulatorScreen),
+  screen(SCREENS.EXAM_DAY_PLAN, ExamDayPlanScreen),
+  screen(SCREENS.EXAM_RESULT, ExamResultScreen),
+  screen(SCREENS.FORECAST_ACCURACY, ForecastAccuracyScreen),
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
   screen(SCREENS.PAYWALL, PaywallScreen, modalOptions),
   screen(SCREENS.SUBSCRIPTION, SubscriptionScreen),

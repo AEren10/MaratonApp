@@ -5,6 +5,7 @@ import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
+import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
 
 const ExamContext = createContext(null);
 
@@ -231,6 +232,8 @@ export function ExamProvider({ children }) {
         { ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() },
       );
     } catch {}
+    // Sinav gunu plani kayitliysa arife hatirlatmasi yeni tarihe tasinir.
+    rescheduleExamEveReminder(session?.user?.id, date);
     if (session?.user?.id && session.user.id) {
       syncExamConfig(session.user.id, {
         examType: type, field: selectedField || null, examDate: date,

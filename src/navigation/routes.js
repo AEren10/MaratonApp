@@ -62,7 +62,10 @@ export const ROUTE_CONFIGS = {
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.COMPARATIVE]: { path: "karsilastirmali-analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.RANK_SIMULATOR]: { path: "siralama", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
-  [SCREENS.EXAM_SIMULATOR]: { path: "sinav-prova", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: false },
+  [SCREENS.EXAM_SIMULATOR]: { path: "sinav-prova", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
+  [SCREENS.EXAM_DAY_PLAN]: { path: "sinav/plan", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
+  [SCREENS.EXAM_RESULT]: { path: "sinav/sonuc", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
+  [SCREENS.FORECAST_ACCURACY]: { path: "sinav/tahmin", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
 
   [SCREENS.WRONG_NOTEBOOK]: { path: "yanlis", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.ADD_WRONG]: { path: "yanlis/yeni", flow: PRODUCT_FLOW_IDS.WRONG_NOTEBOOK, deepLink: true },

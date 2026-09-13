@@ -30,6 +30,9 @@ export const ROTA_STACK = [
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
   SCREENS.EXAM_SIMULATOR,   // Deneme Provasi
+  SCREENS.EXAM_DAY_PLAN,    // Sinav Gunu Plani (PROFIL'de de var)
+  SCREENS.EXAM_RESULT,      // Sinav Sonucu (PROFIL'de de var)
+  SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu / Tahmin Sasti (PROFIL'de de var)
   SCREENS.SUMMARY,          // Gunun/Haftalik/Ayin Ozeti (period parametresi)
   SCREENS.WEEKLY_REVIEW,    // Haftalik Ozet (eski, SUMMARY week moduna gocecek)
   SCREENS.WEEKLY_TRIAL_REVIEW,
@@ -84,6 +87,9 @@ export const PROFIL_STACK = [
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.MILESTONE,        // Kilometre Tasi
   SCREENS.LEVEL,            // Seviye
+  SCREENS.EXAM_DAY_PLAN,    // (paylasimli) Profil satiri
+  SCREENS.EXAM_RESULT,      // (paylasimli)
+  SCREENS.FORECAST_ACCURACY, // (paylasimli)
   SCREENS.PREMIUM,          // Maraton Pro (tam sunum)
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,

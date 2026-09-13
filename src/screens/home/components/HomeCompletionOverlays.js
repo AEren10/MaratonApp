@@ -45,6 +45,9 @@ export function HomeCompletionOverlays({
         totalMinutes={stats?.totalMinutes || 0}
         daysLeft={daysLeft}
         onClose={dismiss}
+        onExamDayPlan={daysLeft != null && daysLeft >= 0
+          ? go("home_route_complete_exam_day_plan", SCREENS.EXAM_DAY_PLAN)
+          : undefined}
         onYearRoute={go("home_route_complete_roadmap", SCREENS.ROADMAP)}
       />
     );

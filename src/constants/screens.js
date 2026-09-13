@@ -79,6 +79,10 @@ export const SCREENS = {
   QUICK_PRACTICE: "QuickPractice",
   CHALLENGE: "Challenge",
   EXAM_SIMULATOR: "ExamSimulator",
+  // Sinav akisi (AKIS 14)
+  EXAM_DAY_PLAN: "ExamDayPlan",
+  EXAM_RESULT: "ExamResult",
+  FORECAST_ACCURACY: "ForecastAccuracy",
   SHARE_CARD: "ShareCard",
   MILESTONE: "Milestone",
 

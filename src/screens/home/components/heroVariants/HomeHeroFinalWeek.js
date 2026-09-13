@@ -7,6 +7,9 @@ import { HomeHeroWeekStrip } from "./HomeHeroWeekStrip";
 import { HomeHeroTrialSummaryCard } from "./HomeHeroTrialSummaryCard";
 import { HomeHeroClosedCard } from "./HomeHeroClosedCard";
 import { HomeHeroCTA } from "../HomeHeroCTA";
+import { HomeHeroFinalWeekTips } from "./HomeHeroFinalWeekTips";
+import { useNavigation } from "@react-navigation/native";
+import { SCREENS } from "../../../../constants/screens";
 
 const CLOSED_ITEMS = ["Yeni konu", "Lig", "Konu borcu", "Tahmini net", "Sıralama"];
 
@@ -34,6 +37,7 @@ export function HomeHeroFinalWeek({
   onStartTask,
 }) {
   const C = useC();
+  const navigation = useNavigation();
 
   return (
     <View>
@@ -78,6 +82,7 @@ export function HomeHeroFinalWeek({
       {trialStats ? (
         <Animated.View entering={FadeInDown.delay(180).duration(480).springify().damping(18)} style={s.block}>
           <HomeHeroTrialSummaryCard
+            lead="Geride kaldığın haftalarda rota yeni konuyla değil, defterinde bekleyen tekrarlarla ilerler."
             best={trialStats.best}
             average={trialStats.average}
             note="Sınav günü işin: bu aralığın üst ucunu yakalamak."
@@ -88,14 +93,20 @@ export function HomeHeroFinalWeek({
       <Animated.View entering={FadeInDown.delay(240).duration(480).springify().damping(18)} style={s.block}>
         <HomeHeroClosedCard
           items={CLOSED_ITEMS}
-          note="Son 6 günde tahmin, hedef ve sıralama gizlenir. Değiştiremediğin bir sayıyı göstermenin faydası yok."
+          note="Son 6 günde tahmin, hedef ve sıralama gizlenir. Değiştiremediğin bir sayıyı göstermenin faydası yok. Sınavdan önceki 48 saatte performans bildirimi de gelmez."
         />
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(300).duration(480).springify().damping(18)} style={s.block}>
+        <HomeHeroFinalWeekTips examDate={examDate} />
       </Animated.View>
 
       <HomeHeroCTA
         label="Tekrara başla"
         onPress={() => onStartTask?.(tasks?.[0] || null)}
-        delay={300}
+        secondaryLabel="Deneme provası kur"
+        onSecondary={() => navigation.navigate(SCREENS.EXAM_SIMULATOR)}
+        delay={360}
       />
     </View>
   );

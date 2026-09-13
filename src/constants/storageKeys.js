@@ -35,6 +35,11 @@ export const STORAGE_KEYS = {
   // Gun/hafta/rota tamamlama anlarinin gorulme kaydi. userScopedKey ile
   // kullaniciya ayrisir; cikista SILINMEZ, yoksa rota kapanisi tekrar gelir.
   COMPLETION_SHOWN: "@maraton:completion_shown",
+  // Sinav akisi (AKIS 14). userScopedKey ile kullaniciya ayrisir; cikista
+  // SILINMEZ: sinav gunu plani ve yilin tek sonucu tekrar girilmesin.
+  EXAM_DAY_PLAN: "@maraton:examDayPlan",
+  EXAM_RESULT: "@maraton:examResult",
+  EXAM_REHEARSAL: "@maraton:examRehearsal",
   DAILY_GOAL_DONE_PREFIX: "@daily_goal_done",
   PLAN_DONE_PREFIX: "@plan_done",
 };
