@@ -231,3 +231,8 @@
 - Challenge oluşturma viral/retention döngüsünü güçlendirebilir, ama accepted arkadaşlık şartı olmadan keyfi UUID'ye challenge atmak spam/taciz yüzeyi açar.
 - Client artık insert öncesi iki yönlü friendship satırını okuyup yalnız `accepted` durumunda devam eder; `blocked`, `pending`, `declined` veya satır yoksa challenge oluşturmaz.
 - Bu ara katman normal app yolunu korur, fakat nihai güvenlik için hâlâ server-authoritative `create_challenge` RPC + doğrudan `challenges` INSERT yetkisinin kaldırılması gerekir.
+
+## 2026-09-14 — Sosyal ekran auth geçişleri
+
+- Arkadaşlık ve challenge ekranları büyüme/retention yüzeyi olduğu için logout/token refresh sırasında beyaz ekrana düşmemeli.
+- Callback dependency array'lerinde `user.id` kullanımı render anında patlar; auth geçişine dayanıklı yerlerde `user?.id` + erken dönüş guard'ı kullanılmalı.

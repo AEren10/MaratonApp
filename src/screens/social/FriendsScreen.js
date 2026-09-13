@@ -132,6 +132,7 @@ export default function FriendsScreen() {
   }, [load, user?.id]);
 
   const remove = useCallback(async (friendshipId) => {
+    if (!user?.id) return;
     H.warn();
     showAlert("Arkadaşlıktan çıkar", "Bu kişiyi listenden kaldır?", [
       { text: "İptal", style: "cancel" },
@@ -146,7 +147,7 @@ export default function FriendsScreen() {
         },
       },
     ]);
-  }, [load, user.id]);
+  }, [load, user?.id]);
 
   const block = useCallback((targetUser) => {
     H.warn();
