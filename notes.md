@@ -209,3 +209,9 @@
 - `showPaywall` premium access snapshot hazır olmadan açılmamalı. Aksi halde cold-start'ta gerçek premium kullanıcı `isPremium=false` varsayımıyla paywall görebilir.
 - Feature check fail-closed kaldığında manuel paywall da aynı prensibi izlemeli: access `loading/error` iken yanlış satış ekranı göstermek yerine bastırılmalı ve suppression event'i yazılmalı.
 - Monetization güveni için “fazla paywall” da bypass kadar riskli; premium kullanıcıya yanlış kapı göstermek iptal/churn tetikleyebilir.
+
+## 2026-09-14 — Challenge oluşturma premium gate tazeliği
+
+- Challenge oluşturma callback'i `checkFeature`, `showPaywall` ve `bumpUsage` bağımlılıklarını taşımalı. Premium snapshot loading→ready geçince eski closure ücretsiz/premium kararını bayat bırakabilir.
+- `challenges` INSERT hâlâ client-side ve authenticated role'a açık görünüyor. UI kapısı güçlendirildi ama nihai kota server-authoritative RPC'ye taşınmalı; Supabase CLI bu ortamda yokken migration dosyası adı uydurulmamalı.
+- Server tarafında hedef: `create_challenge` RPC, arkadaşlık/blocked kontrolü, free active+pending quota kontrolü ve doğrudan `public.challenges` INSERT yetkisinin kaldırılması.

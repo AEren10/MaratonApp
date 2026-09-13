@@ -66,7 +66,7 @@ export default function ChallengeScreen() {
       setCreating(false); setStep(0); setPick({ friend: null, metric: null, target: null });
       load();
     } catch { H.error(); showAlert("Hata", "Challenge oluşturulamadı"); }
-  }, [pick, load]);
+  }, [pick, checkFeature, showPaywall, bumpUsage, load]);
 
   const handleCancel = useCallback(async (id) => {
     try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Challenge iptal edilemedi."); }
