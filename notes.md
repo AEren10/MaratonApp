@@ -153,7 +153,7 @@
 
 - Ücretsiz challenge kotası yalnız `active` kayıtları değil, kullanıcının gönderdiği `pending` davetleri de saymalı. Aksi halde kullanıcı çok sayıda bekleyen davet açarak premium sınırını aşabilir.
 - Challenge oluşturma sonrası local kullanım snapshot'ı hemen artmalı; server refresh beklenirse aynı oturumda ikinci oluşturma butonu yanlışlıkla açık kalabilir.
-- Daha sağlam nihai adım: challenge oluşturma da trial gibi server-authoritative RPC'ye taşınmalı ve doğrudan `challenges` INSERT yetkisi kapatılmalı. Bu migration gerektiriyor; Supabase CLI bu ortamda bulunmadığı için migration dosyası elle uydurulmadı.
+- Nihai adım daha sonra `cdx_create_challenge_rpc` ile kapandı: challenge oluşturma server-authoritative RPC'ye taşındı ve doğrudan `challenges` INSERT yetkisi kaldırıldı.
 
 ## 2026-09-13 — Offline temp görev silme
 
@@ -213,8 +213,7 @@
 ## 2026-09-14 — Challenge oluşturma premium gate tazeliği
 
 - Challenge oluşturma callback'i `checkFeature`, `showPaywall` ve `bumpUsage` bağımlılıklarını taşımalı. Premium snapshot loading→ready geçince eski closure ücretsiz/premium kararını bayat bırakabilir.
-- `challenges` INSERT hâlâ client-side ve authenticated role'a açık görünüyor. UI kapısı güçlendirildi ama nihai kota server-authoritative RPC'ye taşınmalı; Supabase CLI bu ortamda yokken migration dosyası adı uydurulmamalı.
-- Server tarafında hedef: `create_challenge` RPC, arkadaşlık/blocked kontrolü, free active+pending quota kontrolü ve doğrudan `public.challenges` INSERT yetkisinin kaldırılması.
+- Bu maddede işaretlenen nihai açık `cdx_create_challenge_rpc` ile kapandı: `create_challenge` RPC arkadaşlık ve free active+pending quota kontrolünü server tarafına aldı, direct `public.challenges` INSERT yetkisi kaldırıldı.
 
 ## 2026-09-14 — Challenge reddetme status uyumu
 
@@ -230,7 +229,7 @@
 
 - Challenge oluşturma viral/retention döngüsünü güçlendirebilir, ama accepted arkadaşlık şartı olmadan keyfi UUID'ye challenge atmak spam/taciz yüzeyi açar.
 - Client artık insert öncesi iki yönlü friendship satırını okuyup yalnız `accepted` durumunda devam eder; `blocked`, `pending`, `declined` veya satır yoksa challenge oluşturmaz.
-- Bu ara katman normal app yolunu korur, fakat nihai güvenlik için hâlâ server-authoritative `create_challenge` RPC + doğrudan `challenges` INSERT yetkisinin kaldırılması gerekir.
+- Bu ara katman sonrasında server-authoritative `create_challenge` RPC ile kalıcı hale getirildi; doğrudan `challenges` INSERT yetkisi artık yok.
 
 ## 2026-09-14 — Sosyal ekran auth geçişleri
 
