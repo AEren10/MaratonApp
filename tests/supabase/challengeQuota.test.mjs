@@ -38,3 +38,10 @@ test("challenge action callbacks tolerate an empty auth user during session tran
   assert.match(screen, /if \(!user\?\.id\) return;\s+try \{\s+await respondToChallenge\(id, accept, user\.id\);/);
   assert.match(screen, /\}, \[load, showAlert, user\?\.id\]\);/);
 });
+
+test("challenge creation requires an accepted friendship before insert", () => {
+  assert.match(source, /\.from\("friendships"\)[\s\S]*?\.select\("id, status"\)/);
+  assert.match(source, /if \(friendship\?\.status === "blocked"\) throw new Error\("Bu kullanıcıyla etkileşim kurulamaz"\);/);
+  assert.match(source, /if \(friendship\?\.status !== "accepted"\) throw new Error\("Challenge için önce arkadaş olmalısınız"\);/);
+  assert.match(source, /\.from\("challenges"\)\s+\.insert\(/);
+});

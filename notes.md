@@ -225,3 +225,9 @@
 
 - Sosyal/challenge ekranlarında auth state kısa süre boş olabilir; dependency array'de `user.id` kullanmak render anında crash üretir.
 - İptal ve yanıt callback'leri `user?.id` ile guard'lanmalı. Bu, logout/token refresh gibi geçişlerde kullanıcıyı sosyal ekranda beyaz ekrana düşürmez.
+
+## 2026-09-14 — Challenge arkadaşlık guard'ı
+
+- Challenge oluşturma viral/retention döngüsünü güçlendirebilir, ama accepted arkadaşlık şartı olmadan keyfi UUID'ye challenge atmak spam/taciz yüzeyi açar.
+- Client artık insert öncesi iki yönlü friendship satırını okuyup yalnız `accepted` durumunda devam eder; `blocked`, `pending`, `declined` veya satır yoksa challenge oluşturmaz.
+- Bu ara katman normal app yolunu korur, fakat nihai güvenlik için hâlâ server-authoritative `create_challenge` RPC + doğrudan `challenges` INSERT yetkisinin kaldırılması gerekir.

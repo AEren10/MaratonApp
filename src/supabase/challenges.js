@@ -49,13 +49,13 @@ export async function createChallenge({ opponentId, metric, target, days = 7 }) 
     const today = new Date();
     const endsOn = new Date(today.getTime() + days * 86400000);
     if (opponentId === user.id) throw new Error("Kendinize challenge gönderemezsiniz");
-    const { data: blocked } = await supabase
+    const { data: friendship } = await supabase
       .from("friendships")
-      .select("id")
+      .select("id, status")
       .or(`and(requester_id.eq.${user.id},addressee_id.eq.${opponentId}),and(requester_id.eq.${opponentId},addressee_id.eq.${user.id})`)
-      .eq("status", "blocked")
       .maybeSingle();
-    if (blocked) throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
+    if (friendship?.status === "blocked") throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
+    if (friendship?.status !== "accepted") throw new Error("Challenge için önce arkadaş olmalısınız");
     const { data, error } = await supabase
       .from("challenges")
       .insert({
