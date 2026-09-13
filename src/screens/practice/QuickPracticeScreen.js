@@ -66,8 +66,9 @@ export default function QuickPracticeScreen() {
   const current = questions[idx];
 
   const handleAnswer = useCallback((answer) => {
-    if (feedback) return;
+    if (feedback || !user?.id) return;
     const q = questions[idx];
+    if (!q) return;
     const correct = q.correct_answer ? answer === q.correct_answer : answer === "correct";
     correct ? haptic.success() : haptic.error();
     setSelected(answer);
@@ -82,7 +83,7 @@ export default function QuickPracticeScreen() {
       setFeedback(null);
       setIdx((i) => i + 1);
     }, 500);
-  }, [feedback, questions, idx, reward, user.id]);
+  }, [feedback, questions, idx, reward, user?.id]);
 
   const finish = useCallback(() => {
     clearInterval(timerRef.current);

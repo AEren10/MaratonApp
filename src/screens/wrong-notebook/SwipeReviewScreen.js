@@ -58,7 +58,7 @@ export default function SwipeReviewScreen() {
   const finished = idx >= queue.length;
 
   const handleGrade = useCallback((knew) => {
-    if (!current) return;
+    if (!current || !user?.id) return;
     const g = knew ? 3 : 0;
     if (knew) haptic.success(); else haptic.error();
     // is_resolved EKSİKTİ: kullanıcı sağa kaydırıp "bildim" diyor, XP alıyor,
@@ -74,7 +74,7 @@ export default function SwipeReviewScreen() {
     }
     setStats((prev) => knew ? { ...prev, knew: prev.knew + 1 } : { ...prev, didnt: prev.didnt + 1 });
     setIdx((i) => i + 1);
-  }, [current, reward, user.id]);
+  }, [current, reward, user?.id]);
 
   const pan = Gesture.Pan()
     .onUpdate((e) => {

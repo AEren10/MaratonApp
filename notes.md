@@ -236,3 +236,4 @@
 
 - Arkadaşlık ve challenge ekranları büyüme/retention yüzeyi olduğu için logout/token refresh sırasında beyaz ekrana düşmemeli.
 - Callback dependency array'lerinde `user.id` kullanımı render anında patlar; auth geçişine dayanıklı yerlerde `user?.id` + erken dönüş guard'ı kullanılmalı.
+- Yanlış defteri tekrar ekranları da retention yüzeyi: kullanıcı hızlı pratikteyken token refresh/logout arası kısa boşluk, tekrar algoritmasını değil ekranı düşürmemeli.
