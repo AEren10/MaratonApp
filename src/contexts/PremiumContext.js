@@ -18,6 +18,13 @@ import { initPurchases } from "../lib/purchases";
 
 const PremiumContext = createContext(null);
 
+function hasFreeChallengeSlot(usage) {
+  const activeChallenges = usage?.activeChallenges;
+  if (activeChallenges == null) return false;
+  const count = Number(activeChallenges);
+  return Number.isFinite(count) && count < FREE_LIMITS.active_challenges;
+}
+
 export function PremiumProvider({ children }) {
   const { user } = useAuth();
   const { examDate } = useExam();
@@ -62,6 +69,7 @@ export function PremiumProvider({ children }) {
 
   useEffect(() => {
     setSnapshot(null);
+    setUsage(null);
     setAccessState("loading");
     if (!user?.id) return;
     initPurchases(user.id).finally(refreshUsage);
@@ -84,7 +92,7 @@ export function PremiumProvider({ children }) {
     if (featureKey === "unlimited_trials") return trialDecision.allowed;
     if (featureKey === "unlimited_wrongs") return true;
     if (featureKey === "unlimited_challenges") {
-      return isPremium || (!!usage && usage.activeChallenges < FREE_LIMITS.active_challenges);
+      return isPremium || hasFreeChallengeSlot(usage);
     }
     const productKey = PREMIUM_TO_PRODUCT_FEATURE[featureKey];
     if (productKey) {

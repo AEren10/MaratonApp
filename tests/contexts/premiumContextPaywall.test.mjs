@@ -16,3 +16,14 @@ test("challenge usage bump closes the free challenge slot immediately", () => {
   assert.match(source, /setUsage\(\(current\) => \(\{/);
   assert.match(source, /activeChallenges: Math\.max\(0, Number\(current\?\.activeChallenges\) \|\| 0\) \+ 1/);
 });
+
+test("challenge quota fails closed when active challenge count is unknown", () => {
+  assert.match(source, /function hasFreeChallengeSlot\(usage\) \{/);
+  assert.match(source, /if \(activeChallenges == null\) return false;/);
+  assert.match(source, /Number\.isFinite\(count\) && count < FREE_LIMITS\.active_challenges/);
+  assert.match(source, /return isPremium \|\| hasFreeChallengeSlot\(usage\);/);
+});
+
+test("premium usage snapshot is cleared when the signed-in user changes", () => {
+  assert.match(source, /setSnapshot\(null\);\s+setUsage\(null\);\s+setAccessState\("loading"\);/);
+});

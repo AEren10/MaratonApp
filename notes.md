@@ -197,3 +197,9 @@
 - Davet/friend/group deep link'i login öncesi global bekler; tüketim guard'ı uygulama ömrüne değil aktif kullanıcı kimliğine bağlı olmalı.
 - `useDeepLink` içinde tek boolean kullanılırsa aynı app oturumunda çıkış-yeni giriş sonrası pending kod tüketilmez. Bu, referral büyüme döngüsünü ve grup/arkadaş kabul akışını sessizce kaçırır.
 - Referral kodu navigasyon sırasında silinmemeli; ReferralScreen başarılı uygulama sonrası temizlemeli. Aksi halde ekran açılmadan kod kaybolabilir.
+
+## 2026-09-13 — Challenge premium kapısı fail-closed
+
+- Ücretsiz challenge hakkı, aktif challenge sayısı okunamadığında açık sayılmamalı. JS'te `null < limit` true döndüğü için count hatası premium limit bypass'ına dönüşebilir.
+- Kullanıcı değişiminde premium usage snapshot'ı temizlenmeli; eski kullanıcının aktif challenge sayısı yeni kullanıcının monetization kararını etkilememeli.
+- Sunucu yine nihai otorite olmalı, ama istemci kapısı da ağ/snapshot belirsizliğinde güvenli tarafa düşmeli.
