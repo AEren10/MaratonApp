@@ -13,6 +13,7 @@ const permissionScreen = readFileSync(
 );
 const userTasks = readFileSync(new URL("../../src/hooks/useUserTasks.js", import.meta.url), "utf8");
 const dailyGoalReward = readFileSync(new URL("../../src/hooks/useDailyGoalReward.js", import.meta.url), "utf8");
+const userScopedStorage = readFileSync(new URL("../../src/lib/storage/userScopedStorage.js", import.meta.url), "utf8");
 
 test("notification preference and context storage use active user scoped keys", () => {
   assert.match(notifications, /import \{ STORAGE_KEYS, userScopedKey \} from "\.\.\/constants\/storageKeys"/);
@@ -26,6 +27,7 @@ test("notification preference and context storage use active user scoped keys", 
   assert.match(notifications, /readNotifContext\(userId = null\)/);
   assert.match(notifications, /saveNotifContext\(context = \{\}, userId = null\)/);
   assert.match(notifications, /applyNotifPrefs\(prefs, context, userId = null\)/);
+  assert.match(userScopedStorage, /STORAGE_KEYS\.NOTIF_PREFS,\s+STORAGE_KEYS\.NOTIF_CONTEXT,/);
 });
 
 test("notification callers pass user id when reading prefs and scheduling reminders", () => {

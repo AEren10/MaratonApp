@@ -30,6 +30,7 @@ export const USER_SCOPED_KEYS = [
   // Bildirim tercihleri kullanıcıya özel: A'nın kapattığı bildirim B'ye
   // açık gelmesin. Sunucudan loadNotifPrefsFromServer yeniden dolduruyor.
   STORAGE_KEYS.NOTIF_PREFS,
+  STORAGE_KEYS.NOTIF_CONTEXT,
 ];
 
 export const USER_SCOPED_PREFIXES = [
