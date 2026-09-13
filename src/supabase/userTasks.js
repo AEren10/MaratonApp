@@ -40,7 +40,7 @@ export const getCalendarTasks = async (userId, subject = "__calendar") => {
   try {
     const { data, error } = await supabase
       .from("user_tasks")
-      .select("id, task_date, note, completed")
+      .select("id, task_date, note, completed, client_operation_id")
       .eq("user_id", userId)
       .eq("subject", subject)
       .order("created_at", { ascending: true });

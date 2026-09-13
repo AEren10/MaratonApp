@@ -165,3 +165,4 @@
 - Takvim görevi offline oluşturulunca local task, offline queue operation id'sini taşımalı; Supabase remote id dönene kadar bu id tek kaynak olur.
 - Kullanıcı sync öncesi görevi tamamlarsa queued insert payload'ı güncellenmeli. Aksi halde bağlantı gelince görev eski `completed` değeriyle oluşur.
 - Kullanıcı sync öncesi görevi silerse queued insert kuyruktan kaldırılmalı. Aksi halde kullanıcı sildiğini sanarken bağlantı gelince takvim görevi geri doğar.
+- Queue replay sonrası takvim refresh'i `client_operation_id` ile pending local satırı remote satıra yükseltmeli; yalnız `remoteId` eşleşmesi aranırsa aynı görev ikinci kez listelenir.

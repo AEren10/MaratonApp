@@ -31,8 +31,25 @@ export function useCalendarTasks() {
           const merged = { ...prev };
           data.forEach((row) => {
             const list = merged[row.task_date] || [];
-            if (!list.some((t) => t.remoteId === row.id)) {
-              list.push({ id: row.id, remoteId: row.id, title: row.note, done: !!row.completed });
+            const existingIndex = list.findIndex((t) =>
+              t.remoteId === row.id ||
+              (row.client_operation_id && (
+                t.pendingOperationId === row.client_operation_id ||
+                t.client_operation_id === row.client_operation_id
+              ))
+            );
+            const task = {
+              id: row.id,
+              remoteId: row.id,
+              title: row.note,
+              done: !!row.completed,
+              pendingOperationId: null,
+              client_operation_id: row.client_operation_id || null,
+            };
+            if (existingIndex >= 0) {
+              list[existingIndex] = { ...list[existingIndex], ...task };
+            } else {
+              list.push(task);
             }
             merged[row.task_date] = list;
           });
@@ -51,7 +68,16 @@ export function useCalendarTasks() {
     const localId = Date.now().toString();
     const clientOperationId = `calendartask_${localId}`;
     setTasks((prev) => {
-      const list = [...(prev[date] || []), { ...task, id: localId, done: false, pendingOperationId: clientOperationId }];
+      const list = [
+        ...(prev[date] || []),
+        {
+          ...task,
+          id: localId,
+          done: false,
+          pendingOperationId: clientOperationId,
+          client_operation_id: clientOperationId,
+        },
+      ];
       const next = { ...prev, [date]: list };
       persist(next);
       return next;
