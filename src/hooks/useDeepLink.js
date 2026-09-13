@@ -81,11 +81,16 @@ export function useDeepLink() {
   const { session } = useAuth();
   const navigation = useNavigation();
   const lastUrl = useRef(null);
-  const pendingConsumed = useRef(false);
+  const pendingConsumedFor = useRef(null);
 
   useEffect(() => {
-    if (!session || pendingConsumed.current) return;
-    pendingConsumed.current = true;
+    const sessionUserId = session?.user?.id || null;
+    if (!sessionUserId) {
+      pendingConsumedFor.current = null;
+      return;
+    }
+    if (pendingConsumedFor.current === sessionUserId) return;
+    pendingConsumedFor.current = sessionUserId;
     (async () => {
       // Referral BURADA EKSİKTİ: davet linkiyle kurulum yapan kullanıcının
       // kodu depoya yazılıyor ama giriş sonrası hiç tüketilmiyordu. Kullanıcı

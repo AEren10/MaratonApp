@@ -190,3 +190,9 @@
 - Notification prefs, notification context ve çalışma saati histogramı aktif kullanıcıya göre saklanmalı. A'nın bildirim kapatma kararı veya çalışma saati B'nin retention bildirimlerini etkilememeli.
 - `applyNotifPrefs` bağlam verilmediğinde son context'i okuyor; bu context global kalırsa B kullanıcısına A'nın streak/studiedToday durumuyla bildirim kurulabilir.
 - Optimal saat kişiselleştirmesi kullanıcı bazlı olmalı. Retention bildirimi doğru kişiye yanlış saatte giderse bildirim kapatma ve churn riski artar.
+
+## 2026-09-13 — Pending deep link tüketimi
+
+- Davet/friend/group deep link'i login öncesi global bekler; tüketim guard'ı uygulama ömrüne değil aktif kullanıcı kimliğine bağlı olmalı.
+- `useDeepLink` içinde tek boolean kullanılırsa aynı app oturumunda çıkış-yeni giriş sonrası pending kod tüketilmez. Bu, referral büyüme döngüsünü ve grup/arkadaş kabul akışını sessizce kaçırır.
+- Referral kodu navigasyon sırasında silinmemeli; ReferralScreen başarılı uygulama sonrası temizlemeli. Aksi halde ekran açılmadan kod kaybolabilir.
