@@ -143,3 +143,8 @@
 
 - Retention event buffer yalnız yeni event kaydedilirken boşaltılmamalı. Kullanıcı app'i yeniden açtığında veya ağ geri geldiğinde data sync hattı da buffer'ı Supabase'e göndermeli.
 - Premium/retention hunisinde gecikmiş event veri kaybı kadar tehlikeli olabilir: kullanıcı davranışı ölçümü bayat kalırsa paywall/nudge kararları yanlış optimize edilir.
+
+## 2026-09-13 — Study log aralık okuma sayfalaması
+
+- Tarih aralığıyla okunan çalışma kayıtları PostgREST row limit'ine bırakılmamalı. Year activity, wrapped ve haftalık rapor gibi istatistikler yoğun kullanıcıda 1000+ satırı eksik okuyabilir.
+- Limitsiz geçmiş liste ekranı ayrı tutulmalı; mobil performans için son 500 kayıt davranışı korunabilir, ama tarih-scope'lu analitik/rapor okumaları sayfalanmalıdır.

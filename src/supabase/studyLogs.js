@@ -3,6 +3,7 @@ import { handleSupabaseError } from "./handleError";
 import { normalizeStudyLog, toStudyLogRow } from "../domain/study/studyLogModel";
 
 const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, note, notes, study_date, created_at, client_operation_id";
+const PAGE_SIZE = 1000;
 
 function isIdempotencyConflict(error) {
   return error?.code === "23505" && String(error?.message || "").includes("client_operation_id");
@@ -22,19 +23,34 @@ async function getStudyLogByClientOperationId(userId, clientOperationId) {
 
 export const getStudyLogs = async (userId, { from, to } = {}) => {
   try {
-    let query = supabase
-      .from("study_logs")
-      .select(SL_COLUMNS)
-      .eq("user_id", userId)
-      .order("study_date", { ascending: false });
+    const buildQuery = () => {
+      let query = supabase
+        .from("study_logs")
+        .select(SL_COLUMNS)
+        .eq("user_id", userId)
+        .order("study_date", { ascending: false })
+        .order("created_at", { ascending: false });
 
-    if (from) query = query.gte("study_date", from);
-    if (to) query = query.lte("study_date", to);
-    if (!from && !to) query = query.limit(500);
+      if (from) query = query.gte("study_date", from);
+      if (to) query = query.lte("study_date", to);
+      return query;
+    };
 
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data || []).map(normalizeStudyLog);
+    if (!from && !to) {
+      const { data, error } = await buildQuery().limit(500);
+      if (error) throw error;
+      return (data || []).map(normalizeStudyLog);
+    }
+
+    const rows = [];
+    for (let start = 0; ; start += PAGE_SIZE) {
+      const { data, error } = await buildQuery().range(start, start + PAGE_SIZE - 1);
+      if (error) throw error;
+      const page = data || [];
+      rows.push(...page);
+      if (page.length < PAGE_SIZE) break;
+    }
+    return rows.map(normalizeStudyLog);
   } catch (e) {
     handleSupabaseError(e, "getStudyLogs");
     throw e;
