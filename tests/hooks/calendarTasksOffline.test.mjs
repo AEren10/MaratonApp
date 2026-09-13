@@ -21,6 +21,16 @@ test("calendar task refresh matches synced queued rows by client operation id", 
   assert.match(source, /pendingOperationId: null/);
 });
 
+test("calendar task cache is scoped to the active user and refetches after user changes", () => {
+  assert.match(source, /import \{ STORAGE_KEYS, userScopedKey \} from "\.\.\/constants\/storageKeys"/);
+  assert.match(source, /const userId = user\?\.id;/);
+  assert.match(source, /const cacheKey = useMemo\(\(\) => userScopedKey\(KEY, userId\), \[userId\]\);/);
+  assert.match(source, /synced\.current = false;/);
+  assert.match(source, /if \(!userId\) \{\s*setTasks\(\{\}\);/);
+  assert.match(source, /getJson\(cacheKey, \{\}\)/);
+  assert.match(source, /setJson\(cacheKey, merged\)/);
+});
+
 test("calendar task edits before sync mutate the queued payload instead of only local state", () => {
   assert.match(source, /patchQueuedPayload\(toggled\.pendingOperationId, \{ completed: toggled\.done \}\)\.catch/);
   assert.match(source, /handleSupabaseError\(e, "calendar:toggleQueuedTask"\);/);

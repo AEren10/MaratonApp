@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { saveUserTaskOffline, patchQueuedPayload, removeFromQueue } from "../lib/offlineQueue";
 import { getJson, setJson } from "../lib/storage/appStorage";
 import { handleSupabaseError } from "../supabase/handleError";
-import { STORAGE_KEYS } from "../constants/storageKeys";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { getCalendarTasks, updateUserTask, deleteUserTask } from "../supabase/userTasks";
 
 const KEY = STORAGE_KEYS.CALENDAR_TASKS;
@@ -14,19 +14,29 @@ export function useCalendarTasks() {
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const synced = useRef(false);
+  const userId = user?.id;
+  const cacheKey = useMemo(() => userScopedKey(KEY, userId), [userId]);
 
   useEffect(() => {
-    getJson(KEY, {}).then((storedTasks) => {
-      if (storedTasks && typeof storedTasks === "object") setTasks(storedTasks);
+    synced.current = false;
+    if (!userId) {
+      setTasks({});
+      return undefined;
+    }
+    let cancelled = false;
+    getJson(cacheKey, {}).then((storedTasks) => {
+      if (!cancelled && storedTasks && typeof storedTasks === "object") setTasks(storedTasks);
     });
-  }, []);
+    return () => { cancelled = true; };
+  }, [cacheKey, userId]);
 
   useEffect(() => {
-    if (!user?.id || synced.current) return;
+    if (!userId || synced.current) return;
     synced.current = true;
-    getCalendarTasks(user.id, CAL_SUBJECT)
+    let cancelled = false;
+    getCalendarTasks(userId, CAL_SUBJECT)
       .then((data) => {
-        if (!data?.length) return;
+        if (cancelled || !data?.length) return;
         setTasks((prev) => {
           const merged = { ...prev };
           data.forEach((row) => {
@@ -53,16 +63,17 @@ export function useCalendarTasks() {
             }
             merged[row.task_date] = list;
           });
-          setJson(KEY, merged);
+          setJson(cacheKey, merged);
           return merged;
         });
       })
-      .catch(setError);
-  }, [user?.id]);
+      .catch((e) => { if (!cancelled) setError(e); });
+    return () => { cancelled = true; };
+  }, [cacheKey, userId]);
 
   const persist = useCallback((next) => {
-    setJson(KEY, next);
-  }, []);
+    setJson(cacheKey, next);
+  }, [cacheKey]);
 
   const addTask = useCallback((date, task) => {
     const localId = Date.now().toString();
