@@ -97,6 +97,7 @@ kayıtsız duran 8 Eylül migration'ları da kayda geçirildi:
     20260908160000  answer_count_trigger
     20260909100000  product_access_companionship
     20260909110000  route_stop_lifecycle
+    20260913215823  cdx_create_challenge_rpc
 
 Bu, kaydı gerçeğe yaklaştırır ama baseline ihtiyacını ORTADAN KALDIRMAZ:
 `002_*` … `20260907100000_*` serisi hâlâ kayıtsız ve alfabetik sıralaması
@@ -109,3 +110,12 @@ Auth advisor `auth_leaked_password_protection` uyarısı veriyor: Supabase
 Auth'un HaveIBeenPwned kontrolü kapalı. Dashboard > Authentication >
 Policies üzerinden açılabilir. Karar ürün sahibinin: açılırsa ihlal
 listesindeki parolalarla kayıt/parola değişimi reddedilir.
+
+### Güncelleme (2026-09-13)
+
+`cdx_create_challenge_rpc` canlıya Supabase migration aracıyla uygulandı:
+
+- `public.create_challenge` / `private.create_challenge` eklendi.
+- Challenge oluşturma server tarafında accepted friendship, pending+active free quota ve premium/grace durumuna göre karar veriyor.
+- `public.challenges` için authenticated `INSERT` ve `DELETE` grant'leri kaldırıldı.
+- Eski `"Users create challenges"` insert policy'si düşürüldü.

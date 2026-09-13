@@ -240,3 +240,10 @@
 - Bu tamponlar içeride `userId` taşıdığı ve okuma sırasında aktif kullanıcıya filtrelendiği için offline queue ile aynı sınıfta korunmalı; kullanıcıya görünen cache'ler ayrı temizlenmeli.
 - Callback dependency array'lerinde `user.id` kullanımı render anında patlar; auth geçişine dayanıklı yerlerde `user?.id` + erken dönüş guard'ı kullanılmalı.
 - Yanlış defteri tekrar ekranları da retention yüzeyi: kullanıcı hızlı pratikteyken token refresh/logout arası kısa boşluk, tekrar algoritmasını değil ekranı düşürmemeli.
+
+## 2026-09-13 — Challenge create server otoritesi
+
+- Remote Supabase doğrulamasında `public.challenges` üzerinde `authenticated` role için `INSERT` ve `DELETE` grant'i canlıda açıktı; insert policy yalnız `creator_id = auth.uid()` kontrol ediyordu.
+- Bu, normal client kapısı iyi olsa bile kötü niyetli istemcinin accepted friendship ve ücretsiz kota kontrolünü bypass etmesine izin verirdi.
+- `public.create_challenge` RPC canlıya uygulandı ve client bu RPC'ye taşındı; accepted friendship, pending+active quota ve premium/grace kontrolü artık server tarafında.
+- Migration sonrası canlı grant doğrulamasında `public.challenges` için `authenticated` yalnız `SELECT` kaldı.

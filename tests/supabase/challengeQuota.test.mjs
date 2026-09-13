@@ -8,6 +8,10 @@ const hardeningMigration = readFileSync(
   new URL("../../supabase/migrations/20260908140000_harden_challenges_groups_xp.sql", import.meta.url),
   "utf8",
 );
+const createChallengeMigration = readFileSync(
+  new URL("../../supabase/migrations/20260913215823_cdx_create_challenge_rpc.sql", import.meta.url),
+  "utf8",
+);
 const initialChallengeMigration = readFileSync(
   new URL("../../supabase/migrations/006_friends_challenges.sql", import.meta.url),
   "utf8",
@@ -39,9 +43,13 @@ test("challenge action callbacks tolerate an empty auth user during session tran
   assert.match(screen, /\}, \[load, showAlert, user\?\.id\]\);/);
 });
 
-test("challenge creation requires an accepted friendship before insert", () => {
-  assert.match(source, /\.from\("friendships"\)[\s\S]*?\.select\("id, status"\)/);
-  assert.match(source, /if \(friendship\?\.status === "blocked"\) throw new Error\("Bu kullanıcıyla etkileşim kurulamaz"\);/);
-  assert.match(source, /if \(friendship\?\.status !== "accepted"\) throw new Error\("Challenge için önce arkadaş olmalısınız"\);/);
-  assert.match(source, /\.from\("challenges"\)\s+\.insert\(/);
+test("challenge creation goes through the server-authoritative RPC", () => {
+  assert.match(source, /supabase\.rpc\("create_challenge"/);
+  assert.match(source, /if \(!data\?\.ok\) throw new Error\(data\?\.reason \|\| "Challenge oluşturulamadı"\)/);
+  assert.doesNotMatch(source, /\.from\("challenges"\)\s+\.insert\(/);
+  assert.match(createChallengeMigration, /CREATE OR REPLACE FUNCTION private\.create_challenge/);
+  assert.match(createChallengeMigration, /f\.status = 'accepted'/);
+  assert.match(createChallengeMigration, /status IN \('pending', 'active'\)/);
+  assert.match(createChallengeMigration, /REVOKE INSERT, DELETE ON public\.challenges FROM authenticated/);
+  assert.match(createChallengeMigration, /DROP POLICY IF EXISTS "Users create challenges" ON public\.challenges/);
 });

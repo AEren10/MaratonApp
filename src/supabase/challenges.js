@@ -1,6 +1,5 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
-import { dateKey } from "../lib/dateUtils";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -44,33 +43,15 @@ export async function createChallenge({ opponentId, metric, target, days = 7 }) 
     if (!VALID_METRICS.includes(metric)) throw new Error("Invalid metric");
     if (!Number.isFinite(target) || target <= 0) throw new Error("Invalid target");
     if (!Number.isFinite(days) || days < 1 || days > 30) throw new Error("Invalid days");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Oturum yok");
-    const today = new Date();
-    const endsOn = new Date(today.getTime() + days * 86400000);
-    if (opponentId === user.id) throw new Error("Kendinize challenge gönderemezsiniz");
-    const { data: friendship } = await supabase
-      .from("friendships")
-      .select("id, status")
-      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${opponentId}),and(requester_id.eq.${opponentId},addressee_id.eq.${user.id})`)
-      .maybeSingle();
-    if (friendship?.status === "blocked") throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
-    if (friendship?.status !== "accepted") throw new Error("Challenge için önce arkadaş olmalısınız");
-    const { data, error } = await supabase
-      .from("challenges")
-      .insert({
-        creator_id: user.id,
-        opponent_id: opponentId,
-        metric,
-        target,
-        status: "pending",
-        starts_on: dateKey(today),
-        ends_on: dateKey(endsOn),
-      })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("create_challenge", {
+      p_opponent_id: opponentId,
+      p_metric: metric,
+      p_target: Math.round(target),
+      p_days: Math.round(days),
+    });
     if (error) throw error;
-    return data;
+    if (!data?.ok) throw new Error(data?.reason || "Challenge oluşturulamadı");
+    return data.challenge;
   } catch (e) {
     handleSupabaseError(e, "createChallenge");
     throw e;
