@@ -111,13 +111,12 @@ export default function SettingsScreen() {
           </SettingsGroup>
         </Animated.View>
 
-        {/* Tasarimda ayri bir "CALISMA" grubu yok; bu uc ekranin BASKA hicbir
+        {/* Tasarimda ayri bir "CALISMA" grubu yok; bu iki ekranin BASKA hicbir
             giris noktasi olmadigi icin burada tutuluyorlar. Kendi akislarinda
             bir giris acilinca bu grup dusurulebilir. */}
         <Animated.View entering={FadeInDown.delay(120).duration(420)}>
           <SettingsGroup title="ÇALIŞMA">
             <SettingsRow first label="Çalışma geçmişi" onPress={go(SCREENS.STUDY_LOG)} />
-            <SettingsRow label="Konu kartları" onPress={go(SCREENS.TOPIC_CARDS)} />
             <SettingsRow label="Takvim" onPress={go(SCREENS.CALENDAR)} />
           </SettingsGroup>
         </Animated.View>

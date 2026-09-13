@@ -25,7 +25,7 @@ export function HomeQuickActionsSection({
             showPaywall("home_quick_simulator");
             return;
           }
-          navigation.navigate(action.go);
+          navigation.navigate(action.go, action.params);
         }}
       />
     </View>

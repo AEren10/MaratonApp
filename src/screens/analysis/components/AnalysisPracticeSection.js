@@ -43,7 +43,7 @@ export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
             color={C.green}
             icon="target"
             label="5dk Quiz"
-            onPress={() => go(screens.QUICK_PRACTICE, undefined, "analysis_quick_practice")}
+            onPress={() => go(screens.REVIEW_SESSION, { limit: 5, shuffle: true, source: "quick_practice" }, "analysis_quick_practice")}
           />
           <PracticeButton
             C={C}

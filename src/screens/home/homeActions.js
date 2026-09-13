@@ -11,7 +11,7 @@ import { SCREENS } from "../../constants/screens";
 export function createHomeQuickActions(C, examType) {
   const isLGS = examType === "lgs";
   const secondary = [
-    { icon: "target", label: "5dk Quiz", go: SCREENS.QUICK_PRACTICE, color: C.teal, analyticsId: "home_quick_practice" },
+    { icon: "target", label: "5dk Quiz", go: SCREENS.REVIEW_SESSION, params: { limit: 5, shuffle: true, source: "quick_practice" }, color: C.teal, analyticsId: "home_quick_practice" },
     { icon: "clock", label: "Simülasyon", go: SCREENS.EXAM_SIMULATOR, color: C.amber, analyticsId: "home_quick_simulator" },
     { icon: "users", label: "Challenge", go: SCREENS.CHALLENGE, color: C.pink, analyticsId: "home_quick_challenge" },
   ];

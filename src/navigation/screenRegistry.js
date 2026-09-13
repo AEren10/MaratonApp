@@ -30,7 +30,6 @@ import AddWrongScreen from "../screens/wrong-notebook/AddWrongScreen";
 import WrongDetailScreen from "../screens/wrong-notebook/WrongDetailScreen";
 import ReviewSessionScreen from "../screens/wrong-notebook/ReviewSessionScreen";
 import ReviewDoneScreen from "../screens/wrong-notebook/ReviewDoneScreen";
-import SwipeReviewScreen from "../screens/wrong-notebook/SwipeReviewScreen";
 import AddStudyScreen from "../screens/study/AddStudyScreen";
 import StudyTimerScreen from "../screens/study/StudyTimerScreen";
 import StudySaveScreen from "../screens/study/StudySaveScreen";
@@ -85,7 +84,6 @@ const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSi
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
 const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
-const QuickPracticeScreen = React.lazy(() => import("../screens/practice/QuickPracticeScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
 const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
@@ -188,9 +186,11 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.EXAM_DATE, ExamDateScreen, modalOptions),
   screen(SCREENS.WEEKLY_REVIEW, WeeklyReviewScreen, celebrationOptions),
   screen(SCREENS.WEEKLY_TRIAL_REVIEW, WeeklyTrialReviewScreen, celebrationOptions),
-  screen(SCREENS.SWIPE_REVIEW, SwipeReviewScreen),
+  // Kart Tekrari ve Hizli Pratik "Tekrar" tasarimina katlandi; eski rota
+  // adlari derin baglanti/eski girisler icin ayni ekrana baglaniyor.
+  screen(SCREENS.SWIPE_REVIEW, ReviewSessionScreen),
   screen(SCREENS.CHALLENGE, ChallengeScreen),
-  screen(SCREENS.QUICK_PRACTICE, QuickPracticeScreen),
+  screen(SCREENS.QUICK_PRACTICE, ReviewSessionScreen),
   screen(SCREENS.SHARE_CARD, ShareCardScreen),
   screen(SCREENS.MILESTONE, MilestoneScreen),
   screen(SCREENS.LEVEL, LevelScreen),

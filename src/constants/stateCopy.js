@@ -22,6 +22,12 @@ export const EMPTY_COPY = {
     primary: "Yol haritasına bak",
     secondary: "Konu borcunu gör",
   },
+  // Defter bos -- Bos Durumlar artboardinin ilk karti.
+  wrongNotebook: {
+    title: "İlk yanlışını ekle.",
+    body: "Tekrar günü geldiğinde karşına çıkaralım. Aralıklı tekrar 1. gün, 3. gün, 7. gün olarak işler.",
+    primary: "İlk yanlışını ekle",
+  },
   studyHistory: {
     title: "Kayıtlı oturumun yok.",
     body: "Zamanlayıcıyla çalıştığında her oturum buraya süresi ve durağıyla düşer.",

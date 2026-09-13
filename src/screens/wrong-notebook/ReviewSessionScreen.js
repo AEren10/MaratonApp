@@ -1,205 +1,126 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
-import { Image } from "expo-image";
+import { useEffect, useMemo } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { useC } from "../../contexts/ThemeContext";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+
+import { Button, ErrorState, Skeleton } from "../../components/design";
 import { SCREENS } from "../../constants/screens";
-import { useAuth } from "../../contexts/AuthContext";
-import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
-import { saveReviewOffline } from "../../lib/offlineQueue";
-import SignedImage from "../../components/common/SignedImage";
-import { getSubjectByKey } from "../../themes/subjects";
-import { computeNextReview } from "../../lib/spacedRepetition";
-import * as haptic from "../../lib/haptics";
+import { useC } from "../../contexts/ThemeContext";
+import { useWrongReviewSession } from "../../hooks/useWrongReviewSession";
+import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { reviewStatus } from "./components/review/reviewCopy";
+import { ReviewPendingPanel } from "./components/review/ReviewPendingPanel";
+import { ReviewProgress } from "./components/review/ReviewProgress";
+import { ReviewQuestion } from "./components/review/ReviewQuestion";
+import { WrongScreenHeader } from "./components/WrongScreenHeader";
 
-const makeGrades = (C) => [
-  { grade: 0, label: "Hatırlamıyorum", color: C.red, icon: "x" },
-  { grade: 1, label: "Zorlandım", color: C.amber, icon: "alert" },
-  { grade: 3, label: "Biliyorum", color: C.green, icon: "check" },
-];
+// Eski rota adlari ayni ekrana baglanir; derin baglanti ve eski girisler
+// kirilmaz. Hizli Pratik: defterden karisik 5 soru.
+const ROUTE_DEFAULTS = {
+  [SCREENS.QUICK_PRACTICE]: { limit: 5, shuffle: true, source: "quick_practice" },
+  [SCREENS.SWIPE_REVIEW]: { source: "swipe_review" },
+};
 
-function resolveSubject(raw, C) {
-  if (typeof raw === "string") {
-    const f = getSubjectByKey(raw);
-    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: C.muted, icon: "bookOpen" };
-  }
-  return raw || { label: "?", color: C.muted, icon: "bookOpen" };
-}
-
+// "Tekrar" artboardi. Bitis "Tekrar Bitti" ekranina replace ile gecer.
 export default function ReviewSessionScreen() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
-  const { user } = useAuth();
-  const [queue, setQueue] = useState([]);
-  const [idx, setIdx] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [done, setDone] = useState(0);
-  // Tasarimin "Tekrar Bitti" ekrani BILDIM/BILEMEDIM ayrimi istiyor.
-  // Notlar: 0 Hatirlamiyorum · 1 Zorlandim · 3 Biliyorum.
-  // Yalniz "Biliyorum" bildim sayilir; Zorlandim henuz kapanmis degil.
-  const [remembered, setRemembered] = useState(0);
-  // Kaç sonuç sunucuya gidemeyip kuyrukta bekliyor — mesaj buna göre.
-  const [queuedCount, setQueuedCount] = useState(0);
+  const route = useRoute();
+  const opts = useMemo(() => ({ ...ROUTE_DEFAULTS[route.name], ...route.params }), [route.name, route.params]);
+  const s = useWrongReviewSession(opts);
+  const close = () => navigation.goBack();
 
+  // Tekrar gunu gelen soru yoksa bos seans gosterilmez: deftere donulur,
+  // defter kendi halini (bos / liste) zaten gosteriyor.
+  const nothingDue = !s.loading && !s.failed && s.total === 0;
   useEffect(() => {
-    if (!user?.id) { setLoading(false); return; }
-    getDueWrongQuestions(user.id)
-      .then((rows) => setQueue(rows))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [user?.id]);
+    if (!nothingDue) return;
+    const { routes = [], index = 0 } = navigation.getState?.() || {};
+    if (routes[index - 1]?.name === SCREENS.WRONG_NOTEBOOK) navigation.goBack();
+    else navigation.replace(SCREENS.WRONG_NOTEBOOK);
+  }, [nothingDue, navigation]);
 
-  const current = queue[idx];
+  const header = (
+    <WrongScreenHeader
+      icon="x"
+      label="TEKRAR"
+      onPress={close}
+      right={s.total ? (
+        <Text style={[TYPOGRAPHY.micro, styles.counter, { color: C.text3 }]}>
+          {Math.min(s.idx + 1, s.total)} / {s.total}
+        </Text>
+      ) : null}
+    />
+  );
 
-  const grade = useCallback(async (g) => {
-    if (!current) return;
-    if (g >= 3) haptic.success();
-    else if (g <= 0) haptic.error();
-    else haptic.tap();
-    const updates = computeNextReview(current, g);
-    // Sonuç kaybolmasın: başarısızsa kuyruğa girer.
-    saveReviewOffline(current.id, user.id, updates)
-      .then((r) => { if (r.queued) setQueuedCount((n) => n + 1); })
-      .catch(() => {});
-    setDone((d) => d + 1);
-    if (g >= 3) setRemembered((r) => r + 1);
-    setRevealed(false);
-    setIdx((i) => i + 1);
-  }, [current, user.id]);
-
-  if (loading) {
-    return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
+  if (s.loading || nothingDue) {
+    return (
+      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+        {header}
+        <View style={styles.loading}>
+          <Skeleton height={3} />
+          <Skeleton height={14} width="60%" />
+          <Skeleton height={250} radius={SHAPE.sheet} />
+          <Skeleton height={80} radius={SHAPE.sheet} />
+        </View>
+      </SafeAreaView>
+    );
   }
 
-  const finished = idx >= queue.length;
+  if (s.failed || !s.current) {
+    return (
+      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+        {header}
+        <ErrorState preset="server" secondary="" onPrimary={s.load} style={styles.gutter} />
+      </SafeAreaView>
+    );
+  }
 
-  // Tasarim bitisi ayri bir ekran olarak tanimliyor ("Tekrar Bitti").
-  // replace kullaniliyor: geri tusu bitmis oturuma donmemeli.
-  // Kuyruk bostaysa gecilmez — "Bugun tekrar yok" bir kutlama ani degil.
-  useEffect(() => {
-    if (!loading && finished && queue.length > 0) {
-      navigation.replace(SCREENS.REVIEW_DONE, {
-        reviewedCount: done,
-        rememberedCount: remembered,
-        forgotCount: Math.max(0, done - remembered),
-        queuedCount,
-      });
-    }
-  }, [loading, finished, queue.length, done, remembered, queuedCount, navigation]);
+  const status = reviewStatus(s.current, s.answer, C);
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
-          <Icon name="x" size={22} color={C.text} />
-        </Pressable>
-        <Text style={s.title}>Tekrar</Text>
-        <Text style={s.counter}>{Math.min(idx + (finished ? 0 : 1), queue.length)}/{queue.length}</Text>
-      </View>
+    <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+      {header}
+      <ReviewProgress index={s.idx} total={s.total} />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Animated.View key={s.current.id} entering={FadeInDown.duration(500)} style={styles.question}>
+          <ReviewQuestion item={s.current} />
+        </Animated.View>
 
-      {finished ? (
-        <View style={s.center}>
-          <Icon name="checkCircle" size={56} color={C.green} />
-          <Text style={s.doneTitle}>{queue.length ? "Tekrar tamamlandı!" : "Bugün tekrar yok"}</Text>
-          <Text style={s.doneSub}>
-            {!queue.length
-              ? "Yeni yanlışlar zamanı gelince burada belirir."
-              : queuedCount > 0
-                // Eskiden burada koşulsuz "Aralıklar güncellendi" yazıyordu —
-                // çevrimdışı yapılan tekrarın tamamı kaybolmuşken bile.
-                ? `${done} soruyu tekrar ettin. ${queuedCount} sonuç çevrimdışı kaydedildi, bağlantı gelince gönderilecek.`
-                : `${done} soruyu tekrar ettin. Aralıklar güncellendi.`}
-          </Text>
-          <Pressable onPress={() => navigation.goBack()} style={s.closeBtn}>
-            <Text style={s.closeText}>Bitir</Text>
-          </Pressable>
+        <View style={styles.panel}>
+          <ReviewPendingPanel before={s.pendingStart} now={s.pendingNow} status={status} />
         </View>
-      ) : current ? (
-        <ScrollView contentContainerStyle={s.scroll}>
-          {(() => {
-            const subj = resolveSubject(current.subject, C);
-            return (
-              <View style={[s.chip, { backgroundColor: subj.color + "18" }]}>
-                <Icon name={subj.icon} size={14} color={subj.color} />
-                <Text style={[s.chipText, { color: subj.color }]}>{subj.label} · {current.topic}</Text>
-              </View>
-            );
-          })()}
 
-          {current.image_path ? (
-            <SignedImage bucket="wrong-questions" path={current.image_path} style={s.image} contentFit="contain" />
-          ) : (
-            <View style={s.noImage}>
-              <Icon name="notebook" size={32} color={C.muted} />
-              <Text style={s.noImageText}>{current.note || "Bu konuyu hatırlamaya çalış"}</Text>
-            </View>
-          )}
-
-          {revealed ? (
-            <View style={s.answerBox}>
-              {current.note ? <Text style={s.note}>{current.note}</Text> : null}
-              {current.correct_answer ? (
-                <Text style={s.answerText}>
-                  Senin: <Text style={{ color: C.red }}>{current.my_answer || "—"}</Text>  →  Doğru: <Text style={{ color: C.green }}>{current.correct_answer}</Text>
-                </Text>
-              ) : null}
-            </View>
-          ) : null}
-        </ScrollView>
-      ) : null}
-
-      {!finished && current ? (
-        <View style={s.footer}>
-          {!revealed ? (
-            <Pressable onPress={() => setRevealed(true)} style={s.revealBtn}>
-              <Text style={s.revealText}>Cevabı Göster</Text>
-            </Pressable>
-          ) : (
-            <View style={s.gradeRow}>
-              {makeGrades(C).map((g) => (
-                <Pressable key={g.grade} onPress={() => grade(g.grade)} style={[s.gradeBtn, { backgroundColor: g.color + "1A", borderColor: g.color }]}>
-                  <Icon name={g.icon} size={18} color={g.color} />
-                  <Text style={[s.gradeText, { color: g.color }]}>{g.label}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+        <View style={styles.actions}>
+          <Button variant="outline" size="lg" onPress={() => s.grade(false)} style={styles.flex} accessibilityLabel="Bilemedim">
+            Bilemedim
+          </Button>
+          <Button size="lg" onPress={() => s.grade(true)} style={styles.flex} accessibilityLabel="Bildim">
+            Bildim
+          </Button>
         </View>
-      ) : null}
+        <Animated.Text
+          key={status.hint}
+          entering={FadeIn.duration(500)}
+          style={[TYPOGRAPHY.meta, styles.hint, { color: C.text3 }]}
+        >
+          {status.hint}
+        </Animated.Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
-    title: { ...TYPOGRAPHY.subheading, color: C.text },
-    counter: { ...TYPOGRAPHY.captionMedium, color: C.muted },
-    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.sm },
-    scroll: { padding: SPACING.lg, gap: SPACING.lg },
-    chip: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12 },
-    chipText: { ...TYPOGRAPHY.captionMedium },
-    image: { width: "100%", height: 300, borderRadius: RADIUS.lg, backgroundColor: C.surface },
-    noImage: { height: 200, borderRadius: RADIUS.lg, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, alignItems: "center", justifyContent: "center", gap: SPACING.md, padding: SPACING.lg },
-    noImageText: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center" },
-    answerBox: { backgroundColor: C.surface, borderRadius: RADIUS.lg, padding: SPACING.lg, gap: SPACING.sm, borderWidth: 1, borderColor: C.border },
-    note: { ...TYPOGRAPHY.body, color: C.text },
-    answerText: { ...TYPOGRAPHY.bodyMedium, color: C.sec },
-    footer: { padding: SPACING.lg, borderTopWidth: 1, borderTopColor: C.border },
-    revealBtn: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, alignItems: "center" },
-    revealText: { ...TYPOGRAPHY.button, color: C.bg },
-    gradeRow: { flexDirection: "row", gap: SPACING.sm },
-    gradeBtn: { flex: 1, alignItems: "center", gap: 4, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
-    gradeText: { ...TYPOGRAPHY.micro },
-    doneTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.md },
-    doneSub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
-    closeBtn: { backgroundColor: C.orange, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
-    closeText: { ...TYPOGRAPHY.button, color: C.bg },
-  });
-}
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+  gutter: { paddingHorizontal: GUTTER },
+  counter: { fontVariant: ["tabular-nums"] },
+  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, gap: STEP.s3 },
+  scroll: { paddingBottom: STEP.s4 },
+  question: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 - 6 },
+  panel: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 2 },
+  actions: { flexDirection: "row", gap: STEP.s2, paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 2 },
+  flex: { flex: 1 },
+  hint: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 + 2 },
+});
