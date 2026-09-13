@@ -1,72 +1,68 @@
-import { StyleSheet } from "react-native";
-import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
+import { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
+
 import { useNetwork } from "../../contexts/NetworkContext";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { usePendingWrites } from "../../hooks/usePendingWrites";
+import { ERROR_COPY } from "../../constants/stateCopy";
+import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 
-function WifiOffIcon({ size = 18, color }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M2 2l20 20" />
-      <Path d="M8.5 16.5a5 5 0 017 0" />
-      <Path d="M2 8.82a15 15 0 014.17-2.65" />
-      <Path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76" />
-      <Path d="M16.85 11.25a10 10 0 012.22 1.68" />
-      <Path d="M5 12.86a10 10 0 015.09-2.69" />
-      <Path d="M12 20h.01" />
-    </Svg>
-  );
-}
+const COPY = ERROR_COPY.offline;
+const POLL_MS = 15000;
 
+// "Çevrimdışı Kuyruk" artboardinin ust seridi: sari kenarli yuzey, kare
+// isaret, "Çevrimdışısın" + kuyruktaki kayit sayisi. Golge yok.
 export default function OfflineBanner() {
   const { isConnected } = useNetwork();
   const C = useC();
   const insets = useSafeAreaInsets();
+  const { pending, refresh } = usePendingWrites({ pollOnForeground: false });
+
+  useEffect(() => {
+    if (isConnected) return undefined;
+    refresh();
+    const t = setInterval(refresh, POLL_MS);
+    return () => clearInterval(t);
+  }, [isConnected, refresh]);
 
   if (isConnected) return null;
 
+  const body = pending > 0 ? `${pending} kayıt bağlantı gelince yüklenecek` : COPY.bannerBody;
+
   return (
     <Animated.View
-      entering={SlideInUp.duration(300)}
-      exiting={SlideOutUp.duration(300)}
-      style={[
-        styles.container,
-        {
-          top: insets.top,
-          backgroundColor: C.surface,
-          borderLeftColor: C.amber,
-        },
-      ]}
+      entering={FadeInDown.duration(500)}
+      exiting={FadeOutUp.duration(500)}
+      accessibilityRole="alert"
+      accessibilityLabel={`${COPY.bannerTitle}. ${body}`}
+      style={[s.container, { top: insets.top + STEP.s1, backgroundColor: C.surface, borderColor: C.warn }]}
     >
-      <WifiOffIcon size={18} color={C.amber} />
-      <Animated.Text
-        style={[styles.text, { color: C.text }]}
-        numberOfLines={2}
-      >
-        Çevrimdışı — veriler bağlantı gelince senkronize edilecek
-      </Animated.Text>
+      <View style={[s.mark, { backgroundColor: C.warn }]} />
+      <View style={s.flex}>
+        <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text }]}>{COPY.bannerTitle}</Text>
+        <Text numberOfLines={2} style={[TYPOGRAPHY.micro, s.body, { color: C.text3 }]}>{body}</Text>
+      </View>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: {
     position: "absolute",
-    left: SPACING.md,
-    right: SPACING.md,
+    left: STEP.s2 + 4,
+    right: STEP.s2 + 4,
     zIndex: 999,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    borderRadius: RADIUS.md,
-    borderLeftWidth: 3,
-    gap: SPACING.sm,
+    gap: STEP.s2 + 1,
+    paddingVertical: STEP.s2 + 3,
+    paddingHorizontal: STEP.s3 - 2,
+    borderRadius: SHAPE.card,
+    borderWidth: 1,
   },
-  text: {
-    ...TYPOGRAPHY.captionMedium,
-    flex: 1,
-  },
+  mark: { width: 9, height: 9, borderRadius: SHAPE.chip / 6 },
+  flex: { flex: 1, minWidth: 0 },
+  body: { marginTop: STEP.s1 / 2 - 1 },
 });

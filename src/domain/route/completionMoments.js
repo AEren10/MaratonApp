@@ -3,7 +3,7 @@ import { dateKey } from "../../lib/dateUtils.js";
 
 // AKIS 16 tamamlama anlari. Uc an da mevcut durumdan TURER; ayri bir
 // bayrak ya da esik uydurulmaz.
-//   gun   — bugunun plan kartindaki tum maddeler isaretli (TodayPlanCard)
+//   gun   — bugunun duraklarindaki tum maddeler isaretli (useTodayStops)
 //   hafta — rotanin icinde bulunulan haftasindaki tum duraklar COMPLETED
 //   rota  — mufredatta bekleyen konu kalmadi (totals.pending === 0)
 

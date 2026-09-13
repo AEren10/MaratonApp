@@ -1,329 +1,115 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { ScrollView, View, RefreshControl } from "react-native";
+import { useCallback } from "react";
+import { ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { useAuth } from "../../contexts/AuthContext";
-import { selectStreak, selectTodayLogs, selectFreezeCount, selectLongestStreak, selectFreezeResetAt, selectLastStudyDate } from "../../store/slices/studyLogSlice";
-import { selectTrials } from "../../store/slices/trialSlice";
-import { selectXP, selectWeeklyXP } from "../../store/slices/gamificationSlice";
-import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
-import { usePlanContext } from "../../hooks/usePlanContext";
-import { SPACING } from "../../themes/tokens";
-import { useC } from "../../contexts/ThemeContext";
-import { SCREENS } from "../../constants/screens";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
+
 import { SyncProblemBanner } from "../../components/common/SyncProblemBanner";
-import { AnimatedCard } from "../../components/design/AnimatedCard";
-
-import { useRecommendations } from "../../hooks/useRecommendations";
-import { useWeeklyReport } from "../../hooks/useWeeklyReport";
-import { useWeeklyTrialReport } from "../../hooks/useWeeklyTrialReport";
-import { useAISuggestions } from "../../hooks/useAISuggestions";
-import { useSync } from "../../contexts/DataSyncContext";
-import { useNudgePopup } from "../../hooks/useNudgePopup";
-import { useRetention } from "../../hooks/useRetention";
-import { useGamification } from "../../hooks/useGamification";
-import { usePremium } from "../../contexts/PremiumContext";
-import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
-import { useCompletionMoments } from "../../hooks/useCompletionMoments";
-import { useHomeDashboard } from "../../hooks/useHomeDashboard";
-import { HomeHeader } from "./components/HomeHeader";
+import { GUTTER, STEP } from "../../themes/tokens";
+import { HomeTopBar } from "./components/HomeTopBar";
 import { HomeHero } from "./components/HomeHero";
-import { HomeCoachNudge } from "./components/HomeCoachNudge";
-import { HomeOverlays } from "./components/HomeOverlays";
-import { HomePlanSection } from "./components/HomePlanSection";
-import { HomeQuickActionsSection } from "./components/HomeQuickActionsSection";
-import { ExamCountdown } from "./components/ExamCountdown";
 import { HomeExamAftermathRow } from "./components/HomeExamAftermathRow";
-import { HomeWeeklySection } from "./components/HomeWeeklySection";
-import SubjectMomentum from "./components/SubjectMomentum";
-import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
-import { useWrapped } from "../../hooks/useWrapped";
-import { trackButtonTap } from "../../lib/analytics";
-import { createHomeQuickActions } from "./homeActions";
-import { useHomeGamificationBridge } from "./useHomeGamificationBridge";
-import { useHomeNavigation } from "./useHomeNavigation";
-import { useHomeRefresh } from "./useHomeRefresh";
-import { useExam } from "../../contexts/ExamContext";
+import { HomeProBody } from "./components/HomeProBody";
+import { HomeFreeBody } from "./components/HomeFreeBody";
+import { HomeLoading } from "./components/HomeLoading";
+import { HomeOffline } from "./components/HomeOffline";
+import { HomeOverlays } from "./components/HomeOverlays";
+import { useHomeController } from "./useHomeController";
 
-
-function HomeSkeleton() {
-  return (
-    <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 60, gap: SPACING.md }}>
-      <SkeletonCard height={24} width={160} rounded={SPACING.sm} />
-      <SkeletonCard height={160} />
-      <View style={{ flexDirection: "row", gap: SPACING.md }}>
-        <SkeletonCard height={110} width="48%" />
-        <SkeletonCard height={110} width="48%" />
-      </View>
-      <View style={{ flexDirection: "row", gap: SPACING.md }}>
-        <SkeletonCard height={110} width="48%" />
-        <SkeletonCard height={110} width="48%" />
-      </View>
-      <SkeletonCard height={64} />
-    </View>
-  );
-}
-
+// Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
+// Bağlantı Yok). Kaldirilan eski kartlarin hedefleri:
+//   ExamCountdown -> ust bant gun cipi (Takvim) + hero sinav sayaci
+//   TodayPlanCard -> BUGÜNÜN DURAKLARI + "Programın tamamı"; Görev Ekle -> + sheet
+//   SubjectMomentum / WeeklyActivityCard -> DİKKAT ÇEKEN İKİ DERS + Analiz
+//   Haftalik rapor kartlari -> "Bu haftanın raporu"; tekrar karti -> Defter
+//   Hizli eylemler -> + sheet (kayit/deneme/yanlis/gorev) ve ilgili sekmeler
 export default function HomeScreen() {
-  const navigation = useNavigation();
-  const C = useC();
-  const { user } = useAuth();
-  const { examType } = useExam();
-  const {
-    reward, syncStat, checkMilestone,
-    xpToast, dismissXP,
-    levelUpModal, dismissLevelUp,
-    milestoneModal, dismissMilestone,
-  } = useGamification();
-  const { checkFeature, showPaywall } = usePremium();
-  const { comeback, dismissComeback } = useRetention(reward);
-  const dailyGoal = useSelector(selectDailyQuestionsGoal);
+  const h = useHomeController();
+  const { C, dashboard, actions, gamification, goalReward, nudge } = h;
 
-  const quickActions = useMemo(() => createHomeQuickActions(C, examType), [C, examType]);
-  const streak = useSelector(selectStreak);
-  const freezeCount = useSelector(selectFreezeCount);
-  const longestStreak = useSelector(selectLongestStreak);
-  const freezeResetAt = useSelector(selectFreezeResetAt);
-  const lastStudyDate = useSelector(selectLastStudyDate);
-  const todayLogs = useSelector(selectTodayLogs);
-  const [streakSheetVisible, setStreakSheetVisible] = useState(false);
-  const trials = useSelector(selectTrials);
-  const xp = useSelector(selectXP);
-  const weeklyXP = useSelector(selectWeeklyXP);
+  const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
+    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} go={actions} />
+    : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} />
+  ), [h.stops, h.recent, dashboard.subjectMomentum, actions]);
 
-  useHomeGamificationBridge({ checkMilestone, streak, syncStat });
-
-  const planCtx = usePlanContext();
-  const nudges = useRecommendations();
-  const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
-  const weeklyReport = useWeeklyReport();
-  const weeklyTrialReport = useWeeklyTrialReport();
-  const { suggestions: aiSuggestions } = useAISuggestions();
-  const { refresh } = useSync();
-  const [nudgeVisible, setNudgeVisible] = useState(false);
-
-  const dailyAction = aiSuggestions && aiSuggestions.length ? aiSuggestions[0] : null;
-  const { period: wrappedPeriod, stats: wrappedStats } = useWrapped();
-
-  const go = useHomeNavigation(navigation);
-  const [loading, setLoading] = useState(true);
-  const { onRefresh, refreshing } = useHomeRefresh(refresh);
-
-  const dashboard = useHomeDashboard({
-    C,
-    planCtx,
-    todayLogs,
-    trials,
-    user,
-    weeklyXP,
-  });
-  const {
-    daysLeft,
-    displayName,
-    generatedTasks,
-    latestTrial,
-    leagueTier,
-    minutesToday,
-    plan,
-    routeCurrentWeek,
-    routeTotals,
-    solvedToday,
-    subjectMomentum,
-    transitionStop,
-    weeklyActivity,
-  } = dashboard;
-  const { dismissGoalComplete, goalCompleteVisible } = useDailyGoalReward({
-    solvedToday,
-    dailyGoal,
-    userId: user?.id,
-    reward,
-  });
-
-  const completion = useCompletionMoments({
-    currentWeek: routeCurrentWeek,
-    totals: routeTotals,
-    userId: user?.id,
-  });
-  const { markDayDone } = completion;
-
-  useEffect(() => {
-    setLoading(false);
-    showNudgePopup(2000);
-  }, [showNudgePopup]);
-
-  if (loading) {
-    return (
-      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <HomeSkeleton />
-      </SafeAreaView>
+  let body;
+  if (h.loading) {
+    body = <HomeLoading />;
+  } else if (h.offline) {
+    body = <HomeOffline onRetry={h.onRefresh} retrying={h.refreshing} onContinue={h.continueOffline} />;
+  } else {
+    body = (
+      <ScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
+      >
+        {h.firstDay ? null : (
+          <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
+            onProfile={actions.profile} onCalendar={actions.calendar} />
+        )}
+        <SyncProblemBanner />
+        <HomeExamAftermathRow />
+        <HomeHero
+          solvedToday={dashboard.solvedToday}
+          dailyGoal={h.dailyGoal}
+          generatedTasks={dashboard.generatedTasks}
+          weeklyDailyCounts={dashboard.weeklyActivity.counts}
+          comeback={h.comeback}
+          onDismissComeback={h.dismissComeback}
+          onStartTask={actions.startTask}
+          onViewRoute={actions.route}
+          onViewFullRoute={actions.fullRoute}
+          onRedrawRoute={actions.redrawRoute}
+          firstDay={h.firstDay}
+          minutesToday={dashboard.minutesToday}
+          onRecord={actions.record}
+          renderBelow={renderBelow}
+        />
+      </ScrollView>
     );
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 90 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
-      >
-        <HomeHeader
-          name={displayName}
-          streak={streak}
-          freezeCount={freezeCount}
-          lastStudyDate={lastStudyDate}
-          onProfilePress={go(SCREENS.PROFILE)}
-          onStreakPress={() => setStreakSheetVisible(true)}
-          onCalendarPress={go(SCREENS.CALENDAR)}
-        />
-
-        <SyncProblemBanner />
-
-        <View style={{ marginTop: SPACING.lg }}>
-          <ExamCountdown onPress={go(SCREENS.GOALS)} />
-          <HomeExamAftermathRow />
-        </View>
-
-        <HomeCoachNudge
-          C={C}
-          nudge={nudges[0]}
-          onPress={() => {
-            const target = nudges[0].subject ? SCREENS.ANALYSIS : SCREENS.PLAN_DETAIL;
-            trackButtonTap("home_coach_nudge", { targetScreen: target });
-            navigation.navigate(target);
-          }}
-        />
-
-        <View style={{ marginTop: 22 }}>
-          <HomeHero
-            solvedToday={solvedToday}
-            dailyGoal={dailyGoal}
-            generatedTasks={generatedTasks}
-            weeklyDailyCounts={weeklyActivity.counts}
-            comeback={comeback}
-            onDismissComeback={dismissComeback}
-            onStartTask={(task) => {
-              if (!task) { go(SCREENS.ADD_STUDY)(); return; }
-              trackButtonTap("home_hero_cta_start", { subject: task.subject, targetScreen: SCREENS.STUDY_TIMER });
-              navigation.navigate(SCREENS.STUDY_TIMER, {
-                taskId: task.id,
-                planTaskKey: task.source === "plan" ? task.id : undefined,
-                subjectKey: task.subject,
-                topicName: task.label,
-                routeStopId: task.routeStop?.stopId,
-                routeStopVersion: task.routeStop?.version,
-              });
-            }}
-            onViewRoute={go(SCREENS.ROADMAP)}
-            onViewFullRoute={go(SCREENS.ROUTE_FULL)} onRedrawRoute={go(SCREENS.ROUTE_REDRAW)}
-          />
-        </View>
-
-        <HomePlanSection
-          C={C}
-          dailyAction={dailyAction}
-          generatedTasks={generatedTasks}
-          onAddTask={go(SCREENS.ADD_TASK)}
-          onAllDone={(items) => {
-            reward("perfect_plan", {
-              statUpdates: [{ type: "increment", key: "perfectPlans" }],
-            });
-            markDayDone(items);
-          }}
-          onReview={go(SCREENS.REVIEW_SESSION)}
-          onStartTask={(task) => {
-            trackButtonTap("home_plan_task_start", {
-              subject: task.subject,
-              targetScreen: SCREENS.STUDY_TIMER,
-            });
-            navigation.navigate(SCREENS.STUDY_TIMER, {
-              taskId: task.id,
-              planTaskKey: task.source === "plan" ? task.id : undefined,
-              subjectKey: task.subject,
-              topicName: task.label,
-              planSubjectKey: task.source === "plan" ? task.subject : undefined,
-              planTopicName: task.source === "plan" ? task.planTopicName : undefined,
-              routeStopId: task.routeStop?.stopId,
-              routeStopVersion: task.routeStop?.version,
-            });
-          }}
-          onRouteComplete={(stop) => transitionStop(stop, "completed", { source: "home_plan" })}
-          onViewPlan={go(SCREENS.PLAN_DETAIL)}
-          plan={plan}
-          srDue={planCtx.srDue}
-        />
-
-        {subjectMomentum.length > 0 && (
-          <AnimatedCard delay={120}>
-            <View style={{ marginTop: SPACING.md }}>
-              <SubjectMomentum subjects={subjectMomentum} />
-            </View>
-          </AnimatedCard>
-        )}
-
-        {weeklyActivity.total > 0 && (
-          <AnimatedCard delay={140}>
-            <View style={{ marginTop: SPACING.md }}>
-              <WeeklyActivityCard
-                totalQuestions={weeklyActivity.total}
-                percentChange={weeklyActivity.percent}
-                dailyCounts={weeklyActivity.counts}
-                onPress={go(SCREENS.ANALYSIS)}
-              />
-            </View>
-          </AnimatedCard>
-        )}
-
-        <HomeQuickActionsSection
-          actions={quickActions}
-          checkFeature={checkFeature}
-          navigation={navigation}
-          showPaywall={showPaywall}
-        />
-
-        <HomeWeeklySection
-          onWeeklyReview={go(SCREENS.WEEKLY_REVIEW)}
-          onWeeklyTrialReview={go(SCREENS.WEEKLY_TRIAL_REVIEW)}
-          weeklyReport={weeklyReport}
-          weeklyTrialReport={weeklyTrialReport}
-          wrappedPeriod={wrappedPeriod}
-          wrappedStats={wrappedStats}
-        />
-      </ScrollView>
-
+    <SafeAreaView edges={["top"]} style={[s.fill, { backgroundColor: C.bg }]}>
+      {body}
       <HomeOverlays
-        comeback={comeback}
-        completion={completion}
-        dailyGoal={dailyGoal}
-        daysLeft={daysLeft}
-        dismissComeback={dismissComeback}
-        dismissGoalComplete={dismissGoalComplete}
-        dismissLevelUp={dismissLevelUp}
-        dismissMilestone={dismissMilestone}
-        dismissNudgePopup={dismissNudgePopup}
-        dismissXP={dismissXP}
-        freezeCount={freezeCount}
-        freezeResetAt={freezeResetAt}
-        goalCompleteVisible={goalCompleteVisible}
-        lastStudyDate={lastStudyDate}
-        levelUpModal={levelUpModal}
-        longestStreak={longestStreak}
-        milestoneModal={milestoneModal}
-        minutesToday={minutesToday}
-        navigation={navigation}
-        nudgePopup={nudgePopup}
-        nudgeVisible={nudgeVisible}
-        nudges={nudges}
-        onCloseNudgeModal={() => setNudgeVisible(false)}
-        onCloseStreakSheet={() => setStreakSheetVisible(false)}
-        routeCurrentWeek={routeCurrentWeek}
-        routeTotals={routeTotals}
-        solvedToday={solvedToday}
-        streak={streak}
-        streakSheetVisible={streakSheetVisible}
-        xpToast={xpToast}
+        comeback={h.comeback}
+        completion={h.completion}
+        dailyGoal={h.dailyGoal}
+        daysLeft={dashboard.daysLeft}
+        dismissComeback={h.dismissComeback}
+        dismissGoalComplete={goalReward.dismissGoalComplete}
+        dismissLevelUp={gamification.dismissLevelUp}
+        dismissMilestone={gamification.dismissMilestone}
+        dismissNudgePopup={nudge.dismiss}
+        dismissXP={gamification.dismissXP}
+        freezeCount={h.freezeCount}
+        freezeResetAt={h.freezeResetAt}
+        goalCompleteVisible={goalReward.goalCompleteVisible}
+        lastStudyDate={h.lastStudyDate}
+        levelUpModal={gamification.levelUpModal}
+        longestStreak={h.longestStreak}
+        milestoneModal={gamification.milestoneModal}
+        minutesToday={dashboard.minutesToday}
+        navigation={h.navigation}
+        nudgePopup={nudge.popup}
+        nudgeVisible={false}
+        nudges={h.nudges}
+        onCloseNudgeModal={noop}
+        onCloseStreakSheet={noop}
+        routeCurrentWeek={dashboard.routeCurrentWeek}
+        routeTotals={dashboard.routeTotals}
+        solvedToday={dashboard.solvedToday}
+        streak={h.streak}
+        streakSheetVisible={false}
+        xpToast={gamification.xpToast}
       />
     </SafeAreaView>
   );
 }
+
+function noop() {}
+
+const s = StyleSheet.create({
+  fill: { flex: 1 },
+  content: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 + STEP.s4 + 4 },
+});

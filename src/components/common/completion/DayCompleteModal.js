@@ -7,7 +7,7 @@ import { GUTTER } from "../../../themes/tokens";
 import { formatNumber, formatMinutes, formatDayMonth } from "../../../lib/format";
 
 // "Gun Tamamlandi" (AKIS 16). Tetikleyici: bugunun plan kartindaki TUM
-// maddeler isaretlendi (TodayPlanCard -> onAllDone -> useCompletionMoments).
+// maddeler isaretlendi (useTodayStops -> onAllDone -> useCompletionMoments).
 // Tasarimdaki "YARIN SIRADA" bloku YOK: yarinin plani ancak yarin
 // uretiliyor, arkasinda veri olmayan alan cizilmez.
 export const DayCompleteModal = memo(function DayCompleteModal({

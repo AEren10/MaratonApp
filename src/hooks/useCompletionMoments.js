@@ -12,7 +12,7 @@ import {
 /**
  * Tamamlama anlarinin tetikleyicisi (AKIS 16). Kurallar
  * domain/route/completionMoments.js'te; bu hook yalniz "gorulen" kaydini
- * kullanici bazli anahtarda tutar ve gun anini TodayPlanCard'dan alir.
+ * kullanici bazli anahtarda tutar ve gun anini useTodayStops'tan alir.
  */
 export function useCompletionMoments({ currentWeek, totals, userId }) {
   const [seen, setSeen] = useState(null);
@@ -38,7 +38,7 @@ export function useCompletionMoments({ currentWeek, totals, userId }) {
 
   const moment = pickCompletionMoment({ seen, routeComplete, week, dayKey });
 
-  // TodayPlanCard'in onAllDone'i: maddelerin tamami isaretlendiginde cagrilir.
+  // useTodayStops'un onAllDone'i: maddelerin tamami isaretlendiginde cagrilir.
   const markDayDone = useCallback((items = []) => {
     const planItems = items.filter((item) => item.source === "plan");
     // Rota/plan gorevleri henuz yuklenmeden yalniz kullanici gorevleri

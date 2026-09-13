@@ -78,6 +78,15 @@ export const SYNC_PENDING_COPY = {
 };
 
 export const ERROR_COPY = {
+  // "Bağlantı Yok" artboardi (AKIS 17). Serit metni "Çevrimdışı Kuyruk"tan.
+  offline: {
+    title: "Bağlantı kurulamadı.",
+    body: "Çalışmaya devam edebilirsin, girdiklerin cihazında tutulur ve bağlantı gelince yüklenir.",
+    primary: "Tekrar dene",
+    secondary: "Çevrimdışı devam et",
+    bannerTitle: "Çevrimdışısın",
+    bannerBody: "Girdiğin her şey cihazında tutuluyor.",
+  },
   server: {
     title: "Bizde bir sorun var.",
     body: "Rotan yerinde duruyor, şu an sunucudan okunamıyor. Birkaç dakika içinde tekrar dene.",
