@@ -351,3 +351,9 @@
 - Premium snapshot, kota ve mağaza kimliği aynı kullanıcıya ait değilse motivasyon/paywall kararları yanlış verilir.
 - Supabase erişim/usage cevabı döndüğünde hâlâ aynı userId aktif değilse state'e yazılmamalı.
 - RevenueCat bir kez configure edildi diye sonraki hesap değişimlerini yok saymamalı; appUserID yeni kullanıcıya geçirilmelidir.
+
+## 2026-09-15 — Retention UI state'i kullanıcı değişiminde taşınmamalı
+
+- Geri dönüş modalı gibi motivasyon state'leri eski kullanıcıdan yeni kullanıcıya kalırsa ürün kişisel hissettirmek yerine yanlış veri gösterir.
+- Auth userId değiştiğinde comeback ve günlük ödül dedupe ref'leri temizlenmeli; yeni kullanıcının retention kararı kendi verisiyle yeniden kurulmalı.
+- Bu özellikle paylaşımlı cihaz / logout-login senaryosunda retention güvenini korur.

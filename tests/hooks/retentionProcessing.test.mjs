@@ -34,3 +34,11 @@ test("daily login reward has a user-scoped local fallback before server mark", (
   assert.match(source, /const loginRewarded = localLoginRewarded === today \? today : retentionData\.loginRewardedDate/);
   assert.match(source, /setString\(userScopedKey\(STORAGE_KEYS\.LOGIN_REWARDED, user\.id\), today\)/);
 });
+
+test("retention UI state is reset when the signed-in user changes", () => {
+  assert.match(source, /useEffect\(\(\) => \{\s+setComeback\(null\);/);
+  assert.match(source, /processedFor\.current = null;/);
+  assert.match(source, /comebackShownFor\.current = null;/);
+  assert.match(source, /dailyRewardScheduledFor\.current = null;/);
+  assert.match(source, /dailyRewardCompletedFor\.current = null;\s+\}, \[user\?\.id\]\);/);
+});

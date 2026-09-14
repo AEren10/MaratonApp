@@ -29,6 +29,14 @@ export function useRetention(reward) {
   const { user } = useAuth();
 
   useEffect(() => {
+    setComeback(null);
+    processedFor.current = null;
+    comebackShownFor.current = null;
+    dailyRewardScheduledFor.current = null;
+    dailyRewardCompletedFor.current = null;
+  }, [user?.id]);
+
+  useEffect(() => {
     if (!user?.id) {
       setLocalLoginRewarded(null);
       return undefined;
