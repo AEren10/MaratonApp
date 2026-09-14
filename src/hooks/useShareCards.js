@@ -59,6 +59,7 @@ export function useShareCards() {
       minutes: report.totalMinutes || 0,
       questions: report.totalQuestions || 0,
       activeDays: report.activeDays || 0,
+      trials: report.trialCount || 0,
       // useWeeklyReport netleri STRING döndürüyor (toFixed(1)); sayıya çevir.
       // Önceki haftanın ortalaması ayrıca verilmiyor, netDelta'dan türetiliyor.
       netAvg: report.weekNetAvg != null ? Number(report.weekNetAvg) : null,

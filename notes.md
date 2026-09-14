@@ -315,3 +315,9 @@
 - Retention nudge'ı delay sırasında storage'a “gösterildi” diye yazılırsa hızlı ekran değişimi/unmount nudge'ı kullanıcı görmeden o gün kapatır.
 - Gecikme sürecinde yalnız bellek içi `pending` kilidi tutulmalı; kalıcı shown kaydı ve `NUDGE_SHOWN` olayı ancak popup gerçekten state'e konduktan sonra yazılmalı.
 - Aynı anda ikinci timer açılmamalı; aksi halde analiz/home/deneme detay geçişlerinde üst üste popup veya ölçüm gürültüsü oluşur.
+
+## 2026-09-15 — Story kartları gerçek haftalık deneme sayısını bilmeli
+
+- `flat_week` kartı yalnız düşük aktif gün + deneme yok durumunda çıkmalı; haftalık context deneme sayısını taşımazsa deneme girilmiş haftayı da “rota düzleşti” diye anlatabilir.
+- Share/story algoritması görselden bağımsız içerik katmanı olduğu için her iddia gerçek veri alanıyla beslenmeli; veri yoksa kart çıkmasın, uydurma moral metni üretmesin.
+- Yeni story template veya kart eklenirken hook context'i ile domain kartının beklediği alanlar birlikte test edilmeli.
