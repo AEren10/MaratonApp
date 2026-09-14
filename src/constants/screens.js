@@ -129,6 +129,11 @@ export const SCREENS = {
   PREMIUM: "Premium",
   PRO_PREVIEW: "ProPreview",
   ACCESS_ENDED: "AccessEnded",
+  FIRST_WEEK: "FirstWeek",
+  FIRST_ROUTE_READY: "FirstRouteReady",
+  STUDY_PROCESSED: "StudyProcessed",
+  ONE_WEEK_COMPLETED: "OneWeekCompleted",
+  EIGHTH_DAY_LOCK: "EighthDayLock",
 
   // Settings
   SETTINGS: "Settings",
