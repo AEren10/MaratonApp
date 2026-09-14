@@ -5,10 +5,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, GlassCard } from "../../components/design";
+import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { comparePeriods, subjectComparison, personalBests, consistencyScore } from "../../lib/comparativeAnalytics";
 import { PeriodSummary } from "./components/PeriodSummary";
 import { SubjectProgress } from "./components/SubjectProgress";
@@ -36,11 +36,11 @@ export default function ComparativeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md }}>
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s3 }}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, marginLeft: SPACING.md, flex: 1 }}>
+        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, marginLeft: STEP.s3, flex: 1 }}>
           Karşılaştırmalı Analiz
         </Text>
       </View>
@@ -55,8 +55,8 @@ export default function ComparativeScreen() {
           color="accent"
         />
       ) : (
-        <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
-          <View style={{ flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.xl }}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
+          <View style={{ flexDirection: "row", gap: STEP.s2, marginBottom: STEP.s5 }}>
             {PERIODS.map((p) => {
               const active = periodDays === p.key;
               return (
@@ -67,13 +67,13 @@ export default function ComparativeScreen() {
                   accessibilityLabel={p.label}
                   accessibilityHint="Zaman aralığını değiştirir"
                   style={{
-                    flex: 1, paddingVertical: SPACING.sm, borderRadius: RADIUS.lg,
+                    flex: 1, paddingVertical: STEP.s2, borderRadius: 12,
                     borderWidth: 1.5, alignItems: "center",
                     backgroundColor: active ? C.accent + "20" : "transparent",
                     borderColor: active ? C.accent : C.border,
                   }}
                 >
-                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: active ? C.accent : C.sec }}>
+                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: active ? C.accent : C.text2 }}>
                     {p.label}
                   </Text>
                 </Pressable>
@@ -91,31 +91,31 @@ export default function ComparativeScreen() {
           )}
 
           {consistency.trialCount > 0 && (
-            <GlassCard radius={RADIUS.xxl} style={{ marginTop: SPACING.lg, padding: SPACING.lg }}>
+            <View style={{ marginTop: STEP.s4, padding: STEP.s4, borderRadius: 24, backgroundColor: C.surface, borderWidth: 1, borderColor: C.elev }}>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                 <View>
-                  <Text style={{ ...TYPOGRAPHY.label, color: C.muted, letterSpacing: 0.6 }}>TUTARLILIK</Text>
-                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: SPACING.xs }}>
+                  <Text style={{ ...TYPOGRAPHY.label, color: C.text3, letterSpacing: 0.6 }}>TUTARLILIK</Text>
+                  <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: STEP.s1 }}>
                     {consistency.label}
                   </Text>
                 </View>
                 <View style={{ alignItems: "center" }}>
-                  <Text style={{ fontFamily: "Bricolage_400", fontSize: 28, color: C.purple }}>
+                  <Text style={{ fontFamily: "Bricolage_400", fontSize: 28, color: C.text }}>
                     {Math.round(consistency.score)}
                   </Text>
-                  <Text style={{ ...TYPOGRAPHY.micro, color: C.purple, opacity: 0.6 }}>/100</Text>
+                  <Text style={{ ...TYPOGRAPHY.micro, color: C.text2 }}>/100</Text>
                 </View>
               </View>
-            </GlassCard>
+            </View>
           )}
 
           {subjects.length > 0 && (
-            <View style={{ marginTop: SPACING.xl }}>
+            <View style={{ marginTop: STEP.s5 }}>
               <SubjectProgress subjects={subjects} />
             </View>
           )}
 
-          <View style={{ marginTop: SPACING.xl }}>
+          <View style={{ marginTop: STEP.s5 }}>
             <PersonalBests bests={bests} />
           </View>
         </ScrollView>

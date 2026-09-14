@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
 import Svg, { Polyline, Line, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from "react-native-svg";
-import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, GlassCard } from "../design";
+import { Icon } from "../design";
 
 const W = 310;
 const H = 160;
@@ -45,15 +45,15 @@ export function TrendChart({ data, labels = [], color, title = "Net Trendi", com
   const areaStr = `${pts[0].x},${H - PAD_B} ${polyStr} ${pts[pts.length - 1].x},${H - PAD_B}`;
 
   return (
-    <View style={{ gap: SPACING.md }}>
+    <View style={{ gap: STEP.s3 }}>
       {!compact && (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>
           <Icon name="trendUp" size={18} color={chartColor} />
           <Text style={{ ...TYPOGRAPHY.subheading, color: C.text }}>{title}</Text>
         </View>
       )}
 
-      <GlassCard radius={24} style={{ padding: SPACING.lg }}>
+      <View style={{ padding: STEP.s4, borderRadius: 24, backgroundColor: C.surface, borderWidth: 1, borderColor: C.elev }}>
         <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
           <Defs>
             <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">

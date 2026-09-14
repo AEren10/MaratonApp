@@ -10,7 +10,6 @@ export { AnimatedNumber } from "./AnimatedNumber";
 export { Icon } from "./Icon";
 export { IconButton } from "./IconButton";
 export { AnimatedCard } from "./AnimatedCard";
-export { GlassCard } from "./GlassCard";
 export { SectionLabel } from "./SectionLabel";
 
 export { Spot } from "./Spot";
