@@ -23,3 +23,12 @@ test("notificationUrl only allows registered deep-link screens", () => {
 test("appUrl keeps the legacy tolerant fallback for non-notification share links", () => {
   assert.equal(appUrl("MissingScreen"), "maraton://home");
 });
+
+test("social share links use the route parameter names consumed by deep links", () => {
+  assert.equal(appUrl(SCREENS.LEAGUE, { groupCode: "ABC123" }), "maraton://group/ABC123");
+  assert.equal(appUrl(SCREENS.FRIENDS, { friendCode: "FRD456" }), "maraton://friend/FRD456");
+  assert.equal(appUrl(SCREENS.REFERRAL, { code: "REF789" }), "maraton://referral/REF789");
+
+  assert.doesNotMatch(appUrl(SCREENS.LEAGUE, { groupCode: "ABC123" }), /:[A-Za-z_][A-Za-z0-9_]*\??/);
+  assert.doesNotMatch(appUrl(SCREENS.FRIENDS, { friendCode: "FRD456" }), /:[A-Za-z_][A-Za-z0-9_]*\??/);
+});

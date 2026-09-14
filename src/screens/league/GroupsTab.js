@@ -120,7 +120,7 @@ export function GroupsTab({ user, initialGroupCode }) {
   };
 
   const shareCode = (g) => {
-    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { code: g.code })}` }).catch(() => {});
+    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { groupCode: g.code })}` }).catch(() => {});
   };
 
   const renderGroupChip = useCallback(({ item }) => {

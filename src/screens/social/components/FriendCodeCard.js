@@ -41,7 +41,7 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
 
   const shareCode = useCallback(() => {
     if (!myCode) return;
-    Share.share({ message: `Maraton'da benimle çalış! Arkadaşlık kodum: ${myCode}\n${appUrl(SCREENS.FRIENDS, { code: myCode })}` }).catch(() => {});
+    Share.share({ message: `Maraton'da benimle çalış! Arkadaşlık kodum: ${myCode}\n${appUrl(SCREENS.FRIENDS, { friendCode: myCode })}` }).catch(() => {});
   }, [myCode]);
 
   const addByCode = useCallback(async () => {

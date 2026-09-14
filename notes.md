@@ -287,3 +287,8 @@
 - `appUrl` paylaşım linkleri için toleranslı kalabilir, ama scheduled notification URL'leri bilinmeyen veya deep-link kapalı ekranda sessizce Home'a düşmemeli.
 - Bildirimler `notificationUrl` gibi fail-closed bir kapıdan geçmeli; yeni bildirim ekranı eklenirse önce `ROUTE_CONFIGS` içinde deep link olarak kayıtlı olduğu testle görünmeli.
 - Özellikle sınav arifesi, deneme provası, haftalık özet ve görev hatırlatmaları retention yüzeyi olduğu için yanlış deeplink kullanıcı güvenini ve geri dönüş oranını doğrudan bozar.
+
+## 2026-09-14 — Sosyal paylaşım link parametreleri
+
+- Grup ve arkadaş davet linklerinde `appUrl` param adı, route path içindeki param adıyla birebir aynı olmalı. `group/:groupCode?` yoluna `{ code }` verilirse link içinde `:groupCode?` kalır ve davet/referral akışı sessizce kırılır.
+- Referral/growth yüzeylerinde link metninde kod yazıyor olsa bile deep link bozuksa kullanıcı ekleme/katılma adımı manuel koda düşer; bu da paylaşım dönüşümünü azaltır.
