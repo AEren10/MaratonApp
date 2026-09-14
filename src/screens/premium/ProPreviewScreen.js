@@ -6,9 +6,9 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import { useProPreviewData } from "../../hooks/useProPreviewData";
 import { PRO_PREVIEW } from "../../constants/proPitch";
-import { SCREENS } from "../../constants/screens";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { ProPreviewHave } from "./components/ProPreviewHave";
@@ -26,13 +26,14 @@ export default function ProPreviewScreen() {
   const route = useRoute();
   const s = useMemo(() => makeStyles(C), [C]);
   const { rows } = useProPreviewData();
+  const { showPaywall } = usePremium();
 
   const source = route.params?.source;
   const dismiss = useCallback(() => { H.tap(); navigation.goBack(); }, [navigation]);
   const openPaywall = useCallback(() => {
     H.select();
-    navigation.replace(SCREENS.PAYWALL, { source: source || "pro_preview" });
-  }, [navigation, source]);
+    showPaywall(source || "pro_preview");
+  }, [showPaywall, source]);
 
   return (
     <View style={s.root}>

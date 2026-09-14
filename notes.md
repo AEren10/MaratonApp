@@ -270,3 +270,4 @@
 - İlk hafta, sınav arifesi/günü/sonrası ve access snapshot belirsizliği gibi suppression kuralları tek merkezde uygulanmalı. Direkt navigate hem kullanıcı güvenini bozar hem `PAYWALL_SUPPRESSED` ölçümünü kaçırır.
 - Aylık Özet kilidi `monthly_report` source'u ile merkezi gate'e bağlandı; benzer kilitler aynı paterni izlemeli.
 - Oturum eşiği gibi otomatik paywall tetikleyicileri de aynı merkezi gate'i kullanmalı. `PAYWALL_SHOWN_SESSION` yalnız gate gerçekten paywall açarsa yazılmalı; bastırılmış denemeyi “gösterildi” saymak ileride doğru zamanda açılmasını engeller.
+- Pro Önizleme gibi ara satış ekranları da ödeme ekranına doğrudan replace/navigate yapmamalı; CTA sadece merkezi gate'e source ile talep bırakmalı.
