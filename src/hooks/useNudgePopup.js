@@ -27,6 +27,12 @@ export function useNudgePopup(nudges) {
   const shownRef = useRef(new Set());
   const dayRef = useRef(todayKey());
   const timerRef = useRef(null);
+  const pendingIdRef = useRef(null);
+  const popupRef = useRef(null);
+
+  useEffect(() => {
+    popupRef.current = popup;
+  }, [popup]);
 
   useEffect(() => {
     const day = todayKey();
@@ -36,20 +42,27 @@ export function useNudgePopup(nudges) {
     }
     getJson(shownKey).then((parsed) => {
       if (parsed?.day === day) shownRef.current = new Set(parsed.ids || []);
-    });
+    }).catch(() => {});
   }, [shownKey]);
 
   const showNext = useCallback((delay = 1200) => {
-    if (!nudges || !nudges.length) return;
+    if (!nudges || !nudges.length || popupRef.current || timerRef.current) return;
     const candidate = nudges.find(
-      (n) => POPUP_TYPES.has(n.type) && !shownRef.current.has(n.type + (n.subject || "")),
+      (n) => {
+        const id = n.type + (n.subject || "");
+        return POPUP_TYPES.has(n.type) && !shownRef.current.has(id) && pendingIdRef.current !== id;
+      },
     );
     if (!candidate) return;
     const id = candidate.type + (candidate.subject || "");
-    shownRef.current.add(id);
-    setJson(shownKey, { day: todayKey(), ids: [...shownRef.current] });
+    pendingIdRef.current = id;
     timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (pendingIdRef.current !== id) return;
+      pendingIdRef.current = null;
       setPopup(candidate);
+      shownRef.current.add(id);
+      setJson(shownKey, { day: todayKey(), ids: [...shownRef.current] }).catch(() => {});
       if (user?.id) {
         recordRetentionEvent(
           user.id,
@@ -61,7 +74,10 @@ export function useNudgePopup(nudges) {
     }, delay);
   }, [nudges, shownKey, user?.id]);
 
-  useEffect(() => () => clearTimeout(timerRef.current), []);
+  useEffect(() => () => {
+    pendingIdRef.current = null;
+    clearTimeout(timerRef.current);
+  }, []);
 
   const dismiss = useCallback(() => {
     if (popup && user?.id) {

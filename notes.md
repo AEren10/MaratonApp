@@ -309,3 +309,9 @@
 - Günlük giriş ödülü istemcide verildikten sonra Supabase `login_rewarded_date` yazımı düşerse lokal fallback aynı gün tekrar ödülü engellemeli.
 - Bu fallback `userScopedKey(LOGIN_REWARDED, userId)` ile kullanıcıya özel olduğu için cross-user sızıntı yaratmaz; ancak logout temizliğine girerse token/auth hatasında aynı gün re-login ikinci ödül riski doğar.
 - `LOGIN_REWARDED`, retry/tampon anahtarları gibi logout cleanup dışında kalmalı; kullanıcıya görünen cache değil, ödül idempotency kilididir.
+
+## 2026-09-15 — Nudge popup görünmeden yanmış sayılmamalı
+
+- Retention nudge'ı delay sırasında storage'a “gösterildi” diye yazılırsa hızlı ekran değişimi/unmount nudge'ı kullanıcı görmeden o gün kapatır.
+- Gecikme sürecinde yalnız bellek içi `pending` kilidi tutulmalı; kalıcı shown kaydı ve `NUDGE_SHOWN` olayı ancak popup gerçekten state'e konduktan sonra yazılmalı.
+- Aynı anda ikinci timer açılmamalı; aksi halde analiz/home/deneme detay geçişlerinde üst üste popup veya ölçüm gürültüsü oluşur.
