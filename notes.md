@@ -333,3 +333,9 @@
 - `useWeeklyReport` auth yok/dev user durumunda fetch'i pas geçip loading'i açık bırakırsa share/story gibi ekranlar sonsuz skeleton'a düşebilir.
 - Kullanıcı değişimi veya logout sırasında eski haftalık çalışma logları temizlenmezse yeni/boş oturumda önceki kullanıcının kart/özet verisi kısa süre görünebilir.
 - Auth yoksa hook boş ama hazır state dönmeli; gerçek kullanıcı fetch'inde loading yeniden açılıp hata temizlenmeli.
+
+## 2026-09-15 — Story ivme kartı aktif sınav bağlamında kalmalı
+
+- Rota ve hedefler sınav türüne scope'luysa “son deneme ivmesi” story kartı da aktif sınav türünü tercih etmeli.
+- En çok geçmiş verisi olan eski sınav grubunu göstermek, kullanıcı AYT rotasındayken TYT ivmesini paylaşmasına ve ürün güveninin düşmesine yol açar.
+- Aktif sınav türünde en az iki geçerli deneme yoksa kart çıkmamalı; aktif sınav yoksa eski fallback kullanılabilir.

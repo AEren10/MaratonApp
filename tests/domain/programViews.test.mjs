@@ -83,3 +83,15 @@ test("ivme karti: son denemeler arasi fark, tek denemede yok", () => {
   assert.equal(trialMomentumCard(trials.slice(0, 1)).available, false);
   assert.deepEqual(cardsForMode([{ id: "questions" }, card], SHARE_MODES.IVME).map((c) => c.id), ["trial_momentum"]);
 });
+
+test("ivme karti aktif sinav turunu tercih eder", () => {
+  const trials = [
+    { date: "2026-01-01", totalNet: 60, trialType: "TYT" },
+    { date: "2026-02-01", totalNet: 65, trialType: "TYT" },
+    { date: "2026-03-01", totalNet: 40, trialType: "AYT" },
+    { date: "2026-04-01", totalNet: 42.5, trialType: "AYT" },
+  ];
+
+  assert.equal(trialMomentumCard(trials, 5, "AYT").heroValue, "+2,5");
+  assert.equal(trialMomentumCard(trials.slice(0, 2), 5, "AYT").available, false);
+});

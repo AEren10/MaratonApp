@@ -35,21 +35,28 @@ function trialNet(t) {
   return Number.isFinite(n) ? n : null;
 }
 
+function trialType(t) {
+  return String(t?.trialType || t?.exam_type || "UNKNOWN").toUpperCase();
+}
+
 /**
  * SON N DENEME — ayni turdeki son (en fazla) bes denemenin ilk ve son
  * neti arasindaki fark. En az iki deneme yoksa kart yok.
  */
-export function trialMomentumCard(trials = [], limit = 5) {
+export function trialMomentumCard(trials = [], limit = 5, preferredType = null) {
   const groups = new Map();
   trials.forEach((t) => {
     const net = trialNet(t);
     const time = new Date(t?.date || t?.trial_date).getTime();
     if (net == null || !Number.isFinite(time)) return;
-    const type = String(t.trialType || t.exam_type || "UNKNOWN").toUpperCase();
+    const type = trialType(t);
     if (!groups.has(type)) groups.set(type, []);
     groups.get(type).push({ net, time });
   });
-  const group = [...groups.values()].sort((a, b) => b.length - a.length)[0] || [];
+  const preferredKey = preferredType ? String(preferredType).toUpperCase() : null;
+  const group = preferredKey
+    ? groups.get(preferredKey) || []
+    : [...groups.values()].sort((a, b) => b.length - a.length)[0] || [];
   const last = group.sort((a, b) => a.time - b.time).slice(-limit);
   const n = last.length;
   const delta = n >= 2 ? last[n - 1].net - last[0].net : 0;

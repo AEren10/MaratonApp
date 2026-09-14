@@ -8,6 +8,7 @@ import { useWeeklyReport } from "./useWeeklyReport";
 import { useStudyRoute } from "./useStudyRoute";
 import { selectStreak, selectTodayLogs } from "../store/slices/studyLogSlice";
 import { selectRetentionData } from "../store/slices/gamificationSlice";
+import { useExam } from "../contexts/ExamContext";
 import { getSubjectByKey } from "../themes/subjects";
 import { dateKey, differenceInDays } from "../lib/dateUtils";
 
@@ -32,6 +33,7 @@ export function useShareCards() {
   const todayLogs = useSelector(selectTodayLogs);
   const retention = useSelector(selectRetentionData);
   const trials = useSelector(selectTrials);
+  const { examType } = useExam();
   const { route, currentWeek } = useStudyRoute({ persist: false });
 
   const today = useMemo(() => {
@@ -94,7 +96,7 @@ export function useShareCards() {
   }), [today, report, streak, comebackAfterDays, currentWeek, route]);
 
   // Ivme modunun "SON N DENEME" karti deneme verisinden (Kart Modlari).
-  const momentum = useMemo(() => trialMomentumCard(trials || []), [trials]);
+  const momentum = useMemo(() => trialMomentumCard(trials || [], 5, examType), [examType, trials]);
   const cards = useMemo(
     () => [...availableShareCards(ctx), ...(momentum.available ? [momentum] : [])],
     [ctx, momentum],
