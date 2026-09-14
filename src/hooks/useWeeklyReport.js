@@ -21,6 +21,7 @@ export function useWeeklyReport() {
   const { user } = useAuth();
   const trials = useSelector(selectTrials);
   const [logs, setLogs] = useState([]);
+  const [prevLogs, setPrevLogs] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,8 +30,15 @@ export function useWeeklyReport() {
   const weekEnd = useMemo(() => endOfWeek(), [todayKey]);
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!user?.id || user.id === "dev") {
+      setLogs([]);
+      setError(null);
+      setLoading(false);
+      return undefined;
+    }
     let cancelled = false;
+    setLoading(true);
+    setError(null);
     getStudyLogs(user.id, {
       from: toIso(weekStart),
       to: toIso(weekEnd),
@@ -45,10 +53,11 @@ export function useWeeklyReport() {
     return () => { cancelled = true; };
   }, [user?.id, weekStart, weekEnd]);
 
-  const [prevLogs, setPrevLogs] = useState([]);
-
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!user?.id || user.id === "dev") {
+      setPrevLogs([]);
+      return undefined;
+    }
     let cancelled = false;
     const ps = new Date(weekStart);
     ps.setDate(ps.getDate() - 7);

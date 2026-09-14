@@ -327,3 +327,9 @@
 - `WRAPPED_SHARED` event'i sabitlerde durup paylaşım hook'unda atılmazsa hangi story kartının viral döngü ürettiği ölçülemez.
 - Event yalnız başarılı native share sonrası atılmalı; galeriye kaydetme “shared” sayılıp dönüşüm metriğini şişirmemeli.
 - Payload en az `source`, `cardId` ve `mode` taşımalı ki emek/ivme/tam modlarının paylaşım etkisi ayrıştırılabilsin.
+
+## 2026-09-15 — Haftalık rapor auth boşluğunda eski veriyi taşımamalı
+
+- `useWeeklyReport` auth yok/dev user durumunda fetch'i pas geçip loading'i açık bırakırsa share/story gibi ekranlar sonsuz skeleton'a düşebilir.
+- Kullanıcı değişimi veya logout sırasında eski haftalık çalışma logları temizlenmezse yeni/boş oturumda önceki kullanıcının kart/özet verisi kısa süre görünebilir.
+- Auth yoksa hook boş ama hazır state dönmeli; gerçek kullanıcı fetch'inde loading yeniden açılıp hata temizlenmeli.
