@@ -10,7 +10,6 @@ import { SCREENS } from "../../constants/screens";
 import { LEGAL_DOCS } from "../../constants/legalDocs";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
-import { DataExportRow } from "./components/DataExportRow";
 import { useSettingsActions } from "./useSettingsActions";
 
 // Tasarimin "Gizlilik" ekrani bir HUB: belge satirlari + VERILERIN grubu.
@@ -22,6 +21,7 @@ export default function PrivacyScreen() {
   const { handleDeleteAccount } = useSettingsActions();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
+  const openExport = useCallback(() => navigation.navigate(SCREENS.DATA_EXPORT), [navigation]);
   const openDoc = useCallback(
     (docKey) => () => navigation.navigate(SCREENS.DOCUMENT, { docKey }),
     [navigation],
@@ -58,18 +58,14 @@ export default function PrivacyScreen() {
         </SettingsGroup>
 
         <SettingsGroup title="VERİLERİN">
-          <SettingsRow first label="Hesabımı sil" danger onPress={handleDeleteAccount} />
+          <SettingsRow first label="Verilerimi indir" onPress={openExport} />
+          <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
         </SettingsGroup>
-
-        {/* Veri indirme kendi ilerleme/hata halini tasiyor. */}
-        <View style={styles.exportWrap}>
-          <DataExportRow />
-        </View>
 
         <Card tone="surface" radius="panel" style={styles.note}>
           <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
-            Rota verisi hesabında sunucuda tutulur. Telefon değişse de 362 günlük
-            kaydın kaybolmaz.
+            Rota verisi hesabında sunucuda tutulur. Telefon değişse de
+            kayıtların kaybolmaz.
           </Text>
         </Card>
       </ScrollView>
@@ -86,6 +82,5 @@ const styles = StyleSheet.create({
     paddingVertical: STEP.s2,
   },
   scroll: { paddingBottom: 60 },
-  exportWrap: { paddingHorizontal: GUTTER, marginTop: STEP.s3 },
   note: { marginHorizontal: GUTTER, marginTop: STEP.s4 },
 });

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { View, Text } from "react-native";
 
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -7,6 +8,7 @@ import { usePendingWrites } from "../../../hooks/usePendingWrites";
 import { flushQueue, retryDeadLetter, clearDeadLetter } from "../../../lib/offlineQueue";
 import { useAlert } from "../../../contexts/AlertContext";
 import * as H from "../../../lib/haptics";
+import { SCREENS } from "../../../constants/screens";
 
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./SettingsRow";
@@ -24,6 +26,9 @@ export function SyncStatusGroup() {
   const showAlert = useAlert();
   const { pending, failed, refresh } = usePendingWrites();
   const [busy, setBusy] = useState(false);
+  const navigation = useNavigation();
+  // Tasarim: bekleyen kayitlar "Çevrimdışı Kuyruk"ta adiyla listelenir.
+  const openQueue = useCallback(() => { H.tap(); navigation.navigate(SCREENS.OFFLINE_QUEUE); }, [navigation]);
 
   const retry = useCallback(async () => {
     if (busy) return;
@@ -73,7 +78,7 @@ export function SyncStatusGroup() {
           icon="clock"
           iconColor={C.amber}
           label={`${pending} kayıt gönderilmeyi bekliyor`}
-          onPress={retry}
+          onPress={openQueue}
         />
       )}
       {failed > 0 && (

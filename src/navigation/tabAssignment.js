@@ -95,6 +95,8 @@ export const PROFIL_STACK = [
   SCREENS.SUBSCRIPTION,     // Abonelik ve Hesap
   SCREENS.SUBSCRIPTION_CANCEL, // Abonelik Iptali (onay)
   SCREENS.ABOUT,
+  SCREENS.DATA_EXPORT,      // Veri Indir
+  SCREENS.ACCOUNT_DELETE,   // Hesap Silme (tam onay ekrani)
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.CLASS_SCHEDULE,   // Ayarlar · Haftalik ders programi (paylasimli)
   SCREENS.SHARE_CARD,       // Paylasim Karti
@@ -132,6 +134,8 @@ export const ROOT_ONLY = [
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,
   SCREENS.ACCESS_ENDED,     // Deneme Bitti (bir kez, erisim bitince)
+  // Cevrimdisi Kuyruk global seritten (her sekmeden) aciliyor.
+  SCREENS.OFFLINE_QUEUE,
   SCREENS.EDIT_PROFILE,
   SCREENS.CHANGE_PASSWORD,
   SCREENS.EDIT_EMAIL,

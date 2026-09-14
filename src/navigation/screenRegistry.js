@@ -99,6 +99,9 @@ const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
 const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
+const DataExportScreen = React.lazy(() => import("../screens/settings/DataExportScreen"));
+const AccountDeleteScreen = React.lazy(() => import("../screens/settings/AccountDeleteScreen"));
+const OfflineQueueScreen = React.lazy(() => import("../screens/settings/OfflineQueueScreen"));
 
 const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(Comp), options });
 
@@ -230,6 +233,9 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
   screen(SCREENS.PRO_PREVIEW, ProPreviewScreen, overlayOptions),
   screen(SCREENS.ACCESS_ENDED, AccessEndedScreen, modalOptions),
+  screen(SCREENS.DATA_EXPORT, DataExportScreen),
+  screen(SCREENS.ACCOUNT_DELETE, AccountDeleteScreen, modalOptions),
+  screen(SCREENS.OFFLINE_QUEUE, OfflineQueueScreen),
 ];
 
 // Sekme stack'leri ada gore ekran tanimi ariyor (bkz. tabAssignment.js).

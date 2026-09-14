@@ -4,7 +4,7 @@ import { AppModal } from "../components/common/AppModal";
 const Ctx = createContext(null);
 
 export function AlertProvider({ children }) {
-  const [state, setState] = useState({ visible: false, title: "", message: "", actions: [], icon: null, iconColor: null });
+  const [state, setState] = useState({ visible: false, title: "", message: "", actions: [], icon: null, iconColor: null, variant: null });
 
   const showAlert = useCallback((title, message, actions, opts) => {
     if (typeof title === "object") {
@@ -25,6 +25,7 @@ export function AlertProvider({ children }) {
       actions: mapped.length > 0 ? mapped : [{ label: "Tamam" }],
       icon: opts?.icon || null,
       iconColor: opts?.iconColor || null,
+      variant: opts?.variant || null,
     });
   }, []);
 
@@ -41,6 +42,7 @@ export function AlertProvider({ children }) {
         actions={state.actions}
         icon={state.icon}
         iconColor={state.iconColor}
+        variant={state.variant}
       />
     </Ctx.Provider>
   );

@@ -11,12 +11,14 @@ import { SCREENS } from "../../constants/screens";
 import { trackButtonTap } from "../../lib/analytics";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
+import { useTrialCompareEntry } from "../../hooks/useTrialCompareEntry";
 import * as H from "../../lib/haptics";
 
 export function useAnalysisController(C) {
   const navigation = useNavigation();
   const { examType } = useExam();
   const { checkFeature, showPaywall } = usePremium();
+  const openCompare = useTrialCompareEntry();
   const { refresh } = useSync();
   const trials = useSelector(selectTrials);
   const nudges = useRecommendations();
@@ -51,8 +53,9 @@ export function useAnalysisController(C) {
 
   const go = useCallback((screen, params, analyticsId = "analysis_nav") => {
     trackButtonTap(analyticsId, { targetScreen: screen, filter });
+    if (screen === SCREENS.TRIAL_COMPARE) return openCompare(params);
     navigation.navigate(screen, params);
-  }, [filter, navigation]);
+  }, [filter, navigation, openCompare]);
 
   const openSimulator = useCallback(() => {
     if (!checkFeature("exam_simulator")) {

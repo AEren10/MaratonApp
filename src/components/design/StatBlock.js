@@ -41,6 +41,9 @@ export function StatBlock({
             { color: color || C.text },
           ]}
           allowFontScaling={false}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.6}
         >
           {value}
         </Text>
@@ -58,6 +61,7 @@ const styles = StyleSheet.create({
   center: { alignItems: "center" },
   row: { flexDirection: "row", alignItems: "baseline", gap: 6 },
   value: {
+    flexShrink: 1,
     fontFamily: "Bricolage_400",
     fontVariant: ["tabular-nums"],
   },

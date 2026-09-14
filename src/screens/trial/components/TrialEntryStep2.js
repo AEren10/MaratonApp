@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
+import { TrialEntryFooter } from "./TrialEntryFooter";
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP } from "../../../themes/tokens";
 import { EMPTY_TRIAL_SCORE } from "../../../domain/trial/trialEntryModel";
@@ -28,28 +29,30 @@ export function TrialEntryStep2({ form, styles, overflow, onNext }) {
   }, [form]);
 
   return (
-    <ScrollView contentContainerStyle={styles.scroll}
-      showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-      <Animated.View entering={FadeInDown.duration(500)}>
-        <Text style={styles.label}>{headerLabel}</Text>
-        <Text style={[styles.body, { marginTop: 6 }]}>Sayıya dokun, klavyeyle yaz. Artı-eksi ince ayar için.</Text>
-      </Animated.View>
-      <Animated.View entering={FadeInDown.delay(70).duration(500)} style={{ marginTop: STEP.s3 + 2 }}>
-        {form.subjects.map((subject) => (
-          <TrialSubjectScoreRow key={subject.key} subject={subject}
-            values={form.values[subject.key] || EMPTY_TRIAL_SCORE}
-            onChange={form.handleScoreChange(subject.key)} wrongPenalty={form.wrongPenalty}
-            overflow={overflow?.subjectKey === subject.key ? overflow : null} onFix={handleFix} />
-        ))}
-      </Animated.View>
-      <Animated.View entering={FadeInDown.delay(140).duration(500)} style={{ marginTop: STEP.s3 + 6 }}>
-        <TotalCard totalNet={form.totalNet} previousNet={previous?.totalNet} styles={styles} />
-      </Animated.View>
-      <View style={styles.actions}>
-        <Button size="lg" onPress={onNext} fullWidth disabled={!!overflow}>
-          Devam
-        </Button>
-      </View>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <Animated.View entering={FadeInDown.duration(500)}>
+          <Text style={styles.label}>{headerLabel}</Text>
+          <Text style={[styles.body, { marginTop: 6 }]}>Sayıya dokun, klavyeyle yaz. Artı-eksi ince ayar için.</Text>
+        </Animated.View>
+        <Animated.View entering={FadeInDown.delay(70).duration(500)} style={{ marginTop: STEP.s3 + 2 }}>
+          {form.subjects.map((subject) => (
+            <TrialSubjectScoreRow key={subject.key} subject={subject}
+              values={form.values[subject.key] || EMPTY_TRIAL_SCORE}
+              onChange={form.handleScoreChange(subject.key)} wrongPenalty={form.wrongPenalty}
+              overflow={overflow?.subjectKey === subject.key ? overflow : null} onFix={handleFix} />
+          ))}
+        </Animated.View>
+        <Animated.View entering={FadeInDown.delay(140).duration(500)} style={{ marginTop: STEP.s3 + 6 }}>
+          <TotalCard totalNet={form.totalNet} previousNet={previous?.totalNet} styles={styles} />
+        </Animated.View>
+      </ScrollView>
+        <TrialEntryFooter>
+          <Button size="lg" onPress={onNext} fullWidth disabled={!!overflow}>
+            Devam
+          </Button>
+        </TrialEntryFooter>
+    </View>
   );
 }

@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { Icon, EmptyState } from "../../components/design";
 import { SubjectListCard } from "./components/SubjectListCard";
+import { WeakAreasLink } from "./components/WeakAreasLink";
 
 function filterTrials(trials, filter) {
   if (!filter || filter === "ALL") return trials.filter((t) => t.trialType !== "BRANCH");
@@ -107,6 +108,7 @@ export default function SubjectListScreen() {
         renderItem={renderItem}
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={items.length ? <WeakAreasLink /> : null}
         ListEmptyComponent={
           <EmptyState title="Bu filtre için deneme verisi yok." />
         }

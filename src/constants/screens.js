@@ -140,4 +140,7 @@ export const SCREENS = {
   PRIVACY: "Privacy",
   TERMS: "Terms",
   ABOUT: "About",
+  DATA_EXPORT: "DataExport",
+  ACCOUNT_DELETE: "AccountDelete",
+  OFFLINE_QUEUE: "OfflineQueue",
 };

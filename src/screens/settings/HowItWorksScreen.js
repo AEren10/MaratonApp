@@ -8,6 +8,8 @@ import { Icon, Card, Button } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { HOW_IT_WORKS as T } from "../../constants/howItWorks";
 import { HowItWorksSource } from "./components/HowItWorksSource";
 
@@ -22,7 +24,8 @@ export default function HowItWorksScreen() {
   const navigation = useNavigation();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
-  const openPrivacy = useCallback(() => navigation.navigate(SCREENS.PRIVACY), [navigation]);
+  // Tasarim: "Verilerimi indir" Veri İndir ekranina gider (PROFIL sekmesinde).
+  const openPrivacy = useCallback(() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.DATA_EXPORT), [navigation]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>

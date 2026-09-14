@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from "react";
-import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
+import { navigationRef } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ActivityIndicator, AppState, View } from "react-native";
@@ -189,7 +190,6 @@ function Loading() {
 export default function AppNavigator() {
   const { session, loading, recoveryMode } = useAuth();
   const { onboardingDone, hasSeenSlides, loading: examLoading } = useExam();
-  const navigationRef = useNavigationContainerRef();
   const navigationTracker = useMemo(() => createNavigationTracker(track), []);
 
   useEffect(() => {

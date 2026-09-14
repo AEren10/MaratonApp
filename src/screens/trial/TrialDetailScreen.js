@@ -13,6 +13,7 @@ import { TrialReportCard } from "./components/TrialReportCard";
 import { NudgePopup } from "../../components/common/NudgePopup";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
+import { useTrialCompareEntry } from "../../hooks/useTrialCompareEntry";
 import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
 import { useResolvedTrial } from "./useResolvedTrial";
@@ -29,6 +30,7 @@ import { TrialDetailActions } from "./components/TrialDetailActions";
 export default function TrialDetailScreen() {
   const C = useC();
   const navigation = useNavigation();
+  const openCompare = useTrialCompareEntry();
   const route = useRoute();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
@@ -92,7 +94,7 @@ export default function TrialDetailScreen() {
         <TrialDetailRouteImpact C={C} routeImpact={detail.routeImpact} />
         <TrialDetailActions
           onAddWrong={() => navigation.navigate(SCREENS.ADD_WRONG)}
-          onCompare={() => navigation.navigate(SCREENS.TRIAL_COMPARE)}
+          onCompare={() => openCompare()}
         />
       </ScrollView>
 

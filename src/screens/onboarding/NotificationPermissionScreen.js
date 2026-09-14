@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Linking } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -17,6 +17,7 @@ import {
   ensurePushTokenRegistered,
 } from "../../lib/notifications";
 import * as H from "../../lib/haptics";
+import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 
 function NotificationPermissionContent() {
   const C = useC();
@@ -24,6 +25,13 @@ function NotificationPermissionContent() {
   const { user } = useAuth();
   const [denied, setDenied] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Kurulum zincirinden gelindiyse (Rota Hazır) izin/atla kurulumu bitirir.
+  const onboardingSummary = useRoute().params?.onboardingSummary;
+  const { complete } = useFinishOnboarding();
+  const leave = useCallback(() => {
+    if (onboardingSummary) complete(onboardingSummary).catch(() => {});
+    else navigation.goBack();
+  }, [complete, navigation, onboardingSummary]);
 
   const handleAllow = useCallback(async () => {
     setBusy(true);
@@ -36,17 +44,17 @@ function NotificationPermissionContent() {
         await ensurePushTokenRegistered(user?.id);
       } catch {}
       setBusy(false);
-      navigation.goBack();
+      leave();
       return;
     }
     setBusy(false);
     setDenied(true);
-  }, [navigation, user?.id]);
+  }, [leave, user?.id]);
 
   const handleSkip = useCallback(() => {
     H.tap();
-    navigation.goBack();
-  }, [navigation]);
+    leave();
+  }, [leave]);
 
   if (denied) {
     return (

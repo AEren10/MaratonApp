@@ -71,7 +71,7 @@ export default function SubscriptionScreen() {
             <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
           </SettingsGroup>
           <Text style={[TYPOGRAPHY.meta, styles.note, { color: C.text3 }]}>
-            Hesap silme 30 gün içinde tüm veriyi kaldırır. Aboneliğin varsa mağazadan
+            Hesap silme tüm veriyi kalıcı olarak kaldırır. Aboneliğin varsa mağazadan
             ayrıca iptal etmen gerekir.
           </Text>
         </Animated.View>

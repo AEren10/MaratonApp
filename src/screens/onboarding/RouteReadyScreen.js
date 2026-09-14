@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { Button, StatBlock } from "../../components/design";
@@ -10,21 +10,16 @@ import RouteReadyFirstTask from "./components/RouteReadyFirstTask";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteReadySummary } from "../../hooks/useRouteReadySummary";
-import { SCREENS } from "../../constants/screens";
-import { ROOT_STACK } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
-import { track } from "../../lib/analytics";
-import { EVENTS } from "../../constants/analytics";
-import { useExam } from "../../contexts/ExamContext";
+import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 
 export default function RouteReadyScreen() {
   // Seviye Testi sunucuya yazamadiysa notu buraya tasiyor (o ekran submit
   // sonrasi kapandigi icin orada gosterilemiyor).
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
   const C = useC();
-  const navigation = useNavigation();
   const [starting, setStarting] = useState(false);
-  const { completeOnboarding } = useExam();
+  const { finish } = useFinishOnboarding();
   const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, createRoute } =
     useRouteReadySummary();
 
@@ -36,19 +31,12 @@ export default function RouteReadyScreen() {
   // atiliyordu ama kurulum orada bitmiyor — tasarim dort adim tanimliyor ve
   // gercek tamamlanma noktasi burasi. GoalSetup'ta biraksaydik huni son iki
   // adimi hic gormezdi.
-  const finishOnboarding = useCallback(async () => {
-    track(EVENTS.ONBOARDING_COMPLETE, {
-      daysUntilExam,
-      stopCount,
-      hasTargetNet: targetNet != null,
-      hasBaselineNet: currentNet != null,
-    });
-    await completeOnboarding();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: ROOT_STACK.MAIN_TABS, params: { screen: SCREENS.ROADMAP } }],
-    });
-  }, [completeOnboarding, navigation, daysUntilExam, stopCount, targetNet, currentNet]);
+  const finishOnboarding = useCallback(() => finish({
+    daysUntilExam,
+    stopCount,
+    hasTargetNet: targetNet != null,
+    hasBaselineNet: currentNet != null,
+  }), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
 
   const handleStart = useCallback(async () => {
     setStarting(true);

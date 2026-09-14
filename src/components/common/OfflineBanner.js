@@ -1,24 +1,26 @@
-import { useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useNetwork } from "../../contexts/NetworkContext";
-import { useC } from "../../contexts/ThemeContext";
 import { usePendingWrites } from "../../hooks/usePendingWrites";
 import { ERROR_COPY } from "../../constants/stateCopy";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { SCREENS } from "../../constants/screens";
+import { STEP } from "../../themes/tokens";
+import { navigationRef, navigateFromOutside } from "../../navigation/navigationRef";
+import * as H from "../../lib/haptics";
+import { OfflineStrip, offlineStripBody } from "./OfflineStrip";
 
-const COPY = ERROR_COPY.offline;
 const POLL_MS = 15000;
 
-// "Çevrimdışı Kuyruk" artboardinin ust seridi: sari kenarli yuzey, kare
-// isaret, "Çevrimdışısın" + kuyruktaki kayit sayisi. Golge yok.
+// Global serit. Kuyrukta kayit varsa dokununca "Çevrimdışı Kuyruk" acilir;
+// o ekran seridi kendi icinde cizdigi icin orada bu katman gizlenir.
 export default function OfflineBanner() {
   const { isConnected } = useNetwork();
-  const C = useC();
   const insets = useSafeAreaInsets();
   const { pending, refresh } = usePendingWrites({ pollOnForeground: false });
+  const [onQueueScreen, setOnQueueScreen] = useState(false);
 
   useEffect(() => {
     if (isConnected) return undefined;
@@ -27,42 +29,34 @@ export default function OfflineBanner() {
     return () => clearInterval(t);
   }, [isConnected, refresh]);
 
-  if (isConnected) return null;
+  useEffect(() => navigationRef.addListener("state", () => {
+    setOnQueueScreen(navigationRef.getCurrentRoute()?.name === SCREENS.OFFLINE_QUEUE);
+  }), []);
 
-  const body = pending > 0 ? `${pending} kayıt bağlantı gelince yüklenecek` : COPY.bannerBody;
+  const open = useCallback(() => {
+    if (navigateFromOutside(SCREENS.OFFLINE_QUEUE)) H.tap();
+  }, []);
+
+  if (isConnected || onQueueScreen) return null;
 
   return (
     <Animated.View
       entering={FadeInDown.duration(500)}
       exiting={FadeOutUp.duration(500)}
-      accessibilityRole="alert"
-      accessibilityLabel={`${COPY.bannerTitle}. ${body}`}
-      style={[s.container, { top: insets.top + STEP.s1, backgroundColor: C.surface, borderColor: C.warn }]}
+      style={[s.container, { top: insets.top + STEP.s1 }]}
     >
-      <View style={[s.mark, { backgroundColor: C.warn }]} />
-      <View style={s.flex}>
-        <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text }]}>{COPY.bannerTitle}</Text>
-        <Text numberOfLines={2} style={[TYPOGRAPHY.micro, s.body, { color: C.text3 }]}>{body}</Text>
-      </View>
+      <Pressable
+        onPress={pending > 0 ? open : undefined}
+        disabled={!(pending > 0)}
+        accessibilityRole={pending > 0 ? "button" : "alert"}
+        accessibilityLabel={`${ERROR_COPY.offline.bannerTitle}. ${offlineStripBody(pending)}`}
+      >
+        <OfflineStrip pending={pending} />
+      </Pressable>
     </Animated.View>
   );
 }
 
 const s = StyleSheet.create({
-  container: {
-    position: "absolute",
-    left: STEP.s2 + 4,
-    right: STEP.s2 + 4,
-    zIndex: 999,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s2 + 1,
-    paddingVertical: STEP.s2 + 3,
-    paddingHorizontal: STEP.s3 - 2,
-    borderRadius: SHAPE.card,
-    borderWidth: 1,
-  },
-  mark: { width: 9, height: 9, borderRadius: SHAPE.chip / 6 },
-  flex: { flex: 1, minWidth: 0 },
-  body: { marginTop: STEP.s1 / 2 - 1 },
+  container: { position: "absolute", left: STEP.s2 + 4, right: STEP.s2 + 4, zIndex: 999 },
 });

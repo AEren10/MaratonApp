@@ -91,7 +91,8 @@ export default function ReviewSessionScreen() {
         <View style={styles.panel}>
           <ReviewPendingPanel before={s.pendingStart} now={s.pendingNow} status={status} />
         </View>
-
+      </ScrollView>
+      <View style={[styles.footer, { borderTopColor: C.line, backgroundColor: C.bg }]}>
         <View style={styles.actions}>
           <Button variant="outline" size="lg" onPress={() => s.grade(false)} style={styles.flex} accessibilityLabel="Bilemedim">
             Bilemedim
@@ -107,7 +108,7 @@ export default function ReviewSessionScreen() {
         >
           {status.hint}
         </Animated.Text>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -120,7 +121,9 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: STEP.s4 },
   question: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 - 6 },
   panel: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 2 },
-  actions: { flexDirection: "row", gap: STEP.s2, paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 2 },
+  // Kucuk Ekran kurali: Bildim/Bilemedim icerikle kaymaz, alt seritte.
+  footer: { borderTopWidth: 1, paddingTop: STEP.s2, paddingBottom: STEP.s1 },
+  actions: { flexDirection: "row", gap: STEP.s2, paddingHorizontal: GUTTER },
   flex: { flex: 1 },
   hint: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 + 2 },
 });

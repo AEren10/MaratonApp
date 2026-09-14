@@ -117,6 +117,9 @@ export const ROUTE_CONFIGS = {
   [SCREENS.PRIVACY]: { path: "gizlilik", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.TERMS]: { path: "kosullar", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.ABOUT]: { path: "hakkinda", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
+  [SCREENS.DATA_EXPORT]: { path: "ayarlar/veri-indir", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
+  [SCREENS.ACCOUNT_DELETE]: { path: "ayarlar/hesap-sil", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
+  [SCREENS.OFFLINE_QUEUE]: { path: "cevrimdisi-kuyruk", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
 };
 
 export const ROUTE_PATHS = Object.fromEntries(
