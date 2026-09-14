@@ -263,3 +263,9 @@
 - Çalışma kaydı artık kullanıcı tarafından düzenlenip silinebiliyor; `topic_progress` yalnız INSERT ile artarsa rota/konu ustalığı/retention sinyali eski katkıları taşımaya devam eder.
 - `study_logs` trigger'ı INSERT/UPDATE/DELETE için delta-safe kalmalı: UPDATE eski katkıyı düşüp yeni katkıyı eklemeli, DELETE eski katkıyı düşmeli.
 - Eski katkı düşerken sayaçlar negatife inmemeli ve `last_studied_at` kalan çalışma kayıtlarına göre yeniden hesaplanmalı. Aksi halde “uzun süredir çalışılmadı” sinyali ve rota önceliği bayatlar.
+
+## 2026-09-14 — Premium kilitleri merkezi paywall gate
+
+- Yeni kilitli premium yüzeyler doğrudan `navigation.navigate(SCREENS.PAYWALL)` çağırmamalı; `usePremium().showPaywall(source)` üzerinden geçmeli.
+- İlk hafta, sınav arifesi/günü/sonrası ve access snapshot belirsizliği gibi suppression kuralları tek merkezde uygulanmalı. Direkt navigate hem kullanıcı güvenini bozar hem `PAYWALL_SUPPRESSED` ölçümünü kaçırır.
+- Aylık Özet kilidi `monthly_report` source'u ile merkezi gate'e bağlandı; benzer kilitler aynı paterni izlemeli.

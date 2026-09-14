@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
+import { usePremium } from "../../contexts/PremiumContext";
 import { useSummary } from "../../hooks/useSummary";
 import { SCREENS } from "../../constants/screens";
 import { SHARE_CARD_IDS } from "../../domain/share/shareCards";
@@ -27,6 +28,7 @@ function SummaryScreenInner() {
   const C = useC();
   const navigation = useNavigation();
   const route = useRoute();
+  const { showPaywall } = usePremium();
   const period = WEEK_ROUTES.has(route.name) ? "week" : normalizePeriod(route.params?.period);
   const data = useSummary(period);
 
@@ -39,8 +41,8 @@ function SummaryScreenInner() {
   }, [navigation, period]);
   const handlePromise = useCallback(() => navigation.navigate(SCREENS.PLAN_VS_ACTUAL), [navigation]);
   const handleUnlock = useCallback(() => {
-    navigation.navigate(SCREENS.PAYWALL, { source: "monthly_report" });
-  }, [navigation]);
+    showPaywall("monthly_report");
+  }, [showPaywall]);
   const handleStart = useCallback(() => navigation.navigate(SCREENS.HOME), [navigation]);
   const handleHowStreak = useCallback(() => navigation.navigate(SCREENS.HOW_IT_WORKS), [navigation]);
 
