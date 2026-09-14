@@ -375,3 +375,9 @@
 - Kilitli özelliğe ilk dokunuşta local `seen` okuma/yazma hatası olursa kullanıcı ne preview ne paywall görmeden kalmamalı.
 - Pro preview gösterimi best-effort yerel kayda dayanmalı; storage bozuksa ilk preview yine açılabilir.
 - `seen` kontrolü beklerken kullanıcı değişirse eski kullanıcı adına preview navigate edilmemeli.
+
+## 2026-09-15 — Fiziksel iPhone için development build profili
+
+- Proje Expo SDK 54; farklı SDK taşıyan Expo Go ile açılamaz. Sırf telefondaki Expo Go sürümü için proje SDK'sı aceleyle yükseltilmemeli.
+- EAS `ios.simulator: true` çıktısı fiziksel iPhone'a kurulamaz. `development` fiziksel cihaz için, `development-simulator` ayrı simülatör profili için tutulmalı.
+- Google Sign-In ve RevenueCat gibi native modüllerin gerçek cihaz testi için Expo Go yerine development build kullanılmalı. iOS ad hoc dağıtımında Apple Developer üyeliği ve cihaz kaydı gerekir.
