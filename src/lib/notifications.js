@@ -202,7 +202,7 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
       content: {
         title,
         body,
-        data: { type: "weekly_summary", url: appUrl(SCREENS.WEEKLY_REVIEW) },
+        data: { type: "weekly_summary", url: appUrl(SCREENS.SUMMARY, { period: "week" }) },
       },
       trigger: {
         // Tasarim: "Haftalik rapor · Pazar 20:00". weekday 1 = Pazar

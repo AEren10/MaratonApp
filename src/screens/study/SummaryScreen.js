@@ -1,89 +1,84 @@
 import { useCallback } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { EmptyState } from "../../components/design";
+import { EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { useSummary } from "../../hooks/useSummary";
 import { SCREENS } from "../../constants/screens";
-import { STEP, GUTTER } from "../../themes/tokens";
+import { SHARE_CARD_IDS } from "../../domain/share/shareCards";
+import { normalizePeriod } from "../../domain/summary/periodRange";
+import { STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SummaryHeader } from "./components/SummaryHeader";
-import { SummaryHero } from "./components/SummaryHero";
-import { SummaryWeeklyChart } from "./components/SummaryWeeklyChart";
-import { SummaryTaskList } from "./components/SummaryTaskList";
-import { SummaryRouteImpact } from "./components/SummaryRouteImpact";
-import { SummaryCta } from "./components/SummaryCta";
+import { StreakZeroHero } from "./components/summary/StreakZeroHero";
+import { SummaryLocked } from "./components/summary/SummaryLocked";
+import { SummaryActions } from "./components/summary/SummaryActions";
+import { DaySummaryBody } from "./components/summary/DaySummaryBody";
+import { WeekSummaryBody } from "./components/summary/WeekSummaryBody";
+import { MonthSummaryBody } from "./components/summary/MonthSummaryBody";
+
+// Eski WeeklyReview / WeeklyTrialReview rotalari (bildirim, derin baglanti)
+// bu ekrana haftalik modda duser.
+const WEEK_ROUTES = new Set([SCREENS.WEEKLY_REVIEW, SCREENS.WEEKLY_TRIAL_REVIEW]);
+const SHARE_IDS = { day: SHARE_CARD_IDS.STUDY_DAY, week: SHARE_CARD_IDS.WEEKLY_ROUTE };
 
 function SummaryScreenInner() {
   const C = useC();
   const navigation = useNavigation();
   const route = useRoute();
-  const period = route.params?.period || "day";
+  const period = WEEK_ROUTES.has(route.name) ? "week" : normalizePeriod(route.params?.period);
   const data = useSummary(period);
 
   const handleClose = useCallback(() => navigation.goBack(), [navigation]);
   const handlePrimary = useCallback(() => {
-    if (period === "day") navigation.navigate(SCREENS.ROADMAP);
+    navigation.navigate(period === "month" ? SCREENS.CALENDAR : SCREENS.ROADMAP);
   }, [navigation, period]);
   const handleShare = useCallback(() => {
-    navigation.navigate(SCREENS.SHARE_CARD, { type: period });
+    navigation.navigate(SCREENS.SHARE_CARD, SHARE_IDS[period] ? { cardId: SHARE_IDS[period] } : undefined);
   }, [navigation, period]);
+  const handlePromise = useCallback(() => navigation.navigate(SCREENS.PLAN_VS_ACTUAL), [navigation]);
+  const handleUnlock = useCallback(() => {
+    navigation.navigate(SCREENS.PAYWALL, { source: "monthly_report" });
+  }, [navigation]);
+  const handleStart = useCallback(() => navigation.navigate(SCREENS.HOME), [navigation]);
+  const handleHowStreak = useCallback(() => navigation.navigate(SCREENS.HOW_IT_WORKS), [navigation]);
 
-  if (!data.ready) {
-    return (
-      <View style={[styles.safe, { backgroundColor: C.bg }]}>
-        <SummaryHeader dateLabel={data.dateLabel} onClose={handleClose} />
-        <View style={styles.emptyWrap}>
-          <EmptyState
-            title={period === "week" ? "Haftalık özet hazırlanıyor" : "Aylık özet hazırlanıyor"}
-            body="Bu dönem için veri toplama henüz bağlanmadı — sonraki sürümde tamamlanacak."
-          />
-        </View>
+  let body;
+  if (data.locked) {
+    body = <SummaryLocked onUnlock={handleUnlock} />;
+  } else if (data.loading) {
+    body = (
+      <View style={styles.pad}>
+        <Skeleton height={96} radius={SHAPE.cardTight} />
+        <Skeleton height={146} radius={SHAPE.panel} style={styles.gap} />
       </View>
+    );
+  } else if (data.error && period !== "day") {
+    body = <View style={styles.pad}><ErrorState preset="server" onPrimary={data.retry} /></View>;
+  } else if (data.streak === 0 && !data.hasActivity) {
+    body = (
+      <View style={styles.pad}>
+        <EmptyState preset="streakZero" onPrimary={handleStart} onSecondary={handleHowStreak}>
+          <StreakZeroHero />
+        </EmptyState>
+      </View>
+    );
+  } else {
+    body = (
+      <>
+        {period === "day" ? <DaySummaryBody data={data} onShare={handleShare} /> : null}
+        {period === "week" ? <WeekSummaryBody data={data} onPromise={handlePromise} /> : null}
+        {period === "month" ? <MonthSummaryBody data={data} /> : null}
+        <SummaryActions period={period} ctaLabel={data.ctaLabel} onPrimary={handlePrimary} onShare={handleShare} />
+      </>
     );
   }
 
   return (
     <ScrollView style={[styles.safe, { backgroundColor: C.bg }]} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <SummaryHeader dateLabel={data.dateLabel} onClose={handleClose} />
-
-      {!data.hasData ? (
-        <View style={styles.emptyWrap}>
-          <EmptyState preset="streakZero" />
-        </View>
-      ) : (
-        <>
-          <Animated.View entering={FadeInDown.delay(60).duration(500)}>
-            <SummaryHero
-              headline={data.headline}
-              totalQuestions={data.totalQuestions}
-              stopsToday={data.stopsToday}
-              durationLabel={data.durationLabel}
-              dateLabel={data.dateLabel}
-            />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(140).duration(500)}>
-            <SummaryWeeklyChart
-              bars={data.weeklyBars}
-              deltaPct={data.questionsDeltaPct}
-              loading={data.weeklyLoading}
-            />
-          </Animated.View>
-
-          <SummaryTaskList tasks={data.tasks} />
-          <SummaryRouteImpact impact={data.routeImpact} />
-        </>
-      )}
-
-      <SummaryCta
-        ctaLabel={data.ctaLabel}
-        shareLabel={data.shareLabel}
-        onPrimary={handlePrimary}
-        onShare={handleShare}
-      />
+      <SummaryHeader dateLabel={data.headerLabel || ""} onClose={handleClose} />
+      {body}
     </ScrollView>
   );
 }
@@ -99,5 +94,6 @@ export default function SummaryScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { paddingTop: STEP.s4, paddingBottom: STEP.s5 },
-  emptyWrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  pad: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  gap: { marginTop: STEP.s3 },
 });

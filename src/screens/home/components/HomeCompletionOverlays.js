@@ -59,7 +59,7 @@ export function HomeCompletionOverlays({
         week={week}
         onClose={dismiss}
         onNextWeek={go("home_week_complete_next", SCREENS.ROADMAP)}
-        onWeeklySummary={go("home_week_complete_summary", SCREENS.WEEKLY_REVIEW)}
+        onWeeklySummary={go("home_week_complete_summary", SCREENS.SUMMARY, { period: "week" })}
       />
     );
   }

@@ -52,7 +52,6 @@ import ExamDateScreen from "../screens/settings/ExamDateScreen";
 import SubscriptionScreen from "../screens/premium/SubscriptionScreen";
 import CancelSubscriptionScreen from "../screens/premium/CancelSubscriptionScreen";
 import LevelScreen from "../screens/profile/LevelScreen";
-import WeeklyTrialReviewScreen from "../screens/trial/WeeklyTrialReviewScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
 import AddTaskScreen from "../screens/plan/AddTaskScreen";
 import TopicCardsScreen from "../screens/topics/TopicCardsScreen";
@@ -64,7 +63,6 @@ import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
 import CalendarScreen from "../screens/calendar/CalendarScreen";
-import WeeklyReviewScreen from "../screens/home/WeeklyReviewScreen";
 
 const AppearanceScreen = React.lazy(() => import("../screens/settings/AppearanceScreen"));
 const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
@@ -197,8 +195,8 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.DOCUMENT, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),
   screen(SCREENS.EXAM_DATE, ExamDateScreen, modalOptions),
-  screen(SCREENS.WEEKLY_REVIEW, WeeklyReviewScreen, celebrationOptions),
-  screen(SCREENS.WEEKLY_TRIAL_REVIEW, WeeklyTrialReviewScreen, celebrationOptions),
+  screen(SCREENS.WEEKLY_REVIEW, SummaryScreen), // eski rota -> Haftalik Ozet
+  screen(SCREENS.WEEKLY_TRIAL_REVIEW, SummaryScreen), // eski rota -> Haftalik Ozet
   // Kart Tekrari ve Hizli Pratik "Tekrar" tasarimina katlandi; eski rota
   // adlari derin baglanti/eski girisler icin ayni ekrana baglaniyor.
   screen(SCREENS.SWIPE_REVIEW, ReviewSessionScreen),

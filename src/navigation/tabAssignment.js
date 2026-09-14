@@ -38,7 +38,7 @@ export const ROTA_STACK = [
   SCREENS.EXAM_RESULT,      // Sinav Sonucu (PROFIL'de de var)
   SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu / Tahmin Sasti (PROFIL'de de var)
   SCREENS.SUMMARY,          // Gunun/Haftalik/Ayin Ozeti (period parametresi)
-  SCREENS.WEEKLY_REVIEW,    // Haftalik Ozet (eski, SUMMARY week moduna gocecek)
+  SCREENS.WEEKLY_REVIEW,    // eski rota: SummaryScreen week (bildirim/derin baglanti)
   SCREENS.WEEKLY_TRIAL_REVIEW,
   SCREENS.HOW_IT_WORKS,     // (paylasimli)
 ];

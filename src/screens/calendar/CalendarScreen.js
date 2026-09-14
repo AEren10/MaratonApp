@@ -17,6 +17,7 @@ import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { DayDetailSheet } from "./components/DayDetailSheet";
 import { MonthStats } from "./components/MonthStats";
+import { CalendarSummaryLinks } from "./components/CalendarSummaryLinks";
 import { useCalendarTasks } from "../../hooks/useCalendarTasks";
 import { dateKey } from "../../lib/dateUtils";
 
@@ -157,6 +158,11 @@ function CalendarScreenInner() {
                 onAddTask={addTask}
                 onToggleTask={toggleTask}
                 onRemoveTask={removeTask}
+              />
+              <CalendarSummaryLinks
+                showDay={selectedDay === dateKey(new Date())}
+                onDay={() => navigation.navigate(SCREENS.SUMMARY, { period: "day" })}
+                onMonth={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
               />
             </Animated.View>
           </>

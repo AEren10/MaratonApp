@@ -131,6 +131,16 @@ export const TYPOGRAPHY = {
   statPair:      { fontFamily: "Bricolage_400", fontSize: 40, lineHeight: 36, letterSpacing: -1.6,  fontVariant: ["tabular-nums"] },
   statSmall:     { fontFamily: "Bricolage_400", fontSize: 26, lineHeight: 32, letterSpacing: -0.6,  fontVariant: ["tabular-nums"] },
   statMedium:    { fontFamily: "Bricolage_400", fontSize: 22, lineHeight: 28, letterSpacing: -0.4,  fontVariant: ["tabular-nums"] },
+  // Ayin Ozeti · tipografik hal: ay adi 74px, net 150px
+  posterWord:    { fontFamily: "Bricolage_400", fontSize: 74, lineHeight: 64, letterSpacing: -3.0 },
+  posterNumber:  { fontFamily: "Bricolage_400", fontSize: 150, lineHeight: 118, letterSpacing: -7.5, fontVariant: ["tabular-nums"] },
+  statPosterSide: { fontFamily: "Bricolage_400", fontSize: 34, lineHeight: 34, letterSpacing: -1.0, fontVariant: ["tabular-nums"] },
+  statSide:      { fontFamily: "Bricolage_400", fontSize: 25, lineHeight: 25, letterSpacing: -0.5, fontVariant: ["tabular-nums"] },
+  statSideUnit:  { fontFamily: "Bricolage_400", fontSize: 15, lineHeight: 18 },
+  statHeroTight: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 80, letterSpacing: -4.1, fontVariant: ["tabular-nums"] },
+  statCount:     { fontFamily: "Bricolage_400", fontSize: 30, lineHeight: 30, letterSpacing: -0.9, fontVariant: ["tabular-nums"] },
+  signalValue:   { fontFamily: "Bricolage_400", fontSize: 20, lineHeight: 24, letterSpacing: -0.3, fontVariant: ["tabular-nums"] },
+  heroSentence:  { fontFamily: "Bricolage_400", fontSize: 31, lineHeight: 36, letterSpacing: -0.6 },
 
   // Konu adi — Bricolage, govde olcusunde
   topicName:     { fontFamily: "Bricolage_400", fontSize: 16, lineHeight: 22 },
