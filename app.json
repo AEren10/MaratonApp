@@ -7,20 +7,16 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "scheme": "maraton",
     "description": "YKS hazırlık sürecini takip et: günlük plan, deneme analizi, yanlış defteri.",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A0A0F"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.maraton.app",
       "buildNumber": "1",
       "usesAppleSignIn": true,
-      "associatedDomains": ["applinks:maraton.app"],
+      "associatedDomains": [
+        "applinks:maraton.app"
+      ],
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
         "NSCameraUsageDescription": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli.",
@@ -52,14 +48,16 @@
               "pathPrefix": "/group"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A0F"
       },
-      "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
@@ -99,7 +97,19 @@
           "savePhotosPermission": "Paylaşım kartını galerine kaydetmek için izin gerekli.",
           "isAccessMediaLocationEnabled": false
         }
-      ]
+      ],
+      "@sentry/react-native",
+      "expo-image",
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0A0A0F"
+        }
+      ],
+      "expo-status-bar"
     ],
     "extra": {
       "eas": {

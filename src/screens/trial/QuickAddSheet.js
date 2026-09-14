@@ -4,11 +4,11 @@ import Animated, {
   FadeInDown, runOnJS, useAnimatedStyle, useSharedValue, withTiming,
 } from "react-native-reanimated";
 
-import { SectionLabel } from "../components/design";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../themes/tokens";
-import { useC } from "../contexts/ThemeContext";
-import { SCREENS } from "../constants/screens";
-import { useQuickAddActions } from "../hooks/useQuickAddActions";
+import { SectionLabel } from "../../components/design";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
+import { useQuickAddActions } from "../../hooks/useQuickAddActions";
 import { QuickAddNowCard } from "./components/QuickAddNowCard";
 import { QuickAddRow } from "./components/QuickAddRow";
 

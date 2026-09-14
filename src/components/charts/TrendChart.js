@@ -77,7 +77,7 @@ export function TrendChart({ data, labels = [], color, title = "Net Trendi", com
         </Svg>
 
         {labels.length > 0 && (
-          <View style={{ flexDirection: "row", marginTop: SPACING.sm }}>
+          <View style={{ flexDirection: "row", marginTop: STEP.s2 }}>
             {labels.map((l, i) => (
               <Text
                 key={`${l}-${i}`}
@@ -94,8 +94,7 @@ export function TrendChart({ data, labels = [], color, title = "Net Trendi", com
             ))}
           </View>
         )}
-      </GlassCard>
+      </View>
     </View>
   );
 }
-

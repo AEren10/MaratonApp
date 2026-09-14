@@ -7,6 +7,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 
 // Tasarim: "8. Gun". Ilk 7 gunluk surecin ardindan kullanicinin karsilastigi Paywall bilgilendirme ekrani.

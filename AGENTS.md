@@ -1,10 +1,10 @@
 # Maraton Project - Development Rules
 
 ## Expo HAS CHANGED
-Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before writing any code.
+Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
 
 ## Tech Stack
-- Runtime: Expo SDK 54, React Native 0.81, Hermes, New Architecture
+- Runtime: Expo SDK 57, React Native 0.86, Hermes, New Architecture
 - Navigation: React Navigation (native-stack + bottom-tabs)
 - State: Redux Toolkit + React Context
 - Backend: Supabase (Postgres + Auth + Storage + RLS)

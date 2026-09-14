@@ -52,8 +52,8 @@ export function PersonalBests({ bests }) {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingVertical: SPACING.md,
-                paddingHorizontal: SPACING.lg,
+                paddingVertical: STEP.s3,
+                paddingHorizontal: STEP.s4,
               }}
             >
               <Text
@@ -65,7 +65,7 @@ export function PersonalBests({ bests }) {
               <Text
                 style={[
                   TYPOGRAPHY.bodySemiBold,
-                  { color: C.accent, marginRight: SPACING.md },
+                  { color: C.accent, marginRight: STEP.s3 },
                 ]}
               >
                 {s.bestNet}
@@ -76,7 +76,7 @@ export function PersonalBests({ bests }) {
             </View>
           </View>
         ))}
-      </GlassCard>
+      </View>
     </Animated.View>
   );
 }

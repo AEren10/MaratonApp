@@ -381,3 +381,10 @@
 - Proje Expo SDK 54; farklı SDK taşıyan Expo Go ile açılamaz. Sırf telefondaki Expo Go sürümü için proje SDK'sı aceleyle yükseltilmemeli.
 - EAS `ios.simulator: true` çıktısı fiziksel iPhone'a kurulamaz. `development` fiziksel cihaz için, `development-simulator` ayrı simülatör profili için tutulmalı.
 - Google Sign-In ve RevenueCat gibi native modüllerin gerçek cihaz testi için Expo Go yerine development build kullanılmalı. iOS ad hoc dağıtımında Apple Developer üyeliği ve cihaz kaydı gerekir.
+
+## 2026-09-15 — Expo Go 57 ile iPhone önizlemesi
+
+- App Store'daki Expo Go SDK 57'ye geçti; SDK 54 projesi iPhone'daki güncel Expo Go ile açılamıyor. Önizleme tıkanınca SDK 55 → 56 → 57 sırayla yükseltildi.
+- SDK 57 için Expo paketleri, React Native ve TypeScript birlikte hizalanmalı. Eski `newArchEnabled`, `android.edgeToEdgeEnabled`, kök `splash` alanları yeni config şemasında geçersiz; splash ayarı config plugin'e taşındı.
+- Domain testleri geçse bile Metro bundle ayrı doğrulanmalı. İki JSX kapanışı ve `QuickAddSheet` göreli importları bundle'ı engelliyordu; testler bunları yakalamadı.
+- Expo Go tasarım/JS önizlemesini açar; RevenueCat ve Google Sign-In gibi custom native işlevlerin cihaz testi için development build yine gerekir. EAS Apple login'deki `iTunes service key is empty` ayrı bir upstream engeldir.
