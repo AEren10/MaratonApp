@@ -32,6 +32,7 @@ export function usePaywallPurchase() {
   const [selectedPlan, setSelectedPlan] = useState("yearly");
   const [packages, setPackages] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
+  const paywallSource = route.params?.source || "unknown";
 
   // Dönüşümün paydası. PREMIUM_DISMISSED tanımlıydı ama hiç gönderilmiyordu:
   // görüntüleme sayılıyor, kapatma sayılmıyordu — yani paywall dönüşüm oranı
@@ -40,20 +41,20 @@ export function usePaywallPurchase() {
   const convertedRef = useRef(false);
 
   useEffect(() => {
-    track(EVENTS.PREMIUM_VIEWED, { source: route.params?.source || "unknown" });
-    trackPaywallViewed(route.params?.source || "unknown");
-  }, [route.params?.source]);
+    track(EVENTS.PREMIUM_VIEWED, { source: paywallSource });
+    trackPaywallViewed(paywallSource);
+  }, [paywallSource]);
 
   useEffect(() => {
     const unsub = navigation.addListener("beforeRemove", () => {
       if (convertedRef.current) return;
       track(EVENTS.PREMIUM_DISMISSED, {
-        source: route.params?.source || "unknown",
+        source: paywallSource,
         selectedPlan,
       });
     });
     return unsub;
-  }, [navigation, route.params?.source, selectedPlan]);
+  }, [navigation, paywallSource, selectedPlan]);
 
   useEffect(() => {
     if (!isInitialized()) return;
@@ -91,7 +92,7 @@ export function usePaywallPurchase() {
           const started = await startTrial(user.id);
           if (started) {
             convertedRef.current = true;
-            track(EVENTS.TRIAL_STARTED, { source: route.params?.source || "paywall" });
+            track(EVENTS.TRIAL_STARTED, { source: paywallSource });
             H.success();
             await refreshPremium();
             showAlert("Deneme Başladı", "7 günlük ücretsiz denemen başladı!");
@@ -110,7 +111,7 @@ export function usePaywallPurchase() {
       const isPro = await purchasePackage(pkg);
       if (isPro) {
         convertedRef.current = true;
-        track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan });
+        track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan, source: paywallSource });
         H.success();
         await refreshPremium();
         navigation.goBack();
@@ -121,13 +122,15 @@ export function usePaywallPurchase() {
     } finally {
       setPurchasing(false);
     }
-  }, [getSelectedPackage, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
+  }, [getSelectedPackage, paywallSource, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
 
   const handleRestore = useCallback(async () => {
     setPurchasing(true);
     try {
       const isPro = await restorePurchases();
       if (isPro) {
+        convertedRef.current = true;
+        track(EVENTS.PREMIUM_PURCHASED, { plan: "restore", source: paywallSource });
         H.success();
         await refreshPremium();
         showAlert("Başarılı", "Premium üyeliğin geri yüklendi!");
@@ -140,7 +143,7 @@ export function usePaywallPurchase() {
     } finally {
       setPurchasing(false);
     }
-  }, [user?.id, refreshPremium, navigation, showAlert]);
+  }, [paywallSource, refreshPremium, navigation, showAlert]);
 
   return {
     selectedPlan,
