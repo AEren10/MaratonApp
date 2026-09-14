@@ -363,3 +363,9 @@
 - Düz hafta kartı `completedStops/weekNo` beklerken hook bunları geçmezse kullanıcıya “0 durak / Bu hafta” gibi eksik motivasyon verisi gösterilir.
 - Sıradaki durak kartı `stops[0]` yerine önce aktif, yoksa upcoming duraktan beslenmeli; tamamlanmış ilk durak “sıradaki” diye görünmemeli.
 - Story/share domain'i görselden bağımsız kalmalı; algoritmik veri hazırlığı hook/domain sınırında yapılmalı.
+
+## 2026-09-15 — Paywall offering cevabı kapanmış ekrana yazmamalı
+
+- RevenueCat offering isteği paywall kapandıktan sonra dönerse unmounted ekrana state yazımı satış ekranında sessiz uyarı/regresyon üretebilir.
+- Offering yükleme best-effort olmalı; hata veya geç cevap satın alma akışını bozmak yerine mevcut fallback planları korumalı.
+- Purchase catch guard'ı `e?.userCancelled` kullanmalı; beklenmeyen non-object throw ikinci bir hata üretmemeli.

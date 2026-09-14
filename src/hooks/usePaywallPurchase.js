@@ -58,9 +58,11 @@ export function usePaywallPurchase() {
 
   useEffect(() => {
     if (!isInitialized()) return;
+    let alive = true;
     getOfferings().then((offering) => {
-      if (offering?.availablePackages) setPackages(offering.availablePackages);
-    });
+      if (alive && offering?.availablePackages) setPackages(offering.availablePackages);
+    }).catch(() => {});
+    return () => { alive = false; };
   }, []);
 
   // Fiyatı her zaman mağazadan gelen gerçek fiyattan göster. Sabit fiyat
@@ -117,7 +119,7 @@ export function usePaywallPurchase() {
         navigation.goBack();
       }
     } catch (e) {
-      if (e.userCancelled) return;
+      if (e?.userCancelled) return;
       showAlert("Hata", "Satın alma işlemi başarısız oldu. Lütfen tekrar dene.");
     } finally {
       setPurchasing(false);
