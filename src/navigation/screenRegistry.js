@@ -45,6 +45,11 @@ import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
 import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
 import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
+import GapClosureScreen from "../screens/plan/GapClosureScreen";
+import CurriculumMapScreen from "../screens/roadmap/CurriculumMapScreen";
+import WeekProgramScreen from "../screens/program/WeekProgramScreen";
+import ClassScheduleScreen from "../screens/program/ClassScheduleScreen";
+import MonthPlanScreen from "../screens/program/MonthPlanScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
@@ -191,6 +196,11 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
   screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
+  screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
+  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
+  screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
+  screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
+  screen(SCREENS.MONTH_PLAN, MonthPlanScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),

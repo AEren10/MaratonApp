@@ -25,12 +25,13 @@ export const TAB_KEYS = Object.freeze({
 // ROTA sekmesinin KOKU Ana Sayfa'dir (tasarimcinin kendi ifadesi).
 
 export const ROTA_STACK = [
-  SCREENS.ROADMAP,          // Rota Detay  (PROGRAM'da da var: Yol Haritasi)
+  SCREENS.ROADMAP,          // Rota Detay (PROGRAM'da da var; "Yol Haritası" DEGIL, o CURRICULUM_MAP)
   SCREENS.ROUTE_FULL,       // Rotanin tamami
   SCREENS.ROUTE_STOP_DETAIL, // Durak Detayi (tek durak)
   SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
   SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
   SCREENS.PLAN_VS_ACTUAL,   // Soz ve gercek (Rota Detay satiri; PROGRAM'da da var)
+  SCREENS.GAP_CLOSURE,      // Boslugu Kapatma Plani (Soz ve gercek butonu; PROGRAM'da da var)
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
   SCREENS.EXAM_SIMULATOR,   // Deneme Provasi
@@ -44,7 +45,14 @@ export const ROTA_STACK = [
 ];
 
 export const PROGRAM_STACK = [
-  SCREENS.ROADMAP,          // Yol Haritasi (paylasimli)
+  SCREENS.ROADMAP,          // Rota Detay (paylasimli)
+  // Tasarimda PROGRAM sekmesi secili: Rotanin tamami / Ayin Ozeti / Oncelikli
+  // Konular bunlari openInTab ile PROGRAM sekmesinde acar (navigation/tabJump.js).
+  SCREENS.CURRICULUM_MAP,   // Yol Haritasi: mufredat ilerlemesi (Rota Detay DEGIL)
+  SCREENS.WEEK_PROGRAM,     // Program: gunun duraklari
+  SCREENS.MONTH_PLAN,       // Aylik Plan
+  SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
+  SCREENS.GAP_CLOSURE,      // (paylasimli)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
   SCREENS.CALENDAR,         // Takvim ve Seri · Takvim
   SCREENS.TOPIC_STUDY,      // Konu Detayi
@@ -88,6 +96,7 @@ export const PROFIL_STACK = [
   SCREENS.SUBSCRIPTION_CANCEL, // Abonelik Iptali (onay)
   SCREENS.ABOUT,
   SCREENS.GOALS,            // Hedef Duzenle
+  SCREENS.CLASS_SCHEDULE,   // Ayarlar · Haftalik ders programi (paylasimli)
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.MILESTONE,        // Kilometre Tasi
   SCREENS.LEVEL,            // Seviye

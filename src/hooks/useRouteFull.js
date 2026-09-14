@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { SCREENS } from "../constants/screens";
+import { TAB_KEYS } from "../navigation/tabAssignment";
+import { openInTab } from "../navigation/tabJump";
 import { usePremium } from "../contexts/PremiumContext";
 import { buildPlanVsActual } from "../domain/route/planVsActual";
 import { flattenRouteStops, routeProgressSegments, routeStopCounts } from "../domain/route/routeOverview";
@@ -35,10 +37,13 @@ export function useRouteFull() {
     segments,
     debtHours,
     daysLeft,
+    // "Yol haritası · 16 ay": sinava kalan ay (ortalama ay uzunluguyla).
+    monthsLeft: daysLeft > 0 ? Math.max(1, Math.round(daysLeft / 30.44)) : null,
     weekStops: currentWeek?.stops?.length ?? null,
     promiseGap: promise.hasData ? promise.gap : null,
     goBack: () => navigation.goBack(),
-    openProgram: () => navigation.navigate(SCREENS.DAILY_PLAN),
+    openCurriculum: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP),
+    openProgram: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.WEEK_PROGRAM),
     openDebt: () => navigation.navigate(SCREENS.TOPIC_DEBT),
     openPromise: () => navigation.navigate(SCREENS.PLAN_VS_ACTUAL),
     openRedraw: () => navigation.navigate(SCREENS.ROUTE_REDRAW),

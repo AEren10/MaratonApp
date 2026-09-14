@@ -1,80 +1,38 @@
-import { useMemo, useRef, useState, useCallback, useEffect } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
-import { useAlert } from "../../contexts/AlertContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useShareCards } from "../../hooks/useShareCards";
+import { useShareCardActions } from "../../hooks/useShareCardActions";
+import PillTabs from "../../components/common/PillTabs";
+import { SHARE_MODES, SHARE_MODE_OPTIONS, cardMode, cardsForMode } from "../../domain/share/shareCardModes";
 import { Icon, Button, ErrorState, Skeleton, EmptyState } from "../../components/design";
 import { ShareStoryCard } from "./components/ShareStoryCard";
 import { ShareModeChips } from "./components/ShareModeChips";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../themes/tokens";
-import * as H from "../../lib/haptics";
 
 export default function ShareCardScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const nav = useNavigation();
   const { params } = useRoute();
-  const showAlert = useAlert();
   const { daysUntilExam } = useExam();
   const { cards, loading, error } = useShareCards();
 
+  const [mode, setMode] = useState(() => (params?.cardId ? cardMode({ id: params.cardId }) : SHARE_MODES.EMEK));
+  const modeCards = useMemo(() => cardsForMode(cards, mode), [cards, mode]);
   const [selectedId, setSelectedId] = useState(params?.cardId || null);
   useEffect(() => {
-    if (!selectedId && cards.length > 0) setSelectedId(cards[0].id);
-  }, [cards, selectedId]);
+    if (modeCards.length > 0 && !modeCards.some((c) => c.id === selectedId)) setSelectedId(modeCards[0].id);
+  }, [modeCards, selectedId]);
 
-  const activeCard = cards.find((c) => c.id === selectedId) || cards[0] || null;
+  const activeCard = modeCards.find((c) => c.id === selectedId) || modeCards[0] || null;
   const footRight = daysUntilExam != null ? `SINAVA ${daysUntilExam} GÜN` : null;
   const cardRef = useRef(null);
-
-  const handleShare = useCallback(async () => {
-    let captureRef, Sharing;
-    try {
-      ({ captureRef } = require("react-native-view-shot"));
-      Sharing = require("expo-sharing");
-    } catch {
-      showAlert("Paylaşım kullanılamıyor");
-      return;
-    }
-    try {
-      H.tap();
-      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
-      if (!(await Sharing.isAvailableAsync())) { showAlert("Paylaşım yok"); return; }
-      await Sharing.shareAsync(`file://${uri}`, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
-      H.success();
-    } catch {
-      showAlert("Hata", "Kart oluşturulamadı.");
-    }
-  }, [showAlert]);
-
-  // Galeriye kaydet. expo-media-library kuruldu (SDK 54: ~18.2.1) ve
-  // app.json'a savePhotosPermission ile eklendi, yani buton gercekten
-  // calisiyor. Yalniz KAYDETME izni isteniyor ("writeOnly"): kullanicinin
-  // tum galerisini okumaya gerek yok, kart yazmak yeterli.
-  const handleSaveGallery = useCallback(async () => {
-    try {
-      const { captureRef } = require("react-native-view-shot");
-      const MediaLibrary = require("expo-media-library");
-
-      const perm = await MediaLibrary.requestPermissionsAsync(true);
-      if (!perm.granted) {
-        H.warn();
-        showAlert("Galeri izni gerekiyor", "Kartı kaydetmek için izin vermen gerekiyor.");
-        return;
-      }
-      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
-      await MediaLibrary.saveToLibraryAsync(uri);
-      H.success();
-      showAlert("Kaydedildi", "Kart galerine kaydedildi.");
-    } catch {
-      H.warn();
-      showAlert("Hata", "Kart kaydedilemedi.");
-    }
-  }, [showAlert]);
+  const { handleShare, handleSaveGallery } = useShareCardActions(cardRef);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -84,6 +42,9 @@ export default function ShareCardScreen() {
         </Pressable>
         <Text style={s.title}>Paylaş</Text>
         <View style={{ width: CONTROL.tapMin }} />
+      </View>
+      <View style={s.modes}>
+        <PillTabs options={SHARE_MODE_OPTIONS} value={mode} onChange={setMode} height={42} />
       </View>
 
       {loading ? (
@@ -108,7 +69,7 @@ export default function ShareCardScreen() {
             </View>
           </View>
 
-          <ShareModeChips cards={cards} selectedId={activeCard.id} onSelect={setSelectedId} />
+          <ShareModeChips cards={modeCards} selectedId={activeCard.id} onSelect={setSelectedId} />
 
           <View style={s.actions}>
             <Button onPress={handleShare} icon="share" fullWidth size="lg">
@@ -140,6 +101,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   closeBtn: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
   title: { ...TYPOGRAPHY.subheading, color: C.text },
+  modes: { paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   cardWrap: { width: 280 },
   actions: { paddingHorizontal: STEP.s4, paddingBottom: STEP.s4, paddingTop: STEP.s2 },

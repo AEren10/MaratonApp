@@ -2,6 +2,9 @@ import { useCallback, useMemo, useState } from "react";
 import { useStudyRoute } from "./useStudyRoute";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { subjectPaletteKey } from "../themes/subjectPalette";
+import { buildDebtDistributionView } from "../domain/route/debtDistributionView";
+
+const WEEK_MS = 7 * 86400000;
 
 const fmtHours = (minutes) => {
   const h = (Number(minutes) || 0) / 60;
@@ -21,7 +24,7 @@ const fmtHours = (minutes) => {
  * kaydetmeyen sahte bir buton degil.
  */
 export function useTopicDebt() {
-  const { route, debt, debtWeeks, transitionStop } = useStudyRoute();
+  const { route, debt, debtWeeks, transitionStop, distributeDebt } = useStudyRoute();
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -45,6 +48,16 @@ export function useTopicDebt() {
     return out.sort((a, b) => b.minutes - a.minutes);
   }, [route]);
 
+  // Borc Dagitildi onizlemesi: siradaki (bitmemis) uc haftaya distributeDebt.
+  const preview = useMemo(() => {
+    const now = Date.now();
+    const upcoming = (route?.weeks || [])
+      .filter((w) => !w.weekStart || new Date(w.weekStart).getTime() + WEEK_MS > now)
+      .slice(0, 3);
+    if (!upcoming.length || !(debt?.totalQuestions > 0)) return null;
+    return buildDebtDistributionView({ distribution: distributeDebt(upcoming), debt, stops });
+  }, [route, debt, distributeDebt, stops]);
+
   // Yalniz kalici (stopId'si olan) duraklar tasinabilir.
   const movable = useMemo(() => stops.filter((s) => s.stop.stopId), [stops]);
 
@@ -56,8 +69,10 @@ export function useTopicDebt() {
       for (const item of movable) {
         await transitionStop(item.stop, ROUTE_STOP_STATUS.RESCHEDULED, { source: "topic_debt" });
       }
+      return true;
     } catch (e) {
       setError(e);
+      return false;
     } finally {
       setDistributing(false);
     }
@@ -74,6 +89,7 @@ export function useTopicDebt() {
     distributing,
     error,
     distribute,
+    preview,
     isEmpty: stops.length === 0 && !(debt?.hasDebt),
   };
 }

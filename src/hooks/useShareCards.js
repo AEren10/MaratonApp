@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { buildShareCards, availableShareCards, getShareCard } from "../domain/share/shareCards";
+import { trialMomentumCard } from "../domain/share/shareCardModes";
+import { selectTrials } from "../store/slices/trialSlice";
 import { useWeeklyReport } from "./useWeeklyReport";
 import { useStudyRoute } from "./useStudyRoute";
 import { selectStreak, selectTodayLogs } from "../store/slices/studyLogSlice";
@@ -29,6 +31,7 @@ export function useShareCards() {
   const streak = useSelector(selectStreak);
   const todayLogs = useSelector(selectTodayLogs);
   const retention = useSelector(selectRetentionData);
+  const trials = useSelector(selectTrials);
   const { route, currentWeek } = useStudyRoute({ persist: false });
 
   const today = useMemo(() => {
@@ -89,7 +92,12 @@ export function useShareCards() {
     generatedOn: dateKey(new Date()),
   }), [today, report, streak, comebackAfterDays, currentWeek, route]);
 
-  const cards = useMemo(() => availableShareCards(ctx), [ctx]);
+  // Ivme modunun "SON N DENEME" karti deneme verisinden (Kart Modlari).
+  const momentum = useMemo(() => trialMomentumCard(trials || []), [trials]);
+  const cards = useMemo(
+    () => [...availableShareCards(ctx), ...(momentum.available ? [momentum] : [])],
+    [ctx, momentum],
+  );
   const allCards = useMemo(() => buildShareCards(ctx), [ctx]);
 
   return {

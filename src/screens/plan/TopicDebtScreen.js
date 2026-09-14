@@ -1,29 +1,47 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon, Card, Button, EmptyState, StatBlock } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { Icon, Card, Button, EmptyState } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTopicDebt } from "../../hooks/useTopicDebt";
 import { TopicDebtStopRow } from "./components/TopicDebtStopRow";
+import { TopicDebtHero } from "./components/TopicDebtHero";
+import { DebtDistributedView } from "./components/DebtDistributedView";
+import * as H from "../../lib/haptics";
 
 export default function TopicDebtScreen() {
   const C = useC();
   const navigation = useNavigation();
   const {
     stops, stopCount, totalHours, hasHours, capped,
-    canDistribute, distributing, error, distribute, isEmpty,
+    canDistribute, distributing, error, distribute, isEmpty, preview,
   } = useTopicDebt();
 
+  const [showPreview, setShowPreview] = useState(false);
   const onDistribute = useCallback(async () => {
+    if (preview) { H.tap(); setShowPreview(true); return; }
     await distribute();
+  }, [distribute, preview]);
+  const onCommit = useCallback(async () => {
+    if (await distribute()) H.success();
+    setShowPreview(false);
   }, [distribute]);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      {showPreview && preview ? (
+        <DebtDistributedView
+          view={preview}
+          totalHours={totalHours}
+          committing={distributing}
+          onCommit={onCommit}
+          onUndo={() => setShowPreview(false)}
+        />
+      ) : (<>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
@@ -39,29 +57,7 @@ export default function TopicDebtScreen() {
         />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={FadeInDown.duration(560)}>
-            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GEÇİLMEYEN DURAKLAR</Text>
-            <View style={styles.heroRow}>
-              <StatBlock value={hasHours ? totalHours : "—"} size="page" color={C.text} />
-              {hasHours && (
-                <Text style={[styles.unit, { color: C.text2 }]} allowFontScaling={false}>sa</Text>
-              )}
-            </View>
-
-            {capped && (
-              <View style={[styles.note, { backgroundColor: C.surface, borderColor: C.elev }]}>
-                <View style={[styles.noteDot, { backgroundColor: C.up }]} />
-                <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>
-                  Borç bir haftalık kapasitende tutuldu
-                </Text>
-              </View>
-            )}
-
-            <Text style={[TYPOGRAPHY.caption, styles.lede, { color: C.text2 }]}>
-              Borç bir haftalık kapasiteni geçmez — üstü otomatik "Sırada"ya düşer.
-              21 günü geçen durak borç olmaktan çıkar.
-            </Text>
-          </Animated.View>
+          <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} />
 
           {stopCount > 0 && (
             <Animated.View entering={FadeInDown.delay(140).duration(560)} style={styles.listWrap}>
@@ -103,6 +99,7 @@ export default function TopicDebtScreen() {
           </View>
         </ScrollView>
       )}
+      </>)}
     </SafeAreaView>
   );
 }
@@ -117,21 +114,6 @@ const styles = StyleSheet.create({
   },
   scroll: { paddingHorizontal: GUTTER, paddingTop: 26, paddingBottom: 40 },
   empty: { flex: 1, paddingHorizontal: GUTTER, justifyContent: "center" },
-  heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 11, marginTop: 14 },
-  unit: { fontFamily: "Archivo_500", fontSize: 17, lineHeight: 24, paddingBottom: STEP.s1 },
-  note: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 9,
-    marginTop: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: SHAPE.chip,
-    borderWidth: 1,
-  },
-  noteDot: { width: 6, height: 6, borderRadius: 1 },
-  lede: { marginTop: 14, maxWidth: 300, lineHeight: 22 },
   listWrap: { marginTop: 26 },
   listHead: { flexDirection: "row", alignItems: "center", gap: 10, paddingBottom: 4 },
   rule: { flex: 1, height: 1 },

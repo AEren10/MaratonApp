@@ -107,6 +107,12 @@ export const SCREENS = {
   ADD_TASK: "AddTask",
   TOPIC_DEBT: "TopicDebt",
   PLAN_VS_ACTUAL: "PlanVsActual",
+  // AKIS 7 · Program ve plan
+  CURRICULUM_MAP: "CurriculumMap",
+  WEEK_PROGRAM: "WeekProgram",
+  CLASS_SCHEDULE: "ClassSchedule",
+  MONTH_PLAN: "MonthPlan",
+  GAP_CLOSURE: "GapClosure",
   SEARCH: "Search",
   DOCUMENT: "Document",
   HOW_IT_WORKS: "HowItWorks",

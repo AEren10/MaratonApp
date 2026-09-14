@@ -20,6 +20,7 @@ export const STORAGE_KEYS = {
   GAMIFICATION: "@maraton:gamification",
   PENDING_STREAK: "@maraton:pending_streak",
   CALENDAR_TASKS: "@maraton:calendar_tasks",
+  CLASS_SCHEDULE: "@maraton:class_schedule",
   CLAIMED_MILESTONES: "@maraton:claimed_milestones",
   STUDY_HOURS: "@maraton:study_hours",
   LEAGUE_RESULT: "@maraton:league_result",

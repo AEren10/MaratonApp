@@ -7,6 +7,8 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, EmptyState, SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeakAreas } from "../../hooks/useWeakAreas";
 import { WeakAreaRow } from "./components/WeakAreaRow";
@@ -51,7 +53,7 @@ export default function WeakAreasScreen() {
         <EmptyState
           preset="priorityTopics"
           style={styles.empty}
-          onPrimary={() => navigation.navigate(SCREENS.ROADMAP)}
+          onPrimary={() => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP)}
           onSecondary={() => navigation.navigate(SCREENS.SUBJECT_LIST)}
         />
       ) : (

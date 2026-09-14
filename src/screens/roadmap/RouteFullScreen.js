@@ -45,6 +45,12 @@ export default function RouteFullScreen() {
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GÖRÜNÜMLER</Text>
             <View style={s.links}>
               <RouteLinkRow
+                title="Yol haritası"
+                subtitle="Müfredatın ay ay sırası"
+                value={d.monthsLeft != null ? `${d.monthsLeft} ay` : null}
+                onPress={d.openCurriculum}
+              />
+              <RouteLinkRow
                 title="Program"
                 subtitle="Durakların gün gün dağılımı"
                 value={d.weekStops != null ? `bu hafta ${d.weekStops}` : null}

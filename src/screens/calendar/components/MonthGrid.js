@@ -2,7 +2,6 @@ import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { getSubjectByKey } from "../../../themes/subjects";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
@@ -21,60 +20,40 @@ function getCalendarDays(monthDate) {
   return days;
 }
 
-// 0 = kayit yok, 1 = hafif, 2 = orta, 3 = hedefi tuttu
-function activityLevel(data, dailyGoal) {
-  if (!data || data.totalQuestions === 0) return 0;
-  const pct = data.totalQuestions / (dailyGoal || 80);
-  if (pct >= 1) return 3;
-  if (pct >= 0.5) return 2;
-  return 1;
-}
-
-// Gunun calisilan derslerinden en fazla 2 nokta — ders baglaminda renk,
-// gun durumunu boyamaz.
-function subjectDots(data) {
-  if (!data?.logs?.length) return [];
-  const seen = [];
-  for (const l of data.logs) {
-    const subj = getSubjectByKey(l.subject);
-    const color = subj?.color;
-    if (color && !seen.includes(color)) seen.push(color);
-    if (seen.length === 2) break;
+// Tasarim (Takvim ve Seri) lejandi: hedef tuttu = kizil dolgu, seri surdu
+// (calisildi, hedefin altinda) = tint + kenar, gelecek = ince kenar.
+function cellLook(data, dailyGoal, isFuture, C) {
+  if (data?.logs?.length && data.totalQuestions >= dailyGoal) {
+    return { backgroundColor: C.brandFill, borderColor: C.brandFill, color: C.accentInk };
   }
-  return seen;
+  if (data?.logs?.length) return { backgroundColor: C.brandTint, borderColor: C.bandEdge, color: C.text };
+  if (isFuture) return { backgroundColor: "transparent", borderColor: C.line, color: C.text3 };
+  return { backgroundColor: "transparent", borderColor: "transparent", color: C.text3 };
 }
 
-function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, onSelect, C, heat }) {
-  const lvl = activityLevel(data, dailyGoal);
-  const dots = subjectDots(data);
-  const bg = lvl > 0 ? heat[lvl] : "transparent";
-  const textColor = lvl > 0 ? C.text : C.text3;
-
+function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
+  const look = cellLook(data, dailyGoal, isFuture, C);
   return (
     <Pressable
       onPress={() => onSelect(iso)}
       hitSlop={2}
       accessibilityRole="button"
+      accessibilityState={{ selected: isSelected }}
       accessibilityLabel={`${date.getDate()} — güne git`}
       style={[
         styles.dayCell,
-        { backgroundColor: bg, borderColor: isSelected ? C.accent : "transparent" },
+        { backgroundColor: look.backgroundColor, borderColor: look.borderColor },
         isToday && !isSelected && { borderColor: C.accent, borderStyle: "dashed" },
+        isSelected && { borderColor: look.backgroundColor === C.brandFill ? C.text : C.accent, borderWidth: 1.5 },
       ]}
     >
-      <Text style={[styles.dayText, { color: textColor }]}>{date.getDate()}</Text>
-      <View style={styles.dotRow}>
-        {dots.map((c) => (
-          <View key={c} style={[styles.dot, { backgroundColor: c }]} />
-        ))}
-      </View>
+      <Text style={[styles.dayText, { color: look.color }]}>{date.getDate()}</Text>
     </Pressable>
   );
 }
 
 export const MonthGrid = React.memo(function MonthGrid({ monthDate, dayMap, selectedDay, onSelect, dailyGoal = 80 }) {
   const C = useC();
-  const heat = useMemo(() => [null, C.heat1, C.heat3, C.heat4], [C]);
   const days = useMemo(() => getCalendarDays(monthDate), [monthDate]);
   const today = todayTR();
 
@@ -100,9 +79,9 @@ export const MonthGrid = React.memo(function MonthGrid({ monthDate, dayMap, sele
                 dailyGoal={dailyGoal}
                 isSelected={selectedDay === iso}
                 isToday={iso === today}
+                isFuture={iso > today}
                 onSelect={handleSelect}
                 C={C}
-                heat={heat}
               />
             </View>
           );
@@ -123,9 +102,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
   },
   dayText: { ...TYPOGRAPHY.captionMedium, fontVariant: ["tabular-nums"] },
-  dotRow: { flexDirection: "row", gap: 2.5, height: 5, alignItems: "center" },
-  dot: { width: 5, height: 5, borderRadius: 1 },
 });

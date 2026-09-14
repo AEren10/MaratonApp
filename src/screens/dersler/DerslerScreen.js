@@ -12,7 +12,10 @@ import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { WeekProgressCard } from "./components/WeekProgressCard";
 import { WeekDayStrip } from "./components/WeekDayStrip";
 import { SelectedDayPanel } from "./components/SelectedDayPanel";
-import { SubjectsSection } from "./components/SubjectsSection";
+import { ProgramRulesSection } from "./components/ProgramRulesSection";
+import SegmentTabs from "../../components/common/SegmentTabs";
+
+const TABS = [{ key: "week", label: "Haftalık" }, { key: "month", label: "Aylık" }];
 
 function Header({ C, navigation }) {
   return (
@@ -76,13 +79,19 @@ export default function DerslerScreen() {
                 totalQuestions={totalQuestions}
               />
 
+              <View style={{ marginTop: STEP.s3 }}>
+                <SegmentTabs options={TABS} value="week" onChange={() => navigation.navigate(SCREENS.CALENDAR)} />
+              </View>
+
               <WeekDayStrip days={days} selectedDate={selectedDate} onSelect={setSelectedDate} />
 
               {selectedDay && (
                 <SelectedDayPanel selectedDay={selectedDay} logs={selectedDayLogs} />
               )}
 
-              <View style={{ marginTop: STEP.s4 }}>
+              <ProgramRulesSection onOpen={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)} />
+
+              <View style={{ marginTop: STEP.s3 }}>
                 <Button
                   variant="primary"
                   size="lg"
@@ -94,8 +103,6 @@ export default function DerslerScreen() {
               </View>
             </>
           )}
-
-          <SubjectsSection />
         </ScrollView>
       </SafeAreaView>
     </ScreenErrorBoundary>

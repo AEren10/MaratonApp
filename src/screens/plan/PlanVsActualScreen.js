@@ -85,7 +85,7 @@ export default function PlanVsActualScreen() {
                 variant="primary"
                 size="lg"
                 fullWidth
-                onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)}
+                onPress={() => navigation.navigate(SCREENS.GAP_CLOSURE)}
                 accessibilityLabel="Boşluğu kapatma planı"
               >
                 Boşluğu kapatma planı

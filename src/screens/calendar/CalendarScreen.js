@@ -1,185 +1,111 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, Skeleton, ErrorState } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
+import SegmentTabs from "../../components/common/SegmentTabs";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useAuth } from "../../contexts/AuthContext";
-import { getStudyLogs } from "../../supabase/studyLogs";
-import { useSelector } from "react-redux";
-import { selectTrials } from "../../store/slices/trialSlice";
-import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { SCREENS } from "../../constants/screens";
 import { MonthGrid } from "./components/MonthGrid";
 import { DayDetails } from "./components/DayDetails";
 import { DayDetailSheet } from "./components/DayDetailSheet";
-import { MonthStats } from "./components/MonthStats";
+import { StreakHero } from "./components/StreakHero";
+import { StreakLegend } from "./components/StreakLegend";
+import StreakMonthCard from "./components/StreakMonthCard";
+import { CalendarFooter } from "./components/CalendarFooter";
 import { CalendarSummaryLinks } from "./components/CalendarSummaryLinks";
 import { useCalendarTasks } from "../../hooks/useCalendarTasks";
+import { useCalendarMonth } from "../../hooks/useCalendarMonth";
 import { dateKey } from "../../lib/dateUtils";
+import { MONTHS_TR } from "../../lib/trWords";
 
-function startOfMonth(date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-function endOfMonth(date) {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-}
-function toIsoDate(d) {
-  return dateKey(d);
-}
-function monthLabel(date) {
-  return date.toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
-}
+const TABS = [{ key: "week", label: "Haftalık" }, { key: "month", label: "Aylık" }];
+const enter = (i) => FadeInDown.delay(i * 70).duration(500);
 
+// Tasarim AKIS 7 · "Takvim ve Seri" (Programım'ın Aylık sekmesi).
 function CalendarScreenInner() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
-  const { user } = useAuth();
-  const trials = useSelector(selectTrials);
-  const dailyGoal = useSelector(selectDailyQuestionsGoal);
-  const [monthDate, setMonthDate] = useState(() => new Date());
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null);
-  const [selectedDay, setSelectedDay] = useState(() => toIsoDate(new Date()));
+  const m = useCalendarMonth();
+  const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
   const [sheetDay, setSheetDay] = useState(null);
-  const [reloadTick, setReloadTick] = useState(0);
   const { tasks: calendarTasks, addTask, toggleTask, removeTask } = useCalendarTasks();
-
-  const monthStart = useMemo(() => startOfMonth(monthDate), [monthDate]);
-  const monthEnd = useMemo(() => endOfMonth(monthDate), [monthDate]);
-
-  useEffect(() => {
-    if (!user?.id || user.id === "dev") { setLoading(false); return; }
-    let cancelled = false;
-    setLoading(true);
-    setLoadError(null);
-    getStudyLogs(user.id, { from: toIsoDate(monthStart), to: toIsoDate(monthEnd) })
-      .then((data) => { if (!cancelled) setLogs(data || []); })
-      .catch((e) => { if (!cancelled) { setLogs([]); setLoadError(e?.message || "Veriler yüklenemedi"); } })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [user?.id, monthStart, monthEnd, reloadTick]);
-
-  const dayMap = useMemo(() => {
-    const map = {};
-    logs.forEach((l) => {
-      const d = l.study_date;
-      if (!map[d]) map[d] = { logs: [], trials: [], totalMinutes: 0, totalQuestions: 0 };
-      map[d].logs.push(l);
-      map[d].totalMinutes += l.duration ?? l.duration_minutes ?? 0;
-      map[d].totalQuestions += l.questionCount ?? l.question_count ?? 0;
-    });
-    trials.forEach((t) => {
-      const d = t.date;
-      if (d >= toIsoDate(monthStart) && d <= toIsoDate(monthEnd)) {
-        if (!map[d]) map[d] = { logs: [], trials: [], totalMinutes: 0, totalQuestions: 0 };
-        map[d].trials.push(t);
-      }
-    });
-    return map;
-  }, [logs, trials, monthStart, monthEnd]);
-
-  const monthStats = useMemo(() => {
-    let activeDays = 0, totalMinutes = 0, totalQuestions = 0, totalTrials = 0;
-    Object.values(dayMap).forEach((d) => {
-      activeDays += 1;
-      totalMinutes += d.totalMinutes;
-      totalQuestions += d.totalQuestions;
-      totalTrials += d.trials.length;
-    });
-    return { activeDays, totalMinutes, totalQuestions, totalTrials };
-  }, [dayMap]);
-
-  const prevMonth = useCallback(() => {
-    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
-  }, []);
-  const nextMonth = useCallback(() => {
-    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-  }, []);
   const closeSheet = useCallback(() => setSheetDay(null), []);
-
-  const selectedDayData = dayMap[selectedDay];
+  const taskProps = { onAddTask: addTask, onToggleTask: toggleTask, onRemoveTask: removeTask };
 
   return (
-    <SafeAreaView edges={["top"]} style={s.safe}>
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={s.backBtn}>
-          <Icon name="arrowL" size={18} color={C.text} />
+        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Geri" accessibilityRole="button" style={s.tap}>
+          <Icon name="chevL" size={16} color={C.text2} />
         </Pressable>
-        <Text style={s.title}>Takvim</Text>
+        <Text style={[TYPOGRAPHY.subheading, s.flex, { color: C.text }]}>Programım</Text>
+        {m.isPastMonth ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>geçmiş ay</Text> : null}
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.monthHeader}>
-          <Pressable onPress={prevMonth} hitSlop={12} accessibilityLabel="Önceki ay" accessibilityRole="button" style={s.monthBtn}>
-            <Icon name="arrowL" size={16} color={C.text3} />
-          </Pressable>
-          <Text style={s.monthLabel}>{monthLabel(monthDate)}</Text>
-          <Pressable onPress={nextMonth} hitSlop={12} accessibilityLabel="Sonraki ay" accessibilityRole="button" style={s.monthBtn}>
-            <Icon name="arrowR" size={16} color={C.text3} />
-          </Pressable>
+        <SegmentTabs options={TABS} value="month" onChange={() => navigation.navigate(SCREENS.DAILY_PLAN)} />
+        <Animated.View entering={enter(0)}>
+          <StreakHero />
         </Animated.View>
 
-        {loading ? (
-          <View style={{ gap: STEP.s2 }}>
+        <View style={s.monthHeader}>
+          <Pressable onPress={m.prevMonth} accessibilityLabel="Önceki ay" accessibilityRole="button" style={s.tap}>
+            <Icon name="chevL" size={14} color={C.text3} />
+          </Pressable>
+          <Text style={[TYPOGRAPHY.subheading, s.monthLabel, { color: C.text }]}>
+            {`${MONTHS_TR[m.monthDate.getMonth()]} ${m.monthDate.getFullYear()}`}
+          </Text>
+          <Pressable onPress={m.nextMonth} accessibilityLabel="Sonraki ay" accessibilityRole="button" style={s.tap}>
+            <Icon name="chevR" size={14} color={C.text3} />
+          </Pressable>
+        </View>
+
+        {m.loading ? (
+          <View style={s.gap}>
             <Skeleton height={280} radius={SHAPE.panel} />
             <Skeleton height={80} radius={SHAPE.panel} />
           </View>
-        ) : loadError ? (
-          <ErrorState preset="server" onPrimary={() => setReloadTick((n) => n + 1)} />
+        ) : m.error ? (
+          <ErrorState preset="server" onPrimary={m.reload} />
         ) : (
-          <>
-            <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
-              <MonthGrid
-                monthDate={monthDate}
-                dayMap={dayMap}
-                selectedDay={selectedDay}
-                onSelect={setSelectedDay}
-                dailyGoal={dailyGoal}
-              />
-            </Animated.View>
-
-            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={{ marginTop: STEP.s3 }}>
-              <MonthStats stats={monthStats} />
-            </Animated.View>
-
-            <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={{ marginTop: STEP.s3 }}>
+          <Animated.View entering={enter(1)}>
+            <MonthGrid monthDate={m.monthDate} dayMap={m.dayMap} selectedDay={selectedDay} onSelect={setSelectedDay} dailyGoal={m.dailyGoal} />
+            <StreakLegend />
+            <View style={s.block}>
               <DayDetails
                 day={selectedDay}
-                data={selectedDayData}
+                data={m.dayMap[selectedDay]}
                 onTrialPress={(t) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial: t })}
                 onOpenDetail={setSheetDay}
                 calendarTasks={calendarTasks[selectedDay] || []}
-                onAddTask={addTask}
-                onToggleTask={toggleTask}
-                onRemoveTask={removeTask}
+                {...taskProps}
               />
-              <CalendarSummaryLinks
-                showDay={selectedDay === dateKey(new Date())}
-                onDay={() => navigation.navigate(SCREENS.SUMMARY, { period: "day" })}
-                onMonth={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
-              />
-            </Animated.View>
-          </>
+            </View>
+            <StreakMonthCard monthDate={m.monthDate} stats={m.stats} />
+            <CalendarSummaryLinks
+              showDay={selectedDay === dateKey(new Date())}
+              onDay={() => navigation.navigate(SCREENS.SUMMARY, { period: "day" })}
+              onMonth={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
+            />
+          </Animated.View>
         )}
+
+        <CalendarFooter tasksByDate={calendarTasks} />
       </ScrollView>
 
       {sheetDay ? (
         <DayDetailSheet
           key={sheetDay}
           day={sheetDay}
-          data={dayMap[sheetDay]}
+          data={m.dayMap[sheetDay]}
           calendarTasks={calendarTasks[sheetDay] || []}
           visible={!!sheetDay}
           onClose={closeSheet}
-          onAddTask={addTask}
-          onToggleTask={toggleTask}
-          onRemoveTask={removeTask}
+          {...taskProps}
         />
       ) : null}
     </SafeAreaView>
@@ -194,54 +120,14 @@ export default function CalendarScreen() {
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: STEP.s2,
-      paddingHorizontal: GUTTER,
-      paddingVertical: STEP.s2,
-    },
-    backBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: SHAPE.iconBox,
-      backgroundColor: C.surface,
-      borderWidth: 1,
-      borderColor: C.border,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    title: {
-      ...TYPOGRAPHY.subheading,
-      color: C.text,
-    },
-    scroll: {
-      paddingHorizontal: GUTTER,
-      paddingBottom: 100,
-    },
-    monthHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: STEP.s3,
-    },
-    monthBtn: {
-      width: 34,
-      height: 34,
-      borderRadius: SHAPE.iconBox,
-      backgroundColor: C.surface,
-      borderWidth: 1,
-      borderColor: C.border,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    monthLabel: {
-      ...TYPOGRAPHY.topicName,
-      color: C.text,
-      textTransform: "capitalize",
-    },
-  });
-}
+const s = StyleSheet.create({
+  safe: { flex: 1 },
+  header: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingHorizontal: GUTTER - STEP.s2, paddingTop: STEP.s1 / 2 },
+  tap: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
+  flex: { flex: 1 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 - 2, paddingBottom: STEP.s5 },
+  monthHeader: { flexDirection: "row", alignItems: "center", marginTop: STEP.s4 - 4, marginBottom: STEP.s2 },
+  monthLabel: { flex: 1, textAlign: "center", fontSize: TYPOGRAPHY.subheading.fontSize - 3 },
+  gap: { gap: STEP.s2 },
+  block: { marginTop: STEP.s3 },
+});

@@ -7,7 +7,7 @@ import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 // Rota derinligi ekranlarinin ust satiri: geri oku (ya da kapat X) +
 // Bricolage baslik + istege bagli sag aksiyon (Durak Detayi'ndaki uc nokta).
 // Gorsel ikon tasarim boyutunda, dokunma alani 44px.
-export function RouteHeader({ title, onBack, close = false, onMore, moreLabel }) {
+export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, moreIcon }) {
   const C = useC();
   return (
     <View style={s.row}>
@@ -31,7 +31,11 @@ export function RouteHeader({ title, onBack, close = false, onMore, moreLabel })
           accessibilityLabel={moreLabel}
           style={s.tap}
         >
-          <View style={s.vertical}><Icon name="more" size={18} color={C.text3} fill={C.text3} /></View>
+          {moreIcon ? (
+            <Icon name={moreIcon} size={16} color={C.text3} />
+          ) : (
+            <View style={s.vertical}><Icon name="more" size={18} color={C.text3} fill={C.text3} /></View>
+          )}
         </Pressable>
       ) : null}
     </View>

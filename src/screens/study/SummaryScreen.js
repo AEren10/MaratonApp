@@ -8,6 +8,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useSummary } from "../../hooks/useSummary";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { SHARE_CARD_IDS } from "../../domain/share/shareCards";
 import { normalizePeriod } from "../../domain/summary/periodRange";
 import { STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -34,7 +36,8 @@ function SummaryScreenInner() {
 
   const handleClose = useCallback(() => navigation.goBack(), [navigation]);
   const handlePrimary = useCallback(() => {
-    navigation.navigate(period === "month" ? SCREENS.CALENDAR : SCREENS.ROADMAP);
+    if (period === "month") openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.MONTH_PLAN, { monthOffset: 1 });
+    else navigation.navigate(SCREENS.ROADMAP);
   }, [navigation, period]);
   const handleShare = useCallback(() => {
     navigation.navigate(SCREENS.SHARE_CARD, SHARE_IDS[period] ? { cardId: SHARE_IDS[period] } : undefined);
