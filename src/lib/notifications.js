@@ -2,7 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { SCREENS } from "../constants/screens";
-import { appUrl } from "../navigation/routes";
+import { notificationUrl } from "../navigation/routes";
 import { getDaily, getStreakRisk, getWeekly, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
 import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from "../supabase/profiles";
 import * as appStorage from "./storage/appStorage";
@@ -130,7 +130,7 @@ export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null
       content: {
         title,
         body,
-        data: { type: "daily_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
+        data: { type: "daily_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -179,7 +179,7 @@ export async function scheduleStreakRiskReminder(streak = 0, studiedToday = fals
       content: {
         title,
         body,
-        data: { type: "streak_risk", url: appUrl(SCREENS.HOME) },
+        data: { type: "streak_risk", url: notificationUrl(SCREENS.HOME) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -202,7 +202,7 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
       content: {
         title,
         body,
-        data: { type: "weekly_summary", url: appUrl(SCREENS.SUMMARY, { period: "week" }) },
+        data: { type: "weekly_summary", url: notificationUrl(SCREENS.SUMMARY, { period: "week" }) },
       },
       trigger: {
         // Tasarim: "Haftalik rapor · Pazar 20:00". weekday 1 = Pazar
@@ -227,7 +227,7 @@ export async function scheduleTrialReminder() {
       content: {
         title: "Deneme zamanı 📝",
         body: "Bu hafta henüz deneme girmedin. Kendini test et!",
-        data: { type: "trial_reminder", url: appUrl(SCREENS.TRIAL_ENTRY) },
+        data: { type: "trial_reminder", url: notificationUrl(SCREENS.TRIAL_ENTRY) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
@@ -276,7 +276,7 @@ export async function scheduleExamEveReminder(date) {
       content: {
         title: "Sınav günü planı",
         body: "Saat, çanta, yol · şimdi hazırla",
-        data: { type: EXAM_EVE_TYPE, url: appUrl(SCREENS.EXAM_DAY_PLAN) },
+        data: { type: EXAM_EVE_TYPE, url: notificationUrl(SCREENS.EXAM_DAY_PLAN) },
       },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: when },
     });
@@ -304,7 +304,7 @@ export async function scheduleRehearsalReminder(date) {
       content: {
         title: "Sınav saatinde prova.",
         body: "Gerçek oturum uzunluğu, gerçek saat.",
-        data: { type: REHEARSAL_TYPE, url: appUrl(SCREENS.EXAM_SIMULATOR) },
+        data: { type: REHEARSAL_TYPE, url: notificationUrl(SCREENS.EXAM_SIMULATOR) },
       },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: when },
     });
@@ -355,7 +355,7 @@ export async function scheduleTaskNotifications(taskCount, userId = null) {
       content: {
         title: zContent.title || "Yarım kalan görevlerin var",
         body: zContent.body || `${taskCount} görev tamamlanmamış. Geri dön ve bitir!`,
-        data: { type: "task_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
+        data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -368,7 +368,7 @@ export async function scheduleTaskNotifications(taskCount, userId = null) {
         content: {
           title: "Bugünkü hedeflerine ulaşmadın 🎯",
           body: "Hâlâ tamamlanmamış görevlerin var. Son bir hamle!",
-          data: { type: "task_reminder", url: appUrl(SCREENS.PLAN_DETAIL) },
+          data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,

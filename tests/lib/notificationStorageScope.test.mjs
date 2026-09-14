@@ -51,3 +51,12 @@ test("study hour personalization is scoped to the active user", () => {
   assert.match(notifications, /getOptimalHour\(userId\)/);
   assert.match(dailyGoalReward, /trackStudyHour\(userId\)/);
 });
+
+test("scheduled notifications use fail-closed deep links", () => {
+  assert.match(notifications, /import \{ notificationUrl \} from "\.\.\/navigation\/routes"/);
+  assert.doesNotMatch(notifications, /appUrl\(/);
+  assert.match(notifications, /notificationUrl\(SCREENS\.EXAM_DAY_PLAN\)/);
+  assert.match(notifications, /notificationUrl\(SCREENS\.EXAM_SIMULATOR\)/);
+  assert.match(notifications, /notificationUrl\(SCREENS\.PLAN_DETAIL\)/);
+  assert.match(notifications, /notificationUrl\(SCREENS\.SUMMARY, \{ period: "week" \}\)/);
+});

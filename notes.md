@@ -281,3 +281,9 @@
 - Supabase baseline/migration drift hâlâ ürünleşme riski. Canlı kritik parçalar ayrı doğrulansa bile temiz staging/reset güveni için proje sahibi erişimiyle baseline işi kapatılmalı.
 - Unit/domain test kapsamı güçlendi ama onboarding, offline kayıt, bildirim deeplink, comeback/completion modal sırası, RevenueCat/paywall ve sınav günü gibi uçtan uca akışlar için cihaz/simülatör walkthrough şart.
 - Mobil audit script'inin ham sonucu bundle/cache dosyalarından gürültü üretti; yine de küçük ikon/checkbox/mini aksiyonlarda gerçek dokunma alanı manuel QA ile kontrol edilmeli. Eski proje kaynaklı 150 satır dosya sınırı bu turda öncelik kabul edilmedi.
+
+## 2026-09-14 — Bildirim deep link fail-closed kuralı
+
+- `appUrl` paylaşım linkleri için toleranslı kalabilir, ama scheduled notification URL'leri bilinmeyen veya deep-link kapalı ekranda sessizce Home'a düşmemeli.
+- Bildirimler `notificationUrl` gibi fail-closed bir kapıdan geçmeli; yeni bildirim ekranı eklenirse önce `ROUTE_CONFIGS` içinde deep link olarak kayıtlı olduğu testle görünmeli.
+- Özellikle sınav arifesi, deneme provası, haftalık özet ve görev hatırlatmaları retention yüzeyi olduğu için yanlış deeplink kullanıcı güvenini ve geri dönüş oranını doğrudan bozar.

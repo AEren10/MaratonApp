@@ -222,3 +222,11 @@ export function appUrl(screen, params = {}) {
   });
   return `maraton://${path.replace(/\/+/g, "/").replace(/\/$/, "")}`;
 }
+
+export function notificationUrl(screen, params = {}) {
+  const config = ROUTE_CONFIGS[screen];
+  if (!config?.deepLink || !ROUTE_PATHS[screen]) {
+    throw new Error(`notificationUrl: ${screen || "unknown"} deep link olarak kayitli degil`);
+  }
+  return appUrl(screen, params);
+}
