@@ -369,3 +369,9 @@
 - RevenueCat offering isteği paywall kapandıktan sonra dönerse unmounted ekrana state yazımı satış ekranında sessiz uyarı/regresyon üretebilir.
 - Offering yükleme best-effort olmalı; hata veya geç cevap satın alma akışını bozmak yerine mevcut fallback planları korumalı.
 - Purchase catch guard'ı `e?.userCancelled` kullanmalı; beklenmeyen non-object throw ikinci bir hata üretmemeli.
+
+## 2026-09-15 — Pro Preview kapısı local storage hatasına bağlı kalmamalı
+
+- Kilitli özelliğe ilk dokunuşta local `seen` okuma/yazma hatası olursa kullanıcı ne preview ne paywall görmeden kalmamalı.
+- Pro preview gösterimi best-effort yerel kayda dayanmalı; storage bozuksa ilk preview yine açılabilir.
+- `seen` kontrolü beklerken kullanıcı değişirse eski kullanıcı adına preview navigate edilmemeli.
