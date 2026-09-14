@@ -6,6 +6,8 @@ import { markLoginRewarded } from "../supabase/profiles";
 import { recordRetentionEvent } from "../supabase/retention";
 import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
 import { todayTR } from "../lib/dateUtils";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
+import { getString, setString } from "../lib/storage/appStorage";
 
 function todayStr() {
   return todayTR();
@@ -18,12 +20,25 @@ function daysBetween(dateA, dateB) {
 
 export function useRetention(reward) {
   const [comeback, setComeback] = useState(null);
+  const [localLoginRewarded, setLocalLoginRewarded] = useState(null);
   const processedFor = useRef(null);
   const comebackShownFor = useRef(null);
   const dailyRewardScheduledFor = useRef(null);
   const dailyRewardCompletedFor = useRef(null);
   const retentionData = useAppSelector(selectRetentionData);
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.id) {
+      setLocalLoginRewarded(null);
+      return undefined;
+    }
+    let alive = true;
+    getString(userScopedKey(STORAGE_KEYS.LOGIN_REWARDED, user.id))
+      .then((date) => { if (alive) setLocalLoginRewarded(date || null); })
+      .catch(() => { if (alive) setLocalLoginRewarded(null); });
+    return () => { alive = false; };
+  }, [user?.id]);
 
   useEffect(() => {
     const activeUserId = user?.id || "anonymous";
@@ -35,6 +50,7 @@ export function useRetention(reward) {
       today,
       retentionData.lastActive || "",
       retentionData.loginRewardedDate || "",
+      localLoginRewarded || "",
     ].join("|");
     if (processedFor.current === processKey) return;
     processedFor.current = processKey;
@@ -43,7 +59,7 @@ export function useRetention(reward) {
     let scheduledDailyKey = null;
 
     const lastActive = retentionData.lastActive;
-    const loginRewarded = retentionData.loginRewardedDate;
+    const loginRewarded = localLoginRewarded === today ? today : retentionData.loginRewardedDate;
 
     if (lastActive && alive) {
       const lastDate = lastActive.split("T")[0];
@@ -80,7 +96,11 @@ export function useRetention(reward) {
         dailyRewardCompletedFor.current = dailyKey;
         dailyRewardScheduledFor.current = null;
         reward("daily_login");
-        if (user?.id) markLoginRewarded(user.id).catch(() => {});
+        if (user?.id) {
+          setLocalLoginRewarded(today);
+          setString(userScopedKey(STORAGE_KEYS.LOGIN_REWARDED, user.id), today).catch(() => {});
+          markLoginRewarded(user.id).catch(() => {});
+        }
         if (user?.id) {
           recordRetentionEvent(
             user.id,
@@ -99,7 +119,7 @@ export function useRetention(reward) {
         dailyRewardScheduledFor.current = null;
       }
     };
-  }, [retentionData, reward, user?.id]);
+  }, [localLoginRewarded, retentionData, reward, user?.id]);
 
   const dismissComeback = useCallback(() => {
     if (comeback && reward) {

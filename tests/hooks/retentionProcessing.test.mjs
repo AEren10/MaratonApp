@@ -8,6 +8,7 @@ test("retention processing key changes when fresh retention data arrives", () =>
   assert.match(source, /const processKey = \[/);
   assert.match(source, /retentionData\.lastActive \|\| ""/);
   assert.match(source, /retentionData\.loginRewardedDate \|\| ""/);
+  assert.match(source, /localLoginRewarded \|\| ""/);
   assert.doesNotMatch(source, /processedFor\.current === activeUserId/);
 });
 
@@ -26,4 +27,10 @@ test("comeback and daily reward processing are deduped separately", () => {
   assert.match(source, /const comebackKey = \[activeUserId, today, lastDate\]\.join\("\|"\);/);
   assert.match(source, /dailyRewardScheduledFor\.current === dailyKey/);
   assert.match(source, /dailyRewardCompletedFor\.current === dailyKey/);
+});
+
+test("daily login reward has a user-scoped local fallback before server mark", () => {
+  assert.match(source, /getString\(userScopedKey\(STORAGE_KEYS\.LOGIN_REWARDED, user\.id\)\)/);
+  assert.match(source, /const loginRewarded = localLoginRewarded === today \? today : retentionData\.loginRewardedDate/);
+  assert.match(source, /setString\(userScopedKey\(STORAGE_KEYS\.LOGIN_REWARDED, user\.id\), today\)/);
 });

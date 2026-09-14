@@ -297,6 +297,7 @@
 - Pending referral link yakalandığında conversion event'i değil link-open event'i yazılmalı; aksi halde uygulamayı açıp kodu hiç uygulamayan kullanıcılar premium kazanmış gibi görünür.
 - Auth cleanup testleri retention buffer'ı da korumalı. Buffer listeden yanlışlıkla silinirse paywall/comeback/nudge olayları bağlantı yokken veya token logout sırasında kalıcı kaybolur.
 - `useRecommendations` yalnız bugünün loglarıyla çalışırsa 7/14 günlük ihmal, aşırı odak ve çalışma dengesi nudge'ları canlıda neredeyse hiç tetiklenmez. Retention nudge'ları en az rota bağlamındaki 45 günlük pencereyle beslenmeli.
+- Günlük giriş ödülü localde verildikten sonra server `login_rewarded_date` yazımı düşerse aynı gün restart sonrası tekrar ödül verilebilir. Server otorite kalmalı ama user-scoped local fallback bugünkü ödülü tekrar ettirmemeli.
 
 ## 2026-09-14 — Paywall purchase funnel source tutarlılığı
 
