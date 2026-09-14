@@ -55,7 +55,7 @@ export function useHomeController() {
   useHomeGamificationBridge({ checkMilestone, streak, syncStat });
 
   const planCtx = usePlanContext();
-  const nudges = useRecommendations();
+  const nudges = useRecommendations(planCtx.weekLogs);
   const nudge = useNudgePopup(nudges);
   const { suggestions } = useAISuggestions();
   const { refresh } = useSync();
