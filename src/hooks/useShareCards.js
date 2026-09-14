@@ -9,6 +9,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { selectStreak, selectTodayLogs } from "../store/slices/studyLogSlice";
 import { selectRetentionData } from "../store/slices/gamificationSlice";
 import { useExam } from "../contexts/ExamContext";
+import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { getSubjectByKey } from "../themes/subjects";
 import { dateKey, differenceInDays } from "../lib/dateUtils";
 
@@ -55,45 +56,59 @@ export function useShareCards() {
     return gap >= 2 ? gap : null;
   }, [retention?.lastActive]);
 
-  const ctx = useMemo(() => ({
-    today,
-    week: {
-      minutes: report.totalMinutes || 0,
-      questions: report.totalQuestions || 0,
-      activeDays: report.activeDays || 0,
-      trials: report.trialCount || 0,
-      // useWeeklyReport netleri STRING döndürüyor (toFixed(1)); sayıya çevir.
-      // Önceki haftanın ortalaması ayrıca verilmiyor, netDelta'dan türetiliyor.
-      netAvg: report.weekNetAvg != null ? Number(report.weekNetAvg) : null,
-      prevNetAvg: report.hasPrev && report.weekNetAvg != null && report.netDelta != null
-        ? Number(report.weekNetAvg) - Number(report.netDelta)
-        : null,
-      bestDay: null, // useWeeklyReport bu bilgiyi vermiyor
-    },
-    streak: streak || 0,
-    comebackAfterDays,
-    route: {
-      currentWeek: currentWeek
-        ? {
-            plannedQuestions: currentWeek.plannedQuestions || 0,
-            // Bu haftanın gerçekleşeni: haftalık rapordan.
-            completedQuestions: report.totalQuestions || 0,
-          }
-        : null,
-      nextStop: currentWeek?.stops?.[0]
-        ? {
-            topic: currentWeek.stops[0].topic,
-            subjectLabel: currentWeek.stops[0].subjectLabel,
-            questions: currentWeek.stops[0].cost?.questions,
-            difficulty: currentWeek.stops[0].cost?.difficulty,
-          }
-        : null,
-      completedStop: null, // ekran, tamamlanan durağı parametre olarak geçer
-      progressPct: route?.totals?.progress || 0,
-      movedTopics: route?.totals?.mastered || 0,
-    },
-    generatedOn: dateKey(new Date()),
-  }), [today, report, streak, comebackAfterDays, currentWeek, route]);
+  const ctx = useMemo(() => {
+    const currentWeekStops = currentWeek?.stops || [];
+    const completedStops = currentWeekStops.filter(
+      (stop) => stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED,
+    ).length;
+    const nextRouteStop = currentWeekStops.find(
+      (stop) => stop.lifecycleStatus === ROUTE_STOP_STATUS.ACTIVE,
+    ) || currentWeekStops.find(
+      (stop) => stop.lifecycleStatus === ROUTE_STOP_STATUS.UPCOMING,
+    ) || null;
+
+    return {
+      today,
+      week: {
+        minutes: report.totalMinutes || 0,
+        questions: report.totalQuestions || 0,
+        activeDays: report.activeDays || 0,
+        trials: report.trialCount || 0,
+        // useWeeklyReport netleri STRING döndürüyor (toFixed(1)); sayıya çevir.
+        // Önceki haftanın ortalaması ayrıca verilmiyor, netDelta'dan türetiliyor.
+        netAvg: report.weekNetAvg != null ? Number(report.weekNetAvg) : null,
+        prevNetAvg: report.hasPrev && report.weekNetAvg != null && report.netDelta != null
+          ? Number(report.weekNetAvg) - Number(report.netDelta)
+          : null,
+        bestDay: null, // useWeeklyReport bu bilgiyi vermiyor
+      },
+      streak: streak || 0,
+      comebackAfterDays,
+      route: {
+        currentWeek: currentWeek
+          ? {
+              weekNo: currentWeek.weekNo ?? null,
+              plannedQuestions: currentWeek.plannedQuestions || 0,
+              // Bu haftanın gerçekleşeni: haftalık rapordan.
+              completedQuestions: report.totalQuestions || 0,
+              completedStops,
+            }
+          : null,
+        nextStop: nextRouteStop
+          ? {
+              topic: nextRouteStop.topic,
+              subjectLabel: nextRouteStop.subjectLabel,
+              questions: nextRouteStop.cost?.questions,
+              difficulty: nextRouteStop.cost?.difficulty,
+            }
+          : null,
+        completedStop: null, // ekran, tamamlanan durağı parametre olarak geçer
+        progressPct: route?.totals?.progress || 0,
+        movedTopics: route?.totals?.mastered || 0,
+      },
+      generatedOn: dateKey(new Date()),
+    };
+  }, [today, report, streak, comebackAfterDays, currentWeek, route]);
 
   // Ivme modunun "SON N DENEME" karti deneme verisinden (Kart Modlari).
   const momentum = useMemo(() => trialMomentumCard(trials || [], 5, examType), [examType, trials]);

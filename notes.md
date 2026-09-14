@@ -357,3 +357,9 @@
 - Geri dönüş modalı gibi motivasyon state'leri eski kullanıcıdan yeni kullanıcıya kalırsa ürün kişisel hissettirmek yerine yanlış veri gösterir.
 - Auth userId değiştiğinde comeback ve günlük ödül dedupe ref'leri temizlenmeli; yeni kullanıcının retention kararı kendi verisiyle yeniden kurulmalı.
 - Bu özellikle paylaşımlı cihaz / logout-login senaryosunda retention güvenini korur.
+
+## 2026-09-15 — Story kartları route lifecycle verisini eksik beslememeli
+
+- Düz hafta kartı `completedStops/weekNo` beklerken hook bunları geçmezse kullanıcıya “0 durak / Bu hafta” gibi eksik motivasyon verisi gösterilir.
+- Sıradaki durak kartı `stops[0]` yerine önce aktif, yoksa upcoming duraktan beslenmeli; tamamlanmış ilk durak “sıradaki” diye görünmemeli.
+- Story/share domain'i görselden bağımsız kalmalı; algoritmik veri hazırlığı hook/domain sınırında yapılmalı.
