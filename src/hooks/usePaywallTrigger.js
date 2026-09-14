@@ -13,6 +13,13 @@ export function usePaywallTrigger() {
   const { showPaywall } = usePremium();
   const { user } = useAuth();
   const timerRef = useRef(null);
+  const timerUserRef = useRef(null);
+
+  const clearPaywallTimer = useCallback(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
+    timerUserRef.current = null;
+  }, []);
 
   const incrementAndCheck = useCallback(async () => {
     const serverCount = user?.id ? await incrementSessionCount(user.id).catch(() => null) : null;
@@ -46,23 +53,29 @@ export function usePaywallTrigger() {
   }, [user?.id]);
 
   const showDelayedPaywall = useCallback((delayMs = 2000, source = "study_session_threshold") => {
-    clearTimeout(timerRef.current);
+    clearPaywallTimer();
+    const scheduledUserId = user?.id || null;
+    timerUserRef.current = scheduledUserId;
     timerRef.current = setTimeout(async () => {
+      timerRef.current = null;
+      if (timerUserRef.current !== scheduledUserId) return;
+      timerUserRef.current = null;
       const opened = showPaywall(source);
       if (opened) {
-        await setString(userScopedKey(STORAGE_KEYS.PAYWALL_SHOWN_SESSION, user?.id), "true");
+        setString(userScopedKey(STORAGE_KEYS.PAYWALL_SHOWN_SESSION, scheduledUserId), "true")
+          .catch(() => {});
       }
     }, delayMs);
-    return () => clearTimeout(timerRef.current);
-  }, [showPaywall, user?.id]);
+    return clearPaywallTimer;
+  }, [clearPaywallTimer, showPaywall, user?.id]);
 
   const cleanup = useCallback(() => {
-    clearTimeout(timerRef.current);
-  }, []);
+    clearPaywallTimer();
+  }, [clearPaywallTimer]);
 
   // Çağıran ekran unmount olursa gecikmeli paywall yine de açılıyordu.
   // Temizliği manuel cleanup()'a bırakma; hook kendi sorumluluğunu alsın.
-  useEffect(() => () => clearTimeout(timerRef.current), []);
+  useEffect(() => clearPaywallTimer, [clearPaywallTimer, user?.id]);
 
   return { incrementAndCheck, showDelayedPaywall, cleanup };
 }

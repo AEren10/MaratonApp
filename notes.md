@@ -339,3 +339,9 @@
 - Rota ve hedefler sınav türüne scope'luysa “son deneme ivmesi” story kartı da aktif sınav türünü tercih etmeli.
 - En çok geçmiş verisi olan eski sınav grubunu göstermek, kullanıcı AYT rotasındayken TYT ivmesini paylaşmasına ve ürün güveninin düşmesine yol açar.
 - Aktif sınav türünde en az iki geçerli deneme yoksa kart çıkmamalı; aktif sınav yoksa eski fallback kullanılabilir.
+
+## 2026-09-15 — Gecikmeli paywall auth geçişinde eski kullanıcıyla açılmamalı
+
+- Çalışma özeti sonrası gecikmeli paywall timer'ı kullanıcı değişimi/logout sırasında eski closure ile çalışırsa yanlış oturum bağlamında satış ekranı açılabilir.
+- Timer kullanıcı değişiminde iptal edilmeli; çalışırken de planlandığı userId ile güncel timer userId eşleşmeli.
+- Paywall gösterildi işareti storage'a best-effort yazılmalı; yazım hatası timer callback'inde unhandled rejection üretmemeli.
