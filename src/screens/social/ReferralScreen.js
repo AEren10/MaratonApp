@@ -118,6 +118,10 @@ export default function ReferralScreen() {
       const result = await applyReferralCode(user.id, friendCode);
       if (result.ok) {
         H.success();
+        track(EVENTS.REFERRAL_LINK_APPLIED, {
+          source: "referral_screen",
+          entry: route.params?.code ? "deep_link" : "manual_entry",
+        });
         appStorage.remove(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
         await refreshPremium();
         showAlert("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
@@ -136,7 +140,7 @@ export default function ReferralScreen() {
     } finally {
       setApplying(false);
     }
-  }, [friendCode, user?.id, refreshPremium, showAlert]);
+  }, [friendCode, route.params?.code, user?.id, refreshPremium, showAlert]);
 
   if (loading) {
     return (

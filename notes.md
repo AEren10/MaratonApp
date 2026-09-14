@@ -293,6 +293,7 @@
 - Grup ve arkadaş davet linklerinde `appUrl` param adı, route path içindeki param adıyla birebir aynı olmalı. `group/:groupCode?` yoluna `{ code }` verilirse link içinde `:groupCode?` kalır ve davet/referral akışı sessizce kırılır.
 - Referral/growth yüzeylerinde link metninde kod yazıyor olsa bile deep link bozuksa kullanıcı ekleme/katılma adımı manuel koda düşer; bu da paylaşım dönüşümünü azaltır.
 - Referral hunisi üç olayla okunmalı: link paylaşıldı, link açıldı/pending yakalandı, kod başarıyla uygulandı. Paylaşım event'i eksik kalırsa viral döngüde sorun link üretiminde mi, açılışta mı, uygulamada mı ayrıştırılamaz.
+- Kod başarıyla uygulanınca da conversion event'i atılmalı. Sadece pending deeplink yakalandığında event yazmak, gerçek ödül/premium kazanımıyla karışır.
 
 ## 2026-09-14 — Paywall purchase funnel source tutarlılığı
 
