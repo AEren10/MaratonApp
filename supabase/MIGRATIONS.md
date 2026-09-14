@@ -147,3 +147,19 @@ Doğrulandı: `challenge_progress_events`, `sync_challenge_progress`,
 canlıda mevcut. `create_challenge`, `sync_challenge_progress`,
 `persist_route_revision`, `private.has_feature_access` ve
 `private.get_product_access_snapshot` fonksiyonlarında `search_path=""`.
+
+### Güncelleme (2026-09-14, çalışma kaydı delta)
+
+`cdx_study_log_topic_progress_delta` canlıya Supabase migration aracıyla
+uygulandı:
+
+- `study_logs` topic progress trigger'ı `AFTER INSERT OR UPDATE OR DELETE`
+  çalışacak şekilde güncellendi.
+- `UPDATE` eski çalışma kaydı katkısını düşüp yeni katkıyı ekliyor; `DELETE`
+  eski katkıyı düşüyor.
+- Sayaçlar negatife inmiyor ve eski katkı düşerken `last_studied_at` kalan
+  çalışma kayıtlarına göre yeniden hesaplanıyor.
+
+Doğrulandı: canlı `on_study_log_update_progress` trigger'ı artık
+`AFTER INSERT OR DELETE OR UPDATE`; ilgili helper fonksiyonlarda
+`search_path=""`.

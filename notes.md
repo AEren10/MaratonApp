@@ -257,3 +257,9 @@
 - Canlı `schema_migrations` listesi repo ile birebir değil; baseline işi hâlâ gerekli. Ancak read-only canlı sorgular gerçek eksikleri ayırdı.
 - Gerçek eksikler kapatıldı: idempotent challenge progress RPC/tablosu, route week exam scope yazımı, route state exam scope + primary key, analytics export policy ve CDX RPC search_path kilitleri.
 - Bundan sonra rota/challenge/retention tarafında “local test geçiyor” tek başına yeterli değil; canlı registry + canlı schema kontrolü birlikte yapılmalı.
+
+## 2026-09-14 — Çalışma kaydı edit/delete ve topic_progress
+
+- Çalışma kaydı artık kullanıcı tarafından düzenlenip silinebiliyor; `topic_progress` yalnız INSERT ile artarsa rota/konu ustalığı/retention sinyali eski katkıları taşımaya devam eder.
+- `study_logs` trigger'ı INSERT/UPDATE/DELETE için delta-safe kalmalı: UPDATE eski katkıyı düşüp yeni katkıyı eklemeli, DELETE eski katkıyı düşmeli.
+- Eski katkı düşerken sayaçlar negatife inmemeli ve `last_studied_at` kalan çalışma kayıtlarına göre yeniden hesaplanmalı. Aksi halde “uzun süredir çalışılmadı” sinyali ve rota önceliği bayatlar.
