@@ -295,6 +295,7 @@
 - Referral hunisi üç olayla okunmalı: link paylaşıldı, link açıldı/pending yakalandı, kod başarıyla uygulandı. Paylaşım event'i eksik kalırsa viral döngüde sorun link üretiminde mi, açılışta mı, uygulamada mı ayrıştırılamaz.
 - Kod başarıyla uygulanınca da conversion event'i atılmalı. Sadece pending deeplink yakalandığında event yazmak, gerçek ödül/premium kazanımıyla karışır.
 - Pending referral link yakalandığında conversion event'i değil link-open event'i yazılmalı; aksi halde uygulamayı açıp kodu hiç uygulamayan kullanıcılar premium kazanmış gibi görünür.
+- Auth cleanup testleri retention buffer'ı da korumalı. Buffer listeden yanlışlıkla silinirse paywall/comeback/nudge olayları bağlantı yokken veya token logout sırasında kalıcı kaybolur.
 
 ## 2026-09-14 — Paywall purchase funnel source tutarlılığı
 
