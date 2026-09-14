@@ -17,3 +17,8 @@ test("referral pending code is preserved until ReferralScreen applies it", () =>
   assert.match(source, /remove\(\) ETMİYORUZ/);
   assert.doesNotMatch(source, /else if \(referralCode\) \{[\s\S]*remove\(PENDING_KEY\)/);
 });
+
+test("pending referral navigation records link open, not reward conversion", () => {
+  assert.match(source, /track\(EVENTS\.DEEP_LINK_OPENED, \{ type: "referral", source: "deep_link_pending" \}\)/);
+  assert.doesNotMatch(source, /deep_link_pending" \}\);\s*navigation\.navigate[\s\S]*REFERRAL_LINK_APPLIED/);
+});

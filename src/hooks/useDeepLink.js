@@ -107,7 +107,7 @@ export function useDeepLink() {
         // remove() ETMİYORUZ: ReferralScreen kodu depodan okuyup alana
         // dolduruyor ve uygulama başarılı olunca temizleniyor. Burada silersek
         // kullanıcı ekranı görmeden kod kaybolur.
-        track(EVENTS.REFERRAL_LINK_APPLIED, { source: "deep_link_pending" });
+        track(EVENTS.DEEP_LINK_OPENED, { type: "referral", source: "deep_link_pending" });
         navigation.navigate(SCREENS.REFERRAL, { code: referralCode });
       }
     })().catch(() => {});
