@@ -8,13 +8,14 @@ const API_KEYS = {
 
 let initialized = false;
 let unavailableReason = null;
+let configuredAppUserId = null;
 
 function isConfiguredKey(key) {
   return !!key && !key.startsWith("YOUR_");
 }
 
 export async function initPurchases(userId) {
-  if (initialized) return;
+  const requestedUserId = userId || null;
   const key = Platform.OS === "ios" ? API_KEYS.ios : API_KEYS.android;
   if (!isConfiguredKey(key)) {
     unavailableReason = "missing_revenuecat_key";
@@ -22,11 +23,20 @@ export async function initPurchases(userId) {
   }
 
   try {
-    Purchases.configure({ apiKey: key, appUserID: userId || undefined });
-    initialized = true;
+    if (!initialized) {
+      Purchases.configure({ apiKey: key, appUserID: requestedUserId || undefined });
+      initialized = true;
+      configuredAppUserId = requestedUserId;
+      unavailableReason = null;
+      return;
+    }
+    if (requestedUserId && configuredAppUserId !== requestedUserId) {
+      await Purchases.logIn(requestedUserId);
+      configuredAppUserId = requestedUserId;
+    }
     unavailableReason = null;
   } catch (e) {
-    unavailableReason = "configure_failed";
+    unavailableReason = initialized ? "login_failed" : "configure_failed";
     if (__DEV__) console.warn("[Purchases] init failed", e);
   }
 }

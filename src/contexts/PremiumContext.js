@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -32,9 +32,16 @@ export function PremiumProvider({ children }) {
   const [accessState, setAccessState] = useState("loading");
   const [snapshot, setSnapshot] = useState(null);
   const [usage, setUsage] = useState(null);
+  const activeUserRef = useRef(user?.id || null);
+
+  const isCurrentUser = useCallback((expectedUserId) => (
+    activeUserRef.current === (expectedUserId || null)
+  ), []);
 
   const refreshAccess = useCallback(async () => {
-    if (!user?.id || user.id === "dev") {
+    const requestedUserId = user?.id || null;
+    if (!requestedUserId || requestedUserId === "dev") {
+      if (!isCurrentUser(requestedUserId)) return null;
       setSnapshot(user?.id === "dev" ? DEV_ACCESS_SNAPSHOT : null);
       setAccessState("ready");
       return user?.id === "dev" ? DEV_ACCESS_SNAPSHOT : null;
@@ -42,38 +49,46 @@ export function PremiumProvider({ children }) {
     setAccessState((current) => current === "ready" ? current : "loading");
     try {
       const next = await getProductAccessSnapshot();
+      if (!isCurrentUser(requestedUserId)) return null;
       setSnapshot(next);
       setAccessState("ready");
       return next;
     } catch (error) {
+      if (!isCurrentUser(requestedUserId)) return null;
       setAccessState("error");
       if (__DEV__) console.warn("[PremiumContext] refreshAccess", error);
       return null;
     }
-  }, [user?.id]);
+  }, [isCurrentUser, user?.id]);
 
   const refreshUsage = useCallback(async () => {
-    if (!user?.id) return;
-    if (user.id === "dev") return refreshAccess();
+    const requestedUserId = user?.id || null;
+    if (!requestedUserId) return null;
+    if (requestedUserId === "dev") return refreshAccess();
     const [access, wrongs, challenges] = await Promise.allSettled([
       refreshAccess(),
-      getWrongQuestionCount(user.id),
-      getActiveChallengeCount(user.id),
+      getWrongQuestionCount(requestedUserId),
+      getActiveChallengeCount(requestedUserId),
     ]);
+    if (!isCurrentUser(requestedUserId)) return null;
     setUsage({
       wrongEntries: wrongs.status === "fulfilled" ? wrongs.value : null,
       activeChallenges: challenges.status === "fulfilled" ? challenges.value : null,
     });
     return access.status === "fulfilled" ? access.value : null;
-  }, [refreshAccess, user?.id]);
+  }, [isCurrentUser, refreshAccess, user?.id]);
 
   useEffect(() => {
+    activeUserRef.current = user?.id || null;
     setSnapshot(null);
     setUsage(null);
     setAccessState("loading");
     if (!user?.id) return;
-    initPurchases(user.id).finally(refreshUsage);
-  }, [refreshUsage, user?.id]);
+    const requestedUserId = user.id;
+    initPurchases(requestedUserId).finally(() => {
+      if (isCurrentUser(requestedUserId)) refreshUsage();
+    });
+  }, [isCurrentUser, refreshUsage, user?.id]);
 
   useEffect(() => {
     if (!user?.id) return undefined;

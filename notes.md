@@ -345,3 +345,9 @@
 - Çalışma özeti sonrası gecikmeli paywall timer'ı kullanıcı değişimi/logout sırasında eski closure ile çalışırsa yanlış oturum bağlamında satış ekranı açılabilir.
 - Timer kullanıcı değişiminde iptal edilmeli; çalışırken de planlandığı userId ile güncel timer userId eşleşmeli.
 - Paywall gösterildi işareti storage'a best-effort yazılmalı; yazım hatası timer callback'inde unhandled rejection üretmemeli.
+
+## 2026-09-15 — Premium erişim state'i auth geçişinde kullanıcı karıştırmamalı
+
+- Premium snapshot, kota ve mağaza kimliği aynı kullanıcıya ait değilse motivasyon/paywall kararları yanlış verilir.
+- Supabase erişim/usage cevabı döndüğünde hâlâ aynı userId aktif değilse state'e yazılmamalı.
+- RevenueCat bir kez configure edildi diye sonraki hesap değişimlerini yok saymamalı; appUserID yeni kullanıcıya geçirilmelidir.

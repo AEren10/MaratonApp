@@ -15,6 +15,14 @@ test("RevenueCat keys come from Expo public env instead of placeholders", () => 
   assert.doesNotMatch(purchases, /YOUR_REVENUECAT_ANDROID_API_KEY/);
 });
 
+test("RevenueCat app user is switched when the signed-in user changes", () => {
+  assert.match(purchases, /let configuredAppUserId = null;/);
+  assert.match(purchases, /const requestedUserId = userId \|\| null;/);
+  assert.match(purchases, /if \(requestedUserId && configuredAppUserId !== requestedUserId\) \{\s*await Purchases\.logIn\(requestedUserId\);/);
+  assert.match(purchases, /configuredAppUserId = requestedUserId;/);
+  assert.match(purchases, /unavailableReason = initialized \? "login_failed" : "configure_failed";/);
+});
+
 test("paywall trial fallback is limited to dev when RevenueCat is not configured", () => {
   assert.match(paywall, /if \(__DEV__ && user\?\.id && !purchasesStatus\.configured\)/);
   assert.match(paywall, /Satın alma hazır değil/);
