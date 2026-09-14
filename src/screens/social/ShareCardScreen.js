@@ -32,7 +32,11 @@ export default function ShareCardScreen() {
   const activeCard = modeCards.find((c) => c.id === selectedId) || modeCards[0] || null;
   const footRight = daysUntilExam != null ? `SINAVA ${daysUntilExam} GÜN` : null;
   const cardRef = useRef(null);
-  const { handleShare, handleSaveGallery } = useShareCardActions(cardRef);
+  const shareMeta = useMemo(
+    () => () => ({ cardId: activeCard?.id || null, mode }),
+    [activeCard?.id, mode],
+  );
+  const { handleShare, handleSaveGallery } = useShareCardActions(cardRef, shareMeta);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>

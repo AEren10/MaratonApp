@@ -1,10 +1,12 @@
 import { useCallback } from "react";
 
 import { useAlert } from "../contexts/AlertContext";
+import { EVENTS } from "../constants/analytics";
+import { track } from "../lib/analytics";
 import * as H from "../lib/haptics";
 
 // Paylasim Karti eylemleri: karti goruntuye cevirip paylas / galeriye kaydet.
-export function useShareCardActions(cardRef) {
+export function useShareCardActions(cardRef, getShareMeta = null) {
   const showAlert = useAlert();
 
   const handleShare = useCallback(async () => {
@@ -21,11 +23,12 @@ export function useShareCardActions(cardRef) {
       const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
       if (!(await Sharing.isAvailableAsync())) { showAlert("Paylaşım yok"); return; }
       await Sharing.shareAsync(`file://${uri}`, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
+      track(EVENTS.WRAPPED_SHARED, { source: "share_card", ...(getShareMeta?.() || {}) });
       H.success();
     } catch {
       showAlert("Hata", "Kart oluşturulamadı.");
     }
-  }, [cardRef, showAlert]);
+  }, [cardRef, getShareMeta, showAlert]);
 
   // Galeriye kaydet. expo-media-library kuruldu (SDK 54: ~18.2.1) ve
   // app.json'a savePhotosPermission ile eklendi, yani buton gercekten

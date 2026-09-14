@@ -321,3 +321,9 @@
 - `flat_week` kartı yalnız düşük aktif gün + deneme yok durumunda çıkmalı; haftalık context deneme sayısını taşımazsa deneme girilmiş haftayı da “rota düzleşti” diye anlatabilir.
 - Share/story algoritması görselden bağımsız içerik katmanı olduğu için her iddia gerçek veri alanıyla beslenmeli; veri yoksa kart çıkmasın, uydurma moral metni üretmesin.
 - Yeni story template veya kart eklenirken hook context'i ile domain kartının beklediği alanlar birlikte test edilmeli.
+
+## 2026-09-15 — Story paylaşım funnel'ı kör kalmamalı
+
+- `WRAPPED_SHARED` event'i sabitlerde durup paylaşım hook'unda atılmazsa hangi story kartının viral döngü ürettiği ölçülemez.
+- Event yalnız başarılı native share sonrası atılmalı; galeriye kaydetme “shared” sayılıp dönüşüm metriğini şişirmemeli.
+- Payload en az `source`, `cardId` ve `mode` taşımalı ki emek/ivme/tam modlarının paylaşım etkisi ayrıştırılabilsin.
