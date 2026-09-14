@@ -7,6 +7,7 @@ const friendCodeCard = readFileSync(
   new URL("../../src/screens/social/components/FriendCodeCard.js", import.meta.url),
   "utf8",
 );
+const referralScreen = readFileSync(new URL("../../src/screens/social/ReferralScreen.js", import.meta.url), "utf8");
 
 test("group invite share link passes groupCode to the route path", () => {
   assert.match(groupsTab, /appUrl\(SCREENS\.LEAGUE, \{ groupCode: g\.code \}\)/);
@@ -16,4 +17,10 @@ test("group invite share link passes groupCode to the route path", () => {
 test("friend invite share link passes friendCode to the route path", () => {
   assert.match(friendCodeCard, /appUrl\(SCREENS\.FRIENDS, \{ friendCode: myCode \}\)/);
   assert.doesNotMatch(friendCodeCard, /appUrl\(SCREENS\.FRIENDS, \{ code:/);
+});
+
+test("referral share emits the growth funnel event", () => {
+  assert.match(referralScreen, /import \{ track \} from "\.\.\/\.\.\/lib\/analytics"/);
+  assert.match(referralScreen, /import \{ EVENTS \} from "\.\.\/\.\.\/constants\/analytics"/);
+  assert.match(referralScreen, /track\(EVENTS\.REFERRAL_LINK_SHARED, \{ source: "referral_screen", examType \}\)/);
 });

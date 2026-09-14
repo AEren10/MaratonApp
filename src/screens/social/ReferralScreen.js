@@ -31,6 +31,8 @@ import { STORAGE_KEYS } from "../../constants/storageKeys";
 import * as appStorage from "../../lib/storage/appStorage";
 import * as H from "../../lib/haptics";
 import { useExam } from "../../contexts/ExamContext";
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 
 const REWARD_DAYS = 7;
 
@@ -103,10 +105,11 @@ export default function ReferralScreen() {
         message: `Maraton ile birlikte ${examName}'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
         url: link,
       });
+      track(EVENTS.REFERRAL_LINK_SHARED, { source: "referral_screen", examType });
     } catch {
       handleCopy();
     }
-  }, [code, handleCopy, examName]);
+  }, [code, handleCopy, examName, examType]);
 
   const handleApply = useCallback(async () => {
     if (!friendCode.trim() || !user?.id) return;
