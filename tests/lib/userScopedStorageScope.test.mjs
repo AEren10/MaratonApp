@@ -15,5 +15,6 @@ test("durable retry and analytics buffers survive auth cleanup", () => {
   assert.doesNotMatch(userScopedKeys, /STORAGE_KEYS\.PENDING_STREAK/);
   assert.doesNotMatch(userScopedKeys, /STORAGE_KEYS\.ANALYTICS_BUFFER/);
   assert.doesNotMatch(userScopedKeys, /STORAGE_KEYS\.RETENTION_BUFFER/);
-  assert.match(storageScope, /PENDING_STREAK, ANALYTICS_BUFFER ve\s*\/\/ RETENTION_BUFFER zaten/);
+  assert.doesNotMatch(userScopedKeys, /STORAGE_KEYS\.LOGIN_REWARDED/);
+  assert.match(storageScope, /PENDING_STREAK, ANALYTICS_BUFFER,\s*\/\/ RETENTION_BUFFER ve LOGIN_REWARDED zaten/);
 });

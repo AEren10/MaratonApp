@@ -2,16 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
 
 // DİKKAT: dayanıklı retry/tampon anahtarları bu listede OLMAMALI.
-// OFFLINE_QUEUE/OFFLINE_DEAD_LETTER, PENDING_STREAK, ANALYTICS_BUFFER ve
-// RETENTION_BUFFER zaten
+// OFFLINE_QUEUE/OFFLINE_DEAD_LETTER, PENDING_STREAK, ANALYTICS_BUFFER,
+// RETENTION_BUFFER ve LOGIN_REWARDED zaten
 // içeride userId taşır ve okuma sırasında aktif kullanıcıya filtrelenir.
 // Buraya eklenirlerse çıkışta — özellikle token süresi dolunca tetiklenen
 // istem dışı onAuthError→logout yolunda — gönderilmemiş çalışma, seri veya
-// retention/funnel olayları kalıcı olarak silinir.
+// retention/funnel olayları ya da local ödül kilitleri kalıcı olarak silinir.
 export const USER_SCOPED_KEYS = [
   STORAGE_KEYS.GOALS,
   STORAGE_KEYS.LAST_ACTIVE,
-  STORAGE_KEYS.LOGIN_REWARDED,
   STORAGE_KEYS.COMEBACK_SHOWN,
   STORAGE_KEYS.NUDGE_POPUP_SHOWN,
   STORAGE_KEYS.GAMIFICATION,

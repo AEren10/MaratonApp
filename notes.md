@@ -303,3 +303,9 @@
 
 - Paywall görüntüleme, dismissal, trial start, purchase ve restore olayları aynı `source` değerini taşımalı. Aksi halde dönüşüm oranı hangi kilitten geldiğini kaybeder.
 - Başarılı restore conversion gibi kapanmalı; `convertedRef` set edilmezse ekran kapanırken `PREMIUM_DISMISSED` de yazılır ve restore eden kullanıcı hem dönüştü hem terk etti gibi görünür.
+
+## 2026-09-15 — Login reward lokal kilit dayanıklılığı
+
+- Günlük giriş ödülü istemcide verildikten sonra Supabase `login_rewarded_date` yazımı düşerse lokal fallback aynı gün tekrar ödülü engellemeli.
+- Bu fallback `userScopedKey(LOGIN_REWARDED, userId)` ile kullanıcıya özel olduğu için cross-user sızıntı yaratmaz; ancak logout temizliğine girerse token/auth hatasında aynı gün re-login ikinci ödül riski doğar.
+- `LOGIN_REWARDED`, retry/tampon anahtarları gibi logout cleanup dışında kalmalı; kullanıcıya görünen cache değil, ödül idempotency kilididir.
