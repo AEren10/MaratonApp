@@ -36,6 +36,10 @@ export const STORAGE_KEYS = {
   // Gun/hafta/rota tamamlama anlarinin gorulme kaydi. userScopedKey ile
   // kullaniciya ayrisir; cikista SILINMEZ, yoksa rota kapanisi tekrar gelir.
   COMPLETION_SHOWN: "@maraton:completion_shown",
+  // Premium anlari (userScopedKey, cikista SILINMEZ): Pro Onizleme'nin
+  // gorulen kaynaklari ve "Deneme Bitti" ekraninin tek seferlik kaydi.
+  PRO_PREVIEW_SEEN: "@maraton:pro_preview_seen",
+  ACCESS_ENDED: "@maraton:access_ended",
   // Sinav akisi (AKIS 14). userScopedKey ile kullaniciya ayrisir; cikista
   // SILINMEZ: sinav gunu plani ve yilin tek sonucu tekrar girilmesin.
   EXAM_DAY_PLAN: "@maraton:examDayPlan",

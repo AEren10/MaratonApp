@@ -53,7 +53,7 @@ export const PAYWALL_CONTEXTS = {
       "İlk iki deneme ücretsiz",
       "Kaydettiğin denemeler silinmez",
     ],
-    primary: "Okumayı aç",
+    primary: "Okumayı dene",
     secondary: "Elle girmeye devam et",
   },
 
@@ -76,7 +76,7 @@ export const PAYWALL_CONTEXTS = {
       "Yanlış defteri ve çalışma takibi açık",
     ],
     primary: "Tümünü aç",
-    secondary: "Şimdi değil",
+    secondary: "Üç alanla devam et",
   },
 
   monthly_report: {
@@ -120,7 +120,7 @@ export const PAYWALL_CONTEXTS = {
       "İlk iki deneme ücretsiz",
     ],
     primary: "Senaryoları aç",
-    secondary: "Şimdi değil",
+    secondary: "Şimdi değil, rotaya dön",
   },
 };
 
@@ -147,8 +147,8 @@ export function paywallContextFor(key) {
     department_threshold: "topic_progress",
     analysis_exam_simulator: "route_scenarios",
     home_quick_simulator: "route_scenarios",
-    route_gate: "route_scenarios",
     trial_entry_limit: "topic_progress",
+    trial_history: "topic_progress",
   }[key];
   return alias ? PAYWALL_CONTEXTS[alias] : null;
 }

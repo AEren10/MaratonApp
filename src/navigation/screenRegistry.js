@@ -98,6 +98,7 @@ const ForecastAccuracyScreen = React.lazy(() => import("../screens/exam/Forecast
 const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
+const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
 
 const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(Comp), options });
 
@@ -222,11 +223,13 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.EXAM_RESULT, ExamResultScreen),
   screen(SCREENS.FORECAST_ACCURACY, ForecastAccuracyScreen),
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
-  screen(SCREENS.PAYWALL, PaywallScreen, modalOptions),
+  // Baglam paywall'i isin ustunde alt sayfa; "Paywall Anı" kendi zeminini boyar.
+  screen(SCREENS.PAYWALL, PaywallScreen, overlayOptions),
   screen(SCREENS.SUBSCRIPTION, SubscriptionScreen),
   screen(SCREENS.SUBSCRIPTION_CANCEL, CancelSubscriptionScreen, modalOptions),
   screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
   screen(SCREENS.PRO_PREVIEW, ProPreviewScreen, overlayOptions),
+  screen(SCREENS.ACCESS_ENDED, AccessEndedScreen, modalOptions),
 ];
 
 // Sekme stack'leri ada gore ekran tanimi ariyor (bkz. tabAssignment.js).

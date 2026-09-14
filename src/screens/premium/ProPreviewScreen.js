@@ -9,14 +9,19 @@ import { useC } from "../../contexts/ThemeContext";
 import { usePremium } from "../../contexts/PremiumContext";
 import { useProPreviewData } from "../../hooks/useProPreviewData";
 import { PRO_PREVIEW } from "../../constants/proPitch";
+import { PREVIEW_VARIANT_FOR_SOURCE } from "../../constants/proPreviewVariants";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { ProPreviewHave } from "./components/ProPreviewHave";
 import { ProLockedRow } from "./components/ProLockedRow";
+import { ProPreviewHistory } from "./components/ProPreviewHistory";
+import { ProPreviewTempo } from "./components/ProPreviewTempo";
 
 // Tasarim: "Pro Onizleme". Kilitli bir ozellige ILK dokunusta bu cikar,
 // odeme ekrani degil: ustte kullanicinin kendi ucretsiz verisi, altinda
-// kilitli alan. Birincil buton baglama ozel paywall'a goturur.
+// kilitli alan. Birincil buton kaynagin onizleme varyantina (Geçmiş,
+// Tempo) gecer; varyanti olmayan kaynakta baglama ozel paywall'a gider.
+// Varyantin birincil butonu paywall'i "isin ustunde" acar.
 const GHOST_WIDTHS = [42, 30, 36, 48];
 
 export default function ProPreviewScreen() {
@@ -29,11 +34,21 @@ export default function ProPreviewScreen() {
   const { showPaywall } = usePremium();
 
   const source = route.params?.source;
+  const variant = PREVIEW_VARIANT_FOR_SOURCE[source] || null;
+  const detail = route.params?.stage === "detail" && variant;
   const dismiss = useCallback(() => { H.tap(); navigation.goBack(); }, [navigation]);
   const openPaywall = useCallback(() => {
     H.select();
-    showPaywall(source || "pro_preview");
-  }, [showPaywall, source]);
+    // Bastirilan paywall (sinav donemi vb.) olu buton birakmasin.
+    if (!showPaywall(source || "pro_preview")) navigation.goBack();
+  }, [navigation, showPaywall, source]);
+  const openPreview = useCallback(() => {
+    H.select();
+    navigation.setParams({ stage: "detail" });
+  }, [navigation]);
+
+  if (detail === "history") return <ProPreviewHistory onOpen={openPaywall} onDismiss={dismiss} />;
+  if (detail === "tempo") return <ProPreviewTempo onOpen={openPaywall} onDismiss={dismiss} />;
 
   return (
     <View style={s.root}>
@@ -71,7 +86,7 @@ export default function ProPreviewScreen() {
 
         <Text style={[TYPOGRAPHY.meta, s.body, { color: C.text3 }]}>{PRO_PREVIEW.body}</Text>
 
-        <Button onPress={openPaywall} size="lg" fullWidth style={s.cta}>
+        <Button onPress={variant ? openPreview : openPaywall} size="lg" fullWidth style={s.cta}>
           {PRO_PREVIEW.primary}
         </Button>
         <Pressable onPress={dismiss} style={s.secondary} accessibilityRole="button">

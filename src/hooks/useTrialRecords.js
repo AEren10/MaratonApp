@@ -4,8 +4,9 @@ import { selectTrials } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
+import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 
-const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
+export const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
 const TYPE_TABS = ["ALL", "TYT", "AYT", "BRANCH"];
 
 function typeBadge(trialType) {
@@ -43,7 +44,8 @@ function monthKey(date) {
 export function useTrialRecords() {
   const trials = useSelector(selectTrials);
   const [filter, setFilter] = useState("ALL");
-  const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
+  const { accessLoading, accessError, accessSnapshot } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
 
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
   const canAccessHistory = canAccessProductFeature({
@@ -52,7 +54,8 @@ export function useTrialRecords() {
     featureKey: PRODUCT_FEATURES.trial_compare,
   });
 
-  const requestFullHistory = useCallback(() => showPaywall("trial_compare"), [showPaywall]);
+  // Eski kayitlarin kilidi "Paywall · Geçmiş" (trial_history -> topic_progress).
+  const requestFullHistory = useCallback(() => enterLocked("trial_history"), [enterLocked]);
 
   const { sections, lockedCount, totalCount } = useMemo(() => {
     const sorted = [...trials].sort((a, b) => new Date(a.date) - new Date(b.date));

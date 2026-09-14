@@ -131,6 +131,7 @@ export const ROOT_ONLY = [
   // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,
+  SCREENS.ACCESS_ENDED,     // Deneme Bitti (bir kez, erisim bitince)
   SCREENS.EDIT_PROFILE,
   SCREENS.CHANGE_PASSWORD,
   SCREENS.EDIT_EMAIL,

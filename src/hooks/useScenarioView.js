@@ -10,6 +10,7 @@ import { updateProfile } from "../supabase/profiles";
 import { captureError } from "../lib/errorReporting";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
+import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 import * as H from "../lib/haptics";
 
 /**
@@ -24,7 +25,8 @@ export function useScenarioView() {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
   const showAlert = useAlert();
-  const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
+  const { accessLoading, accessError, accessSnapshot } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
   const { tempoScenarios, forecast } = useStudyRoute({ persist: false });
   const goals = useAppSelector(selectGoals);
 
@@ -44,13 +46,13 @@ export function useScenarioView() {
   );
 
   const selectScenario = useCallback((multiplier) => {
-    if (!canAccess) { showPaywall("route_scenarios"); return; }
+    if (!canAccess) { enterLocked("route_scenarios"); return; }
     H.select();
     setSelected(multiplier);
-  }, [canAccess, showPaywall]);
+  }, [canAccess, enterLocked]);
 
   const applyTempo = useCallback(async () => {
-    if (!canAccess) { showPaywall("route_scenarios"); return; }
+    if (!canAccess) { enterLocked("route_scenarios"); return; }
     if (!selectedScenario || selectedScenario.multiplier === 1) {
       showAlert("Zaten uygulanıyor", "Şimdiki tempo hâlihazırda hedefin.");
       return;
@@ -72,7 +74,7 @@ export function useScenarioView() {
     } finally {
       setApplying(false);
     }
-  }, [canAccess, showPaywall, selectedScenario, showAlert, dispatch, goals, user?.id, navigation]);
+  }, [canAccess, enterLocked, selectedScenario, showAlert, dispatch, goals, user?.id, navigation]);
 
   return {
     forecast,

@@ -11,12 +11,14 @@ import { routeDetailForecast } from "../domain/route/routeDetailView";
 import { flattenRouteStops, routeDateTag, upcomingRouteStops } from "../domain/route/routeOverview";
 import { useRouteCreate } from "./useRouteCreate";
 import { useStudyRoute } from "./useStudyRoute";
+import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 
 // Rota Detay ekraninin tum verisi ve aksiyonlari. Ekran yalniz render eder.
 export function useRouteDetail() {
   const navigation = useNavigation();
   const { targetNet, examDate } = useExam();
   const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
   const route = useStudyRoute({ persist: false });
   const {
     weeks, daysLeft, forecast, tempoScenarios, isPaused, routeCreated, routeCreating, createRoute,
@@ -49,8 +51,8 @@ export function useRouteDetail() {
 
   const openScenarios = useCallback(() => {
     if (scenariosOpen) navigation.navigate(SCREENS.NET_FORECAST);
-    else showPaywall("route_scenarios");
-  }, [navigation, scenariosOpen, showPaywall]);
+    else enterLocked("route_scenarios");
+  }, [enterLocked, navigation, scenariosOpen]);
 
   return {
     access: {

@@ -128,6 +128,7 @@ export const SCREENS = {
   SUBSCRIPTION_CANCEL: "SubscriptionCancel",
   PREMIUM: "Premium",
   PRO_PREVIEW: "ProPreview",
+  ACCESS_ENDED: "AccessEnded",
 
   // Settings
   SETTINGS: "Settings",

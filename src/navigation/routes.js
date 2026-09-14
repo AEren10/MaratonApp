@@ -106,6 +106,7 @@ export const ROUTE_CONFIGS = {
   // Baglamsiz acilmasi anlamsiz: kaynak param olmadan hangi ozelligin
   // onizlemesi oldugu belirsiz kalir, o yuzden deep link yok.
   [SCREENS.PRO_PREVIEW]: { path: "pro/onizleme", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.ACCESS_ENDED]: { path: "pro/deneme-bitti", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
 
   [SCREENS.SETTINGS]: { path: "ayarlar", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.APPEARANCE]: { path: "ayarlar/gorunum", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
