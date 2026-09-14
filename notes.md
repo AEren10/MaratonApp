@@ -271,3 +271,13 @@
 - Aylık Özet kilidi `monthly_report` source'u ile merkezi gate'e bağlandı; benzer kilitler aynı paterni izlemeli.
 - Oturum eşiği gibi otomatik paywall tetikleyicileri de aynı merkezi gate'i kullanmalı. `PAYWALL_SHOWN_SESSION` yalnız gate gerçekten paywall açarsa yazılmalı; bastırılmış denemeyi “gösterildi” saymak ileride doğru zamanda açılmasını engeller.
 - Pro Önizleme gibi ara satış ekranları da ödeme ekranına doğrudan replace/navigate yapmamalı; CTA sadece merkezi gate'e source ile talep bırakmalı.
+
+## 2026-09-14 — 114/170 akış read-only kontrol notu
+
+- Otomatik kapılar temiz geçti: test, TypeScript, runtime/undefined/design drift ve diff whitespace kontrolü yeşil. Bu kapılar “anlık bariz kırık yok” der; cihaz üstü tüm akış kalitesini kanıtlamaz.
+- 114/170 akış listesi şu an dışarıdan gelen metin gibi duruyor. Repo içinde her akışın route/screen/test/manual QA karşılığını takip eden makine-okunur bir kapsam matrisi yoksa ileride “ekran var ama state yok” veya “tasarım var ama deeplink yok” gibi drift sessiz kalabilir.
+- Screen/route tarafında `SCREENS` sabitleri kullanılıyor; string route araması temiz. Sınav günü planı artık route, registry ve notification deeplink tarafında kayıtlı görünüyor.
+- Paywall girişleri merkezi gate'e toparlandı; yeni premium yüzeyler bu kuralı bozarsa sınav hassasiyeti, ilk hafta suppression ve analytics ölçümü dağılır.
+- Supabase baseline/migration drift hâlâ ürünleşme riski. Canlı kritik parçalar ayrı doğrulansa bile temiz staging/reset güveni için proje sahibi erişimiyle baseline işi kapatılmalı.
+- Unit/domain test kapsamı güçlendi ama onboarding, offline kayıt, bildirim deeplink, comeback/completion modal sırası, RevenueCat/paywall ve sınav günü gibi uçtan uca akışlar için cihaz/simülatör walkthrough şart.
+- Mobil audit script'inin ham sonucu bundle/cache dosyalarından gürültü üretti; yine de küçük ikon/checkbox/mini aksiyonlarda gerçek dokunma alanı manuel QA ile kontrol edilmeli. Eski proje kaynaklı 150 satır dosya sınırı bu turda öncelik kabul edilmedi.
