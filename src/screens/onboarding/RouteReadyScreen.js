@@ -47,7 +47,7 @@ export default function RouteReadyScreen() {
       H.warn();
     } finally {
       setStarting(false);
-      navigation.navigate(SCREENS.NOTIFICATION_PERMISSION);
+      finishOnboarding().catch(() => {});
     }
   }, [createRoute, finishOnboarding]);
 
@@ -126,4 +126,5 @@ const styles = StyleSheet.create({
   pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
 });
+
 
