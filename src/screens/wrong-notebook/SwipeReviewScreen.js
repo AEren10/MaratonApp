@@ -137,13 +137,13 @@ export default function SwipeReviewScreen() {
 
       {finished ? (
         <Animated.View entering={FadeInDown} style={s.center}>
-          <Icon name="checkCircle" size={56} color={C.green} />
+          <Icon name="checkCircle" size={56} color={C.up} />
           <Text style={s.doneTitle}>{queue.length ? "Tekrar Tamamlandı!" : "Bugün tekrar yok"}</Text>
           <View style={s.statsRow}>
-            <View style={[s.statBadge, { backgroundColor: C.green + "18" }]}>
-              <Icon name="check" size={14} color={C.green} />
-              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.green }}>{stats.knew}</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.green }}>Bildim</Text>
+            <View style={[s.statBadge, { backgroundColor: C.up + "18" }]}>
+              <Icon name="check" size={14} color={C.up} />
+              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.up }}>{stats.knew}</Text>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.up }}>Bildim</Text>
             </View>
             <View style={[s.statBadge, { backgroundColor: C.red + "18" }]}>
               <Icon name="x" size={14} color={C.red} />
@@ -160,7 +160,7 @@ export default function SwipeReviewScreen() {
           {/* Swipe hints */}
           <View style={s.hintRow}>
             <Text style={[s.hint, { color: C.red }]}>← Bilmedim</Text>
-            <Text style={[s.hint, { color: C.green }]}>Bildim →</Text>
+            <Text style={[s.hint, { color: C.up }]}>Bildim →</Text>
           </View>
 
           <GestureDetector gesture={pan}>
@@ -170,7 +170,7 @@ export default function SwipeReviewScreen() {
                 <Icon name="x" size={40} color={C.red} />
               </Animated.View>
               <Animated.View style={[s.overlay, s.overlayRight, rightOverlay]}>
-                <Icon name="check" size={40} color={C.green} />
+                <Icon name="check" size={40} color={C.up} />
               </Animated.View>
 
               {/* Card content */}
@@ -197,8 +197,8 @@ export default function SwipeReviewScreen() {
               {current.correct_answer && (
                 <View style={s.answerRow}>
                   <Text style={s.answerLabel}>Doğru cevap:</Text>
-                  <View style={[s.answerBadge, { backgroundColor: C.green + "18" }]}>
-                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.green }}>{current.correct_answer}</Text>
+                  <View style={[s.answerBadge, { backgroundColor: C.up + "18" }]}>
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.up }}>{current.correct_answer}</Text>
                   </View>
                 </View>
               )}
@@ -220,10 +220,10 @@ export default function SwipeReviewScreen() {
               onPress={() => handleGrade(true)}
               accessibilityRole="button"
               accessibilityLabel="Bildim"
-              style={[s.tapBtn, { borderColor: C.green + "40", backgroundColor: C.green + "14" }]}
+              style={[s.tapBtn, { borderColor: C.up + "40", backgroundColor: C.up + "14" }]}
             >
-              <Icon name="check" size={18} color={C.green} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>Bildim</Text>
+              <Icon name="check" size={18} color={C.up} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.up }}>Bildim</Text>
             </Pressable>
           </View>
         </View>
@@ -268,5 +268,6 @@ function makeStyles(C) {
     tapBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1 },
   });
 }
+
 
 
