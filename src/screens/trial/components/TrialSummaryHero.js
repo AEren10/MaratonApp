@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+﻿import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design";
@@ -6,14 +6,13 @@ import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { formatDelta, formatNumber } from "../../../lib/format";
 
-// TYT · KAYDEDILDI + kahraman net + onceki denemeye gore degisim.
 export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
   const C = useC();
   const tone = delta > 0 ? C.up : delta < 0 ? C.down : C.text3;
   return (
     <Animated.View entering={FadeInDown.duration(500)} style={styles.wrap}>
       <Text style={[TYPOGRAPHY.label, styles.kicker, { color: C.text3 }]}>
-        {`${typeLabel} · KAYDEDİLDİ`.toLocaleUpperCase("tr-TR")}
+        {${typeLabel} · KAYDEDİLDİ.toLocaleUpperCase("tr-TR")}
       </Text>
       <View style={styles.netRow}>
         <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]}>{formatNumber(net, 2)}</Text>
@@ -28,7 +27,7 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
         <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>TOPLAM NET</Text>
         {prevNet != null ? (
           <Text style={[TYPOGRAPHY.meta, styles.tabular, { color: C.text3 }]}>
-            {`önceki ${formatNumber(prevNet, 2)} → yeni ${formatNumber(net, 2)}`}
+            {önceki ${formatNumber(prevNet, 2)} \u2192 yeni ${formatNumber(net, 2)}}
           </Text>
         ) : null}
       </View>
