@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+﻿import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { formatNumber } from "../../../lib/format";
 import { difficultyMeta } from "../trialDifficultyLevels";
 
-// HESAPLANAN NET (Deneme Gir 3/3): ham net buyuk, normalize net yaninda.
 export function TrialEntryNetCard({ totalNet, normalizedNet, difficultyLevel, publisherName, styles: shared }) {
   const C = useC();
   const meta = [publisherName, difficultyMeta(difficultyLevel).factor].filter(Boolean).join(" · ");
@@ -18,7 +17,8 @@ export function TrialEntryNetCard({ totalNet, normalizedNet, difficultyLevel, pu
       <View style={styles.bottom}>
         <Text style={[TYPOGRAPHY.stat, styles.value, { color: C.text }]}>{formatNumber(totalNet, 2)}</Text>
         <Text style={[TYPOGRAPHY.meta, styles.note, { color: C.text2 }]}>
-          {`normalize net ${formatNumber(normalizedNet, 2)} · rota bunu kullanır`}
+          {
+ormalize net ${formatNumber(normalizedNet, 2)} · rota bunu kullanır}
         </Text>
       </View>
     </View>
