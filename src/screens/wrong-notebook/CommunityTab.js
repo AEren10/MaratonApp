@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect, useMemo, memo } from "react";
+﻿import { useState, useCallback, useEffect, useMemo, memo } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
 import { getSharedQuestions, subscribeToFeed } from "../../supabase/community";
 import SignedImage from "../../components/common/SignedImage";
@@ -40,7 +40,7 @@ function relativeTime(iso) {
 const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
   const subj = getSubjectByKey(item.subject);
   const id = useSubjectIdentity(item.subject);
-  const color = id?.solid || subj?.color || C.muted;
+  const color = id?.solid || subj?.color || C.text3;
   const icon = subj?.icon || "bookOpen";
   const hasImage = !!item.image_path;
 
@@ -67,8 +67,8 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
             <Text style={{ ...TYPOGRAPHY.bodySemiBold, fontSize: 14, color: C.text }}>
               {item.profile?.name || "Anonim"}
             </Text>
-            <Text style={{ color: C.muted, fontSize: 13 }}>·</Text>
-            <Text style={{ ...TYPOGRAPHY.micro, color: C.muted }}>
+            <Text style={{ color: C.text3, fontSize: 13 }}>·</Text>
+            <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>
               {relativeTime(item.created_at)}
             </Text>
           </View>
@@ -76,7 +76,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
             <View style={{
               flexDirection: "row", alignItems: "center", gap: 3,
               backgroundColor: color + "16", paddingHorizontal: 8, paddingVertical: 3,
-              borderRadius: RADIUS.pill,
+              borderRadius: SHAPE.pill,
             }}>
               <Icon name={icon} size={10} color={color} />
               <Text style={{ fontSize: 11, fontFamily: "Archivo_600", color }}>
@@ -84,7 +84,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
               </Text>
             </View>
             {item.topic ? (
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.sec }} numberOfLines={1}>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.text2 }} numberOfLines={1}>
                 {item.topic}
               </Text>
             ) : null}
@@ -102,7 +102,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
         <SignedImage
           bucket="wrong-questions"
           path={item.image_path}
-          style={{ marginTop: 12, height: 220, borderRadius: 16, backgroundColor: C.surface2 }}
+          style={{ marginTop: 12, height: 220, borderRadius: 16, backgroundColor: C.elev }}
           contentFit="cover" transition={200}
         />
       ) : null}
@@ -112,11 +112,11 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
         {item.answer_count > 0 ? (
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: C.surface2, paddingHorizontal: 10, paddingVertical: 6,
-            borderRadius: RADIUS.pill,
+            backgroundColor: C.elev, paddingHorizontal: 10, paddingVertical: 6,
+            borderRadius: SHAPE.pill,
           }}>
-            <Icon name="chat" size={13} color={C.sec} />
-            <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: C.sec }}>
+            <Icon name="chat" size={13} color={C.text2} />
+            <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: C.text2 }}>
               {item.answer_count} cevap
             </Text>
           </View>
@@ -127,7 +127,7 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
           style={({ pressed }) => ({
             flexDirection: "row", alignItems: "center", gap: 6,
             backgroundColor: C.accent, paddingHorizontal: 16, paddingVertical: 9,
-            borderRadius: RADIUS.pill, opacity: pressed ? 0.85 : 1,
+            borderRadius: SHAPE.pill, opacity: pressed ? 0.85 : 1,
           })}
         >
           <Icon name="edit" size={14} color={C.textOnFill} />
@@ -198,7 +198,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: SPACING.md, alignItems: "center" }}>
+        contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: STEP.s3, alignItems: "center" }}>
         {filters.map((f) => {
           const subj = f.key !== "all" ? getSubjectByKey(f.key) : null;
           const clr = subj?.color || C.accent;
@@ -206,12 +206,12 @@ export function CommunityTab({ visible, onSwitchToMine }) {
           return (
             <Pressable key={f.key} onPress={() => setFilter(f.key)} style={{
               flexDirection: "row", alignItems: "center", gap: 6,
-              paddingHorizontal: 14, paddingVertical: 9, borderRadius: RADIUS.pill,
+              paddingHorizontal: 14, paddingVertical: 9, borderRadius: SHAPE.pill,
               backgroundColor: on ? clr + "1A" : "transparent",
               borderWidth: 1, borderColor: on ? clr + "40" : C.border,
             }}>
-              <Icon name={f.icon} size={13} color={on ? clr : C.muted} />
-              <Text style={{ fontSize: 13, fontFamily: on ? "Archivo_600" : "Archivo_500", color: on ? clr : C.sec }}>
+              <Icon name={f.icon} size={13} color={on ? clr : C.text3} />
+              <Text style={{ fontSize: 13, fontFamily: on ? "Archivo_600" : "Archivo_500", color: on ? clr : C.text2 }}>
                 {f.label}
               </Text>
             </Pressable>
@@ -220,7 +220,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
       </ScrollView>
 
       {loading ? (
-        <View style={{ gap: SPACING.md, paddingHorizontal: 16 }}>
+        <View style={{ gap: STEP.s3, paddingHorizontal: 16 }}>
           <SkeletonCard height={200} /><SkeletonCard height={160} /><SkeletonCard height={180} />
         </View>
       ) : loadError ? (
@@ -247,7 +247,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
           keyExtractor={(i) => i.id} showsVerticalScrollIndicator={false}
           windowSize={5}
           maxToRenderPerBatch={10}
-          contentContainerStyle={{ gap: SPACING.md, paddingHorizontal: 16, paddingBottom: 100 }}
+          contentContainerStyle={{ gap: STEP.s3, paddingHorizontal: 16, paddingBottom: 100 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}
             tintColor={C.accent} colors={[C.accent]} />}
         />
@@ -255,3 +255,4 @@ export function CommunityTab({ visible, onSwitchToMine }) {
     </View>
   );
 }
+
