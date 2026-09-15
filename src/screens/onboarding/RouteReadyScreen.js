@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
@@ -47,7 +47,7 @@ export default function RouteReadyScreen() {
       H.warn();
     } finally {
       setStarting(false);
-      finishOnboarding().catch(() => {});
+      navigation.navigate(SCREENS.NOTIFICATION_PERMISSION);
     }
   }, [createRoute, finishOnboarding]);
 
@@ -126,3 +126,4 @@ const styles = StyleSheet.create({
   pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
 });
+
