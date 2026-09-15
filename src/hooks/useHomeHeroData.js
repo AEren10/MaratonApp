@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useExam } from "../contexts/ExamContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
+import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
@@ -62,6 +63,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
   }, [forecast]);
 
   const nextTask = generatedTasks?.[0] || null;
+  const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`
     : null;
@@ -91,6 +93,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
       ? Math.max(0, Math.floor((Date.now() - new Date(pausedAt).getTime()) / 86400000))
       : null,
     hasDebt: !!debt?.hasDebt,
+    comebackRecommendation,
     nextTask,
     ctaSubtitle,
   };

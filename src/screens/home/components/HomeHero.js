@@ -35,7 +35,17 @@ export function HomeHero({
 }) {
   const { examDate } = useExam();
   const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks });
-  const { daysUntilExam, hasRouteAccess, debtHours, hasDebt, nextTask, isPaused, frozenAtStop, frozenDays } = hero;
+  const {
+    daysUntilExam,
+    hasRouteAccess,
+    debtHours,
+    hasDebt,
+    nextTask,
+    comebackRecommendation,
+    isPaused,
+    frozenAtStop,
+    frozenDays,
+  } = hero;
   const mode = useHomeHeroMode({ examDate, hasDebt, comeback, isPaused });
   const trialStats = useTrialSummaryStats();
 
@@ -63,6 +73,7 @@ export function HomeHero({
     content = (
       <HomeHeroComeback
         nextTask={nextTask}
+        recommendation={comebackRecommendation}
         onStartTask={onStartTask}
         onDismiss={onDismissComeback}
         onViewRoute={onRedrawRoute || onViewRoute}

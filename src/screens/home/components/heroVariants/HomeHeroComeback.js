@@ -9,8 +9,9 @@ import * as H from "../../../../lib/haptics";
 // Tasarim AKIS 14 · "Geri Dönüş Modu": uzun aradan sonra ilk açılışta gelir.
 // Borç sayısı, kaçan seri ve geçmiş burada gösterilmez — tek iş kullanıcıyı
 // ilk oturuma ulaştırmak.
-export function HomeHeroComeback({ nextTask, onStartTask, onDismiss, onViewRoute }) {
+export function HomeHeroComeback({ nextTask, recommendation, onStartTask, onDismiss, onViewRoute }) {
   const C = useC();
+  const rec = recommendation || {};
 
   return (
     <View>
@@ -28,23 +29,30 @@ export function HomeHeroComeback({ nextTask, onStartTask, onDismiss, onViewRoute
           onPress={() => { H.select(); onStartTask?.(nextTask); }}
           style={[s.recCard, { backgroundColor: C.brandTint, borderColor: C.accent }]}
           accessibilityRole="button"
-          accessibilityLabel="20 dakikalık dönüş durağı ile başla"
+          accessibilityLabel={rec.accessibilityLabel || "Küçük dönüş durağı ile başla"}
         >
           <View style={s.recHeader}>
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright, letterSpacing: 1.8 }]}>
-              ÖNERİLEN
+              {rec.kicker || "ÖNERİLEN"}
             </Text>
             <View style={{ flex: 1 }} />
-            <Text style={[s.recNumber, { color: C.text }]} allowFontScaling={false}>20</Text>
-            <Text style={[TYPOGRAPHY.caption, { color: C.text3, paddingBottom: 2 }]}> dk</Text>
+            {rec.value ? (
+              <>
+                <Text style={[s.recNumber, { color: C.text }]} allowFontScaling={false}>{rec.value}</Text>
+                <Text style={[TYPOGRAPHY.caption, { color: C.text3, paddingBottom: 2 }]}> {rec.unit}</Text>
+              </>
+            ) : null}
           </View>
-          <Text style={[s.recTitle, { color: C.text }]}>20 dakikalık dönüş durağı</Text>
+          <Text style={[s.recTitle, { color: C.text }]}>{rec.title || "Bugünkü plana yumuşak dönüş"}</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: 6 }]}>
-            10 dakika konu tekrarı · 10 soru
+            {rec.effort || "Bugünkü plandan küçük bir adım"}
           </Text>
         </Pressable>
 
-        <HomeHeroComebackAction label="20 dakikayla başla" onPress={() => onStartTask?.(nextTask)} />
+        <HomeHeroComebackAction
+          label={rec.primaryLabel || "Küçük adımla başla"}
+          onPress={() => onStartTask?.(nextTask)}
+        />
         <HomeHeroComebackAction label="Bugünkü plana dön" onPress={onDismiss} />
         <HomeHeroComebackAction label="Rotayı yeniden düzenle" onPress={onViewRoute} />
 
