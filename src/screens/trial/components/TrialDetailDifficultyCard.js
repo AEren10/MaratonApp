@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+﻿import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
-// Tasarımın birebir kopyası yalnızca "zor" durumu için var — diğer
+// Tasarımın birebir kopyası yalnızca "zor" durumu için var - diğer
 // zorluk seviyeleri için uydurma metin yazılmadı (bkz useTrialDetail).
 export function TrialDetailDifficultyCard({ C, difficultyLabel }) {
   return (
@@ -27,10 +27,7 @@ export function TrialDetailDifficultyCard({ C, difficultyLabel }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingHorizontal: STEP.s3, marginTop: STEP.s4 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 },
-  badge: {
-    height: 32, paddingHorizontal: 14, borderRadius: 6,
-    borderWidth: 1, alignItems: "center", justifyContent: "center",
-  },
+  wrap: { paddingHorizontal: STEP.s3, marginTop: STEP.s2 },
+  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2 },
+  badge: { paddingHorizontal: STEP.s2, height: 26, borderRadius: 6, borderWidth: 1, justifyContent: "center" },
 });
