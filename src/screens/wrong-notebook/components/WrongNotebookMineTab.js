@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+﻿import { useCallback } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
 
 import { EmptyState } from "../../../components/common/EmptyState";
@@ -7,7 +7,7 @@ import {
   WRONG_NOTEBOOK_STATUS,
   WRONG_NOTEBOOK_TAB,
 } from "../../../domain/wrongNotebook/wrongNotebookModel";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import { DueBanner } from "./DueBanner";
 import { FilterPill, SubjectFilterPill } from "./FilterPills";
 import { SwipeableWrongCard } from "./SwipeableWrongCard";
@@ -48,12 +48,12 @@ export function WrongNotebookMineTab({
           style={({ pressed }) => ({
             flexDirection: "row",
             alignItems: "center",
-            gap: SPACING.sm,
-            marginHorizontal: SPACING.lg,
-            marginBottom: SPACING.sm,
+            gap: STEP.s2,
+            marginHorizontal: GUTTER,
+            marginBottom: STEP.s2,
             backgroundColor: C.accent + "12",
-            borderRadius: RADIUS.lg,
-            padding: SPACING.md,
+            borderRadius: SHAPE.cardTight,
+            padding: STEP.s3,
             borderWidth: 1,
             borderColor: C.accent + "25",
             opacity: pressed ? 0.8 : 1,
@@ -90,7 +90,7 @@ export function WrongNotebookMineTab({
                 style={{
                   fontFamily: active ? "Archivo_600" : "Archivo_500",
                   fontSize: 13,
-                  color: active ? color : C.muted,
+                  color: active ? color : C.text3,
                 }}
               >
                 {tab.getLabel(viewModel.counts)}
@@ -197,14 +197,15 @@ function TopicFilterChip({ C, active, accessibilityLabel, label, onPress, styles
       style={[
         styles.topicChip,
         {
-          backgroundColor: active ? C.surface2 : "transparent",
+          backgroundColor: active ? C.elev : "transparent",
           borderColor: active ? C.border : "transparent",
         },
       ]}
     >
-      <Text style={{ ...TYPOGRAPHY.captionMedium, color: active ? C.text : C.muted }}>
+      <Text style={{ ...TYPOGRAPHY.captionMedium, color: active ? C.text : C.text3 }}>
         {label}
       </Text>
     </Pressable>
   );
 }
+
