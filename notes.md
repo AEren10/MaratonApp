@@ -436,3 +436,9 @@
 - Payment ekranları app stack'e girerse tab/root assignment'a eklenmeli; yoksa ekran kayıtlı olsa bile navigation ağacında ulaşılamaz kalır ve test kırılır.
 - `MainTabs` bir `SCREENS` sabiti değil root stack route'udur; ödeme sonucu/iptal gibi resetler `ROOT_STACK.MAIN_TABS` kullanmalı.
 - Kart formu/processing ekranı gerçek ödeme altyapısına bağlanmadan premium CTA'larına bağlanmamalı; mock random success/fail satış güvenini bozar.
+
+## 2026-09-16 — Comeback tasarımı canlı retention hattını çiftlememeli
+
+- Geri dönüş akışı zaten `useRetention` + `useComebackFlow` + `HomeComebackOverlay` hattından çalışıyor ve Supabase retention event'leri burada kaydoluyor.
+- Ayrı `ComebackScreen`/`ComebackDoneScreen` mock ekranları hardcoded `20 dk / 10 soru / bir durak` gösterip gerçek çalışma kaydı, XP ve route progress ile konuşmadan canlıya alınırsa kullanıcı verisi güveni bozulur.
+- Bu akış ayrı ekran olarak dönecekse önce tek domain hook'u kurulmalı: önerilen dönüş görevi gerçek route/task verisinden çıkmalı, başlangıç StudyTimer'a gitmeli, tamamlanma StudySave/route event'iyle kapanmalı.

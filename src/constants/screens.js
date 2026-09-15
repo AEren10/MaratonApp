@@ -122,11 +122,6 @@
   NET_FORECAST: "NetForecast",
   COMPARATIVE: "Comparative",
 
-  // Comeback
-  COMEBACK: "Comeback",
-  COMEBACK_DONE: "ComebackDone",
-
-
   // Premium
   PAYWALL: "Paywall",
   PAYMENT_CARD: "PaymentCard",
@@ -158,7 +153,6 @@
   ACCOUNT_DELETE: "AccountDelete",
   OFFLINE_QUEUE: "OfflineQueue",
 };
-
 
 
 
