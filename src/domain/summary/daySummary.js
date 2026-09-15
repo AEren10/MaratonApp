@@ -9,6 +9,12 @@ function formatDuration(minutes) {
   return `${h}sa ${String(m).padStart(2, "0")}`;
 }
 
+function headlineForDay({ stopsToday, streak, totalQuestions, totalMinutes }) {
+  if (stopsToday > 0) return `${stopsToday} durak geçtin, seri ${streak} güne çıktı.`;
+  if (totalQuestions > 0 || totalMinutes > 0) return `Bugünkü çalışman kayda geçti, seri ${streak} güne çıktı.`;
+  return `Bugün için özet hazır, seri ${streak} günde.`;
+}
+
 /**
  * Gunun Ozeti. Bugunun kayitlari Redux'tan (todayLogs), duraklar rotadan:
  * tamamlanma gunu bugun olan duraklar "DURAK" sayisidir.
@@ -35,7 +41,7 @@ export function buildDaySummary({ todayKey, todayLogs = [], streak = 0, routeWee
     period: "day",
     headerLabel: `${dayLabel} · ${upperTr(DAYS_FULL[weekdayIndex(todayKey)])}`,
     eyebrow: null,
-    headline: `${stopsToday} durak geçtin, seri ${streak} güne çıktı.`,
+    headline: headlineForDay({ stopsToday, streak, totalQuestions, totalMinutes }),
     hero: { value: formatInt(totalQuestions), label: `SORU · ${dayLabel}` },
     side: [
       { value: String(stopsToday), suffix: null, label: "DURAK" },

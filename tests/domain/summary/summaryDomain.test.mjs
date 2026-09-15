@@ -146,3 +146,15 @@ test("day summary counts stops completed today and labels in Turkish upper case"
   assert.deepEqual(s.ledger, ["1 durak", "118 soru", "seri 47 gün"]);
   assert.equal(s.hasActivity, true);
 });
+
+test("day summary avoids saying zero route stops were passed after non-route study", async () => {
+  const { buildDaySummary } = await import("../../../src/domain/summary/daySummary.js");
+  const s = buildDaySummary({
+    todayKey: "2026-06-23",
+    todayLogs: [{ id: 1, subject: "turkce", duration: 30, questionCount: 20 }],
+    streak: 4,
+    routeWeeks: [],
+  });
+  assert.equal(s.headline, "Bugünkü çalışman kayda geçti, seri 4 güne çıktı.");
+  assert.equal(s.hasActivity, true);
+});

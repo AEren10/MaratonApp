@@ -469,3 +469,9 @@
 - Rota durağından başlayan oturum timer ekranında “kaçıncı durak” bağlamını göstermeli; aksi halde ekran screenshot'taki yön hissini kaybedip serbest çalışma gibi görünür.
 - Durak numarası gerçek route/detail bilgisinden gelmeli. Pozisyon yoksa uydurulmamalı; sıralama sentinel'i (`9999`) UI'a sızmamalı.
 - Timer bitiş payload'ı route stop id/version yanında route stop number'ı da taşıyabilmeli; post-session ekranları bu bağlamı tekrar kullanabilir.
+
+## 2026-09-16 — Özet ekranları emeği eksik sayı gibi anlatmamalı
+
+- Gün özeti rota durağı tamamlanmadığında “0 durak geçtin” dememeli; çalışma kaydı varsa başarı cümlesi çalışmanın kayda geçtiğini söylemeli.
+- Retention dili sayı uydurmamalı ama kullanıcının gerçek emeğini görünür kılmalı; özellikle serbest çalışma/rota dışı kayıtlar eski app hissine düşmemeli.
+- Ay özeti “Kartı paylaş” için ayrı monthly share card modeli hâlâ eksik. Share ekranı paramsız galeriye düşerek kırılmıyor, fakat screenshot'taki özel ay kartı için sonradan domain kartı eklenmeli.
