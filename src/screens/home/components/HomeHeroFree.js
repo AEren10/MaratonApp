@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+﻿import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import Svg, { Path, Circle } from "react-native-svg";
 
@@ -15,7 +15,7 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
   const C = useC();
   const line = minutesToday > 0
     ? `bugün ${formatStudyMinutes(minutesToday)} kaydettin`
-    : (remainingToGoal > 0 ? `hedefe ${remainingToGoal} kaldı` : "hedef tamamlandı");
+    : (remainingToGoal > 0 ? `hedefe ${remainingToGoal} kaldıı` : "hedef tamamlandıı");
 
   return (
     <View style={s.top}>
@@ -59,3 +59,4 @@ const s = StyleSheet.create({
   },
   cta: { marginTop: STEP.s3 + 2 },
 });
+
