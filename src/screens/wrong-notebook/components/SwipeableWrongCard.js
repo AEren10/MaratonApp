@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react";
+﻿import React, { useRef, useCallback } from "react";
 import { Text, Pressable } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { Icon } from "../../../components/design";
@@ -41,10 +41,10 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
         accessibilityLabel="Çözdüm"
         accessibilityHint="Yanlışı çözülmüş olarak işaretler"
         onPress={handleResolve}
-        style={{ ...actionStyle, backgroundColor: C.green, marginLeft: 8 }}
+        style={{ ...actionStyle, backgroundColor: C.up, marginLeft: 8 }}
       >
-        <Icon name="check" size={24} color={C.textOnFill} sw={2.5} />
-        <Text style={{ ...TYPOGRAPHY.micro, color: C.textOnFill, marginTop: 4 }}>Çözdüm</Text>
+        <Icon name="check" size={24} color={C.accentInk} sw={2.5} />
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Çözdüm</Text>
       </Pressable>
     );
   }, [C, handleResolve, item.is_resolved]);
@@ -59,8 +59,8 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
         onPress={handleDelete}
         style={{ ...actionStyle, backgroundColor: C.red, marginRight: 8 }}
       >
-        <Icon name="trash" size={24} color={C.textOnFill} sw={2} />
-        <Text style={{ ...TYPOGRAPHY.micro, color: C.textOnFill, marginTop: 4 }}>Sil</Text>
+        <Icon name="trash" size={24} color={C.accentInk} sw={2} />
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Sil</Text>
       </Pressable>
     );
   }, [C, handleDelete, onDelete]);
@@ -91,3 +91,4 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
     </Swipeable>
   );
 });
+
