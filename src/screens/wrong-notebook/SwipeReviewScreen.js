@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+﻿import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,7 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
@@ -27,9 +27,9 @@ const SWIPE_THRESHOLD = SW * 0.3;
 function resolveSubject(raw, C) {
   if (typeof raw === "string") {
     const f = getSubjectByKey(raw);
-    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: C.muted, icon: "bookOpen" };
+    return f ? { label: f.label, color: f.color, icon: f.icon } : { label: raw, color: C.text3, icon: "bookOpen" };
   }
-  return raw || { label: "?", color: C.muted, icon: "bookOpen" };
+  return raw || { label: "?", color: C.text3, icon: "bookOpen" };
 }
 
 export default function SwipeReviewScreen() {
@@ -234,37 +234,39 @@ export default function SwipeReviewScreen() {
 
 function makeStyles(C) {
   return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
+    safe: { flex: 1, backgroundcolor: C.accentInk },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s3 },
     title: { ...TYPOGRAPHY.subheading, color: C.text },
-    counter: { ...TYPOGRAPHY.captionMedium, color: C.muted },
-    progressBg: { height: 3, backgroundColor: C.surface2, marginHorizontal: SPACING.lg },
+    counter: { ...TYPOGRAPHY.captionMedium, color: C.text3 },
+    progressBg: { height: 3, backgroundColor: C.track, marginHorizontal: GUTTER },
     progressFill: { height: 3, backgroundColor: C.accent, borderRadius: 2 },
-    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.xl, gap: SPACING.md },
-    cardArea: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: SPACING.lg },
-    hintRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginBottom: SPACING.md },
+    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: STEP.s5, gap: STEP.s3 },
+    cardArea: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: GUTTER },
+    hintRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginBottom: STEP.s3 },
     hint: { ...TYPOGRAPHY.micro },
     card: {
-      width: SW - 48, backgroundColor: C.surface, borderRadius: RADIUS.xxl,
-      padding: SPACING.xl, minHeight: 400, borderWidth: 1, borderColor: C.border,
+      width: SW - 48, backgroundColor: C.surface, borderRadius: SHAPE.sheet,
+      padding: STEP.s5, minHeight: 400, borderWidth: 1, borderColor: C.border,
     },
     overlay: { position: "absolute", top: 20, zIndex: 10 },
     overlayLeft: { right: 20 },
     overlayRight: { left: 20 },
     subjChip: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12 },
-    topicText: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: SPACING.lg },
-    image: { width: "100%", height: 240, borderRadius: RADIUS.lg, marginTop: SPACING.lg, backgroundColor: C.surface2 },
-    noteBox: { backgroundColor: C.surface2, borderRadius: RADIUS.lg, padding: SPACING.lg, marginTop: SPACING.lg },
-    noteText: { ...TYPOGRAPHY.body, color: C.sec },
-    answerRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginTop: SPACING.lg },
-    answerLabel: { ...TYPOGRAPHY.captionMedium, color: C.muted },
+    topicText: { ...TYPOGRAPHY.subheading, color: C.text, marginTop: STEP.s4 },
+    image: { width: "100%", height: 240, borderRadius: SHAPE.cardTight, marginTop: STEP.s4, backgroundColor: C.elev },
+    noteBox: { backgroundColor: C.elev, borderRadius: SHAPE.cardTight, padding: STEP.s4, marginTop: STEP.s4 },
+    noteText: { ...TYPOGRAPHY.body, color: C.text2 },
+    answerRow: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s4 },
+    answerLabel: { ...TYPOGRAPHY.captionMedium, color: C.text3 },
     answerBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 },
-    statsRow: { flexDirection: "row", gap: SPACING.lg, marginTop: SPACING.md },
-    statBadge: { alignItems: "center", gap: 4, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },
+    statsRow: { flexDirection: "row", gap: STEP.s4, marginTop: STEP.s3 },
+    statBadge: { alignItems: "center", gap: 4, paddingHorizontal: STEP.s5, paddingVertical: STEP.s3, borderRadius: SHAPE.cardTight },
     doneTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    closeBtn: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxxl, marginTop: SPACING.lg },
-    closeText: { ...TYPOGRAPHY.button, color: C.bg },
-    tapRow: { flexDirection: "row", gap: SPACING.md, marginTop: SPACING.lg, width: "100%" },
-    tapBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1 },
+    closeBtn: { backgroundColor: C.accent, borderRadius: SHAPE.cardTight, paddingVertical: STEP.s3, paddingHorizontal: STEP.s5, marginTop: STEP.s4 },
+    closeText: { ...TYPOGRAPHY.button, color: C.accentInk },
+    tapRow: { flexDirection: "row", gap: STEP.s3, marginTop: STEP.s4, width: "100%" },
+    tapBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1 },
   });
 }
+
+
