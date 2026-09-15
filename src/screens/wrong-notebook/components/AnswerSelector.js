@@ -57,14 +57,14 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
 
           if (isBoth) {
             // Double role — green dominant with orange inner ring hint
-            bgColor = C.green + "1A";
-            borderColor = C.green;
+            bgColor = C.up + "1A";
+            borderColor = C.up;
           } else if (isMyAnswer) {
             bgColor = C.orange + "1A";
             borderColor = C.orange;
           } else if (isCorrect) {
-            bgColor = C.green + "1A";
-            borderColor = C.green;
+            bgColor = C.up + "1A";
+            borderColor = C.up;
           }
 
           return (
@@ -86,7 +86,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
               <Text style={{
                 fontFamily: "Bricolage_400",
                 fontSize: 15,
-                color: isBoth ? C.green : isMyAnswer ? C.orange : isCorrect ? C.green : C.text2,
+                color: isBoth ? C.up : isMyAnswer ? C.orange : isCorrect ? C.up : C.text2,
               }}>
                 {letter}
               </Text>
@@ -97,7 +97,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
                   <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: C.orange }} />
                 )}
                 {isCorrect && (
-                  <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: C.green }} />
+                  <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: C.up }} />
                 )}
               </View>
             </Pressable>
@@ -112,11 +112,12 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Senin cevabın</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-          <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.green }} />
+          <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.up }} />
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Doğru cevap</Text>
         </View>
       </View>
     </View>
   );
 }
+
 
