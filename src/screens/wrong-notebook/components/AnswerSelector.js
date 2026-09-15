@@ -1,6 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+﻿import { View, Text, Pressable } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
-import { SPACING, RADIUS, TYPOGRAPHY } from "../../../themes/tokens";
+import { STEP, GUTTER, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
 const ANSWERS = ["A", "B", "C", "D", "E"];
@@ -36,17 +36,17 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
   return (
     <View>
       {/* Header row */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: SPACING.lg, marginBottom: SPACING.sm }}>
-        <Text style={[TYPOGRAPHY.label, { color: C.sec }]}>Cevap</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: STEP.s4, marginBottom: STEP.s2 }}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>Cevap</Text>
         {(myAnswer || correctAnswer) ? (
           <Pressable onPress={clearAll} hitSlop={8}>
-            <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Temizle</Text>
+            <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Temizle</Text>
           </Pressable>
         ) : null}
       </View>
 
       {/* Button row */}
-      <View style={{ flexDirection: "row", gap: SPACING.sm }}>
+      <View style={{ flexDirection: "row", gap: STEP.s2 }}>
         {ANSWERS.map((letter) => {
           const isMyAnswer = myAnswer === letter;
           const isCorrect = correctAnswer === letter;
@@ -74,7 +74,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
               style={({ pressed }) => ({
                 flex: 1,
                 height: 48,
-                borderRadius: RADIUS.lg,
+                borderRadius: SHAPE.cardTight,
                 backgroundColor: bgColor,
                 borderWidth: 1.5,
                 borderColor: borderColor,
@@ -86,7 +86,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
               <Text style={{
                 fontFamily: "Bricolage_400",
                 fontSize: 15,
-                color: isBoth ? C.green : isMyAnswer ? C.orange : isCorrect ? C.green : C.sec,
+                color: isBoth ? C.green : isMyAnswer ? C.orange : isCorrect ? C.green : C.text2,
               }}>
                 {letter}
               </Text>
@@ -106,16 +106,17 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
       </View>
 
       {/* Legend */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING.sm }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s2 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
           <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.orange }} />
-          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Senin cevabın</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Senin cevabın</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
           <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.green }} />
-          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Doğru cevap</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Doğru cevap</Text>
         </View>
       </View>
     </View>
   );
 }
+
