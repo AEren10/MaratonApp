@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+﻿import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -50,3 +50,4 @@ const styles = StyleSheet.create({
   track: { height: 5, borderRadius: 2, marginTop: STEP.s1 + 2, marginLeft: 19, overflow: "hidden" },
   fill: { height: "100%", borderRadius: 2 },
 });
+
