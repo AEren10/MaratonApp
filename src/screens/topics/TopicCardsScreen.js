@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+﻿import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, IconBox, Chip } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 
-const ItemSeparator = () => <View style={{ height: SPACING.md }} />;
+const ItemSeparator = () => <View style={{ height: STEP.s2 }} />;
 
 const CardItem = React.memo(function CardItem({ item, onPress, styles, C }) {
   const pct = item.count > 0 ? Math.round((item.mastered / item.count) * 100) : 0;
@@ -78,7 +78,7 @@ export default function TopicCardsScreen() {
         <Pressable onPress={goBack} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           Konu Kartları
         </Text>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>
@@ -116,17 +116,18 @@ function makeStyles(C) {
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
       flexDirection: "row", alignItems: "center",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+      paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
     },
-    list: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    list: { paddingHorizontal: GUTTER, paddingBottom: 60 },
     card: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.md,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      padding: SPACING.lg,
+      flexDirection: "row", alignItems: "center", gap: STEP.s2,
+      backgroundColor: C.surface, borderRadius: SHAPE.card,
+      padding: GUTTER,
     },
     miniBar: {
-      width: 50, height: 4, borderRadius: 2, backgroundColor: C.surface2, overflow: "hidden",
+      width: 50, height: 4, borderRadius: 2, backgroundColor: C.elev, overflow: "hidden",
     },
     miniBarFill: { height: 4, borderRadius: 2 },
   });
 }
+
