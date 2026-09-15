@@ -95,7 +95,7 @@ const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSi
 const ExamDayPlanScreen = React.lazy(() => import("../screens/exam/ExamDayPlanScreen"));
 const ExamResultScreen = React.lazy(() => import("../screens/exam/ExamResultScreen"));
 const ForecastAccuracyScreen = React.lazy(() => import("../screens/exam/ForecastAccuracyScreen"));
-const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
+const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));`nconst PaymentCardScreen = React.lazy(() => import("../screens/premium/PaymentCardScreen"));`nconst PaymentProcessingScreen = React.lazy(() => import("../screens/premium/PaymentProcessingScreen"));`nconst PaymentSuccessScreen = React.lazy(() => import("../screens/premium/PaymentSuccessScreen"));`nconst PaymentFailedScreen = React.lazy(() => import("../screens/premium/PaymentFailedScreen"));
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
 const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
@@ -263,4 +263,5 @@ export function screensByName(names) {
     return route;
   });
 }
+
 

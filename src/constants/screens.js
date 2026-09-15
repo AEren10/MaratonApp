@@ -1,4 +1,4 @@
-export const SCREENS = {
+﻿export const SCREENS = {
   // Auth
   LOGIN: "Login",
   REGISTER: "Register",
@@ -123,7 +123,7 @@ export const SCREENS = {
   COMPARATIVE: "Comparative",
 
   // Premium
-  PAYWALL: "Paywall",
+  PAYWALL: "Paywall",`n  PAYMENT_CARD: "PaymentCard",`n  PAYMENT_PROCESSING: "PaymentProcessing",`n  PAYMENT_SUCCESS: "PaymentSuccess",`n  PAYMENT_FAILED: "PaymentFailed",
   SUBSCRIPTION: "Subscription",
   SUBSCRIPTION_CANCEL: "SubscriptionCancel",
   PREMIUM: "Premium",
@@ -149,4 +149,5 @@ export const SCREENS = {
   ACCOUNT_DELETE: "AccountDelete",
   OFFLINE_QUEUE: "OfflineQueue",
 };
+
 
