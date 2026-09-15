@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { useExam } from "../../contexts/ExamContext";
@@ -9,8 +9,6 @@ import { numberWithCase, withCase } from "../../lib/turkishSuffix";
 
 const netOf = (trial) => Number(trial?.rawTotalNet ?? trial?.totalNet ?? 0);
 
-// Kayit, Redux'a sunucu kimligiyle girer; ozet parametresi yerel kopyadir.
-// Ayni denemeyi kimlik ya da (tarih, ad, net) esligiyle tanir.
 function isSameEntry(a, b) {
   if (a.id === b.id) return true;
   return a.date === b.date && a.name === b.name && Math.abs(netOf(a) - netOf(b)) < 0.001;
@@ -23,8 +21,6 @@ function subjectsFor(trial, C) {
   return getTrialTypes(C)[trial.trialType]?.subjects || [];
 }
 
-// Deneme Ozeti'nin tum turetilmis verisi: onceki deneme, ders ders degisim,
-// rotanin eski/yeni hali ve tahmin cumlesi. Veri yoksa ilgili parca null.
 export function useTrialSummary({ trial, C }) {
   const trials = useSelector(selectTrials);
   const { examDate } = useExam();
@@ -64,9 +60,9 @@ export function useTrialSummary({ trial, C }) {
 
     let sentence = null;
     if (forecast && forecast.after > forecast.before) {
-      sentence = `Tahmin ${numberWithCase(forecast.before, "ablative")} ${numberWithCase(forecast.after, "dative")} çıktı.`;
+      sentence = "Tahmin " + numberWithCase(forecast.before, "ablative") + " " + numberWithCase(forecast.after, "dative") + " çıktı.";
       const top = bars.filter((b) => b.delta > 0).sort((a, b) => b.delta - a.delta)[0];
-      if (top && bars.length > 1) sentence += ` ${withCase(top.name, "locative")}ki artış rotayı yukarı çekti.`;
+      if (top && bars.length > 1) sentence += " " + withCase(top.name, "locative") + "ki artış rotayı yukarı çekti.";
     }
 
     const route = prev ? {
