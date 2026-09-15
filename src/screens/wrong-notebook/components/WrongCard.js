@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+﻿import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
@@ -25,9 +25,9 @@ function resolveSubject(raw, C) {
     const found = getSubjectByKey(raw);
     return found
       ? { key: raw, label: found.label, color: found.color, icon: found.icon }
-      : { key: raw, label: raw, color: C.muted, icon: "bookOpen" };
+      : { key: raw, label: raw, color: C.text3, icon: "bookOpen" };
   }
-  return raw || { key: "?", label: "?", color: C.muted, icon: "bookOpen" };
+  return raw || { key: "?", label: "?", color: C.text3, icon: "bookOpen" };
 }
 
 // Twitter-tweet benzeri kart: kimlik avatar + ders/konu + içerik + büyük foto + meta.
@@ -57,7 +57,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
         backgroundColor: C.surface,
         borderRadius: 22,
         borderWidth: 1,
-        borderColor: item.is_resolved ? C.green + "30" : C.border,
+        borderColor: item.is_resolved ? C.up + "30" : C.border,
         padding: 14,
       }}
     >
@@ -77,13 +77,13 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             <Text style={{ fontFamily: "Archivo_600", fontSize: 14, color: C.text }}>
               {subj.label}
             </Text>
-            <Text style={{ color: C.muted, fontSize: 13 }}>·</Text>
-            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.muted }}>
+            <Text style={{ color: C.text3, fontSize: 13 }}>·</Text>
+            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.text3 }}>
               {relativeDate(item.created_at)}
             </Text>
           </View>
           {item.topic ? (
-            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.sec, marginTop: 1 }} numberOfLines={1}>
+            <Text style={{ fontFamily: "Archivo_400", fontSize: 13, color: C.text2, marginTop: 1 }} numberOfLines={1}>
               {item.topic}
             </Text>
           ) : null}
@@ -102,13 +102,13 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             paddingHorizontal: 12,
             paddingVertical: 7,
             borderRadius: 999,
-            backgroundColor: item.is_resolved ? C.green + "1A" : C.amber + "14",
+            backgroundColor: item.is_resolved ? C.up + "1A" : C.warn + "14",
             borderWidth: 1,
-            borderColor: item.is_resolved ? C.green + "40" : C.amber + "30",
+            borderColor: item.is_resolved ? C.up + "40" : C.warn + "30",
           }}
         >
-          <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.green : C.amber} sw={item.is_resolved ? 3 : 1.5} />
-          <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: item.is_resolved ? C.green : C.amber }}>
+          <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.up : C.warn} sw={item.is_resolved ? 3 : 1.5} />
+          <Text style={{ fontSize: 12, fontFamily: "Archivo_600", color: item.is_resolved ? C.up : C.warn }}>
             {item.is_resolved ? "Çözüldü" : "Çözdüm"}
           </Text>
         </Pressable>
@@ -136,14 +136,14 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           <SignedImage
             bucket="wrong-questions"
             path={imagePath}
-            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.surface2 }}
+            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.elev }}
             contentFit="cover"
             transition={200}
           />
         ) : (
           <Image
             source={{ uri: fallbackImage }}
-            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.surface2 }}
+            style={{ marginTop: 12, height: 200, borderRadius: 16, backgroundColor: C.elev }}
             contentFit="cover"
             cachePolicy="memory-disk"
             transition={200}
@@ -156,12 +156,12 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
         {myA && corA ? (
           <View style={{
             flexDirection: "row", alignItems: "center", gap: 5,
-            backgroundColor: C.surface2,
+            backgroundColor: C.elev,
             paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
           }}>
             <Text style={{ fontSize: 12, color: C.red, fontFamily: "Archivo_600" }}>{myA}</Text>
-            <Icon name="arrowR" size={11} color={C.muted} />
-            <Text style={{ fontSize: 12, color: C.green, fontFamily: "Archivo_600" }}>{corA}</Text>
+            <Icon name="arrowR" size={11} color={C.text3} />
+            <Text style={{ fontSize: 12, color: C.up, fontFamily: "Archivo_600" }}>{corA}</Text>
           </View>
         ) : null}
 
@@ -189,15 +189,15 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             hitSlop={8}
             style={({ pressed }) => ({
               flexDirection: "row", alignItems: "center", gap: 6,
-              backgroundColor: shared ? C.green + "18" : C.accent + "14",
+              backgroundColor: shared ? C.up + "18" : C.accent + "14",
               paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999,
               borderWidth: 1,
-              borderColor: shared ? C.green + "30" : C.accent + "30",
+              borderColor: shared ? C.up + "30" : C.accent + "30",
               opacity: pressed ? 0.85 : 1,
             })}
           >
-            <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.green : C.accent} />
-            <Text style={{ fontSize: 13, fontFamily: "Archivo_600", color: shared ? C.green : C.accent }}>
+            <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.up : C.accent} />
+            <Text style={{ fontSize: 13, fontFamily: "Archivo_600", color: shared ? C.up : C.accent }}>
               {shared ? "Paylaşıldı" : "Paylaş"}
             </Text>
           </Pressable>
@@ -207,3 +207,4 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
     </Pressable>
   );
 }
+
