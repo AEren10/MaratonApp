@@ -1,12 +1,10 @@
-import { Pressable, Text, View, StyleSheet } from "react-native";
+﻿import { Pressable, Text, View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-// Hızlı Ekle listesindeki tekil satır. Nokta rengi kararlı/nötr —
-// ders bağlamı olmadığı için ders rengi kullanılmıyor.
-export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel }) {
+export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, dotColor }) {
   return (
     <Pressable
       onPress={() => { H.tap(); onPress(); }}
@@ -14,7 +12,7 @@ export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel })
       accessibilityLabel={accessibilityLabel || title}
       style={[styles.row, { backgroundColor: C.surface, borderColor: C.elev }]}
     >
-      <View style={[styles.dot, { backgroundColor: C.text3 }]} />
+      <View style={[styles.dot, { backgroundColor: dotColor || C.text3 }]} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{title}</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{subtitle}</Text>
