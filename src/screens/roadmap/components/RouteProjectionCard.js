@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+﻿import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// "BU TEMPOYLA SINAV GÜNÜ" karti: tahmin, hedefe mesafe, tahmin araligi.
+// "BU TEMPOYLA SINAV GÜNÜ" karti: tahmin, hedefe mesafe, Tahmin aralığıigi.
 // Tahmin yoksa (3 denemeden az) tasarimin kendi hali: "—" ve acilma notu.
 export function RouteProjectionCard({ projectedNet, note, rangeText }) {
   const C = useC();
@@ -16,7 +16,7 @@ export function RouteProjectionCard({ projectedNet, note, rangeText }) {
           <Text style={[TYPOGRAPHY.bodyMedium, s.note, { color: C.text3 }]}>net · {note}</Text>
         </View>
         <View style={[s.range, { borderTopColor: C.elev }]}>
-          <Text style={[TYPOGRAPHY.meta, s.flex, { color: C.text3 }]}>Tahmin aralığı</Text>
+          <Text style={[TYPOGRAPHY.meta, s.flex, { color: C.text3 }]}>Tahmin aralığıığı</Text>
           <Text style={[TYPOGRAPHY.tableValue, { color: C.text }]}>{rangeText}</Text>
         </View>
       </View>
@@ -39,3 +39,4 @@ const s = StyleSheet.create({
   },
   flex: { flex: 1 },
 });
+
