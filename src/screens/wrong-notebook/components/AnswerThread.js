@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+﻿import { useCallback, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 
 import { Icon, Avatar } from "../../../components/design";
 import SignedImage from "../../../components/common/SignedImage";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useQuestionAnswers } from "../../../hooks/useQuestionAnswers";
 import { formatTime, formatShortDate } from "../../../lib/format";
@@ -53,7 +53,7 @@ export function AnswerThread({ sharedQuestionId }) {
         <View style={s.center}><ActivityIndicator color={C.accent} /></View>
       ) : answers.length === 0 ? (
         <View style={s.empty}>
-          <Icon name="chat" size={20} color={C.muted} />
+          <Icon name="chat" size={20} color={C.text3} />
           <Text style={s.emptyText}>Henüz cevap yok. İlk açıklamayı sen yaz.</Text>
         </View>
       ) : (
@@ -65,7 +65,7 @@ export function AnswerThread({ sharedQuestionId }) {
           value={draft}
           onChangeText={(t) => { setDraft(t.slice(0, MAX_LEN)); if (hint) setHint(null); }}
           placeholder="Bu soruyu nasıl çözdün?"
-          placeholderTextColor={C.muted}
+          placeholderTextColor={C.text3}
           multiline
           style={s.input}
           accessibilityLabel="Cevabın"
@@ -78,7 +78,7 @@ export function AnswerThread({ sharedQuestionId }) {
             accessibilityLabel="Anonim yaz"
             style={s.anonBtn}
           >
-            <Icon name={anonymous ? "checkCircle" : "circle"} size={16} color={anonymous ? C.accent : C.muted} />
+            <Icon name={anonymous ? "checkCircle" : "circle"} size={16} color={anonymous ? C.accent : C.text3} />
             <Text style={[s.anonText, anonymous && { color: C.text }]}>Anonim</Text>
           </Pressable>
 
@@ -131,41 +131,42 @@ function AnswerRow({ answer, s, C }) {
 
 function makeStyles(C) {
   return StyleSheet.create({
-    wrap: { marginTop: SPACING.xxl, gap: SPACING.md },
-    headRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-    sectionLabel: { ...TYPOGRAPHY.label, color: C.muted },
-    count: { ...TYPOGRAPHY.captionMedium, color: C.sec },
-    center: { paddingVertical: SPACING.xl, alignItems: "center" },
+    wrap: { marginTop: STEP.s5, gap: STEP.s3 },
+    headRow: { flexDirection: "row", alignItems: "center", gap: STEP.s2 },
+    sectionLabel: { ...TYPOGRAPHY.label, color: C.text3 },
+    count: { ...TYPOGRAPHY.captionMedium, color: C.text2 },
+    center: { paddingVertical: STEP.s5, alignItems: "center" },
     empty: {
-      alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.xl,
-      borderRadius: RADIUS.lg, backgroundColor: C.surface,
+      alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s5,
+      borderRadius: SHAPE.cardTight, backgroundColor: C.surface,
     },
-    emptyText: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center" },
+    emptyText: { ...TYPOGRAPHY.caption, color: C.text3, textAlign: "center" },
 
     answer: {
-      flexDirection: "row", gap: SPACING.md, padding: SPACING.md,
-      backgroundColor: C.surface, borderRadius: RADIUS.lg,
+      flexDirection: "row", gap: STEP.s3, padding: STEP.s3,
+      backgroundColor: C.surface, borderRadius: SHAPE.cardTight,
       borderWidth: 1, borderColor: C.border,
     },
-    answerHead: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+    answerHead: { flexDirection: "row", alignItems: "center", gap: STEP.s2 },
     answerName: { ...TYPOGRAPHY.captionMedium, color: C.text },
-    answerTime: { ...TYPOGRAPHY.micro, color: C.muted },
-    answerText: { ...TYPOGRAPHY.caption, color: C.sec, lineHeight: 19 },
-    answerImage: { width: "100%", height: 160, borderRadius: RADIUS.md, marginTop: SPACING.sm },
+    answerTime: { ...TYPOGRAPHY.micro, color: C.text3 },
+    answerText: { ...TYPOGRAPHY.caption, color: C.text2, lineHeight: 19 },
+    answerImage: { width: "100%", height: 160, borderRadius: SHAPE.button, marginTop: STEP.s2 },
 
     composer: {
-      backgroundColor: C.surface, borderRadius: RADIUS.lg,
-      borderWidth: 1, borderColor: C.border, padding: SPACING.md, gap: SPACING.sm,
+      backgroundColor: C.surface, borderRadius: SHAPE.cardTight,
+      borderWidth: 1, borderColor: C.border, padding: STEP.s3, gap: STEP.s2,
     },
     input: { ...TYPOGRAPHY.body, color: C.text, minHeight: 64, textAlignVertical: "top" },
-    composerFoot: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
-    anonBtn: { flexDirection: "row", alignItems: "center", gap: SPACING.xs, minHeight: 44, paddingRight: SPACING.sm },
-    anonText: { ...TYPOGRAPHY.caption, color: C.muted },
-    counter: { ...TYPOGRAPHY.micro, color: C.muted, flex: 1, textAlign: "right" },
+    composerFoot: { flexDirection: "row", alignItems: "center", gap: STEP.s3 },
+    anonBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1, minHeight: 44, paddingRight: STEP.s2 },
+    anonText: { ...TYPOGRAPHY.caption, color: C.text3 },
+    counter: { ...TYPOGRAPHY.micro, color: C.text3, flex: 1, textAlign: "right" },
     sendBtn: {
-      width: 44, height: 44, borderRadius: RADIUS.md, backgroundColor: C.accent,
+      width: 44, height: 44, borderRadius: SHAPE.button, backgroundColor: C.accent,
       alignItems: "center", justifyContent: "center",
     },
     hint: { ...TYPOGRAPHY.micro, color: C.danger },
   });
 }
+
