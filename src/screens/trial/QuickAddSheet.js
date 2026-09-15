@@ -1,4 +1,4 @@
-import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
+﻿import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, {
   FadeInDown, runOnJS, useAnimatedStyle, useSharedValue, withTiming,
@@ -64,10 +64,13 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
             <SectionLabel>KAYDET</SectionLabel>
             <View style={{ gap: STEP.s1 }}>
               <QuickAddRow C={C} title="Çalışma kaydet" subtitle="Yaptığın çalışmayı gir · sayaç açmadan"
+                dotColor={C.subjects?.matematik}
                 onPress={() => go(SCREENS.ADD_STUDY)} />
               <QuickAddRow C={C} title="Deneme Gir" subtitle="Fotoğraftan veya elle"
+                dotColor={C.subjects?.turkce}
                 onPress={() => go(SCREENS.TRIAL_ENTRY)} />
               <QuickAddRow C={C} title="Yanlış ekle" subtitle="Deftere soru kaydet"
+                dotColor={C.subjects?.kimya}
                 onPress={() => go(SCREENS.ADD_WRONG)} />
             </View>
           </View>
@@ -75,6 +78,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           <View style={styles.section}>
             <SectionLabel>PLANA EKLE</SectionLabel>
             <QuickAddRow C={C} title="Durak ekle" subtitle="Programa · gün ve süre seçerek"
+              dotColor={C.subjects?.cografya}
               onPress={() => go(SCREENS.ADD_TASK)} />
           </View>
         </Animated.View>
