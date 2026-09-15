@@ -406,3 +406,9 @@
 - `FIRST_WEEK`, `FIRST_ROUTE_READY`, `STUDY_PROCESSED`, `ONE_WEEK_COMPLETED`, `EIGHTH_DAY_LOCK` ekranları navigator ve CTA seviyesinde bağlanmadan bırakılırsa tasarım bitmiş görünür ama kullanıcı akışında yaşamaz.
 - İlk entegrasyon yalnız erişim/CTA problemini kapatmalı; `completedTasks`, süre, durak sayısı gibi iddialar gerçek kullanıcı verisine bağlanmadan satış/retention metni olarak güvenilmemeli.
 - Sonraki sağlıklı adım tek bir first-week/moment domain hook'u kurup bu ekranlara route, study log, trial ve premium grace verisini oradan beslemek.
+
+## 2026-09-15 — İlk hafta ekranları gerçek veri yokken başarı uydurmamalı
+
+- İlk hafta/premium momentleri retention açısından güçlüdür ama yanlış sayı gösterirse güveni düşürür; süre, soru, aktif gün ve kapanan durak tek hook'tan beslenmeli.
+- Veri yoksa ekran “henüz kayıt yok” tavrında kalmalı; `25 dakika`, `6 durak`, `5 gün` gibi demo sayıları üretime taşınmamalı.
+- Hook Supabase study log aralığını kullanıcının ilk 7 gün penceresine göre çekmeli; Redux yalnız bugünün hızlı fallback'i olmalı.

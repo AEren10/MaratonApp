@@ -8,6 +8,7 @@ import Svg, { Path, Circle } from "react-native-svg";
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -20,6 +21,9 @@ export default function FirstRouteReadyScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const moment = useFirstWeekMomentData();
+  const routeStops = moment.totals.routeStops;
+  const firstWeekStarts = Math.min(routeStops, 4);
 
   const handleClose = useCallback(() => {
     H.select();
@@ -107,9 +111,11 @@ export default function FirstRouteReadyScreen() {
 
         <Animated.View entering={FadeInDown.delay(140).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
-            <Text style={[styles.statNumber, { color: C.text }]}>11</Text>
+            <Text style={[styles.statNumber, { color: C.text }]}>{routeStops || "—"}</Text>
             <Text style={[styles.statText, { color: C.text2 }]}>
-              durak rotana yerleşti · ilk hafta 4 tanesi bugünden başlıyor
+              {routeStops
+                ? `durak rotana yerleşti · ilk hafta ${firstWeekStarts} tanesi öne çıkıyor`
+                : "rota verin oluştukça durak sayısı burada netleşecek"}
             </Text>
           </View>
         </Animated.View>

@@ -8,6 +8,7 @@ import Svg, { Path, Circle } from "react-native-svg";
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -20,6 +21,9 @@ export default function StudyProcessedScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const moment = useFirstWeekMomentData();
+  const { minutes, minutesLabel, questions, questionsLabel } = moment.totals;
+  const hasStudyData = minutes > 0 || questions > 0;
 
   const handleClose = useCallback(() => {
     H.select();
@@ -60,7 +64,9 @@ export default function StudyProcessedScreen() {
           <Text style={[styles.eyebrow, { color: C.accentBright }]}>İLK OTURUM</Text>
           <Text style={[styles.title, { color: C.text }]}>Çalışman rotaya işlendi.</Text>
           <Text style={[styles.desc, { color: C.text2 }]}>
-            25 dakikalık çalışman ve çözdüğün 18 soru kaydedildi. Rota bundan sonra bu veriyle çiziliyor.
+            {hasStudyData
+              ? `${minutesLabel} çalışman ve ${questionsLabel} sorun kaydedildi. Rota bundan sonra bu veriyle çiziliyor.`
+              : "İlk çalışma kaydından sonra rota bu veriyi sakin bir sinyal olarak kullanacak."}
           </Text>
         </Animated.View>
 
@@ -98,9 +104,9 @@ export default function StudyProcessedScreen() {
 
         <Animated.View entering={FadeInDown.delay(140).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
-            <Text style={[styles.statNumber, { color: C.text }]}>25</Text>
+            <Text style={[styles.statNumber, { color: C.text }]}>{hasStudyData ? minutes : "—"}</Text>
             <Text style={[styles.statText, { color: C.text2 }]}>
-              dakika · İlk çalışma oturumun rotanın ilk düğümü oldu
+              {hasStudyData ? "dakika · İlk hafta çalışma verin rotaya işlendi" : "ilk çalışma oturumun burada görünecek"}
             </Text>
           </View>
         </Animated.View>

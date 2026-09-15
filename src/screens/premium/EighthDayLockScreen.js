@@ -8,6 +8,7 @@ import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import * as H from "../../lib/haptics";
 
 // Tasarim: "8. Gun". Ilk 7 gunluk surecin ardindan kullanicinin karsilastigi Paywall bilgilendirme ekrani.
@@ -15,6 +16,8 @@ export default function EighthDayLockScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const moment = useFirstWeekMomentData();
+  const { completedStops, minutesLabel, activeDays } = moment.totals;
 
   const handleClose = useCallback(() => {
     H.select();
@@ -48,15 +51,15 @@ export default function EighthDayLockScreen() {
         <Animated.View entering={FadeInDown.delay(100).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <View style={[styles.statsRow, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <View style={styles.statCol}>
-              <Text style={[styles.statNum, { color: C.text }]}>6</Text>
+              <Text style={[styles.statNum, { color: C.text }]}>{completedStops || "—"}</Text>
               <Text style={[styles.statLabel, { color: C.text3 }]}>durak</Text>
             </View>
             <View style={styles.statCol}>
-              <Text style={[styles.statNum, { color: C.text }]}>4:20</Text>
+              <Text style={[styles.statNum, { color: C.text }]}>{minutesLabel}</Text>
               <Text style={[styles.statLabel, { color: C.text3 }]}>saat çalışma</Text>
             </View>
             <View style={styles.statCol}>
-              <Text style={[styles.statNum, { color: C.text }]}>5</Text>
+              <Text style={[styles.statNum, { color: C.text }]}>{activeDays || "—"}</Text>
               <Text style={[styles.statLabel, { color: C.text3 }]}>çalışma günü</Text>
             </View>
           </View>

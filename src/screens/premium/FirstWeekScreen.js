@@ -7,6 +7,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
@@ -15,6 +16,7 @@ export default function FirstWeekScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const moment = useFirstWeekMomentData();
 
   const handleClose = useCallback(() => {
     H.select();
@@ -32,20 +34,25 @@ export default function FirstWeekScreen() {
     navigation.navigate(screenName);
   }, [navigation]);
 
-  // TODO: Ileride context'ten veya hook'tan alinacak (örn. useFirstWeekStatus)
-  const completedTasks = 3;
-  const totalTasks = 7;
-  const currentDay = 4;
+  const stepState = new Map((moment.steps || []).map((step) => [step.key, step.done]));
+  const completedTasks = moment.completedTasks;
+  const totalTasks = moment.totalTasks;
+  const currentDay = moment.dayNumber || 1;
 
   const steps = [
-    { id: 1, title: "İlk deneme sonucunu ekle", sub: "Ders bazlı net · 5 dakika", done: true, screen: SCREENS.FIRST_ROUTE_READY },
-    { id: 2, title: "İlk çalışma oturumunu tamamla", sub: "Pomodoro · 25 dakika", done: true, screen: SCREENS.STUDY_PROCESSED },
-    { id: 3, title: "İlk durağı kapat", sub: "Rotandaki ilk konu", done: true },
-    { id: 4, title: "İkinci çalışma gününü oluştur", sub: "Programa bir gün daha ekle", done: false, active: true },
-    { id: 5, title: "Bir sonraki durağı gör", sub: "Rota detayında sıradaki konu", done: false },
-    { id: 6, title: "Haftalık mini özeti incele", sub: "Pazar akşamı gelir", done: false, screen: SCREENS.ONE_WEEK_COMPLETED },
-    { id: 7, title: "Rota değişimini fark et", sub: "İlk hafta öncesi ve sonrası", done: false },
+    { id: 1, key: "trial", title: "İlk deneme sonucunu ekle", sub: "Ders bazlı net · 5 dakika", screen: SCREENS.FIRST_ROUTE_READY },
+    { id: 2, key: "study", title: "İlk çalışma oturumunu tamamla", sub: "Pomodoro · 25 dakika", screen: SCREENS.STUDY_PROCESSED },
+    { id: 3, key: "first_stop", title: "İlk durağı kapat", sub: "Rotandaki ilk konu" },
+    { id: 4, key: "second_day", title: "İkinci çalışma gününü oluştur", sub: "Programa bir gün daha ekle" },
+    { id: 5, key: "next_stop", title: "Bir sonraki durağı gör", sub: "Rota detayında sıradaki konu" },
+    { id: 6, key: "weekly_summary", title: "Haftalık mini özeti incele", sub: "Pazar akşamı gelir", screen: SCREENS.ONE_WEEK_COMPLETED },
+    { id: 7, key: "route_learning", title: "Rota değişimini fark et", sub: "İlk hafta öncesi ve sonrası" },
   ];
+  const decoratedSteps = steps.map((step) => ({
+    ...step,
+    done: Boolean(stepState.get(step.key)),
+    active: !stepState.get(step.key) && step.id === Math.min(totalTasks, completedTasks + 1),
+  }));
 
   return (
     <View style={[styles.container, { backgroundColor: C.bg, paddingTop: insets.top }]}>
@@ -89,7 +96,7 @@ export default function FirstWeekScreen() {
           </View>
 
           <View style={styles.taskList}>
-            {steps.map((step, idx) => (
+            {decoratedSteps.map((step) => (
               <Pressable
                 key={step.id}
                 onPress={() => openMoment(step.screen)}

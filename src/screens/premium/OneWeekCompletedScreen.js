@@ -8,6 +8,7 @@ import Svg, { Path, Circle } from "react-native-svg";
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -20,6 +21,8 @@ export default function OneWeekCompletedScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const moment = useFirstWeekMomentData();
+  const { activeDays, completedStops, minutesLabel } = moment.totals;
 
   const handleClose = useCallback(() => {
     H.select();
@@ -59,7 +62,9 @@ export default function OneWeekCompletedScreen() {
           <Text style={[styles.eyebrow, { color: C.accentBright }]}>İLK HAFTA TAMAM</Text>
           <Text style={[styles.title, { color: C.text }]}>Bir haftalık emeğin artık görünür.</Text>
           <Text style={[styles.desc, { color: C.text2 }]}>
-            Yedi gün, beş çalışma günü ve altı durak. Rotan artık senin verinle şekilleniyor.
+            {activeDays > 0 || completedStops > 0
+              ? `Yedi gün, ${activeDays} çalışma günü ve ${completedStops} kapanan durak. Rotan artık senin verinle şekilleniyor.`
+              : "Yedi günün sonunda çalışma, deneme ve durak izlerin burada birlikte görünecek."}
           </Text>
         </Animated.View>
 
@@ -94,9 +99,9 @@ export default function OneWeekCompletedScreen() {
 
         <Animated.View entering={FadeInDown.delay(140).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
-            <Text style={[styles.statNumber, { color: C.text }]}>6</Text>
+            <Text style={[styles.statNumber, { color: C.text }]}>{completedStops || "—"}</Text>
             <Text style={[styles.statText, { color: C.text2 }]}>
-              durak kapandı · 4 sa 20 dk çalışma kaydedildi
+              {completedStops ? `durak kapandı · ${minutesLabel} çalışma kaydedildi` : "kapanan duraklar ve çalışma süren burada toplanacak"}
             </Text>
           </View>
         </Animated.View>
