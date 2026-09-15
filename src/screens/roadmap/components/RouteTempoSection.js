@@ -1,12 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+﻿import { StyleSheet, Text, View } from "react-native";
 
 import { Button, Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// "TEMPO DEĞİŞİRSE": %10 fazla / az soru senaryosu. Senaryolar Pro degilse
-// deger yerine kilit + sonuk kutu (tasarimin kilitli hali); acma dugmesi
-// Senaryolar ekranina ya da o baglamin paywall'una gider.
 export function RouteTempoSection({ rows, locked, onOpen }) {
   const C = useC();
   return (
@@ -30,7 +27,7 @@ export function RouteTempoSection({ rows, locked, onOpen }) {
           )}
         </View>
       ))}
-      <Button size="md" fullWidth onPress={onOpen} style={s.button}>
+      <Button size="lg" fullWidth onPress={onOpen} style={s.button}>
         Senaryoları aç
       </Button>
     </View>
