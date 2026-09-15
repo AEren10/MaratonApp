@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -6,14 +6,12 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 const SEGMENT_TONE = { completed: "accent", rescheduled: "barIdle", queued: "track" };
 
-// "Rotanın tamamı" ust blogu: "7/11 durak tamamlandı.", durak cubuklari,
-// lejant ve BORÇ · YENİDEN PLANLANAN · SINAVA uclusu.
 export function RouteFullSummary({ counts, segments, debtHours, daysLeft }) {
   const C = useC();
   const legend = [
-    { tone: "accent", text: `tamamlandı ${counts.completed}` },
-    { tone: "barIdle", text: `yeniden planlandı ${counts.rescheduled}` },
-    { tone: "track", text: `sırada ${counts.queued}` },
+    { tone: "accent", text: "tamamlandı " },
+    { tone: "barIdle", text: "yeniden planlandı " },
+    { tone: "track", text: "sırada " },
   ];
   const stats = [
     { label: "BORÇ", value: debtHours, unit: "sa" },
@@ -26,9 +24,9 @@ export function RouteFullSummary({ counts, segments, debtHours, daysLeft }) {
       <Text style={[TYPOGRAPHY.statSmall, s.headline, { color: C.text }]}>
         {counts.completed}/{counts.total} durak tamamlandı.
       </Text>
-      <View style={s.bars} accessible accessibilityLabel={`${counts.total} duraktan ${counts.completed} tamamlandı`}>
+      <View style={s.bars} accessible accessibilityLabel={${counts.total} duraktan  tamamlandı}>
         {segments.map((kind, i) => (
-          <View key={`${kind}-${i}`} style={[s.bar, { backgroundColor: C[SEGMENT_TONE[kind]] }]} />
+          <View key={${kind}-} style={[s.bar, { backgroundColor: C[SEGMENT_TONE[kind]] }]} />
         ))}
       </View>
       <View style={s.legend}>
@@ -58,14 +56,21 @@ export function RouteFullSummary({ counts, segments, debtHours, daysLeft }) {
 }
 
 const s = StyleSheet.create({
-  headline: { maxWidth: 290 },
-  bars: { flexDirection: "row", gap: STEP.s1 / 2, marginTop: STEP.s3 },
-  bar: { flex: 1, height: 5, borderRadius: SHAPE.chip / 3 },
-  legend: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s2, marginTop: STEP.s2 },
-  legendItem: { flexDirection: "row", alignItems: "center", gap: STEP.s1 / 2 },
-  swatch: { width: 12, height: 4, borderRadius: SHAPE.chip / 3 },
-  legendText: { letterSpacing: 0 },
-  stats: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s3, marginTop: STEP.s3 },
-  divider: { width: 1, height: 34 },
-  statRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 / 2, marginTop: STEP.s1 / 2 },
+  headline: { paddingBottom: STEP.s2 },
+  bars: { flexDirection: "row", gap: 6 },
+  bar: { flex: 1, height: 4, borderRadius: 2 },
+  legend: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s2, paddingBottom: STEP.s4 },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+  swatch: { width: 12, height: 4, borderRadius: 2 },
+  legendText: { marginTop: 1 },
+  stats: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: STEP.s3,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "transparent",
+  },
+  divider: { width: 1, marginVertical: 4 },
+  statRow: { flexDirection: "row", alignItems: "baseline", gap: 4, marginTop: 4 },
 });
