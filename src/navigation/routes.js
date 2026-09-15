@@ -107,6 +107,11 @@ export const ROUTE_CONFIGS = {
   // onizlemesi oldugu belirsiz kalir, o yuzden deep link yok.
   [SCREENS.PRO_PREVIEW]: { path: "pro/onizleme", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
   [SCREENS.ACCESS_ENDED]: { path: "pro/deneme-bitti", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.FIRST_WEEK]: { path: "pro/ilk-hafta", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.FIRST_ROUTE_READY]: { path: "pro/ilk-rota-hazir", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.STUDY_PROCESSED]: { path: "pro/calisma-islendi", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.ONE_WEEK_COMPLETED]: { path: "pro/bir-hafta", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
+  [SCREENS.EIGHTH_DAY_LOCK]: { path: "pro/sekizinci-gun", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
 
   [SCREENS.SETTINGS]: { path: "ayarlar", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.APPEARANCE]: { path: "ayarlar/gorunum", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },

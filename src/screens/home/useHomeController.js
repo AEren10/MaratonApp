@@ -39,7 +39,7 @@ export function useHomeController() {
   const { user } = useAuth();
   const { daysUntilExam } = useExam();
   const { isConnected } = useNetwork();
-  const { accessLoading } = usePremium();
+  const { accessLoading, isInGrace } = usePremium();
   const gamification = useGamification();
   const { reward, syncStat, checkMilestone } = gamification;
   const { comeback, dismissComeback } = useRetention(reward);
@@ -103,7 +103,7 @@ export function useHomeController() {
   return {
     C, navigation, dailyGoal, daysUntilExam, comeback, dismissComeback, gamification, goalReward, completion,
     nudges, nudge, dashboard, stops, recent, actions, onRefresh, refreshing,
-    streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate,
+    streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
     firstDay: !hasLocalData && streak === 0,
     offline: !isConnected && !hasLocalData && !offlineDismissed,

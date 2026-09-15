@@ -99,6 +99,11 @@ const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
 const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
+const FirstWeekScreen = React.lazy(() => import("../screens/premium/FirstWeekScreen"));
+const FirstRouteReadyScreen = React.lazy(() => import("../screens/premium/FirstRouteReadyScreen"));
+const StudyProcessedScreen = React.lazy(() => import("../screens/premium/StudyProcessedScreen"));
+const OneWeekCompletedScreen = React.lazy(() => import("../screens/premium/OneWeekCompletedScreen"));
+const EighthDayLockScreen = React.lazy(() => import("../screens/premium/EighthDayLockScreen"));
 const DataExportScreen = React.lazy(() => import("../screens/settings/DataExportScreen"));
 const AccountDeleteScreen = React.lazy(() => import("../screens/settings/AccountDeleteScreen"));
 const OfflineQueueScreen = React.lazy(() => import("../screens/settings/OfflineQueueScreen"));
@@ -233,6 +238,11 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
   screen(SCREENS.PRO_PREVIEW, ProPreviewScreen, overlayOptions),
   screen(SCREENS.ACCESS_ENDED, AccessEndedScreen, modalOptions),
+  screen(SCREENS.FIRST_WEEK, FirstWeekScreen, modalOptions),
+  screen(SCREENS.FIRST_ROUTE_READY, FirstRouteReadyScreen, modalOptions),
+  screen(SCREENS.STUDY_PROCESSED, StudyProcessedScreen, celebrationOptions),
+  screen(SCREENS.ONE_WEEK_COMPLETED, OneWeekCompletedScreen, celebrationOptions),
+  screen(SCREENS.EIGHTH_DAY_LOCK, EighthDayLockScreen, modalOptions),
   screen(SCREENS.DATA_EXPORT, DataExportScreen),
   screen(SCREENS.ACCOUNT_DELETE, AccountDeleteScreen, modalOptions),
   screen(SCREENS.OFFLINE_QUEUE, OfflineQueueScreen),

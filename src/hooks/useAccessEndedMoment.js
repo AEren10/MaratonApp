@@ -17,7 +17,7 @@ export function useAccessEndedMoment() {
     if (accessLoading || accessError || !accessSnapshot || !user?.id) return undefined;
     let cancelled = false;
     consumeAccessEnded(accessSnapshot, user.id).then((show) => {
-      if (show && !cancelled) navigation.navigate(SCREENS.ACCESS_ENDED);
+      if (show && !cancelled) navigation.navigate(SCREENS.EIGHTH_DAY_LOCK);
     });
     return () => { cancelled = true; };
   }, [accessError, accessLoading, accessSnapshot, navigation, user?.id]);

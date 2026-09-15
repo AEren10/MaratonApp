@@ -394,3 +394,15 @@
 - `wrong-questions` kullanıcıların kişisel yanlış defteri görsellerini tuttuğu için bucket public kalırsa URL'yi bilen herkes fotoğrafı indirebilir; RLS yalnız object policy'de kalmamalı.
 - Client zaten `createSignedUrl` kullanıyorsa doğru güvenlik modeli private bucket + owner/shared SELECT policy'dir.
 - Toplulukta paylaşılan yanlışlar için ayrı izin `shared_questions.image_path` üzerinden verilmeli; kişisel defter gizliliği public bucket kolaylığına feda edilmemeli.
+
+## 2026-09-15 — Root'tan sekme içi ekrana dönerken nested state doğru kurulmalı
+
+- `MainTabs > ROTA tab > ROADMAP` gibi resetlerde tab route'un state'i yalnız kendi stack ekranlarını içermeli; aynı tab adını stack route'u gibi tekrar koymak nested navigation state'i bozabilir.
+- Kutlama/moment ekranlarının CTA'ları `goBack()` ile belirsiz geçmişe dönmemeli; hedef sekme + hedef ekran açıkça kurulmalı.
+- Root-only ekranlardan sekmeye dönüş yapan her yeni helper gerçek navigator ağacına göre test edilmeli.
+
+## 2026-09-15 — İlk hafta momentleri erişilebilir ama veri katmanı eksik
+
+- `FIRST_WEEK`, `FIRST_ROUTE_READY`, `STUDY_PROCESSED`, `ONE_WEEK_COMPLETED`, `EIGHTH_DAY_LOCK` ekranları navigator ve CTA seviyesinde bağlanmadan bırakılırsa tasarım bitmiş görünür ama kullanıcı akışında yaşamaz.
+- İlk entegrasyon yalnız erişim/CTA problemini kapatmalı; `completedTasks`, süre, durak sayısı gibi iddialar gerçek kullanıcı verisine bağlanmadan satış/retention metni olarak güvenilmemeli.
+- Sonraki sağlıklı adım tek bir first-week/moment domain hook'u kurup bu ekranlara route, study log, trial ve premium grace verisini oradan beslemek.

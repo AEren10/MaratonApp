@@ -27,8 +27,8 @@ export default function HomeScreen() {
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
     ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} go={actions} />
-    : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} />
-  ), [h.stops, h.recent, dashboard.subjectMomentum, actions]);
+    : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
+  ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, actions]);
 
   let body;
   if (h.loading) {

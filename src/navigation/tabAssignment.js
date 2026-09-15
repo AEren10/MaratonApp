@@ -134,6 +134,11 @@ export const ROOT_ONLY = [
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,
   SCREENS.ACCESS_ENDED,     // Deneme Bitti (bir kez, erisim bitince)
+  SCREENS.FIRST_WEEK,
+  SCREENS.FIRST_ROUTE_READY,
+  SCREENS.STUDY_PROCESSED,
+  SCREENS.ONE_WEEK_COMPLETED,
+  SCREENS.EIGHTH_DAY_LOCK,
   // Cevrimdisi Kuyruk global seritten (her sekmeden) aciliyor.
   SCREENS.OFFLINE_QUEUE,
   SCREENS.EDIT_PROFILE,

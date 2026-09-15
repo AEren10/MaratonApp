@@ -27,5 +27,6 @@ export function useHomeActions({ navigation, go }) {
     notebook: go(SCREENS.WRONG_NOTEBOOK),
     record: go(SCREENS.ADD_STUDY),
     proPreview: go(SCREENS.PRO_PREVIEW),
+    firstWeek: go(SCREENS.FIRST_WEEK),
   }), [go, startTask]);
 }

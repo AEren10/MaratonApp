@@ -23,7 +23,7 @@ export default function EighthDayLockScreen() {
 
   const handleTryFree = useCallback(() => {
     H.select();
-    navigation.navigate(SCREENS.PREMIUM); // Ileride premium akisina yonlendirme
+    navigation.replace(SCREENS.PAYWALL, { source: "eighth_day_lock" });
   }, [navigation]);
 
   return (

@@ -21,7 +21,7 @@ const RecentRow = React.memo(function RecentRow({ row }) {
 
 // Ücretsiz Ana Sayfa govdesi: "SON ÇALIŞMALARIN" (bu haftanin gercek
 // kayitlari) + tek notr cikis "Rotanı gör" -> Pro Önizleme.
-export function HomeFreeBody({ recent, onSeeRoute }) {
+export function HomeFreeBody({ recent, onSeeRoute, onFirstWeek }) {
   const C = useC();
   return (
     <View>
@@ -36,6 +36,7 @@ export function HomeFreeBody({ recent, onSeeRoute }) {
         </View>
       ) : null}
       <View style={s.links}>
+        {onFirstWeek ? <HomeLinkRow label="İlk haftanı gör" onPress={onFirstWeek} /> : null}
         <HomeLinkRow label="Rotanı gör" onPress={onSeeRoute} />
       </View>
     </View>

@@ -7,6 +7,9 @@ import Svg, { Path, Circle } from "react-native-svg";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
+import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
@@ -25,7 +28,7 @@ export default function OneWeekCompletedScreen() {
 
   const handleAction = useCallback(() => {
     H.select();
-    navigation.goBack(); // Haftalık özete yönlendirecek
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.SUMMARY, { period: "week" });
   }, [navigation]);
 
   const pulseScale = useSharedValue(8);
