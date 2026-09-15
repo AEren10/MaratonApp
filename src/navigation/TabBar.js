@@ -15,11 +15,11 @@ import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 
 const TABS = [
-  { key: SCREENS.HOME,       label: "Ana Sayfa", icon: "home",  hint: "Ana sayfaya gider" },
-  { key: SCREENS.DAILY_PLAN, label: "Dersler",   icon: "book",  hint: "Ders planını gösterir" },
-  { key: "Add",              label: "Kaydet",    icon: "plus",  center: true },
-  { key: SCREENS.ANALYSIS,   label: "Analiz",    icon: "chart", hint: "Analiz ekranına gider" },
-  { key: SCREENS.PROFILE,    label: "Profil",    icon: "user",  hint: "Profil sayfanı açar" },
+  { key: SCREENS.HOME, label: "ROTA", icon: "home", hint: "Rota ana sayfasına gider" },
+  { key: SCREENS.DAILY_PLAN, label: "PROGRAM", icon: "book", hint: "Program ekranını gösterir" },
+  { key: "Add", label: "Kaydet", icon: "plus", center: true },
+  { key: SCREENS.ANALYSIS, label: "ANALİZ", icon: "chart", hint: "Analiz ekranına gider" },
+  { key: SCREENS.PROFILE, label: "PROFİL", icon: "user", hint: "Profil sayfanı açar" },
 ];
 
 function CenterFab({ onPress, C }) {
@@ -52,10 +52,10 @@ function CenterFab({ onPress, C }) {
           <View
             style={{
               width: 54, height: 54, borderRadius: 27,
-              backgroundColor: C.orange,
+              backgroundColor: C.accent,
               alignItems: "center", justifyContent: "center",
               marginTop: -18,
-              shadowColor: C.orange,
+              shadowColor: C.accent,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.32,
               shadowRadius: 14,
@@ -101,12 +101,12 @@ function TabItem({ tab, active, onPress, C }) {
       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }}
     >
       <Animated.View style={[{ alignItems: "center" }, iconStyle]}>
-        <Icon name={tab.icon} size={22} color={active ? C.orange : C.muted} sw={active ? 2.2 : 1.8} />
+        <Icon name={tab.icon} size={22} color={active ? C.accent : C.muted} sw={active ? 2.2 : 1.8} />
         <Animated.View
           style={[
             {
               width: 4, height: 4, borderRadius: 2,
-              backgroundColor: C.orange,
+              backgroundColor: C.accent,
               marginTop: 3,
             },
             dotStyle,
@@ -117,7 +117,7 @@ function TabItem({ tab, active, onPress, C }) {
         style={{
           ...TYPOGRAPHY.micro,
           fontFamily: active ? "Archivo_600" : "Archivo_500",
-          color: active ? C.orange : C.muted,
+          color: active ? C.accent : C.muted,
           marginTop: active ? 0 : 4,
         }}
       >

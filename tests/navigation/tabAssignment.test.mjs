@@ -22,6 +22,15 @@ function setupStackScreenKeys() {
 
 const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
 
+test("tabbar tasarim etiketleri ROTA PROGRAM ANALIZ PROFIL olarak kalir", () => {
+  const src = readFileSync("src/navigation/TabBar.js", "utf8");
+  for (const label of ["ROTA", "PROGRAM", "ANALİZ", "PROFİL"]) {
+    assert.match(src, new RegExp(`label: "${label}"`));
+  }
+  assert.doesNotMatch(src, /label: "Ana Sayfa"|label: "Dersler"/);
+  assert.doesNotMatch(src, /C\.orange/);
+});
+
 test("her APP_STACK ekrani bir sekmeye ya da koke atanmis", () => {
   const assigned = new Set([...Object.values(TAB_STACKS).flat(), ...ROOT_ONLY]);
   const missing = appStackScreenKeys()
