@@ -1,4 +1,4 @@
-export const SCREENS = {
+﻿export const SCREENS = {
   // Auth
   LOGIN: "Login",
   REGISTER: "Register",
@@ -141,7 +141,7 @@ export const SCREENS = {
   EDIT_PROFILE: "EditProfile",
   CHANGE_PASSWORD: "ChangePassword",
   EDIT_EMAIL: "EditEmail",
-  NOTIFICATIONS_SETTINGS: "NotificationsSettings",
+  NOTIFICATIONS: "Notifications",`n  NOTIFICATIONS_SETTINGS: "NotificationsSettings",
   PRIVACY: "Privacy",
   TERMS: "Terms",
   ABOUT: "About",
@@ -149,3 +149,4 @@ export const SCREENS = {
   ACCOUNT_DELETE: "AccountDelete",
   OFFLINE_QUEUE: "OfflineQueue",
 };
+
