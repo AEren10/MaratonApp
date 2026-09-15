@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+﻿import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
@@ -6,7 +6,6 @@ import { trialDifficultyMultiplier } from "../../../domain/trial/trialModel";
 import { TrialEntryDetailsCard } from "./TrialEntryDetailsCard";
 import { TrialEntryNetCard } from "./TrialEntryNetCard";
 
-// Deneme Gir 3/3: son kontrol, kaydet ve rotayi ciz.
 export function TrialEntryStep3({ form, styles, onBack }) {
   const normalizedNet = Number(form.totalNet) * trialDifficultyMultiplier(form.difficultyLevel);
   const publisherName = form.publishers.find((p) => p.id === form.publisherId)?.name || null;
