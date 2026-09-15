@@ -430,3 +430,9 @@
 - Private bucket düzeltmesi migration'da kalıp testte görünmezse ileride başka migration yanlışlıkla `public = true` döndürebilir.
 - Kişisel görsel bucket'ları için test yalnız policy kapsamını değil bucket access modelini de kontrol etmeli.
 - Supabase storage güvenliğinde client signed URL kullanımı ve bucket private ayarı birlikte korunmalı.
+
+## 2026-09-16 — Mock ödeme ekranları navigation bütünlüğünü bozmamalı
+
+- Payment ekranları app stack'e girerse tab/root assignment'a eklenmeli; yoksa ekran kayıtlı olsa bile navigation ağacında ulaşılamaz kalır ve test kırılır.
+- `MainTabs` bir `SCREENS` sabiti değil root stack route'udur; ödeme sonucu/iptal gibi resetler `ROOT_STACK.MAIN_TABS` kullanmalı.
+- Kart formu/processing ekranı gerçek ödeme altyapısına bağlanmadan premium CTA'larına bağlanmamalı; mock random success/fail satış güvenini bozar.

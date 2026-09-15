@@ -7,6 +7,7 @@ import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { ROOT_STACK } from "../../navigation/routes";
 
 export default function PaymentFailedScreen() {
   const C = useC();
@@ -76,7 +77,7 @@ export default function PaymentFailedScreen() {
             s.secondaryBtn,
             pressed && { opacity: 0.7 }
           ]}
-          onPress={() => navigation.navigate(SCREENS.MAIN_TABS)}
+          onPress={() => navigation.navigate(ROOT_STACK.MAIN_TABS)}
         >
           <Text style={s.secondaryBtnText}>Ücretsiz sürümle devam et</Text>
         </Pressable>

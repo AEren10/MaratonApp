@@ -130,6 +130,10 @@ export const ROOT_ONLY = [
   SCREENS.ROUTE_PAUSE,      // Ara Verme (tam ekran onay)
   SCREENS.ROUTE_REDRAW,     // Rotayi Yeniden Ciz (tam ekran onay)
   SCREENS.PAYWALL,
+  SCREENS.PAYMENT_CARD,
+  SCREENS.PAYMENT_PROCESSING,
+  SCREENS.PAYMENT_SUCCESS,
+  SCREENS.PAYMENT_FAILED,
   // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,

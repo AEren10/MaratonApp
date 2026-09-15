@@ -6,7 +6,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop, Line, Path, Circle, Text as SvgT
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
-import { SCREENS } from "../../constants/screens";
+import { ROOT_STACK } from "../../navigation/routes";
 
 export default function PaymentSuccessScreen() {
   const C = useC();
@@ -18,7 +18,7 @@ export default function PaymentSuccessScreen() {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: SCREENS.MAIN_TABS }],
+        routes: [{ name: ROOT_STACK.MAIN_TABS }],
       })
     );
   };
