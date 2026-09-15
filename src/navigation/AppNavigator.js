@@ -168,11 +168,11 @@ function AppStackInner() {
   );
 }
 
-function AppStack() {
+function SessionProviders({ children }) {
   return (
     <DataSyncProvider>
       <PremiumProvider>
-        <AppStackInner />
+        {children}
       </PremiumProvider>
     </DataSyncProvider>
   );
@@ -224,9 +224,17 @@ export default function AppNavigator() {
   } else if (!session) {
     content = <AuthStack />;
   } else if (!onboardingDone) {
-    content = <SetupStack />;
+    content = (
+      <SessionProviders>
+        <SetupStack />
+      </SessionProviders>
+    );
   } else {
-    content = <AppStack />;
+    content = (
+      <SessionProviders>
+        <AppStackInner />
+      </SessionProviders>
+    );
   }
 
   return (
