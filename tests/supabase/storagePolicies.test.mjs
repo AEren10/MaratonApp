@@ -6,6 +6,10 @@ const migration = readFileSync(
   new URL("../../supabase/migrations/20260911231806_cdx_harden_storage_policies.sql", import.meta.url),
   "utf8",
 );
+const privateWrongQuestionsBucketMigration = readFileSync(
+  new URL("../../supabase/migrations/20260915110000_cdx_private_wrong_question_bucket.sql", import.meta.url),
+  "utf8",
+);
 
 test("storage mutating policies are scoped to authenticated users", () => {
   for (const bucket of ["avatars", "wrong-questions", "community-answers"]) {
@@ -23,4 +27,11 @@ test("avatar update policy has both USING and WITH CHECK ownership predicates", 
   assert.match(updatePolicy, /USING \(/);
   assert.match(updatePolicy, /WITH CHECK \(/);
   assert.match(updatePolicy, /\(select auth\.uid\(\)\)::text = \(storage\.foldername\(name\)\)\[1\]/);
+});
+
+test("wrong question image bucket is private at bucket level", () => {
+  assert.match(privateWrongQuestionsBucketMigration, /UPDATE storage\.buckets/);
+  assert.match(privateWrongQuestionsBucketMigration, /SET public = false/);
+  assert.match(privateWrongQuestionsBucketMigration, /WHERE id = 'wrong-questions'/);
+  assert.doesNotMatch(privateWrongQuestionsBucketMigration, /SET public = true/);
 });

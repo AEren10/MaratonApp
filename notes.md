@@ -424,3 +424,9 @@
 - Yeni `NotificationsScreen` mock listeyle gelirse kullanıcı gerçek sistem bildirimi sanabilir; retention güveni için inbox verisi gerçek notification/event store'dan beslenmeden route'a alınmamalı.
 - `NOTIFICATIONS_SETTINGS` mevcut ayar ekranıdır; ayrı `NOTIFICATIONS` sabiti literal `\n` hatasıyla eklenirse build kırılır ve orphan check doğru şekilde yakalar.
 - Bildirim inbox canlı yapılacaksa önce storage/Supabase notification feed modeli, okundu durumu ve deep-link hedefleri netleşmeli.
+
+## 2026-09-15 — Storage gizlilik migration'ı testle kilitlenmeli
+
+- Private bucket düzeltmesi migration'da kalıp testte görünmezse ileride başka migration yanlışlıkla `public = true` döndürebilir.
+- Kişisel görsel bucket'ları için test yalnız policy kapsamını değil bucket access modelini de kontrol etmeli.
+- Supabase storage güvenliğinde client signed URL kullanımı ve bucket private ayarı birlikte korunmalı.
