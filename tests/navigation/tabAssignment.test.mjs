@@ -14,6 +14,12 @@ function appStackScreenKeys() {
   return [...new Set([...body.matchAll(/screen\(SCREENS\.([A-Z_]+)/g)].map((m) => m[1]))];
 }
 
+function setupStackScreenKeys() {
+  const src = readFileSync("src/navigation/screenRegistry.js", "utf8");
+  const body = src.slice(src.indexOf("export const SETUP_STACK_SCREENS"), src.indexOf("export const APP_STACK_SCREENS"));
+  return [...body.matchAll(/screen\(SCREENS\.([A-Z_]+)/g)].map((m) => m[1]);
+}
+
 const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
 
 test("her APP_STACK ekrani bir sekmeye ya da koke atanmis", () => {
@@ -35,12 +41,15 @@ test("kok ortu ekranlari ayni navigator icinde iki kez kayitlanmiyor", () => {
   const src = readFileSync("src/navigation/AppNavigator.js", "utf8");
   const setupStackBody = src.slice(src.indexOf("function SetupStack()"), src.indexOf("function AppStackInner()"));
   const appStackBody = src.slice(src.indexOf("function AppStackInner()"), src.indexOf("function SessionProviders"));
+  const setupNames = new Set(setupStackScreenKeys().map((key) => SCREENS[key]));
+  const setupRootOverlap = ROOT_ONLY.filter((name) => setupNames.has(name));
 
   assert.equal(
-    (setupStackBody.match(/ROOT_SCREENS\.map\(renderStackScreen\)/g) || []).length,
+    (setupStackBody.match(/SETUP_ROOT_SCREENS\.map\(renderStackScreen\)/g) || []).length,
     1,
-    "kurulum stack'i kok ortuleri tam bir kez kaydetmeli",
+    "kurulum stack'i root ortuleri setup ekranlarindan filtreleyerek kaydetmeli",
   );
+  assert.ok(setupRootOverlap.length > 0, "test anlamsizlastiysa kurulum/root kesişimi bitmis olabilir");
   assert.equal(
     (appStackBody.match(/ROOT_SCREENS\.map\(renderStackScreen\)/g) || []).length,
     1,

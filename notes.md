@@ -455,3 +455,5 @@
 - Tasarım aktarımında root modal ekranlarını hem kurulum hem ana uygulama stack'ine almak doğru; aynı stack içinde aynı listeyi iki kez render etmek doğru değil.
 - Duplicate `ROOT_SCREENS` kaydı React Navigation'da ekran adı çakışması/warning üretebilir ve deep link/debug davranışını belirsizleştirir.
 - `AppNavigator` gibi yapısal dosyalarda küçük kopyala-yapıştır hataları testle kilitlenmeli; tab/root assignment testi bu yüzden navigator gövdesini de kontrol ediyor.
+- Kurulum stack'i özel riskli: `SETUP_STACK_SCREENS` zaten `ExamSetup/GoalSetup/...` içerdiği için `ROOT_ONLY` ham haliyle eklenirse aynı navigator içinde `ExamSetup` ikinci kez kaydolur.
+- Rota Hazır sonrası bildirim izni/kurulum bitişi tek yerden (`useFinishOnboarding`) akmalı; ekran içinde manuel `navigation.navigate(SCREENS.NOTIFICATION_PERMISSION)` yazmak hem import unutma hatası üretir hem de onboarding otoritesini böler.

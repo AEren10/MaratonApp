@@ -35,6 +35,8 @@ const Stack = createNativeStackNavigator();
 
 // Kokte kalanlar: tabbar'in BILEREK gizlendigi tam ekran ortuler.
 const ROOT_SCREENS = screensByName(ROOT_ONLY);
+const SETUP_SCREEN_NAMES = new Set(SETUP_STACK_SCREENS.map((route) => route.name));
+const SETUP_ROOT_SCREENS = ROOT_SCREENS.filter((route) => !SETUP_SCREEN_NAMES.has(route.name));
 const Tab = createBottomTabNavigator();
 
 function AddStub() {
@@ -152,7 +154,7 @@ function SetupStack() {
     >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
-      {ROOT_SCREENS.map(renderStackScreen)}
+      {SETUP_ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
 }
