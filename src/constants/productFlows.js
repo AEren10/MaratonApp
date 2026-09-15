@@ -175,7 +175,17 @@ export const PRODUCT_FLOWS = [
     id: PRODUCT_FLOW_IDS.PREMIUM,
     order: 13,
     label: "Premium",
-    designScreens: ["Paywall moment", "Premium", "Subscription", "Cancel subscription"],
+    designScreens: [
+      "First week",
+      "First route ready",
+      "Study processed",
+      "One week completed",
+      "Eighth day lock",
+      "Paywall moment",
+      "Premium",
+      "Subscription",
+      "Cancel subscription",
+    ],
   },
   {
     id: PRODUCT_FLOW_IDS.TIME_BASED,

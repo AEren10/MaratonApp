@@ -73,7 +73,7 @@ const AppearanceScreen = React.lazy(() => import("../screens/settings/Appearance
 const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
 const ChangePasswordScreen = React.lazy(() => import("../screens/settings/ChangePasswordScreen"));
 const EditEmailScreen = React.lazy(() => import("../screens/settings/EditEmailScreen"));
-const NotificationsScreen = React.lazy(() => import("../screens/notifications/NotificationsScreen"));`nconst NotificationsSettingsScreen = React.lazy(() => import("../screens/settings/NotificationsSettingsScreen"));
+const NotificationsSettingsScreen = React.lazy(() => import("../screens/settings/NotificationsSettingsScreen"));
 const PrivacyScreen = React.lazy(() => import("../screens/settings/PrivacyScreen"));
 const TermsScreen = React.lazy(() => import("../screens/settings/TermsScreen"));
 const AboutScreen = React.lazy(() => import("../screens/settings/AboutScreen"));
@@ -181,7 +181,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.EDIT_PROFILE, EditProfileScreen, modalOptions),
   screen(SCREENS.CHANGE_PASSWORD, ChangePasswordScreen, modalOptions),
   screen(SCREENS.EDIT_EMAIL, EditEmailScreen, modalOptions),
-  screen(SCREENS.NOTIFICATIONS, NotificationsScreen),`n  screen(SCREENS.NOTIFICATIONS_SETTINGS, NotificationsSettingsScreen),
+  screen(SCREENS.NOTIFICATIONS_SETTINGS, NotificationsSettingsScreen),
   screen(SCREENS.PRIVACY, PrivacyScreen),
   screen(SCREENS.TERMS, TermsScreen),
   screen(SCREENS.ABOUT, AboutScreen),

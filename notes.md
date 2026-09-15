@@ -412,3 +412,15 @@
 - İlk hafta/premium momentleri retention açısından güçlüdür ama yanlış sayı gösterirse güveni düşürür; süre, soru, aktif gün ve kapanan durak tek hook'tan beslenmeli.
 - Veri yoksa ekran “henüz kayıt yok” tavrında kalmalı; `25 dakika`, `6 durak`, `5 gün` gibi demo sayıları üretime taşınmamalı.
 - Hook Supabase study log aralığını kullanıcının ilk 7 gün penceresine göre çekmeli; Redux yalnız bugünün hızlı fallback'i olmalı.
+
+## 2026-09-15 — Ürün akış kataloğu canlı moment ekranlarını da saymalı
+
+- Yeni premium/ilk hafta ekranları registry'ye girip ürün akış kataloğuna girmezse “hangi tasarım canlı?” raporları eksik görünür.
+- Flow listesi yalnız dekoratif değil; orphan/design denetimlerinde ürün kapsamını anlamak için referans olarak kullanılıyor.
+- Yeni moment ekranı eklenince `PRODUCT_FLOWS` aynı commit içinde güncellenmeli.
+
+## 2026-09-15 — Bildirim inbox tasarımı mock veriyle canlı akışa bağlanmamalı
+
+- Yeni `NotificationsScreen` mock listeyle gelirse kullanıcı gerçek sistem bildirimi sanabilir; retention güveni için inbox verisi gerçek notification/event store'dan beslenmeden route'a alınmamalı.
+- `NOTIFICATIONS_SETTINGS` mevcut ayar ekranıdır; ayrı `NOTIFICATIONS` sabiti literal `\n` hatasıyla eklenirse build kırılır ve orphan check doğru şekilde yakalar.
+- Bildirim inbox canlı yapılacaksa önce storage/Supabase notification feed modeli, okundu durumu ve deep-link hedefleri netleşmeli.

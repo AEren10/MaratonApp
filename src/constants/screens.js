@@ -1,4 +1,4 @@
-﻿export const SCREENS = {
+export const SCREENS = {
   // Auth
   LOGIN: "Login",
   REGISTER: "Register",
@@ -141,7 +141,7 @@
   EDIT_PROFILE: "EditProfile",
   CHANGE_PASSWORD: "ChangePassword",
   EDIT_EMAIL: "EditEmail",
-  NOTIFICATIONS: "Notifications",`n  NOTIFICATIONS_SETTINGS: "NotificationsSettings",
+  NOTIFICATIONS_SETTINGS: "NotificationsSettings",
   PRIVACY: "Privacy",
   TERMS: "Terms",
   ABOUT: "About",
