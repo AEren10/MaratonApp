@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+﻿import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
@@ -14,7 +14,6 @@ import { RouteStatusLegend } from "./components/RouteStatusLegend";
 
 const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
-// Tasarim AKIS 2 · "Rotanın tamamı".
 export default function RouteFullScreen() {
   const C = useC();
   const d = useRouteFull();
@@ -47,40 +46,29 @@ export default function RouteFullScreen() {
               <RouteLinkRow
                 title="Yol haritası"
                 subtitle="Müfredatın ay ay sırası"
-                value={d.monthsLeft != null ? `${d.monthsLeft} ay` : null}
+                value={d.monthsLeft != null ? ${d.monthsLeft} ay : null}
                 onPress={d.openCurriculum}
               />
               <RouteLinkRow
                 title="Program"
                 subtitle="Durakların gün gün dağılımı"
-                value={d.weekStops != null ? `bu hafta ${d.weekStops}` : null}
+                value={d.weekStops != null ? "bu hafta " : null}
                 onPress={d.openProgram}
               />
               <RouteLinkRow
                 title="Konu borcu"
                 subtitle="Tamamlanmamış duraklar"
-                chip={d.debtHours > 0 ? `${d.debtHours} sa` : null}
+                chip={d.debtHours > 0 ? ${d.debtHours} sa : null}
                 onPress={d.openDebt}
               />
               <RouteLinkRow
                 title="Söz ve gerçek"
                 subtitle="Planlanan ve tamamlanan durak sayısı"
-                value={d.promiseGap != null ? `${d.promiseGap} durak` : null}
+                value={d.promiseGap != null ? ${d.promiseGap} durak : null}
                 onPress={d.openPromise}
               />
             </View>
           </Animated.View>
-          <View style={s.redrawWrap}>
-            <Pressable
-              onPress={d.openRedraw}
-              accessibilityRole="button"
-              accessibilityLabel="Rotayı yeniden çiz"
-              style={({ pressed }) => [s.redraw, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Text style={[TYPOGRAPHY.metaSemiBold, s.flex, { color: C.text2 }]}>Rotayı yeniden çiz</Text>
-              <Icon name="chevR" size={13} color={C.text5} />
-            </Pressable>
-          </View>
         </ScrollView>
       </RouteAccessGate>
     </SafeAreaView>
@@ -89,17 +77,9 @@ export default function RouteFullScreen() {
 
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingBottom: STEP.s4 },
-  top: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  scroll: { paddingBottom: 100 },
+  top: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
   section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
   links: { gap: STEP.s1, marginTop: STEP.s2 },
-  redrawWrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
-  redraw: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s2,
-    minHeight: CONTROL.buttonPrimary,
-    borderTopWidth: 1,
-  },
-  flex: { flex: 1 },
 });
+
