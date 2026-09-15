@@ -95,7 +95,11 @@ const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSi
 const ExamDayPlanScreen = React.lazy(() => import("../screens/exam/ExamDayPlanScreen"));
 const ExamResultScreen = React.lazy(() => import("../screens/exam/ExamResultScreen"));
 const ForecastAccuracyScreen = React.lazy(() => import("../screens/exam/ForecastAccuracyScreen"));
-const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));`nconst PaymentCardScreen = React.lazy(() => import("../screens/premium/PaymentCardScreen"));`nconst PaymentProcessingScreen = React.lazy(() => import("../screens/premium/PaymentProcessingScreen"));`nconst PaymentSuccessScreen = React.lazy(() => import("../screens/premium/PaymentSuccessScreen"));`nconst PaymentFailedScreen = React.lazy(() => import("../screens/premium/PaymentFailedScreen"));
+const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
+const PaymentCardScreen = React.lazy(() => import("../screens/premium/PaymentCardScreen"));
+const PaymentProcessingScreen = React.lazy(() => import("../screens/premium/PaymentProcessingScreen"));
+const PaymentSuccessScreen = React.lazy(() => import("../screens/premium/PaymentSuccessScreen"));
+const PaymentFailedScreen = React.lazy(() => import("../screens/premium/PaymentFailedScreen"));
 const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
 const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
 const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
@@ -233,6 +237,10 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
   // Baglam paywall'i isin ustunde alt sayfa; "Paywall Anı" kendi zeminini boyar.
   screen(SCREENS.PAYWALL, PaywallScreen, overlayOptions),
+  screen(SCREENS.PAYMENT_CARD, PaymentCardScreen),
+  screen(SCREENS.PAYMENT_PROCESSING, PaymentProcessingScreen, { presentation: 'fullScreenModal', animation: 'fade' }),
+  screen(SCREENS.PAYMENT_SUCCESS, PaymentSuccessScreen, { gestureEnabled: false, animation: 'fade' }),
+  screen(SCREENS.PAYMENT_FAILED, PaymentFailedScreen),
   screen(SCREENS.SUBSCRIPTION, SubscriptionScreen),
   screen(SCREENS.SUBSCRIPTION_CANCEL, CancelSubscriptionScreen, modalOptions),
   screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
@@ -263,5 +271,7 @@ export function screensByName(names) {
     return route;
   });
 }
+
+
 
 

@@ -123,7 +123,11 @@
   COMPARATIVE: "Comparative",
 
   // Premium
-  PAYWALL: "Paywall",`n  PAYMENT_CARD: "PaymentCard",`n  PAYMENT_PROCESSING: "PaymentProcessing",`n  PAYMENT_SUCCESS: "PaymentSuccess",`n  PAYMENT_FAILED: "PaymentFailed",
+  PAYWALL: "Paywall",
+  PAYMENT_CARD: "PaymentCard",
+  PAYMENT_PROCESSING: "PaymentProcessing",
+  PAYMENT_SUCCESS: "PaymentSuccess",
+  PAYMENT_FAILED: "PaymentFailed",
   SUBSCRIPTION: "Subscription",
   SUBSCRIPTION_CANCEL: "SubscriptionCancel",
   PREMIUM: "Premium",
@@ -149,5 +153,6 @@
   ACCOUNT_DELETE: "AccountDelete",
   OFFLINE_QUEUE: "OfflineQueue",
 };
+
 
 
