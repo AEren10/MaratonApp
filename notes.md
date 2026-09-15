@@ -388,3 +388,9 @@
 - SDK 57 için Expo paketleri, React Native ve TypeScript birlikte hizalanmalı. Eski `newArchEnabled`, `android.edgeToEdgeEnabled`, kök `splash` alanları yeni config şemasında geçersiz; splash ayarı config plugin'e taşındı.
 - Domain testleri geçse bile Metro bundle ayrı doğrulanmalı. İki JSX kapanışı ve `QuickAddSheet` göreli importları bundle'ı engelliyordu; testler bunları yakalamadı.
 - Expo Go tasarım/JS önizlemesini açar; RevenueCat ve Google Sign-In gibi custom native işlevlerin cihaz testi için development build yine gerekir. EAS Apple login'deki `iTunes service key is empty` ayrı bir upstream engeldir.
+
+## 2026-09-15 — Yanlış soru fotoğrafları bucket seviyesinde private kalmalı
+
+- `wrong-questions` kullanıcıların kişisel yanlış defteri görsellerini tuttuğu için bucket public kalırsa URL'yi bilen herkes fotoğrafı indirebilir; RLS yalnız object policy'de kalmamalı.
+- Client zaten `createSignedUrl` kullanıyorsa doğru güvenlik modeli private bucket + owner/shared SELECT policy'dir.
+- Toplulukta paylaşılan yanlışlar için ayrı izin `shared_questions.image_path` üzerinden verilmeli; kişisel defter gizliliği public bucket kolaylığına feda edilmemeli.
