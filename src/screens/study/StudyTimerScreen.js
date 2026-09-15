@@ -59,6 +59,7 @@ export default function StudyTimerScreen() {
     selectedSubjectKey,
     setSelectedSubjectKey,
     skipPhase,
+    stopLabel,
     subject,
     toggle,
     topic,
@@ -102,7 +103,7 @@ export default function StudyTimerScreen() {
 
         {hasSubject && (
           <>
-            <SubjectTopicCard C={C} subject={subject} topic={topic} />
+            <SubjectTopicCard C={C} subject={subject} topic={topic} stopLabel={stopLabel} />
 
             <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s2 }}>
               <Card tone="void">

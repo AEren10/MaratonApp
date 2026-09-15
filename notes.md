@@ -463,3 +463,9 @@
 - İlk gün/boş rota halinde bile Ana Sayfa üst kimliği ve sınava kalan gün bağlamı saklanmamalı; aksi halde ekran eski, pasif ve rotasız görünür.
 - `ROTA · PRO` gibi ürün etiketi Home hero'nun ana mesajı olmamalı. Ücretsiz/kilitli durumda rota sakin bir “önizleme” olarak anlatılmalı, kullanıcıya ne zaman açılacağı söylenmeli.
 - Defter kartındaki “Topluluktan yeni cevap” kopyası ayrı ürün kararı gerektiriyor. Sosyal/topluluk v1 dışındaysa canlı Home bu metni göstermemeli; gerçek kaynak bağlanmadan sosyal bildirim uydurulmamalı.
+
+## 2026-09-16 — Study timer rota bağlamını kaybetmemeli
+
+- Rota durağından başlayan oturum timer ekranında “kaçıncı durak” bağlamını göstermeli; aksi halde ekran screenshot'taki yön hissini kaybedip serbest çalışma gibi görünür.
+- Durak numarası gerçek route/detail bilgisinden gelmeli. Pozisyon yoksa uydurulmamalı; sıralama sentinel'i (`9999`) UI'a sızmamalı.
+- Timer bitiş payload'ı route stop id/version yanında route stop number'ı da taşıyabilmeli; post-session ekranları bu bağlamı tekrar kullanabilir.

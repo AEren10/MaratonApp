@@ -99,6 +99,9 @@ export function firstRouteAction(stops = []) {
 
 export function routeActionTimerParams(action) {
   if (!action) return null;
+  const stopNumber = Number(action.stopNumber ?? action.number);
+  const position = Number(action.position);
+  const hasRealPosition = Number.isFinite(position) && position >= 0 && position < 9999;
   return {
     subjectKey: action.subjectKey,
     topicName: action.topicName,
@@ -106,5 +109,8 @@ export function routeActionTimerParams(action) {
     routeTopicName: action.topicName,
     routeStopId: action.stopId || undefined,
     routeStopVersion: action.version ?? undefined,
+    routeStopNumber: Number.isFinite(stopNumber)
+      ? Math.max(1, Math.round(stopNumber))
+      : (hasRealPosition ? Math.max(1, Math.round(position) + 1) : undefined),
   };
 }

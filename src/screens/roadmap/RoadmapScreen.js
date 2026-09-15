@@ -68,7 +68,7 @@ export default function RoadmapScreen() {
                 <View style={s.links}>
                   {d.targetNet != null ? (
                     <RouteLinkRow
-                      title={${d.targetNet} net ≈ hangi bölümler?}
+                      title={`${d.targetNet} net ≈ hangi bölümler?`}
                       subtitle="Hedef netinin karşılığı"
                       onPress={d.openThreshold}
                     />

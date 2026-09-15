@@ -46,7 +46,7 @@ export default function RouteFullScreen() {
               <RouteLinkRow
                 title="Yol haritası"
                 subtitle="Müfredatın ay ay sırası"
-                value={d.monthsLeft != null ? ${d.monthsLeft} ay : null}
+                value={d.monthsLeft != null ? `${d.monthsLeft} ay` : null}
                 onPress={d.openCurriculum}
               />
               <RouteLinkRow
@@ -58,13 +58,13 @@ export default function RouteFullScreen() {
               <RouteLinkRow
                 title="Konu borcu"
                 subtitle="Tamamlanmamış duraklar"
-                chip={d.debtHours > 0 ? ${d.debtHours} sa : null}
+                chip={d.debtHours > 0 ? `${d.debtHours} sa` : null}
                 onPress={d.openDebt}
               />
               <RouteLinkRow
                 title="Söz ve gerçek"
                 subtitle="Planlanan ve tamamlanan durak sayısı"
-                value={d.promiseGap != null ? ${d.promiseGap} durak : null}
+                value={d.promiseGap != null ? `${d.promiseGap} durak` : null}
                 onPress={d.openPromise}
               />
             </View>

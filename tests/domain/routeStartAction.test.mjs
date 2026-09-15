@@ -39,6 +39,7 @@ test("selects the active route stop before upcoming stops", () => {
     routeTopicName: "Problemler",
     routeStopId: "active-1",
     routeStopVersion: 5,
+    routeStopNumber: 3,
   });
 });
 
@@ -64,7 +65,17 @@ test("accepts persisted stopId shape from the route screen", () => {
     routeTopicName: "Basınç",
     routeStopId: "persisted-1",
     routeStopVersion: 3,
+    routeStopNumber: undefined,
   });
+});
+
+test("prefers explicit route stop number when starting from stop detail", () => {
+  assert.equal(routeActionTimerParams({
+    subjectKey: "felsefe",
+    topicName: "Bilgi Felsefesi",
+    stopId: "detail-1",
+    stopNumber: 4,
+  }).routeStopNumber, 4);
 });
 
 test("reads insight and effort from persisted route stop metadata", () => {

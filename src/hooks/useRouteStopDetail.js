@@ -45,8 +45,9 @@ export function useRouteStopDetail() {
     if (!stop) return;
     navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams({
       subjectKey: stop.subject, topicName: stop.topic, stopId: stop.stopId, version: stop.version,
+      stopNumber: found?.entry.number,
     }));
-  }, [navigation, stop]);
+  }, [found?.entry.number, navigation, stop]);
 
   const canPostpone = Boolean(stop?.stopId && canTransitionRouteStop(found?.entry.status, S.RESCHEDULED));
   const postpone = useCallback(async () => {

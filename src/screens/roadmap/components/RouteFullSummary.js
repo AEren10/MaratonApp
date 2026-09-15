@@ -24,9 +24,9 @@ export function RouteFullSummary({ counts, segments, debtHours, daysLeft }) {
       <Text style={[TYPOGRAPHY.statSmall, s.headline, { color: C.text }]}>
         {counts.completed}/{counts.total} durak tamamlandı.
       </Text>
-      <View style={s.bars} accessible accessibilityLabel={${counts.total} duraktan  tamamlandı}>
+      <View style={s.bars} accessible accessibilityLabel={`${counts.total} duraktan ${counts.completed} tamamlandı`}>
         {segments.map((kind, i) => (
-          <View key={${kind}-} style={[s.bar, { backgroundColor: C[SEGMENT_TONE[kind]] }]} />
+          <View key={`${kind}-${i}`} style={[s.bar, { backgroundColor: C[SEGMENT_TONE[kind]] }]} />
         ))}
       </View>
       <View style={s.legend}>

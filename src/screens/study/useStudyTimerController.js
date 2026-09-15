@@ -34,6 +34,7 @@ export function useStudyTimerController(C) {
     planSubjectKey,
     planTopicName,
     routeStopId,
+    routeStopNumber,
     routeStopVersion,
     routeSubjectKey: routeActionSubjectKey,
     routeTopicName: routeActionTopicName,
@@ -45,6 +46,7 @@ export function useStudyTimerController(C) {
     planSubjectKey,
     planTopicName,
     routeStopId,
+    routeStopNumber,
     routeStopVersion,
     routeSubjectKey: routeActionSubjectKey,
     routeTopicName: routeActionTopicName,
@@ -72,6 +74,9 @@ export function useStudyTimerController(C) {
   const mode = useMemo(() => modes.find((item) => item.key === modeKey), [modeKey, modes]);
   const isPomodoro = modeKey !== "FREE";
   const hasSubject = !!selectedSubjectKey;
+  const stopLabel = Number.isFinite(Number(taskContext.routeStopNumber))
+    ? `${Math.max(1, Math.round(Number(taskContext.routeStopNumber)))}. durak`
+    : null;
   const subject = selectedSubjectKey
     ? (getSubjectByKey(selectedSubjectKey) || { key: selectedSubjectKey, label: selectedSubjectKey, color: C.amber, icon: "bookOpen" })
     : { key: null, label: "Ders Seçilmedi", color: C.muted, icon: "clock" };
@@ -379,6 +384,7 @@ export function useStudyTimerController(C) {
     setSelectedSubjectKey,
     skipPhase: advancePhase,
     subject,
+    stopLabel,
     toggle,
     topic,
     totalFocusSeconds,
