@@ -1,4 +1,4 @@
-// Topluluk sorusu detayi (WrongDetail, params.community === true).
+﻿// Topluluk sorusu detayi (WrongDetail, params.community === true).
 // Sosyal v1 disi; bu yol yeni tasarima TASINMADI, eski WrongDetailScreen
 // govdesi degistirilmeden buraya alindi ki derin baglanti kirilmasin.
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -9,7 +9,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon, IconBox, Chip } from "../../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../../themes/tokens";
 import { useC } from "../../../../contexts/ThemeContext";
 import SignedImage from "../../../../components/common/SignedImage";
 import { resolveWrongQuestion, getWrongQuestionById } from "../../../../supabase/wrongQuestions";
@@ -23,8 +23,8 @@ import { AnswerThread } from "../AnswerThread";
 function InfoRow({ icon, label, value, color, styles, C }) {
   return (
     <View style={styles.infoRow}>
-      <Icon name={icon} size={16} color={color || C.muted} />
-      <Text style={[TYPOGRAPHY.caption, { color: C.sec, flex: 1 }]}>{label}</Text>
+      <Icon name={icon} size={16} color={color || C.text3} />
+      <Text style={[TYPOGRAPHY.caption, { color: C.text2, flex: 1 }]}>{label}</Text>
       <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>{value}</Text>
     </View>
   );
@@ -33,7 +33,7 @@ function InfoRow({ icon, label, value, color, styles, C }) {
 function AnswerBadge({ label, answer, color, styles, C }) {
   return (
     <View style={[styles.answerBox, { borderColor: color + "40" }]}>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>{label}</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{label}</Text>
       <Text style={[TYPOGRAPHY.statSmall, { color }]}>{answer}</Text>
     </View>
   );
@@ -66,7 +66,7 @@ export function CommunityQuestionDetail() {
 
   const item = passedItem || fetched || {};
   const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
-  const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.muted, icon: "bookOpen" };
+  const s = getSubjectByKey(subjectKey) || { key: subjectKey, label: subjectKey, color: C.text3, icon: "bookOpen" };
   const hasImage = !!item.image_path;
   const date = item.created_at
     ? new Date(item.created_at).toLocaleDateString("tr-TR", {
@@ -82,7 +82,7 @@ export function CommunityQuestionDetail() {
         <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s3 }]}>
           Soru Detayı
         </Text>
         {!community && (
@@ -97,7 +97,7 @@ export function CommunityQuestionDetail() {
           <IconBox icon={s.icon} color={s.color} size={44} rounded={14} />
           <View style={{ flex: 1 }}>
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{s.label || s.name}</Text>
-            <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: 2 }]}>{item.topic}</Text>
+            <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: 2 }]}>{item.topic}</Text>
           </View>
         </Animated.View>
 
@@ -109,7 +109,7 @@ export function CommunityQuestionDetail() {
         )}
 
         <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>
-          <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
+          <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
             DETAYLAR
           </Text>
           <InfoRow icon="calendar" label="Tarih" value={date} styles={styles} C={C} />
@@ -117,11 +117,11 @@ export function CommunityQuestionDetail() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={styles.section}>
-          <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
+          <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
             NOTLARIM
           </Text>
           <View style={styles.noteCard}>
-            <Text style={[TYPOGRAPHY.body, { color: C.sec }]}>
+            <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>
               {item.note || "Not eklenmedi."}
             </Text>
           </View>
@@ -129,7 +129,7 @@ export function CommunityQuestionDetail() {
 
         {hasImage && (
           <Animated.View entering={FadeInDown.delay(300).duration(400).springify()} style={styles.section}>
-            <Text style={[TYPOGRAPHY.label, { color: C.sec, marginBottom: SPACING.md }]}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
               FOTOĞRAF
             </Text>
             <Pressable onPress={() => setPhotoZoom(true)}>
@@ -143,7 +143,7 @@ export function CommunityQuestionDetail() {
               />
               <View style={styles.zoomHint}>
                 <Icon name="eye" size={14} color={C.text} />
-                <Text style={[TYPOGRAPHY.micro, { color: C.sec }]}>Büyütmek için dokun</Text>
+                <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Büyütmek için dokun</Text>
               </View>
             </Pressable>
           </Animated.View>
@@ -216,43 +216,43 @@ function makeStyles(C) {
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
       flexDirection: "row", alignItems: "center",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+      paddingHorizontal: GUTTER, paddingVertical: STEP.s3,
     },
-    scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 60 },
+    scroll: { paddingHorizontal: GUTTER, paddingBottom: 60 },
     subjectCard: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.md,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      borderLeftWidth: 3, padding: SPACING.lg, marginBottom: SPACING.xl,
+      flexDirection: "row", alignItems: "center", gap: STEP.s3,
+      backgroundColor: C.surface, borderRadius: SHAPE.sheet,
+      borderLeftWidth: 3, padding: STEP.s4, marginBottom: STEP.s5,
     },
     answersRow: {
-      flexDirection: "row", gap: SPACING.md, marginBottom: SPACING.xxl,
+      flexDirection: "row", gap: STEP.s3, marginBottom: STEP.s5,
     },
     answerBox: {
-      flex: 1, alignItems: "center", paddingVertical: SPACING.lg,
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
+      flex: 1, alignItems: "center", paddingVertical: STEP.s4,
+      backgroundColor: C.surface, borderRadius: SHAPE.sheet,
       borderWidth: 1,
     },
-    section: { marginBottom: SPACING.xxl },
+    section: { marginBottom: STEP.s5 },
     infoRow: {
-      flexDirection: "row", alignItems: "center", gap: SPACING.sm,
-      paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: C.border,
+      flexDirection: "row", alignItems: "center", gap: STEP.s2,
+      paddingVertical: STEP.s3, borderBottomWidth: 1, borderBottomColor: C.border,
     },
     noteCard: {
-      backgroundColor: C.surface, borderRadius: RADIUS.lg,
-      padding: SPACING.lg, borderWidth: 1, borderColor: C.border,
+      backgroundColor: C.surface, borderRadius: SHAPE.card,
+      padding: STEP.s4, borderWidth: 1, borderColor: C.border,
     },
     resolveBtn: {
-      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
-      backgroundColor: C.green, borderRadius: RADIUS.xl, paddingVertical: SPACING.lg,
+      flexDirection: "row", alignItems: "center", justifyContent: "center", gap: STEP.s2,
+      backgroundColor: C.green, borderRadius: SHAPE.sheet, paddingVertical: STEP.s4,
     },
     photo: {
-      width: "100%", height: 200, borderRadius: RADIUS.lg,
+      width: "100%", height: 200, borderRadius: SHAPE.card,
       backgroundColor: C.surface,
     },
     zoomHint: {
       flexDirection: "row", alignItems: "center", gap: 4,
       position: "absolute", bottom: 8, right: 8,
-      backgroundColor: C.bg + "CC", borderRadius: RADIUS.sm,
+      backgroundColor: C.bg + "CC", borderRadius: SHAPE.cardTight,
       paddingHorizontal: 8, paddingVertical: 4,
     },
     zoomOverlay: {
@@ -270,3 +270,4 @@ function makeStyles(C) {
     },
   });
 }
+
