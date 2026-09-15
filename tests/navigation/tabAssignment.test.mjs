@@ -31,6 +31,23 @@ test("atanan her ekran gercekten kayitli", () => {
   assert.deepEqual(orphan, [], "tabAssignment ile screenRegistry arasinda kayma var");
 });
 
+test("kok ortu ekranlari ayni navigator icinde iki kez kayitlanmiyor", () => {
+  const src = readFileSync("src/navigation/AppNavigator.js", "utf8");
+  const setupStackBody = src.slice(src.indexOf("function SetupStack()"), src.indexOf("function AppStackInner()"));
+  const appStackBody = src.slice(src.indexOf("function AppStackInner()"), src.indexOf("function SessionProviders"));
+
+  assert.equal(
+    (setupStackBody.match(/ROOT_SCREENS\.map\(renderStackScreen\)/g) || []).length,
+    1,
+    "kurulum stack'i kok ortuleri tam bir kez kaydetmeli",
+  );
+  assert.equal(
+    (appStackBody.match(/ROOT_SCREENS\.map\(renderStackScreen\)/g) || []).length,
+    1,
+    "ana uygulama stack'i kok ortuleri tam bir kez kaydetmeli",
+  );
+});
+
 // Bu proje bir kez "Found conflicting screens with the same pattern" hatasi
 // yasadi ve o sirada HICBIR deep link calismadi (bildirim dokunuslari, sifre
 // sifirlama dahil). Paylasimli ekranlar agacta iki yerde oldugu icin bu risk

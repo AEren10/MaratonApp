@@ -152,7 +152,7 @@ function SetupStack() {
     >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
-        {ROOT_SCREENS.map(renderStackScreen)}
+      {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
 }
@@ -164,7 +164,6 @@ function AppStackInner() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
-        {ROOT_SCREENS.map(renderStackScreen)}
       {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );

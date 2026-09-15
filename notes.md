@@ -449,3 +449,9 @@
 - Mock `PaymentCard/Processing/Success/Failed` ekranları tasarım önizlemesi olarak kalabilir ama premium CTA'ları buraya bağlanırsa sahte kart formu ve random success kullanıcı güvenini bozar.
 - Canlı paywall akışı `usePaywallPurchase` üzerinden RevenueCat/store paketine gitmeli; paket yoksa production'da açıkça "satın alma hazır değil" deyip durmalı.
 - Mock ödeme ekranları repoda kaldığı sürece canlı paywall dosyalarında `PAYMENT_CARD` referansı olmadığını testle kilitlemek gerekir.
+
+## 2026-09-16 — Root-only ekranlar navigator'a tek kez kaydolmalı
+
+- Tasarım aktarımında root modal ekranlarını hem kurulum hem ana uygulama stack'ine almak doğru; aynı stack içinde aynı listeyi iki kez render etmek doğru değil.
+- Duplicate `ROOT_SCREENS` kaydı React Navigation'da ekran adı çakışması/warning üretebilir ve deep link/debug davranışını belirsizleştirir.
+- `AppNavigator` gibi yapısal dosyalarda küçük kopyala-yapıştır hataları testle kilitlenmeli; tab/root assignment testi bu yüzden navigator gövdesini de kontrol ediyor.
