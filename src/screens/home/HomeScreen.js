@@ -42,10 +42,8 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
-        {h.firstDay ? null : (
-          <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
-            onProfile={actions.profile} onCalendar={actions.calendar} />
-        )}
+        <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
+          onProfile={actions.profile} onCalendar={actions.calendar} />
         <SyncProblemBanner />
         <HomeExamAftermathRow />
         <HomeHero

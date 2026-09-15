@@ -15,7 +15,7 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
   const C = useC();
   const line = minutesToday > 0
     ? `bugün ${formatStudyMinutes(minutesToday)} kaydettin`
-    : (remainingToGoal > 0 ? `hedefe ${remainingToGoal} kaldıı` : "hedef tamamlandıı");
+    : (remainingToGoal > 0 ? `hedefe ${remainingToGoal} kaldı` : "hedef tamamlandı");
 
   return (
     <View style={s.top}>
@@ -25,7 +25,7 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
         </StatBlock>
       </Animated.View>
 
-      <View style={s.lock} accessible accessibilityLabel="Rota Pro ile açılır">
+      <View style={s.lock} accessible accessibilityLabel="Rota önizlemesi kilitli">
         <Svg viewBox="0 0 390 150" style={[s.svg, { opacity: 0.3 }]}>
           <Path d="M 26 118 C 96 110 132 92 178 78 C 240 58 300 42 364 28" fill="none" stroke={C.accent} strokeWidth={4.5} strokeLinecap="round" />
           <Circle cx={26} cy={118} r={5} fill={C.bg} stroke={C.accent} strokeWidth={2.4} />
@@ -36,7 +36,10 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
           <View style={[s.lockBox, { backgroundColor: C.surface, borderColor: C.border }]}>
             <Icon name="lock" size={15} color={C.text2} />
           </View>
-          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ROTA · PRO</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ROTA ÖNİZLEMESİ</Text>
+          <Text style={[TYPOGRAPHY.caption, s.lockCopy, { color: C.text2 }]}>
+            Denemelerin geldikçe rotanın gidişini burada göreceksin.
+          </Text>
         </View>
       </View>
 
@@ -53,6 +56,7 @@ const s = StyleSheet.create({
   lock: { marginTop: STEP.s3 + 6 },
   svg: { width: "100%", aspectRatio: 390 / 150 },
   overlay: { ...StyleSheet.absoluteFillObject, alignItems: "center", justifyContent: "center", gap: STEP.s2 },
+  lockCopy: { maxWidth: 240, textAlign: "center" },
   lockBox: {
     width: STEP.s4, height: STEP.s4, borderRadius: SHAPE.iconBox - 1, borderWidth: 1,
     alignItems: "center", justifyContent: "center",

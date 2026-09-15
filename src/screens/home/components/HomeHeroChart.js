@@ -4,7 +4,7 @@ import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
-// Ucretsizde rota grafigi kilitli: "ROTA · PRO" etiketi + kilit ikonu.
+// Ucretsizde rota grafigi kilitli: sakin bir onizleme ve kilit ikonu.
 // Veri yoksa (henuz 3 denemeden az) sakin bir bos durum gosterilir.
 export function HomeHeroChart({ hasAccess, data, target, height = 200 }) {
   const C = useC();
@@ -12,9 +12,11 @@ export function HomeHeroChart({ hasAccess, data, target, height = 200 }) {
   if (!hasAccess) {
     return (
       <View style={[s.fallback, { height, borderColor: C.border, backgroundColor: C.surface }]}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ROTA · PRO</Text>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ROTA ÖNİZLEMESİ</Text>
         <Icon name="lock" size={20} color={C.text3} style={{ marginTop: STEP.s1 }} />
-        <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>Rotanı gör</Text>
+        <Text style={[TYPOGRAPHY.body, s.copy, { color: C.text2, marginTop: STEP.s1 }]}>
+          Denemelerin geldikçe rota çizgin burada açılır.
+        </Text>
       </View>
     );
   }
@@ -49,4 +51,5 @@ const s = StyleSheet.create({
     justifyContent: "center",
     gap: 2,
   },
+  copy: { maxWidth: 240, textAlign: "center" },
 });

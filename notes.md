@@ -457,3 +457,9 @@
 - `AppNavigator` gibi yapısal dosyalarda küçük kopyala-yapıştır hataları testle kilitlenmeli; tab/root assignment testi bu yüzden navigator gövdesini de kontrol ediyor.
 - Kurulum stack'i özel riskli: `SETUP_STACK_SCREENS` zaten `ExamSetup/GoalSetup/...` içerdiği için `ROOT_ONLY` ham haliyle eklenirse aynı navigator içinde `ExamSetup` ikinci kez kaydolur.
 - Rota Hazır sonrası bildirim izni/kurulum bitişi tek yerden (`useFinishOnboarding`) akmalı; ekran içinde manuel `navigation.navigate(SCREENS.NOTIFICATION_PERMISSION)` yazmak hem import unutma hatası üretir hem de onboarding otoritesini böler.
+
+## 2026-09-16 — Home ilk akışı screenshot kanonuna göre korunmalı
+
+- İlk gün/boş rota halinde bile Ana Sayfa üst kimliği ve sınava kalan gün bağlamı saklanmamalı; aksi halde ekran eski, pasif ve rotasız görünür.
+- `ROTA · PRO` gibi ürün etiketi Home hero'nun ana mesajı olmamalı. Ücretsiz/kilitli durumda rota sakin bir “önizleme” olarak anlatılmalı, kullanıcıya ne zaman açılacağı söylenmeli.
+- Defter kartındaki “Topluluktan yeni cevap” kopyası ayrı ürün kararı gerektiriyor. Sosyal/topluluk v1 dışındaysa canlı Home bu metni göstermemeli; gerçek kaynak bağlanmadan sosyal bildirim uydurulmamalı.

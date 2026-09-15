@@ -10,8 +10,11 @@ import { FirstDayStop } from "./FirstDayStop";
 
 function routeSentence(daysUntilExam, totalStops) {
   const tail = "Bugün ilk durakla başlıyoruz; her durak geçtiğinde bu çizgi biraz daha uzuyor.";
-  if (daysUntilExam == null || !totalStops) return tail;
-  return `Rotan ${Math.max(0, daysUntilExam)} gün, ${totalStops} durak. ${tail}`;
+  const days = daysUntilExam == null ? null : Math.max(0, daysUntilExam);
+  if (days != null && totalStops) return `YKS'ye ${days} gün, rotanda ${totalStops} durak var. ${tail}`;
+  if (days != null) return `YKS'ye ${days} gün. ${tail}`;
+  if (totalStops) return `Rotanda ${totalStops} durak var. ${tail}`;
+  return tail;
 }
 
 // İlk Gün: kayit ve deneme yokken Ana Sayfa. Hayalet "0", kesikli rota,
@@ -20,12 +23,15 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute }) {
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
   const enter = (i) => FadeInDown.delay(i * 80).duration(500);
+  const daysLine = daysUntilExam == null
+    ? "ilk durak hazır"
+    : `YKS'ye ${Math.max(0, daysUntilExam)} gün · ilk durak hazır`;
 
   return (
     <View>
       <Animated.View entering={enter(0)} style={s.top}>
         <StatBlock label="Bugün çözülen" value={0} unit={`/${dailyGoal}`} size="hero" color={C.text5}>
-          <Text style={[TYPOGRAPHY.body, s.line, { color: C.text3 }]}>soru · rotanın ilk günü</Text>
+          <Text style={[TYPOGRAPHY.body, s.line, { color: C.text3 }]}>{daysLine}</Text>
         </StatBlock>
       </Animated.View>
 
