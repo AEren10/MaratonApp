@@ -25,7 +25,7 @@ export function RouteProjectionCard({ projectedNet, note, rangeText }) {
 }
 
 const s = StyleSheet.create({
-  pad: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  pad: { paddingTop: STEP.s3 },
   card: { padding: STEP.s3, borderRadius: SHAPE.sheet, borderWidth: 1 },
   row: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s2, marginTop: STEP.s2 },
   note: { flexShrink: 1, paddingBottom: STEP.s1 },
@@ -39,4 +39,5 @@ const s = StyleSheet.create({
   },
   flex: { flex: 1 },
 });
+
 

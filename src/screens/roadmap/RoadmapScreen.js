@@ -55,29 +55,32 @@ export default function RoadmapScreen() {
                     <RouteEmptyChart examDateTag={d.examDateTag} target={d.targetNet} loading />
                   )}
                 </View>
-                <Animated.View entering={enter(1)}>
-                  <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
-                </Animated.View>
-                <Animated.View entering={enter(2)} style={s.section}>
-                  {view.tempoRows.length ? (
-                    <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
+              </Animated.View>
+              
+              <Animated.View entering={enter(1)}>
+                <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
+              </Animated.View>
+              
+              <Animated.View entering={enter(2)} style={s.section}>
+                {view.tempoRows.length ? (
+                  <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
+                ) : null}
+                <View style={s.links}>
+                  {d.targetNet != null ? (
+                    <RouteLinkRow
+                      title={${d.targetNet} net ≈ hangi bölümler?}
+                      subtitle="Hedef netinin karşılığı"
+                      onPress={d.openThreshold}
+                    />
                   ) : null}
-                  <View style={s.links}>
-                    {d.targetNet != null ? (
-                      <RouteLinkRow
-                        title={${d.targetNet} net ≈ hangi bölümler?}
-                        subtitle="Hedef netinin karşılığı"
-                        onPress={d.openThreshold}
-                      />
-                    ) : null}
-                    <RouteLinkRow title="Söz ve gerçek" subtitle={d.promiseText} onPress={d.openPromise} />
-                  </View>
-                </Animated.View>
-                <Animated.View entering={enter(3)} style={s.section}>
-                  {view.upcomingStops.length ? (
-                    <RouteUpcomingStops stops={view.upcomingStops} onPress={d.openStop} />
-                  ) : null}
-                </Animated.View>
+                  <RouteLinkRow title="Söz ve gerçek" subtitle={d.promiseText} onPress={d.openPromise} />
+                </View>
+              </Animated.View>
+              
+              <Animated.View entering={enter(3)} style={s.section}>
+                {view.upcomingStops.length ? (
+                  <RouteUpcomingStops stops={view.upcomingStops} onPress={d.openStop} />
+                ) : null}
               </Animated.View>
             </>
           )}
