@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+﻿import React, { useEffect, useMemo } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -152,6 +152,7 @@ function SetupStack() {
     >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
+        {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
 }
@@ -163,6 +164,7 @@ function AppStackInner() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
+        {ROOT_SCREENS.map(renderStackScreen)}
       {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
@@ -248,3 +250,4 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
+
