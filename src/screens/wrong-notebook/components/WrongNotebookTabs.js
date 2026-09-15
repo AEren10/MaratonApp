@@ -1,8 +1,8 @@
-import { View, Text, Pressable } from "react-native";
+﻿import { View, Text, Pressable } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { WRONG_NOTEBOOK_TAB } from "../../../domain/wrongNotebook/wrongNotebookModel";
-import { RADIUS, SHADOWS, SPACING } from "../../../themes/tokens";
+import { SHAPE, SHADOWS, STEP, GUTTER } from "../../../themes/tokens";
 
 const TABS = [
   { key: WRONG_NOTEBOOK_TAB.COMMUNITY, label: "Topluluk", icon: "globe", accentBg: true },
@@ -14,10 +14,10 @@ export function WrongNotebookTabs({ C, activeTab, onChange }) {
     <View
       style={{
         flexDirection: "row",
-        marginHorizontal: SPACING.lg,
-        marginVertical: SPACING.sm,
-        backgroundColor: C.surface2,
-        borderRadius: RADIUS.lg,
+        marginHorizontal: GUTTER,
+        marginVertical: STEP.s2,
+        backgroundColor: C.track,
+        borderRadius: SHAPE.button,
         padding: 3,
       }}
     >
@@ -38,17 +38,17 @@ export function WrongNotebookTabs({ C, activeTab, onChange }) {
               justifyContent: "center",
               gap: 6,
               paddingVertical: 10,
-              borderRadius: RADIUS.md,
+              borderRadius: SHAPE.button,
               backgroundColor: isAccent ? C.accent : active ? C.surface : "transparent",
               ...(active ? SHADOWS.sm : {}),
             }}
           >
-            <Icon name={tab.icon} size={16} color={isAccent ? C.textOnFill : active ? C.accent : C.muted} />
+            <Icon name={tab.icon} size={16} color={isAccent ? C.textOnFill : active ? C.accent : C.text3} />
             <Text
               style={{
                 fontFamily: active ? "Archivo_600" : "Archivo_500",
                 fontSize: 14,
-                color: isAccent ? C.textOnFill : active ? C.text : C.muted,
+                color: isAccent ? C.textOnFill : active ? C.text : C.text3,
               }}
             >
               {tab.label}
@@ -62,3 +62,4 @@ export function WrongNotebookTabs({ C, activeTab, onChange }) {
     </View>
   );
 }
+
