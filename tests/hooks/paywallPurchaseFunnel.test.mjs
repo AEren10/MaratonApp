@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("../../src/hooks/usePaywallPurchase.js", import.meta.url), "utf8");
+const paywallScreen = readFileSync(new URL("../../src/screens/premium/PaywallScreen.js", import.meta.url), "utf8");
+const paywallSheet = readFileSync(new URL("../../src/screens/premium/components/PaywallSheet.js", import.meta.url), "utf8");
+const paywallMoment = readFileSync(new URL("../../src/screens/premium/components/PaywallMoment.js", import.meta.url), "utf8");
 
 test("paywall purchase funnel keeps a single source across view, dismiss, trial and purchase", () => {
   assert.match(source, /const paywallSource = route\.params\?\.source \|\| "unknown";/);
@@ -29,4 +32,12 @@ test("late RevenueCat offering responses cannot update a closed paywall", () => 
 test("purchase cancellation guard tolerates non-error throws", () => {
   assert.match(source, /if \(e\?\.userCancelled\) return;/);
   assert.doesNotMatch(source, /if \(e\.userCancelled\) return;/);
+});
+
+test("live paywall does not enter the mock card payment flow", () => {
+  const livePaywall = [source, paywallScreen, paywallSheet, paywallMoment].join("\n");
+
+  assert.doesNotMatch(livePaywall, /PAYMENT_CARD/);
+  assert.doesNotMatch(livePaywall, /PaymentCard/);
+  assert.match(livePaywall, /purchasePackage\(pkg\)/);
 });

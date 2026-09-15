@@ -443,3 +443,9 @@
 - Ayrı `ComebackScreen`/`ComebackDoneScreen` mock ekranları hardcoded `20 dk / 10 soru / bir durak` gösterip gerçek çalışma kaydı, XP ve route progress ile konuşmadan canlıya alınırsa kullanıcı verisi güveni bozulur.
 - Bu akış ayrı ekran olarak dönecekse önce tek domain hook'u kurulmalı: önerilen dönüş görevi gerçek route/task verisinden çıkmalı, başlangıç StudyTimer'a gitmeli, tamamlanma StudySave/route event'iyle kapanmalı.
 - Ana Sayfa comeback hero'su da aynı yüzden sabit sayı göstermemeli; öneri metni `nextTask`/route stop effort'undan türemeli, veri yoksa sayı uydurmadan küçük adım fallback'i kullanılmalı.
+
+## 2026-09-16 — Canlı paywall mock kart ödeme akışına sapmamalı
+
+- Mock `PaymentCard/Processing/Success/Failed` ekranları tasarım önizlemesi olarak kalabilir ama premium CTA'ları buraya bağlanırsa sahte kart formu ve random success kullanıcı güvenini bozar.
+- Canlı paywall akışı `usePaywallPurchase` üzerinden RevenueCat/store paketine gitmeli; paket yoksa production'da açıkça "satın alma hazır değil" deyip durmalı.
+- Mock ödeme ekranları repoda kaldığı sürece canlı paywall dosyalarında `PAYMENT_CARD` referansı olmadığını testle kilitlemek gerekir.
