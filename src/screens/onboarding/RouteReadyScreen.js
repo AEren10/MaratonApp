@@ -55,7 +55,7 @@ export default function RouteReadyScreen() {
         <Animated.View entering={FadeInDown.delay(200)}>
           <Text style={[TYPOGRAPHY.subheading, styles.headline, { color: C.text }]}>
             {stopCount > 0
-              ? ${stopCount} durak, tek yol. Bugünden sınav gününe kadar.
+              ? `${stopCount} durak, tek yol. Bugünden sınav gününe kadar.`
               : "Rotan tek yol. Bugünden sınav gününe kadar."}
           </Text>
         </Animated.View>

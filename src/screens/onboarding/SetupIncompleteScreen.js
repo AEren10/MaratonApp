@@ -86,7 +86,7 @@ function SetupIncompleteContent() {
           </View>
           <View style={styles.progressLabelRow}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>KURULUM</Text>
-            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{${doneCount} / }</Text>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${doneCount} / ${totalSteps}`}</Text>
           </View>
         </Animated.View>
 
