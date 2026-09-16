@@ -8,6 +8,8 @@ import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
@@ -23,16 +25,23 @@ export default function FirstWeekScreen() {
     navigation.goBack();
   }, [navigation]);
 
-  const handleTaskAction = useCallback(() => {
+  const openRoute = useCallback(() => {
     H.select();
-    navigation.navigate(SCREENS.ADD_TASK);
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
   }, [navigation]);
 
-  const openMoment = useCallback((screenName) => {
-    if (!screenName) return;
+  const handleTaskAction = useCallback((step) => {
     H.select();
-    navigation.navigate(screenName);
-  }, [navigation]);
+    if (step?.screen) {
+      navigation.navigate(step.screen);
+      return;
+    }
+    if (step?.key === "second_day") {
+      navigation.navigate(SCREENS.ADD_TASK);
+      return;
+    }
+    openRoute();
+  }, [navigation, openRoute]);
 
   const stepState = new Map((moment.steps || []).map((step) => [step.key, step.done]));
   const completedTasks = moment.completedTasks;
@@ -52,7 +61,9 @@ export default function FirstWeekScreen() {
     ...step,
     done: Boolean(stepState.get(step.key)),
     active: !stepState.get(step.key) && step.id === Math.min(totalTasks, completedTasks + 1),
+    cta: step.key === "second_day" ? "Başla" : "Aç",
   }));
+  const activeStep = decoratedSteps.find((step) => step.active);
 
   return (
     <View style={[styles.container, { backgroundColor: C.bg, paddingTop: insets.top }]}>
@@ -99,9 +110,9 @@ export default function FirstWeekScreen() {
             {decoratedSteps.map((step) => (
               <Pressable
                 key={step.id}
-                onPress={() => openMoment(step.screen)}
-                disabled={!step.screen}
-                accessibilityRole={step.screen ? "button" : undefined}
+                onPress={() => handleTaskAction(step)}
+                disabled={step.done}
+                accessibilityRole={!step.done ? "button" : undefined}
                 style={[styles.taskItem, { borderTopColor: C.line, paddingTop: STEP.s3, paddingBottom: STEP.s3, borderTopWidth: 1 }]}
               >
                 <Text style={[styles.taskNumber, { color: step.active ? C.accentBright : C.text3 }]}>
@@ -125,9 +136,9 @@ export default function FirstWeekScreen() {
 
                 {step.active && (
                   <Button
-                    title="Bağla"
-                    onPress={handleTaskAction}
-                    variant="tint"
+                    title={step.cta}
+                    onPress={() => handleTaskAction(step)}
+                    variant="secondary"
                     size="small"
                   />
                 )}
@@ -146,8 +157,8 @@ export default function FirstWeekScreen() {
 
         <Animated.View entering={FadeInDown.delay(240).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <Button
-            title="4. adımı yap"
-            onPress={handleTaskAction}
+            title={activeStep ? `${activeStep.id}. adımı yap` : "Rotayı gör"}
+            onPress={() => activeStep ? handleTaskAction(activeStep) : openRoute()}
             size="large"
           />
           <Pressable onPress={handleClose} style={styles.backButton}>

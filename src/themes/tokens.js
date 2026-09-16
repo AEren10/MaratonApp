@@ -104,6 +104,15 @@ export const CONTROL = {
 };
 
 export const TYPOGRAPHY = {
+  // Back-compat font aliases for older screen files. Prefer semantic tokens
+  // below in new code, but keep these defined so legacy premium/onboarding
+  // moments do not render with an undefined fontFamily.
+  Bricolage_400: "Bricolage_400",
+  Archivo_400: "Archivo_400",
+  Archivo_500: "Archivo_500",
+  Archivo_600: "Archivo_600",
+  Archivo_700: "Archivo_700",
+
   // Display — Bricolage Grotesque, tasarimda display'in tamami 400 agirlik
   display:       { fontFamily: "Bricolage_400", fontSize: 34,  lineHeight: 40, letterSpacing: -1.0 },
   heading:       { fontFamily: "Bricolage_400", fontSize: 28,  lineHeight: 34, letterSpacing: -0.8 },

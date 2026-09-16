@@ -26,7 +26,7 @@ export default function EighthDayLockScreen() {
 
   const handleTrial = useCallback(() => {
     H.select();
-    navigation.navigate(SCREENS.PAYMENT_CARD, { plan: "monthly" });
+    navigation.navigate(SCREENS.PAYWALL, { source: "route_gate" });
   }, [navigation]);
 
   const handleContinueFree = useCallback(() => {
@@ -74,10 +74,10 @@ export default function EighthDayLockScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(600).springify()} style={styles.featureList}>
           <View style={styles.featureCol}>
             <Text style={[styles.colTitle, { color: C.up }]}>Ücretsiz Kalır</Text>
-            <FeatureItem color={C.up} text="çalışma oturumu snrsz" C={C} />
-            <FeatureItem color={C.up} text="Yanlış defteri & tekrar snrsz" C={C} />
+            <FeatureItem color={C.up} text="Çalışma oturumu ve süre kaydı · sınırsız" C={C} />
+            <FeatureItem color={C.up} text="Yanlış defteri ve aralıklı tekrar · sınırsız" C={C} />
             <FeatureItem color={C.up} text="Ayda 4 deneme" C={C} />
-            <FeatureItem color={C.up} text="Seri & zetler" C={C} />
+            <FeatureItem color={C.up} text="Seri, günlük ve haftalık özet" C={C} />
           </View>
 
           <View style={styles.featureCol}>

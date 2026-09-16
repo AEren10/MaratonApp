@@ -23,9 +23,13 @@ const SIZES = {
   md: { height: CONTROL.buttonTertiary, px: 20, fontSize: 15, iconSize: 16, radius: SHAPE.button },
   lg: { height: CONTROL.buttonPrimary,  px: 24, fontSize: 16, iconSize: 18, radius: SHAPE.button },
 };
+SIZES.small = SIZES.sm;
+SIZES.medium = SIZES.md;
+SIZES.large = SIZES.lg;
 
 export function Button({
   children,
+  title,
   onPress,
   variant = "primary",
   size = "md",
@@ -45,6 +49,7 @@ export function Button({
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   const isDisabled = disabled || loading;
+  const label = children ?? title;
 
   return (
     <ReanimatedPressable
@@ -76,9 +81,9 @@ export function Button({
       ) : (
         <>
           {icon && <Icon name={icon} size={s.iconSize} color={v.text} sw={2.5} />}
-          {children ? (
+          {label ? (
             <Text style={[styles.label, { color: v.text, fontSize: s.fontSize }]}>
-              {children}
+              {label}
             </Text>
           ) : null}
           {iconRight && <Icon name={iconRight} size={s.iconSize} color={v.text} sw={2.5} />}
