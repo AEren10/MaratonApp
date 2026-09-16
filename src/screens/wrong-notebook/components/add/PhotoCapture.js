@@ -1,12 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+﻿import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 
-// Yanlis Ekle'nin ilk adimi: soru fotografi kadraji + cek / galeri.
-// Fotograf yokken kadraj tasarimin soyut soru kagidini gosterir.
 export function PhotoCapture({ image, onCamera, onGallery }) {
   const C = useC();
   return (
@@ -49,23 +47,20 @@ export function PhotoCapture({ image, onCamera, onGallery }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
-  frame: { height: 200, borderRadius: SHAPE.sheet, borderWidth: 1, overflow: "hidden" },
-  paper: { ...StyleSheet.absoluteFillObject, margin: STEP.s3, gap: STEP.s1 },
-  line: { height: 6, borderRadius: 1 },
-  figure: { flex: 1, borderRadius: SHAPE.chip + 4 },
-  corner: { position: "absolute", width: 22, height: 22 },
-  tl: { left: 14, top: 14, borderLeftWidth: 2, borderTopWidth: 2, borderTopLeftRadius: SHAPE.chip },
-  br: { right: 14, bottom: 14, borderRightWidth: 2, borderBottomWidth: 2, borderBottomRightRadius: SHAPE.chip },
-  actions: { flexDirection: "row", gap: STEP.s2 - 2, marginTop: STEP.s2 },
+  wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
+  frame: {
+    height: 190, borderRadius: SHAPE.card, borderWidth: 1, overflow: "hidden",
+    justifyContent: "center", paddingHorizontal: STEP.s4,
+  },
+  paper: { gap: STEP.s1 + 2 },
+  line: { height: 6, borderRadius: 3 },
+  figure: { width: "100%", height: 80, borderRadius: SHAPE.button, marginTop: STEP.s1 + 2 },
+  corner: { position: "absolute", width: 14, height: 14 },
+  tl: { top: 12, left: 12, borderTopWidth: 1.5, borderLeftWidth: 1.5, borderTopLeftRadius: 4 },
+  br: { bottom: 12, right: 12, borderBottomWidth: 1.5, borderRightWidth: 1.5, borderBottomRightRadius: 4 },
+  actions: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s2 },
   btn: {
-    flex: 1,
-    height: 48,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: STEP.s1,
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: STEP.s1, height: 46, borderRadius: SHAPE.button, borderWidth: 1,
   },
 });
