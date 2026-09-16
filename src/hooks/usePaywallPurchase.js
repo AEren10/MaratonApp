@@ -14,7 +14,7 @@ import {
   getPurchasesStatus,
   isInitialized,
 } from "../lib/purchases";
-import { startTrial } from "../supabase/productAccess";
+import { startTrial } from "../supabase/profiles";
 import * as H from "../lib/haptics";
 
 // Paywall satin alma mantigi. Ekran dosyasinda is mantigi durmaz

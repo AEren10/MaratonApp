@@ -17,6 +17,7 @@ test("paywall purchase handler can be reused by controlled processing screens", 
   const hook = read("../../src/hooks/usePaywallPurchase.js");
 
   assert.match(hook, /usePaywallPurchase\(\{ closeOnSuccess = true \} = \{\}\)/);
+  assert.match(hook, /import \{ startTrial \} from "\.\.\/supabase\/profiles"/);
   assert.match(hook, /if \(closeOnSuccess\) navigation\.goBack\(\)/);
   assert.match(hook, /return true/);
   assert.match(hook, /return false/);
