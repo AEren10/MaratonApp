@@ -1,10 +1,11 @@
-// PRO ONIZLEME VARYANTLARI — "Önizleme · Geçmiş" ve "Önizleme · Tempo"
-// artboardlarindan BIREBIR. OCR varyanti v1 disi.
+// PRO ONIZLEME VARYANTLARI — "Önizleme · Geçmiş", "Önizleme · Tempo"
+// ve "Önizleme · OCR" artboardlarindan.
 //
 // Kaynak -> varyant. Karsiligi olmayan kaynakta Pro Onizleme'nin birincil
 // butonu dogrudan baglam paywall'ina gider.
 export const PREVIEW_VARIANT_FOR_SOURCE = {
   trial_history: "history",
+  ocr: "ocr",
   route_scenarios: "tempo",
 };
 
@@ -47,4 +48,18 @@ export const PREVIEW_TEMPO = {
   note: "Tahmin bandı ders bazlı deneme netlerinden hesaplanır; konu bazlı çıkarım yapılmaz.",
   primary: "Senaryoları aç",
   secondary: "Şimdilik devam et",
+};
+
+export const PREVIEW_OCR = {
+  title: "Fotoğraftan okuma",
+  body: "Sonuç kâğıdını çektiğinde dersler ve netler tek tek yazmadan onay ekranına düşer.",
+  empty: "Henüz örnek gösterecek deneme kaydın yok. Elle giriş ücretsiz kalır; fotoğraftan okuma Pro ile açılır.",
+  tableLabel: "SON DENEMENDEN",
+  correct: "DOĞRU",
+  wrong: "YANLIŞ",
+  emptyCount: "BOŞ",
+  success: "Okunan değerleri onaylayıp kaydedersin; elle düzenleme her zaman açık kalır.",
+  lockedSave: "Okunan değerleri onaylayıp kaydet",
+  primary: "Okumayı dene",
+  secondary: "Elle girmeye devam et",
 };

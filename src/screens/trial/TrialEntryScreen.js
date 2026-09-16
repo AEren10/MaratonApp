@@ -11,6 +11,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useTrialEntryForm } from "./useTrialEntryForm";
 import { useTrialEntrySteps } from "./useTrialEntrySteps";
 import { useTrialQuotaGate } from "./useTrialQuotaGate";
+import { useLockedFeatureEntry } from "../../hooks/useLockedFeatureEntry";
 import { TrialEntryFormContent } from "./components/TrialEntryFormContent";
 import { TrialQuotaSheet } from "./components/TrialQuotaSheet";
 import { makeTrialEntryStyles } from "./trialEntryStyles";
@@ -19,7 +20,8 @@ export default function TrialEntryScreen() {
   const navigation = useNavigation();
   const C = useC();
   const styles = useMemo(() => makeTrialEntryStyles(C), [C]);
-  const { refreshUsage, showPaywall } = usePremium();
+  const { refreshUsage } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
   const quotaGate = useTrialQuotaGate();
   const showAlert = useAlert();
   const trialEntry = useTrialEntryForm({ C, navigation });
@@ -74,7 +76,7 @@ export default function TrialEntryScreen() {
   if (quotaGate.blocked && quotaGate.sheet) {
     return <SafeAreaView edges={["top"]} style={styles.safe}>
       <TrialQuotaSheet sheet={quotaGate.sheet} onClose={exitScreen}
-        onPro={() => showPaywall("trial_entry_limit")} />
+        onPro={() => enterLocked("trial_entry_limit")} />
     </SafeAreaView>;
   }
 

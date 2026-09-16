@@ -15,6 +15,7 @@ import * as H from "../../lib/haptics";
 import { ProPreviewHave } from "./components/ProPreviewHave";
 import { ProLockedRow } from "./components/ProLockedRow";
 import { ProPreviewHistory } from "./components/ProPreviewHistory";
+import { ProPreviewOcr } from "./components/ProPreviewOcr";
 import { ProPreviewTempo } from "./components/ProPreviewTempo";
 
 // Tasarim: "Pro Onizleme". Kilitli bir ozellige ILK dokunusta bu cikar,
@@ -48,6 +49,7 @@ export default function ProPreviewScreen() {
   }, [navigation]);
 
   if (detail === "history") return <ProPreviewHistory onOpen={openPaywall} onDismiss={dismiss} />;
+  if (detail === "ocr") return <ProPreviewOcr onOpen={openPaywall} onDismiss={dismiss} />;
   if (detail === "tempo") return <ProPreviewTempo onOpen={openPaywall} onDismiss={dismiss} />;
 
   return (

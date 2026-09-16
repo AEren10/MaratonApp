@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
-import { usePremium } from "../../contexts/PremiumContext";
+import { useLockedFeatureEntry } from "../../hooks/useLockedFeatureEntry";
 import { useSummary } from "../../hooks/useSummary";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
@@ -30,7 +30,7 @@ function SummaryScreenInner() {
   const C = useC();
   const navigation = useNavigation();
   const route = useRoute();
-  const { showPaywall } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
   const period = WEEK_ROUTES.has(route.name) ? "week" : normalizePeriod(route.params?.period);
   const data = useSummary(period);
 
@@ -44,8 +44,8 @@ function SummaryScreenInner() {
   }, [navigation, period]);
   const handlePromise = useCallback(() => navigation.navigate(SCREENS.PLAN_VS_ACTUAL), [navigation]);
   const handleUnlock = useCallback(() => {
-    showPaywall("monthly_report");
-  }, [showPaywall]);
+    enterLocked("monthly_report");
+  }, [enterLocked]);
   const handleStart = useCallback(() => navigation.navigate(SCREENS.HOME), [navigation]);
   const handleHowStreak = useCallback(() => navigation.navigate(SCREENS.HOW_IT_WORKS), [navigation]);
 

@@ -5,14 +5,16 @@ import { SCREENS } from "../constants/screens";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { usePremium } from "../contexts/PremiumContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
+import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 
-// Deneme Karşılaştırma kapisi. Erisimi olan dogrudan acar; olmayan
-// "Paywall · Karşılaştırma" (trial_compare) baglamina gider. Pro Önizleme'nin
-// bu kaynak icin varyanti yok (proPreviewVariants), o yuzden dogrudan
-// showPaywall; erisim hazir degilken bastirma orada.
+// Deneme Karşılaştırma kapisi. Erisimi olan dogrudan acar; olmayan ilk
+// dokunusta Pro Onizleme'ye, sonraki dokunusta "Paywall · Karşılaştırma"
+// baglamina gider. Bastirma karari useLockedFeatureEntry -> showPaywall
+// hattinda kalir.
 export function useTrialCompareEntry() {
   const navigation = useNavigation();
-  const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
+  const { accessLoading, accessError, accessSnapshot } = usePremium();
+  const enterLocked = useLockedFeatureEntry();
 
   return useCallback((params) => {
     const allowed = canAccessProductFeature({
@@ -24,6 +26,6 @@ export function useTrialCompareEntry() {
       navigation.navigate(SCREENS.TRIAL_COMPARE, params);
       return true;
     }
-    return showPaywall("trial_compare");
-  }, [accessError, accessLoading, accessSnapshot?.features, navigation, showPaywall]);
+    return enterLocked("trial_compare");
+  }, [accessError, accessLoading, accessSnapshot?.features, enterLocked, navigation]);
 }
