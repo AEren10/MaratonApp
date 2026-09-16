@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -18,6 +18,7 @@ import { TrialSummaryHero } from "./components/TrialSummaryHero";
 import { TrialSummaryRouteLine } from "./components/TrialSummaryRouteLine";
 import { TrialSummarySubjectDeltas } from "./components/TrialSummarySubjectDeltas";
 import { TrialSummaryTarget } from "./components/TrialSummaryTarget";
+import { TrialDropLayout } from "./components/TrialDropLayout";
 
 // Deneme Ozeti: kayit sonrasi ekran. Imza ani rota cizgisinde.
 export default function TrialSummaryScreen() {
@@ -39,6 +40,11 @@ export default function TrialSummaryScreen() {
   const dayMonth = date ? date.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }) : "";
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
 
+  // NEGATIF RETENTION DURUMU (ZOR DENEME)
+  if (summary.delta != null && summary.delta < 0) {
+    return <TrialDropLayout trial={trial} summary={summary} typeLabel={typeLabel} dayMonth={dayMonth} />;
+  }
+
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <View style={styles.header}>
@@ -51,10 +57,11 @@ export default function TrialSummaryScreen() {
         </Text>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <TrialSummaryHero typeLabel={typeLabel} net={summary.net}
-          prevNet={summary.prev ? summary.prev.rawTotalNet ?? summary.prev.totalNet : null} delta={summary.delta} />
-        {summary.route ? (
-          <View style={styles.chart}><TrialSummaryRouteLine route={summary.route} /></View>
+        <TrialSummaryHero typeLabel={typeLabel} net={trial.totalNet} prevNet={summary.prevNet} delta={summary.delta} />
+        {summary.hasChart ? (
+          <View style={styles.chart}>
+            <TrialSummaryRouteLine route={summary.route} />
+          </View>
         ) : null}
         {summary.sentence ? (
           <Animated.View entering={FadeInDown.delay(100).duration(500)} style={styles.section}>
