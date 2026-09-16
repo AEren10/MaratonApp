@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+﻿import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -109,3 +109,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
