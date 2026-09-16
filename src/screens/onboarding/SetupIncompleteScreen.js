@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+﻿import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +14,19 @@ import { ROOT_STACK } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
 import { useAuth } from "../../contexts/AuthContext";
 import { firstNameOf } from "../../lib/displayName";
+
+function getSubtitle(nextStepKey) {
+  if (nextStepKey === "goal") {
+    return "Sınavını seçmişsin ama hedefini belirlememişsin. Rotan hedef olmadan çizilemiyor.";
+  }
+  if (nextStepKey === "levelTest") {
+    return "Hedefini belirlemişsin ama seviyeni ölçmemişsin. Başlangıç noktan olmadan rota çizilemiyor.";
+  }
+  if (nextStepKey === "route") {
+    return "Neredeyse bitti! Rotanı çizmek için son bir adım kaldı.";
+  }
+  return "Maraton'a başlamak için kurulumu tamamlaman gerekiyor.";
+}
 
 function SetupIncompleteContent() {
   const C = useC();
@@ -52,12 +65,12 @@ function SetupIncompleteContent() {
       <View style={styles.content}>
         <Animated.View entering={FadeIn.delay(80)}>
           <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>
-            {`HOŞ GELDİN ${firstNameOf(user).toLocaleUpperCase("tr-TR")}`}
+            {"HOŞ GELDİN " + firstNameOf(user).toLocaleUpperCase("tr-TR")}
           </Text>
           <Text style={[styles.title, { color: C.text }]}>Kaldığın yerden devam edelim.</Text>
           {nextStep ? (
             <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
-              Sınavını seçmişsin ama hedefini belirlememişsin. Rotan hedef olmadan çizilemiyor.
+              {getSubtitle(nextStep.key)}
             </Text>
           ) : null}
         </Animated.View>
@@ -73,7 +86,7 @@ function SetupIncompleteContent() {
           </View>
           <View style={styles.progressLabelRow}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>KURULUM</Text>
-            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${doneCount} / ${totalSteps}`}</Text>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{${doneCount} / }</Text>
           </View>
         </Animated.View>
 

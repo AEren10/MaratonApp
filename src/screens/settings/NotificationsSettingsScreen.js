@@ -13,6 +13,7 @@ import { SettingsRow } from "./components/SettingsRow";
 import { ReminderHourPicker } from "./components/ReminderHourPicker";
 import { useNotificationPrefs } from "../../hooks/useNotificationPrefs";
 import * as H from "../../lib/haptics";
+import { SCREENS } from "../../constants/screens";
 
 function NotificationsSettingsContent() {
   const C = useC();
@@ -64,6 +65,11 @@ function NotificationsSettingsContent() {
           <SettingsGroup title="BİLDİRİMLER">
             <SettingsRow
               first
+              label="Rota haberleri"
+              hint="Uygulama içi bildirim geçmişi"
+              onPress={() => navigation.navigate(SCREENS.NOTIFICATIONS)}
+            />
+            <SettingsRow
               label="Günlük Hatırlatıcı"
               hint="Çalışmayı unutmamak için bir hatırlatma"
               toggle

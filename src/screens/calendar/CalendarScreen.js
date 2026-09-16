@@ -101,12 +101,10 @@ function CalendarScreenInner() {
           </View>
 
           <View style={s.dayDetail}>
-            <View style={s.dayHeader}>
+            <Pressable style={s.dayHeader} onPress={() => navigation.navigate(SCREENS.PLAN_DETAIL)}>
               <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1 }]}>SALI · {selectedDay} HAZİRAN</Text>
               <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>4 durak · 3 sa 20 dk</Text>
-            </View>
-
-            <View style={s.tasks}>
+            </Pressable><View style={s.tasks}>
               <View style={styles.slotRow}>
                 <Text style={[TYPOGRAPHY.metaSemiBold, styles.timeStr, { color: C.text3 }]}>08:30</Text>
                 <View style={[styles.verticalLine, { backgroundColor: C.subjects?.turkce || "blue" }]} />
@@ -150,7 +148,7 @@ function CalendarScreenInner() {
       </ScrollView>
       
       <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
-        <Button variant="primary" size="lg" fullWidth>{selectedDay} Haziran'a durak ekle</Button>
+        <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK)}>{selectedDay} Haziran'a durak ekle</Button>
       </View>
     </SafeAreaView>
   );
@@ -198,3 +196,5 @@ const styles = StyleSheet.create({
   verticalLine: { width: 6, height: 6, borderRadius: 1 },
   slotBody: { flex: 1 },
 });
+
+

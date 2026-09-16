@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+﻿import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -15,7 +15,6 @@ export default function OnboardingScreen() {
   const C = useC();
   const { markSlidesAsSeen } = useExam();
 
-  // Iki aksiyon ayni yere dusmemeli: AuthStack niyete gore aciliyor.
   const createRoute = useCallback(() => {
     setAuthIntent("register");
     markSlidesAsSeen();
@@ -38,8 +37,7 @@ export default function OnboardingScreen() {
               Sınava kadar olan yolu bir rotaya çeviriyoruz.
             </Text>
             <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s2, maxWidth: 300 }]}>
-              Her gün nereye gideceğini biliyorsun, her denemede rotanın nereye çıktığını
-              görüyorsun.
+              Her gün nereye gideceğini biliyorsun, her denemede rotanın nereye çıktığını görüyorsun.
             </Text>
           </Animated.View>
 
@@ -58,6 +56,9 @@ export default function OnboardingScreen() {
           <Button onPress={createRoute} size="lg" fullWidth>
             Rotamı kur
           </Button>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2, marginBottom: STEP.s1 }]}>
+            Hesap sonra. Önce rotanı görüyorsun.
+          </Text>
           <Pressable onPress={goToLogin} hitSlop={12} style={styles.loginLink} accessibilityRole="button">
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
               Hesabım var, giriş yap
@@ -71,7 +72,7 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
-  headline: { ...TYPOGRAPHY.display, marginTop: STEP.s3, maxWidth: 300 },
+  headline: { ...TYPOGRAPHY.title, fontSize: 32, lineHeight: 36, marginTop: STEP.s2, maxWidth: 280 },
   footer: { paddingHorizontal: GUTTER, paddingBottom: STEP.s3 },
-  loginLink: { alignItems: "center", marginTop: STEP.s3, minHeight: 44, justifyContent: "center" },
+  loginLink: { alignItems: "center", marginTop: STEP.s1, minHeight: 44, justifyContent: "center" },
 });

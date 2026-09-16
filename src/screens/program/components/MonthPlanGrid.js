@@ -1,4 +1,4 @@
-﻿import { memo } from "react";
+import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -34,11 +34,11 @@ function MonthPlanGrid({ C, cells }) {
       </View>
       <View style={s.grid}>
         {gridCells.map((d, i) => (
-          <View key={d?.key || \e\\} style={s.cellWrap}>
+          <View key={d?.key || `e_${i}`} style={s.cellWrap}>
             {d ? (
               <View
                 accessible
-                accessibilityLabel={\\, \ durak\}
+                accessibilityLabel={`${d.day}, ${d.count} durak`}
                 style={[s.cell, look(d.count)]}
               >
                 <Text style={[TYPOGRAPHY.meta, s.num, { color: d.count ? C.text : C.text3 }]}>{d.day}</Text>

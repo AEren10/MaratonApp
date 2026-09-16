@@ -118,6 +118,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.EDIT_PROFILE]: { path: "ayarlar/profil", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.CHANGE_PASSWORD]: { path: "ayarlar/sifre", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.EDIT_EMAIL]: { path: "ayarlar/eposta", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
+  [SCREENS.NOTIFICATIONS]: { path: "bildirimler/rota-haberleri", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.NOTIFICATIONS_SETTINGS]: { path: "ayarlar/bildirim", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.PRIVACY]: { path: "gizlilik", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },
   [SCREENS.TERMS]: { path: "kosullar", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: true },

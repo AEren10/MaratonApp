@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -17,8 +17,7 @@ export function TrialEntryNetCard({ totalNet, normalizedNet, difficultyLevel, pu
       <View style={styles.bottom}>
         <Text style={[TYPOGRAPHY.stat, styles.value, { color: C.text }]}>{formatNumber(totalNet, 2)}</Text>
         <Text style={[TYPOGRAPHY.meta, styles.note, { color: C.text2 }]}>
-          {
-ormalize net ${formatNumber(normalizedNet, 2)} · rota bunu kullanır}
+          {`normalize net ${formatNumber(normalizedNet, 2)} · rota bunu kullanır`}
         </Text>
       </View>
     </View>

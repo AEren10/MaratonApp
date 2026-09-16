@@ -1,75 +1,45 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+
 import { Icon } from "../../components/design";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 
-// Mock data based on "Bildirim Halleri" design specs
-const INITIAL_NOTIFS = [
-  { 
-    id: "1", 
-    kind: "MARATON", 
-    title: "Bugünkü durağın hazır", 
-    desc: "Felsefe · Bilgi Felsefesi · 24 dk",
-    time: "Şimdi", 
-    read: false, 
-    colorKey: "accent" 
-  },
-  { 
-    id: "2", 
-    kind: "MARATON", 
-    title: "Sonuç rotayı değiştirdi", 
-    desc: "Bugünkü ilk adım hazır: 20 dakikalık tekrar durağı.",
-    time: "Dün", 
-    read: true, 
-    colorKey: "accent" 
-  },
-  { 
-    id: "3", 
-    kind: "MARATON", 
-    title: "Bu hafta 3 durağı tamamladın", 
-    desc: "Sıradaki durak açıldı: Matematik · Kombinasyon.",
-    time: "Pazartesi", 
-    read: true, 
-    colorKey: "up" 
-  },
-];
+const EMPTY_NOTIFICATIONS = [];
 
-export default function NotificationsScreen() {
+function NotificationsContent() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
-  const [notifs, setNotifs] = useState(INITIAL_NOTIFS);
-
-  const unreadCount = notifs.filter(n => !n.read).length;
-
-  const handleMarkAllRead = useCallback(() => {
-    setNotifs(prev => prev.map(n => ({ ...n, read: true })));
-  }, []);
-
-  const handlePressNotif = useCallback((id) => {
-    setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  }, []);
+  const notifs = EMPTY_NOTIFICATIONS;
 
   const renderEmpty = () => (
-    <View style={s.emptyContainer}>
-      <Icon name="bell" size={72} color={C.text4} />
-      <Text style={s.emptyTitle}>Yeni haber yok.</Text>
+    <Animated.View entering={FadeInDown.duration(500)} style={s.emptyContainer}>
+      <View style={s.emptyIcon}>
+        <Icon name="bell" size={30} color={C.text3} />
+      </View>
+      <Text style={s.emptyEyebrow}>ROTA HABERLERİ</Text>
+      <Text style={s.emptyTitle}>Şimdilik yeni haber yok.</Text>
       <Text style={s.emptySubtitle}>
-        Rotan değiştiğinde, defterinde tekrar zamanı geldiğinde ve hafta kapandığında burada görürsün.
+        Durağın açıldığında, deneme analizin hazır olduğunda veya hafta özeti geldiğinde bu ekranda birikir.
       </Text>
       
       <Pressable 
-        style={({ pressed }) => [s.settingsBtn, pressed && { backgroundColor: C.accentPress, transform: [{ scale: 0.98 }] }]} 
+        accessibilityRole="button"
+        style={({ pressed }) => [s.settingsBtn, pressed && { opacity: 0.86 }]} 
         onPress={() => navigation.navigate(SCREENS.NOTIFICATIONS_SETTINGS)}
       >
         <Text style={s.settingsBtnText}>Bildirim ayarlarına bak</Text>
       </Pressable>
-    </View>
+    </Animated.View>
   );
+
+  const handlePressNotif = useCallback(() => {}, []);
 
   const renderItem = ({ item }) => {
     const isUnread = !item.read;
@@ -82,7 +52,7 @@ export default function NotificationsScreen() {
           isUnread && { backgroundColor: C.surface },
           pressed && { opacity: 0.8 }
         ]}
-        onPress={() => handlePressNotif(item.id)}
+        onPress={handlePressNotif}
       >
         <View style={[s.iconBox, { backgroundColor: color + "18" }]}>
           <View style={[s.iconDot, { backgroundColor: color }]} />
@@ -108,17 +78,13 @@ export default function NotificationsScreen() {
             hitSlop={12} 
             onPress={() => navigation.goBack()}
             style={({ pressed }) => [s.backBtn, pressed && { opacity: 0.6 }]}
+            accessibilityRole="button"
+            accessibilityLabel="Geri"
           >
-            <Icon name="chevronLeft" size={24} color={C.text2} />
+            <Icon name="chevL" size={18} color={C.text2} />
           </Pressable>
           <Text style={s.headerTitle}>Rota haberleri</Text>
         </View>
-
-        {unreadCount > 0 && (
-          <Pressable hitSlop={12} onPress={handleMarkAllRead}>
-            <Text style={s.markReadText}>Tümünü oku</Text>
-          </Pressable>
-        )}
       </View>
 
       <FlatList
@@ -130,6 +96,14 @@ export default function NotificationsScreen() {
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
+  );
+}
+
+export default function NotificationsScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <NotificationsContent />
+    </ScreenErrorBoundary>
   );
 }
 
@@ -156,12 +130,8 @@ function makeStyles(C) {
       marginLeft: -6, // optik hizalama
     },
     headerTitle: { 
-      ...TYPOGRAPHY.h2, 
+      ...TYPOGRAPHY.subheading,
       color: C.text 
-    },
-    markReadText: {
-      ...TYPOGRAPHY.captionMedium,
-      color: C.text3,
     },
     
     // List
@@ -205,10 +175,7 @@ function makeStyles(C) {
       marginBottom: 6
     },
     kindText: {
-      fontFamily: "Archivo_700Bold",
-      fontSize: 11,
-      letterSpacing: 1.76, // 0.16em
-      textTransform: "uppercase"
+      ...TYPOGRAPHY.label,
     },
     timeText: {
       ...TYPOGRAPHY.micro,
@@ -219,9 +186,7 @@ function makeStyles(C) {
       color: C.text,
     },
     descText: {
-      fontFamily: "Archivo_400Regular",
-      fontSize: 12.5,
-      lineHeight: 18.75, // 1.5
+      ...TYPOGRAPHY.meta,
       color: C.text2,
       marginTop: 4
     },
@@ -231,12 +196,28 @@ function makeStyles(C) {
       flex: 1,
       alignItems: "center",
       paddingHorizontal: 40,
-      paddingTop: 66,
+      paddingTop: 72,
+    },
+    emptyIcon: {
+      width: 72,
+      height: 72,
+      borderRadius: 22,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    emptyEyebrow: {
+      ...TYPOGRAPHY.label,
+      color: C.text3,
+      marginTop: STEP.s3,
+      textAlign: "center",
     },
     emptyTitle: {
-      ...TYPOGRAPHY.h2,
+      ...TYPOGRAPHY.subheading,
       color: C.text,
-      marginTop: 26,
+      marginTop: STEP.s1,
       textAlign: "center"
     },
     emptySubtitle: {
@@ -249,7 +230,8 @@ function makeStyles(C) {
     settingsBtn: {
       width: "100%",
       height: 52,
-      backgroundColor: C.accent,
+      borderWidth: 1,
+      borderColor: C.border,
       borderRadius: SHAPE.button,
       alignItems: "center",
       justifyContent: "center",
@@ -257,7 +239,7 @@ function makeStyles(C) {
     },
     settingsBtnText: {
       ...TYPOGRAPHY.button,
-      color: C.accentInk
+      color: C.text
     }
   });
 }

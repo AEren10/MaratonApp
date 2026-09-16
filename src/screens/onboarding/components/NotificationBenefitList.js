@@ -1,13 +1,12 @@
-import { View, Text, StyleSheet } from "react-native";
+﻿import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-// Tasarim: "SANA NE GONDERIRIZ" karti listesi (label="Bildirim Izni").
 const ITEMS = [
-  { key: "predict", dotKey: "accent", text: "“Tahminin 71'den 73'e çıktı.”" },
-  { key: "repeat", dotKey: "matematik", text: "“Bugün 6 soru tekrar zamanı.”" },
-  { key: "stop", dotKey: "warn", text: "“Bekleyen iki durağın hazır.”" },
-  { key: "report", dotKey: "up", text: "“Haftalık raporun hazır.”" },
+  { key: "predict", dotKey: "accent", text: "Tahminin 71'den 73'e çıktı." },
+  { key: "repeat", dotKey: "matematik", text: "Bugün 6 soru tekrar zamanı." },
+  { key: "stop", dotKey: "warn", text: "Bekleyen iki durağın hazır." },
+  { key: "report", dotKey: "up", text: "Haftalık raporun hazır." },
 ];
 
 function dotColor(C, key) {

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
@@ -32,7 +32,7 @@ export function WeekProgressCard({ rangeLabel, activeDaysCount, totalMinutes, to
       </View>
 
       <View style={[styles.track, { backgroundColor: C.track }]}>
-        <View style={[styles.fill, { backgroundColor: C.brandTint, width: \\%\ }]} />
+        <View style={[styles.fill, { backgroundColor: C.brandTint, width: `${Math.round(pct * 100)}%` }]} />
       </View>
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s2 }}>

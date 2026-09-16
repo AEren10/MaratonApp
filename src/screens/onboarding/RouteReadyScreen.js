@@ -14,8 +14,6 @@ import * as H from "../../lib/haptics";
 import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 
 export default function RouteReadyScreen() {
-  // Seviye Testi sunucuya yazamadiysa notu buraya tasiyor (o ekran submit
-  // sonrasi kapandigi icin orada gosterilemiyor).
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
   const C = useC();
   const [starting, setStarting] = useState(false);
@@ -23,14 +21,6 @@ export default function RouteReadyScreen() {
   const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, createRoute } =
     useRouteReadySummary();
 
-  // Onboarding kok stack'ten cikiyor; StudyTimer MainTabs icindeki bir
-  // yigina ait oldugundan dogrudan reset ile hedeflenmez (navigasyon
-  // dosyalarina dokunma kurali). Bunun yerine MainTabs -> Roadmap sekmesine
-  // donulur; ilk aksiyon orada zaten hazir bekliyor (useRoadmapNextAction).
-  // ONBOARDING_COMPLETE huni olayi BURADA atiliyor. Onceden GoalSetup'ta
-  // atiliyordu ama kurulum orada bitmiyor — tasarim dort adim tanimliyor ve
-  // gercek tamamlanma noktasi burasi. GoalSetup'ta biraksaydik huni son iki
-  // adimi hic gormezdi.
   const finishOnboarding = useCallback(() => finish({
     daysUntilExam,
     stopCount,
@@ -60,30 +50,34 @@ export default function RouteReadyScreen() {
           <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accent }]}>ROTAN HAZIR</Text>
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(140)}>
-          <StatBlock value={daysUntilExam ?? "—"} unit="gün" size="hero" />
+          <StatBlock value={daysUntilExam ?? "-"} unit="gün" size="hero" />
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(200)}>
           <Text style={[TYPOGRAPHY.subheading, styles.headline, { color: C.text }]}>
             {stopCount > 0
-              ? `${stopCount} durak, tek yol. Bugünden sınav gününe kadar.`
+              ? ${stopCount} durak, tek yol. Bugünden sınav gününe kadar.
               : "Rotan tek yol. Bugünden sınav gününe kadar."}
           </Text>
         </Animated.View>
 
-        {(currentNet != null || targetNet != null) && (
+        {targetNet != null && currentNet != null ? (
           <Animated.View entering={FadeInDown.delay(260)} style={styles.compareRow}>
-            {currentNet != null && (
-              <Text style={[TYPOGRAPHY.micro, { color: C.accent }]}>{`BUGÜN · ${currentNet.toFixed(2).replace(".", ",")}`}</Text>
-            )}
-            {targetNet != null && (
-              <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>{`HEDEF · ${targetNet}`}</Text>
-            )}
+            <View>
+              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>BUGÜN</Text>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text, marginTop: 4 }]}>{currentNet}</Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>HEDEF</Text>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text, marginTop: 4 }]}>{targetNet}</Text>
+            </View>
           </Animated.View>
-        )}
+        ) : null}
 
         {upcomingStops.length > 0 && (
           <Animated.View entering={FadeInDown.delay(320)} style={styles.stopList}>
-            {upcomingStops.map((stop) => <RouteReadyStopRow key={stop.key} stop={stop} />)}
+            {upcomingStops.map((stop) => (
+              <RouteReadyStopRow key={stop.id} stop={stop} />
+            ))}
           </Animated.View>
         )}
 
@@ -126,5 +120,3 @@ const styles = StyleSheet.create({
   pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
 });
-
-

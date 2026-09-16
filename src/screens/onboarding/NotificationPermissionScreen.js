@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Linking } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,9 +25,9 @@ function NotificationPermissionContent() {
   const { user } = useAuth();
   const [denied, setDenied] = useState(false);
   const [busy, setBusy] = useState(false);
-  // Kurulum zincirinden gelindiyse (Rota Hazır) izin/atla kurulumu bitirir.
   const onboardingSummary = useRoute().params?.onboardingSummary;
   const { complete } = useFinishOnboarding();
+  
   const leave = useCallback(() => {
     if (onboardingSummary) complete(onboardingSummary).catch(() => {});
     else navigation.goBack();
@@ -72,6 +72,7 @@ function NotificationPermissionContent() {
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >

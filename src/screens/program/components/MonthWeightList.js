@@ -1,4 +1,4 @@
-﻿import { memo } from "react";
+import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -28,7 +28,7 @@ function MonthWeightList({ C, weights }) {
               {w.label}
             </Text>
             <View style={[s.track, { backgroundColor: C.track }]}>
-              <View style={[s.fill, { backgroundColor: color, width: \\%\ }]} />
+              <View style={[s.fill, { backgroundColor: color, width: `${Math.round(w.ratio * 100)}%` }]} />
             </View>
             <Text style={[TYPOGRAPHY.metaSemiBold, s.val, { color: C.text }]} allowFontScaling={false}>
               {w.stops} dr

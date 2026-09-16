@@ -1,4 +1,4 @@
-﻿import { Pressable, StyleSheet, Text, TextInput, View, Switch } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, Switch } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -22,7 +22,7 @@ export function TrialEntryDetailsCard({ form, styles: shared }) {
       <View style={styles.row}>
         <Text style={[shared.label, styles.key]}>TARİH</Text>
         <Pressable onPress={() => form.setShowDatePicker((open) => !open)} hitSlop={HIT} style={well}
-          accessibilityRole="button" accessibilityLabel={Tarih: ${dateLabel}}
+          accessibilityRole="button" accessibilityLabel={`Tarih: ${dateLabel}`}
           accessibilityState={{ expanded: form.showDatePicker }}>
           <Text style={[TYPOGRAPHY.tableName, { color: C.text }]}>{dateLabel}</Text>
         </Pressable>

@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Card, Icon, EmptyState } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
@@ -12,7 +12,7 @@ function formatDayLabel(iso) {
   const d = new Date(iso);
   const day = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
   const weekday = d.toLocaleDateString("tr-TR", { weekday: "long" });
-  return \\ · \\;
+  return `${day} · ${weekday}`;
 }
 
 function formatTime(iso) {
@@ -48,20 +48,20 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   const slots = useMemo(() => {
     if (!data) return [];
     const logSlots = (data.studyLogs || []).map((l) => ({
-      key: \log_\\,
+      key: `log_${l.id || l.created_at}`,
       time: formatTime(l.created_at),
       color: getSubjectByKey(l.subject)?.color || C.accent,
       name: l.topic || l.subject,
       subject: l.topic ? getSubjectByKey(l.subject)?.label : null,
-      dur: l.minutes ? \\ dk\ : "",
+      dur: l.minutes ? `${l.minutes} dk` : "",
     }));
     const trialSlots = (data.trialLogs || []).map((t) => ({
-      key: \	rial_\\,
+      key: `trial_${t.id || t.created_at}`,
       time: formatTime(t.created_at),
       color: trialTypes[t.trialType]?.color || C.accent,
       name: trialTypes[t.trialType]?.label || t.name || "Deneme",
       subject: null,
-      dur: \\ net\,
+      dur: `${t.totalNet || t.net || 0} net`,
       trial: t,
     }));
     return [...logSlots, ...trialSlots];

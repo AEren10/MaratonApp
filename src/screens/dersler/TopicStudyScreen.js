@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, ScrollView, Pressable, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -21,9 +21,9 @@ function formatMinutesShort(min) {
   if (min >= 60) {
     const h = Math.floor(min / 60);
     const m = min % 60;
-    return m > 0 ? \\ sa \ dk\ : \\ sa\;
+    return m > 0 ? `${h} sa ${m} dk` : `${h} sa`;
   }
-  return \\ dk\;
+  return `${min} dk`;
 }
 
 export default function TopicStudyScreen() {
@@ -85,7 +85,7 @@ export default function TopicStudyScreen() {
               Bu konuya durak koy
             </Button>
             <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-              Defterdeki \ soruyu tekrar et
+              {`Defterdeki ${notebookCount} soruyu tekrar et`}
             </Text>
           </View>
         </>

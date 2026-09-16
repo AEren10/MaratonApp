@@ -7,6 +7,7 @@ import {
   applyNotifPrefs,
   requestNotificationPermissions,
   ensurePushTokenRegistered,
+  cancelTaskReminders,
 } from "../lib/notifications";
 import { useAlert } from "../contexts/AlertContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -45,7 +46,11 @@ export function useNotificationPrefs() {
       setPrefs(next);
       setBusy(true);
       try {
-        const anyEnabled = next.dailyReminderEnabled || next.streakRiskEnabled || next.weeklySummaryEnabled;
+        const anyEnabled = next.dailyReminderEnabled
+          || next.streakRiskEnabled
+          || next.trialReminderEnabled
+          || next.taskReminderEnabled
+          || next.weeklySummaryEnabled;
         if (anyEnabled) {
           const granted = await requestNotificationPermissions();
           if (granted) {
@@ -54,10 +59,15 @@ export function useNotificationPrefs() {
             showAlert("İzin Gerekli", "Bildirim izni vermeden hatırlatıcı kuramayız.");
             next.dailyReminderEnabled = false;
             next.streakRiskEnabled = false;
+            next.trialReminderEnabled = false;
+            next.taskReminderEnabled = false;
             next.weeklySummaryEnabled = false;
             setPrefs(next);
           }
           await checkPermission();
+        }
+        if (next.taskReminderEnabled === false) {
+          await cancelTaskReminders();
         }
         await setNotifPrefs(next, user?.id);
         await applyNotifPrefs(next, undefined, user?.id);

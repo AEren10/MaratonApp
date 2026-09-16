@@ -124,7 +124,7 @@ export default function PlanDetailScreen({ route }) {
       </ScrollView>
 
       <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-        <Button variant="primary" size="lg" fullWidth>Bugüne durak ekle</Button>
+        <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK)}>Bugüne durak ekle</Button>
         <Button variant="ghost" size="md" fullWidth style={{ marginTop: STEP.s2 }}>
           {isEmpty ? "Bu günü boş bırak" : "Günü yeniden düzenle"}
         </Button>
@@ -153,3 +153,4 @@ const styles = StyleSheet.create({
   startBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(255,255,255,0.1)" },
   bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
 });
+

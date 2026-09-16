@@ -1,4 +1,4 @@
-﻿import React, { useCallback } from "react";
+import React, { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
@@ -14,15 +14,15 @@ export const SubjectTopicRow = React.memo(function SubjectTopicRow({ topic, C, o
     topic.statusLabel === "planda" ? C.text3 : C.text2;
 
   const metaText = topic.totalQuestions && topic.totalMinutes 
-    ? \\ soru · \\ 
-    : topic.statusLabel === "planda" ? "planda" : "0 soru";
+    ? `${topic.totalQuestions} soru · ${formatMinutes(topic.totalMinutes)}`
+    : topic.statusLabel === "planda" ? "planda" : `${topic.totalQuestions || 0} soru`;
 
   return (
     <Pressable
       onPress={handlePress}
       style={({ pressed }) => [styles.row, { opacity: pressed ? 0.7 : 1 }]}
       accessibilityRole="button"
-      accessibilityLabel={\\ konusuna git\}
+      accessibilityLabel={`${topic.name} konusuna git`}
     >
       <View
         style={[

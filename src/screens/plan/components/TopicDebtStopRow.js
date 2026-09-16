@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -8,9 +8,9 @@ export const TopicDebtStopRow = React.memo(function TopicDebtStopRow({ item, C }
   const color = subjectColorOf(C, item.subjectKey);
   const subjectLabel = getSubjectByKey(item.subjectKey)?.label || item.subjectKey;
   
-  const title = item.title || \\ · \\;
-  const meta = item.hours ? \tlandı · \ sa\ : \\ · \\;
-  const rightText = item.hours ? \\sa\ : item.dueLabel;
+  const title = item.title || `${subjectLabel} · ${item.topicName}`;
+  const meta = item.hours ? `atlandı · ${item.hours} sa` : `${item.statusLabel || "atlandı"} · ${item.minutesLabel || "2 sa"}`;
+  const rightText = item.hours ? `${item.hours}sa` : item.dueLabel;
 
   return (
     <View style={[styles.row, { borderTopColor: C.line }]}>

@@ -145,6 +145,7 @@
   EDIT_PROFILE: "EditProfile",
   CHANGE_PASSWORD: "ChangePassword",
   EDIT_EMAIL: "EditEmail",
+  NOTIFICATIONS: "Notifications",
   NOTIFICATIONS_SETTINGS: "NotificationsSettings",
   PRIVACY: "Privacy",
   TERMS: "Terms",

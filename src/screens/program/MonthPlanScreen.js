@@ -1,4 +1,4 @@
-﻿import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -38,7 +38,7 @@ function MonthPlanInner() {
               <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]} allowFontScaling={false}>{m.totalStops || 43}</Text>
               <View style={s.heroCopy}>
                 <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>durak planlandı</Text>
-                <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{\\ · \ çalışma günü\}</Text>
+                <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{`${m.totalHours || 72} sa · ${m.activeDays || 26} çalışma günü`}</Text>
               </View>
               <View style={s.heroSide}>
                 <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>{formatNumber(m.totalQuestions || 3100)}</Text>

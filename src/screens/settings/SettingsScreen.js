@@ -167,10 +167,9 @@ export default function SettingsScreen() {
           </SettingsGroup>
         </Animated.View>
 
-        {/* Tasarimin Ayarlar ekraninda sosyal satir YOK ve sosyal v1 kapsami
-            disi. Ama "Yol Arkadasin" ve "Davet Et" ekranlarinin BASKA hicbir
-            giris noktasi yok; satirlari dusurmek onlari erisilemez birakirdi.
-            Sosyal v1'den tamamen cikarilirsa bu grup da silinmeli. */}
+        {/* Lig/arkadas akislari canli urun alani. Tasarimin ana Ayarlar
+            ekraninda bu satirlar ayrica gosterilmese de Profil/Sosyal
+            akislari erisilebilir kalmali; aksi halde ekranlar yetim kalir. */}
         <Animated.View entering={FadeInDown.delay(420).duration(420)}>
           <SettingsGroup title="ARKADAŞLAR">
             <SettingsRow first label="Arkadaşlar" onPress={go(SCREENS.FRIENDS)} />

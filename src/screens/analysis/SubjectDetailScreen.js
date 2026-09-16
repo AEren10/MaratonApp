@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, SectionList, StyleSheet, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -65,7 +65,7 @@ export default function SubjectDetailScreen() {
         else if (gi === 2 && ti === 1) t.statusLabel = "bugün";
         else if (gi === 2 && ti === 2) t.statusLabel = "defter 5";
         else if (gi === 2 && ti === 3) { t.statusLabel = "planda"; t.done = false; }
-        else t.statusLabel = \\ gün\;
+        else t.statusLabel = `${(ti + 1) * 3} gün`;
       });
     });
     return grouped;
