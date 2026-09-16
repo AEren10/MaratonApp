@@ -1,142 +1,140 @@
-import { useState, useCallback, useMemo } from "react";
-import {
-  View, Text, ScrollView, Pressable,
-  KeyboardAvoidingView, Platform, StyleSheet,
-} from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+﻿import { useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Icon, Button, SectionLabel } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../themes/tokens";
+import { useNavigation } from "@react-navigation/native";
+import { Icon, Button } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useCurriculum } from "../../hooks/useCurriculum";
-import { useUserTasks } from "../../hooks/useUserTasks";
-import { TopicPicker } from "../../components/forms/TopicPicker";
-import { useAlert } from "../../contexts/AlertContext";
-import { userTaskSchema, validate } from "../../validations/auth";
-import { AddTaskSubjectList } from "./components/AddTaskSubjectList";
-import { AddTaskPillRow } from "./components/AddTaskPillRow";
-import { AddTaskWhenSection } from "./components/AddTaskWhenSection";
-import { AddTaskTopicField } from "./components/AddTaskTopicField";
-import { AddTaskNoteField } from "./components/AddTaskNoteField";
-import * as H from "../../lib/haptics";
+import { AddTaskSubjectRow } from "./components/AddTaskSubjectRow";
 
-const Q_PRESETS = [10, 20, 30, 50];
-const D_PRESETS = [30, 60, 90, 120];
-const fmtDur = (d) => (d >= 60 ? `${d / 60}sa` : `${d}dk`);
+function SectionHeader({ title, C }) {
+  return (
+    <Text style={[TYPOGRAPHY.label, { color: C.text2, letterSpacing: 1, marginTop: STEP.s5, marginBottom: STEP.s3 }]}>
+      {title}
+    </Text>
+  );
+}
+
+function Pill({ label, selected, onPress, C }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        s.pill,
+        { 
+          borderColor: selected ? C.accent : C.elev,
+          backgroundColor: selected ? C.brandTint : C.surface
+        }
+      ]}
+    >
+      <Text style={[TYPOGRAPHY.metaSemiBold, { color: selected ? C.text : C.text3 }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function ListItemRow({ label, value, C, isLast }) {
+  return (
+    <View style={[s.listItem, { borderBottomColor: C.line, borderBottomWidth: isLast ? 0 : 1 }]}>
+      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, flex: 1 }]}>{label}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{value}</Text>
+        <Icon name="chevR" size={14} color={C.text4} />
+      </View>
+    </View>
+  );
+}
 
 export default function AddTaskScreen() {
   const navigation = useNavigation();
-  const route = useRoute();
   const C = useC();
-  const showAlert = useAlert();
-  const { tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
-  const { createTask } = useUserTasks();
-  const preSubject = route.params?.preSubject || null;
+  
+  const [subjectKey, setSubjectKey] = useState("matematik");
+  const [durVal, setDurVal] = useState("50 dk");
+  const [repeat, setRepeat] = useState(true);
 
-  const [subjectKey, setSubjectKey] = useState(preSubject);
-  const [topic, setTopic] = useState("");
-  const [topicOpen, setTopicOpen] = useState(false);
-  const [qCount, setQCount] = useState("");
-  const [durVal, setDurVal] = useState("");
-  const [note, setNote] = useState("");
-
-  const allSubjects = useMemo(() => [...tytSubjects, ...aytSubjects], [tytSubjects, aytSubjects]);
-  const current = useMemo(() => allSubjects.find((s) => s.key === subjectKey), [allSubjects, subjectKey]);
-  const groups = useMemo(() => {
-    const list = [];
-    if (tytSubjects.length) list.push({ label: group1Label, items: tytSubjects });
-    if (aytSubjects.length) list.push({ label: group2Label, items: aytSubjects });
-    return list;
-  }, [tytSubjects, aytSubjects, group1Label, group2Label]);
-
-  const canSave = !!subjectKey;
-  const pickSubject = (key) => { H.select(); setSubjectKey(key); setTopic(""); };
-
-  const save = useCallback(async () => {
-    if (!canSave) return;
-    const input = {
-      subject: subjectKey,
-      topic: topic.trim() || undefined,
-      questionCount: parseInt(qCount, 10) || undefined,
-      targetMinutes: parseInt(durVal, 10) || undefined,
-      note: note.trim() || undefined,
-    };
-    const { ok, errors } = validate(userTaskSchema, input);
-    if (!ok) {
-      H.warn();
-      showAlert("Hata", Object.values(errors)[0] || "Görev eklenemedi");
-      return;
-    }
-    try {
-      await createTask(input);
-      H.success();
-      navigation.goBack();
-    } catch (e) {
-      H.warn();
-      showAlert("Hata", e?.issues?.[0]?.message || "Görev eklenemedi");
-    }
-  }, [canSave, subjectKey, topic, qCount, durVal, note, createTask, navigation, showAlert]);
-
-  const openTopicPicker = () => {
-    if (!current) { H.warn(); showAlert("Önce ders seç", ""); return; }
-    H.select(); setTopicOpen(true);
-  };
+  // Mocks based on Image 5
+  const subjects = [
+    { key: "turkce", name: "Türkçe" },
+    { key: "matematik", name: "Matematik" },
+    { key: "fizik", name: "Fizik" },
+    { key: "kimya", name: "Kimya" },
+    { key: "biyoloji", name: "Biyoloji" },
+    { key: "tarih", name: "Tarih" },
+  ];
+  const durations = ["25 dk", "50 dk", "1,5 sa", "2 sa"];
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <View style={st.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={st.backBtn}>
-            <Icon name="chevL" size={16} color={C.text2} />
-          </Pressable>
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Durak ekle</Text>
+      <View style={s.header}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Icon name="chevL" size={18} color={C.text} />
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Durak ekle</Text>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <SectionHeader title="DERS" C={C} />
+        <View style={{ borderTopWidth: 1, borderTopColor: C.line }}>
+          {subjects.map(s => (
+            <AddTaskSubjectRow 
+              key={s.key} 
+              subject={s} 
+              selected={subjectKey === s.key} 
+              onPress={() => setSubjectKey(s.key)} 
+              C={C} 
+            />
+          ))}
         </View>
 
-        <ScrollView contentContainerStyle={st.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <Animated.View entering={FadeInDown.duration(420).springify()}>
-            <AddTaskSubjectList groups={groups} subjectKey={subjectKey} onPick={pickSubject} C={C} />
-          </Animated.View>
+        <SectionHeader title="KONU" C={C} />
+        <Pressable style={[s.picker, { backgroundColor: C.surface, borderColor: C.elev }]}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, flex: 1 }]}>Permütasyon - Kombinasyon</Text>
+          <Icon name="chevD" size={14} color={C.text3} />
+        </Pressable>
 
-          <Animated.View entering={FadeInDown.delay(70).duration(420).springify()} style={st.section}>
-            <AddTaskTopicField topic={topic} onPress={openTopicPicker} C={C} />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(140).duration(420).springify()} style={st.section}>
-            <SectionLabel>Süre</SectionLabel>
-            <AddTaskPillRow presets={D_PRESETS} value={durVal} onChange={setDurVal} formatLabel={fmtDur} C={C} suffix="dk" placeholder="dk" />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(210).duration(420).springify()} style={st.section}>
-            <AddTaskWhenSection C={C} />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(280).duration(420).springify()} style={st.section}>
-            <SectionLabel>Soru sayısı (opsiyonel)</SectionLabel>
-            <AddTaskPillRow presets={Q_PRESETS} value={qCount} onChange={setQCount} formatLabel={String} C={C} suffix="soru" placeholder="..." />
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(350).duration(420).springify()} style={st.section}>
-            <AddTaskNoteField value={note} onChange={setNote} C={C} />
-          </Animated.View>
-        </ScrollView>
-
-        <View style={st.bottom}>
-          <Button onPress={save} disabled={!canSave} fullWidth>Rotaya ekle</Button>
+        <SectionHeader title="SÜRE" C={C} />
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2 }}>
+          {durations.map(d => (
+            <Pill 
+              key={d} 
+              label={d} 
+              selected={durVal === d} 
+              onPress={() => setDurVal(d)} 
+              C={C} 
+            />
+          ))}
         </View>
-      </KeyboardAvoidingView>
 
-      {topicOpen && current ? (
-        <TopicPicker subject={current} visible={topicOpen} onSelect={(t) => { setTopic(t); setTopicOpen(false); }} onClose={() => setTopicOpen(false)} />
-      ) : null}
+        <SectionHeader title="NE ZAMAN" C={C} />
+        <View style={{ paddingBottom: STEP.s4 }}>
+          <ListItemRow label="Tarih" value="Bugün · 23 Haz" C={C} />
+          <ListItemRow label="Saat" value="19:30" C={C} />
+          
+          <View style={[s.listItem, { borderBottomWidth: 0, marginTop: STEP.s2 }]}>
+            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, flex: 1 }]}>Her hafta tekrarla</Text>
+            <Switch 
+              value={repeat} 
+              onValueChange={setRepeat} 
+              trackColor={{ false: C.line, true: C.accent }} 
+              thumbColor={C.text} 
+            />
+          </View>
+        </View>
+
+      </ScrollView>
+
+      <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
+        <Button variant="primary" size="lg" fullWidth>Rotaya ekle</Button>
+      </View>
     </SafeAreaView>
   );
 }
 
-const st = StyleSheet.create({
-  header: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingHorizontal: GUTTER, paddingTop: 4 },
-  backBtn: { width: CONTROL.buttonTertiary, height: CONTROL.buttonTertiary, alignItems: "center", justifyContent: "center" },
-  scroll: { paddingHorizontal: GUTTER, paddingBottom: 100 },
-  section: { marginTop: STEP.s4 },
-  bottom: { paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
+const s = StyleSheet.create({
+  header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
+  picker: { flexDirection: "row", alignItems: "center", paddingHorizontal: STEP.s3, height: 56, borderRadius: SHAPE.panel, borderWidth: 1 },
+  pill: { flex: 1, minWidth: "22%", height: 48, borderRadius: SHAPE.panel, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  listItem: { flexDirection: "row", alignItems: "center", height: 56 },
+  bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
 });
