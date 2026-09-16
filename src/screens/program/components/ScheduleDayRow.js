@@ -13,7 +13,7 @@ const KIND_LABEL = { [DAY_KINDS.TRIAL]: "Deneme günü", [DAY_KINDS.OFF]: "Boş 
 
 function hoursLabel(day) {
   if (day.kind === DAY_KINDS.OFF || !day.minutes) return "—";
-  return \\ sa\;
+  return `${formatNumber(day.minutes / 60, day.minutes % 60 ? 1 : 0)} sa`;
 }
 
 function ScheduleDayRow({ day, isToday, isLast, open, editor }) {

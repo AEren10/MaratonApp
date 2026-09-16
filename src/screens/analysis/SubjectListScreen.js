@@ -99,7 +99,7 @@ export default function SubjectListScreen() {
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginLeft: STEP.s2 }]}>
-          Ders Analizi
+          Konu ilerlemesi
         </Text>
       </View>
       <FlatList

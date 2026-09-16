@@ -52,7 +52,7 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
     <View style={{ gap: STEP.s2 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 }}>
         <Icon name="clock" size={18} color={C.text2} />
-        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Geçmiş Denemeler</Text>
+        <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Deneme kayıtları</Text>
         {onSeeAll && totalCount > history.length && (
           <Pressable
             onPress={onSeeAll}
@@ -61,7 +61,7 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
             accessibilityLabel="Tüm deneme kayıtları"
             style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Tümü</Text>
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Tüm kayıtlar</Text>
           </Pressable>
         )}
       </View>
@@ -110,10 +110,10 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>
-                Denemeleri Karşılaştır
+                Yayın karşılaştırması
               </Text>
               <Text style={{ ...TYPOGRAPHY.caption, color: C.text2, marginTop: 2 }}>
-                Son iki denemeni kıyasla
+                Son iki denemeni ders ders kıyasla
               </Text>
             </View>
             <Icon name="chevR" size={18} color={C.accent} />

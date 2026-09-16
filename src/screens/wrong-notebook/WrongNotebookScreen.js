@@ -15,8 +15,8 @@ import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
-// "Yanlış Defteri" artboardi. Topluluk sekmesi sosyal v1 disi karariyla
-// basilmiyor (CommunityTab dosyasi duruyor, ekrana baglanmiyor).
+// "Yanlış Defteri" artboardi. Sosyal sekme v1 disi karariyla
+// basilmiyor (ilgili eski dosya duruyor, ekrana baglanmiyor).
 export default function WrongNotebookScreen() {
   const C = useC();
   const nb = useWrongNotebookController();

@@ -40,6 +40,7 @@ export default function PlanVsActualScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { series, plannedDue, doneDue, gap, hasData, headline, gapBody } = usePlanVsActual();
+  const openGapClosure = () => navigation.navigate(SCREENS.GAP_CLOSURE);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -63,7 +64,7 @@ export default function PlanVsActualScreen() {
               <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 1.5, marginBottom: STEP.s4 }]}>
                 PLANLANAN vs GERÇEKLEŞEN
               </Text>
-              <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 26, marginBottom: STEP.s2 }]}>İki durak geridesin.</Text>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 26, marginBottom: STEP.s2 }]}>{headline}</Text>
               <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, lineHeight: 22 }]}>
                 Soluk hat plana göre nerede olman gerektiğini, parlak hat gerçekte nerede olduğunu gösterir.
               </Text>
@@ -78,20 +79,20 @@ export default function PlanVsActualScreen() {
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(200).duration(560)} style={styles.cards}>
-              <CountCard C={C} eyebrow="PLANDA" value={9} caption="durak bitmeliydi" />
-              <CountCard C={C} eyebrow="GERÇEKTE" value={7} caption="durak bitti" accent />
+              <CountCard C={C} eyebrow="PLANDA" value={plannedDue} caption="durak bitmeliydi" />
+              <CountCard C={C} eyebrow="GERÇEKTE" value={doneDue} caption="durak bitti" accent />
             </Animated.View>
 
             <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3, padding: STEP.s4 }}>
               <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 1, marginBottom: STEP.s2 }]}>ARADAKİ BOŞLUK</Text>
               <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, lineHeight: 22 }]}>
-                Boşluk üç haftada kapanabilir: haftada iki fazla durak. Sabit olan sınav tarihi ve hedefin; esneyen haftalık yükün.
+                {gapBody || (gap > 0 ? "Boşluk var; nasıl kapatacağını seçebilirsin." : "Boşluk yok. Plan ve gerçek aynı çizgide ilerliyor.")}
               </Text>
             </Card>
           </ScrollView>
 
           <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-            <Button variant="primary" size="lg" fullWidth>Boşluğu kapatma planı</Button>
+            <Button variant="primary" size="lg" fullWidth onPress={openGapClosure}>Boşluğu kapatma planı</Button>
             
             <View style={{ alignItems: "center", marginTop: STEP.s4, gap: STEP.s2 }}>
               <Pressable hitSlop={10}>

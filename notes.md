@@ -475,3 +475,9 @@
 - Gün özeti rota durağı tamamlanmadığında “0 durak geçtin” dememeli; çalışma kaydı varsa başarı cümlesi çalışmanın kayda geçtiğini söylemeli.
 - Retention dili sayı uydurmamalı ama kullanıcının gerçek emeğini görünür kılmalı; özellikle serbest çalışma/rota dışı kayıtlar eski app hissine düşmemeli.
 - Ay özeti “Kartı paylaş” için ayrı monthly share card modeli hâlâ eksik. Share ekranı paramsız galeriye düşerek kırılmıyor, fakat screenshot'taki özel ay kartı için sonradan domain kartı eklenmeli.
+
+## 2026-09-16 — Analiz v1 akışı tab içinde ve sosyal olmadan yaşamalı
+
+- Analiz tabındaki “Konu ilerlemesi / Deneme kayıtları / Yayın karşılaştırması / Net Tahmini / Simülasyon / Defter” girişleri aynı tab stack'i içinde kayıtlı kalmalı; buton var ama route stack dışında kalırsa canlıda akış kırılır.
+- V1'de topluluk yok. Defter/Home/Analiz yüzeylerinde “Topluluktan yeni cevap” gibi kopya gösterilmeyecek; sosyal dosyalar repoda dursa bile canlı tab yüzeyine bağlanmamalı.
+- Analiz ana ekranında deneme girişi ana header aksiyonu olmalı; tabbar üstünde kayan ayrı FAB gerçek cihazda çakışma ve eski tasarım hissi yaratıyor.

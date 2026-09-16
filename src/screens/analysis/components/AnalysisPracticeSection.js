@@ -7,33 +7,35 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
   return (
     <>
-      <SectionLabel>PRATİK</SectionLabel>
+      <SectionLabel>DAHA DERİNE</SectionLabel>
       <AnimatedCard delay={380}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Yanlış Defteri"
-          onPress={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_wrong_notebook")}
-          style={({ pressed }) => ({
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 12,
-            padding: SPACING.md,
-            borderRadius: 22,
-            backgroundColor: C.coral + "14",
-            borderWidth: 1,
-            borderColor: C.coral + "28",
-            opacity: pressed ? 0.85 : 1,
-          })}
-        >
-          <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.coral + "24", alignItems: "center", justifyContent: "center" }}>
-            <Icon name="notebook" size={22} color={C.coral} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Yanlış Defteri</Text>
-            <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 1 }}>Yanlışlarını tekrar edip güçlen</Text>
-          </View>
-          <Icon name="arrowR" size={18} color={C.coral} />
-        </Pressable>
+        <View style={{ backgroundColor: C.surface, borderRadius: 22, borderWidth: 1, borderColor: C.border, overflow: "hidden" }}>
+          <DeepRow
+            C={C}
+            title="Konu ilerlemesi"
+            sub="Altı konuda defter yükü veya çalışma açığı"
+            onPress={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_progress")}
+          />
+          <DeepRow
+            C={C}
+            title="Defter"
+            sub="Kendi yanlışların ve tekrar zamanı gelenler"
+            onPress={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_wrong_notebook")}
+          />
+          <DeepRow
+            C={C}
+            title="Net Tahmini"
+            sub="Bu tempoyla sınav günü tahmini"
+            onPress={() => go(screens.NET_FORECAST, undefined, "analysis_net_forecast")}
+          />
+          <DeepRow
+            C={C}
+            title="Simülasyon"
+            sub="Tam süreli TYT provası"
+            onPress={onSimulator}
+            last
+          />
+        </View>
       </AnimatedCard>
 
       <AnimatedCard delay={440}>
@@ -55,6 +57,33 @@ export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
         </View>
       </AnimatedCard>
     </>
+  );
+}
+
+function DeepRow({ C, title, sub, onPress, last }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 58,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: C.line,
+        opacity: pressed ? 0.76 : 1,
+      })}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>{title}</Text>
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.text3, marginTop: 2 }}>{sub}</Text>
+      </View>
+      <Icon name="chevR" size={14} color={C.text3} />
+    </Pressable>
   );
 }
 

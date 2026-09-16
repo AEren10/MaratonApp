@@ -6,8 +6,8 @@ import { alpha } from "../../../themes/colorMix";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-// "Defter" karti. Tasarimdaki "çözülmemiş soru" sayisi ve topluluk cevaplari
-// icin Ana Sayfa'da guvenilir kaynak yok; sayi uydurulmaz, kart yalniz giris.
+// "Defter" karti. Ana Sayfa'da guvenilir sayac kaynagi yok;
+// sayi uydurulmaz, kart yalniz giris olarak kalir.
 export function HomeNotebookCard({ onPress }) {
   const C = useC();
   return (

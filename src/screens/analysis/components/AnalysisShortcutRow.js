@@ -1,33 +1,28 @@
 import { View, Text, Pressable } from "react-native";
 
-import { Icon } from "../../../components/design";
+import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 
 export function AnalysisShortcutRow({ C, go, screens }) {
   return (
-    <AnimatedCard delay={60}>
-      <View style={{ flexDirection: "row", gap: STEP.s1 }}>
+    <View>
+      <SectionLabel>YAYIN KARŞILAŞTIRMASI</SectionLabel>
+      <AnimatedCard delay={60}>
         <Shortcut
           C={C}
           color={C.accent}
-          icon="trendUp"
-          label="Senaryolar"
-          onPress={() => go(screens.NET_FORECAST, undefined, "analysis_net_forecast")}
-        />
-        <Shortcut
-          C={C}
-          color={C.text}
           icon="chart"
-          label="Dönem Analizi"
+          label="Yayın karşılaştırması"
+          sub="Zor yayınlarda net düşüşün normal mi, panik mi?"
           onPress={() => go(screens.COMPARATIVE, undefined, "analysis_comparative")}
         />
-      </View>
-    </AnimatedCard>
+      </AnimatedCard>
+    </View>
   );
 }
 
-function Shortcut({ C, color, icon, label, onPress }) {
+function Shortcut({ C, color, icon, label, sub, onPress }) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -51,6 +46,9 @@ function Shortcut({ C, color, icon, label, onPress }) {
         <Icon name={icon} size={18} color={color} />
       </View>
       <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text, textAlign: "center" }}>{label}</Text>
+      {sub ? (
+        <Text style={{ ...TYPOGRAPHY.micro, color: C.text3, textAlign: "center" }}>{sub}</Text>
+      ) : null}
     </Pressable>
   );
 }

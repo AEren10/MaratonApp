@@ -2,8 +2,8 @@
 import { View, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
-import { useC, useTheme } from "../../../contexts/ThemeContext";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
 
@@ -19,12 +19,12 @@ function StopRow({ log, C, solid }) {
         style={{ ...TYPOGRAPHY.bodyMedium, color: isDone ? C.text3 : C.text, textDecorationLine: isDone ? "line-through" : "none", flex: 1 }} 
         numberOfLines={1}
       >
-        {log.topic ? \\ · \\ : log.subjectLabel}
+        {log.topic ? `${log.subjectLabel} · ${log.topic}` : log.subjectLabel}
       </Text>
       {isDone ? (
         <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.2, color: C.up }}>BİTTİ</Text>
       ) : (
-        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{log.minutes ? \\ dk\ : ""}</Text>
+        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{log.minutes ? formatMinutes(log.minutes) : ""}</Text>
       )}
     </View>
   );
@@ -32,14 +32,13 @@ function StopRow({ log, C, solid }) {
 
 export function SelectedDayPanel({ selectedDay, logs }) {
   const C = useC();
-  const { subject: subjectId } = useTheme();
   const navigation = useNavigation();
 
   const dateLabel = useMemo(() => {
     const d = new Date(selectedDay.key);
     const weekday = d.toLocaleDateString("tr-TR", { weekday: "long" }).toUpperCase();
     const rest = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }).toUpperCase();
-    return \\ · \\;
+    return `${weekday} · ${rest}`;
   }, [selectedDay.key]);
 
   const displayLogs = logs.length > 0 ? logs : [
@@ -50,7 +49,7 @@ export function SelectedDayPanel({ selectedDay, logs }) {
   ];
 
   const totalMinutes = displayLogs.reduce((s, l) => s + (l.minutes || 0), 0);
-  const meta = \\ durak · \\;
+  const meta = `${displayLogs.length} durak · ${formatMinutes(totalMinutes)}`;
 
   return (
     <View style={{ marginTop: STEP.s4 }}>

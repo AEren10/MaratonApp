@@ -65,7 +65,19 @@ export default function AnalysisScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
-        <Text style={s.title}>Analiz</Text>
+        <View style={s.header}>
+          <Text style={s.title}>Analiz</Text>
+          <Button
+            variant="primary"
+            size="sm"
+            icon="plus"
+            onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_header_trial_entry")}
+            accessibilityLabel="Deneme gir"
+            accessibilityHint="Yeni deneme sonucu giriş ekranına gider"
+          >
+            Deneme gir
+          </Button>
+        </View>
 
         <TrialFilter value={filter} onChange={changeFilter} />
 
@@ -89,7 +101,7 @@ export default function AnalysisScreen() {
 
               <AnalysisOverviewSection C={C} analysis={analysis} filter={filter} />
 
-              <SectionLabel>DERSLER</SectionLabel>
+              <SectionLabel>DERS BAZLI TREND</SectionLabel>
               <AnimatedCard delay={160}>
                 <SubjectBars
                   bars={analysis.bars}
@@ -99,7 +111,7 @@ export default function AnalysisScreen() {
                 />
               </AnimatedCard>
 
-              <SectionLabel>GEÇMİŞ</SectionLabel>
+              <SectionLabel>DENEME KAYITLARI</SectionLabel>
               <AnimatedCard delay={300}>
                 <HistoryList
                   history={analysis.history}
@@ -131,18 +143,6 @@ export default function AnalysisScreen() {
         onDismiss={dismissNudgePopup}
         onAction={handleNudgeAction}
       />
-
-      <Button
-        variant="primary"
-        size="lg"
-        icon="plus"
-        onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_fab_trial_entry")}
-        accessibilityLabel="Deneme Gir"
-        accessibilityHint="Yeni deneme sonucu giriş ekranına gider"
-        style={s.fab}
-      >
-        Deneme Gir
-      </Button>
     </SafeAreaView>
     </SwipeToHome>
   );
@@ -152,12 +152,15 @@ function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
     scroll: { paddingHorizontal: STEP.s3, paddingBottom: 176 },
-    title: { ...TYPOGRAPHY.heading, color: C.text, marginTop: STEP.s3, marginBottom: STEP.s4 },
-    content: { gap: STEP.s4 },
-    fab: {
-      position: "absolute",
-      bottom: 90,
-      right: STEP.s2,
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: STEP.s2,
+      marginTop: STEP.s3,
+      marginBottom: STEP.s4,
     },
+    title: { ...TYPOGRAPHY.heading, color: C.text },
+    content: { gap: STEP.s4 },
   });
 }

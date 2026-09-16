@@ -68,8 +68,11 @@ export const ANALIZ_STACK = [
   SCREENS.TRIAL_INSIGHTS,   // Deneme Icgorusu (ayri ekran, tasarim karsiligi yok)
   SCREENS.SUBJECT_LIST,     // Konu Ilerlemesi
   SCREENS.TRIAL_COMPARE,    // Deneme Karsilastirma
+  SCREENS.COMPARATIVE,      // Yayin / donem karsilastirmasi
   SCREENS.TRIAL_DETAIL,     // Deneme Detayi
   SCREENS.WEAK_AREAS,       // Oncelikli Konular
+  SCREENS.NET_FORECAST,     // Net Tahmini
+  SCREENS.EXAM_SIMULATOR,   // Simulasyon
   SCREENS.SUBJECT_DETAIL,   // (paylasimli)
   SCREENS.TOPIC_STUDY,      // (paylasimli)
   SCREENS.WRONG_NOTEBOOK,   // Yanlis Defteri

@@ -3,7 +3,7 @@ import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Styl
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Button } from "../../components/design";
+import { Button, Icon } from "../../components/design";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { TopicPicker } from "../../components/forms/TopicPicker";
 import { useC } from "../../contexts/ThemeContext";
