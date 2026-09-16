@@ -13,11 +13,13 @@ import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
+import { useBlockBack } from "../../hooks/useBlockBack";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-// Tasarim: "Çalışman İşlendi". İlk oturum sonu kutlama ekranı.
+// Tasarim: "Calisman islendi". Ilk oturum sonu kutlama ekrani.
 export default function StudyProcessedScreen() {
+  useBlockBack(true);
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -35,7 +37,7 @@ export default function StudyProcessedScreen() {
     resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
   }, [navigation]);
 
-  // SVG Animasyon değerleri
+  // SVG animasyon degerleri
   const pulseScale = useSharedValue(8);
   const pulseOpacity = useSharedValue(0);
   const coreScale = useSharedValue(0);
@@ -72,7 +74,7 @@ export default function StudyProcessedScreen() {
 
         <View style={styles.svgContainer}>
           <Svg viewBox="0 0 390 122" style={styles.svg}>
-            {/* Geçmiş Rota */}
+            {/* Geçmiş rota */}
             <Path 
               d="M 26 96 C 92 90 132 78 180 66" 
               fill="none" 
@@ -90,14 +92,14 @@ export default function StudyProcessedScreen() {
               strokeDasharray="2 8" 
             />
             
-            {/* İlk Düğüm */}
+            {/* İlk düğüm */}
             <Circle cx="26" cy="96" r="4.4" fill={C.accent} />
             
-            {/* Aktif Düğüm Animasyonu */}
+            {/* Aktif düğüm animasyonu */}
             <AnimatedCircle cx="180" cy="66" r={pulseScale} fill="none" stroke={C.accent} strokeWidth="3" opacity={pulseOpacity} />
             <AnimatedCircle cx="180" cy="66" r={coreScale} fill={C.bg} stroke={C.accent} strokeWidth="2.4" />
             
-            {/* Sonraki Düğüm */}
+            {/* Sonraki düğüm */}
             <Circle cx="364" cy="26" r="5.5" fill={C.bg} stroke={C.border} strokeWidth="2.4" />
           </Svg>
         </View>
@@ -106,7 +108,7 @@ export default function StudyProcessedScreen() {
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <Text style={[styles.statNumber, { color: C.text }]}>{hasStudyData ? minutes : "—"}</Text>
             <Text style={[styles.statText, { color: C.text2 }]}>
-              {hasStudyData ? "dakika · İlk hafta çalışma verin rotaya işlendi" : "ilk çalışma oturumun burada görünecek"}
+              {hasStudyData ? "dakika · ilk hafta çalışma verin rotaya işlendi" : "ilk çalışma oturumun burada görünecek"}
             </Text>
           </View>
         </Animated.View>
@@ -172,3 +174,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+

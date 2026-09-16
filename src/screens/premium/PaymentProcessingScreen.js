@@ -5,37 +5,49 @@ import { useNavigation } from "@react-navigation/native";
 import Svg, { Circle, Path } from "react-native-svg";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { useBlockBack } from "../../hooks/useBlockBack";
+import { usePaywallPurchase } from "../../hooks/usePaywallPurchase";
 
 export default function PaymentProcessingScreen() {
+  useBlockBack(true);
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const spinAnim = useRef(new Animated.Value(0)).current;
+  const purchaseStartedRef = useRef(false);
+  const { handlePurchase } = usePaywallPurchase({ closeOnSuccess: false });
 
-  // Mock processing time
   useEffect(() => {
-    // Start spinner
-    Animated.loop(
+    const spinLoop = Animated.loop(
       Animated.timing(spinAnim, {
         toValue: 1,
         duration: 1100, // dur="1.1s" in HTML
         easing: Easing.linear,
         useNativeDriver: true,
       })
-    ).start();
+    );
+    spinLoop.start();
 
-    // Mock API call to navigate to success/fail
-    const timer = setTimeout(() => {
-      // 80% success rate for preview purposes
-      if (Math.random() > 0.2) {
-        navigation.navigate(SCREENS.PAYMENT_SUCCESS);
-      } else {
-        navigation.navigate(SCREENS.PAYMENT_FAILED);
-      }
-    }, 2500);
+    return () => spinLoop.stop();
+  }, [spinAnim]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    if (purchaseStartedRef.current) return;
+    purchaseStartedRef.current = true;
+    let alive = true;
+
+    async function runPurchase() {
+      const completed = await handlePurchase();
+      if (!alive) return;
+      navigation.replace(completed ? SCREENS.PAYMENT_SUCCESS : SCREENS.PAYMENT_FAILED);
+    }
+
+    runPurchase();
+
+    return () => {
+      alive = false;
+    };
+  }, [handlePurchase, navigation]);
 
   const spin = spinAnim.interpolate({
     inputRange: [0, 1],
@@ -113,3 +125,4 @@ function makeStyles(C) {
     }
   });
 }
+

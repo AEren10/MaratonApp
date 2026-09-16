@@ -13,11 +13,13 @@ import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
+import { useBlockBack } from "../../hooks/useBlockBack";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // Tasarim: "Ilk Rotan Hazir". 1. Gun Sonu - Ilk deneme kaydedildiginde rota kurulur.
 export default function FirstRouteReadyScreen() {
+  useBlockBack(true);
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -208,3 +210,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+

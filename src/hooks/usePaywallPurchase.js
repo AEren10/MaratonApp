@@ -23,7 +23,7 @@ import * as H from "../lib/haptics";
 // URETIMDE ucretsiz denemeye DUSMEZ: paket bulunamazsa "Satin alma hazir
 // degil" der ve durur. Deneme yoluna yalniz __DEV__ ve RevenueCat
 // yapilandirilmamisken giriliyor.
-export function usePaywallPurchase() {
+export function usePaywallPurchase({ closeOnSuccess = true } = {}) {
   const navigation = useNavigation();
   const route = useRoute();
   const { refreshPremium } = usePremium();
@@ -98,17 +98,17 @@ export function usePaywallPurchase() {
             H.success();
             await refreshPremium();
             showAlert("Deneme Başladı", "7 günlük ücretsiz denemen başladı!");
-            navigation.goBack();
-            return;
+            if (closeOnSuccess) navigation.goBack();
+            return true;
           }
           showAlert("Deneme Kullanıldı", "Ücretsiz deneme hakkını zaten kullandın.");
-          return;
+          return false;
         }
         showAlert(
           "Satın alma hazır değil",
           "Mağaza paketleri yüklenemedi. Biraz sonra tekrar dene.",
         );
-        return;
+        return false;
       }
       const isPro = await purchasePackage(pkg);
       if (isPro) {
@@ -116,15 +116,18 @@ export function usePaywallPurchase() {
         track(EVENTS.PREMIUM_PURCHASED, { plan: selectedPlan, source: paywallSource });
         H.success();
         await refreshPremium();
-        navigation.goBack();
+        if (closeOnSuccess) navigation.goBack();
+        return true;
       }
+      return false;
     } catch (e) {
-      if (e?.userCancelled) return;
+      if (e?.userCancelled) return false;
       showAlert("Hata", "Satın alma işlemi başarısız oldu. Lütfen tekrar dene.");
+      return false;
     } finally {
       setPurchasing(false);
     }
-  }, [getSelectedPackage, paywallSource, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
+  }, [closeOnSuccess, getSelectedPackage, paywallSource, selectedPlan, user?.id, refreshPremium, navigation, showAlert]);
 
   const handleRestore = useCallback(async () => {
     setPurchasing(true);
