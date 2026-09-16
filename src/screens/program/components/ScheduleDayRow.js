@@ -1,4 +1,4 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -13,10 +13,9 @@ const KIND_LABEL = { [DAY_KINDS.TRIAL]: "Deneme günü", [DAY_KINDS.OFF]: "Boş 
 
 function hoursLabel(day) {
   if (day.kind === DAY_KINDS.OFF || !day.minutes) return "—";
-  return `${formatNumber(day.minutes / 60, day.minutes % 60 ? 1 : 0)} sa`;
+  return \\ sa\;
 }
 
-// Haftalik ders programi satiri: GUN · ders cipleri · saat. Dokununca acilir.
 function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
   const C = useC();
   const kindLabel = KIND_LABEL[day.kind];
@@ -51,7 +50,7 @@ export default memo(ScheduleDayRow);
 
 const s = StyleSheet.create({
   wrap: { borderTopWidth: 1 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 2, paddingVertical: STEP.s2 + 4, minHeight: CONTROL.tapMin },
-  day: { width: 34 },
-  chips: { flex: 1, flexDirection: "row", flexWrap: "wrap", gap: STEP.s1 - 2 },
+  row: { flexDirection: "row", alignItems: "center", minHeight: CONTROL.tapMin, paddingVertical: STEP.s2, gap: STEP.s2 },
+  day: { width: 36 },
+  chips: { flex: 1, flexDirection: "row", flexWrap: "wrap", gap: 6 },
 });

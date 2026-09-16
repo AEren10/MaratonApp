@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+﻿import { useCallback } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -18,7 +18,6 @@ import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { RouteHeader } from "../roadmap/components/RouteHeader";
 import ScheduleDayRow from "./components/ScheduleDayRow";
 
-// Tasarim AYARLAR · "Haftalık ders programı".
 function ClassScheduleInner() {
   const C = useC();
   const navigation = useNavigation();
@@ -82,20 +81,11 @@ export default function ClassScheduleScreen() {
 
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s4 },
-  lede: { maxWidth: 302 },
-  list: { marginTop: STEP.s3 + 6 },
-  total: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: STEP.s2,
-    marginTop: STEP.s3 + 4,
-    paddingVertical: STEP.s2 + 4,
-    paddingHorizontal: STEP.s3 - 2,
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
-  },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s4 },
+  lede: { marginTop: STEP.s3 },
+  list: { marginTop: STEP.s4 },
+  total: { flexDirection: "row", alignItems: "baseline", gap: 6, marginTop: STEP.s5, paddingVertical: STEP.s3 - 2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.panel, borderWidth: 1 },
   flex: { flex: 1 },
-  cta: { marginTop: STEP.s2 + 4 },
-  foot: { marginTop: STEP.s2 + 2, textAlign: "center" },
+  cta: { marginTop: STEP.s5 },
+  foot: { marginTop: STEP.s4, textAlign: "center" },
 });
