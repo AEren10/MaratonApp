@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -55,29 +55,30 @@ export default function ProfileScreen() {
     return "YKS";
   }, [examType, field]);
 
-  const leagueTier = useMemo(() => getTier(weeklyXP), [weeklyXP]);
-  const leagueNextTier = useMemo(() => getNextTier(weeklyXP), [weeklyXP]);
-
   const careerStats = useMemo(() => {
-    const totalQ = gStats.totalQuestions || 0;
-    const totalMin = gStats.totalMinutes || 0;
-    return { totalQuestions: totalQ, totalHours: Math.floor(totalMin / 60) };
+    return {
+      totalQuestions: gStats?.totalQuestions || 0,
+      totalHours: Math.floor((gStats?.totalMinutes || 0) / 60),
+    };
   }, [gStats]);
 
-  const strengths = useMemo(() => {
-    if (!trials.length) return [];
-    const subjectMap = {};
-    subjects.forEach((s) => { subjectMap[s.key] = s; });
+  const leagueTier = getTier(weeklyXP);
+  const leagueNextTier = getNextTier(leagueTier);
 
+  const strengths = useMemo(() => {
+    if (!trials || trials.length === 0) return [];
+    const latest = trials.slice(0, 5);
     const totals = {};
-    trials.slice(0, 5).forEach((trial) => {
-      Object.entries(trial.subjects || {}).forEach(([key, data]) => {
-        const norm = key.replace(/^tyt_/, "").replace(/^ayt_/, "");
-        if (!totals[norm]) totals[norm] = { correct: 0, total: 0 };
-        totals[norm].correct += data.correct || 0;
-        totals[norm].total += (data.correct || 0) + (data.wrong || 0);
+    latest.forEach((t) => {
+      Object.entries(t.subjects || {}).forEach(([subj, data]) => {
+        if (!totals[subj]) totals[subj] = { correct: 0, total: 0 };
+        totals[subj].correct += data.correct || 0;
+        totals[subj].total += (data.correct || 0) + (data.wrong || 0) + (data.empty || 0);
       });
     });
+
+    const subjectMap = {};
+    subjects.forEach((s) => (subjectMap[s.normName] = s));
 
     const entries = [];
     Object.entries(totals).forEach(([norm, agg]) => {
@@ -120,10 +121,15 @@ export default function ProfileScreen() {
 
           <Animated.View entering={FADE(250)} style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
             <ProfileLinkRow
+              label="Arkadaşını davet et"
+              meta="2 aktif"
+              onPress={() => navigation.navigate(SCREENS.REFERRAL)}
+              first
+            />
+            <ProfileLinkRow
               label="Premium"
               meta="7 gün ücretsiz"
               onPress={() => navigation.navigate(SCREENS.PREMIUM, { source: "profile_premium_row" })}
-              first
             />
             <ExamFlowRow />
           </Animated.View>

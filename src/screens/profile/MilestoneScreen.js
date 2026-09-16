@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+﻿import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -10,17 +10,9 @@ import { SCREENS } from "../../constants/screens";
 import { useMilestone } from "../../hooks/useMilestone";
 import { MilestoneHero } from "./components/MilestoneHero";
 import { MilestoneStats } from "./components/MilestoneStats";
+import { MilestoneBadges } from "./components/MilestoneBadges";
 import * as H from "../../lib/haptics";
 
-// Tasarim: "Kilometre Tasi" (RETENTION). Rotada tamamlanan durak sayisi bir
-// esige oturdugunda gosterilen basari ani; Profil/Seviye tarafindaki
-// "Kilometre taslarini gor" satirindan da aciliyor.
-//
-// TASARIMDAN BILEREK CIKARILANLAR:
-//  - "Onuncu durakta olan ogrencilerin cogu sinava kadar rotada kaliyor."
-//    Kohort verisi YOK; oran iddiasi uydurma olur.
-//  - "ROZETLERIN" bolumu. Kodda hicbir rozet kaynagi yok (profiles.badges
-//    kolonunu yazan mekanizma da yok), bos kutu gostermek yerine cikarildi.
 export default function MilestoneScreen() {
   const C = useC();
   const navigation = useNavigation();
@@ -71,6 +63,10 @@ export default function MilestoneScreen() {
               <MilestoneStats questions={questions} hours={hours} net={net} />
             </Animated.View>
 
+            <Animated.View entering={FadeInDown.delay(200).duration(500)}>
+              <MilestoneBadges />
+            </Animated.View>
+
             <Animated.View entering={FadeInDown.delay(280).duration(500)} style={styles.cta}>
               <Button onPress={goShare} size="lg" fullWidth>Kartı paylaş</Button>
               <Button
@@ -92,12 +88,15 @@ export default function MilestoneScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: "row", alignItems: "center", gap: STEP.s2,
-    paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
+    flexDirection: "row", alignItems: "center", gap: 14,
+    paddingHorizontal: GUTTER - 4, paddingVertical: STEP.s1,
   },
-  back: { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginLeft: -14 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4, paddingBottom: STEP.s5 },
-  loading: { alignItems: "center" },
+  back: {
+    width: 44, height: 44,
+    alignItems: "center", justifyContent: "center",
+  },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s4 },
+  loading: { alignItems: "center", marginTop: STEP.s5 },
   stats: { marginTop: STEP.s4 },
   cta: { marginTop: STEP.s4 },
   secondaryCta: { marginTop: STEP.s2 },

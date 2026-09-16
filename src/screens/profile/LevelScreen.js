@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+﻿import { useCallback } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -11,9 +11,8 @@ import { SCREENS } from "../../constants/screens";
 import { useLevelProgress } from "../../hooks/useLevelProgress";
 import { LevelHero } from "./components/LevelHero";
 import { LevelPathRow } from "./components/LevelPathRow";
+import { WeeklyGains } from "./components/WeeklyGains";
 
-// Tasarim: "Seviye" (Profil > SEVIYE satiri). XP sunucu otoritesinde,
-// bu ekran yalniz gosterim yapar.
 const NOTE =
   "Halka emeği ölçer, rota sonucu. Neti düşen hafta bile soru ve süre XP " +
   "kazandırır — bu yüzden ikisi aynı soruya cevap vermiyor.";
@@ -86,20 +85,20 @@ export default function LevelScreen() {
         keyExtractor={keyExtractor}
         ListHeaderComponent={header}
         ListFooterComponent={
-          /* Tasarim bu satiri Seviye artboardinda gosteriyor. Ekran o sirada
-             yoktu, simdi var -- baglandi. Kilometre Tasi'nin baska giris
-             noktasi yok, bu satir olmazsa erisilemez kalirdi. */
-          <Pressable
-            onPress={() => navigation.navigate(SCREENS.MILESTONE)}
-            accessibilityRole="button"
-            accessibilityLabel="Kilometre taşlarını gör"
-            style={({ pressed }) => [styles.milestoneRow, { borderColor: C.border, opacity: pressed ? 0.7 : 1 }]}
-          >
-            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>
-              Kilometre taşlarını gör
-            </Text>
-            <Icon name="chevR" size={13} color={C.text3} />
-          </Pressable>
+          <View>
+            <WeeklyGains />
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.MILESTONE)}
+              accessibilityRole="button"
+              accessibilityLabel="Kilometre taşlarını gör"
+              style={({ pressed }) => [styles.milestoneRow, { borderColor: C.border, opacity: pressed ? 0.7 : 1 }]}
+            >
+              <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>
+                Kilometre taşlarını gör
+              </Text>
+              <Icon name="chevR" size={13} color={C.text3} />
+            </Pressable>
+          </View>
         }
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}

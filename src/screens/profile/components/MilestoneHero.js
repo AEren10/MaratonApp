@@ -1,12 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+﻿import { View, Text, StyleSheet } from "react-native";
 
 import { Card, StatBlock } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-// Tasarim: "Kilometre Tasi" hero'su. Kutu 132x132 r12, zemin void, 1px kenarlik
-// (tasarimin blur'lu accent parlamasi ALINMADI — derinlik golge/parlama ile
-// degil yuzey tonu + kenarlikla kurulur).
 export function MilestoneHero({ done }) {
   const C = useC();
 
@@ -17,11 +14,15 @@ export function MilestoneHero({ done }) {
       </Card>
 
       <Text style={[TYPOGRAPHY.label, styles.eyebrow, { color: C.accentBright }]}>
-        {done}. DURAK
+        ONUNCU DURAK
       </Text>
 
       <Text style={[TYPOGRAPHY.heading, styles.headline, { color: C.text }]}>
-        Rotanın {done} durağını geçtin.
+        Rotanın onda birini geçtin.
+      </Text>
+      
+      <Text style={[TYPOGRAPHY.bodyMedium, styles.subtitle, { color: C.text3 }]}>
+        Onuncu durakta olan öğrencilerin çoğu sınava kadar rotada kalıyor. İyi gidiyorsun.
       </Text>
     </View>
   );
@@ -43,4 +44,9 @@ const styles = StyleSheet.create({
     maxWidth: 270,
     textAlign: "center",
   },
+  subtitle: {
+    marginTop: STEP.s2,
+    maxWidth: 270,
+    textAlign: "center",
+  }
 });
