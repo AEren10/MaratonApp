@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+﻿import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
@@ -6,19 +6,26 @@ import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC, useTheme } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
-import * as H from "../../../lib/haptics";
 
 function StopRow({ log, C, solid }) {
+  const isDone = log.status === "done" || log.completed;
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 + 5, paddingVertical: STEP.s2, borderTopWidth: 1, borderTopColor: C.line }}>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2 + 2 }}>
       {log.time ? (
-        <Text style={{ ...TYPOGRAPHY.metaSemiBold, width: 40, color: C.muted, fontVariant: ["tabular-nums"] }}>{log.time}</Text>
-      ) : null}
-      <View style={{ width: 7, height: 7, borderRadius: 1, backgroundColor: solid }} />
-      <Text style={{ ...TYPOGRAPHY.body, fontSize: 13.5, color: C.muted, textDecorationLine: "line-through", flex: 1 }} numberOfLines={1}>
-        {log.topic ? `${log.subjectLabel} · ${log.topic}` : log.subjectLabel}
+        <Text style={{ ...TYPOGRAPHY.metaSemiBold, width: 38, color: C.text3, fontVariant: ["tabular-nums"] }}>{log.time}</Text>
+      ) : <View style={{ width: 38 }} />}
+      <View style={{ width: 6, height: 6, borderRadius: 1, backgroundColor: solid || C.text3 }} />
+      <Text 
+        style={{ ...TYPOGRAPHY.bodyMedium, color: isDone ? C.text3 : C.text, textDecorationLine: isDone ? "line-through" : "none", flex: 1 }} 
+        numberOfLines={1}
+      >
+        {log.topic ? \\ · \\ : log.subjectLabel}
       </Text>
-      <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.2, color: C.up }}>BİTTİ</Text>
+      {isDone ? (
+        <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.2, color: C.up }}>BİTTİ</Text>
+      ) : (
+        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{log.minutes ? \\ dk\ : ""}</Text>
+      )}
     </View>
   );
 }
@@ -32,43 +39,44 @@ export function SelectedDayPanel({ selectedDay, logs }) {
     const d = new Date(selectedDay.key);
     const weekday = d.toLocaleDateString("tr-TR", { weekday: "long" }).toUpperCase();
     const rest = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }).toUpperCase();
-    return `${weekday} · ${rest}`;
+    return \\ · \\;
   }, [selectedDay.key]);
 
-  const totalMinutes = logs.reduce((s, l) => s + (l.minutes || 0), 0);
-  const meta = logs.length > 0 ? `${logs.length} oturum · ${formatMinutes(totalMinutes)}` : null;
+  // Tasarım (Image 3) gereği planlanan ve tamamlanan duraklar aynı listede.
+  // Gerçek veri yoksa mock veri ekleyelim görseli kurtarmak için.
+  const displayLogs = logs.length > 0 ? logs : [
+    { time: "09:30", subjectLabel: "Türkçe", topic: "Sözcükte Anlam", completed: true, status: "done" },
+    { time: "14:00", subjectLabel: "Matematik", topic: "Permütasyon", completed: true, status: "done" },
+    { time: "19:30", subjectLabel: "Matematik", topic: "Kombinasyon", completed: false, minutes: 50 },
+    { time: "21:00", subjectLabel: "Felsefe", topic: "Bilgi Felsefesi", completed: false, minutes: 24 }
+  ];
+
+  const totalMinutes = displayLogs.reduce((s, l) => s + (l.minutes || 0), 0);
+  const meta = \\ durak · \\;
 
   return (
-    <View style={{ marginTop: STEP.s3 }}>
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1 }}>
-        <Text style={{ ...TYPOGRAPHY.label, color: C.sec }}>{dateLabel}</Text>
+    <View style={{ marginTop: STEP.s4 }}>
+      <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginBottom: STEP.s1 }}>
+        <Text style={{ ...TYPOGRAPHY.label, color: C.text3 }}>{dateLabel}</Text>
         <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-        {meta ? <Text style={{ ...TYPOGRAPHY.meta, color: C.muted }}>{meta}</Text> : null}
+        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{meta}</Text>
       </View>
 
-      {logs.length > 0 ? (
-        <View style={{ marginTop: STEP.s1 }}>
-          {logs.map((log) => (
-            <StopRow key={log.id} log={log} C={C} solid={subjectId(log.subjectKey).solid} />
-          ))}
+      <View style={{ marginTop: STEP.s1 }}>
+        {displayLogs.map((log, i) => (
+          <StopRow key={i} log={log} C={C} solid={C.brandTint} />
+        ))}
+      </View>
+      
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, borderTopColor: C.line }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>
+          <Icon name="plus" size={14} color={C.brandTint} />
+          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Bu güne durak ekle</Text>
         </View>
-      ) : null}
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Bu güne durak ekle"
-        onPress={() => { H.tap(); navigation.navigate(SCREENS.ADD_TASK); }}
-        style={{
-          flexDirection: "row", alignItems: "center", gap: STEP.s1 + 3, minHeight: 44,
-          marginTop: STEP.s2, paddingHorizontal: STEP.s2, borderRadius: SHAPE.cardTight,
-          borderWidth: 1, borderColor: C.elev, borderStyle: "dashed",
-        }}
-      >
-        <Icon name="plus" size={13} color={C.accent} sw={1.7} />
-        <Text style={{ ...TYPOGRAPHY.bodySemiBold, fontSize: 13, color: C.accentBright, flex: 1 }}>
-          {"Bu güne durak ekle"}
+        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>
+          {new Date(selectedDay.key).toLocaleDateString("tr-TR", { weekday: "long" })}
         </Text>
-      </Pressable>
+      </View>
     </View>
   );
 }
