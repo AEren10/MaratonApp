@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -16,8 +16,6 @@ import { PhotoCapture } from "./components/add/PhotoCapture";
 import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 
-// "Yanlış Ekle" artboardi: fotograf -> sinav turu -> ders -> konu -> not -> kaydet.
-// Istege bagli route.params.subjectKey dersi dolu acar (deneme detayindan gelis).
 export default function AddWrongScreen() {
   const C = useC();
   const navigation = useNavigation();
@@ -49,77 +47,103 @@ export default function AddWrongScreen() {
             {form.subjects.map((s) => (
               <ChoiceChip
                 key={s.key}
-                label={s.label}
-                dot={subjectColorOf(C, s.key)}
-                active={subject?.key === s.key}
+                label={s.name}
+                dotColor={subjectColorOf(C, s.key)}
+                selected={form.subjectKey === s.key}
                 onPress={() => form.changeSubject(s.key)}
               />
             ))}
           </FormSection>
 
-          {subject ? (
-            <FormSection
-              label="KONU"
-              hint={form.guess ? `${subject.label} · son çalıştığından tahmin edildi` : null}
-            >
-              {form.suggestions.map((name) => (
-                <ChoiceChip
-                  key={name}
-                  label={name}
-                  active={form.selectedTopic === name}
-                  badge={name === form.guess ? "TAHMİN" : null}
-                  onPress={() => form.setTopic(name)}
-                />
-              ))}
-              <ChoiceChip label="Konu ara" icon="search" dashed onPress={() => setPickerOpen(true)} />
-            </FormSection>
-          ) : null}
-
-          <FormSection label="KENDİME NOT" hint="isteğe bağlı" wrap={false}>
-            <TextInput
-              value={form.note}
-              onChangeText={form.setNote}
-              placeholder="Bir dahaki sefere neye dikkat edeceğim…"
-              placeholderTextColor={C.text3}
-              multiline
-              accessibilityLabel="Kendime not"
-              style={[TYPOGRAPHY.body, styles.note, { color: C.text, backgroundColor: C.surface, borderColor: C.elev }]}
+          <FormSection
+            label={"KONU"}
+            suffix={form.inferredTopic ? "Matematik · son çalıştığından tahmin edildi" : ""}
+            onSuffixPress={form.inferredTopic ? undefined : () => setPickerOpen(true)}
+          >
+            {form.topics.slice(0, 4).map((t) => (
+              <ChoiceChip
+                key={t.key}
+                label={t.name + (form.inferredTopic?.key === t.key ? "  TAHMİN" : "")}
+                selected={form.topicKey === t.key}
+                onPress={() => form.changeTopic(t.key)}
+              />
+            ))}
+            <ChoiceChip
+              label={form.isOtherTopic ? form.topicLabel : "Konu ara"}
+              selected={form.isOtherTopic}
+              icon="search"
+              onPress={() => setPickerOpen(true)}
             />
           </FormSection>
 
-          <View style={styles.save}>
-            <Button size="lg" fullWidth loading={form.saving} onPress={form.save}>
-              Kaydet
-            </Button>
-            <Text style={[TYPOGRAPHY.meta, styles.foot, { color: C.text3 }]}>
-              Kaydedince 1. gün tekrarına düşer.
-            </Text>
+          <FormSection label="NEDEN YANLIŞ" suffix="isteğe bağlı">
+            {form.reasons.map((r) => (
+              <ChoiceChip
+                key={r.key}
+                label={r.label}
+                selected={form.reason === r.key}
+                onPress={() => form.changeReason(r.key)}
+              />
+            ))}
+          </FormSection>
+
+          <FormSection label="KENDİME NOT" suffix="isteğe bağlı" wrap={false}>
+            <TextInput
+              style={[TYPOGRAPHY.bodyMedium, styles.input, { backgroundColor: C.surface, borderColor: C.elev, color: C.text }]}
+              placeholder="Bir dahaki sefere neye dikkat edeceğim..."
+              placeholderTextColor={C.text3}
+              value={form.note}
+              onChangeText={form.changeNote}
+              multiline
+              maxLength={200}
+            />
+          </FormSection>
+
+          <View style={[styles.sourceRow, { borderBottomColor: C.line }]}>
+            <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>Kaynak</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{form.sourceLabel}</Text>
+              <Icon name="chevR" size={14} color={C.text3} />
+            </View>
           </View>
         </ScrollView>
-
-        <TopicPicker
-          visible={pickerOpen}
-          subject={subject}
-          onClose={() => setPickerOpen(false)}
-          onSelect={(name) => form.setTopic(name)}
-        />
-        <XPBoostToast amount={form.xpToast.amount} visible={form.xpToast.visible} multiplier={form.xpToast.multiplier} onDismiss={form.dismissXP} />
+        <View style={[styles.footer, { backgroundColor: C.bg, borderTopColor: C.line }]}>
+          <Button size="lg" onPress={form.save} loading={form.saving} fullWidth>
+            Kaydet
+          </Button>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text2, textAlign: "center", marginTop: STEP.s2 }]}>
+            Kaydedince 1. gün tekrarına düşer.
+          </Text>
+        </View>
       </KeyboardAvoidingView>
+      <TopicPicker
+        visible={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        subject={subject}
+        selectedKey={form.topicKey}
+        onSelect={(t) => { form.changeTopic(t.key); setPickerOpen(false); }}
+      />
+      <XPBoostToast
+        visible={form.saved}
+        xp={10}
+        title="Deftere atıldı"
+        subtitle="İlk tekrar yarın. Maraton bunu unutmana izin vermeyecek."
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingBottom: STEP.s4 },
-  note: {
-    minHeight: 76,
-    paddingHorizontal: STEP.s3 - 2,
-    paddingVertical: STEP.s2 + 4,
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
+  scroll: { paddingBottom: STEP.s5 },
+  input: {
+    height: 104, padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1,
     textAlignVertical: "top",
   },
-  save: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 4 },
-  foot: { marginTop: STEP.s2 + 2, textAlign: "center" },
+  sourceRow: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: GUTTER, paddingVertical: STEP.s3, marginTop: STEP.s3,
+    borderBottomWidth: 1,
+  },
+  footer: { padding: GUTTER, paddingBottom: STEP.s2, borderTopWidth: 1 },
 });
