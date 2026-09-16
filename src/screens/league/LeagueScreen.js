@@ -37,7 +37,7 @@ function TierHeader({ tier, nextTier, myScore, totalUsers, C }) {
         <View style={{ marginLeft: SPACING.md, flex: 1 }}>
           <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
-            {totalUsers} yarışmacı{xpToNext != null ? ` · ${nextTier.name} Lig'e ${xpToNext} XP` : ""}
+            {totalUsers} yarışmacı{xpToNext != null ? ` · ${nextTier.name} Lig'e ${xpToNext} puan` : ""}
           </Text>
         </View>
       </View>
@@ -95,7 +95,7 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
           {isYou ? "Sen" : item.name || "Öğrenci"}
         </Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginTop: 1 }]}>
-          {item.questions} soru · {item.trials} deneme
+          {item.streak ? `${item.streak} günlük seri` : `${item.questions || 0} soru · ${item.trials || 0} deneme`}
         </Text>
       </View>
 
@@ -104,13 +104,84 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
       )}
 
       <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, color: C.text }}>
-        {item.weekly_xp}
+        {item.questions ?? item.weekly_xp}
       </Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: SPACING.xs }]}>XP</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: SPACING.xs }]}>soru</Text>
     </AnimPressable>
   );
 });
 
+function LeagueBrief({ C, data }) {
+  const my = data.list.find((item) => item.you);
+  const previous = data.list.find((item) => item.rank === (my?.rank ?? 0) + 1);
+  const delta = previous ? Math.max(0, (my?.questions || 0) - (previous.questions || 0)) : 0;
+  const rankText = data.myRank ? `${data.myRank}. sıra` : "sıralama";
+  return (
+    <AnimatedCard delay={0}>
+      <View style={{
+        padding: SPACING.lg,
+        marginBottom: SPACING.md,
+        borderRadius: RADIUS.xxl,
+        backgroundColor: C.surface,
+        borderWidth: 1,
+        borderColor: C.border,
+      }}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>BU HAFTA · {rankText.toUpperCase()}</Text>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: SPACING.sm }]}>
+          Bu hafta {my?.questions || 0} soru çözdün{delta ? `, alt sıradan ${delta} fazla.` : "."}
+        </Text>
+        <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: SPACING.sm, lineHeight: 19 }]}>
+          Sıralama haftalık çözülen soru ve çalışma süresine göre okunur. Netlerin burada görünmez — burada kıyas emek üzerinden.
+        </Text>
+      </View>
+    </AnimatedCard>
+  );
+}
+
+function SocialActionCard({ C, onInvite, onCompanion }) {
+  return (
+    <View style={{ gap: SPACING.sm, marginTop: SPACING.md }}>
+      <Pressable
+        onPress={onInvite}
+        accessibilityRole="button"
+        accessibilityLabel="Arkadaşını davet et"
+        style={({ pressed }) => ({
+          minHeight: 52,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: SPACING.md,
+          borderRadius: RADIUS.xl,
+          backgroundColor: C.surface,
+          borderWidth: 1,
+          borderColor: C.border,
+          opacity: pressed ? 0.75 : 1,
+        })}
+      >
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et · +1 hafta premium</Text>
+        <Icon name="chevR" size={14} color={C.text3} />
+      </Pressable>
+      <Pressable
+        onPress={onCompanion}
+        accessibilityRole="button"
+        accessibilityLabel="Yol arkadaşını aç"
+        style={({ pressed }) => ({
+          minHeight: 52,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: SPACING.md,
+          borderRadius: RADIUS.xl,
+          backgroundColor: C.surface,
+          borderWidth: 1,
+          borderColor: C.border,
+          opacity: pressed ? 0.75 : 1,
+        })}
+      >
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Yol arkadaşın · iki rota yan yana</Text>
+        <Icon name="chevR" size={14} color={C.text3} />
+      </Pressable>
+    </View>
+  );
+}
 
 export default function LeagueScreen() {
   const navigation = useNavigation();
@@ -163,6 +234,8 @@ export default function LeagueScreen() {
   const nextTier = useMemo(() => getNextTier(data.myScore), [data.myScore]);
 
   const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
+  const goInvite = () => navigation.navigate(SCREENS.REFERRAL);
+  const goCompanion = () => navigation.navigate(SCREENS.ROUTE_COMPANION);
 
   // Gerçek kohort büyüklüğü sunucudan gelir. list.length kullanılırsa global
   // sıralamada liste 50 satırla sınırlı olduğu için 46-50. sıradakiler
@@ -243,20 +316,25 @@ export default function LeagueScreen() {
         >
           <Icon name="chevL" size={20} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Haftalık Lig</Text>
+        <View style={{ flex: 1, marginHorizontal: SPACING.sm }}>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Sosyal</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2, marginTop: 2 }]}>LİG</Text>
+        </View>
         <Pressable
-          onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
+          onPress={goInvite}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Challenge"
+          accessibilityLabel="Arkadaş davet et"
           style={{
             width: 38, height: 38,
             borderRadius: 12,
-            backgroundColor: C.orange + "28",
+            backgroundColor: C.surface,
             alignItems: "center", justifyContent: "center",
+            borderWidth: 1,
+            borderColor: C.border,
           }}
         >
-          <Icon name="zap" size={18} color={C.orange} />
+          <Icon name="users" size={18} color={C.text2} />
         </Pressable>
       </View>
 
@@ -273,8 +351,7 @@ export default function LeagueScreen() {
       }}>
         {[
           { key: "friends", label: "Arkadaşlar" },
-          { key: "global", label: "Global" },
-          { key: "groups", label: "Gruplar" },
+          { key: "global", label: "Genel" },
         ].map((t) => (
           <Pressable
             key={t.key}
@@ -309,6 +386,7 @@ export default function LeagueScreen() {
           keyExtractor={(item) => item._id ?? String(item.user_id)}
           ListHeaderComponent={
             <>
+              <LeagueBrief C={C} data={data} />
               <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} totalUsers={totalUsers} C={C} />
               <Text style={[
                 TYPOGRAPHY.label,
@@ -319,7 +397,7 @@ export default function LeagueScreen() {
                   marginBottom: SPACING.sm,
                   marginLeft: SPACING.xs,
                 },
-              ]}>▲ YÜKSELME BÖLGESİ</Text>
+              ]}>SIRALAMA · SORU SAYISI</Text>
             </>
           }
           renderItem={renderItem}
@@ -332,6 +410,7 @@ export default function LeagueScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />
           }
+          ListFooterComponent={<SocialActionCard C={C} onInvite={goInvite} onCompanion={goCompanion} />}
         />
       )}
     </SafeAreaView>

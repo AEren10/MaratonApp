@@ -111,7 +111,8 @@ export const PROFIL_STACK = [
   SCREENS.PREMIUM,          // Maraton Pro (tam sunum)
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
-  // Sosyal — v1'de yeni is yapilmiyor, mevcut ekranlar erisilebilir kaliyor.
+  // Sosyal/Lig — Defter topluluk soru-cevap v1 disi; Lig ve arkadas
+  // akislari canli urun alani olarak PROFIL stack'inde kalir.
   SCREENS.LEAGUE,
   SCREENS.FRIENDS,
   SCREENS.REFERRAL,

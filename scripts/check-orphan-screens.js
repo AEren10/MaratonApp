@@ -19,12 +19,11 @@ const REGISTRY_FILES = new Set([
   "navigation/tabAssignment.js",
 ]);
 
-// Bilerek girissiz: sosyal v1 disi, navigator kapsayicilari, eski rota adinin
+// Bilerek girissiz: Defter topluluk v1 disi, navigator kapsayicilari, eski rota adinin
 // yeni ekrana yonlendigi takma adlar (derin baglanti icin kayitli), yigin
 // ilk ekrani ve yalniz e-posta baglantisiyla acilan sifre belirleme.
 const ALLOWED = new Set([
-  "LEAGUE", "FRIENDS", "FRIEND_PROFILE", "GROUPS", "GROUP_DETAIL", "COMMUNITY",
-  "REFERRAL", "ROUTE_COMPANION", "CHALLENGE", "CHALLENGES",
+  "FRIEND_PROFILE", "GROUPS", "GROUP_DETAIL", "COMMUNITY", "CHALLENGES",
   "SWIPE_REVIEW", "QUICK_PRACTICE", "STUDY_LOG", "WEEKLY_REVIEW",
   "WEEKLY_TRIAL_REVIEW", "TOPIC_CARDS", "CARD_DETAIL",
   "ONBOARDING", "SET_NEW_PASSWORD", "ACCESS_ENDED",

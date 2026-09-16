@@ -481,3 +481,9 @@
 - Analiz tabındaki “Konu ilerlemesi / Deneme kayıtları / Yayın karşılaştırması / Net Tahmini / Simülasyon / Defter” girişleri aynı tab stack'i içinde kayıtlı kalmalı; buton var ama route stack dışında kalırsa canlıda akış kırılır.
 - V1'de topluluk yok. Defter/Home/Analiz yüzeylerinde “Topluluktan yeni cevap” gibi kopya gösterilmeyecek; sosyal dosyalar repoda dursa bile canlı tab yüzeyine bağlanmamalı.
 - Analiz ana ekranında deneme girişi ana header aksiyonu olmalı; tabbar üstünde kayan ayrı FAB gerçek cihazda çakışma ve eski tasarım hissi yaratıyor.
+
+## 2026-09-16 — Lig topluluk değildir, canlı kalacak
+
+- Defter soru-cevap topluluğu v1 dışı kalsa bile Lig/Arkadaş/Davet/Yol Arkadaşı akışları sosyal ürün alanı olarak canlı kalmalı.
+- Lig ekranı kullanıcıya “Sosyal · Lig” bağlamında açılır; görünür metrik soru/emek kıyasına dayanır, netler burada gösterilmez.
+- Yetim ekran kontrolü Lig, Arkadaşlar, Davet, Yol Arkadaşı ve Challenge ekranlarını allow-list ile saklamamalı; bu akışlardan biri koparsa check patlamalı.
