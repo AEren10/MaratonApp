@@ -1,19 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-
+﻿import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { useClassSchedule } from "../../../hooks/useClassSchedule";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Program Hub · PROGRAMIN KURALLARI -> Haftalık ders programı. Deger
-// ("6 gün") yalniz kullanici programi tanimladiysa yazilir.
 export function ProgramRulesSection({ onOpen }) {
   const C = useC();
   const { defined, activeDays } = useClassSchedule();
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>PROGRAMIN KURALLARI</Text>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PROGRAMIN KURALLARI</Text>
         <View style={[s.rule, { backgroundColor: C.line }]} />
       </View>
       <Pressable
@@ -22,21 +19,27 @@ export function ProgramRulesSection({ onOpen }) {
         style={({ pressed }) => [s.row, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
       >
         <View style={s.copy}>
-          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>Haftalık ders programı</Text>
-          <Text style={[TYPOGRAPHY.micro, s.sub, { color: C.text3 }]}>Hangi gün hangi derse çalışıyorsun</Text>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Haftalık ders programı</Text>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Hangi gün hangi derse çalışıyorsun</Text>
         </View>
-        {defined ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{`${activeDays} gün`}</Text> : null}
-        <Icon name="chevR" size={12} color={C.text5} />
+        <View style={s.val}>
+          {defined && activeDays > 0 ? (
+            <Text style={[TYPOGRAPHY.meta, { color: C.text }]}>{activeDays} gün</Text>
+          ) : (
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Belirle</Text>
+          )}
+          <Icon name="chevR" size={14} color={C.text3} />
+        </View>
       </Pressable>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { marginTop: STEP.s4 - 6 },
-  head: { flexDirection: "row", alignItems: "center", gap: STEP.s2 - 2, paddingBottom: STEP.s1 - 2 },
+  wrap: { marginTop: STEP.s4 },
+  head: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s2 },
   rule: { flex: 1, height: 1 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 2, paddingVertical: STEP.s3 - 4, borderTopWidth: 1 },
-  copy: { flex: 1, minWidth: 0 },
-  sub: { marginTop: STEP.s1 / 2 },
+  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: STEP.s2 + 2 },
+  copy: { gap: 2 },
+  val: { flexDirection: "row", alignItems: "center", gap: 6 },
 });
