@@ -51,7 +51,8 @@ export default function HomeScreen() {
           dailyGoal={h.dailyGoal}
           generatedTasks={dashboard.generatedTasks}
           weeklyDailyCounts={dashboard.weeklyActivity.counts}
-          comeback={h.comeback}
+          comeback={h.comebackFlow.stage === "prompt" ? h.comeback : null}
+          onBeginComeback={h.comebackFlow.start}
           onDismissComeback={h.dismissComeback}
           onStartTask={actions.startTask}
           onViewRoute={actions.route}
@@ -71,6 +72,7 @@ export default function HomeScreen() {
       {body}
       <HomeOverlays
         comeback={h.comeback}
+        comebackStage={h.comebackFlow.stage}
         completion={h.completion}
         dailyGoal={h.dailyGoal}
         daysLeft={dashboard.daysLeft}

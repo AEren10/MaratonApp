@@ -12,6 +12,7 @@ import { NudgeModal } from "../../../components/common/NudgeModal";
 
 export function HomeOverlays({
   comeback,
+  comebackStage,
   completion,
   dailyGoal,
   daysLeft,
@@ -52,7 +53,7 @@ export function HomeOverlays({
       />
 
       <HomeComebackOverlay
-        comeback={comeback}
+        stage={comebackStage}
         dismissComeback={dismissComeback}
         minutesToday={minutesToday}
         navigation={navigation}

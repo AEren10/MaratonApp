@@ -1,16 +1,14 @@
 import { useCallback, useMemo } from "react";
-import { useIsFocused } from "@react-navigation/native";
 import { SCREENS } from "../../../constants/screens";
 import { trackButtonTap } from "../../../lib/analytics";
 import { ComebackModal } from "../../../components/common/ComebackModal";
-import { useComebackFlow } from "../../../hooks/useComebackFlow";
 import { summarizeComebackStops } from "../../../domain/route/completionMoments";
 
-// Geri donus anlari (AKIS 14) — Ana sayfada, yalniz ekran odaktayken.
-// Kapatma her yolda useRetention.dismissComeback'e gider (mevcut
-// "comeback_bonus" odulu ve retention olayi orada, degismedi).
+// Geri donus anlari (AKIS 14) — prompt artik Ana Sayfa hero'sudur.
+// Bu overlay yalniz calisma sonrasindaki "Geri döndün" kapanisini cizer;
+// boylece ayni anda hem hero hem modal prompt gosterilmez.
 export function HomeComebackOverlay({
-  comeback,
+  stage,
   dismissComeback,
   minutesToday,
   navigation,
@@ -18,8 +16,6 @@ export function HomeComebackOverlay({
   routeTotals,
   solvedToday,
 }) {
-  const focused = useIsFocused();
-  const { stage, start } = useComebackFlow({ comeback, focused, solvedToday, minutesToday });
   const { pendingStops, stopsClosedToday } = useMemo(
     () => summarizeComebackStops(routeCurrentWeek),
     [routeCurrentWeek],
@@ -28,9 +24,8 @@ export function HomeComebackOverlay({
 
   const onStart = useCallback(() => {
     trackButtonTap("home_comeback_start", { targetScreen: SCREENS.STUDY_TIMER });
-    start();
     navigation.navigate(SCREENS.STUDY_TIMER);
-  }, [navigation, start]);
+  }, [navigation]);
 
   const goPlan = useCallback((id) => {
     trackButtonTap(id, { targetScreen: SCREENS.PLAN_DETAIL });
@@ -41,6 +36,7 @@ export function HomeComebackOverlay({
   return (
     <ComebackModal
       stage={stage}
+      disablePrompt
       pendingStops={pendingStops}
       solvedToday={solvedToday}
       minutesToday={minutesToday}

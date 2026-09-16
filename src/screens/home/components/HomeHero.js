@@ -25,6 +25,7 @@ export function HomeHero({
   generatedTasks = [],
   weeklyDailyCounts,
   comeback = null,
+  onBeginComeback,
   onDismissComeback,
   onStartTask,
   onViewRoute, onViewFullRoute, onRedrawRoute,
@@ -74,7 +75,10 @@ export function HomeHero({
       <HomeHeroComeback
         nextTask={nextTask}
         recommendation={comebackRecommendation}
-        onStartTask={onStartTask}
+        onStartTask={(task) => {
+          onBeginComeback?.();
+          onStartTask?.(task);
+        }}
         onDismiss={onDismissComeback}
         onViewRoute={onRedrawRoute || onViewRoute}
       />

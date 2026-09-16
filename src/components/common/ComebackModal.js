@@ -7,6 +7,7 @@ import { ComebackDone } from "./comeback/ComebackDone";
 //   "done"   — donus baslatildiktan sonra bugun gercek calisma kaydi olustu (Geri Dondun)
 export const ComebackModal = memo(function ComebackModal({
   stage = null,
+  disablePrompt = false,
   pendingStops = 0,
   solvedToday = 0,
   minutesToday = 0,
@@ -17,7 +18,7 @@ export const ComebackModal = memo(function ComebackModal({
   onNext,
   onClose,
 }) {
-  if (stage === "prompt") {
+  if (stage === "prompt" && !disablePrompt) {
     return (
       <ComebackPrompt
         pendingStops={pendingStops}

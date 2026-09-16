@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
 import { useAuth } from "../../contexts/AuthContext";
@@ -23,6 +23,7 @@ import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
 import { useCompletionMoments } from "../../hooks/useCompletionMoments";
 import { useHomeDashboard } from "../../hooks/useHomeDashboard";
 import { useTodayStops } from "../../hooks/useTodayStops";
+import { useComebackFlow } from "../../hooks/useComebackFlow";
 import { buildRecentStudies } from "../../domain/study/recentStudies";
 import { getSubjectByKey } from "../../themes/subjects";
 import { useHomeGamificationBridge } from "./useHomeGamificationBridge";
@@ -35,6 +36,7 @@ const subjectLabel = (key) => getSubjectByKey(key)?.label;
 // Ana Sayfa'nin tum durumu tek yerde; ekran dosyasi yalniz hal secer ve cizer.
 export function useHomeController() {
   const navigation = useNavigation();
+  const focused = useIsFocused();
   const C = useC();
   const { user } = useAuth();
   const { daysUntilExam } = useExam();
@@ -64,6 +66,12 @@ export function useHomeController() {
 
   const dashboard = useHomeDashboard({ C, planCtx, todayLogs, trials, user });
   const { solvedToday, routeCurrentWeek, routeTotals, transitionStop, weekLogs, weekLoaded } = dashboard;
+  const comebackFlow = useComebackFlow({
+    comeback,
+    focused,
+    solvedToday,
+    minutesToday: dashboard.minutesToday,
+  });
   const goalReward = useDailyGoalReward({ solvedToday, dailyGoal, userId: user?.id, reward });
   const completion = useCompletionMoments({ currentWeek: routeCurrentWeek, totals: routeTotals, userId: user?.id });
   const { markDayDone } = completion;
@@ -101,7 +109,7 @@ export function useHomeController() {
   const hasLocalData = todayLogs.length > 0 || trials.length > 0 || weekLogs.length > 0 || !!lastStudyDate;
 
   return {
-    C, navigation, dailyGoal, daysUntilExam, comeback, dismissComeback, gamification, goalReward, completion,
+    C, navigation, dailyGoal, daysUntilExam, comeback, comebackFlow, dismissComeback, gamification, goalReward, completion,
     nudges, nudge, dashboard, stops, recent, actions, onRefresh, refreshing,
     streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
