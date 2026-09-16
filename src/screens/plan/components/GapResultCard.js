@@ -1,12 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
-
+﻿import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { formatDelta } from "../../../lib/format";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// SEÇİLEN YOLUN SONUCU: ŞİMDİ -> PLANLA ve net farki. Net bilinmiyorsa
-// sayilar hic cizilmez, yalniz aciklama kalir.
 export function GapResultCard({ result, body }) {
   const C = useC();
   if (!result && !body) return null;
@@ -48,5 +45,5 @@ const s = StyleSheet.create({
   num: { marginTop: STEP.s1 },
   arrow: { paddingBottom: STEP.s1 },
   delta: { flex: 1, alignItems: "flex-end" },
-  body: { marginTop: STEP.s3 - 4 },
+  body: { marginTop: STEP.s3, paddingTop: STEP.s3, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" },
 });

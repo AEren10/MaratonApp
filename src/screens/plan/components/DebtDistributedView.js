@@ -1,6 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+﻿import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-
 import { Button, StatBlock } from "../../../components/design";
 import { EyebrowHeader } from "../../../components/common/EyebrowHeader";
 import { useC } from "../../../contexts/ThemeContext";
@@ -11,12 +10,10 @@ import DebtWeekRow from "./DebtWeekRow";
 
 const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
-// Tasarim AKIS 7 · "Borç Dağıtıldı" — Konu Borcu'nun dagitim sonrasi hali.
-// Dagitim once gosterilir; "Rotaya işle" kalici gecisi yapar.
 export function DebtDistributedView({ view, totalHours, committing, onCommit, onUndo }) {
   const C = useC();
   const lede = [
-    view.loadIncreasePct != null ? `Haftalık yükün %${view.loadIncreasePct} arttı.` : null,
+    view.loadIncreasePct != null ? \Haftalık yükün %\ arttı.\ : null,
     "Kalan durakların sırası değişmedi.",
   ].filter(Boolean).join(" ");
   const stats = [
@@ -33,7 +30,7 @@ export function DebtDistributedView({ view, totalHours, committing, onCommit, on
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={enter(0)}>
           <Text style={[TYPOGRAPHY.heading, s.headline, { color: C.text }]}>
-            {`${totalHours} sa ${numberWord(view.weekCount)} haftaya bölündü.`}
+            {\\ sa \ haftaya bölündü.\}
           </Text>
           <Text style={[TYPOGRAPHY.body, s.lede, { color: C.text3 }]}>{lede}</Text>
         </Animated.View>

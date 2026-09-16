@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+﻿import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
@@ -13,7 +13,6 @@ import { GapResultCard } from "./components/GapResultCard";
 
 const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
-// Tasarim AKIS 7 · "Boşluğu Kapatma Planı".
 function GapClosureInner() {
   const C = useC();
   const g = useGapClosure();
@@ -68,7 +67,7 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 - 2, paddingBottom: STEP.s4 },
   headline: { maxWidth: 300 },
   lede: { marginTop: STEP.s2 + 2, maxWidth: 306 },
-  options: { gap: STEP.s1, marginTop: STEP.s4 - 6 },
+  options: { marginTop: STEP.s5, gap: STEP.s1 },
   note: { marginTop: STEP.s4 - 8, paddingVertical: STEP.s3 - 2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.panel, borderWidth: 1 },
   actions: { marginTop: STEP.s4 - 8, gap: STEP.s1 },
 });

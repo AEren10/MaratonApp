@@ -1,16 +1,23 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
-import { WEEKDAYS_SHORT_TR } from "../../../lib/trWords";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Aylik Plan izgarasi: iki+ durak tint, bir durak surface, bos gun void.
-// Durak sayisi nokta olarak (en fazla iki).
-function MonthPlanGrid({ days, leading }) {
-  const C = useC();
-  const cells = [...Array(leading).fill(null), ...days];
-  while (cells.length % 7) cells.push(null);
+const WEEKDAYS_SHORT_TR = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
+
+function MonthPlanGrid({ C, cells }) {
+  // Image 3 mockup days if cells is undefined
+  const defaultDays = Array.from({ length: 30 }, (_, i) => ({
+    key: String(i),
+    day: i + 1,
+    count: i % 7 === 6 ? 0 : (i % 7 === 1 ? 1 : 2) // pazarlar bos, salı 1 durak, digerleri 2 durak (örnek)
+  }));
+  const days = cells?.days || defaultDays;
+  const leading = cells?.leading ?? 1; // Eylül 2026 starts on Tuesday (1 leading empty cell)
+
+  const gridCells = [...Array(leading).fill(null), ...days];
+  while (gridCells.length % 7) gridCells.push(null);
 
   const look = (count) => (count >= 2
     ? { backgroundColor: C.brandTint, borderColor: C.bandEdge }
@@ -19,19 +26,19 @@ function MonthPlanGrid({ days, leading }) {
       : { backgroundColor: C.void, borderColor: C.line });
 
   return (
-    <View>
+    <View style={{ marginTop: STEP.s4 }}>
       <View style={s.week}>
         {WEEKDAYS_SHORT_TR.map((w) => (
           <Text key={w} style={[TYPOGRAPHY.tableHead, s.head, { color: C.text3 }]}>{w}</Text>
         ))}
       </View>
       <View style={s.grid}>
-        {cells.map((d, i) => (
-          <View key={d?.key || `e${i}`} style={s.cellWrap}>
+        {gridCells.map((d, i) => (
+          <View key={d?.key || \e\\} style={s.cellWrap}>
             {d ? (
               <View
                 accessible
-                accessibilityLabel={`${d.day}, ${d.count} durak`}
+                accessibilityLabel={\\, \ durak\}
                 style={[s.cell, look(d.count)]}
               >
                 <Text style={[TYPOGRAPHY.meta, s.num, { color: d.count ? C.text : C.text3 }]}>{d.day}</Text>
@@ -51,15 +58,13 @@ function MonthPlanGrid({ days, leading }) {
 
 export default memo(MonthPlanGrid);
 
-const DOT = 4;
-
 const s = StyleSheet.create({
-  week: { flexDirection: "row", marginBottom: STEP.s1 + 2 },
-  head: { flex: 1, textAlign: "center", letterSpacing: 1.1 },
+  week: { flexDirection: "row", paddingHorizontal: STEP.s2, marginBottom: STEP.s2 },
+  head: { flex: 1, textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap" },
-  cellWrap: { width: `${100 / 7}%`, aspectRatio: 1, padding: STEP.s1 / 2 - 1 },
-  cell: { flex: 1, borderRadius: SHAPE.button, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: STEP.s1 / 2 - 1 },
-  num: { fontVariant: ["tabular-nums"] },
-  dots: { flexDirection: "row", gap: STEP.s1 / 4, height: DOT },
-  dot: { width: DOT, height: DOT, borderRadius: DOT / 4 },
+  cellWrap: { width: "14.28%", aspectRatio: 1, padding: 3 },
+  cell: { flex: 1, borderRadius: SHAPE.cardTight, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  num: { fontFamily: "Archivo_500", fontSize: 13 },
+  dots: { flexDirection: "row", gap: 2, position: "absolute", bottom: 6 },
+  dot: { width: 4, height: 4, borderRadius: 1 },
 });
