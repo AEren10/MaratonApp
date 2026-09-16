@@ -14,9 +14,8 @@ import { WrongScreenHeader } from "../WrongScreenHeader";
 import { DetailPhoto } from "./DetailPhoto";
 import { ReviewLadder } from "./ReviewLadder";
 import { WhyWrongCard } from "./WhyWrongCard";
+import { useAlert } from "../../../../contexts/AlertContext";
 
-// "Yanlış Detayı" artboardi (kendi sorun). "Topluluğa sor" sosyal v1 disi
-// oldugu icin basilmaz; kaynak (ör. "Apotemi TYT-14") icin veri alani yok.
 export function OwnWrongDetail() {
   const C = useC();
   const navigation = useNavigation();
@@ -24,6 +23,7 @@ export function OwnWrongDetail() {
   const d = useWrongDetail(params);
   const item = d.item;
   const goBack = () => navigation.goBack();
+  const showAlert = useAlert();
 
   if (d.loading && !item) {
     return (
@@ -48,44 +48,59 @@ export function OwnWrongDetail() {
     );
   }
 
-  const subjectKey = typeof item.subject === "string" ? item.subject : item.subject?.key;
-  const subjectLabel = getSubjectByKey(subjectKey)?.label || subjectKey || "";
-  const color = subjectColorOf(C, subjectKey);
-  const added = dayMonthLocative(item.created_at);
+  const sInfo = getSubjectByKey(item.subject);
+  const subjectName = sInfo?.name || item.subject;
+  const sColor = subjectColorOf(C, item.subject);
+  const meta = [item.source_title, dayMonthLocative(item.created_at, "da eklendi")].filter(Boolean).join(" · ");
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <WrongScreenHeader onPress={goBack} label="" />
+      <WrongScreenHeader
+        onPress={goBack}
+        label="YANLIŞ DETAYI"
+        right={<Icon name="moreH" size={16} color={C.text3} />}
+      />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <DetailPhoto path={item.image_path} subjectColor={color} />
-
-        <Animated.View entering={FadeInDown.duration(500)} style={styles.titleBlock}>
-          <Text style={[TYPOGRAPHY.label, { color }]}>{subjectLabel.toLocaleUpperCase("tr")}</Text>
-          <Text style={[TYPOGRAPHY.subheading, styles.topic, { color: C.text }]}>{item.topic}</Text>
-          {added ? (
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s1 + 2 }]}>{added} eklendi</Text>
-          ) : null}
+        <Animated.View entering={FadeInDown.duration(400)}>
+          <DetailPhoto uri={item.image_uri} subjectColor={sColor} />
+          <View style={styles.titleBlock}>
+            <Text style={[TYPOGRAPHY.label, { color: sColor, letterSpacing: 1.5 }]}>
+              {subjectName.toLocaleUpperCase("tr-TR")}
+            </Text>
+            <Text style={[TYPOGRAPHY.subheading, styles.topic, { color: C.text }]}>{item.topic_title}</Text>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s1 + 2 }]}>{meta}</Text>
+          </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(80).duration(500)}>
-          <WhyWrongCard note={item.note} onSave={d.saveNote} />
+        <Animated.View entering={FadeInDown.delay(70).duration(400)}>
+          <WhyWrongCard item={item} />
           <ReviewLadder item={item} />
         </Animated.View>
 
         <View style={styles.actions}>
           {!item.is_resolved ? (
-            <Button size="lg" fullWidth loading={d.busy} onPress={d.resolve}>
+            <Button size="lg" fullWidth loading={d.busy} onPress={d.resolve} style={{ marginBottom: STEP.s2 }}>
               Bu soruyu kapat
             </Button>
           ) : null}
-          <Pressable
-            onPress={d.remove}
-            accessibilityRole="button"
-            accessibilityLabel="Soruyu sil"
-            style={[styles.trash, { borderColor: C.border }]}
-          >
-            <Icon name="trash" size={16} color={C.text3} />
-          </Pressable>
+          <View style={styles.actionRow}>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              style={{ flex: 1 }} 
+              onPress={() => showAlert("Yakında", "Topluluğa sor özelliği henüz aktif değil.")}
+            >
+              Topluluğa sor
+            </Button>
+            <Pressable
+              onPress={d.remove}
+              accessibilityRole="button"
+              accessibilityLabel="Soruyu sil"
+              style={[styles.trash, { borderColor: C.border }]}
+            >
+              <Icon name="trash" size={16} color={C.text3} />
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -99,7 +114,8 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: STEP.s4 + 6 },
   titleBlock: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 4 },
   topic: { marginTop: STEP.s1 + 2, maxWidth: 300 },
-  actions: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6, gap: STEP.s2 - 2, alignItems: "flex-end" },
+  actions: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
+  actionRow: { flexDirection: "row", gap: STEP.s2 },
   trash: {
     width: 48,
     height: 48,
@@ -109,4 +125,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
