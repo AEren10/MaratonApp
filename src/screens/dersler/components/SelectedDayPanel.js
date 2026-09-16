@@ -42,8 +42,6 @@ export function SelectedDayPanel({ selectedDay, logs }) {
     return \\ · \\;
   }, [selectedDay.key]);
 
-  // Tasarım (Image 3) gereği planlanan ve tamamlanan duraklar aynı listede.
-  // Gerçek veri yoksa mock veri ekleyelim görseli kurtarmak için.
   const displayLogs = logs.length > 0 ? logs : [
     { time: "09:30", subjectLabel: "Türkçe", topic: "Sözcükte Anlam", completed: true, status: "done" },
     { time: "14:00", subjectLabel: "Matematik", topic: "Permütasyon", completed: true, status: "done" },
@@ -56,19 +54,19 @@ export function SelectedDayPanel({ selectedDay, logs }) {
 
   return (
     <View style={{ marginTop: STEP.s4 }}>
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginBottom: STEP.s1 }}>
+      <Pressable onPress={() => navigation.navigate(SCREENS.PLAN_DETAIL, { date: selectedDay.key })} style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginBottom: STEP.s1 }}>
         <Text style={{ ...TYPOGRAPHY.label, color: C.text3 }}>{dateLabel}</Text>
         <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
         <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{meta}</Text>
-      </View>
-
+      </Pressable>
+      
       <View style={{ marginTop: STEP.s1 }}>
         {displayLogs.map((log, i) => (
           <StopRow key={i} log={log} C={C} solid={C.brandTint} />
         ))}
       </View>
       
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, borderTopColor: C.line }}>
+      <Pressable onPress={() => navigation.navigate(SCREENS.ADD_TASK)} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, borderTopColor: C.line }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>
           <Icon name="plus" size={14} color={C.brandTint} />
           <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Bu güne durak ekle</Text>
@@ -76,7 +74,7 @@ export function SelectedDayPanel({ selectedDay, logs }) {
         <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>
           {new Date(selectedDay.key).toLocaleDateString("tr-TR", { weekday: "long" })}
         </Text>
-      </View>
+      </Pressable>
     </View>
   );
 }
