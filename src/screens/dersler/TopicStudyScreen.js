@@ -15,17 +15,23 @@ import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
 import { TopicInfoList } from "./components/TopicInfoList";
 import { TopicWrongNotesList } from "./components/TopicWrongNotesList";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
-import { useAuth } from "../../contexts/AuthContext";
-import { useAlert } from "../../contexts/AlertContext";
-import { saveStudyLogOffline } from "../../lib/offlineQueue";
-import * as H from "../../lib/haptics";
+
+function formatMinutesShort(min) {
+  if (!min) return "0 dk";
+  if (min >= 60) {
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return m > 0 ? \\ sa \ dk\ : \\ sa\;
+  }
+  return \\ dk\;
+}
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
   const C = useC();
   const route = useRoute();
-
   const params = route.params ?? {};
+
   const subject = useMemo(() => {
     if (params.subject) return params.subject;
     const key = params.subjectKey;
@@ -41,10 +47,13 @@ export default function TopicStudyScreen() {
   }, [params.topic, params.topicName]);
 
   const color = subjectColorOf(C, subject?.key);
-
   const { data, loading, error, refresh } = useTopicStudyDetail(subject?.key, topic?.name);
 
-  // Tasarım (Image 2) için statik başlık meta eklendi
+  // Mock data for missing fields based on Image 2
+  const solved = data?.totalQuestions || 184;
+  const durationLabel = data?.totalMinutes ? formatMinutesShort(data.totalMinutes) : "4 sa";
+  const notebookCount = data?.notebookCount || 5;
+
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.headerBar}>
@@ -64,10 +73,10 @@ export default function TopicStudyScreen() {
       ) : (
         <>
           <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-            <TopicHeroHeader C={C} subject={subject} topic={topic} color={color} />
-            <TopicStatsRow C={C} data={data} />
+            <TopicHeroHeader C={C} subjectName={subject?.name} topicName={topic?.name} color={color} />
+            <TopicStatsRow C={C} solved={solved} durationLabel={durationLabel} notebookCount={notebookCount} />
             <TopicAccumulationChart C={C} color={color} data={data} />
-            <TopicInfoList C={C} data={data} />
+            <TopicInfoList C={C} data={data} color={color} />
             <TopicWrongNotesList C={C} data={data} subjectKey={subject?.key} />
           </ScrollView>
 
@@ -76,7 +85,7 @@ export default function TopicStudyScreen() {
               Bu konuya durak koy
             </Button>
             <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-              Defterdeki 5 soruyu tekrar et
+              Defterdeki \ soruyu tekrar et
             </Text>
           </View>
         </>
