@@ -20,8 +20,8 @@ export function MilestoneBadges() {
       <View style={styles.row}>
         {badges.map((badge, i) => (
           <Card key={i} tone="surface" radius="sheet" padded={false} style={styles.badgeCard}>
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, fontSize: 18, marginBottom: 2 }]}>{badge.value}</Text>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3, fontSize: 9, letterSpacing: 0.5 }]}>{badge.label}</Text>
+            <Text style={[TYPOGRAPHY.subheading, styles.badgeVal, { color: C.text }]}>{badge.value}</Text>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 0.8 }]}>{badge.label}</Text>
           </Card>
         ))}
       </View>
@@ -37,5 +37,9 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     justifyContent: "center", 
     aspectRatio: 0.85 
-  }
+  },
+  badgeVal: {
+    fontVariant: ["tabular-nums"],
+    marginBottom: STEP.s1,
+  },
 });

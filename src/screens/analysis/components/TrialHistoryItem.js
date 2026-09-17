@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
+import { SHAPE, STEP } from "../../../themes/tokens";
 
 function formatNum(n) {
   if (n == null || isNaN(n)) return "0,00";
@@ -22,7 +23,7 @@ export function TrialHistoryItem({ C, item, onPress }) {
       accessibilityRole="button"
       accessibilityLabel={`${item.type} deneme detayı`}
       onPress={onPress}
-      style={s.row}
+      style={[s.row, { borderTopColor: C.line }]}
     >
       <View style={s.rowContent}>
         <View style={s.metaRow}>
@@ -54,18 +55,17 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    paddingVertical: 16,
+    gap: STEP.s2,
+    paddingVertical: STEP.s3,
     borderTopWidth: 1,
-    borderTopColor: "#34343F",
   },
   rowContent: { flex: 1 },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   typeLabel: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.84 },
   dateLabel: { fontFamily: "Archivo_500", fontSize: 11.5 },
-  latestBadge: { height: 18, paddingHorizontal: 8, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  latestText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 1.4 },
-  scoreRow: { flexDirection: "row", alignItems: "baseline", gap: 9, marginTop: 4 },
+  latestBadge: { height: 18, paddingHorizontal: STEP.s1, borderRadius: SHAPE.chip, alignItems: "center", justifyContent: "center" },
+  latestText: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.4 },
+  scoreRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginTop: 4 },
   netText: { fontFamily: "Bricolage_400", fontSize: 24, fontVariant: ["tabular-nums"] },
   deltaWrap: { flexDirection: "row", alignItems: "center", gap: 3 },
   deltaText: { fontFamily: "Archivo_600", fontSize: 12, fontVariant: ["tabular-nums"] },

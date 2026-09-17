@@ -1,8 +1,9 @@
 import React, { Suspense } from "react";
-import { ActivityIndicator, Platform, View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { ScreenErrorBoundary } from "../components/common/ScreenErrorBoundary";
-import { C } from "../themes/tokens";
+import { Skeleton } from "../components/design/Skeleton";
+import { C, GUTTER, SHAPE, STEP } from "../themes/tokens";
 
 const isWeb = Platform.OS === "web";
 
@@ -43,8 +44,20 @@ export const detailOptions = {
 
 function LazyFallback() {
   return (
-    <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
-      <ActivityIndicator color={C.accent} size="large" />
+    <View
+      accessibilityLabel="Ekran yükleniyor"
+      style={{ flex: 1, backgroundColor: C.bg, paddingHorizontal: GUTTER, paddingTop: STEP.s5 }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2, marginBottom: STEP.s4 }}>
+        <Skeleton width={32} height={32} radius={SHAPE.chip} />
+        <Skeleton width={130} height={16} radius={SHAPE.chip} />
+      </View>
+      <Skeleton width="100%" height={130} radius={SHAPE.card} style={{ marginBottom: STEP.s3 }} />
+      <View style={{ gap: STEP.s2 }}>
+        <Skeleton width="100%" height={68} radius={SHAPE.card} />
+        <Skeleton width="100%" height={68} radius={SHAPE.card} />
+        <Skeleton width="100%" height={68} radius={SHAPE.card} />
+      </View>
     </View>
   );
 }

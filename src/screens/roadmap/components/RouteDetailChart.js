@@ -133,7 +133,7 @@ const s = StyleSheet.create({
     width: 22,
     textAlign: "right",
     fontFamily: "Archivo_500",
-    fontSize: 10,
+    fontSize: 11,
     fontVariant: ["tabular-nums"],
   },
   right: { right: STEP.s1 },
