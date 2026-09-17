@@ -1,20 +1,23 @@
-import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon, Card, Button } from "../../components/design";
+import { Card, Button } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { PlanDetailHeader } from "./components/PlanDetailHeader";
 import { PlanDetailStopRow } from "./components/PlanDetailStopRow";
 import { PlanDetailEmptyState } from "./components/PlanDetailEmptyState";
 import { PlanDetailSubjects } from "./components/PlanDetailSubjects";
+import { ReorganizeDayModal } from "./components/ReorganizeDayModal";
 import { formatMinutes, usePlanDetailViewModel } from "./usePlanDetailViewModel";
 
 function PlanDetailInner({ route }) {
   const C = useC();
+  const [reorganizeOpen, setReorganizeOpen] = useState(false);
   const isEmpty = Boolean(route?.params?.isEmpty);
   const dayLabel = route?.params?.dateLabel || (isEmpty ? "Perşembe, 25 Haziran" : "Salı, 23 Haziran");
   const { detail, doneMinutes, hasTasks, navigation, plannedMinutes } = usePlanDetailViewModel({
@@ -24,18 +27,7 @@ function PlanDetailInner({ route }) {
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
-      <View style={s.header}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Geri"
-          hitSlop={12}
-          onPress={() => navigation.goBack()}
-          style={s.backBtn}
-        >
-          <Icon name="chevL" size={18} color={C.text} />
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>{dayLabel}</Text>
-        </Pressable>
-      </View>
+      <PlanDetailHeader dayLabel={dayLabel} onBack={() => navigation.goBack()} C={C} />
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(400)} style={s.cardsRow}>
@@ -108,12 +100,24 @@ function PlanDetailInner({ route }) {
           style={{ marginTop: STEP.s2 }}
           onPress={() => {
             if (!hasTasks) navigation.goBack();
-            else navigation.navigate(SCREENS.CLASS_SCHEDULE);
+            else setReorganizeOpen(true);
           }}
         >
           {hasTasks ? "Günü yeniden düzenle" : "Bu günü boş bırak"}
         </Button>
       </View>
+
+      <ReorganizeDayModal
+        visible={reorganizeOpen}
+        onClose={() => setReorganizeOpen(false)}
+        dayLabel={dayLabel}
+        tasks={detail.tasks}
+        onMoveTask={detail.moveTask}
+        onRemoveTask={detail.removeTask}
+        onClearRemaining={detail.clearRemaining}
+        onOpenSchedule={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)}
+        C={C}
+      />
     </SafeAreaView>
   );
 }
@@ -128,8 +132,6 @@ export default function PlanDetailScreen(props) {
 
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
-  backBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 3 + STEP.s1 },
   cardsRow: { flexDirection: "row", gap: STEP.s2 },
   statCard: { flex: 1, padding: STEP.s3 },

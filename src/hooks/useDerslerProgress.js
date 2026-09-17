@@ -13,7 +13,8 @@ export function calcTopicProgress(tp) {
 }
 
 function buildDersler(subjects, progressMap) {
-  return subjects.map((s) => {
+  const safeSubjects = Array.isArray(subjects) ? subjects : [];
+  return safeSubjects.map((s) => {
     const subjectProgress = progressMap[s.key] || {};
     const topicsList = (s.topics || []).map((t) => {
       const tName = typeof t === "string" ? t : t.name;

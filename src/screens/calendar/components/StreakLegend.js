@@ -10,6 +10,7 @@ export function StreakLegend() {
   const items = [
     { label: "Hedef tuttu", box: { backgroundColor: C.brandFill, borderColor: C.brandFill } },
     { label: "Seri sürdü", box: { backgroundColor: C.brandTint, borderColor: C.bandEdge } },
+    { label: "Donduruldu", box: { borderColor: C.border, borderStyle: "dashed" } },
     { label: "Gelecek", box: { borderColor: C.line } },
   ];
   return (

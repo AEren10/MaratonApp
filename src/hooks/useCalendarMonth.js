@@ -12,11 +12,14 @@ const DEFAULT_GOAL = 80;
 // Takvim ve Seri ekraninin ay verisi: calisma kayitlari + denemeler gun
 // gun, ay ozeti (hedef tuttu / seri surdu gunleri, soru). Ekranda is
 // mantigi kalmasin diye CalendarScreen'den tasindi.
-export function useCalendarMonth() {
+export function useCalendarMonth(initialOffset = 0) {
   const { user } = useAuth();
   const trials = useSelector(selectTrials);
   const dailyGoal = useSelector(selectDailyQuestionsGoal) || DEFAULT_GOAL;
-  const [monthDate, setMonthDate] = useState(() => new Date());
+  const [monthDate, setMonthDate] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + initialOffset, 1);
+  });
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

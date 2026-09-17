@@ -51,6 +51,14 @@ export function useWeekStops() {
 
   const d = parseDayKey(days[index].key);
   const plannedMinutes = agenda.reduce((sum, a) => sum + a.minutes, 0);
+  const allStops = byDay.flat();
+  const totalStops = allStops.length;
+  const completedStops = allStops.filter((stop) => stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED).length;
+  const weeklyPlannedMinutes = allStops.reduce((sum, stop) => sum + (Number(stop.cost?.minutes) || 0), 0);
+  const weeklyCompletedMinutes = allStops
+    .filter((stop) => stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED)
+    .reduce((sum, stop) => sum + (Number(stop.cost?.minutes) || 0), 0);
+  const weekRange = `${parseDayKey(days[0].key).getUTCDate()}—${parseDayKey(days[6].key).getUTCDate()} ${MONTHS_TR[parseDayKey(days[6].key).getUTCMonth()]}`;
 
   return {
     loading,
@@ -60,6 +68,11 @@ export function useWeekStops() {
     setSelected,
     dayLabel: `${WEEKDAY_LONG[index]} · ${d.getUTCDate()} ${MONTHS_TR[d.getUTCMonth()].toLocaleUpperCase("tr-TR")}`,
     plannedMinutes,
+    weeklyPlannedMinutes,
+    weeklyCompletedMinutes,
+    totalStops,
+    completedStops,
+    weekRange,
     agenda,
   };
 }

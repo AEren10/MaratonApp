@@ -21,7 +21,7 @@ export function useCurriculum() {
     setLoading(true);
 
     fetchSubjects(examType, field)
-      .then((data) => { if (!cancelled) setSubjects(data); })
+      .then((data) => { if (!cancelled) setSubjects(Array.isArray(data) ? data : []); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
 
@@ -30,15 +30,16 @@ export function useCurriculum() {
 
   const isLGS = examType === "lgs";
 
+  const safeSubjects = Array.isArray(subjects) ? subjects : [];
   const tytSubjects = isLGS
-    ? subjects.filter((s) => s.group === "sozel")
-    : subjects.filter((s) => s.exam === "tyt");
+    ? safeSubjects.filter((s) => s.group === "sozel")
+    : safeSubjects.filter((s) => s.exam === "tyt");
   const aytSubjects = isLGS
-    ? subjects.filter((s) => s.group === "sayisal")
-    : subjects.filter((s) => s.exam === "ayt" || s.exam === "ydt");
+    ? safeSubjects.filter((s) => s.group === "sayisal")
+    : safeSubjects.filter((s) => s.exam === "ayt" || s.exam === "ydt");
 
   return {
-    subjects,
+    subjects: safeSubjects,
     tytSubjects,
     aytSubjects,
     isLGS,

@@ -29,6 +29,7 @@ export const ROTA_STACK = [
   SCREENS.ROUTE_FULL,       // Rotanin tamami
   SCREENS.ROUTE_STOP_DETAIL, // Durak Detayi (tek durak)
   SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
+  SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (paylasimli)
   SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
   SCREENS.PLAN_VS_ACTUAL,   // Soz ve gercek (Rota Detay satiri; PROGRAM'da da var)
   SCREENS.GAP_CLOSURE,      // Boslugu Kapatma Plani (Soz ve gercek butonu; PROGRAM'da da var)

@@ -2,61 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
-import { buildPlanTaskKey } from "../../domain/plan/planTaskIdentity";
-import { getSubjectByKey } from "../../themes/subjects";
-
-function mapGeneratedTask(t, C, isPlanDone) {
-  const pid = t.planTaskKey || buildPlanTaskKey(t);
-  const subj = getSubjectByKey(t.subject);
-  return {
-    id: pid,
-    s: subj || { key: t.subject, label: t.subjectLabel, color: t.color, icon: "bookOpen" },
-    topic: t.topicLabel || "Genel çalışma",
-    topicKey: t.topic,
-    q: t.questionCount,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
-    reason: t.reason,
-    rkind: t.rkind || "gray",
-    assignment: t.assignment || null,
-    done: isPlanDone(pid),
-    routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
-    planTask: true,
-    planSubjectKey: t.subject,
-    planTopicName: t.topic || null,
-  };
-}
-
-function mapAdHocTask(t, C) {
-  const subj = getSubjectByKey(t.subject);
-  return {
-    id: t.id,
-    s: subj || { key: t.subject, label: t.subjectLabel, color: t.color || C.amber, icon: "bookOpen" },
-    topic: t.topic || "Genel çalışma",
-    topicKey: t.topic,
-    q: t.questionCount,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
-    reason: t.reason,
-    rkind: "red",
-    done: false,
-    adHoc: true,
-  };
-}
-
-function mapUserTask(t, C) {
-  const subj = getSubjectByKey(t.subject);
-  return {
-    id: t.id,
-    s: subj || { key: t.subject, label: t.subject, color: C.accent, icon: "bookOpen" },
-    topic: t.topic || "Genel çalışma",
-    topicKey: t.topic,
-    q: t.questionCount ?? t.question_count ?? 0,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount ?? t.question_count ?? 0) * 2),
-    reason: t.note || "Senin eklediğin görev",
-    rkind: "blue",
-    done: t.completed,
-    userTask: true,
-  };
-}
+import { mapGeneratedTask, mapAdHocTask, mapUserTask } from "./planTaskMappers";
 
 export function usePlanDetailTasks({
   C,
@@ -68,6 +14,7 @@ export function usePlanDetailTasks({
   showAlert,
   togglePlanDone,
   toggleUserTask,
+  removeUserTask,
   transitionStop,
 }) {
   const initialTasks = useMemo(() => [
@@ -123,14 +70,45 @@ export function usePlanDetailTasks({
     });
   }, [navigation]);
 
+  const moveTask = useCallback((id, direction) => {
+    setTasks((prev) => {
+      const idx = prev.findIndex((t) => t.id === id);
+      if (idx === -1) return prev;
+      const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
+      const copy = [...prev];
+      const [item] = copy.splice(idx, 1);
+      copy.splice(targetIdx, 0, item);
+      return copy;
+    });
+    haptic.select();
+  }, []);
+
+  const removeTask = useCallback((id) => {
+    const task = tasksRef.current.find((t) => t.id === id);
+    if (task?.userTask && removeUserTask) {
+      removeUserTask(id);
+    }
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    haptic.warning();
+  }, [removeUserTask]);
+
+  const clearRemaining = useCallback(() => {
+    setTasks((prev) => prev.filter((t) => t.done));
+    haptic.warning();
+  }, []);
+
   const showReason = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);
     if (task) setReasonTask(task);
   }, []);
 
   return {
+    clearRemaining,
     doneCount: tasks.filter((t) => t.done).length,
+    moveTask,
     reasonTask,
+    removeTask,
     setReasonTask,
     showReason,
     startTask,

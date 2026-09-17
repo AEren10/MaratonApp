@@ -24,7 +24,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const showAlert = useAlert();
   const studyRoute = useStudyRoute();
   const planCtx = usePlanContext();
-  const { tasks: userTasks, toggleTask: toggleUserTask } = useUserTasks();
+  const { tasks: userTasks, toggleTask: toggleUserTask, removeTask: removeUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
 
   // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar
@@ -44,6 +44,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     showAlert,
     togglePlanDone: toggle,
     toggleUserTask,
+    removeUserTask,
     transitionStop: studyRoute.transitionStop,
   });
 
