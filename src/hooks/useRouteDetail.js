@@ -64,6 +64,7 @@ export function useRouteDetail() {
     },
     isEmpty: !routeCreated,
     creating: routeCreating,
+    chartReady: Boolean(view.chart && (view.chart.stops?.length ?? 0) >= 2),
     daysLeft,
     examDateTag: routeDateTag(examDate, { withYear: true }),
     targetNet: Number.isFinite(targetNet) ? Math.round(targetNet) : null,

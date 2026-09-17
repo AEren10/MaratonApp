@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { useEffect, useRef } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
@@ -10,7 +10,7 @@ import Animated, {
   cancelAnimation,
   runOnJS,
 } from "react-native-reanimated";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../design";
 
@@ -21,20 +21,19 @@ const HIDE_MS = 250;
 export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
   const C = useC();
   const insets = useSafeAreaInsets();
-  const s = useMemo(() => makeStyles(C, insets.top), [C, insets.top]);
-  const translateY = useSharedValue(-60);
+  const translateY = useSharedValue(60);
   const opacity = useSharedValue(0);
   const dismissRef = useRef(onDismiss);
   dismissRef.current = onDismiss;
 
   useEffect(() => {
     if (!visible) return;
-    translateY.value = -60;
+    translateY.value = 60;
     opacity.value = 0;
 
     translateY.value = withSequence(
       withTiming(0, { duration: SHOW_MS }),
-      withDelay(VISIBLE_MS, withTiming(-60, { duration: HIDE_MS })),
+      withDelay(VISIBLE_MS, withTiming(60, { duration: HIDE_MS })),
     );
     opacity.value = withSequence(
       withTiming(1, { duration: SHOW_MS }),
@@ -58,59 +57,57 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
   const boosted = multiplier > 1;
 
   return (
-    <Animated.View style={[s.container, animStyle]} pointerEvents="none">
-      <Icon
-        name={boosted ? "zap" : "star"}
-        size={18}
-        color={boosted ? C.amber : C.accent}
-      />
-      <Text style={s.amount}>+{amount} XP</Text>
-      {boosted && (
-        <View style={s.pill}>
-          <Text style={s.pillText}>x{multiplier}</Text>
-        </View>
-      )}
+    <Animated.View style={[styles.container, { bottom: insets.bottom + STEP.s4 + 80 }, animStyle]} pointerEvents="none">
+      <View style={[styles.card, { backgroundColor: C.surface, borderColor: boosted ? C.amber : C.accent }]}>
+        <Icon
+          name={boosted ? "zap" : "star"}
+          size={18}
+          color={boosted ? C.amber : C.accent}
+        />
+        <Text style={[styles.amount, { color: C.text }]}>+{amount} XP</Text>
+        {boosted && (
+          <View style={[styles.pill, { backgroundColor: C.amber + "30" }]}>
+            <Text style={[styles.pillText, { color: C.amber }]}>x{multiplier}</Text>
+          </View>
+        )}
+      </View>
     </Animated.View>
   );
 }
 
-function makeStyles(C, safeTop) {
-  return StyleSheet.create({
-    container: {
-      position: "absolute",
-      top: safeTop + SPACING.md,
-      alignSelf: "center",
-      flexDirection: "row",
-      alignItems: "center",
-      gap: SPACING.sm,
-      backgroundColor: C.surface,
-      borderWidth: 1,
-      borderColor: C.border,
-      borderRadius: RADIUS.pill,
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.sm,
-      zIndex: 9999,
-      elevation: 8,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-    },
-    amount: {
-      ...TYPOGRAPHY.subheading,
-      color: C.text,
-    },
-    pill: {
-      backgroundColor: C.amber,
-      borderRadius: RADIUS.pill,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 2,
-    },
-    pillText: {
-      fontFamily: "Bricolage_400",
-      fontSize: 13,
-      color: "#000000",
-      letterSpacing: -0.3,
-    },
-  });
-}
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    alignSelf: "center",
+    zIndex: 10001,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#26262F", // surface
+    paddingHorizontal: STEP.s3,
+    paddingVertical: 10,
+    borderRadius: 30,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  amount: {
+    fontFamily: "Archivo_700",
+    fontSize: 15,
+    marginLeft: STEP.s1,
+  },
+  pill: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: SHAPE.pill,
+    marginLeft: STEP.s2,
+  },
+  pillText: {
+    fontFamily: "Archivo_700",
+    fontSize: 11,
+  },
+});

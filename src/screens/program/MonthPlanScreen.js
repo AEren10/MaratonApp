@@ -12,6 +12,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useMonthPlan } from "../../hooks/useMonthPlan";
 import { formatNumber } from "../../lib/format";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import * as H from "../../lib/haptics";
 import MonthPlanGrid from "./components/MonthPlanGrid";
 import MonthWeightList from "./components/MonthWeightList";
 
@@ -75,8 +76,16 @@ function MonthPlanInner() {
               </Text>
             </View>
             <View style={s.actions}>
-              <Button variant="primary" size="lg" fullWidth>
-                Eylül planını onayla
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onPress={() => {
+                  H.success();
+                  toWeek();
+                }}
+              >
+                {m.title ? `${m.title.split(" ")[0]} planını onayla` : "Planı onayla"}
               </Button>
               <Button variant="ghost" size="md" fullWidth onPress={toWeek}>
                 Haftalık görünüme dön

@@ -14,30 +14,7 @@ import { SubjectDetailHeader } from "./components/SubjectDetailHeader";
 import { SubjectProgressHeader } from "./components/SubjectProgressHeader";
 import { SubjectTopicSegment } from "./components/SubjectTopicSegment";
 import { SubjectTopicRow } from "./components/SubjectTopicRow";
-
-function filterTopics(topics, segment) {
-  if (segment === "done") return topics.filter((t) => t.done);
-  if (segment === "remaining") return topics.filter((t) => !t.done);
-  return topics;
-}
-
-// Tasarım (Image 1) - Konular kategorilere (ünitelere) ayrılmış.
-function groupTopics(topics) {
-  if (!topics || topics.length === 0) return [];
-  // Mock grouping for design fidelity.
-  const categories = [
-    { title: "SAYILAR VE İŞLEMLER", data: [] },
-    { title: "CEBİR", data: [] },
-    { title: "SAYMA VE OLASILIK", data: [] }
-  ];
-  
-  topics.forEach((t, i) => {
-    if (i < 4) categories[0].data.push(t);
-    else if (i < 8) categories[1].data.push(t);
-    else categories[2].data.push(t);
-  });
-  return categories.filter(c => c.data.length > 0);
-}
+import { filterTopics, groupTopics } from "./subjectDetailUtils";
 
 export default function SubjectDetailScreen() {
   const C = useC();
@@ -139,7 +116,7 @@ export default function SubjectDetailScreen() {
               ListHeaderComponent={ListHeaderComponent}
             />
             <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-              <Button variant="primary" size="lg" fullWidth>Seçili 3 konuya durak koy</Button>
+              <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey })}>Seçili 3 konuya durak koy</Button>
               <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>Tamamlananları gizle</Text>
             </View>
           </>

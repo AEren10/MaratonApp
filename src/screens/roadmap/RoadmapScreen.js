@@ -1,4 +1,4 @@
-﻿import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
@@ -49,10 +49,10 @@ export default function RoadmapScreen() {
                   <Text style={[TYPOGRAPHY.caption, s.caption, { color: C.text3 }]}>{view.caption}</Text>
                 ) : null}
                 <View style={s.chart}>
-                  {d.chartReady ? (
+                  {d.chartReady && view.chart ? (
                     <RouteDetailChart chart={view.chart} target={d.targetNet} examDateTag={d.examDateTag} />
                   ) : (
-                    <RouteEmptyChart examDateTag={d.examDateTag} target={d.targetNet} loading />
+                    <RouteEmptyChart examDateTag={d.examDateTag} />
                   )}
                 </View>
               </Animated.View>
@@ -62,7 +62,7 @@ export default function RoadmapScreen() {
               </Animated.View>
               
               <Animated.View entering={enter(2)} style={s.section}>
-                {view.tempoRows.length ? (
+                {view.tempoRows?.length ? (
                   <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
                 ) : null}
                 <View style={s.links}>
@@ -78,8 +78,8 @@ export default function RoadmapScreen() {
               </Animated.View>
               
               <Animated.View entering={enter(3)} style={s.section}>
-                {view.upcomingStops.length ? (
-                  <RouteUpcomingStops stops={view.upcomingStops} onPress={d.openStop} />
+                {(d.upcoming?.length ?? 0) > 0 ? (
+                  <RouteUpcomingStops items={d.upcoming} onStop={d.openStop} />
                 ) : null}
               </Animated.View>
             </>

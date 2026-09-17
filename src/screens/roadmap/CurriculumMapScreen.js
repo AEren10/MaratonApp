@@ -30,7 +30,7 @@ function CurriculumMapInner() {
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <RouteHeader
         title="Yol haritası"
-        onBack={() => navigation.goBack()}
+        onBack={() => { if (navigation.canGoBack()) navigation.goBack(); }}
         onMore={() => navigation.navigate(SCREENS.SEARCH)}
         moreIcon="search"
         moreLabel="Konu ara"
@@ -62,6 +62,21 @@ function CurriculumMapInner() {
             ))}
           </Animated.View>
           <View style={s.pad}>
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.DAILY_PLAN)}
+              accessibilityRole="button"
+              style={({ pressed }) => [
+                s.link,
+                { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.elev, marginBottom: STEP.s2 },
+              ]}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Haftalık Programım</Text>
+                <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 2 }]}>Bu haftanın durakları ve gün şeridi</Text>
+              </View>
+              <Icon name="chevR" size={12} color={C.text3} />
+            </Pressable>
+
             <Pressable
               onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
               accessibilityRole="button"

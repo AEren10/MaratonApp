@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -16,7 +16,7 @@ export function RouteProjectionCard({ projectedNet, note, rangeText }) {
           <Text style={[TYPOGRAPHY.bodyMedium, s.note, { color: C.text3 }]}>net · {note}</Text>
         </View>
         <View style={[s.range, { borderTopColor: C.elev }]}>
-          <Text style={[TYPOGRAPHY.meta, s.flex, { color: C.text3 }]}>Tahmin aralığıığı</Text>
+          <Text style={[TYPOGRAPHY.meta, s.flex, { color: C.text3 }]}>Tahmin aralığı</Text>
           <Text style={[TYPOGRAPHY.tableValue, { color: C.text }]}>{rangeText}</Text>
         </View>
       </View>

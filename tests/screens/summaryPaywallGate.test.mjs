@@ -7,9 +7,9 @@ const summaryScreen = readFileSync(
   "utf8",
 );
 
-test("monthly summary unlock uses the central premium paywall gate", () => {
-  assert.match(summaryScreen, /import \{ usePremium \} from "\.\.\/\.\.\/contexts\/PremiumContext";/);
-  assert.match(summaryScreen, /const \{ showPaywall \} = usePremium\(\);/);
-  assert.match(summaryScreen, /showPaywall\("monthly_report"\)/);
+test("monthly summary unlock uses the central locked feature gate", () => {
+  assert.match(summaryScreen, /import \{ useLockedFeatureEntry \} from "\.\.\/\.\.\/hooks\/useLockedFeatureEntry";/);
+  assert.match(summaryScreen, /const enterLocked = useLockedFeatureEntry\(\);/);
+  assert.match(summaryScreen, /enterLocked\("monthly_report"\)/);
   assert.doesNotMatch(summaryScreen, /navigate\(SCREENS\.PAYWALL/);
 });

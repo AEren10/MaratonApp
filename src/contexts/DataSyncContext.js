@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import { useDataSync } from "../hooks/useDataSync";
 
-const DataSyncContext = createContext({ syncing: false, refresh: async () => {} });
+const DataSyncContext = createContext({ syncing: false, syncedOnce: false, refresh: async () => {} });
 
 export function DataSyncProvider({ children }) {
   const value = useDataSync();

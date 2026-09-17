@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
+﻿import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "./AuthContext";
 import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
@@ -77,6 +77,7 @@ export function ExamProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false;
+    const safety = setTimeout(() => { if (!cancelled) setLoading(false); }, 2000);
     Promise.all([
       userId ? appStorage.getJson(storageKey, null) : Promise.resolve(null),
       appStorage.getString(SLIDES_KEY),
@@ -97,7 +98,7 @@ export function ExamProvider({ children }) {
       setHasSeenSlides(seenRaw === "true");
     })
     .catch(() => {})
-    .finally(() => { if (!cancelled) setLoading(false); });
+    .finally(() => { clearTimeout(safety); if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [storageKey, userId]);
 
@@ -354,7 +355,7 @@ export function ExamProvider({ children }) {
     return Math.max(0, Math.round((examUTC - todayUTC) / (1000 * 60 * 60 * 24)));
   }, [examDate]);
 
-  const combinedLoading = loading || dbLoading;
+  const combinedLoading = loading;
 
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,

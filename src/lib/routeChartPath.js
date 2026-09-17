@@ -138,7 +138,8 @@ export function buildChartSummary({ values = [], projection = [], target } = {})
     : diff < 0 ? `${Math.abs(diff)} net düşüş`
     : "değişim yok";
 
-  const son = projection.length ? projection[projection.length - 1] : null;
+  const proj = Array.isArray(projection) ? projection : [];
+  const son = proj.length ? proj[proj.length - 1] : null;
   const projeksiyon = typeof son === "number"
     ? ` Tahmin ${Math.round(son * 10) / 10} net.`
     : "";

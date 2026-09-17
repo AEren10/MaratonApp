@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+﻿import { useEffect, useCallback, useState, useRef } from "react";
 import { AppState } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useNetwork } from "../contexts/NetworkContext";
@@ -116,7 +116,7 @@ async function loadAll(userId, dispatch) {
   const serverStats = profile.status === "fulfilled" ? profile.value?.gamification_stats : null;
 
   if (xpFromServer > 0 || serverStats) {
-    const patch = { xp: xpFromServer, weeklyXP: weeklyFromServer };
+    const patch = { xp: xpFromServer, weeklyXP: weeklyFromServer, isServer: true };
     if (serverStats && typeof serverStats === "object") {
       const { claimedMilestones: cm, ...pureStats } = serverStats;
       patch.stats = pureStats;
@@ -153,6 +153,7 @@ export function useDataSync() {
   const dispatch = useAppDispatch();
   const { isConnected } = useNetwork();
   const [syncing, setSyncing] = useState(false);
+  const [syncedOnce, setSyncedOnce] = useState(false);
   const [error, setError] = useState(null);
   const wasOfflineRef = useRef(false);
   const mountedRef = useRef(true);
@@ -174,14 +175,14 @@ export function useDataSync() {
   );
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!user?.id || user.id === "dev") { setSyncedOnce(true); return; }
     const ownerId = user.id;
     let cancelled = false;
     setSyncing(true);
     loadAll(ownerId, (action) => safeDispatch(action, ownerId))
       .catch((e) => { if (!cancelled) setError(e); })
       .finally(() => {
-        if (!cancelled) setSyncing(false);
+        if (!cancelled) { setSyncing(false); setSyncedOnce(true); }
       });
     return () => { cancelled = true; };
   }, [user?.id, safeDispatch]);
@@ -236,5 +237,5 @@ export function useDataSync() {
     }
   }, [user?.id, safeDispatch]);
 
-  return { syncing, refresh, error };
+  return { syncing, syncedOnce, refresh, error };
 }

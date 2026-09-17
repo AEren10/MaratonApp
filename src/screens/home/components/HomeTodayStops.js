@@ -11,7 +11,7 @@ const PREVIEW = 3;
 
 // "BUGÜNÜN DURAKLARI": ilerleme bolutleri + ilk uc durak + "Programın tamamı".
 // Liste en fazla uc satir oldugu icin FlatList yerine map (kaydirma yok).
-export function HomeTodayStops({ stops, onViewPlan }) {
+export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const C = useC();
   const { items, doneCount, nextId, toggle } = stops;
   const preview = items.slice(0, PREVIEW);
@@ -34,7 +34,7 @@ export function HomeTodayStops({ stops, onViewPlan }) {
       {preview.length ? (
         <View style={s.list}>
           {preview.map((item) => (
-            <HomeStopRow key={item.id} item={item} isNext={item.id === nextId} onToggle={toggle} />
+            <HomeStopRow key={item.id} item={item} isNext={item.id === nextId} onToggle={toggle} onStart={onStartTask} />
           ))}
         </View>
       ) : (

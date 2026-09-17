@@ -23,7 +23,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SETUP_INCOMPLETE]: { path: "kurulum/yarim", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
 
   [SCREENS.HOME]: { path: "home", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: true, tab: true },
-  [SCREENS.DAILY_PLAN]: { path: "dersler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },
+  [SCREENS.CURRICULUM_MAP]: { path: "mufredat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },
   [SCREENS.STUDY_LOG]: { path: "calisma/gecmis", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: true },
   [SCREENS.ANALYSIS]: { path: "analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true, tab: true },
   [SCREENS.PROFILE]: { path: "profil", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true, tab: true },
@@ -52,7 +52,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.TRIAL_COMPARE]: { path: "deneme/karsilastir", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.TRIAL_DETAIL]: { path: "deneme/:id", flow: PRODUCT_FLOW_IDS.QUICK_ENTRY, deepLink: true },
   [SCREENS.TRIAL_RECORDS]: { path: "deneme/kayitlar", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
-  [SCREENS.TRIAL_INSIGHTS]: { path: "deneme/icgoru", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
+
   [SCREENS.WEEKLY_TRIAL_REVIEW]: { path: "deneme/haftalik", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: false },
 
   [SCREENS.SUBJECT_DETAIL]: { path: "ders/:subjectKey", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
@@ -65,7 +65,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SEARCH]: { path: "ara", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.PLAN_VS_ACTUAL]: { path: "program/plan-gercek", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
-  [SCREENS.CURRICULUM_MAP]: { path: "program/mufredat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
+  [SCREENS.DAILY_PLAN]: { path: "program/dersler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.WEEK_PROGRAM]: { path: "program/hafta", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.CLASS_SCHEDULE]: { path: "program/ders-programi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.MONTH_PLAN]: { path: "program/ay", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },

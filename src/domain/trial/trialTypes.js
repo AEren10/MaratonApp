@@ -1,12 +1,18 @@
 // Domain-level trial catalog. UI code should import from here, not screens.
+import { C as DEFAULT_C } from "../../themes/tokens";
 
 // Ders renkleri palet ders haritasindan okunur. Eskiden eski takma
 // adlar (C.blue/C.teal...) kullaniliyordu; bunlar ders haritasina 1:1
 // esleşmediği için Fizik Turkce'nin mavisiyle, Kimya Fizik'in
 // turkuaziyla ciziliyordu. Haritada olmayan ders accent'e duser.
-const S = (C, key) => C.subjects?.[key] || C.accent;
+const palette = (C) => C || DEFAULT_C;
+const S = (C, key) => {
+  const P = palette(C);
+  return P.subjects?.[key] || P.accent;
+};
 
 export function getTYTSubjects(C) {
+  C = palette(C);
   return [
     { key: "tyt_turkce", name: "Türkçe", color: S(C, "turkce"), icon: "bookOpen", max: 40, parent: "TYT" },
     { key: "tyt_matematik", name: "Matematik", color: S(C, "matematik"), icon: "hash", max: 40, parent: "TYT" },
@@ -16,6 +22,7 @@ export function getTYTSubjects(C) {
 }
 
 export function getAYTSaySubjects(C) {
+  C = palette(C);
   return [
     { key: "ayt_matematik", name: "Matematik", color: S(C, "matematik"), icon: "hash", max: 40, parent: "AYT" },
     { key: "ayt_fizik", name: "Fizik", color: S(C, "fizik"), icon: "zap", max: 14, parent: "AYT" },
@@ -25,6 +32,7 @@ export function getAYTSaySubjects(C) {
 }
 
 export function getAYTEASubjects(C) {
+  C = palette(C);
   return [
     { key: "ayt_matematik", name: "Matematik", color: S(C, "matematik"), icon: "hash", max: 40, parent: "AYT" },
     { key: "ayt_edebiyat", name: "Edebiyat", color: S(C, "edebiyat"), icon: "bookOpen", max: 24, parent: "AYT" },
@@ -34,6 +42,7 @@ export function getAYTEASubjects(C) {
 }
 
 export function getAYTSozSubjects(C) {
+  C = palette(C);
   return [
     { key: "ayt_edebiyat", name: "Edebiyat", color: S(C, "edebiyat"), icon: "bookOpen", max: 24, parent: "AYT" },
     { key: "ayt_tarih1", name: "Tarih-1", color: S(C, "tarih"), icon: "clock", max: 10, parent: "AYT" },
@@ -46,6 +55,7 @@ export function getAYTSozSubjects(C) {
 }
 
 export function getLGSSubjects(C) {
+  C = palette(C);
   return [
     { key: "lgs_turkce", name: "Türkçe", color: S(C, "turkce"), icon: "bookOpen", max: 20, parent: "LGS" },
     { key: "lgs_matematik", name: "Matematik", color: S(C, "matematik"), icon: "hash", max: 20, parent: "LGS" },
@@ -57,6 +67,7 @@ export function getLGSSubjects(C) {
 }
 
 export function getAllSubjects(C) {
+  C = palette(C);
   return [
     ...getTYTSubjects(C),
     ...getAYTSaySubjects(C),
@@ -67,6 +78,7 @@ export function getAllSubjects(C) {
 }
 
 export function getTrialTypes(C) {
+  C = palette(C);
   return {
     TYT: { code: "TYT", label: "TYT Denemesi", description: "120 soru · 4 ders", icon: "bookOpen", color: C.blue, subjects: getTYTSubjects(C), totalQuestions: 120 },
     AYT_SAY: { code: "AYT_SAY", label: "AYT Sayısal", description: "80 soru · Mat-Fizik-Kimya-Biyoloji", icon: "hash", color: C.amber, subjects: getAYTSaySubjects(C), totalQuestions: 80 },

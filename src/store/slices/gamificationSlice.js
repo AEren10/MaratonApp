@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit";
+﻿import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { getLevelForXP } from "../../lib/xpEngine";
 import { STORAGE_KEYS, userScopedKey } from "../../constants/storageKeys";
 import * as appStorage from "../../lib/storage/appStorage";
@@ -68,11 +68,11 @@ const gamificationSlice = createSlice({
     },
     hydrateGamification(state, action) {
       const d = action.payload || {};
-      if (d.xp != null) state.xp = Math.max(state.xp, d.xp);
+      if (d.xp != null) state.xp = d.isServer ? d.xp : Math.max(state.xp, d.xp);
       if (d.weeklyXP != null) state.weeklyXP = d.weeklyXP;
       if (d.stats) {
         Object.keys(d.stats).forEach((k) => {
-          if (k in state.stats) state.stats[k] = Math.max(state.stats[k], d.stats[k] || 0);
+          if (k in state.stats) state.stats[k] = d.isServer ? (d.stats[k] || 0) : Math.max(state.stats[k], d.stats[k] || 0);
         });
       }
       if (Array.isArray(d.claimedMilestones)) {

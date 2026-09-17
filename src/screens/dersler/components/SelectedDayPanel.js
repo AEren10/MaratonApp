@@ -1,32 +1,49 @@
-﻿import React, { useMemo } from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useMemo } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
+import { subjectColorOf } from "../../../themes/subjectPalette";
 
-function StopRow({ log, C, solid }) {
+function StopRow({ log, C, onPress }) {
   const isDone = log.status === "done" || log.completed;
+  const dotColor = subjectColorOf(C, log.subjectKey || log.subjectLabel);
+
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2 + 2 }}>
-      {log.time ? (
-        <Text style={{ ...TYPOGRAPHY.metaSemiBold, width: 38, color: C.text3, fontVariant: ["tabular-nums"] }}>{log.time}</Text>
-      ) : <View style={{ width: 38 }} />}
-      <View style={{ width: 6, height: 6, borderRadius: 1, backgroundColor: solid || C.text3 }} />
-      <Text 
-        style={{ ...TYPOGRAPHY.bodyMedium, color: isDone ? C.text3 : C.text, textDecorationLine: isDone ? "line-through" : "none", flex: 1 }} 
-        numberOfLines={1}
-      >
-        {log.topic ? `${log.subjectLabel} · ${log.topic}` : log.subjectLabel}
-      </Text>
-      {isDone ? (
-        <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.2, color: C.up }}>BİTTİ</Text>
-      ) : (
-        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{log.minutes ? formatMinutes(log.minutes) : ""}</Text>
-      )}
-    </View>
+    <Pressable onPress={onPress} style={s.timelineRow}>
+      <View style={s.timeCol}>
+        <Text style={[TYPOGRAPHY.label, s.tabular, { color: C.text }]}>{log.time || "—"}</Text>
+        <Text style={[TYPOGRAPHY.micro, s.tabular, { color: C.text3 }]}>{log.minutes ? `${log.minutes} dk` : ""}</Text>
+      </View>
+
+      <View style={s.lineTrack}>
+        <View style={[s.dot, { backgroundColor: dotColor }]} />
+        <View style={[s.vertLine, { backgroundColor: C.line }]} />
+      </View>
+
+      <View style={[s.stopCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
+        <View style={s.cardHead}>
+          <Text style={[TYPOGRAPHY.tableHead, { color: dotColor }]}>
+            {(log.subjectLabel || "DERS").toUpperCase()}
+          </Text>
+          {isDone ? (
+            <Text style={[TYPOGRAPHY.tableHead, { color: C.up }]}>BİTTİ</Text>
+          ) : null}
+        </View>
+        <Text
+          style={[
+            TYPOGRAPHY.bodyMedium,
+            { color: isDone ? C.text3 : C.text, textDecorationLine: isDone ? "line-through" : "none" },
+          ]}
+          numberOfLines={1}
+        >
+          {log.topic || log.subjectLabel}
+        </Text>
+      </View>
+    </Pressable>
   );
 }
 
@@ -41,39 +58,70 @@ export function SelectedDayPanel({ selectedDay, logs }) {
     return `${weekday} · ${rest}`;
   }, [selectedDay.key]);
 
-  const displayLogs = logs.length > 0 ? logs : [
-    { time: "09:30", subjectLabel: "Türkçe", topic: "Sözcükte Anlam", completed: true, status: "done" },
-    { time: "14:00", subjectLabel: "Matematik", topic: "Permütasyon", completed: true, status: "done" },
-    { time: "19:30", subjectLabel: "Matematik", topic: "Kombinasyon", completed: false, minutes: 50 },
-    { time: "21:00", subjectLabel: "Felsefe", topic: "Bilgi Felsefesi", completed: false, minutes: 24 }
+  const displayLogs = logs && logs.length > 0 ? logs : [
+    { time: "08:30", minutes: 45, subjectLabel: "Türkçe", topic: "Paragraf - Anlatım Biçimleri", completed: true, status: "done" },
+    { time: "10:00", minutes: 50, subjectLabel: "Matematik", topic: "Permütasyon - Kombinasyon" },
+    { time: "16:00", minutes: 40, subjectLabel: "Biyoloji", topic: "Nükleik Asitler" },
+    { time: "19:30", minutes: 25, subjectLabel: "Matematik", topic: "Defter tekrarı · 6 soru" },
   ];
 
   const totalMinutes = displayLogs.reduce((s, l) => s + (l.minutes || 0), 0);
-  const meta = `${displayLogs.length} durak · ${formatMinutes(totalMinutes)}`;
+  const meta = `${formatMinutes(totalMinutes)} planlı`;
+
+  const openDetail = () => navigation.navigate(SCREENS.PLAN_DETAIL, { date: selectedDay.key, dateLabel });
 
   return (
-    <View style={{ marginTop: STEP.s4 }}>
-      <Pressable onPress={() => navigation.navigate(SCREENS.PLAN_DETAIL, { date: selectedDay.key })} style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginBottom: STEP.s1 }}>
-        <Text style={{ ...TYPOGRAPHY.label, color: C.text3 }}>{dateLabel}</Text>
-        <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>{meta}</Text>
+    <View style={s.wrap}>
+      <Pressable onPress={openDetail} style={s.headerRow}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>{dateLabel}</Text>
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{meta}</Text>
       </Pressable>
-      
-      <View style={{ marginTop: STEP.s1 }}>
+
+      <View style={s.listWrap}>
         {displayLogs.map((log, i) => (
-          <StopRow key={i} log={log} C={C} solid={C.brandTint} />
+          <StopRow key={i} log={log} C={C} onPress={openDetail} />
         ))}
       </View>
-      
-      <Pressable onPress={() => navigation.navigate(SCREENS.ADD_TASK)} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, borderTopColor: C.line }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>
-          <Icon name="plus" size={14} color={C.brandTint} />
-          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Bu güne durak ekle</Text>
-        </View>
-        <Text style={{ ...TYPOGRAPHY.meta, color: C.text3 }}>
-          {new Date(selectedDay.key).toLocaleDateString("tr-TR", { weekday: "long" })}
+
+      <Pressable
+        onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+        style={({ pressed }) => [
+          s.addButton,
+          { borderColor: C.elev, backgroundColor: pressed ? C.elev : "transparent" },
+        ]}
+      >
+        <Icon name="plus" size={13} color={C.accent} />
+        <Text style={[TYPOGRAPHY.bodySemiBold, s.btnText, { color: C.accentBright }]}>
+          Durak ekle
         </Text>
       </Pressable>
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  wrap: { marginTop: STEP.s4 },
+  headerRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: STEP.s2 },
+  listWrap: { marginTop: STEP.s1 },
+  timelineRow: { flexDirection: "row", alignItems: "stretch", gap: STEP.s1 + 2, marginBottom: STEP.s2 },
+  timeCol: { width: 44, alignItems: "flex-start", paddingTop: 2 },
+  tabular: { fontVariant: ["tabular-nums"] },
+  lineTrack: { width: 12, alignItems: "center", paddingTop: 6 },
+  dot: { width: 8, height: 8, borderRadius: 2 },
+  vertLine: { width: 1, flex: 1, marginTop: 4 },
+  stopCard: { flex: 1, padding: STEP.s2, borderRadius: SHAPE.cardTight, borderWidth: 1 },
+  cardHead: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginBottom: 2 },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: STEP.s1,
+    height: CONTROL.buttonTertiary,
+    marginTop: STEP.s1,
+    paddingHorizontal: STEP.s2,
+    borderRadius: SHAPE.cardTight,
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  btnText: { letterSpacing: 0.2 },
+});

@@ -11,7 +11,8 @@ export function buildStudyTimerParams(task) {
   const stopId = isMergedItem ? task.routeStop?.stopId : (task.stopId || task.routeStopId);
   const version = isMergedItem ? task.routeStop?.version : task.version;
 
-  return {
+  const stopNumber = task.routeStopNumber ?? task.stopNumber ?? task.position ?? task.priority ?? (task.routeStop?.position != null ? task.routeStop.position + 1 : undefined);
+  const out = {
     taskId: isMergedItem ? task.id : planTaskKey,
     planTaskKey,
     subjectKey: task.subject,
@@ -21,4 +22,6 @@ export function buildStudyTimerParams(task) {
     routeStopId: stopId || undefined,
     routeStopVersion: stopId ? (version ?? undefined) : undefined,
   };
+  if (stopNumber != null) out.routeStopNumber = stopNumber;
+  return out;
 }

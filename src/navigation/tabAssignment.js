@@ -16,7 +16,7 @@ import { SCREENS } from "../constants/screens.js";
 
 export const TAB_KEYS = Object.freeze({
   ROTA: SCREENS.HOME,
-  PROGRAM: SCREENS.DAILY_PLAN,
+  PROGRAM: SCREENS.CURRICULUM_MAP,
   ANALIZ: SCREENS.ANALYSIS,
   PROFIL: SCREENS.PROFILE,
 });
@@ -42,13 +42,23 @@ export const ROTA_STACK = [
   SCREENS.WEEKLY_REVIEW,    // eski rota: SummaryScreen week (bildirim/derin baglanti)
   SCREENS.WEEKLY_TRIAL_REVIEW,
   SCREENS.HOW_IT_WORKS,     // (paylasimli)
+  SCREENS.CALENDAR,         // Takvim
+  SCREENS.MONTH_PLAN,       // Takvim -> Aylik Plan
+  SCREENS.WRONG_NOTEBOOK,   // Defter (Home Defter karti)
+  SCREENS.ADD_WRONG,        // Yanlis ekle
+  SCREENS.WRONG_DETAIL,     // Soru detayi
+  SCREENS.REVIEW_SESSION,   // Tekrar baslat
+  SCREENS.REVIEW_DONE,      // Tekrar bitti
+  SCREENS.SWIPE_REVIEW,     // Hizli tekrar
+  SCREENS.SHARE_CARD,       // Ozet -> Paylasim Karti
+  SCREENS.GOALS,            // Bolum Esigi -> Hedef Duzenle
+  SCREENS.TOPIC_STUDY,      // Konu Detayi
+  SCREENS.SUBJECT_DETAIL,   // Ders Konulari
 ];
 
 export const PROGRAM_STACK = [
+  SCREENS.DAILY_PLAN,       // Program Hub: Hafta (Programim 2. sayfa)
   SCREENS.ROADMAP,          // Rota Detay (paylasimli)
-  // Tasarimda PROGRAM sekmesi secili: Rotanin tamami / Ayin Ozeti / Oncelikli
-  // Konular bunlari openInTab ile PROGRAM sekmesinde acar (navigation/tabJump.js).
-  SCREENS.CURRICULUM_MAP,   // Yol Haritasi: mufredat ilerlemesi (Rota Detay DEGIL)
   SCREENS.WEEK_PROGRAM,     // Program: gunun duraklari
   SCREENS.MONTH_PLAN,       // Aylik Plan
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
@@ -61,11 +71,14 @@ export const PROGRAM_STACK = [
   SCREENS.PLAN_VS_ACTUAL,   // Plan vs Gercek
   SCREENS.SEARCH,           // Arama (konu + yanlis defteri)
   SCREENS.COMPARATIVE,      // Plan vs Gercek
+  SCREENS.WRONG_NOTEBOOK,   // Defter
+  SCREENS.WRONG_DETAIL,     // Arama -> Soru detayi
+  SCREENS.SHARE_CARD,       // Paylasim Karti
+  SCREENS.HOW_IT_WORKS,     // Nasil Calisir
 ];
 
 export const ANALIZ_STACK = [
   SCREENS.TRIAL_RECORDS,    // Deneme Kayitlari (tasarim: filtreli, aya gruplu liste)
-  SCREENS.TRIAL_INSIGHTS,   // Deneme Icgorusu (ayri ekran, tasarim karsiligi yok)
   SCREENS.SUBJECT_LIST,     // Konu Ilerlemesi
   SCREENS.TRIAL_COMPARE,    // Deneme Karsilastirma
   SCREENS.COMPARATIVE,      // Yayin / donem karsilastirmasi
@@ -84,6 +97,8 @@ export const ANALIZ_STACK = [
   SCREENS.QUICK_PRACTICE,
   SCREENS.TOPIC_CARDS,
   SCREENS.CARD_DETAIL,
+  SCREENS.SHARE_CARD,
+  SCREENS.SEARCH,
 ];
 
 export const PROFIL_STACK = [

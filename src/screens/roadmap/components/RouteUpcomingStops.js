@@ -26,14 +26,15 @@ const StopRow = memo(function StopRow({ item, onPress, C }) {
   );
 });
 
-// "GELECEK DURAKLAR": siradaki acik duraklar; dokununca Durak Detayi.
-export function RouteUpcomingStops({ items, onStop }) {
+export function RouteUpcomingStops({ items, stops, onStop, onPress }) {
   const C = useC();
-  if (!items.length) return null;
+  const list = items || stops || [];
+  const handlePress = onStop || onPress;
+  if (!list.length) return null;
   return (
     <View>
       <Text style={[TYPOGRAPHY.label, s.label, { color: C.text2 }]}>GELECEK DURAKLAR</Text>
-      {items.map((item) => <StopRow key={item.key} item={item} onPress={onStop} C={C} />)}
+      {list.map((item) => <StopRow key={item.key} item={item} onPress={handlePress} C={C} />)}
     </View>
   );
 }

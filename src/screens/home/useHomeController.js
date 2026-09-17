@@ -60,7 +60,7 @@ export function useHomeController() {
   const nudges = useRecommendations(planCtx.weekLogs);
   const nudge = useNudgePopup(nudges);
   const { suggestions } = useAISuggestions();
-  const { refresh } = useSync();
+  const { refresh, syncedOnce } = useSync();
   const { onRefresh, refreshing } = useHomeRefresh(refresh);
   const go = useHomeNavigation(navigation);
 
@@ -104,7 +104,7 @@ export function useHomeController() {
     const t = setTimeout(() => setTimedOut(true), 4000);
     return () => clearTimeout(t);
   }, []);
-  if ((!accessLoading && weekLoaded) || !isConnected || timedOut) readyRef.current = true;
+  if ((!accessLoading && weekLoaded && syncedOnce) || !isConnected || timedOut) readyRef.current = true;
   const [offlineDismissed, setOfflineDismissed] = useState(false);
   const hasLocalData = todayLogs.length > 0 || trials.length > 0 || weekLogs.length > 0 || !!lastStudyDate;
 

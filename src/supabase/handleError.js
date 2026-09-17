@@ -37,18 +37,36 @@ function isAuthError(error) {
   );
 }
 
+function isTransientNetworkError(error) {
+  if (!error) return false;
+  const msg = String(error.message || error.name || error).toLowerCase();
+  return (
+    msg.includes("fetch failed") ||
+    msg.includes("network request failed") ||
+    msg.includes("network connection was lost") ||
+    msg.includes("network error") ||
+    msg.includes("internet connection") ||
+    msg.includes("aborterror")
+  );
+}
+
 export function handleSupabaseError(error, context) {
   if (!error) return null;
 
+  const transientNetwork = isTransientNetworkError(error);
+
   if (__DEV__) {
-    console.error(`[Supabase:${context}]`, error.message || error);
+    const log = transientNetwork ? console.warn : console.error;
+    log(`[Supabase:${context}]`, error.message || error);
   } else {
     addBreadcrumb({
       category: "supabase",
       message: context,
-      level: "error",
+      level: transientNetwork ? "warning" : "error",
     });
-    captureError(error, { supabaseContext: context });
+    if (!transientNetwork) {
+      captureError(error, { supabaseContext: context });
+    }
   }
 
   if (isAuthError(error)) {

@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+﻿import { View, Text, Pressable } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
@@ -22,7 +22,7 @@ export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
           accessibilityRole="button"
           accessibilityLabel="Detaylı Analiz"
           accessibilityHint="Deneme trendlerinin detaylı analizine gider"
-          onPress={() => go(screens.TRIAL_INSIGHTS, { initialFilter: filter }, "analysis_trial_insights")}
+          onPress={() => go(screens.TRIAL_RECORDS, { initialFilter: filter }, "analysis_trial_insights")}
           style={{
             flexDirection: "row",
             alignItems: "center",

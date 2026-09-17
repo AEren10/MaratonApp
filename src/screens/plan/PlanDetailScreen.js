@@ -80,6 +80,7 @@ function PlanDetailInner({ route }) {
                   meta={`${formatMinutes(task.minutes ?? ((task.q || 0) * 2))} · ${task.q || 0} soru`}
                   hasStart={!task.done}
                   onStart={() => detail.startTask(task.id)}
+                  onToggle={() => detail.toggleTask(task.id)}
                 />
               ))}
             </View>
@@ -129,13 +130,13 @@ const s = StyleSheet.create({
   safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
   backBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 160 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 3 + STEP.s1 },
   cardsRow: { flexDirection: "row", gap: STEP.s2 },
   statCard: { flex: 1, padding: STEP.s3 },
   statNum: { marginTop: STEP.s2 },
   progressBarWrap: { marginTop: STEP.s3, height: 4 },
-  progressBase: { height: 4, borderRadius: 2 },
-  progressFill: { height: "100%", borderRadius: 2 },
+  progressBase: { height: 4, borderRadius: STEP.s1 / 4 },
+  progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
   listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s4, paddingBottom: STEP.s2 },
   rule: { flex: 1, height: 1 },
   stopsList: { gap: STEP.s3 },

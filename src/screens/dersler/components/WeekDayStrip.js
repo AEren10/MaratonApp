@@ -5,14 +5,15 @@ import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 
 function DayChip({ day, selected, onPress, C }) {
-  const filled = day.isToday;
-  const outlined = !filled && selected;
-  const bg = filled ? C.brandFill : "transparent";
-  const border = filled ? C.brandFill : outlined ? C.accent : day.isFuture ? C.line : C.elev;
-  const letterColor = filled ? C.accentInk : outlined ? C.accentBright : C.text3;
-  const numColor = filled ? C.accentInk : outlined ? C.text : day.isFuture ? C.text3 : C.text2;
-  const dotColor = day.active ? C.accent : day.isFuture ? "transparent" : C.text5;
-  const bgFallback = filled ? C.brandFill : day.isFuture ? "transparent" : C.surface;
+  const isSelected = selected;
+  const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
+  const filled = isPastDone;
+
+  const bg = filled ? C.brandFill : isSelected ? "transparent" : day.isFuture ? "transparent" : C.surface;
+  const border = filled ? C.brandFill : isSelected ? C.accent : day.isFuture ? C.line : C.elev;
+  const letterColor = filled ? C.accentInk : isSelected ? C.accentBright : C.text3;
+  const numColor = filled ? C.accentInk : isSelected ? C.text : day.isFuture ? C.text3 : C.text2;
+  const dotColor = filled ? C.accentInk : isSelected ? C.accent : day.active ? C.accent : day.isFuture ? "transparent" : C.text5;
 
   return (
     <Pressable
@@ -23,11 +24,11 @@ function DayChip({ day, selected, onPress, C }) {
         flex: 1,
         minHeight: 44,
         paddingVertical: 11,
-        borderRadius: SHAPE.cardTight,
-        backgroundColor: bg || bgFallback,
+        borderRadius: 16,
+        backgroundColor: bg,
         borderWidth: 1,
         borderColor: border,
-        borderStyle: day.isFuture && !outlined ? "dashed" : "solid",
+        borderStyle: day.isFuture && !isSelected ? "dashed" : "solid",
         alignItems: "center",
         gap: 6,
       }}

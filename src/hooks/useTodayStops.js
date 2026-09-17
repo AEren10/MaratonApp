@@ -8,10 +8,10 @@ import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 
-// Ana Sayfa "BUGÜNÜN DURAKLARI". Eski TodayPlanCard'in veri tarafi: kullanici
-// gorevleri + rota/plan duraklari + AI onerisi tek listede birlesir, plan
-// sunucuya senkronlanir ve tum maddeler isaretlendiginde onAllDone BIR KEZ
-// cagrilir (Gun Tamamlandi ani -> useCompletionMoments.markDayDone).
+// Ana Sayfa "BUGÜNÜN DURAKLARI".
+// Kullanıcı görevleri + rota/plan durakları + AI önerisi tek listede birleşir.
+// Tamamlanan duraklar kaybolmaz; motive edici şekilde yeşil tikle listenin
+// altına iner ve sayaçla (örn. 2/5) tam senkronize kalır.
 export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onAllDone }) {
   const { user } = useAuth();
   const showAlert = useAlert();
@@ -20,6 +20,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
   const rewardedRef = useRef(false);
   const onAllDoneRef = useRef(onAllDone);
   onAllDoneRef.current = onAllDone;
+  const completedHistoryRef = useRef(new Map());
 
   useEffect(() => {
     if (!generatedTasks.length) return;
@@ -44,21 +45,24 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         source: "user",
       });
     });
+
     generatedTasks.forEach((t) => {
       const pid = t.planTaskKey || buildPlanTaskKey(t);
+      const isDone = isPlanDone(pid);
       out.push({
         id: pid,
         subject: t.subject,
         label: t.topicLabel || t.subjectLabel,
         planTopicName: t.topic || null,
         count: t.questionCount || 0,
-        completed: isPlanDone(pid),
+        completed: isDone,
         badge: t.badge,
         rkind: t.rkind,
         source: "plan",
         routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
       });
     });
+
     if (aiSuggestion) {
       out.push({
         id: "ai_suggestion",
@@ -69,7 +73,25 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         source: "ai",
       });
     }
-    return out;
+
+    // Tamamlananları havuzda sakla; rota yeniden çizilse bile bugün bitirilen durak kaybolmasın
+    out.forEach((item) => {
+      if (item.completed) {
+        completedHistoryRef.current.set(item.id, item);
+      }
+    });
+
+    completedHistoryRef.current.forEach((cachedItem, id) => {
+      if (!out.some((t) => t.id === id)) {
+        out.push({ ...cachedItem, completed: true });
+      }
+    });
+
+    // Sırada bekleyenler önce, tamamlananlar listenin altında (motivasyon için)
+    return out.sort((a, b) => {
+      if (a.completed === b.completed) return 0;
+      return a.completed ? 1 : -1;
+    });
   }, [generatedTasks, userTasks, aiSuggestion, isPlanDone]);
 
   useEffect(() => {
@@ -82,18 +104,22 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
 
   const toggle = useCallback(async (item) => {
     H.select();
-    if (item.routeStop && item.completed) return;
-    if (item.routeStop) {
-      try {
-        await onRouteComplete?.(item.routeStop);
-      } catch {
-        showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
-        return;
-      }
-    }
+    const wasDone = item.completed;
     if (item.source === "user") toggleTask(item.id);
     else togglePlan(item.id);
-  }, [onRouteComplete, showAlert, toggleTask, togglePlan]);
+
+    if (!wasDone) {
+      completedHistoryRef.current.set(item.id, { ...item, completed: true });
+    } else {
+      completedHistoryRef.current.delete(item.id);
+    }
+
+    if (item.routeStop && !wasDone) {
+      try {
+        await onRouteComplete?.(item.routeStop);
+      } catch {}
+    }
+  }, [onRouteComplete, toggleTask, togglePlan]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;

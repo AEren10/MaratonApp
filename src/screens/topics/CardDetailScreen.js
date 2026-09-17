@@ -1,38 +1,15 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { FlashcardItem } from "./components/FlashcardItem";
 
-const { width: SW } = Dimensions.get("window");
-const CARD_W = SW - SPACING.lg * 2;
-
-function Flashcard({ card, flipped, onFlip, styles, C }) {
-  return (
-    <Pressable onPress={onFlip} style={styles.flashcard}>
-      <View style={styles.cardLabel}>
-        <Icon name={flipped ? "eye" : "eyeOff"} size={14} color={C.muted} />
-        <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>
-          {flipped ? "CEVAP" : "SORU"}
-        </Text>
-      </View>
-      <Text style={[
-        flipped ? TYPOGRAPHY.body : TYPOGRAPHY.subheading,
-        { color: C.text, textAlign: "center" },
-      ]}>
-        {flipped ? card.back : card.front}
-      </Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginTop: SPACING.lg }]}>
-        Çevirmek için dokun
-      </Text>
-    </Pressable>
-  );
-}
-
-export default function CardDetailScreen() {
+function CardDetailContent() {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
@@ -49,16 +26,16 @@ export default function CardDetailScreen() {
     return (
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12}>
+          <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
             <Icon name="arrowL" size={22} color={C.text} />
           </Pressable>
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
             Kart Detay
           </Text>
         </View>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.xxxl }}>
-          <Icon name="bookOpen" size={48} color={C.muted} />
-          <Text style={[TYPOGRAPHY.body, { color: C.muted, marginTop: SPACING.lg, textAlign: "center" }]}>
+        <View style={styles.empty}>
+          <Icon name="bookOpen" size={48} color={C.text3} />
+          <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s3, textAlign: "center" }]}>
             Bu konu için henüz flashcard bulunmuyor.
           </Text>
         </View>
@@ -73,7 +50,7 @@ export default function CardDetailScreen() {
   const flip = () => setFlipped((p) => !p);
 
   const next = (isKnown) => {
-    if (isKnown) setKnown((prev) => new Set(prev).add(card.id));
+    if (isKnown && card?.id) setKnown((prev) => new Set(prev).add(card.id));
     setFlipped(false);
     if (index < total - 1) setIndex((p) => p + 1);
   };
@@ -88,13 +65,13 @@ export default function CardDetailScreen() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
+        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           {cardTitle}
         </Text>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec }]}>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>
           {index + 1}/{total}
         </Text>
       </View>
@@ -105,15 +82,15 @@ export default function CardDetailScreen() {
             key={c.id || String(i)}
             style={[
               styles.progressDot,
-              i === index && styles.progressActive,
-              known.has(c.id) && styles.progressKnown,
+              i === index && { backgroundColor: C.accent },
+              known.has(c.id) && { backgroundColor: C.up },
             ]}
           />
         ))}
       </View>
 
       <View style={styles.center}>
-        <Flashcard card={card} flipped={flipped} onFlip={flip} styles={styles} C={C} />
+        <FlashcardItem card={card} flipped={flipped} onFlip={flip} C={C} />
       </View>
 
       <View style={styles.actions}>
@@ -121,24 +98,29 @@ export default function CardDetailScreen() {
           <Icon name="arrowL" size={20} color={C.text} />
         </Pressable>
 
-        <Pressable onPress={() => next(false)} style={[styles.actionBtn, { backgroundColor: C.red + "20" }]}>
-          <Icon name="x" size={20} color={C.red} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.red }]}>Tekrar et</Text>
+        <Pressable onPress={() => next(false)} style={[styles.actionBtn, { backgroundColor: C.danger + "20" }]}>
+          <Icon name="x" size={20} color={C.danger} />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.danger }]}>Tekrar et</Text>
         </Pressable>
 
-        <Pressable onPress={() => next(true)} style={[styles.actionBtn, { backgroundColor: C.green + "20" }]}>
-          <Icon name="check" size={20} color={C.green} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.green }]}>Bildim</Text>
+        <Pressable onPress={() => next(true)} style={[styles.actionBtn, { backgroundColor: C.up + "20" }]}>
+          <Icon name="check" size={20} color={C.up} />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.up }]}>Bildim</Text>
         </Pressable>
 
-        <Pressable
-          onPress={() => next(false)}
-          style={[styles.navBtn, index === total - 1 && { opacity: 0.3 }]}
-        >
+        <Pressable onPress={() => next(false)} style={[styles.navBtn, index === total - 1 && { opacity: 0.3 }]}>
           <Icon name="arrowR" size={20} color={C.text} />
         </Pressable>
       </View>
     </SafeAreaView>
+  );
+}
+
+export default function CardDetailScreen() {
+  return (
+    <ScreenErrorBoundary screenName="CardDetailScreen">
+      <CardDetailContent />
+    </ScreenErrorBoundary>
   );
 }
 
@@ -147,33 +129,20 @@ function makeStyles(C) {
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
       flexDirection: "row", alignItems: "center",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+      paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
     },
+    empty: { flex: 1, justifyContent: "center", alignItems: "center", padding: STEP.s5 },
     progressRow: {
       flexDirection: "row", justifyContent: "center", gap: 6,
-      paddingHorizontal: SPACING.lg, marginTop: SPACING.sm,
+      paddingHorizontal: GUTTER, marginTop: STEP.s1,
     },
     progressDot: {
-      flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2, maxWidth: 60,
+      flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface, maxWidth: 60,
     },
-    progressActive: { backgroundColor: C.accent },
-    progressKnown: { backgroundColor: C.green },
-    center: { flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.lg },
-    flashcard: {
-      width: CARD_W, minHeight: 280,
-      backgroundColor: C.surface, borderRadius: RADIUS.xxl,
-      borderWidth: 1, borderColor: C.border,
-      alignItems: "center", justifyContent: "center",
-      padding: SPACING.xxxl,
-      ...SHADOWS.card,
-    },
-    cardLabel: {
-      flexDirection: "row", alignItems: "center", gap: 4,
-      position: "absolute", top: SPACING.lg,
-    },
+    center: { flex: 1, justifyContent: "center", alignItems: "center", padding: GUTTER },
     actions: {
       flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xxl,
+      gap: STEP.s2, paddingHorizontal: GUTTER, paddingBottom: STEP.s4,
     },
     navBtn: {
       width: 44, height: 44, borderRadius: 22,
@@ -181,7 +150,7 @@ function makeStyles(C) {
     },
     actionBtn: {
       flexDirection: "row", alignItems: "center", gap: 6,
-      borderRadius: RADIUS.full, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
+      borderRadius: SHAPE.pill, paddingHorizontal: STEP.s3, paddingVertical: STEP.s2,
     },
   });
 }

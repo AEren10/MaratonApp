@@ -2,14 +2,14 @@ import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Card } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { formatTimerDuration } from "../../domain/study/studyTimerModel";
 import { SubjectPicker } from "./components/SubjectPicker";
 import { StudyTimerControls } from "./components/StudyTimerControls";
 import { StudyTimerHeader } from "./components/StudyTimerHeader";
 import { StudyTimerModeSelector } from "./components/StudyTimerModeSelector";
+import { StudyTimerNotice } from "./components/StudyTimerNotice";
 import { StudyTimerQuestionCounters } from "./components/StudyTimerQuestionCounters";
 import { SubjectTopicCard } from "./components/SubjectTopicCard";
 import { TimerRing } from "./components/TimerRing";
@@ -34,39 +34,15 @@ export default function StudyTimerScreen() {
   }
 
   const {
-    addCorrect,
-    addQuestion,
-    correctCount,
-    cycleIndex,
-    elapsed,
-    exit,
-    finish,
-    handleModeChange,
-    hasSubject,
-    isPomodoro,
-    mode,
-    modeKey,
-    modes,
-    openHistory,
-    pct,
-    phaseColor,
-    phaseLabel,
-    phaseTargetSec,
-    questions,
-    removeCorrect,
-    removeQuestion,
-    running,
-    selectedSubjectKey,
-    setSelectedSubjectKey,
-    skipPhase,
-    stopLabel,
-    subject,
-    toggle,
-    topic,
+    addCorrect, addQuestion, correctCount, cycleIndex, elapsed, exit, finish,
+    handleModeChange, hasSubject, isPomodoro, mode, modeKey, modes, openHistory,
+    pct, phaseColor, questions, removeCorrect, removeQuestion, running,
+    selectedSubjectKey, setSelectedSubjectKey, skipPhase, stopLabel, subject,
+    toggle, topic,
   } = timer;
 
   const eyebrow = isPomodoro
-    ? `${phaseLabel.toUpperCase()} · TUR ${cycleIndex + 1}/${mode.cycles}`
+    ? `ODAK · ${cycleIndex + 1}. SEANS`
     : hasSubject
       ? "SERBEST ÇALIŞMA"
       : "ODAK";
@@ -83,20 +59,35 @@ export default function StudyTimerScreen() {
 
       <StudyTimerModeSelector C={C} modeKey={modeKey} modes={modes} onChange={handleModeChange} />
 
-      {!running && elapsed === 0 && (
+      {!running && elapsed === 0 && !hasSubject && (
         <SubjectPicker selected={selectedSubjectKey} onSelect={setSelectedSubjectKey} />
       )}
 
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: STEP.s4 }}>
         <Animated.View entering={FadeIn.duration(500)} style={{ alignItems: "center" }}>
-          <TimerRing size={240} stroke={10} pct={pct} color={phaseColor} C={C}>
-            <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]} allowFontScaling={false}>
-              {formatTimerDuration(elapsed)}
+          <TimerRing
+            size={272}
+            stroke={8}
+            pct={pct}
+            color={phaseColor}
+            cycleIndex={cycleIndex}
+            totalCycles={mode?.cycles || 4}
+            showDashes={isPomodoro}
+            C={C}
+          >
+            <Text
+              style={[
+                TYPOGRAPHY.heroNumber,
+                { fontSize: 62, lineHeight: 66, letterSpacing: -1.8, color: C.text },
+              ]}
+              allowFontScaling={false}
+            >
+              {formatTimerDuration(timer.displaySeconds ?? elapsed)}
             </Text>
-            <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>
+            <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 10 }]}>
               {isPomodoro
-                ? `${Math.floor(phaseTargetSec / 60)} dk ${phaseLabel.includes("Mola") ? "mola" : "odak"}`
-                : hasSubject ? "serbest çalışma" : "ders seçilmedi"}
+                ? `${mode?.focus || 25} dk odak · ${mode?.break || 5} dk mola`
+                : (hasSubject ? "serbest çalışma" : "ders seçilmedi")}
             </Text>
           </TimerRing>
         </Animated.View>
@@ -105,25 +96,21 @@ export default function StudyTimerScreen() {
           <>
             <SubjectTopicCard C={C} subject={subject} topic={topic} stopLabel={stopLabel} />
 
-            <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s2 }}>
-              <Card tone="void">
-                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
-                  Çözdüğün soruyu bitişte soracağız. Şimdi sadece çalış.
-                </Text>
-              </Card>
-            </View>
+            <StudyTimerNotice C={C} />
           </>
         )}
 
-        <StudyTimerQuestionCounters
-          C={C}
-          correctCount={correctCount}
-          questions={questions}
-          onAddCorrect={addCorrect}
-          onAddQuestion={addQuestion}
-          onRemoveCorrect={removeCorrect}
-          onRemoveQuestion={removeQuestion}
-        />
+        {!isPomodoro && (
+          <StudyTimerQuestionCounters
+            C={C}
+            correctCount={correctCount}
+            questions={questions}
+            onAddCorrect={addCorrect}
+            onAddQuestion={addQuestion}
+            onRemoveCorrect={removeCorrect}
+            onRemoveQuestion={removeQuestion}
+          />
+        )}
 
         <StudyTimerControls
           C={C}

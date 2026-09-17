@@ -17,10 +17,13 @@
 
   // Main Tabs
   HOME: "Home",
+  HOME_ROOT: "HomeRoot",
   DAILY_PLAN: "DailyPlan",
   STUDY_LOG: "StudyLog",
   ANALYSIS: "Analysis",
+  ANALYSIS_ROOT: "AnalysisRoot",
   PROFILE: "Profile",
+  PROFILE_ROOT: "ProfileRoot",
 
   // Daily Plan Stack
   PLAN_DETAIL: "PlanDetail",
@@ -77,7 +80,7 @@
   // Tasarimin uc ozet artboardi (Gunun/Haftalik/Ayin Ozeti) tek parametreli
   // ekran: period = "day" | "week" | "month". Ayni iskelet, farkli donem.
   SUMMARY: "Summary",
-  TRIAL_INSIGHTS: "TrialInsights",
+
   WEEKLY_REVIEW: "WeeklyReview",
   WEEKLY_TRIAL_REVIEW: "WeeklyTrialReview",
   SWIPE_REVIEW: "SwipeReview",
@@ -109,6 +112,7 @@
   PLAN_VS_ACTUAL: "PlanVsActual",
   // AKIS 7 · Program ve plan
   CURRICULUM_MAP: "CurriculumMap",
+  CURRICULUM_MAP_ROOT: "CurriculumMapRoot",
   WEEK_PROGRAM: "WeekProgram",
   CLASS_SCHEDULE: "ClassSchedule",
   MONTH_PLAN: "MonthPlan",

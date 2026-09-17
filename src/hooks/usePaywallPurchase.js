@@ -121,7 +121,7 @@ export function usePaywallPurchase({ closeOnSuccess = true } = {}) {
       }
       return false;
     } catch (e) {
-      if (e?.userCancelled) return false;
+      if (e?.userCancelled) return;
       showAlert("Hata", "Satın alma işlemi başarısız oldu. Lütfen tekrar dene.");
       return false;
     } finally {

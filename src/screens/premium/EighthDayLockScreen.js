@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useBlockBack } from "../../hooks/useBlockBack";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -14,6 +15,7 @@ import * as H from "../../lib/haptics";
 
 // Tasarim: "8. Gun" (Artboard 118). Ilk 7 gunluk deneme suresinin bitisi ve Pro paywall.
 export default function EighthDayLockScreen() {
+  useBlockBack(true);
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -140,4 +142,6 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3, marginTop: 6 },
   featureText: { flex: 1, fontFamily: TYPOGRAPHY.Archivo_400, fontSize: 13, lineHeight: 18 },
 });
+
+
 

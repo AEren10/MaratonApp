@@ -329,11 +329,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
   const transitionStop = useCallback(async (stop, transition, payload = {}) => {
     if (!stop?.stopId) throw new Error("route_stop_not_persisted");
+    const version = stop.version ?? 1;
     const routeResult = await saveRouteStopTransitionOffline({
       userId: user?.id,
       stopId: stop.stopId,
       transition,
-      expectedVersion: stop.version ?? 1,
+      expectedVersion: version,
       clientOperationId: Crypto.randomUUID(),
       payload,
     });

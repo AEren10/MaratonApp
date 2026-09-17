@@ -6,6 +6,8 @@ import { useC } from "../../../contexts/ThemeContext";
 import { makeScale } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
+import { RouteEmptyChart } from "./RouteEmptyChart";
+
 // RouteLineChart'in tuval olcusu ve olcek kurali (tek ortak olcek).
 const W = 390;
 const H = 250;
@@ -21,31 +23,41 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
   const k = width / W;
   const hasTarget = Number.isFinite(target);
 
+  const stops = chart?.stops || [];
+  const projection = chart?.projection || [];
+
   const pos = useMemo(() => {
-    const values = chart.stops.map((p) => p.y);
-    const total = values.length + chart.projection.length;
-    const sc = makeScale([...values, ...chart.projection, ...(hasTarget ? [target] : [])], {
+    if (!stops.length) {
+      return { today: { x: W / 2, y: H / 2 }, end: null, targetY: null };
+    }
+    const values = stops.map((p) => (typeof p === "number" ? p : p?.y ?? 0));
+    const total = values.length + projection.length;
+    const sc = makeScale([...values, ...projection, ...(hasTarget ? [target] : [])], {
       width: W, height: H, padTop: PAD, padBottom: PAD,
     });
     const stepX = total > 1 ? W / (total - 1) : 0;
-    const last = values.length - 1;
-    const endValue = chart.projection.length ? chart.projection[chart.projection.length - 1] : null;
+    const last = Math.max(0, values.length - 1);
+    const endValue = projection.length ? projection[projection.length - 1] : null;
     return {
-      today: { x: total > 1 ? last * stepX : W / 2, y: sc.toY(values[last]) },
+      today: { x: total > 1 ? last * stepX : W / 2, y: sc.toY(values[last]) ?? H / 2 },
       end: endValue != null ? { y: sc.toY(endValue) } : null,
       targetY: hasTarget ? sc.toY(target) : null,
     };
-  }, [chart, hasTarget, target]);
+  }, [stops, projection, hasTarget, target]);
+
+  if (!stops.length) {
+    return <RouteEmptyChart examDateTag={examDateTag} target={target} />;
+  }
 
   const tag = [TYPOGRAPHY.tableHead, s.tag];
   return (
     <View style={s.wrap} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {width > 0 ? (
         <RouteLineChart
-          stops={chart.stops}
-          todayIndex={chart.todayIndex}
-          projection={chart.projection}
-          band={chart.band}
+          stops={stops}
+          todayIndex={chart?.todayIndex}
+          projection={projection}
+          band={chart?.band}
           target={hasTarget ? target : undefined}
           height={H * k}
         />
@@ -71,7 +83,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
               top: (pos.end ? pos.end.y * k : H * k / 2) + STEP.s2, color: C.text2,
             }]}
           >
-            {chart.projectedNet != null ? `SINAV GÜNÜ · ${chart.projectedNet}` : "TAHMİN YOK"}
+            {chart?.projectedNet != null ? `SINAV GÜNÜ · ${chart.projectedNet}` : "TAHMİN YOK"}
           </Text>
           {examDateTag ? (
             <Text style={[...tag, s.right, s.bottom, { color: C.text3 }]}>{examDateTag}</Text>

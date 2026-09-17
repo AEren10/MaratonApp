@@ -1,39 +1,23 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, RefreshControl } from "react-native";
-import { ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { SectionLabel, Button, EmptyState, Skeleton } from "../../components/design";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
-import { AnimatedCard } from "../../components/design/AnimatedCard";
-
 import { NudgePopup } from "../../components/common/NudgePopup";
-import { SubjectBars } from "./components/SubjectBars";
-import { HistoryList } from "./components/HistoryList";
-import { TrialFilter } from "./components/TrialFilter";
-import { MoodTrend } from "./components/MoodTrend";
-import { AnalysisOverviewSection } from "./components/AnalysisOverviewSection";
-import { AnalysisPracticeSection } from "./components/AnalysisPracticeSection";
-import { AnalysisShortcutRow } from "./components/AnalysisShortcutRow";
-import { AnalysisTrendSection } from "./components/AnalysisTrendSection";
-import { useAnalysisController } from "./useAnalysisController";
 
-function AnalysisSkeleton() {
-  return (
-    <View style={{ paddingHorizontal: STEP.s3, paddingTop: STEP.s5, gap: STEP.s4 }}>
-      <Skeleton height={28} width={80} radius={8} />
-      <Skeleton height={48} />
-      <Skeleton height={120} />
-      <Skeleton height={160} />
-      <Skeleton height={200} />
-    </View>
-  );
-}
+import { AnalysisHeader } from "./components/AnalysisHeader";
+import { AnalysisFilterPills } from "./components/AnalysisFilterPills";
+import { AnalysisInsightsCard } from "./components/AnalysisInsightsCard";
+import { AnalysisHeroScore } from "./components/AnalysisHeroScore";
+import { SubjectTrendCards } from "./components/SubjectTrendCards";
+import { AnalysisTrialHistory } from "./components/AnalysisTrialHistory";
+import { PublisherComparisonCard } from "./components/PublisherComparisonCard";
+import { DeeperAnalysisSection } from "./components/DeeperAnalysisSection";
+import { AnalysisSkeleton } from "./components/AnalysisSkeleton";
+import { useAnalysisController } from "./useAnalysisController";
 
 export default function AnalysisScreen() {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
   const {
     analysis,
     changeFilter,
@@ -49,118 +33,97 @@ export default function AnalysisScreen() {
     screens,
   } = useAnalysisController(C);
 
-  if (loading) {
-    return (
-      <SafeAreaView edges={["top"]} style={s.safe}>
-        <AnalysisSkeleton />
-      </SafeAreaView>
-    );
-  }
+  const totalTrials = analysis.filteredTrials?.length ?? 0;
 
   return (
     <SwipeToHome>
-    <SafeAreaView edges={["top"]} style={s.safe}>
-      <ScrollView
-        contentContainerStyle={s.scroll}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
-      >
-        <View style={s.header}>
-          <Text style={s.title}>Analiz</Text>
-          <Button
-            variant="primary"
-            size="sm"
-            icon="plus"
-            onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_header_trial_entry")}
-            accessibilityLabel="Deneme gir"
-            accessibilityHint="Yeni deneme sonucu giriş ekranına gider"
-          >
-            Deneme gir
-          </Button>
-        </View>
-
-        <TrialFilter value={filter} onChange={changeFilter} />
-
-        <View style={s.content}>
-          {analysis.empty ? (
-            <EmptyState
-              preset="analysisThin"
-              onPrimary={() => go(screens.TRIAL_ENTRY, undefined, "analysis_empty_trial_entry")}
+      <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+        <ScrollView
+          contentContainerStyle={s.scroll}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={C.accent}
+              colors={[C.accent]}
             />
+          }
+        >
+          <AnalysisHeader
+            C={C}
+            onAddTrial={() => go(screens.TRIAL_ENTRY, undefined, "analysis_header_trial_entry")}
+          />
+
+          {loading ? (
+            <AnalysisSkeleton />
           ) : (
             <>
-              <AnalysisTrendSection
+              <AnalysisFilterPills
                 C={C}
-                analysis={analysis}
-                filter={filter}
-                go={go}
-                screens={screens}
+                value={filter}
+                onChange={changeFilter}
               />
 
-              <AnalysisShortcutRow C={C} go={go} screens={screens} />
+              <AnalysisInsightsCard C={C} />
 
-              <AnalysisOverviewSection C={C} analysis={analysis} filter={filter} />
-
-              <SectionLabel>DERS BAZLI TREND</SectionLabel>
-              <AnimatedCard delay={160}>
-                <SubjectBars
-                  bars={analysis.bars}
-                  onBarPress={(b) =>
-                    go(screens.SUBJECT_LIST, { filter, subjectKey: b?.key }, "analysis_subject_list")
-                  }
-                />
-              </AnimatedCard>
-
-              <SectionLabel>DENEME KAYITLARI</SectionLabel>
-              <AnimatedCard delay={300}>
-                <HistoryList
-                  history={analysis.history}
-                  onPress={(trial) => go(screens.TRIAL_DETAIL, { trial }, "analysis_history_trial")}
-                  onCompare={() => go(screens.TRIAL_COMPARE, undefined, "analysis_trial_compare")}
-                  totalCount={analysis.filteredTrials?.length ?? 0}
-                  onSeeAll={() => go(screens.TRIAL_RECORDS, undefined, "analysis_trial_records")}
-                />
-              </AnimatedCard>
-
-              <AnimatedCard delay={360}>
-                <MoodTrend trials={analysis.filteredTrials} />
-              </AnimatedCard>
-
-              <AnalysisPracticeSection
+              <AnalysisHeroScore
                 C={C}
-                go={go}
-                onSimulator={openSimulator}
-                screens={screens}
+                latest={analysis.latest}
+                heroLine={analysis.heroLine}
+                heroLabels={analysis.heroLabels}
+              />
+
+              {/* DERS BAZLI TREND */}
+              <SubjectTrendCards
+                C={C}
+                bars={analysis.bars}
+                onSelectSubject={(subj) =>
+                  go(screens.SUBJECT_DETAIL, { subjectKey: subj.key }, "analysis_subject_card")
+                }
+              />
+
+              {/* DENEME KAYITLARI */}
+              <AnalysisTrialHistory
+                C={C}
+                history={analysis.history}
+                totalCount={totalTrials}
+                onSelectTrial={(trial) =>
+                  go(screens.TRIAL_DETAIL, { trial }, "analysis_trial_detail")
+                }
+                onSeeAll={() =>
+                  go(screens.TRIAL_RECORDS, undefined, "analysis_all_trials")
+                }
+              />
+
+              <PublisherComparisonCard C={C} />
+
+              <DeeperAnalysisSection
+                C={C}
+                onKonuIlerlemesi={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_list")}
+                onNetTahmini={() => go(screens.NET_FORECAST, undefined, "analysis_forecast")}
+                onSimulasyon={openSimulator}
               />
             </>
           )}
-        </View>
-      </ScrollView>
+        </ScrollView>
 
-      <NudgePopup
-        nudge={nudgePopup}
-        visible={!!nudgePopup}
-        onDismiss={dismissNudgePopup}
-        onAction={handleNudgeAction}
-      />
-    </SafeAreaView>
+        <NudgePopup
+          nudge={nudgePopup}
+          visible={!!nudgePopup}
+          onDismiss={dismissNudgePopup}
+          onAction={handleNudgeAction}
+        />
+      </SafeAreaView>
     </SwipeToHome>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    scroll: { paddingHorizontal: STEP.s3, paddingBottom: 176 },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: STEP.s2,
-      marginTop: STEP.s3,
-      marginBottom: STEP.s4,
-    },
-    title: { ...TYPOGRAPHY.heading, color: C.text },
-    content: { gap: STEP.s4 },
-  });
-}
+const s = StyleSheet.create({
+  safe: {
+    flex: 1,
+  },
+  scroll: {
+    paddingBottom: 110,
+  },
+});

@@ -51,7 +51,7 @@ export function useStudyTimerController(C) {
     routeSubjectKey: routeActionSubjectKey,
     routeTopicName: routeActionTopicName,
   });
-  const [modeKey, setModeKey] = useState("FREE");
+  const [modeKey, setModeKey] = useState(route.params?.modeKey || "POMODORO_25");
   const [phase, setPhase] = useState(STUDY_TIMER_PHASE.FOCUS);
   const [cycleIndex, setCycleIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
@@ -388,5 +388,6 @@ export function useStudyTimerController(C) {
     toggle,
     topic,
     totalFocusSeconds,
+    displaySeconds: isPomodoro ? Math.max(0, phaseTargetSec - elapsed) : elapsed,
   };
 }

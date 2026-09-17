@@ -6,6 +6,8 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
+import { usePlanContext } from "../../hooks/usePlanContext";
+import { generateDailyPlan } from "../../lib/planEngine";
 import { usePlanDetailTasks } from "./usePlanDetailTasks";
 
 export function formatMinutes(minutes) {
@@ -21,9 +23,17 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const { user } = useAuth();
   const showAlert = useAlert();
   const studyRoute = useStudyRoute();
+  const planCtx = usePlanContext();
   const { tasks: userTasks, toggleTask: toggleUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
-  const generatedTasks = studyRoute.currentWeek?.stops || studyRoute.currentWeek?.tasks || [];
+
+  // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar
+  const generatedTasks = useMemo(() => {
+    const routeWeekStops = studyRoute.currentWeek?.stops || [];
+    const generated = generateDailyPlan({ ...planCtx, routeWeekStops });
+    return generated.tasks || [];
+  }, [planCtx, studyRoute.currentWeek?.stops]);
+
   const detail = usePlanDetailTasks({
     C,
     plan: { tasks: generatedTasks },

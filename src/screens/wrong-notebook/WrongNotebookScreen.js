@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -13,14 +13,14 @@ import { ReviewDueCard } from "./components/ReviewDueCard";
 import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
+import { NotebookHeaderTabs, WRONG_TABS } from "./components/NotebookHeaderTabs";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
-// "Yanlış Defteri" artboardi. Sosyal sekme v1 disi karariyla
-// basilmiyor (ilgili eski dosya duruyor, ekrana baglanmiyor).
 export default function WrongNotebookScreen() {
   const C = useC();
   const nb = useWrongNotebookController();
   const { view } = nb;
+  const [activeTab, setActiveTab] = useState(WRONG_TABS.MINE);
 
   const filterOptions = useMemo(() => [
     { key: NOTEBOOK_FILTER.OPEN, label: `Bekleyen · ${view.openCount}` },
@@ -89,6 +89,7 @@ export default function WrongNotebookScreen() {
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <WrongScreenHeader title="Defter" onPress={nb.goBack} />
+      <NotebookHeaderTabs C={C} activeTab={activeTab} onChange={setActiveTab} count={view.openCount} />
       {body}
     </SafeAreaView>
   );

@@ -6,10 +6,10 @@ export const STUDY_TIMER_PHASE = {
 
 export function buildStudyTimerModes(C) {
   return [
-    { key: "FREE", label: "Serbest", icon: "zap", desc: "Süresiz — istediğin zaman bitir", color: C.text, focus: 0, break: 0, longBreak: 0, cycles: 0 },
-    { key: "POMODORO_25", label: "25/5", icon: "timer", desc: "25 dk odak + 5 dk mola × 4 tur", color: C.amber, focus: 25, break: 5, longBreak: 15, cycles: 4 },
-    { key: "POMODORO_50", label: "50/10", icon: "timer", desc: "50 dk odak + 10 dk mola × 3 tur", color: C.blue, focus: 50, break: 10, longBreak: 20, cycles: 3 },
-    { key: "DEEP_90", label: "90 dk", icon: "timer", desc: "Sınav modu — 90dk kesintisiz", color: C.purple, focus: 90, break: 20, longBreak: 30, cycles: 2 },
+    { key: "POMODORO_15", label: "15", rest: "3 DK", icon: "timer", desc: "15 dk odak · 3 dk mola", color: C.accent, focus: 15, break: 3, longBreak: 10, cycles: 4 },
+    { key: "POMODORO_25", label: "25", rest: "5 DK", icon: "timer", desc: "25 dk odak · 5 dk mola", color: C.accent, focus: 25, break: 5, longBreak: 15, cycles: 4 },
+    { key: "POMODORO_50", label: "50", rest: "10 DK", icon: "timer", desc: "50 dk odak · 10 dk mola", color: C.accent, focus: 50, break: 10, longBreak: 20, cycles: 4 },
+    { key: "POMODORO_90", label: "90", rest: "20 DK", icon: "timer", desc: "90 dk odak · 20 dk mola", color: C.accent, focus: 90, break: 20, longBreak: 30, cycles: 2 },
   ];
 }
 
@@ -22,10 +22,10 @@ export function formatTimerDuration(seconds) {
 }
 
 export function getPhaseTargetSeconds({ mode, modeKey, phase }) {
-  if (modeKey === "FREE") return 25 * 60;
-  if (phase === STUDY_TIMER_PHASE.FOCUS) return mode.focus * 60;
-  if (phase === STUDY_TIMER_PHASE.BREAK) return mode.break * 60;
-  return mode.longBreak * 60;
+  if (!mode || modeKey === "FREE") return 25 * 60;
+  if (phase === STUDY_TIMER_PHASE.FOCUS) return (mode.focus || 25) * 60;
+  if (phase === STUDY_TIMER_PHASE.BREAK) return (mode.break || 5) * 60;
+  return (mode.longBreak || 15) * 60;
 }
 
 export function getPhaseLabel({ cycleIndex, mode, phase }) {

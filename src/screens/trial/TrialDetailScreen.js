@@ -42,7 +42,7 @@ export default function TrialDetailScreen() {
 
   const fromEntry = route.params?.fromEntry;
   const latest = useResolvedTrial({
-    trial: route.params?.trial, linkedId: route.params?.id, trials, user,
+    trial: route.params?.trial, linkedId: route.params?.id || route.params?.trialId, trials, user,
   });
   const detail = useTrialDetail({ latest: latest || {}, trials, C });
   const { handleMenu } = useTrialDetailMenu({ latest, user, navigation, showAlert, cardRef });

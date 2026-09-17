@@ -13,9 +13,11 @@ import { SaveNotesSection } from "./components/SaveNotesSection";
 import { useStudySaveController } from "./useStudySaveController";
 import { MeasuredRecordForm } from "./components/record/MeasuredRecordForm";
 import { UnsavedSessionView } from "./components/record/UnsavedSessionView";
+import { useBlockBack } from "../../hooks/useBlockBack";
 
 export default function StudySaveScreen() {
   const s = useStudySaveController();
+  useBlockBack(true);
 
   if (s.unsaved.pending) {
     return (

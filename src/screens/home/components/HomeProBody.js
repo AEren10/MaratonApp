@@ -15,7 +15,7 @@ export function HomeProBody({ stops, momentum, debtHours, go }) {
   const C = useC();
   return (
     <View>
-      <HomeTodayStops stops={stops} onViewPlan={go.plan} />
+      <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
 
       {momentum.length ? (
         <View style={s.attention}>

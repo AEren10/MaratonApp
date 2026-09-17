@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
+﻿import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import * as Linking from "expo-linking";
 import {
   getSession,
@@ -54,6 +54,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    let active = true;
+    const safetyTimer = setTimeout(() => { if (active) setLoading(false); }, 2000);
     getSession()
       .then((s) => {
         setSession(s);
@@ -64,7 +66,7 @@ export function AuthProvider({ children }) {
       .catch((e) => {
         if (__DEV__) console.warn("[Auth] getSession failed", e.message || e);
       })
-      .finally(() => setLoading(false));
+      .finally(() => { clearTimeout(safetyTimer); if (active) setLoading(false); });
 
     const {
       data: { subscription },

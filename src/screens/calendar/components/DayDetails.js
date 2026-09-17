@@ -36,7 +36,7 @@ function SlotRow({ time, color, name, subject, dur, C }) {
 
 export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, onOpenDetail }) {
   const C = useC();
-  const trialTypes = getTrialTypes();
+  const trialTypes = getTrialTypes(C);
   const today = day === todayTR();
 
   // Tasarım Image 5: Mock veya gerçek veri. Durak, dakika, soru sayısı.

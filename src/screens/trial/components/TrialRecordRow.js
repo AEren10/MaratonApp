@@ -1,42 +1,64 @@
-import React from "react";
+﻿import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 
-// Deneme turu bir DERS degil. Ders renkleri yalniz ders baglaminda kullanilir
-// (AGENTS.md). Tasarim bu rozeti notr text2 buyuk harf olarak gosteriyor.
 export const TrialRecordRow = React.memo(function TrialRecordRow({ item, C, onPress }) {
+  const isTyt = (item.badge || "").toUpperCase().includes("TYT");
+  const isUp = item.deltaUp;
+  const isFirst = item.deltaLabel === "ilk";
+  const deltaColor = isFirst ? C.text3 : isUp ? C.up : C.down;
+
   return (
     <Pressable
       onPress={() => onPress(item.trial)}
-      style={({ pressed }) => [styles.row, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
+      style={({ pressed }) => [
+        styles.row,
+        { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 },
+      ]}
       accessibilityRole="button"
       accessibilityLabel={`${item.title}, ${item.dateLabel}, net ${item.netLabel}`}
     >
-      <View style={[styles.badge, { borderColor: C.line }]}>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>
+      <View
+        style={[
+          styles.badge,
+          isTyt
+            ? { backgroundColor: C.brandTint, borderColor: C.bandEdge || C.accent + "30" }
+            : { borderColor: C.border },
+        ]}
+      >
+        <Text
+          style={[
+            styles.badgeText,
+            { color: isTyt ? C.accentBright : C.text3 },
+          ]}
+        >
           {item.badge.toLocaleUpperCase("tr-TR")}
         </Text>
       </View>
+
       <View style={styles.mid}>
-        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]} numberOfLines={1}>{item.title}</Text>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{item.dateLabel}</Text>
+        <Text style={[styles.title, { color: C.text }]} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={[styles.date, { color: C.text3 }]}>
+          {item.dateLabel}
+        </Text>
       </View>
+
       <View style={styles.end}>
-        <Text style={[TYPOGRAPHY.statMedium, { color: C.text, fontSize: 19 }]} allowFontScaling={false}>
+        <Text style={[styles.net, { color: C.text }]} allowFontScaling={false}>
           {item.netLabel}
         </Text>
         <Text
-          style={[
-            TYPOGRAPHY.micro,
-            { color: item.deltaLabel === "ilk" ? C.text3 : item.deltaUp ? C.up : C.down, marginTop: 3 },
-          ]}
+          style={[styles.delta, { color: deltaColor }]}
           allowFontScaling={false}
         >
           {item.deltaLabel}
         </Text>
       </View>
-      <Icon name="chevR" size={13} color={C.text3} />
+
+      <Icon name="chevR" size={13} color={C.text5 || C.text4} />
     </Pressable>
   );
 });
@@ -45,19 +67,49 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: STEP.s2,
-    paddingVertical: STEP.s2,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    minHeight: 44,
+    gap: 12,
+    paddingVertical: 15,
+    borderTopWidth: 1,
   },
   badge: {
-    paddingHorizontal: 8,
     height: 22,
-    borderRadius: 6,
+    paddingHorizontal: 8,
+    borderRadius: SHAPE.chip, // 6px
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  mid: { flex: 1, minWidth: 0 },
-  end: { alignItems: "flex-end" },
+  badgeText: {
+    fontFamily: "Archivo_700",
+    fontSize: 11,
+    letterSpacing: 1.3,
+  },
+  mid: {
+    flex: 1,
+    minWidth: 0,
+  },
+  title: {
+    fontFamily: "Archivo_500",
+    fontSize: 13.5,
+  },
+  date: {
+    fontFamily: "Archivo_500",
+    fontSize: 11.5,
+    marginTop: 4,
+  },
+  end: {
+    alignItems: "flex-end",
+    flexShrink: 0,
+  },
+  net: {
+    fontFamily: "Bricolage_400",
+    fontSize: 19,
+    fontVariant: ["tabular-nums"],
+  },
+  delta: {
+    fontFamily: "Archivo_600",
+    fontSize: 11,
+    fontVariant: ["tabular-nums"],
+    marginTop: 3,
+  },
 });

@@ -1,4 +1,4 @@
-﻿import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -11,7 +11,7 @@ import { SCREENS } from "../../../constants/screens";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../../navigation/rootStackActions";
 
-export function TrialDropLayout({ trial, summary, typeLabel, dayMonth }) {
+export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }) {
   const C = useC();
   const navigation = useNavigation();
 
@@ -28,6 +28,11 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth }) {
         <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
           {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}
         </Text>
+        {onShare ? (
+          <Pressable onPress={onShare} style={styles.close} accessibilityLabel="Paylaş" accessibilityRole="button">
+            <Icon name="share" size={16} color={C.text2} />
+          </Pressable>
+        ) : <View style={styles.close} />}
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(400)} style={styles.section}>

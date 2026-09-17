@@ -73,7 +73,7 @@ export default function ExamSetupScreen() {
       updateExamConfig(opt.examType, opt.field, date).catch(() => {});
     }
     H.success();
-    navigation.navigate(SCREENS.GOAL_SETUP);
+    navigation.replace(SCREENS.GOAL_SETUP);
   }, [category, selectedId, examDate, isLGS, updateExamConfig, YKS_OPTIONS, navigation]);
 
   const handleCategorySelect = useCallback((id) => {

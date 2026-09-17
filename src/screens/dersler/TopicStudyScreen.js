@@ -81,7 +81,7 @@ export default function TopicStudyScreen() {
           </ScrollView>
 
           <View style={[s.bottom, { backgroundColor: C.bg }]}>
-            <Button variant="primary" size="lg" fullWidth>
+            <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey: subject?.key, topicName: topic?.name })}>
               Bu konuya durak koy
             </Button>
             <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>

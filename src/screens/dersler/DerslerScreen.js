@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { ScrollView, View, Text, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -8,7 +8,7 @@ import { STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeekProgram } from "../../hooks/useWeekProgram";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { DerslerSkeleton } from "./components/DerslerSkeleton";
 import { WeekProgressCard } from "./components/WeekProgressCard";
 import { WeekDayStrip } from "./components/WeekDayStrip";
 import { SelectedDayPanel } from "./components/SelectedDayPanel";
@@ -27,7 +27,10 @@ function Header({ C, navigation }) {
         accessibilityRole="button"
         accessibilityLabel="Geri"
         hitSlop={10}
-        onPress={() => { if (navigation.canGoBack()) navigation.goBack(); }}
+        onPress={() => {
+          if (navigation.canGoBack()) navigation.goBack();
+          else navigation.navigate(SCREENS.CURRICULUM_MAP);
+        }}
         style={{ width: 40, height: 44, justifyContent: "center" }}
       >
         <Icon name="chevL" size={17} color={C.text} />
@@ -69,10 +72,7 @@ export default function DerslerScreen() {
           <Header C={C} navigation={navigation} />
 
           {loading ? (
-            <View style={{ gap: STEP.s2, marginTop: STEP.s2 }}>
-              <SkeletonCard height={140} rounded={20} />
-              <SkeletonCard height={70} rounded={16} />
-            </View>
+            <DerslerSkeleton />
           ) : (
             <>
               <WeekProgressCard
@@ -95,6 +95,9 @@ export default function DerslerScreen() {
               <ProgramRulesSection onOpen={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)} />
 
               <View style={{ marginTop: STEP.s4 }}>
+                <Button variant="outline" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)} style={{ marginBottom: STEP.s2 }}>
+                  Geriye Dönük Borçlar
+                </Button>
                 <Button
                   variant="primary"
                   size="lg"

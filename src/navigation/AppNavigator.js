@@ -64,10 +64,17 @@ function renderTabScreen(route) {
 const TAB_STACK_COMPONENTS = new Map(
   TAB_SCREENS.map((root) => {
     const inner = screensByName(TAB_STACKS[root.name] || []);
+    const rootScreenName = {
+      [SCREENS.HOME]: SCREENS.HOME_ROOT,
+      [SCREENS.CURRICULUM_MAP]: SCREENS.CURRICULUM_MAP_ROOT,
+      [SCREENS.ANALYSIS]: SCREENS.ANALYSIS_ROOT,
+      [SCREENS.PROFILE]: SCREENS.PROFILE_ROOT,
+    }[root.name] || root.name;
+
     function TabStack() {
       return (
         <Stack.Navigator screenOptions={screenOptions}>
-          <Stack.Screen name={root.name} component={root.component} options={root.options} />
+          <Stack.Screen name={rootScreenName} component={root.component} options={root.options} />
           {inner.map(renderStackScreen)}
         </Stack.Navigator>
       );

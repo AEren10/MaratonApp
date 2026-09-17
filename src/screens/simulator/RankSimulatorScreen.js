@@ -31,6 +31,8 @@ export default function RankSimulatorScreen() {
           eyebrow="NET EŞİĞİ"
           title="Eşik için hedef net gerekiyor"
           body="Hedef netini Hedeflerim'den belirle, en az bir deneme gir; açığı burada göreceksin."
+          primary="Hedef Belirle"
+          onPrimary={() => navigation.navigate(SCREENS.GOALS)}
           style={{ paddingHorizontal: GUTTER }}
         />
       </SafeAreaView>

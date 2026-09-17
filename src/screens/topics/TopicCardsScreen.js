@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -16,7 +16,7 @@ const ItemSeparator = () => <View style={{ height: STEP.s2 }} />;
 const CardItem = React.memo(function CardItem({ item, onPress, styles, C }) {
   const pct = item.count > 0 ? Math.round((item.mastered / item.count) * 100) : 0;
   const pctColor = pct >= 70 ? C.green : pct >= 40 ? C.amber : C.red;
-  const handlePress = useCallback(() => onPress(item.id), [onPress, item.id]);
+  const handlePress = useCallback(() => onPress(item), [onPress, item]);
   return (
     <Pressable onPress={handlePress} style={styles.card}>
       <IconBox icon={item.icon} color={item.color} size={44} rounded={14} />
@@ -62,8 +62,12 @@ export default function TopicCardsScreen() {
   }, [user?.id, C]);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
-  const openCard = useCallback((id) => {
-    navigation.navigate(SCREENS.CARD_DETAIL, { cardId: id });
+  const openCard = useCallback((item) => {
+    navigation.navigate(SCREENS.CARD_DETAIL, {
+      cardId: item?.id,
+      title: item?.title,
+      flashcards: item?.flashcards || [],
+    });
   }, [navigation]);
 
   const renderItem = useCallback(({ item }) => (
@@ -81,6 +85,9 @@ export default function TopicCardsScreen() {
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           Konu Kartları
         </Text>
+        <Pressable onPress={() => navigation.navigate(SCREENS.HOW_IT_WORKS)} hitSlop={12} style={{ marginRight: STEP.s2 }}>
+          <Icon name="info" size={22} color={C.text2} />
+        </Pressable>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>
           {cards.length} konu
         </Text>
@@ -130,4 +137,5 @@ function makeStyles(C) {
     miniBarFill: { height: 4, borderRadius: 2 },
   });
 }
+
 

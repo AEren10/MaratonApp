@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 import { SCREENS } from "../constants/screens";
 import {
@@ -41,7 +41,7 @@ import TrialEntryScreen from "../screens/trial/TrialEntryScreen";
 import TrialSummaryScreen from "../screens/trial/TrialSummaryScreen";
 import TrialDetailScreen from "../screens/trial/TrialDetailScreen";
 import TrialCompareScreen from "../screens/trial/TrialCompareScreen";
-import TrialInsightsScreen from "../screens/trial/TrialInsightsScreen";
+
 import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
 import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
@@ -117,7 +117,7 @@ const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(C
 
 export const TAB_SCREENS = [
   screen(SCREENS.HOME, HomeScreen),
-  screen(SCREENS.DAILY_PLAN, DerslerScreen),
+  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
   screen(SCREENS.ANALYSIS, AnalysisScreen),
   screen(SCREENS.PROFILE, ProfileScreen),
 ];
@@ -207,12 +207,12 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.ROUTE_REDRAW, RouteRedrawScreen, modalOptions),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
   screen(SCREENS.SUMMARY, SummaryScreen),
-  screen(SCREENS.TRIAL_INSIGHTS, TrialInsightsScreen, detailOptions),
+
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
   screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
   screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
-  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
+  screen(SCREENS.DAILY_PLAN, DerslerScreen),
   screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
   screen(SCREENS.MONTH_PLAN, MonthPlanScreen),
