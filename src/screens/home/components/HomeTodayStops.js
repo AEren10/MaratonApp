@@ -1,4 +1,6 @@
+import { useState, useCallback, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, { Layout } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -6,6 +8,7 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
 import * as H from "../../../lib/haptics";
 import { HomeStopRow } from "./HomeStopRow";
+import { HomeStopToast } from "./HomeStopToast";
 
 const PREVIEW = 3;
 
@@ -16,14 +19,32 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const { items, doneCount, nextId, toggle } = stops;
   const preview = items.slice(0, PREVIEW);
   const more = Math.max(0, items.length - PREVIEW);
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimerRef = useRef(null);
+
+  const handleChecked = useCallback(() => {
+    setToastVisible(true);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToastVisible(false);
+    }, 2200);
+  }, []);
 
   return (
     <View style={s.wrap}>
+      <HomeStopToast visible={toastVisible} />
+
       <View style={s.head}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BUGÜNÜN DURAKLARI</Text>
         <View style={s.segs}>
-          {items.map((item) => (
-            <View key={item.id} style={[s.seg, { backgroundColor: item.completed ? C.up : C.track }]} />
+          {items.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                s.seg,
+                { backgroundColor: i < doneCount ? C.up : C.track },
+              ]}
+            />
           ))}
         </View>
         {items.length ? (
@@ -34,7 +55,15 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
       {preview.length ? (
         <View style={s.list}>
           {preview.map((item) => (
-            <HomeStopRow key={item.id} item={item} isNext={item.id === nextId} onToggle={toggle} onStart={onStartTask} />
+            <Animated.View key={item.id} layout={Layout.springify().damping(16)}>
+              <HomeStopRow
+                item={item}
+                isNext={item.id === nextId}
+                onToggle={toggle}
+                onStart={onStartTask}
+                onChecked={handleChecked}
+              />
+            </Animated.View>
           ))}
         </View>
       ) : (
@@ -59,7 +88,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { paddingTop: STEP.s4 + 8 },
+  wrap: { paddingTop: STEP.s4 + 8, position: "relative" },
   head: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s2 + 2 },
   segs: { flex: 1, flexDirection: "row", gap: STEP.s1 / 2 },
   seg: { flex: 1, height: 4, borderRadius: SHAPE.chip / 6 },
