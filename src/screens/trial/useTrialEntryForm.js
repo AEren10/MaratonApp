@@ -22,7 +22,8 @@ export function useTrialEntryForm({ C, navigation }) {
   const { reward, xpToast, dismissXP } = useGamification();
   const { examType: userExamType } = useExam();
   const showAlert = useAlert();
-  const { checkFeature, showPaywall, bumpUsage } = usePremium();
+  const { checkFeature, showPaywall, bumpUsage, accessLoading, accessError } = usePremium();
+  const accessReady = !accessLoading && !accessError;
   const [trialType, setTrialType] = useState(userExamType === "lgs" ? "LGS" : "TYT");
   const [branchSubject, setBranchSubject] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -143,6 +144,7 @@ export function useTrialEntryForm({ C, navigation }) {
       C,
       branchSubject,
       checkFeature,
+      accessReady,
       bumpUsage,
       completeForm,
       dispatch,
@@ -168,6 +170,7 @@ export function useTrialEntryForm({ C, navigation }) {
     C,
     branchSubject,
     checkFeature,
+    accessReady,
     bumpUsage,
     completeForm,
     dispatch,

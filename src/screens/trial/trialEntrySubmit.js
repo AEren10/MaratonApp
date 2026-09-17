@@ -15,6 +15,7 @@ export async function submitTrialEntry({
   C,
   branchSubject,
   checkFeature,
+  accessReady,
   bumpUsage,
   completeForm,
   dispatch,
@@ -39,6 +40,16 @@ export async function submitTrialEntry({
   if (!user?.id || user.id === "dev") {
     H.warn();
     showAlert("Oturum bulunamadı", "Deneme sonucunu kaydetmek için tekrar giriş yapmalısın.");
+    return;
+  }
+  // Erisim durumu bilinmiyorken kota dolmus SAYILMAZ: kullanicinin girdigi
+  // deneme silinip satis ekrani acilirsa emegi kaybolur.
+  if (!accessReady) {
+    H.warn();
+    showAlert(
+      "Bağlantı doğrulanamadı",
+      "Kaydını göndermeden önce üyelik durumunu kontrol edemedik. Girdiklerin duruyor — tekrar dene.",
+    );
     return;
   }
   if (!checkFeature("unlimited_trials")) {
