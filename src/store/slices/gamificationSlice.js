@@ -1,4 +1,4 @@
-﻿import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { getLevelForXP } from "../../lib/xpEngine";
 import { STORAGE_KEYS, userScopedKey } from "../../constants/storageKeys";
 import * as appStorage from "../../lib/storage/appStorage";

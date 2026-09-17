@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";

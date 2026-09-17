@@ -1,4 +1,4 @@
-﻿import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "../../../components/design";

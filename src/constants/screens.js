@@ -1,4 +1,4 @@
-﻿export const SCREENS = {
+export const SCREENS = {
   // Auth
   LOGIN: "Login",
   REGISTER: "Register",

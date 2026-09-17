@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, STEP } from "../../../themes/tokens";
 

@@ -1,4 +1,4 @@
-﻿import { Fragment } from "react";
+import { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";

@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";

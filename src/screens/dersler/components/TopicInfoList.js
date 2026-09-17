@@ -1,4 +1,4 @@
-﻿import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 

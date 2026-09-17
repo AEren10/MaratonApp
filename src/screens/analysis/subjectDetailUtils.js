@@ -1,4 +1,4 @@
-﻿export function filterTopics(topics, segment) {
+export function filterTopics(topics, segment) {
   if (segment === "done") return topics.filter((t) => t.done);
   if (segment === "remaining") return topics.filter((t) => !t.done);
   return topics;

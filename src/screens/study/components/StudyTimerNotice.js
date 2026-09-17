@@ -1,4 +1,4 @@
-﻿import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
 
 export function StudyTimerNotice({ C }) {

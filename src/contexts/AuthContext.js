@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import * as Linking from "expo-linking";
 import {
   getSession,

@@ -1,4 +1,4 @@
-﻿import { forwardRef } from "react";
+import { forwardRef } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";

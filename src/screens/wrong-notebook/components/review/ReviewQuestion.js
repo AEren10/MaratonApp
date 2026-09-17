@@ -1,4 +1,4 @@
-﻿import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import SignedImage from "../../../../components/common/SignedImage";
 import { Card } from "../../../../components/design";

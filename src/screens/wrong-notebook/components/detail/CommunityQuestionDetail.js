@@ -1,4 +1,4 @@
-﻿// Topluluk sorusu detayi (WrongDetail, params.community === true).
+// Topluluk sorusu detayi (WrongDetail, params.community === true).
 // Sosyal v1 disi; bu yol yeni tasarima TASINMADI, eski WrongDetailScreen
 // govdesi degistirilmeden buraya alindi ki derin baglanti kirilmasin.
 import { useCallback, useEffect, useMemo, useState } from "react";

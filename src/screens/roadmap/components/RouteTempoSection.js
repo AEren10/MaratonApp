@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Button, Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";

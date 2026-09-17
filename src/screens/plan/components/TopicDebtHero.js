@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { StatBlock } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";

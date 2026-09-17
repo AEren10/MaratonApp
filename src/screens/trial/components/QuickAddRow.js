@@ -1,4 +1,4 @@
-﻿import { Pressable, Text, View, StyleSheet } from "react-native";
+import { Pressable, Text, View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";

@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect, useMemo, memo } from "react";
+import { useState, useCallback, useEffect, useMemo, memo } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";

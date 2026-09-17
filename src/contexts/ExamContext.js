@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "./AuthContext";
 import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";

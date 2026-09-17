@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { TYPOGRAPHY } from "../../../themes/tokens";
 import { subjectColorOf } from "../../../themes/subjectPalette";

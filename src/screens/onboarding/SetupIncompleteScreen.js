@@ -1,4 +1,4 @@
-﻿import { useCallback } from "react";
+import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";

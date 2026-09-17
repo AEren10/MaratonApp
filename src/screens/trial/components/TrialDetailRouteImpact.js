@@ -1,4 +1,4 @@
-﻿import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Card } from "../../../components/design";

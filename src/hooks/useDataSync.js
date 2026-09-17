@@ -1,4 +1,4 @@
-﻿import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { AppState } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useNetwork } from "../contexts/NetworkContext";

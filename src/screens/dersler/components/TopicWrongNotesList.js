@@ -1,4 +1,4 @@
-﻿import { View, Text } from "react-native";
+import { View, Text } from "react-native";
 import { SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { TopicWrongNoteRow } from "./TopicWrongNoteRow";

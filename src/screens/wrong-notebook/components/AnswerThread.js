@@ -1,4 +1,4 @@
-﻿import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 
 import { Icon, Avatar } from "../../../components/design";

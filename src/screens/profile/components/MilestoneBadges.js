@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";

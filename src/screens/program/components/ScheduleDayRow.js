@@ -1,4 +1,4 @@
-﻿import { memo } from "react";
+import { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";

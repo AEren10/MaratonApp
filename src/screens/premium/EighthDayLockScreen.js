@@ -1,4 +1,4 @@
-﻿import React, { useCallback } from "react";
+import React, { useCallback } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";

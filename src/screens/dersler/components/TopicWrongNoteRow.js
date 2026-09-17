@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";

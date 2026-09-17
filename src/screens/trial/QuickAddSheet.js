@@ -1,4 +1,4 @@
-﻿import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
+import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, {
   FadeInDown, runOnJS, useAnimatedStyle, useSharedValue, withTiming,

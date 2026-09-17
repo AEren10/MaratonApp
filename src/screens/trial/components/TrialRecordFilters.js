@@ -1,4 +1,4 @@
-﻿import React, { useCallback } from "react";
+import React, { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";

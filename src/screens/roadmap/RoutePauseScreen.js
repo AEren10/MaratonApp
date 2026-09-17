@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 
 import { useRouteConfirm } from "../../hooks/useRouteConfirm";

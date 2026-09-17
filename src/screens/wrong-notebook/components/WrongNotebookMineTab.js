@@ -1,4 +1,4 @@
-﻿import { useCallback } from "react";
+import { useCallback } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
 
 import { EmptyState } from "../../../components/common/EmptyState";

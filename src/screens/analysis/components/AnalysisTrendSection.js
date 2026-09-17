@@ -1,4 +1,4 @@
-﻿import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";

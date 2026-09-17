@@ -1,4 +1,4 @@
-﻿import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import { Text, Pressable } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { Icon } from "../../../components/design";

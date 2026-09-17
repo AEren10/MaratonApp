@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { SubjectSparklineSvg } from "./SubjectSparklineSvg";

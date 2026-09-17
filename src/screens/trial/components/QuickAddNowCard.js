@@ -1,4 +1,4 @@
-﻿import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 
 import { Button } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";

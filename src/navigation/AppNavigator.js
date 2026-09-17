@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";

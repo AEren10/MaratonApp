@@ -1,4 +1,4 @@
-﻿import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
