@@ -19,6 +19,7 @@ export function useCurriculumMap() {
       return {
         key: label,
         label: label.toLocaleUpperCase("tr-TR"),
+        countLabel: `${items.length} ders`,
         done: items.reduce((n, d) => n + d.done, 0),
         total: items.reduce((n, d) => n + d.total, 0),
         items,

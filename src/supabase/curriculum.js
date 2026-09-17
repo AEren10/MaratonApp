@@ -13,8 +13,9 @@ export async function fetchSubjects(exam, field) {
       query.eq("exam", "lgs");
     } else if (exam === "tyt") {
       query.eq("exam", "tyt");
-    } else if (exam === "tyt_ayt") {
-      query.or(`exam.eq.tyt,and(exam.eq.ayt,field.eq.${field})`);
+    } else if (exam === "tyt_ayt" || exam === "yks" || !exam) {
+      const activeField = field || "sayisal";
+      query.or(`exam.eq.tyt,and(exam.eq.ayt,field.eq.${activeField})`);
     } else if (exam === "dil") {
       query.or("exam.eq.tyt,exam.eq.ydt");
     }

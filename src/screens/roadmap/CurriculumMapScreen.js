@@ -1,17 +1,18 @@
 import { useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { ErrorState, Icon, Skeleton } from "../../components/design";
+import { ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { useCurriculumMap } from "../../hooks/useCurriculumMap";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { CurriculumProgressCard } from "./components/CurriculumProgressCard";
 import CurriculumSubjectRow from "./components/CurriculumSubjectRow";
+import { CurriculumBottomActions } from "./components/CurriculumBottomActions";
 import { RouteHeader } from "./components/RouteHeader";
 
 const enter = (i) => FadeInDown.delay(i * 80).duration(600);
@@ -51,9 +52,14 @@ function CurriculumMapInner() {
             {map.groups.map((g) => (
               <View key={g.key}>
                 <View style={s.groupHead}>
-                  <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>{g.label}</Text>
+                  <View style={s.groupTitleRow}>
+                    <Text style={[TYPOGRAPHY.bodySemiBold, s.groupTitle, { color: C.text }]}>{g.label}</Text>
+                    {g.countLabel ? (
+                      <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{g.countLabel}</Text>
+                    ) : null}
+                  </View>
                   <View style={[s.rule, { backgroundColor: C.line }]} />
-                  <Text style={[TYPOGRAPHY.tableHead, s.num, { color: C.text3 }]}>{`${g.done}/${g.total}`}</Text>
+                  <Text style={[TYPOGRAPHY.tableValue, s.num, { color: C.text3 }]}>{`${g.done}/${g.total}`}</Text>
                 </View>
                 {g.items.map((subject) => (
                   <CurriculumSubjectRow key={subject.key} subject={subject} onPress={openSubject} />
@@ -62,29 +68,11 @@ function CurriculumMapInner() {
             ))}
           </Animated.View>
           <View style={s.pad}>
-            <Pressable
-              onPress={() => navigation.navigate(SCREENS.DAILY_PLAN)}
-              accessibilityRole="button"
-              style={({ pressed }) => [
-                s.link,
-                { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.elev, marginBottom: STEP.s2 },
-              ]}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Haftalık Programım</Text>
-                <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 2 }]}>Bu haftanın durakları ve gün şeridi</Text>
-              </View>
-              <Icon name="chevR" size={12} color={C.text3} />
-            </Pressable>
-
-            <Pressable
-              onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
-              accessibilityRole="button"
-              style={({ pressed }) => [s.link, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.elev }]}
-            >
-              <Text style={[TYPOGRAPHY.captionMedium, s.flex, { color: C.text2 }]}>Bu döneme durak ekle</Text>
-              <Icon name="chevR" size={12} color={C.text5} />
-            </Pressable>
+            <CurriculumBottomActions
+              C={C}
+              onOpenProgram={() => navigation.navigate(SCREENS.DAILY_PLAN)}
+              onAddTask={() => navigation.navigate(SCREENS.ADD_TASK)}
+            />
           </View>
         </ScrollView>
       )}
@@ -103,20 +91,11 @@ export default function CurriculumMapScreen() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   pad: { paddingHorizontal: GUTTER },
-  scroll: { paddingTop: STEP.s3, paddingBottom: STEP.s4 },
-  groups: { gap: STEP.s3 + 6, paddingTop: STEP.s3 + 6 },
-  groupHead: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 3, paddingBottom: STEP.s1 + 2 },
+  scroll: { paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  groups: { gap: STEP.s4, paddingTop: STEP.s4 },
+  groupHead: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s1 + 2 },
+  groupTitleRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
+  groupTitle: { letterSpacing: 0.5 },
   rule: { flex: 1, height: 1 },
   num: { letterSpacing: 0, fontVariant: ["tabular-nums"] },
-  link: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s2,
-    minHeight: CONTROL.buttonPrimary,
-    paddingHorizontal: STEP.s2 + 4,
-    marginTop: STEP.s3,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
-  },
-  flex: { flex: 1 },
 });
