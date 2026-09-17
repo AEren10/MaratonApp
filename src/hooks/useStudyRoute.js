@@ -80,6 +80,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   }, [examType, isPaused, pausedWeeks, routeState?.exam_type,
     routeState?.paused_at, routeState?.resumed_at]);
   const [persistedStops, setPersistedStops] = useState([]);
+  // persistedStops bos olmasi 'rota yok' demek DEGIL; henuz gelmemis de olabilir.
+  // Bu ayrim olmadan Rota ekrani yuklenirken 'Yol buradan basliyor' bosunu basiyordu.
+  const [stopsLoaded, setStopsLoaded] = useState(false);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
@@ -217,7 +220,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // examType filtresi kritik: kullanıcı YKS↔LGS geçtiyse eski müfredatın
   // planı borç sayılmamalı.
   useEffect(() => {
-    if (!user?.id || !examType || !hasRouteAccess) return;
+    if (!user?.id || !examType || !hasRouteAccess) { setStopsLoaded(true); return; }
     let cancelled = false;
     getRouteWeeks(user.id, { examType })
       .then((rows) => { if (!cancelled) setPastWeeks(rows); })
@@ -227,7 +230,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       .catch(() => {});
     getLatestRouteStops(user.id, examType)
       .then((rows) => { if (!cancelled) setPersistedStops(rows); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setStopsLoaded(true); });
     return () => { cancelled = true; };
   }, [user?.id, examType, hasRouteAccess]);
 
@@ -380,6 +384,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     routeAccessLoading: accessLoading,
     refreshRouteAccess: refreshUsage,
     routeCreated,
+    routeStopsLoaded: stopsLoaded,
     routeRevisionPreview,
     routeReadiness,
     routeCreating,

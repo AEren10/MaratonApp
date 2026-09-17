@@ -56,13 +56,13 @@ export function useRouteDetail() {
 
   return {
     access: {
-      loading: route.routeAccessLoading,
+      loading: route.routeAccessLoading || !route.routeStopsLoaded,
       error: route.routeAccessError,
       hasAccess: route.hasRouteAccess,
       retry: route.refreshRouteAccess,
       paywall: () => showPaywall("route_gate"),
     },
-    isEmpty: !routeCreated,
+    isEmpty: route.routeStopsLoaded && !routeCreated,
     creating: routeCreating,
     chartReady: Boolean(view.chart && (view.chart.stops?.length ?? 0) >= 2),
     daysLeft,
