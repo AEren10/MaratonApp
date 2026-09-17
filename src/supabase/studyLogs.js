@@ -93,15 +93,25 @@ export const addStudyLog = async (log) => {
 };
 
 export const updateStudyLog = async (id, updates) => {
+  const userId = updates?.user_id || updates?.userId;
+  if (!userId) throw new Error("userId is required");
   try {
+    const row = toStudyLogRow(updates);
+    const {
+      user_id: _userId,
+      client_operation_id: _clientOperationId,
+      ...safeUpdates
+    } = row;
     const { data, error } = await supabase
       .from("study_logs")
-      .update(toStudyLogRow(updates))
+      .update(safeUpdates)
       .eq("id", id)
+      .eq("user_id", userId)
       .select()
       .maybeSingle();
     if (error) throw error;
-    return data ? normalizeStudyLog(data) : data;
+    if (!data) throw new Error("study_log_not_found");
+    return normalizeStudyLog(data);
   } catch (e) {
     handleSupabaseError(e, "updateStudyLog");
     throw e;

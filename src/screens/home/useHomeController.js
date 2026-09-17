@@ -60,7 +60,7 @@ export function useHomeController() {
   const nudges = useRecommendations(planCtx.weekLogs);
   const nudge = useNudgePopup(nudges);
   const { suggestions } = useAISuggestions();
-  const { refresh, syncedOnce } = useSync();
+  const { refresh, syncedOnce, error: syncError } = useSync();
   const { onRefresh, refreshing } = useHomeRefresh(refresh);
   const go = useHomeNavigation(navigation);
 
@@ -117,6 +117,7 @@ export function useHomeController() {
     nudges, nudge, dashboard, stops, recent, actions, onRefresh, refreshing,
     streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
+    syncError: syncError && !hasLocalData ? syncError : null,
     firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0,
     offline: !isConnected && !hasLocalData && !offlineDismissed,
     continueOffline: () => setOfflineDismissed(true),

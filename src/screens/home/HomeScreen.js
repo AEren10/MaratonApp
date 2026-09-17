@@ -3,6 +3,7 @@ import { ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { SyncProblemBanner } from "../../components/common/SyncProblemBanner";
+import { ErrorState } from "../../components/design/ErrorState";
 import { GUTTER, STEP } from "../../themes/tokens";
 import { HomeTopBar } from "./components/HomeTopBar";
 import { HomeHero } from "./components/HomeHero";
@@ -33,6 +34,22 @@ export default function HomeScreen() {
   let body;
   if (h.loading) {
     body = <HomeLoading />;
+  } else if (h.syncError) {
+    body = (
+      <ScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
+      >
+        <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
+          onProfile={actions.profile} onCalendar={actions.calendar} />
+        <ErrorState
+          preset="server"
+          onPrimary={h.onRefresh}
+          code={h.syncError.code || "sync_read_failed"}
+        />
+      </ScrollView>
+    );
   } else if (h.offline) {
     body = <HomeOffline onRetry={h.onRefresh} retrying={h.refreshing} onContinue={h.continueOffline} />;
   } else {

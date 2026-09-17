@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
-import { EmptyState, Skeleton } from "../../components/design";
+import { EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useSync } from "../../contexts/DataSyncContext";
@@ -35,7 +35,7 @@ export default function TrialDetailScreen() {
   const route = useRoute();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
-  const { syncedOnce } = useSync();
+  const { syncedOnce, error: syncError, refresh } = useSync();
   const { user } = useAuth();
   const cardRef = useRef(null);
   const showAlert = useAlert();
@@ -54,6 +54,7 @@ export default function TrialDetailScreen() {
   }, [fromEntry, showNudgePopup]);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
+  const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
 
   if (!latest && !syncedOnce) {
     return (
@@ -63,6 +64,17 @@ export default function TrialDetailScreen() {
           <Skeleton width="100%" height={146} radius={SHAPE.panel} />
           <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
           <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!latest && readError) {
+    return (
+      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+        <TrialDetailHeader C={C} onBack={goBack} onMenu={() => {}} />
+        <View style={styles.emptyBox}>
+          <ErrorState preset="server" onPrimary={refresh} code={readError.code || "sync_read_failed"} />
         </View>
       </SafeAreaView>
     );

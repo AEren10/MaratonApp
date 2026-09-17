@@ -22,7 +22,8 @@ function fmtDayMonth(date) {
 
 export function useTrialCompare(C, params = {}) {
   const trials = useSelector(selectTrials);
-  const { syncedOnce } = useSync();
+  const { syncedOnce, error: syncError, refresh } = useSync();
+  const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
 
   const sorted = useMemo(
     () => [...trials].sort((a, b) => new Date(b.date) - new Date(a.date)),
@@ -99,7 +100,9 @@ export function useTrialCompare(C, params = {}) {
     sameTypeTrials,
     rows,
     canCompare: Boolean(newer && older),
-    loading: !syncedOnce,
+    loading: !syncedOnce && !readError,
+    error: readError,
+    retry: refresh,
     publisherMismatch,
     titles: {
       older: older?.title?.trim() || (older ? "Eski deneme" : "Deneme seç"),

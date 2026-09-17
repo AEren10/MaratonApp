@@ -7,7 +7,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
 import { GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
-import { Icon, EmptyState } from "../../components/design";
+import { Icon, EmptyState, ErrorState } from "../../components/design";
 import { useTrialRecords } from "../../hooks/useTrialRecords";
 import { TrialRecordFilters } from "./components/TrialRecordFilters";
 import { TrialRecordRow } from "./components/TrialRecordRow";
@@ -19,7 +19,7 @@ export default function TrialRecordsScreen() {
   const navigation = useNavigation();
   const {
     filter, setFilter, typeTabs, sections, lockedCount,
-    totalCount, requestFullHistory, isEmpty, loading,
+    totalCount, requestFullHistory, isEmpty, loading, error, retry,
   } = useTrialRecords();
 
   const openTrial = useCallback(
@@ -63,6 +63,8 @@ export default function TrialRecordsScreen() {
 
       {isEmpty && loading ? (
         <TrialRecordsSkeleton />
+      ) : error ? (
+        <ErrorState preset="server" onPrimary={retry} code={error.code} style={{ paddingHorizontal: GUTTER }} />
       ) : isEmpty ? (
         <EmptyState preset="trialRecords" style={{ paddingHorizontal: GUTTER }} />
       ) : (

@@ -6,7 +6,7 @@ const source = readFileSync(new URL("../../src/hooks/useCalendarTasks.js", impor
 const userTasksSource = readFileSync(new URL("../../src/supabase/userTasks.js", import.meta.url), "utf8");
 
 test("calendar tasks keep queued insert identity until Supabase returns the remote id", () => {
-  assert.match(source, /import \{ saveUserTaskOffline, patchQueuedPayload, removeFromQueue \} from "\.\.\/lib\/offlineQueue"/);
+  assert.match(source, /saveUserTaskOffline,\s+saveUserTaskUpdateOffline,\s+deleteUserTaskOffline,\s+patchQueuedPayload,\s+removeFromQueue,/);
   assert.match(source, /const clientOperationId = `calendartask_\$\{localId\}`;/);
   assert.match(source, /pendingOperationId: clientOperationId/);
   assert.match(source, /client_operation_id: clientOperationId/);
@@ -35,6 +35,13 @@ test("calendar task edits before sync mutate the queued payload instead of only 
   assert.match(source, /patchQueuedPayload\(toggled\.pendingOperationId, \{ completed: toggled\.done \}\)\.catch/);
   assert.match(source, /handleSupabaseError\(e, "calendar:toggleQueuedTask"\);/);
   assert.match(source, /setError\(e\);/);
+});
+
+test("calendar remote edits and deletes use the offline-safe user task queue", () => {
+  assert.match(source, /saveUserTaskUpdateOffline\(toggled\.remoteId, \{ completed: toggled\.done \}, userId\)/);
+  assert.match(source, /deleteUserTaskOffline\(removed\.remoteId, userId\)/);
+  assert.doesNotMatch(source, /updateUserTask\(toggled\.remoteId/);
+  assert.doesNotMatch(source, /deleteUserTask\(removed\.remoteId/);
 });
 
 test("removing an unsynced calendar task removes its queued insert and rolls back on failure", () => {

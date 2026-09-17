@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import {
   View,
   Text,
@@ -7,141 +7,42 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
-  Share,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as Clipboard from "expo-clipboard";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import { Icon, AnimatedPressable } from "../../components/design";
 import { ReferralSkeleton } from "./components/ReferralSkeleton";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
-import {
-  getOrCreateReferralCode,
-  applyReferralCode,
-  getReferralStats,
-} from "../../supabase/referrals";
-import { usePremium } from "../../contexts/PremiumContext";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
-import * as appStorage from "../../lib/storage/appStorage";
-import * as H from "../../lib/haptics";
 import { useExam } from "../../contexts/ExamContext";
-import { track } from "../../lib/analytics";
-import { EVENTS } from "../../constants/analytics";
-
-const REWARD_DAYS = 7;
+import { useReferrals } from "../../hooks/useReferrals";
 
 export default function ReferralScreen() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = useAuth();
   const { examType } = useExam();
   // LGS öğrencisi "YKS'ye hazırlanmak ister misin?" diye davet göndermesin.
-  const examName = examType === "lgs" ? "LGS" : "YKS";
   const showAlert = useAlert();
-  const { refreshPremium } = usePremium();
-
-  const [code, setCode] = useState(null);
-  const [stats, setStats] = useState({ referralCount: 0 });
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [friendCode, setFriendCode] = useState("");
-  const [applying, setApplying] = useState(false);
-
-  useEffect(() => {
-    const deepCode = route.params?.code;
-    if (deepCode) {
-      setFriendCode(deepCode.toUpperCase());
-      return;
-    }
-    appStorage.getString(STORAGE_KEYS.PENDING_REFERRAL)
-      .then((pending) => { if (pending) setFriendCode(pending); })
-      .catch(() => {});
-  }, [route.params?.code]);
-
-  useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const [c, st] = await Promise.all([
-          getOrCreateReferralCode(user.id),
-          getReferralStats(user.id),
-        ]);
-        if (!cancelled) {
-          setCode(c);
-          setStats(st);
-        }
-      } catch {
-        if (!cancelled) showAlert("Hata", "Referral kodu alınamadı.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user?.id]);
-
-  const handleCopy = useCallback(async () => {
-    if (!code) return;
-    await Clipboard.setStringAsync(code);
-    H.success();
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [code]);
-
-  const handleShare = useCallback(async () => {
-    if (!code) return;
-    H.medium();
-    try {
-      const link = `https://maraton.app/referral/${code}`;
-      await Share.share({
-        message: `Maraton ile birlikte ${examName}'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
-        url: link,
-      });
-      track(EVENTS.REFERRAL_LINK_SHARED, { source: "referral_screen", examType });
-    } catch {
-      handleCopy();
-    }
-  }, [code, handleCopy, examName, examType]);
-
-  const handleApply = useCallback(async () => {
-    if (!friendCode.trim() || !user?.id) return;
-    setApplying(true);
-    try {
-      const result = await applyReferralCode(user.id, friendCode);
-      if (result.ok) {
-        H.success();
-        track(EVENTS.REFERRAL_LINK_APPLIED, {
-          source: "referral_screen",
-          entry: route.params?.code ? "deep_link" : "manual_entry",
-        });
-        appStorage.remove(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
-        await refreshPremium();
-        showAlert("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
-        setFriendCode("");
-      } else if (result.reason === "invalid") {
-        showAlert("Geçersiz Kod", "Bu davet kodu bulunamadı.");
-      } else if (result.reason === "self") {
-        showAlert("Hata", "Kendi davet kodunu kullanamazsın.");
-      } else if (result.reason === "already_used") {
-        showAlert("Zaten Kullanıldı", "Daha önce bir davet kodu kullandın.");
-      } else {
-        showAlert("Hata", "Davet kodu uygulanamadı, tekrar dene.");
-      }
-    } catch {
-      showAlert("Hata", "Bir sorun oluştu, tekrar dene.");
-    } finally {
-      setApplying(false);
-    }
-  }, [friendCode, route.params?.code, user?.id, refreshPremium, showAlert]);
+  const {
+    code,
+    stats,
+    loading,
+    copied,
+    friendCode,
+    setFriendCode,
+    applying,
+    rewardDays,
+    handleCopy,
+    handleShare,
+    handleApply,
+  } = useReferrals({ routeCode: route.params?.code, examType, showAlert });
 
   if (loading) {
     return (
@@ -178,7 +79,7 @@ export default function ReferralScreen() {
           Birlikte Çalışın
         </Animated.Text>
         <Animated.Text entering={FadeInUp.delay(260)} style={[s.subtitle, { color: C.sec }]}>
-          Arkadaşlarını davet et, ikiniz de {REWARD_DAYS} gün Premium kazanın
+          Arkadaşlarını davet et, ikiniz de {rewardDays} gün Premium kazanın
         </Animated.Text>
 
         <Animated.View entering={FadeInDown.delay(350)} style={[s.codeCard, { backgroundColor: C.surface, borderColor: C.border }]}>
@@ -213,7 +114,7 @@ export default function ReferralScreen() {
             </Text>
           </View>
           <Text style={[TYPOGRAPHY.statSmall, { color: C.green }]}>
-            +{stats.referralCount * REWARD_DAYS} gün
+            +{stats.referralCount * rewardDays} gün
           </Text>
         </Animated.View>
 
@@ -256,7 +157,7 @@ export default function ReferralScreen() {
           {[
             "Davet kodunu arkadaşınla paylaş",
             "Arkadaşın uygulamayı indirip kodunu girsin",
-            "İkiniz de " + REWARD_DAYS + " gün Premium kazanın",
+            "İkiniz de " + rewardDays + " gün Premium kazanın",
           ].map((step, i) => (
             <View key={i} style={s.stepRow}>
               <View style={[s.stepNum, { backgroundColor: C.accent + "20" }]}>

@@ -48,6 +48,41 @@ async function retryPendingNetSync(userId, local, isCancelled) {
   }
 }
 
+async function retryPendingProfileSettingsSync(userId, local, isCancelled) {
+  if (!userId || !local) return;
+  try {
+    if (local.examConfigSyncPending && local.examType) {
+      await syncExamConfig(userId, {
+        examType: local.examType,
+        field: local.field || null,
+        examDate: local.examDate || null,
+        targetRanking: local.targetRanking || null,
+        targetDepartment: local.targetDepartment || null,
+      });
+      if (isCancelled()) return;
+      await persistExamConfigPatch({ examConfigSyncPending: false }, userId);
+    }
+    if (local.rankingSyncPending) {
+      await syncExamConfig(userId, {
+        examType: local.examType || null,
+        field: local.field || null,
+        examDate: local.examDate || null,
+        targetRanking: local.targetRanking || null,
+        targetDepartment: local.targetDepartment || null,
+      });
+      if (isCancelled()) return;
+      await persistExamConfigPatch({ rankingSyncPending: false }, userId);
+    }
+    if (local.dailyGoalSyncPending && local.dailyQuestionGoal != null) {
+      await updateProf(userId, { daily_question_goal: Number(local.dailyQuestionGoal) });
+      if (isCancelled()) return;
+      await persistExamConfigPatch({ dailyGoalSyncPending: false }, userId);
+    }
+  } catch {
+    // Hala başarısız: pending bayrakları yerelde kalır, sonraki açılışta yeniden denenir.
+  }
+}
+
 async function persistExamConfigPatch(patch, userId = null) {
   const key = examConfigKey(userId);
   const existing = await appStorage.getJson(key, {});
@@ -144,6 +179,7 @@ export function ExamProvider({ children }) {
           setSetupCompleted(!!local.setupCompleted);
         }
         await retryPendingNetSync(userId, local, () => cancelled);
+        await retryPendingProfileSettingsSync(userId, local, () => cancelled);
         return;
       }
       // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
@@ -160,15 +196,20 @@ export function ExamProvider({ children }) {
       const baselineNetValue = local.baselineNetSyncPending && local.baselineNet != null
         ? Number(local.baselineNet)
         : (p.baseline_net == null ? local.baselineNet ?? null : Number(p.baseline_net));
+      const examConfigPending = !!local.examConfigSyncPending && !!local.examType;
+      const rankingPending = !!local.rankingSyncPending;
+      const dailyGoalPending = !!local.dailyGoalSyncPending;
       const config = {
-        examType: p.exam_type,
-        field: p.field || null,
-        examDate: p.exam_date ? new Date(p.exam_date) : null,
-        targetRanking: p.target_ranking || null,
-        targetDepartment: p.target_department || null,
+        examType: examConfigPending ? local.examType : p.exam_type,
+        field: examConfigPending ? (local.field || null) : (p.field || null),
+        examDate: examConfigPending
+          ? (local.examDate ? new Date(local.examDate) : null)
+          : (p.exam_date ? new Date(p.exam_date) : null),
+        targetRanking: rankingPending ? (local.targetRanking || null) : (p.target_ranking || null),
+        targetDepartment: rankingPending ? (local.targetDepartment || null) : (p.target_department || null),
         targetNet: targetNetValue,
         baselineNet: baselineNetValue,
-        dailyGoalSet: !!p.daily_question_goal || !!p.target_ranking,
+        dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
         setupCompleted: !!local.setupCompleted,
       };
@@ -204,6 +245,7 @@ export function ExamProvider({ children }) {
       }
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
       await retryPendingNetSync(userId, local, () => cancelled);
+      await retryPendingProfileSettingsSync(userId, local, () => cancelled);
     }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
 
     return () => { cancelled = true; };
@@ -230,17 +272,38 @@ export function ExamProvider({ children }) {
       const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
         storageKey,
-        { ...existing, examType: type, field: selectedField || null, examDate: date?.toISOString() },
+        {
+          ...existing,
+          examType: type,
+          field: selectedField || null,
+          examDate: date?.toISOString(),
+          examConfigSyncPending: false,
+        },
       );
     } catch {}
     // Sinav gunu plani kayitliysa arife hatirlatmasi yeni tarihe tasinir.
     rescheduleExamEveReminder(session?.user?.id, date);
     if (session?.user?.id && session.user.id) {
-      syncExamConfig(session.user.id, {
-        examType: type, field: selectedField || null, examDate: date,
-        targetRanking, targetDepartment,
-      }).catch(() => {});
+      try {
+        await syncExamConfig(session.user.id, {
+          examType: type, field: selectedField || null, examDate: date,
+          targetRanking, targetDepartment,
+        });
+        await persistExamConfigPatch({ examConfigSyncPending: false }, session.user.id);
+        return { synced: true };
+      } catch (e) {
+        await persistExamConfigPatch({
+          examType: type,
+          field: selectedField || null,
+          examDate: date?.toISOString(),
+          targetRanking,
+          targetDepartment,
+          examConfigSyncPending: true,
+        }, session.user.id).catch(() => {});
+        return { synced: false, error: e };
+      }
     }
+    return { synced: false, offline: true };
   }, [session, storageKey, targetRanking, targetDepartment, examType]);
 
   const updateGoal = useCallback(async (dailyQuestions) => {
@@ -249,12 +312,23 @@ export function ExamProvider({ children }) {
       const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
         storageKey,
-        { ...existing, dailyGoalSet: true },
+        { ...existing, dailyGoalSet: true, dailyQuestionGoal: dailyQuestions, dailyGoalSyncPending: false },
       );
     } catch {}
     if (session?.user?.id) {
-      updateProf(session.user.id, { daily_question_goal: dailyQuestions }).catch(() => {});
+      try {
+        await updateProf(session.user.id, { daily_question_goal: dailyQuestions });
+        await persistExamConfigPatch({ dailyQuestionGoal: dailyQuestions, dailyGoalSyncPending: false }, session.user.id);
+        return { synced: true };
+      } catch (e) {
+        await persistExamConfigPatch({
+          dailyQuestionGoal: dailyQuestions,
+          dailyGoalSyncPending: true,
+        }, session.user.id).catch(() => {});
+        return { synced: false, error: e };
+      }
     }
+    return { synced: false, offline: true };
   }, [session, storageKey]);
 
   // Hedef net. Sunucu yazimi sessizce yutulMUYOR: basarisizsa yerelde kaliyor
@@ -334,15 +408,35 @@ export function ExamProvider({ children }) {
       const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(
         storageKey,
-        { ...existing, targetRanking: ranking, targetDepartment: department || null },
+        {
+          ...existing,
+          targetRanking: ranking,
+          targetDepartment: department || null,
+          rankingSyncPending: false,
+        },
       );
     } catch {}
     if (session?.user?.id) {
-      syncExamConfig(session.user.id, {
-        examType, field, examDate,
-        targetRanking: ranking, targetDepartment: department || null,
-      }).catch(() => {});
+      try {
+        await syncExamConfig(session.user.id, {
+          examType, field, examDate,
+          targetRanking: ranking, targetDepartment: department || null,
+        });
+        await persistExamConfigPatch({ rankingSyncPending: false }, session.user.id);
+        return { synced: true };
+      } catch (e) {
+        await persistExamConfigPatch({
+          examType,
+          field,
+          examDate: examDate?.toISOString?.() || examDate || null,
+          targetRanking: ranking,
+          targetDepartment: department || null,
+          rankingSyncPending: true,
+        }, session.user.id).catch(() => {});
+        return { synced: false, error: e };
+      }
     }
+    return { synced: false, offline: true };
   }, [session, storageKey, examType, field, examDate]);
 
   const onboardingDone = !!examType && dailyGoalSet && setupCompleted;

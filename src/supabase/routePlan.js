@@ -89,7 +89,7 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
     return rows.length;
   } catch (e) {
     handleSupabaseError(e, "saveRouteWeeks");
-    return 0;
+    throw e;
   }
 }
 
@@ -189,7 +189,7 @@ export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
     }));
   } catch (e) {
     handleSupabaseError(e, "getRouteWeeks");
-    return [];
+    throw e;
   }
 }
 
@@ -227,7 +227,7 @@ export async function getRouteState(userId, examType = null) {
     return rows.find((row) => row.exam_type === examType) || rows[0] || null;
   } catch (e) {
     handleSupabaseError(e, "getRouteState");
-    return null;
+    throw e;
   }
 }
 
@@ -251,7 +251,7 @@ export async function setRouteState(userId, patch, examType = null) {
     return data || null;
   } catch (e) {
     handleSupabaseError(e, "setRouteState");
-    return null;
+    throw e;
   }
 }
 

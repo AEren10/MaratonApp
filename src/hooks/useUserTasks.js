@@ -14,11 +14,15 @@ import {
 } from "../store/slices/userTasksSlice";
 import {
   getUserTasksByDate,
-  updateUserTask,
-  deleteUserTask,
   deleteUserTasksByDate,
 } from "../supabase/userTasks";
-import { saveUserTaskOffline, patchQueuedPayload, removeFromQueue } from "../lib/offlineQueue";
+import {
+  saveUserTaskOffline,
+  saveUserTaskUpdateOffline,
+  deleteUserTaskOffline,
+  patchQueuedPayload,
+  removeFromQueue,
+} from "../lib/offlineQueue";
 import { userTaskSchema } from "../validations/auth";
 import { scheduleTaskNotifications, cancelTaskReminders } from "../lib/notifications";
 import { track } from "../lib/analytics";
@@ -117,7 +121,9 @@ export function useUserTasks() {
       return;
     }
 
-    updateUserTask(id, { completed: newCompleted }).catch(() => {
+    saveUserTaskUpdateOffline(id, { completed: newCompleted }, user?.id).then((result) => {
+      if (result.queued) return;
+      if (result.saved) return;
       // Geri alma mutlak değerle: arada kullanıcı tekrar dokunmuş olsa bile
       // görevi bilinen son doğru duruma döndür.
       dispatch(setUserTaskCompleted({ id, completed: previous }));
@@ -139,7 +145,7 @@ export function useUserTasks() {
     if (doneAfter >= tasks.length) {
       cancelTaskReminders().catch(() => {});
     }
-  }, [dispatch, tasks]);
+  }, [dispatch, tasks, user?.id]);
 
   const removeTask = useCallback(async (id) => {
     const task = tasks.find((t) => t.id === id);
@@ -150,7 +156,8 @@ export function useUserTasks() {
       });
       return;
     }
-    deleteUserTask(id, user?.id).catch(() => {
+    deleteUserTaskOffline(id, user?.id).then((result) => {
+      if (result.queued || result.saved) return;
       if (task) dispatch(addUserTask(task));
     });
   }, [dispatch, tasks, user?.id]);

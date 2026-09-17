@@ -46,7 +46,7 @@ export function useStudyLogMutations() {
   const update = useCallback(async (id, patch) => {
     if (!id || !user?.id) throw new Error("missing_id");
     try {
-      const updated = await updateStudyLog(id, patch);
+      const updated = await updateStudyLog(id, { ...patch, user_id: user.id });
       refresh?.();
       return updated;
     } catch (e) {

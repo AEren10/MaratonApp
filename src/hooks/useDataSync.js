@@ -25,6 +25,43 @@ import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { normalizeStudyLog } from "../domain/study/studyLogModel";
 import { normalizeTrial } from "../domain/trial/trialModel";
 import { getJson, remove } from "../lib/storage/appStorage";
+import { captureError } from "../lib/errorReporting";
+
+const READ_SOURCES = {
+  trials: "deneme kayıtları",
+  streak: "seri",
+  todayLogs: "bugünkü çalışmalar",
+  profile: "profil",
+  userTasks: "günün durakları",
+  xpTotals: "XP",
+};
+
+class DataSyncReadError extends Error {
+  constructor(failures) {
+    const sourceText = failures.map((f) => READ_SOURCES[f.source] || f.source).join(", ");
+    super(`Supabase okuma hatası: ${sourceText}`);
+    this.name = "DataSyncReadError";
+    this.code = "sync_read_failed";
+    this.failures = failures;
+    this.sourceKeys = failures.map((f) => f.source);
+  }
+}
+
+function rejectedRead(source, result) {
+  if (result.status !== "rejected") return null;
+  return {
+    source,
+    message: result.reason?.message || String(result.reason || "unknown"),
+    reason: result.reason,
+  };
+}
+
+function buildReadError(resultsBySource) {
+  const failures = Object.entries(resultsBySource)
+    .map(([source, result]) => rejectedRead(source, result))
+    .filter(Boolean);
+  return failures.length ? new DataSyncReadError(failures) : null;
+}
 
 async function retryPendingStreak(activeUserId) {
   try {
@@ -52,6 +89,7 @@ async function loadAll(userId, dispatch) {
     getUserTasksByDate(userId, todayDate),
     getXPTotals(userId),
   ]);
+  const readError = buildReadError({ trials, streak, todayLogs, profile, userTasks, xpTotals });
 
   if (trials.status === "fulfilled" && trials.value) {
     const server = trials.value.map(normalizeTrial);
@@ -111,8 +149,8 @@ async function loadAll(userId, dispatch) {
     if (localGoals) dispatch(setGoals(localGoals));
   }
 
-  const xpFromServer = xpTotals.status === "fulfilled" ? xpTotals.value.total : 0;
-  const weeklyFromServer = xpTotals.status === "fulfilled" ? xpTotals.value.weekly : 0;
+  const xpFromServer = xpTotals.status === "fulfilled" ? xpTotals.value?.total ?? 0 : 0;
+  const weeklyFromServer = xpTotals.status === "fulfilled" ? xpTotals.value?.weekly ?? 0 : 0;
   const serverStats = profile.status === "fulfilled" ? profile.value?.gamification_stats : null;
 
   if (xpFromServer > 0 || serverStats) {
@@ -146,6 +184,13 @@ async function loadAll(userId, dispatch) {
   }).catch(() => {});
 
   updateLastActive(userId);
+  if (readError) {
+    captureError(readError, {
+      context: "data_sync_read",
+      sources: readError.sourceKeys,
+    });
+    throw readError;
+  }
 }
 
 export function useDataSync() {
@@ -179,10 +224,22 @@ export function useDataSync() {
     const ownerId = user.id;
     let cancelled = false;
     setSyncing(true);
+    setError(null);
     loadAll(ownerId, (action) => safeDispatch(action, ownerId))
-      .catch((e) => { if (!cancelled) setError(e); })
+      .then(() => {
+        if (!cancelled) {
+          setError(null);
+          setSyncedOnce(true);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e);
+          setSyncedOnce(false);
+        }
+      })
       .finally(() => {
-        if (!cancelled) { setSyncing(false); setSyncedOnce(true); }
+        if (!cancelled) setSyncing(false);
       });
     return () => { cancelled = true; };
   }, [user?.id, safeDispatch]);
@@ -199,14 +256,24 @@ export function useDataSync() {
         flushQueue()
           .then(async (r) => {
             await flushRetentionEvents(user.id).catch(() => ({ processed: 0 }));
-            if (r.processed > 0) loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {});
+            if (r.processed > 0 || error || !syncedOnce) {
+              loadAll(user.id, (a) => safeDispatch(a, user.id))
+                .then(() => {
+                  setError(null);
+                  setSyncedOnce(true);
+                })
+                .catch((e) => {
+                  setError(e);
+                  setSyncedOnce(false);
+                });
+            }
           })
           .catch(() => {});
       }
       appStateRef.current = next;
     });
     return () => sub.remove();
-  }, [user?.id, safeDispatch]);
+  }, [user?.id, safeDispatch, error, syncedOnce]);
 
   // Network reconnection sync
   useEffect(() => {
@@ -219,7 +286,15 @@ export function useDataSync() {
       flushQueue()
         .then(async () => {
           await flushRetentionEvents(user.id).catch(() => ({ processed: 0 }));
-          loadAll(user.id, (a) => safeDispatch(a, user.id)).catch(() => {});
+          loadAll(user.id, (a) => safeDispatch(a, user.id))
+            .then(() => {
+              setError(null);
+              setSyncedOnce(true);
+            })
+            .catch((e) => {
+              setError(e);
+              setSyncedOnce(false);
+            });
         })
         .catch(() => {});
     }
@@ -228,10 +303,15 @@ export function useDataSync() {
   const refresh = useCallback(async () => {
     if (!user?.id || user.id === "dev") return;
     setSyncing(true);
+    setError(null);
     try {
       await loadAll(user.id, (a) => safeDispatch(a, user.id));
+      if (mountedRef.current) setSyncedOnce(true);
     } catch (e) {
-      if (mountedRef.current) setError(e);
+      if (mountedRef.current) {
+        setError(e);
+        setSyncedOnce(false);
+      }
     } finally {
       if (mountedRef.current) setSyncing(false);
     }

@@ -72,15 +72,25 @@ export const createUserTask = async (task) => {
 };
 
 export const updateUserTask = async (id, updates) => {
+  const userId = updates?.user_id || updates?.userId;
+  if (!userId) throw new Error("userId is required");
   try {
+    const row = toUserTaskRow(updates);
+    const {
+      user_id: _userId,
+      client_operation_id: _clientOperationId,
+      ...safeUpdates
+    } = row;
     const { data, error } = await supabase
       .from("user_tasks")
-      .update({ ...toUserTaskRow(updates), updated_at: new Date().toISOString() })
+      .update({ ...safeUpdates, updated_at: new Date().toISOString() })
       .eq("id", id)
+      .eq("user_id", userId)
       .select()
       .maybeSingle();
     if (error) throw error;
-    return data ? normalizeUserTask(data) : data;
+    if (!data) throw new Error("user_task_not_found");
+    return normalizeUserTask(data);
   } catch (e) {
     handleSupabaseError(e, "updateUserTask");
     throw e;

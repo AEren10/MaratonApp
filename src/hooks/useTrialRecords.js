@@ -47,10 +47,11 @@ export function useTrialRecords() {
   const trialsLoading = useSelector(selectTrialsLoading);
   const [filter, setFilter] = useState("ALL");
   const { accessLoading, accessError, accessSnapshot } = usePremium();
-  const { syncedOnce } = useSync();
+  const { syncedOnce, error: syncError, refresh } = useSync();
   const enterLocked = useLockedFeatureEntry();
 
-  const loading = Boolean(trialsLoading || accessLoading || !syncedOnce);
+  const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
+  const loading = Boolean(trialsLoading || accessLoading || (!syncedOnce && !readError));
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
   const canAccessHistory = canAccessProductFeature({
     accessState,
@@ -121,6 +122,8 @@ export function useTrialRecords() {
     canAccessHistory,
     requestFullHistory,
     loading,
+    error: readError,
+    retry: refresh,
     isEmpty: trials.length === 0,
   };
 }

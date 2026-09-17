@@ -41,6 +41,10 @@ let _cache = {
   dataHealth: { logs: "idle", topics: "idle", wrongs: "idle" },
 };
 
+function isHealthyCache(health) {
+  return health?.logs === "ready" && health?.topics === "ready" && health?.wrongs === "ready";
+}
+
 // C) HomeScreen ve PlanDetailScreen için ortak plan bağlamı.
 // Son 3 deneme ağırlıklı zayıflık + 7 günlük çalışma + konu zayıflığı + nudge sinyalleri.
 export function usePlanContext() {
@@ -62,7 +66,7 @@ export function usePlanContext() {
 
   useEffect(() => {
     if (!uid || uid === "dev") return;
-    if (uid === _cache.uid && _cache.weekLogs.length > 0) {
+    if (uid === _cache.uid && isHealthyCache(_cache.dataHealth)) {
       setWeekLogs(_cache.weekLogs);
       setTopicRows(_cache.topicRows);
       setSrDue(_cache.srDue);

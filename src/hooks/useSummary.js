@@ -27,8 +27,13 @@ export function useSummary(period = "day") {
   const lastStudyDate = useSelector(selectLastStudyDate);
   const trials = useSelector(selectTrials);
   const { checkFeature, accessLoading } = usePremium();
-  const { syncedOnce } = useSync();
-  const { route, totals, hasRouteAccess } = useStudyRoute({ persist: false });
+  const { syncedOnce, error: syncError, refresh } = useSync();
+  const {
+    route, totals, hasRouteAccess, routeLoadError, retryRouteLoad,
+  } = useStudyRoute({ persist: false });
+  const syncReadError = syncError?.sourceKeys?.some((source) => (
+    source === "todayLogs" || source === "streak" || source === "trials"
+  )) ? syncError : null;
 
   const todayKey = dateKey(new Date());
   const range = useMemo(() => resolveSummaryRange(period, todayKey), [period, todayKey]);
@@ -51,11 +56,11 @@ export function useSummary(period = "day") {
       period: range.period,
       locked,
       headerLabel: rangeHeaderLabel(range),
-      loading: !syncedOnce
+      loading: (!syncedOnce && !syncReadError)
         || (range.period !== "day" && logsState.loading)
         || (range.period === "month" && accessLoading),
-      error: logsState.error,
-      retry: logsState.retry,
+      error: syncReadError || routeLoadError || logsState.error,
+      retry: syncReadError ? refresh : routeLoadError ? retryRouteLoad : logsState.retry,
       streak,
     };
     if (locked) return base;
@@ -75,6 +80,7 @@ export function useSummary(period = "day") {
       ...buildDaySummary({ todayKey, todayLogs, streak, routeWeeks, totals, hasRouteAccess }),
       recent: logsState.loading ? null : buildRecentDays({ range, logs: logsState.logs }),
     };
-  }, [range, locked, logsState, period, accessLoading, syncedOnce, streak, routeWeeks, C, trials, lastStudyDate,
+  }, [range, locked, logsState, period, accessLoading, syncedOnce, syncReadError,
+    routeLoadError, refresh, retryRouteLoad, streak, routeWeeks, C, trials, lastStudyDate,
     todayKey, todayLogs, totals, hasRouteAccess]);
 }

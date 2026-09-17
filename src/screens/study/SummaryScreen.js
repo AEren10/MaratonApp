@@ -59,7 +59,7 @@ function SummaryScreenInner() {
         <Skeleton height={146} radius={SHAPE.panel} style={styles.gap} />
       </View>
     );
-  } else if (data.error && period !== "day") {
+  } else if (data.error) {
     body = <View style={styles.pad}><ErrorState preset="server" onPrimary={data.retry} /></View>;
   } else if (data.streak === 0 && !data.hasActivity) {
     body = (

@@ -39,7 +39,14 @@ function computeWeakTopics(C, trials) {
 export function useWeakAreas() {
   const C = useC();
   const trials = useSelector(selectTrials);
-  const { syncedOnce } = useSync();
+  const { syncedOnce, error: syncError, refresh } = useSync();
+  const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const weakTopics = useMemo(() => computeWeakTopics(C, trials), [C, trials]);
-  return { weakTopics, isEmpty: weakTopics.length === 0, loading: !syncedOnce };
+  return {
+    weakTopics,
+    isEmpty: weakTopics.length === 0,
+    loading: !syncedOnce && !readError,
+    error: readError,
+    retry: refresh,
+  };
 }

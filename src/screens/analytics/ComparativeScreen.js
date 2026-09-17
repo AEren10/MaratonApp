@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Skeleton } from "../../components/design";
+import { ErrorState } from "../../components/design/ErrorState";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -26,7 +27,8 @@ export default function ComparativeScreen() {
   const navigation = useNavigation();
   const C = useC();
   const trials = useSelector(selectTrials);
-  const { syncedOnce } = useSync();
+  const { syncedOnce, error: syncError, refresh } = useSync();
+  const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const [periodDays, setPeriodDays] = useState(30);
 
   const period = useMemo(() => comparePeriods(trials, periodDays), [trials, periodDays]);
@@ -47,11 +49,15 @@ export default function ComparativeScreen() {
         </Text>
       </View>
 
-      {trials.length === 0 && !syncedOnce ? (
+      {trials.length === 0 && !syncedOnce && !readError ? (
         <View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <Skeleton width="100%" height={96} radius={SHAPE.card} />
           <Skeleton width="100%" height={146} radius={SHAPE.panel} style={{ marginTop: STEP.s3 }} />
           <Skeleton width="100%" height={146} radius={SHAPE.panel} style={{ marginTop: STEP.s3 }} />
+        </View>
+      ) : readError ? (
+        <View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+          <ErrorState preset="server" onPrimary={refresh} code={readError.code} />
         </View>
       ) : trials.length === 0 ? (
         <EmptyState

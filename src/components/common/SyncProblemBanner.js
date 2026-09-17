@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
@@ -8,6 +7,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { usePendingWrites } from "../../hooks/usePendingWrites";
 import { flushQueue, retryDeadLetter } from "../../lib/offlineQueue";
+import { navigateFromOutside } from "../../navigation/navigationRef";
 import * as H from "../../lib/haptics";
 
 // Kalıcı olarak gönderilemeyen kayıt varsa ana ekranda uyarı şeridi.
@@ -17,7 +17,6 @@ import * as H from "../../lib/haptics";
 
 export function SyncProblemBanner() {
   const C = useC();
-  const navigation = useNavigation();
   const { failed, refresh } = usePendingWrites();
   const [busy, setBusy] = useState(false);
   const styles = useMemo(() => makeStyles(C), [C]);
@@ -48,7 +47,14 @@ export function SyncProblemBanner() {
       <Pressable onPress={retry} hitSlop={8} style={styles.action}>
         <Text style={styles.actionText}>{busy ? "..." : "Tekrar dene"}</Text>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate(SCREENS.SETTINGS)} hitSlop={8}>
+      <Pressable
+        onPress={() => {
+          if (navigateFromOutside(SCREENS.OFFLINE_QUEUE)) H.tap();
+        }}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="Gönderilemeyen kayıtları aç"
+      >
         <Icon name="chevR" size={16} color={C.muted} />
       </Pressable>
     </View>

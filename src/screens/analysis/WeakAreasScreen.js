@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon, EmptyState, SectionLabel, Skeleton } from "../../components/design";
+import { Icon, EmptyState, ErrorState, SectionLabel, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
@@ -16,7 +16,7 @@ import { WeakAreaRow } from "./components/WeakAreaRow";
 export default function WeakAreasScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { weakTopics, isEmpty, loading } = useWeakAreas();
+  const { weakTopics, isEmpty, loading, error, retry } = useWeakAreas();
 
   const handleStudy = useCallback((item) => {
     navigation.navigate(SCREENS.TOPIC_STUDY, {
@@ -55,6 +55,8 @@ export default function WeakAreasScreen() {
           <Skeleton width="100%" height={72} radius={SHAPE.card} style={styles.loadingGap} />
           <Skeleton width="100%" height={72} radius={SHAPE.card} style={styles.loadingGap} />
         </View>
+      ) : error ? (
+        <ErrorState preset="server" onPrimary={retry} code={error.code} style={styles.empty} />
       ) : isEmpty ? (
         <EmptyState
           preset="priorityTopics"

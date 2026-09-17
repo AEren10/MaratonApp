@@ -1,10 +1,16 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { saveUserTaskOffline, patchQueuedPayload, removeFromQueue } from "../lib/offlineQueue";
+import {
+  saveUserTaskOffline,
+  saveUserTaskUpdateOffline,
+  deleteUserTaskOffline,
+  patchQueuedPayload,
+  removeFromQueue,
+} from "../lib/offlineQueue";
 import { getJson, setJson } from "../lib/storage/appStorage";
 import { handleSupabaseError } from "../supabase/handleError";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
-import { getCalendarTasks, updateUserTask, deleteUserTask } from "../supabase/userTasks";
+import { getCalendarTasks } from "../supabase/userTasks";
 
 const KEY = STORAGE_KEYS.CALENDAR_TASKS;
 const CAL_SUBJECT = "__calendar";
@@ -131,7 +137,9 @@ export function useCalendarTasks() {
       persist(next);
       const toggled = list.find((t) => t.id === taskId);
       if (toggled?.remoteId) {
-        updateUserTask(toggled.remoteId, { completed: toggled.done }).catch((e) => {
+        saveUserTaskUpdateOffline(toggled.remoteId, { completed: toggled.done }, userId).then((result) => {
+          if (result?.saved || result?.queued) return;
+          const e = result?.error || new Error("calendar_task_update_failed");
           handleSupabaseError(e, "calendar:toggleTask");
           setTasks((revert) => {
             const revList = (revert[date] || []).map((t) => t.id === taskId ? { ...t, done: !t.done } : t);
@@ -148,7 +156,7 @@ export function useCalendarTasks() {
       }
       return next;
     });
-  }, [persist]);
+  }, [persist, userId]);
 
   const removeTask = useCallback((date, taskId) => {
     setTasks((prev) => {
@@ -159,7 +167,9 @@ export function useCalendarTasks() {
       else delete next[date];
       persist(next);
       if (removed?.remoteId) {
-        deleteUserTask(removed.remoteId, user?.id).catch((e) => {
+        deleteUserTaskOffline(removed.remoteId, userId).then((result) => {
+          if (result?.saved || result?.queued) return;
+          const e = result?.error || new Error("calendar_task_delete_failed");
           handleSupabaseError(e, "calendar:removeTask");
           setTasks((revert) => {
             const revList = [...(revert[date] || []), removed];

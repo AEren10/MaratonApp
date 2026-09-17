@@ -46,6 +46,9 @@ function isTransientNetworkError(error) {
     msg.includes("network connection was lost") ||
     msg.includes("network error") ||
     msg.includes("internet connection") ||
+    msg.includes("request timeout") ||
+    msg.includes("upstream request timeout") ||
+    msg.includes("timeout") ||
     msg.includes("aborterror")
   );
 }

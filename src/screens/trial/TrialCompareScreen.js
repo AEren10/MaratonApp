@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Icon, Card, EmptyState, Skeleton } from "../../components/design";
+import { Icon, Card, EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTrialCompare } from "../../hooks/useTrialCompare";
@@ -21,7 +21,7 @@ export default function TrialCompareScreen() {
 
   const {
     newer, older, setNewer, setOlder, sameTypeTrials,
-    rows, canCompare, publisherMismatch, titles, hero, loading,
+    rows, canCompare, publisherMismatch, titles, hero, loading, error, retry,
   } = useTrialCompare(C, route.params || {});
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
@@ -45,6 +45,8 @@ export default function TrialCompareScreen() {
           <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
           <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
         </View>
+      ) : error ? (
+        <ErrorState preset="server" onPrimary={retry} code={error.code} style={{ paddingHorizontal: GUTTER }} />
       ) : !canCompare ? (
         <EmptyState
           title="Karşılaştırma için en az 2 deneme gerekli"

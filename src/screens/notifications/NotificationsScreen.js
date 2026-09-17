@@ -1,22 +1,48 @@
 import { useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
+import { View, Text, Pressable, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
+import { ErrorState, Icon, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { useNotifications } from "../../hooks/useNotifications";
 
-const EMPTY_NOTIFICATIONS = [];
+const KIND_LABELS = {
+  route_stop_opened: "ROTA",
+  trial_analysis_ready: "DENEME",
+  weekly_summary_ready: "HAFTA",
+};
+
+function formatTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const diff = Date.now() - date.getTime();
+  if (diff < 60_000) return "şimdi";
+  if (diff < 3_600_000) return `${Math.max(1, Math.round(diff / 60_000))} dk`;
+  if (diff < 86_400_000) return `${Math.round(diff / 3_600_000)} sa`;
+  return date.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+}
 
 function NotificationsContent() {
   const C = useC();
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
-  const notifs = EMPTY_NOTIFICATIONS;
+  const {
+    notifications,
+    loading,
+    refreshing,
+    error,
+    refresh,
+    retry,
+    openNotification,
+    markAllRead,
+    unreadCount,
+  } = useNotifications();
 
   const renderEmpty = () => (
     <Animated.View entering={FadeInDown.duration(500)} style={s.emptyContainer}>
@@ -39,11 +65,28 @@ function NotificationsContent() {
     </Animated.View>
   );
 
-  const handlePressNotif = useCallback(() => {}, []);
+  const renderError = () => (
+    <View style={s.stateWrap}>
+      <ErrorState
+        preset="server"
+        onPrimary={retry}
+        code={error?.code || "notifications_read_failed"}
+      />
+    </View>
+  );
+
+  const renderLoading = () => (
+    <View style={s.loadingList}>
+      {[0, 1, 2].map((i) => (
+        <Skeleton key={i} width="100%" height={86} radius={SHAPE.cardTight} />
+      ))}
+    </View>
+  );
 
   const renderItem = ({ item }) => {
     const isUnread = !item.read;
     const color = C[item.colorKey] || C.accent;
+    const kind = KIND_LABELS[item.kind] || "HABER";
     
     return (
       <Pressable 
@@ -52,22 +95,24 @@ function NotificationsContent() {
           isUnread && { backgroundColor: C.surface },
           pressed && { opacity: 0.8 }
         ]}
-        onPress={handlePressNotif}
+        onPress={() => openNotification(item)}
       >
         <View style={[s.iconBox, { backgroundColor: color + "18" }]}>
           <View style={[s.iconDot, { backgroundColor: color }]} />
         </View>
         <View style={s.contentBox}>
           <View style={s.kindRow}>
-            <Text style={[s.kindText, { color }]}>{item.kind}</Text>
-            <Text style={s.timeText}>{item.time}</Text>
+            <Text style={[s.kindText, { color }]}>{kind}</Text>
+            <Text style={s.timeText}>{formatTime(item.createdAt)}</Text>
           </View>
           <Text style={[s.titleText, !isUnread && { color: C.text2 }]}>{item.title}</Text>
-          <Text style={s.descText}>{item.desc}</Text>
+          {item.body ? <Text style={s.descText}>{item.body}</Text> : null}
         </View>
       </Pressable>
     );
   };
+
+  const data = loading ? [] : notifications;
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -85,14 +130,20 @@ function NotificationsContent() {
           </Pressable>
           <Text style={s.headerTitle}>Rota haberleri</Text>
         </View>
+        {unreadCount > 0 ? (
+          <Pressable onPress={markAllRead} hitSlop={8}>
+            <Text style={s.readAll}>Okundu yap</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <FlatList
-        data={notifs}
+        data={data}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        contentContainerStyle={notifs.length === 0 ? s.listEmptyContent : s.listContent}
-        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={data.length === 0 ? s.listEmptyContent : s.listContent}
+        ListEmptyComponent={loading ? renderLoading : error ? renderError : renderEmpty}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={C.accent} colors={[C.accent]} />}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -133,6 +184,10 @@ function makeStyles(C) {
       ...TYPOGRAPHY.subheading,
       color: C.text 
     },
+    readAll: {
+      ...TYPOGRAPHY.meta,
+      color: C.accentBright,
+    },
     
     // List
     listContent: {
@@ -142,6 +197,15 @@ function makeStyles(C) {
     },
     listEmptyContent: {
       flexGrow: 1,
+    },
+    loadingList: {
+      paddingHorizontal: GUTTER,
+      paddingTop: STEP.s3,
+      gap: STEP.s2,
+    },
+    stateWrap: {
+      paddingHorizontal: GUTTER,
+      paddingTop: STEP.s5,
     },
     
     // Notification Item

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -10,22 +10,9 @@ import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { FriendCodeCard } from "./components/FriendCodeCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { useAuth } from "../../contexts/AuthContext";
-import {
-  listFriends,
-  listIncomingRequests,
-  listOutgoingRequests,
-  searchUsers,
-  sendFriendRequest,
-  respondToRequest,
-  unfriend,
-  cancelRequest,
-  blockUser,
-  listBlockedUsers,
-} from "../../supabase/friends";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
-import * as H from "../../lib/haptics";
+import { useFriends } from "../../hooks/useFriends";
 
 function FriendRow({ user, action }) {
   const C = useC();
@@ -45,127 +32,27 @@ export default function FriendsScreen() {
   const s = useMemo(() => makeStyles(C), [C]);
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = useAuth();
   const showAlert = useAlert();
-  const [friends, setFriends] = useState([]);
-  const [blockedIds, setBlockedIds] = useState(new Set());
-  const [requests, setRequests] = useState([]);
-  const [outgoing, setOutgoing] = useState([]);
-  const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searching, setSearching] = useState(false);
-  const [sending, setSending] = useState(null);
-
-  const load = useCallback(async () => {
-    if (!user?.id || user.id === "dev") {
-      setLoading(false);
-      return;
-    }
-    try {
-      const [f, r, o, blocked] = await Promise.all([listFriends(user.id), listIncomingRequests(user.id), listOutgoingRequests(user.id), listBlockedUsers(user.id)]);
-      setFriends(f);
-      setRequests(r);
-      setOutgoing(o);
-      setBlockedIds(new Set((blocked || []).map((b) => b.id)));
-    } catch (_) {
-      showAlert("Yüklenemedi", "Arkadaş listesi alınamadı. Tekrar dene.");
-    }
-    setLoading(false);
-  }, [user?.id]);
-
-  useEffect(() => { load(); }, [load]);
-
-  useEffect(() => {
-    if (!query || query.length < 3) {
-      setSearchResults([]);
-      return;
-    }
-    let cancelled = false;
-    setSearching(true);
-    const t = setTimeout(async () => {
-      try {
-        const res = await searchUsers(query);
-        if (!cancelled) setSearchResults((res || []).filter((u) => u.id !== user?.id && !blockedIds.has(u.id)));
-      } catch (_) {}
-      if (!cancelled) setSearching(false);
-    }, 400);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [query, user?.id, blockedIds]);
-
-  const friendIds = useMemo(() => new Set(friends.map((f) => f.id)), [friends]);
-  const outgoingIds = useMemo(() => new Set(outgoing.map((o) => o.addressee?.id).filter(Boolean)), [outgoing]);
-  const incomingIds = useMemo(() => new Set(requests.map((r) => r.requester?.id).filter(Boolean)), [requests]);
-
-  const addFriend = useCallback(async (targetId) => {
-    if (sending) return;
-    setSending(targetId);
-    try {
-      await sendFriendRequest(targetId);
-      H.success();
-      showAlert("İstek gönderildi", "Arkadaşlık isteğin iletildi.");
-      load();
-    } catch (e) {
-      showAlert("Hata", e.message || "İstek gönderilemedi.");
-    } finally {
-      setSending(null);
-    }
-  }, [load, sending]);
-
-  const cancelOutgoing = useCallback(async (friendshipId) => {
-    try {
-      await cancelRequest(friendshipId, user?.id);
-      H.select();
-      load();
-    } catch (e) {
-      showAlert("Hata", e.message || "İşlem başarısız.");
-    }
-  }, [load, user?.id]);
-
-  const respond = useCallback(async (id, accept) => {
-    try {
-      await respondToRequest(id, accept, user?.id);
-      load();
-    } catch (e) {
-      showAlert("Hata", e.message || "İşlem başarısız.");
-    }
-  }, [load, user?.id]);
-
-  const remove = useCallback(async (friendshipId) => {
-    if (!user?.id) return;
-    H.warn();
-    showAlert("Arkadaşlıktan çıkar", "Bu kişiyi listenden kaldır?", [
-      { text: "İptal", style: "cancel" },
-      {
-        text: "Kaldır",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await unfriend(friendshipId, user.id);
-            load();
-          } catch (_) {}
-        },
-      },
-    ]);
-  }, [load, user?.id]);
-
-  const block = useCallback((targetUser) => {
-    H.warn();
-    showAlert("Kullanıcıyı Engelle", `${targetUser.name || "Bu kullanıcı"} engellensin mi? Arkadaşlık da kaldırılacak.`, [
-      { text: "İptal", style: "cancel" },
-      {
-        text: "Engelle",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await blockUser(targetUser.id);
-            H.success();
-            load();
-          } catch (e) { showAlert("Hata", e.message || "Engellenemedi."); }
-        },
-      },
-    ]);
-  }, [load]);
+  const {
+    friends,
+    requests,
+    outgoing,
+    query,
+    setQuery,
+    searchResults,
+    loading,
+    searching,
+    sending,
+    friendIds,
+    outgoingIds,
+    incomingIds,
+    load,
+    addFriend,
+    cancelOutgoing,
+    respond,
+    removeFriend,
+    block,
+  } = useFriends({ showAlert });
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -299,7 +186,7 @@ export default function FriendsScreen() {
                           <Pressable onPress={() => block(f)} style={[s.actionBtn, { backgroundColor: C.muted + "15" }]} accessibilityLabel="Engelle">
                             <Icon name="shield" size={14} color={C.muted} />
                           </Pressable>
-                          <Pressable onPress={() => remove(f.friendshipId)} style={s.actionBtn} accessibilityLabel="Kaldır">
+                          <Pressable onPress={() => removeFriend(f.friendshipId)} style={s.actionBtn} accessibilityLabel="Kaldır">
                             <Icon name="trash" size={14} color={C.red} />
                           </Pressable>
                         </View>

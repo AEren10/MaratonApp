@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { buildRoute, thresholdGap, computeDebt, capDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
@@ -23,6 +23,7 @@ import { routeReadinessSummary } from "../domain/route/routeCreation";
 import { summarizeRouteRevision } from "../domain/route/routeRevisionSummary";
 import { routePersistenceDecision } from "../domain/route/routePersistenceDecision";
 import { isRoutePausedForExam, routePausedAtForExam } from "../domain/route/routePauseState";
+import { captureError } from "../lib/errorReporting";
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
@@ -38,6 +39,25 @@ function forecastProfilesForRoute(examType, field) {
   const ayt = field === "sayisal" ? "AYT_SAY"
     : field === "ea" ? "AYT_EA" : field === "sozel" ? "AYT_SOZ" : "AYT_SAY";
   return [{ types: ["TYT"], max: 120 }, { types: [ayt, "AYT"], max: 80 }];
+}
+
+class RouteReadError extends Error {
+  constructor(failures) {
+    super(`Rota okuma hatası: ${failures.map((f) => f.source).join(", ")}`);
+    this.name = "RouteReadError";
+    this.code = "route_read_failed";
+    this.failures = failures;
+    this.sourceKeys = failures.map((f) => f.source);
+  }
+}
+
+function failedRouteRead(source, result) {
+  if (result.status !== "rejected") return null;
+  return {
+    source,
+    message: result.reason?.message || String(result.reason || "unknown"),
+    reason: result.reason,
+  };
 }
 
 /**
@@ -69,6 +89,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const [routeState, setRouteStateLocal] = useState(null);
   const [routeCreating, setRouteCreating] = useState(false);
   const [routeCreationError, setRouteCreationError] = useState(null);
+  const [routeLoadError, setRouteLoadError] = useState(null);
+  const [routeLoadTick, setRouteLoadTick] = useState(0);
+  const routeLoadKeyRef = useRef(null);
   const isPaused = isRoutePausedForExam(routeState, examType);
   const recoveryWeek = useMemo(() => {
     if (pausedWeeks != null) return pausedWeeks;
@@ -220,20 +243,53 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // examType filtresi kritik: kullanıcı YKS↔LGS geçtiyse eski müfredatın
   // planı borç sayılmamalı.
   useEffect(() => {
-    if (!user?.id || !examType || !hasRouteAccess) { setStopsLoaded(true); return; }
+    if (!user?.id || !examType || !hasRouteAccess) {
+      routeLoadKeyRef.current = null;
+      setPastWeeks([]);
+      setRouteStateLocal(null);
+      setPersistedStops([]);
+      setRouteLoadError(null);
+      setStopsLoaded(true);
+      return;
+    }
     let cancelled = false;
-    getRouteWeeks(user.id, { examType })
-      .then((rows) => { if (!cancelled) setPastWeeks(rows); })
-      .catch(() => {});
-    getRouteState(user.id, examType)
-      .then((st) => { if (!cancelled) setRouteStateLocal(st); })
-      .catch(() => {});
-    getLatestRouteStops(user.id, examType)
-      .then((rows) => { if (!cancelled) setPersistedStops(rows); })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setStopsLoaded(true); });
+    const loadKey = `${user.id}:${examType}`;
+    routeLoadKeyRef.current = loadKey;
+    setStopsLoaded(false);
+    setRouteLoadError(null);
+    setPastWeeks([]);
+    setRouteStateLocal(null);
+    setPersistedStops([]);
+    Promise.allSettled([
+      getRouteWeeks(user.id, { examType }),
+      getRouteState(user.id, examType),
+      getLatestRouteStops(user.id, examType),
+    ]).then(([weeksResult, stateResult, stopsResult]) => {
+      if (cancelled) return;
+      if (routeLoadKeyRef.current !== loadKey) return;
+      if (weeksResult.status === "fulfilled") setPastWeeks(weeksResult.value);
+      if (stateResult.status === "fulfilled") setRouteStateLocal(stateResult.value);
+      if (stopsResult.status === "fulfilled") setPersistedStops(stopsResult.value);
+
+      const failures = [
+        failedRouteRead("route_weeks", weeksResult),
+        failedRouteRead("route_state", stateResult),
+        failedRouteRead("route_stops", stopsResult),
+      ].filter(Boolean);
+      if (failures.length) {
+        const error = new RouteReadError(failures);
+        setRouteLoadError(error);
+        captureError(error, {
+          context: "route_read",
+          sources: error.sourceKeys,
+          examType,
+        });
+      }
+    }).finally(() => {
+      if (!cancelled && routeLoadKeyRef.current === loadKey) setStopsLoaded(true);
+    });
     return () => { cancelled = true; };
-  }, [user?.id, examType, hasRouteAccess]);
+  }, [user?.id, examType, hasRouteAccess, routeLoadTick]);
 
   // Rota çizildiğinde haftaları sakla. Bu olmadan borç her zaman sıfır çıkar.
   useEffect(() => {
@@ -248,7 +304,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     saveRouteWeeks(user.id, computedRoute.weeks, examType, computedRoute.revision)
       .then(() => getLatestRouteStops(user.id, examType))
       .then(setPersistedStops)
-      .catch(() => {});
+      .catch((error) => {
+        setRouteLoadError(error);
+        captureError(error, { context: "route_auto_persist", examType });
+      });
   }, [persist, user?.id, examType, hasRouteAccess, isPaused,
     computedRoute.weeks, computedRoute.revision, routeCreated, routeRevisionPreview]);
 
@@ -365,6 +424,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
     [debt.totalQuestions, route.capacity, route.weeks],
   );
+  const retryRouteLoad = useCallback(() => setRouteLoadTick((tick) => tick + 1), []);
 
   return {
     route,
@@ -389,6 +449,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     routeReadiness,
     routeCreating,
     routeCreationError,
+    routeLoadError,
+    retryRouteLoad,
     createRoute,
     threshold,
     debt,

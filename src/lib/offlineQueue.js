@@ -2,7 +2,7 @@ import { addStudyLog } from "../supabase/studyLogs";
 import { addTrial, isPermanentTrialError } from "../supabase/trials";
 import { addWrongQuestion, reviewWrongQuestion } from "../supabase/wrongQuestions";
 import * as Crypto from "expo-crypto";
-import { createUserTask } from "../supabase/userTasks";
+import { createUserTask, updateUserTask, deleteUserTask } from "../supabase/userTasks";
 import { togglePlanTask } from "../supabase/plans";
 import { transitionRouteStop } from "../supabase/routePlan";
 import { uploadWrongQuestionImage } from "../supabase/storage";
@@ -26,6 +26,8 @@ export const OP_STUDY_LOG = "STUDY_LOG";
 export const OP_TRIAL = "TRIAL";
 export const OP_WRONG_QUESTION = "WRONG_QUESTION";
 export const OP_USER_TASK = "USER_TASK";
+export const OP_USER_TASK_UPDATE = "USER_TASK_UPDATE";
+export const OP_USER_TASK_DELETE = "USER_TASK_DELETE";
 // Tekrar (spaced repetition) sonuçları. Eskiden kuyrukta YOKTU: çevrimdışı
 // yapılan 20-30 kartlık tekrar oturumu tamamen çöpe gidiyor, ekran ise
 // "Aralıklar güncellendi" diyordu.
@@ -99,6 +101,10 @@ function getOperationFingerprint(op) {
       return trialFingerprint(op.payload?.trial, op.payload?.subjects);
     case OP_USER_TASK:
       return userTaskFingerprint(op.payload);
+    case OP_USER_TASK_UPDATE:
+      return ["user_task_update", op.payload?.id || ""].join("|");
+    case OP_USER_TASK_DELETE:
+      return ["user_task_delete", op.payload?.id || ""].join("|");
     case OP_PLAN_TASK:
       // Aynı görev için son durum neyse o geçerli; tek kayıt yeter.
       return ["plan_task", op.payload?.taskId || ""].join("|");
@@ -232,6 +238,15 @@ async function runOne(item) {
     case OP_USER_TASK:
       await createUserTask(item.payload);
       break;
+    case OP_USER_TASK_UPDATE:
+      await updateUserTask(item.payload.id, {
+        ...(item.payload.updates || {}),
+        user_id: item.payload.user_id,
+      });
+      break;
+    case OP_USER_TASK_DELETE:
+      await deleteUserTask(item.payload.id, item.payload.user_id);
+      break;
     default:
       throw new Error(`Unknown op type: ${item.type}`);
   }
@@ -293,6 +308,10 @@ function isPermanentError(e) {
   return false;
 }
 
+function throwIfPermanentWriteError(e) {
+  if (isPermanentError(e)) throw e;
+}
+
 function shouldSkipByBackoff(item) {
   if (!item.retryCount || !item.lastAttempt) return false;
   const delay = Math.min(1000 * Math.pow(2, item.retryCount), 300_000);
@@ -301,11 +320,10 @@ function shouldSkipByBackoff(item) {
 
 async function moveToDeadLetter(items) {
   if (!items.length) return;
-  try {
-    const existing = await appStorage.getJson(DEAD_LETTER_KEY, []);
-    const merged = [...existing, ...items].slice(-50);
-    await appStorage.setJson(DEAD_LETTER_KEY, merged);
-  } catch {}
+  const existing = await appStorage.getJson(DEAD_LETTER_KEY, []);
+  const merged = [...existing, ...items].slice(-50);
+  const ok = await appStorage.setJson(DEAD_LETTER_KEY, merged);
+  if (!ok) throw new Error("dead_letter_write_failed");
 }
 
 export async function getDeadLetterCount() {
@@ -411,6 +429,7 @@ export async function saveStudyLogOffline(payload) {
     const saved = await addStudyLog(payloadWithId);
     return { saved: true, queued: false, data: saved, clientOperationId };
   } catch (e) {
+    throwIfPermanentWriteError(e);
     await enqueue({ type: OP_STUDY_LOG, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e, clientOperationId };
   }
@@ -439,6 +458,7 @@ export async function saveWrongQuestionOffline(payload) {
     const saved = await addWrongQuestion(payloadWithId);
     return { saved: true, queued: false, data: saved };
   } catch (e) {
+    throwIfPermanentWriteError(e);
     await enqueue({ type: OP_WRONG_QUESTION, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e };
   }
@@ -451,8 +471,50 @@ export async function saveUserTaskOffline(payload) {
     const saved = await createUserTask(payloadWithId);
     return { saved: true, queued: false, data: saved };
   } catch (e) {
+    throwIfPermanentWriteError(e);
     await enqueue({ type: OP_USER_TASK, payload: payloadWithId, clientOperationId });
     return { saved: false, queued: true, error: e };
+  }
+}
+
+export async function saveUserTaskUpdateOffline(id, updates, userId = null) {
+  try {
+    const saved = await updateUserTask(id, { ...updates, user_id: userId });
+    return { saved: true, queued: false, data: saved };
+  } catch (e) {
+    if (isPermanentError(e)) return { saved: false, queued: false, error: e };
+    try {
+      const operationId = `usertask_update_${id}`;
+      await removeFromQueue(operationId);
+      await enqueue({
+        type: OP_USER_TASK_UPDATE,
+        payload: { id, updates, user_id: userId },
+        clientOperationId: operationId,
+      });
+      return { saved: false, queued: true, error: e };
+    } catch (queueErr) {
+      return { saved: false, queued: false, error: queueErr };
+    }
+  }
+}
+
+export async function deleteUserTaskOffline(id, userId = null) {
+  try {
+    await deleteUserTask(id, userId);
+    return { saved: true, queued: false };
+  } catch (e) {
+    if (isPermanentError(e)) return { saved: false, queued: false, error: e };
+    try {
+      await removeFromQueue(`usertask_update_${id}`);
+      await enqueue({
+        type: OP_USER_TASK_DELETE,
+        payload: { id, user_id: userId },
+        clientOperationId: `usertask_delete_${id}`,
+      });
+      return { saved: false, queued: true, error: e };
+    } catch (queueErr) {
+      return { saved: false, queued: false, error: queueErr };
+    }
   }
 }
 
@@ -504,18 +566,32 @@ export async function getDeadLetterItems() {
  * Sayaçlar sıfırlanır ki backoff/retry limiti baştan başlasın.
  */
 export async function retryDeadLetter() {
+  return withQueueLock(retryDeadLetterLocked);
+}
+
+async function retryDeadLetterLocked() {
   const items = await getDeadLetterItems();
   if (!items.length) return { requeued: 0 };
   const list = await readQueue();
   const known = new Set(list.map((i) => i.clientOperationId || i.id));
   const requeued = [];
+  const skipped = [];
+  const capacity = Math.max(0, MAX_QUEUE_SIZE - list.length);
   for (const item of items) {
     const id = item.clientOperationId || item.id;
-    if (id && known.has(id)) continue;
+    if (id && known.has(id)) {
+      skipped.push(item);
+      continue;
+    }
+    if (requeued.length >= capacity) {
+      skipped.push(item);
+      continue;
+    }
     requeued.push({ ...item, retryCount: 0, lastAttempt: null, queuedAt: Date.now(), deadReason: undefined });
   }
-  await writeQueue([...list, ...requeued].slice(-MAX_QUEUE_SIZE));
-  await appStorage.setJson(DEAD_LETTER_KEY, []);
+  if (requeued.length) await writeQueue([...list, ...requeued]);
+  const ok = await appStorage.setJson(DEAD_LETTER_KEY, skipped);
+  if (!ok) throw new Error("dead_letter_write_failed");
   return { requeued: requeued.length };
 }
 
@@ -527,11 +603,13 @@ export async function clearDeadLetter() {
 /** Kuyruktan tek bir kaydı çıkarır (kullanıcı henüz gönderilmemiş kaydı silerse). */
 export async function removeFromQueue(id) {
   if (!id) return false;
-  const list = await readQueue();
-  const next = list.filter((item) => (item.clientOperationId || item.id) !== id);
-  if (next.length === list.length) return false;
-  await writeQueue(next);
-  return true;
+  return withQueueLock(async () => {
+    const list = await readQueue();
+    const next = list.filter((item) => (item.clientOperationId || item.id) !== id);
+    if (next.length === list.length) return false;
+    await writeQueue(next);
+    return true;
+  });
 }
 
 /**
@@ -546,6 +624,7 @@ export async function saveReviewOffline(id, userId, updates) {
     await reviewWrongQuestion(id, userId, updates);
     return { saved: true, queued: false };
   } catch (e) {
+    if (isPermanentError(e)) return { saved: false, queued: false, error: e };
     try {
       await enqueue({ type: OP_REVIEW, payload: { id, user_id: userId, updates } });
       return { saved: false, queued: true, error: e };
@@ -561,6 +640,7 @@ export async function savePlanTaskToggleOffline(taskId, completed, userId = null
     await togglePlanTask(taskId, completed, userId);
     return { saved: true, queued: false };
   } catch (e) {
+    if (isPermanentError(e)) return { saved: false, queued: false, error: e };
     try {
       // Aynı görev için eski kayıt varsa çıkar — son durum geçerli olmalı,
       // yoksa "işaretle/kaldır" dizisi yanlış sırayla gönderilebilir.

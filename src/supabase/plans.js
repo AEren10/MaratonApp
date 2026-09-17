@@ -68,15 +68,18 @@ export const createPlanTasks = async (plan, tasks) => {
   }
 };
 
-export const completeTask = async (taskId) => {
+export const completeTask = async (taskId, userId) => {
+  if (!userId) throw new Error("userId is required");
   try {
     const { data, error } = await supabase
       .from("plan_tasks")
       .update({ completed: true })
       .eq("id", taskId)
+      .eq("user_id", userId)
       .select()
       .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("plan_task_not_found");
     return data;
   } catch (e) {
     handleSupabaseError(e, "completeTask");
