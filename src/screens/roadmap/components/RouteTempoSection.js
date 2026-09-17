@@ -21,13 +21,13 @@ export function RouteTempoSection({ rows, locked, onOpen }) {
               <View style={[s.ghost, { backgroundColor: C.track }]} />
             </>
           ) : (
-            <Text style={[TYPOGRAPHY.tableValue, { color: row.tone === "up" ? C.up : C.down }]}>
+            <Text style={[s.valueText, { color: row.tone === "up" ? C.up : C.down }]}>
               {row.value}
             </Text>
           )}
         </View>
       ))}
-      <Button size="lg" fullWidth onPress={onOpen} style={s.button}>
+      <Button size="md" fullWidth onPress={onOpen} style={s.button}>
         Senaryoları aç
       </Button>
     </View>
@@ -35,15 +35,20 @@ export function RouteTempoSection({ rows, locked, onOpen }) {
 }
 
 const s = StyleSheet.create({
-  lead: { marginTop: STEP.s1, paddingBottom: STEP.s1 },
+  lead: { marginTop: STEP.s1, paddingBottom: STEP.s1 / 2 },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s2,
-    minHeight: 50,
+    paddingVertical: 15,
     borderBottomWidth: 1,
   },
   flex: { flex: 1 },
   ghost: { width: 52, height: 16, borderRadius: SHAPE.chip },
-  button: { marginTop: STEP.s2 },
+  valueText: {
+    fontFamily: "Bricolage_400",
+    fontSize: 19,
+    fontVariant: ["tabular-nums"],
+  },
+  button: { marginTop: STEP.s2 + 4 },
 });

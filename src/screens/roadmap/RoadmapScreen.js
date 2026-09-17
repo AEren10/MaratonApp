@@ -43,11 +43,13 @@ export default function RoadmapScreen() {
             />
           ) : (
             <>
-              <Animated.View entering={enter(0)} style={s.intro}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>NET ORTALAMASI</Text>
-                {view.caption ? (
-                  <Text style={[TYPOGRAPHY.caption, s.caption, { color: C.text3 }]}>{view.caption}</Text>
-                ) : null}
+              <Animated.View entering={enter(0)}>
+                <View style={s.introHeader}>
+                  <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>NET ORTALAMASI</Text>
+                  {view.caption ? (
+                    <Text style={[TYPOGRAPHY.caption, s.caption, { color: C.text3 }]}>{view.caption}</Text>
+                  ) : null}
+                </View>
                 <View style={s.chart}>
                   {d.chartReady && view.chart ? (
                     <RouteDetailChart chart={view.chart} target={d.targetNet} examDateTag={d.examDateTag} />
@@ -57,7 +59,7 @@ export default function RoadmapScreen() {
                 </View>
               </Animated.View>
               
-              <Animated.View entering={enter(1)}>
+              <Animated.View entering={enter(1)} style={s.cardSection}>
                 <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
               </Animated.View>
               
@@ -69,7 +71,7 @@ export default function RoadmapScreen() {
                   {d.targetNet != null ? (
                     <RouteLinkRow
                       title={`${d.targetNet} net ≈ hangi bölümler?`}
-                      subtitle="Hedef netinin karşılığı"
+                      subtitle="Hedef netinin karşılığı · 24 devlet üniversitesi"
                       onPress={d.openThreshold}
                     />
                   ) : null}
@@ -93,9 +95,10 @@ export default function RoadmapScreen() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: 100 },
-  intro: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  introHeader: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
   caption: { marginTop: STEP.s1 / 2 },
-  chart: { marginTop: STEP.s2 },
-  section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
-  links: { gap: STEP.s1, marginTop: STEP.s2 },
+  chart: { marginTop: 12 },
+  cardSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
+  section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 + 4 },
+  links: { gap: STEP.s1 + 2, marginTop: STEP.s2 + 4 },
 });

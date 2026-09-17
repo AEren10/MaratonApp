@@ -35,7 +35,7 @@ export function ProgressRing({
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: c * (1 - progress.value),
-  }));
+  }), [c]);
 
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>

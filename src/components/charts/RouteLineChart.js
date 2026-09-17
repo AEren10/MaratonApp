@@ -16,16 +16,12 @@ const W = 390;
 const H = 250;
 
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
-export function RouteLineChart({ stops = [], todayIndex, projection = [], band, target, height = H }) {
+export function RouteLineChart({ stops = [], todayIndex, projection = [], band, target, ticks, height = H }) {
   const C = useC();
   const scale = height / H;
   const safeStops = Array.isArray(stops) ? stops : [];
   const safeProj = Array.isArray(projection) ? projection : [];
   const values = safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0));
-
-  // TEK ORTAK OLCEK: duraklar + projeksiyon + hedef ayni alandan olceklenir.
-  // Ayri olceklenirse projeksiyon gecmis hattin bittigi yerde kopuk baslar,
-  // hedef cizgisi de tuvalin disina duser.
   const scaleOpts = { width: W, height: H, padTop: 20, padBottom: 20 };
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
@@ -76,7 +72,7 @@ export function RouteLineChart({ stops = [], todayIndex, projection = [], band, 
           </LinearGradient>
         </Defs>
 
-        <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD} width={W} C={C} />
+        <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD} width={W} ticks={ticks} C={C} />
 
         {/* Gecmis hat. SVG path statik tutuluyor; bu grafik ana navigasyon
             ekraninda cok sik render oluyor ve animatedProps, Reanimated

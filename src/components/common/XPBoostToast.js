@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -23,13 +23,15 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
   const insets = useSafeAreaInsets();
   const translateY = useSharedValue(60);
   const opacity = useSharedValue(0);
-  const dismissRef = useRef(onDismiss);
-  dismissRef.current = onDismiss;
 
   useEffect(() => {
     if (!visible) return;
     translateY.value = 60;
     opacity.value = 0;
+
+    const handleDismiss = () => {
+      onDismiss?.();
+    };
 
     translateY.value = withSequence(
       withTiming(0, { duration: SHOW_MS }),
@@ -38,14 +40,14 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
     opacity.value = withSequence(
       withTiming(1, { duration: SHOW_MS }),
       withDelay(VISIBLE_MS, withTiming(0, { duration: HIDE_MS }, () => {
-        if (dismissRef.current) runOnJS(dismissRef.current)();
+        runOnJS(handleDismiss)();
       })),
     );
     return () => {
       cancelAnimation(translateY);
       cancelAnimation(opacity);
     };
-  }, [visible]);
+  }, [visible, onDismiss, translateY, opacity]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -84,7 +86,6 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#26262F", // surface
     paddingHorizontal: STEP.s3,
     paddingVertical: 10,
     borderRadius: 30,

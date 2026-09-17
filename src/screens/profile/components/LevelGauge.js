@@ -37,7 +37,7 @@ export function LevelGauge({ size = 286, progress = 0, children }) {
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: c * (1 - ARC * p.value),
-  }));
+  }), [c]);
 
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>

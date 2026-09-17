@@ -4,10 +4,10 @@
 
 export const SUMMARY_ROUTE = { width: 390, height: 176, bottom: 150, top: 34 };
 
-const SEGMENTS = [
-  [0.46, 0.21, 0.7, 0.63],
-  [0.33, 0.4, 0.66, 0.72],
-];
+const SEGMENTS = Object.freeze([
+  Object.freeze([0.46, 0.21, 0.7, 0.63]),
+  Object.freeze([0.33, 0.4, 0.66, 0.72]),
+]);
 
 export function summaryRouteXs(count) {
   return count >= 3 ? [26, 178, 364] : [26, 364];

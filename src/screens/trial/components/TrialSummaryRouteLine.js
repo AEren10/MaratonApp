@@ -38,9 +38,18 @@ export function TrialSummaryRouteLine({ route }) {
     progress.value = withDelay(120, withTiming(1, { duration: 660, easing: Easing.bezier(0.2, 0.75, 0.2, 1) }));
   }, [progress, reduced, newYs]);
 
-  const lineProps = useAnimatedProps(() => ({ d: buildSummaryRoutePath(xs, lerpYs(oldYs, newYs, progress.value)) }));
-  const todayProps = useAnimatedProps(() => ({ cy: oldYs[1] + (newYs[1] - oldYs[1]) * progress.value }));
-  const endProps = useAnimatedProps(() => ({ cy: newYs.length > 2 ? oldYs[2] + (newYs[2] - oldYs[2]) * progress.value : 0 }));
+  const lineProps = useAnimatedProps(
+    () => ({ d: buildSummaryRoutePath(xs, lerpYs(oldYs, newYs, progress.value)) }),
+    [xs, oldYs, newYs],
+  );
+  const todayProps = useAnimatedProps(
+    () => ({ cy: oldYs[1] + (newYs[1] - oldYs[1]) * progress.value }),
+    [oldYs, newYs],
+  );
+  const endProps = useAnimatedProps(
+    () => ({ cy: newYs.length > 2 ? oldYs[2] + (newYs[2] - oldYs[2]) * progress.value : 0 }),
+    [oldYs, newYs],
+  );
 
   const todayX = xs[1];
   const todayY = newYs[1];
