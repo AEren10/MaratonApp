@@ -107,13 +107,17 @@ export function useHomeController() {
   if ((!accessLoading && weekLoaded && syncedOnce) || !isConnected || timedOut) readyRef.current = true;
   const [offlineDismissed, setOfflineDismissed] = useState(false);
   const hasLocalData = todayLogs.length > 0 || trials.length > 0 || weekLogs.length > 0 || !!lastStudyDate;
+  // Ilk Gun hero'su Home govdesinin TAMAMINI gizliyor (HomeHero showBelow).
+  // O yuzden yalniz kesin bilgiyle iddia edilir: senkron basariyla bitmeden,
+  // ya da rotada tamamlanmis durak varken kullanici ilk gununde degildir.
+  const hasRouteProgress = (routeTotals?.mastered || 0) > 0;
 
   return {
     C, navigation, dailyGoal, daysUntilExam, comeback, comebackFlow, dismissComeback, gamification, goalReward, completion,
     nudges, nudge, dashboard, stops, recent, actions, onRefresh, refreshing,
     streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
-    firstDay: !hasLocalData && streak === 0,
+    firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0,
     offline: !isConnected && !hasLocalData && !offlineDismissed,
     continueOffline: () => setOfflineDismissed(true),
   };
