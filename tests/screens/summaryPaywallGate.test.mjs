@@ -8,8 +8,7 @@ const summaryScreen = readFileSync(
 );
 
 test("monthly summary unlock uses the central locked feature gate", () => {
-  assert.match(summaryScreen, /import \{ useLockedFeatureEntry \} from "\.\.\/\.\.\/hooks\/useLockedFeatureEntry";/);
-  assert.match(summaryScreen, /const enterLocked = useLockedFeatureEntry\(\);/);
-  assert.match(summaryScreen, /enterLocked\("monthly_report"\)/);
+  assert.match(summaryScreen, /import \{ useFeatureEntry \} from "\.\.\/\.\.\/hooks\/useFeatureEntry";/);
+  assert.match(summaryScreen, /useFeatureEntry\(PRODUCT_FEATURES\.monthly_report, "monthly_report"\)/);
   assert.doesNotMatch(summaryScreen, /navigate\(SCREENS\.PAYWALL/);
 });

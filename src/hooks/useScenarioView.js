@@ -10,7 +10,7 @@ import { updateProfile } from "../supabase/profiles";
 import { captureError } from "../lib/errorReporting";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
-import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
+import { useFeatureEntry } from "./useFeatureEntry";
 import * as H from "../lib/haptics";
 
 /**
@@ -26,7 +26,7 @@ export function useScenarioView() {
   const { user } = useAuth();
   const showAlert = useAlert();
   const { accessLoading, accessError, accessSnapshot } = usePremium();
-  const enterLocked = useLockedFeatureEntry();
+  const { ensure: ensureScenarios } = useFeatureEntry(PRODUCT_FEATURES.route_scenarios, "route_scenarios");
   const { tempoScenarios, forecast, routeStopsLoaded } = useStudyRoute({ persist: false });
   const goals = useAppSelector(selectGoals);
 
@@ -45,14 +45,14 @@ export function useScenarioView() {
     [tempoScenarios, selected],
   );
 
-  const selectScenario = useCallback((multiplier) => {
-    if (!canAccess) { enterLocked("route_scenarios"); return; }
+  const selectScenario = useCallback(async (multiplier) => {
+    if (!(await ensureScenarios())) return;
     H.select();
     setSelected(multiplier);
-  }, [canAccess, enterLocked]);
+  }, [ensureScenarios]);
 
   const applyTempo = useCallback(async () => {
-    if (!canAccess) { enterLocked("route_scenarios"); return; }
+    if (!(await ensureScenarios())) return;
     if (!selectedScenario || selectedScenario.multiplier === 1) {
       showAlert("Zaten uygulanıyor", "Şimdiki tempo hâlihazırda hedefin.");
       return;
@@ -74,7 +74,7 @@ export function useScenarioView() {
     } finally {
       setApplying(false);
     }
-  }, [canAccess, enterLocked, selectedScenario, showAlert, dispatch, goals, user?.id, navigation]);
+  }, [ensureScenarios, selectedScenario, showAlert, dispatch, goals, user?.id, navigation]);
 
   return {
     forecast,

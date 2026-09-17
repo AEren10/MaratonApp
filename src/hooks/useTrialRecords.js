@@ -5,7 +5,7 @@ import { usePremium } from "../contexts/PremiumContext";
 import { useSync } from "../contexts/DataSyncContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
-import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
+import { useFeatureEntry } from "./useFeatureEntry";
 
 export const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
 const TYPE_TABS = ["ALL", "TYT", "AYT", "BRANCH"];
@@ -48,7 +48,7 @@ export function useTrialRecords() {
   const [filter, setFilter] = useState("ALL");
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const { syncedOnce, error: syncError, refresh } = useSync();
-  const enterLocked = useLockedFeatureEntry();
+  const { open: openHistoryGate } = useFeatureEntry(PRODUCT_FEATURES.trial_compare, "trial_history");
 
   const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const loading = Boolean(trialsLoading || accessLoading || (!syncedOnce && !readError));
@@ -60,7 +60,7 @@ export function useTrialRecords() {
   });
 
   // Eski kayitlarin kilidi "Paywall · Geçmiş" (trial_history -> topic_progress).
-  const requestFullHistory = useCallback(() => enterLocked("trial_history"), [enterLocked]);
+  const requestFullHistory = useCallback(() => openHistoryGate(), [openHistoryGate]);
 
   const { sections, lockedCount, totalCount } = useMemo(() => {
     const sorted = [...trials].sort((a, b) => new Date(a.date) - new Date(b.date));

@@ -5,7 +5,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
-import { useLockedFeatureEntry } from "../../hooks/useLockedFeatureEntry";
+import { PRODUCT_FEATURES } from "../../constants/premium";
+import { useFeatureEntry } from "../../hooks/useFeatureEntry";
 import { useSummary } from "../../hooks/useSummary";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
@@ -30,7 +31,7 @@ function SummaryScreenInner() {
   const C = useC();
   const navigation = useNavigation();
   const route = useRoute();
-  const enterLocked = useLockedFeatureEntry();
+  const { open: openMonthlyReport } = useFeatureEntry(PRODUCT_FEATURES.monthly_report, "monthly_report");
   const period = WEEK_ROUTES.has(route.name) ? "week" : normalizePeriod(route.params?.period);
   const data = useSummary(period);
 
@@ -44,8 +45,8 @@ function SummaryScreenInner() {
   }, [navigation, period]);
   const handlePromise = useCallback(() => navigation.navigate(SCREENS.PLAN_VS_ACTUAL), [navigation]);
   const handleUnlock = useCallback(() => {
-    enterLocked("monthly_report");
-  }, [enterLocked]);
+    openMonthlyReport();
+  }, [openMonthlyReport]);
   const handleStart = useCallback(() => navigation.navigate(SCREENS.HOME), [navigation]);
   const handleHowStreak = useCallback(() => navigation.navigate(SCREENS.HOW_IT_WORKS), [navigation]);
 

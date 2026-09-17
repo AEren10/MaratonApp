@@ -4,7 +4,7 @@ import { usePremium } from "../contexts/PremiumContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
-import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
+import { useFeatureEntry } from "./useFeatureEntry";
 
 /**
  * "Bölüm Eşiği" ekranının iş mantığı — AKIŞ 2.
@@ -18,7 +18,7 @@ import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 export function useThresholdView() {
   const { targetNet, daysUntilExam, loading: examLoading } = useExam();
   const { accessLoading, accessError, accessSnapshot } = usePremium();
-  const enterLocked = useLockedFeatureEntry();
+  const { open: openThresholdGate } = useFeatureEntry(PRODUCT_FEATURES.department_threshold, "department_threshold");
   const { forecast, threshold, daysLeft, routeStopsLoaded } = useStudyRoute({ persist: false });
 
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
@@ -34,7 +34,7 @@ export function useThresholdView() {
     return threshold(currentNet, targetNet);
   }, [threshold, currentNet, targetNet]);
 
-  const requestAccess = () => enterLocked("department_threshold");
+  const requestAccess = () => openThresholdGate();
 
   return {
     targetNet,

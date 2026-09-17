@@ -3,9 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import { SCREENS } from "../constants/screens";
 import { PRODUCT_FEATURES } from "../constants/premium";
-import { usePremium } from "../contexts/PremiumContext";
-import { canAccessProductFeature } from "../domain/premium/paywallGate";
-import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
+import { useFeatureEntry } from "./useFeatureEntry";
 
 // Deneme Karşılaştırma kapisi. Erisimi olan dogrudan acar; olmayan ilk
 // dokunusta Pro Onizleme'ye, sonraki dokunusta "Paywall · Karşılaştırma"
@@ -13,19 +11,10 @@ import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
 // hattinda kalir.
 export function useTrialCompareEntry() {
   const navigation = useNavigation();
-  const { accessLoading, accessError, accessSnapshot } = usePremium();
-  const enterLocked = useLockedFeatureEntry();
+  const { open } = useFeatureEntry(PRODUCT_FEATURES.trial_compare, "trial_compare");
 
-  return useCallback((params) => {
-    const allowed = canAccessProductFeature({
-      accessState: accessLoading ? "loading" : accessError ? "error" : "ready",
-      features: accessSnapshot?.features,
-      featureKey: PRODUCT_FEATURES.trial_compare,
-    });
-    if (allowed) {
-      navigation.navigate(SCREENS.TRIAL_COMPARE, params);
-      return true;
-    }
-    return enterLocked("trial_compare");
-  }, [accessError, accessLoading, accessSnapshot?.features, enterLocked, navigation]);
+  return useCallback(
+    (params) => open(() => navigation.navigate(SCREENS.TRIAL_COMPARE, params)),
+    [navigation, open],
+  );
 }
