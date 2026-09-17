@@ -55,7 +55,7 @@ export function buildPlanVsActual(weeks = [], now = new Date()) {
     ahead: doneDue > plannedDue,
     totalPlanned: plannedCum,
     totalDone: doneCum,
-    hasData: series.length > 0 && plannedCum > 0,
+    hasData: series.some((w) => w.elapsed),
   };
 }
 
