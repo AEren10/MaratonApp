@@ -46,7 +46,6 @@ export const ROTA_STACK = [
   SCREENS.CALENDAR,         // Takvim
   SCREENS.MONTH_PLAN,       // Takvim -> Aylik Plan
   SCREENS.WRONG_NOTEBOOK,   // Defter (Home Defter karti)
-  SCREENS.ADD_WRONG,        // Yanlis ekle
   SCREENS.WRONG_DETAIL,     // Soru detayi
   SCREENS.REVIEW_SESSION,   // Tekrar baslat
   SCREENS.REVIEW_DONE,      // Tekrar bitti
@@ -90,7 +89,6 @@ export const ANALIZ_STACK = [
   SCREENS.SUBJECT_DETAIL,   // (paylasimli)
   SCREENS.TOPIC_STUDY,      // (paylasimli)
   SCREENS.WRONG_NOTEBOOK,   // Yanlis Defteri
-  SCREENS.ADD_WRONG,
   SCREENS.WRONG_DETAIL,
   SCREENS.REVIEW_SESSION,   // Tekrar
   SCREENS.REVIEW_DONE,      // Tekrar Bitti
@@ -146,6 +144,7 @@ export const ROOT_ONLY = [
   SCREENS.TRIAL_ENTRY,
   SCREENS.TRIAL_SUMMARY,
   SCREENS.ADD_STUDY,
+  SCREENS.ADD_WRONG,        // '+' sayfasinin dort hedefi de tam ekran form
   SCREENS.EDIT_STUDY_LOG,   // Kaydi Duzenle (tam ekran form)
   SCREENS.ADD_TASK,
   SCREENS.ROUTE_PAUSE,      // Ara Verme (tam ekran onay)

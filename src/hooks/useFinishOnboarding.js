@@ -5,7 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 
 import { useExam } from "../contexts/ExamContext";
 import { SCREENS } from "../constants/screens";
-import { ROOT_STACK } from "../navigation/routes";
+import { resetToTabStackScreen } from "../navigation/rootStackActions";
+import { TAB_KEYS } from "../navigation/tabAssignment";
 import { EVENTS } from "../constants/analytics";
 import { track } from "../lib/analytics";
 
@@ -30,10 +31,7 @@ export function useFinishOnboarding() {
   const complete = useCallback(async (summary = {}) => {
     track(EVENTS.ONBOARDING_COMPLETE, summary);
     await completeOnboarding();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: ROOT_STACK.MAIN_TABS, params: { screen: SCREENS.ROADMAP } }],
-    });
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
   }, [completeOnboarding, navigation]);
 
   const finish = useCallback(async (summary = {}) => {

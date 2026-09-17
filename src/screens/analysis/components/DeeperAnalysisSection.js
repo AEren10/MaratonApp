@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { GUTTER, STEP } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 
-export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onNetTahmini, onSimulasyon }) {
+export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
   const items = [
     {
       name: "Konu İlerlemesi",
@@ -11,9 +11,19 @@ export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onNetTahmini, onSim
       onPress: onKonuIlerlemesi,
     },
     {
+      name: "Öncelikli Konular",
+      note: "Rotanda geride kalan konular",
+      onPress: onOncelikliKonular,
+    },
+    {
       name: "Net Tahmini",
       note: "Bu tempoyla sınav günü 71 net",
       onPress: onNetTahmini,
+    },
+    {
+      name: "Yayın karşılaştırması",
+      note: "Zor yayınlarda net düşüşün normal mi, panik mi?",
+      onPress: onYayinKarsilastirmasi,
     },
     {
       name: "Simülasyon",

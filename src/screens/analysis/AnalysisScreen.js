@@ -101,7 +101,9 @@ export default function AnalysisScreen() {
               <DeeperAnalysisSection
                 C={C}
                 onKonuIlerlemesi={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_list")}
+                onOncelikliKonular={() => go(screens.WEAK_AREAS, undefined, "analysis_weak_areas")}
                 onNetTahmini={() => go(screens.NET_FORECAST, undefined, "analysis_forecast")}
+                onYayinKarsilastirmasi={() => go(screens.COMPARATIVE, undefined, "analysis_comparative")}
                 onSimulasyon={openSimulator}
               />
             </>
