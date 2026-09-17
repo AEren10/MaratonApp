@@ -50,7 +50,7 @@ export function useTrialRecords() {
   const { syncedOnce } = useSync();
   const enterLocked = useLockedFeatureEntry();
 
-  const loading = Boolean(trialsLoading || accessLoading);
+  const loading = Boolean(trialsLoading || accessLoading || !syncedOnce);
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
   const canAccessHistory = canAccessProductFeature({
     accessState,
@@ -122,6 +122,5 @@ export function useTrialRecords() {
     requestFullHistory,
     loading,
     isEmpty: trials.length === 0,
-    loading: !syncedOnce,
   };
 }

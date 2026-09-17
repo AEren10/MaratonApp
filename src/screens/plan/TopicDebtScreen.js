@@ -42,70 +42,92 @@ function TopicDebtImpactCard({ C, totalHours }) {
 export default function TopicDebtScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { stops, stopCount, totalHours, hasHours, capped, canDistribute, distributing, distribute, isEmpty, loading } = useTopicDebt();
+  const {
+    stops, stopCount, totalHours, hasHours, capped,
+    canDistribute, distributing, distribute, isEmpty, loading,
+  } = useTopicDebt();
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Geri"
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+        >
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Konu borcu</Text>
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} />
+      {loading ? (
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <TopicDebtHero loading />
+          <View style={styles.loadingList}>
+            <Skeleton width="100%" height={160} radius={SHAPE.card} />
+            <Skeleton width="100%" height={68} radius={SHAPE.card} />
+            <Skeleton width="100%" height={68} radius={SHAPE.card} />
+          </View>
+        </ScrollView>
+      ) : isEmpty ? (
+        <View style={styles.emptyWrap}>
+          <EmptyState
+            title="Konu borcun yok."
+            body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
+          />
+        </View>
+      ) : (
+        <>
+          <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+            <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} />
 
-        {hasHours ? (
-          <Animated.View entering={FadeInDown.delay(100).duration(500)}>
-            <TopicDebtImpactCard C={C} totalHours={totalHours} />
-          </Animated.View>
-        ) : null}
+            {hasHours ? (
+              <Animated.View entering={FadeInDown.delay(100).duration(500)}>
+                <TopicDebtImpactCard C={C} totalHours={totalHours} />
+              </Animated.View>
+            ) : null}
 
-        {isEmpty ? (
-          loading ? (
-            <View style={styles.loading}>
-              <Skeleton width="100%" height={72} radius={SHAPE.card} />
-              <Skeleton width="100%" height={72} radius={SHAPE.card} />
-              <Skeleton width="100%" height={72} radius={SHAPE.card} />
-            </View>
-          ) : (
-            <EmptyState
-              title="Konu borcun yok."
-              body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
-              style={{ marginTop: STEP.s5 }}
-            />
-          )
-        ) : (
-          <Animated.View entering={FadeInDown.delay(140).duration(560)} style={styles.listWrap}>
-            <View style={styles.listHead}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>BİRİKEN DURAKLAR</Text>
-              <View style={[styles.rule, { backgroundColor: C.line }]} />
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{stopCount} durak</Text>
-            </View>
-            {stops.map((item) => (
-              <TopicDebtStopRow
-                key={item.key}
-                item={{
-                  subjectKey: item.subjectKey,
-                  title: item.title,
-                  statusLabel: "atlandı",
-                  dueLabel: `${item.hours} sa`,
-                  minutesLabel: `${item.hours} sa`,
-                }}
-                C={C}
-              />
-            ))}
-          </Animated.View>
-        )}
-      </ScrollView>
+            <Animated.View entering={FadeInDown.delay(140).duration(560)} style={styles.listWrap}>
+              <View style={styles.listHead}>
+                <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>BİRİKEN DURAKLAR</Text>
+                <View style={[styles.rule, { backgroundColor: C.line }]} />
+                <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{stopCount} durak</Text>
+              </View>
+              {stops.map((item) => (
+                <TopicDebtStopRow
+                  key={item.key}
+                  item={{
+                    subjectKey: item.subjectKey,
+                    title: item.title,
+                    statusLabel: "atlandı",
+                    dueLabel: `${item.hours} sa`,
+                    minutesLabel: `${item.hours} sa`,
+                  }}
+                  C={C}
+                />
+              ))}
+            </Animated.View>
+          </ScrollView>
 
-      <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-        <Button variant="primary" size="lg" fullWidth onPress={distribute} loading={distributing} disabled={!canDistribute}>Borcu üç haftaya dağıt</Button>
-        <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-          Dağıtınca borç durakları rotaya yeniden yazılır.
-        </Text>
-      </View>
+          <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onPress={distribute}
+              loading={distributing}
+              disabled={!canDistribute}
+            >
+              Borcu üç haftaya dağıt
+            </Button>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
+              Dağıtınca borç durakları rotaya yeniden yazılır.
+            </Text>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 }
@@ -115,7 +137,8 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
   impactCard: { marginTop: STEP.s4, padding: STEP.s4 },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: SHAPE.chip, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.05)" },
-  loading: { marginTop: STEP.s5, gap: STEP.s2 },
+  loadingList: { marginTop: STEP.s4, gap: STEP.s3 },
+  emptyWrap: { flex: 1, paddingHorizontal: GUTTER, justifyContent: "center", alignItems: "center" },
   listWrap: { marginTop: STEP.s5 },
   listHead: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s3 },
   rule: { flex: 1, height: 1 },
