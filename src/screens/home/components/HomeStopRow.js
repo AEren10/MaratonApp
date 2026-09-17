@@ -1,10 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
-import { Icon } from "../../../components/design/Icon";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { HomeStopCheckRing } from "./HomeStopCheckRing";
 
 function metaOf(item) {
   const est = item.count > 0 ? Math.round(item.count * 1.2) : 0;
@@ -13,51 +13,55 @@ function metaOf(item) {
 }
 
 // Bugünün durakları satırı. Figma referansına (media_1789650533819.png) birebir:
-// [Dikey ders renk çubuğu] -> [Tik/onay halkası] -> [Ders / Konu / Meta] -> [Kırmızı nokta (sıradaki)]
-export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart }) {
+// [Dikey ders renk çubuğu] -> [Yaylı tik halkası] -> [Ders / Konu / Meta] -> [Kırmızı nokta (sıradaki)]
+export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onChecked }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
   const subjectLabel = getSubjectByKey(item.subject)?.label || item.subject || "";
   const done = item.completed;
-  const tone = done ? C.text3 : (sid?.solid || C.text2);
-  const toggle = useCallback(() => onToggle(item), [onToggle, item]);
+  const [checking, setChecking] = useState(false);
+
+  useEffect(() => {
+    if (done) setChecking(false);
+  }, [done]);
+
+  const isDone = done || checking;
+  const tone = isDone ? C.text3 : (sid?.solid || C.text2);
+
+  const handleToggle = useCallback(() => {
+    onToggle(item);
+  }, [onToggle, item]);
+
+  const handleChecked = useCallback(() => {
+    setChecking(true);
+    onChecked?.();
+  }, [onChecked]);
+
   const handlePress = useCallback(() => {
     if (onStart) onStart(item);
     else onToggle(item);
   }, [onStart, onToggle, item]);
+
   const meta = metaOf(item);
 
   return (
     <View
       style={[s.row, {
-        backgroundColor: isNext ? C.brandTint : C.surface,
-        borderColor: isNext ? C.bandEdge : (done ? C.line : C.elev),
+        backgroundColor: (isNext && !isDone) ? C.brandTint : C.surface,
+        borderColor: (isNext && !isDone) ? C.bandEdge : (isDone ? C.line : C.elev),
       }]}
     >
       {/* 1. Dikey ders rengi çubuğu (tikin solunda) */}
       <View style={[s.bar, { backgroundColor: tone }]} />
 
-      {/* 2. Dairesel tik / onay halkası */}
-      <Pressable
-        onPress={toggle}
-        hitSlop={STEP.s2}
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: done }}
+      {/* 2. Yaylı animasyonlu dairesel tik / onay halkası */}
+      <HomeStopCheckRing
+        done={done}
+        isNext={isNext}
+        onToggle={handleToggle}
+        onChecked={handleChecked}
         accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
-        style={s.checkArea}
-      >
-        <View
-          style={[
-            s.ring,
-            {
-              borderColor: done ? C.up : (isNext ? C.accent : C.text5),
-              backgroundColor: done ? C.up : "transparent",
-            },
-          ]}
-        >
-          {done ? <Icon name="check" size={13} color={C.bg} sw={2.8} /> : null}
-        </View>
-      </Pressable>
+      />
 
       {/* 3. Metin bloğu: Ders, Konu, Soru/Süre bilgisi */}
       <Pressable
@@ -70,7 +74,17 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
             {subjectLabel}
           </Text>
-          <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.topic, { color: done ? C.text3 : C.text }]}>
+          <Text
+            numberOfLines={1}
+            style={[
+              TYPOGRAPHY.topicName,
+              s.topic,
+              {
+                color: isDone ? C.text3 : C.text,
+                textDecorationLine: isDone ? "line-through" : "none",
+              },
+            ]}
+          >
             {item.label}
           </Text>
           {meta ? (
@@ -79,7 +93,7 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
             </Text>
           ) : null}
         </View>
-        {isNext ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
+        {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
       </Pressable>
     </View>
   );
@@ -100,20 +114,6 @@ const s = StyleSheet.create({
     width: 3.5,
     height: STEP.s4 + 4,
     borderRadius: SHAPE.chip / 3,
-  },
-  checkArea: {
-    width: STEP.s4 + 2,
-    height: STEP.s4 + 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ring: {
-    width: STEP.s3 + 6,
-    height: STEP.s3 + 6,
-    borderRadius: (STEP.s3 + 6) / 2,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
   },
   bodyArea: {
     flex: 1,
