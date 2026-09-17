@@ -5,10 +5,11 @@ import { createClient } from "@supabase/supabase-js";
 let storageAdapter;
 
 if (Platform.OS === "web") {
+  let memorySession = null;
   storageAdapter = {
-    getItem: (key) => Promise.resolve(localStorage.getItem(key)),
-    setItem: (key, value) => { localStorage.setItem(key, value); return Promise.resolve(); },
-    removeItem: (key) => { localStorage.removeItem(key); return Promise.resolve(); },
+    getItem: () => Promise.resolve(memorySession),
+    setItem: (_key, value) => { memorySession = value || null; return Promise.resolve(); },
+    removeItem: () => { memorySession = null; return Promise.resolve(); },
   };
 } else {
   const SecureStore = require("expo-secure-store");
@@ -80,7 +81,7 @@ export const supabase = (() => {
       auth: {
         storage: storageAdapter,
         autoRefreshToken: true,
-        persistSession: true,
+        persistSession: Platform.OS !== "web",
         detectSessionInUrl: false,
       },
     });

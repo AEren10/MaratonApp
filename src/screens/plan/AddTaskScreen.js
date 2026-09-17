@@ -1,11 +1,17 @@
-﻿import { useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Switch } from "react-native";
+import { useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+
 import { Icon, Button } from "../../components/design";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useAlert } from "../../contexts/AlertContext";
+import * as H from "../../lib/haptics";
+import { useUserTasks } from "../../hooks/useUserTasks";
 import { AddTaskSubjectRow } from "./components/AddTaskSubjectRow";
+import { ADD_TASK_DURATIONS, ADD_TASK_SUBJECTS, parseDurationMinutes } from "./addTaskOptions";
 
 function SectionHeader({ title, C }) {
   return (
@@ -21,10 +27,10 @@ function Pill({ label, selected, onPress, C }) {
       onPress={onPress}
       style={[
         s.pill,
-        { 
+        {
           borderColor: selected ? C.accent : C.elev,
-          backgroundColor: selected ? C.brandTint : C.surface
-        }
+          backgroundColor: selected ? C.brandTint : C.surface,
+        },
       ]}
     >
       <Text style={[TYPOGRAPHY.metaSemiBold, { color: selected ? C.text : C.text3 }]}>{label}</Text>
@@ -32,41 +38,23 @@ function Pill({ label, selected, onPress, C }) {
   );
 }
 
-function ListItemRow({ label, value, C, isLast }) {
-  return (
-    <View style={[s.listItem, { borderBottomColor: C.line, borderBottomWidth: isLast ? 0 : 1 }]}>
-      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, flex: 1 }]}>{label}</Text>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{value}</Text>
-        <Icon name="chevR" size={14} color={C.text4} />
-      </View>
-    </View>
-  );
-}
-
-export default function AddTaskScreen() {
+function AddTaskInner() {
   const navigation = useNavigation();
+  const route = useRoute();
   const C = useC();
-  
-  const [subjectKey, setSubjectKey] = useState("matematik");
-  const [durVal, setDurVal] = useState("50 dk");
-  const [repeat, setRepeat] = useState(true);
+  const { createTask } = useUserTasks();
+  const showAlert = useAlert();
 
-  // Mocks based on Image 5
-  const subjects = [
-    { key: "turkce", name: "Türkçe" },
-    { key: "matematik", name: "Matematik" },
-    { key: "fizik", name: "Fizik" },
-    { key: "kimya", name: "Kimya" },
-    { key: "biyoloji", name: "Biyoloji" },
-    { key: "tarih", name: "Tarih" },
-  ];
-  const durations = ["25 dk", "50 dk", "1,5 sa", "2 sa"];
+  const initialSubject = route.params?.subjectKey || route.params?.preSubject;
+  const initialTopic = route.params?.topicName;
+  const [subjectKey, setSubjectKey] = useState(initialSubject || "matematik");
+  const [topicName] = useState(initialTopic || "Genel çalışma");
+  const [durVal, setDurVal] = useState("50 dk");
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={s.backRow}>
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Durak ekle</Text>
         </Pressable>
@@ -75,66 +63,80 @@ export default function AddTaskScreen() {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <SectionHeader title="DERS" C={C} />
         <View style={{ borderTopWidth: 1, borderTopColor: C.line }}>
-          {subjects.map(s => (
-            <AddTaskSubjectRow 
-              key={s.key} 
-              subject={s} 
-              selected={subjectKey === s.key} 
-              onPress={() => setSubjectKey(s.key)} 
-              C={C} 
+          {ADD_TASK_SUBJECTS.map((sub) => (
+            <AddTaskSubjectRow
+              key={sub.key}
+              subject={sub}
+              selected={subjectKey === sub.key}
+              onPress={() => setSubjectKey(sub.key)}
+              C={C}
             />
           ))}
         </View>
 
         <SectionHeader title="KONU" C={C} />
-        <Pressable style={[s.picker, { backgroundColor: C.surface, borderColor: C.elev }]}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, flex: 1 }]}>Permütasyon - Kombinasyon</Text>
-          <Icon name="chevD" size={14} color={C.text3} />
-        </Pressable>
+        <View style={[s.picker, { backgroundColor: C.surface, borderColor: C.elev }]}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, flex: 1 }]}>{topicName}</Text>
+        </View>
 
         <SectionHeader title="SÜRE" C={C} />
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2 }}>
-          {durations.map(d => (
-            <Pill 
-              key={d} 
-              label={d} 
-              selected={durVal === d} 
-              onPress={() => setDurVal(d)} 
-              C={C} 
+        <View style={s.pillsRow}>
+          {ADD_TASK_DURATIONS.map((d) => (
+            <Pill
+              key={d}
+              label={d}
+              selected={durVal === d}
+              onPress={() => setDurVal(d)}
+              C={C}
             />
           ))}
         </View>
-
-        <SectionHeader title="NE ZAMAN" C={C} />
-        <View style={{ paddingBottom: STEP.s4 }}>
-          <ListItemRow label="Tarih" value="Bugün · 23 Haz" C={C} />
-          <ListItemRow label="Saat" value="19:30" C={C} />
-          
-          <View style={[s.listItem, { borderBottomWidth: 0, marginTop: STEP.s2 }]}>
-            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, flex: 1 }]}>Her hafta tekrarla</Text>
-            <Switch 
-              value={repeat} 
-              onValueChange={setRepeat} 
-              trackColor={{ false: C.line, true: C.accent }} 
-              thumbColor={C.text} 
-            />
-          </View>
-        </View>
-
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s3 }]}>
+          Bugünün planına eklenir. Farklı gün/saat seçimi takvimden yapılır.
+        </Text>
       </ScrollView>
 
       <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
-        <Button variant="primary" size="lg" fullWidth>Rotaya ekle</Button>
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onPress={async () => {
+            try {
+              await createTask({
+                subject: subjectKey,
+                topic: topicName,
+                targetMinutes: parseDurationMinutes(durVal),
+                note: "Kullanıcı ekledi",
+              });
+              H.success();
+              navigation.goBack();
+            } catch (e) {
+              showAlert("Durak eklenemedi", e?.message || "Bilgileri kontrol edip tekrar dene.");
+            }
+          }}
+        >
+          Rotaya ekle
+        </Button>
       </View>
     </SafeAreaView>
   );
 }
 
+export default function AddTaskScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <AddTaskInner />
+    </ScreenErrorBoundary>
+  );
+}
+
 const s = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
+  backRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
   picker: { flexDirection: "row", alignItems: "center", paddingHorizontal: STEP.s3, height: 56, borderRadius: SHAPE.panel, borderWidth: 1 },
+  pillsRow: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s2 },
   pill: { flex: 1, minWidth: "22%", height: 48, borderRadius: SHAPE.panel, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  listItem: { flexDirection: "row", alignItems: "center", height: 56 },
   bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
 });

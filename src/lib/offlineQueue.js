@@ -315,6 +315,10 @@ export async function getDeadLetterCount() {
 }
 
 export async function flushQueue() {
+  return withQueueLock(flushQueueLocked);
+}
+
+async function flushQueueLocked() {
   if (_flushing) return { processed: 0, failed: 0, types: [] };
   _flushing = true;
   const startTime = Date.now();
