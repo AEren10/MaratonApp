@@ -1,5 +1,5 @@
-﻿import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
+import { SwipeReviewSkeleton } from "./components/SwipeReviewSkeleton";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -117,7 +118,11 @@ export default function SwipeReviewScreen() {
   }));
 
   if (loading) {
-    return <SafeAreaView edges={["top"]} style={s.safe}><View style={s.center}><ActivityIndicator color={C.accent} size="large" /></View></SafeAreaView>;
+    return (
+      <SafeAreaView edges={["top"]} style={s.safe}>
+        <SwipeReviewSkeleton />
+      </SafeAreaView>
+    );
   }
 
   return (

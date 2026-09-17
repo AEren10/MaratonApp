@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from "react";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -9,6 +9,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useRouteCompanion } from "../../hooks/useRouteCompanion";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../themes/tokens";
 import { CompanionEffortCard } from "./components/CompanionEffortCard";
+import { RouteCompanionSkeleton } from "./components/RouteCompanionSkeleton";
 
 const PendingRow = memo(function PendingRow({ item, onRespond }) {
   const C = useC();
@@ -80,7 +81,7 @@ export default function RouteCompanionScreen() {
         <View style={styles.back} />
       </View>
       {loading ? (
-        <View style={styles.center}><ActivityIndicator size="large" color={C.accent} /></View>
+        <RouteCompanionSkeleton />
       ) : error ? (
         <EmptyState icon="users" title="Şimdilik gösteremiyoruz"
           message="Yol arkadaşlığı verisi alınamadı." actionLabel="Tekrar dene" onAction={refresh} />

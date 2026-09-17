@@ -17,6 +17,7 @@ import * as Clipboard from "expo-clipboard";
 import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import { Icon, AnimatedPressable } from "../../components/design";
+import { ReferralSkeleton } from "./components/ReferralSkeleton";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -151,7 +152,7 @@ export default function ReferralScreen() {
           </Pressable>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Arkadaşını Davet Et</Text>
         </View>
-        <ActivityIndicator color={C.accent} style={{ flex: 1 }} />
+        <ReferralSkeleton />
       </SafeAreaView>
     );
   }

@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { ZoomIn } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
-import { Icon } from "../../components/design";
+import { SPACING } from "../../themes/tokens";
 import { useAuth } from "../../contexts/AuthContext";
 import { useGamification } from "../../hooks/useGamification";
 import { getDueWrongQuestions } from "../../supabase/wrongQuestions";
@@ -13,17 +11,13 @@ import { saveReviewOffline } from "../../lib/offlineQueue";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import * as haptic from "../../lib/haptics";
 import QuizCard from "./QuizCard";
+import { shuffle } from "./components/shuffle";
+import { QuickPracticeSkeleton } from "./components/QuickPracticeSkeleton";
+import { QuickPracticeDone } from "./components/QuickPracticeDone";
+import { QuickPracticeEmptyState } from "./components/QuickPracticeEmptyState";
+import { QuickPracticeTopBar } from "./components/QuickPracticeTopBar";
 
 const TOTAL = 5;
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 export default function QuickPracticeScreen() {
   const nav = useNavigation();
@@ -74,7 +68,6 @@ export default function QuickPracticeScreen() {
     setSelected(answer);
     setFeedback(true);
     const next = computeNextReview(q, correct ? 3 : 0);
-    // Eskiden .catch bile yoktu: çevrimdışıyken yakalanmamış promise reddi.
     saveReviewOffline(q.id, user.id, { ...next, is_resolved: correct || q.is_resolved }).catch(() => {});
     if (correct) reward("wrong_resolved", { subject: q.subject });
     setTimeout(() => {
@@ -86,72 +79,40 @@ export default function QuickPracticeScreen() {
   }, [feedback, questions, idx, reward, user?.id]);
 
   const finish = useCallback(() => {
-    clearInterval(timerRef.current);
+    if (timerRef.current) clearInterval(timerRef.current);
     nav.goBack();
   }, [nav]);
 
   if (loading) {
-    return (
-      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
-        <ActivityIndicator color={C.accent} size="large" />
-      </SafeAreaView>
-    );
+    return <SafeAreaView edges={["top"]} style={s.container}><QuickPracticeSkeleton /></SafeAreaView>;
   }
 
   if (loadError) {
-    return (
-      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
-        <Icon name="alert" size={48} color={C.red} />
-        <Text style={s.emptyText}>{loadError}</Text>
-        <TouchableOpacity style={s.backBtn} onPress={() => nav.goBack()}>
-          <Text style={s.backBtnText}>Geri Dön</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
+    return <QuickPracticeEmptyState icon="alert" iconColor={C.red} text={loadError} onBack={() => nav.goBack()} C={C} />;
   }
 
   if (questions.length === 0) {
-    return (
-      <SafeAreaView edges={["top"]} style={[s.container, s.center]}>
-        <Icon name="check-circle" size={48} color={C.green} />
-        <Text style={s.emptyText}>Tekrar edilecek soru yok!</Text>
-        <TouchableOpacity style={s.backBtn} onPress={() => nav.goBack()}>
-          <Text style={s.backBtnText}>Geri Dön</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
+    return <QuickPracticeEmptyState icon="check-circle" iconColor={C.green} text="Tekrar edilecek soru yok!" onBack={() => nav.goBack()} C={C} />;
   }
 
   if (done) {
     return (
       <SafeAreaView edges={["top"]} style={s.container}>
-        <Animated.View entering={ZoomIn.duration(400)} style={[s.center, { flex: 1 }]}>
-          <Text style={s.summaryScore}>{score}/{questions.length}</Text>
-          <Text style={s.summaryLabel}>Doğru</Text>
-          <Text style={s.summaryTime}>{elapsed}s</Text>
-          <TouchableOpacity style={s.finishBtn} onPress={finish}>
-            <Text style={s.finishText}>Bitir</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        <QuickPracticeDone score={score} total={questions.length} elapsed={elapsed} onFinish={finish} C={C} />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView edges={["top"]} style={s.container}>
-      <View style={s.topBar}>
-        <TouchableOpacity onPress={() => nav.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button" style={{ padding: 4 }}>
-          <Icon name="x" size={20} color={C.muted} />
-        </TouchableOpacity>
-        <View style={s.dots}>
-          {questions.map((_, i) => {
-            const bg = i < results.length ? (results[i] ? C.green : C.red) : i === idx ? C.accent : C.surface2;
-            return <View key={i} style={[s.dot, { backgroundColor: bg }]} />;
-          })}
-        </View>
-        <Text style={s.timer}>{elapsed}s</Text>
-      </View>
-
+      <QuickPracticeTopBar
+        questions={questions}
+        results={results}
+        currentIndex={idx}
+        elapsed={elapsed}
+        onClose={() => nav.goBack()}
+        C={C}
+      />
       <QuizCard item={current} selected={selected} feedback={feedback} onAnswer={handleAnswer} />
     </SafeAreaView>
   );
@@ -160,17 +121,4 @@ export default function QuickPracticeScreen() {
 const makeStyles = (C) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg, padding: SPACING.lg },
-    center: { alignItems: "center", justifyContent: "center", gap: SPACING.md },
-    topBar: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.lg },
-    dots: { flexDirection: "row", gap: SPACING.sm, flex: 1 },
-    dot: { width: SPACING.md, height: SPACING.md, borderRadius: SPACING.md / 2 },
-    timer: { ...TYPOGRAPHY.subheading, color: C.sec },
-    emptyText: { ...TYPOGRAPHY.body, color: C.sec, marginTop: SPACING.sm },
-    backBtn: { marginTop: SPACING.md, paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg, backgroundColor: C.surface, borderRadius: RADIUS.md },
-    backBtnText: { ...TYPOGRAPHY.body, color: C.accent, fontWeight: "600" },
-    summaryScore: { fontFamily: "Bricolage_400", fontSize: 56, color: C.accent },
-    summaryLabel: { ...TYPOGRAPHY.body, color: C.sec },
-    summaryTime: { fontFamily: "Bricolage_400", fontSize: 24, color: C.muted, marginTop: SPACING.sm },
-    finishBtn: { marginTop: SPACING.xl, backgroundColor: C.orange, paddingVertical: SPACING.md, paddingHorizontal: SPACING.xxl, borderRadius: RADIUS.md },
-    finishText: { ...TYPOGRAPHY.body, color: C.textOnFill, fontWeight: "700" },
   });

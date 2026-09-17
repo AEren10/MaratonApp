@@ -3,39 +3,17 @@ import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Icon, IconBox, Chip } from "../../components/design";
+import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
+import { CardItem } from "./components/CardItem";
+import { TopicCardsSkeleton } from "./components/TopicCardsSkeleton";
 
 const ItemSeparator = () => <View style={{ height: STEP.s2 }} />;
-
-const CardItem = React.memo(function CardItem({ item, onPress, styles, C }) {
-  const pct = item.count > 0 ? Math.round((item.mastered / item.count) * 100) : 0;
-  const pctColor = pct >= 70 ? C.green : pct >= 40 ? C.amber : C.red;
-  const handlePress = useCallback(() => onPress(item), [onPress, item]);
-  return (
-    <Pressable onPress={handlePress} style={styles.card}>
-      <IconBox icon={item.icon} color={item.color} size={44} rounded={14} />
-      <View style={{ flex: 1 }}>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{item.title}</Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: 2 }]}>
-          {item.mastered}/{item.count} öğrenildi
-        </Text>
-      </View>
-      <View style={{ alignItems: "flex-end", gap: 4 }}>
-        <Chip color={pctColor}>%{pct}</Chip>
-        <View style={styles.miniBar}>
-          <View style={[styles.miniBarFill, { width: `${pct}%`, backgroundColor: item.color }]} />
-        </View>
-      </View>
-      <Icon name="chevR" size={16} color={C.muted} />
-    </Pressable>
-  );
-});
 
 export default function TopicCardsScreen() {
   const C = useC();
@@ -43,9 +21,14 @@ export default function TopicCardsScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!user?.id || user.id === "dev") {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     getTopicProgress(user.id)
       .then((rows) => {
         const mapped = rows.map((r) => ({
@@ -58,7 +41,8 @@ export default function TopicCardsScreen() {
         }));
         setCards(mapped.filter((c) => c.count > 0));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [user?.id, C]);
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
@@ -93,7 +77,9 @@ export default function TopicCardsScreen() {
         </Text>
       </View>
 
-      {cards.length === 0 ? (
+      {loading ? (
+        <TopicCardsSkeleton />
+      ) : cards.length === 0 ? (
         <EmptyState
           icon="bookOpen"
           title="Konu kartların burada oluşacak"

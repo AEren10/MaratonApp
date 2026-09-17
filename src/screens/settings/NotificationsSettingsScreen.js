@@ -1,10 +1,11 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Linking, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, Linking, ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon, ErrorState } from "../../components/design";
+import { NotificationsSettingsSkeleton } from "./components/NotificationsSettingsSkeleton";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -24,7 +25,7 @@ function NotificationsSettingsContent() {
   if (!prefs) {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <ActivityIndicator style={{ flex: 1 }} color={C.accent} />
+        <NotificationsSettingsSkeleton />
       </SafeAreaView>
     );
   }

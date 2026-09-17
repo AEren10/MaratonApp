@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, Modal, TextInput, ActivityIndicator, StyleSheet, Share, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, Pressable, FlatList, Modal, TextInput, StyleSheet, Share, KeyboardAvoidingView, Platform } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Avatar } from "../../components/design";
+import { GroupsSkeleton } from "./components/GroupsSkeleton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
 import { useAlert } from "../../contexts/AlertContext";
@@ -139,7 +140,7 @@ export function GroupsTab({ user, initialGroupCode }) {
   const renderMemberItem = useCallback(({ item }) => <MemberRow item={item} />, []);
 
   if (loading) {
-    return <View style={st.center}><ActivityIndicator color={C.accent} size="large" /></View>;
+    return <GroupsSkeleton />;
   }
 
   return (

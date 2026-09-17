@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -14,6 +14,7 @@ import { useTrialQuotaGate } from "./useTrialQuotaGate";
 import { useLockedFeatureEntry } from "../../hooks/useLockedFeatureEntry";
 import { TrialEntryFormContent } from "./components/TrialEntryFormContent";
 import { TrialQuotaSheet } from "./components/TrialQuotaSheet";
+import { TrialEntrySkeleton } from "./components/TrialEntrySkeleton";
 import { makeTrialEntryStyles } from "./trialEntryStyles";
 
 export default function TrialEntryScreen() {
@@ -58,9 +59,11 @@ export default function TrialEntryScreen() {
   }, [navigation, quotaBlocked, showAlert, trialEntry]);
 
   if (quotaGate.loading) {
-    return <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.center}><ActivityIndicator size="large" color={C.accent} /></View>
-    </SafeAreaView>;
+    return (
+      <SafeAreaView edges={["top"]} style={styles.safe}>
+        <TrialEntrySkeleton />
+      </SafeAreaView>
+    );
   }
 
   if (quotaGate.error) {
