@@ -1,35 +1,32 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
-import { GUTTER, SHAPE } from "../../themes/tokens";
+import { GUTTER, SHAPE, STEP } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { Icon } from "../../components/design";
+import { EmptyState } from "../../components/common/EmptyState";
+import { SkeletonCard } from "../../components/common/SkeletonCard";
+import { useSubjectProgressList, SUBJECT_PROGRESS_TAB } from "../../hooks/useSubjectProgressList";
 import { SubjectProgressBanner } from "./components/SubjectProgressBanner";
 import { SubjectProgressRow } from "./components/SubjectProgressRow";
 import { SubjectProgressLockCard } from "./components/SubjectProgressLockCard";
 
 const TABS = [
-  { key: "PRIORITY", label: "Öncelikli" },
-  { key: "PROGRESS", label: "Sürüyor" },
-  { key: "CLOSED", label: "Kapandı" },
+  { key: SUBJECT_PROGRESS_TAB.PRIORITY, label: "Öncelikli", section: "ROTA ÖNCELİĞİ", empty: "Öncelik verecek bir konu yok." },
+  { key: SUBJECT_PROGRESS_TAB.PROGRESS, label: "Sürüyor", section: "BU HAFTA VE SONRAKİ", empty: "Şu an sürmekte olan durak yok." },
+  { key: SUBJECT_PROGRESS_TAB.CLOSED, label: "Kapandı", section: "KAPANAN KONULAR", empty: "Henüz kapanan konu yok." },
 ];
 
 export default function SubjectListScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const [tab, setTab] = useState("PRIORITY");
-
-  const topics = useMemo(() => [
-    { key: "1", name: "Permütasyon - Kombinasyon", color: C.subjects?.matematik || "#E0A570", badge: "defter 5", badgeColor: C.warn, pct: "75%", barColor: C.accent, meta: "son çalışma 11 gün önce · 2 durak geride" },
-    { key: "2", name: "Basınç ve Kaldırma Kuvveti", color: C.subjects?.fizik || "#6ECFC0", badge: "defter 3", badgeColor: C.warn, pct: "40%", barColor: C.accent, meta: "son çalışma 14 gün önce · 1 durak geride" },
-    { key: "3", name: "Nükleik Asitler", color: C.subjects?.biyoloji || "#86CE92", badge: "defter 3", badgeColor: C.warn, pct: "35%", barColor: C.accent, meta: "son çalışma 9 gün önce · 1 durak geride" },
-    { key: "4", name: "Paragraf - Ana Düşünce", color: C.subjects?.turkce || "#74A9E8", badge: "defter 2", badgeColor: C.warn, pct: "38%", barColor: C.accent, meta: "son çalışma 6 gün önce · rotada" },
-    { key: "5", name: "Mol Kavramı", color: C.subjects?.kimya || "#E8A0C4", badge: "defter 1", badgeColor: C.warn, pct: "30%", barColor: C.accent, meta: "son çalışma 12 gün önce · rotada" },
-    { key: "6", name: "İlk Çağ Uygarlıkları", color: C.subjects?.tarih || "#C9BE6A", badge: "defter 1", badgeColor: C.warn, pct: "25%", barColor: C.accent, meta: "son çalışma 17 gün önce · rotada" },
-  ], [C]);
+  const [tab, setTab] = useState(SUBJECT_PROGRESS_TAB.PRIORITY);
+  const { items, loading, isEmpty } = useSubjectProgressList(tab);
+  const active = TABS.find((t) => t.key === tab) || TABS[0];
+  const solved = items.reduce((sum, item) => sum + item.totalQuestions, 0);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -41,46 +38,62 @@ export default function SubjectListScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        {/* Segment Tabs */}
         <View style={s.tabsWrap}>
           <View style={[s.tabsContainer, { backgroundColor: C.surface, borderColor: C.elev }]}>
             {TABS.map((t) => {
-              const active = tab === t.key;
+              const on = tab === t.key;
               return (
                 <Pressable
                   key={t.key}
                   onPress={() => setTab(t.key)}
-                  style={[s.tabItem, active && { backgroundColor: C.elev }]}
+                  style={[s.tabItem, on && { backgroundColor: C.elev }]}
                 >
-                  <Text style={[s.tabText, { color: active ? C.text : C.text3 }]}>{t.label}</Text>
+                  <Text style={[s.tabText, { color: on ? C.text : C.text3 }]}>{t.label}</Text>
                 </Pressable>
               );
             })}
           </View>
         </View>
 
-        <SubjectProgressBanner
-          C={C}
-          onAddToRoute={() => navigation.navigate(SCREENS.ADD_TASK)}
-        />
+        {!loading && items.length > 0 && tab === SUBJECT_PROGRESS_TAB.PRIORITY ? (
+          <SubjectProgressBanner
+            C={C}
+            topicCount={items.length}
+            solvedCount={solved}
+            onAddToRoute={() => navigation.navigate(SCREENS.ADD_TASK)}
+          />
+        ) : null}
 
         <View style={s.listWrap}>
-          <Text style={[s.sectionLabel, { color: C.text2 }]}>ROTA ÖNCELİĞİ</Text>
-          <View style={s.list}>
-            {topics.map((item) => (
-              <SubjectProgressRow
-                key={item.key}
-                C={C}
-                item={item}
-                onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { topic: { name: item.name } })}
-              />
-            ))}
-          </View>
+          <Text style={[s.sectionLabel, { color: C.text2 }]}>{active.section}</Text>
 
-          <SubjectProgressLockCard
-            C={C}
-            onPress={() => navigation.navigate(SCREENS.PRO_PREVIEW)}
-          />
+          {loading ? (
+            <View style={s.skeletons}>
+              <SkeletonCard height={52} />
+              <SkeletonCard height={52} />
+              <SkeletonCard height={52} />
+            </View>
+          ) : isEmpty ? (
+            <EmptyState icon="target" title={active.empty} message="Çalıştıkça ve rotan ilerledikçe konular burada toplanır." />
+          ) : (
+            <View style={s.list}>
+              {items.map((item) => (
+                <SubjectProgressRow
+                  key={item.key}
+                  C={C}
+                  item={item}
+                  onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { topic: { name: item.name } })}
+                />
+              ))}
+            </View>
+          )}
+
+          {!loading && !isEmpty ? (
+            <SubjectProgressLockCard
+              C={C}
+              onPress={() => navigation.navigate(SCREENS.PRO_PREVIEW)}
+            />
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -107,4 +120,5 @@ const s = StyleSheet.create({
   listWrap: { paddingHorizontal: GUTTER, paddingTop: 30 },
   sectionLabel: { fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.84 },
   list: { marginTop: 6 },
+  skeletons: { marginTop: STEP.s2, gap: STEP.s1 },
 });

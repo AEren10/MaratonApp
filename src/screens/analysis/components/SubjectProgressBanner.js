@@ -2,17 +2,19 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { GUTTER, SHAPE, STEP } from "../../../themes/tokens";
 
-export function SubjectProgressBanner({ C, onAddToRoute, solvedCount = "1.284" }) {
+export function SubjectProgressBanner({ C, onAddToRoute, topicCount = 0, solvedCount = 0 }) {
   return (
     <View style={s.wrap}>
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
         <View style={s.topRow}>
           <Text style={[s.tag, { color: C.text2 }]}>ÇALIŞMA VERİLERİNDEN</Text>
-          <Text style={[s.count, { color: C.text3 }]}>{solvedCount} soru</Text>
+          {solvedCount > 0 ? (
+            <Text style={[s.count, { color: C.text3 }]}>{solvedCount.toLocaleString("tr-TR")} soru</Text>
+          ) : null}
         </View>
 
         <Text style={[s.title, { color: C.text }]}>
-          Altı konuda defter yükü veya çalışma açığı var.
+          {topicCount} konuda defter yükü veya çalışma açığı var.
         </Text>
 
         <Text style={[s.desc, { color: C.text3 }]}>
