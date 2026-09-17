@@ -59,6 +59,9 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     [detail.tasks],
   );
   const hasTasks = detail.tasks.length > 0 && !forceEmpty;
+  // Duraklar gelmeden bos gostermek kullaniciya yalan soyler: rota fetch'i
+  // bitene kadar plan zaten bos gorunur.
+  const loading = !studyRoute.routeStopsLoaded;
 
   useEffect(() => {
     if (!generatedTasks.length) return;
@@ -69,5 +72,5 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     });
   }, [generatedTasks, plannedMinutes, syncPlan]);
 
-  return { detail, doneMinutes, hasTasks, navigation, plannedMinutes };
+  return { detail, doneMinutes, hasTasks, loading, navigation, plannedMinutes };
 }

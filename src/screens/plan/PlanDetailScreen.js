@@ -3,9 +3,9 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Card, Button } from "../../components/design";
+import { Card, Button, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { PlanDetailHeader } from "./components/PlanDetailHeader";
@@ -20,7 +20,7 @@ function PlanDetailInner({ route }) {
   const [reorganizeOpen, setReorganizeOpen] = useState(false);
   const isEmpty = Boolean(route?.params?.isEmpty);
   const dayLabel = route?.params?.dateLabel || (isEmpty ? "Perşembe, 25 Haziran" : "Salı, 23 Haziran");
-  const { detail, doneMinutes, hasTasks, navigation, plannedMinutes } = usePlanDetailViewModel({
+  const { detail, doneMinutes, hasTasks, loading, navigation, plannedMinutes } = usePlanDetailViewModel({
     C,
     forceEmpty: isEmpty,
   });
@@ -84,6 +84,12 @@ function PlanDetailInner({ route }) {
               </Text>
             </Card>
           </Animated.View>
+        ) : loading ? (
+          <View style={s.loading}>
+            <Skeleton width="100%" height={72} radius={SHAPE.card} />
+            <Skeleton width="100%" height={72} radius={SHAPE.card} style={{ marginTop: STEP.s2 }} />
+            <Skeleton width="100%" height={72} radius={SHAPE.card} style={{ marginTop: STEP.s2 }} />
+          </View>
         ) : (
           <PlanDetailEmptyState C={C} />
         )}
@@ -131,6 +137,7 @@ export default function PlanDetailScreen(props) {
 }
 
 const s = StyleSheet.create({
+  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   safe: { flex: 1 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 3 + STEP.s1 },
   cardsRow: { flexDirection: "row", gap: STEP.s2 },
