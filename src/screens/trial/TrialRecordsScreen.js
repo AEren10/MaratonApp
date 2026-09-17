@@ -12,13 +12,14 @@ import { useTrialRecords } from "../../hooks/useTrialRecords";
 import { TrialRecordFilters } from "./components/TrialRecordFilters";
 import { TrialRecordRow } from "./components/TrialRecordRow";
 import { TrialRecordUnlockCard } from "./components/TrialRecordUnlockCard";
+import { TrialRecordsSkeleton } from "./components/TrialRecordsSkeleton";
 
 export default function TrialRecordsScreen() {
   const C = useC();
   const navigation = useNavigation();
   const {
     filter, setFilter, typeTabs, sections, lockedCount,
-    totalCount, requestFullHistory, isEmpty,
+    totalCount, requestFullHistory, isEmpty, loading,
   } = useTrialRecords();
 
   const openTrial = useCallback(
@@ -60,7 +61,9 @@ export default function TrialRecordsScreen() {
         <Text style={[styles.count, { color: C.text3 }]}>{totalCount}</Text>
       </View>
 
-      {isEmpty ? (
+      {loading ? (
+        <TrialRecordsSkeleton />
+      ) : isEmpty ? (
         <EmptyState preset="trialRecords" style={{ paddingHorizontal: GUTTER }} />
       ) : (
         <SectionList

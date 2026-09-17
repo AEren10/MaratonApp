@@ -39,6 +39,7 @@ export const { setTrials, addTrial, setLoading, removeTrial, restoreTrial } = tr
 export default trialSlice.reducer;
 
 export const selectTrials = (state) => state.trials.trials;
+export const selectTrialsLoading = (state) => Boolean(state.trials?.loading);
 export const selectLatestTrial = (state) => state.trials.trials[0] || null;
 
 export const selectTYTTrials = createSelector(

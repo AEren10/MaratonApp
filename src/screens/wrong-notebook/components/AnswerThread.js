@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 
-import { Icon, Avatar } from "../../../components/design";
-import SignedImage from "../../../components/common/SignedImage";
+import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useQuestionAnswers } from "../../../hooks/useQuestionAnswers";
-import { formatTime, formatShortDate } from "../../../lib/format";
 import * as H from "../../../lib/haptics";
+import { AnswerRow } from "./AnswerRow";
+import { AnswerThreadSkeleton } from "./AnswerThreadSkeleton";
 
 const MAX_LEN = 600;
 
@@ -50,7 +50,7 @@ export function AnswerThread({ sharedQuestionId }) {
       </View>
 
       {loading ? (
-        <View style={s.center}><ActivityIndicator color={C.accent} /></View>
+        <AnswerThreadSkeleton />
       ) : answers.length === 0 ? (
         <View style={s.empty}>
           <Icon name="chat" size={20} color={C.text3} />
@@ -97,33 +97,6 @@ export function AnswerThread({ sharedQuestionId }) {
           </Pressable>
         </View>
         {hint ? <Text style={s.hint}>{hint}</Text> : null}
-      </View>
-    </View>
-  );
-}
-
-function AnswerRow({ answer, s, C }) {
-  const name = answer.profile?.name || "Anonim";
-  const when = answer.created_at
-    ? `${formatShortDate(answer.created_at)} · ${formatTime(answer.created_at)}`
-    : "";
-  return (
-    <View style={s.answer}>
-      <Avatar init={name.slice(0, 2).toUpperCase()} size={28} image={answer.profile?.avatar_url} />
-      <View style={{ flex: 1 }}>
-        <View style={s.answerHead}>
-          <Text style={s.answerName}>{name}</Text>
-          <Text style={s.answerTime}>{when}</Text>
-        </View>
-        {answer.text ? <Text style={s.answerText}>{answer.text}</Text> : null}
-        {answer.image_path ? (
-          <SignedImage
-            bucket="community-answers"
-            path={answer.image_path}
-            style={s.answerImage}
-            contentFit="cover"
-          />
-        ) : null}
       </View>
     </View>
   );

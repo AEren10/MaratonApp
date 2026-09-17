@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { EditProfileSkeleton } from "./components/EditProfileSkeleton";
 
 import { Icon } from "../../components/design";
 import { SettingsRow } from "./components/SettingsRow";
@@ -28,7 +29,7 @@ export default function EditProfileScreen() {
   if (loading) {
     return (
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <ActivityIndicator color={C.accent} style={{ marginTop: 60 }} />
+        <EditProfileSkeleton />
       </SafeAreaView>
     );
   }

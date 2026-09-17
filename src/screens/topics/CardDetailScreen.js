@@ -8,6 +8,7 @@ import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { FlashcardItem } from "./components/FlashcardItem";
+import { FlashcardActions } from "./components/FlashcardActions";
 
 function CardDetailContent() {
   const C = useC();
@@ -93,25 +94,13 @@ function CardDetailContent() {
         <FlashcardItem card={card} flipped={flipped} onFlip={flip} C={C} />
       </View>
 
-      <View style={styles.actions}>
-        <Pressable onPress={prev} style={[styles.navBtn, index === 0 && { opacity: 0.3 }]}>
-          <Icon name="arrowL" size={20} color={C.text} />
-        </Pressable>
-
-        <Pressable onPress={() => next(false)} style={[styles.actionBtn, { backgroundColor: C.danger + "20" }]}>
-          <Icon name="x" size={20} color={C.danger} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.danger }]}>Tekrar et</Text>
-        </Pressable>
-
-        <Pressable onPress={() => next(true)} style={[styles.actionBtn, { backgroundColor: C.up + "20" }]}>
-          <Icon name="check" size={20} color={C.up} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.up }]}>Bildim</Text>
-        </Pressable>
-
-        <Pressable onPress={() => next(false)} style={[styles.navBtn, index === total - 1 && { opacity: 0.3 }]}>
-          <Icon name="arrowR" size={20} color={C.text} />
-        </Pressable>
-      </View>
+      <FlashcardActions
+        onPrev={prev}
+        onNext={next}
+        isFirst={index === 0}
+        isLast={index === total - 1}
+        C={C}
+      />
     </SafeAreaView>
   );
 }
@@ -128,29 +117,26 @@ function makeStyles(C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
-      flexDirection: "row", alignItems: "center",
-      paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: GUTTER,
+      paddingVertical: STEP.s2,
     },
     empty: { flex: 1, justifyContent: "center", alignItems: "center", padding: STEP.s5 },
     progressRow: {
-      flexDirection: "row", justifyContent: "center", gap: 6,
-      paddingHorizontal: GUTTER, marginTop: STEP.s1,
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: STEP.s1,
+      paddingHorizontal: GUTTER,
+      marginTop: STEP.s1,
     },
     progressDot: {
-      flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface, maxWidth: 60,
+      flex: 1,
+      height: 4,
+      borderRadius: SHAPE.chip / 4,
+      backgroundColor: C.surface,
+      maxWidth: 60,
     },
     center: { flex: 1, justifyContent: "center", alignItems: "center", padding: GUTTER },
-    actions: {
-      flexDirection: "row", alignItems: "center", justifyContent: "center",
-      gap: STEP.s2, paddingHorizontal: GUTTER, paddingBottom: STEP.s4,
-    },
-    navBtn: {
-      width: 44, height: 44, borderRadius: 22,
-      backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
-    },
-    actionBtn: {
-      flexDirection: "row", alignItems: "center", gap: 6,
-      borderRadius: SHAPE.pill, paddingHorizontal: STEP.s3, paddingVertical: STEP.s2,
-    },
   });
 }

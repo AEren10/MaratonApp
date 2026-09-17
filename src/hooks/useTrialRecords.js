@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { selectTrials } from "../store/slices/trialSlice";
+import { selectTrials, selectTrialsLoading } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
@@ -43,10 +43,12 @@ function monthKey(date) {
 
 export function useTrialRecords() {
   const trials = useSelector(selectTrials);
+  const trialsLoading = useSelector(selectTrialsLoading);
   const [filter, setFilter] = useState("ALL");
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const enterLocked = useLockedFeatureEntry();
 
+  const loading = Boolean(trialsLoading || accessLoading);
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
   const canAccessHistory = canAccessProductFeature({
     accessState,
@@ -116,6 +118,7 @@ export function useTrialRecords() {
     totalCount,
     canAccessHistory,
     requestFullHistory,
+    loading,
     isEmpty: trials.length === 0,
   };
 }
