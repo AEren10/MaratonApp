@@ -682,15 +682,16 @@ export const LGS_DERSLER = [
   },
 ];
 
-export function getSubjectsForExam(examType, field) {
+export function getSubjectsForExam(examType, field = "sayisal") {
   if (examType === "lgs") return [...LGS_DERSLER];
 
   const subjects = [...TYT_DERSLER];
+  const activeField = field || "sayisal";
 
-  if (examType === "tyt_ayt" || examType === "ayt") {
-    if (field === "sayisal") subjects.push(...AYT_SAY_DERSLER);
-    else if (field === "ea") subjects.push(...AYT_EA_DERSLER);
-    else if (field === "sozel") subjects.push(...AYT_SOZ_DERSLER);
+  if (examType === "tyt_ayt" || examType === "ayt" || examType === "yks" || !examType) {
+    if (activeField === "sayisal") subjects.push(...AYT_SAY_DERSLER);
+    else if (activeField === "ea") subjects.push(...AYT_EA_DERSLER);
+    else if (activeField === "sozel") subjects.push(...AYT_SOZ_DERSLER);
   }
 
   if (examType === "dil") {

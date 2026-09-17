@@ -33,7 +33,7 @@ function CurriculumCurve({ ratio = 0 }) {
   const nodes = [0.25, 0.75].map((f) => ({ f, p: pointAt(f) }));
 
   return (
-    <Svg viewBox="0 -14 300 92" width="100%" style={{ aspectRatio: 300 / 92 }}>
+    <Svg viewBox="0 -18 300 108" width="100%" style={{ aspectRatio: 300 / 108 }}>
       <Defs>
         <LinearGradient id="curriculumGlow" x1="0" y1="0" x2="1" y2="0">
           <Stop offset="0" stopColor={C.accent} stopOpacity={0.15} />
@@ -44,7 +44,7 @@ function CurriculumCurve({ ratio = 0 }) {
       {[18, 38, 58].map((y) => (
         <Path key={y} d={`M 6 ${y} L 294 ${y}`} stroke={C.line} strokeWidth={0.8} opacity={0.55} />
       ))}
-      <Path d={`${FULL} L294 70 L6 70 Z`} fill="url(#curriculumGlow)" opacity={0.36} />
+      <Path d={`${FULL} L294 78 L6 78 Z`} fill="url(#curriculumGlow)" opacity={0.36} />
       <Path d={FULL} fill="none" stroke={C.track} strokeWidth={2.6} strokeLinecap="round" />
       {r > 0 ? <Path d={done} fill="none" stroke={C.accent} strokeWidth={4.8} strokeLinecap="round" /> : null}
       <Circle cx={6} cy={58} r={4.4} fill={C.bg} stroke={C.accent} strokeWidth={2.4} />
@@ -56,7 +56,7 @@ function CurriculumCurve({ ratio = 0 }) {
       <Circle cx={here[0]} cy={here[1]} r={6.5} fill={C.accent} />
       <SvgText
         x={labelX}
-        y={here[1] > 40 ? here[1] - 12 : here[1] + 20}
+        y={here[1] > 38 ? here[1] - 14 : here[1] + 22}
         textAnchor="middle"
         fontFamily="Archivo_700"
         fontSize={11}
