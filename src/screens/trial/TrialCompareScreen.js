@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Icon, Card, EmptyState } from "../../components/design";
+import { Icon, Card, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTrialCompare } from "../../hooks/useTrialCompare";
@@ -21,7 +21,7 @@ export default function TrialCompareScreen() {
 
   const {
     newer, older, setNewer, setOlder, sameTypeTrials,
-    rows, canCompare, publisherMismatch, titles, hero,
+    rows, canCompare, publisherMismatch, titles, hero, loading,
   } = useTrialCompare(C, route.params || {});
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
@@ -39,7 +39,13 @@ export default function TrialCompareScreen() {
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>KARŞILAŞTIRMA</Text>
       </View>
 
-      {!canCompare ? (
+      {!canCompare && loading ? (
+        <View style={styles.loading}>
+          <Skeleton width="100%" height={146} radius={SHAPE.panel} />
+          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
+          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
+        </View>
+      ) : !canCompare ? (
         <EmptyState
           title="Karşılaştırma için en az 2 deneme gerekli"
           body="İkinci denemeni girdiğinde iki sonucu ders ders yan yana koyarız."
@@ -111,6 +117,8 @@ const styles = StyleSheet.create({
     height: CONTROL.tapMin,
   },
   scroll: { paddingHorizontal: GUTTER, paddingTop: 26, paddingBottom: 40 },
+  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  loadingGap: { marginTop: STEP.s3 },
   pills: { flexDirection: "row", gap: STEP.s1 },
   footerBtn: {
     height: CONTROL.buttonPrimary,

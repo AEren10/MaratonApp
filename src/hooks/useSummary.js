@@ -5,6 +5,7 @@ import { selectTodayLogs, selectStreak, selectLastStudyDate } from "../store/sli
 import { selectTrials } from "../store/slices/trialSlice";
 import { useC } from "../contexts/ThemeContext";
 import { usePremium } from "../contexts/PremiumContext";
+import { useSync } from "../contexts/DataSyncContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { useSummaryLogs } from "./useSummaryLogs";
 import { dateKey } from "../lib/dateUtils";
@@ -26,6 +27,7 @@ export function useSummary(period = "day") {
   const lastStudyDate = useSelector(selectLastStudyDate);
   const trials = useSelector(selectTrials);
   const { checkFeature, accessLoading } = usePremium();
+  const { syncedOnce } = useSync();
   const { route, totals, hasRouteAccess } = useStudyRoute({ persist: false });
 
   const todayKey = dateKey(new Date());
@@ -49,7 +51,9 @@ export function useSummary(period = "day") {
       period: range.period,
       locked,
       headerLabel: rangeHeaderLabel(range),
-      loading: (range.period !== "day" && logsState.loading) || (range.period === "month" && accessLoading),
+      loading: !syncedOnce
+        || (range.period !== "day" && logsState.loading)
+        || (range.period === "month" && accessLoading),
       error: logsState.error,
       retry: logsState.retry,
       streak,
@@ -71,6 +75,6 @@ export function useSummary(period = "day") {
       ...buildDaySummary({ todayKey, todayLogs, streak, routeWeeks, totals, hasRouteAccess }),
       recent: logsState.loading ? null : buildRecentDays({ range, logs: logsState.logs }),
     };
-  }, [range, locked, logsState, period, accessLoading, streak, routeWeeks, C, trials, lastStudyDate,
+  }, [range, locked, logsState, period, accessLoading, syncedOnce, streak, routeWeeks, C, trials, lastStudyDate,
     todayKey, todayLogs, totals, hasRouteAccess]);
 }

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { selectTrials } from "../store/slices/trialSlice";
 import { getAllSubjects } from "../domain/trial/trialTypes";
 import { useC } from "../contexts/ThemeContext";
+import { useSync } from "../contexts/DataSyncContext";
 
 // Son 5 denemenin ders bazli ortalamasi %50'nin altinda kalan dersleri
 // "geride kalan konu" olarak isaretler. Konu tarafinda yalniz ders bazli
@@ -38,6 +39,7 @@ function computeWeakTopics(C, trials) {
 export function useWeakAreas() {
   const C = useC();
   const trials = useSelector(selectTrials);
+  const { syncedOnce } = useSync();
   const weakTopics = useMemo(() => computeWeakTopics(C, trials), [C, trials]);
-  return { weakTopics, isEmpty: weakTopics.length === 0 };
+  return { weakTopics, isEmpty: weakTopics.length === 0, loading: !syncedOnce };
 }

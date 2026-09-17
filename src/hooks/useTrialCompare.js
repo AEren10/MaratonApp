@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../store/slices/trialSlice";
+import { useSync } from "../contexts/DataSyncContext";
 import { getTrialTypes, getAllSubjects } from "../domain/trial/trialTypes";
 
 const fmtNet = (v) => Number(v ?? 0).toFixed(1).replace(".", ",");
@@ -21,22 +22,32 @@ function fmtDayMonth(date) {
 
 export function useTrialCompare(C, params = {}) {
   const trials = useSelector(selectTrials);
+  const { syncedOnce } = useSync();
 
   const sorted = useMemo(
     () => [...trials].sort((a, b) => new Date(b.date) - new Date(a.date)),
     [trials],
   );
 
-  const defaultNewer = sorted[0];
-  const defaultOlder =
-    sorted.find((t, i) => i > 0 && t.trialType === defaultNewer?.trialType) || sorted[1] || null;
+  // Secim id olarak tutulur: denemeler senkron sonrasi geldiginde tek seferlik
+  // useState baslangici bos listede donup kalir, turetilmis deger toparlanir.
+  const [newerId, setNewerId] = useState(params.trial1Id ?? null);
+  const [olderId, setOlderId] = useState(params.trial2Id ?? null);
 
-  const [newer, setNewer] = useState(
-    () => (params.trial1Id && sorted.find((t) => t.id === params.trial1Id)) || defaultNewer,
-  );
-  const [older, setOlder] = useState(
-    () => (params.trial2Id && sorted.find((t) => t.id === params.trial2Id)) || defaultOlder,
-  );
+  const newer = useMemo(() => {
+    const picked = newerId == null ? null : sorted.find((t) => String(t.id) === String(newerId));
+    return picked || sorted[0] || null;
+  }, [sorted, newerId]);
+
+  const older = useMemo(() => {
+    const picked = olderId == null ? null : sorted.find((t) => String(t.id) === String(olderId));
+    if (picked) return picked;
+    const rest = sorted.filter((t) => String(t.id) !== String(newer?.id));
+    return rest.find((t) => t.trialType === newer?.trialType) || rest[0] || null;
+  }, [sorted, olderId, newer]);
+
+  const setNewer = useCallback((t) => setNewerId(t?.id ?? null), []);
+  const setOlder = useCallback((t) => setOlderId(t?.id ?? null), []);
 
   // Ayni turden olmayan iki denemeyi karsilastirmak ders kirilimini
   // anlamsiz kilar; secici yalnizca yeni denemenin turunu listeler.
@@ -88,6 +99,7 @@ export function useTrialCompare(C, params = {}) {
     sameTypeTrials,
     rows,
     canCompare: Boolean(newer && older),
+    loading: !syncedOnce,
     publisherMismatch,
     titles: {
       older: older?.title?.trim() || (older ? "Eski deneme" : "Deneme seç"),

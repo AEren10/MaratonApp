@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
-import { EmptyState } from "../../components/design";
-import { TYPOGRAPHY, STEP } from "../../themes/tokens";
+import { EmptyState, Skeleton } from "../../components/design";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useSync } from "../../contexts/DataSyncContext";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { useAuth } from "../../contexts/AuthContext";
 import { TrialReportCard } from "./components/TrialReportCard";
@@ -34,6 +35,7 @@ export default function TrialDetailScreen() {
   const route = useRoute();
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const trials = useSelector(selectTrials);
+  const { syncedOnce } = useSync();
   const { user } = useAuth();
   const cardRef = useRef(null);
   const showAlert = useAlert();
@@ -52,6 +54,19 @@ export default function TrialDetailScreen() {
   }, [fromEntry, showNudgePopup]);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
+
+  if (!latest && !syncedOnce) {
+    return (
+      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+        <TrialDetailHeader C={C} onBack={goBack} onMenu={() => {}} />
+        <View style={styles.loading}>
+          <Skeleton width="100%" height={146} radius={SHAPE.panel} />
+          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
+          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!latest) {
     return (
@@ -126,5 +141,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: 40 },
   emptyBox: { flex: 1, justifyContent: "center", paddingHorizontal: STEP.s3 },
+  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  loadingGap: { marginTop: STEP.s3 },
   offscreen: { position: "absolute", left: -10000, top: 0 },
 });

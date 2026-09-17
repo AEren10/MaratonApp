@@ -5,10 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../../store/slices/trialSlice";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon } from "../../components/design";
+import { Icon, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { useSync } from "../../contexts/DataSyncContext";
 import { comparePeriods, subjectComparison, personalBests, consistencyScore } from "../../lib/comparativeAnalytics";
 import { PeriodSummary } from "./components/PeriodSummary";
 import { SubjectProgress } from "./components/SubjectProgress";
@@ -25,6 +26,7 @@ export default function ComparativeScreen() {
   const navigation = useNavigation();
   const C = useC();
   const trials = useSelector(selectTrials);
+  const { syncedOnce } = useSync();
   const [periodDays, setPeriodDays] = useState(30);
 
   const period = useMemo(() => comparePeriods(trials, periodDays), [trials, periodDays]);
@@ -45,7 +47,13 @@ export default function ComparativeScreen() {
         </Text>
       </View>
 
-      {trials.length === 0 ? (
+      {trials.length === 0 && !syncedOnce ? (
+        <View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+          <Skeleton width="100%" height={96} radius={SHAPE.card} />
+          <Skeleton width="100%" height={146} radius={SHAPE.panel} style={{ marginTop: STEP.s3 }} />
+          <Skeleton width="100%" height={146} radius={SHAPE.panel} style={{ marginTop: STEP.s3 }} />
+        </View>
+      ) : trials.length === 0 ? (
         <EmptyState
           icon="chart"
           title="Karşılaştırmak için veri gerekli"

@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials, selectTrialsLoading } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";
+import { useSync } from "../contexts/DataSyncContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
@@ -46,6 +47,7 @@ export function useTrialRecords() {
   const trialsLoading = useSelector(selectTrialsLoading);
   const [filter, setFilter] = useState("ALL");
   const { accessLoading, accessError, accessSnapshot } = usePremium();
+  const { syncedOnce } = useSync();
   const enterLocked = useLockedFeatureEntry();
 
   const loading = Boolean(trialsLoading || accessLoading);
@@ -120,5 +122,6 @@ export function useTrialRecords() {
     requestFullHistory,
     loading,
     isEmpty: trials.length === 0,
+    loading: !syncedOnce,
   };
 }

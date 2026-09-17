@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { useC } from "../../contexts/ThemeContext";
-import { GUTTER, STEP } from "../../themes/tokens";
+import { GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { Icon, EmptyState } from "../../components/design";
 import { useTrialRecords } from "../../hooks/useTrialRecords";
@@ -61,7 +61,7 @@ export default function TrialRecordsScreen() {
         <Text style={[styles.count, { color: C.text3 }]}>{totalCount}</Text>
       </View>
 
-      {loading ? (
+      {isEmpty && loading ? (
         <TrialRecordsSkeleton />
       ) : isEmpty ? (
         <EmptyState preset="trialRecords" style={{ paddingHorizontal: GUTTER }} />

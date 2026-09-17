@@ -4,8 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon, EmptyState, SectionLabel } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { Icon, EmptyState, SectionLabel, Skeleton } from "../../components/design";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
@@ -16,7 +16,7 @@ import { WeakAreaRow } from "./components/WeakAreaRow";
 export default function WeakAreasScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { weakTopics, isEmpty } = useWeakAreas();
+  const { weakTopics, isEmpty, loading } = useWeakAreas();
 
   const handleStudy = useCallback((item) => {
     navigation.navigate(SCREENS.TOPIC_STUDY, {
@@ -49,7 +49,13 @@ export default function WeakAreasScreen() {
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ÖNCELİKLİ KONULAR</Text>
       </View>
 
-      {isEmpty ? (
+      {isEmpty && loading ? (
+        <View style={styles.loading}>
+          <Skeleton width="100%" height={72} radius={SHAPE.card} />
+          <Skeleton width="100%" height={72} radius={SHAPE.card} style={styles.loadingGap} />
+          <Skeleton width="100%" height={72} radius={SHAPE.card} style={styles.loadingGap} />
+        </View>
+      ) : isEmpty ? (
         <EmptyState
           preset="priorityTopics"
           style={styles.empty}
@@ -95,4 +101,6 @@ const styles = StyleSheet.create({
   list: { paddingBottom: STEP.s5 },
   rowWrap: { paddingHorizontal: GUTTER, marginTop: STEP.s1 },
   empty: { flex: 1, paddingHorizontal: GUTTER, justifyContent: "center" },
+  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  loadingGap: { marginTop: STEP.s2 },
 });
