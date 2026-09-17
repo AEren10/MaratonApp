@@ -7,6 +7,8 @@ import { Button, SectionLabel, Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openHere } from "../../navigation/tabJump";
 import { useAppSearch } from "../../hooks/useAppSearch";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { reviewDueLabel } from "../../lib/searchIndex";
@@ -85,7 +87,7 @@ export default function SearchScreen() {
               variant="outline"
               size="md"
               fullWidth
-              onPress={() => navigation.navigate(SCREENS.ROADMAP)}
+              onPress={() => openHere(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}
               style={{ marginTop: STEP.s2 }}
             >
               Tüm yol haritasına bak

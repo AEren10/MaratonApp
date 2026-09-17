@@ -9,6 +9,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { useSubjectTopics } from "../../hooks/useSubjectTopics";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openHere } from "../../navigation/tabJump";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { SubjectDetailHeader } from "./components/SubjectDetailHeader";
 import { SubjectProgressHeader } from "./components/SubjectProgressHeader";
@@ -91,7 +93,7 @@ export default function SubjectDetailScreen() {
           C={C}
           title="Yol haritası"
           onBack={() => navigation.goBack()}
-          onSearch={() => navigation.navigate(SCREENS.SEARCH)}
+          onSearch={() => openHere(navigation, TAB_KEYS.ANALIZ, SCREENS.SEARCH)}
         />
 
         {loading ? (

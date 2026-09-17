@@ -14,6 +14,8 @@ import {
 
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import {
   STUDY_TIMER_PHASE,
   buildStudyTimerModes,
@@ -347,7 +349,7 @@ export function useStudyTimerController(C) {
   }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
   const openHistory = useCallback(() => {
-    navigation.navigate(SCREENS.STUDY_HISTORY);
+    openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.STUDY_HISTORY);
   }, [navigation]);
 
   return {

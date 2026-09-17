@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { todayTR } from "../../lib/dateUtils";
 import { GUTTER } from "../../themes/tokens";
 import { useCalendarMonth } from "../../hooks/useCalendarMonth";
@@ -45,11 +47,11 @@ function CalendarScreenInner() {
   }, [navigation]);
 
   const handleWeekTab = useCallback(() => {
-    navigation.navigate(SCREENS.DAILY_PLAN);
+    openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.DAILY_PLAN);
   }, [navigation]);
 
   const handleTrialPress = useCallback((trial) => {
-    if (trial?.id) navigation.navigate(SCREENS.TRIAL_DETAIL, { id: trial.id, trialId: trial.id, trial });
+    if (trial?.id) openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.TRIAL_DETAIL, { id: trial.id, trialId: trial.id, trial });
   }, [navigation]);
 
   return (

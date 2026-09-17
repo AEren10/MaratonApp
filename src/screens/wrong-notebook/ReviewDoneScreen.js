@@ -7,6 +7,8 @@ import { Button, Card, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { STEP, SHAPE, TYPOGRAPHY, GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import * as haptic from "../../lib/haptics";
 
 export default function ReviewDoneScreen() {
@@ -104,7 +106,7 @@ export default function ReviewDoneScreen() {
             size="lg"
             onPress={() => {
               haptic.select();
-              navigation.navigate(SCREENS.ROADMAP);
+              openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
             }}
             style={styles.actionBtn}
           >

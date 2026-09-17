@@ -2,6 +2,8 @@ import { useCallback, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { SCREENS } from "../constants/screens";
+import { TAB_KEYS } from "../navigation/tabAssignment";
+import { openInTab } from "../navigation/tabJump";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { useExam } from "../contexts/ExamContext";
 import { usePremium } from "../contexts/PremiumContext";
@@ -50,7 +52,7 @@ export function useRouteDetail() {
   }, [navigation, runCreate, weeks.length]);
 
   const openScenarios = useCallback(
-    () => openScenarioGate(() => navigation.navigate(SCREENS.NET_FORECAST)),
+    () => openScenarioGate(() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.NET_FORECAST)),
     [navigation, openScenarioGate],
   );
 
@@ -75,9 +77,9 @@ export function useRouteDetail() {
     addFirstStop,
     openScenarios,
     goBack: () => navigation.goBack(),
-    openThreshold: () => navigation.navigate(SCREENS.RANK_SIMULATOR),
+    openThreshold: () => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.RANK_SIMULATOR),
     openPromise: () => navigation.navigate(SCREENS.PLAN_VS_ACTUAL),
     openHowItWorks: () => navigation.navigate(SCREENS.HOW_IT_WORKS),
-    openStop: (key) => navigation.navigate(SCREENS.ROUTE_STOP_DETAIL, { stopKey: key }),
+    openStop: (key) => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROUTE_STOP_DETAIL, { stopKey: key }),
   };
 }

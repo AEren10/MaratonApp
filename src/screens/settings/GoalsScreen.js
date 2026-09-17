@@ -10,6 +10,8 @@ import { GoalBandNote } from "./components/GoalBandNote";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 
 // Tasarim: "Hedef Duzenle" artboard'i — Ayarlar > Hedef net satirindan
@@ -78,7 +80,7 @@ export default function GoalsScreen() {
             first
             label="Sınav tarihi"
             value={examDateLabel}
-            onPress={() => navigation.navigate(SCREENS.EXAM_DATE)}
+            onPress={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.EXAM_DATE)}
           />
         </SettingsGroup>
       </ScrollView>

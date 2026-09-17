@@ -8,6 +8,8 @@ import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { trialShortLabel } from "./trialLabels";
@@ -77,7 +79,7 @@ export default function TrialSummaryScreen() {
               </Animated.View>
             ) : null}
             <TrialSummarySubjectDeltas bars={summary.bars} />
-            <TrialSummaryTarget onDepartments={() => navigation.navigate(SCREENS.GOALS)} />
+            <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.actions}>
               <Button size="lg" fullWidth onPress={handleShare}>Kartı paylaş</Button>
               {summary.totalWrong > 0 ? (
