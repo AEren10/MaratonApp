@@ -14,8 +14,8 @@ const WEEKDAY_LONG = ["PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "
 // PROGRAM — bu haftanin rota duraklari, haftalik ders programina gore
 // gunlere dusurulmus. Durak saati rotada tutulmuyor; yalniz sure gosterilir.
 export function useWeekStops() {
-  const { weeks } = useStudyRoute({ persist: false });
-  const { schedule, loading } = useClassSchedule();
+  const { weeks, routeStopsLoaded } = useStudyRoute({ persist: false });
+  const { schedule, loading: scheduleLoading } = useClassSchedule();
   const today = todayTR();
   const monday = mondayOf(today);
   const [selected, setSelected] = useState(today);
@@ -61,7 +61,7 @@ export function useWeekStops() {
   const weekRange = `${parseDayKey(days[0].key).getUTCDate()}—${parseDayKey(days[6].key).getUTCDate()} ${MONTHS_TR[parseDayKey(days[6].key).getUTCMonth()]}`;
 
   return {
-    loading,
+    loading: scheduleLoading || !routeStopsLoaded,
     hasWeek: Boolean(week),
     days,
     selected: days[index].key,

@@ -27,7 +27,7 @@ export function useScenarioView() {
   const showAlert = useAlert();
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const enterLocked = useLockedFeatureEntry();
-  const { tempoScenarios, forecast } = useStudyRoute({ persist: false });
+  const { tempoScenarios, forecast, routeStopsLoaded } = useStudyRoute({ persist: false });
   const goals = useAppSelector(selectGoals);
 
   const [selected, setSelected] = useState(1);
@@ -85,5 +85,6 @@ export function useScenarioView() {
     applyTempo,
     applying,
     canAccess,
+    loading: accessLoading || !routeStopsLoaded,
   };
 }

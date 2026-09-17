@@ -3,9 +3,9 @@ import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon, Card, Button } from "../../components/design";
+import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
-import { GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useThresholdView } from "../../hooks/useThresholdView";
@@ -21,7 +21,20 @@ import { ThresholdContributorRow } from "./components/ThresholdContributorRow";
 export default function RankSimulatorScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const { targetNet, currentNet, daysUntilExam, gapResult, canAccess, requestAccess } = useThresholdView();
+  const { targetNet, currentNet, daysUntilExam, gapResult, canAccess, requestAccess, loading } = useThresholdView();
+
+  if (loading) {
+    return (
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <Header onBack={() => navigation.goBack()} C={C} />
+        <View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, gap: STEP.s2 }}>
+          <Skeleton width="100%" height={72} radius={SHAPE.card} />
+          <Skeleton width="100%" height={72} radius={SHAPE.card} />
+          <Skeleton width="100%" height={72} radius={SHAPE.card} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (targetNet == null || currentNet == null) {
     return (

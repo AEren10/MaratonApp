@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Icon, Card, Button, EmptyState } from "../../components/design";
+import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTopicDebt } from "../../hooks/useTopicDebt";
@@ -42,7 +42,7 @@ function TopicDebtImpactCard({ C, totalHours }) {
 export default function TopicDebtScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { stops, stopCount, totalHours, hasHours, capped, canDistribute, distributing, distribute, isEmpty } = useTopicDebt();
+  const { stops, stopCount, totalHours, hasHours, capped, canDistribute, distributing, distribute, isEmpty, loading } = useTopicDebt();
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -63,11 +63,19 @@ export default function TopicDebtScreen() {
         ) : null}
 
         {isEmpty ? (
-          <EmptyState
-            title="Konu borcun yok."
-            body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
-            style={{ marginTop: STEP.s5 }}
-          />
+          loading ? (
+            <View style={styles.loading}>
+              <Skeleton width="100%" height={72} radius={SHAPE.card} />
+              <Skeleton width="100%" height={72} radius={SHAPE.card} />
+              <Skeleton width="100%" height={72} radius={SHAPE.card} />
+            </View>
+          ) : (
+            <EmptyState
+              title="Konu borcun yok."
+              body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
+              style={{ marginTop: STEP.s5 }}
+            />
+          )
         ) : (
           <Animated.View entering={FadeInDown.delay(140).duration(560)} style={styles.listWrap}>
             <View style={styles.listHead}>
@@ -107,6 +115,7 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
   impactCard: { marginTop: STEP.s4, padding: STEP.s4 },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: SHAPE.chip, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.05)" },
+  loading: { marginTop: STEP.s5, gap: STEP.s2 },
   listWrap: { marginTop: STEP.s5 },
   listHead: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s3 },
   rule: { flex: 1, height: 1 },

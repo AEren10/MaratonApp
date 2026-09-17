@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, Card, Button } from "../../components/design";
+import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
 import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useScenarioView } from "../../hooks/useScenarioView";
@@ -16,7 +16,7 @@ export default function NetForecastScreen() {
   const C = useC();
   const {
     forecast, scenarios, selected, selectedScenario,
-    selectScenario, applyTempo, applying, canAccess,
+    selectScenario, applyTempo, applying, canAccess, loading,
   } = useScenarioView();
 
   return (
@@ -29,12 +29,20 @@ export default function NetForecastScreen() {
       </View>
 
       {!forecast || !scenarios?.length ? (
-        <EmptyState
-          eyebrow="SENARYOLAR"
-          title="Senaryolar için veriye ihtiyacın var"
-          body="En az 3 aynı tip deneme ve bir rota gerekiyor. Önce deneme gir, rota oluşsun."
-          style={{ paddingHorizontal: GUTTER }}
-        />
+        loading ? (
+          <View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, gap: STEP.s2 }}>
+            <Skeleton width="100%" height={72} radius={SHAPE.card} />
+            <Skeleton width="100%" height={72} radius={SHAPE.card} />
+            <Skeleton width="100%" height={72} radius={SHAPE.card} />
+          </View>
+        ) : (
+          <EmptyState
+            eyebrow="SENARYOLAR"
+            title="Senaryolar için veriye ihtiyacın var"
+            body="En az 3 aynı tip deneme ve bir rota gerekiyor. Önce deneme gir, rota oluşsun."
+            style={{ paddingHorizontal: GUTTER }}
+          />
+        )
       ) : (
         <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s4 }} showsVerticalScrollIndicator={false}>
           <Animated.View entering={FadeInDown.duration(420)} style={{ marginTop: STEP.s2 }}>

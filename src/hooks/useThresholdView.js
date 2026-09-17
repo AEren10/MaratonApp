@@ -16,10 +16,10 @@ import { useLockedFeatureEntry } from "./useLockedFeatureEntry";
  * açığı ve o açığı en çok kapatan konular (threshold() zaten hesaplıyor).
  */
 export function useThresholdView() {
-  const { targetNet, daysUntilExam } = useExam();
+  const { targetNet, daysUntilExam, loading: examLoading } = useExam();
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const enterLocked = useLockedFeatureEntry();
-  const { forecast, threshold, daysLeft } = useStudyRoute({ persist: false });
+  const { forecast, threshold, daysLeft, routeStopsLoaded } = useStudyRoute({ persist: false });
 
   const accessState = accessLoading ? "loading" : accessError ? "error" : "ready";
   const canAccess = canAccessProductFeature({
@@ -43,5 +43,6 @@ export function useThresholdView() {
     gapResult,
     canAccess,
     requestAccess,
+    loading: examLoading || !routeStopsLoaded,
   };
 }

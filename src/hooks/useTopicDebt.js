@@ -24,7 +24,7 @@ const fmtHours = (minutes) => {
  * kaydetmeyen sahte bir buton degil.
  */
 export function useTopicDebt() {
-  const { route, debt, debtWeeks, transitionStop, distributeDebt } = useStudyRoute();
+  const { route, debt, debtWeeks, transitionStop, distributeDebt, routeStopsLoaded } = useStudyRoute();
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -91,5 +91,6 @@ export function useTopicDebt() {
     distribute,
     preview,
     isEmpty: stops.length === 0 && !(debt?.hasDebt),
+    loading: !routeStopsLoaded,
   };
 }

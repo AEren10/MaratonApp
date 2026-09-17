@@ -3,7 +3,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { buildPlanVsActual, gapClosurePlan } from "../domain/route/planVsActual";
 
 export function usePlanVsActual() {
-  const { route } = useStudyRoute();
+  const { route, routeStopsLoaded } = useStudyRoute();
   const weeks = route?.weeks || [];
 
   const data = useMemo(() => buildPlanVsActual(weeks), [weeks]);
@@ -27,5 +27,5 @@ export function usePlanVsActual() {
       ? "Sınava kalan sürede boşluğu kapatacak hafta kalmadı. Haftalık yükü artırmak yerine hedefi gözden geçirmek daha gerçekçi."
       : null;
 
-  return { ...data, remainingWeeks, closure, headline, gapBody };
+  return { ...data, remainingWeeks, closure, headline, gapBody, loading: !routeStopsLoaded };
 }

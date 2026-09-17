@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { Icon, Card, Button, EmptyState } from "../../components/design";
+import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -39,7 +39,7 @@ function Legend({ C, color, label }) {
 export default function PlanVsActualScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { series, plannedDue, doneDue, gap, hasData, headline, gapBody } = usePlanVsActual();
+  const { series, plannedDue, doneDue, gap, hasData, headline, gapBody, loading } = usePlanVsActual();
   const openGapClosure = () => navigation.navigate(SCREENS.GAP_CLOSURE);
 
   return (
@@ -52,11 +52,18 @@ export default function PlanVsActualScreen() {
       </View>
 
       {!hasData ? (
-        <EmptyState
-          title="Karşılaştıracak plan yok."
-          body="Rotan çizildiğinde planladığın ve gerçekleşen ilerlemeni burada yan yana görürsün."
-          style={styles.empty}
-        />
+        loading ? (
+          <View style={styles.loading}>
+            <Skeleton width="100%" height={72} radius={SHAPE.card} />
+            <Skeleton width="100%" height={220} radius={SHAPE.panel} />
+          </View>
+        ) : (
+          <EmptyState
+            title="Karşılaştıracak plan yok."
+            body="Rotan çizildiğinde planladığın ve gerçekleşen ilerlemeni burada yan yana görürsün."
+            style={styles.empty}
+          />
+        )
       ) : (
         <>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -113,6 +120,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 160 },
   empty: { marginTop: STEP.s5, paddingHorizontal: GUTTER },
+  loading: { marginTop: STEP.s5, paddingHorizontal: GUTTER, gap: STEP.s2 },
   legend: { flexDirection: "row", alignItems: "center", gap: STEP.s4, marginTop: STEP.s3 },
   cards: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s5 },
   countCard: { flex: 1, padding: STEP.s3 },
