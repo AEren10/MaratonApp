@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { SCREENS } from "../../constants/screens";
+import { PREMIUM_ENABLED } from "../../constants/premium";
 import { STEP, GUTTER } from "../../themes/tokens";
 
 import { ProfileTopBar } from "./components/ProfileTopBar";
@@ -87,11 +88,13 @@ export default function ProfileScreen() {
                 label="Rotayı Yeniden Çiz"
                 onPress={() => navigation.navigate(SCREENS.ROUTE_REDRAW)}
               />
-              <ProfileLinkRow
-                label="Premium"
-                meta="7 gün ücretsiz"
-                onPress={() => navigation.navigate(SCREENS.PREMIUM, { source: "profile_premium_row" })}
-              />
+              {PREMIUM_ENABLED ? (
+                <ProfileLinkRow
+                  label="Premium"
+                  meta="7 gün ücretsiz"
+                  onPress={() => navigation.navigate(SCREENS.PREMIUM, { source: "profile_premium_row" })}
+                />
+              ) : null}
               <ExamFlowRow />
             </Animated.View>
 

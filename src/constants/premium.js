@@ -1,3 +1,8 @@
+// PREMIUM ASKIDA (2026-09-18). Kullanici tabani birikene kadar hicbir sey
+// ucretli degil: butun ozellikler acik, paywall ve kilit gosterilmez, kota
+// uygulanmaz. Kod SILINMEDI — bu bayragi true yapmak yeterli.
+export const PREMIUM_ENABLED = false;
+
 // Premium feature keys — used by PremiumContext.checkFeature()
 export const PREMIUM_FEATURES = {
   unlimited_trials: {

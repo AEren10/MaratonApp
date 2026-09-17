@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { SCREENS } from "../constants/screens";
+import { PREMIUM_ENABLED } from "../constants/premium";
 import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
 import { consumeAccessEnded } from "../lib/premiumMoments";
@@ -14,6 +15,7 @@ export function useAccessEndedMoment() {
   const { accessSnapshot, accessLoading, accessError } = usePremium();
 
   useEffect(() => {
+    if (!PREMIUM_ENABLED) return undefined;
     if (accessLoading || accessError || !accessSnapshot || !user?.id) return undefined;
     let cancelled = false;
     consumeAccessEnded(accessSnapshot, user.id).then((show) => {

@@ -21,7 +21,7 @@ test("first week includes days one through seven and closes at the boundary", ()
 });
 
 test("paywall stays suppressed during the first week", () => {
-  const result = canShowPaywall({
+  const result = canShowPaywall({ enabled: true,
     isPremium: false,
     createdAt: "2026-09-01T09:00:00.000Z",
     now: new Date("2026-09-07T09:00:00.000Z"),
@@ -31,7 +31,7 @@ test("paywall stays suppressed during the first week", () => {
 
 test("paywall stays suppressed during exam eve, exam day and aftermath", () => {
   for (const phase of [EXAM_PHASE.EXAM_EVE, EXAM_PHASE.EXAM_DAY, EXAM_PHASE.AFTERMATH]) {
-    assert.deepEqual(canShowPaywall({
+    assert.deepEqual(canShowPaywall({ enabled: true,
       isPremium: false,
       createdAt: "2026-08-01T09:00:00.000Z",
       examPhase: phase,
@@ -41,7 +41,7 @@ test("paywall stays suppressed during exam eve, exam day and aftermath", () => {
 });
 
 test("paywall is allowed outside grace and protected exam phases", () => {
-  assert.deepEqual(canShowPaywall({
+  assert.deepEqual(canShowPaywall({ enabled: true,
     isPremium: false,
     createdAt: "2026-08-01T09:00:00.000Z",
     examPhase: EXAM_PHASE.APPROACHING,
@@ -50,34 +50,34 @@ test("paywall is allowed outside grace and protected exam phases", () => {
 });
 
 test("product features fail closed until the server snapshot is ready", () => {
-  assert.equal(canAccessProductFeature({
+  assert.equal(canAccessProductFeature({ enabled: true,
     accessState: "loading", features: { route: true }, featureKey: "route",
   }), false);
-  assert.equal(canAccessProductFeature({
+  assert.equal(canAccessProductFeature({ enabled: true,
     accessState: "error", features: { route: true }, featureKey: "route",
   }), false);
-  assert.equal(canAccessProductFeature({
+  assert.equal(canAccessProductFeature({ enabled: true,
     accessState: "ready", features: { route: true }, featureKey: "route",
   }), true);
 });
 
 test("trial quota permits four, then blocks the fifth", () => {
-  assert.deepEqual(trialQuotaDecision({
+  assert.deepEqual(trialQuotaDecision({ enabled: true,
     accessState: "ready", quota: { remaining: 1, unlimited: false },
   }), { allowed: true, reason: null, remaining: 1 });
-  assert.deepEqual(trialQuotaDecision({
+  assert.deepEqual(trialQuotaDecision({ enabled: true,
     accessState: "ready", quota: { remaining: 0, unlimited: false },
   }), { allowed: false, reason: "quota_exhausted", remaining: 0 });
 });
 
 test("grace or premium quota is unlimited", () => {
-  assert.deepEqual(trialQuotaDecision({
+  assert.deepEqual(trialQuotaDecision({ enabled: true,
     accessState: "ready", quota: { remaining: null, unlimited: true },
   }), { allowed: true, reason: null, remaining: Infinity });
 });
 
 test("unknown quota never fails open", () => {
-  assert.deepEqual(trialQuotaDecision({ accessState: "ready", quota: null }), {
+  assert.deepEqual(trialQuotaDecision({ enabled: true, accessState: "ready", quota: null }), {
     allowed: false,
     reason: "access_unknown",
     remaining: null,
@@ -89,4 +89,16 @@ test("premium feature catalog uses dedicated product access keys", () => {
   assert.equal(PRODUCT_FEATURES.department_threshold, "departmentThreshold");
   assert.notEqual(PRODUCT_FEATURES.topic_progress, PRODUCT_FEATURES.route_priorities);
   assert.equal(PREMIUM_TO_PRODUCT_FEATURE.rank_simulator, PRODUCT_FEATURES.route_forecast);
+});
+
+test("premium askidayken hicbir sey kilitli degil", () => {
+  assert.equal(canAccessProductFeature({
+    enabled: false, accessState: "loading", features: {}, featureKey: "routeScenarios",
+  }), true);
+  assert.deepEqual(canShowPaywall({ enabled: false, isPremium: false }), {
+    allowed: false, reason: "premium_disabled",
+  });
+  assert.deepEqual(trialQuotaDecision({ enabled: false, accessState: "error", quota: null }), {
+    allowed: true, reason: null, remaining: Infinity,
+  });
 });

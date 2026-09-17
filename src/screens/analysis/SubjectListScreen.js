@@ -13,6 +13,7 @@ import { useSubjectProgressList, SUBJECT_PROGRESS_TAB } from "../../hooks/useSub
 import { SubjectProgressBanner } from "./components/SubjectProgressBanner";
 import { SubjectProgressRow } from "./components/SubjectProgressRow";
 import { SubjectProgressLockCard } from "./components/SubjectProgressLockCard";
+import { PREMIUM_ENABLED } from "../../constants/premium";
 
 const TABS = [
   { key: SUBJECT_PROGRESS_TAB.PRIORITY, label: "Öncelikli", section: "ROTA ÖNCELİĞİ", empty: "Öncelik verecek bir konu yok." },
@@ -88,7 +89,7 @@ export default function SubjectListScreen() {
             </View>
           )}
 
-          {!loading && !isEmpty ? (
+          {PREMIUM_ENABLED && !loading && !isEmpty ? (
             <SubjectProgressLockCard
               C={C}
               onPress={() => navigation.navigate(SCREENS.PRO_PREVIEW)}

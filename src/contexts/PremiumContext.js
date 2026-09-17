@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
 import { useExam } from "./ExamContext";
 import { SCREENS } from "../constants/screens";
-import { FREE_LIMITS, PREMIUM_TO_PRODUCT_FEATURE } from "../constants/premium";
+import { FREE_LIMITS, PREMIUM_ENABLED, PREMIUM_TO_PRODUCT_FEATURE } from "../constants/premium";
 import { recordRetentionEvent } from "../supabase/retention";
 import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
 import { getActiveChallengeCount } from "../supabase/challenges";
@@ -104,6 +104,7 @@ export function PremiumProvider({ children }) {
   const trialDecision = trialQuotaDecision({ accessState, quota: trialQuota });
 
   const checkFeature = useCallback((featureKey) => {
+    if (!PREMIUM_ENABLED) return true;
     if (featureKey === "unlimited_trials") return trialDecision.allowed;
     if (featureKey === "unlimited_wrongs") return true;
     if (featureKey === "unlimited_challenges") {

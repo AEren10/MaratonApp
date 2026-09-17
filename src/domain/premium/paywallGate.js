@@ -1,4 +1,5 @@
 import { EXAM_PHASE, examPhaseBehavior } from "../exam/examPhase.js";
+import { PREMIUM_ENABLED } from "../../constants/premium.js";
 
 // PAYWALL KAPISI — paywall'ın GÖSTERİLMEMESİ gereken durumlar.
 //
@@ -47,7 +48,8 @@ export function firstWeekStatus(createdAt, now = new Date()) {
  *
  * @returns { allowed, reason }  reason: neden engellendiği (analytics için)
  */
-export function canShowPaywall({ isPremium, createdAt, examPhase, now = new Date() } = {}) {
+export function canShowPaywall({ isPremium, createdAt, examPhase, now = new Date(), enabled = PREMIUM_ENABLED } = {}) {
+  if (!enabled) return { allowed: false, reason: "premium_disabled" };
   if (isPremium) return { allowed: false, reason: "already_premium" };
 
   const fw = firstWeekStatus(createdAt, now);
@@ -69,13 +71,15 @@ export function canShowPaywall({ isPremium, createdAt, examPhase, now = new Date
  * Saf istemci kararı. Sunucudan snapshot gelene kadar Pro alanları açılmaz;
  * ağ hatası ise "ücretsiz" sayılmaz ve yanlış paywall üretmez.
  */
-export function canAccessProductFeature({ accessState, features, featureKey } = {}) {
+export function canAccessProductFeature({ accessState, features, featureKey, enabled = PREMIUM_ENABLED } = {}) {
   if (!featureKey) return false;
+  if (!enabled) return true;
   if (accessState !== "ready") return false;
   return features?.[featureKey] === true;
 }
 
-export function trialQuotaDecision({ accessState, quota } = {}) {
+export function trialQuotaDecision({ accessState, quota, enabled = PREMIUM_ENABLED } = {}) {
+  if (!enabled) return { allowed: true, reason: null, remaining: Infinity };
   if (accessState !== "ready" || !quota) {
     return { allowed: false, reason: "access_unknown", remaining: null };
   }
