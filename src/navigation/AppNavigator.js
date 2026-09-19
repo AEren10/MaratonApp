@@ -199,7 +199,7 @@ function Loading() {
 
 export default function AppNavigator() {
   const { session, loading, recoveryMode } = useAuth();
-  const { onboardingDone, hasSeenSlides, loading: examLoading } = useExam();
+  const { onboardingDone, hasSeenSlides, setupSkipped, loading: examLoading } = useExam();
   const navigationTracker = useMemo(() => createNavigationTracker(track), []);
 
   useEffect(() => {
@@ -233,7 +233,7 @@ export default function AppNavigator() {
     content = <SlidesStack />;
   } else if (!session) {
     content = <AuthStack />;
-  } else if (!onboardingDone) {
+  } else if (!onboardingDone && !setupSkipped) {
     content = (
       <SessionProviders>
         <SetupStack />

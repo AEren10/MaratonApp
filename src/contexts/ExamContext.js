@@ -105,6 +105,9 @@ export function ExamProvider({ children }) {
   const [dailyGoalSet, setDailyGoalSet] = useState(false);
   const [levelTestDone, setLevelTestDone] = useState(false);
   const [setupCompleted, setSetupCompleted] = useState(false);
+  // Kullanici kurulumu bilerek yarim biraktiysa bunu HATIRLARIZ. Yoksa her
+  // acilista ayni ekrana dusuyordu: girmesine izin verip yine sormak.
+  const [setupSkipped, setSetupSkipped] = useState(false);
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dbLoading, setDbLoading] = useState(false);
@@ -129,6 +132,7 @@ export function ExamProvider({ children }) {
         if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
         setLevelTestDone(!!d.levelTestDone || d.baselineNet != null);
         setSetupCompleted(!!d.setupCompleted);
+        setSetupSkipped(!!d.setupSkipped);
       }
       setHasSeenSlides(seenRaw === "true");
     })
@@ -177,6 +181,7 @@ export function ExamProvider({ children }) {
           setBaselineNet(local.baselineNet ?? null);
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
           setSetupCompleted(!!local.setupCompleted);
+          setSetupSkipped(!!local.setupSkipped);
         }
         await retryPendingNetSync(userId, local, () => cancelled);
         await retryPendingProfileSettingsSync(userId, local, () => cancelled);
@@ -223,6 +228,7 @@ export function ExamProvider({ children }) {
       if (config.dailyGoalSet) setDailyGoalSet(true);
       setLevelTestDone(config.levelTestDone);
       setSetupCompleted(config.setupCompleted);
+      setSetupSkipped(!!local.setupSkipped);
       appStorage.setJson(storageKey, {
         ...local,
         examType: config.examType,
@@ -401,6 +407,14 @@ export function ExamProvider({ children }) {
     } catch {}
   }, [storageKey]);
 
+  const skipSetup = useCallback(async () => {
+    setSetupSkipped(true);
+    try {
+      const existing = await appStorage.getJson(storageKey, {});
+      await appStorage.setJson(storageKey, { ...existing, setupSkipped: true });
+    } catch {}
+  }, [storageKey]);
+
   const updateRanking = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
@@ -454,15 +468,15 @@ export function ExamProvider({ children }) {
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
-    dailyGoalSet, levelTestDone, setupCompleted,
+    dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
-    markLevelTestDone, completeOnboarding,
+    markLevelTestDone, completeOnboarding, skipSetup,
     markSlidesAsSeen,
   }), [examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
-    dailyGoalSet, levelTestDone, setupCompleted,
+    dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
-    markLevelTestDone, completeOnboarding,
+    markLevelTestDone, completeOnboarding, skipSetup,
     markSlidesAsSeen]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;

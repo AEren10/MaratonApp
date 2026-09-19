@@ -13,6 +13,7 @@ import { useSetupProgress } from "../../hooks/useSetupProgress";
 import { ROOT_STACK } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
 import { useAuth } from "../../contexts/AuthContext";
+import { useExam } from "../../contexts/ExamContext";
 import { firstNameOf } from "../../lib/displayName";
 
 function getSubtitle(nextStepKey) {
@@ -32,6 +33,7 @@ function SetupIncompleteContent() {
   const C = useC();
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { skipSetup } = useExam();
   const { steps, doneCount, totalSteps, nextStep, loading } = useSetupProgress();
 
   const handleContinue = useCallback(() => {
@@ -43,10 +45,12 @@ function SetupIncompleteContent() {
     navigation.navigate(nextStep.screen);
   }, [navigation, nextStep]);
 
+  // Atlamayi KAYDEDEREK gir: yoksa her acilista bu ekrana geri dusuyordu.
   const goHome = useCallback(() => {
     H.tap();
+    skipSetup();
     navigation.reset({ index: 0, routes: [{ name: ROOT_STACK.MAIN_TABS }] });
-  }, [navigation]);
+  }, [navigation, skipSetup]);
 
   if (loading) {
     return (
