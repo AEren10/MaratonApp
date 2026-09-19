@@ -8,6 +8,10 @@ export function storyPalette(C, background) {
   return {
     photo,
     accent: C.accent,
+    // Paylasim tasarimi marka isareti icin KOYU murekkep kullaniyor
+    // (tasarimin kendi --ink degeri). Uygulamanin accentInk'i ise acik ton.
+    // Ikisi celisiyor; bkz. briefs/99-EREN-icin-sorular.md.
+    markInk: "#22090B",
     solid: photo ? "#FFFFFF" : C.text,
     mid: photo ? "rgba(255,255,255,0.82)" : C.text2,
     dim: photo ? "rgba(255,255,255,0.72)" : C.text4,

@@ -6,15 +6,15 @@ import { TYPOGRAPHY } from "../../themes/tokens";
 // Etiketin altindaki marka satiri. Bu, paylasimin bize donen tek getirisi —
 // her varyantta ayni yerde, ayni boyda durur ("kart" haric, onun kendi
 // ayagi var).
-export function StoryFoot({ p, daysToExam }) {
+export function StoryFoot({ p, daysToExam, inline = false }) {
   return (
-    <View style={s.wrap}>
+    <View style={[s.wrap, inline && s.inline]}>
       <View style={s.brand}>
         <View style={[s.mark, { backgroundColor: p.accent }]}>
           <Svg width={17} height={17} viewBox="0 0 18 18">
             <Path
               d="M2 14C6 14 7 4 9 4s3 10 7 10"
-              stroke="#22090B"
+              stroke={p.markInk}
               strokeWidth={2.2}
               strokeLinecap="round"
               fill="none"
@@ -33,6 +33,7 @@ export function StoryFoot({ p, daysToExam }) {
 }
 
 const s = StyleSheet.create({
+  inline: { position: "relative", left: 0, right: 0, bottom: 0 },
   wrap: {
     position: "absolute",
     left: 34,

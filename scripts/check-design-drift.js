@@ -8,6 +8,11 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..", "src");
 const EXEMPT = ["themes", "data"]; // token ve müfredat veri dosyaları
+// Sabit ARTBOARD dosyalari: story etiketi 405x720'lik bir goruntu uretir,
+// uygulama arayuzu degil. 132px kahraman rakam, 210px geri sayim gibi
+// degerler tasarimin kendi koordinatlari — STEP/TYPOGRAPHY olcegine
+// sokulamaz ve sokulmamali. Renkler yine paletten okunur.
+const EXEMPT_PATHS = ["components/share"];
 
 // Ölçüm tarihi 2026-09-05. Sayılar SADECE düşmeli.
 const BASELINE = { fontSize: 287, fontFamily: 216, spacing: 724, radius: 288, hex: 71 };
@@ -27,6 +32,8 @@ function walk(dir, out = []) {
       if (EXEMPT.includes(entry.name) && path.dirname(full) === ROOT) continue;
       walk(full, out);
     } else if (entry.name.endsWith(".js")) {
+      const rel = path.relative(ROOT, full).split(path.sep).join("/");
+      if (EXEMPT_PATHS.some((prefix) => rel.startsWith(prefix + "/"))) continue;
       out.push(full);
     }
   }

@@ -11,6 +11,13 @@ import {
   StoryStatsBody,
   StoryStreakBody,
 } from "./bodies/StoryNumberBodies";
+import { StoryRouteBody } from "./bodies/StoryRouteBody";
+import { StoryCardBody } from "./bodies/StoryCardBody";
+import {
+  StoryCountdownBody,
+  StoryHonestBody,
+  StoryNetBody,
+} from "./bodies/StoryMomentBodies";
 
 // Tasarimin tuvali: 9:16, sabit olcu. Kucuk gosterilecekse SARAN view
 // olceklenir, tuval degil — yakalama tam cozunurlukte olsun diye.
@@ -21,6 +28,11 @@ const BODIES = {
   [STORY_KIND.ISTATISTIK]: StoryStatsBody,
   [STORY_KIND.SADE]: StorySimpleBody,
   [STORY_KIND.SERI]: StoryStreakBody,
+  [STORY_KIND.ROTA]: StoryRouteBody,
+  [STORY_KIND.KART]: StoryCardBody,
+  [STORY_KIND.GERISAYIM]: StoryCountdownBody,
+  [STORY_KIND.NET]: StoryNetBody,
+  [STORY_KIND.DURUST]: StoryHonestBody,
 };
 
 export function isStoryKindReady(kind) {
@@ -45,7 +57,7 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}
 
-      <Body data={variant.data} p={p} />
+      <Body data={variant.data} p={p} C={C} />
 
       {variant.kind !== STORY_KIND.KART ? (
         <StoryFoot p={p} daysToExam={variant.data.daysToExam} />
