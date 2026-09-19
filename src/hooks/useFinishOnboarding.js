@@ -28,18 +28,18 @@ export function useFinishOnboarding() {
   const navigation = useNavigation();
   const { completeOnboarding } = useExam();
 
-  const complete = useCallback(async (summary = {}) => {
+  const complete = useCallback(async (summary = {}, options = {}) => {
     track(EVENTS.ONBOARDING_COMPLETE, summary);
     await completeOnboarding();
-    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP, undefined, options.then);
   }, [completeOnboarding, navigation]);
 
-  const finish = useCallback(async (summary = {}) => {
+  const finish = useCallback(async (summary = {}, options = {}) => {
     if (await permissionNotAsked()) {
       navigation.navigate(SCREENS.NOTIFICATION_PERMISSION, { onboardingSummary: summary });
       return;
     }
-    await complete(summary);
+    await complete(summary, options);
   }, [complete, navigation]);
 
   return { finish, complete };

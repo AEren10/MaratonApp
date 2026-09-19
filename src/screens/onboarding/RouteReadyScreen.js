@@ -12,36 +12,55 @@ import { useC } from "../../contexts/ThemeContext";
 import { useRouteReadySummary } from "../../hooks/useRouteReadySummary";
 import * as H from "../../lib/haptics";
 import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
+import { useAlert } from "../../contexts/AlertContext";
+import { SCREENS } from "../../constants/screens";
+import { buildStudyTimerParams } from "../../domain/plan/studyTimerParams";
 
 export default function RouteReadyScreen() {
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
   const C = useC();
   const [starting, setStarting] = useState(false);
   const { finish } = useFinishOnboarding();
-  const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, createRoute } =
+  const showAlert = useAlert();
+  const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, firstStopAction, createRoute } =
     useRouteReadySummary();
 
-  const finishOnboarding = useCallback(() => finish({
+  const finishOnboarding = useCallback((then) => finish({
     daysUntilExam,
     stopCount,
     hasTargetNet: targetNet != null,
     hasBaselineNet: currentNet != null,
-  }), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
+  }, { then }), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
 
+  // Rota kurulamadiysa kurulum BITMEZ: rotasiz iceri alinan kullanici hem
+  // bos bir uygulama goruyor hem de neyin ters gittigini ogrenemiyordu.
   const handleStart = useCallback(async () => {
     setStarting(true);
     try {
       await createRoute();
-      H.success();
     } catch {
       H.warn();
-    } finally {
       setStarting(false);
-      finishOnboarding().catch(() => {});
+      showAlert(
+        "Rotan oluşturulamadı",
+        "Bağlantını kontrol edip tekrar dener misin? Verdiğin bilgiler duruyor.",
+      );
+      return;
     }
-  }, [createRoute, finishOnboarding]);
+    H.success();
+    setStarting(false);
+    const params = buildStudyTimerParams({
+      subject: firstStopAction?.subjectKey,
+      topicLabel: firstStopAction?.topicName,
+      stopId: firstStopAction?.stopId,
+      version: firstStopAction?.version,
+      position: firstStopAction?.position,
+    });
+    finishOnboarding(params ? { screen: SCREENS.STUDY_TIMER, params } : undefined).catch(() => {});
+  }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
-  const handleViewRoute = finishOnboarding;
+  // Ikinci buton rotanin tamamina goturur: finish zaten Rota'ya resetliyor.
+  const handleViewRoute = useCallback(() => finishOnboarding(), [finishOnboarding]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>

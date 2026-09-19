@@ -36,8 +36,10 @@ export function useRouteReadySummary() {
     when: index === 0 ? "Bugün" : `${index + 1}. durak`,
   })), [allStops]);
 
+  const firstStopAction = useMemo(() => firstRouteAction(allStops), [allStops]);
+
   const firstStop = useMemo(() => {
-    const stop = firstRouteAction(allStops);
+    const stop = firstStopAction;
     if (!stop) return null;
     return {
       subjectLabel: (SUBJECT_LABELS[stop.subjectKey] || stop.subjectLabel || stop.subjectKey || "").toUpperCase(),
@@ -49,7 +51,7 @@ export function useRouteReadySummary() {
       confidenceLabel: stop.confidenceLabel,
       impact: stop.impact,
     };
-  }, [allStops]);
+  }, [firstStopAction]);
 
   return {
     daysUntilExam,
@@ -60,5 +62,6 @@ export function useRouteReadySummary() {
     stopCount: allStops.length,
     upcomingStops,
     firstStop,
+    firstStopAction,
   };
 }
