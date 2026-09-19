@@ -11,7 +11,7 @@
     "description": "YKS hazırlık sürecini takip et: günlük plan, deneme analizi, yanlış defteri.",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.maraton.app",
+      "bundleIdentifier": "com.ahmeterensiranli.maraton",
       "buildNumber": "1",
       "usesAppleSignIn": true,
       "associatedDomains": [
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "com.maraton.app",
+      "package": "com.ahmeterensiranli.maraton",
       "versionCode": 1,
       "intentFilters": [
         {
