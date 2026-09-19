@@ -19,6 +19,8 @@ import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
 import RouteNextActionPanel from "../roadmap/components/RouteNextActionPanel";
 import { StudySummaryStats } from "./components/StudySummaryStats";
+import { StoryShareBlock } from "../../components/share/StoryShareBlock";
+import { STORY_MOMENT } from "../../domain/share/storySticker";
 
 export default function StudySummaryScreen() {
   const C = useC();
@@ -119,6 +121,8 @@ export default function StudySummaryScreen() {
         </Animated.View>
 
         <View style={{ flex: 1 }} />
+
+        <StoryShareBlock moment={STORY_MOMENT.SESSION} emphasis="quiet" />
 
         <Animated.View entering={FadeInDown.delay(320).duration(500)} style={{ gap: STEP.s1 }}>
           {nextRouteAction ? (
