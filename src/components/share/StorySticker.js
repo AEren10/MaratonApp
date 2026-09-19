@@ -35,10 +35,6 @@ const BODIES = {
   [STORY_KIND.DURUST]: StoryHonestBody,
 };
 
-export function isStoryKindReady(kind) {
-  return Boolean(BODIES[kind]);
-}
-
 /**
  * Tek bir story etiketi. `ref` view-shot'in yakaladigi dugumdur.
  */
