@@ -54,3 +54,6 @@ supabase/.temp/
 # build ve gecici cikti
 output/
 tmp/
+
+# Ajan gorev brief'leri (yerel calisma notu)
+briefs/
