@@ -71,12 +71,6 @@
       "@sentry/react-native/expo",
       "expo-apple-authentication",
       [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.PLACEHOLDER_IOS_CLIENT_ID"
-        }
-      ],
-      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
