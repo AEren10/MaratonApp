@@ -8,6 +8,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { PRODUCT_FEATURES } from "../../constants/premium";
 import { useFeatureEntry } from "../../hooks/useFeatureEntry";
 import { useSummary } from "../../hooks/useSummary";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
+import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
@@ -34,6 +36,10 @@ function SummaryScreenInner() {
   const { open: openMonthlyReport } = useFeatureEntry(PRODUCT_FEATURES.monthly_report, "monthly_report");
   const period = WEEK_ROUTES.has(route.name) ? "week" : normalizePeriod(route.params?.period);
   const data = useSummary(period);
+  const { routeCreated, weeks } = useStudyRoute({ persist: false });
+  const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({
+    navigation, routeCreated, weeks,
+  });
 
   const handleClose = useCallback(() => navigation.goBack(), [navigation]);
   const handlePrimary = useCallback(() => {
@@ -47,7 +53,14 @@ function SummaryScreenInner() {
   const handleUnlock = useCallback(() => {
     openMonthlyReport();
   }, [openMonthlyReport]);
-  const handleStart = useCallback(() => navigation.navigate(SCREENS.HOME), [navigation]);
+  // Buton "Bugünün durağına başla" diyor; oyleyse duragi baslatmali.
+  // Eskiden navigate(HOME) idi: ROTA yiginin koku HOME_ROOT adiyla kayitli
+  // oldugu icin cagri zaten acik olan sekmeyi yeniden seciyordu, yani hicbir
+  // sey olmuyordu. Durak yoksa en azindan sekmenin kokune donulur.
+  const handleStart = useCallback(() => {
+    if (nextRouteAction) { startNextRouteAction(); return; }
+    navigation.popToTop();
+  }, [navigation, nextRouteAction, startNextRouteAction]);
   const handleHowStreak = useCallback(() => navigation.navigate(SCREENS.HOW_IT_WORKS), [navigation]);
 
   let body;

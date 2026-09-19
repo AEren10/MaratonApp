@@ -14,7 +14,7 @@ import * as H from "../../lib/haptics";
 import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
-import { buildStudyTimerParams } from "../../domain/plan/studyTimerParams";
+import { routeActionTimerParams } from "../../domain/route/routeStartAction";
 
 export default function RouteReadyScreen() {
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
@@ -49,13 +49,7 @@ export default function RouteReadyScreen() {
     }
     H.success();
     setStarting(false);
-    const params = buildStudyTimerParams({
-      subject: firstStopAction?.subjectKey,
-      topicLabel: firstStopAction?.topicName,
-      stopId: firstStopAction?.stopId,
-      version: firstStopAction?.version,
-      position: firstStopAction?.position,
-    });
+    const params = routeActionTimerParams(firstStopAction);
     finishOnboarding(params ? { screen: SCREENS.STUDY_TIMER, params } : undefined).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
