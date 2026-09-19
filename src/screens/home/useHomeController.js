@@ -31,6 +31,10 @@ import { useHomeNavigation } from "./useHomeNavigation";
 import { useHomeRefresh } from "./useHomeRefresh";
 import { useHomeActions } from "./useHomeActions";
 
+// Odakta sessiz tazeleme araligi. Sekme degistirmede ag trafigi olmasin,
+// ama uzun bir oturumdan donen kullanici bayat sayi gormesin.
+const FOCUS_REFRESH_MS = 30000;
+
 const subjectLabel = (key) => getSubjectByKey(key)?.label;
 
 // Ana Sayfa'nin tum durumu tek yerde; ekran dosyasi yalniz hal secer ve cizer.
@@ -96,6 +100,18 @@ export function useHomeController() {
 
   const { showNext } = nudge;
   useEffect(() => { showNext(2000); }, [showNext]);
+
+  // Ana sayfaya geri donuldugunde (ornegin zamanlayicidan cikinca) sunucudan
+  // bir kez cekilen veri bayat kaliyordu; yalniz Ozet'in reset yolu yeniden
+  // baglıyordu. Sessiz tazeleme: iskelet yok, titresim yok, spinner yok.
+  const lastFocusSyncRef = useRef(Date.now());
+  useEffect(() => {
+    if (!focused || !isConnected) return;
+    const now = Date.now();
+    if (now - lastFocusSyncRef.current < FOCUS_REFRESH_MS) return;
+    lastFocusSyncRef.current = now;
+    refresh();
+  }, [focused, isConnected, refresh]);
 
   // Iskelet yalniz ilk acilista: veri geldi, baglanti yok ya da 4 sn doldu.
   const readyRef = useRef(false);
