@@ -112,6 +112,11 @@ const EighthDayLockScreen = React.lazy(() => import("../screens/premium/EighthDa
 const DataExportScreen = React.lazy(() => import("../screens/settings/DataExportScreen"));
 const AccountDeleteScreen = React.lazy(() => import("../screens/settings/AccountDeleteScreen"));
 const OfflineQueueScreen = React.lazy(() => import("../screens/settings/OfflineQueueScreen"));
+const GroupsScreen = React.lazy(() => import("../screens/groups/GroupsScreen"));
+const CreateGroupScreen = React.lazy(() => import("../screens/groups/CreateGroupScreen"));
+const JoinGroupScreen = React.lazy(() => import("../screens/groups/JoinGroupScreen"));
+const GroupDetailScreen = React.lazy(() => import("../screens/groups/GroupDetailScreen"));
+const GroupSettingsScreen = React.lazy(() => import("../screens/groups/GroupSettingsScreen"));
 
 const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(Comp), options });
 
@@ -256,6 +261,11 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.DATA_EXPORT, DataExportScreen),
   screen(SCREENS.ACCOUNT_DELETE, AccountDeleteScreen, modalOptions),
   screen(SCREENS.OFFLINE_QUEUE, OfflineQueueScreen),
+  screen(SCREENS.GROUPS, GroupsScreen),
+  screen(SCREENS.CREATE_GROUP, CreateGroupScreen),
+  screen(SCREENS.JOIN_GROUP, JoinGroupScreen),
+  screen(SCREENS.GROUP_DETAIL, GroupDetailScreen),
+  screen(SCREENS.GROUP_SETTINGS, GroupSettingsScreen),
 ];
 
 // Sekme stack'leri ada gore ekran tanimi ariyor (bkz. tabAssignment.js).

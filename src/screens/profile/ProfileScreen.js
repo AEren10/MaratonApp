@@ -81,6 +81,10 @@ export default function ProfileScreen() {
                 first
               />
               <ProfileLinkRow
+                label="Gruplarım"
+                onPress={() => navigation.navigate(SCREENS.GROUPS)}
+              />
+              <ProfileLinkRow
                 label="Rotayı Dondur"
                 onPress={() => navigation.navigate(SCREENS.ROUTE_PAUSE)}
               />

@@ -98,6 +98,11 @@ export const SCREENS = {
   FRIENDS: "Friends",
   REFERRAL: "Referral",
   ROUTE_COMPANION: "RouteCompanion",
+  GROUPS: "Groups",
+  CREATE_GROUP: "CreateGroup",
+  JOIN_GROUP: "JoinGroup",
+  GROUP_DETAIL: "GroupDetail",
+  GROUP_SETTINGS: "GroupSettings",
 
   // Study Save (post-timer)
   STUDY_SAVE: "StudySave",
