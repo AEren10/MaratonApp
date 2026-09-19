@@ -16,6 +16,7 @@ const MemberRow = React.memo(function MemberRow({ item }) {
   const st = useMemo(() => makeStyles(C), [C]);
   const isYou = item.you;
   const medal = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const weeklyQuestions = item.weekly_questions ?? item.questions ?? item.weekly_xp ?? 0;
   return (
     <View style={[st.row, isYou && st.rowYou]}>
       <View style={{ width: 26, alignItems: "center" }}>
@@ -25,8 +26,8 @@ const MemberRow = React.memo(function MemberRow({ item }) {
       <Text style={{ flex: 1, marginLeft: 10, ...TYPOGRAPHY.bodyMedium, color: isYou ? C.accent : C.text }} numberOfLines={1}>
         {isYou ? "Sen" : item.name || "Öğrenci"}
       </Text>
-      <Text style={{ fontFamily: "Bricolage_400", fontSize: 15, color: C.text }}>{item.weekly_xp}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>XP</Text>
+      <Text style={{ fontFamily: "Bricolage_400", fontSize: 15, color: C.text }}>{weeklyQuestions}</Text>
+      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>soru</Text>
     </View>
   );
 });
@@ -39,6 +40,7 @@ export function GroupsTab({ user, initialGroupCode }) {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [board, setBoard] = useState({ list: [] });
+  const [boardError, setBoardError] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [name, setName] = useState("");
@@ -69,10 +71,17 @@ export function GroupsTab({ user, initialGroupCode }) {
       .finally(() => setBusy(false));
   }, [initialGroupCode, user?.id]);
 
-  useEffect(() => {
+  const loadBoard = useCallback(async () => {
     if (!selected?.id || !user?.id) return;
-    groupLeaderboard(selected.id, user.id).then(setBoard).catch(() => setBoard({ list: [] }));
+    setBoardError(null);
+    try {
+      setBoard(await groupLeaderboard(selected.id, user.id));
+    } catch (e) {
+      setBoardError(e?.message || "Sıralama yüklenemedi.");
+    }
   }, [selected?.id, user?.id]);
+
+  useEffect(() => { loadBoard(); }, [loadBoard]);
 
   const doCreate = async () => {
     if (!name.trim()) return;
@@ -92,7 +101,7 @@ export function GroupsTab({ user, initialGroupCode }) {
   };
 
   const doJoin = async () => {
-    if (code.trim().length < 4) return;
+    if (code.trim().length < 6) return;
     setBusy(true);
     try {
       await joinByCode(code);
@@ -183,7 +192,18 @@ export function GroupsTab({ user, initialGroupCode }) {
                 </Pressable>
               }
               contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
-              ListEmptyComponent={<Text style={st.emptySub}>Bu hafta kimse aktif değil.</Text>}
+              ListEmptyComponent={
+                boardError ? (
+                  <View style={st.boardError}>
+                    <Text style={st.emptySub}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text>
+                    <Pressable onPress={loadBoard} style={st.retryBtn}>
+                      <Text style={st.retryText}>Tekrar dene</Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <Text style={st.emptySub}>Bu hafta kimse aktif değil.</Text>
+                )
+              }
             />
           ) : null}
         </>
@@ -237,6 +257,9 @@ const makeStyles = (C) => StyleSheet.create({
   actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },
   actText: { ...TYPOGRAPHY.button },
   emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", paddingHorizontal: SPACING.xl },
+  boardError: { alignItems: "center", gap: SPACING.sm, paddingTop: SPACING.lg },
+  retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1, borderColor: C.border },
+  retryText: { ...TYPOGRAPHY.captionMedium, color: C.text },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
   chipActive: { backgroundColor: C.accent + "18", borderColor: C.accent },
   chipText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
