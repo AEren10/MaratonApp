@@ -5,56 +5,27 @@ import { GUTTER, SHAPE, STEP } from "../../../themes/tokens";
 
 export const WRONG_TABS = {
   MINE: "mine",
-  COMMUNITY: "community",
 };
 
-export function NotebookHeaderTabs({ C, activeTab, onChange, count = 0 }) {
-  const isMine = activeTab === WRONG_TABS.MINE;
-  const isComm = activeTab === WRONG_TABS.COMMUNITY;
-
+export function NotebookHeaderTabs({ C, count = 0 }) {
   return (
     <View style={[s.tabs, { borderBottomColor: C.line }]}>
-      <Pressable
+      <View
         accessibilityRole="tab"
         accessibilityLabel={`Defterim, ${count} soru`}
-        accessibilityState={{ selected: isMine }}
-        onPress={() => {
-          if (isMine) return;
-          H.select();
-          onChange(WRONG_TABS.MINE);
-        }}
+        accessibilityState={{ selected: true }}
         style={s.tab}
       >
         <View style={s.tabLabelRow}>
-          <Text style={[s.tabTitle, { color: isMine ? C.text : C.text3 }]}>
+          <Text style={[s.tabTitle, { color: C.text }]}>
             Defterim
           </Text>
           <Text style={[s.tabCount, { color: C.text3 }]}>
             {count}
           </Text>
         </View>
-        <View style={[s.indicator, { backgroundColor: isMine ? C.accent : "transparent" }]} />
-      </Pressable>
-
-      <Pressable
-        accessibilityRole="tab"
-        accessibilityLabel="Topluluk"
-        accessibilityState={{ selected: isComm }}
-        onPress={() => {
-          if (isComm) return;
-          H.select();
-          onChange(WRONG_TABS.COMMUNITY);
-        }}
-        style={s.tab}
-      >
-        <View style={s.tabLabelRow}>
-          <Text style={[s.tabTitle, { color: isComm ? C.text : C.text3 }]}>
-            Topluluk
-          </Text>
-          <View style={[s.dot, { backgroundColor: C.accent }]} />
-        </View>
-        <View style={[s.indicator, { backgroundColor: isComm ? C.accent : "transparent" }]} />
-      </Pressable>
+        <View style={[s.indicator, { backgroundColor: C.accent }]} />
+      </View>
     </View>
   );
 }

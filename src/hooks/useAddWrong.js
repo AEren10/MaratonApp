@@ -82,7 +82,14 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
     }
   }, [showAlert]);
 
-  const save = useCallback(async () => {
+  const resetForNext = useCallback(() => {
+    setImage(null);
+    setNote("");
+    setTopic(null);
+  }, []);
+
+  const save = useCallback(async (opts = {}) => {
+    const keepOpen = opts?.keepOpen ?? false;
     if (saving) return;
     if (!checkFeature("unlimited_wrongs")) {
       H.warn();
@@ -120,7 +127,7 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
         ...initialReview(),
       });
       bumpUsage?.("wrong");
-      trackButtonTap("wrong_add_save", { subject: subject.key, hasImage: !!image, guessed: !topic && !!guess });
+      trackButtonTap("wrong_add_save", { subject: subject.key, hasImage: !!image, guessed: !topic && !!guess, keepOpen });
       if (result.queued || imageLocalUri) {
         H.tap();
         showAlert(imageLocalUri ? "Fotoğraf beklemede" : "Çevrimdışı", "Bağlantı geldiğinde otomatik kaydedilecek.");
@@ -128,18 +135,24 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
         H.success();
       }
       await reward("question_solved", { count: 1, statUpdates: [{ type: "increment", key: "totalQuestions" }] });
-      onSaved?.();
+      if (keepOpen) {
+        resetForNext();
+      } else {
+        onSaved?.();
+      }
     } catch (err) {
       H.error();
       showAlert("Hata", "Kaydederken bir sorun oluştu.\n" + (err?.message || ""));
     } finally {
       setSaving(false);
     }
-  }, [saving, checkFeature, showPaywall, subject, selectedTopic, showAlert, image, user?.id, note, bumpUsage, topic, guess, reward, onSaved]);
+  }, [saving, checkFeature, showPaywall, subject, selectedTopic, showAlert, image, user?.id, note, bumpUsage, topic, guess, reward, onSaved, resetForNext]);
+
+  const saveAndNew = useCallback(() => save({ keepOpen: true }), [save]);
 
   return {
     changeGroup, changeSubject, dismissXP, group, groupLabels: [group1Label, group2Label],
-    guess, image, note, pick, save, saving, selectedTopic, setNote, setTopic, subject,
-    subjects, suggestions, xpToast,
+    guess, image, note, pick, resetForNext, save, saveAndNew, saving, selectedTopic,
+    setNote, setTopic, subject, subjects, suggestions, xpToast,
   };
 }

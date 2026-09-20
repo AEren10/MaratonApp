@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -189,6 +189,12 @@ export default function LeagueScreen() {
   const C = useC();
   const { user } = useAuth();
   const [tab, setTab] = useState(route.params?.groupCode ? "groups" : "friends");
+
+  useEffect(() => {
+    if (route.params?.groupCode) {
+      setTab("groups");
+    }
+  }, [route.params?.groupCode]);
   const [data, setData] = useState({ list: [], total: null, myRank: null, myScore: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -352,6 +358,7 @@ export default function LeagueScreen() {
         {[
           { key: "friends", label: "Arkadaşlar" },
           { key: "global", label: "Genel" },
+          { key: "groups", label: "Gruplar" },
         ].map((t) => (
           <Pressable
             key={t.key}

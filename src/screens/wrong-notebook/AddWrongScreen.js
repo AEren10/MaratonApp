@@ -3,13 +3,14 @@ import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Styl
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Button, Icon } from "../../components/design";
+import { Icon } from "../../components/design";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { TopicPicker } from "../../components/forms/TopicPicker";
 import { useC } from "../../contexts/ThemeContext";
 import { useAddWrong } from "../../hooks/useAddWrong";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { AddWrongFooter } from "./components/add/AddWrongFooter";
 import { ChoiceChip } from "./components/add/ChoiceChip";
 import { FormSection } from "./components/add/FormSection";
 import { PhotoCapture } from "./components/add/PhotoCapture";
@@ -107,14 +108,7 @@ export default function AddWrongScreen() {
             </View>
           </View>
         </ScrollView>
-        <View style={[styles.footer, { backgroundColor: C.bg, borderTopColor: C.line }]}>
-          <Button size="lg" onPress={form.save} loading={form.saving} fullWidth>
-            Kaydet
-          </Button>
-          <Text style={[TYPOGRAPHY.micro, { color: C.text2, textAlign: "center", marginTop: STEP.s2 }]}>
-            Kaydedince 1. gün tekrarına düşer.
-          </Text>
-        </View>
+        <AddWrongFooter C={C} onSave={form.save} onSaveAndNew={form.saveAndNew} saving={form.saving} />
       </KeyboardAvoidingView>
       <TopicPicker
         visible={pickerOpen}
@@ -145,5 +139,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: GUTTER, paddingVertical: STEP.s3, marginTop: STEP.s3,
     borderBottomWidth: 1,
   },
-  footer: { padding: GUTTER, paddingBottom: STEP.s2, borderTopWidth: 1 },
 });

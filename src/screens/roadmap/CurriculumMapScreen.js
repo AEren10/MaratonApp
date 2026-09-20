@@ -6,6 +6,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import SegmentTabs from "../../components/common/SegmentTabs";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { useCurriculumMap } from "../../hooks/useCurriculumMap";
@@ -16,6 +17,10 @@ import { CurriculumBottomActions } from "./components/CurriculumBottomActions";
 import { RouteHeader } from "./components/RouteHeader";
 
 const enter = (i) => FadeInDown.delay(i * 80).duration(600);
+const TABS = [
+  { key: "curriculum", label: "Müfredat" },
+  { key: "program", label: "Programım" },
+];
 
 // Tasarim AKIS 7 · "Yol Haritası" — mufredat ilerlemesi (rota haftalari DEGIL).
 function CurriculumMapInner() {
@@ -27,6 +32,12 @@ function CurriculumMapInner() {
     navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: subject.key, subjectName: subject.name });
   }, [navigation]);
 
+  const onTabChange = useCallback((tab) => {
+    if (tab === "program") {
+      navigation.navigate(SCREENS.DAILY_PLAN);
+    }
+  }, [navigation]);
+
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <RouteHeader
@@ -36,6 +47,9 @@ function CurriculumMapInner() {
         moreIcon="search"
         moreLabel="Konu ara"
       />
+      <View style={[s.pad, { marginBottom: STEP.s2 }]}>
+        <SegmentTabs options={TABS} value="curriculum" onChange={onTabChange} />
+      </View>
       {map.loading ? (
         <View style={s.pad}>
           <Skeleton height={220} radius={SHAPE.sheet} />

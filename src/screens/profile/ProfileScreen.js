@@ -85,6 +85,10 @@ export default function ProfileScreen() {
                 onPress={() => navigation.navigate(SCREENS.GROUPS)}
               />
               <ProfileLinkRow
+                label="Çalışma Geçmişi"
+                onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
+              />
+              <ProfileLinkRow
                 label="Rotayı Dondur"
                 onPress={() => navigation.navigate(SCREENS.ROUTE_PAUSE)}
               />

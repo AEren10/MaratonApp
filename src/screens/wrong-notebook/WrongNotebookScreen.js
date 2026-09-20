@@ -13,14 +13,13 @@ import { ReviewDueCard } from "./components/ReviewDueCard";
 import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
-import { NotebookHeaderTabs, WRONG_TABS } from "./components/NotebookHeaderTabs";
+import { NotebookHeaderTabs } from "./components/NotebookHeaderTabs";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
 export default function WrongNotebookScreen() {
   const C = useC();
   const nb = useWrongNotebookController();
   const { view } = nb;
-  const [activeTab, setActiveTab] = useState(WRONG_TABS.MINE);
 
   const filterOptions = useMemo(() => [
     { key: NOTEBOOK_FILTER.OPEN, label: `Bekleyen · ${view.openCount}` },
@@ -89,7 +88,7 @@ export default function WrongNotebookScreen() {
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <WrongScreenHeader title="Defter" onPress={nb.goBack} />
-      <NotebookHeaderTabs C={C} activeTab={activeTab} onChange={setActiveTab} count={view.openCount} />
+      <NotebookHeaderTabs C={C} count={view.openCount} />
       {body}
     </SafeAreaView>
   );
