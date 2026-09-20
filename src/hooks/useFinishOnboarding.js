@@ -31,12 +31,17 @@ export function useFinishOnboarding() {
   const complete = useCallback(async (summary = {}, options = {}) => {
     track(EVENTS.ONBOARDING_COMPLETE, summary);
     await completeOnboarding();
-    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP, undefined, options.then);
+    // Kurulumdan cikan kullanici ANA SAYFA'ya iner, Rota Detay'a degil.
+    // Rota Detay ilk gun bos gorunuyor (hicbir deneme, hicbir tamamlanmis
+    // durak yok); ana sayfada ise selamlama, bugunun duragi ve rota cizgisi
+    // var. Ilk izlenim orasi olmali. ROTA sekmesinin koku zaten Ana Sayfa,
+    // o yuzden ekran adi VERMIYORUZ.
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, options.screen, undefined, options.then);
   }, [completeOnboarding, navigation]);
 
   const finish = useCallback(async (summary = {}, options = {}) => {
     if (await permissionNotAsked()) {
-      navigation.navigate(SCREENS.NOTIFICATION_PERMISSION, { onboardingSummary: summary });
+      navigation.navigate(SCREENS.NOTIFICATION_PERMISSION, { onboardingSummary: summary, onboardingOptions: options });
       return;
     }
     await complete(summary, options);

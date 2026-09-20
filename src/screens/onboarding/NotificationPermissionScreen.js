@@ -26,12 +26,15 @@ function NotificationPermissionContent() {
   const [denied, setDenied] = useState(false);
   const [busy, setBusy] = useState(false);
   const onboardingSummary = useRoute().params?.onboardingSummary;
+  // Kullanicinin "ilk duraga basla" mi yoksa "rotanin tamami" mi dedigi
+  // izin ekraninda kayboluyordu; her iki halde de ayni yere dusuyordu.
+  const onboardingOptions = useRoute().params?.onboardingOptions;
   const { complete } = useFinishOnboarding();
   
   const leave = useCallback(() => {
-    if (onboardingSummary) complete(onboardingSummary).catch(() => {});
+    if (onboardingSummary) complete(onboardingSummary, onboardingOptions || {}).catch(() => {});
     else navigation.goBack();
-  }, [complete, navigation, onboardingSummary]);
+  }, [complete, navigation, onboardingSummary, onboardingOptions]);
 
   const handleAllow = useCallback(async () => {
     setBusy(true);

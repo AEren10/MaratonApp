@@ -25,12 +25,12 @@ export default function RouteReadyScreen() {
   const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, firstStopAction, createRoute } =
     useRouteReadySummary();
 
-  const finishOnboarding = useCallback((then) => finish({
+  const finishOnboarding = useCallback((options = {}) => finish({
     daysUntilExam,
     stopCount,
     hasTargetNet: targetNet != null,
     hasBaselineNet: currentNet != null,
-  }, { then }), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
+  }, options), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
 
   // Rota kurulamadiysa kurulum BITMEZ: rotasiz iceri alinan kullanici hem
   // bos bir uygulama goruyor hem de neyin ters gittigini ogrenemiyordu.
@@ -50,11 +50,15 @@ export default function RouteReadyScreen() {
     H.success();
     setStarting(false);
     const params = routeActionTimerParams(firstStopAction);
-    finishOnboarding(params ? { screen: SCREENS.STUDY_TIMER, params } : undefined).catch(() => {});
+    finishOnboarding(params ? { then: { screen: SCREENS.STUDY_TIMER, params } } : {}).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
-  // Ikinci buton rotanin tamamina goturur: finish zaten Rota'ya resetliyor.
-  const handleViewRoute = useCallback(() => finishOnboarding(), [finishOnboarding]);
+  // Ikinci buton rotanin tamamina goturur. Varsayilan inis Ana Sayfa oldugu
+  // icin Rota Detay'i acikca istemek gerekiyor.
+  const handleViewRoute = useCallback(
+    () => finishOnboarding({ screen: SCREENS.ROADMAP }),
+    [finishOnboarding],
+  );
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
