@@ -77,6 +77,12 @@ function normalizeGroup(row = {}) {
     role: row.role || "member",
     member_count: Number(row.member_count ?? row.memberCount ?? 0) || 0,
     memberCount: Number(row.member_count ?? row.memberCount ?? 0) || 0,
+    creator_name: row.creator_name ?? row.creatorName ?? null,
+    creatorName: row.creator_name ?? row.creatorName ?? null,
+    // get_my_groups sirayi uretiyor; yoksa null kalir ve kart sirayi hic
+    // yazmaz -- uydurma bir 0. sira gostermekten iyidir.
+    user_rank: Number(row.user_rank ?? row.userRank) || null,
+    userRank: Number(row.user_rank ?? row.userRank) || null,
   };
 }
 
@@ -141,6 +147,21 @@ export async function joinByCode(code) {
   } catch (e) {
     JOIN_THROTTLE.recordFailure();
     handleSupabaseError(e, "joinByCode");
+    throw e;
+  }
+}
+
+export async function previewGroupByCode(code) {
+  const trimmed = normalizeGroupCode(code);
+  if (trimmed.length !== 6) throw new Error("Grup kodu 6 hane olmalı");
+  JOIN_THROTTLE.check();
+  try {
+    const result = ensureOk(await rpc("preview_group_by_code", { group_code: trimmed }, "previewGroupByCode"));
+    JOIN_THROTTLE.recordSuccess();
+    return normalizeGroup(result);
+  } catch (e) {
+    JOIN_THROTTLE.recordFailure();
+    handleSupabaseError(e, "previewGroupByCode");
     throw e;
   }
 }

@@ -78,6 +78,31 @@ kuralları doğrulamaya devam ediyor.
   `src/lib/storyShare.js`.
 - **Widget** — `expo-widgets` (iOS, SDK 57'de stabil) +
   `react-native-android-widget`. Ertelendi.
-- **Grup sistemi** — `user_rank` hiçbir yerde üretilmiyor ama
-  `GroupCard.js:34` render ediyor; guard'lı olduğu için sessizce hiç
-  görünmüyor. Codex'in işi.
+- **Grup sistemi** — `user_rank` artık üretiliyor (migration
+  `20260920010000_clde_my_groups_user_rank.sql`). Grup arayüzü hâlâ
+  `agy/work` branch'inde, merge edilmedi.
+
+---
+
+## Canlı Supabase'e uygulanmamış migration'lar
+
+**Bunlar repoda var ama canlı veritabanında olduğu doğrulanmadı.** Uygulama
+bu RPC'leri çağırıyor; canlıda yoksa çalışma anında hata verir.
+
+- `20260919120000_cdx_group_data_layer.sql`
+- `20260920002000_cdx_group_preview_by_code.sql`
+- `20260920002201_cdx_group_preview_creator_name.sql`
+- `20260920010000_clde_my_groups_user_rank.sql`
+
+Doğrulamak için canlıya karşı çalıştır:
+
+```sql
+select p.proname, n.nspname
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where p.proname in ('get_my_groups','preview_group_by_code','get_group_leaderboard');
+```
+
+`get_my_groups` çıktısında `user_rank` kolonu yoksa migration uygulanmamıştır.
+
+**Not:** Supabase MCP bu oturumda yetkisiz ("Unauthorized — access token"),
+o yüzden canlıya bakılamadı. Token ayarlanınca ilk iş bu doğrulama.
