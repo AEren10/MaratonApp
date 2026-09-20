@@ -1,6 +1,7 @@
+import { useCallback } from "react";
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
@@ -18,7 +19,13 @@ export default function GroupDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { groupId, groupName: initialName } = route.params || {};
-  const { group, leaderboard = [], goal, loading, refresh } = useGroupDetail(groupId);
+  const { group, leaderboard = [], goal, loading, refreshing, refresh, reload } = useGroupDetail(groupId);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (groupId) reload?.().catch(() => {});
+    }, [groupId, reload])
+  );
 
   const displayName = group?.name || initialName || "Grup Detayı";
 
@@ -60,7 +67,7 @@ export default function GroupDetailScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
+            refreshing={refreshing}
             onRefresh={refresh}
             tintColor={C.accent}
             colors={[C.accent]}

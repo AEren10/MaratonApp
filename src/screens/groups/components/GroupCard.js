@@ -6,9 +6,11 @@ import * as H from "../../../lib/haptics";
 
 export function GroupCard({ group, onPress }) {
   const C = useC();
-  const target = group.weekly_target || 1000;
-  const current = group.weekly_questions || 0;
-  const progressPercent = Math.min(100, Math.round((current / target) * 100));
+  const target = group.weekly_target || group.weeklyTarget || 1000;
+  const current = group.weekly_questions || group.weeklyQuestions || 0;
+  const progressPercent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+  const memberCount = group.member_count || group.memberCount || 1;
+  const rank = group.user_rank || group.userRank || group.rank;
 
   return (
     <Pressable
@@ -30,11 +32,11 @@ export function GroupCard({ group, onPress }) {
           </Text>
           <View style={styles.metaRow}>
             <Icon name="users" size={13} color={C.text3} />
-            <Text style={[styles.metaText, { color: C.text2 }]}>{group.member_count || 1} üye</Text>
-            {group.user_rank ? (
+            <Text style={[styles.metaText, { color: C.text2 }]}>{memberCount} üye</Text>
+            {rank ? (
               <View style={[styles.rankPill, { backgroundColor: C.elev }]}>
                 <Text style={[styles.rankText, { color: C.accentBright }]}>
-                  {group.user_rank}. sıradasın
+                  {rank}. sıradasın
                 </Text>
               </View>
             ) : null}

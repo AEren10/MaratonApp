@@ -1,6 +1,7 @@
+import { useCallback } from "react";
 import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { GUTTER, STEP } from "../../themes/tokens";
@@ -14,7 +15,13 @@ import { Button } from "../../components/design/Button";
 export default function GroupsScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { groups, loading, refresh } = useGroups();
+  const { groups = [], loading, refreshing, refresh, reload } = useGroups();
+
+  useFocusEffect(
+    useCallback(() => {
+      reload?.().catch(() => {});
+    }, [reload])
+  );
 
   const handleSelectGroup = (group) => {
     navigation.navigate(SCREENS.GROUP_DETAIL, { groupId: group.id, groupName: group.name });
@@ -28,36 +35,37 @@ export default function GroupsScreen() {
     <SafeAreaView edges={["top"]} style={[styles.safeArea, { backgroundColor: C.bg }]}>
       <GroupsHeader onAddPress={() => navigation.navigate(SCREENS.CREATE_GROUP)} />
 
-      {loading ? (
+      {loading && groups.length === 0 ? (
         <GroupsSkeleton />
-      ) : groups.length === 0 ? (
-        <GroupsEmptyState />
       ) : (
         <FlatList
           data={groups}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={groups.length === 0 ? styles.emptyContent : styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              refreshing={loading}
+              refreshing={refreshing}
               onRefresh={refresh}
               tintColor={C.accent}
               colors={[C.accent]}
             />
           }
+          ListEmptyComponent={<GroupsEmptyState />}
           ListFooterComponent={
-            <View style={styles.footerRow}>
-              <Button
-                title="Koda Katıl"
-                variant="outline"
-                size="md"
-                fullWidth
-                icon="hash"
-                onPress={() => navigation.navigate(SCREENS.JOIN_GROUP)}
-              />
-            </View>
+            groups.length > 0 ? (
+              <View style={styles.footerRow}>
+                <Button
+                  title="Koda Katıl"
+                  variant="outline"
+                  size="md"
+                  fullWidth
+                  icon="hash"
+                  onPress={() => navigation.navigate(SCREENS.JOIN_GROUP)}
+                />
+              </View>
+            ) : null
           }
         />
       )}
@@ -73,6 +81,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: GUTTER,
     paddingTop: STEP.s2,
     paddingBottom: STEP.s5 + STEP.s4,
+  },
+  emptyContent: {
+    flexGrow: 1,
   },
   footerRow: {
     marginTop: STEP.s3,

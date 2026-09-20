@@ -48,8 +48,8 @@ export function CreatedGroupModal({ visible, group, onProceed }) {
           >
             <Text style={[styles.codeText, { color: C.accentBright }]}>{group.code}</Text>
             <View style={styles.copyRow}>
-              <Icon name={copied ? "check" : "copy"} size={14} color={copied ? C.green : C.text3} />
-              <Text style={[styles.copyLabel, { color: copied ? C.green : C.text3 }]}>
+              <Icon name={copied ? "check" : "copy"} size={14} color={copied ? C.up : C.text3} />
+              <Text style={[styles.copyLabel, { color: copied ? C.up : C.text3 }]}>
                 {copied ? "Kopyalandı" : "Kopyalamak için dokun"}
               </Text>
             </View>

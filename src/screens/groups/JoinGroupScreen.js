@@ -48,12 +48,14 @@ export default function JoinGroupScreen() {
 
   const handleJoin = async () => {
     if (code.length !== 6 || busy) return;
+    setError("");
     try {
       const res = await joinGroupByCode(code);
       H.success();
       navigation.replace(SCREENS.GROUP_DETAIL, { groupId: res.id, groupName: res.name });
-    } catch {
-      // Handled in hook
+    } catch (err) {
+      setError(err?.message || "Gruba katılınamadı.");
+      H.warn();
     }
   };
 

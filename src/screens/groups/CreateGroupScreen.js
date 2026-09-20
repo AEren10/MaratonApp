@@ -33,6 +33,7 @@ export default function CreateGroupScreen() {
   };
 
   const handleProceed = () => {
+    if (!createdGroup) return;
     const group = createdGroup;
     setCreatedGroup(null);
     navigation.replace(SCREENS.GROUP_DETAIL, { groupId: group.id, groupName: group.name });

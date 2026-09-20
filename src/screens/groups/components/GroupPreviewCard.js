@@ -35,14 +35,14 @@ export function GroupPreviewCard({ group, loading }) {
         <View style={styles.detailItem}>
           <Icon name="user" size={13} color={C.text3} />
           <Text style={[styles.detailText, { color: C.text2 }]}>
-            Kurucu: {group.creator_name || "Öğrenci"}
+            Kurucu: {group.creator_name || group.creatorName || group.owner_name || "Öğrenci"}
           </Text>
         </View>
 
         <View style={styles.detailItem}>
           <Icon name="users" size={13} color={C.text3} />
           <Text style={[styles.detailText, { color: C.text2 }]}>
-            {group.member_count} üye
+            {group.member_count || group.memberCount || 1} üye
           </Text>
         </View>
       </View>
@@ -50,7 +50,7 @@ export function GroupPreviewCard({ group, loading }) {
       <View style={[styles.targetBanner, { backgroundColor: C.void, borderColor: C.line }]}>
         <Text style={[styles.targetLabel, { color: C.text3 }]}>Haftalık Hedef:</Text>
         <Text style={[styles.targetVal, { color: C.text }]}>
-          {(group.weekly_target || 1000).toLocaleString("tr-TR")} soru
+          {(group.weekly_target || group.weeklyTarget || 1000).toLocaleString("tr-TR")} soru
         </Text>
       </View>
     </View>

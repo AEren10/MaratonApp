@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -22,6 +22,11 @@ export default function GroupSettingsScreen() {
   const [groupName, setGroupName] = useState(group?.name || initialName || "");
   const [groupCode, setGroupCode] = useState(group?.code || initialCode || "");
   const isAdmin = (group?.role || initialRole) === "admin";
+
+  useEffect(() => {
+    if (group?.name && !groupName) setGroupName(group.name);
+    if (group?.code && !groupCode) setGroupCode(group.code);
+  }, [group?.name, group?.code]);
 
   const {
     handleSaveName,
