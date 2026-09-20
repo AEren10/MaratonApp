@@ -58,7 +58,12 @@ kuralları doğrulamaya devam ediyor.
 - `ReviewDoneScreen.js` — "Yarın 4 soru bekliyor" sabit yazı
 - `TopicDebtHero` — yüklenirken kısa süre "0 sa" görünüyor
 - `AGENTS.md` — accent-ink açıklamasında çelişki
-- Sentry expo plugin'inde `organization` / `project` eksik
+- **Sentry kurulumu hiç yapılmamış.** Ne `sentry.properties` var, ne plugin'de
+  `organization` / `project`. Bu yüzden `development` ve `preview` profillerinde
+  `SENTRY_DISABLE_AUTO_UPLOAD=true` ile source map yüklemesi kapatıldı.
+  **`production` profilinde kapatılmadı** — mağazaya çıkmadan önce gerçek bir
+  Sentry projesi açıp org/project slug'ını girmek gerekiyor, yoksa production
+  build'i aynı hatayla kırılır ve crash raporları okunamaz kalır.
 - "Rota hazır" ekranındaki iki buton farklı yerlere gitmeli (düzeltildi,
   cihazda doğrulanmadı)
 - Kurulumu yarıda bırakan kullanıcının takılması (düzeltildi, cihazda
