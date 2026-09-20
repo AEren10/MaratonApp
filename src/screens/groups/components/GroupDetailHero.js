@@ -3,14 +3,14 @@ import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 
-export function GroupDetailHero({ group }) {
+export function GroupDetailHero({ group, goal }) {
   const C = useC();
   if (!group) return null;
 
-  const current = group.weekly_questions || 0;
-  const target = group.weekly_target || 1000;
-  const percent = Math.min(100, Math.round((current / target) * 100));
-  const remaining = Math.max(0, target - current);
+  const current = goal?.weekly_questions ?? group.weekly_questions ?? 0;
+  const target = goal?.weekly_target ?? group.weekly_target ?? 1000;
+  const percent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+  const remaining = goal?.remaining ?? Math.max(0, target - current);
 
   return (
     <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>

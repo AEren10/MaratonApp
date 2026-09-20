@@ -6,7 +6,8 @@ import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 
 export function GroupLeaderboardRow({ member }) {
   const C = useC();
-  const isYou = member.is_user;
+  const isYou = Boolean(member.is_user || member.you);
+  const questions = Number(member.weekly_questions ?? member.questions ?? 0);
 
   return (
     <View
@@ -26,7 +27,7 @@ export function GroupLeaderboardRow({ member }) {
 
       <View style={styles.avatarWrapper}>
         <Avatar
-          init={(member.display_name || "?").slice(0, 2).toUpperCase()}
+          init={(member.display_name || member.name || "?").slice(0, 2).toUpperCase()}
           size={32}
           color={isYou ? C.accent : undefined}
         />
@@ -43,7 +44,7 @@ export function GroupLeaderboardRow({ member }) {
             style={[styles.nameText, { color: isYou ? C.accentBright : C.text }]}
             numberOfLines={1}
           >
-            {isYou ? "Sen" : member.display_name}
+            {isYou ? "Sen" : member.display_name || member.name}
           </Text>
           {member.role === "admin" ? (
             <View style={[styles.roleBadge, { backgroundColor: C.void }]}>
@@ -59,7 +60,7 @@ export function GroupLeaderboardRow({ member }) {
 
       <View style={styles.statCol}>
         <Text style={[styles.statValue, { color: isYou ? C.accentBright : C.text }]}>
-          {member.weekly_questions.toLocaleString("tr-TR")}
+          {questions.toLocaleString("tr-TR")}
         </Text>
         <Text style={[styles.statUnit, { color: C.text3 }]}>soru</Text>
       </View>

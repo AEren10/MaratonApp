@@ -17,24 +17,25 @@ export function GroupMembersList({ members = [], isAdmin, onRemoveMember }) {
 
       <View style={styles.list}>
         {members.map((member) => {
-          const isYou = member.is_user;
+          const isYou = Boolean(member.is_user || member.you);
           const isMemberAdmin = member.role === "admin";
           const canRemove = isAdmin && !isYou && !isMemberAdmin;
+          const memberName = member.display_name || member.name || "Öğrenci";
 
           return (
             <View
-              key={member.user_id}
+              key={member.user_id || member.id}
               style={[styles.memberRow, { borderBottomColor: C.line }]}
             >
               <Avatar
-                init={(member.display_name || "?").slice(0, 2).toUpperCase()}
+                init={memberName.slice(0, 2).toUpperCase()}
                 size={32}
                 color={isYou ? C.accent : undefined}
               />
 
               <View style={styles.nameBlock}>
                 <Text style={[styles.name, { color: isYou ? C.accentBright : C.text }]}>
-                  {isYou ? "Sen" : member.display_name}
+                  {isYou ? "Sen" : memberName}
                 </Text>
                 <Text style={[styles.role, { color: C.text3 }]}>
                   {isMemberAdmin ? "Kurucu" : "Üye"}

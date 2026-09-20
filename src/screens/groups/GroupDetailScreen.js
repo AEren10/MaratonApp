@@ -18,7 +18,7 @@ export default function GroupDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { groupId, groupName: initialName } = route.params || {};
-  const { group, leaderboard, loading, refresh } = useGroupDetail(groupId);
+  const { group, leaderboard = [], goal, loading, refresh } = useGroupDetail(groupId);
 
   const displayName = group?.name || initialName || "Grup Detayı";
 
@@ -67,14 +67,14 @@ export default function GroupDetailScreen() {
           />
         }
       >
-        <GroupDetailHero group={group} />
+        <GroupDetailHero group={group} goal={goal} />
 
         {top3.length >= 2 ? <GroupPodium topMembers={top3} /> : null}
 
         <View style={styles.listSection}>
           <Text style={[styles.sectionTitle, { color: C.text3 }]}>TÜM ÜYELER</Text>
-          {leaderboard.map((member) => (
-            <GroupLeaderboardRow key={member.user_id} member={member} />
+          {(leaderboard || []).map((member) => (
+            <GroupLeaderboardRow key={member.user_id || member.id} member={member} />
           ))}
         </View>
 

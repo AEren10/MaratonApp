@@ -21,41 +21,39 @@ export default function JoinGroupScreen() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const hasPreviewFn = typeof previewGroupByCode === "function";
+
   useEffect(() => {
-    if (code.length === 6) {
+    if (code.length === 6 && hasPreviewFn) {
       let active = true;
       setPreviewLoading(true);
       setError("");
       previewGroupByCode(code)
-        .then((res) => {
-          if (active) setPreview(res);
-        })
+        .then((res) => { if (active) setPreview(res); })
         .catch((err) => {
           if (active) {
             setPreview(null);
             setError(err?.message || "Grup bulunamadı.");
           }
         })
-        .finally(() => {
-          if (active) setPreviewLoading(false);
-        });
-      return () => {
-        active = false;
-      };
+        .finally(() => { if (active) setPreviewLoading(false); });
+      return () => { active = false; };
     } else {
       setPreview(null);
       setError("");
     }
-  }, [code, previewGroupByCode]);
+  }, [code, hasPreviewFn, previewGroupByCode]);
+
+  const canJoin = code.length === 6 && !busy && (!hasPreviewFn || !!preview);
 
   const handleJoin = async () => {
-    if (!preview) return;
+    if (code.length !== 6 || busy) return;
     try {
       const res = await joinGroupByCode(code);
       H.success();
       navigation.replace(SCREENS.GROUP_DETAIL, { groupId: res.id, groupName: res.name });
     } catch {
-      // Error handled in hook
+      // Handled in hook
     }
   };
 
@@ -104,7 +102,7 @@ export default function JoinGroupScreen() {
               variant="primary"
               size="lg"
               fullWidth
-              disabled={!preview || busy}
+              disabled={!canJoin}
               loading={busy}
               onPress={handleJoin}
             />

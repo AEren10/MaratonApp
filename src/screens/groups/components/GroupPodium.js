@@ -15,13 +15,14 @@ export function GroupPodium({ topMembers = [] }) {
 
   const renderPedestal = (member, rank, height, isCenter = false) => {
     if (!member) return <View style={{ flex: 1 }} />;
-    const isYou = member.is_user;
+    const isYou = Boolean(member.is_user || member.you);
+    const questions = Number(member.weekly_questions ?? member.questions ?? 0);
 
     return (
       <View style={[styles.pedestalCol, { flex: 1 }]}>
         <View style={styles.avatarWrapper}>
           <Avatar
-            init={(member.display_name || "?").slice(0, 2).toUpperCase()}
+            init={(member.display_name || member.name || "?").slice(0, 2).toUpperCase()}
             size={isCenter ? 44 : 36}
             color={isYou ? C.accent : undefined}
           />
@@ -39,11 +40,11 @@ export function GroupPodium({ topMembers = [] }) {
           ]}
           numberOfLines={1}
         >
-          {isYou ? "Sen" : member.display_name}
+          {isYou ? "Sen" : member.display_name || member.name}
         </Text>
 
         <Text style={[styles.questionCount, { color: C.text }]}>
-          {member.weekly_questions} <Text style={[styles.unit, { color: C.text3 }]}>soru</Text>
+          {questions.toLocaleString("tr-TR")} <Text style={[styles.unit, { color: C.text3 }]}>soru</Text>
         </Text>
 
         <View
