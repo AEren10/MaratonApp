@@ -54,9 +54,17 @@ export default function RoadmapScreen() {
                   {d.chartReady && view.chart ? (
                     <RouteDetailChart chart={view.chart} target={d.targetNet} examDateTag={d.examDateTag} />
                   ) : (
-                    <RouteEmptyChart examDateTag={d.examDateTag} />
+                    <RouteEmptyChart examDateTag={d.examDateTag} declared={d.declared} />
                   )}
                 </View>
+
+                {/* Olculmus tahmin yokken bile yolun uzunlugu bilinir:
+                    kalan gun, durak sayisi ve haftalik tempo. Hepsi gercek. */}
+                {!d.chartReady && d.declared?.summary ? (
+                  <Text style={[TYPOGRAPHY.meta, s.declaredSummary, { color: C.text3 }]}>
+                    {d.declared.summary}
+                  </Text>
+                ) : null}
               </Animated.View>
               
               <Animated.View entering={enter(1)} style={s.cardSection}>
@@ -98,6 +106,7 @@ const s = StyleSheet.create({
   introHeader: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
   caption: { marginTop: STEP.s1 / 2 },
   chart: { marginTop: 12 },
+  declaredSummary: { paddingHorizontal: GUTTER, marginTop: STEP.s2 },
   cardSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
   section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 + 4 },
   links: { gap: STEP.s1 + 2, marginTop: STEP.s2 + 4 },

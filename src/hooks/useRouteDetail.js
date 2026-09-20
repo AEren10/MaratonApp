@@ -10,6 +10,7 @@ import { usePremium } from "../contexts/PremiumContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { buildPlanVsActual } from "../domain/route/planVsActual";
 import { routeDetailForecast } from "../domain/route/routeDetailView";
+import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { flattenRouteStops, routeDateTag, upcomingRouteStops } from "../domain/route/routeOverview";
 import { useRouteCreate } from "./useRouteCreate";
 import { useStudyRoute } from "./useStudyRoute";
@@ -18,7 +19,7 @@ import { useFeatureEntry } from "./useFeatureEntry";
 // Rota Detay ekraninin tum verisi ve aksiyonlari. Ekran yalniz render eder.
 export function useRouteDetail() {
   const navigation = useNavigation();
-  const { targetNet, examDate } = useExam();
+  const { targetNet, baselineNet, examDate } = useExam();
   const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
   const { open: openScenarioGate } = useFeatureEntry(PRODUCT_FEATURES.route_scenarios, "route_scenarios");
   const route = useStudyRoute({ persist: false });
@@ -38,6 +39,14 @@ export function useRouteDetail() {
     [forecast, targetNet, tempoScenarios],
   );
   const promise = useMemo(() => buildPlanVsActual(weeks), [weeks]);
+
+  // Olculmus tahmin yokken bile kullanicinin KENDI beyani var: kurulumda
+  // girdigi baslangic ve hedef net. Ekran bunlari geri soylemek yerine
+  // "HENUZ TAHMIN YOK" yaziyordu.
+  const declared = useMemo(
+    () => routeDeclaredPath({ baselineNet, targetNet, daysLeft, stopCount: flat.length }),
+    [baselineNet, targetNet, daysLeft, flat.length],
+  );
 
   const scenariosOpen = canAccessProductFeature({
     accessState: accessLoading ? "loading" : accessError ? "error" : "ready",
@@ -71,6 +80,7 @@ export function useRouteDetail() {
     examDateTag: routeDateTag(examDate, { withYear: true }),
     targetNet: Number.isFinite(targetNet) ? Math.round(targetNet) : null,
     view,
+    declared,
     scenariosLocked: !scenariosOpen,
     promiseText: promise.hasData ? `Planlanan ${promise.plannedDue}, tamamlanan ${promise.doneDue} durak` : null,
     upcoming,

@@ -7,9 +7,11 @@ import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 const W = 390;
 const H = 150;
 
-// Boş Rota grafigi: hat henuz yok. Bugun dugumu, sinav gunune giden sonuk
-// noktali yol ve "HENÜZ TAHMİN YOK". Deger cizmez — veri uydurmaz.
-export function RouteEmptyChart({ examDateTag, emptyLabel = "HENÜZ TAHMİN YOK" }) {
+// Olculmus tahmin yokken Rota grafigi. Hat henuz cizilmedi ama iki ucu
+// biliyoruz: kullanici kurulumda baslangic ve hedef netini kendi girdi.
+// `declared` gelirse o sayilar yazilir -- UYDURMA DEGIL, kullanicinin kendi
+// beyani. Gelmezse eski davranis: "HENÜZ TAHMİN YOK".
+export function RouteEmptyChart({ examDateTag, declared, emptyLabel = "HENÜZ TAHMİN YOK" }) {
   const C = useC();
   return (
     <View style={s.wrap} accessible accessibilityLabel={`Net grafiği: henüz veri yok. ${emptyLabel}`}>
@@ -29,8 +31,22 @@ export function RouteEmptyChart({ examDateTag, emptyLabel = "HENÜZ TAHMİN YOK"
         <Circle cx={40} cy={112} r={7} fill={C.accent} />
         <Circle cx={352} cy={40} r={7.5} fill={C.bg} stroke={C.stop} strokeWidth={2.6} />
       </Svg>
-      <Text style={[TYPOGRAPHY.tableHead, s.today, { color: C.accentBright }]}>BUGÜN</Text>
-      <Text style={[TYPOGRAPHY.tableHead, s.none, { color: C.text4 }]}>{emptyLabel}</Text>
+      <View style={s.today}>
+        {declared?.startLabel ? (
+          <Text style={[TYPOGRAPHY.tableValue, { color: C.text }]}>{declared.startLabel}</Text>
+        ) : null}
+        <Text style={[TYPOGRAPHY.tableHead, { color: C.accentBright }]}>BUGÜN</Text>
+      </View>
+
+      <View style={s.goal}>
+        {declared?.goalLabel ? (
+          <Text style={[TYPOGRAPHY.tableValue, s.right, { color: C.text }]}>{declared.goalLabel}</Text>
+        ) : null}
+        <Text style={[TYPOGRAPHY.tableHead, s.right, { color: declared?.goalLabel ? C.text2 : C.text4 }]}>
+          {declared?.goalLabel ? "HEDEFİN" : emptyLabel}
+        </Text>
+      </View>
+
       {examDateTag ? (
         <Text style={[TYPOGRAPHY.tableHead, s.exam, { color: C.text2 }]}>{examDateTag}</Text>
       ) : null}
@@ -41,6 +57,7 @@ export function RouteEmptyChart({ examDateTag, emptyLabel = "HENÜZ TAHMİN YOK"
 const s = StyleSheet.create({
   wrap: { width: "100%", aspectRatio: W / H, position: "relative" },
   today: { position: "absolute", left: "10%", bottom: STEP.s1 },
-  none: { position: "absolute", right: "6%", bottom: STEP.s1 },
+  goal: { position: "absolute", right: "6%", bottom: STEP.s1, alignItems: "flex-end" },
+  right: { textAlign: "right" },
   exam: { position: "absolute", right: "6%", top: "4%" },
 });
