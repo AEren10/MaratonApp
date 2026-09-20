@@ -12,6 +12,7 @@ import { AnalysisHeroScore } from "./components/AnalysisHeroScore";
 import { SubjectTrendCards } from "./components/SubjectTrendCards";
 import { AnalysisTrialHistory } from "./components/AnalysisTrialHistory";
 import { PublisherComparisonCard } from "./components/PublisherComparisonCard";
+import { buildPublisherComparison } from "../../domain/analysis/publisherComparison";
 import { DeeperAnalysisSection } from "./components/DeeperAnalysisSection";
 import { AnalysisSkeleton } from "./components/AnalysisSkeleton";
 import { useAnalysisController } from "./useAnalysisController";
@@ -34,6 +35,10 @@ export default function AnalysisScreen() {
   } = useAnalysisController(C);
 
   const totalTrials = analysis.filteredTrials?.length ?? 0;
+  const publisherComparison = useMemo(
+    () => buildPublisherComparison(analysis.filteredTrials || []),
+    [analysis.filteredTrials],
+  );
 
   return (
     <SwipeToHome>
@@ -96,7 +101,7 @@ export default function AnalysisScreen() {
                 }
               />
 
-              <PublisherComparisonCard C={C} />
+              <PublisherComparisonCard C={C} comparison={publisherComparison} />
 
               <DeeperAnalysisSection
                 C={C}

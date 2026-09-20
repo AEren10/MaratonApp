@@ -1,13 +1,24 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, SHAPE } from "../../../themes/tokens";
+import { PendingSection } from "../../../components/common/PendingSection";
 
-export function PublisherComparisonCard({ C }) {
-  const publishers = [
-    { name: "Limit", net: 58, percent: "88%" },
-    { name: "3D", net: 52, percent: "79%" },
-    { name: "Karekök", net: 47, percent: "71%" },
-  ];
+export function PublisherComparisonCard({ C, comparison }) {
+  // Bu kart eskiden hic veri almiyordu: herkese ayni uc yayini gosteriyordu.
+  // Karsilastirma en az iki farkli yayindan deneme ister.
+  if (!comparison?.ready) {
+    return (
+      <PendingSection
+        label="YAYIN KARŞILAŞTIRMASI"
+        title="Karşılaştıracak yayın yok"
+        note={comparison?.reason === "tek_yayin"
+          ? "Tek yayından deneme girdin. Farklı bir yayından deneme girince ikisini karşılaştırırım."
+          : "Deneme girerken yayını da seçersen hangi yayında daha iyi olduğunu buradan görürsün."}
+      />
+    );
+  }
+
+  const publishers = comparison.publishers;
 
   return (
     <View style={s.wrap}>
@@ -21,7 +32,7 @@ export function PublisherComparisonCard({ C }) {
               <View style={[s.track, { backgroundColor: C.track }]}>
                 <View style={[s.bar, { width: p.percent, backgroundColor: C.accent }]} />
               </View>
-              <Text style={[s.netNum, { color: C.text }]}>{p.net}</Text>
+              <Text style={[s.netNum, { color: C.text }]}>{String(p.net).replace(".", ",")}</Text>
             </View>
           ))}
         </View>

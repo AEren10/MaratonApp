@@ -70,13 +70,29 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
     };
   });
   const subjects = subjectsForFilter(C, filter, latest, examType);
-  const bars = subjects.map((subject) => ({
-    key: subject.key,
-    name: subject.name,
-    color: subject.color,
-    net: latest?.subjects?.[subject.key]?.net || 0,
-    max: subject.max,
-  }));
+  // Ders karti bir zamanlar trend okunu ve mini grafigi sabit bir listeden
+  // esleyerek ciziyordu: gercek net yaninda UYDURMA bir egri. Ikisi de burada
+  // ham denemelerden hesaplaniyor; hesaplanamiyorsa null donuyor ve kart
+  // grafigi hic cizmiyor.
+  const oldestFirst = [...sorted].reverse();
+  const bars = subjects.map((subject) => {
+    const series = oldestFirst
+      .map((trial) => trial.subjects?.[subject.key]?.net)
+      .filter((n) => Number.isFinite(n))
+      .slice(-6);
+    const hasTrend = series.length >= 2;
+    return {
+      key: subject.key,
+      name: subject.name,
+      color: subject.color,
+      net: latest?.subjects?.[subject.key]?.net || 0,
+      max: subject.max,
+      series: hasTrend ? series : null,
+      delta: hasTrend ? series[series.length - 1] - series[series.length - 2] : null,
+      lo: hasTrend ? Math.min(...series) : null,
+      hi: hasTrend ? Math.max(...series) : null,
+    };
+  });
   const heroLine = heroSlice.slice().reverse().map((trial) => trial.totalNet || 0);
   const heroLabels = heroSlice.slice().reverse().map((trial) =>
     formatTrialDate(trial.date, { day: "numeric", month: "short" }),

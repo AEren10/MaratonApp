@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { GUTTER } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { HeroTrendChartSvg } from "./HeroTrendChartSvg";
+import { PendingSection } from "../../../components/common/PendingSection";
 
 function formatNumber(n) {
   if (n == null || isNaN(n)) return "0,00";
@@ -16,20 +17,28 @@ function formatDelta(n) {
 }
 
 export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [] }) {
-  const data = useMemo(() => {
-    if (heroLine.length >= 2) return heroLine;
-    return [54, 56.5, 59, 56, 59.5, 55.5, 58.25];
-  }, [heroLine]);
+  // Burada net, trend, tarih ve grafigin TAMAMI icin uydurma yedek vardi:
+  // deneme girmemis biri "58,25 · +2,3 · 23 HAZIRAN 2026" goruyordu.
+  if (latest?.net == null) {
+    return (
+      <PendingSection
+        label="NET ORTALAMASI"
+        title="İlk denemeni bekliyorum"
+        note="Deneme girdikçe net eğrin burada oluşur."
+      />
+    );
+  }
 
-  const netText = latest?.net != null ? formatNumber(latest.net) : "58,25";
-  const trendVal = latest?.trend ?? 2.3;
+  const data = heroLine.length >= 2 ? heroLine : [latest.net];
+  const netText = formatNumber(latest.net);
+  const trendVal = latest.trend ?? 0;
   const isUp = trendVal >= 0;
   const deltaColor = isUp ? C.up : C.down;
-  const label = (latest?.typeLabel || "TYT DENEMESİ") + " · " + (latest?.date || "23 HAZİRAN 2026").toUpperCase();
-
+  const label = [latest.typeLabel, latest.date && String(latest.date).toUpperCase()]
+    .filter(Boolean).join(" · ");
   const labels = heroLabels.length >= 3
     ? [heroLabels[0], heroLabels[Math.floor(heroLabels.length / 2)], heroLabels[heroLabels.length - 1]]
-    : ["22 HAZ", "5 TEM", "18 TEM"];
+    : heroLabels;
 
   return (
     <View style={s.wrap}>

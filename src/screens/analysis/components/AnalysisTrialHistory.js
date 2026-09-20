@@ -3,28 +3,36 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { GUTTER } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { TrialHistoryItem } from "./TrialHistoryItem";
+import { PendingSection } from "../../../components/common/PendingSection";
 
 export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelectTrial, onSeeAll }) {
-  const defaultItems = [
-    { id: "t1", type: "TYT", date: "23 Haziran 2026", net: 58.25, trend: 2.3, latest: true, mood: "İYİ" },
-    { id: "t2", type: "AYT SAY", date: "16 Haziran 2026", net: 55.95, trend: -1.4, latest: false, mood: "ZOR" },
-  ];
+  // Deneme yoksa UYDURMA: burada bir zamanlar "TYT 23 Haziran 58,25" ve
+  // "24 kayit" sabit yaziyordu, yeni acilan hesap bunlari kendi verisi
+  // saniyordu. Deneme gecmisi olmayan birine gosterilecek gercek bir sey yok.
+  if (!history.length) {
+    return (
+      <PendingSection
+        label="DENEME KAYITLARI"
+        title="Henüz deneme girmedin"
+        note="İlk denemeni girdiğinde net değişimin burada görünmeye başlar."
+      />
+    );
+  }
 
-  const items = history.length > 0
-    ? history.slice(0, 2).map((t, i) => ({
-        id: t.id,
-        type: t.trialType || "TYT",
-        date: t.date || "",
-        net: t.net || 0,
-        trend: t.trend || 0,
-        latest: i === 0,
-        mood: (t.trend || 0) >= 0 ? "İYİ" : "ZOR",
-        trial: t,
-      }))
-    : defaultItems;
+  const items = history.slice(0, 2).map((t, i) => ({
+    id: t.id,
+    type: t.trialType || "TYT",
+    date: t.date || "",
+    net: t.net || 0,
+    trend: t.trend || 0,
+    latest: i === 0,
+    mood: (t.trend || 0) >= 0 ? "İYİ" : "ZOR",
+    trial: t,
+  }));
 
-  const countText = `${totalCount || 24} kayıt`;
-  const btnSubtitle = `${totalCount || 24} deneme · yayın ve tarihe göre süz`;
+  const count = totalCount || history.length;
+  const countText = `${count} kayıt`;
+  const btnSubtitle = `${count} deneme · yayın ve tarihe göre süz`;
 
   return (
     <View style={s.wrap}>

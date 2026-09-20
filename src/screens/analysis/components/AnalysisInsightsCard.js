@@ -1,15 +1,23 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, STEP } from "../../../themes/tokens";
+import { PendingSection } from "../../../components/common/PendingSection";
 
 export function AnalysisInsightsCard({ C, insights }) {
-  const defaultItems = [
-    { color: C.down, text: "Matematik netin son 5 denemede düşüşte." },
-    { color: C.warn, text: "Bu hafta Matematikte en az çalıştığın konu Permütasyon." },
-    { color: C.accent, text: "Defterinde Matematikten 5 tekrar bekliyor." },
-  ];
+  // Bu karta hicbir zaman gercek icgoru gecilmedi: herkese ayni uc cumle
+  // yaziliyordu ("Matematik netin son 5 denemede dususte"), hesap yeni olsa
+  // bile. Gercek icgoru uretimi baglanana kadar durust hali gosteriyoruz.
+  if (!insights?.length) {
+    return (
+      <PendingSection
+        label="BU HAFTA NE OKUYORUZ"
+        title="Okunacak bir şey birikmedi"
+        note="Çalışma ve deneme kaydettikçe buraya haftalık çıkarımlar düşer."
+      />
+    );
+  }
 
-  const items = insights?.length ? insights : defaultItems;
+  const items = insights;
 
   return (
     <View style={s.wrap}>

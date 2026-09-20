@@ -15,6 +15,10 @@ function formatDelta(n) {
 }
 
 export function SubjectCardItem({ C, card, onPress }) {
+  // Tek deneme girmis birinde trend yok: rozet de mini grafik de sinir
+  // satiri da gizleniyor. Eskiden "+0,00" ve duz bir cizgi cizip sanki
+  // olcum varmis gibi gosteriyordu.
+  const hasTrend = card.delta != null && Array.isArray(card.series) && card.series.length >= 2;
   const isUp = (card.delta ?? 0) >= 0;
   const dc = isUp ? C.up : C.down;
 
@@ -32,18 +36,24 @@ export function SubjectCardItem({ C, card, onPress }) {
         <View style={[s.dot, { backgroundColor: card.color }]} />
         <Text style={[s.name, { color: C.text }]}>{card.name}</Text>
         <Text style={[s.net, { color: C.text }]}>{formatNum(card.net)}</Text>
-        <View style={[s.badge, { backgroundColor: C.void }]}>
-          <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={2.2} />
-          <Text style={[s.badgeText, { color: dc }]}>{formatDelta(card.delta)}</Text>
+        {hasTrend ? (
+          <View style={[s.badge, { backgroundColor: C.void }]}>
+            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={2.2} />
+            <Text style={[s.badgeText, { color: dc }]}>{formatDelta(card.delta)}</Text>
+          </View>
+        ) : null}
+      </View>
+
+      {hasTrend ? <SubjectSparklineSvg series={card.series} color={card.color} /> : null}
+
+      {hasTrend ? (
+        <View style={s.cardBottom}>
+          <Text style={[s.boundText, { color: C.text3 }]}>{formatNum(card.lo)} en düşük</Text>
+          <Text style={[s.boundText, { color: C.text3 }]}>{formatNum(card.hi)} en yüksek</Text>
         </View>
-      </View>
-
-      <SubjectSparklineSvg series={card.series} color={card.color} />
-
-      <View style={s.cardBottom}>
-        <Text style={[s.boundText, { color: C.text3 }]}>{formatNum(card.lo)} en düşük</Text>
-        <Text style={[s.boundText, { color: C.text3 }]}>{formatNum(card.hi)} en yüksek</Text>
-      </View>
+      ) : (
+        <Text style={[s.boundText, { color: C.text3 }]}>ikinci denemeden sonra trend çıkar</Text>
+      )}
     </Pressable>
   );
 }
