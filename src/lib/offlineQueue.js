@@ -687,7 +687,9 @@ export async function saveRouteStopTransitionOffline({
     });
     return { saved: true, queued: false, data: saved, clientOperationId: operationId };
   } catch (e) {
-    if (isPermanentError(e) || e?.code === "40001") {
+    // Surum catismasi kalici: ayni eski surumle tekrar denemek sonsuza
+    // kadar ayni cevabi alir. PT409 yeni kod, 40001 eski kurulumlar icin.
+    if (isPermanentError(e) || e?.code === "PT409" || e?.code === "40001") {
       return { saved: false, queued: false, error: e, clientOperationId: operationId };
     }
     try {

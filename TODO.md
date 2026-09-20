@@ -84,25 +84,33 @@ kuralları doğrulamaya devam ediyor.
 
 ---
 
-## Canlı Supabase'e uygulanmamış migration'lar
+## Canlı Supabase — 20 Eylül 04:10 itibarıyla senkron
 
-**Bunlar repoda var ama canlı veritabanında olduğu doğrulanmadı.** Uygulama
-bu RPC'leri çağırıyor; canlıda yoksa çalışma anında hata verir.
+Beş migration da canlıda doğrulandı. MCP artık OAuth ile bağlı, canlıya
+bakabiliyorum.
 
-- `20260919120000_cdx_group_data_layer.sql`
-- `20260920002000_cdx_group_preview_by_code.sql`
-- `20260920002201_cdx_group_preview_creator_name.sql`
-- `20260920010000_clde_my_groups_user_rank.sql`
+Bilinen küçük sapma: `public.create_group(p_name text)` tek argümanlı eski
+sürüm canlıda duruyor, migration onu `DROP` etmesine rağmen. Zararsız —
+`SECURITY DEFINER` değil, `search_path` kilitli, üç argümanlıyı varsayılanlarla
+çağırıyor. İstemci hep üç argüman gönderdiği için hiç çağrılmıyor.
 
-Doğrulamak için canlıya karşı çalıştır:
+---
 
-```sql
-select p.proname, n.nspname
-from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-where p.proname in ('get_my_groups','preview_group_by_code','get_group_leaderboard');
-```
+## Çözülmüş: veritabanını yakan sonsuz döngü (20 Eylül)
 
-`get_my_groups` çıktısında `user_rank` kolonu yoksa migration uygulanmamıştır.
+`transition_route_stop`, sürüm çakışmasını `ERRCODE 40001` ile bildiriyordu.
+`40001` = *serialization_failure*, yani "geçici çakışma, aynı isteği tekrar
+gönder". PostgREST bu tavsiyeye uydu. Ama sürüm çakışması geçici değil —
+istemcinin beklediği sürüm eskimiş, aynı sürümle bin kere denese bin kere aynı
+cevabı alır.
 
-**Not:** Supabase MCP bu oturumda yetkisiz ("Unauthorized — access token"),
-o yüzden canlıya bakılamadı. Token ayarlanınca ilk iş bu doğrulama.
+Sonuç: **19 gün boyunca saniyede tam 100 istek**, 302 milyon geri alınan işlem,
+veritabanı süresinin %98,7'si, ve Supabase'in "kaynaklar tükeniyor" uyarısı.
+
+Düzeltme: `PT409` — PostgREST bunu doğrudan HTTP 409 Conflict'e çevirir ve
+tekrar etmez. Uygulandıktan sonra döngü aynı dakika içinde durdu (ölçüldü:
+3 saniyede 0 yeni geri alma, öncesinde ~300).
+
+**Ders:** `40001` ve `40P01` (deadlock) "tekrar dene" anlamına gelir. Kalıcı bir
+iş kuralı ihlali için asla bu kodları kullanma. Yeni RPC yazarken kalıcı hatada
+`PTxxx` kullan.

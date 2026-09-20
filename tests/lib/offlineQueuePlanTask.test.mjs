@@ -17,7 +17,10 @@ test("queued route stop transitions replay through the lifecycle RPC", () => {
   assert.match(source, /transitionRouteStop\(\{\s*stopId: item\.payload\.stopId/);
   assert.match(source, /saveRouteStopTransitionOffline\(\{/);
   assert.match(source, /payload: routePayload/);
-  assert.match(source, /isPermanentError\(e\) \|\| e\?\.code === "40001"/);
+  // Surum catismasi kuyruga GIRMEMELI: ayni eski surumle tekrar denemek
+  // sonsuza kadar ayni cevabi alir. Bir kez PostgREST bunu 19 gun boyunca
+  // saniyede 100 kez yapti. PT409 canli kod, 40001 eski kurulumlar icin.
+  assert.match(source, /isPermanentError\(e\) \|\| e\?\.code === "PT409" \|\| e\?\.code === "40001"/);
 });
 
 test("route stop UI transitions use the offline-safe helper", () => {
@@ -25,4 +28,12 @@ test("route stop UI transitions use the offline-safe helper", () => {
   assert.match(useStudyRouteSource, /if \(routeResult\.error && !routeResult\.queued\) throw routeResult\.error/);
   assert.match(useStudyRouteSource, /getLatestRouteStops\(user\.id, examType\)/);
   assert.doesNotMatch(useStudyRouteSource, /const updated = await transitionRouteStop\(/);
+});
+
+test("route stop version conflict is not advertised as retryable", () => {
+  // 40001 = serialization_failure, yani "ayni istegi tekrar gonder". Surum
+  // catismasi kalici bir hata; o kodla bildirilirse PostgREST sonsuz doner.
+  const sql = readFileSync("supabase/migrations/20260920020000_clde_route_stop_conflict_not_retryable.sql", "utf8");
+  assert.match(sql, /route stop version conflict' USING ERRCODE = 'PT409'/);
+  assert.doesNotMatch(sql, /ERRCODE = '40001'/);
 });
