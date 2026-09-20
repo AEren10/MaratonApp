@@ -10,8 +10,15 @@ test("home ilk gun state'i sinav baglamini saklamaz", () => {
 
   assert.match(screen, /<HomeTopBar name=\{dashboard\.displayName\} daysUntilExam=\{h\.daysUntilExam\}/);
   assert.doesNotMatch(screen, /h\.firstDay\s*\?\s*null/);
-  assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün · ilk durak hazır/);
-  assert.match(firstDay, /YKS'ye \$\{days\} gün, rotanda \$\{totalStops\} durak var/);
+  // Sinav baglami hala gorunur olmali. Cumlenin kendisi degisebilir --
+  // 21 Eylul'de ilk gun ekrani yedi bloktan uce indi ve o iki cumle silindi.
+  // Sabitlenmesi gereken sey metin degil, gun sayisinin kaybolmamasi.
+  assert.match(firstDay, /daysUntilExam/, "gun sayisi ilk gun ekranindan dusmemeli");
+  assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün/);
+
+  // Uygulamanin bos oldugu icin ozur diledigi kesik cerceveli kutu geri gelmesin.
+  assert.doesNotMatch(firstDay, /Deneme girdikçe burada ne görünür/);
+  assert.doesNotMatch(firstDay, /borderStyle: "dashed"/);
 });
 
 test("home rota kilidi eski pro paywall etiketi gibi gorunmez", () => {

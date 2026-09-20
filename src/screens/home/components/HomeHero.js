@@ -28,7 +28,7 @@ export function HomeHero({
   onBeginComeback,
   onDismissComeback,
   onStartTask,
-  onViewRoute, onViewFullRoute, onRedrawRoute,
+  onViewRoute, onViewFullRoute, onRedrawRoute, onSetGoal,
   firstDay = false,
   minutesToday = 0,
   onRecord,
@@ -84,7 +84,7 @@ export function HomeHero({
       />
     );
   } else if (firstDay) {
-    content = <HomeFirstDay dailyGoal={dailyGoal} hero={hero} onStartTask={onStartTask} onViewRoute={onViewRoute} />;
+    content = <HomeFirstDay dailyGoal={dailyGoal} hero={hero} onStartTask={onStartTask} onViewRoute={onViewRoute} onSetGoal={onSetGoal} />;
   } else if (!hasRouteAccess) {
     content = (
       <HomeHeroFree
