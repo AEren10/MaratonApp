@@ -5,6 +5,7 @@ import {
   deleteGroup as deleteGroupRecord,
   joinByCode,
   leaveGroup,
+  previewGroupByCode as previewGroup,
   removeGroupMember,
   regenerateGroupCode,
   updateGroupSettings,
@@ -17,13 +18,13 @@ export function useGroupActions({ onDone, showAlert } = {}) {
   const [busyKey, setBusyKey] = useState(null);
   const [error, setError] = useState(null);
 
-  const run = useCallback(async (key, fn, successMessage) => {
+  const run = useCallback(async (key, fn, successMessage, { silentSuccess = false } = {}) => {
     setBusy(true);
     setBusyKey(key);
     setError(null);
     try {
       const result = await fn();
-      H.success();
+      if (!silentSuccess) H.success();
       if (successMessage) showAlert?.("Tamam", successMessage);
       onDone?.(result, key);
       return result;
@@ -44,6 +45,10 @@ export function useGroupActions({ onDone, showAlert } = {}) {
 
   const join = useCallback((code) => (
     run("join", () => joinByCode(code), "Gruba katıldın.")
+  ), [run]);
+
+  const preview = useCallback((code) => (
+    run("preview", () => previewGroup(code), null, { silentSuccess: true })
   ), [run]);
 
   const leave = useCallback((groupId) => (
@@ -83,6 +88,8 @@ export function useGroupActions({ onDone, showAlert } = {}) {
     createGroup: create,
     join,
     joinGroupByCode: join,
+    preview,
+    previewGroupByCode: preview,
     leave,
     leaveGroup: leave,
     removeMember,

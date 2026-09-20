@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const migration = readFileSync("supabase/migrations/20260919120000_cdx_group_data_layer.sql", "utf8");
+const previewMigration = readFileSync("supabase/migrations/20260920002000_cdx_group_preview_by_code.sql", "utf8");
+const previewCreatorMigration = readFileSync("supabase/migrations/20260920002201_cdx_group_preview_creator_name.sql", "utf8");
 const groupsApi = readFileSync("src/supabase/groups.js", "utf8");
 const groupsTab = readFileSync("src/screens/league/GroupsTab.js", "utf8");
 const groupsHook = readFileSync("src/hooks/useGroups.js", "utf8");
@@ -39,6 +41,14 @@ test("private group security definer functions are not executable by PUBLIC or a
   ]) {
     assert.match(migration, new RegExp(`REVOKE ALL ON FUNCTION private\\.${fn} FROM PUBLIC, anon, authenticated`));
   }
+  assert.match(
+    previewMigration,
+    /REVOKE ALL ON FUNCTION private\.preview_group_by_code\(TEXT\) FROM PUBLIC, anon, authenticated/,
+  );
+  assert.match(
+    previewMigration,
+    /REVOKE ALL ON FUNCTION public\.preview_group_by_code\(TEXT\) FROM PUBLIC, anon/,
+  );
 });
 
 test("group leaderboard ranks by weekly questions instead of xp", () => {
@@ -49,11 +59,24 @@ test("group leaderboard ranks by weekly questions instead of xp", () => {
 test("group API surfaces errors instead of silent empty states", () => {
   assert.match(groupsApi, /throw error/);
   assert.match(groupsApi, /ensureOk/);
-  assert.doesNotMatch(groupsApi, /previewGroupByCode|preview_group_by_code/);
   assert.doesNotMatch(groupsApi, /catch\s*\(\s*\)\s*=>\s*\{\s*\}/);
   assert.match(groupsTab, /setBoardError/);
   assert.match(groupsTab, /Sıralama yüklenemedi/);
   assert.doesNotMatch(groupsTab, /catch\s*\(\s*\)\s*=>\s*setBoard\(\{ list: \[\] \}\)/);
+});
+
+test("group code preview is limited and does not bypass member-scoped group reads", () => {
+  assert.match(previewMigration, /CREATE OR REPLACE FUNCTION private\.preview_group_by_code\(group_code TEXT\)/);
+  assert.match(previewMigration, /IF \(SELECT auth\.uid\(\)\) IS NULL/);
+  assert.match(previewMigration, /SELECT id, name, code, weekly_target/);
+  assert.match(previewMigration, /'member_count', member_total/);
+  assert.doesNotMatch(previewMigration, /description|created_by|owner_id|avatar_url|joined_at|role/);
+  assert.match(previewCreatorMigration, /'creator_name', COALESCE\(creator_name, 'Öğrenci'\)/);
+  assert.doesNotMatch(previewCreatorMigration, /'created_by'|'owner_id'|'description'|'avatar_url'|'joined_at'|'role'/);
+  assert.match(groupsApi, /export async function previewGroupByCode\(code\)/);
+  assert.match(groupsApi, /creatorName/);
+  assert.match(groupsApi, /preview_group_by_code/);
+  assert.match(groupsApi, /JOIN_THROTTLE\.check\(\)/);
 });
 
 test("group hooks keep the Antigravity UI contract while using Supabase data", () => {
@@ -62,6 +85,7 @@ test("group hooks keep the Antigravity UI contract while using Supabase data", (
   assert.match(groupDetailHook, /setLeaderboard: setMembers/);
   for (const name of [
     "createGroup",
+    "previewGroupByCode",
     "joinGroupByCode",
     "leaveGroup",
     "regenerateGroupCode",
