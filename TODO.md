@@ -78,9 +78,7 @@ kuralları doğrulamaya devam ediyor.
   `src/lib/storyShare.js`.
 - **Widget** — `expo-widgets` (iOS, SDK 57'de stabil) +
   `react-native-android-widget`. Ertelendi.
-- **Grup sistemi** — `user_rank` artık üretiliyor (migration
-  `20260920010000_clde_my_groups_user_rank.sql`). Grup arayüzü hâlâ
-  `agy/work` branch'inde, merge edilmedi.
+- **Grup sistemi** — Tamamlandı ve `main`'e merge edildi. `user_rank` ve tüm grup arayüzleri entegre.
 
 ---
 
