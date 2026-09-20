@@ -89,7 +89,7 @@ export default function RouteReadyScreen() {
         {upcomingStops.length > 0 && (
           <Animated.View entering={FadeInDown.delay(320)} style={styles.stopList}>
             {upcomingStops.map((stop) => (
-              <RouteReadyStopRow key={stop.id} stop={stop} />
+              <RouteReadyStopRow key={stop.key} stop={stop} />
             ))}
           </Animated.View>
         )}
