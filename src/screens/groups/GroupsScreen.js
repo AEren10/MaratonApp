@@ -15,7 +15,7 @@ import { Button } from "../../components/design/Button";
 export default function GroupsScreen() {
   const C = useC();
   const navigation = useNavigation();
-  const { groups = [], loading, refreshing, refresh, reload } = useGroups();
+  const { groups = [], loading, refreshing, refresh, reload } = useGroups({ autoLoad: false });
 
   useFocusEffect(
     useCallback(() => {

@@ -28,7 +28,7 @@ export function HomeProBody({ stops, momentum, debtHours, go }) {
               <Icon name="chevR" size={11} color={C.text5} />
             </Pressable>
           </View>
-          {momentum.map((m) => <HomeMomentumRow key={m.key} subject={m} />)}
+          {momentum.map((m) => <HomeMomentumRow key={m.key} subject={m} onPress={go.subjectDetail} />)}
         </View>
       ) : null}
 

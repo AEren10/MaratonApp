@@ -18,7 +18,11 @@ export function useRoadmapNextAction({ navigation, routeCreated, weeks }) {
       subject: nextRouteAction.subjectKey,
       stopId: nextRouteAction.stopId || null,
     });
-    navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
+    if (typeof navigation.replace === "function") {
+      navigation.replace(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
+    } else {
+      navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
+    }
   }, [navigation, nextRouteAction]);
 
   return { nextRouteAction, startNextRouteAction };

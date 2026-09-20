@@ -27,7 +27,8 @@ function ClassScheduleInner() {
   const onSubmit = useCallback(async () => {
     await editor.submit();
     H.success();
-    openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.WEEK_PROGRAM);
+    if (navigation.canGoBack()) navigation.goBack();
+    else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.DAILY_PLAN);
   }, [editor, navigation]);
 
   return (

@@ -13,8 +13,13 @@ export function useHomeActions({ navigation, go }) {
     navigation.navigate(SCREENS.STUDY_TIMER, buildStudyTimerParams(task));
   }, [go, navigation]);
 
+  const subjectDetail = useCallback((subjectKey, subjectName) => {
+    navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey, subjectName });
+  }, [navigation]);
+
   return useMemo(() => ({
     startTask,
+    subjectDetail,
     profile: go(SCREENS.PROFILE),
     calendar: go(SCREENS.CALENDAR),
     route: go(SCREENS.ROADMAP),
@@ -28,5 +33,5 @@ export function useHomeActions({ navigation, go }) {
     record: go(SCREENS.ADD_STUDY),
     proPreview: go(SCREENS.PRO_PREVIEW),
     firstWeek: go(SCREENS.FIRST_WEEK),
-  }), [go, startTask]);
+  }), [go, startTask, subjectDetail]);
 }

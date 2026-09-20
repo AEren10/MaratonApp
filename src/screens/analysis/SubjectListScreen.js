@@ -83,7 +83,7 @@ export default function SubjectListScreen() {
                   key={item.key}
                   C={C}
                   item={item}
-                  onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { topic: { name: item.name } })}
+                  onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, { subjectKey: item.subjectKey, topicName: item.name })}
                 />
               ))}
             </View>

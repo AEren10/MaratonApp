@@ -7,20 +7,23 @@ import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 // Rota derinligi ekranlarinin ust satiri: geri oku (ya da kapat X) +
 // Bricolage baslik + istege bagli sag aksiyon (Durak Detayi'ndaki uc nokta).
 // Gorsel ikon tasarim boyutunda, dokunma alani 44px.
-export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, moreIcon }) {
+export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, moreIcon, hideBack = false }) {
   const C = useC();
+  const showBack = !hideBack && Boolean(onBack);
   return (
     <View style={s.row}>
-      <Pressable
-        onPress={onBack}
-        hitSlop={STEP.s1}
-        accessibilityRole="button"
-        accessibilityLabel={close ? "Kapat" : "Geri"}
-        style={s.tap}
-      >
-        <Icon name={close ? "x" : "chevL"} size={close ? 14 : 16} color={C.text2} />
-      </Pressable>
-      <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]} numberOfLines={1}>
+      {showBack ? (
+        <Pressable
+          onPress={onBack}
+          hitSlop={STEP.s1}
+          accessibilityRole="button"
+          accessibilityLabel={close ? "Kapat" : "Geri"}
+          style={s.tap}
+        >
+          <Icon name={close ? "x" : "chevL"} size={close ? 14 : 16} color={C.text2} />
+        </Pressable>
+      ) : null}
+      <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text, paddingLeft: showBack ? 0 : STEP.s1 }]} numberOfLines={1}>
         {title || ""}
       </Text>
       {onMore ? (

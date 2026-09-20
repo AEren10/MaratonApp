@@ -31,7 +31,7 @@ function CurriculumMapInner() {
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <RouteHeader
         title="Yol haritası"
-        onBack={() => { if (navigation.canGoBack()) navigation.goBack(); }}
+        onBack={navigation.canGoBack() ? () => navigation.goBack() : null}
         onMore={() => navigation.navigate(SCREENS.SEARCH)}
         moreIcon="search"
         moreLabel="Konu ara"
