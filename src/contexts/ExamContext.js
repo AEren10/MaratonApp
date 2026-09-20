@@ -453,7 +453,17 @@ export function ExamProvider({ children }) {
     return { synced: false, offline: true };
   }, [session, storageKey, examType, field, examDate]);
 
-  const onboardingDone = !!examType && dailyGoalSet && setupCompleted;
+  // Kurulumu ACIKCA bitirmis olmak baglayicidir.
+  //
+  // Eskiden ucu de gerekiyordu ve bu bir kilit uretiyordu: hedef sürgüsü bir
+  // worklet hatasiyla cokunce gunluk hedef hic kaydedilmiyor, dailyGoalSet
+  // false kaliyor, kullanici kurulumu bitirse bile onboardingDone asla true
+  // olmuyordu. Her acilista ayni kurulum ekranina dusuyor ve Ana Sayfa'yi hic
+  // goremiyordu -- cikis yolu olmayan bir dongu.
+  //
+  // examType hala sart: onsuz uygulama calisamaz. Ama gunluk hedef eksikse
+  // kullaniciyi kurulumda hapsetmek yerine iceri alip hedefi sonra sorariz.
+  const onboardingDone = !!examType && (setupCompleted || dailyGoalSet);
 
   const daysUntilExam = useMemo(() => {
     if (!examDate) return null;
