@@ -11,8 +11,6 @@ import { STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 const W = 390;
 const H = 210;
 const PATH = "M 26 176 C 110 164 158 128 206 100 C 266 66 316 46 364 30";
-// Yolun yaklasik uzunlugu; dash animasyonu icin yeterli hassasiyet.
-const LEN = 420;
 // 178 durak tek tek cizilemez. Seyrek temsil: yapi gorunur, sayim yapilmaz.
 const TICKS = 24;
 
@@ -30,6 +28,22 @@ function pointAt(t) {
   const y = m * m * m * c[0][1] + 3 * m * m * lt * c[1][1] + 3 * m * lt * lt * c[2][1] + lt * lt * lt * c[3][1];
   return [x, y];
 }
+
+// Yol uzunlugunu AYNI egriden ornekleyerek olcer. Elle yazilan bir sayi
+// tutmuyordu (420 yazmistim, gercegi 370.2 -- %13 fazla) ve fazlalik
+// animasyonun basinda gorunur bir olu ana donusuyordu: offset henuz yolun
+// uzunlugunun altina inmedigi icin ekranda bir sure hicbir sey olmuyordu.
+// Buradan hesaplanirsa PATH degisse bile dogru kalir.
+const LEN = (() => {
+  let total = 0;
+  let prev = pointAt(0);
+  for (let i = 1; i <= 240; i += 1) {
+    const cur = pointAt(i / 240);
+    total += Math.hypot(cur[0] - prev[0], cur[1] - prev[1]);
+    prev = cur;
+  }
+  return Math.ceil(total);
+})();
 
 // ROTA HATTI — markanin imzasi, ekranin sahibi.
 //
