@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design/Icon";
 import { Button } from "../../components/design/Button";
@@ -14,6 +14,7 @@ import * as H from "../../lib/haptics";
 
 export default function JoinGroupScreen() {
   const C = useC();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { previewGroupByCode, joinGroupByCode, busy } = useGroupActions();
   const [code, setCode] = useState("");
@@ -65,10 +66,7 @@ export default function JoinGroupScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Geri"
-          onPress={() => {
-            H.tap();
-            navigation.goBack();
-          }}
+          onPress={() => { H.tap(); navigation.goBack(); }}
           style={({ pressed }) => [
             styles.backBtn,
             { backgroundColor: C.surface, opacity: pressed ? 0.7 : 1 },
@@ -81,7 +79,8 @@ export default function JoinGroupScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 56 : 0}
         style={styles.flex}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design/Icon";
 import { useC } from "../../contexts/ThemeContext";
@@ -13,6 +13,7 @@ import * as H from "../../lib/haptics";
 
 export default function CreateGroupScreen() {
   const C = useC();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { createGroup, busy } = useGroupActions();
   const [createdGroup, setCreatedGroup] = useState(null);
@@ -58,7 +59,8 @@ export default function CreateGroupScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 56 : 0}
         style={styles.flex}
       >
         <ScrollView

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Button } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -16,6 +16,7 @@ import { emailSchema, validate } from "../../validations/auth";
 
 export default function ForgotPasswordScreen() {
   const C = useC();
+  const insets = useSafeAreaInsets();
   const showAlert = useAlert();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -47,19 +48,34 @@ export default function ForgotPasswordScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={{ padding: STEP.s1, minWidth: 44, minHeight: 44, justifyContent: "center" }}>
-          <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1, paddingBottom: STEP.s4 }}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Pressable
+              onPress={goBack}
+              hitSlop={12}
+              accessibilityLabel="Geri"
+              accessibilityRole="button"
+              style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
+            >
+              <Icon name="arrowL" size={18} color={C.text2} />
+            </Pressable>
+          </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 }} keyboardShouldPersistTaps="handled">
           {sent ? (
             <EmailSentPanel email={email.trim()} onResend={submit} />
           ) : (
             <>
-              <Animated.View entering={FadeInDown.delay(80).duration(350)}>
+              <Animated.View entering={FadeInDown.delay(80).duration(350)} style={{ marginTop: STEP.s2 }}>
                 <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 270 }]}>
                   Şifreni sıfırlayalım.
                 </Text>

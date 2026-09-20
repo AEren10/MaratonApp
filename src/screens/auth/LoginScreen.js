@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Icon, Button } from "../../components/design";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
@@ -18,6 +18,7 @@ import { authErrorMessage } from "../../supabase/authErrors";
 export default function LoginScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const insets = useSafeAreaInsets();
   const showAlert = useAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,15 +44,30 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button" style={{ padding: STEP.s1, minWidth: 44, minHeight: 44, justifyContent: "center" }}>
-          <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1, paddingBottom: STEP.s4 }}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              hitSlop={12}
+              accessibilityLabel="Geri"
+              accessibilityRole="button"
+              style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
+            >
+              <Icon name="arrowL" size={18} color={C.text2} />
+            </Pressable>
+          </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 }} keyboardShouldPersistTaps="handled">
-          <Animated.View entering={FadeInDown.delay(80).duration(350)}>
+          <Animated.View entering={FadeInDown.delay(80).duration(350)} style={{ marginTop: STEP.s2 }}>
             <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 280 }]}>
               Hesabına gir.
             </Text>
