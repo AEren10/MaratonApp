@@ -40,7 +40,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: STEP.s2,
-    marginTop: STEP.s2,
+    marginTop: STEP.s3,
   },
   tap: {
     width: CONTROL.tapMin,

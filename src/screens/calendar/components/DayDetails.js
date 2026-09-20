@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { View, Text, Pressable } from "react-native";
+import { useMemo } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Card, Icon, EmptyState } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -34,7 +34,7 @@ function SlotRow({ time, color, name, subject, dur, C }) {
   );
 }
 
-export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, onOpenDetail }) {
+export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, onOpenDetail, style }) {
   const C = useC();
   const trialTypes = getTrialTypes(C);
   const today = day === todayTR();
@@ -70,7 +70,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   const isEmpty = slots.length === 0 && !calendarTasks.length;
 
   return (
-    <Card tone="surface" radius="panel">
+    <Card tone="surface" radius="panel" style={[styles.card, style]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s2 }}>
         <Text style={[TYPOGRAPHY.topicName, { color: C.text }]}>{formatDayLabel(day)}</Text>
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 0.8 }]}>{streakStatus}</Text>
@@ -112,3 +112,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
     </Card>
   );
 }
+
+const styles = StyleSheet.create({
+  card: { marginTop: STEP.s3 },
+});

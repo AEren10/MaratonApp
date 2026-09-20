@@ -39,8 +39,8 @@ export function StreakHero() {
 }
 
 const s = StyleSheet.create({
-  wrap: { alignItems: "center", paddingTop: STEP.s4 - 8 },
-  labelRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginTop: STEP.s1 },
+  wrap: { alignItems: "center", paddingTop: STEP.s4 - 8, paddingBottom: STEP.s2 },
+  labelRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2, marginTop: STEP.s2 + 2 },
   chip: { height: 26, justifyContent: "center", paddingHorizontal: STEP.s2, marginTop: STEP.s3 - 4, borderRadius: SHAPE.chip + 3 },
   note: { marginTop: STEP.s4 - 4, maxWidth: 300, textAlign: "center" },
 });

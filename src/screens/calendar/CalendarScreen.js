@@ -68,13 +68,13 @@ function CalendarScreenInner() {
           <CalendarSkeleton />
         ) : (
           <>
+            <StreakHero />
             <MonthSwitcher
               monthDate={monthDate}
               prevMonth={prevMonth}
               nextMonth={nextMonth}
               C={C}
             />
-            <StreakHero />
             <MonthGrid
               monthDate={monthDate}
               dayMap={dayMap}
