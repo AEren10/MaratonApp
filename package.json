@@ -8,11 +8,12 @@
     "ios": "expo run:ios",
     "check:design": "node scripts/check-design-drift.js",
     "check:runtime": "node scripts/check-runtime-risks.js",
-    "check": "npm run check:conflicts && npm run check:design && npm run check:runtime && npm run check:undefined && npm run check:orphans",
+    "check": "npm run check:conflicts && npm run check:design && npm run check:runtime && npm run check:undefined && npm run check:orphans && npm run check:worklets",
     "check:orphans": "node scripts/check-orphan-screens.js",
     "check:undefined": "node scripts/check-undefined.js",
     "test": "node --experimental-default-type=module --test \"tests/**/*.test.mjs\"",
-    "check:conflicts": "node scripts/check-conflict-markers.js"
+    "check:conflicts": "node scripts/check-conflict-markers.js",
+    "check:worklets": "node scripts/check-worklet-calls.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",

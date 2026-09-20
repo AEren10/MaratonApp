@@ -6,7 +6,11 @@ import * as H from "../../../lib/haptics";
 const THUMB_R = 14;
 const TRACK_H = 6;
 
+// onUpdate/onEnd UI thread'inde kosuyor; oradan cagrilan her fonksiyon
+// worklet olmali, yoksa Reanimated "Tried to synchronously call a Remote
+// Function" diye atiyor.
 function snap(val, step) {
+  "worklet";
   return Math.round(val / step) * step;
 }
 
