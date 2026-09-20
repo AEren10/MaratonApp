@@ -1,13 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { TAB_KEYS } from "../../navigation/tabAssignment";
-import { openInTab } from "../../navigation/tabJump";
 import { navigateFromOutside } from "../../navigation/navigationRef";
 import { usePendingWrites } from "../../hooks/usePendingWrites";
 import { flushQueue, retryDeadLetter } from "../../lib/offlineQueue";
@@ -20,7 +17,6 @@ import * as H from "../../lib/haptics";
 
 export function SyncProblemBanner() {
   const C = useC();
-  const navigation = useNavigation();
   const { failed, refresh } = usePendingWrites();
   const [busy, setBusy] = useState(false);
   const styles = useMemo(() => makeStyles(C), [C]);
@@ -48,7 +44,6 @@ export function SyncProblemBanner() {
         <Text style={styles.title}>{failed} kayıt gönderilemedi</Text>
         <Text style={styles.sub}>Cihazında duruyor. Tekrar denemek için dokun.</Text>
       </View>
-<<<<<<< HEAD
       <Pressable onPress={retry} hitSlop={8} style={styles.action}>
         <Text style={styles.actionText}>{busy ? "..." : "Tekrar dene"}</Text>
       </Pressable>
@@ -62,14 +57,6 @@ export function SyncProblemBanner() {
       >
         <Icon name="chevR" size={16} color={C.muted} />
       </Pressable>
-=======
-      <Pressable onPress={retry} hitSlop={8} style={styles.action}>
-        <Text style={styles.actionText}>{busy ? "..." : "Tekrar dene"}</Text>
-      </Pressable>
-      <Pressable onPress={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.SETTINGS)} hitSlop={8}>
-        <Icon name="chevR" size={16} color={C.muted} />
-      </Pressable>
->>>>>>> 8a40297 (CLDE route cross-tab actions through the tab helpers)
     </View>
   );
 }
