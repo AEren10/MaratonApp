@@ -62,9 +62,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-    ...TYPOGRAPHY.statMedium,
+    ...TYPOGRAPHY.inputStat,
     letterSpacing: 4,
     textAlign: "center",
+    paddingVertical: 0,
   },
   errorText: {
     ...TYPOGRAPHY.micro,

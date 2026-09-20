@@ -16,7 +16,7 @@ export function SaveNotesSection({ C, notes, onChangeNotes }) {
         maxLength={140}
         accessibilityLabel="Oturum notu"
         style={{
-          ...TYPOGRAPHY.body,
+          ...TYPOGRAPHY.input,
           color: C.text,
           borderRadius: SHAPE.card,
           borderWidth: 1,

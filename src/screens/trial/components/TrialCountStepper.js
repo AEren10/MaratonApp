@@ -16,7 +16,7 @@ export function TrialCountStepper({ label, value, max, warn, onChangeText, onSte
       <TextInput accessibilityLabel={label} value={String(value ?? "")} onChangeText={onChangeText}
         onFocus={() => H.tap()} keyboardType="number-pad" maxLength={String(max).length}
         placeholder="0" placeholderTextColor={C.text3} selectTextOnFocus
-        style={[TYPOGRAPHY.topicName, styles.input, {
+        style={[TYPOGRAPHY.inputTopic, styles.input, {
           color: C.text, backgroundColor: C.void, borderColor: warn ? C.warn : C.border,
         }]} />
       <Pressable onPress={() => onStep(-1)} disabled={count <= 0} style={styles.step}

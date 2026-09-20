@@ -61,7 +61,7 @@ export function RehearsalInput({ value, onChange, label, time }) {
       placeholderTextColor={C.text3}
       returnKeyType="done"
       style={[
-        time ? [TYPOGRAPHY.topicName, s.time] : [TYPOGRAPHY.tableName, s.text],
+        time ? [TYPOGRAPHY.inputTopic, s.time] : [TYPOGRAPHY.inputTable, s.text],
         { color: C.text, backgroundColor: C.void, borderColor: C.border },
       ]}
     />

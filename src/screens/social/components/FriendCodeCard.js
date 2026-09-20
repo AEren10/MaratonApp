@@ -133,7 +133,7 @@ const makeStyles = (C) => StyleSheet.create({
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     color: C.text,
     letterSpacing: 3,
     fontFamily: "Bricolage_400",

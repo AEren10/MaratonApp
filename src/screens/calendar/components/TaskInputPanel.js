@@ -80,7 +80,7 @@ const styles = (C) => ({
   inputRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   input: {
     flex: 1,
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     color: C.text,
     backgroundColor: C.elev,
     borderRadius: SHAPE.cardTight,

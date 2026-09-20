@@ -23,7 +23,7 @@ function LevelTestSubjectRow({ subject, value, onChangeText }) {
         placeholderTextColor={C.text3}
         keyboardType="decimal-pad"
         maxLength={5}
-        style={[TYPOGRAPHY.subheading, styles.input, { color: C.text }]}
+        style={[TYPOGRAPHY.inputHeading, styles.input, { color: C.text }]}
         accessibilityLabel={`${subject.name} net değeri`}
       />
       <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>net</Text>

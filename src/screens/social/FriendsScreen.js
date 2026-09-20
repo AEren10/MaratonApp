@@ -245,7 +245,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingVertical: SPACING.sm,
   },
   searchInput: {
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     flex: 1,
     color: C.text,
     paddingVertical: 4,

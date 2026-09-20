@@ -69,13 +69,13 @@ const styles = StyleSheet.create({
   container: { gap: SPACING.xs },
   label: { ...TYPOGRAPHY.captionMedium, marginLeft: SPACING.xs },
   input: {
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     borderWidth: 1,
     borderRadius: RADIUS.lg,
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.sm + 2,
     minHeight: 48,
   },
-  multiline: { minHeight: 100, textAlignVertical: "top", paddingTop: SPACING.md },
+  multiline: { minHeight: 100, textAlignVertical: "top", paddingTop: SPACING.md, paddingBottom: SPACING.md },
   error: { ...TYPOGRAPHY.micro, marginLeft: SPACING.xs },
 });

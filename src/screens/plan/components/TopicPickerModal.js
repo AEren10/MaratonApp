@@ -47,7 +47,7 @@ export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, top
               onChangeText={setQuery}
               placeholder="Konularda ara veya yeni konu yaz..."
               placeholderTextColor={C.text3}
-              style={[TYPOGRAPHY.body, s.input, { color: C.text }]}
+              style={[TYPOGRAPHY.input, s.input, { color: C.text, paddingVertical: 0 }]}
             />
             {query ? (
               <Pressable onPress={() => setQuery("")} hitSlop={8}>

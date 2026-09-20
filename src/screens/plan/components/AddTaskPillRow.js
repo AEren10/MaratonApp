@@ -34,7 +34,7 @@ export function AddTaskPillRow({ presets, value, onChange, formatLabel, C, suffi
           placeholder={placeholder}
           placeholderTextColor={C.text3}
           keyboardType="number-pad"
-          style={[TYPOGRAPHY.bodySemiBold, st.input, { color: C.text }]}
+          style={[TYPOGRAPHY.inputSemiBold, st.input, { color: C.text }]}
           maxLength={3}
         />
         {!isPreset && value ? <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{suffix}</Text> : null}

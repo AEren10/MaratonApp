@@ -47,7 +47,7 @@ export function WhyWrongCard({ note, onSave }) {
               multiline
               autoFocus
               accessibilityLabel="Neden yanlış yaptım"
-              style={[TYPOGRAPHY.body, styles.input, { color: C.text, backgroundColor: C.void, borderColor: C.line }]}
+              style={[TYPOGRAPHY.input, styles.input, { color: C.text, backgroundColor: C.void, borderColor: C.line }]}
             />
             <Button size="md" fullWidth loading={saving} onPress={submit} style={{ marginTop: STEP.s2 }}>
               Kaydet

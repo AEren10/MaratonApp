@@ -26,7 +26,7 @@ export function RecordNumberField({ value, onChange, suffix, width = 64, locked,
         placeholderTextColor={C.text3}
         accessibilityLabel={a11yLabel}
         selectTextOnFocus
-        style={[TYPOGRAPHY.topicName, styles.num, styles.input, { color: C.text }]}
+        style={[TYPOGRAPHY.inputTopic, styles.num, styles.input, { color: C.text }]}
       />
       {suffix ? <Text style={[TYPOGRAPHY.topicName, styles.num, { color: C.text }]}>{suffix}</Text> : null}
     </View>

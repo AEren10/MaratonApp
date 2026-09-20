@@ -7,7 +7,7 @@ import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 // kendi girdisi; bos alan "—" ile bekler, tahmin edilmez.
 export function ExamPlanFieldsCard({ draft, leaveAtInvalid, onChange }) {
   const C = useC();
-  const inputText = [TYPOGRAPHY.tableName, { color: C.text }];
+  const inputText = [TYPOGRAPHY.inputTable, { color: C.text }];
 
   const plain = (key, label) => (
     <View style={s.row}>
@@ -57,7 +57,7 @@ export function ExamPlanFieldsCard({ draft, leaveAtInvalid, onChange }) {
       {boxed("leaveAt", "ÇIKIŞ SAATİ", {
         invalid: leaveAtInvalid,
         input: { keyboardType: "number-pad", maxLength: 5, placeholder: "--:--" },
-        textStyle: [TYPOGRAPHY.topicName, { color: C.text, fontVariant: ["tabular-nums"], textAlign: "center" }],
+        textStyle: [TYPOGRAPHY.inputTopic, { color: C.text, fontVariant: ["tabular-nums"], textAlign: "center" }],
         boxStyle: s.time,
       })}
       {divider}

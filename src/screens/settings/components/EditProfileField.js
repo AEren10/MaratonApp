@@ -36,7 +36,7 @@ export function EditProfileField({ label, value, onChangeText, onPress, placehol
         placeholder={placeholder}
         placeholderTextColor={C.text3}
         maxLength={maxLength}
-        style={[TYPOGRAPHY.bodyMedium, { flex: 1, color: C.text, padding: 0 }]}
+        style={[TYPOGRAPHY.inputMedium, { flex: 1, color: C.text, padding: 0 }]}
       />
     </View>
   );

@@ -49,7 +49,7 @@ export function ExamBagList({ items, onToggle, onAdd }) {
               onBlur={submit}
               returnKeyType="done"
               accessibilityLabel="Kendin ekle"
-              style={[TYPOGRAPHY.bodyMedium, s.input, { color: C.text }]}
+              style={[TYPOGRAPHY.inputMedium, s.input, { color: C.text }]}
             />
           ) : (
             <Text style={[TYPOGRAPHY.bodyMedium, s.input, { color: C.text3 }]}>Kendin ekle</Text>

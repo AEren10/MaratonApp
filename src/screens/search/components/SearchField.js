@@ -24,7 +24,7 @@ export const SearchField = React.memo(function SearchField({
           autoFocus
           autoCorrect={false}
           accessibilityLabel="Arama"
-          style={[TYPOGRAPHY.bodyMedium, styles.input, { color: C.text }]}
+          style={[TYPOGRAPHY.inputMedium, styles.input, { color: C.text }]}
         />
         {value ? (
           <Pressable

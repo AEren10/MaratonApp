@@ -154,6 +154,18 @@ export const TYPOGRAPHY = {
   // Konu adi — Bricolage, govde olcusunde
   topicName:     { fontFamily: "Bricolage_400", fontSize: 16, lineHeight: 22 },
 
+  // TextInput alanları — React Native (özellikle iOS UITextField)'te TextInput stiline
+  // lineHeight verilmesi descender harflerin (g, p, y, j, q, ç, ş, ğ) alt yarısının
+  // kırpılmasına yol açar. Bu nedenle input stilleri lineHeight içermez.
+  input:         { fontFamily: "Archivo_400", fontSize: 14 },
+  inputMedium:   { fontFamily: "Archivo_500", fontSize: 14 },
+  inputSemiBold: { fontFamily: "Archivo_600", fontSize: 14 },
+  inputCaption:  { fontFamily: "Archivo_400", fontSize: 13 },
+  inputTable:    { fontFamily: "Archivo_500", fontSize: 13.5 },
+  inputHeading:  { fontFamily: "Bricolage_400", fontSize: 22, letterSpacing: -0.5 },
+  inputTopic:    { fontFamily: "Bricolage_400", fontSize: 16 },
+  inputStat:     { fontFamily: "Bricolage_400", fontSize: 22, letterSpacing: -0.4, fontVariant: ["tabular-nums"] },
+
   button:        { fontFamily: "Archivo_700", fontSize: 16, lineHeight: 20 },
   label: {
     fontFamily: "Archivo_600",

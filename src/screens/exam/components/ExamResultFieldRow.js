@@ -20,7 +20,7 @@ export const ExamResultFieldRow = memo(function ExamResultFieldRow({ field, colo
           placeholderTextColor={C.text3}
           accessibilityLabel={field.label}
           style={[
-            TYPOGRAPHY.topicName,
+            TYPOGRAPHY.inputTopic,
             s.input,
             { color: C.text, backgroundColor: C.void, borderColor: error ? C.warn : C.border },
           ]}

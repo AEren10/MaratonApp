@@ -31,7 +31,7 @@ export function DeleteConfirmInput({ value, onChangeText, editable = true }) {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={[
-          TYPOGRAPHY.tableName,
+          TYPOGRAPHY.inputTable,
           styles.input,
           { color: C.text, backgroundColor: C.surface, borderColor: focused ? C.accent : C.border },
         ]}

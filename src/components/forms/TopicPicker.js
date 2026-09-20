@@ -131,7 +131,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingHorizontal: SPACING.md,
     marginBottom: SPACING.sm,
   },
-  searchInput: { flex: 1, ...TYPOGRAPHY.body, color: C.text, paddingVertical: SPACING.sm },
+  searchInput: { flex: 1, ...TYPOGRAPHY.input, color: C.text, paddingVertical: SPACING.sm },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -157,7 +157,7 @@ const makeStyles = (C) => StyleSheet.create({
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     color: C.text,
   },
   primaryBtn: {

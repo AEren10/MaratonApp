@@ -271,7 +271,7 @@ const makeStyles = (C) => StyleSheet.create({
   sheet: { backgroundColor: C.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: SPACING.lg, paddingBottom: SPACING.xxxl },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: SPACING.md },
   sheetTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.md },
-  input: { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, ...TYPOGRAPHY.body, color: C.text },
+  input: { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, ...TYPOGRAPHY.input, color: C.text },
   submit: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, alignItems: "center", marginTop: SPACING.md },
   submitText: { ...TYPOGRAPHY.button, color: C.bg },
 });

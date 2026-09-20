@@ -89,5 +89,5 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: "center",
   },
   saveText: { ...TYPOGRAPHY.micro, color: C.accentInk },
-  input: { ...TYPOGRAPHY.body, color: C.text, minHeight: 80, textAlignVertical: "top" },
+  input: { ...TYPOGRAPHY.input, color: C.text, minHeight: 80, textAlignVertical: "top" },
 });

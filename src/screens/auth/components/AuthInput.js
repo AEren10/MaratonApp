@@ -47,7 +47,7 @@ export function AuthInput({
           autoCorrect={false}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={[TYPOGRAPHY.bodyMedium, { flex: 1, color: C.text }]}
+          style={[TYPOGRAPHY.inputMedium, { flex: 1, color: C.text, paddingVertical: 0 }]}
         />
         {isPassword ? (
           <Pressable onPress={() => setShow((v) => !v)} hitSlop={10} style={{ padding: STEP.s1 }} accessibilityRole="button" accessibilityLabel={show ? "Şifreyi gizle" : "Şifreyi göster"}>

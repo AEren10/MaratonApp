@@ -89,7 +89,7 @@ export default function AddWrongScreen() {
 
           <FormSection label="KENDİME NOT" suffix="isteğe bağlı" wrap={false}>
             <TextInput
-              style={[TYPOGRAPHY.bodyMedium, styles.input, { backgroundColor: C.surface, borderColor: C.elev, color: C.text }]}
+              style={[TYPOGRAPHY.inputMedium, styles.input, { backgroundColor: C.surface, borderColor: C.elev, color: C.text }]}
               placeholder="Bir dahaki sefere neye dikkat edeceğim..."
               placeholderTextColor={C.text3}
               value={form.note}

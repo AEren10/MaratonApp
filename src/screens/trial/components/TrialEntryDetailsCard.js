@@ -16,7 +16,7 @@ export function TrialEntryDetailsCard({ form, styles: shared }) {
         <Text style={[shared.label, styles.key]}>DENEME ADI</Text>
         <TextInput accessibilityLabel="Deneme adı" value={form.title} onChangeText={form.handleTitleChange}
           placeholder="Deneme adı" placeholderTextColor={C.text3} maxLength={40}
-          style={[TYPOGRAPHY.tableName, well, styles.input, { color: C.text }]} />
+          style={[TYPOGRAPHY.inputTable, well, styles.input, { color: C.text }]} />
       </View>
       <View style={[styles.divider, { backgroundColor: C.line }]} />
       <View style={styles.row}>

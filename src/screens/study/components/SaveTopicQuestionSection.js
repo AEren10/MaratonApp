@@ -62,7 +62,7 @@ export function SaveTopicQuestionSection({
 
 const styles = {
   input: (C) => ({
-    ...TYPOGRAPHY.body,
+    ...TYPOGRAPHY.input,
     color: C.text,
     borderRadius: SHAPE.card,
     borderWidth: 1,

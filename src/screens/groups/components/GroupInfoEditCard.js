@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
   fieldLabel: { ...TYPOGRAPHY.micro, marginBottom: SPACING.xs / 2 },
   nameValue: { ...TYPOGRAPHY.bodyMedium },
   nameInput: {
-    ...TYPOGRAPHY.bodyMedium,
+    ...TYPOGRAPHY.inputMedium,
     borderWidth: 1,
     borderRadius: SHAPE.chip,
     paddingHorizontal: STEP.s1,
-    paddingVertical: SPACING.xs,
+    paddingVertical: SPACING.xs + 2,
     marginTop: SPACING.xs / 2,
   },
   codeValue: { ...TYPOGRAPHY.topicName, letterSpacing: 2 },

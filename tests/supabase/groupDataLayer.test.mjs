@@ -116,3 +116,12 @@ test("the groups client carries user_rank through to the card", () => {
   assert.match(groupsApi, /user_rank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
   assert.match(groupsApi, /userRank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
 });
+
+test("generate_group_code uses built-in random without pgcrypto dependency", () => {
+  const fixMigration = readFileSync("supabase/migrations/20260920050000_fix_generate_group_code_builtin_random.sql", "utf8");
+  assert.doesNotMatch(fixMigration, /gen_random_bytes\(\d+\)/);
+  assert.match(fixMigration, /floor\(random\(\) \* length\(alphabet\) \+ 1\)::INTEGER/);
+  assert.match(fixMigration, /REVOKE ALL ON FUNCTION private\.generate_group_code\(\) FROM PUBLIC, anon, authenticated;/);
+  assert.doesNotMatch(migration, /gen_random_bytes\(\d+\)/);
+  assert.match(migration, /floor\(random\(\) \* length\(alphabet\) \+ 1\)::INTEGER/);
+});

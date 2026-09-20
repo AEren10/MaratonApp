@@ -130,7 +130,7 @@ function makeStyles(C) {
       backgroundColor: C.surface, borderRadius: SHAPE.cardTight,
       borderWidth: 1, borderColor: C.border, padding: STEP.s3, gap: STEP.s2,
     },
-    input: { ...TYPOGRAPHY.body, color: C.text, minHeight: 64, textAlignVertical: "top" },
+    input: { ...TYPOGRAPHY.input, color: C.text, minHeight: 64, textAlignVertical: "top" },
     composerFoot: { flexDirection: "row", alignItems: "center", gap: STEP.s3 },
     anonBtn: { flexDirection: "row", alignItems: "center", gap: STEP.s1, minHeight: 44, paddingRight: STEP.s2 },
     anonText: { ...TYPOGRAPHY.caption, color: C.text3 },

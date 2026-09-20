@@ -32,21 +32,25 @@ CREATE INDEX IF NOT EXISTS idx_group_members_group_role
 CREATE OR REPLACE FUNCTION private.generate_group_code()
 RETURNS TEXT
 LANGUAGE plpgsql
+SECURITY DEFINER
 SET search_path TO 'public', 'pg_temp'
 AS $fn$
 DECLARE
   alphabet CONSTANT TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  bytes BYTEA;
   out_code TEXT;
   i INT;
+  attempts INT := 0;
 BEGIN
   LOOP
-    bytes := gen_random_bytes(6);
+    attempts := attempts + 1;
     out_code := '';
-    FOR i IN 0..5 LOOP
-      out_code := out_code || substr(alphabet, (get_byte(bytes, i) % length(alphabet)) + 1, 1);
+    FOR i IN 1..6 LOOP
+      out_code := out_code || substr(alphabet, floor(random() * length(alphabet) + 1)::INTEGER, 1);
     END LOOP;
     EXIT WHEN NOT EXISTS (SELECT 1 FROM public.groups WHERE code = out_code);
+    IF attempts > 100 THEN
+      RAISE EXCEPTION 'group_code_generation_failed';
+    END IF;
   END LOOP;
   RETURN out_code;
 END;
