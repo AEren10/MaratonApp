@@ -8,9 +8,13 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { FirstDayRouteLine } from "./FirstDayRouteLine";
 import { FirstDayStop } from "./FirstDayStop";
 
-function routeSentence(daysUntilExam, totalStops) {
+function routeSentence(daysUntilExam, totalStops, tempo) {
   const tail = "Bugün ilk durakla başlıyoruz; her durak geçtiğinde bu çizgi biraz daha uzuyor.";
   const days = daysUntilExam == null ? null : Math.max(0, daysUntilExam);
+  // Tempo varsa soyle: "178 durak" soyut, "haftada ~2 durak" tutulabilir.
+  if (days != null && totalStops && tempo) {
+    return `YKS'ye ${days} gün, rotanda ${totalStops} durak var — ${tempo}. ${tail}`;
+  }
   if (days != null && totalStops) return `YKS'ye ${days} gün, rotanda ${totalStops} durak var. ${tail}`;
   if (days != null) return `YKS'ye ${days} gün. ${tail}`;
   if (totalStops) return `Rotanda ${totalStops} durak var. ${tail}`;
@@ -21,7 +25,7 @@ function routeSentence(daysUntilExam, totalStops) {
 // tek durak, "İlk durağa başla".
 export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute }) {
   const C = useC();
-  const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
+  const { daysUntilExam, stopCounts, nextTask, declared } = hero;
   const enter = (i) => FadeInDown.delay(i * 80).duration(500);
   const daysLine = daysUntilExam == null
     ? "ilk durak hazır"
@@ -35,11 +39,11 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute }) {
         </StatBlock>
       </Animated.View>
 
-      <FirstDayRouteLine targetNet={targetNet} />
+      <FirstDayRouteLine declared={declared} />
 
       <Animated.View entering={enter(1)}>
         <Text style={[TYPOGRAPHY.body, s.summary, { color: C.text2 }]}>
-          {routeSentence(daysUntilExam, stopCounts?.total)}
+          {routeSentence(daysUntilExam, stopCounts?.total, declared?.tempo)}
         </Text>
         <FirstDayStop task={nextTask} />
       </Animated.View>

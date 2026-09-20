@@ -3,11 +3,12 @@ import { useExam } from "../contexts/ExamContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
+import { routeDeclaredPath } from "../domain/route/declaredPath";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
 export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
-  const { targetNet, daysUntilExam, examType } = useExam();
+  const { targetNet, baselineNet, daysUntilExam, examType } = useExam();
   const {
     weeks,
     forecast,
@@ -29,6 +30,19 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     }
     return { total, done };
   }, [weeks]);
+
+  // Ilk gun rota cizgisinin iki ucu: kullanicinin kurulumda kendi girdigi
+  // baslangic ve hedef net. Uydurma degil, beyan -- o yuzden "BURADASIN"
+  // dugumu artik sayisiz durmuyor.
+  const declared = useMemo(
+    () => routeDeclaredPath({
+      baselineNet,
+      targetNet,
+      daysLeft: daysUntilExam,
+      stopCount: stopCounts.total,
+    }),
+    [baselineNet, targetNet, daysUntilExam, stopCounts.total],
+  );
 
   // Rota dondurulduginda "kacinci durakta birakildi" bilgisi - hero'nun
   // "Rota Donduruldu" varyaminda kullaniliyor. Duraklar hafta-hafta duz
@@ -83,6 +97,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     frozenAtStop,
     chartData,
     stopCounts,
+    declared,
     // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
     // kacirilan sorunun dakika karsiligini haftanin plannedMinutes oraniyla
     // turetiyor; dakika yoksa 0 gelir ve serit borcu hic gostermez —

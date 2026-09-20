@@ -43,5 +43,7 @@ export function routeDeclaredPath({ baselineNet, targetNet, daysLeft, stopCount 
       ? `${Math.abs(goal - start)} net ${goal > start ? "yukarı" : "aşağı"}`
       : null,
     summary: summary || null,
+    // Tempo tek basina da kullaniliyor (Ana Sayfa cumlesi).
+    tempo,
   };
 }
