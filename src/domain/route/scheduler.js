@@ -1,3 +1,5 @@
+import { spreadSubjects } from "./subjectSpread.js";
+
 // Konuları haftalara KAPASİTEYE göre yerleştirir.
 //
 // Eski motor `Math.ceil(konuSayısı / haftaSayısı)` ile eşit bölüyordu; bu,
@@ -18,7 +20,10 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = 
   const fullQuestionBudget = Math.max(1, Math.round(capacity.questionsPerWeek * NEW_TOPIC_SHARE));
   const fullMinuteBudget = Math.max(1, Math.round(capacity.minutesPerWeek * NEW_TOPIC_SHARE));
   const weeks = [];
-  const queue = [...items];
+  // Oncelik sirasi ayni dersi ust uste yigiyordu: ilk gun acilan kullanici
+  // dort Turkce duragi goruyordu. spreadSubjects onceligi bozmadan ayni
+  // dersten ust uste en fazla ikiye izin verir.
+  const queue = spreadSubjects(items);
   let overflow = [];
 
   for (let w = 0; w < weeksLeft; w++) {

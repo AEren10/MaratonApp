@@ -112,3 +112,17 @@ tekrar etmez. Uygulandıktan sonra döngü aynı dakika içinde durdu (ölçüld
 **Ders:** `40001` ve `40P01` (deadlock) "tekrar dene" anlamına gelir. Kalıcı bir
 iş kuralı ihlali için asla bu kodları kullanma. Yeni RPC yazarken kalıcı hatada
 `PTxxx` kullan.
+
+---
+
+## Analiz ekranı — yarım kalan tek şey
+
+`AnalysisInsightsCard` ("BU HAFTA NE OKUYORUZ") artık dürüst boş halini
+gösteriyor, ama **gerçek içgörü üretimi hiç bağlanmadı** — ekrana `insights`
+prop'u geçilmiyor. Yani o kart şu an hiçbir kullanıcıda dolmayacak.
+
+Kaynak var: `useRecommendations` / `src/lib/smartNudge.js` zaten öneri
+üretiyor. Bağlanması gereken tek şey `AnalysisScreen` → `insights={...}`.
+
+Eskiden herkese sabit üç cümle yazıyordu ("Matematik netin son 5 denemede
+düşüşte"), o yüzden kimse eksik olduğunu fark etmemişti.
