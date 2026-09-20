@@ -79,6 +79,10 @@ function normalizeGroup(row = {}) {
     memberCount: Number(row.member_count ?? row.memberCount ?? 0) || 0,
     creator_name: row.creator_name ?? row.creatorName ?? null,
     creatorName: row.creator_name ?? row.creatorName ?? null,
+    // get_my_groups sirayi uretiyor; yoksa null kalir ve kart sirayi hic
+    // yazmaz -- uydurma bir 0. sira gostermekten iyidir.
+    user_rank: Number(row.user_rank ?? row.userRank) || null,
+    userRank: Number(row.user_rank ?? row.userRank) || null,
   };
 }
 
