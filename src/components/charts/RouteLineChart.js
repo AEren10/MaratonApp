@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { View } from "react-native";
 import Svg, { Path, Circle, Defs, LinearGradient, Stop, Text as SvgText } from "react-native-svg";
 import { RouteChartLayers } from "./components/RouteChartLayers";
+import { RouteChartNodes } from "./components/RouteChartNodes";
 import { useC } from "../../contexts/ThemeContext";
 import {
   makeScale,
@@ -14,11 +15,9 @@ import {
 } from "../../lib/routeChartPath";
 import {
   CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT,
-  NODE, STROKE, LABEL, scaleOptions, axisAnchor,
+  STROKE, LABEL, scaleOptions, axisAnchor,
 } from "./chartStyle";
 
-// Olculer ve tipografi chartStyle'dan — bos grafik de ayni kaynagi okuyor,
-// boylece iki hat yan yana konunca ayni uygulamadan gelmis gibi duruyor.
 const W = CHART_W;
 const H = CHART_H;
 
@@ -53,7 +52,6 @@ export function RouteLineChart({
   const baseY = H - scaleOpts.padBottom;
   const areaD = buildAreaPath(points, baseY);
   const pastD = buildLinePath(pastPoints);
-  // Tasarimda projeksiyon akan bir egri; gecmis hat kirikli kalir.
   const futD = buildSmoothPath(futurePoints);
   const bandD = band?.upper && band?.lower
     ? buildBandPath(
@@ -62,9 +60,7 @@ export function RouteLineChart({
       )
     : null;
 
-  // Hedef cizgisi — tasarimda kendi tokeni var (--target-line).
   const targetY = typeof target === "number" ? sc.toY(target) : null;
-
   const todayPoint = pastPoints[pastPoints.length - 1];
   const endPoint = futurePoints[futurePoints.length - 1] || todayPoint;
 
@@ -86,10 +82,6 @@ export function RouteLineChart({
         <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD}
           width={W} padLeft={PAD_LEFT} padRight={PAD_RIGHT} ticks={ticks} C={C} />
 
-        {/* Gecmis hat. SVG path statik tutuluyor; bu grafik ana navigasyon
-            ekraninda cok sik render oluyor ve animatedProps, Reanimated
-            worklet'ine SVG/prop objesi tasidigi icin runtime'da shareable
-            mutation uyarisi uretebiliyordu. */}
         {pastD ? (
           <Path
             d={pastD}
@@ -101,60 +93,16 @@ export function RouteLineChart({
           />
         ) : null}
 
-        {pastPoints.slice(0, -1).map((p, i) => (
-          <Circle
-            key={`pt-${i}`}
-            cx={p.x}
-            cy={p.y}
-            r={NODE.past}
-            fill={C.bg}
-            stroke={C.past}
-            strokeWidth={STROKE.pastNode}
-          />
-        ))}
+        <RouteChartNodes
+          pastPoints={pastPoints}
+          todayPoint={todayPoint}
+          endPoint={endPoint}
+          hasFuture={Boolean(safeProj.length)}
+          todayLabel={todayLabel}
+          endLabel={endLabel}
+          C={C}
+        />
 
-        {todayPoint ? (
-          <>
-            <Circle cx={todayPoint.x} cy={todayPoint.y} r={NODE.todayGlow} fill={C.accent} fillOpacity={0.18} />
-            <Circle cx={todayPoint.x} cy={todayPoint.y} r={NODE.today} fill={C.accent} />
-          </>
-        ) : null}
-
-        {endPoint && !safeProj.length ? null : endPoint ? (
-          <Circle cx={endPoint.x} cy={endPoint.y} r={NODE.end} fill={C.bg} stroke={C.projNode} strokeWidth={STROKE.endNode} />
-        ) : null}
-
-        {/* Dugum etiketleri: tasarimda hattin iki ucu adlandirilmis.
-            "BUGÜN" kirmizi dugumun altinda, tahmin degeri son dugumun
-            ustunde. Metin yoksa hicbir sey cizilmez. */}
-        {todayLabel && todayPoint ? (
-          <SvgText
-            x={todayPoint.x + 12}
-            y={todayPoint.y + 20}
-            fill={C.accentBright}
-            fontSize={LABEL.size}
-            fontWeight={LABEL.weight}
-            letterSpacing={LABEL.tracking}
-          >
-            {todayLabel}
-          </SvgText>
-        ) : null}
-
-        {endLabel && endPoint && safeProj.length ? (
-          <SvgText
-            x={endPoint.x - 10}
-            y={endPoint.y - 14}
-            fill={C.text2}
-            fontSize={LABEL.size}
-            fontWeight={LABEL.weight}
-            letterSpacing={LABEL.tracking}
-            textAnchor="end"
-          >
-            {endLabel}
-          </SvgText>
-        ) : null}
-
-        {/* Zaman ekseni: ilk olcum · bugun · sinav gunu. */}
         {hasAxis ? axisLabels.map((label, i) => {
           if (!label) return null;
           const { x, anchor } = axisAnchor(i, axisLabels.length);
@@ -176,3 +124,4 @@ export function RouteLineChart({
     </View>
   );
 }
+

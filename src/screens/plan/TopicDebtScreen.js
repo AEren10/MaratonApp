@@ -111,23 +111,23 @@ export default function TopicDebtScreen() {
                 />
               ))}
             </Animated.View>
-          </ScrollView>
 
-          <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              onPress={distribute}
-              loading={distributing}
-              disabled={!canDistribute}
-            >
-              Borcu üç haftaya dağıt
-            </Button>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-              Dağıtınca borç durakları rotaya yeniden yazılır.
-            </Text>
-          </View>
+            <View style={styles.actionWrap}>
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onPress={distribute}
+                loading={distributing}
+                disabled={!canDistribute}
+              >
+                Borcu üç haftaya dağıt
+              </Button>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
+                Dağıtınca borç durakları rotaya yeniden yazılır.
+              </Text>
+            </View>
+          </ScrollView>
         </>
       )}
     </SafeAreaView>
@@ -136,7 +136,7 @@ export default function TopicDebtScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
-  scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 },
   impactCard: { marginTop: STEP.s4, padding: STEP.s4 },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: SHAPE.chip, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.05)" },
   loadingList: { marginTop: STEP.s4, gap: STEP.s3 },
@@ -144,5 +144,5 @@ const styles = StyleSheet.create({
   listWrap: { marginTop: STEP.s5 },
   listHead: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s3 },
   rule: { flex: 1, height: 1 },
-  bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
+  actionWrap: { marginTop: STEP.s5, paddingBottom: STEP.s4 },
 });

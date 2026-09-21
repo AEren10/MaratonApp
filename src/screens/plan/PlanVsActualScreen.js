@@ -96,20 +96,19 @@ export default function PlanVsActualScreen() {
                 {gapBody || (gap > 0 ? "Boşluk var; nasıl kapatacağını seçebilirsin." : "Boşluk yok. Plan ve gerçek aynı çizgide ilerliyor.")}
               </Text>
             </Card>
-          </ScrollView>
 
-          <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-            <Button variant="primary" size="lg" fullWidth onPress={openGapClosure}>Boşluğu kapatma planı</Button>
-            
-            <View style={{ alignItems: "center", marginTop: STEP.s4, gap: STEP.s2 }}>
-              <Pressable hitSlop={10}>
-                <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, textDecorationLine: "underline" }]}>Tempoyu gerçeğe çek</Text>
-              </Pressable>
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", maxWidth: 280, opacity: 0.7 }]}>
-                Hedefin aynı kalır. Haftalık yükünü son üç haftada gerçekten yaptığın kadarına indiririm.
-              </Text>
+            <View style={styles.actionWrap}>
+              <Button variant="primary" size="lg" fullWidth onPress={openGapClosure}>Boşluğu kapatma planı</Button>
+              <View style={{ alignItems: "center", marginTop: STEP.s3, gap: STEP.s1 }}>
+                <Pressable hitSlop={10}>
+                  <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, textDecorationLine: "underline" }]}>Tempoyu gerçeğe çek</Text>
+                </Pressable>
+                <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", maxWidth: 280, opacity: 0.7 }]}>
+                  Hedefin aynı kalır. Haftalık yükünü son üç haftada gerçekten yaptığın kadarına indiririm.
+                </Text>
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </>
       )}
     </SafeAreaView>
@@ -118,11 +117,11 @@ export default function PlanVsActualScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 160 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 },
   empty: { marginTop: STEP.s5, paddingHorizontal: GUTTER },
   loading: { marginTop: STEP.s5, paddingHorizontal: GUTTER, gap: STEP.s2 },
   legend: { flexDirection: "row", alignItems: "center", gap: STEP.s4, marginTop: STEP.s3 },
   cards: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s5 },
   countCard: { flex: 1, padding: STEP.s3 },
-  bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
+  actionWrap: { marginTop: STEP.s4, paddingBottom: STEP.s4 },
 });

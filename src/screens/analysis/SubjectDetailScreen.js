@@ -118,11 +118,15 @@ export default function SubjectDetailScreen() {
               contentContainerStyle={styles.list}
               showsVerticalScrollIndicator={false}
               ListHeaderComponent={ListHeaderComponent}
+              ListFooterComponent={
+                <View style={styles.footerAction}>
+                  <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey })}>
+                    Seçili 3 konuya durak koy
+                  </Button>
+                  <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>Tamamlananları gizle</Text>
+                </View>
+              }
             />
-            <View style={[styles.bottomAction, { backgroundColor: C.bg }]}>
-              <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey })}>Seçili 3 konuya durak koy</Button>
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>Tamamlananları gizle</Text>
-            </View>
           </>
         )}
       </SafeAreaView>
@@ -131,9 +135,9 @@ export default function SubjectDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { paddingHorizontal: GUTTER, paddingTop: STEP.s1, paddingBottom: 120 },
+  list: { paddingHorizontal: GUTTER, paddingTop: STEP.s1, paddingBottom: STEP.s5 },
   skeletonWrap: { paddingHorizontal: GUTTER, gap: STEP.s1 },
   state: { paddingHorizontal: GUTTER, marginTop: STEP.s3 },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: STEP.s4, paddingBottom: STEP.s2, borderBottomWidth: 1, marginBottom: STEP.s2 },
-  bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 }
+  footerAction: { marginTop: STEP.s4, paddingBottom: STEP.s4 }
 });
