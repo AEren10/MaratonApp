@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { RouteEmptyChart } from "./RouteEmptyChart";
+import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
 // Tasarim "Boş Rota": rotada henuz durak yok. Kopya artboard'dan birebir.
 export function RouteEmptyState({ daysLeft, examDateTag, loading, onAddFirstStop }) {

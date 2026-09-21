@@ -10,7 +10,7 @@ import { HomeCTAButton } from "./HomeCTAButton";
 // Ana Sayfa hero'sunun normal (Pro) hali: dev sayi + rota grafigi + ozet
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
-  const { remainingToGoal, daysUntilExam, examType, targetNet, hasRouteAccess, chartData, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
+  const { remainingToGoal, daysUntilExam, examType, targetNet, hasRouteAccess, chartData, declared, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
   return (
     <View style={s.top}>
       <HomeHeroStat
@@ -23,7 +23,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 
       <Pressable style={s.chart} onPress={onViewRoute} disabled={!hasRouteAccess}
         accessibilityRole="button" accessibilityLabel="Rota detayını gör">
-        <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} target={targetNet} />
+        <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} declared={declared} target={targetNet} />
       </Pressable>
 
       <HomeRouteSummaryBar

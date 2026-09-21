@@ -6,7 +6,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { makeScale } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-import { RouteEmptyChart } from "./RouteEmptyChart";
+import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
 // RouteLineChart'in tuval olcusu ve olcek kurali (tek ortak olcek).
 const W = 390;

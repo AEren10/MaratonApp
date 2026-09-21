@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Line, Path } from "react-native-svg";
 
-import { useC } from "../../../contexts/ThemeContext";
-import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { useC } from "../../contexts/ThemeContext";
+import { STEP, TYPOGRAPHY } from "../../themes/tokens";
 
 const W = 390;
 const H = 150;

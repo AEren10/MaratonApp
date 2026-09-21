@@ -8,7 +8,7 @@ import { useRouteDetail } from "../../hooks/useRouteDetail";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { RouteAccessGate } from "./components/RouteAccessGate";
 import { RouteDetailChart } from "./components/RouteDetailChart";
-import { RouteEmptyChart } from "./components/RouteEmptyChart";
+import { RouteEmptyChart } from "../../components/charts/RouteEmptyChart";
 import { RouteEmptyState } from "./components/RouteEmptyState";
 import { RouteHeader } from "./components/RouteHeader";
 import RouteLinkRow from "./components/RouteLinkRow";

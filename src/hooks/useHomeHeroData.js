@@ -3,11 +3,12 @@ import { useExam } from "../contexts/ExamContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
+import { routeDeclaredPath } from "../domain/route/declaredPath";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
 export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
-  const { targetNet, daysUntilExam, examType } = useExam();
+  const { targetNet, baselineNet, daysUntilExam, examType } = useExam();
   const {
     weeks,
     forecast,
@@ -62,6 +63,13 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     return { stops, todayIndex, projection, band };
   }, [forecast]);
 
+  // Olculmus tahmin (3 deneme) gelene kadar grafik bos kalmasin: kurulumda
+  // kullanicinin KENDI girdigi baslangic ve hedef netini gosteririz.
+  const declared = useMemo(
+    () => routeDeclaredPath({ baselineNet, targetNet, daysLeft: daysUntilExam, stopCount: stopCounts.total }),
+    [baselineNet, targetNet, daysUntilExam, stopCounts.total],
+  );
+
   const nextTask = generatedTasks?.[0] || null;
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
@@ -82,6 +90,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     isPaused,
     frozenAtStop,
     chartData,
+    declared,
     stopCounts,
     // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
     // kacirilan sorunun dakika karsiligini haftanin plannedMinutes oraniyla
