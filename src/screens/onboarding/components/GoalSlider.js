@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, runOnJS } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, runOnJS, withSpring } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as H from "../../../lib/haptics";
 
@@ -19,24 +19,40 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, acc
   const pct = (value - min) / (max - min);
   const thumbX = useSharedValue(pct * trackWidth);
   const startX = useSharedValue(0);
+  const thumbScale = useSharedValue(1);
+  const lastSnapped = useSharedValue(value);
 
   const gesture = Gesture.Pan()
-    .onStart(() => { startX.value = thumbX.value; })
+    .onBegin(() => {
+      thumbScale.value = withSpring(1.18, { damping: 15, stiffness: 350 });
+    })
+    .onStart(() => {
+      startX.value = thumbX.value;
+      thumbScale.value = withSpring(1.18, { damping: 15, stiffness: 350 });
+    })
     .onUpdate((e) => {
       const nx = Math.max(0, Math.min(trackWidth, startX.value + e.translationX));
       thumbX.value = nx;
       const raw = min + (nx / trackWidth) * (max - min);
       const snapped = Math.max(min, Math.min(max, snap(raw, step)));
+      if (snapped !== lastSnapped.value) {
+        lastSnapped.value = snapped;
+        runOnJS(H.select)();
+      }
       runOnJS(onChange)(snapped);
     })
     .onEnd(() => {
       const raw = min + (thumbX.value / trackWidth) * (max - min);
       const snapped = Math.max(min, Math.min(max, snap(raw, step)));
       thumbX.value = ((snapped - min) / (max - min)) * trackWidth;
-      runOnJS(H.select)();
+    })
+    .onFinalize(() => {
+      thumbScale.value = withSpring(1, { damping: 16, stiffness: 300 });
     });
 
-  const thumbStyle = useAnimatedStyle(() => ({ transform: [{ translateX: thumbX.value - THUMB_R }] }));
+  const thumbStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: thumbX.value - THUMB_R }, { scale: thumbScale.value }],
+  }));
   const fillStyle = useAnimatedStyle(() => ({ width: thumbX.value }));
   const hitArea = THUMB_R * 2 + 20;
 

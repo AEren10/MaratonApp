@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
-import { Button, StatBlock } from "../../components/design";
+import { Button, AnimatedNumber } from "../../components/design";
 import RouteReadyStopRow from "./components/RouteReadyStopRow";
 import RouteReadyFirstTask from "./components/RouteReadyFirstTask";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -32,8 +32,6 @@ export default function RouteReadyScreen() {
     hasBaselineNet: currentNet != null,
   }, options), [finish, daysUntilExam, stopCount, targetNet, currentNet]);
 
-  // Rota kurulamadiysa kurulum BITMEZ: rotasiz iceri alinan kullanici hem
-  // bos bir uygulama goruyor hem de neyin ters gittigini ogrenemiyordu.
   const handleStart = useCallback(async () => {
     setStarting(true);
     try {
@@ -41,10 +39,7 @@ export default function RouteReadyScreen() {
     } catch {
       H.warn();
       setStarting(false);
-      showAlert(
-        "Rotan oluşturulamadı",
-        "Bağlantını kontrol edip tekrar dener misin? Verdiğin bilgiler duruyor.",
-      );
+      showAlert("Rotan oluşturulamadı", "Bağlantını kontrol edip tekrar dener misin? Verdiğin bilgiler duruyor.");
       return;
     }
     H.success();
@@ -53,18 +48,8 @@ export default function RouteReadyScreen() {
     finishOnboarding(params ? { then: { screen: SCREENS.STUDY_TIMER, params } } : {}).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
-  // Bu ekranin cikisi YALNIZ ileriydi: bir buton zamanlayiciya, digeri Rota
-  // Detay'a. Ana Sayfa'ya giden hicbir yol yoktu, yani kurulumu biten
-  // kullanici once calismak ya da rotayi incelemek zorundaydi. Ucuncu bir
-  // secenek: sadece iceri gir.
   const handleGoHome = useCallback(() => finishOnboarding({}), [finishOnboarding]);
-
-  // Ikinci buton rotanin tamamina goturur. Varsayilan inis Ana Sayfa oldugu
-  // icin Rota Detay'i acikca istemek gerekiyor.
-  const handleViewRoute = useCallback(
-    () => finishOnboarding({ screen: SCREENS.ROADMAP }),
-    [finishOnboarding],
-  );
+  const handleViewRoute = useCallback(() => finishOnboarding({ screen: SCREENS.ROADMAP }), [finishOnboarding]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -72,14 +57,17 @@ export default function RouteReadyScreen() {
         <Animated.View entering={FadeIn.delay(60)}>
           <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accent }]}>ROTAN HAZIR</Text>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(140)}>
-          <StatBlock value={daysUntilExam ?? "-"} unit="gün" size="hero" />
+        <Animated.View entering={FadeInDown.delay(140)} style={styles.heroWrap}>
+          <AnimatedNumber
+            value={daysUntilExam || 0}
+            duration={750}
+            style={[TYPOGRAPHY.heroNumber, { color: C.text }]}
+          />
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text3 }]}>gün</Text>
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(200)}>
           <Text style={[TYPOGRAPHY.subheading, styles.headline, { color: C.text }]}>
-            {stopCount > 0
-              ? `${stopCount} durak, tek yol. Bugünden sınav gününe kadar.`
-              : "Rotan tek yol. Bugünden sınav gününe kadar."}
+            {stopCount > 0 ? `${stopCount} durak, tek yol. Bugünden sınav gününe kadar.` : "Rotan tek yol. Bugünden sınav gününe kadar."}
           </Text>
         </Animated.View>
 
@@ -116,17 +104,11 @@ export default function RouteReadyScreen() {
           İlk durağa başla
         </Button>
         {syncPendingNote ? (
-          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>
-            {syncPendingNote}
-          </Text>
+          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{syncPendingNote}</Text>
         ) : null}
-        {/* Ana sayfa artik BUTON. Alt cizgili bir bag olarak konmustu ve
-            gorulmedi; kurulumu biten kullanici bu ekranda takili kaldi. */}
         <Button onPress={handleGoHome} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
           Ana sayfaya git
         </Button>
-        {/* Rota detayi ucuncul: Ana Sayfa'ya gecen kullanici rota hattina
-            basarak zaten tek dokunusta oraya ulasiyor. */}
         <Pressable
           onPress={handleViewRoute}
           accessibilityRole="button"
@@ -149,6 +131,7 @@ export default function RouteReadyScreen() {
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
   eyebrow: { letterSpacing: 2.6 },
+  heroWrap: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginVertical: STEP.s1 },
   headline: { marginTop: STEP.s2, maxWidth: 300 },
   compareRow: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s3 },
   stopList: { marginTop: STEP.s3 },
