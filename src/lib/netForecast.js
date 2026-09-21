@@ -93,7 +93,9 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
   const dataPoints = points.map(({ x, y, trial }) => ({
     dayIndex: x, net: y, rawNet: finite(
       trial.rawTotalNet ?? trial.raw_total_net ?? trial.totalNet ?? trial.total_net,
-    ), dateStr: formatDDMM(trial.__date),
+    // dateStr "26/05" — zaman ekseni "26 MAY" gibi baska bir bicim istiyor,
+    // o yuzden ham tarih de tasiniyor.
+    ), dateStr: formatDDMM(trial.__date), date: trial.__date,
   }));
   return {
     projected, current: points[n - 1].y, first: points[0].y,

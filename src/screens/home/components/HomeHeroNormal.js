@@ -1,7 +1,8 @@
-import { Pressable, View, StyleSheet } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { STEP } from "../../../themes/tokens";
+import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeRouteSummaryBar } from "./HomeRouteSummaryBar";
@@ -10,6 +11,7 @@ import { HomeCTAButton } from "./HomeCTAButton";
 // Ana Sayfa hero'sunun normal (Pro) hali: dev sayi + rota grafigi + ozet
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
+  const C = useC();
   const { remainingToGoal, daysUntilExam, examType, targetNet, hasRouteAccess, chartData, declared, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
   return (
     <View style={s.top}>
@@ -25,6 +27,13 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         accessibilityRole="button" accessibilityLabel="Rota detayını gör">
         <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} declared={declared} target={targetNet} />
       </Pressable>
+
+      {/* Grafigin sozle karsiligi. Tahmin yoksa cumle de yazilmaz. */}
+      {chartData?.sentence ? (
+        <Text style={[TYPOGRAPHY.body, s.sentence, { color: C.text2 }]}>
+          {chartData.sentence}
+        </Text>
+      ) : null}
 
       <HomeRouteSummaryBar
         hasAccess={hasRouteAccess}
@@ -48,5 +57,6 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 const s = StyleSheet.create({
   top: { paddingTop: STEP.s3 + 2 },
   chart: { marginTop: STEP.s3, marginBottom: STEP.s2 },
+  sentence: { marginBottom: STEP.s2 },
   cta: { marginTop: STEP.s4 },
 });

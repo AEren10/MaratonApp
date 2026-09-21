@@ -4,11 +4,12 @@ import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
 import { routeDeclaredPath } from "../domain/route/declaredPath";
+import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
 export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
-  const { targetNet, baselineNet, daysUntilExam, examType } = useExam();
+  const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const {
     weeks,
     forecast,
@@ -60,8 +61,22 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     const band = projection.length
       ? { upper: [forecast.range?.high ?? forecast.projected], lower: [forecast.range?.low ?? forecast.projected] }
       : undefined;
-    return { stops, todayIndex, projection, band };
-  }, [forecast]);
+    // Hattin iki ucu ve zaman ekseni adlandiriliyor — tasarimda grafik
+    // etiketsiz degil: "BUGÜN", "TAHMİN 71", ve altta uc tarih.
+    return {
+      stops,
+      todayIndex,
+      projection,
+      band,
+      todayLabel: "BUGÜN",
+      endLabel: projection.length ? `TAHMİN ${Math.round(forecast.projected)}` : null,
+      axisLabels: chartAxisLabels({
+        firstDate: forecast.dataPoints[0]?.date,
+        examDate,
+      }),
+      sentence: forecastSentence({ projected: forecast.projected, target: targetNet }),
+    };
+  }, [forecast, examDate, targetNet]);
 
   // Olculmus tahmin (3 deneme) gelene kadar grafik bos kalmasin: kurulumda
   // kullanicinin KENDI girdigi baslangic ve hedef netini gosteririz.

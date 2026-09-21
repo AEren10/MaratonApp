@@ -116,3 +116,27 @@ test("buildChartSummary veri yoksa sakin bir cumle doner", () => {
   assert.equal(buildChartSummary({ values: [] }), "Net grafiği: henüz veri yok.");
   assert.equal(buildChartSummary({}), "Net grafiği: henüz veri yok.");
 });
+
+test("makeScale yatay boslukla dugumleri kenardan iceri alir", () => {
+  // Eski hali x'i 0..width arasina yayiyordu: ilk ve son dugum dairesi
+  // viewBox'in disina tasip kirpiliyordu.
+  const sc = makeScale([10, 20, 30], { width: 300, height: 100, padLeft: 20, padRight: 40 });
+  const pts = sc.toPoints([10, 20, 30]);
+  assert.equal(pts[0].x, 20, "ilk nokta sol boslukta baslar");
+  assert.equal(pts[2].x, 260, "son nokta sag bosluktan once biter");
+  assert.equal(pts[1].x, 140, "ara noktalar esit bolunur");
+});
+
+test("yatay bosluk verilmezse eski davranis aynen korunur", () => {
+  const sc = makeScale([0, 1], { width: 200, height: 50 });
+  const pts = sc.toPoints([0, 1]);
+  assert.equal(pts[0].x, 0);
+  assert.equal(pts[1].x, 200);
+});
+
+test("offset'li projeksiyon da ayni yatay bosluga uyar", () => {
+  const sc = makeScale([0, 10], { width: 300, height: 100, padLeft: 20, padRight: 40 });
+  const pts = sc.toPoints([5, 10], { count: 3, offset: 1 });
+  assert.equal(pts[0].x, 140, "offset 1 -> ikinci sutun");
+  assert.equal(pts[1].x, 260, "son sutun sag bosluga dayanir");
+});

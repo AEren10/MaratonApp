@@ -114,7 +114,13 @@ export function buildMiniChart(values, { width, height, tailCount = 2 }) {
 // de ayni alanda olmali, yoksa tuvalin disina duser.
 // Bu yuzden tum degerler (duraklar + projeksiyon + hedef) tek bir alandan
 // olceklenir.
-export function makeScale(domainValues, { width, height, padTop = 12, padBottom = 12 }) {
+// padLeft/padRight: dugumler tuvalin KENARINA oturmasin diye. Eski davranis
+// x'i 0..width arasina yayiyordu, yani ilk ve son dugum dairesi (r=9) yarisi
+// viewBox'in disinda kaliyor ve kirpik goruunuyordu. Varsayilan 0 — mevcut
+// cagiranlar ve testler etkilenmez.
+export function makeScale(domainValues, {
+  width, height, padTop = 12, padBottom = 12, padLeft = 0, padRight = 0,
+}) {
   const nums = (domainValues || [])
     .map((v) => (typeof v === "number" ? v : v?.y))
     .filter((v) => typeof v === "number" && Number.isFinite(v));
@@ -132,9 +138,10 @@ export function makeScale(domainValues, { width, height, padTop = 12, padBottom 
   const toPoints = (values, { count, offset = 0 } = {}) => {
     const list = (values || []).map((v) => (typeof v === "number" ? v : v?.y));
     const total = count ?? list.length;
-    const stepX = total > 1 ? width / (total - 1) : 0;
+    const usableW = width - padLeft - padRight;
+    const stepX = total > 1 ? usableW / (total - 1) : 0;
     return list.map((v, i) => ({
-      x: total > 1 ? (i + offset) * stepX : width / 2,
+      x: total > 1 ? padLeft + (i + offset) * stepX : width / 2,
       y: toY(v),
     }));
   };

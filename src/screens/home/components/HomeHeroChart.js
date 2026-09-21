@@ -41,6 +41,9 @@ export function HomeHeroChart({ hasAccess, data, declared, target, height = 200 
       todayIndex={data.todayIndex}
       projection={data.projection}
       band={data.band}
+      todayLabel={data.todayLabel}
+      endLabel={data.endLabel}
+      axisLabels={data.axisLabels}
       target={target}
       height={height}
     />
