@@ -1,0 +1,27 @@
+-- BULGU (2026-09-21, canli dogrulama): target_net ve baseline_net HICBIR
+-- kullanicida dolu degil (10/10 profil null) — kullanici degeri girmedigi
+-- icin degil, ISTEMCI O KOLONLARA YAZAMADIGI icin.
+--
+-- 20260901220745_protect_profile_write_surface.sql profiles uzerinde
+-- kolon-bazli bir yazma beyaz listesi kurdu:
+--   GRANT UPDATE (name, exam_type, exam_date, ... target_ranking,
+--                 target_department, ...) ON public.profiles TO authenticated;
+-- Iki net kolonu ise 9 GUN SONRA eklendi:
+--   20260910120000_profiles_target_net.sql
+--   20260910130000_profiles_baseline_net.sql
+-- Ikisi de beyaz listeye eklenmedi. Sonuc: her UPDATE ... SET target_net
+-- 42501 "permission denied for column" ile donuyordu.
+--
+-- Neden kimse fark etmedi: ExamContext.updateTargetNet/updateBaselineNet
+-- hatayi yakalayip degeri yerelde `*SyncPending` bayragiyla tutuyor ve
+-- { synced: false } donduruyor. Kurulum akisi bloklanmiyor, kullaniciya
+-- hata gosterilmiyor, retryPendingNetSync her acilista yeniden deniyor ve
+-- her seferinde AYNI kalici hataya carpiyor. Sessiz ve sonsuz.
+--
+-- Okuma yolu etkilenmemisti: private.get_my_profile() SECURITY DEFINER,
+-- satirin tamamini jsonb olarak donduruyor, kolon SELECT izni aramiyor.
+--
+-- Guvenlik: "Users can update own profile" RLS politikasi USING ve
+-- WITH CHECK ile auth.uid() = id sarti koyuyor, yani bu grant yalnizca
+-- kullanicinin KENDI satirindaki iki kolonu yazmasina izin verir.
+GRANT UPDATE (target_net, baseline_net) ON public.profiles TO authenticated;
