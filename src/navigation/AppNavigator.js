@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { navigationRef } from "./navigationRef";
+import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ActivityIndicator, AppState, View } from "react-native";
@@ -251,7 +251,10 @@ export default function AppNavigator() {
     <NavigationContainer
       ref={navigationRef}
       linking={linkingConfig}
-      onReady={() => navigationTracker.ready(navigationRef.getCurrentRoute())}
+      onReady={() => {
+        markNavigationReady();
+        navigationTracker.ready(navigationRef.getCurrentRoute());
+      }}
       onStateChange={() => navigationTracker.change(navigationRef.getCurrentRoute())}
     >
       {content}

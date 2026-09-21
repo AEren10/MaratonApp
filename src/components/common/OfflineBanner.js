@@ -8,7 +8,7 @@ import { usePendingWrites } from "../../hooks/usePendingWrites";
 import { ERROR_COPY } from "../../constants/stateCopy";
 import { SCREENS } from "../../constants/screens";
 import { STEP } from "../../themes/tokens";
-import { navigationRef, navigateFromOutside } from "../../navigation/navigationRef";
+import { navigationRef, navigateFromOutside, onNavigationReady } from "../../navigation/navigationRef";
 import * as H from "../../lib/haptics";
 import { OfflineStrip, offlineStripBody } from "./OfflineStrip";
 
@@ -29,9 +29,23 @@ export default function OfflineBanner() {
     return () => clearInterval(t);
   }, [isConnected, refresh]);
 
-  useEffect(() => navigationRef.addListener("state", () => {
-    setOnQueueScreen(navigationRef.getCurrentRoute()?.name === SCREENS.OFFLINE_QUEUE);
-  }), []);
+  // Bu serit navigator'dan once render oluyor; addListener'i mount aninda
+  // cagirmak "navigation object hasn't been initialized" hatasi veriyordu.
+  // Once hazir olmasini bekliyoruz, sonra dinliyoruz.
+  useEffect(() => {
+    let unsubscribeState = null;
+    const stop = onNavigationReady(() => {
+      const sync = () => setOnQueueScreen(
+        navigationRef.getCurrentRoute()?.name === SCREENS.OFFLINE_QUEUE,
+      );
+      sync();
+      unsubscribeState = navigationRef.addListener("state", sync);
+    });
+    return () => {
+      stop();
+      unsubscribeState?.();
+    };
+  }, []);
 
   const open = useCallback(() => {
     if (navigateFromOutside(SCREENS.OFFLINE_QUEUE)) H.tap();
