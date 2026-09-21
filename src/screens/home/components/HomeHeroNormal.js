@@ -12,7 +12,7 @@ import { HomeCTAButton } from "./HomeCTAButton";
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
   const C = useC();
-  const { remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess, chartData, declared, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
+  const { remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess, chartData, declared, declaredAxis, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
   return (
     <View style={s.top}>
       <HomeHeroStat
@@ -26,13 +26,15 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 
       <Pressable style={s.chart} onPress={onViewRoute} disabled={!hasRouteAccess}
         accessibilityRole="button" accessibilityLabel="Rota detayını gör">
-        <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} declared={declared} target={targetNet} />
+        <HomeHeroChart hasAccess={hasRouteAccess} data={chartData} declared={declared} declaredAxis={declaredAxis} target={targetNet} />
       </Pressable>
 
-      {/* Grafigin sozle karsiligi. Tahmin yoksa cumle de yazilmaz. */}
-      {chartData?.sentence ? (
+      {/* Grafigin sozle karsiligi. Olculmus tahmin varsa onu, yoksa
+          kullanicinin kendi beyan ettigi rotanin ozetini yazar. Ikisi de
+          yoksa satir hic cizilmez — bos yer tutucu koymuyoruz. */}
+      {chartData?.sentence || declared?.summary ? (
         <Text style={[TYPOGRAPHY.body, s.sentence, { color: C.text2 }]}>
-          {chartData.sentence}
+          {chartData?.sentence || declared.summary}
         </Text>
       ) : null}
 

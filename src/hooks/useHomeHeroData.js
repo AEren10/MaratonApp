@@ -85,6 +85,13 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     [baselineNet, targetNet, daysUntilExam, stopCounts.total],
   );
 
+  // Beyan hattinin zaman ekseni: bugun -> sinav gunu. Olculmus grafikteki
+  // eksenle ayni bicim, boylece veri gelince serit yerinden oynamiyor.
+  const declaredAxis = useMemo(
+    () => chartAxisLabels({ firstDate: new Date(), examDate }),
+    [examDate],
+  );
+
   const nextTask = generatedTasks?.[0] || null;
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
@@ -107,6 +114,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     frozenAtStop,
     chartData,
     declared,
+    declaredAxis,
     stopCounts,
     // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
     // kacirilan sorunun dakika karsiligini haftanin plannedMinutes oraniyla

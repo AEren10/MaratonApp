@@ -12,15 +12,15 @@ import {
   buildBandPath,
   splitPastFuture,
 } from "../../lib/routeChartPath";
+import {
+  CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT,
+  NODE, STROKE, LABEL, scaleOptions, axisAnchor,
+} from "./chartStyle";
 
-const W = 390;
-const H = 250;
-// Dugum yaricapi 9, "TAHMİN 71" etiketi sag ucta daha genis yer istiyor.
-// Bu bosluklar olmadan ilk/son dugum viewBox'in kenarindan tasiyordu.
-const PAD_LEFT = 26;
-const PAD_RIGHT = 34;
-// Alt seritte tarih etiketleri var; hat onlarin uzerinde kalmali.
-const AXIS_BAND = 26;
+// Olculer ve tipografi chartStyle'dan — bos grafik de ayni kaynagi okuyor,
+// boylece iki hat yan yana konunca ayni uygulamadan gelmis gibi duruyor.
+const W = CHART_W;
+const H = CHART_H;
 
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
 export function RouteLineChart({
@@ -32,14 +32,7 @@ export function RouteLineChart({
   const safeProj = Array.isArray(projection) ? projection : [];
   const values = safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0));
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
-  const scaleOpts = {
-    width: W,
-    height: H,
-    padTop: 26,
-    padBottom: 20 + (hasAxis ? AXIS_BAND : 0),
-    padLeft: PAD_LEFT,
-    padRight: PAD_RIGHT,
-  };
+  const scaleOpts = scaleOptions({ hasAxis });
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
@@ -102,7 +95,7 @@ export function RouteLineChart({
             d={pastD}
             fill="none"
             stroke={C.past}
-            strokeWidth={4.5}
+            strokeWidth={STROKE.past}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -113,22 +106,22 @@ export function RouteLineChart({
             key={`pt-${i}`}
             cx={p.x}
             cy={p.y}
-            r={4.6}
+            r={NODE.past}
             fill={C.bg}
             stroke={C.past}
-            strokeWidth={2.6}
+            strokeWidth={STROKE.pastNode}
           />
         ))}
 
         {todayPoint ? (
           <>
-            <Circle cx={todayPoint.x} cy={todayPoint.y} r={9} fill={C.accent} fillOpacity={0.18} />
-            <Circle cx={todayPoint.x} cy={todayPoint.y} r={7} fill={C.accent} />
+            <Circle cx={todayPoint.x} cy={todayPoint.y} r={NODE.todayGlow} fill={C.accent} fillOpacity={0.18} />
+            <Circle cx={todayPoint.x} cy={todayPoint.y} r={NODE.today} fill={C.accent} />
           </>
         ) : null}
 
         {endPoint && !safeProj.length ? null : endPoint ? (
-          <Circle cx={endPoint.x} cy={endPoint.y} r={6.5} fill={C.bg} stroke={C.projNode} strokeWidth={2.4} />
+          <Circle cx={endPoint.x} cy={endPoint.y} r={NODE.end} fill={C.bg} stroke={C.projNode} strokeWidth={STROKE.endNode} />
         ) : null}
 
         {/* Dugum etiketleri: tasarimda hattin iki ucu adlandirilmis.
@@ -139,9 +132,9 @@ export function RouteLineChart({
             x={todayPoint.x + 12}
             y={todayPoint.y + 20}
             fill={C.accentBright}
-            fontSize={11.5}
-            fontWeight="600"
-            letterSpacing={1.6}
+            fontSize={LABEL.size}
+            fontWeight={LABEL.weight}
+            letterSpacing={LABEL.tracking}
           >
             {todayLabel}
           </SvgText>
@@ -152,9 +145,9 @@ export function RouteLineChart({
             x={endPoint.x - 10}
             y={endPoint.y - 14}
             fill={C.text2}
-            fontSize={11.5}
-            fontWeight="600"
-            letterSpacing={1.6}
+            fontSize={LABEL.size}
+            fontWeight={LABEL.weight}
+            letterSpacing={LABEL.tracking}
             textAnchor="end"
           >
             {endLabel}
@@ -164,17 +157,14 @@ export function RouteLineChart({
         {/* Zaman ekseni: ilk olcum · bugun · sinav gunu. */}
         {hasAxis ? axisLabels.map((label, i) => {
           if (!label) return null;
-          const anchor = i === 0 ? "start" : i === axisLabels.length - 1 ? "end" : "middle";
-          const x = i === 0 ? PAD_LEFT
-            : i === axisLabels.length - 1 ? W - PAD_RIGHT
-            : PAD_LEFT + (W - PAD_LEFT - PAD_RIGHT) / 2;
+          const { x, anchor } = axisAnchor(i, axisLabels.length);
           return (
             <SvgText
               key={`axis-${i}`}
               x={x}
               y={H - 6}
               fill={C.text4}
-              fontSize={11.5}
+              fontSize={LABEL.size}
               fontWeight="500"
               textAnchor={anchor}
             >

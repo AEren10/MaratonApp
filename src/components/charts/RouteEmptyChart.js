@@ -1,63 +1,126 @@
-import { StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, Line, Path } from "react-native-svg";
+import { StyleSheet, View } from "react-native";
+import Svg, { Circle, Path, Text as SvgText } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
-import { STEP, TYPOGRAPHY } from "../../themes/tokens";
+import {
+  CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT, PAD_TOP,
+  NODE, STROKE, LABEL, VALUE, plotBottom, axisAnchor,
+} from "./chartStyle";
 
-const W = 390;
-const H = 150;
-
-// Olculmus tahmin yokken Rota grafigi. Hat henuz cizilmedi ama iki ucu
-// biliyoruz: kullanici kurulumda baslangic ve hedef netini kendi girdi.
-// `declared` gelirse o sayilar yazilir -- UYDURMA DEGIL, kullanicinin kendi
-// beyani. Gelmezse eski davranis: "HENÜZ TAHMİN YOK".
-export function RouteEmptyChart({ examDateTag, declared, emptyLabel = "HENÜZ TAHMİN YOK" }) {
+// Olculmus tahmin yokken cizilen hat. Iki ucu biliyoruz: kullanici kurulumda
+// baslangic ve hedef netini kendi girdi. Hat KESIKLI — hicbir sey olculmedi,
+// kirilim de yok, cunku arada veri noktasi yok.
+//
+// Gorunum RouteLineChart ile AYNI dilde: ayni tuval orani, ayni dugum
+// yaricaplari, ayni etiket olculeri, ayni tarih seridi. Eski hali kendi
+// olculerini kullaniyordu ve yan yana konunca baska bir uygulamadan gelmis
+// gibi duruyordu. Izgara cizgileri de kaldirildi — olculmus grafikte yok.
+export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel = "HENÜZ TAHMİN YOK" }) {
   const C = useC();
+  const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
+  const bottom = plotBottom({ hasAxis });
+
+  // Hat asagidan yukari. Olcum olmadigi icin gercek bir y degeri yok;
+  // bunlar yalnizca CIZIM konumu, uzerlerine sayi yazilmaz.
+  const x0 = PAD_LEFT;
+  const y0 = bottom - 16;
+  const x1 = CHART_W - PAD_RIGHT;
+  const y1 = PAD_TOP + 10;
+  const cx1 = x0 + (x1 - x0) * 0.42;
+  const cy1 = y0 - (y0 - y1) * 0.12;
+  const cx2 = x0 + (x1 - x0) * 0.72;
+  const cy2 = y1 + (y0 - y1) * 0.34;
+
+  const goalText = declared?.goalLabel || (examDateTag ? null : emptyLabel);
+
   return (
-    <View style={s.wrap} accessible accessibilityLabel={`Net grafiği: henüz veri yok. ${emptyLabel}`}>
-      <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
-        {[30, 68, 106].map((y) => (
-          <Line key={y} x1={34} y1={y} x2={366} y2={y} stroke={C.line} strokeWidth={1} />
-        ))}
+    <View
+      style={s.wrap}
+      accessible
+      accessibilityLabel={declared?.summary
+        ? `Rota: ${declared.startLabel || "başlangıç bilinmiyor"} → ${declared.goalLabel || "hedef yok"}. ${declared.summary}`
+        : "Net grafiği: henüz veri yok."}
+    >
+      <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
         <Path
-          d="M 40 112 C 130 108 240 74 352 40"
+          d={`M${x0},${y0} C${cx1},${cy1} ${cx2},${cy2} ${x1},${y1}`}
           fill="none"
-          stroke={C.track}
-          strokeWidth={2.6}
+          stroke={C.proj}
+          strokeWidth={STROKE.proj}
           strokeLinecap="round"
-          strokeDasharray="1.5 7"
+          strokeDasharray={STROKE.projDash}
         />
-        <Circle cx={40} cy={112} r={9} fill={C.accent} fillOpacity={0.18} />
-        <Circle cx={40} cy={112} r={7} fill={C.accent} />
-        <Circle cx={352} cy={40} r={7.5} fill={C.bg} stroke={C.stop} strokeWidth={2.6} />
-      </Svg>
-      <View style={s.today}>
+
+        <Circle cx={x0} cy={y0} r={NODE.todayGlow} fill={C.accent} fillOpacity={0.18} />
+        <Circle cx={x0} cy={y0} r={NODE.today} fill={C.accent} />
+        <Circle
+          cx={x1} cy={y1} r={NODE.end}
+          fill={C.bg} stroke={C.projNode} strokeWidth={STROKE.endNode}
+        />
+
         {declared?.startLabel ? (
-          <Text style={[TYPOGRAPHY.tableValue, { color: C.text }]}>{declared.startLabel}</Text>
+          <SvgText
+            x={x0 + 13} y={y0 - 12}
+            fill={C.text} fontSize={VALUE.size} fontWeight={VALUE.weight}
+          >
+            {declared.startLabel}
+          </SvgText>
         ) : null}
-        <Text style={[TYPOGRAPHY.tableHead, { color: C.accentBright }]}>BUGÜN</Text>
-      </View>
+        <SvgText
+          x={x0 + 13} y={y0 + 20}
+          fill={C.accentBright}
+          fontSize={LABEL.size} fontWeight={LABEL.weight} letterSpacing={LABEL.tracking}
+        >
+          BUGÜN
+        </SvgText>
 
-      <View style={s.goal}>
         {declared?.goalLabel ? (
-          <Text style={[TYPOGRAPHY.tableValue, s.right, { color: C.text }]}>{declared.goalLabel}</Text>
+          <SvgText
+            x={x1 - 13} y={y1 - 26}
+            fill={C.text} fontSize={VALUE.size} fontWeight={VALUE.weight} textAnchor="end"
+          >
+            {declared.goalLabel}
+          </SvgText>
         ) : null}
-        <Text style={[TYPOGRAPHY.tableHead, s.right, { color: declared?.goalLabel ? C.text2 : C.text4 }]}>
-          {declared?.goalLabel ? "HEDEFİN" : emptyLabel}
-        </Text>
-      </View>
+        {goalText ? (
+          <SvgText
+            x={x1 - 13} y={y1 - 8}
+            fill={declared?.goalLabel ? C.text2 : C.text4}
+            fontSize={LABEL.size} fontWeight={LABEL.weight} letterSpacing={LABEL.tracking}
+            textAnchor="end"
+          >
+            {declared?.goalLabel ? "HEDEFİN" : emptyLabel}
+          </SvgText>
+        ) : null}
 
-      {examDateTag ? (
-        <Text style={[TYPOGRAPHY.tableHead, s.exam, { color: C.text2 }]}>{examDateTag}</Text>
-      ) : null}
+        {hasAxis ? axisLabels.map((label, i) => {
+          if (!label) return null;
+          const { x, anchor } = axisAnchor(i, axisLabels.length);
+          return (
+            <SvgText
+              key={`axis-${i}`}
+              x={x} y={CHART_H - 6}
+              fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor={anchor}
+            >
+              {label}
+            </SvgText>
+          );
+        }) : null}
+
+        {!hasAxis && examDateTag ? (
+          <SvgText
+            x={CHART_W - PAD_RIGHT} y={PAD_TOP - 8}
+            fill={C.text2} fontSize={LABEL.size} fontWeight={LABEL.weight}
+            letterSpacing={LABEL.tracking} textAnchor="end"
+          >
+            {examDateTag}
+          </SvgText>
+        ) : null}
+      </Svg>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { width: "100%", aspectRatio: W / H, position: "relative" },
-  today: { position: "absolute", left: "10%", bottom: STEP.s1 },
-  goal: { position: "absolute", right: "6%", bottom: STEP.s1, alignItems: "flex-end" },
-  right: { textAlign: "right" },
-  exam: { position: "absolute", right: "6%", top: "4%" },
+  wrap: { width: "100%", aspectRatio: CHART_W / CHART_H },
 });

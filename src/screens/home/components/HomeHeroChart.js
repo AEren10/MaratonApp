@@ -7,7 +7,7 @@ import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
 // Ucretsizde rota grafigi kilitli: sakin bir onizleme ve kilit ikonu.
 // Veri yoksa (henuz 3 denemeden az) sakin bir bos durum gosterilir.
-export function HomeHeroChart({ hasAccess, data, declared, target, height = 200 }) {
+export function HomeHeroChart({ hasAccess, data, declared, declaredAxis, target, height = 200 }) {
   const C = useC();
 
   if (!hasAccess) {
@@ -25,7 +25,7 @@ export function HomeHeroChart({ hasAccess, data, declared, target, height = 200 
   // Olculmus hat yoksa bos kutu gostermeyiz: kullanici kurulumda baslangic
   // ve hedef netini zaten verdi, iki ucu o sayilarla yazariz.
   if (!data) {
-    if (declared) return <RouteEmptyChart declared={declared} />;
+    if (declared) return <RouteEmptyChart declared={declared} axisLabels={declaredAxis} />;
     return (
       <View style={[s.fallback, { height, borderColor: C.border, backgroundColor: C.surface }]}>
         <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>
