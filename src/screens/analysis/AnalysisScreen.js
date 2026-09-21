@@ -84,7 +84,7 @@ export default function AnalysisScreen() {
                 C={C}
                 bars={analysis.bars}
                 onSelectSubject={(subj) =>
-                  go(screens.SUBJECT_DETAIL, { subjectKey: subj.key }, "analysis_subject_card")
+                  go(screens.SUBJECT_DETAIL, { subjectKey: subj.key, subjectName: subj.name }, "analysis_subject_card")
                 }
               />
 

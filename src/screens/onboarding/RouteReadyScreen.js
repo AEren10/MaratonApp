@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -52,6 +52,12 @@ export default function RouteReadyScreen() {
     const params = routeActionTimerParams(firstStopAction);
     finishOnboarding(params ? { then: { screen: SCREENS.STUDY_TIMER, params } } : {}).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
+
+  // Bu ekranin cikisi YALNIZ ileriydi: bir buton zamanlayiciya, digeri Rota
+  // Detay'a. Ana Sayfa'ya giden hicbir yol yoktu, yani kurulumu biten
+  // kullanici once calismak ya da rotayi incelemek zorundaydi. Ucuncu bir
+  // secenek: sadece iceri gir.
+  const handleGoHome = useCallback(() => finishOnboarding({}), [finishOnboarding]);
 
   // Ikinci buton rotanin tamamina goturur. Varsayilan inis Ana Sayfa oldugu
   // icin Rota Detay'i acikca istemek gerekiyor.
@@ -117,6 +123,17 @@ export default function RouteReadyScreen() {
         <Button onPress={handleViewRoute} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
           Rotanın tamamını gör
         </Button>
+        <Pressable
+          onPress={handleGoHome}
+          accessibilityRole="button"
+          accessibilityLabel="Şimdilik ana sayfaya git"
+          hitSlop={8}
+          style={({ pressed }) => [styles.homeLink, { opacity: pressed ? 0.7 : 1 }]}
+        >
+          <Text style={[TYPOGRAPHY.captionMedium, styles.homeLinkText, { color: C.text2 }]}>
+            Şimdilik ana sayfaya git
+          </Text>
+        </Pressable>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
           Rotanı her zaman değiştirebilirsin. Deneme girdikçe kendini de günceller.
         </Text>
@@ -133,6 +150,8 @@ const styles = StyleSheet.create({
   stopList: { marginTop: STEP.s3 },
   taskBlock: { marginTop: STEP.s3, marginBottom: STEP.s2 },
   cta: { paddingHorizontal: GUTTER, paddingBottom: STEP.s2, paddingTop: STEP.s1 },
+  homeLink: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
+  homeLinkText: { textDecorationLine: "underline" },
   secondaryBtn: { marginTop: STEP.s1 },
   pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
