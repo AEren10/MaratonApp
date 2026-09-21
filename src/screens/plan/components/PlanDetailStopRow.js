@@ -1,22 +1,28 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import * as H from "../../../lib/haptics";
 
 export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, onStart, onToggle }) {
   return (
     <View style={s.stopRow}>
       <Pressable
-        onPress={onToggle}
+        onPress={() => {
+          if (!done) H.success();
+          else H.select();
+          onToggle();
+        }}
         hitSlop={8}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
         accessibilityLabel={`${subject} tamamlandı olarak işaretle`}
       >
         {done ? (
-          <View style={[s.checkWrap, { backgroundColor: C.up }]}>
+          <Animated.View entering={ZoomIn.springify().damping(12)} style={[s.checkWrap, { backgroundColor: C.up }]}>
             <Icon name="check" size={13} color={C.bg} sw={2.8} />
-          </View>
+          </Animated.View>
         ) : (
           <View style={[s.circle, { borderColor: hasStart ? C.accent : C.text3 }]} />
         )}
@@ -42,8 +48,15 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, onS
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${subject} çalışmaya başla`}
-          onPress={onStart}
-          style={[s.startBtn, { backgroundColor: C.elev, borderColor: C.line }]}
+          onPress={(e) => {
+            H.tap();
+            onStart?.(e);
+          }}
+          style={({ pressed }) => [
+            s.startBtn,
+            { backgroundColor: pressed ? C.surfacePressed : C.elev, borderColor: C.line },
+            pressed && { transform: [{ scale: 0.96 }] },
+          ]}
         >
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text }]}>Başla</Text>
         </Pressable>

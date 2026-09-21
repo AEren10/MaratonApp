@@ -93,25 +93,23 @@ function PlanDetailInner({ route }) {
         ) : (
           <PlanDetailEmptyState C={C} />
         )}
-      </ScrollView>
 
-      <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
-        <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK)}>
-          Bugüne durak ekle
-        </Button>
-        <Button
-          variant="ghost"
-          size="md"
-          fullWidth
-          style={{ marginTop: STEP.s2 }}
-          onPress={() => {
-            if (!hasTasks) navigation.goBack();
-            else setReorganizeOpen(true);
-          }}
-        >
-          {hasTasks ? "Günü yeniden düzenle" : "Bu günü boş bırak"}
-        </Button>
-      </View>
+        {!loading ? (
+          <View style={s.actionsWrap}>
+            <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK)}>
+              Bugüne durak ekle
+            </Button>
+            <Button
+              variant="ghost"
+              size="md"
+              fullWidth
+              onPress={() => (hasTasks ? setReorganizeOpen(true) : navigation.goBack())}
+            >
+              {hasTasks ? "Günü yeniden düzenle" : "Bu günü boş bırak"}
+            </Button>
+          </View>
+        ) : null}
+      </ScrollView>
 
       <ReorganizeDayModal
         visible={reorganizeOpen}
@@ -139,16 +137,12 @@ export default function PlanDetailScreen(props) {
 const s = StyleSheet.create({
   loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   safe: { flex: 1 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 3 + STEP.s1 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 },
   cardsRow: { flexDirection: "row", gap: STEP.s2 },
-  statCard: { flex: 1, padding: STEP.s3 },
-  statNum: { marginTop: STEP.s2 },
-  progressBarWrap: { marginTop: STEP.s3, height: 4 },
-  progressBase: { height: 4, borderRadius: STEP.s1 / 4 },
-  progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
+  statCard: { flex: 1, padding: STEP.s3 }, statNum: { marginTop: STEP.s2 },
+  progressBarWrap: { marginTop: STEP.s3, height: 4 }, progressBase: { height: 4, borderRadius: STEP.s1 / 4 }, progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
   listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s4, paddingBottom: STEP.s2 },
-  rule: { flex: 1, height: 1 },
-  stopsList: { gap: STEP.s3 },
+  rule: { flex: 1, height: 1 }, stopsList: { gap: STEP.s3 },
   summaryCard: { marginTop: STEP.s4, padding: STEP.s3 },
-  bottomAction: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
+  actionsWrap: { marginTop: STEP.s4, paddingBottom: STEP.s4, gap: STEP.s2 },
 });
