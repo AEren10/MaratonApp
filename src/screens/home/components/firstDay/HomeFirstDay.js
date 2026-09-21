@@ -19,7 +19,7 @@ function routeSentence(daysUntilExam, totalStops) {
 
 // İlk Gün: kayit ve deneme yokken Ana Sayfa. Hayalet "0", kesikli rota,
 // tek durak, "İlk durağa başla".
-export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute }) {
+export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShowHome }) {
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
   const enter = (i) => FadeInDown.delay(i * 80).duration(500);
@@ -51,6 +51,14 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute }) {
         <Button variant="outline" size="md" fullWidth onPress={onViewRoute}>
           Rotayı gözden geçir
         </Button>
+        {/* Ilk Gun hero'su Home govdesinin tamamini gizliyor ve eski tek
+            cikisi veri girmekti. Bu buton kapiyi aciyor: ilk duragi yapmadan
+            da Ana Sayfa'nin geri kalani gorulebilir. */}
+        {onShowHome ? (
+          <Button variant="ghost" size="md" fullWidth onPress={onShowHome}>
+            Ana sayfayı göster
+          </Button>
+        ) : null}
       </Animated.View>
 
       <Animated.View entering={enter(3)} style={[s.hint, { borderColor: C.elev }]}>

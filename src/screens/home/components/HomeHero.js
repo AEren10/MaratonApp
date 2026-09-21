@@ -30,6 +30,7 @@ export function HomeHero({
   onStartTask,
   onViewRoute, onViewFullRoute, onRedrawRoute,
   firstDay = false,
+  onDismissFirstDay,
   minutesToday = 0,
   onRecord,
   renderBelow,
@@ -84,7 +85,15 @@ export function HomeHero({
       />
     );
   } else if (firstDay) {
-    content = <HomeFirstDay dailyGoal={dailyGoal} hero={hero} onStartTask={onStartTask} onViewRoute={onViewRoute} />;
+    content = (
+      <HomeFirstDay
+        dailyGoal={dailyGoal}
+        hero={hero}
+        onStartTask={onStartTask}
+        onViewRoute={onViewRoute}
+        onShowHome={onDismissFirstDay}
+      />
+    );
   } else if (!hasRouteAccess) {
     content = (
       <HomeHeroFree

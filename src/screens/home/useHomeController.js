@@ -18,6 +18,7 @@ import { useRecommendations } from "../../hooks/useRecommendations";
 import { useAISuggestions } from "../../hooks/useAISuggestions";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useRetention } from "../../hooks/useRetention";
+import { useFirstDayDismiss } from "../../hooks/useFirstDayDismiss";
 import { useGamification } from "../../hooks/useGamification";
 import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
 import { useCompletionMoments } from "../../hooks/useCompletionMoments";
@@ -113,6 +114,8 @@ export function useHomeController() {
     refresh();
   }, [focused, isConnected, refresh]);
 
+  const { dismissed: firstDayDismissed, dismiss: dismissFirstDay } = useFirstDayDismiss();
+
   // Iskelet yalniz ilk acilista: veri geldi, baglanti yok ya da 4 sn doldu.
   const readyRef = useRef(false);
   const [timedOut, setTimedOut] = useState(false);
@@ -134,7 +137,8 @@ export function useHomeController() {
     streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
     syncError: syncError && !hasLocalData ? syncError : null,
-    firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0,
+    firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0 && !firstDayDismissed,
+    dismissFirstDay,
     offline: !isConnected && !hasLocalData && !offlineDismissed,
     continueOffline: () => setOfflineDismissed(true),
   };

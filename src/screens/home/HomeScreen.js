@@ -76,6 +76,7 @@ export default function HomeScreen() {
           onViewFullRoute={actions.fullRoute}
           onRedrawRoute={actions.redrawRoute}
           firstDay={h.firstDay}
+          onDismissFirstDay={h.dismissFirstDay}
           minutesToday={dashboard.minutesToday}
           onRecord={actions.record}
           renderBelow={renderBelow}
