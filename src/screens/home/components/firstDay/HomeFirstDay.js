@@ -34,7 +34,7 @@ function routeSentence(daysUntilExam, totalStops, tempo) {
   return tail;
 }
 
-export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onSetGoal }) {
+export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onSetGoal, onSeeHome }) {
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, declared, ctaSubtitle } = hero;
   const stat = firstDayHero({ declared, stopCount: stopCounts?.total, daysUntilExam });
@@ -92,6 +92,20 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onSetG
           subtitle={ctaSubtitle}
           onPress={() => onStartTask?.(nextTask)}
         />
+
+        {/* Bu hero normal Ana Sayfa'nin YERINE geciyor. Ilk duragi
+            tamamlamadan asil ekrani gormenin yolu yoktu. */}
+        <Pressable
+          onPress={onSeeHome}
+          accessibilityRole="button"
+          accessibilityLabel="Ana sayfayı göster"
+          hitSlop={8}
+          style={({ pressed }) => [s.seeHome, { opacity: pressed ? 0.7 : 1 }]}
+        >
+          <Text style={[TYPOGRAPHY.captionMedium, s.seeHomeText, { color: C.text2 }]}>
+            Ana sayfayı göster
+          </Text>
+        </Pressable>
       </Animated.View>
     </View>
   );
@@ -104,4 +118,6 @@ const s = StyleSheet.create({
   inviteText: { textDecorationLine: "underline" },
   summary: { marginTop: STEP.s3 },
   actions: { marginTop: STEP.s4 - 4 },
+  seeHome: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s2 },
+  seeHomeText: { textDecorationLine: "underline" },
 });

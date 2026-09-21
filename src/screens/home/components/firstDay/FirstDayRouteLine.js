@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Svg, { Path, Circle } from "react-native-svg";
+import Svg, { Path, Circle, Rect, Defs, ClipPath, G } from "react-native-svg";
 import Animated, {
-  useSharedValue, useAnimatedProps, withTiming, Easing,
+  useSharedValue, useAnimatedProps, withTiming, withDelay, Easing,
 } from "react-native-reanimated";
 
 import { useC } from "../../../../contexts/ThemeContext";
@@ -14,7 +14,8 @@ const PATH = "M 26 176 C 110 164 158 128 206 100 C 266 66 316 46 364 30";
 // 178 durak tek tek cizilemez. Seyrek temsil: yapi gorunur, sayim yapilmaz.
 const TICKS = 24;
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // Kubik bezier uzerinde t noktasi — tik dugumlerini hattin USTUNE koymak icin.
 const P = [[26, 176], [110, 164], [158, 128], [206, 100], [266, 66], [316, 46], [364, 30]];
@@ -40,13 +41,19 @@ function pointAt(t) {
 // nerede oldugunu biliyor ama soylemiyordu.
 export function FirstDayRouteLine({ declared, stopCount, onPress }) {
   const C = useC();
-  const draw = useSharedValue(0);
+  // Hat soldan saga BUYUYEREK belirir. Kesikliligi korumak sart oldugu icin
+  // strokeDashoffset kullanilamaz (dasharray zaten desen icin dolu) -- onun
+  // yerine hattin ustunden soldan saga acilan bir kirpma dikdortgeni geciyor.
+  const grow = useSharedValue(0);
+  const endNode = useSharedValue(0);
 
   useEffect(() => {
-    draw.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.cubic) });
-  }, [draw]);
+    grow.value = withTiming(W, { duration: 900, easing: Easing.out(Easing.cubic) });
+    endNode.value = withDelay(680, withTiming(1, { duration: 360 }));
+  }, [grow, endNode]);
 
-  const animatedProps = useAnimatedProps(() => ({ opacity: draw.value }));
+  const clipProps = useAnimatedProps(() => ({ width: grow.value }));
+  const endProps = useAnimatedProps(() => ({ opacity: endNode.value }));
 
   const ticks = Number.isFinite(stopCount) && stopCount > 0
     ? Array.from({ length: TICKS }, (_, i) => pointAt((i + 1) / (TICKS + 1)))
@@ -65,29 +72,39 @@ export function FirstDayRouteLine({ declared, stopCount, onPress }) {
       accessibilityLabel={`Rotanı aç. ${label}`}
       style={({ pressed }) => [s.wrap, { opacity: pressed ? 0.85 : 1 }]}
     >
-      <Svg viewBox={`0 0 ${W} ${H}`} style={s.svg}>
-        {/* Yurunmemis yol KESIKLI kalir. Cizim animasyonu icin dasharray'i
-            kullanmak, animasyon bitince cizgiyi DOLU birakiyordu -- yani
-            yurunmemis yolu yurunmus gibi gosteriyordu. Bunun yerine hat
-            sabit kesikli, beliren sey opaklik. */}
-        <AnimatedPath
-          d={PATH}
-          fill="none"
-          stroke={C.text5}
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeDasharray="2 9"
-          animatedProps={animatedProps}
-        />
+      <Svg viewBox={`0 ${0} ${W} ${H}`} style={s.svg}>
+        <Defs>
+          <ClipPath id="routeReveal">
+            <AnimatedRect x={0} y={0} height={H} animatedProps={clipProps} />
+          </ClipPath>
+        </Defs>
 
-        {/* 178 durak: sayilmaz ama GORULUR. */}
-        {ticks.map(([x, y], i) => (
-          <Circle key={i} cx={x} cy={y} r={2.1} fill={C.text4} />
-        ))}
+        <G clipPath="url(#routeReveal)">
+          {/* Yurunmemis yol KESIKLI kalir: dolu bir cizgi yurunmus bir rota
+              anlamina gelirdi ve metin de zaten "her durak gectiginde bu
+              cizgi biraz daha uzuyor" diye soz veriyor. */}
+          <Path
+            d={PATH}
+            fill="none"
+            stroke={C.text5}
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeDasharray="2 9"
+          />
+
+          {/* 178 durak: sayilmaz ama GORULUR. */}
+          {ticks.map(([x, y], i) => (
+            <Circle key={i} cx={x} cy={y} r={2.1} fill={C.text4} />
+          ))}
+        </G>
 
         <Circle cx={26} cy={176} r={13} fill={C.accent} fillOpacity={0.14} />
         <Circle cx={26} cy={176} r={7} fill={C.accent} />
-        <Circle cx={364} cy={30} r={6.5} fill={C.bg} stroke={C.text5} strokeWidth={2.4} />
+        <AnimatedCircle
+          cx={364} cy={30} r={6.5}
+          fill={C.bg} stroke={C.text3} strokeWidth={2.4}
+          animatedProps={endProps}
+        />
       </Svg>
 
       <View style={s.here}>
