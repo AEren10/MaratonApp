@@ -32,26 +32,28 @@ export function HomeRouteSummaryBar({ hasAccess, total, done, debtHours, onPress
       accessibilityRole="button"
       accessibilityLabel="Rotanın tamamını gör"
     >
-      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Rotanın tamamı</Text>
-      <View style={[s.dot, { backgroundColor: C.text3 }]} />
-      {hasAccess ? (
-        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{done}/{total} durak</Text>
-      ) : (
-        <LockedValue value={`${done}/${total} durak`} variant="bodyMedium" />
-      )}
-      {debtHours > 0 ? (
-        <>
-          <View style={[s.dot, { backgroundColor: C.text3 }]} />
+      {/* Tasarimda baslik solda, degerler sagda — aradaki ayirici noktalar
+          yok, bosluk ayiriyor. */}
+      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>Rotanın tamamı</Text>
+      <View style={s.values}>
+        {hasAccess ? (
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>{done}/{total} durak</Text>
+        ) : (
+          <LockedValue value={`${done}/${total} durak`} variant="bodyMedium" />
+        )}
+        {debtHours > 0 ? (
           <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{debtHours} sa borç</Text>
-        </>
-      ) : null}
-      <Icon name="chevR" size={16} color={C.text3} style={s.chev} />
+        ) : null}
+        <Icon name="chevR" size={16} color={C.text3} />
+      </View>
     </Pressable>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flexDirection: "row", alignItems: "center", paddingVertical: STEP.s2 },
-  dot: { width: 3, height: 3, borderRadius: 1.5, marginHorizontal: STEP.s1 },
-  chev: { marginLeft: "auto" },
+  wrap: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingVertical: STEP.s2,
+  },
+  values: { flexDirection: "row", alignItems: "center", gap: STEP.s2 },
 });

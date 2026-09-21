@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { ZoomIn } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -44,11 +43,8 @@ export function HomeStopCheckRing({ done, isNext, onToggle, onChecked, accessibi
           },
         ]}
       >
-        {done ? (
-          <Animated.View entering={ZoomIn.springify().damping(12)}>
-            <Icon name="check" size={13} color={C.bg} sw={2.8} />
-          </Animated.View>
-        ) : null}
+        {/* Animasyon YOK — kullanici acikca istedi. Geri eklenmesin. */}
+        {done ? <Icon name="check" size={13} color={C.bg} sw={2.8} /> : null}
       </View>
     </Pressable>
   );

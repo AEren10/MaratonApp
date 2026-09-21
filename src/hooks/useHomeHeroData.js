@@ -99,6 +99,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     remainingToGoal,
     daysUntilExam,
     examType,
+    examDate,
     targetNet,
     hasRouteAccess,
     routeAccessLoading,

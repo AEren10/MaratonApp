@@ -12,7 +12,7 @@ import { HomeCTAButton } from "./HomeCTAButton";
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
   const C = useC();
-  const { remainingToGoal, daysUntilExam, examType, targetNet, hasRouteAccess, chartData, declared, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
+  const { remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess, chartData, declared, stopCounts, debtHours, nextTask, ctaSubtitle } = hero;
   return (
     <View style={s.top}>
       <HomeHeroStat
@@ -21,6 +21,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         remainingToGoal={remainingToGoal}
         daysUntilExam={daysUntilExam}
         examType={examType}
+        examDate={examDate}
       />
 
       <Pressable style={s.chart} onPress={onViewRoute} disabled={!hasRouteAccess}
