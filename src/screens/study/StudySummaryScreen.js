@@ -11,7 +11,6 @@ import { Button, StatBlock } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
-import { XP_REWARDS } from "../../constants/gamification";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
 import { useInAppReview } from "../../hooks/useInAppReview";
 import { ROOT_STACK } from "../../navigation/routes";
@@ -41,20 +40,8 @@ export default function StudySummaryScreen() {
   const todayLogs = useSelector((state) => state.studyLog.todayLogs);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
 
-  const todaySolved = useMemo(
-    () => todayLogs.reduce((sum, l) => sum + (l.questionCount || 0), 0),
-    [todayLogs],
-  );
-  const todayMinutes = useMemo(
-    () => todayLogs.reduce((sum, l) => sum + (l.duration || 0), 0),
-    [todayLogs],
-  );
-
-  const xpEarned = useMemo(() => {
-    let xp = Math.floor(duration / 15) * XP_REWARDS.study_15min;
-    xp += questions * XP_REWARDS.question_solved;
-    return xp;
-  }, [duration, questions]);
+  const todaySolved = useMemo(() => todayLogs.reduce((sum, l) => sum + (l.questionCount || 0), 0), [todayLogs]);
+  const todayMinutes = useMemo(() => todayLogs.reduce((sum, l) => sum + (l.duration || 0), 0), [todayLogs]);
 
   const { incrementAndCheck, showDelayedPaywall, cleanup } = usePaywallTrigger();
   const { maybeRequestReview } = useInAppReview();
@@ -125,6 +112,15 @@ export default function StudySummaryScreen() {
         <StoryShareBlock moment={STORY_MOMENT.SESSION} emphasis="quiet" />
 
         <Animated.View entering={FadeInDown.delay(320).duration(500)} style={{ gap: STEP.s1 }}>
+          {wrongCount > 0 ? (
+            <Button
+              onPress={() => navigation.navigate(SCREENS.ADD_WRONG, { subjectKey: route.params?.subjectKey })}
+              variant="outline"
+              fullWidth
+            >
+              Yanlışları deftere ekle
+            </Button>
+          ) : null}
           {nextRouteAction ? (
             <RouteNextActionPanel
               C={C}

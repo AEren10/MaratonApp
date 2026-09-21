@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, Card, EmptyState, ErrorState, Skeleton } from "../../components/design";
+import { SCREENS } from "../../constants/screens";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTrialCompare } from "../../hooks/useTrialCompare";
@@ -51,6 +52,8 @@ export default function TrialCompareScreen() {
         <EmptyState
           title="Karşılaştırma için en az 2 deneme gerekli"
           body="İkinci denemeni girdiğinde iki sonucu ders ders yan yana koyarız."
+          primary="Deneme Gir"
+          onPrimary={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
           style={{ paddingHorizontal: GUTTER }}
         />
       ) : (

@@ -5,6 +5,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
+import { SCREENS } from "../../constants/screens";
 import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useScenarioView } from "../../hooks/useScenarioView";
 import { ScenarioCard } from "./components/ScenarioCard";
@@ -40,6 +41,8 @@ export default function NetForecastScreen() {
             eyebrow="SENARYOLAR"
             title="Senaryolar için veriye ihtiyacın var"
             body="En az 3 aynı tip deneme ve bir rota gerekiyor. Önce deneme gir, rota oluşsun."
+            primary="Deneme Gir"
+            onPrimary={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
             style={{ paddingHorizontal: GUTTER }}
           />
         )

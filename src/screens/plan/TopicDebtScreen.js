@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { SCREENS } from "../../constants/screens";
 import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -24,7 +25,6 @@ function TopicDebtImpactCard({ C, totalHours }) {
           çalışma yükü kapanır - rotan daha dengeli hale gelir
         </Text>
       </View>
-      
       <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, marginBottom: STEP.s3 }]}>
         Düzenli tekrar ve soru çözümü, sonraki denemelerde daha iyi bir sonuç için zemin oluşturur.
       </Text>
@@ -76,6 +76,8 @@ export default function TopicDebtScreen() {
           <EmptyState
             title="Konu borcun yok."
             body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
+            primary="Günün Planına Dön"
+            onPrimary={() => navigation.navigate(SCREENS.DAILY_PLAN)}
           />
         </View>
       ) : (

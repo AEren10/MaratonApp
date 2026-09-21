@@ -7,6 +7,7 @@ import { EmptyState, ErrorState, Skeleton, Button } from "../../components/desig
 import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { subjectColorOf } from "../../themes/subjectPalette";
+import { getSubjectByKey } from "../../themes/subjects";
 import { useSubjectTopics } from "../../hooks/useSubjectTopics";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
@@ -25,7 +26,8 @@ export default function SubjectDetailScreen() {
   const [segment, setSegment] = useState("all");
 
   const subjectKey = route.params?.subjectKey || route.params?.subject?.key || "matematik";
-  const subjectName = route.params?.subjectName || route.params?.subject?.name || "Matematik";
+  const subjectMeta = useMemo(() => getSubjectByKey(subjectKey), [subjectKey]);
+  const subjectName = route.params?.subjectName || route.params?.subject?.name || subjectMeta?.name || subjectMeta?.label || "Ders";
 
   const { topics, doneCount, totalCount, totalQuestionsSum, progressPct, loading, error, refresh } =
     useSubjectTopics(subjectKey);
