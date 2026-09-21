@@ -28,7 +28,6 @@ export function useHomeActions({ navigation, go }) {
     plan: go(SCREENS.PLAN_DETAIL),
     analysis: go(SCREENS.ANALYSIS),
     debt: go(SCREENS.TOPIC_DEBT),
-    goals: go(SCREENS.GOALS),
     weekReport: go(SCREENS.SUMMARY, { period: "week" }),
     notebook: go(SCREENS.WRONG_NOTEBOOK),
     record: go(SCREENS.ADD_STUDY),

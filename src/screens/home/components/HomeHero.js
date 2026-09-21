@@ -28,7 +28,7 @@ export function HomeHero({
   onBeginComeback,
   onDismissComeback,
   onStartTask,
-  onViewRoute, onViewFullRoute, onRedrawRoute, onSetGoal, onSeeHome,
+  onViewRoute, onViewFullRoute, onRedrawRoute,
   firstDay = false,
   minutesToday = 0,
   onRecord,
@@ -84,7 +84,7 @@ export function HomeHero({
       />
     );
   } else if (firstDay) {
-    content = <HomeFirstDay dailyGoal={dailyGoal} hero={hero} onStartTask={onStartTask} onViewRoute={onViewRoute} onSetGoal={onSetGoal} onSeeHome={onSeeHome} />;
+    content = <HomeFirstDay dailyGoal={dailyGoal} hero={hero} onStartTask={onStartTask} onViewRoute={onViewRoute} />;
   } else if (!hasRouteAccess) {
     content = (
       <HomeHeroFree
@@ -108,14 +108,7 @@ export function HomeHero({
     );
   }
 
-  // Ilk gun govdenin TAMAMI gizleniyordu: bugunun duraklari, iki ders
-  // ozeti, konu borcu, haftalik rapor, defter karti. Yani uygulama ilk gun
-  // kendi icerigini kendisi sakliyordu ve o ekrandan gercek Ana Sayfa'ya
-  // gecis yoktu -- tek durak tamamlanana kadar cikis yok.
-  //
-  // O satirlar artik kendi durust bos hallerini gosterebiliyor, gizlemeye
-  // gerek yok.
-  const showBelow = true;
+  const showBelow = !(mode === HOME_HERO_MODE.NORMAL && firstDay);
   return (
     <Fragment>
       <View style={s.wrap}>{content}</View>

@@ -73,8 +73,6 @@ export default function HomeScreen() {
           onDismissComeback={h.dismissComeback}
           onStartTask={actions.startTask}
           onViewRoute={actions.route}
-          onSetGoal={actions.goals}
-          onSeeHome={h.dismissFirstDay}
           onViewFullRoute={actions.fullRoute}
           onRedrawRoute={actions.redrawRoute}
           firstDay={h.firstDay}

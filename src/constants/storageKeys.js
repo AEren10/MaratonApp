@@ -8,9 +8,6 @@ export const STORAGE_KEYS = {
   EXAM_CONFIG: "@exam_config",
   HAS_SEEN_ONBOARDING: "@has_seen_onboarding",
   NOTIF_PREFS: "@maraton:notifPrefs",
-  // Ilk gun karsilama hero'su kapatildi mi. Kullanici ilk duragi
-  // tamamlamadan normal Ana Sayfa'yi gorebilsin diye.
-  FIRST_DAY_DISMISSED: "@maraton:firstDayDismissed",
   NOTIF_CONTEXT: "@maraton:notifContext",
   OFFLINE_QUEUE: "@maraton:offlineQueue",
   OFFLINE_DEAD_LETTER: "@maraton:dead_letter_queue",

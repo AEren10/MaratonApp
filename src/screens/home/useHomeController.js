@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
-import { getJson, setJson } from "../../lib/storage/appStorage";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
 import { useAuth } from "../../contexts/AuthContext";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -124,22 +122,6 @@ export function useHomeController() {
   }, []);
   if ((!accessLoading && weekLoaded && syncedOnce) || !isConnected || timedOut) readyRef.current = true;
   const [offlineDismissed, setOfflineDismissed] = useState(false);
-
-  // Ilk gun hero'su normal Ana Sayfa'nin yerine geciyor. Kullanici ilk
-  // duragi tamamlamadan asil ekrani goremiyordu; artik kapatabiliyor ve
-  // karar cihazda kaliyor.
-  const [firstDayDismissed, setFirstDayDismissed] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    getJson(STORAGE_KEYS.FIRST_DAY_DISMISSED, false)
-      .then((v) => { if (!cancelled) setFirstDayDismissed(!!v); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-  const dismissFirstDay = useCallback(() => {
-    setFirstDayDismissed(true);
-    setJson(STORAGE_KEYS.FIRST_DAY_DISMISSED, true).catch(() => {});
-  }, []);
   const hasLocalData = todayLogs.length > 0 || trials.length > 0 || weekLogs.length > 0 || !!lastStudyDate;
   // Ilk Gun hero'su Home govdesinin TAMAMINI gizliyor (HomeHero showBelow).
   // O yuzden yalniz kesin bilgiyle iddia edilir: senkron basariyla bitmeden,
@@ -152,8 +134,7 @@ export function useHomeController() {
     streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
     loading: !readyRef.current,
     syncError: syncError && !hasLocalData ? syncError : null,
-    firstDay: !firstDayDismissed && syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0,
-    dismissFirstDay,
+    firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0,
     offline: !isConnected && !hasLocalData && !offlineDismissed,
     continueOffline: () => setOfflineDismissed(true),
   };
