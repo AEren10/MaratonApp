@@ -108,7 +108,14 @@ export function HomeHero({
     );
   }
 
-  const showBelow = !(mode === HOME_HERO_MODE.NORMAL && firstDay);
+  // Ilk gun govdenin TAMAMI gizleniyordu: bugunun duraklari, iki ders
+  // ozeti, konu borcu, haftalik rapor, defter karti. Yani uygulama ilk gun
+  // kendi icerigini kendisi sakliyordu ve o ekrandan gercek Ana Sayfa'ya
+  // gecis yoktu -- tek durak tamamlanana kadar cikis yok.
+  //
+  // O satirlar artik kendi durust bos hallerini gosterebiliyor, gizlemeye
+  // gerek yok.
+  const showBelow = true;
   return (
     <Fragment>
       <View style={s.wrap}>{content}</View>
