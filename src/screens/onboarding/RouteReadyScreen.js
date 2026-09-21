@@ -120,18 +120,22 @@ export default function RouteReadyScreen() {
             {syncPendingNote}
           </Text>
         ) : null}
-        <Button onPress={handleViewRoute} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
-          Rotanın tamamını gör
+        {/* Ana sayfa artik BUTON. Alt cizgili bir bag olarak konmustu ve
+            gorulmedi; kurulumu biten kullanici bu ekranda takili kaldi. */}
+        <Button onPress={handleGoHome} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
+          Ana sayfaya git
         </Button>
+        {/* Rota detayi ucuncul: Ana Sayfa'ya gecen kullanici rota hattina
+            basarak zaten tek dokunusta oraya ulasiyor. */}
         <Pressable
-          onPress={handleGoHome}
+          onPress={handleViewRoute}
           accessibilityRole="button"
-          accessibilityLabel="Şimdilik ana sayfaya git"
+          accessibilityLabel="Rotanın tamamını gör"
           hitSlop={8}
           style={({ pressed }) => [styles.homeLink, { opacity: pressed ? 0.7 : 1 }]}
         >
           <Text style={[TYPOGRAPHY.captionMedium, styles.homeLinkText, { color: C.text2 }]}>
-            Şimdilik ana sayfaya git
+            Rotanın tamamını gör
           </Text>
         </Pressable>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
