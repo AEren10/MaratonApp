@@ -60,3 +60,12 @@ test("iki uctan biri yoksa orta etiket yazilmaz", () => {
   );
   assert.equal(chartAxisLabels({ now }), null, "hicbiri yoksa eksen cizilmez");
 });
+
+test("orta etiket uc etiketlerden biriyle ayniysa yazilmaz", () => {
+  // Olcum yokken ilk tarih BUGUN: "22 EYL ... 22 EYL" gorunuyordu.
+  const now = new Date(2026, 8, 22);
+  assert.deepEqual(
+    chartAxisLabels({ firstDate: now, examDate: new Date(2028, 5, 15), now }),
+    ["22 EYL", null, "15 HAZ 2028"],
+  );
+});

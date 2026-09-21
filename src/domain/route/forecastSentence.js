@@ -43,5 +43,8 @@ export function chartAxisLabels({ firstDate, examDate, now = new Date() } = {}) 
   const right = axisDateLabel(examDate, { now });
   const mid = axisDateLabel(now, { now });
   if (!left && !right) return null;
-  return [left, left && right ? mid : null, right];
+  // Henuz olcum yokken ilk tarih BUGUN oluyor; orta etiket sol ucla ayni
+  // metni yazip "22 EYL ... 22 EYL" gibi gorunuyordu. Ayniysa yazilmaz.
+  const showMid = left && right && mid !== left && mid !== right;
+  return [left, showMid ? mid : null, right];
 }
