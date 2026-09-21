@@ -7,25 +7,33 @@ import { STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { firstDayHero } from "../../../../domain/route/firstDayHero";
 import { HomeCTAButton } from "../HomeCTAButton";
 import { FirstDayRouteLine } from "./FirstDayRouteLine";
+import { FirstDayStop } from "./FirstDayStop";
 
-// İLK GÜN ANA SAYFASI — üç blok: sayı, hat, eylem.
+// İLK GÜN ANA SAYFASI
 //
-// Eskiden yedi blok vardı ve en büyüğü "0" idi: ekranin en pahali tipografisi
-// (96px Bricolage) kullanici hakkinda en anlamsiz seyi soyluyordu, ustelik
-// hayalet renkte. Yaninda kullanicinin KENDI girdigi hedef 26px dipnottu.
-// Yani ekran, ogrencinin kendi iddiasini uygulamanin muhasebesinden kucuk
-// gosteriyordu.
+// Kahraman sayi eskiden "0" idi: ekranin en pahali tipografisi (96px
+// Bricolage) kullanici hakkinda en anlamsiz seyi soyluyordu, ustelik hayalet
+// renkte. Yaninda kullanicinin KENDI girdigi hedef 26px dipnottu. Artik hero
+// kullanicinin beyanindan turuyor (fark -> hedef -> durak -> gun).
 //
-// Silinenler ve sebepleri:
-// - Kesik cerceveli "Deneme girdikce burada ne gorunur?" kutusu: uygulamanin
-//   bos oldugu icin ozur dilemesi. Ayrica dashed kenarlik arayuzde "bu bozuk"
-//   demektir.
-// - "633 gun, 178 durak, haftada ~2 durak" cumlesi: uc sayi da artik hattin
-//   kendisinde gorunuyor. Grafige altyazi yazmak grafige guvenmemektir.
-// - Ikinci tam genislik buton: birincil olani zayiflatiyordu. Rotaya gecis
-//   artik hattin kendisine basarak.
-// - Ayri durak karti: ders ve konu CTA'nin alt satirina katlandi. Ilk 60
-//   saniyede verilecek tek karar var, ne oldugu dugmenin ustunde yazmali.
+// Silinen tek sey uygulamanin BOS OLDUGU ICIN OZUR DILEDIGI kesik cerceveli
+// kutuydu ("Deneme girdikce burada ne gorunur?"). Bir ara ekran uc bloga
+// indirilmisti ve alt yarisi komple bos kaldi -- sadelestirme adina icerik
+// silinmis oldu. Durak karti ve rota cumlesi geri geldi: onlar ozur degil,
+// kullaniciya bugun ne yapacagini soyleyen seyler.
+
+function routeSentence(daysUntilExam, totalStops, tempo) {
+  const tail = "Bugün ilk durakla başlıyoruz; her durak geçtiğinde bu çizgi biraz daha uzuyor.";
+  const days = daysUntilExam == null ? null : Math.max(0, daysUntilExam);
+  if (days != null && totalStops && tempo) {
+    return `YKS'ye ${days} gün, rotanda ${totalStops} durak var — ${tempo}. ${tail}`;
+  }
+  if (days != null && totalStops) return `YKS'ye ${days} gün, rotanda ${totalStops} durak var. ${tail}`;
+  if (days != null) return `YKS'ye ${days} gün. ${tail}`;
+  if (totalStops) return `Rotanda ${totalStops} durak var. ${tail}`;
+  return tail;
+}
+
 export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onSetGoal }) {
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, declared, ctaSubtitle } = hero;
@@ -68,7 +76,17 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onSetG
         onPress={onViewRoute}
       />
 
-      <Animated.View entering={enter(1)} style={s.actions}>
+      {/* Uc bloga indirmek ekranin alt yarisini komple bos birakti. Silinmesi
+          gereken sey uygulamanin ozur dilemesiydi, kullaniciya ne oldugunu
+          anlatan icerik degil. */}
+      <Animated.View entering={enter(1)}>
+        <Text style={[TYPOGRAPHY.body, s.summary, { color: C.text2 }]}>
+          {routeSentence(daysUntilExam, stopCounts?.total, declared?.tempo)}
+        </Text>
+        <FirstDayStop task={nextTask} />
+      </Animated.View>
+
+      <Animated.View entering={enter(2)} style={s.actions}>
         <HomeCTAButton
           title={nextTask ? "İlk durağa başla" : "İlk durağını ekle"}
           subtitle={ctaSubtitle}
@@ -84,5 +102,6 @@ const s = StyleSheet.create({
   meta: { marginTop: STEP.s2 + 2 },
   invite: { marginTop: STEP.s2, minHeight: 44, justifyContent: "center" },
   inviteText: { textDecorationLine: "underline" },
+  summary: { marginTop: STEP.s3 },
   actions: { marginTop: STEP.s4 - 4 },
 });

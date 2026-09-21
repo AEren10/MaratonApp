@@ -29,22 +29,6 @@ function pointAt(t) {
   return [x, y];
 }
 
-// Yol uzunlugunu AYNI egriden ornekleyerek olcer. Elle yazilan bir sayi
-// tutmuyordu (420 yazmistim, gercegi 370.2 -- %13 fazla) ve fazlalik
-// animasyonun basinda gorunur bir olu ana donusuyordu: offset henuz yolun
-// uzunlugunun altina inmedigi icin ekranda bir sure hicbir sey olmuyordu.
-// Buradan hesaplanirsa PATH degisse bile dogru kalir.
-const LEN = (() => {
-  let total = 0;
-  let prev = pointAt(0);
-  for (let i = 1; i <= 240; i += 1) {
-    const cur = pointAt(i / 240);
-    total += Math.hypot(cur[0] - prev[0], cur[1] - prev[1]);
-    prev = cur;
-  }
-  return Math.ceil(total);
-})();
-
 // ROTA HATTI — markanin imzasi, ekranin sahibi.
 //
 // Hat KESIKLI kalir: tamamlanmis durak yok, dolu bir cizgi olmayan bir
@@ -56,13 +40,13 @@ const LEN = (() => {
 // nerede oldugunu biliyor ama soylemiyordu.
 export function FirstDayRouteLine({ declared, stopCount, onPress }) {
   const C = useC();
-  const draw = useSharedValue(LEN);
+  const draw = useSharedValue(0);
 
   useEffect(() => {
-    draw.value = withTiming(0, { duration: 850, easing: Easing.out(Easing.cubic) });
+    draw.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.cubic) });
   }, [draw]);
 
-  const animatedProps = useAnimatedProps(() => ({ strokeDashoffset: draw.value }));
+  const animatedProps = useAnimatedProps(() => ({ opacity: draw.value }));
 
   const ticks = Number.isFinite(stopCount) && stopCount > 0
     ? Array.from({ length: TICKS }, (_, i) => pointAt((i + 1) / (TICKS + 1)))
@@ -82,20 +66,23 @@ export function FirstDayRouteLine({ declared, stopCount, onPress }) {
       style={({ pressed }) => [s.wrap, { opacity: pressed ? 0.85 : 1 }]}
     >
       <Svg viewBox={`0 0 ${W} ${H}`} style={s.svg}>
-        {/* Yurunmemis yol: kesikli ve sonuk. */}
+        {/* Yurunmemis yol KESIKLI kalir. Cizim animasyonu icin dasharray'i
+            kullanmak, animasyon bitince cizgiyi DOLU birakiyordu -- yani
+            yurunmemis yolu yurunmus gibi gosteriyordu. Bunun yerine hat
+            sabit kesikli, beliren sey opaklik. */}
         <AnimatedPath
           d={PATH}
           fill="none"
-          stroke={C.track}
-          strokeWidth={2}
+          stroke={C.text5}
+          strokeWidth={2.4}
           strokeLinecap="round"
-          strokeDasharray={`${LEN} ${LEN}`}
+          strokeDasharray="2 9"
           animatedProps={animatedProps}
         />
 
         {/* 178 durak: sayilmaz ama GORULUR. */}
         {ticks.map(([x, y], i) => (
-          <Circle key={i} cx={x} cy={y} r={1.6} fill={C.line} />
+          <Circle key={i} cx={x} cy={y} r={2.1} fill={C.text4} />
         ))}
 
         <Circle cx={26} cy={176} r={13} fill={C.accent} fillOpacity={0.14} />
