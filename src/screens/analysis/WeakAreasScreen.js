@@ -61,7 +61,7 @@ export default function WeakAreasScreen() {
         <EmptyState
           preset="priorityTopics"
           style={styles.empty}
-          onPrimary={() => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP_ROOT)}
+          onPrimary={() => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP)}
           onSecondary={() => navigation.navigate(SCREENS.SUBJECT_LIST)}
         />
       ) : (

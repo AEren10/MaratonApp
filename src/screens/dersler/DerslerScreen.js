@@ -3,6 +3,7 @@ import { ScrollView, View, Text, Pressable, RefreshControl } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
+import { openInTab, TAB_KEYS } from "../../navigation/tabJump";
 import { Icon, Button } from "../../components/design";
 import { STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -29,7 +30,7 @@ function Header({ C, navigation }) {
         hitSlop={10}
         onPress={() => {
           if (navigation.canGoBack()) navigation.goBack();
-          else navigation.navigate(SCREENS.CURRICULUM_MAP_ROOT);
+          else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP);
         }}
         style={{ width: 40, height: 44, justifyContent: "center" }}
       >

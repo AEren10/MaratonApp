@@ -43,7 +43,7 @@ function CalendarScreenInner() {
 
   const handleBack = useCallback(() => {
     if (navigation.canGoBack()) navigation.goBack();
-    else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP_ROOT);
+    else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP);
   }, [navigation]);
 
   const handleWeekTab = useCallback(() => {

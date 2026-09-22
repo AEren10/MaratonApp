@@ -42,7 +42,7 @@ export function useRouteFull() {
     weekStops: currentWeek?.stops?.length ?? null,
     promiseGap: promise.hasData ? promise.gap : null,
     goBack: () => navigation.goBack(),
-    openCurriculum: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP_ROOT),
+    openCurriculum: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP),
     openProgram: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.WEEK_PROGRAM),
     openDebt: () => navigation.navigate(SCREENS.TOPIC_DEBT),
     openPromise: () => navigation.navigate(SCREENS.PLAN_VS_ACTUAL),
