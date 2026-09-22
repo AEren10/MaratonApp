@@ -58,3 +58,29 @@ test("can forecast compatible legacy and field-specific trial types together", (
   assert.equal(result.sampleSize, 3);
   assert.equal(result.current, 38);
 });
+
+test("uzaga uzatilan tahminin payi yakina uzatilandan genistir", () => {
+  const trials = [
+    trial("2026-01-01", 40), trial("2026-01-08", 42), trial("2026-01-15", 44),
+  ];
+  const near = forecastNet(trials, "2026-02-01", 120);
+  const far = forecastNet(trials, "2027-09-20", 120);
+  assert.ok(far.predictionInterval.margin > near.predictionInterval.margin);
+  assert.equal(far.predictionInterval.floorApplied, true);
+});
+
+test("pay ust sinira takilir, aralik okunamaz hale gelmez", () => {
+  const result = forecastNet([
+    trial("2026-01-01", 40), trial("2026-01-03", 42), trial("2026-01-05", 44),
+  ], "2030-01-01", 120);
+  assert.ok(result.predictionInterval.margin <= 120 * 0.18 + 0.001);
+});
+
+test("cok deneme ve kisa uzatma dar pay verir", () => {
+  const result = forecastNet([
+    trial("2026-01-01", 40), trial("2026-02-01", 46), trial("2026-03-01", 49),
+    trial("2026-04-01", 55), trial("2026-05-01", 58), trial("2026-06-01", 63),
+  ], "2026-09-01", 120);
+  assert.ok(result.predictionInterval.margin < 6);
+  assert.equal(result.confidence, "high");
+});

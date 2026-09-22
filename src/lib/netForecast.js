@@ -8,6 +8,8 @@ const SUBJECT_NAMES = {
 };
 const MS_PER_DAY = 86400000;
 const Z_95 = 1.96;
+// Tahmin aralığının en geniş hali, toplam netin oranı olarak.
+const UNCERTAINTY_CAP = 0.18;
 const round = (value, digits = 4) => {
   const scale = 10 ** digits;
   return Math.round(value * scale) / scale;
@@ -84,9 +86,30 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
   const mse = ssRes / (n - 2);
   const leverage = 1 + 1 / n + ((examDays - meanX) ** 2 / sxx);
   const standardError = Math.sqrt(Math.max(0, mse * leverage));
-  // Kusursuz doğrusal 3-5 nokta gerçek hayatta "sıfır belirsizlik" değildir.
-  // Ölçüm gürültüsü görünmese bile küçük örneklem için muhafazakâr taban tut.
-  const uncertaintyFloor = (maxNet ? maxNet * 0.01 : 1) * (n < 5 ? 2 : 1);
+  // BELİRSİZLİK TABANI
+  //
+  // Kusursuz doğrusal 3-5 nokta gerçek hayatta "sıfır belirsizlik" değildir:
+  // OLS'in standart hatası böyle bir örneklemde neredeyse sıfır çıkar ve
+  // grafik, 3 denemeye bakıp 600 gün sonrasını ±2 net kesinlikle söyler.
+  // Öğrenci bunu bir söz sanıyor.
+  //
+  // Taban bu yüzden iki şeyle birlikte büyür:
+  //   örneklem — 3 deneme 6 denemeden daha az şey bilir,
+  //   uzatma   — ölçülen aralığın 40 katı ileri gitmek, 1 katı gitmekle
+  //              aynı şey değil. Karekök alınıyor ki mesafeyle doğrusal
+  //              değil, sönümlenerek büyüsün.
+  //
+  // Üst sınır ürün kararıdır: bunun ötesinde aralık okunabilir olmaktan
+  // çıkar, grafik "hiçbir şey bilmiyorum" der ve kimseye yardımı dokunmaz.
+  const measuredSpan = Math.max(1, points[n - 1].x - points[0].x);
+  const horizon = Math.max(0, examDays - points[n - 1].x);
+  const reach = Math.sqrt(1 + horizon / measuredSpan);
+  const sampleFactor = n < 4 ? 2.2 : n < 5 ? 1.6 : 1.2;
+  const netScale = maxNet || 100;
+  const uncertaintyFloor = Math.min(
+    netScale * 0.02 * sampleFactor * reach,
+    netScale * UNCERTAINTY_CAP,
+  );
   const margin = Math.max(Z_95 * standardError, uncertaintyFloor);
   const confidence = n < 4 || r2 < 0.3 ? "low"
     : n < 5 || r2 < 0.6 ? "medium" : "high";

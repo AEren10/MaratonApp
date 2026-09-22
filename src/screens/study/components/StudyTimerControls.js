@@ -1,9 +1,12 @@
-import { View, Text, Pressable } from "react-native";
+import React, { useCallback } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 
-import { Button } from "../../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE, ANIMATION } from "../../../themes/tokens";
 
-// Tasarım: birincil "Duraklat/Başlat" (outline), altında ince metin linkleri.
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 export function StudyTimerControls({
   C,
   hasSubject,
@@ -13,36 +16,96 @@ export function StudyTimerControls({
   onSkip,
   onToggle,
 }) {
+  const scale = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.96, ANIMATION.spring.default);
+  }, [scale]);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, ANIMATION.spring.default);
+  }, [scale]);
+
+  const handleToggle = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    onToggle?.();
+  }, [onToggle]);
+
+  const handleFinish = useCallback(() => {
+    Haptics.selectionAsync().catch(() => {});
+    onFinish?.();
+  }, [onFinish]);
+
+  const handleSkip = useCallback(() => {
+    Haptics.selectionAsync().catch(() => {});
+    onSkip?.();
+  }, [onSkip]);
+
+  const btnBg = !hasSubject
+    ? C.elev
+    : running
+      ? C.surface
+      : C.accent;
+
+  const btnText = !hasSubject
+    ? C.text4
+    : running
+      ? C.text
+      : C.textOnBrand;
+
+  const btnBorder = running ? C.border : "transparent";
+
   return (
-    <View style={{ width: "100%", paddingHorizontal: GUTTER, marginTop: STEP.s4 }}>
-      <Button
-        onPress={onToggle}
+    <View style={s.wrap}>
+      <AnimatedPressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={handleToggle}
         disabled={!hasSubject}
-        variant="outline"
-        size="lg"
-        fullWidth
+        accessibilityRole="button"
         accessibilityLabel={running ? "Duraklat" : "Başlat"}
+        style={[
+          animStyle,
+          s.mainBtn,
+          {
+            backgroundColor: btnBg,
+            borderColor: btnBorder,
+            borderWidth: running ? 1 : 0,
+            opacity: !hasSubject ? 0.6 : 1,
+          },
+        ]}
       >
-        {running ? "Duraklat" : "Başlat"}
-      </Button>
+        <Text style={[TYPOGRAPHY.button, { color: btnText, letterSpacing: 0.2 }]}>
+          {running ? "Duraklat" : "Başlat"}
+        </Text>
+      </AnimatedPressable>
 
       <Pressable
-        onPress={onFinish}
-        hitSlop={8}
+        onPress={handleFinish}
+        hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel="Durağı bitir"
-        style={{ height: CONTROL.buttonTertiary, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 }}
+        style={({ pressed }) => [
+          s.linkBtn,
+          { opacity: pressed ? 0.65 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
+        ]}
       >
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>Durağı bitir</Text>
       </Pressable>
 
       {isPomodoro && (
         <Pressable
-          onPress={onSkip}
-          hitSlop={8}
+          onPress={handleSkip}
+          hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Fazı atla"
-          style={{ height: CONTROL.buttonTertiary, alignItems: "center", justifyContent: "center" }}
+          style={({ pressed }) => [
+            s.skipBtn,
+            { opacity: pressed ? 0.65 : 1 },
+          ]}
         >
           <Text style={[TYPOGRAPHY.caption, { color: C.text4 }]}>Fazı atla</Text>
         </Pressable>
@@ -50,3 +113,33 @@ export function StudyTimerControls({
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  wrap: {
+    width: "100%",
+    paddingHorizontal: GUTTER,
+    marginTop: STEP.s4,
+    alignItems: "center",
+  },
+  mainBtn: {
+    width: "100%",
+    height: CONTROL.buttonPrimary,
+    borderRadius: SHAPE.cardTight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  linkBtn: {
+    height: CONTROL.buttonTertiary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: STEP.s1,
+    paddingHorizontal: STEP.s3,
+  },
+  skipBtn: {
+    height: CONTROL.buttonTertiary - 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: STEP.s3,
+  },
+});
+
