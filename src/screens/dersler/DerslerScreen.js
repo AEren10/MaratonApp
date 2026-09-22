@@ -29,7 +29,7 @@ function Header({ C, navigation }) {
         hitSlop={10}
         onPress={() => {
           if (navigation.canGoBack()) navigation.goBack();
-          else navigation.navigate(SCREENS.CURRICULUM_MAP);
+          else navigation.navigate(SCREENS.CURRICULUM_MAP_ROOT);
         }}
         style={{ width: 40, height: 44, justifyContent: "center" }}
       >

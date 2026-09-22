@@ -63,7 +63,7 @@ function MonthPlanInner() {
 
   const handleBack = useCallback(() => {
     if (navigation.canGoBack()) navigation.goBack();
-    else navigation.navigate(SCREENS.CURRICULUM_MAP);
+    else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP_ROOT);
   }, [navigation]);
 
   const handleWeekTab = useCallback(() => {
