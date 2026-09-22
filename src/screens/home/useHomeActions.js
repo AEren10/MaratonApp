@@ -30,6 +30,8 @@ export function useHomeActions({ navigation, go }) {
     debt: go(SCREENS.TOPIC_DEBT),
     weekReport: go(SCREENS.SUMMARY, { period: "week" }),
     notebook: go(SCREENS.WRONG_NOTEBOOK),
+    // Tekrar bekleyen varken listeye degil dogrudan oturuma gidilir.
+    review: go(SCREENS.SWIPE_REVIEW),
     record: go(SCREENS.ADD_STUDY),
     proPreview: go(SCREENS.PRO_PREVIEW),
     firstWeek: go(SCREENS.FIRST_WEEK),

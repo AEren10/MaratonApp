@@ -14,6 +14,8 @@ import { HomeLoading } from "./components/HomeLoading";
 import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
 import { useHomeController } from "./useHomeController";
+import { useDueReviews } from "../../hooks/useDueReviews";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
 // Bağlantı Yok). Kaldirilan eski kartlarin hedefleri:
@@ -25,11 +27,14 @@ import { useHomeController } from "./useHomeController";
 export default function HomeScreen() {
   const h = useHomeController();
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
+  // Tekrari gelen yanlislar: veri katmani vardi ama hicbir ekran okumuyordu.
+  const { user } = useAuth();
+  const { dueCount } = useDueReviews(user?.id);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} go={actions} />
+    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} dueCount={dueCount} go={actions} />
     : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
-  ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, actions]);
+  ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, dueCount, actions]);
 
   let body;
   if (h.loading) {

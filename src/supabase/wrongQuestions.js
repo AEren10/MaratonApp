@@ -129,6 +129,26 @@ export const getDueWrongQuestions = async (userId) => {
   }
 };
 
+// Tekrarı gelenlerin SAYISI. Ana Sayfa yalnızca sayıyı gösteriyor; satırları
+// çekmek boşuna veri taşımak olur — head:true ile gövde hiç gelmiyor.
+export const getDueWrongCount = async (userId) => {
+  try {
+    const nowIso = new Date().toISOString();
+    const { count, error } = await supabase
+      .from("wrong_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("is_resolved", false)
+      .not("next_review_at", "is", null)
+      .lte("next_review_at", nowIso);
+    if (error) throw error;
+    return count || 0;
+  } catch (e) {
+    handleSupabaseError(e, "getDueWrongCount");
+    throw e;
+  }
+};
+
 // SR güncellemesi (tekrar sonrası interval/ease/next_review_at).
 export const reviewWrongQuestion = async (id, userId, updates) => {
   if (!userId) throw new Error("userId is required");

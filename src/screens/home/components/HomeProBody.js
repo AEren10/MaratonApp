@@ -11,11 +11,20 @@ import { HomeNotebookCard } from "./HomeNotebookCard";
 
 // Ana Sayfa (Pro) govdesi: bugunun duraklari, dikkat ceken iki ders,
 // konu borcu + haftalik rapor satirlari, Defter karti.
-export function HomeProBody({ stops, momentum, debtHours, go }) {
+export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
   const C = useC();
+  // Tekrar bekleyen varsa Defter karti yukari, duraklarin hemen altina cikar:
+  // o da bugunun isi. Bekleyen yoksa sayfanin sonunda sakin bir giris olarak
+  // kalir ve dikkati bolmez.
+  const notebook = (
+    <HomeNotebookCard dueCount={dueCount} onPress={go.notebook} onReview={go.review} />
+  );
+
   return (
     <View>
       <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
+
+      {dueCount > 0 ? <View style={s.due}>{notebook}</View> : null}
 
       {momentum.length ? (
         <View style={s.attention}>
@@ -37,14 +46,13 @@ export function HomeProBody({ stops, momentum, debtHours, go }) {
         <HomeLinkRow label="Bu haftanın raporu" onPress={go.weekReport} />
       </View>
 
-      <View style={s.notebook}>
-        <HomeNotebookCard onPress={go.notebook} />
-      </View>
+      <View style={s.notebook}>{dueCount > 0 ? null : notebook}</View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
+  due: { paddingTop: STEP.s3 },
   attention: { paddingTop: STEP.s5 - 8 },
   head: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 2, paddingBottom: STEP.s1 - 2 },
   rule: { flex: 1, height: 1 },

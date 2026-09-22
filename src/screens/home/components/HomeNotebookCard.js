@@ -6,22 +6,47 @@ import { alpha } from "../../../themes/colorMix";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-// "Defter" karti. Ana Sayfa'da guvenilir sayac kaynagi yok;
-// sayi uydurulmaz, kart yalniz giris olarak kalir.
-export function HomeNotebookCard({ onPress }) {
+// "Defter" karti.
+//
+// IKI HALI VAR, CUNKU IKI AYRI SEY SOYLUYOR:
+//
+// Tekrar bekleyen yoksa — sakin bir giris. Sayi UYDURULMAZ.
+//
+// Tekrar bekleyen varsa — bugunun ikinci isi. Aralikli tekrar bu uygulamanin
+// net kazandiran tek mekanizmasi ve eskiden tamamen sessizdi: sorular
+// birikiyor, ogrenci Deftere kendi girmedikce haberi olmuyordu. Kart o zaman
+// duraklarin hemen altina cikiyor ve dokunuldugunda listeye degil, DOGRUDAN
+// tekrar oturumuna gidiyor -- arada bir ekran daha olsa kimse gecmez.
+export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
   const C = useC();
+  const due = dueCount > 0;
+  const action = due ? onReview || onPress : onPress;
+
   return (
     <Pressable
-      onPress={() => { H.tap(); onPress?.(); }}
+      onPress={() => { H.tap(); action?.(); }}
       accessibilityRole="button"
-      accessibilityLabel="Defter"
-      style={({ pressed }) => [s.card, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}
+      accessibilityLabel={due ? `${dueCount} soru tekrar bekliyor, tekrar oturumunu başlat` : "Defter"}
+      style={({ pressed }) => [
+        s.card,
+        {
+          backgroundColor: pressed ? C.elev : C.surface,
+          borderColor: due ? alpha(C.accent, 38) : C.border,
+        },
+      ]}
     >
-      <Icon name="notebook" size={20} color={alpha(C.accent, 55)} />
+      <Icon name="notebook" size={20} color={due ? C.accent : alpha(C.accent, 55)} />
       <View style={s.flex}>
-        <Text style={[TYPOGRAPHY.bodyMedium, s.title, { color: C.text }]}>Defter</Text>
+        <Text style={[TYPOGRAPHY.bodyMedium, s.title, { color: C.text }]}>
+          {due ? `${dueCount} soru tekrar bekliyor` : "Defter"}
+        </Text>
+        {due ? (
+          <Text style={[TYPOGRAPHY.meta, s.sub, { color: C.text3 }]}>
+            Hafızadan silinmeden önce bir kez daha gör.
+          </Text>
+        ) : null}
       </View>
-      <Icon name="chevR" size={12} color={C.text5} />
+      <Icon name="chevR" size={12} color={due ? C.text3 : C.text5} />
     </Pressable>
   );
 }
@@ -33,4 +58,5 @@ const s = StyleSheet.create({
   },
   flex: { flex: 1, minWidth: 0 },
   title: { fontSize: TYPOGRAPHY.bodyMedium.fontSize + 0.5 },
+  sub: { marginTop: STEP.s1 / 2 },
 });
