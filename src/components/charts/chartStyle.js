@@ -34,8 +34,12 @@ export const NODE = {
 export const STROKE = {
   past: 4.5,
   pastNode: 2.6,
-  proj: 2.4,
-  endNode: 2.4,
+  // Projeksiyon eskiden C.proj (accent'in %52 soluk karisimi) ve 2.4pt idi;
+  // koyu zeminde neredeyse kayboluyordu. Tasarimda kesikli hat acikca
+  // kirmizi okunuyor. Renk accent'in kendisi, canliligi opaklik veriyor.
+  proj: 2.8,
+  projOpacity: 0.78,
+  endNode: 2.6,
   projDash: "2 8",
 };
 

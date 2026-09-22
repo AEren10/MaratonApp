@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import Svg, { Circle, Path, Text as SvgText } from "react-native-svg";
+import Svg, { Circle, Defs, LinearGradient, Path, Stop, Text as SvgText } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
 import {
@@ -32,6 +32,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel 
   const cy1 = y0 - (y0 - y1) * 0.12;
   const cx2 = x0 + (x1 - x0) * 0.72;
   const cy2 = y1 + (y0 - y1) * 0.34;
+  const curve = `M${x0},${y0} C${cx1},${cy1} ${cx2},${cy2} ${x1},${y1}`;
 
   // "HEDEF 60" — olculmus grafikteki "TAHMİN 71" ile ayni kalip.
   const goalNumber = declared?.goalLabel ? declared.goalLabel.replace(/\s*net$/i, "") : null;
@@ -46,20 +47,35 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel 
         : "Net grafiği: henüz veri yok."}
     >
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
+        <Defs>
+          <LinearGradient id="declaredGlow" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={C.accent} stopOpacity={0.13} />
+            <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
+          </LinearGradient>
+        </Defs>
+
+        {/* Hattin altindaki yumusak dolgu — olculmus grafikte de var.
+            Grafige derinlik veren sey bu; olmayinca hat havada duruyor. */}
+        <Path d={`${curve} L${x1},${bottom} L${x0},${bottom} Z`} fill="url(#declaredGlow)" />
+
         <Path
-          d={`M${x0},${y0} C${cx1},${cy1} ${cx2},${cy2} ${x1},${y1}`}
+          d={curve}
           fill="none"
-          stroke={C.proj}
+          stroke={C.accent}
+          strokeOpacity={STROKE.projOpacity}
           strokeWidth={STROKE.proj}
           strokeLinecap="round"
           strokeDasharray={STROKE.projDash}
         />
 
-        <Circle cx={x0} cy={y0} r={NODE.todayGlow} fill={C.accent} fillOpacity={0.18} />
+        {/* Bugun dugumu: iki kademeli halka, disi cok yumusak. */}
+        <Circle cx={x0} cy={y0} r={NODE.todayGlow + 6} fill={C.accent} fillOpacity={0.09} />
+        <Circle cx={x0} cy={y0} r={NODE.todayGlow} fill={C.accent} fillOpacity={0.2} />
         <Circle cx={x0} cy={y0} r={NODE.today} fill={C.accent} />
+        {/* Hedef halkasi tasarimda soluk degil, net kirmizi. */}
         <Circle
           cx={x1} cy={y1} r={NODE.end}
-          fill={C.bg} stroke={C.projNode} strokeWidth={STROKE.endNode}
+          fill={C.bg} stroke={C.accent} strokeOpacity={0.85} strokeWidth={STROKE.endNode}
         />
 
         {declared?.startLabel ? (

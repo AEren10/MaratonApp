@@ -1,0 +1,25 @@
+diff --git a/node_modules/expo/src/async-require/hmr.ts b/node_modules/expo/src/async-require/hmr.ts
+index bd226af..515675c 100644
+--- a/node_modules/expo/src/async-require/hmr.ts
++++ b/node_modules/expo/src/async-require/hmr.ts
+@@ -16,6 +16,7 @@ import {
+   getFullBundlerUrl,
+   handleCompileError,
+   hideLoading,
++  reload,
+   resetErrorOverlay,
+   showLoading,
+ } from './hmrUtils';
+@@ -317,7 +318,11 @@ function setHMRUnavailableReason(reason: string) {
+ function registerBundleEntryPoints(client: MetroHMRClient | null) {
+   if (hmrUnavailableReason != null) {
+     // "Bundle Splitting – Metro disconnected"
+-    window.location.reload();
++    // PATCH (maraton): platform ayrimli reload() kullaniliyor. window.location
++    // yalniz web'de var; React Native'de undefined oldugu icin bu satir
++    // "Cannot read property 'reload' of undefined" ile cokuyordu. Expo'nun
++    // kendi hmrUtils.native.ts'i zaten DevSettings.reload() cagiriyor.
++    reload();
+     return;
+   }
+ 

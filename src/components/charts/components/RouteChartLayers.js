@@ -1,5 +1,7 @@
 import { Path, Line } from "react-native-svg";
 
+import { STROKE } from "../chartStyle";
+
 // Grafigin arka katmanlari, tasarimin siralamasiyla:
 // alan dolgusu -> guven bandi -> hedef cizgisi -> projeksiyon.
 // Gecmis hat ve dugumler animasyonlu oldugu icin ana bilesende kaldi.
@@ -34,8 +36,9 @@ export function RouteChartLayers({ areaD, bandD, targetY, futD, width, padLeft =
         <Path
           d={futD}
           fill="none"
-          stroke={C.proj}
-          strokeWidth={2.4}
+          stroke={C.accent}
+          strokeOpacity={STROKE.projOpacity}
+          strokeWidth={STROKE.proj}
           strokeLinecap="round"
           strokeDasharray="2 8"
         />

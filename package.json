@@ -13,7 +13,8 @@
     "check:undefined": "node scripts/check-undefined.js",
     "test": "node --experimental-default-type=module --test \"tests/**/*.test.mjs\"",
     "check:conflicts": "node scripts/check-conflict-markers.js",
-    "check:worklets": "node scripts/check-worklet-calls.js"
+    "check:worklets": "node scripts/check-worklet-calls.js",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "expo-dev-client": "~57.0.19",
+    "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
   "private": true
