@@ -12,6 +12,7 @@ const THUMB_W = 124;
 const SELECTED_W = 148;
 
 const MESSAGE = {
+  placed: "Instagram'a gönderildi.",
   opened: "Etiket panoda. Instagram'da basılı tut, Yapıştır'a dokun.",
   copied: "Etiket panoya kopyalandı. Instagram'ı açıp yapıştırabilirsin.",
   saved: "Galeriye kaydedildi.",
@@ -92,7 +93,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
       </Pressable>
 
       <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text4 }]}>
-        {s.result ? MESSAGE[s.result] : "Etiket panoya kopyalanır, Instagram'da yapıştır."}
+        {s.result ? MESSAGE[s.result] : "Etiketin Instagram story'ne gönderilir."}
       </Text>
 
       {/* Yakalanan asil etiket: tam olcu, ekran disinda. */}

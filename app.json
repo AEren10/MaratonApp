@@ -104,7 +104,14 @@
         }
       ],
       "expo-status-bar",
-      "expo-asset"
+      "expo-asset",
+      [
+        "react-native-share",
+        {
+          "ios": ["instagram", "instagram-stories"],
+          "android": ["com.instagram.android"]
+        }
+      ]
     ],
     "extra": {
       "eas": {
