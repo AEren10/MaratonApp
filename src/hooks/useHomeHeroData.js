@@ -5,10 +5,11 @@ import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
 import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
+import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
-export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
+export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs }) {
   const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const {
     weeks,
@@ -92,6 +93,17 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     [examDate],
   );
 
+  // Haftalik emek: deneme GEREKTIRMEZ, her calisilan gun degisir. Grafik
+  // alanindaki ilk sayfa bu; rota ikinci sayfada.
+  const weeklyEffort = useMemo(
+    () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal }),
+    [weekLogs, dailyGoal],
+  );
+  const todayIndex = useMemo(() => {
+    const js = new Date().getDay();
+    return js === 0 ? 6 : js - 1;
+  }, []);
+
   const nextTask = generatedTasks?.[0] || null;
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
@@ -115,6 +127,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks }) {
     chartData,
     declared,
     declaredAxis,
+    weeklyEffort,
+    todayIndex,
     stopCounts,
     // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
     // kacirilan sorunun dakika karsiligini haftanin plannedMinutes oraniyla
