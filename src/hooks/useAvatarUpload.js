@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
+import { useIsFocused } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { uploadAvatar, getAvatarUrl } from "../supabase/storage";
 import { getProfile, updateProfile } from "../supabase/profiles";
@@ -11,15 +12,16 @@ import * as H from "../lib/haptics";
 export function useAvatarUpload() {
   const { user } = useAuth();
   const showAlert = useAlert();
+  const isFocused = useIsFocused();
   const [avatarUri, setAvatarUri] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (!user?.id || user.id === "dev") return;
+    if (!isFocused || !user?.id || user.id === "dev") return;
     getProfile(user.id)
-      .then((p) => { if (p?.avatar_url) setAvatarUri(p.avatar_url); })
+      .then((p) => { setAvatarUri(p?.avatar_url || null); })
       .catch(() => {});
-  }, [user?.id]);
+  }, [user?.id, isFocused]);
 
   const avatarSource = useMemo(() => (avatarUri ? { uri: avatarUri } : null), [avatarUri]);
 
@@ -29,15 +31,30 @@ export function useAvatarUpload() {
     try {
       const path = await uploadAvatar(user.id, localUri);
       const url = getAvatarUrl(path);
-      await updateProfile(user.id, { avatar_url: url });
+      const stampedUrl = url ? `${url}?t=${Date.now()}` : url;
+      await updateProfile(user.id, { avatar_url: stampedUrl });
       H.success();
-      setAvatarUri(url + "?t=" + Date.now());
+      setAvatarUri(stampedUrl);
     } catch (e) {
       showAlert("Hata", "Avatar yüklenirken bir sorun oluştu.\n\n" + (e?.message || ""));
     } finally {
       setUploading(false);
     }
   };
+
+  const removeAvatar = useCallback(async () => {
+    if (!user?.id) return;
+    setUploading(true);
+    try {
+      await updateProfile(user.id, { avatar_url: null });
+      setAvatarUri(null);
+      H.success();
+    } catch (e) {
+      showAlert("Hata", "Avatar silinirken bir sorun oluştu.\n\n" + (e?.message || ""));
+    } finally {
+      setUploading(false);
+    }
+  }, [user?.id, showAlert]);
 
   const pickFromGallery = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -60,12 +77,16 @@ export function useAvatarUpload() {
   const pickAvatar = () => {
     if (!user?.id) return;
     H.medium();
-    showAlert("Profil Fotoğrafı", "Nereden eklemek istersin?", [
+    const actions = [
       { text: "Kamera", onPress: pickFromCamera },
       { text: "Galeri", onPress: pickFromGallery },
-      { text: "İptal", style: "cancel" },
-    ]);
+    ];
+    if (avatarUri) {
+      actions.push({ text: "Fotoğrafı Kaldır", style: "destructive", onPress: removeAvatar });
+    }
+    actions.push({ text: "İptal", style: "cancel" });
+    showAlert("Profil Fotoğrafı", "Nereden eklemek istersin?", actions);
   };
 
-  return { avatarUri, avatarSource, uploading, pickAvatar };
+  return { avatarUri, avatarSource, uploading, pickAvatar, removeAvatar };
 }

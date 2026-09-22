@@ -17,7 +17,7 @@ function pruneCache() {
 
 function resolveUrl(bucket, path) {
   if (!path) return null;
-  if (path.startsWith("http")) return path;
+  if (path.startsWith("http") || path.startsWith("file:") || path.startsWith("ph:") || path.startsWith("content:")) return path;
   const key = `${bucket}/${path}`;
   const entry = cache.get(key);
   if (!entry) return null;
@@ -33,7 +33,7 @@ export default function SignedImage({ bucket, path, style, contentFit, ...rest }
   const [uri, setUri] = useState(cached);
 
   useEffect(() => {
-    if (!path || path.startsWith("http") || cached) return;
+    if (!path || path.startsWith("http") || path.startsWith("file:") || path.startsWith("ph:") || path.startsWith("content:") || cached) return;
     let cancelled = false;
     createStorageSignedUrl(bucket, path, 3600)
       .then((signedUrl) => {

@@ -37,7 +37,12 @@ export default function AddWrongScreen() {
           right={<Text style={[TYPOGRAPHY.tableHead, { color: C.text3, letterSpacing: 0 }]}>~15 sn</Text>}
         />
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <PhotoCapture image={form.image} onCamera={() => form.pick("camera")} onGallery={() => form.pick("gallery")} />
+          <PhotoCapture
+            image={form.image}
+            onCamera={() => form.pick("camera")}
+            onGallery={() => form.pick("gallery")}
+            onRemove={form.clearImage}
+          />
 
           <FormSection label="SINAV TÜRÜ" wrap={false}>
             <Segmented options={groupOptions} value={form.group} onChange={form.changeGroup} />

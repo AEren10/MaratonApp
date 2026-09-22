@@ -149,9 +149,10 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
   }, [saving, checkFeature, showPaywall, subject, selectedTopic, showAlert, image, user?.id, note, bumpUsage, topic, guess, reward, onSaved, resetForNext]);
 
   const saveAndNew = useCallback(() => save({ keepOpen: true }), [save]);
+  const clearImage = useCallback(() => setImage(null), []);
 
   return {
-    changeGroup, changeSubject, dismissXP, group, groupLabels: [group1Label, group2Label],
+    changeGroup, changeSubject, clearImage, dismissXP, group, groupLabels: [group1Label, group2Label],
     guess, image, note, pick, resetForNext, save, saveAndNew, saving, selectedTopic,
     setNote, setTopic, subject, subjects, suggestions, xpToast,
   };

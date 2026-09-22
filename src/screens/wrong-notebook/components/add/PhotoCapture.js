@@ -5,13 +5,26 @@ import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 
-export function PhotoCapture({ image, onCamera, onGallery }) {
+export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
   const C = useC();
   return (
     <View style={styles.wrap}>
       <View style={[styles.frame, { backgroundColor: C.surface, borderColor: C.elev }]}>
         {image ? (
-          <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" cachePolicy="memory-disk" />
+          <>
+            <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" cachePolicy="memory-disk" />
+            {onRemove ? (
+              <Pressable
+                onPress={onRemove}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Fotoğrafı kaldır"
+                style={[styles.removeBtn, { backgroundColor: C.surface, borderColor: C.border }]}
+              >
+                <Icon name="x" size={14} color={C.text} />
+              </Pressable>
+            ) : null}
+          </>
         ) : (
           <View style={styles.paper}>
             {["72%", "90%", "58%"].map((w) => (
@@ -51,6 +64,18 @@ const styles = StyleSheet.create({
   frame: {
     height: 190, borderRadius: SHAPE.card, borderWidth: 1, overflow: "hidden",
     justifyContent: "center", paddingHorizontal: STEP.s4,
+  },
+  removeBtn: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
   },
   paper: { gap: STEP.s1 + 2 },
   line: { height: 6, borderRadius: 3 },
