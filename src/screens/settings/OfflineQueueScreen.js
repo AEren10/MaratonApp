@@ -12,6 +12,7 @@ import { useOfflineQueueView } from "../../hooks/useOfflineQueueView";
 import * as H from "../../lib/haptics";
 import { SystemHeader } from "./components/system/SystemHeader";
 import { QueueRow } from "./components/system/QueueRow";
+import { FailedRow } from "./components/system/FailedRow";
 
 // Tasarim "Çevrimdışı Kuyruk". Engelleyici degil: serit ustte, kuyruktaki
 // her kayit adiyla, guncellenmeyen veri ayrica yazili.
@@ -19,7 +20,9 @@ export default function OfflineQueueScreen() {
   const C = useC();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const { rows, total, loading, retrying, retryNow, isConnected } = useOfflineQueueView();
+  const {
+    rows, total, failedRows, loading, retrying, retryNow, discard, isConnected,
+  } = useOfflineQueueView();
 
   const goBack = useCallback(() => { H.tap(); navigation.goBack(); }, [navigation]);
   const renderItem = useCallback(({ item }) => <QueueRow title={item.title} meta={item.meta} />, []);
@@ -29,11 +32,33 @@ export default function OfflineQueueScreen() {
     <Animated.View entering={FadeInDown.duration(600)}>
       {!isConnected ? <OfflineStrip pending={total} style={styles.strip} /> : null}
       <Text accessibilityRole="header" style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>
-        Çalışmaya devam edebilirsin.
+        {failedRows.length ? "Birkaç kayıt sunucuya ulaşamadı." : "Çalışmaya devam edebilirsin."}
       </Text>
       <Text style={[TYPOGRAPHY.body, styles.body, { color: C.text2 }]}>
-        Girdiğin her şey cihazında tutuluyor. Rota, bağlantı geldiğinde bir kerede yeniden çizilir.
+        {failedRows.length
+          ? "Hiçbiri kaybolmadı, hepsi cihazında duruyor. Tekrar deneyebilir ya da vazgeçtiklerini silebilirsin."
+          : "Girdiğin her şey cihazında tutuluyor. Rota, bağlantı geldiğinde bir kerede yeniden çizilir."}
       </Text>
+
+      {/* Gonderilemeyenler EN USTE: kullanici buraya ana ekrandaki kirmizi
+          seritten geliyor ve aradigi sey bu. Bekleyenler normal durum. */}
+      {failedRows.length ? (
+        <View style={styles.section}>
+          <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>GÖNDERİLEMEYEN</Text>
+          <Text style={[TYPOGRAPHY.meta, styles.failedNote, { color: C.text3 }]}>
+            Bu kayıtlar cihazında duruyor ama sunucuya yazılamadı. Aşağıdaki
+            düğme hepsini yeniden dener; vazgeçtiklerini tek tek silebilirsin.
+          </Text>
+          {failedRows.map((row) => (
+            <FailedRow
+              key={row.id}
+              title={row.title}
+              meta={row.meta}
+              onDiscard={() => discard(row.id)}
+            />
+          ))}
+        </View>
+      ) : null}
       {loading ? <Skeleton height={48} style={styles.section} /> : null}
       {rows.length ? <Text style={[TYPOGRAPHY.label, styles.section, styles.label, { color: C.text2 }]}>KUYRUKTA</Text> : null}
     </Animated.View>
@@ -59,7 +84,7 @@ export default function OfflineQueueScreen() {
         contentContainerStyle={[styles.list, { paddingBottom: STEP.s5 + STEP.s4 }]}
         showsVerticalScrollIndicator={false}
       />
-      {rows.length ? (
+      {rows.length || failedRows.length ? (
         <View style={[styles.cta, { paddingBottom: insets.bottom + STEP.s2, backgroundColor: C.bg, borderTopColor: C.line }]}>
           <Button variant="outline" size="md" fullWidth loading={retrying} onPress={retryNow}>
             Şimdi yüklemeyi dene
@@ -78,6 +103,7 @@ const styles = StyleSheet.create({
   body: { marginTop: STEP.s2, maxWidth: 290 },
   section: { marginTop: STEP.s3 + 8 },
   label: { marginBottom: STEP.s2 },
+  failedNote: { marginBottom: STEP.s2, maxWidth: 300 },
   note: {
     marginTop: STEP.s3 + 6,
     paddingVertical: STEP.s3 - 4,

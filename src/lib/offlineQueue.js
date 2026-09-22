@@ -598,6 +598,19 @@ async function retryDeadLetterLocked() {
   return { requeued: requeued.length };
 }
 
+/** Tek bir gönderilemeyen kaydı siler (kullanıcı o satırda "vazgeç" derse). */
+export async function removeFromDeadLetter(id) {
+  if (!id) return false;
+  return withQueueLock(async () => {
+    const items = await getDeadLetterItems();
+    const next = items.filter((item) => (item.clientOperationId || item.id) !== id);
+    if (next.length === items.length) return false;
+    const ok = await appStorage.setJson(DEAD_LETTER_KEY, next);
+    if (!ok) throw new Error("dead_letter_write_failed");
+    return true;
+  });
+}
+
 /** Kullanıcı "vazgeç" derse — kayıtları kalıcı olarak siler. */
 export async function clearDeadLetter() {
   try { await appStorage.setJson(DEAD_LETTER_KEY, []); } catch {}

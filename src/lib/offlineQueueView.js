@@ -76,6 +76,24 @@ export function describeQueue(items = []) {
   return rows;
 }
 
+// GONDERILEMEYEN kayitlar. Gruplanmaz: her satir tek tek silinebilmeli,
+// gruplanan satirin arkasinda kac kayit oldugu belli olmaz.
+export async function readDeadLetterRows() {
+  try {
+    const raw = await appStorage.getJson(STORAGE_KEYS.OFFLINE_DEAD_LETTER, []);
+    const list = Array.isArray(raw) ? raw : [];
+    return {
+      rows: list.map((item, index) => ({
+        id: item?.clientOperationId || item?.id || `dead-${index}`,
+        ...describe(item),
+      })),
+      total: list.length,
+    };
+  } catch {
+    return { rows: [], total: 0 };
+  }
+}
+
 export async function readQueueRows() {
   try {
     const raw = await appStorage.getJson(STORAGE_KEYS.OFFLINE_QUEUE, []);

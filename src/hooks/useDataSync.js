@@ -16,7 +16,7 @@ import { todayTR } from "../lib/dateUtils";
 import { getStreak } from "../supabase/streaks";
 import { getProfile, updateLastActive } from "../supabase/profiles";
 import { getUserTasksByDate } from "../supabase/userTasks";
-import { flushQueue, getPendingStudyLogs, getPendingTrials } from "../lib/offlineQueue";
+import { flushQueue, getPendingStudyLogs, getPendingTrials, retryDeadLetter } from "../lib/offlineQueue";
 import { flushRetentionEvents } from "../supabase/retention";
 import { getExpoPushToken, loadNotifPrefsFromServer, applyNotifPrefs, getNotifPrefs } from "../lib/notifications";
 import { registerPushToken } from "../supabase/profiles";
@@ -74,9 +74,19 @@ async function retryPendingStreak(activeUserId) {
   } catch (_) {}
 }
 
+// Gonderilemeyen kayitlar kendiliginden HIC denenmiyordu: sunucu tarafi
+// duzelse bile (eksik kisit, yanlis politika) kayit, kullanici ayarlara girip
+// elle basana kadar olu kutuda kaliyordu. Acilista BIR KEZ denenir -- hata
+// hala kaliciysa ayni turda geri duser, maliyeti tek bir istek.
+let deadLetterRetried = false;
+
 async function loadAll(userId, dispatch) {
   await loadGamificationFromStorage(dispatch, userId);
   await retryPendingStreak(userId);
+  if (!deadLetterRetried) {
+    deadLetterRetried = true;
+    await retryDeadLetter().catch(() => ({ requeued: 0 }));
+  }
   await flushQueue().catch(() => ({ processed: 0, types: [] }));
   await flushRetentionEvents(userId).catch(() => ({ processed: 0 }));
 
