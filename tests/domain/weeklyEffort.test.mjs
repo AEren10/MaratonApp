@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  buildWeeklyEffort, formatMinutes, groupThousands, WEEK_DAYS,
+  buildTempo, buildWeeklyEffort, formatMinutes, groupThousands, WEEK_DAYS,
 } from "../../src/domain/home/weeklyEffort.js";
 
 // 2026-09-21 Pazartesi, 2026-09-27 Pazar.
@@ -117,4 +117,51 @@ test("bicimleyiciler", () => {
   assert.equal(formatMinutes(45), "45 dk");
   assert.equal(formatMinutes(60), "1 sa");
   assert.equal(formatMinutes(490), "8 sa 10 dk");
+});
+
+test("tempo: gecen haftaya gore onde", () => {
+  const t = buildTempo(1200, 1000);
+  assert.equal(t.direction, "up");
+  assert.equal(t.percent, 20);
+  assert.equal(t.label, "geçen haftadan %20 önde");
+});
+
+test("tempo: geride kalan hafta kirmizi degil, sadece yazi", () => {
+  const t = buildTempo(800, 1000);
+  assert.equal(t.direction, "down");
+  assert.equal(t.label, "geçen haftadan %20 geride");
+});
+
+test("tempo: esigin altindaki fark tempo sayilmaz", () => {
+  assert.equal(buildTempo(1030, 1000).direction, "flat");
+  assert.equal(buildTempo(970, 1000).label, "geçen haftayla aynı tempo");
+});
+
+test("tempo: karsilastirilacak hafta yoksa cumle kurulmaz", () => {
+  assert.equal(buildTempo(500, 0), null);
+  assert.equal(buildTempo(500, null), null);
+  assert.equal(buildTempo(500, undefined), null);
+});
+
+test("ozet cumlesine tempo eklenir", () => {
+  const w = buildWeeklyEffort({
+    logs: [{ study_date: PZT, question_count: 120, duration_minutes: 90 }],
+    previousQuestions: 100,
+  });
+  assert.equal(w.summary, "Bu hafta 120 soru · 1 sa 30 dk · geçen haftadan %20 önde");
+  assert.equal(w.tempo.direction, "up");
+});
+
+test("hic calisilmamis haftada tempo yazilmaz", () => {
+  const w = buildWeeklyEffort({ logs: [], previousQuestions: 400 });
+  assert.equal(w.summary, null);
+  assert.equal(w.tempo, null);
+});
+
+test("gecen hafta verisi yoksa cumle eskisi gibi kalir", () => {
+  const w = buildWeeklyEffort({
+    logs: [{ study_date: SALI, question_count: 60, duration_minutes: 45 }],
+  });
+  assert.equal(w.summary, "Bu hafta 60 soru · 45 dk");
+  assert.equal(w.tempo, null);
 });

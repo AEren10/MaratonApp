@@ -44,7 +44,29 @@ export function formatMinutes(value) {
   return rest ? `${hours} sa ${rest} dk` : `${hours} sa`;
 }
 
-export function buildWeeklyEffort({ logs = [], dailyGoal = 0 } = {}) {
+// Gecen haftanin AYNI gunune kadarki soru sayisiyla karsilastirma.
+//
+// NEDEN "AYNI GUNE KADAR"
+// Sali gunu bu haftanin 2 gunu ile gecen haftanin 7 gununu karsilastirmak
+// her zaman "geride" der; kullanici hic ilerlemiyormus gibi gorunur.
+//
+// NEDEN ESIK VAR
+// %3'luk fark tempo degil gurultudur. Esigin altinda "ayni tempo" denir --
+// yoksa her hafta ya onde ya geride cikar ve cumle anlamini yitirir.
+const TEMPO_THRESHOLD = 5;
+
+export function buildTempo(total, previous) {
+  if (previous == null || previous <= 0) return null;
+  const percent = Math.round(((total - previous) / previous) * 100);
+  if (Math.abs(percent) < TEMPO_THRESHOLD) {
+    return { direction: "flat", percent: 0, label: "geçen haftayla aynı tempo" };
+  }
+  const direction = percent > 0 ? "up" : "down";
+  const word = direction === "up" ? "önde" : "geride";
+  return { direction, percent, label: `geçen haftadan %${Math.abs(percent)} ${word}` };
+}
+
+export function buildWeeklyEffort({ logs = [], dailyGoal = 0, previousQuestions = null } = {}) {
   const days = WEEK_DAYS.map((label) => ({
     label, questions: 0, minutes: 0, worked: false, minutesOnly: false,
   }));
@@ -73,8 +95,13 @@ export function buildWeeklyEffort({ logs = [], dailyGoal = 0 } = {}) {
   const parts = [];
   if (totalQuestions > 0) parts.push(`${groupThousands(totalQuestions)} soru`);
   if (totalMinutes > 0) parts.push(formatMinutes(totalMinutes));
+  // Tempo yalnizca gercekten calisildiysa anlatilir: hic kayit yokken
+  // "gecen haftadan %100 geride" demek cezalandirmak olur.
+  const tempo = totalQuestions > 0 ? buildTempo(totalQuestions, previousQuestions) : null;
+  if (tempo) parts.push(tempo.label);
 
   return {
+    tempo,
     days,
     goal,
     maxValue,

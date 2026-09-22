@@ -9,7 +9,7 @@ import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
-export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs }) {
+export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs, previousQuestions = null }) {
   const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const {
     weeks,
@@ -96,8 +96,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLo
   // Haftalik emek: deneme GEREKTIRMEZ, her calisilan gun degisir. Grafik
   // alanindaki ilk sayfa bu; rota ikinci sayfada.
   const weeklyEffort = useMemo(
-    () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal }),
-    [weekLogs, dailyGoal],
+    () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal, previousQuestions }),
+    [weekLogs, dailyGoal, previousQuestions],
   );
   const todayIndex = useMemo(() => {
     const js = new Date().getDay();
