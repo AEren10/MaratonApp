@@ -1,6 +1,8 @@
 import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, {
+  FadeInDown, FadeInUp, FadeOutDown, FadeOutUp, useAnimatedStyle, withSpring,
+} from "react-native-reanimated";
 
 import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -20,9 +22,6 @@ export default function StudyTimerScreen() {
   const C = useC();
   const timer = useStudyTimerController(C);
 
-  // YARIM KALAN OTURUM KURTARMA ("Oturum Kurtarıldı").
-  // Uygulama arka planda öldürüldüyse (iOS'ta rutin) oturum diskten geri
-  // gelir; süre onaylanır ya da düzeltilir, sonra kayıt ekranına geçilir.
   if (timer.recovery) {
     return (
       <RecoveredSessionView
@@ -41,11 +40,18 @@ export default function StudyTimerScreen() {
     toggle, topic,
   } = timer;
 
-  const eyebrow = isPomodoro
-    ? `ODAK · ${cycleIndex + 1}. SEANS`
-    : hasSubject
-      ? "SERBEST ÇALIŞMA"
-      : "ODAK";
+  const eyebrow = isPomodoro ? `ODAK · ${cycleIndex + 1}. SEANS`
+    : hasSubject ? (subject.label || "SERBEST ÇALIŞMA").toUpperCase() : "ODAK";
+
+  const timerAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: withSpring(running ? 1.18 : 1.0, { damping: 18, stiffness: 180 }) },
+      { translateY: withSpring(running ? 16 : 0, { damping: 18, stiffness: 180 }) },
+    ],
+  }));
+
+  const topicSubtitle = topic && topic.toLowerCase() !== (subject?.label || "").toLowerCase()
+    ? topic : "Genel çalışma";
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -57,14 +63,21 @@ export default function StudyTimerScreen() {
         onHistory={openHistory}
       />
 
-      <StudyTimerModeSelector C={C} modeKey={modeKey} modes={modes} onChange={handleModeChange} />
+      {!running && (
+        <Animated.View
+          entering={FadeInDown.duration(280)}
+          exiting={FadeOutUp.duration(220)}
+        >
+          <StudyTimerModeSelector C={C} modeKey={modeKey} modes={modes} onChange={handleModeChange} />
+        </Animated.View>
+      )}
 
       {!running && elapsed === 0 && !hasSubject && (
         <SubjectPicker selected={selectedSubjectKey} onSelect={setSelectedSubjectKey} />
       )}
 
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: STEP.s4 }}>
-        <Animated.View entering={FadeIn.duration(500)} style={{ alignItems: "center" }}>
+        <Animated.View style={[{ alignItems: "center" }, timerAnimStyle]}>
           <TimerRing
             size={272}
             stroke={8}
@@ -78,48 +91,49 @@ export default function StudyTimerScreen() {
             <Text
               style={[
                 TYPOGRAPHY.heroNumber,
-                { fontSize: 62, lineHeight: 66, letterSpacing: -1.8, color: C.text },
+                {
+                  fontSize: running ? 68 : 62,
+                  lineHeight: running ? 72 : 66,
+                  letterSpacing: -2.0,
+                  color: C.text,
+                },
               ]}
               allowFontScaling={false}
             >
               {formatTimerDuration(timer.displaySeconds ?? elapsed)}
             </Text>
             <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 10 }]}>
-              {isPomodoro
-                ? `${mode?.focus || 25} dk odak · ${mode?.break || 5} dk mola`
-                : (hasSubject ? "serbest çalışma" : "ders seçilmedi")}
+              {running && hasSubject
+                ? `${subject.label} · ${topicSubtitle}`
+                : isPomodoro
+                  ? `${mode?.focus || 25} dk odak · ${mode?.break || 5} dk mola`
+                  : (hasSubject ? topicSubtitle : "ders seçilmedi")}
             </Text>
           </TimerRing>
         </Animated.View>
 
-        {hasSubject && (
-          <>
+        {!running && hasSubject && (
+          <Animated.View
+            entering={FadeInUp.duration(280)}
+            exiting={FadeOutDown.duration(220)}
+            style={{ width: "100%" }}
+          >
             <SubjectTopicCard C={C} subject={subject} topic={topic} stopLabel={stopLabel} />
-
             <StudyTimerNotice C={C} />
-          </>
+          </Animated.View>
         )}
 
-        {!isPomodoro && (
+        {!isPomodoro && !running && (
           <StudyTimerQuestionCounters
-            C={C}
-            correctCount={correctCount}
-            questions={questions}
-            onAddCorrect={addCorrect}
-            onAddQuestion={addQuestion}
-            onRemoveCorrect={removeCorrect}
-            onRemoveQuestion={removeQuestion}
+            C={C} correctCount={correctCount} questions={questions}
+            onAddCorrect={addCorrect} onAddQuestion={addQuestion}
+            onRemoveCorrect={removeCorrect} onRemoveQuestion={removeQuestion}
           />
         )}
 
         <StudyTimerControls
-          C={C}
-          hasSubject={hasSubject}
-          isPomodoro={isPomodoro}
-          running={running}
-          onFinish={finish}
-          onSkip={skipPhase}
-          onToggle={toggle}
+          C={C} hasSubject={hasSubject} isPomodoro={isPomodoro} running={running}
+          onFinish={finish} onSkip={skipPhase} onToggle={toggle}
         />
       </View>
     </SafeAreaView>

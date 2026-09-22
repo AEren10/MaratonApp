@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 
 export function TimerRing({
   size = 272,
@@ -16,10 +16,28 @@ export function TimerRing({
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - Math.min(Math.max(pct, 0), 1));
+  const activeColor = color || C.accent;
 
   return (
     <View style={{ width: size, height: size + 28, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={{ position: "absolute", top: 0 }}>
+        <Defs>
+          <RadialGradient id="ringAura" cx="50%" cy="50%" rx="50%" ry="50%">
+            <Stop offset="0%" stopColor={activeColor} stopOpacity="0.14" />
+            <Stop offset="65%" stopColor={activeColor} stopOpacity="0.04" />
+            <Stop offset="100%" stopColor={activeColor} stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+
+        {/* Yumuşak atmosferik odak ışığı (Ambient Aura) */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius + stroke * 1.5}
+          fill="url(#ringAura)"
+        />
+
+        {/* Pasif Arka Plan Halkası */}
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -28,11 +46,13 @@ export function TimerRing({
           strokeWidth={stroke}
           fill="none"
         />
+
+        {/* Aktif İlerleme Halkası */}
         <Circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={color || C.accent}
+          stroke={activeColor}
           strokeWidth={stroke}
           fill="none"
           strokeLinecap="round"
@@ -55,11 +75,11 @@ export function TimerRing({
               <View
                 key={i}
                 style={{
-                  width: 22,
+                  width: 24,
                   height: 4,
-                  borderRadius: 1,
-                  backgroundColor: filled ? (color || C.accent) : current ? (color || C.accent) : C.track,
-                  opacity: current ? 0.45 : filled ? 1 : 1,
+                  borderRadius: 2,
+                  backgroundColor: filled ? activeColor : current ? activeColor : C.track,
+                  opacity: current ? 0.5 : filled ? 1 : 1,
                 }}
               />
             );
