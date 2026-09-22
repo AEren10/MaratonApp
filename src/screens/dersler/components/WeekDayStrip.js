@@ -22,15 +22,15 @@ function DayChip({ day, selected, onPress, C }) {
       onPress={onPress}
       style={{
         flex: 1,
-        minHeight: 44,
-        paddingVertical: 11,
-        borderRadius: 16,
+        minHeight: 48,
+        paddingVertical: 10,
+        borderRadius: 14,
         backgroundColor: bg,
         borderWidth: 1,
         borderColor: border,
         borderStyle: day.isFuture && !isSelected ? "dashed" : "solid",
         alignItems: "center",
-        gap: 6,
+        gap: 5,
       }}
     >
       <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.1, color: letterColor }}>
@@ -44,7 +44,7 @@ function DayChip({ day, selected, onPress, C }) {
   );
 }
 
-export function WeekDayStrip({ days, selectedDate, onSelect }) {
+export function WeekDayStrip({ days, selectedDate, onSelect, style }) {
   const C = useC();
   const handlePress = useCallback((key) => {
     H.tap();
@@ -52,7 +52,7 @@ export function WeekDayStrip({ days, selectedDate, onSelect }) {
   }, [onSelect]);
 
   return (
-    <View style={{ marginTop: STEP.s2 }}>
+    <View style={[{ marginTop: STEP.s3 }, style]}>
       <View style={{ flexDirection: "row", gap: 6 }}>
         {days.map((day) => (
           <DayChip
@@ -64,7 +64,7 @@ export function WeekDayStrip({ days, selectedDate, onSelect }) {
           />
         ))}
       </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2, marginTop: STEP.s1 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2, marginTop: STEP.s2 }}>
         <Legend color={C.accent} label="tamamlandı" C={C} />
         <Legend color={C.text5} label="bekleyen" C={C} />
         <Legend color="transparent" dashed label="boş gün" C={C} />

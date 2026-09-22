@@ -10,34 +10,9 @@ import { useC } from "../../contexts/ThemeContext";
 import { useTopicDebt } from "../../hooks/useTopicDebt";
 import { TopicDebtStopRow } from "./components/TopicDebtStopRow";
 import { TopicDebtHero } from "./components/TopicDebtHero";
+import { TopicDebtImpactCard } from "./components/TopicDebtImpactCard";
 import { DebtDistributedView } from "./components/DebtDistributedView";
 import * as H from "../../lib/haptics";
-
-function TopicDebtImpactCard({ C, totalHours }) {
-  return (
-    <Card tone="surface" radius="panel" style={styles.impactCard}>
-      <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 1, marginBottom: STEP.s2 }]}>
-        BU DURAKLARI KAPATINCA
-      </Text>
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6, marginBottom: STEP.s4 }}>
-        <Text style={[TYPOGRAPHY.heading, { color: C.up, fontSize: 32 }]}>{totalHours} sa</Text>
-        <Text style={[TYPOGRAPHY.meta, { color: C.text3, flex: 1 }]}>
-          çalışma yükü kapanır - rotan daha dengeli hale gelir
-        </Text>
-      </View>
-      <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, marginBottom: STEP.s3 }]}>
-        Düzenli tekrar ve soru çözümü, sonraki denemelerde daha iyi bir sonuç için zemin oluşturur.
-      </Text>
-      <View style={{ flexDirection: "row", gap: STEP.s2, marginBottom: STEP.s3 }}>
-        <View style={styles.chip}><Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Çalışma yükü %18 azaldı</Text></View>
-        <View style={styles.chip}><Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Rota yeniden dengeleniyor</Text></View>
-      </View>
-      <Text style={[TYPOGRAPHY.micro, { color: C.text3, opacity: 0.7 }]}>
-        Rota tamamlanmadı ama yön doğru · uygulama içi rota göstergeleri, net tahmini değildir
-      </Text>
-    </Card>
-  );
-}
 
 export default function TopicDebtScreen() {
   const C = useC();
@@ -137,8 +112,6 @@ export default function TopicDebtScreen() {
 const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 },
-  impactCard: { marginTop: STEP.s4, padding: STEP.s4 },
-  chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: SHAPE.chip, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.05)" },
   loadingList: { marginTop: STEP.s4, gap: STEP.s3 },
   emptyWrap: { flex: 1, paddingHorizontal: GUTTER, justifyContent: "center", alignItems: "center" },
   listWrap: { marginTop: STEP.s5 },

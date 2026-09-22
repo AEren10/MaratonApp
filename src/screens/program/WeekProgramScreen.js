@@ -86,9 +86,9 @@ function WeekProgramInner() {
         ) : (
           <>
             <WeekSummary p={p} C={C} onMonth={() => navigation.navigate(SCREENS.MONTH_PLAN)} />
-            <WeekDayStrip days={p.days} selectedDate={p.selected} onSelect={p.setSelected} />
+            <WeekDayStrip days={p.days} selectedDate={p.selected} onSelect={p.setSelected} style={{ marginTop: STEP.s4 }} />
             <Animated.View key={p.selected} entering={FadeIn.duration(500)} style={s.dayHead}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>{p.dayLabel}</Text>
+              <Text style={[TYPOGRAPHY.label, { color: C.text2, letterSpacing: 1.4 }]}>{p.dayLabel}</Text>
               {plannedLabel(p.plannedMinutes) ? (
                 <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{plannedLabel(p.plannedMinutes)}</Text>
               ) : null}
@@ -122,19 +122,19 @@ export default function WeekProgramScreen() {
 
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s4 },
-  gap: { gap: STEP.s2 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 110 },
+  gap: { gap: STEP.s3 },
   summary: { padding: STEP.s3, borderRadius: SHAPE.sheet, borderWidth: 1 },
   summaryHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
-  summaryHero: { flexDirection: "row", alignItems: "baseline", marginTop: STEP.s1 },
-  progressTrack: { height: 4, borderRadius: STEP.s1 / 8, overflow: "hidden", marginTop: STEP.s2 },
-  progressFill: { height: "100%", borderRadius: STEP.s1 / 8 },
-  summaryFoot: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s1 },
-  segment: { flexDirection: "row", padding: STEP.s1 / 2, borderRadius: SHAPE.chip, borderWidth: 1, marginTop: STEP.s3 },
-  segmentActive: { flex: 1, minHeight: 34, alignItems: "center", justifyContent: "center", borderRadius: SHAPE.chip - 2 },
-  segmentIdle: { flex: 1, minHeight: 34, alignItems: "center", justifyContent: "center", borderRadius: SHAPE.chip - 2 },
-  dayHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: STEP.s4 - 6 },
-  agenda: { marginTop: STEP.s1 },
-  empty: { marginTop: STEP.s3 },
-  cta: { marginTop: STEP.s3 + 2 },
+  summaryHero: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginTop: STEP.s2 },
+  progressTrack: { height: 5, borderRadius: 2.5, overflow: "hidden", marginTop: STEP.s3 },
+  progressFill: { height: "100%", borderRadius: 2.5 },
+  summaryFoot: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s2 },
+  segment: { flexDirection: "row", padding: 3, borderRadius: SHAPE.chip, borderWidth: 1, marginTop: STEP.s3 + 4 },
+  segmentActive: { flex: 1, minHeight: 36, alignItems: "center", justifyContent: "center", borderRadius: SHAPE.chip - 2 },
+  segmentIdle: { flex: 1, minHeight: 36, alignItems: "center", justifyContent: "center", borderRadius: SHAPE.chip - 2 },
+  dayHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: STEP.s4 },
+  agenda: { marginTop: STEP.s2 + 2 },
+  empty: { marginTop: STEP.s4 },
+  cta: { marginTop: STEP.s4, paddingBottom: STEP.s3 },
 });

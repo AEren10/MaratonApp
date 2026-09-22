@@ -35,11 +35,40 @@ function ProgramAgendaItem({ item }) {
 export default memo(ProgramAgendaItem);
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, minHeight: 48, borderTopWidth: 1 },
-  time: { width: 42, letterSpacing: 0, fontVariant: ["tabular-nums"] },
-  swatch: { width: 6, height: 6, borderRadius: 1 },
-  body: { flex: 1, minWidth: 0 },
-  name: { letterSpacing: -0.1 },
-  doneText: { textDecorationLine: "line-through" },
-  meta: { width: 42, textAlign: "right", letterSpacing: 0, fontVariant: ["tabular-nums"] },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2 + 2,
+    minHeight: 56,
+    paddingVertical: 11,
+    borderTopWidth: 1,
+  },
+  time: {
+    width: 44,
+    letterSpacing: 0,
+    fontVariant: ["tabular-nums"],
+  },
+  swatch: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+  },
+  body: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: STEP.s1,
+  },
+  name: {
+    letterSpacing: -0.15,
+    lineHeight: 20,
+  },
+  doneText: {
+    textDecorationLine: "line-through",
+  },
+  meta: {
+    width: 44,
+    textAlign: "right",
+    letterSpacing: 0,
+    fontVariant: ["tabular-nums"],
+  },
 });
