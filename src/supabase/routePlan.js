@@ -131,6 +131,19 @@ export async function getRouteStops(userId, revisionId = null) {
   }
 }
 
+export async function getRouteStopById(stopId, userId = null) {
+  if (!stopId || stopId === "dev") return null;
+  try {
+    let query = supabase.from("route_stops").select(ROUTE_STOP_COLUMNS).eq("id", stopId);
+    if (userId && userId !== "dev") query = query.eq("user_id", userId);
+    const { data, error } = await query.maybeSingle();
+    if (error) return null;
+    return data || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function transitionRouteStop({
   stopId,
   transition,
@@ -138,6 +151,8 @@ export async function transitionRouteStop({
   clientOperationId,
   occurredAt = new Date().toISOString(),
   payload = {},
+  userId = null,
+  reconcileOnConflict = true,
 }) {
   if (!stopId || !transition || !clientOperationId) {
     throw new Error("stopId, transition and clientOperationId are required");
@@ -154,6 +169,52 @@ export async function transitionRouteStop({
     if (error) throw error;
     return Array.isArray(data) ? data[0] || null : data;
   } catch (e) {
+    const isConflict =
+      e?.code === "PT409" ||
+      e?.code === "40001" ||
+      e?.code === "22023" ||
+      e?.code === "P0002" ||
+      e?.message?.includes("version conflict") ||
+      e?.message?.includes("invalid route stop transition");
+
+    if (reconcileOnConflict && isConflict) {
+      try {
+        const serverStop = await getRouteStopById(stopId, userId);
+
+        if (!serverStop) {
+          return { id: stopId, lifecycle_status: transition, reconciled: true, reason: "stop_not_found" };
+        }
+
+        if (serverStop.lifecycle_status === transition) {
+          return { ...serverStop, reconciled: true, reason: "already_in_state" };
+        }
+
+        const canTransition =
+          (serverStop.lifecycle_status === "upcoming" || serverStop.lifecycle_status === "active") &&
+          ["completed", "skipped", "rescheduled"].includes(transition);
+
+        if (canTransition) {
+          const { data: retriedData, error: retryErr } = await supabase.rpc("transition_route_stop", {
+            p_stop_id: stopId,
+            p_transition: transition,
+            p_expected_version: serverStop.version,
+            p_client_operation_id: clientOperationId,
+            p_occurred_at: occurredAt,
+            p_payload: payload,
+          });
+          if (!retryErr) {
+            return Array.isArray(retriedData) ? retriedData[0] || null : retriedData;
+          }
+        }
+
+        if (serverStop.version > (expectedVersion ?? 0)) {
+          return { ...serverStop, reconciled: true, reason: "server_version_ahead" };
+        }
+      } catch {
+        // Reconcile esnasinda beklenmeyen bir hata olursa orijinal hataya devam et
+      }
+    }
+
     handleSupabaseError(e, "transitionRouteStop");
     throw e;
   }

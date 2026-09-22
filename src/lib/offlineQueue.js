@@ -230,6 +230,8 @@ async function runOne(item) {
         clientOperationId: item.clientOperationId || item.id || item.payload.client_operation_id,
         occurredAt: item.payload.occurredAt,
         payload: item.payload.payload,
+        userId: item.payload.user_id,
+        reconcileOnConflict: true,
       });
       break;
     case OP_REVIEW:
@@ -331,7 +333,8 @@ async function moveToDeadLetter(items) {
 
 export async function getDeadLetterCount() {
   try {
-    return (await appStorage.getJson(DEAD_LETTER_KEY, [])).length;
+    const items = await getDeadLetterItems();
+    return items.length;
   } catch { return 0; }
 }
 
@@ -398,6 +401,11 @@ async function flushQueueLocked() {
           break;
         }
         if (isPermanentError(e)) {
+          if (item.type === OP_ROUTE_STOP_TRANSITION && (e?.code === "PT409" || e?.code === "22023" || e?.code === "P0002" || e?.code === "40001")) {
+            // Rota duragi surum/gecis catismasi kullanici veri kaybi degildir.
+            // Sunucu durumu gecerli kabul edilir, dead-letter'a tasinip kullanici kilitlenmez.
+            continue;
+          }
           dead.push({ ...item, deadReason: e?.code || e?.status || "permanent" });
           failed += 1;
           continue;
@@ -560,7 +568,18 @@ export async function getPendingWrongQuestions(userId) {
 /** Kalıcı olarak başarısız olmuş kayıtlar — kullanıcıya gösterilebilir. */
 export async function getDeadLetterItems() {
   try {
-    return await appStorage.getJson(DEAD_LETTER_KEY, []);
+    const raw = await appStorage.getJson(DEAD_LETTER_KEY, []);
+    const filtered = raw.filter((item) => {
+      if (item.type === OP_ROUTE_STOP_TRANSITION &&
+          (item.deadReason === "PT409" || item.deadReason === "22023" || item.deadReason === "P0002" || item.deadReason === "40001" || item.deadReason === "permanent")) {
+        return false;
+      }
+      return true;
+    });
+    if (filtered.length !== raw.length) {
+      await appStorage.setJson(DEAD_LETTER_KEY, filtered);
+    }
+    return filtered;
   } catch { return []; }
 }
 
