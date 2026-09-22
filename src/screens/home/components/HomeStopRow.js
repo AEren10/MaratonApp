@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
@@ -14,28 +14,16 @@ function metaOf(item) {
 
 // Bugünün durakları satırı. Figma referansına (media_1789650533819.png) birebir:
 // [Dikey ders renk çubuğu] -> [Yaylı tik halkası] -> [Ders / Konu / Meta] -> [Kırmızı nokta (sıradaki)]
-export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onChecked }) {
+export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
   const subjectLabel = getSubjectByKey(item.subject)?.label || item.subject || "";
-  const done = item.completed;
-  const [checking, setChecking] = useState(false);
-
-  useEffect(() => {
-    if (done) setChecking(false);
-  }, [done]);
-
-  const isDone = done || checking;
+  const isDone = Boolean(item.completed);
   const tone = isDone ? C.text3 : (sid?.solid || C.text2);
 
   const handleToggle = useCallback(() => {
     onToggle(item);
   }, [onToggle, item]);
-
-  const handleChecked = useCallback(() => {
-    setChecking(true);
-    onChecked?.();
-  }, [onChecked]);
 
   const handlePress = useCallback(() => {
     if (onStart) onStart(item);
@@ -54,12 +42,11 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
       {/* 1. Dikey ders rengi çubuğu (tikin solunda) */}
       <View style={[s.bar, { backgroundColor: tone }]} />
 
-      {/* 2. Yaylı animasyonlu dairesel tik / onay halkası */}
+      {/* 2. Dairesel tik / onay halkası */}
       <HomeStopCheckRing
-        done={done}
+        done={isDone}
         isNext={isNext}
         onToggle={handleToggle}
-        onChecked={handleChecked}
         accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
       />
 

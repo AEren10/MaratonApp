@@ -9,24 +9,25 @@ import Animated, {
   withDelay,
   cancelAnimation,
   runOnJS,
+  Easing,
 } from "react-native-reanimated";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../design";
 
-const SHOW_MS = 300;
-const VISIBLE_MS = 2500;
-const HIDE_MS = 250;
+const SHOW_MS = 280;
+const VISIBLE_MS = 2000;
+const HIDE_MS = 220;
 
 export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
   const C = useC();
   const insets = useSafeAreaInsets();
-  const translateY = useSharedValue(60);
+  const translateY = useSharedValue(-50);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     if (!visible) return;
-    translateY.value = 60;
+    translateY.value = -50;
     opacity.value = 0;
 
     const handleDismiss = () => {
@@ -34,8 +35,8 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
     };
 
     translateY.value = withSequence(
-      withTiming(0, { duration: SHOW_MS }),
-      withDelay(VISIBLE_MS, withTiming(60, { duration: HIDE_MS })),
+      withTiming(0, { duration: SHOW_MS, easing: Easing.out(Easing.cubic) }),
+      withDelay(VISIBLE_MS, withTiming(-50, { duration: HIDE_MS, easing: Easing.in(Easing.cubic) })),
     );
     opacity.value = withSequence(
       withTiming(1, { duration: SHOW_MS }),
@@ -57,18 +58,19 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
   if (!visible) return null;
 
   const boosted = multiplier > 1;
+  const topInset = Math.max(insets.top, 12);
 
   return (
-    <Animated.View style={[styles.container, { bottom: insets.bottom + STEP.s4 + 80 }, animStyle]} pointerEvents="none">
-      <View style={[styles.card, { backgroundColor: C.surface, borderColor: boosted ? C.amber : C.accent }]}>
+    <Animated.View style={[styles.container, { top: topInset + 6 }, animStyle]} pointerEvents="none">
+      <View style={[styles.card, { backgroundColor: C.elev, borderColor: boosted ? C.amber : C.border }]}>
         <Icon
           name={boosted ? "zap" : "star"}
-          size={18}
-          color={boosted ? C.amber : C.accent}
+          size={15}
+          color={boosted ? C.amber : C.accentBright}
         />
         <Text style={[styles.amount, { color: C.text }]}>+{amount} XP</Text>
         {boosted && (
-          <View style={[styles.pill, { backgroundColor: C.amber + "30" }]}>
+          <View style={[styles.pill, { backgroundColor: C.amber + "25" }]}>
             <Text style={[styles.pillText, { color: C.amber }]}>x{multiplier}</Text>
           </View>
         )}
@@ -86,26 +88,27 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: STEP.s3,
-    paddingVertical: 10,
-    borderRadius: 30,
+    height: 38,
+    paddingHorizontal: 14,
+    borderRadius: 19,
     borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 8,
   },
   amount: {
     fontFamily: "Archivo_700",
-    fontSize: 15,
-    marginLeft: STEP.s1,
+    fontSize: 13.5,
+    marginLeft: 6,
+    letterSpacing: -0.2,
   },
   pill: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: SHAPE.pill,
-    marginLeft: STEP.s2,
+    marginLeft: 8,
   },
   pillText: {
     fontFamily: "Archivo_700",

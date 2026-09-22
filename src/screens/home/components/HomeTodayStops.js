@@ -1,4 +1,3 @@
-import { useState, useCallback, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 
@@ -8,7 +7,6 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
 import * as H from "../../../lib/haptics";
 import { HomeStopRow } from "./HomeStopRow";
-import { HomeStopToast } from "./HomeStopToast";
 
 const PREVIEW = 3;
 
@@ -19,21 +17,9 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const { items, doneCount, nextId, toggle } = stops;
   const preview = items.slice(0, PREVIEW);
   const more = Math.max(0, items.length - PREVIEW);
-  const [toastVisible, setToastVisible] = useState(false);
-  const toastTimerRef = useRef(null);
-
-  const handleChecked = useCallback(() => {
-    setToastVisible(true);
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(() => {
-      setToastVisible(false);
-    }, 2200);
-  }, []);
 
   return (
     <View style={s.wrap}>
-      <HomeStopToast visible={toastVisible} />
-
       <View style={s.head}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BUGÜNÜN DURAKLARI</Text>
         <View style={s.segs}>
@@ -55,13 +41,12 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
       {preview.length ? (
         <View style={s.list}>
           {preview.map((item) => (
-            <Animated.View key={item.id} layout={Layout.springify().damping(16)}>
+            <Animated.View key={item.id} layout={Layout.duration(240)}>
               <HomeStopRow
                 item={item}
                 isNext={item.id === nextId}
                 onToggle={toggle}
                 onStart={onStartTask}
-                onChecked={handleChecked}
               />
             </Animated.View>
           ))}

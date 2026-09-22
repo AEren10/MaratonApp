@@ -11,7 +11,7 @@ const RING_SIZE = STEP.s3 + 6;
 // Tik halkasi. Yayli buyuyup kuculen animasyon ve onu bekleten 420 ms
 // gecikme kaldirildi: kullanici tike bastiginda durum ANINDA degisiyor.
 // Geri bildirim dokunsal (H.success) ve renk degisimi — gosteri yok.
-export function HomeStopCheckRing({ done, isNext, onToggle, onChecked, accessibilityLabel }) {
+export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }) {
   const C = useC();
 
   const handlePress = useCallback(() => {
@@ -21,9 +21,8 @@ export function HomeStopCheckRing({ done, isNext, onToggle, onChecked, accessibi
       return;
     }
     H.success();
-    onChecked?.();
     onToggle();
-  }, [done, onToggle, onChecked]);
+  }, [done, onToggle]);
 
   return (
     <Pressable
@@ -32,7 +31,7 @@ export function HomeStopCheckRing({ done, isNext, onToggle, onChecked, accessibi
       accessibilityRole="checkbox"
       accessibilityState={{ checked: done }}
       accessibilityLabel={accessibilityLabel}
-      style={s.area}
+      style={({ pressed }) => [s.area, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
     >
       <View
         style={[
