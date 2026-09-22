@@ -6,7 +6,11 @@ import { alpha } from "../../../themes/colorMix";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-const HEIGHT = STEP.s5 + STEP.s3 + 2;
+// Iki satirli oldugu icin birincil buton olcusunden (52) yuksek, ama 74
+// ekranin en agir blogu oluyordu: kizil alan kahraman sayidan cok yer
+// kapliyordu. 64 iki satiri da rahat tasiyor, dokunma alani da fazlasiyla
+// tabanin (44) uzerinde.
+const HEIGHT = STEP.s5 + STEP.s2;
 
 // Ana Sayfa birincil eylemi: iki satirli kizil blok (baslik + alt satir) ve
 // sagda yuvarlak ok. "Çalışmaya Başla" / "Bugün ne çalıştın, kaydet".

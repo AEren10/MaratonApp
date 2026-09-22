@@ -1,9 +1,8 @@
-import { useCallback, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { View, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { useC } from "../../../contexts/ThemeContext";
+import { STEP } from "../../../themes/tokens";
 import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeRouteSummaryBar } from "./HomeRouteSummaryBar";
@@ -14,7 +13,6 @@ import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart"
 // Ana Sayfa hero'sunun normal (Pro) hali: dev sayi + rota grafigi + ozet
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
-  const C = useC();
   const {
     remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess,
     chartData, declared, declaredAxis, weeklyEffort, todayIndex,
@@ -24,20 +22,23 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
   // soru "bugun ilerledim mi". Rota haftada bir bakilan bir sey, ikinci
   // sayfada duruyor.
-  const [page, setPage] = useState("week");
   const onPressPage = useCallback((key) => {
     if (key === "route" && hasRouteAccess) onViewRoute?.();
   }, [hasRouteAccess, onViewRoute]);
 
+  // Cumle sayfanin ICINDE tasiniyor: disarida dururken bir sayfada var bir
+  // sayfada yok oluyor ve kaydirirken altindaki her sey bir satir zipliyordu.
   const pages = [
     {
       key: "week",
       a11y: weeklyEffort?.summary || "Bu hafta",
+      caption: weeklyEffort?.summary || null,
       render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
     },
     {
       key: "route",
       a11y: "Rota detayını gör",
+      caption: chartData?.sentence || declared?.summary || null,
       render: () => (
         <HomeHeroChart
           hasAccess={hasRouteAccess}
@@ -50,11 +51,6 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
     },
   ];
 
-  // Altindaki cumle acik olan sayfayi anlatir: haftalik sayfada emek ozeti,
-  // rota sayfasinda tahmin cumlesi. Yoksa satir hic cizilmez.
-  const caption = page === "week"
-    ? weeklyEffort?.summary
-    : (chartData?.sentence || declared?.summary || null);
   return (
     <View style={s.top}>
       <HomeHeroStat
@@ -67,12 +63,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       />
 
       <View style={s.chart}>
-        <HomeChartPager pages={pages} onPressPage={onPressPage} onPageChange={setPage} />
+        <HomeChartPager pages={pages} onPressPage={onPressPage} />
       </View>
-
-      {caption ? (
-        <Text style={[TYPOGRAPHY.body, s.sentence, { color: C.text2 }]}>{caption}</Text>
-      ) : null}
 
       <HomeRouteSummaryBar
         hasAccess={hasRouteAccess}
@@ -99,6 +91,5 @@ const s = StyleSheet.create({
   // hat ile kahraman sayi ayni dusey alani paylasiyor. Hattin sol ust
   // kosesi bos oldugu icin metinle cakismiyor.
   chart: { marginTop: -STEP.s4, marginBottom: STEP.s2 },
-  sentence: { marginBottom: STEP.s2 },
   cta: { marginTop: STEP.s4 },
 });
