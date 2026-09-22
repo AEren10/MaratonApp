@@ -59,7 +59,10 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 
 const s = StyleSheet.create({
   top: { paddingTop: STEP.s3 + 2 },
-  chart: { marginTop: STEP.s3, marginBottom: STEP.s2 },
+  // Tasarimda grafigin ucu "hedefe X kaldı" satirinin USTUNE tasiyor:
+  // hat ile kahraman sayi ayni dusey alani paylasiyor. Hattin sol ust
+  // kosesi bos oldugu icin metinle cakismiyor.
+  chart: { marginTop: -STEP.s4, marginBottom: STEP.s2 },
   sentence: { marginBottom: STEP.s2 },
   cta: { marginTop: STEP.s4 },
 });
