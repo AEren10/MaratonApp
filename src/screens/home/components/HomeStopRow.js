@@ -6,14 +6,13 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { HomeStopCheckRing } from "./HomeStopCheckRing";
 
-function metaOf(item) {
+function durationOf(item) {
   const mins = item.minutes || (item.count > 0 ? Math.round(item.count * 1.5) : null);
-  const timeStr = mins ? `${mins} dk` : null;
-  return [timeStr, item.badge || null].filter(Boolean).join(" · ");
+  return mins ? `${mins} dk` : "30 dk";
 }
 
 // Bugünün durakları satırı:
-// [Dikey ders renk çubuğu] -> [Yaylı tik halkası] -> [Ders · Süre / Konu] -> [Kırmızı nokta (sıradaki)]
+// [Dikey ders renk çubuğu] -> [Onay halkası] -> [Ders / Konu] -> [Sağda Süre + Durum]
 export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
@@ -30,7 +29,13 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
     else onToggle(item);
   }, [onStart, onToggle, item]);
 
-  const meta = metaOf(item);
+  const durationStr = durationOf(item);
+
+  const rawTopic = item.topic || item.planTopicName || item.label;
+  const isDuplicate = !rawTopic
+    || rawTopic.toLowerCase() === subjectLabel.toLowerCase()
+    || rawTopic.toLowerCase() === (item.subject || "").toLowerCase();
+  const topicTitle = isDuplicate ? "Genel çalışma" : rawTopic;
 
   return (
     <View
@@ -53,24 +58,18 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
       />
 
-      {/* 3. Metin bloğu: [DERS · SÜRE] ve [KONU BAŞLIĞI] */}
+      {/* 3. Metin bloğu: [DERS ADI] ve [KONU BAŞLIĞI] */}
       <Pressable
         onPress={handlePress}
         accessibilityRole="button"
-        accessibilityLabel={`${subjectLabel}, ${item.label}`}
+        accessibilityLabel={`${subjectLabel}, ${topicTitle}`}
         style={s.bodyArea}
       >
         <View style={s.flex}>
-          <View style={s.subRow}>
-            <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
-              {subjectLabel}
-            </Text>
-            {meta ? (
-              <Text numberOfLines={1} style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
-                {`·  ${meta}`}
-              </Text>
-            ) : null}
-          </View>
+          <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
+            {subjectLabel.toUpperCase()}
+            {item.badge ? ` · ${String(item.badge).toUpperCase()}` : ""}
+          </Text>
           <Text
             numberOfLines={1}
             style={[
@@ -82,10 +81,17 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
               },
             ]}
           >
-            {item.label}
+            {topicTitle}
           </Text>
         </View>
-        {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
+
+        {/* 4. En sağ ortada: Süre (dakika) + Sıradaki göstergesi */}
+        <View style={s.rightCol}>
+          <Text style={[TYPOGRAPHY.tableValue, { color: isDone ? C.text3 : C.text2 }]}>
+            {durationStr}
+          </Text>
+          {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
+        </View>
       </Pressable>
     </View>
   );
@@ -98,14 +104,14 @@ const s = StyleSheet.create({
     borderRadius: SHAPE.cardTight,
     borderWidth: 1,
     paddingLeft: STEP.s2,
-    paddingRight: STEP.s2 + 2,
-    paddingVertical: STEP.s2,
+    paddingRight: STEP.s3,
+    paddingVertical: STEP.s2 + 2,
     gap: STEP.s2,
-    minHeight: 56,
+    minHeight: 64,
   },
   bar: {
     width: 3,
-    height: 26,
+    height: 30,
     borderRadius: SHAPE.chip / 4,
   },
   bodyArea: {
@@ -116,16 +122,16 @@ const s = StyleSheet.create({
     gap: STEP.s2,
   },
   flex: { flex: 1, minWidth: 0 },
-  subRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s1 - 2,
-  },
   sub: {
     letterSpacing: 0.6,
   },
   topic: {
     marginTop: STEP.s1 / 4,
+  },
+  rightCol: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1 - 2,
   },
   dot: {
     width: 6,

@@ -10,9 +10,10 @@
 // eklenirse o da buradan okumali.
 
 export const CHART_W = 390;
-// Tasarimda grafik genis ve BASIK (yaklasik 390x210). 250 cok uzundu:
-// hat ayni yolu daha dik cikiyor ve altinda bos alan kaliyordu.
-export const CHART_H = 210;
+// Tasarimda grafik genis ve BASIK. 250 cok uzundu: hat ayni yolu daha dik
+// cikiyor ve altinda bos alan kaliyordu. 210 ise ana sayfada cok sikisikti --
+// kahraman sayi ile "Rotanin tamami" seridi arasinda nefes kalmiyordu.
+export const CHART_H = 232;
 
 // Dugum yaricapi 9; bosluk olmadan ilk/son dugum viewBox'in disina tasiyor.
 // Sag taraf daha genis, cunku "TAHMİN 71" etiketi oraya yasliyor.

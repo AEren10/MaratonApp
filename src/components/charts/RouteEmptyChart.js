@@ -15,7 +15,7 @@ import {
 // yaricaplari, ayni etiket olculeri, ayni tarih seridi. Eski hali kendi
 // olculerini kullaniyordu ve yan yana konunca baska bir uygulamadan gelmis
 // gibi duruyordu. Izgara cizgileri de kaldirildi — olculmus grafikte yok.
-export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel = "HENÜZ TAHMİN YOK" }) {
+export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emptyLabel = "HENÜZ TAHMİN YOK" }) {
   const C = useC();
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
   const bottom = plotBottom({ hasAxis });
@@ -40,7 +40,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel 
 
   return (
     <View
-      style={s.wrap}
+      style={[s.wrap, height ? { aspectRatio: undefined, height } : null]}
       accessible
       accessibilityLabel={declared?.summary
         ? `Rota: ${declared.startLabel || "başlangıç bilinmiyor"} → ${declared.goalLabel || "hedef yok"}. ${declared.summary}`

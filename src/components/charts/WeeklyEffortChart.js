@@ -14,7 +14,7 @@ const MINUTES_ONLY_H = 6;
 // Ustte kesikli gunluk hedef cizgisi. Rota grafigiyle AYNI tuval olcusunu
 // kullanir (chartStyle) — ikisi slider'da yan yana duruyor, birbirinden
 // farkli boyda olurlarsa kaydirirken zipliyorlar.
-export function WeeklyEffortChart({ week, todayIndex }) {
+export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
   if (!week) return null;
 
@@ -30,7 +30,7 @@ export function WeeklyEffortChart({ week, todayIndex }) {
 
   return (
     <View
-      style={s.wrap}
+      style={[s.wrap, { height }]}
       accessible
       accessibilityLabel={week.summary || "Bu hafta henüz çalışma kaydın yok."}
     >
@@ -108,5 +108,8 @@ export function WeeklyEffortChart({ week, todayIndex }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { width: "100%", aspectRatio: CHART_W / CHART_H },
+  // Yukseklik SABIT, oran degil. Rota grafigi de sabit yukseklik kullaniyor;
+  // biri orana biri piksele baglandiginda ikisi ekran genisligine gore farkli
+  // boya oturuyor ve slider'da sayfa degisirken alt taraf zipliyordu.
+  wrap: { width: "100%" },
 });
