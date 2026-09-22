@@ -17,6 +17,13 @@ import { ProgramRulesSection } from "./components/ProgramRulesSection";
 import SegmentTabs from "../../components/common/SegmentTabs";
 
 const TABS = [{ key: "week", label: "Haftalık" }, { key: "month", label: "Aylık" }];
+// Mufredat ekranindaki segmentin AYNISI, ters yonu. Gecis eskiden tek
+// yonluydu: Mufredat'tan Programim'a gelinebiliyor ama geri donulemiyordu,
+// ogrenci sekmeye basip bastan baslamak zorunda kaliyordu.
+const SECTIONS = [
+  { key: "curriculum", label: "Müfredat" },
+  { key: "program", label: "Programım" },
+];
 
 function Header({ C, navigation }) {
   // Tasarım (Image 3) gereği, bu ekranda '< Programım' başlığı var.
@@ -71,6 +78,16 @@ export default function DerslerScreen() {
           }
         >
           <Header C={C} navigation={navigation} />
+
+          <View style={{ marginTop: STEP.s2 }}>
+            <SegmentTabs
+              options={SECTIONS}
+              value="program"
+              onChange={(key) => {
+                if (key === "curriculum") openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP);
+              }}
+            />
+          </View>
 
           {loading ? (
             <DerslerSkeleton />
