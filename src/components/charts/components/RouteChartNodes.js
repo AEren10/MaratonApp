@@ -43,8 +43,10 @@ export function RouteChartNodes({ pastPoints = [], todayPoint, endPoint, hasFutu
 
       {endLabel && endPoint && hasFuture ? (
         <SvgText
-          x={endPoint.x - 10}
-          y={endPoint.y - 14}
+          // Tasarimda uc etiketi dugumun SOL ALTINDA duruyor, ustunde degil:
+          // hattin ucu tuvalin en ustune kadar cikabilsin diye.
+          x={endPoint.x - 14}
+          y={endPoint.y + 26}
           fill={C.text2}
           fontSize={LABEL.size}
           fontWeight={LABEL.weight}

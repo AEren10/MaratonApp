@@ -25,13 +25,17 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel 
   const x0 = PAD_LEFT;
   const y0 = bottom - 16;
   const x1 = CHART_W - PAD_RIGHT;
-  const y1 = PAD_TOP + 10;
+  // Tasarimda hattin ucu tuvalin EN USTUNE kadar cikiyor. Etiket artik
+  // dugumun ustunde degil solunda durdugu icin yukarida yer kaldi.
+  const y1 = PAD_TOP - 8;
   const cx1 = x0 + (x1 - x0) * 0.42;
   const cy1 = y0 - (y0 - y1) * 0.12;
   const cx2 = x0 + (x1 - x0) * 0.72;
   const cy2 = y1 + (y0 - y1) * 0.34;
 
-  const goalText = declared?.goalLabel || (examDateTag ? null : emptyLabel);
+  // "HEDEF 60" — olculmus grafikteki "TAHMİN 71" ile ayni kalip.
+  const goalNumber = declared?.goalLabel ? declared.goalLabel.replace(/\s*net$/i, "") : null;
+  const goalText = goalNumber ? `HEDEF ${goalNumber}` : (examDateTag ? null : emptyLabel);
 
   return (
     <View
@@ -74,22 +78,16 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, emptyLabel 
           BUGÜN
         </SvgText>
 
-        {declared?.goalLabel ? (
-          <SvgText
-            x={x1 - 13} y={y1 - 26}
-            fill={C.text} fontSize={VALUE.size} fontWeight={VALUE.weight} textAnchor="end"
-          >
-            {declared.goalLabel}
-          </SvgText>
-        ) : null}
+        {/* Tasarimda uc etiketi TEK SATIR ve dugumun SOL ALTINDA:
+            "TAHMİN 71" gibi. Burada karsiligi "HEDEF 60". */}
         {goalText ? (
           <SvgText
-            x={x1 - 13} y={y1 - 8}
+            x={x1 - 14} y={y1 + 26}
             fill={declared?.goalLabel ? C.text2 : C.text4}
             fontSize={LABEL.size} fontWeight={LABEL.weight} letterSpacing={LABEL.tracking}
             textAnchor="end"
           >
-            {declared?.goalLabel ? "HEDEFİN" : emptyLabel}
+            {goalText}
           </SvgText>
         ) : null}
 

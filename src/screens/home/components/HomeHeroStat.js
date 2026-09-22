@@ -33,12 +33,14 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>
             {examYear ? `${examLabel} ${examYear}` : examLabel}
           </Text>
+          {/* Tasarimda "362 gün" bir butun okunuyor: birim de buyuk.
+              Eskiden 11.5px meta idi ve sayinin yaninda kayboluyordu. */}
           <View style={s.daysRow}>
-            <Text style={[TYPOGRAPHY.stat, { color: C.text, fontSize: 26, lineHeight: 30 }]}>
+            <Text style={[TYPOGRAPHY.stat, { color: C.text, fontSize: 30, lineHeight: 34 }]}>
               {Math.max(0, daysUntilExam)}
             </Text>
-            <Text style={[TYPOGRAPHY.meta, s.daysUnit, { color: C.text3 }]}>gün</Text>
-            <Icon name="chevR" size={16} color={C.text3} />
+            <Text style={[TYPOGRAPHY.body, s.daysUnit, { color: C.text2, fontSize: 18 }]}>gün</Text>
+            <Icon name="chevR" size={18} color={C.text3} />
           </View>
         </View>
       ) : null}
@@ -50,5 +52,5 @@ const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
   examChip: { alignItems: "flex-end", gap: 2, paddingTop: STEP.s1 },
   daysRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  daysUnit: { marginTop: 6 },
+  daysUnit: { marginTop: 7 },
 });

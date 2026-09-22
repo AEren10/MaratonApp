@@ -10,7 +10,9 @@
 // eklenirse o da buradan okumali.
 
 export const CHART_W = 390;
-export const CHART_H = 250;
+// Tasarimda grafik genis ve BASIK (yaklasik 390x210). 250 cok uzundu:
+// hat ayni yolu daha dik cikiyor ve altinda bos alan kaliyordu.
+export const CHART_H = 210;
 
 // Dugum yaricapi 9; bosluk olmadan ilk/son dugum viewBox'in disina tasiyor.
 // Sag taraf daha genis, cunku "TAHMİN 71" etiketi oraya yasliyor.
