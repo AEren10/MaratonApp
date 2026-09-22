@@ -23,8 +23,9 @@ export function EffortDay({
       width={width}
       height={slotH}
       radius={radius}
+      isToday={isToday}
       isFuture={index > todayIndex}
-      edge={C.line}
+      C={C}
     />
   ) : null;
 

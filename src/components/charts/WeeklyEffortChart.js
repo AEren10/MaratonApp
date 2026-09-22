@@ -43,8 +43,19 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const slot = usableW / week.days.length;
   const barW = Math.min(26, slot * 0.52);
 
-  const yOf = (value) => bottom - (value / week.maxValue) * usableH;
-  const goalY = week.goal > 0 ? yOf(week.goal) : null;
+  // Tuval tepe payı (headroom): Hedef çizgisi tavana yapışmasın;
+  // hedefte veya 300 soru gibi yüksek sayılarda çubuklar taşmadan
+  // orantılı ve ferah kalsın.
+  const peak = (week.days || []).reduce((max, d) => Math.max(max, d.questions), 0);
+  const goal = week.goal || 0;
+  const chartMax = Math.max(
+    Math.round(peak * 1.2),
+    Math.round(goal * 1.55),
+    100
+  );
+
+  const yOf = (value) => bottom - (value / chartMax) * usableH;
+  const goalY = goal > 0 ? yOf(goal) : null;
 
   return (
     <View
@@ -53,7 +64,7 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
       accessibilityLabel={week.summary || "Bu hafta henüz çalışma kaydın yok."}
     >
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
-        <EffortSlotDefs color={C.track} />
+        <EffortSlotDefs color={C.accent} />
         <Line
           x1={PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
           stroke={C.line} strokeWidth={1}

@@ -1,49 +1,52 @@
-import { Defs, Pattern, Path, Rect } from "react-native-svg";
+import { Defs, G, Pattern, Path, Rect } from "react-native-svg";
 
-// GUNUN YERI: o gun doldurulabilecek alanin kendisi.
-//
-// NEDEN VAR
-// Cubuk tek basina yalnizca YAPILANI gosteriyordu; yapilmayan gun bos bir
-// bosluktu ve hedefin nerede oldugu sadece ustteki kesikli cizgiden
-// okunuyordu. Her gunun kendi kutusu cizilince hedef her cubugun yaninda
-// duruyor: kutu dolduysa gun tamam, yarisi kaldiysa yarisi kaldi.
-//
-// GELECEK GUN CEZALANDIRILMAZ
-// Yasanmis gunun kutusu tarali ve kenari duz: "burasi vardi". Gelecek gunun
-// kenari kesikli ve taramasiz: henuz gelmedi, bos kalmasi bir eksik degil.
 export const HATCH_ID = "effortSlotHatch";
 
 export function EffortSlotDefs({ color }) {
   return (
     <Defs>
-      {/* 45 derece kesintisiz tarama. patternTransform kullanilmiyor:
-          desenin kendisi kose kose cizilerek tekrarda ek yeri birakmiyor. */}
-      <Pattern id={HATCH_ID} patternUnits="userSpaceOnUse" width={5} height={5}>
+      <Pattern id={HATCH_ID} patternUnits="userSpaceOnUse" width={6} height={6}>
         <Path
-          d="M-1,1 l2,-2 M0,5 l5,-5 M4,6 l2,-2"
+          d="M-1,1 l2,-2 M0,6 l6,-6 M5,7 l2,-2"
           stroke={color}
           strokeWidth={1}
+          strokeOpacity={0.16}
         />
       </Pattern>
     </Defs>
   );
 }
 
-export function EffortSlot({ x, y, width, height, radius, isFuture, edge }) {
+export function EffortSlot({ x, y, width, height, radius, isToday, isFuture, C }) {
   if (height <= 0) return null;
+  const accent = C?.accent || "#E5343F";
+  const bgOpacity = isToday ? 0.12 : isFuture ? 0.06 : 0.08;
+  const strokeOpacity = isToday ? 0.38 : isFuture ? 0.18 : 0.22;
+
   return (
-    <Rect
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      rx={radius}
-      fill={isFuture ? "none" : `url(#${HATCH_ID})`}
-      fillOpacity={0.5}
-      stroke={edge}
-      strokeWidth={1}
-      strokeOpacity={isFuture ? 0.55 : 0.9}
-      strokeDasharray={isFuture ? "3 4" : undefined}
-    />
+    <G>
+      <Rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rx={radius}
+        fill={accent}
+        fillOpacity={bgOpacity}
+      />
+      <Rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rx={radius}
+        fill={`url(#${HATCH_ID})`}
+        stroke={accent}
+        strokeWidth={1}
+        strokeOpacity={strokeOpacity}
+        strokeDasharray={isFuture ? "4 3" : undefined}
+      />
+    </G>
   );
 }
+
