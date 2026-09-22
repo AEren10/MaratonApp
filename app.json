@@ -106,12 +106,33 @@
       "expo-status-bar",
       "expo-asset",
       [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "MaratonWeek",
+              "displayName": "Bu hafta",
+              "description": "Haftanın çözülen soruları ve günlük hedef.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            }
+          ]
+        }
+      ],
+      [
         "react-native-share",
         {
-          "ios": ["instagram", "instagram-stories"],
-          "android": ["com.instagram.android"]
+          "ios": [
+            "instagram",
+            "instagram-stories"
+          ],
+          "android": [
+            "com.instagram.android"
+          ]
         }
-      ]
+      ],
+      "expo-widgets"
     ],
     "extra": {
       "eas": {
