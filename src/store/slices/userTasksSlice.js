@@ -13,13 +13,16 @@ const userTasksSlice = createSlice({
   },
   reducers: {
     setUserTasks: (state, action) => {
-      state.tasks = action.payload.map(normalizeUserTask);
+      state.tasks = action.payload
+        .filter((t) => t?.subject !== "__calendar")
+        .map(normalizeUserTask);
       state.day = todayStr();
-      if (action.payload.length > 0 && !state.listCreatedAt) {
+      if (state.tasks.length > 0 && !state.listCreatedAt) {
         state.listCreatedAt = Date.now();
       }
     },
     addUserTask: (state, action) => {
+      if (action.payload?.subject === "__calendar") return;
       state.day = todayStr();
       state.tasks.push(normalizeUserTask(action.payload));
       if (!state.listCreatedAt) {
@@ -62,7 +65,8 @@ const EMPTY = [];
 
 export const selectUserTasks = (state) => {
   const today = todayStr();
-  return state.userTasks.day === today ? state.userTasks.tasks : EMPTY;
+  if (state.userTasks.day !== today) return EMPTY;
+  return state.userTasks.tasks.filter((t) => t.subject !== "__calendar");
 };
 
 export const selectUserTasksProgress = createSelector(

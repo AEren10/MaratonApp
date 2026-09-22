@@ -35,6 +35,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
   const items = useMemo(() => {
     const out = [];
     userTasks.forEach((t) => {
+      if (t.subject === "__calendar") return;
       const subj = getSubjectByKey(t.subject);
       out.push({
         id: t.id,

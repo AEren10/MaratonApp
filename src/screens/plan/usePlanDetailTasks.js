@@ -39,7 +39,7 @@ export function usePlanDetailTasks({
   transitionStop,
 }) {
   const initialTasks = useMemo(() => [
-    ...userTasks.map((t) => mapUserTask(t, C)),
+    ...userTasks.filter((t) => t.subject !== "__calendar").map((t) => mapUserTask(t, C)),
     ...adHocTasks.map((t) => mapAdHocTask(t, C)),
     ...plan.tasks.map((t) => mapGeneratedTask(t, C, isPlanDone)),
   ], [C, plan, adHocTasks, userTasks, isPlanDone]);

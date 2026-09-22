@@ -32,14 +32,14 @@ function PlanDetailInner({ route }) {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(400)} style={s.cardsRow}>
           <Card tone="surface" radius="panel" style={s.statCard}>
-            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>PLANLANAN</Text>
-            <Text style={[TYPOGRAPHY.heading, s.statNum, { color: C.text }]}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PLANLANAN</Text>
+            <Text style={[TYPOGRAPHY.statSmall, s.statNum, { color: C.text }]}>
               {hasTasks ? formatMinutes(plannedMinutes) : "―"}
             </Text>
           </Card>
           <Card tone="surface" radius="panel" style={s.statCard}>
-            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GERÇEKLEŞEN</Text>
-            <Text style={[TYPOGRAPHY.heading, s.statNum, { color: C.text }]}>
+            <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>GERÇEKLEŞEN</Text>
+            <Text style={[TYPOGRAPHY.statSmall, s.statNum, { color: C.text }]}>
               {hasTasks ? formatMinutes(doneMinutes) : "―"}
             </Text>
           </Card>
@@ -62,15 +62,16 @@ function PlanDetailInner({ route }) {
             </View>
 
             <View style={s.stopsList}>
-              {detail.tasks.map((task) => (
+              {detail.tasks.map((task, idx) => (
                 <PlanDetailStopRow
                   key={task.id}
                   done={task.done}
                   C={C}
                   subject={task.s?.label || task.s?.key || "Durak"}
                   title={task.topic}
-                  meta={`${formatMinutes(task.minutes ?? ((task.q || 0) * 2))} · ${task.q || 0} soru`}
+                  meta={`${task.time ? `${task.time} · ` : ""}${formatMinutes(task.minutes ?? ((task.q || 0) * 2))}${task.q ? ` · ${task.q} soru` : ""}`}
                   hasStart={!task.done}
+                  isLast={idx === detail.tasks.length - 1}
                   onStart={() => detail.startTask(task.id)}
                   onToggle={() => detail.toggleTask(task.id)}
                 />
@@ -78,8 +79,8 @@ function PlanDetailInner({ route }) {
             </View>
 
             <Card tone="surface" radius="panel" style={s.summaryCard}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s2 }]}>GÜNÜN ÖZETİ</Text>
-              <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3 }]}>
+              <Text style={[TYPOGRAPHY.label, { color: C.text3, marginBottom: STEP.s1 }]}>GÜNÜN ÖZETİ</Text>
+              <Text style={[TYPOGRAPHY.caption, { color: C.text2 }]}>
                 {detail.doneCount} durak kapandı. Kalanları başlattığında rota ve günlük plan aynı kaynaktan güncellenir.
               </Text>
             </Card>
@@ -100,7 +101,7 @@ function PlanDetailInner({ route }) {
               Bugüne durak ekle
             </Button>
             <Button
-              variant="ghost"
+              variant={hasTasks ? "outline" : "ghost"}
               size="md"
               fullWidth
               onPress={() => (hasTasks ? setReorganizeOpen(true) : navigation.goBack())}
@@ -138,11 +139,11 @@ const s = StyleSheet.create({
   loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   safe: { flex: 1 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 },
-  cardsRow: { flexDirection: "row", gap: STEP.s2 },
-  statCard: { flex: 1, padding: STEP.s3 }, statNum: { marginTop: STEP.s2 },
-  progressBarWrap: { marginTop: STEP.s3, height: 4 }, progressBase: { height: 4, borderRadius: STEP.s1 / 4 }, progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
-  listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s4, paddingBottom: STEP.s2 },
-  rule: { flex: 1, height: 1 }, stopsList: { gap: STEP.s3 },
-  summaryCard: { marginTop: STEP.s4, padding: STEP.s3 },
-  actionsWrap: { marginTop: STEP.s4, paddingBottom: STEP.s4, gap: STEP.s2 },
+  cardsRow: { flexDirection: "row", gap: STEP.s1 },
+  statCard: { flex: 1, padding: STEP.s2 }, statNum: { marginTop: STEP.s1 },
+  progressBarWrap: { marginTop: STEP.s2, height: 5 }, progressBase: { height: 5, borderRadius: STEP.s1 / 4, overflow: "hidden" }, progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
+  listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s3, paddingBottom: STEP.s1 },
+  rule: { flex: 1, height: 1 }, stopsList: { marginTop: STEP.s1 },
+  summaryCard: { marginTop: STEP.s3, padding: STEP.s2 },
+  actionsWrap: { marginTop: STEP.s3, paddingBottom: STEP.s3, gap: STEP.s2 },
 });

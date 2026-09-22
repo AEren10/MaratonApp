@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { SHAPE, TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 
@@ -20,12 +20,17 @@ export function PlanDetailSubjects({ C, tasks = [] }) {
     return acc;
   }, {})).slice(0, 4);
 
+  if (subjects.length === 0) return null;
+
   return (
     <View style={s.row}>
       {subjects.map((sub) => (
-        <View key={sub.key} style={s.item}>
+        <View
+          key={sub.key}
+          style={[s.chip, { backgroundColor: C.surface, borderColor: C.elev }]}
+        >
           <View style={[s.dot, { backgroundColor: subjectColorOf(C, sub.key) }]} />
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
+          <Text style={[TYPOGRAPHY.tableHead, s.chipText, { color: C.text2 }]}>
             {getSubjectByKey(sub.key)?.label || sub.key} · {fmt(sub.minutes)}
           </Text>
         </View>
@@ -35,7 +40,19 @@ export function PlanDetailSubjects({ C, tasks = [] }) {
 }
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s3, marginTop: STEP.s3 },
-  item: { flexDirection: "row", alignItems: "center", gap: 6 },
-  dot: { width: 8, height: 8, borderRadius: 1 },
+  row: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s1, marginTop: STEP.s2 },
+  chip: {
+    height: 28,
+    paddingHorizontal: STEP.s2,
+    borderRadius: SHAPE.chip,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1,
+  },
+  chipText: {
+    letterSpacing: 0,
+    textTransform: "none",
+  },
+  dot: { width: 6, height: 6, borderRadius: 1 },
 });

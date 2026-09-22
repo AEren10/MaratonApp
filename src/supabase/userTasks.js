@@ -27,6 +27,7 @@ export const getUserTasksByDate = async (userId, date) => {
       .select(TASK_COLUMNS)
       .eq("user_id", userId)
       .eq("task_date", date)
+      .neq("subject", "__calendar")
       .order("created_at", { ascending: true });
     if (error) throw error;
     return (data || []).map(normalizeUserTask);
@@ -115,7 +116,8 @@ export const deleteUserTasksByDate = async (userId, date) => {
       .from("user_tasks")
       .delete()
       .eq("user_id", userId)
-      .eq("task_date", date);
+      .eq("task_date", date)
+      .neq("subject", "__calendar");
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "deleteUserTasksByDate");
