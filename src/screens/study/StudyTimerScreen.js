@@ -94,6 +94,9 @@ export default function StudyTimerScreen() {
           </TimerRing>
         </Animated.View>
 
+        {/* Odak modunda solup cekilen kisim: ders kimlik karti ve not.
+            Ikisi de "hangi durak" bilgisi -- oturum baslayinca kullanici
+            bunu zaten biliyor. */}
         <Animated.View style={[{ width: "100%" }, bottomCardsAnimStyle]} pointerEvents={running ? "none" : "auto"}>
           {hasSubject && (
             <>
@@ -101,11 +104,14 @@ export default function StudyTimerScreen() {
               <StudyTimerNotice C={C} />
             </>
           )}
-
-          {!isPomodoro && (
-            <StudyTimerQuestionCounters C={C} correctCount={correctCount} questions={questions} onAddCorrect={addCorrect} onAddQuestion={addQuestion} onRemoveCorrect={removeCorrect} onRemoveQuestion={removeQuestion} />
-          )}
         </Animated.View>
+
+        {/* Soru sayaclari odak modunda SOLMAZ. Serbest calismada ekranin
+            asil isi bu: adam soruyu cozer, +1 der. Solan ve dokunulamayan
+            bir sayac, saymak icin oturumu durdurmayi zorunlu kilardi. */}
+        {!isPomodoro && (
+          <StudyTimerQuestionCounters C={C} correctCount={correctCount} questions={questions} onAddCorrect={addCorrect} onAddQuestion={addQuestion} onRemoveCorrect={removeCorrect} onRemoveQuestion={removeQuestion} />
+        )}
 
         <StudyTimerControls C={C} hasSubject={hasSubject} isPomodoro={isPomodoro} running={running} onFinish={finish} onSkip={skipPhase} onToggle={toggle} />
       </View>

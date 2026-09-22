@@ -1,13 +1,14 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import * as Haptics from "expo-haptics";
-
 import { Icon } from "../../../components/design/Icon";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
+// Dogrudan expo-haptics KULLANILMAZ: haptics.js kullanicinin "titresim
+// kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
+import * as H from "../../../lib/haptics";
 
 export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPress }) {
   const handleSelect = (key) => {
     if (key !== modeKey) {
-      Haptics.selectionAsync().catch(() => {});
+      H.select();
       onChange(key);
     }
   };

@@ -1,9 +1,11 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
 
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../../themes/tokens";
+// Dogrudan expo-haptics KULLANILMAZ: haptics.js kullanicinin "titresim
+// kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
+import * as H from "../../../lib/haptics";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -30,22 +32,23 @@ export function StudyTimerControls({
   }, [scale]);
 
   const handleToggle = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    // Baslat/duraklat bir TAAHHUT, agir bir dusus degil: Medium fazla sert.
+    H.tap();
     onToggle?.();
   }, [onToggle]);
 
   const handleFinish = useCallback(() => {
-    Haptics.selectionAsync().catch(() => {});
+    H.select();
     onFinish?.();
   }, [onFinish]);
 
   const handleSkip = useCallback(() => {
-    Haptics.selectionAsync().catch(() => {});
+    H.select();
     onSkip?.();
   }, [onSkip]);
 
   const btnBg = !hasSubject ? C.elev : running ? C.surface : C.accent;
-  const btnText = !hasSubject ? C.text4 : running ? C.text : C.accentInk || "#F7F2F0";
+  const btnText = !hasSubject ? C.text4 : running ? C.text : C.accentInk;
   const btnBorder = running ? C.border : "transparent";
 
   return (
@@ -111,7 +114,7 @@ const s = StyleSheet.create({
   mainBtn: {
     width: "100%",
     height: CONTROL.buttonPrimary,
-    borderRadius: 14,
+    borderRadius: SHAPE.button,
     alignItems: "center",
     justifyContent: "center",
   },
