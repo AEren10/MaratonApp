@@ -17,6 +17,29 @@ export function openInTab(navigation, tab, screen, params) {
   // ic stack'teki gercek kok ekran adina (_ROOT) cevrilir. Boylece React
   // Navigation'in "The screen X passed in params couldn't be applied" hatasi onlenir.
   const targetScreen = (screen && TAB_ROOT_MAP[screen]) || screen || TAB_ROOT_MAP[tab] || tab;
+
+  // Eger gecerli navigator kok stack (MainTabs kardesi ekranlar: StudyTimer vb.)
+  // ise veya hedef tab bu navigator'da dogrudan yoksa, MainTabs uzerinden hedeflenir.
+  const state = navigation.getState?.();
+  const routeNames = state?.routeNames || [];
+  if (routeNames.includes("MainTabs") && !routeNames.includes(tab)) {
+    navigation.navigate("MainTabs", {
+      screen: tab,
+      params: { screen: targetScreen, params, initial: false },
+    });
+    return;
+  }
+
+  const parent = navigation.getParent?.();
+  const parentRouteNames = parent?.getState?.()?.routeNames || [];
+  if (parentRouteNames.includes("MainTabs") && !parentRouteNames.includes(tab)) {
+    parent.navigate("MainTabs", {
+      screen: tab,
+      params: { screen: targetScreen, params, initial: false },
+    });
+    return;
+  }
+
   navigation.navigate(tab, { screen: targetScreen, params, initial: false });
 }
 

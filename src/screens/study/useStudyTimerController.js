@@ -338,13 +338,17 @@ export function useStudyTimerController(C) {
   ]);
 
   const exit = useCallback(() => {
+    const doExit = () => {
+      if (navigation.canGoBack()) navigation.goBack();
+      else openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME_ROOT);
+    };
     if (elapsed >= 30 || totalFocusSeconds >= 30) {
       showAlert("Çıkış", "Çalışmayı kaydetmeden çıkmak istiyor musun?", [
         { text: "İptal", style: "cancel" },
-        { text: "Çıkış", style: "destructive", onPress: () => navigation.goBack() },
+        { text: "Çıkış", style: "destructive", onPress: doExit },
       ]);
     } else {
-      navigation.goBack();
+      doExit();
     }
   }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
