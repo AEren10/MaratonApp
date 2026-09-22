@@ -6,6 +6,6 @@
 //
 // expo-widgets'in Android yolu su an `enableAndroid` ile opt-in ve deneysel;
 // acildiginda bu dosya widgetSync.android.js'e donusur.
-export function syncWeekWidget() {
-  return false;
-}
+export function syncWeekWidget() { return false; }
+export function syncTodayWidget() { return false; }
+export function syncReviewWidget() { return false; }

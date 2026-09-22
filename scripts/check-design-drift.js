@@ -12,7 +12,12 @@ const EXEMPT = ["themes", "data"]; // token ve müfredat veri dosyaları
 // uygulama arayuzu degil. 132px kahraman rakam, 210px geri sayim gibi
 // degerler tasarimin kendi koordinatlari — STEP/TYPOGRAPHY olcegine
 // sokulamaz ve sokulmamali. Renkler yine paletten okunur.
-const EXEMPT_PATHS = ["components/share"];
+// src/widgets: widget'lar AYRI bir JS calisma zamaninda cizilir. `'widget'`
+// direktifi fonksiyonu kendi paketine cikarip dis kapsamla bagini keser, bu
+// yuzden tokens.js oradan okunamaz -- denendi, cihazda "Can't find variable"
+// ile patliyor. Renkler elle yazilmak zorunda; kaymayi
+// tests/widgets/widgetPalette.test.mjs yakaliyor.
+const EXEMPT_PATHS = ["components/share", "widgets"];
 
 // Ölçüm tarihi 2026-09-05. Sayılar SADECE düşmeli.
 const BASELINE = { fontSize: 287, fontFamily: 216, spacing: 724, radius: 288, hex: 71 };

@@ -110,6 +110,22 @@
         {
           "widgets": [
             {
+              "name": "MaratonToday",
+              "displayName": "Bugün",
+              "description": "Günlük hedefin, serin ve sıradaki durağın.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            },
+            {
+              "name": "MaratonReview",
+              "displayName": "Tekrar",
+              "description": "Tekrarı gelen yanlış soruların.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            },
+            {
               "name": "MaratonWeek",
               "displayName": "Bu hafta",
               "description": "Haftanın çözülen soruları ve günlük hedef.",

@@ -1,21 +1,40 @@
 import WeekWidget from "../widgets/WeekWidget";
+import TodayWidget from "../widgets/TodayWidget";
+import ReviewWidget from "../widgets/ReviewWidget";
 
-// WIDGET'A VERI YAZMA — tek gecis noktasi (iOS).
+// WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
-// Widget ayri bir calisma zamaninda: uygulamanin state'ini goremez, veri
-// cekemez. Gorecegi her sey buradan `updateSnapshot` ile yazilir.
+// Widget'lar ayri bir calisma zamaninda: uygulamanin state'ini goremez,
+// veri cekemez, hook kullanamaz. Gorecekleri her sey buradan
+// `updateSnapshot` ile yazilir.
 //
 // NEDEN .ios.js
-// Widget dosyasi STATIK import edilmeli: derleyici `'widget'` direktifli
-// fonksiyonu modul grafiginde gorup ayri pakete cikariyor, kosullu bir
-// require'a guvenmek istemiyoruz. Ama ayni dosya Android'de
-// `@expo/ui/swift-ui` yuklemeye calisirdi. Metro'nun platform uzantisi
-// ikisini birden cozuyor: iOS bu dosyayi alir, Android yanindaki
+// Widget dosyalari STATIK import edilmeli: derleyici `'widget'` direktifli
+// fonksiyonu modul grafiginde gorup ayri pakete cikariyor. Ama ayni dosya
+// Android'de `@expo/ui/swift-ui` yuklemeye calisirdi. Metro'nun platform
+// uzantisi ikisini birden cozuyor: iOS burayi, digerleri yanindaki
 // widgetSync.js'i (bos gecis) alir.
 
-// Widget'ta yalniz gun etiketi ve soru sayisi var: dakika, minutesOnly ve
-// diger alanlar gonderilmiyor. Props her yazmada bir daha seri hale
-// getiriliyor; gereksiz alan tasimanin bedeli var, faydasi yok.
+// Her yazma widget'i yeniden cizdiriyor; degismeyen veri icin yazmiyoruz.
+const last = {};
+
+function push(key, widget, snapshot) {
+  const serialized = JSON.stringify(snapshot);
+  if (serialized === last[key]) return false;
+  last[key] = serialized;
+  try {
+    widget.updateSnapshot(snapshot);
+    return true;
+  } catch {
+    // Widget bir suslemedir: yazmasi basarisiz olursa uygulama etkilenmez.
+    last[key] = null;
+    return false;
+  }
+}
+
+// Widget'ta yalniz gun etiketi ve soru sayisi var; dakika ve diger alanlar
+// gonderilmiyor. Props her yazmada seri hale getiriliyor, gereksiz alan
+// tasimanin bedeli var faydasi yok.
 function toDays(week) {
   return (week?.days || []).map((day) => ({
     label: day.label,
@@ -23,32 +42,30 @@ function toDays(week) {
   }));
 }
 
-/**
- * Haftalik widget'i gunceller. Gurultulu cagrilabilir — degisiklik yoksa
- * hicbir sey yazilmaz, cunku her yazma widget'i yeniden cizdiriyor.
- */
-let lastSnapshot = null;
-
+/** Haftanin emegi (cubuklar). */
 export function syncWeekWidget({ week, solved = 0 } = {}) {
   if (!week) return false;
-
-  const snapshot = {
+  return push("week", WeekWidget, {
     days: toDays(week),
     goal: Number(week.goal) || 0,
     solved: Number(solved) || 0,
-  };
+  });
+}
 
-  const key = JSON.stringify(snapshot);
-  if (key === lastSnapshot) return false;
-  lastSnapshot = key;
+/** Bugunun sayisi, seri ve siradaki durak. */
+export function syncTodayWidget({ solved = 0, goal = 0, streak = 0, nextStop = null } = {}) {
+  return push("today", TodayWidget, {
+    solved: Number(solved) || 0,
+    goal: Number(goal) || 0,
+    streak: Number(streak) || 0,
+    nextStop: nextStop || null,
+  });
+}
 
-  try {
-    WeekWidget.updateSnapshot(snapshot);
-    return true;
-  } catch {
-    // Widget yazmasi basarisiz olursa uygulama etkilenmemeli: widget bir
-    // suslemedir, veri kaybi degil.
-    lastSnapshot = null;
-    return false;
-  }
+/** Tekrari gelen yanlislar. */
+export function syncReviewWidget({ due = 0, subjects = 0 } = {}) {
+  return push("review", ReviewWidget, {
+    due: Number(due) || 0,
+    subjects: Number(subjects) || 0,
+  });
 }

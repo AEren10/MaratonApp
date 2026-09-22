@@ -6,11 +6,11 @@ import { buildComebackRecommendation } from "../domain/route/comebackRecommendat
 import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
-import { syncWeekWidget } from "../lib/widgetSync";
+import { syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
-export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs, previousQuestions = null }) {
+export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs, previousQuestions = null, streak = 0 }) {
   const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const {
     weeks,
@@ -105,13 +105,20 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLo
     return js === 0 ? 6 : js - 1;
   }, []);
 
-  // Ana ekran widget'i ayni haftalik tablodan besleniyor. Burada yaziliyor
-  // cunku veri burada doguyor; ekran dosyasinin haberi olmasina gerek yok.
+  const nextTask = generatedTasks?.[0] || null;
+
+  // Ana ekran widget'lari ayni verilerden besleniyor. Burada yaziliyor cunku
+  // veri burada doguyor; ekran dosyasinin haberi olmasina gerek yok.
+  // nextTask'tan SONRA: yukarida olsaydi const henuz tanimli olmazdi.
   useEffect(() => {
     syncWeekWidget({ week: weeklyEffort, solved: solvedToday });
-  }, [weeklyEffort, solvedToday]);
-
-  const nextTask = generatedTasks?.[0] || null;
+    syncTodayWidget({
+      solved: solvedToday,
+      goal: dailyGoal,
+      streak,
+      nextStop: nextTask ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}` : null,
+    });
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`

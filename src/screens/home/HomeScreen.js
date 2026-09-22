@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,6 +15,7 @@ import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
 import { useHomeController } from "./useHomeController";
 import { useDueReviews } from "../../hooks/useDueReviews";
+import { syncReviewWidget } from "../../lib/widgetSync";
 import { useAuth } from "../../contexts/AuthContext";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
@@ -30,6 +31,7 @@ export default function HomeScreen() {
   // Tekrari gelen yanlislar: veri katmani vardi ama hicbir ekran okumuyordu.
   const { user } = useAuth();
   const { dueCount } = useDueReviews(user?.id);
+  useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
     ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} dueCount={dueCount} go={actions} />
@@ -75,6 +77,7 @@ export default function HomeScreen() {
           weeklyDailyCounts={dashboard.weeklyActivity.counts}
           weekLogs={dashboard.weekLogs}
           previousQuestions={dashboard.weeklyActivity.previous}
+          streak={h.streak}
           comeback={h.comebackFlow.stage === "prompt" ? h.comeback : null}
           onBeginComeback={h.comebackFlow.start}
           onDismissComeback={h.dismissComeback}
