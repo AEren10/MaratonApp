@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import Svg, { Line, Rect, Text as SvgText } from "react-native-svg";
+import Svg, { Line, Text as SvgText } from "react-native-svg";
 import {
   Easing, useReducedMotion, useSharedValue, withTiming,
 } from "react-native-reanimated";
 
-import { EffortBar } from "./components/EffortBar";
+import { EffortDay } from "./components/EffortDay";
+import { EffortSlotDefs } from "./components/EffortSlot";
 import { useC } from "../../contexts/ThemeContext";
 import {
   CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom,
@@ -15,8 +16,6 @@ const BAR_RADIUS = 3;
 // Tasarimin izin verdigi hareket suresi (0.5-0.9 sn) icinde, alt siniri.
 const GROW_MS = 620;
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
-// Soru girilmemis ama calisilmis gun: sifir degil, kisa bir iz.
-const MINUTES_ONLY_H = 6;
 
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
 // Ustte kesikli gunluk hedef cizgisi. Rota grafigiyle AYNI tuval olcusunu
@@ -54,6 +53,7 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
       accessibilityLabel={week.summary || "Bu hafta henüz çalışma kaydın yok."}
     >
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
+        <EffortSlotDefs color={C.track} />
         <Line
           x1={PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
           stroke={C.line} strokeWidth={1}
@@ -61,44 +61,21 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
 
         {week.days.map((day, i) => {
           const cx = PAD_LEFT + slot * i + slot / 2;
-          const x = cx - barW / 2;
-          const isToday = i === todayIndex;
-
-          let barH = 0;
-          let fill = C.track;
-          if (day.questions > 0) {
-            barH = Math.max(4, bottom - yOf(day.questions));
-            // Hedefi tutturan gun vurgulanir; tutturamayan gun de gorunur
-            // kalir, cezalandirilmaz.
-            fill = week.goal > 0 && day.questions >= week.goal ? C.up : C.accent;
-          } else if (day.minutesOnly) {
-            barH = MINUTES_ONLY_H;
-            fill = C.text5;
-          }
-
-          // Calisilmamis gun: yukselecek bir sey yok, taban izi sabit durur.
-          if (barH <= 0) {
-            return (
-              <Rect
-                key={day.label}
-                x={x} y={bottom - 2} width={barW} height={2}
-                rx={BAR_RADIUS} fill={C.track} fillOpacity={0.5}
-              />
-            );
-          }
-
           return (
-            <EffortBar
+            <EffortDay
               key={day.label}
-              progress={progress}
+              day={day}
               index={i}
-              x={x}
+              todayIndex={todayIndex}
+              goal={week.goal}
+              x={cx - barW / 2}
               width={barW}
               bottom={bottom}
-              height={barH}
+              goalY={goalY}
+              yOf={yOf}
               radius={BAR_RADIUS}
-              fill={fill}
-              fillOpacity={isToday ? 1 : 0.88}
+              progress={progress}
+              C={C}
             />
           );
         })}
