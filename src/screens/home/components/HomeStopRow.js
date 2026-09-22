@@ -7,13 +7,13 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { HomeStopCheckRing } from "./HomeStopCheckRing";
 
 function metaOf(item) {
-  const est = item.count > 0 ? Math.round(item.count * 1.2) : 0;
-  return [item.count > 0 ? `${item.count} soru` : null, est > 0 ? `~${est} dk` : null, item.badge || null]
-    .filter(Boolean).join(" · ");
+  const mins = item.minutes || (item.count > 0 ? Math.round(item.count * 1.5) : null);
+  const timeStr = mins ? `${mins} dk` : null;
+  return [timeStr, item.badge || null].filter(Boolean).join(" · ");
 }
 
-// Bugünün durakları satırı. Figma referansına (media_1789650533819.png) birebir:
-// [Dikey ders renk çubuğu] -> [Yaylı tik halkası] -> [Ders / Konu / Meta] -> [Kırmızı nokta (sıradaki)]
+// Bugünün durakları satırı:
+// [Dikey ders renk çubuğu] -> [Yaylı tik halkası] -> [Ders · Süre / Konu] -> [Kırmızı nokta (sıradaki)]
 export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
@@ -34,13 +34,16 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
 
   return (
     <View
-      style={[s.row, {
-        backgroundColor: (isNext && !isDone) ? C.brandTint : C.surface,
-        borderColor: (isNext && !isDone) ? C.bandEdge : (isDone ? C.line : C.elev),
-      }]}
+      style={[
+        s.row,
+        {
+          backgroundColor: C.surface,
+          borderColor: (isNext && !isDone) ? C.border : (isDone ? C.line : C.elev),
+        },
+      ]}
     >
-      {/* 1. Dikey ders rengi çubuğu (tikin solunda) */}
-      <View style={[s.bar, { backgroundColor: tone }]} />
+      {/* 1. Dikey ders rengi çubuğu (tikin solunda, kompakt ve zarif) */}
+      <View style={[s.bar, { backgroundColor: isDone ? C.line : tone }]} />
 
       {/* 2. Dairesel tik / onay halkası */}
       <HomeStopCheckRing
@@ -50,7 +53,7 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
       />
 
-      {/* 3. Metin bloğu: Ders, Konu, Soru/Süre bilgisi */}
+      {/* 3. Metin bloğu: [DERS · SÜRE] ve [KONU BAŞLIĞI] */}
       <Pressable
         onPress={handlePress}
         accessibilityRole="button"
@@ -58,13 +61,20 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         style={s.bodyArea}
       >
         <View style={s.flex}>
-          <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
-            {subjectLabel}
-          </Text>
+          <View style={s.subRow}>
+            <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
+              {subjectLabel}
+            </Text>
+            {meta ? (
+              <Text numberOfLines={1} style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
+                {`·  ${meta}`}
+              </Text>
+            ) : null}
+          </View>
           <Text
             numberOfLines={1}
             style={[
-              TYPOGRAPHY.topicName,
+              TYPOGRAPHY.tableName,
               s.topic,
               {
                 color: isDone ? C.text3 : C.text,
@@ -74,11 +84,6 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           >
             {item.label}
           </Text>
-          {meta ? (
-            <Text numberOfLines={1} style={[TYPOGRAPHY.micro, s.meta, { color: C.text3 }]}>
-              {meta}
-            </Text>
-          ) : null}
         </View>
         {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
       </Pressable>
@@ -90,17 +95,18 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: SHAPE.card,
+    borderRadius: SHAPE.cardTight,
     borderWidth: 1,
     paddingLeft: STEP.s2,
-    paddingRight: STEP.s3,
-    paddingVertical: STEP.s2 + 2,
+    paddingRight: STEP.s2 + 2,
+    paddingVertical: STEP.s2,
     gap: STEP.s2,
+    minHeight: 56,
   },
   bar: {
-    width: 3.5,
-    height: STEP.s4 + 4,
-    borderRadius: SHAPE.chip / 3,
+    width: 3,
+    height: 26,
+    borderRadius: SHAPE.chip / 4,
   },
   bodyArea: {
     flex: 1,
@@ -110,19 +116,20 @@ const s = StyleSheet.create({
     gap: STEP.s2,
   },
   flex: { flex: 1, minWidth: 0 },
+  subRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1 - 2,
+  },
   sub: {
-    letterSpacing: 0,
-    textTransform: "none",
+    letterSpacing: 0.6,
   },
   topic: {
     marginTop: STEP.s1 / 4,
   },
-  meta: {
-    marginTop: STEP.s1 / 4,
-  },
   dot: {
-    width: 7,
-    height: 7,
+    width: 6,
+    height: 6,
     borderRadius: SHAPE.chip / 2,
   },
 });

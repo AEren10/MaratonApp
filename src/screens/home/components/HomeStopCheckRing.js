@@ -6,11 +6,8 @@ import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, STEP } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
-const RING_SIZE = STEP.s3 + 6;
+const RING_SIZE = 22;
 
-// Tik halkasi. Yayli buyuyup kuculen animasyon ve onu bekleten 420 ms
-// gecikme kaldirildi: kullanici tike bastiginda durum ANINDA degisiyor.
-// Geri bildirim dokunsal (H.success) ve renk degisimi — gosteri yok.
 export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }) {
   const C = useC();
 
@@ -37,13 +34,13 @@ export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }
         style={[
           s.ring,
           {
-            borderColor: done ? C.up : (isNext ? C.accent : C.text5),
+            borderColor: done ? C.up : (isNext ? C.accent : C.border),
             backgroundColor: done ? C.up : "transparent",
+            borderWidth: done ? 0 : (isNext ? 2 : 1.5),
           },
         ]}
       >
-        {/* Animasyon YOK — kullanici acikca istedi. Geri eklenmesin. */}
-        {done ? <Icon name="check" size={13} color={C.bg} sw={2.8} /> : null}
+        {done ? <Icon name="check" size={11} color={C.bg} sw={2.4} /> : null}
       </View>
     </Pressable>
   );
@@ -51,16 +48,15 @@ export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }
 
 const s = StyleSheet.create({
   area: {
-    width: CONTROL.tapMin,
-    height: CONTROL.tapMin,
+    width: 32,
+    height: 32,
     alignItems: "center",
     justifyContent: "center",
   },
   ring: {
     width: RING_SIZE,
     height: RING_SIZE,
-    borderRadius: RING_SIZE / 2,
-    borderWidth: 2,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
   },

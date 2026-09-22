@@ -37,11 +37,13 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     userTasks.forEach((t) => {
       if (t.subject === "__calendar") return;
       const subj = getSubjectByKey(t.subject);
+      const minutes = t.targetMinutes ?? t.target_minutes ?? (t.questionCount ? Math.round(t.questionCount * 1.5) : 30);
       out.push({
         id: t.id,
         subject: t.subject,
         label: t.topic || subj?.label || t.subject,
         count: t.questionCount ?? t.question_count ?? 0,
+        minutes,
         completed: t.completed,
         source: "user",
       });
@@ -50,12 +52,14 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     generatedTasks.forEach((t) => {
       const pid = t.planTaskKey || buildPlanTaskKey(t);
       const isDone = isPlanDone(pid);
+      const minutes = t.minutes ?? t.estimatedMinutes ?? t.assignment?.estimatedMinutes ?? (t.questionCount ? Math.round(t.questionCount * 1.5) : 35);
       out.push({
         id: pid,
         subject: t.subject,
         label: t.topicLabel || t.subjectLabel,
         planTopicName: t.topic || null,
         count: t.questionCount || 0,
+        minutes,
         completed: isDone,
         badge: t.badge,
         rkind: t.rkind,
@@ -70,7 +74,9 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         subject: aiSuggestion.subjectKey,
         label: aiSuggestion.title,
         count: 0,
+        minutes: aiSuggestion.estimatedMinutes || 25,
         completed: isPlanDone("ai_suggestion"),
+        badge: "Öneri",
         source: "ai",
       });
     }
