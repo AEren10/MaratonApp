@@ -1,9 +1,8 @@
 import { useCallback, useState } from "react";
-import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { Icon } from "../../components/design";
 import { XPBoostToast } from "../../components/common/XPBoostToast";
 import { TopicPicker } from "../../components/forms/TopicPicker";
 import { useC } from "../../contexts/ThemeContext";
@@ -48,80 +47,58 @@ export default function AddWrongScreen() {
             {form.subjects.map((s) => (
               <ChoiceChip
                 key={s.key}
-                label={s.name}
-                dotColor={subjectColorOf(C, s.key)}
-                selected={form.subjectKey === s.key}
+                label={s.label || s.name}
+                dot={subjectColorOf(C, s.key)}
+                active={subject?.key === s.key}
                 onPress={() => form.changeSubject(s.key)}
               />
             ))}
           </FormSection>
 
-          <FormSection
-            label={"KONU"}
-            suffix={form.inferredTopic ? "Matematik · son çalıştığından tahmin edildi" : ""}
-            onSuffixPress={form.inferredTopic ? undefined : () => setPickerOpen(true)}
-          >
-            {form.topics.slice(0, 4).map((t) => (
-              <ChoiceChip
-                key={t.key}
-                label={t.name + (form.inferredTopic?.key === t.key ? "  TAHMİN" : "")}
-                selected={form.topicKey === t.key}
-                onPress={() => form.changeTopic(t.key)}
-              />
-            ))}
-            <ChoiceChip
-              label={form.isOtherTopic ? form.topicLabel : "Konu ara"}
-              selected={form.isOtherTopic}
-              icon="search"
-              onPress={() => setPickerOpen(true)}
-            />
-          </FormSection>
+          {subject ? (
+            <FormSection
+              label="KONU"
+              hint={form.guess ? `${subject.label || subject.name} · son çalıştığından tahmin edildi` : null}
+            >
+              {(form.suggestions || []).map((name) => (
+                <ChoiceChip
+                  key={name}
+                  label={name}
+                  active={form.selectedTopic === name}
+                  badge={name === form.guess ? "TAHMİN" : null}
+                  onPress={() => form.setTopic(name)}
+                />
+              ))}
+              <ChoiceChip label="Konu ara" icon="search" dashed onPress={() => setPickerOpen(true)} />
+            </FormSection>
+          ) : null}
 
-          <FormSection label="NEDEN YANLIŞ" suffix="isteğe bağlı">
-            {form.reasons.map((r) => (
-              <ChoiceChip
-                key={r.key}
-                label={r.label}
-                selected={form.reason === r.key}
-                onPress={() => form.changeReason(r.key)}
-              />
-            ))}
-          </FormSection>
-
-          <FormSection label="KENDİME NOT" suffix="isteğe bağlı" wrap={false}>
+          <FormSection label="KENDİME NOT" hint="isteğe bağlı" wrap={false}>
             <TextInput
-              style={[TYPOGRAPHY.inputMedium, styles.input, { backgroundColor: C.surface, borderColor: C.elev, color: C.text }]}
-              placeholder="Bir dahaki sefere neye dikkat edeceğim..."
+              style={[TYPOGRAPHY.bodyMedium, styles.input, { backgroundColor: C.surface, borderColor: C.elev, color: C.text }]}
+              placeholder="Bir dahaki sefere neye dikkat edeceğim…"
               placeholderTextColor={C.text3}
               value={form.note}
-              onChangeText={form.changeNote}
+              onChangeText={form.setNote}
               multiline
               maxLength={200}
             />
           </FormSection>
-
-          <View style={[styles.sourceRow, { borderBottomColor: C.line }]}>
-            <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>Kaynak</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{form.sourceLabel}</Text>
-              <Icon name="chevR" size={14} color={C.text3} />
-            </View>
-          </View>
         </ScrollView>
         <AddWrongFooter C={C} onSave={form.save} onSaveAndNew={form.saveAndNew} saving={form.saving} />
       </KeyboardAvoidingView>
+
       <TopicPicker
         visible={pickerOpen}
-        onClose={() => setPickerOpen(false)}
         subject={subject}
-        selectedKey={form.topicKey}
-        onSelect={(t) => { form.changeTopic(t.key); setPickerOpen(false); }}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(name) => form.setTopic(name)}
       />
       <XPBoostToast
-        visible={form.saved}
-        xp={10}
-        title="Deftere atıldı"
-        subtitle="İlk tekrar yarın. Maraton bunu unutmana izin vermeyecek."
+        amount={form.xpToast.amount}
+        visible={form.xpToast.visible}
+        multiplier={form.xpToast.multiplier}
+        onDismiss={form.dismissXP}
       />
     </SafeAreaView>
   );
@@ -131,12 +108,10 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: STEP.s5 },
   input: {
-    height: 104, padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1,
+    height: 104,
+    padding: STEP.s3,
+    borderRadius: SHAPE.card,
+    borderWidth: 1,
     textAlignVertical: "top",
-  },
-  sourceRow: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: GUTTER, paddingVertical: STEP.s3, marginTop: STEP.s3,
-    borderBottomWidth: 1,
   },
 });

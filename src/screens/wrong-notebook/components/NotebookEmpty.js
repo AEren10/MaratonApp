@@ -35,7 +35,12 @@ export function NotebookEmpty({ onAdd }) {
 }
 
 const styles = StyleSheet.create({
-  outer: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
+  outer: {
+    flex: 1,
+    paddingHorizontal: GUTTER,
+    justifyContent: "center",
+    paddingBottom: STEP.s5 + STEP.s2,
+  },
   card: {
     borderWidth: 1.5,
     borderStyle: "dashed",
