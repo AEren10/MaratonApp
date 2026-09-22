@@ -30,6 +30,7 @@ export const USER_SCOPED_KEYS = [
   // açık gelmesin. Sunucudan loadNotifPrefsFromServer yeniden dolduruyor.
   STORAGE_KEYS.NOTIF_PREFS,
   STORAGE_KEYS.NOTIF_CONTEXT,
+  STORAGE_KEYS.COMPLETED_TOPICS,
 ];
 
 export const USER_SCOPED_PREFIXES = [

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { ErrorState, Skeleton } from "../../components/design";
@@ -27,6 +27,12 @@ function CurriculumMapInner() {
   const C = useC();
   const navigation = useNavigation();
   const map = useCurriculumMap();
+
+  useFocusEffect(
+    useCallback(() => {
+      map.refresh?.();
+    }, [map.refresh])
+  );
 
   const openSubject = useCallback((subject) => {
     navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: subject.key, subjectName: subject.name });

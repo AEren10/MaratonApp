@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { getTopicProgress } from "../supabase/topicProgress";
 import { captureError } from "../lib/errorReporting";
+import { getCompletedTopicsMap, isTopicDone } from "../lib/topicCompletion";
 
 const EXPECTED_QUESTIONS = 30;
 
@@ -12,16 +13,18 @@ export function calcTopicProgress(tp) {
   return Math.min(100, Math.round(qScore + accScore + freqScore));
 }
 
-function buildDersler(subjects, progressMap) {
+function buildDersler(subjects, progressMap, completedMap = {}) {
   const safeSubjects = Array.isArray(subjects) ? subjects : [];
   return safeSubjects.map((s) => {
     const subjectProgress = progressMap[s.key] || {};
     const topicsList = (s.topics || []).map((t) => {
       const tName = typeof t === "string" ? t : t.name;
       const tp = subjectProgress[tName];
-      return { name: tName, pct: tp ? calcTopicProgress(tp) : 0 };
+      const autoPct = tp ? calcTopicProgress(tp) : 0;
+      const done = isTopicDone(completedMap, s.key, tName, autoPct);
+      return { name: tName, pct: done ? 100 : autoPct, done };
     });
-    const done = topicsList.filter((t) => t.pct >= 100).length;
+    const done = topicsList.filter((t) => t.done).length;
     const total = topicsList.length;
     return { ...s, name: s.label, pct: total > 0 ? Math.round((done / total) * 100) : 0, done, total };
   });
@@ -33,25 +36,30 @@ function buildDersler(subjects, progressMap) {
 export function useDerslerProgress(activeSubjects) {
   const { user } = useAuth();
   const [progressMap, setProgressMap] = useState({});
+  const [completedMap, setCompletedMap] = useState({});
 
   const loadProgress = useCallback(async () => {
-    if (!user?.id || user.id === "dev") return;
+    const userId = user?.id || "dev";
     try {
-      const rows = await getTopicProgress(user.id);
+      const [rows, cMap] = await Promise.all([
+        user?.id && user.id !== "dev" ? getTopicProgress(user.id) : Promise.resolve([]),
+        getCompletedTopicsMap(userId),
+      ]);
       const map = {};
       (rows || []).forEach((r) => {
         if (!map[r.subject_key]) map[r.subject_key] = {};
         map[r.subject_key][r.topic_name || r.topic_id] = r;
       });
       setProgressMap(map);
+      setCompletedMap(cMap || {});
     } catch (e) { captureError(e, { context: "dersler_loadProgress" }); }
   }, [user?.id]);
 
   useEffect(() => { loadProgress(); }, [loadProgress]);
 
   const dersler = useMemo(
-    () => buildDersler(activeSubjects, progressMap),
-    [activeSubjects, progressMap],
+    () => buildDersler(activeSubjects, progressMap, completedMap),
+    [activeSubjects, progressMap, completedMap],
   );
 
   const { totalDone, totalAll, focusSubject } = useMemo(() => {

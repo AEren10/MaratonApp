@@ -13,9 +13,25 @@ export function groupTopics(topics) {
   ];
 
   topics.forEach((t, i) => {
-    if (i < 4) categories[0].data.push(t);
-    else if (i < 8) categories[1].data.push(t);
-    else categories[2].data.push(t);
+    const item = { ...t };
+    if (i < 4) categories[0].data.push(item);
+    else if (i < 8) categories[1].data.push(item);
+    else categories[2].data.push(item);
   });
-  return categories.filter((c) => c.data.length > 0);
+
+  const filtered = categories.filter((c) => c.data.length > 0);
+  filtered.forEach((group, gi) => {
+    group.data.forEach((t, ti) => {
+      if (t.done) t.statusLabel = "tamam";
+      else if (gi === 0 && ti === 3) t.statusLabel = "defter 3";
+      else if (gi === 1 && ti === 1) t.statusLabel = "defter 2";
+      else if (gi === 1 && ti === 2) t.statusLabel = "planda";
+      else if (gi === 2 && ti === 1) t.statusLabel = "bugün";
+      else if (gi === 2 && ti === 2) t.statusLabel = "defter 5";
+      else if (gi === 2 && ti === 3) t.statusLabel = "planda";
+      else t.statusLabel = `${(ti + 1) * 3} gün`;
+    });
+  });
+
+  return filtered;
 }

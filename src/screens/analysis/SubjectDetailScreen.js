@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, SectionList, StyleSheet, Text, Pressable } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { View, SectionList, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { EmptyState, ErrorState, Skeleton, Button } from "../../components/design";
-import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { getSubjectByKey } from "../../themes/subjects";
@@ -29,37 +28,30 @@ export default function SubjectDetailScreen() {
   const subjectMeta = useMemo(() => getSubjectByKey(subjectKey), [subjectKey]);
   const subjectName = route.params?.subjectName || route.params?.subject?.name || subjectMeta?.name || subjectMeta?.label || "Ders";
 
-  const { topics, doneCount, totalCount, totalQuestionsSum, progressPct, loading, error, refresh } =
+  const { topics, doneCount, totalCount, totalQuestionsSum, progressPct, loading, error, refresh, toggleTopic } =
     useSubjectTopics(subjectKey);
   const subjectColor = useMemo(() => subjectColorOf(C, subjectKey), [C, subjectKey]);
   const visibleTopics = useMemo(() => filterTopics(topics, segment), [topics, segment]);
-  
-  // Apply fake status for design (bugün, defter, planda)
-  const groupedTopics = useMemo(() => {
-    const grouped = groupTopics(visibleTopics);
-    // Mutate mock data statuses to match Image 1
-    grouped.forEach((group, gi) => {
-      group.data.forEach((t, ti) => {
-        if (gi === 0 && ti === 3) t.statusLabel = "defter 3";
-        else if (gi === 1 && ti === 1) t.statusLabel = "defter 2";
-        else if (gi === 1 && ti === 2) { t.statusLabel = "planda"; t.done = false; }
-        else if (gi === 2 && ti === 1) t.statusLabel = "bugün";
-        else if (gi === 2 && ti === 2) t.statusLabel = "defter 5";
-        else if (gi === 2 && ti === 3) { t.statusLabel = "planda"; t.done = false; }
-        else t.statusLabel = `${(ti + 1) * 3} gün`;
-      });
-    });
-    return grouped;
-  }, [visibleTopics]);
+  const groupedTopics = useMemo(() => groupTopics(visibleTopics), [visibleTopics]);
 
   const handleTopicPress = useCallback(
     (topic) => navigation.navigate(SCREENS.TOPIC_STUDY, { subjectKey, topicName: topic.name }),
     [navigation, subjectKey],
   );
-  
+
+  const handleTopicToggle = useCallback((topic) => toggleTopic(topic.name), [toggleTopic]);
+
   const renderItem = useCallback(
-    ({ item }) => <SubjectTopicRow topic={item} C={C} onPress={handleTopicPress} />,
-    [C, handleTopicPress]
+    ({ item }) => (
+      <SubjectTopicRow
+        topic={item}
+        C={C}
+        subjectColor={subjectColor}
+        onPress={handleTopicPress}
+        onToggle={handleTopicToggle}
+      />
+    ),
+    [C, subjectColor, handleTopicPress, handleTopicToggle],
   );
   
   const renderSectionHeader = useCallback(({ section }) => {
