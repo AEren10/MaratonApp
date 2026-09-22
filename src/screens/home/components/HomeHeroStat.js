@@ -23,9 +23,18 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
         unit={`/${goal}`}
         size="hero"
       >
-        <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
-          {remainingToGoal > 0 ? `hedefe ${remainingToGoal} kaldı` : "hedef tamamlandı"}
-        </Text>
+        {/* GUNUN BASINDA BU SATIR YOK.
+            Ustteki "0 /110" hedefi zaten soyluyor; "hedefe 110 kaldı" ayni
+            iki sayinin cikarmasi ve ucuncu kez tekrar ediyor (grafikteki
+            "GÜNLÜK HEDEF 110" ile dorduncu). Cikarma yapmak gerekmeyen tek
+            an gunun basi -- kalan, hedefin kendisi. Ilerleme basladiginda
+            satir geri geliyor, cunku 63/110'da "47 kaldı" goz karari
+            hesaplanmiyor ve ise yariyor. */}
+        {solved > 0 ? (
+          <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
+            {remainingToGoal > 0 ? `${remainingToGoal} kaldı` : "hedef tamamlandı"}
+          </Text>
+        ) : null}
       </StatBlock>
 
       {daysUntilExam != null ? (
