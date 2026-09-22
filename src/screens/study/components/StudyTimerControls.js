@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE, ANIMATION } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -22,11 +22,11 @@ export function StudyTimerControls({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.96, ANIMATION.spring.default);
+    scale.value = withSpring(0.96, { damping: 18, stiffness: 320 });
   }, [scale]);
 
   const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, ANIMATION.spring.default);
+    scale.value = withSpring(1, { damping: 18, stiffness: 320 });
   }, [scale]);
 
   const handleToggle = useCallback(() => {
@@ -44,18 +44,8 @@ export function StudyTimerControls({
     onSkip?.();
   }, [onSkip]);
 
-  const btnBg = !hasSubject
-    ? C.elev
-    : running
-      ? C.surface
-      : C.accent;
-
-  const btnText = !hasSubject
-    ? C.text4
-    : running
-      ? C.text
-      : C.textOnBrand;
-
+  const btnBg = !hasSubject ? C.elev : running ? C.surface : C.accent;
+  const btnText = !hasSubject ? C.text4 : running ? C.text : C.accentInk || "#F7F2F0";
   const btnBorder = running ? C.border : "transparent";
 
   return (
@@ -78,14 +68,14 @@ export function StudyTimerControls({
           },
         ]}
       >
-        <Text style={[TYPOGRAPHY.button, { color: btnText, letterSpacing: 0.2 }]}>
+        <Text style={[TYPOGRAPHY.button, { color: btnText, letterSpacing: 0.3 }]}>
           {running ? "Duraklat" : "Başlat"}
         </Text>
       </AnimatedPressable>
 
       <Pressable
         onPress={handleFinish}
-        hitSlop={12}
+        hitSlop={10}
         accessibilityRole="button"
         accessibilityLabel="Durağı bitir"
         style={({ pressed }) => [
@@ -99,13 +89,10 @@ export function StudyTimerControls({
       {isPomodoro && (
         <Pressable
           onPress={handleSkip}
-          hitSlop={12}
+          hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel="Fazı atla"
-          style={({ pressed }) => [
-            s.skipBtn,
-            { opacity: pressed ? 0.65 : 1 },
-          ]}
+          style={({ pressed }) => [s.skipBtn, { opacity: pressed ? 0.65 : 1 }]}
         >
           <Text style={[TYPOGRAPHY.caption, { color: C.text4 }]}>Fazı atla</Text>
         </Pressable>
@@ -124,7 +111,7 @@ const s = StyleSheet.create({
   mainBtn: {
     width: "100%",
     height: CONTROL.buttonPrimary,
-    borderRadius: SHAPE.cardTight,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -132,14 +119,15 @@ const s = StyleSheet.create({
     height: CONTROL.buttonTertiary,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: STEP.s1,
+    marginTop: STEP.s1 - 2,
     paddingHorizontal: STEP.s3,
   },
   skipBtn: {
-    height: CONTROL.buttonTertiary - 8,
+    height: CONTROL.buttonTertiary - 10,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: STEP.s3,
   },
 });
+
 

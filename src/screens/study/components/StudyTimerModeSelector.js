@@ -1,13 +1,21 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import * as Haptics from "expo-haptics";
 
 import { Icon } from "../../../components/design/Icon";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
 
 export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPress }) {
+  const handleSelect = (key) => {
+    if (key !== modeKey) {
+      Haptics.selectionAsync().catch(() => {});
+      onChange(key);
+    }
+  };
+
   return (
     <View style={s.container}>
       <View style={s.row}>
-        <View style={[s.pillsBox, { backgroundColor: C.void, borderColor: C.line }]}>
+        <View style={[s.pillsBox, { backgroundColor: C.surface, borderColor: C.line }]}>
           {modes.map((mode) => {
             const active = mode.key === modeKey;
             const n = mode.label || String(mode.focus);
@@ -15,15 +23,16 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
             return (
               <Pressable
                 key={mode.key}
-                onPress={() => onChange(mode.key)}
+                onPress={() => handleSelect(mode.key)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={`${n} dakika ${rest} mola modu`}
-                style={[
+                style={({ pressed }) => [
                   s.pill,
                   {
                     backgroundColor: active ? C.elev : "transparent",
                     borderColor: active ? C.border : "transparent",
+                    transform: [{ scale: pressed ? 0.96 : 1 }],
                   },
                 ]}
               >
@@ -32,8 +41,8 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                     TYPOGRAPHY.topicName,
                     {
                       color: active ? C.text : C.text3,
-                      fontSize: 18,
-                      lineHeight: 20,
+                      fontSize: 17,
+                      lineHeight: 19,
                       fontVariant: ["tabular-nums"],
                     },
                   ]}
@@ -44,7 +53,12 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 <Text
                   style={[
                     TYPOGRAPHY.micro,
-                    { color: active ? C.text2 : C.text4, letterSpacing: 0.8 },
+                    {
+                      color: active ? C.text2 : C.text4,
+                      fontSize: 10.5,
+                      letterSpacing: 0.6,
+                      marginTop: 1,
+                    },
                   ]}
                 >
                   {rest}
@@ -61,12 +75,13 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
           style={({ pressed }) => [
             s.editButton,
             {
-              borderColor: C.border,
-              backgroundColor: pressed ? C.elev : "transparent",
+              borderColor: C.line,
+              backgroundColor: pressed ? C.elev : C.surface,
+              transform: [{ scale: pressed ? 0.94 : 1 }],
             },
           ]}
         >
-          <Icon name="edit" size={16} color={C.text3} />
+          <Icon name="edit" size={15} color={C.text3} />
         </Pressable>
       </View>
     </View>
@@ -74,31 +89,31 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
 }
 
 const s = StyleSheet.create({
-  container: { paddingHorizontal: GUTTER, marginTop: STEP.s1 + 2 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 2 },
+  container: { paddingHorizontal: GUTTER, marginTop: STEP.s2 },
+  row: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   pillsBox: {
     flex: 1,
     flexDirection: "row",
-    gap: 2,
-    padding: 4,
-    borderRadius: SHAPE.cardTight,
+    gap: 3,
+    padding: 3,
+    borderRadius: 14,
     borderWidth: 1,
   },
   pill: {
     flex: 1,
     height: 44,
-    borderRadius: SHAPE.iconBox,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    gap: 1,
   },
   editButton: {
     width: 44,
     height: 44,
-    borderRadius: SHAPE.iconBox + 1,
+    borderRadius: 14,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
 });
+

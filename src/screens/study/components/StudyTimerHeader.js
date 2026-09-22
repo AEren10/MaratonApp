@@ -1,47 +1,86 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 
-// Tasarım: geri + ortalanmış eyebrow ("ODAK · Tur 1/4") + geçmiş kısayolu.
 export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }) {
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: GUTTER - (CONTROL.tapMin - 24) / 2,
-        paddingVertical: STEP.s2,
-      }}
-    >
+    <View style={s.container}>
       <Pressable
         onPress={onBack}
-        hitSlop={12}
+        hitSlop={8}
         accessibilityLabel="Geri"
         accessibilityRole="button"
-        style={{ width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" }}
+        style={({ pressed }) => [
+          s.iconBtn,
+          {
+            backgroundColor: C.surface,
+            borderColor: C.line,
+            opacity: pressed ? 0.7 : 1,
+            transform: [{ scale: pressed ? 0.94 : 1 }],
+          },
+        ]}
       >
-        <Icon name="x" size={16} color={C.text2} />
+        <Icon name="x" size={15} color={C.text2} sw={2} />
       </Pressable>
 
-      <Text
-        style={[TYPOGRAPHY.label, { color: eyebrowColor || C.text3 }]}
-        accessibilityRole="text"
-        numberOfLines={1}
-      >
-        {eyebrow}
-      </Text>
+      <View style={[s.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
+        <Text
+          style={[
+            TYPOGRAPHY.label,
+            { color: eyebrowColor || C.text2, fontSize: 11, letterSpacing: 1.3 },
+          ]}
+          accessibilityRole="text"
+          numberOfLines={1}
+        >
+          {eyebrow}
+        </Text>
+      </View>
 
       <Pressable
         onPress={onHistory}
-        hitSlop={12}
+        hitSlop={8}
         accessibilityLabel="Geçmiş"
         accessibilityRole="button"
-        style={{ width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" }}
+        style={({ pressed }) => [
+          s.iconBtn,
+          {
+            backgroundColor: C.surface,
+            borderColor: C.line,
+            opacity: pressed ? 0.7 : 1,
+            transform: [{ scale: pressed ? 0.94 : 1 }],
+          },
+        ]}
       >
-        <Icon name="clock" size={18} color={C.text3} />
+        <Icon name="clock" size={16} color={C.text3} sw={2} />
       </Pressable>
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s2,
+    minHeight: CONTROL.tapMin,
+  },
+  iconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badge: {
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    maxWidth: "60%",
+  },
+});
+

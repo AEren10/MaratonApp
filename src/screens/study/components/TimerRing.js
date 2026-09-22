@@ -19,12 +19,12 @@ export function TimerRing({
   const activeColor = color || C.accent;
 
   return (
-    <View style={{ width: size, height: size + 28, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ width: size, height: size + 32, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={{ position: "absolute", top: 0 }}>
         <Defs>
           <RadialGradient id="ringAura" cx="50%" cy="50%" rx="50%" ry="50%">
-            <Stop offset="0%" stopColor={activeColor} stopOpacity="0.14" />
-            <Stop offset="65%" stopColor={activeColor} stopOpacity="0.04" />
+            <Stop offset="0%" stopColor={activeColor} stopOpacity="0.16" />
+            <Stop offset="60%" stopColor={activeColor} stopOpacity="0.05" />
             <Stop offset="100%" stopColor={activeColor} stopOpacity="0" />
           </RadialGradient>
         </Defs>
@@ -33,7 +33,7 @@ export function TimerRing({
         <Circle
           cx={size / 2}
           cy={size / 2}
-          r={radius + stroke * 1.5}
+          r={radius + stroke * 1.8}
           fill="url(#ringAura)"
         />
 
@@ -67,7 +67,7 @@ export function TimerRing({
       </View>
 
       {showDashes && (
-        <View style={{ position: "absolute", bottom: 4, flexDirection: "row", gap: 6 }}>
+        <View style={{ position: "absolute", bottom: 2, flexDirection: "row", gap: 7 }}>
           {Array.from({ length: totalCycles }).map((_, i) => {
             const filled = i < cycleIndex;
             const current = i === cycleIndex;
@@ -78,8 +78,8 @@ export function TimerRing({
                   width: 24,
                   height: 4,
                   borderRadius: 2,
-                  backgroundColor: filled ? activeColor : current ? activeColor : C.track,
-                  opacity: current ? 0.5 : filled ? 1 : 1,
+                  backgroundColor: filled || current ? activeColor : C.track,
+                  opacity: current ? 1 : filled ? 0.85 : 0.45,
                 }}
               />
             );
@@ -89,3 +89,4 @@ export function TimerRing({
     </View>
   );
 }
+
