@@ -5,6 +5,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { NudgePopup } from "../../components/common/NudgePopup";
 
+import { SectionSwitch } from "../../components/common/SectionSwitch";
+import { ANALYSIS_SECTIONS } from "../../constants/analysisSections";
 import { AnalysisHeader } from "./components/AnalysisHeader";
 import { AnalysisFilterPills } from "./components/AnalysisFilterPills";
 import { AnalysisInsightsCard } from "./components/AnalysisInsightsCard";
@@ -58,6 +60,17 @@ export default function AnalysisScreen() {
           <AnalysisHeader
             C={C}
             onAddTrial={() => go(screens.TRIAL_ENTRY, undefined, "analysis_header_trial_entry")}
+          />
+
+          {/* Yanlis Defteri Analiz'in ALT MENUSUNDE degil, YANINDA. Deneme
+              analiziyle ayni kademede: biri neyi bildigini olcer, oteki neyi
+              bilmedigini kapatir. Alt menude kalinca ikincisi hic acilmiyordu. */}
+          <SectionSwitch
+            options={ANALYSIS_SECTIONS}
+            value="trials"
+            onChange={(key) => {
+              if (key === "notebook") go(screens.WRONG_NOTEBOOK, undefined, "analysis_section_notebook");
+            }}
           />
 
           {loading ? (

@@ -5,6 +5,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { trackButtonTap } from "../../lib/analytics";
 import { SCREENS } from "../../constants/screens";
+import { openInTab } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { buildNotebookView, NOTEBOOK_FILTER } from "../../domain/wrongNotebook/wrongTopicGroups";
 import { getWrongQuestions } from "../../supabase/wrongQuestions";
 import {
@@ -102,6 +104,12 @@ export function useWrongNotebookController() {
     trackButtonTap("wrong_add_open", { targetScreen: SCREENS.ADD_WRONG });
     navigation.navigate(SCREENS.ADD_WRONG);
   }, [navigation]);
+  // Defter, Analiz'in alt menusu degil yanindaki bolum. Sekme kokune
+  // donuluyor ki kullanici yigin biriktirmesin.
+  const goAnalysis = useCallback(() => {
+    openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.ANALYSIS);
+  }, [navigation]);
+
   const goReview = useCallback(() => {
     trackButtonTap("wrong_review_start", { targetScreen: SCREENS.REVIEW_SESSION });
     navigation.navigate(SCREENS.REVIEW_SESSION, { source: "notebook" });
@@ -112,6 +120,7 @@ export function useWrongNotebookController() {
     dismissLostPhotos,
     filter,
     goAddWrong,
+    goAnalysis,
     goBack,
     goReview,
     loadFailed,
