@@ -41,7 +41,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
-        <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
+        <HomeTopBar name={dashboard.displayName} streak={h.streak}
           onProfile={actions.profile} onCalendar={actions.calendar} />
         <ErrorState
           preset="server"
@@ -59,7 +59,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
-        <HomeTopBar name={dashboard.displayName} daysUntilExam={h.daysUntilExam}
+        <HomeTopBar name={dashboard.displayName} streak={h.streak}
           onProfile={actions.profile} onCalendar={actions.calendar} />
         <SyncProblemBanner />
         <HomeExamAftermathRow />

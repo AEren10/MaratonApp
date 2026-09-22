@@ -4,6 +4,27 @@ import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
 import { mapGeneratedTask, mapAdHocTask, mapUserTask } from "./planTaskMappers";
 
+function mergeTasks(initialTasks, prev, history, isPlanDone) {
+  const doneById = {};
+  prev.forEach((t) => { if (t.done) doneById[t.id] = true; });
+  history.forEach((_t, id) => { doneById[id] = true; });
+
+  const nextTasks = initialTasks.map((t) => {
+    const isDoneNow = doneById[t.id] ?? (isPlanDone ? isPlanDone(t.id) : t.done);
+    if (isDoneNow) history.set(t.id, { ...t, done: true });
+    return { ...t, done: isDoneNow };
+  });
+
+  const presentIds = new Set(nextTasks.map((t) => t.id));
+  prev.forEach((t) => {
+    if (t.done && !presentIds.has(t.id)) { nextTasks.push(t); presentIds.add(t.id); }
+  });
+  history.forEach((item, id) => {
+    if (!presentIds.has(id)) { nextTasks.push({ ...item, done: true }); presentIds.add(id); }
+  });
+  return nextTasks;
+}
+
 export function usePlanDetailTasks({
   C,
   plan,
@@ -25,35 +46,50 @@ export function usePlanDetailTasks({
 
   const [tasks, setTasks] = useState(initialTasks);
   const tasksRef = useRef(tasks);
+  const completedHistoryRef = useRef(new Map());
   const [reasonTask, setReasonTask] = useState(null);
   tasksRef.current = tasks;
 
   const taskSig = initialTasks.map((t) => t.id).join("|");
   useEffect(() => {
-    setTasks((prev) => {
-      const doneById = {};
-      prev.forEach((t) => { doneById[t.id] = t.done; });
-      return initialTasks.map((t) => ({ ...t, done: doneById[t.id] ?? t.done }));
-    });
+    setTasks((prev) => mergeTasks(initialTasks, prev, completedHistoryRef.current, isPlanDone));
   }, [taskSig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTask = useCallback(async (id) => {
     const task = tasksRef.current.find((item) => item.id === id);
-    if (!task || (task.routeStop && task.done)) return;
-    if (task.routeStop && !task.done) {
+    if (!task) return;
+    if (task.routeStop && task.done) {
+      haptic.select();
+      return;
+    }
+
+    const nextDone = !task.done;
+
+    // Optimistik anında güncelleme: durak ekrandan kaybolmaz, dakikası hemen artar
+    setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, done: nextDone } : item)));
+
+    if (nextDone) {
+      completedHistoryRef.current.set(id, { ...task, done: true });
+      haptic.success();
+    } else {
+      completedHistoryRef.current.delete(id);
+      haptic.select();
+    }
+
+    if (task.userTask) toggleUserTask(id);
+    else togglePlanDone(id);
+
+    if (task.routeStop && nextDone) {
       try {
         await transitionStop(task.routeStop, "completed", { source: "daily_plan" });
       } catch {
+        setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, done: false } : item)));
+        completedHistoryRef.current.delete(id);
+        if (task.userTask) toggleUserTask(id);
+        else togglePlanDone(id);
         showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
-        return;
       }
     }
-    if (task.userTask) toggleUserTask(id);
-    else togglePlanDone(id);
-    if (!task.done) haptic.success();
-    setTasks((prev) => prev.map((item) => (
-      item.id === id ? { ...item, done: !item.done } : item
-    )));
   }, [showAlert, toggleUserTask, togglePlanDone, transitionStop]);
 
   const startTask = useCallback((id) => {
@@ -86,9 +122,7 @@ export function usePlanDetailTasks({
 
   const removeTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);
-    if (task?.userTask && removeUserTask) {
-      removeUserTask(id);
-    }
+    if (task?.userTask && removeUserTask) removeUserTask(id);
     setTasks((prev) => prev.filter((t) => t.id !== id));
     haptic.warning();
   }, [removeUserTask]);
@@ -104,15 +138,8 @@ export function usePlanDetailTasks({
   }, []);
 
   return {
-    clearRemaining,
-    doneCount: tasks.filter((t) => t.done).length,
-    moveTask,
-    reasonTask,
-    removeTask,
-    setReasonTask,
-    showReason,
-    startTask,
-    tasks,
-    toggleTask,
+    clearRemaining, doneCount: tasks.filter((t) => t.done).length,
+    moveTask, reasonTask, removeTask, setReasonTask,
+    showReason, startTask, tasks, toggleTask,
   };
 }

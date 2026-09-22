@@ -20,8 +20,12 @@ function initialsOf(name = "") {
 }
 
 // Ana Sayfa ust bandi: bas harf kutusu, selam + ad, sinava kalan gun cipi.
-export function HomeTopBar({ name, daysUntilExam, onProfile, onCalendar }) {
+export function HomeTopBar({ name, streak = 0, onProfile, onCalendar }) {
   const C = useC();
+  // Bu cip eskiden sinava kalan gunu yaziyordu — ama ayni sayi hemen altinda
+  // "YKS 2028 / 632 gun" olarak zaten duruyor. Ayni ekranda ayni sayi iki kez.
+  // Tasarimda buradaki sayi SERI: her gun degisen, takvime goturen bir sey.
+  const days = Math.max(0, Math.round(Number(streak) || 0));
   return (
     <Animated.View entering={FadeInDown.duration(500)} style={s.row}>
       <Pressable onPress={() => { H.tap(); onProfile?.(); }} hitSlop={STEP.s1 / 4}
@@ -33,14 +37,16 @@ export function HomeTopBar({ name, daysUntilExam, onProfile, onCalendar }) {
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
         <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.name, { color: C.text }]}>{name}</Text>
       </View>
-      {daysUntilExam != null ? (
-        <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
-          accessibilityRole="button" accessibilityLabel={`Sınava ${daysUntilExam} gün, takvimi aç`}
-          style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-          <Icon name="calendar" size={14} color={C.accent} />
-          <Text style={[TYPOGRAPHY.metaSemiBold, s.chipText, { color: C.text }]}>{`${Math.max(0, daysUntilExam)} GÜN`}</Text>
-        </Pressable>
-      ) : null}
+      <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
+        accessibilityRole="button"
+        accessibilityLabel={days > 0 ? `${days} günlük seri, takvimi aç` : "Takvimi aç"}
+        style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+        <Icon name="calendar" size={14} color={C.accent} />
+        {/* Seri 0 iken "0 GÜN" yazmak cesaret kirar; ikon tek basina kalir. */}
+        {days > 0 ? (
+          <Text style={[TYPOGRAPHY.metaSemiBold, s.chipText, { color: C.text }]}>{`${days} GÜN`}</Text>
+        ) : null}
+      </Pressable>
     </Animated.View>
   );
 }

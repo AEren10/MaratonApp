@@ -8,7 +8,12 @@ test("home ilk gun state'i sinav baglamini saklamaz", () => {
   const screen = read("src/screens/home/HomeScreen.js");
   const firstDay = read("src/screens/home/components/firstDay/HomeFirstDay.js");
 
-  assert.match(screen, /<HomeTopBar name=\{dashboard\.displayName\} daysUntilExam=\{h\.daysUntilExam\}/);
+  // Ust cip artik SERI gosteriyor, sinava kalan gunu degil: ayni sayi hemen
+  // altinda "YKS 2028 / 632 gun" olarak zaten duruyordu ve ekranda iki kez
+  // gorunuyordu. Testin korudugu sey cipin icerigi degil, sinav baglaminin
+  // ilk gun ekraninda KAYBOLMAMASI — onu asagidaki iki satir dogruluyor.
+  assert.match(screen, /<HomeTopBar name=\{dashboard\.displayName\} streak=\{h\.streak\}/);
+  assert.doesNotMatch(screen, /HomeTopBar[^>]*daysUntilExam/, "ust cip gun sayacini tekrarlamaz");
   assert.doesNotMatch(screen, /h\.firstDay\s*\?\s*null/);
   assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün · ilk durak hazır/);
   assert.match(firstDay, /YKS'ye \$\{days\} gün, rotanda \$\{totalStops\} durak var/);

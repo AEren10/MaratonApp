@@ -1,5 +1,5 @@
-import { buildPlanTaskKey } from "../../domain/plan/planTaskIdentity";
-import { getSubjectByKey } from "../../themes/subjects";
+import { buildPlanTaskKey } from "../../domain/plan/planTaskIdentity.js";
+import { getSubjectByKey } from "../../themes/subjects.js";
 
 export function mapGeneratedTask(t, C, isPlanDone) {
   const pid = t.planTaskKey || buildPlanTaskKey(t);
@@ -10,11 +10,11 @@ export function mapGeneratedTask(t, C, isPlanDone) {
     topic: t.topicLabel || "Genel çalışma",
     topicKey: t.topic,
     q: t.questionCount,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
+    minutes: t.minutes ?? t.estimatedMinutes ?? t.assignment?.estimatedMinutes ?? t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
     reason: t.reason,
     rkind: t.rkind || "gray",
     assignment: t.assignment || null,
-    done: isPlanDone ? isPlanDone(pid) : false,
+    done: Boolean(t.completed || (isPlanDone ? isPlanDone(pid) : false)),
     routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
     planTask: true,
     planSubjectKey: t.subject,
@@ -30,7 +30,7 @@ export function mapAdHocTask(t, C) {
     topic: t.topic || "Genel çalışma",
     topicKey: t.topic,
     q: t.questionCount,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
+    minutes: t.minutes ?? t.estimatedMinutes ?? t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
     reason: t.reason,
     rkind: "red",
     done: false,
@@ -46,7 +46,7 @@ export function mapUserTask(t, C) {
     topic: t.topic || "Genel çalışma",
     topicKey: t.topic,
     q: t.questionCount ?? t.question_count ?? 0,
-    minutes: t.targetMinutes ?? t.target_minutes ?? ((t.questionCount ?? t.question_count ?? 0) * 2),
+    minutes: t.minutes ?? t.targetMinutes ?? t.target_minutes ?? ((t.questionCount ?? t.question_count ?? 0) * 2),
     reason: t.note || "Senin eklediğin görev",
     rkind: "blue",
     done: t.completed,

@@ -402,19 +402,25 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       payload,
     });
     if (routeResult.error && !routeResult.queued) throw routeResult.error;
-    const updated = routeResult.data;
+    const updated = routeResult.data || (routeResult.queued ? {
+      id: stop.stopId,
+      lifecycle_status: transition,
+      updated_at: new Date().toISOString(),
+      version: version + 1,
+      subject: stop.subject,
+    } : null);
     if (updated) {
       setPersistedStops((current) => current.map((item) => (
-        item.id === updated.id ? updated : item
+        item.id === updated.id ? { ...item, ...updated } : item
       )));
-      if (user?.id && examType) {
+      if (user?.id && examType && routeResult.saved) {
         getLatestRouteStops(user.id, examType)
           .then(setPersistedStops)
           .catch(() => {});
       }
       track(EVENTS.ROUTE_STOP_TRANSITIONED, {
         transition,
-        subject: updated.subject,
+        subject: updated.subject || stop.subject,
         source: payload.source || "unknown",
       });
     }

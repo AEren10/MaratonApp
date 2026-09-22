@@ -7,7 +7,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { navigateFromOutside } from "../../navigation/navigationRef";
 import { usePendingWrites } from "../../hooks/usePendingWrites";
-import { flushQueue, retryDeadLetter } from "../../lib/offlineQueue";
+import { flushQueue, retryDeadLetter, getDeadLetterCount } from "../../lib/offlineQueue";
 import * as H from "../../lib/haptics";
 
 // Kalıcı olarak gönderilemeyen kayıt varsa ana ekranda uyarı şeridi.
@@ -19,17 +19,27 @@ export function SyncProblemBanner() {
   const C = useC();
   const { failed, refresh } = usePendingWrites();
   const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState(null);
   const styles = useMemo(() => makeStyles(C), [C]);
 
+  // Eskiden hata sessizce yutuluyordu: kullanici "Tekrar dene"ye basiyor,
+  // hicbir sey degismiyor, NEDEN oldugunu ogrenemiyordu. Basari da
+  // soylenmiyordu. Artik ikisi de yaziliyor.
   const retry = useCallback(async () => {
     if (busy) return;
     setBusy(true);
+    setNote(null);
     H.tap();
     try {
       await retryDeadLetter();
       await flushQueue();
       await refresh();
+      const left = await getDeadLetterCount().catch(() => 0);
+      setNote(left > 0
+        ? "Hâlâ gönderilemedi. Kayıt cihazında duruyor, bağlantı gelince tekrar deneyebilirsin."
+        : null);
     } catch (_) {
+      setNote("Tekrar denenemedi. Biraz sonra yeniden dene.");
     } finally {
       setBusy(false);
     }
@@ -42,7 +52,7 @@ export function SyncProblemBanner() {
       <Icon name="alert" size={18} color={C.red} />
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>{failed} kayıt gönderilemedi</Text>
-        <Text style={styles.sub}>Cihazında duruyor. Tekrar denemek için dokun.</Text>
+        <Text style={styles.sub}>{note || "Cihazında duruyor. Tekrar denemek için dokun."}</Text>
       </View>
       <Pressable onPress={retry} hitSlop={8} style={styles.action}>
         <Text style={styles.actionText}>{busy ? "..." : "Tekrar dene"}</Text>
