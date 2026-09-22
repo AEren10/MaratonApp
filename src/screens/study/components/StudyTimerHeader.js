@@ -21,7 +21,7 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
           },
         ]}
       >
-        <Icon name="x" size={15} color={C.text2} sw={2} />
+        <Icon name="x" size={18} color={C.text2} sw={2} />
       </Pressable>
 
       <View style={[s.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
@@ -52,7 +52,7 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
           },
         ]}
       >
-        <Icon name="clock" size={16} color={C.text3} sw={2} />
+        <Icon name="clock" size={20} color={C.text2} sw={2} />
       </Pressable>
     </View>
   );
@@ -68,9 +68,9 @@ const s = StyleSheet.create({
     minHeight: CONTROL.tapMin,
   },
   iconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
