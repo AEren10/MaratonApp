@@ -294,6 +294,9 @@ const PERMANENT_PG_CODES = new Set([
   "42703", // kolon yok
   "42P01", // tablo yok
   "P0002", // no_data_found / route stop not found gibi kalıcı domain hataları
+  "PT409", // route stop surum catismasi (yeniden denemek cozmez)
+  "22023", // gecersiz gecis (or. zaten tamamlanmis durak)
+  "40001", // serilestirme / eszamanlilik catismasi
 ]);
 
 function isPermanentError(e) {

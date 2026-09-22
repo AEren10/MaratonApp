@@ -59,6 +59,8 @@ export const ROTA_STACK = [
 export const PROGRAM_STACK = [
   SCREENS.DAILY_PLAN,       // Program Hub: Hafta (Programim 2. sayfa)
   SCREENS.ROADMAP,          // Rota Detay (paylasimli)
+  SCREENS.ROUTE_FULL,       // Rotanin tamami (paylasimli)
+  SCREENS.ROUTE_STOP_DETAIL,// Durak Detayi (paylasimli)
   SCREENS.WEEK_PROGRAM,     // Program: gunun duraklari
   SCREENS.MONTH_PLAN,       // Aylik Plan
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
@@ -75,6 +77,9 @@ export const PROGRAM_STACK = [
   SCREENS.WRONG_DETAIL,     // Arama -> Soru detayi
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.HOW_IT_WORKS,     // Nasil Calisir
+  SCREENS.RANK_SIMULATOR,   // Bolum Esigi (paylasimli)
+  SCREENS.NET_FORECAST,     // Senaryolar (paylasimli)
+  SCREENS.GOALS,            // Hedef Duzenle (paylasimli)
 ];
 
 export const ANALIZ_STACK = [

@@ -41,18 +41,18 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
       {preview.length ? (
         <View style={s.list}>
           {preview.map((item) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInDown.duration(240)}
-              exiting={FadeOutUp.duration(180)}
-              layout={Layout.duration(240)}
-            >
-              <HomeStopRow
-                item={item}
-                isNext={item.id === nextId}
-                onToggle={toggle}
-                onStart={onStartTask}
-              />
+            <Animated.View key={item.id} layout={Layout.duration(240)}>
+              <Animated.View
+                entering={FadeInDown.duration(240)}
+                exiting={FadeOutUp.duration(180)}
+              >
+                <HomeStopRow
+                  item={item}
+                  isNext={item.id === nextId}
+                  onToggle={toggle}
+                  onStart={onStartTask}
+                />
+              </Animated.View>
             </Animated.View>
           ))}
         </View>
