@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { H } from "../../../lib/haptics";
+import * as H from "../../../lib/haptics";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 

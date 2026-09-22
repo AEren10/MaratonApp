@@ -15,7 +15,7 @@ export function CurriculumProgressCard({ done, total, left, pct }) {
         <Text style={[TYPOGRAPHY.tableValue, s.headCount, { color: C.text2 }]}>{`${done}/${total} konu · %${pct}`}</Text>
       </View>
       <View style={s.hero}>
-        <Text style={[TYPOGRAPHY.stat, { color: C.text }]} allowFontScaling={false}>{done}</Text>
+        <Text style={[TYPOGRAPHY.statLarge, s.heroNum, { color: C.text }]} allowFontScaling={false}>{done}</Text>
         <Text style={[TYPOGRAPHY.bodyMedium, s.heroSub, { color: C.text3 }]}>{`konu bitti · ${left} kaldı`}</Text>
       </View>
       <View style={s.curve}>
@@ -48,11 +48,17 @@ const s = StyleSheet.create({
   hero: {
     flexDirection: "row",
     alignItems: "baseline",
-    gap: STEP.s1 + 2,
+    gap: STEP.s2,
     marginTop: STEP.s2,
   },
+  heroNum: {
+    fontSize: 60,
+    lineHeight: 64,
+    letterSpacing: -2.2,
+  },
   heroSub: {
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
   },
   curve: {
     marginTop: STEP.s2,
