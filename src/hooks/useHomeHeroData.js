@@ -6,7 +6,7 @@ import { buildComebackRecommendation } from "../domain/route/comebackRecommendat
 import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
-import { syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
+import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
@@ -118,7 +118,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLo
       streak,
       nextStop: nextTask ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}` : null,
     });
-  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask]);
+    syncRouteWidget({ daysLeft: daysUntilExam, chart: chartData, target: targetNet });
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, daysUntilExam, chartData, targetNet]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`

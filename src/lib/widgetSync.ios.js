@@ -1,6 +1,7 @@
 import WeekWidget from "../widgets/WeekWidget";
 import TodayWidget from "../widgets/TodayWidget";
 import ReviewWidget from "../widgets/ReviewWidget";
+import RouteWidget from "../widgets/RouteWidget";
 
 // WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
@@ -59,6 +60,21 @@ export function syncTodayWidget({ solved = 0, goal = 0, streak = 0, nextStop = n
     goal: Number(goal) || 0,
     streak: Number(streak) || 0,
     nextStop: nextStop || null,
+  });
+}
+
+/** Sinava kalan gun, olculmus rota hatti ve son denemelerdeki artis. */
+export function syncRouteWidget({ daysLeft = null, chart = null, target = 0 } = {}) {
+  const stops = chart?.stops || [];
+  const first = stops.length ? Number(stops[0].y) : null;
+  const last = stops.length ? Number(stops[stops.length - 1].y) : null;
+  return push("route", RouteWidget, {
+    daysLeft: Number.isFinite(daysLeft) ? daysLeft : null,
+    // Widget'ta mutlak net YOK: ana ekrani baskasi da gorur, artis gosterilir.
+    delta: first != null && last != null ? last - first : null,
+    trialCount: stops.length,
+    target: Number(target) || 0,
+    points: stops.map((s) => ({ label: s.label, net: Number(s.y) || 0 })),
   });
 }
 

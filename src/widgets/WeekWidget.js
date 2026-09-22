@@ -40,6 +40,12 @@ const WeekWidget = (props, environment) => {
 
   // Hedefi tutturan gun yesil, tutturamayan kizil, calisilmamis gun soluk iz.
   // Uygulamadaki grafikle ayni kural; iki yerde farkli konusmasinlar.
+  // BOS HAFTA KUTU GIBI DURMAZ
+  // Hic soru cozulmemisken Chart'in cizecegi bir sey yok: kesikli hedef
+  // cizgisiyle bos bir kutu kaliyor ve widget bozuk gibi gorunuyor.
+  // Tasarimin kurali bos durumun cagri gibi durmasi.
+  const worked = days.some((day) => Number(day.questions) > 0);
+
   const data = days.map((day) => ({
     x: day.label,
     y: day.questions > 0 ? day.questions : 0,
@@ -68,6 +74,7 @@ const WeekWidget = (props, environment) => {
         <Spacer />
       </HStack>
 
+      {worked ? (
       <Chart
         data={data}
         type="bar"
@@ -78,6 +85,14 @@ const WeekWidget = (props, environment) => {
         referenceLines={goal > 0 ? [{ x: "", y: goal }] : undefined}
         ruleStyle={{ color: text4, lineWidth: 1, dashArray: [4, 6] }}
       />
+      ) : (
+        <HStack>
+          <Text modifiers={[font({ size: 11.5, weight: "medium" }), foregroundStyle(text2)]}>
+            Bu haftanın ilk sorusunu çöz.
+          </Text>
+          <Spacer />
+        </HStack>
+      )}
     </VStack>
   );
 };

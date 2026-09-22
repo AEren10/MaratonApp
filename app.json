@@ -126,6 +126,14 @@
               }
             },
             {
+              "name": "MaratonRoute",
+              "displayName": "Rota",
+              "description": "Sınava kalan gün ve net artışın.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            },
+            {
               "name": "MaratonWeek",
               "displayName": "Bu hafta",
               "description": "Haftanın çözülen soruları ve günlük hedef.",
