@@ -9,11 +9,14 @@ import { TrialEntryNetCard } from "./TrialEntryNetCard";
 
 export function TrialEntryStep3({ form, styles, onBack }) {
   const normalizedNet = Number(form.totalNet) * trialDifficultyMultiplier(form.difficultyLevel);
-  const publisherName = form.publishers.find((p) => p.id === form.publisherId)?.name || null;
+  const publisherName = form.publishers?.find((p) => p.id === form.publisherId)?.name || null;
   const [addWrong, setAddWrong] = useState(true);
   
   // Hesaplanan yanlis sayisi
-  const totalWrong = Object.values(form.sections).reduce((acc, sec) => acc + (Number(sec.y) || 0), 0);
+  const totalWrong = Object.values(form.values || {}).reduce(
+    (acc, sec) => acc + (parseInt(sec?.wrong, 10) || 0),
+    0,
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}

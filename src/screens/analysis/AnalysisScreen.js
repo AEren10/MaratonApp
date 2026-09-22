@@ -15,6 +15,7 @@ import { PublisherComparisonCard } from "./components/PublisherComparisonCard";
 import { buildPublisherComparison } from "../../domain/analysis/publisherComparison";
 import { DeeperAnalysisSection } from "./components/DeeperAnalysisSection";
 import { AnalysisSkeleton } from "./components/AnalysisSkeleton";
+import { AnalysisStickyFab } from "./components/AnalysisStickyFab";
 import { useAnalysisController } from "./useAnalysisController";
 
 export default function AnalysisScreen() {
@@ -114,6 +115,11 @@ export default function AnalysisScreen() {
             </>
           )}
         </ScrollView>
+
+        <AnalysisStickyFab
+          C={C}
+          onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_sticky_trial_entry")}
+        />
 
         <NudgePopup
           nudge={nudgePopup}

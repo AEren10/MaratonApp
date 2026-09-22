@@ -7,18 +7,20 @@ export function AnalysisHeader({ C, onAddTrial }) {
   return (
     <View style={s.header}>
       <Text style={[s.title, { color: C.text }]}>Analiz</Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Deneme gir"
-        onPress={onAddTrial}
-        style={({ pressed }) => [
-          s.btn,
-          { backgroundColor: pressed ? C.accentPress || C.accent : C.accent },
-        ]}
-      >
-        <Icon name="plus" size={13} color={C.accentInk} sw={2.5} />
-        <Text style={[s.btnText, { color: C.accentInk }]}>Deneme gir</Text>
-      </Pressable>
+      {onAddTrial ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Deneme gir"
+          onPress={onAddTrial}
+          style={({ pressed }) => [
+            s.btn,
+            { backgroundColor: pressed ? C.accentPress || C.accent : C.accent },
+          ]}
+        >
+          <Icon name="plus" size={13} color={C.accentInk} sw={2.5} />
+          <Text style={[s.btnText, { color: C.accentInk }]}>Deneme gir</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
