@@ -28,7 +28,22 @@ const RouteWidget = (props, environment) => {
   const text3 = "#9794A0";
   const text4 = "#6B6870";
 
-  const days = Number(props?.daysLeft);
+  // Gun sayisi BURADA hesaplaniyor, uygulamadan hazir gelmiyor. Iki sebep:
+  // uygulama acilirken sinav baglami henuz yuklenmemis olabiliyor (cihazda
+  // "— gün" cikti), ve widget kendi zamanlamasiyla yenilendigi icin sayac
+  // uygulama hic acilmasa da dogru kaliyor. environment.date o anki tarih.
+  const examISO = props?.examISO || null;
+  const now = environment?.date instanceof Date ? environment.date : new Date();
+  let days = NaN;
+  if (examISO) {
+    const exam = new Date(examISO);
+    if (!Number.isNaN(exam.getTime())) {
+      const dayMs = 86400000;
+      const a = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const b = Date.UTC(exam.getFullYear(), exam.getMonth(), exam.getDate());
+      days = Math.max(0, Math.round((b - a) / dayMs));
+    }
+  }
   const delta = Number(props?.delta);
   const trialCount = Number(props?.trialCount) || 0;
   const target = Number(props?.target) || 0;

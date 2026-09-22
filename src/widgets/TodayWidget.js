@@ -1,4 +1,4 @@
-import { HStack, ProgressView, Spacer, Text, VStack } from "@expo/ui/swift-ui";
+import { Chart, HStack, ProgressView, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import { font, foregroundStyle, padding, tint } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
@@ -25,11 +25,13 @@ const TodayWidget = (props, environment) => {
   const text = "#F5F2EF";
   const text2 = "#A3A0A8";
   const text3 = "#9794A0";
+  const track = "#33333A";
 
   const solved = Number(props?.solved) || 0;
   const goal = Number(props?.goal) || 0;
   const streak = Number(props?.streak) || 0;
   const nextStop = props?.nextStop || null;
+  const days = Array.isArray(props?.days) ? props.days : [];
   const compact = environment?.widgetFamily === "systemSmall";
 
   const remaining = goal > 0 ? Math.max(0, goal - solved) : 0;
@@ -39,6 +41,16 @@ const TodayWidget = (props, environment) => {
   // Hedef tutunca kahraman satir yesile doner: gunun bittigini soyleyen tek
   // isaret bu, ayrica bir rozet eklemiyoruz.
   const barColor = done ? up : accent;
+
+  // Genis boyda haftanin cubuklari da var: kucuk boyla arasindaki fark tek
+  // satir olmasin, genislik bir ise yarasin. Gunun kendisi vurgulu, digerleri
+  // soluk -- widget'in kahramani bugunun sayisi, hafta destek.
+  const weekData = days.map((day) => ({
+    x: day.label,
+    y: Number(day.questions) > 0 ? Number(day.questions) : 0,
+    color: Number(day.questions) > 0 ? accent : track,
+  }));
+  const weekHasData = weekData.some((d) => d.y > 0);
 
   return (
     <VStack modifiers={[padding({ all: compact ? 14 : 16 })]}>
@@ -89,14 +101,25 @@ const TodayWidget = (props, environment) => {
         </HStack>
       )}
 
-      {/* Orta boy, tasarimda gunun siradaki duragini da tasiyor. */}
+      {/* Orta boy: siradaki durak ve haftanin cubuklari. */}
       {!compact && nextStop ? (
         <HStack>
-          <Text modifiers={[font({ size: 11, weight: "medium" }), foregroundStyle(text3)]}>
+          <Text modifiers={[font({ size: 11, weight: "medium" }), foregroundStyle(accent)]}>
             {`sıradaki · ${nextStop}`}
           </Text>
           <Spacer />
         </HStack>
+      ) : null}
+
+      {!compact && weekHasData ? (
+        <Chart
+          data={weekData}
+          type="bar"
+          showGrid={false}
+          showLegend={false}
+          animate={false}
+          barStyle={{ cornerRadius: 2 }}
+        />
       ) : null}
     </VStack>
   );

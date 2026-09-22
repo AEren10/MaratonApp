@@ -116,10 +116,15 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLo
       solved: solvedToday,
       goal: dailyGoal,
       streak,
-      nextStop: nextTask ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}` : null,
+      // Konu adi bos olabiliyor; birlestirmeden once eleniyor, yoksa
+      // widget'ta "Türkçe · null" yaziyordu.
+      nextStop: nextTask
+        ? [nextTask.subjectLabel, nextTask.topicLabel].filter(Boolean).join(" · ")
+        : null,
+      week: weeklyEffort,
     });
-    syncRouteWidget({ daysLeft: daysUntilExam, chart: chartData, target: targetNet });
-  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, daysUntilExam, chartData, targetNet]);
+    syncRouteWidget({ examDate, chart: chartData, target: targetNet });
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, examDate, chartData, targetNet]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`

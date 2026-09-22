@@ -54,22 +54,30 @@ export function syncWeekWidget({ week, solved = 0 } = {}) {
 }
 
 /** Bugunun sayisi, seri ve siradaki durak. */
-export function syncTodayWidget({ solved = 0, goal = 0, streak = 0, nextStop = null } = {}) {
+export function syncTodayWidget({ solved = 0, goal = 0, streak = 0, nextStop = null, week = null } = {}) {
   return push("today", TodayWidget, {
     solved: Number(solved) || 0,
     goal: Number(goal) || 0,
     streak: Number(streak) || 0,
     nextStop: nextStop || null,
+    // Genis boy haftanin cubuklarini da tasiyor: kucuk boyla arasindaki fark
+    // tek satirdan ibaret kalmasin, genislik bir ise yarasin.
+    days: week ? toDays(week) : [],
   });
 }
 
 /** Sinava kalan gun, olculmus rota hatti ve son denemelerdeki artis. */
-export function syncRouteWidget({ daysLeft = null, chart = null, target = 0 } = {}) {
+export function syncRouteWidget({ examDate = null, chart = null, target = 0 } = {}) {
   const stops = chart?.stops || [];
   const first = stops.length ? Number(stops[0].y) : null;
   const last = stops.length ? Number(stops[stops.length - 1].y) : null;
+  // Gun sayisi degil TARIH gonderiliyor: widget kendi yenilenirken gunu
+  // yeniden hesaplasin, uygulama acilmasa da sayac dogru kalsin.
+  const examISO = examDate instanceof Date
+    ? examDate.toISOString()
+    : (typeof examDate === "string" ? examDate : null);
   return push("route", RouteWidget, {
-    daysLeft: Number.isFinite(daysLeft) ? daysLeft : null,
+    examISO,
     // Widget'ta mutlak net YOK: ana ekrani baskasi da gorur, artis gosterilir.
     delta: first != null && last != null ? last - first : null,
     trialCount: stops.length,
