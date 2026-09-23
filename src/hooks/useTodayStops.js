@@ -53,7 +53,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
 
     generatedTasks.forEach((t) => {
       const pid = t.planTaskKey || buildPlanTaskKey(t);
-      const isDone = isPlanDone(pid);
+      const isDone = Boolean(t.completed || isPlanDone(pid));
       const minutes = t.minutes ?? t.estimatedMinutes ?? t.assignment?.estimatedMinutes ?? (t.questionCount ? Math.round(t.questionCount * 1.5) : 35);
       out.push({
         id: pid,
@@ -84,16 +84,12 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       });
     }
 
-    // Tamamlananları havuzda sakla; rota yeniden çizilse bile bugün bitirilen durak kaybolmasın
+    // Tamamlananları senkronize et; yeni duraklar ekleyerek listeyi sonsuz uzatma
     out.forEach((item) => {
       if (item.completed) {
-        completedHistoryRef.current.set(item.id, item);
-      }
-    });
-
-    completedHistoryRef.current.forEach((cachedItem, id) => {
-      if (!out.some((t) => t.id === id)) {
-        out.push({ ...cachedItem, completed: true });
+        completedHistoryRef.current.set(item.id, true);
+      } else if (completedHistoryRef.current.has(item.id)) {
+        item.completed = true;
       }
     });
 

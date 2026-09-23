@@ -29,46 +29,27 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const { tasks: userTasks, toggleTask: toggleUserTask, removeTask: removeUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
 
-  // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar
+  // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar (en fazla 3-4 durak)
   const generatedTasks = useMemo(() => {
-    const routeWeekStops = studyRoute.currentWeek?.stops || [];
-    const generated = generateDailyPlan({ ...planCtx, routeWeekStops });
-    const tasks = [...(generated.tasks || [])];
-
-    // Bugün tamamlanmış rota duraklarını da dahil et: kullanıcı ekranı kapatsa
-    // ya da gün içinde tekrar açsa bile bugün bitirdiği duraklar ve dakikalar kaybolmaz.
+    const rawStops = studyRoute.currentWeek?.stops || [];
     const today = todayTR();
-    const existingKeys = new Set(tasks.map((t) => t.planTaskKey || t.stopId));
-    routeWeekStops.forEach((stop) => {
+    const routeWeekStops = rawStops.map((stop) => {
       const stopKey = stop.logicalStopKey ? buildPlanTaskKey(stop.subject, stop.topic) : null;
-      const isCompletedToday = stop.lifecycleStatus === "completed" && (
-        (stop.completedAt && dateKey(new Date(stop.completedAt)) === today) ||
+      const isCompletedToday = (
+        (stop.lifecycleStatus === "completed" && (
+          (stop.completedAt && dateKey(new Date(stop.completedAt)) === today) ||
+          stop.completedToday === true
+        )) ||
         (stopKey && isDone?.(stopKey)) ||
         isDone?.(stop.id)
       );
-      const key = stopKey || `plan_${stop.id || stop.stopId}`;
-      if (isCompletedToday && !existingKeys.has(key) && !existingKeys.has(stop.id)) {
-        const estMinutes = stop.cost?.minutes || stop.minutes || (stop.cost?.questions ? stop.cost.questions * 2 : 30);
-        tasks.unshift({
-          subject: stop.subject,
-          subjectLabel: stop.subject,
-          topic: stop.topic,
-          topicLabel: stop.topic,
-          stopId: stop.id || stop.stopId,
-          version: stop.version,
-          questionCount: stop.cost?.questions || stop.questions || 0,
-          estimatedMinutes: estMinutes,
-          minutes: estMinutes,
-          completed: true,
-          planTaskKey: key,
-          reason: "Bugün tamamlanan durak",
-          rkind: "green",
-        });
-        existingKeys.add(key);
+      if (isCompletedToday && stop.lifecycleStatus !== "completed") {
+        return { ...stop, lifecycleStatus: "completed", completedToday: true };
       }
+      return stop;
     });
-
-    return tasks;
+    const generated = generateDailyPlan({ ...planCtx, routeWeekStops });
+    return generated.tasks || [];
   }, [planCtx, studyRoute.currentWeek?.stops, isDone]);
 
   const detail = usePlanDetailTasks({

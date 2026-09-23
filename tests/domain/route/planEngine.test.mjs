@@ -120,3 +120,87 @@ test("daily plan fills route cost leftovers with adaptive tasks", () => {
   );
   assert.equal(plan.totalQuestions, 30);
 });
+
+test("daily plan preserves completed today stops and strictly caps total tasks", () => {
+  const todayIso = new Date().toISOString();
+  const routeWeekStops = [
+    {
+      id: "done-1",
+      subject: "matematik",
+      topic: "Fonksiyonlar",
+      lifecycleStatus: "completed",
+      completedAt: todayIso,
+      cost: { questions: 20, minutes: 30 },
+    },
+    {
+      id: "done-2",
+      subject: "turkce",
+      topic: "Paragraf",
+      lifecycleStatus: "completed",
+      completedToday: true,
+      cost: { questions: 20, minutes: 30 },
+    },
+    {
+      id: "active-1",
+      subject: "fizik",
+      topic: "Kuvvet ve Hareket",
+      lifecycleStatus: "active",
+      cost: { questions: 20, minutes: 30 },
+    },
+    {
+      id: "active-2",
+      subject: "kimya",
+      topic: "Mol Kavramı",
+      lifecycleStatus: "upcoming",
+      cost: { questions: 20, minutes: 30 },
+    },
+    {
+      id: "extra-1",
+      subject: "biyoloji",
+      topic: "Hücre",
+      lifecycleStatus: "upcoming",
+      cost: { questions: 20, minutes: 30 },
+    },
+    {
+      id: "extra-2",
+      subject: "tarih",
+      topic: "İlk Çağ",
+      lifecycleStatus: "upcoming",
+      cost: { questions: 20, minutes: 30 },
+    },
+  ];
+
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 80,
+    routeWeekStops,
+  });
+
+  // maxTaskCount = 4
+  // 2 tamamlanan + 2 aktif = tam 4 durak (extra-1 ve extra-2 ÇEKİLMEZ)
+  assert.equal(plan.tasks.length, 4);
+  assert.equal(plan.tasks.filter((t) => t.completed).length, 2);
+  assert.equal(plan.tasks.filter((t) => !t.completed).length, 2);
+  assert.deepEqual(plan.tasks.map((t) => t.stopId), ["done-1", "done-2", "active-1", "active-2"]);
+});
+
+test("when quota is full with completed today stops, no new active stops are spawned", () => {
+  const routeWeekStops = [
+    { id: "d1", subject: "matematik", topic: "T1", lifecycleStatus: "completed", completedToday: true },
+    { id: "d2", subject: "turkce", topic: "T2", lifecycleStatus: "completed", completedToday: true },
+    { id: "d3", subject: "fizik", topic: "T3", lifecycleStatus: "completed", completedToday: true },
+    { id: "d4", subject: "kimya", topic: "T4", lifecycleStatus: "completed", completedToday: true },
+    { id: "extra", subject: "biyoloji", topic: "T5", lifecycleStatus: "upcoming" },
+  ];
+
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 80,
+    routeWeekStops,
+  });
+
+  // 4 durak da bugün bitmiş, arkadan ekstra durak gelmez!
+  assert.equal(plan.tasks.length, 4);
+  assert.ok(plan.tasks.every((t) => t.completed));
+  assert.ok(!plan.tasks.some((t) => t.stopId === "extra"));
+});

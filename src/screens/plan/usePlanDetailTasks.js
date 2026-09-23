@@ -9,20 +9,11 @@ function mergeTasks(initialTasks, prev, history, isPlanDone) {
   prev.forEach((t) => { if (t.done) doneById[t.id] = true; });
   history.forEach((_t, id) => { doneById[id] = true; });
 
-  const nextTasks = initialTasks.map((t) => {
+  return initialTasks.map((t) => {
     const isDoneNow = doneById[t.id] ?? (isPlanDone ? isPlanDone(t.id) : t.done);
     if (isDoneNow) history.set(t.id, { ...t, done: true });
     return { ...t, done: isDoneNow };
   });
-
-  const presentIds = new Set(nextTasks.map((t) => t.id));
-  prev.forEach((t) => {
-    if (t.done && !presentIds.has(t.id)) { nextTasks.push(t); presentIds.add(t.id); }
-  });
-  history.forEach((item, id) => {
-    if (!presentIds.has(id)) { nextTasks.push({ ...item, done: true }); presentIds.add(id); }
-  });
-  return nextTasks;
 }
 
 export function usePlanDetailTasks({

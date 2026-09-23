@@ -1,4 +1,4 @@
-import { differenceInDays, todayTR } from "./dateUtils.js";
+import { differenceInDays, todayTR, dateKey } from "./dateUtils.js";
 import { getSubjectsForExam } from "../data/curriculum.js";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity.js";
 import { buildDailyAssignmentNarrative } from "../domain/plan/dailyAssignment.js";
@@ -64,12 +64,61 @@ export function generateDailyPlan({
   //
   // Önceden günlük plan ile haftalık rota BİRBİRİNDEN HABERSİZDİ: rota
   // "bu hafta Paragraf ve Türev" derken günlük plan kendi skoruyla bambaşka
+
   // dersler seçebiliyordu. Öğrenci iki ayrı yerde çelişen yönlendirme
   // görüyordu — planın güvenilirliğini bitiren bir şey.
   //
   // Artık rotanın bu haftaki durakları varsa günlük plan ONLARDAN türetilir.
   // Rota yoksa (henüz çizilmemiş) eski skorlama devreye girer.
   const validRouteStops = routeWeekStops.filter((stop) => subjectMap[stop.subject]);
+
+  const todayDateKey = todayTR();
+  const completedTodayStops = validRouteStops.filter((stop) => {
+    if (stop.lifecycleStatus !== "completed") return false;
+    if (stop.completedToday === true) return true;
+    if (stop.completedAt && dateKey(new Date(stop.completedAt)) === todayDateKey) return true;
+    return false;
+  });
+
+  const uncompletedRouteStops = validRouteStops.filter(
+    (stop) => stop.lifecycleStatus !== "completed",
+  );
+
+  const completedTodayTasks = completedTodayStops.map((routeStop, i) => {
+    const subject = subjectMap[routeStop.subject] || { label: routeStop.subject, color: "#888" };
+    const costMinutes = routeStop.cost?.minutes || routeStop.minutes || (routeStop.cost?.questions ? routeStop.cost.questions * 2 : 30);
+    const qCount = routeStop.cost?.questions || routeStop.questions || routeStop.questionCount || 20;
+    return {
+      subject: routeStop.subject,
+      subjectLabel: subject.label,
+      topicLabel: routeStop.topic,
+      topic: routeStop.topic,
+      stopId: routeStop.id || routeStop.stopId || null,
+      version: routeStop.version ?? null,
+      routeStopId: routeStop.id || routeStop.stopId || null,
+      logicalStopKey: routeStop.logicalStopKey || null,
+      rootStopKey: routeStop.rootStopKey || null,
+      color: subject.color,
+      questionCount: qCount,
+      priority: i + 1,
+      reason: routeStop.insight?.reasonText || "Bugün tamamlanan durak",
+      rkind: "green",
+      tier: "low",
+      badge: "BİTTİ",
+      daysSince: 0,
+      accuracy: 100,
+      completed: true,
+      routeConfidence: routeStop.insight?.confidence || routeStop.dataConfidence || null,
+      routeInsight: routeStop.insight || null,
+      routeAllocation: null,
+      estimatedMinutes: costMinutes,
+      planTaskKey: routeStop.logicalStopKey ? `plan_${routeStop.logicalStopKey}` : buildPlanTaskKey({
+        subject: routeStop.subject,
+        topic: routeStop.topic,
+        logicalStopKey: routeStop.logicalStopKey,
+      }),
+    };
+  });
 
   const scored = [];
   for (const key of Object.keys(subjectMap)) {
@@ -88,39 +137,49 @@ export function generateDailyPlan({
 
   scored.sort((a, b) => b.score - a.score);
   const scoreBySubject = new Map(scored.map((item) => [item.key, item.score]));
-  // Her rota durağı ayrı adaydır. Subject bazında tekilleştirmek, aynı dersteki
-  // ikinci konuyu görünmez yapıyor ve tamamlamayı yanlış durağa yazıyordu.
-  const routeCandidates = validRouteStops.map((routeStop) => ({
-      key: routeStop.subject,
-      score: routeStop.score || scoreBySubject.get(routeStop.subject) || 0,
-      routeStop,
-    }));
 
   const maxTaskCount = daysLeft < 30 ? 3 : 4;
-  const routeAllocations = buildDailyRouteTaskAllocations(routeCandidates, dailyTarget, {
-    maxTasks: maxTaskCount,
-  });
-  const routeAllocatedQuestions = routeAllocations.reduce((sum, item) => sum + item.questionCount, 0);
-  const routeKeys = new Set(routeAllocations.map((item) => item.key));
-  const adaptivePool = scored.filter((candidate) => !routeKeys.has(candidate.key));
-  const fallbackPool = adaptivePool.length ? adaptivePool : scored;
-  const fallbackTarget = Math.max(0, dailyTarget - routeAllocatedQuestions);
-  const fallbackSlots = fallbackTarget > 0 && routeAllocations.length
-    ? Math.max(1, maxTaskCount - routeAllocations.length)
-    : 0;
-  const adaptiveFallback = allocateAdaptiveCandidates(
-    fallbackPool,
-    fallbackTarget,
-    fallbackSlots,
-    routeAllocations.length + 1,
-  );
+  const remainingActiveSlots = Math.max(0, maxTaskCount - completedTodayTasks.length);
+  const completedQuestionsCount = completedTodayTasks.reduce((sum, t) => sum + (t.questionCount || 0), 0);
+  const remainingTarget = Math.max(0, dailyTarget - completedQuestionsCount);
 
-  const candidates = routeAllocations.length
-    ? [...routeAllocations, ...adaptiveFallback]
-    : allocateAdaptiveCandidates(scored, dailyTarget, maxTaskCount);
+  let candidates = [];
+  if (remainingActiveSlots > 0 && remainingTarget > 0) {
+    if (uncompletedRouteStops.length > 0) {
+      const routeCandidates = uncompletedRouteStops.map((routeStop) => ({
+        key: routeStop.subject,
+        score: routeStop.score || scoreBySubject.get(routeStop.subject) || 0,
+        routeStop,
+      }));
 
-  const tasks = [];
-  let remaining = dailyTarget;
+      const routeAllocations = buildDailyRouteTaskAllocations(routeCandidates, remainingTarget, {
+        maxTasks: remainingActiveSlots,
+      });
+      const routeAllocatedQuestions = routeAllocations.reduce((sum, item) => sum + item.questionCount, 0);
+      const routeKeys = new Set(routeAllocations.map((item) => item.key));
+      const adaptivePool = scored.filter((candidate) => !routeKeys.has(candidate.key));
+      const fallbackPool = adaptivePool.length ? adaptivePool : scored;
+      const fallbackTarget = Math.max(0, remainingTarget - routeAllocatedQuestions);
+      const fallbackSlots = fallbackTarget > 0 && routeAllocations.length && remainingActiveSlots > routeAllocations.length
+        ? Math.max(1, remainingActiveSlots - routeAllocations.length)
+        : 0;
+      const adaptiveFallback = fallbackSlots > 0
+        ? allocateAdaptiveCandidates(
+            fallbackPool,
+            fallbackTarget,
+            fallbackSlots,
+            routeAllocations.length + 1,
+          )
+        : [];
+
+      candidates = [...routeAllocations, ...adaptiveFallback];
+    } else if (validRouteStops.length === 0) {
+      candidates = allocateAdaptiveCandidates(scored, remainingTarget, remainingActiveSlots);
+    }
+  }
+
+  const tasks = [...completedTodayTasks];
+  let remaining = remainingTarget;
   for (let i = 0; i < candidates.length && remaining > 0; i++) {
     const {
       key,

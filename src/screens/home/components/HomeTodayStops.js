@@ -15,13 +15,16 @@ const PREVIEW = 3;
 export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const C = useC();
   const { items, doneCount, nextId, toggle } = stops;
+  const isAllDone = items.length > 0 && doneCount === items.length;
   const preview = items.slice(0, PREVIEW);
   const more = Math.max(0, items.length - PREVIEW);
 
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BUGÜNÜN DURAKLARI</Text>
+        <Text style={[TYPOGRAPHY.label, { color: isAllDone ? C.up : C.text2 }]}>
+          {isAllDone ? "GÜNÜ KAPATTIN 🎉" : "BUGÜNÜN DURAKLARI"}
+        </Text>
         <View style={s.segs}>
           {items.map((_, i) => (
             <View
@@ -34,7 +37,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
           ))}
         </View>
         {items.length ? (
-          <Text style={[TYPOGRAPHY.label, s.count, { color: C.text }]}>{`${doneCount}/${items.length}`}</Text>
+          <Text style={[TYPOGRAPHY.label, s.count, { color: isAllDone ? C.up : C.text }]}>{`${doneCount}/${items.length}`}</Text>
         ) : null}
       </View>
 
