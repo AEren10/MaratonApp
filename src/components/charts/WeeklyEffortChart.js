@@ -1,9 +1,5 @@
-import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Line, Text as SvgText } from "react-native-svg";
-import {
-  Easing, useReducedMotion, useSharedValue, withTiming,
-} from "react-native-reanimated";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
@@ -13,9 +9,6 @@ import {
 } from "./chartStyle";
 
 const BAR_RADIUS = 3;
-// Tasarimin izin verdigi hareket suresi (0.5-0.9 sn) icinde, alt siniri.
-const GROW_MS = 620;
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
 // Ustte kesikli gunluk hedef cizgisi. Rota grafigiyle AYNI tuval olcusunu
@@ -23,16 +16,6 @@ const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 // farkli boyda olurlarsa kaydirirken zipliyorlar.
 export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
-  const reduced = useReducedMotion();
-  const progress = useSharedValue(reduced ? 1 : 0);
-
-  // Haftanin degerleri degistiginde (gun doner, kayit girilir) yeniden kurulur.
-  const signature = (week?.days || []).map((d) => d.questions).join(",");
-  useEffect(() => {
-    if (reduced) { progress.value = 1; return; }
-    progress.value = 0;
-    progress.value = withTiming(1, { duration: GROW_MS, easing: EASE_OUT });
-  }, [signature, progress, reduced]);
 
   if (!week) return null;
 
@@ -89,7 +72,6 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
               goalY={goalY}
               yOf={yOf}
               radius={BAR_RADIUS}
-              progress={progress}
               C={C}
             />
           );

@@ -84,6 +84,7 @@ export default function HomeScreen() {
           onStartTask={actions.startTask}
           onViewRoute={actions.route}
           onViewFullRoute={actions.fullRoute}
+          onViewWeek={actions.weekReport}
           onRedrawRoute={actions.redrawRoute}
           firstDay={h.firstDay}
           onDismissFirstDay={h.dismissFirstDay}

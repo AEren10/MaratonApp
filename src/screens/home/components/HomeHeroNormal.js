@@ -12,7 +12,7 @@ import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart"
 
 // Ana Sayfa hero'sunun normal (Pro) hali: dev sayi + rota grafigi + ozet
 // seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
-export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute }) {
+export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute, onViewWeek }) {
   const {
     remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess,
     chartData, declared, declaredAxis, weeklyEffort, todayIndex,
@@ -22,16 +22,20 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
   // soru "bugun ilerledim mi". Rota haftada bir bakilan bir sey, ikinci
   // sayfada duruyor.
+  // Her sayfa kendi detayina gider. Haftalik cubuklar zaten haftanin
+  // kendisi; dokununca haftanin raporu acilir. O baglanti sayfanin
+  // asagisinda bir metin satiri olarak duruyordu, grafigin ustunde olmali.
   const onPressPage = useCallback((key) => {
     if (key === "route" && hasRouteAccess) onViewRoute?.();
-  }, [hasRouteAccess, onViewRoute]);
+    else if (key === "week") onViewWeek?.();
+  }, [hasRouteAccess, onViewRoute, onViewWeek]);
 
   // Cumle sayfanin ICINDE tasiniyor: disarida dururken bir sayfada var bir
   // sayfada yok oluyor ve kaydirirken altindaki her sey bir satir zipliyordu.
   const pages = [
     {
       key: "week",
-      a11y: weeklyEffort?.summary || "Bu hafta",
+      a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Haftanın raporunu aç` : "Bu haftanın raporunu aç",
       caption: weeklyEffort?.summary || null,
       render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
     },

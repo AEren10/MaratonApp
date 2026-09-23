@@ -9,7 +9,7 @@ const MINUTES_ONLY_H = 6;
 
 // Haftanin TEK gunu: doldurulabilecek kutu + icini dolduran cubuk.
 export function EffortDay({
-  day, index, todayIndex, goal, x, width, bottom, goalY, yOf, radius, progress, C,
+  day, index, todayIndex, goal, x, width, bottom, goalY, yOf, radius, C,
 }) {
   const isToday = index === todayIndex;
   // Kutu HEDEF yuksekliginde: o gun doldurulabilecek alan bu kadar.
@@ -53,11 +53,23 @@ export function EffortDay({
     );
   }
 
+  // Kutunun disina tasan gun: hedefi gecmis demektir.
+  const overflow = slotH > 0 && barH > slotH + 2;
+
   return (
     <Fragment>
       {slot}
+      {/* HEDEFI GECEN GUN: cubuk kutunun disina tasiyor ama bu fark
+          edilmiyordu. Hedef cizgisinin hizasina zeminden ince bir centik
+          koyuyoruz — cubuk cizgiyi gecerken gozle goruluyor, ayrica rozet
+          gerekmiyor. */}
+      {overflow ? (
+        <Rect
+          x={x} y={goalY - 1} width={width} height={2}
+          fill={C.bg} fillOpacity={0.9}
+        />
+      ) : null}
       <EffortBar
-        progress={progress}
         index={index}
         x={x}
         width={width}

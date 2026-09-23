@@ -31,7 +31,7 @@ export function HomeHero({
   onBeginComeback,
   onDismissComeback,
   onStartTask,
-  onViewRoute, onViewFullRoute, onRedrawRoute,
+  onViewRoute, onViewFullRoute, onRedrawRoute, onViewWeek,
   firstDay = false,
   onDismissFirstDay,
   minutesToday = 0,
@@ -116,6 +116,7 @@ export function HomeHero({
         onStartTask={onStartTask}
         onViewRoute={onViewRoute}
         onViewFullRoute={onViewFullRoute}
+        onViewWeek={onViewWeek}
       />
     );
   }
