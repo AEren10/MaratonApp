@@ -15,9 +15,9 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
         {`${typeLabel} · KAYDEDİLDİ`.toLocaleUpperCase("tr-TR")}
       </Text>
       <View style={styles.netRow}>
-        <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]}>{formatNumber(net, 2)}</Text>
+        <Text style={[TYPOGRAPHY.statHeroTight, styles.net, { color: C.text }]}>{formatNumber(net, 2)}</Text>
         {delta != null ? (
-          <View style={styles.delta}>
+          <View style={[styles.delta, { backgroundColor: C.surface, borderColor: C.line }]}>
             {delta !== 0 ? <Icon name={delta > 0 ? "arrowUp" : "arrowDown"} size={11} color={tone} sw={1.7} /> : null}
             <Text style={[TYPOGRAPHY.topicName, styles.deltaText, { color: tone }]}>{formatDelta(delta, 2)}</Text>
           </View>
@@ -26,7 +26,7 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
       <View style={styles.metaRow}>
         <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>TOPLAM NET</Text>
         {prevNet != null ? (
-          <Text style={[TYPOGRAPHY.meta, styles.tabular, { color: C.text3 }]}>
+          <Text style={[TYPOGRAPHY.meta, styles.prevText, { color: C.text3 }]}>
             {`önceki ${formatNumber(prevNet, 2)} \u2192 yeni ${formatNumber(net, 2)}`}
           </Text>
         ) : null}
@@ -36,11 +36,23 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
-  kicker: { fontFamily: "Archivo_700", letterSpacing: 2.76 },
-  netRow: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s2, marginTop: STEP.s2 + 4 },
-  delta: { flexDirection: "row", alignItems: "center", gap: 5, paddingBottom: STEP.s1 + 1 },
+  wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, alignItems: "center" },
+  kicker: { alignSelf: "stretch", fontFamily: "Archivo_700", letterSpacing: 2.76 },
+  netRow: { width: "100%", alignItems: "center", justifyContent: "center", marginTop: STEP.s2 + 8, minHeight: 116 },
+  net: { textAlign: "center" },
+  delta: {
+    position: "absolute",
+    right: 0,
+    bottom: STEP.s1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    minHeight: 32,
+    paddingHorizontal: STEP.s1,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
   deltaText: { fontFamily: "Archivo_600", fontVariant: ["tabular-nums"] },
-  metaRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 + 1, marginTop: STEP.s2, flexWrap: "wrap" },
-  tabular: { fontVariant: ["tabular-nums"] },
+  metaRow: { alignItems: "center", gap: STEP.s1 - 2, marginTop: STEP.s1 },
+  prevText: { textAlign: "center", fontVariant: ["tabular-nums"] },
 });

@@ -81,7 +81,13 @@ export default function TrialSummaryScreen() {
             <TrialSummarySubjectDeltas bars={summary.bars} />
             <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.actions}>
-              <Button size="lg" fullWidth onPress={handleShare}>Kartı paylaş</Button>
+              <Button
+                size="lg"
+                fullWidth
+                onPress={() => openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.TRIAL_RECORDS)}
+              >
+                Deneme kayıtlarını gör
+              </Button>
               {summary.totalWrong > 0 ? (
                 <Button size="lg" variant="outline" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_WRONG)} style={{ marginTop: STEP.s2 }}>
                   Yanlışları deftere ekle
@@ -104,7 +110,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingHorizontal: GUTTER - STEP.s2, paddingTop: 4 },
   close: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
-  headerLabel: { flex: 1, fontFamily: "Archivo_700" },
+  headerLabel: { flex: 1, fontFamily: "Archivo_700", fontSize: 13, lineHeight: 18, letterSpacing: 2.4 },
   scroll: { paddingBottom: STEP.s4 + STEP.s1 },
   chart: { marginTop: STEP.s3 + 4 },
   section: { paddingHorizontal: GUTTER, marginTop: STEP.s2 + 2 },

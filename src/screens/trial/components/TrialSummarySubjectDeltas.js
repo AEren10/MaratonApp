@@ -13,7 +13,7 @@ function Row({ bar, C }) {
       <View style={styles.head}>
         <View style={[styles.dot, { backgroundColor: bar.color }]} />
         <Text style={[TYPOGRAPHY.tableName, styles.name, { color: C.text }]} numberOfLines={1}>{bar.name}</Text>
-        <Text style={[TYPOGRAPHY.topicName, styles.tabular, { color: C.text }]}>{formatNet(bar.net)}</Text>
+        <Text style={[TYPOGRAPHY.topicName, styles.value, { color: C.text }]}>{formatNet(bar.net)}</Text>
         <Text style={[TYPOGRAPHY.metaSemiBold, styles.delta, { color: tone }]}>
           {bar.delta != null ? formatDelta(bar.delta, 2) : ""}
         </Text>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2 - 1 },
   dot: { width: 8, height: 8, borderRadius: 1 },
   name: { flex: 1 },
-  tabular: { fontVariant: ["tabular-nums"] },
+  value: { width: 64, textAlign: "center", fontVariant: ["tabular-nums"] },
   delta: { width: 46, textAlign: "right", fontVariant: ["tabular-nums"] },
   track: { height: 5, borderRadius: 2, marginTop: STEP.s1 + 2, marginLeft: 19, overflow: "hidden" },
   fill: { height: "100%", borderRadius: 2 },
