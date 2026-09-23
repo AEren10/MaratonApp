@@ -22,6 +22,7 @@ const INSTAGRAM_APP_ID = "1219619257045936";
 // Etiketin arkasindaki zemin. Tasarimin yuzey merdiveninden: bg -> surface.
 const STORY_BG_TOP = "#26262F";
 const STORY_BG_BOTTOM = "#1C1C23";
+const INSTAGRAM_STORIES_SOCIAL = Share.Social?.INSTAGRAM_STORIES || "instagramstories";
 
 export { STORY_SHARE, storyShareOutcome };
 
@@ -87,7 +88,7 @@ async function placeStickerInStory(shot) {
     const sticker = Platform.OS === "ios" ? `data:image/png;base64,${shot}` : shot;
 
     await Share.shareSingle({
-      social: Share.Social.InstagramStories,
+      social: INSTAGRAM_STORIES_SOCIAL,
       appId: INSTAGRAM_APP_ID,
       stickerImage: sticker,
       backgroundTopColor: STORY_BG_TOP,

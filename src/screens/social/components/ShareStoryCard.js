@@ -49,7 +49,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
         <StatBlock
           value={card.heroValue}
           unit={card.heroLabel}
-          size="page"
+          size="large"
           color={heroColor}
           style={styles.hero}
         />
@@ -99,6 +99,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
 
 const styles = StyleSheet.create({
   card: {
+    width: "100%",
     borderRadius: 26,
     borderWidth: 1,
     paddingHorizontal: 18,

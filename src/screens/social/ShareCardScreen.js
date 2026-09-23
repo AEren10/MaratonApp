@@ -107,8 +107,8 @@ const makeStyles = (C) => StyleSheet.create({
   title: { ...TYPOGRAPHY.subheading, color: C.text },
   modes: { paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  preview: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
-  cardWrap: { width: 236 },
-  actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s2 },
+  preview: { height: 398, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
+  cardWrap: { width: 214 },
+  actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
   saveRow: { alignItems: "center", justifyContent: "center", minHeight: CONTROL.tapMin },
 });

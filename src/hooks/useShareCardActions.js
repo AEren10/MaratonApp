@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useAlert } from "../contexts/AlertContext";
 import { EVENTS } from "../constants/analytics";
 import { track } from "../lib/analytics";
-import { shareStoryToInstagram, STORY_SHARE } from "../lib/storyShare";
+import { saveStoryToGallery, shareStoryToInstagram, STORY_SHARE } from "../lib/storyShare";
 import * as H from "../lib/haptics";
 
 // Paylasim Karti eylemleri: karti goruntuye cevirip paylas / galeriye kaydet.
@@ -36,17 +36,12 @@ export function useShareCardActions(cardRef, getShareMeta = null) {
   // tum galerisini okumaya gerek yok, kart yazmak yeterli.
   const handleSaveGallery = useCallback(async () => {
     try {
-      const { captureRef } = require("react-native-view-shot");
-      const MediaLibrary = require("expo-media-library");
-
-      const perm = await MediaLibrary.requestPermissionsAsync(true);
-      if (!perm.granted) {
+      const outcome = await saveStoryToGallery(cardRef);
+      if (outcome === STORY_SHARE.FAILED) {
         H.warn();
         showAlert("Galeri izni gerekiyor", "Kartı kaydetmek için izin vermen gerekiyor.");
         return;
       }
-      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
-      await MediaLibrary.saveToLibraryAsync(uri);
       H.success();
       showAlert("Kaydedildi", "Kart galerine kaydedildi.");
     } catch {
