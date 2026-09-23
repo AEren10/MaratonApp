@@ -52,11 +52,11 @@ export default function ShareCardScreen() {
       </View>
 
       {loading ? (
-        <View style={s.center}>
-          <Skeleton width={280} height={420} radius={20} />
+        <View style={s.preview}>
+          <Skeleton width={236} height={420} radius={20} />
         </View>
       ) : error ? (
-        <View style={s.center}>
+        <View style={s.preview}>
           <ErrorState preset="server" onPrimary={() => nav.goBack()} />
         </View>
       ) : !activeCard ? (
@@ -67,7 +67,7 @@ export default function ShareCardScreen() {
         />
       ) : (
         <>
-          <View style={s.center}>
+          <View style={s.preview}>
             <View style={s.cardWrap}>
               <ShareStoryCard ref={cardRef} card={activeCard} footRight={footRight} />
             </View>
@@ -107,7 +107,8 @@ const makeStyles = (C) => StyleSheet.create({
   title: { ...TYPOGRAPHY.subheading, color: C.text },
   modes: { paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  cardWrap: { width: 280 },
-  actions: { paddingHorizontal: STEP.s4, paddingBottom: STEP.s4, paddingTop: STEP.s2 },
+  preview: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
+  cardWrap: { width: 236 },
+  actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s2 },
   saveRow: { alignItems: "center", justifyContent: "center", minHeight: CONTROL.tapMin },
 });

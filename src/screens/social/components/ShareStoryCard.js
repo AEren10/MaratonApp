@@ -49,7 +49,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
         <StatBlock
           value={card.heroValue}
           unit={card.heroLabel}
-          size="hero"
+          size="page"
           color={heroColor}
           style={styles.hero}
         />
@@ -68,7 +68,13 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
           <View style={[styles.statsRow, { borderTopColor: "rgba(245,242,239,0.1)" }]}>
             {card.stats.map((stat) => (
               <View key={stat.label} style={styles.statCell}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{stat.label}</Text>
+                <Text
+                  style={[TYPOGRAPHY.label, styles.statLabel, { color: C.text3 }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {stat.label}
+                </Text>
                 <StatBlock value={stat.value} size="value" color={stat.color || C.text} style={styles.statValue} />
               </View>
             ))}
@@ -95,8 +101,8 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 26,
     borderWidth: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 26,
+    paddingHorizontal: 18,
+    paddingVertical: 22,
     aspectRatio: 9 / 16,
     justifyContent: "space-between",
     overflow: "hidden",
@@ -106,14 +112,13 @@ const styles = StyleSheet.create({
   markText: { fontFamily: "Archivo_700", fontSize: 11.5, marginBottom: 1 },
   brand: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.8 },
   body: { flex: 1, justifyContent: "center" },
-  kicker: { letterSpacing: 2, textTransform: "uppercase" },
+  kicker: { letterSpacing: 1.6, textTransform: "uppercase" },
   hero: { marginTop: STEP.s2 },
   caption: { marginTop: STEP.s2, maxWidth: 250 },
   footerContainer: { marginTop: STEP.s3 },
-  statsRow: {
-    flexDirection: "row", gap: STEP.s4, paddingBottom: STEP.s3, borderTopWidth: 1, paddingTop: STEP.s3,
-  },
+  statsRow: { flexDirection: "row", gap: STEP.s2, paddingBottom: STEP.s3, borderTopWidth: 1, paddingTop: STEP.s3 },
   statCell: { flex: 1 },
+  statLabel: { letterSpacing: 1.0 },
   statValue: { marginTop: 4 },
   footer: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",

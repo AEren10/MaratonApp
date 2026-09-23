@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useAlert } from "../contexts/AlertContext";
 import { EVENTS } from "../constants/analytics";
 import { track } from "../lib/analytics";
+import { shareStoryToInstagram, STORY_SHARE } from "../lib/storyShare";
 import * as H from "../lib/haptics";
 
 // Paylasim Karti eylemleri: karti goruntuye cevirip paylas / galeriye kaydet.
@@ -10,22 +11,21 @@ export function useShareCardActions(cardRef, getShareMeta = null) {
   const showAlert = useAlert();
 
   const handleShare = useCallback(async () => {
-    let captureRef, Sharing;
-    try {
-      ({ captureRef } = require("react-native-view-shot"));
-      Sharing = require("expo-sharing");
-    } catch {
-      showAlert("Paylaşım kullanılamıyor");
-      return;
-    }
     try {
       H.tap();
-      const uri = await captureRef(cardRef, { format: "png", quality: 1, result: "tmpfile" });
-      if (!(await Sharing.isAvailableAsync())) { showAlert("Paylaşım yok"); return; }
-      await Sharing.shareAsync(`file://${uri}`, { mimeType: "image/png", dialogTitle: "Kartını paylaş" });
+      const outcome = await shareStoryToInstagram(cardRef);
+      if (outcome === STORY_SHARE.FAILED) {
+        H.warn();
+        showAlert("Paylaşım hazırlanamadı", "Kart görüntüsü oluşturulamadı. Tekrar dener misin?");
+        return;
+      }
       track(EVENTS.WRAPPED_SHARED, { source: "share_card", ...(getShareMeta?.() || {}) });
       H.success();
+      if (outcome === STORY_SHARE.PLACED) showAlert("Instagram'a gönderildi", "Kart story editöründe hazır.");
+      else if (outcome === STORY_SHARE.OPENED) showAlert("Etiket panoda", "Instagram'da basılı tutup Yapıştır'a dokun.");
+      else if (outcome === STORY_SHARE.COPIED) showAlert("Etiket panoda", "Instagram'ı açıp story'ne yapıştırabilirsin.");
     } catch {
+      H.warn();
       showAlert("Hata", "Kart oluşturulamadı.");
     }
   }, [cardRef, getShareMeta, showAlert]);
