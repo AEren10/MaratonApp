@@ -7,6 +7,7 @@ import { usePlanCompletion } from "./usePlanCompletion";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
+import { recordStopCompletion, removeStopCompletion } from "../lib/stopCompletionLog";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + AI önerisi tek listede birleşir.
@@ -113,9 +114,16 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
 
   const toggle = useCallback(async (item) => {
     H.select();
-    const wasDone = item.completed;
+    // Durak kapandiginda PLANLANAN sayilari calisma kaydina yaziliyor;
+    // tik geri alininca kayit siliniyor. Eskiden tik yalnizca "completed"
+    // yaziyordu: gunun butun duraklari tiklenir, grafik sifirda kalirdi.
+    const wasDone = !!item.completed;
     if (item.source === "user") toggleTask(item.id);
     else togglePlan(item.id);
+    if (user?.id) {
+      const sync = wasDone ? removeStopCompletion : recordStopCompletion;
+      sync(user.id, item).catch(() => {});
+    }
 
     if (!wasDone) {
       completedHistoryRef.current.set(item.id, { ...item, completed: true });
@@ -128,7 +136,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         await onRouteComplete?.(item.routeStop);
       } catch {}
     }
-  }, [onRouteComplete, toggleTask, togglePlan]);
+  }, [onRouteComplete, toggleTask, togglePlan, user?.id]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;

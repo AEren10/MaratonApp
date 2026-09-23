@@ -9,7 +9,7 @@ function isIdempotencyConflict(error) {
   return error?.code === "23505" && String(error?.message || "").includes("client_operation_id");
 }
 
-async function getStudyLogByClientOperationId(userId, clientOperationId) {
+export async function getStudyLogByClientOperationId(userId, clientOperationId) {
   if (!userId || !clientOperationId) return null;
   const { data, error } = await supabase
     .from("study_logs")
