@@ -77,8 +77,8 @@ function SummaryScreenInner() {
     body = <View style={styles.pad}><ErrorState preset="server" onPrimary={data.retry} /></View>;
   } else if (data.streak === 0 && !data.hasActivity) {
     body = (
-      <View style={styles.pad}>
-        <EmptyState preset="streakZero" onPrimary={handleStart} onSecondary={handleHowStreak}>
+      <View style={[styles.pad, styles.emptyPad]}>
+        <EmptyState preset="streakZero" onPrimary={handleStart} onSecondary={handleHowStreak} style={styles.streakEmpty}>
           <StreakZeroHero />
         </EmptyState>
       </View>
@@ -112,7 +112,9 @@ export default function SummaryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  content: { paddingTop: STEP.s4, paddingBottom: STEP.s5 },
+  content: { flexGrow: 1, paddingTop: STEP.s4, paddingBottom: STEP.s5 },
   pad: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  emptyPad: { flex: 1, justifyContent: "center", paddingTop: STEP.s2, paddingBottom: STEP.s5 * 2 },
+  streakEmpty: { alignItems: "center" },
   gap: { marginTop: STEP.s3 },
 });

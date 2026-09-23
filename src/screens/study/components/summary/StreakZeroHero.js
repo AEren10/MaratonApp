@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../../themes/tokens";
 
-const EMPTY_CELLS = Array.from({ length: 14 }, (_, i) => i);
+const EMPTY_CELLS = Array.from({ length: 10 }, (_, i) => i);
 
 // Seri Sifir: "0 gün" ve kesikli cerceveli bos serit (suclamayan sifir hali).
 export function StreakZeroHero() {
@@ -24,8 +24,8 @@ export function StreakZeroHero() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: STEP.s3 },
-  row: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
-  strip: { flexDirection: "row", gap: STEP.s1 / 2, marginTop: STEP.s3 },
-  cell: { flex: 1, height: STEP.s4, borderRadius: SHAPE.chip, borderWidth: 1, borderStyle: "dashed" },
+  wrap: { width: "100%", alignItems: "center", marginBottom: STEP.s3 },
+  row: { flexDirection: "row", alignItems: "baseline", justifyContent: "center", gap: STEP.s1 },
+  strip: { width: "86%", flexDirection: "row", gap: STEP.s1 - 2, marginTop: STEP.s3 },
+  cell: { flex: 1, height: STEP.s4, borderRadius: SHAPE.chip, borderWidth: 1, borderStyle: "dashed", opacity: 0.72 },
 });
