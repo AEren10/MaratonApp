@@ -1,5 +1,5 @@
 import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
-import { font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
+import { containerBackground, font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
 // ANA EKRAN WIDGET'I — "Tekrar" (tasarim: Maraton Widget.dc.html, Widget 3).
@@ -12,10 +12,17 @@ import { createWidget } from "expo-widgets";
 //
 // Renkler neden icerde: bkz. TodayWidget.
 
+//
+// CIHAZDA COZULEN COKME
+// Widget galeride dogru ciziliyor ama ana ekrana yerlestirilince kirmizi bir
+// yer tutucu oluyordu. Sebep: iOS 17+ agacinda hic `containerBackground`
+// cagrilmayan widget'i DUSURUYOR ve yerine sistem yer tutucusunu koyuyor
+// (expo/expo#49015). Kok VStack artik zemini kendisi bildiriyor.
 const ReviewWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
+  const bg = "#1C1C23";
   const text = "#F5F2EF";
   const text2 = "#A3A0A8";
   const text3 = "#9794A0";
@@ -25,7 +32,7 @@ const ReviewWidget = (props, environment) => {
   const compact = environment?.widgetFamily === "systemSmall";
 
   return (
-    <VStack modifiers={[padding({ all: compact ? 14 : 16 })]}>
+    <VStack modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 14 : 16 })]}>
       <HStack>
         <Text modifiers={[font({ size: 9.5, weight: "bold" }), foregroundStyle(accent)]}>
           TEKRAR

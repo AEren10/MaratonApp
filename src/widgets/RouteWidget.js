@@ -1,5 +1,5 @@
 import { Chart, HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
-import { font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
+import { containerBackground, font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
 // ANA EKRAN WIDGET'I — "Rota" (tasarim: Maraton Widget.dc.html, Widget 2).
@@ -19,10 +19,17 @@ import { createWidget } from "expo-widgets";
 //
 // Renkler neden icerde: bkz. TodayWidget.
 
+//
+// CIHAZDA COZULEN COKME
+// Widget galeride dogru ciziliyor ama ana ekrana yerlestirilince kirmizi bir
+// yer tutucu oluyordu. Sebep: iOS 17+ agacinda hic `containerBackground`
+// cagrilmayan widget'i DUSURUYOR ve yerine sistem yer tutucusunu koyuyor
+// (expo/expo#49015). Kok VStack artik zemini kendisi bildiriyor.
 const RouteWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
+  const bg = "#1C1C23";
   const up = "#34D399";
   const text = "#F5F2EF";
   const text3 = "#9794A0";
@@ -59,7 +66,7 @@ const RouteWidget = (props, environment) => {
   const data = points.map((p, i) => ({ x: p.label || String(i), y: Number(p.net) || 0 }));
 
   return (
-    <VStack modifiers={[padding({ all: compact ? 14 : 16 })]}>
+    <VStack modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 14 : 16 })]}>
       <HStack>
         <VStack>
           <HStack>

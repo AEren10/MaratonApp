@@ -1,5 +1,5 @@
 import { Chart, HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
-import { font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
+import { containerBackground, font, foregroundStyle, padding } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
 // ANA EKRAN WIDGET'I — haftanin emegi.
@@ -22,10 +22,17 @@ import { createWidget } from "expo-widgets";
 // bunlari buildPalette("dark") ciktisiyla karsilastiriyor; palet degisir de
 // burasi degismezse test kirilir.
 
+//
+// CIHAZDA COZULEN COKME
+// Widget galeride dogru ciziliyor ama ana ekrana yerlestirilince kirmizi bir
+// yer tutucu oluyordu. Sebep: iOS 17+ agacinda hic `containerBackground`
+// cagrilmayan widget'i DUSURUYOR ve yerine sistem yer tutucusunu koyuyor
+// (expo/expo#49015). Kok VStack artik zemini kendisi bildiriyor.
 const WeekWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
+  const bg = "#1C1C23";
   const up = "#34D399";
   const text = "#F5F2EF";
   const text2 = "#A3A0A8";
@@ -60,7 +67,7 @@ const WeekWidget = (props, environment) => {
   });
 
   return (
-    <VStack modifiers={[padding({ all: compact ? 10 : 14 })]}>
+    <VStack modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 10 : 14 })]}>
       <HStack>
         <Text modifiers={[font({ size: 10, weight: "semibold" }), foregroundStyle(text2)]}>
           BU HAFTA
