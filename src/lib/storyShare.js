@@ -22,7 +22,8 @@ const INSTAGRAM_APP_ID = "1219619257045936";
 // Etiketin arkasindaki zemin. Tasarimin yuzey merdiveninden: bg -> surface.
 const STORY_BG_TOP = "#26262F";
 const STORY_BG_BOTTOM = "#1C1C23";
-const INSTAGRAM_STORIES_SOCIAL = Share.Social?.INSTAGRAM_STORIES || "instagramstories";
+const INSTAGRAM_STORIES_FALLBACK = "instagramstories";
+const INSTAGRAM_STORIES_SOCIAL = Share.Social?.INSTAGRAM_STORIES || INSTAGRAM_STORIES_FALLBACK;
 
 export { STORY_SHARE, storyShareOutcome };
 
@@ -134,7 +135,7 @@ export async function saveStoryToGallery(ref) {
   const uri = await capture(ref, "tmpfile");
   if (!uri) return STORY_SHARE.FAILED;
   try {
-    const { granted } = await MediaLibrary.requestPermissionsAsync();
+    const { granted } = await MediaLibrary.requestPermissionsAsync(true);
     if (!granted) return STORY_SHARE.FAILED;
     await MediaLibrary.saveToLibraryAsync(uri);
     return STORY_SHARE.SAVED;

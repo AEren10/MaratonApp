@@ -27,12 +27,17 @@ test("story share success records card metadata", () => {
 });
 
 test("story share uses the native Instagram Stories social key", () => {
-  assert.match(storyShare, /Share\.Social\?\.INSTAGRAM_STORIES \|\| "instagramstories"/);
+  assert.match(storyShare, /Share\.Social\?\.INSTAGRAM_STORIES \|\| INSTAGRAM_STORIES_FALLBACK/);
   assert.doesNotMatch(storyShare, /Share\.Social\.InstagramStories/);
 });
 
 test("share card preview keeps controls outside the captured story card", () => {
-  assert.match(screen, /preview: \{ height: 398,/);
-  assert.match(screen, /cardWrap: \{ width: 214 \}/);
+  assert.match(screen, /<ScrollView contentContainerStyle=\{s\.content\}/);
+  assert.match(screen, /height: PREVIEW_SLOT_HEIGHT/);
+  assert.match(screen, /cardWrap: \{ width: PREVIEW_CARD_WIDTH \}/);
   assert.match(storyCard, /size="large"/);
+});
+
+test("gallery save keeps write-only photo permission", () => {
+  assert.match(storyShare, /MediaLibrary\.requestPermissionsAsync\(true\)/);
 });

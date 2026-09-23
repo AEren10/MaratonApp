@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -13,6 +13,11 @@ import { Icon, Button, ErrorState, Skeleton, EmptyState } from "../../components
 import { ShareStoryCard } from "./components/ShareStoryCard";
 import { ShareModeChips } from "./components/ShareModeChips";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../themes/tokens";
+import { STORY_HEIGHT, STORY_WIDTH } from "../../domain/share/storySticker";
+
+const PREVIEW_CARD_WIDTH = 214;
+const PREVIEW_CARD_HEIGHT = Math.round((PREVIEW_CARD_WIDTH * STORY_HEIGHT) / STORY_WIDTH);
+const PREVIEW_SLOT_HEIGHT = PREVIEW_CARD_HEIGHT + STEP.s3;
 
 export default function ShareCardScreen() {
   const C = useC();
@@ -47,52 +52,54 @@ export default function ShareCardScreen() {
         <Text style={s.title}>Paylaş</Text>
         <View style={{ width: CONTROL.tapMin }} />
       </View>
-      <View style={s.modes}>
-        <PillTabs options={SHARE_MODE_OPTIONS} value={mode} onChange={setMode} height={42} />
-      </View>
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <View style={s.modes}>
+          <PillTabs options={SHARE_MODE_OPTIONS} value={mode} onChange={setMode} height={42} />
+        </View>
 
-      {loading ? (
-        <View style={s.preview}>
-          <Skeleton width={236} height={420} radius={20} />
-        </View>
-      ) : error ? (
-        <View style={s.preview}>
-          <ErrorState preset="server" onPrimary={() => nav.goBack()} />
-        </View>
-      ) : !activeCard ? (
-        <EmptyState
-          preset="shareCards"
-          onPrimary={() => nav.goBack()}
-          style={s.center}
-        />
-      ) : (
-        <>
+        {loading ? (
           <View style={s.preview}>
-            <View style={s.cardWrap}>
-              <ShareStoryCard ref={cardRef} card={activeCard} footRight={footRight} />
+            <Skeleton width={PREVIEW_CARD_WIDTH} height={PREVIEW_CARD_HEIGHT} radius={20} />
+          </View>
+        ) : error ? (
+          <View style={s.preview}>
+            <ErrorState preset="server" onPrimary={() => nav.goBack()} />
+          </View>
+        ) : !activeCard ? (
+          <EmptyState
+            preset="shareCards"
+            onPrimary={() => nav.goBack()}
+            style={s.center}
+          />
+        ) : (
+          <>
+            <View style={s.preview}>
+              <View style={s.cardWrap}>
+                <ShareStoryCard ref={cardRef} card={activeCard} footRight={footRight} />
+              </View>
             </View>
-          </View>
 
-          <ShareModeChips cards={modeCards} selectedId={activeCard.id} onSelect={setSelectedId} />
+            <ShareModeChips cards={modeCards} selectedId={activeCard.id} onSelect={setSelectedId} />
 
-          <View style={s.actions}>
-            <Button onPress={handleShare} icon="share" fullWidth size="lg">
-              Paylaş
-            </Button>
-            <Pressable
-              onPress={handleSaveGallery}
-              hitSlop={12}
-              accessibilityRole="button"
-              accessibilityLabel="Kartı galerine kaydet"
-              style={({ pressed }) => [s.saveRow, { opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
-                Galeriye kaydet
-              </Text>
-            </Pressable>
-          </View>
-        </>
-      )}
+            <View style={s.actions}>
+              <Button onPress={handleShare} icon="share" fullWidth size="lg">
+                Paylaş
+              </Button>
+              <Pressable
+                onPress={handleSaveGallery}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel="Kartı galerine kaydet"
+                style={({ pressed }) => [s.saveRow, { opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
+                  Galeriye kaydet
+                </Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -105,10 +112,11 @@ const makeStyles = (C) => StyleSheet.create({
   },
   closeBtn: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
   title: { ...TYPOGRAPHY.subheading, color: C.text },
+  content: { flexGrow: 1, paddingBottom: STEP.s2 },
   modes: { paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  preview: { height: 398, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
-  cardWrap: { width: 214 },
+  preview: { height: PREVIEW_SLOT_HEIGHT, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
+  cardWrap: { width: PREVIEW_CARD_WIDTH },
   actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
   saveRow: { alignItems: "center", justifyContent: "center", minHeight: CONTROL.tapMin },
 });
