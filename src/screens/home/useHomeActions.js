@@ -29,6 +29,11 @@ export function useHomeActions({ navigation, go }) {
     analysis: go(SCREENS.ANALYSIS),
     debt: go(SCREENS.TOPIC_DEBT),
     weekReport: go(SCREENS.SUMMARY, { period: "week" }),
+    // Haftalik grafige dokununca: haftanin RAPORU degil, o gunlerin
+    // KAYITLARI. Grafik zaten toplamlari gosteriyor; rapora gitmek yandan
+    // yana gitmek olurdu. Bir cubuk yanlis gorunuyorsa duzeltilecek yer de
+    // burasi — satir duzenlenip silinebiliyor.
+    studyHistory: go(SCREENS.STUDY_HISTORY),
     notebook: go(SCREENS.WRONG_NOTEBOOK),
     // Tekrar bekleyen varken listeye degil dogrudan oturuma gidilir.
     review: go(SCREENS.SWIPE_REVIEW),

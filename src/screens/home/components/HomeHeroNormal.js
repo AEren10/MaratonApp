@@ -35,7 +35,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   const pages = [
     {
       key: "week",
-      a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Haftanın raporunu aç` : "Bu haftanın raporunu aç",
+      a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Çalışma geçmişini aç` : "Çalışma geçmişini aç",
       caption: weeklyEffort?.summary || null,
       render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
     },

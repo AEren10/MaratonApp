@@ -39,6 +39,8 @@ export const ROTA_STACK = [
   SCREENS.EXAM_DAY_PLAN,    // Sinav Gunu Plani (PROFIL'de de var)
   SCREENS.EXAM_RESULT,      // Sinav Sonucu (PROFIL'de de var)
   SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu / Tahmin Sasti (PROFIL'de de var)
+  SCREENS.STUDY_HISTORY,    // Calisma Gecmisi (PROFIL'de de var; haftalik grafik dokununca)
+  SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
   SCREENS.SUMMARY,          // Gunun/Haftalik/Ayin Ozeti (period parametresi)
   SCREENS.WEEKLY_REVIEW,    // eski rota: SummaryScreen week (bildirim/derin baglanti)
   SCREENS.WEEKLY_TRIAL_REVIEW,
