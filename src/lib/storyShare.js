@@ -6,6 +6,9 @@ import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 
 import { STORY_SHARE, storyShareOutcome } from "../domain/share/storyShareOutcome";
+import {
+  STORY_CAPTURE_SCALE, STORY_HEIGHT, STORY_WIDTH,
+} from "../domain/share/storySticker";
 
 // Instagram'in story kamerasi. Acilamazsa (uygulama yoksa) hata firlatir;
 // etiket zaten panoda oldugu icin kullanici elle de yapistirabilir.
@@ -22,10 +25,21 @@ const STORY_BG_BOTTOM = "#1C1C23";
 
 export { STORY_SHARE, storyShareOutcome };
 
+// YAKALAMA OLCULU YAPILIR.
+// Olcu verilmediginde captureRef cihazin piksel oraniyla calisiyordu: 3x
+// telefonda 1215x2160 PNG, base64'u birkac megabaytlik tek bir metin. Karti
+// paylasmak uygulamayi cokertiyordu — iOS bellek basincinda olduruyor, dev
+// client yeniden baslayip bundle aliyor. Tam olarak gorulen belirti buydu.
 async function capture(ref, result) {
   if (!ref?.current) return null;
   try {
-    return await captureRef(ref, { format: "png", quality: 1, result });
+    return await captureRef(ref, {
+      format: "png",
+      quality: 1,
+      result,
+      width: STORY_WIDTH * STORY_CAPTURE_SCALE,
+      height: STORY_HEIGHT * STORY_CAPTURE_SCALE,
+    });
   } catch {
     return null;
   }
@@ -43,8 +57,17 @@ async function capture(ref, result) {
  * com.instagram.share.ADD_TO_STORY intent'i, ve kayitli bir Meta App ID.
  */
 export async function shareStoryToInstagram(ref) {
-  if (await placeStickerInStory(ref)) return STORY_SHARE.PLACED;
-  return pasteboardFallback(ref);
+  // TEK YAKALAMA. Once dogrudan gonderim kendi yakalamasini yapiyor, sonra
+  // basarisiz olursa pano yolu BIR DAHA yakaliyordu: iki tam boy PNG ve iki
+  // base64 arka arkaya. Goruntu bir kez uretilip iki yola da veriliyor.
+  const shot = await capture(ref, Platform.OS === "ios" ? "base64" : "tmpfile");
+  if (!shot) return STORY_SHARE.FAILED;
+
+  if (await placeStickerInStory(shot)) return STORY_SHARE.PLACED;
+  // Pano yolu base64 ister; Android'de dosya yakalandigi icin orada bir kez
+  // daha uretmek gerekiyor. Nadir yol: yalnizca dogrudan gonderim reddedilirse.
+  const base64 = Platform.OS === "ios" ? shot : await capture(ref, "base64");
+  return pasteboardFallback(base64);
 }
 
 /**
@@ -58,12 +81,10 @@ export async function shareStoryToInstagram(ref) {
  * Instagram kurulu degilse ya da cagri reddedilirse firlatir; cagiran
  * pano yoluna duser.
  */
-async function placeStickerInStory(ref) {
+async function placeStickerInStory(shot) {
   try {
-    const sticker = Platform.OS === "ios"
-      ? await capture(ref, "base64").then((b) => (b ? `data:image/png;base64,${b}` : null))
-      : await capture(ref, "tmpfile");
-    if (!sticker) return false;
+    if (!shot) return false;
+    const sticker = Platform.OS === "ios" ? `data:image/png;base64,${shot}` : shot;
 
     await Share.shareSingle({
       social: Share.Social.InstagramStories,
@@ -84,8 +105,7 @@ async function placeStickerInStory(ref) {
  * paylasabilsin: etiket panoya konur, story kamerasi acilir, kullanici
  * basili tutup yapistirir.
  */
-async function pasteboardFallback(ref) {
-  const base64 = await capture(ref, "base64");
+async function pasteboardFallback(base64) {
   if (!base64) return STORY_SHARE.FAILED;
 
   let copied = false;

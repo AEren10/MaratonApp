@@ -18,6 +18,20 @@ export const STORY_KIND = Object.freeze({
 
 export const STORY_BG = Object.freeze({ MARKA: "marka", FOTO: "foto" });
 
+// Etiketin tuval olcusu. Hem cizen bilesen hem yakalayan katman buradan
+// okur: ikisi ayri sayi tutarsa yakalanan goruntu kirpiliyor ya da esniyor.
+export const STORY_WIDTH = 405;
+export const STORY_HEIGHT = 720;
+
+// YAKALAMA OLCEGI — BELLEK MESELESI.
+// Olcek verilmezse captureRef cihazin kendi piksel oraniyla yakaliyor:
+// 3x telefonda 1215x2160 PNG ve onun base64'u birkac megabaytlik bir metin.
+// Kartin paylasilmasi uygulamayi cokertiyordu (iOS bellek basincinda
+// olduruyor, dev client yeniden baslayip bundle aliyor). 2x hem Instagram
+// story'sinin cozunurlugu icin fazlasiyla yeterli hem de piksel sayisini
+// yariya indiriyor.
+export const STORY_CAPTURE_SCALE = 2;
+
 export const STORY_MOMENT = Object.freeze({
   SESSION: "session",
   TRIAL: "trial",

@@ -21,8 +21,12 @@ import {
 
 // Tasarimin tuvali: 9:16, sabit olcu. Kucuk gosterilecekse SARAN view
 // olceklenir, tuval degil — yakalama tam cozunurlukte olsun diye.
-export const STORY_WIDTH = 405;
-export const STORY_HEIGHT = 720;
+// Olcu artik domain'de: yakalayan katman da ayni sayiyi okumali.
+// Hem iceri alinip hem disari veriliyor — salt re-export yerel kapsama
+// getirmez, asagidaki kullanimlar tanimsiz kalirdi.
+import { STORY_WIDTH, STORY_HEIGHT } from "../../domain/share/storySticker";
+
+export { STORY_WIDTH, STORY_HEIGHT };
 
 const BODIES = {
   [STORY_KIND.ISTATISTIK]: StoryStatsBody,
