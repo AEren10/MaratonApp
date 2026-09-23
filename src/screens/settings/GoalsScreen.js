@@ -83,19 +83,19 @@ export default function GoalsScreen() {
             onPress={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.EXAM_DATE)}
           />
         </SettingsGroup>
-      </ScrollView>
 
-      <View style={[styles.cta, { borderTopColor: C.line }]}>
-        <Button onPress={save} size="lg" fullWidth loading={saving}>
-          Kaydet
-        </Button>
-        <Pressable onPress={cancel} style={styles.cancelBtn} accessibilityRole="button">
-          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
-        </Pressable>
-        {pendingNote ? (
-          <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{pendingNote}</Text>
-        ) : null}
-      </View>
+        <View style={styles.actions}>
+          <Button onPress={save} size="lg" fullWidth loading={saving}>
+            Kaydet
+          </Button>
+          <Pressable onPress={cancel} style={styles.cancelBtn} accessibilityRole="button">
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
+          </Pressable>
+          {pendingNote ? (
+            <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{pendingNote}</Text>
+          ) : null}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -103,8 +103,8 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   header:      { flexDirection: "row", alignItems: "center", paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   closeBtn:    { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginLeft: -STEP.s2 },
-  scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 },
-  cta:         { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  actions:     { marginTop: STEP.s4 },
   section:     { marginTop: STEP.s5, marginBottom: STEP.s1 },
   cancelBtn:   { height: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
   pendingNote: { marginTop: STEP.s1, textAlign: "center" },
