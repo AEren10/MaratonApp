@@ -14,7 +14,8 @@ export function TimerCenterDisplay({
   topicSubtitle,
 }) {
   const badgeColor = running && subject?.color ? subject.color : C.text3;
-  const badgeBg = running && subject?.color ? subject.color + "18" : "transparent";
+  const badgeBg = running && subject?.color ? subject.color + "18" : C.surface;
+  const badgeBorder = running && subject?.color ? subject.color + "30" : C.line;
 
   const label = running && hasSubject
     ? `${subject.label} · ${topicSubtitle}`
@@ -23,11 +24,11 @@ export function TimerCenterDisplay({
       : (hasSubject ? topicSubtitle : "ders seçilmedi");
 
   return (
-    <>
+    <View style={{ alignItems: "center", justifyContent: "center" }}>
       <Text
         style={[
           TYPOGRAPHY.heroNumber,
-          { fontSize: 62, lineHeight: 66, letterSpacing: -2.0, color: C.text },
+          { color: C.text, fontSize: 66, lineHeight: 70, letterSpacing: -2.5 },
         ]}
         allowFontScaling={false}
       >
@@ -35,11 +36,14 @@ export function TimerCenterDisplay({
       </Text>
       <View
         style={{
-          marginTop: 8,
-          paddingHorizontal: 12,
-          paddingVertical: 3,
+          marginTop: 10,
+          paddingHorizontal: 13,
+          paddingVertical: 4,
           borderRadius: 999,
           backgroundColor: badgeBg,
+          borderWidth: 1,
+          borderColor: badgeBorder,
+          maxWidth: 220,
         }}
       >
         <Text
@@ -49,6 +53,6 @@ export function TimerCenterDisplay({
           {label}
         </Text>
       </View>
-    </>
+    </View>
   );
 }

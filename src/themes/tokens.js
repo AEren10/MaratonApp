@@ -134,6 +134,7 @@ export const TYPOGRAPHY = {
   tableHead:     { fontFamily: "Archivo_600", fontSize: 11,   lineHeight: 15, letterSpacing: 1.32 },
 
   // Sayilar — Bricolage 400, tabular
+  heroNumber:    { fontFamily: "Bricolage_400", fontSize: 66, lineHeight: 70, letterSpacing: -2.5, fontVariant: ["tabular-nums"] },
   statHero:      { fontFamily: "Bricolage_400", fontSize: 96, lineHeight: 96, letterSpacing: -3.84, fontVariant: ["tabular-nums"] },
   stat:          { fontFamily: "Bricolage_400", fontSize: 46, lineHeight: 50, letterSpacing: -1.4,  fontVariant: ["tabular-nums"] },
   statLarge:     { fontFamily: "Bricolage_400", fontSize: 56, lineHeight: 60, letterSpacing: -2.0,  fontVariant: ["tabular-nums"] },

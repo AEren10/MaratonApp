@@ -16,7 +16,7 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
   return (
     <View style={s.container}>
       <View style={s.row}>
-        <View style={[s.pillsBox, { backgroundColor: C.surface, borderColor: C.line }]}>
+        <View style={[s.pillsBox, { backgroundColor: C.void, borderColor: C.line }]}>
           {modes.map((mode) => {
             const active = mode.key === modeKey;
             const n = mode.label || String(mode.focus);
@@ -31,7 +31,7 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 style={({ pressed }) => [
                   s.pill,
                   {
-                    backgroundColor: active ? C.elev : "transparent",
+                    backgroundColor: active ? C.surface : "transparent",
                     borderColor: active ? C.border : "transparent",
                     transform: [{ scale: pressed ? 0.96 : 1 }],
                   },
@@ -39,13 +39,8 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
               >
                 <Text
                   style={[
-                    TYPOGRAPHY.topicName,
-                    {
-                      color: active ? C.text : C.text3,
-                      fontSize: 17,
-                      lineHeight: 19,
-                      fontVariant: ["tabular-nums"],
-                    },
+                    s.pillNumber,
+                    { color: active ? C.text : C.text3 },
                   ]}
                   allowFontScaling={false}
                 >
@@ -53,13 +48,8 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 </Text>
                 <Text
                   style={[
-                    TYPOGRAPHY.micro,
-                    {
-                      color: active ? C.text2 : C.text4,
-                      fontSize: 10.5,
-                      letterSpacing: 0.6,
-                      marginTop: 1,
-                    },
+                    s.pillRest,
+                    { color: active ? C.text2 : C.text4 },
                   ]}
                 >
                   {rest}
@@ -76,13 +66,13 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
           style={({ pressed }) => [
             s.editButton,
             {
-              borderColor: C.line,
+              borderColor: C.border,
               backgroundColor: pressed ? C.elev : C.surface,
               transform: [{ scale: pressed ? 0.94 : 1 }],
             },
           ]}
         >
-          <Icon name="edit" size={15} color={C.text3} />
+          <Icon name="edit" size={16} color={C.text3} />
         </Pressable>
       </View>
     </View>
@@ -91,7 +81,7 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
 
 const s = StyleSheet.create({
   container: { paddingHorizontal: GUTTER, marginTop: STEP.s2 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  row: { flexDirection: "row", alignItems: "center", gap: 10 },
   pillsBox: {
     flex: 1,
     flexDirection: "row",
@@ -108,10 +98,23 @@ const s = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
   },
+  pillNumber: {
+    fontFamily: "Bricolage_400",
+    fontSize: 18,
+    lineHeight: 20,
+    letterSpacing: -0.4,
+    fontVariant: ["tabular-nums"],
+  },
+  pillRest: {
+    fontFamily: "Archivo_500Medium",
+    fontSize: 10.5,
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   editButton: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: 13,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",

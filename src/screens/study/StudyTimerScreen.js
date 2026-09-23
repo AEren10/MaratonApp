@@ -89,8 +89,28 @@ export default function StudyTimerScreen() {
 
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: STEP.s4 }}>
         <Animated.View style={[{ alignItems: "center" }, timerAnimStyle]}>
-          <TimerRing size={272} stroke={8} pct={pct} color={phaseColor} cycleIndex={cycleIndex} totalCycles={mode?.cycles || 4} showDashes={isPomodoro} C={C}>
-            <TimerCenterDisplay C={C} displaySeconds={timer.displaySeconds} elapsed={elapsed} hasSubject={hasSubject} isPomodoro={isPomodoro} mode={mode} running={running} subject={subject} topicSubtitle={topicSubtitle} />
+          <TimerRing
+            size={272}
+            stroke={8}
+            pct={pct}
+            color={phaseColor}
+            cycleIndex={cycleIndex}
+            totalCycles={mode?.cycles || 4}
+            showDashes={isPomodoro}
+            running={running}
+            C={C}
+          >
+            <TimerCenterDisplay
+              C={C}
+              displaySeconds={timer.displaySeconds}
+              elapsed={elapsed}
+              hasSubject={hasSubject}
+              isPomodoro={isPomodoro}
+              mode={mode}
+              running={running}
+              subject={subject}
+              topicSubtitle={topicSubtitle}
+            />
           </TimerRing>
         </Animated.View>
 

@@ -45,12 +45,18 @@ const TodayWidget = (props, environment) => {
   // Genis boyda haftanin cubuklari da var: kucuk boyla arasindaki fark tek
   // satir olmasin, genislik bir ise yarasin. Gunun kendisi vurgulu, digerleri
   // soluk -- widget'in kahramani bugunun sayisi, hafta destek.
-  const weekData = days.map((day) => ({
-    x: day.label,
-    y: Number(day.questions) > 0 ? Number(day.questions) : 0,
-    color: Number(day.questions) > 0 ? accent : track,
-  }));
-  const weekHasData = weekData.some((d) => d.y > 0);
+  // BOS HAFTADA DA CIZILIR.
+  // Once "veri yoksa cizme" demistim; sonuc: hic soru cozulmemis haftada
+  // genis boy kucuk boydan farksiz kaliyordu. Uygulamadaki grafikte bunun
+  // icin hayalet kutular var, widget'ta da olmali. Calisilmamis gun en
+  // kucuk degeri alip track renginde duruyor: yerini gosteriyor, dolu
+  // gibi gorunmuyor.
+  const peak = days.reduce((max, d) => Math.max(max, Number(d.questions) || 0), 0);
+  const ghost = Math.max(1, Math.round(peak * 0.06));
+  const weekData = days.map((day) => {
+    const q = Number(day.questions) || 0;
+    return { x: day.label, y: q > 0 ? q : ghost, color: q > 0 ? accent : track };
+  });
 
   return (
     <VStack modifiers={[padding({ all: compact ? 14 : 16 })]}>
@@ -111,7 +117,7 @@ const TodayWidget = (props, environment) => {
         </HStack>
       ) : null}
 
-      {!compact && weekHasData ? (
+      {!compact && weekData.length ? (
         <Chart
           data={weekData}
           type="bar"

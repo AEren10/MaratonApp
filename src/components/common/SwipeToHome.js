@@ -3,6 +3,8 @@ import { runOnJS, useSharedValue } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { SCREENS } from "../../constants/screens";
+import { openInTab } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 // Sol kenardan başlasın — scroll içeren ekranlarda yan dürtme bile tetiklemesin.
@@ -18,8 +20,21 @@ const MIN_VELOCITY = 450;
 // Sıkı eşikler — aşağı scroll'a yanlışlıkla tetiklenmesin.
 export function SwipeToHome({ children }) {
   const navigation = useNavigation();
-  const goHome = () => navigation.navigate(SCREENS.HOME);
   const edgeStart = useSharedValue(false);
+
+  // SOL KENAR iOS'UN KENDI GERI HAREKETI.
+  // Yigin icindeki bir ekranda (or. Profil -> Profili Duzenle) kenardan
+  // kaydirmak hem sistemin geri hareketini hem bunu tetikliyordu: ekran bir
+  // yandan pop edilirken bir yandan Ana Sayfa'ya gidiliyor, React Navigation
+  // "bu eylem hicbir navigator tarafindan karsilanmadi" diye uyariyor ve
+  // kullanici kendini Ana Sayfa'da buluyordu. Geri gidilebilen bir ekrandaysak
+  // hareket devre disi: orada sistemin isi.
+  const goHome = () => {
+    if (navigation.canGoBack?.()) return;
+    // Bare navigate(HOME) ic yiginda karsilanmayabiliyor; sekme kokune
+    // gidildigi icin eylem her zaman bir navigator tarafindan ele aliniyor.
+    openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
+  };
 
   const pan = Gesture.Pan()
     .manualActivation(true)

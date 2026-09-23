@@ -266,6 +266,13 @@ const ICONS = {
       <Polyline points="17 18 23 18 23 12" />
     </>
   ),
+  play: <Polygon points="6 4 20 12 6 20 6 4" />,
+  pause: (
+    <>
+      <Rect x="6" y="4" width="4" height="16" rx="1" />
+      <Rect x="14" y="4" width="4" height="16" rx="1" />
+    </>
+  ),
   refresh: (
     <>
       <Polyline points="23 4 23 10 17 10" />

@@ -1,14 +1,13 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Icon } from "../../../components/design/Icon";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
+import { STEP, GUTTER } from "../../../themes/tokens";
 
 export function StudyTimerNotice({ C }) {
   return (
     <View style={s.wrap}>
-      <View style={s.row}>
-        <Icon name="info" size={13} color={C.text3} />
-        <Text style={[TYPOGRAPHY.caption, s.text, { color: C.text3 }]}>
-          Çözdüğün soruyu bitişte soracağız. Şimdi sadece odaklan.
+      <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
+        <View style={[s.dot, { backgroundColor: C.text4 }]} />
+        <Text style={[s.text, { color: C.text3 }]}>
+          Çözdüğün soruyu bitişte soracağız. Şimdi sadece çalış.
         </Text>
       </View>
     </View>
@@ -19,19 +18,29 @@ const s = StyleSheet.create({
   wrap: {
     width: "100%",
     paddingHorizontal: GUTTER,
-    marginTop: STEP.s1 + 3,
-    alignItems: "center",
+    marginTop: STEP.s2,
   },
-  row: {
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 7,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    gap: 11,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 2,
+    flexShrink: 0,
   },
   text: {
-    fontSize: 12,
-    lineHeight: 16,
+    flex: 1,
+    fontFamily: "Archivo_500Medium",
+    fontSize: 12.5,
+    lineHeight: 18,
   },
 });
+
 

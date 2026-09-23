@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
+import { Icon } from "../../../components/design/Icon";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../../themes/tokens";
 // Dogrudan expo-haptics KULLANILMAZ: haptics.js kullanicinin "titresim
 // kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
@@ -32,7 +33,6 @@ export function StudyTimerControls({
   }, [scale]);
 
   const handleToggle = useCallback(() => {
-    // Baslat/duraklat bir TAAHHUT, agir bir dusus degil: Medium fazla sert.
     H.tap();
     onToggle?.();
   }, [onToggle]);
@@ -71,6 +71,11 @@ export function StudyTimerControls({
           },
         ]}
       >
+        <Icon
+          name={running ? "pause" : "play"}
+          size={16}
+          color={btnText}
+        />
         <Text style={[TYPOGRAPHY.button, { color: btnText, letterSpacing: 0.3 }]}>
           {running ? "Duraklat" : "Başlat"}
         </Text>
@@ -115,8 +120,10 @@ const s = StyleSheet.create({
     width: "100%",
     height: CONTROL.buttonPrimary,
     borderRadius: SHAPE.button,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
   },
   linkBtn: {
     height: CONTROL.buttonTertiary,
