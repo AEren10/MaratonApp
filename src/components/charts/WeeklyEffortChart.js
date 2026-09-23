@@ -41,7 +41,11 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const usableH = bottom - top;
   const usableW = CHART_W - PAD_LEFT - PAD_RIGHT;
   const slot = usableW / week.days.length;
-  const barW = Math.min(26, slot * 0.52);
+  // Cubuk genisligi: yuvanin yarisindan az oldugunda haftalik grafik yedi
+  // ince cizgiye donuyor ve aradaki bosluk cubuktan genis kaliyor. Oran
+  // 0.52 -> 0.68, tavan 26 -> 34: aralar hala nefes aliyor ama agirlik
+  // cubukta.
+  const barW = Math.min(34, slot * 0.68);
 
   // Tuval tepe payı (headroom): Hedef çizgisi tavana yapışmasın;
   // hedefte veya 300 soru gibi yüksek sayılarda çubuklar taşmadan

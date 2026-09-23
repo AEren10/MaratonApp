@@ -17,8 +17,10 @@ export const CHART_H = 232;
 
 // Dugum yaricapi 9; bosluk olmadan ilk/son dugum viewBox'in disina tasiyor.
 // Sag taraf daha genis, cunku "TAHMİN 71" etiketi oraya yasliyor.
-export const PAD_LEFT = 26;
-export const PAD_RIGHT = 34;
+// Haftalik grafikte yedi cubuk bu iki payin arasina siginiyor; genis
+// paylar cubuklari daha da inceltiyordu.
+export const PAD_LEFT = 20;
+export const PAD_RIGHT = 28;
 export const PAD_TOP = 26;
 export const PAD_BOTTOM = 20;
 
