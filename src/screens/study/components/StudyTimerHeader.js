@@ -25,6 +25,7 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
       </Pressable>
 
       <View style={[s.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
+        <View style={[s.badgeDot, { backgroundColor: eyebrowColor || C.accent }]} />
         <Text
           style={[
             TYPOGRAPHY.label,
@@ -76,11 +77,21 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     paddingHorizontal: 13,
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
     maxWidth: "60%",
   },
+  badgeDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    flexShrink: 0,
+  },
 });
+
 

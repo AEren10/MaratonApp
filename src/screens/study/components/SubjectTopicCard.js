@@ -13,7 +13,9 @@ export function SubjectTopicCard({ C, subject, topic, stopLabel }) {
   return (
     <View style={s.wrap}>
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <View style={[s.jewelDot, { backgroundColor: subColor }]} />
+        <View style={[s.jewelBox, { backgroundColor: subColor + "18", borderColor: subColor + "35" }]}>
+          <View style={[s.jewelDot, { backgroundColor: subColor }]} />
+        </View>
         <View style={s.content}>
           <Text
             style={[s.subjectLabel, { color: subColor }]}
@@ -29,9 +31,11 @@ export function SubjectTopicCard({ C, subject, topic, stopLabel }) {
           </Text>
         </View>
         {stopLabel ? (
-          <Text style={[s.stopText, { color: C.text3 }]}>
-            {stopLabel}
-          </Text>
+          <View style={[s.stopBadge, { backgroundColor: C.elev, borderColor: C.border }]}>
+            <Text style={[s.stopText, { color: C.text2 }]}>
+              {stopLabel}
+            </Text>
+          </View>
         ) : null}
       </View>
     </View>
@@ -48,15 +52,24 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 13,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
   },
+  jewelBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
   jewelDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 2.5,
     flexShrink: 0,
   },
   content: {
@@ -65,20 +78,27 @@ const s = StyleSheet.create({
   },
   subjectLabel: {
     fontFamily: "Archivo_700Bold",
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontSize: 11,
+    letterSpacing: 1.4,
   },
   topicText: {
     fontFamily: "Bricolage_400",
     fontSize: 16.5,
     lineHeight: 21,
-    marginTop: 3,
+    marginTop: 2,
   },
-  stopText: {
-    fontFamily: "Archivo_500Medium",
-    fontSize: 12,
+  stopBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
     flexShrink: 0,
   },
+  stopText: {
+    fontFamily: "Archivo_600SemiBold",
+    fontSize: 11.5,
+  },
 });
+
 
 

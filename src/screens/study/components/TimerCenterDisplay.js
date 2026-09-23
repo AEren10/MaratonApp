@@ -37,17 +37,21 @@ export function TimerCenterDisplay({
       <View
         style={{
           marginTop: 10,
-          paddingHorizontal: 13,
+          paddingHorizontal: 12,
           paddingVertical: 4,
           borderRadius: 999,
           backgroundColor: badgeBg,
           borderWidth: 1,
           borderColor: badgeBorder,
-          maxWidth: 220,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+          maxWidth: 240,
         }}
       >
+        <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: badgeColor }} />
         <Text
-          style={[TYPOGRAPHY.captionMedium, { color: badgeColor, fontSize: 12.5 }]}
+          style={[TYPOGRAPHY.captionMedium, { color: badgeColor, fontSize: 12 }]}
           numberOfLines={1}
         >
           {label}

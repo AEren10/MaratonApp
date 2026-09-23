@@ -49,7 +49,7 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 <Text
                   style={[
                     s.pillRest,
-                    { color: active ? C.text2 : C.text4 },
+                    { color: active ? C.accent : C.text4 },
                   ]}
                 >
                   {rest}

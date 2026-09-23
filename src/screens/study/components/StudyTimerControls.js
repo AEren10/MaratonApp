@@ -94,7 +94,7 @@ export function StudyTimerControls({
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>Durağı bitir</Text>
       </Pressable>
 
-      {isPomodoro && (
+      {isPomodoro && running && (
         <Pressable
           onPress={handleSkip}
           hitSlop={10}
