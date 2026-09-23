@@ -16,6 +16,7 @@ const WIDGETS = ["WeekWidget", "TodayWidget", "ReviewWidget", "RouteWidget"];
 // buildPalette("dark") ciktisi; track gibi turetilmis olanlar dahil.
 const PALETTE = {
   accent: "#E5343F",
+  bg: "#1C1C23",
   up: "#34D399",
   text: "#F5F2EF",
   text2: "#A3A0A8",

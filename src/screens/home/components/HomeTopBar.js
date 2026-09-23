@@ -19,8 +19,8 @@ function initialsOf(name = "") {
   return letters.toLocaleUpperCase("tr");
 }
 
-// Ana Sayfa ust bandi: bas harf kutusu, selam + ad, sinava kalan gun cipi.
-export function HomeTopBar({ name, streak = 0, onProfile, onCalendar }) {
+// Ana Sayfa ust bandi: bas harf kutusu, selam + ad, sinava kalan gun cipi ve sosyal kisayol.
+export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }) {
   const C = useC();
   // Bu cip eskiden sinava kalan gunu yaziyordu — ama ayni sayi hemen altinda
   // "YKS 2028 / 632 gun" olarak zaten duruyor. Ayni ekranda ayni sayi iki kez.
@@ -37,6 +37,12 @@ export function HomeTopBar({ name, streak = 0, onProfile, onCalendar }) {
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
         <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.name, { color: C.text }]}>{name}</Text>
       </View>
+      <Pressable onPress={() => { H.tap(); onSocial?.(); }}
+        accessibilityRole="button"
+        accessibilityLabel="Sosyal ve Gruplar"
+        style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+        <Icon name="users" size={16} color={C.text2} />
+      </Pressable>
       <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
         accessibilityRole="button"
         accessibilityLabel={days > 0 ? `${days} günlük seri, takvimi aç` : "Takvimi aç"}
@@ -60,6 +66,10 @@ const s = StyleSheet.create({
   initials: { fontSize: TYPOGRAPHY.button.fontSize + 2, lineHeight: TYPOGRAPHY.button.lineHeight + 2 },
   flex: { flex: 1, minWidth: 0 },
   name: { fontSize: TYPOGRAPHY.topicName.fontSize + 1, marginTop: STEP.s1 / 4 },
+  iconBtn: {
+    width: CONTROL.tapMin, height: CONTROL.tapMin, borderRadius: SHAPE.button, borderWidth: 1,
+    alignItems: "center", justifyContent: "center",
+  },
   chip: {
     flexDirection: "row", alignItems: "center", gap: STEP.s1, height: CONTROL.tapMin,
     paddingHorizontal: STEP.s2 + 3, borderRadius: SHAPE.button, borderWidth: 1,

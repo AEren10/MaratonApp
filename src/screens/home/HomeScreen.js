@@ -49,7 +49,7 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
         <HomeTopBar name={dashboard.displayName} streak={h.streak}
-          onProfile={actions.profile} onCalendar={actions.calendar} />
+          onProfile={actions.profile} onCalendar={actions.calendar} onSocial={actions.groups} />
         <ErrorState
           preset="server"
           onPrimary={h.onRefresh}
@@ -67,7 +67,7 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
         <HomeTopBar name={dashboard.displayName} streak={h.streak}
-          onProfile={actions.profile} onCalendar={actions.calendar} />
+          onProfile={actions.profile} onCalendar={actions.calendar} onSocial={actions.groups} />
         <SyncProblemBanner />
         <HomeExamAftermathRow />
         <HomeHero

@@ -35,5 +35,7 @@ export function useHomeActions({ navigation, go }) {
     record: go(SCREENS.ADD_STUDY),
     proPreview: go(SCREENS.PRO_PREVIEW),
     firstWeek: go(SCREENS.FIRST_WEEK),
+    groups: go(SCREENS.LEAGUE, { tab: "groups" }),
+    league: go(SCREENS.LEAGUE, { tab: "groups" }),
   }), [go, startTask, subjectDetail]);
 }

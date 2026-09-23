@@ -1,277 +1,109 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, Modal, TextInput, StyleSheet, Share, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, Pressable, FlatList, StyleSheet, Share } from "react-native";
+
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Icon, Avatar } from "../../components/design";
+import { Icon } from "../../components/design";
 import { GroupsSkeleton } from "./components/GroupsSkeleton";
+import { GroupMemberRow } from "./components/GroupMemberRow";
+import { GroupCodeModal } from "./components/GroupCodeModal";
+import { GroupCompetitionBanner } from "./components/GroupCompetitionBanner";
 import { EmptyState } from "../../components/common/EmptyState";
-import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
-import { useAlert } from "../../contexts/AlertContext";
-import * as H from "../../lib/haptics";
+import { groupLeaderboard } from "../../supabase/groups";
+import { useGroupsController } from "./useGroupsController";
 import { SCREENS } from "../../constants/screens";
 import { appUrl } from "../../navigation/routes";
 
-const MemberRow = React.memo(function MemberRow({ item }) {
-  const C = useC();
-  const st = useMemo(() => makeStyles(C), [C]);
-  const isYou = item.you;
-  const medal = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
-  const weeklyQuestions = item.weekly_questions ?? item.questions ?? item.weekly_xp ?? 0;
-  return (
-    <View style={[st.row, isYou && st.rowYou]}>
-      <View style={{ width: 26, alignItems: "center" }}>
-        {medal ? <Icon name="trophy" size={16} color={medal} /> : <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{item.rank}</Text>}
-      </View>
-      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={30} color={isYou ? C.accent : undefined} />
-      <Text style={{ flex: 1, marginLeft: 10, ...TYPOGRAPHY.bodyMedium, color: isYou ? C.accent : C.text }} numberOfLines={1}>
-        {isYou ? "Sen" : item.name || "Öğrenci"}
-      </Text>
-      <Text style={{ fontFamily: "Bricolage_400", fontSize: 15, color: C.text }}>{weeklyQuestions}</Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: 3 }]}>soru</Text>
-    </View>
-  );
-});
-
 export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
-  const showAlert = useAlert();
-  const st = useMemo(() => makeStyles(C), [C]);
-  const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
+  const c = useGroupsController({ user, initialGroupCode });
   const [board, setBoard] = useState({ list: [] });
   const [boardError, setBoardError] = useState(null);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [joinOpen, setJoinOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  const loadGroups = useCallback(async () => {
-    if (!user?.id) return;
-    setLoading(true);
-    try {
-      const list = await listMyGroups(user.id);
-      setGroups(list);
-      if (list.length && !selected) setSelected(list[0]);
-    } catch (e) {
-      showAlert("Yüklenemedi", "Gruplar alınamadı. Tekrar dene.");
-    }
-    setLoading(false);
-  }, [user?.id, selected]);
-
-  useEffect(() => { loadGroups(); }, [user?.id]);
-
-  useEffect(() => {
-    if (!initialGroupCode || !user?.id) return;
-    setBusy(true);
-    joinByCode(initialGroupCode)
-      .then(() => { H.success(); loadGroups(); })
-      .catch(() => showAlert("Hata", "Grup kodu geçersiz veya zaten üyesin."))
-      .finally(() => setBusy(false));
-  }, [initialGroupCode, user?.id]);
 
   const loadBoard = useCallback(async () => {
-    if (!selected?.id || !user?.id) return;
+    if (!c.selected?.id || !user?.id) return;
     setBoardError(null);
     try {
-      setBoard(await groupLeaderboard(selected.id, user.id));
+      setBoard(await groupLeaderboard(c.selected.id, user.id));
     } catch (e) {
       setBoardError(e?.message || "Sıralama yüklenemedi.");
     }
-  }, [selected?.id, user?.id]);
+  }, [c.selected?.id, user?.id]);
 
   useEffect(() => { loadBoard(); }, [loadBoard]);
 
-  const doCreate = async () => {
-    if (!name.trim()) return;
-    setBusy(true);
-    try {
-      const g = await createGroup(name);
-      H.success();
-      setCreateOpen(false);
-      setName("");
-      await loadGroups();
-      setSelected(g);
-      showAlert("Grup oluştu", `Kod: ${g.code}\nArkadaşlarınla paylaş!`);
-    } catch (e) {
-      showAlert("Hata", "Grup oluşturulamadı.");
-    }
-    setBusy(false);
-  };
-
-  const doJoin = async () => {
-    if (code.trim().length < 6) return;
-    setBusy(true);
-    try {
-      await joinByCode(code);
-      H.success();
-      setJoinOpen(false);
-      setCode("");
-      await loadGroups();
-    } catch (e) {
-      showAlert("Hata", "Kod geçersiz ya da grup bulunamadı.");
-    }
-    setBusy(false);
-  };
-
-  const doLeave = (g) => {
-    H.warn();
-    showAlert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
-      { text: "İptal", style: "cancel" },
-      { text: "Ayrıl", style: "destructive", onPress: async () => {
-        try {
-          await leaveGroup(g.id, user.id);
-          if (selected?.id === g.id) setSelected(null);
-          loadGroups();
-        } catch (e) { showAlert("Hata", e.message || "Gruptan ayrılınamadı."); }
-      } },
-    ]);
-  };
+  const standing = useMemo(() => {
+    if (!board.list?.length) return null;
+    const leader = board.list[0];
+    const mine = board.list.find((m) => m.you);
+    if (!mine) return null;
+    const isLeader = mine.rank === 1;
+    const second = board.list[1];
+    const myQ = mine.weekly_questions ?? mine.questions ?? 0;
+    const leaderQ = leader.weekly_questions ?? leader.questions ?? 0;
+    const secQ = second ? (second.weekly_questions ?? second.questions ?? 0) : 0;
+    const diff = isLeader ? Math.max(0, myQ - secQ) : Math.max(0, leaderQ - myQ);
+    return { isLeader, rank: mine.rank, diff, leaderName: leader.name || "Lider", leaderQuestions: leaderQ };
+  }, [board.list]);
 
   const shareCode = (g) => {
     Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { groupCode: g.code })}` }).catch(() => {});
   };
 
   const renderGroupChip = useCallback(({ item }) => {
-    const active = selected?.id === item.id;
+    const active = c.selected?.id === item.id;
     return (
-      <Pressable
-        onPress={() => setSelected(item)}
-        onLongPress={() => doLeave(item)}
-        style={[st.chip, active && st.chipActive]}
-      >
-        <Text style={[st.chipText, active && { color: C.accent }]}>{item.name}</Text>
+      <Pressable onPress={() => c.setSelected(item)} onLongPress={() => c.doLeave(item)}
+        style={[s.chip, { backgroundColor: C.surface, borderColor: active ? C.accent : C.border }, active && { backgroundColor: C.accent + "18" }]}>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: active ? C.accent : C.text2 }]}>{item.name}</Text>
       </Pressable>
     );
-  }, [selected?.id, st, C.accent, doLeave]);
+  }, [c, C]);
 
-  const renderMemberItem = useCallback(({ item }) => <MemberRow item={item} />, []);
+  const renderMemberItem = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
 
-  if (loading) {
-    return <GroupsSkeleton />;
-  }
+  if (c.loading) return <GroupsSkeleton />;
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={st.actions}>
-        <Pressable onPress={() => setCreateOpen(true)} style={[st.actBtn, { backgroundColor: C.accent }]}>
-          <Icon name="plus" size={15} color={C.bg} sw={2.5} />
-          <Text style={[st.actText, { color: C.bg }]}>Grup Oluştur</Text>
+    <View style={s.fill}>
+      <View style={s.actions}>
+        <Pressable onPress={() => c.setCreateOpen(true)} style={[s.actBtn, { backgroundColor: C.accent }]}>
+          <Icon name="plus" size={15} color={C.accentInk} sw={2.5} /><Text style={[TYPOGRAPHY.button, { color: C.accentInk }]}>Yeni Grup Oluştur</Text>
         </Pressable>
-        <Pressable onPress={() => setJoinOpen(true)} style={[st.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
-          <Icon name="users" size={15} color={C.text} />
-          <Text style={[st.actText, { color: C.text }]}>Koda Gir</Text>
+        <Pressable onPress={() => c.setJoinOpen(true)} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+          <Icon name="users" size={15} color={C.text} /><Text style={[TYPOGRAPHY.button, { color: C.text }]}>Kodu Gir</Text>
         </Pressable>
       </View>
-
-      {groups.length === 0 ? (
-        <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla bir grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
+      {c.groups.length === 0 ? (
+        <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
       ) : (
         <>
-          <FlatList
-            horizontal
-            data={groups}
-            keyExtractor={(g) => g.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 8 }}
-            renderItem={renderGroupChip}
-          />
-
-          {selected ? (
-            <FlatList
-              data={board.list}
-              keyExtractor={(m) => String(m.user_id)}
-              renderItem={renderMemberItem}
-              windowSize={5}
-              maxToRenderPerBatch={10}
-              ListHeaderComponent={
-                <Pressable onPress={() => shareCode(selected)} style={st.codeRow}>
-                  <Icon name="share" size={14} color={C.accent} />
-                  <Text style={st.codeText}>Kod: {selected.code} · paylaş</Text>
-                </Pressable>
-              }
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, gap: 6 }}
-              ListEmptyComponent={
-                boardError ? (
-                  <View style={st.boardError}>
-                    <Text style={st.emptySub}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text>
-                    <Pressable onPress={loadBoard} style={st.retryBtn}>
-                      <Text style={st.retryText}>Tekrar dene</Text>
-                    </Pressable>
-                  </View>
-                ) : (
-                  <Text style={st.emptySub}>Bu hafta kimse aktif değil.</Text>
-                )
-              }
+          <FlatList horizontal data={c.groups} keyExtractor={(g) => g.id} showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipList} renderItem={renderGroupChip} />
+          {c.selected ? (
+            <FlatList data={board.list} keyExtractor={(m) => String(m.user_id)} renderItem={renderMemberItem} windowSize={5} maxToRenderPerBatch={10}
+              ListHeaderComponent={<GroupCompetitionBanner standing={standing} group={c.selected} onShare={shareCode} />}
+              contentContainerStyle={s.boardList}
+              ListEmptyComponent={boardError ? (
+                <View style={s.boardError}><Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text><Pressable onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}><Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text></Pressable></View>
+              ) : <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>Bu hafta kimse aktif değil.</Text>}
             />
           ) : null}
         </>
       )}
-
-      <CodeModal
-        visible={createOpen} title="Grup Oluştur" placeholder="Grup adı"
-        value={name} onChange={setName} onSubmit={doCreate} onClose={() => setCreateOpen(false)} busy={busy} cta="Oluştur"
-      />
-      <CodeModal
-        visible={joinOpen} title="Koda Gir" placeholder="6 haneli kod" autoCap maxLen={6}
-        value={code} onChange={setCode} onSubmit={doJoin} onClose={() => setJoinOpen(false)} busy={busy} cta="Katıl"
-      />
+      <GroupCodeModal visible={c.createOpen} title="Yeni Grup Oluştur" placeholder="Grup adı (örn. 12-A Sayısal)" value={c.name} onChange={c.setName} onSubmit={c.doCreate} onClose={() => c.setCreateOpen(false)} busy={c.busy} cta="Oluştur" />
+      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" placeholder="6 haneli kod" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={() => c.setJoinOpen(false)} busy={c.busy} cta="Katıl" />
     </View>
   );
 }
 
-function CodeModal({ visible, title, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen }) {
-  const C = useC();
-  const st = useMemo(() => makeStyles(C), [C]);
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <Pressable style={st.backdrop} onPress={onClose}>
-        <Pressable style={st.sheet} onPress={(e) => e.stopPropagation()}>
-          <View style={st.handle} />
-          <Text style={st.sheetTitle}>{title}</Text>
-          <TextInput
-            value={value}
-            onChangeText={onChange}
-            placeholder={placeholder}
-            placeholderTextColor={C.muted}
-            autoCapitalize={autoCap ? "characters" : "sentences"}
-            maxLength={maxLen}
-            style={st.input}
-            autoFocus
-          />
-          <Pressable onPress={onSubmit} disabled={busy} style={[st.submit, busy && { opacity: 0.6 }]}>
-            <Text style={st.submitText}>{busy ? "..." : cta}</Text>
-          </Pressable>
-        </Pressable>
-      </Pressable>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-}
-
-const makeStyles = (C) => StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+const s = StyleSheet.create({
+  fill: { flex: 1 },
   actions: { flexDirection: "row", gap: SPACING.sm, paddingHorizontal: 16, marginBottom: SPACING.sm },
-  actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md, borderRadius: RADIUS.lg },
-  actText: { ...TYPOGRAPHY.button },
-  emptySub: { ...TYPOGRAPHY.caption, color: C.muted, textAlign: "center", paddingHorizontal: SPACING.xl },
+  actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, borderRadius: RADIUS.lg },
+  chipList: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1 },
+  boardList: { paddingHorizontal: 16, paddingBottom: 100, gap: 6 },
   boardError: { alignItems: "center", gap: SPACING.sm, paddingTop: SPACING.lg },
-  retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1, borderColor: C.border },
-  retryText: { ...TYPOGRAPHY.captionMedium, color: C.text },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
-  chipActive: { backgroundColor: C.accent + "18", borderColor: C.accent },
-  chipText: { ...TYPOGRAPHY.captionMedium, color: C.sec },
-  codeRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: SPACING.md },
-  codeText: { ...TYPOGRAPHY.captionMedium, color: C.accent },
-  row: { flexDirection: "row", alignItems: "center", backgroundColor: C.surface, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10 },
-  rowYou: { backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "40" },
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: C.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: SPACING.lg, paddingBottom: SPACING.xxxl },
-  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: SPACING.md },
-  sheetTitle: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.md },
-  input: { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, ...TYPOGRAPHY.input, color: C.text },
-  submit: { backgroundColor: C.accent, borderRadius: RADIUS.lg, paddingVertical: SPACING.md, alignItems: "center", marginTop: SPACING.md },
-  submitText: { ...TYPOGRAPHY.button, color: C.bg },
+  retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1 },
+  emptySub: { textAlign: "center", paddingHorizontal: SPACING.xl, paddingTop: SPACING.lg },
 });

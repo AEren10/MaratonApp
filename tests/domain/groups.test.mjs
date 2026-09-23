@@ -34,3 +34,22 @@ test("groupWeeklyGoalSummary computes shared question target progress", () => {
     { weekly_questions: 55, weekly_target: 100, progress: 0.55, remaining: 45 },
   );
 });
+
+test("sweet competition calculates gap with leader or runner-up", () => {
+  const members = rankGroupMembers([
+    { user_id: "leader", name: "Ahmet", weekly_questions: 140, joined_at: "2026-09-01" },
+    { user_id: "me", name: "Sen", weekly_questions: 122, you: true, joined_at: "2026-09-02" },
+    { user_id: "third", name: "Mehmet", weekly_questions: 90, joined_at: "2026-09-03" },
+  ]);
+
+  const mine = members.find((m) => m.you);
+  const leader = members[0];
+  const second = members[1];
+  const isLeader = mine.rank === 1;
+  const diff = isLeader
+    ? Math.max(0, mine.weekly_questions - second.weekly_questions)
+    : Math.max(0, leader.weekly_questions - mine.weekly_questions);
+
+  assert.equal(mine.rank, 2);
+  assert.equal(diff, 18); // "Ahmet 140 soru çözdü, liderle aranda 18 soru var!"
+});

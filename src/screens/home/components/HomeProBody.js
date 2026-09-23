@@ -8,11 +8,14 @@ import { HomeTodayStops } from "./HomeTodayStops";
 import { HomeMomentumRow } from "./HomeMomentumRow";
 import { HomeLinkRow } from "./HomeLinkRow";
 import { HomeNotebookCard } from "./HomeNotebookCard";
+import { HomeGroupCard } from "./HomeGroupCard";
+import { useMyGroups } from "../../../hooks/useMyGroups";
 
-// Ana Sayfa (Pro) govdesi: bugunun duraklari, dikkat ceken iki ders,
+// Ana Sayfa (Pro) govdesi: bugunun duraklari, calisma grubu karti, dikkat ceken iki ders,
 // konu borcu + haftalik rapor satirlari, Defter karti.
 export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
   const C = useC();
+  const groupsData = useMyGroups();
   // Tekrar bekleyen varsa Defter karti yukari, duraklarin hemen altina cikar:
   // o da bugunun isi. Bekleyen yoksa sayfanin sonunda sakin bir giris olarak
   // kalir ve dikkati bolmez.
@@ -23,6 +26,8 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
   return (
     <View>
       <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
+
+      <HomeGroupCard groupsData={groupsData} onPress={go.groups} />
 
       {dueCount > 0 ? <View style={s.due}>{notebook}</View> : null}
 

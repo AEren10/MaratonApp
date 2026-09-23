@@ -188,13 +188,15 @@ export default function LeagueScreen() {
   const route = useRoute();
   const C = useC();
   const { user } = useAuth();
-  const [tab, setTab] = useState(route.params?.groupCode ? "groups" : "friends");
+  const [tab, setTab] = useState(route.params?.tab || "groups");
 
   useEffect(() => {
-    if (route.params?.groupCode) {
+    if (route.params?.tab) {
+      setTab(route.params.tab);
+    } else if (route.params?.groupCode) {
       setTab("groups");
     }
-  }, [route.params?.groupCode]);
+  }, [route.params?.tab, route.params?.groupCode]);
   const [data, setData] = useState({ list: [], total: null, myRank: null, myScore: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -323,8 +325,10 @@ export default function LeagueScreen() {
           <Icon name="chevL" size={20} color={C.text} />
         </Pressable>
         <View style={{ flex: 1, marginHorizontal: SPACING.sm }}>
-          <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Sosyal</Text>
-          <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2, marginTop: 2 }]}>LİG</Text>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Sosyal Hub</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2, marginTop: 2 }]}>
+            {tab === "groups" ? "GRUPLARIM" : tab === "global" ? "LİG" : "ARKADAŞLAR"}
+          </Text>
         </View>
         <Pressable
           onPress={goInvite}
@@ -356,9 +360,9 @@ export default function LeagueScreen() {
         marginBottom: SPACING.md,
       }}>
         {[
+          { key: "groups", label: "Gruplarım" },
+          { key: "global", label: "Genel Lig" },
           { key: "friends", label: "Arkadaşlar" },
-          { key: "global", label: "Genel" },
-          { key: "groups", label: "Gruplar" },
         ].map((t) => (
           <Pressable
             key={t.key}
