@@ -17,7 +17,7 @@ import { SHARE_CARD_IDS } from "../../domain/share/shareCards";
 import { normalizePeriod } from "../../domain/summary/periodRange";
 import { STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SummaryHeader } from "./components/SummaryHeader";
-import { StreakZeroHero } from "./components/summary/StreakZeroHero";
+import { StreakZeroEmpty } from "./components/summary/StreakZeroEmpty";
 import { SummaryLocked } from "./components/summary/SummaryLocked";
 import { SummaryActions } from "./components/summary/SummaryActions";
 import { DaySummaryBody } from "./components/summary/DaySummaryBody";
@@ -78,9 +78,7 @@ function SummaryScreenInner() {
   } else if (data.streak === 0 && !data.hasActivity) {
     body = (
       <View style={[styles.pad, styles.emptyPad]}>
-        <EmptyState preset="streakZero" onPrimary={handleStart} onSecondary={handleHowStreak} style={styles.streakEmpty}>
-          <StreakZeroHero />
-        </EmptyState>
+        <StreakZeroEmpty onPrimary={handleStart} onSecondary={handleHowStreak} />
       </View>
     );
   } else {
@@ -115,6 +113,5 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, paddingTop: STEP.s4, paddingBottom: STEP.s5 },
   pad: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
   emptyPad: { flex: 1, justifyContent: "center", paddingTop: STEP.s2, paddingBottom: STEP.s5 * 2 },
-  streakEmpty: { alignItems: "center" },
   gap: { marginTop: STEP.s3 },
 });
