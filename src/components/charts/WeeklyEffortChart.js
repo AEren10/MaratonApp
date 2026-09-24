@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Line, Text as SvgText } from "react-native-svg";
 
@@ -14,7 +15,7 @@ const BAR_RADIUS = 3;
 // Ustte kesikli gunluk hedef cizgisi. Rota grafigiyle AYNI tuval olcusunu
 // kullanir (chartStyle) — ikisi slider'da yan yana duruyor, birbirinden
 // farkli boyda olurlarsa kaydirirken zipliyorlar.
-export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
+export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
 
   if (!week) return null;
@@ -111,7 +112,7 @@ export function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
       </Svg>
     </View>
   );
-}
+});
 
 const s = StyleSheet.create({
   // Yukseklik SABIT, oran degil. Rota grafigi de sabit yukseklik kullaniyor;

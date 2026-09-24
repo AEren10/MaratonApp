@@ -1,8 +1,7 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, SectionList, StyleSheet } from "react-native";
+import { View, Text, Pressable, SectionList, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { useC } from "../../contexts/ThemeContext";
 import { GUTTER } from "../../themes/tokens";
@@ -28,11 +27,7 @@ export default function TrialRecordsScreen() {
   );
 
   const renderItem = useCallback(
-    ({ item, index }) => (
-      <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 30)}>
-        <TrialRecordRow item={item} C={C} onPress={openTrial} />
-      </Animated.View>
-    ),
+    ({ item }) => <TrialRecordRow item={item} C={C} onPress={openTrial} />,
     [C, openTrial],
   );
 
@@ -75,6 +70,10 @@ export default function TrialRecordsScreen() {
           renderSectionHeader={renderSectionHeader}
           stickySectionHeadersEnabled={false}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          removeClippedSubviews={Platform.OS === "android"}
           contentContainerStyle={styles.list}
           ListHeaderComponent={
             <TrialRecordFilters

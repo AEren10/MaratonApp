@@ -96,18 +96,26 @@ function renderTabStack(root) {
 
 // Tabbar'in kendi sirasi: ROTA · PROGRAM · [+] · ANALIZ · PROFIL
 const TABS_BEFORE_FAB = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM];
+const BEFORE_FAB_SCREENS = TAB_SCREENS.filter((route) => TABS_BEFORE_FAB.includes(route.name));
+const AFTER_FAB_SCREENS = TAB_SCREENS.filter((route) => !TABS_BEFORE_FAB.includes(route.name));
+
+const TAB_NAV_OPTIONS = {
+  headerShown: false,
+  lazy: true,
+  animation: "none",
+  freezeOnBlur: true,
+  detachInactiveScreens: true,
+};
 
 function MainTabs() {
-  const before = TAB_SCREENS.filter((route) => TABS_BEFORE_FAB.includes(route.name));
-  const after = TAB_SCREENS.filter((route) => !TABS_BEFORE_FAB.includes(route.name));
   return (
     <Tab.Navigator
-      screenOptions={{ headerShown: false }}
+      screenOptions={TAB_NAV_OPTIONS}
       tabBar={(props) => <TabBar {...props} />}
     >
-      {before.map(renderTabStack)}
+      {BEFORE_FAB_SCREENS.map(renderTabStack)}
       <Tab.Screen name={ROOT_STACK.CENTER_ACTION} component={AddStub} />
-      {after.map(renderTabStack)}
+      {AFTER_FAB_SCREENS.map(renderTabStack)}
     </Tab.Navigator>
   );
 }

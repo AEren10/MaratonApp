@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { View } from "react-native";
 import Svg, { Path, Circle, Defs, LinearGradient, Stop, Text as SvgText } from "react-native-svg";
 import { RouteChartLayers } from "./components/RouteChartLayers";
@@ -22,43 +22,50 @@ const W = CHART_W;
 const H = CHART_H;
 
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
-export function RouteLineChart({
+export const RouteLineChart = memo(function RouteLineChart({
   stops = [], todayIndex, projection = [], band, target, ticks, height = H,
   todayLabel, endLabel, axisLabels,
 }) {
   const C = useC();
   const safeStops = Array.isArray(stops) ? stops : [];
   const safeProj = Array.isArray(projection) ? projection : [];
-  const values = safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0));
+  const values = useMemo(() => safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0)), [safeStops]);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
   const scaleOpts = scaleOptions({ hasAxis });
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
-    [values.join(","), safeProj.join(","), target],
+    [values, safeProj, target],
   );
 
-  const points = useMemo(() => sc.toPoints(values, { count: totalCount }), [sc, values.join(","), totalCount]);
-  const { past: pastPoints } = splitPastFuture(points, todayIndex);
+  const points = useMemo(() => sc.toPoints(values, { count: totalCount }), [sc, values, totalCount]);
+  const { past: pastPoints, future: fallbackFuture } = useMemo(
+    () => splitPastFuture(points, todayIndex),
+    [points, todayIndex],
+  );
 
   // Projeksiyon gecmisin SON noktasindan devam eder — surekli cizgi.
-  const futurePoints = safeProj.length && values.length
+  const futurePoints = useMemo(() => (safeProj.length && values.length
     ? sc.toPoints([values[values.length - 1], ...safeProj], {
         count: totalCount,
         offset: values.length - 1,
       })
-    : splitPastFuture(points, todayIndex).future;
+    : fallbackFuture), [safeProj, values, sc, totalCount, fallbackFuture]);
 
-  const baseY = H - scaleOpts.padBottom;
-  const areaD = buildAreaPath(points, baseY);
-  const pastD = buildLinePath(pastPoints);
-  const futD = buildSmoothPath(futurePoints);
-  const bandD = band?.upper && band?.lower
-    ? buildBandPath(
-        sc.toPoints(band.upper, { count: totalCount }),
-        sc.toPoints(band.lower, { count: totalCount }),
-      )
-    : null;
+  const { areaD, pastD, futD, bandD } = useMemo(() => {
+    const baseY = H - scaleOpts.padBottom;
+    return {
+      areaD: buildAreaPath(points, baseY),
+      pastD: buildLinePath(pastPoints),
+      futD: buildSmoothPath(futurePoints),
+      bandD: band?.upper && band?.lower
+        ? buildBandPath(
+            sc.toPoints(band.upper, { count: totalCount }),
+            sc.toPoints(band.lower, { count: totalCount }),
+          )
+        : null,
+    };
+  }, [points, pastPoints, futurePoints, band, sc, totalCount, scaleOpts.padBottom]);
 
   const targetY = typeof target === "number" ? sc.toY(target) : null;
   const todayPoint = pastPoints[pastPoints.length - 1];
@@ -123,5 +130,5 @@ export function RouteLineChart({
       </Svg>
     </View>
   );
-}
+});
 

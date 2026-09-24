@@ -38,8 +38,8 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, acc
       if (snapped !== lastSnapped.value) {
         lastSnapped.value = snapped;
         runOnJS(H.select)();
+        runOnJS(onChange)(snapped);
       }
-      runOnJS(onChange)(snapped);
     })
     .onEnd(() => {
       const raw = min + (thumbX.value / trackWidth) * (max - min);
@@ -53,7 +53,9 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, acc
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value - THUMB_R }, { scale: thumbScale.value }],
   }));
-  const fillStyle = useAnimatedStyle(() => ({ width: thumbX.value }));
+  const fillStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleX: trackWidth > 0 ? Math.max(0, Math.min(1, thumbX.value / trackWidth)) : 0 }],
+  }));
   const hitArea = THUMB_R * 2 + 20;
 
   return (
@@ -79,6 +81,6 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, acc
 const styles = StyleSheet.create({
   trackWrap: { justifyContent: "center" },
   trackBg: { height: TRACK_H, borderRadius: TRACK_H / 2, overflow: "hidden" },
-  trackFill: { height: TRACK_H, borderRadius: TRACK_H / 2 },
+  trackFill: { width: "100%", height: TRACK_H, borderRadius: TRACK_H / 2, transformOrigin: "left" },
   thumb: { position: "absolute", width: THUMB_R * 2, height: THUMB_R * 2, borderRadius: 6 },
 });

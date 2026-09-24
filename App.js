@@ -1,5 +1,9 @@
+import { enableFreeze, enableScreens } from "react-native-screens";
 import { useCallback } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
+
+enableScreens(true);
+enableFreeze(true);
 
 if (Text.defaultProps == null) Text.defaultProps = {};
 Text.defaultProps.maxFontSizeMultiplier = 1.3;

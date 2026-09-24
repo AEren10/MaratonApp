@@ -1,6 +1,7 @@
 import { memo, useMemo, useEffect } from "react";
 import Svg, { Defs, LinearGradient, Path, Circle, Stop, Text as SvgText } from "react-native-svg";
 import Animated, {
+  cancelAnimation,
   useSharedValue,
   useAnimatedProps,
   withRepeat,
@@ -56,6 +57,10 @@ function CurriculumCurve({ ratio = 0 }) {
       -1,
       true,
     );
+    return () => {
+      cancelAnimation(pulseR);
+      cancelAnimation(pulseOpacity);
+    };
   }, [pulseR, pulseOpacity, reduced]);
 
   const haloProps = useAnimatedProps(() => ({

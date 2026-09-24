@@ -11,21 +11,23 @@ export const screenOptions = {
   headerShown: false,
   contentStyle: { backgroundColor: C.bg },
   animation: isWeb ? "none" : "slide_from_right",
-  animationDuration: 240,
   gestureEnabled: true,
   fullScreenGestureEnabled: true,
+  freezeOnBlur: true,
 };
 
 export const modalOptions = {
   animation: isWeb ? "none" : "slide_from_bottom",
   presentation: "modal",
   animationDuration: 280,
+  freezeOnBlur: true,
 };
 
 export const celebrationOptions = {
   animation: isWeb ? "none" : "fade_from_bottom",
   animationDuration: 320,
   gestureEnabled: false,
+  freezeOnBlur: true,
 };
 
 // Icerigi ORTEN degil, uzerine OTURAN yari saydam katman (Pro Onizleme).
@@ -35,11 +37,13 @@ export const overlayOptions = {
   presentation: "transparentModal",
   animationDuration: 240,
   contentStyle: { backgroundColor: "transparent" },
+  freezeOnBlur: true,
 };
 
 export const detailOptions = {
   animation: isWeb ? "none" : "fade",
   animationDuration: 280,
+  freezeOnBlur: true,
 };
 
 function LazyFallback() {

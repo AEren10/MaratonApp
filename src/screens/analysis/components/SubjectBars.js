@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, {
+  cancelAnimation,
   useSharedValue,
   useAnimatedStyle,
   withDelay,
@@ -20,10 +21,11 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
       delay,
       withTiming(pct, { duration: 800, easing: Easing.out(Easing.cubic) })
     );
+    return () => { cancelAnimation(width); };
   }, [pct, delay, width]);
 
   const fillStyle = useAnimatedStyle(() => ({
-    width: `${width.value * 100}%`,
+    transform: [{ scaleX: Math.max(0, Math.min(1, width.value)) }],
   }));
 
   return (
@@ -45,9 +47,11 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
         <Animated.View
           style={[
             {
+              width: "100%",
               height: 12,
               borderRadius: 6,
               backgroundColor: color,
+              transformOrigin: "left",
             },
             fillStyle,
           ]}

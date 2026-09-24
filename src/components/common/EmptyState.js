@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, {
+  cancelAnimation,
   FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
 } from "react-native-reanimated";
 import { Spot } from "../design";
@@ -28,6 +29,7 @@ export function EmptyState({
       withTiming(-6, { duration: 1400, easing: Easing.inOut(Easing.quad) }),
       withTiming(0, { duration: 1400, easing: Easing.inOut(Easing.quad) })
     ), -1, false);
+    return () => { cancelAnimation(float); };
   }, []);
   const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: float.value }] }));
 

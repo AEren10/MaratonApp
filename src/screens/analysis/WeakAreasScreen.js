@@ -1,8 +1,7 @@
 import React, { useCallback } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon, EmptyState, ErrorState, SectionLabel, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -26,10 +25,10 @@ export default function WeakAreasScreen() {
   }, [navigation]);
 
   const renderItem = useCallback(
-    ({ item, index }) => (
-      <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40)} style={styles.rowWrap}>
+    ({ item }) => (
+      <View style={styles.rowWrap}>
         <WeakAreaRow item={item} C={C} onPress={handleStudy} />
-      </Animated.View>
+      </View>
     ),
     [C, handleStudy],
   );
@@ -73,6 +72,8 @@ export default function WeakAreasScreen() {
           showsVerticalScrollIndicator={false}
           windowSize={5}
           maxToRenderPerBatch={10}
+          initialNumToRender={8}
+          removeClippedSubviews={Platform.OS === "android"}
           ListHeaderComponent={
             <View style={styles.hero}>
               <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>

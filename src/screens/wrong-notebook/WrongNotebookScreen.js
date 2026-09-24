@@ -1,7 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
-import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
+import { useCallback, useMemo } from "react";
+import { View, FlatList, RefreshControl, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button, ErrorState, SectionLabel, Skeleton } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -29,13 +28,13 @@ export default function WrongNotebookScreen() {
     { key: NOTEBOOK_FILTER.ALL, label: "Tümü" },
   ], [view.openCount]);
 
-  const renderItem = useCallback(({ item, index }) => (
-    <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 40).duration(500)} style={styles.gutter}>
+  const renderItem = useCallback(({ item }) => (
+    <View style={styles.gutter}>
       <WrongTopicRow group={item} onPress={nb.openGroup} />
-    </Animated.View>
+    </View>
   ), [nb.openGroup]);
 
-  const header = (
+  const header = useMemo(() => (
     <View>
       <PhotoLostBanner C={C} count={nb.lostPhotoCount} onRetry={nb.dismissLostPhotos} />
       {/* Analiz'deki segmentin AYNISI, ters yonu — gecis cift yonlu olsun. */}
@@ -56,15 +55,15 @@ export default function WrongNotebookScreen() {
         <SectionLabel style={[styles.gutter, styles.section, { color: C.text2 }]}>KONUYA GÖRE</SectionLabel>
       ) : null}
     </View>
-  );
+  ), [C, nb.lostPhotoCount, nb.dismissLostPhotos, nb.goAnalysis, filterOptions, nb.filter, nb.changeFilter, view.dueCount, nb.goReview, view.groups.length]);
 
-  const footer = (
+  const footer = useMemo(() => (
     <View style={[styles.gutter, styles.footer]}>
       <Button variant="outline" size="md" fullWidth onPress={nb.goAddWrong}>
         Yanlış ekle
       </Button>
     </View>
-  );
+  ), [nb.goAddWrong]);
 
   let body;
   if (nb.loading) {
@@ -88,6 +87,8 @@ export default function WrongNotebookScreen() {
         }
         windowSize={5}
         maxToRenderPerBatch={10}
+        initialNumToRender={8}
+        removeClippedSubviews={Platform.OS === "android"}
         showsVerticalScrollIndicator={false}
       />
     );

@@ -25,6 +25,20 @@ import { routePersistenceDecision } from "../domain/route/routePersistenceDecisi
 import { isRoutePausedForExam, routePausedAtForExam } from "../domain/route/routePauseState";
 import { captureError } from "../lib/errorReporting";
 
+let _lastRouteCache = {
+  key: "",
+  result: null,
+};
+
+function cachedBuildRoute(inputs, key) {
+  if (_lastRouteCache.result && _lastRouteCache.key === key) {
+    return _lastRouteCache.result;
+  }
+  const result = buildRoute(inputs);
+  _lastRouteCache = { key, result };
+  return result;
+}
+
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
   if (examType !== "tyt_ayt") return ["TYT"];
@@ -143,7 +157,23 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       .map(([key]) => key);
   }, [allowedTrialTypes, trials]);
 
-  const computedRoute = useMemo(() => buildRoute({
+  const routeCacheKey = useMemo(() => [
+    examType || "",
+    field || "",
+    hasRouteAccess ? "1" : "0",
+    goals?.dailyQuestions || 20,
+    daysLeft ?? "",
+    recoveryWeek ?? "",
+    dataHealth?.logs || "",
+    weakSubjectKeys.join(","),
+    (weekLogs || []).length,
+    (topicRows || []).length,
+  ].join("|"), [
+    examType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, weekLogs, topicRows,
+  ]);
+
+  const computedRoute = useMemo(() => cachedBuildRoute({
     // examType yoksa rota HESAPLANMAZ. "tyt" varsaymak LGS kullanıcısının
     // rotasını yanlış müfredatla çizerdi.
     pool: examType && hasRouteAccess ? getSubjectsForExam(examType, field) : [],
@@ -155,8 +185,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     pausedWeeks: recoveryWeek,
     examType,
     studyLogDataState: dataHealth?.logs,
-  }), [dataHealth?.logs, examType, field, hasRouteAccess, progressByKey, weekLogs,
-    goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek]);
+  }, routeCacheKey), [dataHealth?.logs, examType, field, hasRouteAccess, progressByKey, weekLogs,
+    goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
     const byKey = new Map((persistedStops || []).map((stop) => [stop.logical_key, stop]));

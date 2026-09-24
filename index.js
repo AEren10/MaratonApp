@@ -1,4 +1,8 @@
+import { enableFreeze, enableScreens } from 'react-native-screens';
 import { registerRootComponent } from 'expo';
+
+enableScreens(true);
+enableFreeze(true);
 
 import App from './App';
 
