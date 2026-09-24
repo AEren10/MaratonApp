@@ -38,8 +38,8 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
 const styles = StyleSheet.create({
   wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, alignItems: "center" },
   kicker: { alignSelf: "stretch", fontFamily: "Archivo_700", letterSpacing: 2.76 },
-  netRow: { width: "100%", alignItems: "center", justifyContent: "center", marginTop: STEP.s2 + 8, minHeight: 116 },
-  net: { textAlign: "center" },
+  netRow: { width: "100%", alignItems: "center", justifyContent: "center", marginTop: STEP.s2 + 8, minHeight: 132 },
+  net: { textAlign: "center", lineHeight: 106, paddingVertical: 6 },
   delta: {
     position: "absolute",
     right: 0,
