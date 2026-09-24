@@ -1,8 +1,9 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { STEP, GUTTER, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
+import { STEP, GUTTER, TYPOGRAPHY } from "../../../themes/tokens";
 import { alpha } from "../../../themes/colorMix";
+import { TargetSvg, ClockSvg, FlameSvg } from "./RouteCredentialSvgs";
 
 export function RouteCredentialsList({ totalQuestions = 0, totalHours = 0, longestStreak = 0 }) {
   const C = useC();
@@ -19,58 +20,48 @@ export function RouteCredentialsList({ totalQuestions = 0, totalHours = 0, longe
       label: "Çözülen Soru",
       value: qDisplay,
       unit: "soru",
-      icon: "target",
-      iconColor: C.accentBright,
-      iconBg: alpha(C.accent, 14),
+      svg: <TargetSvg color={C.accentBright} bg={alpha(C.accent, 16)} />,
     },
     {
       key: "hours",
       label: "Toplam Süre",
       value: String(totalHours),
       unit: "saat",
-      icon: "clock",
-      iconColor: matColor,
-      iconBg: alpha(matColor, 14),
+      svg: <ClockSvg color={matColor} bg={alpha(matColor, 16)} />,
     },
     {
       key: "streak",
       label: "En Uzun Seri",
       value: String(longestStreak || 0),
       unit: "gün",
-      icon: "flame",
-      iconColor: flameColor,
-      iconBg: alpha(flameColor, 14),
+      svg: <FlameSvg color={flameColor} bg={alpha(flameColor, 16)} />,
     },
   ];
 
   return (
     <View style={s.container}>
-      <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-        <View style={s.cardHead}>
-          <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>YOL KÜNYESİ</Text>
-          <View style={[s.badge, { backgroundColor: C.void, borderColor: C.line }]}>
-            <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Kariyer Özeti</Text>
-          </View>
-        </View>
+      <View style={s.headRow}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>YOL KÜNYESİ</Text>
+        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Kariyer Özeti</Text>
+      </View>
 
-        <View style={s.grid}>
-          {stats.map((item, idx) => (
-            <View key={item.key} style={[s.col, idx > 0 && [s.colDivider, { borderLeftColor: C.line }]]}>
-              <View style={[s.iconBox, { backgroundColor: item.iconBg }]}>
-                <Icon name={item.icon} size={15} color={item.iconColor} />
-              </View>
-              <View style={s.valRow}>
-                <Text style={[s.val, { color: C.text }]} numberOfLines={1}>
-                  {item.value}
-                </Text>
-                <Text style={[s.unit, { color: C.text3 }]}>{item.unit}</Text>
-              </View>
-              <Text style={[s.label, { color: C.text2 }]} numberOfLines={1}>
-                {item.label}
-              </Text>
+      <View style={s.grid}>
+        {stats.map((item, idx) => (
+          <View key={item.key} style={[s.col, idx > 0 && [s.colDivider, { borderLeftColor: C.line }]]}>
+            <View style={s.iconWrap}>
+              {item.svg}
             </View>
-          ))}
-        </View>
+            <View style={s.valRow}>
+              <Text style={[s.val, { color: C.text }]} numberOfLines={1}>
+                {item.value}
+              </Text>
+              <Text style={[s.unit, { color: C.text3 }]}>{item.unit}</Text>
+            </View>
+            <Text style={[s.label, { color: C.text2 }]} numberOfLines={1}>
+              {item.label}
+            </Text>
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -81,27 +72,18 @@ const s = StyleSheet.create({
     marginHorizontal: GUTTER,
     marginTop: STEP.s3 + 4,
   },
-  card: {
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
-    padding: STEP.s3,
-  },
-  cardHead: {
+  headRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: STEP.s3 - 2,
-  },
-  badge: {
-    paddingHorizontal: STEP.s1 + 2,
-    paddingVertical: 2,
-    borderRadius: SHAPE.chip / 4,
-    borderWidth: 1,
+    marginBottom: STEP.s2,
+    paddingHorizontal: 2,
   },
   grid: {
     flexDirection: "row",
     alignItems: "stretch",
     justifyContent: "space-between",
+    paddingVertical: STEP.s1,
   },
   col: {
     flex: 1,
@@ -111,13 +93,10 @@ const s = StyleSheet.create({
   colDivider: {
     borderLeftWidth: 1,
   },
-  iconBox: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
+  iconWrap: {
+    marginBottom: STEP.s1,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: STEP.s1,
   },
   valRow: {
     flexDirection: "row",
@@ -126,18 +105,16 @@ const s = StyleSheet.create({
   },
   val: {
     fontFamily: "Bricolage_400",
-    fontSize: 22,
-    lineHeight: 26,
+    fontSize: 26,
+    lineHeight: 30,
     fontVariant: ["tabular-nums"],
   },
   unit: {
-    fontFamily: "Archivo_500",
-    fontSize: 11,
+    ...TYPOGRAPHY.meta,
   },
   label: {
-    fontFamily: "Archivo_500",
-    fontSize: 11,
-    marginTop: 3,
+    ...TYPOGRAPHY.metaSemiBold,
+    marginTop: 4,
     textAlign: "center",
   },
 });
