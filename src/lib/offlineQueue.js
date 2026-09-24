@@ -467,11 +467,11 @@ export async function saveWrongQuestionOffline(payload) {
   const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
     const saved = await addWrongQuestion(payloadWithId);
-    return { saved: true, queued: false, data: saved };
+    return { saved: true, queued: false, data: saved, clientOperationId };
   } catch (e) {
     throwIfPermanentWriteError(e);
     await enqueue({ type: OP_WRONG_QUESTION, payload: payloadWithId, clientOperationId });
-    return { saved: false, queued: true, error: e };
+    return { saved: false, queued: true, error: e, clientOperationId };
   }
 }
 
@@ -480,11 +480,11 @@ export async function saveUserTaskOffline(payload) {
   const payloadWithId = withClientOperationId(payload, clientOperationId);
   try {
     const saved = await createUserTask(payloadWithId);
-    return { saved: true, queued: false, data: saved };
+    return { saved: true, queued: false, data: saved, clientOperationId };
   } catch (e) {
     throwIfPermanentWriteError(e);
     await enqueue({ type: OP_USER_TASK, payload: payloadWithId, clientOperationId });
-    return { saved: false, queued: true, error: e };
+    return { saved: false, queued: true, error: e, clientOperationId };
   }
 }
 
