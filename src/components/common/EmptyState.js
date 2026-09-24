@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, {
   cancelAnimation,
-  FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
+  useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
 } from "react-native-reanimated";
 import { Spot } from "../design";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
@@ -34,7 +34,7 @@ export function EmptyState({
   const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: float.value }] }));
 
   return (
-    <Animated.View entering={FadeInDown.duration(420).springify().damping(18)} style={styles.container}>
+    <Animated.View style={styles.container}>
       <Animated.View style={floatStyle}>
         <Spot name="empty" size={132} icon={icon} color={accent} />
       </Animated.View>

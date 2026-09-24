@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Button } from "../../components/design";
@@ -75,7 +75,7 @@ export default function ForgotPasswordScreen() {
             <EmailSentPanel email={email.trim()} onResend={submit} />
           ) : (
             <>
-              <Animated.View entering={FadeInDown.delay(80).duration(350)} style={{ marginTop: STEP.s2 }}>
+              <Animated.View style={{ marginTop: STEP.s2 }}>
                 <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 270 }]}>
                   Şifreni sıfırlayalım.
                 </Text>
@@ -84,11 +84,11 @@ export default function ForgotPasswordScreen() {
                 </Text>
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(150).duration(350)} style={{ marginTop: STEP.s4 }}>
+              <Animated.View style={{ marginTop: STEP.s4 }}>
                 <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={error} />
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(210).duration(350)}>
+              <Animated.View>
                 <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s1 }}>
                   {busy ? "Gönderiliyor..." : "Bağlantıyı gönder"}
                 </Button>

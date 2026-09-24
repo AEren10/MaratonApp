@@ -1,12 +1,12 @@
 import { View, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { STEP } from "../../../themes/tokens";
 
 export function TrialDetailActions({ onAddWrong, onCompare }) {
   return (
-    <Animated.View entering={FadeInDown.delay(320).duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Button variant="primary" size="lg" fullWidth onPress={onAddWrong}>
         Yanlışları deftere ekle
       </Button>

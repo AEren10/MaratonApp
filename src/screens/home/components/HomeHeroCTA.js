@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Button } from "../../../components/design/Button";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -10,7 +10,7 @@ import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 export function HomeHeroCTA({ label = "Çalışmaya Başla", subtitle, onPress, delay = 200, secondaryLabel, onSecondary }) {
   const C = useC();
   return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(380)} style={s.wrap}>
+    <Animated.View style={s.wrap}>
       <Button variant="primary" size="lg" fullWidth onPress={onPress}>
         {label}
       </Button>

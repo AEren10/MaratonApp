@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
@@ -48,7 +48,7 @@ export default function NetForecastScreen() {
         )
       ) : (
         <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s4 }} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={FadeInDown.duration(420)} style={{ marginTop: STEP.s2 }}>
+          <Animated.View style={{ marginTop: STEP.s2 }}>
             <Text style={{ ...TYPOGRAPHY.heading, color: C.text, maxWidth: 300 }}>Aynı hedef, üç tempo.</Text>
             <Text style={{ ...TYPOGRAPHY.body, color: C.text3, marginTop: STEP.s2, maxWidth: 306 }}>
               Hedef net değişmiyor. Değişen tek şey haftalık yük ve bandın nereye oturduğu.
@@ -57,7 +57,7 @@ export default function NetForecastScreen() {
 
           <View style={{ marginTop: STEP.s3, gap: STEP.s1 }}>
             {scenarios.map((item, i) => (
-              <Animated.View key={item.id} entering={FadeInDown.delay(80 + i * 60).duration(420)}>
+              <Animated.View key={item.id}>
                 <ScenarioCard
                   item={item}
                   selected={selected === item.multiplier}

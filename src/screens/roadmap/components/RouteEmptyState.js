@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -14,7 +14,7 @@ export function RouteEmptyState({ daysLeft, examDateTag, loading, onAddFirstStop
     : "Yol buradan başlıyor.";
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(600)} style={s.intro}>
+      <Animated.View style={s.intro}>
         <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>BAŞLANGIÇ NOKTASIN</Text>
         <Text style={[TYPOGRAPHY.display, s.title, { color: C.text }]}>{title}</Text>
         <Text style={[TYPOGRAPHY.body, s.body, { color: C.text2 }]}>
@@ -22,7 +22,7 @@ export function RouteEmptyState({ daysLeft, examDateTag, loading, onAddFirstStop
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(80).duration(600)} style={s.chart}>
+      <Animated.View style={s.chart}>
         <RouteEmptyChart examDateTag={examDateTag} />
       </Animated.View>
 
@@ -32,7 +32,7 @@ export function RouteEmptyState({ daysLeft, examDateTag, loading, onAddFirstStop
         </Button>
       </View>
 
-      <Animated.View entering={FadeInDown.delay(160).duration(600)} style={[s.pad, s.section]}>
+      <Animated.View style={[s.pad, s.section]}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BUGÜNÜN DURAKLARI</Text>
         <View style={[s.slot, { borderColor: C.border }]}>
           <View style={[s.box, { borderColor: C.text5 }]} />

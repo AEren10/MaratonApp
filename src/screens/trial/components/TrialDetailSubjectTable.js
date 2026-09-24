@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -30,7 +30,7 @@ function SubjectRow({ b, C, isLast }) {
 export function TrialDetailSubjectTable({ C, bars }) {
   if (!bars.length) return null;
   return (
-    <Animated.View entering={FadeInDown.delay(140).duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <View style={styles.headerRow}>
         <SectionLabel style={{ marginBottom: 0, flex: 1 }}>DERS DERS</SectionLabel>
         <Col C={C} width={30}>D</Col>

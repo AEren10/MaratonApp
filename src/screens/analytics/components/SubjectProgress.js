@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -48,7 +48,7 @@ export function SubjectProgress({ subjects }) {
   if (!subjects?.length) return null;
 
   return (
-    <Animated.View entering={FadeInDown.delay(150).duration(420).springify()}>
+    <Animated.View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2, marginBottom: STEP.s3 }}>
         <Icon name="layers" size={18} color={C.text2} />
         <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Ders Bazlı Gelişim</Text>

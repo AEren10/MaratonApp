@@ -1,5 +1,5 @@
 import { ScrollView, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { TrialEntryFooter } from "./TrialEntryFooter";
@@ -15,13 +15,13 @@ export function TrialEntryStep1({ form, styles, onNext }) {
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <Animated.View entering={FadeInDown.duration(500)}>
+        <Animated.View>
           <TrialTypeSelector value={form.trialType} onChange={form.handleTypeChange} />
         </Animated.View>
         {form.trialType === "BRANCH" ? (
           <BranchSubjectPicker value={form.branchSubject} onChange={form.handleBranchChange} />
         ) : null}
-        <Animated.View entering={FadeInDown.duration(500)} style={styles.section}>
+        <Animated.View style={styles.section}>
           <Text style={styles.title}>Hangi denemeyi girdin?</Text>
           <Text style={styles.body}>
             Yayını seç, zorluğunu sen işaretle. Netini o çarpanla normalize edip rotaya işleriz.

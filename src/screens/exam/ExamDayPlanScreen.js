@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -14,7 +14,6 @@ import { ExamReminderRow } from "./components/ExamReminderRow";
 // Tasarim AKIS 14 · "Sınav günü planı". Girisler: Son Hafta (borclu) modunun
 // "Sınav günü planı" satiri/butonu, Rota Tamamlandi modali, Profil satiri ve
 // sinav arifesi bildirimi. Veri cihazda; hatirlatma kayitla kurulur.
-const FADE = (delay) => FadeInDown.delay(delay).duration(500);
 
 export default function ExamDayPlanScreen() {
   const C = useC();
@@ -37,19 +36,19 @@ export default function ExamDayPlanScreen() {
 
           {p.status === "ready" ? (
             <>
-              <Animated.View entering={FADE(70)} style={s.block}>
+              <Animated.View style={s.block}>
                 <ExamPlanFieldsCard draft={p.draft} leaveAtInvalid={p.leaveAtInvalid} onChange={p.setField} />
               </Animated.View>
 
-              <Animated.View entering={FADE(140)} style={s.block}>
+              <Animated.View style={s.block}>
                 <ExamBagList items={p.items} onToggle={p.toggleItem} onAdd={p.addExtra} />
               </Animated.View>
 
-              <Animated.View entering={FADE(210)} style={s.block}>
+              <Animated.View style={s.block}>
                 <ExamReminderRow on={p.draft.remind} caption={p.draft.remind ? p.caption : null} onToggle={p.toggleRemind} />
               </Animated.View>
 
-              <Animated.View entering={FADE(280)} style={s.cta}>
+              <Animated.View style={s.cta}>
                 <Button size="lg" fullWidth onPress={p.save} loading={p.saving} disabled={!p.canSave}>
                   Planı kaydet
                 </Button>

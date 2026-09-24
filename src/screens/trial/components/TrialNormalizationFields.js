@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -38,7 +38,7 @@ export function TrialNormalizationFields({
   return (
     <>
       {publishers.length ? (
-        <Animated.View entering={FadeInDown.delay(enterDelay).duration(500)} style={styles.section}>
+        <Animated.View style={styles.section}>
           <TrialEntryRuleLabel>YAYIN</TrialEntryRuleLabel>
           <View style={styles.chips}>
             {publishers.map((publisher) => (
@@ -48,7 +48,7 @@ export function TrialNormalizationFields({
           </View>
         </Animated.View>
       ) : null}
-      <Animated.View entering={FadeInDown.delay(enterDelay * 2).duration(500)} style={styles.section}>
+      <Animated.View style={styles.section}>
         <TrialEntryRuleLabel>SENCE NE KADAR ZORDU</TrialEntryRuleLabel>
         {rows.map((row, index) => (
           <View key={index} style={[styles.grid, index > 0 && { marginTop: STEP.s1 }]}>

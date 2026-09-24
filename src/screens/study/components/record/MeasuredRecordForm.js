@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../../components/design";
 import { getSubjectByKey } from "../../../../themes/subjects";
@@ -23,10 +23,10 @@ export function MeasuredRecordForm({ s }) {
       <RecordHeader title="Ne çalıştın?" onBack={s.goBack} />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <RecordIntro>Süreyi biz tuttuk. Sen sadece dersi, konuyu ve çözdüğün soruyu yaz.</RecordIntro>
-        <Animated.View entering={FadeInDown.delay(40).duration(500)} style={styles.block}>
+        <Animated.View style={styles.block}>
           <MeasuredBanner minutes={s.duration} range={s.measuredRange} />
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(70).duration(500)} style={styles.blockLg}>
+        <Animated.View style={styles.blockLg}>
           <RecordFormCard>
             <RecordRow label="DERS" value={s.currentSubject?.label || s.currentSubject?.name || getSubjectByKey(s.subjectKey)?.label} placeholder="Seç" onPress={() => setSubjectOpen(true)} />
             <RecordRow label="KONU" value={s.topic} placeholder="Seç" onPress={s.openTopicPicker} />
@@ -39,7 +39,7 @@ export function MeasuredRecordForm({ s }) {
             </RecordRow>
           </RecordFormCard>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(140).duration(500)} style={styles.blockLg}>
+        <Animated.View style={styles.blockLg}>
           <Button size="lg" fullWidth onPress={s.save} disabled={!s.canSave} loading={s.saving}>Kaydet</Button>
         </Animated.View>
       </ScrollView>

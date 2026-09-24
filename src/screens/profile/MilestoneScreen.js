@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Icon, Button, EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -55,19 +55,19 @@ export default function MilestoneScreen() {
           <EmptyState preset="shareCards" onPrimary={() => navigation.goBack()} />
         ) : (
           <>
-            <Animated.View entering={FadeInDown.duration(500)}>
+            <Animated.View entering={FadeIn.duration(500)}>
               <MilestoneHero done={done} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(140).duration(500)} style={styles.stats}>
+            <Animated.View entering={FadeIn.delay(140).duration(500)} style={styles.stats}>
               <MilestoneStats questions={questions} hours={hours} net={net} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(200).duration(500)}>
+            <Animated.View entering={FadeIn.delay(200).duration(500)}>
               <MilestoneBadges />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(280).duration(500)} style={styles.cta}>
+            <Animated.View entering={FadeIn.delay(280).duration(500)} style={styles.cta}>
               <Button onPress={goShare} size="lg" fullWidth>Kartı paylaş</Button>
               <Button
                 onPress={goRoute}

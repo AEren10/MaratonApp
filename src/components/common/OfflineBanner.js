@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Animated, { FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useNetwork } from "../../contexts/NetworkContext";
@@ -55,7 +55,6 @@ export default function OfflineBanner() {
 
   return (
     <Animated.View
-      entering={FadeInDown.duration(500)}
       exiting={FadeOutUp.duration(500)}
       style={[s.container, { top: insets.top + STEP.s1 }]}
     >

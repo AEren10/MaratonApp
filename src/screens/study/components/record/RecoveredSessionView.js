@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../../components/design";
 import { useC, useSubjectIdentity } from "../../../../contexts/ThemeContext";
@@ -27,7 +27,7 @@ export function RecoveredSessionView({ session, onConfirm, onDiscard }) {
     <SafeAreaView edges={["top"]} style={[styles.fill, { backgroundColor: C.bg }]}>
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <Animated.View entering={FadeInDown.duration(500)}>
+          <Animated.View>
             <Text style={[TYPOGRAPHY.label, styles.eyebrow, { color: C.accentBright }]}>SAYAÇ KAPANMIŞ</Text>
             <Text accessibilityRole="header" style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>
               {`Süreni kurtardık. ${measured} dakika çalışmışsın.`}
@@ -39,7 +39,7 @@ export function RecoveredSessionView({ session, onConfirm, onDiscard }) {
             </Text>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(80).duration(500)}
+          <Animated.View
             style={[styles.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
             {title || start ? (
               <>
@@ -58,7 +58,7 @@ export function RecoveredSessionView({ session, onConfirm, onDiscard }) {
             </RecordRow>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(160).duration(500)} style={styles.actions}>
+          <Animated.View style={styles.actions}>
             <Button size="lg" fullWidth disabled={!valid} onPress={() => onConfirm(Number(minutes))}>
               Onayla, durağa işle
             </Button>

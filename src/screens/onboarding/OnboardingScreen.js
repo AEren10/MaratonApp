@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -41,18 +41,18 @@ export default function OnboardingScreen() {
             </Text>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(120).duration(350)}>
+          <Animated.View>
             <RouteIllustration />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(200).duration(350)}>
+          <Animated.View>
             <QuestionPreviewList />
           </Animated.View>
         </View>
 
         <View style={{ flex: 1 }} />
 
-        <Animated.View entering={FadeInDown.delay(280).duration(350)} style={styles.footer}>
+        <Animated.View style={styles.footer}>
           <Button onPress={createRoute} size="lg" fullWidth>
             Rotamı kur
           </Button>

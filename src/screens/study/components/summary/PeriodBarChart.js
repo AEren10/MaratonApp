@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../../themes/tokens";
@@ -30,7 +30,6 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
           {bars.map((bar, i) => (
             <View key={bar.key} style={styles.col}>
               <Animated.View
-                entering={FadeInDown.delay(i * 40).duration(500)}
                 style={[styles.bar, {
                   height: Math.max(MIN_BAR, Math.round((bar.questions / max) * CHART_HEIGHT)),
                   backgroundColor: bar.highlight ? C.accent : C.barIdle,

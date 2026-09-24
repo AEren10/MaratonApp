@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, ErrorState, Skeleton } from "../../components/design";
 import { SCREENS } from "../../constants/screens";
@@ -84,7 +84,7 @@ export default function ReviewSessionScreen() {
       {header}
       <ReviewProgress index={s.idx} total={s.total} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View key={s.current.id} entering={FadeInDown.duration(500)} style={styles.question}>
+        <Animated.View key={s.current.id} style={styles.question}>
           <ReviewQuestion item={s.current} />
         </Animated.View>
 

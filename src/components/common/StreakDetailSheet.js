@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { View, Text, Pressable, Modal, Platform, StyleSheet } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon, Button } from "../design";
@@ -88,7 +88,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
           <View style={[s.handle, { backgroundColor: C.border }]} />
 
           {/* Streak Hero */}
-          <Animated.View entering={FadeInDown.duration(400)} style={s.hero}>
+          <Animated.View style={s.hero}>
             <LinearGradient
               colors={streak > 0 ? [C.orange + "20", "transparent"] : [C.surface2, "transparent"]}
               style={s.heroBg}
@@ -104,7 +104,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
 
           {/* At Risk Warning */}
           {atRisk && streak > 0 && (
-            <Animated.View entering={FadeInDown.duration(400).delay(100)} style={[s.riskBanner, { backgroundColor: C.danger + "14", borderColor: C.danger + "28" }]}>
+            <Animated.View style={[s.riskBanner, { backgroundColor: C.danger + "14", borderColor: C.danger + "28" }]}>
               <Icon name="alert" size={18} color={C.danger} />
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.danger, flex: 1 }]}>
                 Bugün çalışmadın! Serin kırılabilir.
@@ -113,7 +113,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
           )}
 
           {/* Stats Row */}
-          <Animated.View entering={FadeInDown.duration(400).delay(150)} style={s.statsRow}>
+          <Animated.View style={s.statsRow}>
             <View style={[s.statCard, { backgroundColor: C.surface2 }]}>
               <Icon name="trophy" size={18} color={C.amber} />
               <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]}>{longestStreak}</Text>
@@ -127,13 +127,13 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
           </Animated.View>
 
           {/* Calendar */}
-          <Animated.View entering={FadeInDown.duration(400).delay(250)} style={s.calendarWrap}>
+          <Animated.View style={s.calendarWrap}>
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.sec, marginBottom: SPACING.md }]}>Son 7 gün</Text>
             <StreakCalendar lastStudyDate={lastStudyDate} streak={streak} C={C} />
           </Animated.View>
 
           {/* Freeze Info */}
-          <Animated.View entering={FadeInDown.duration(400).delay(350)} style={[s.freezeInfo, { backgroundColor: C.surface2 }]}>
+          <Animated.View style={[s.freezeInfo, { backgroundColor: C.surface2 }]}>
             <Icon name="shield" size={16} color={C.info} />
             <Text style={[TYPOGRAPHY.caption, { color: C.sec, flex: 1 }]}>
               Haftada 1 joker hakkın var. Bir gün atlasan bile serin korunur. Yenileme: {resetLabel}

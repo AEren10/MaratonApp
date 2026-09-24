@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { useProPreviewTempo } from "../../../hooks/useProPreviewTempo";
@@ -28,7 +28,7 @@ export function ProPreviewTempo({ onOpen, onDismiss }) {
         <Text style={[TYPOGRAPHY.body, styles.intro, { color: C.text2 }]}>{P.intro(sampleSize)}</Text>
       ) : null}
 
-      <Animated.View entering={FadeInDown.duration(620)} style={styles.cards}>
+      <Animated.View style={styles.cards}>
         {cards.map((card) => <ProPreviewScenarioCard key={card.id} card={card} />)}
       </Animated.View>
 

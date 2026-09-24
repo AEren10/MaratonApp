@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
 
 import { Button } from "../../../../components/design";
@@ -12,7 +12,7 @@ export function HistoryEmpty({ onStart, onManual }) {
   const C = useC();
   const copy = EMPTY_COPY.studyHistory;
   return (
-    <Animated.View entering={FadeInDown.duration(500)}>
+    <Animated.View>
       <View style={styles.center}>
         <Svg width={72} height={72} viewBox="0 0 72 72" fill="none">
           <Circle cx={36} cy={36} r={23} stroke={C.text4} strokeWidth={2} />

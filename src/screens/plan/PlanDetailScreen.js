@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Card, Button, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -30,7 +30,7 @@ function PlanDetailInner({ route }) {
       <PlanDetailHeader dayLabel={dayLabel} onBack={() => navigation.goBack()} C={C} />
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(400)} style={s.cardsRow}>
+        <Animated.View style={s.cardsRow}>
           <Card tone="surface" radius="panel" style={s.statCard}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PLANLANAN</Text>
             <Text style={[TYPOGRAPHY.statSmall, s.statNum, { color: C.text }]}>
@@ -46,7 +46,7 @@ function PlanDetailInner({ route }) {
         </Animated.View>
 
         {hasTasks ? (
-          <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+          <Animated.View>
             <View style={s.progressBarWrap}>
               <View style={[s.progressBase, { backgroundColor: C.track }]}>
                 <View style={[s.progressFill, { backgroundColor: C.accent, width: `${Math.round((detail.doneCount / detail.tasks.length) * 100)}%` }]} />

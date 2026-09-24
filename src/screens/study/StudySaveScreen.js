@@ -1,5 +1,5 @@
 import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "../../components/design";
@@ -39,7 +39,7 @@ export default function StudySaveScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Animated.View entering={FadeInDown.delay(60).duration(420)}>
+          <Animated.View>
             <SaveSubjectSection
               C={s.C}
               showTier={!s.preSubjectKey}
@@ -52,7 +52,7 @@ export default function StudySaveScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(120).duration(420)}>
+          <Animated.View>
             <SaveTopicQuestionSection
               C={s.C}
               topic={s.topic}
@@ -64,7 +64,7 @@ export default function StudySaveScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(180).duration(420)}>
+          <Animated.View>
             <SaveNotesSection C={s.C} notes={s.notes} onChangeNotes={s.setNotes} />
           </Animated.View>
         </ScrollView>

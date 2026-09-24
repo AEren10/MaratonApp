@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -8,7 +8,7 @@ import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 // zorluk seviyeleri için uydurma metin yazılmadı (bkz useTrialDetail).
 export function TrialDetailDifficultyCard({ C, difficultyLabel }) {
   return (
-    <Animated.View entering={FadeInDown.delay(200).duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Card style={styles.row}>
         <View style={{ flex: 1 }}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ZORLUK</Text>

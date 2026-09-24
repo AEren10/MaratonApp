@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, ActivityIndicator, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Avatar } from "../../components/design/Avatar";
@@ -68,7 +68,7 @@ export default function FriendsScreen() {
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <FriendCodeCard onRequestSent={load} initialCode={route.params?.friendCode} />
 
-        <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={s.searchBox}>
+        <Animated.View style={s.searchBox}>
           <Icon name="search" size={18} color={C.muted} />
           <TextInput
             value={query}
@@ -81,7 +81,7 @@ export default function FriendsScreen() {
         </Animated.View>
 
         {searchResults.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(120).duration(400).springify()}>
+          <Animated.View>
             <Text style={s.sectionLabel}>ARAMA SONUÇLARI</Text>
             <View style={s.card}>
               {searchResults.map((u) => {
@@ -120,7 +120,7 @@ export default function FriendsScreen() {
         ) : (
           <>
             {requests.length > 0 && (
-              <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+              <Animated.View style={{ marginTop: SPACING.lg }}>
                 <Text style={s.sectionLabel}>GELEN İSTEKLER ({requests.length})</Text>
                 <View style={s.card}>
                   {requests.map((r) => (
@@ -147,7 +147,7 @@ export default function FriendsScreen() {
             )}
 
             {outgoing.length > 0 && (
-              <Animated.View entering={FadeInDown.delay(150).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+              <Animated.View style={{ marginTop: SPACING.lg }}>
                 <Text style={s.sectionLabel}>GÖNDERİLEN İSTEKLER ({outgoing.length})</Text>
                 <View style={s.card}>
                   {outgoing.map((o) => (
@@ -166,7 +166,7 @@ export default function FriendsScreen() {
               </Animated.View>
             )}
 
-            <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+            <Animated.View style={{ marginTop: SPACING.lg }}>
               <Text style={s.sectionLabel}>ARKADAŞLARIN ({friends.length})</Text>
               {friends.length === 0 ? (
                 <EmptyState
@@ -198,7 +198,7 @@ export default function FriendsScreen() {
             </Animated.View>
 
             {friends.length > 0 && (
-              <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={{ marginTop: SPACING.lg }}>
+              <Animated.View style={{ marginTop: SPACING.lg }}>
                 <Pressable
                   onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
                   accessibilityRole="button"

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Skeleton } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
@@ -22,7 +22,7 @@ export function TopicDebtHero({ totalHours, hasHours, capped, loading }) {
   }
 
   return (
-    <Animated.View entering={FadeInDown.duration(560)} style={styles.heroWrap}>
+    <Animated.View style={styles.heroWrap}>
       <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GEÇİLMEYEN DURAKLAR</Text>
       <View style={styles.heroRow}>
         <Text style={[styles.heroStat, { color: C.text }]}>{hasHours ? totalHours : "0"}</Text>

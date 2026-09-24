@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Icon, Button, Card, StatBlock } from "../../components/design";
 import LevelTestSubjectRow from "./components/LevelTestSubjectRow";
@@ -73,7 +73,7 @@ export default function LevelTestScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(160)} style={styles.list}>
+        <Animated.View style={styles.list}>
           {subjects.map((subject) => (
             <LevelTestSubjectRow
               key={subject.key}
@@ -85,7 +85,7 @@ export default function LevelTestScreen() {
         </Animated.View>
 
         {hasAnyEntry && (
-          <Animated.View entering={FadeInDown.delay(220)}>
+          <Animated.View>
             <Card style={styles.summaryCard}>
               <View style={styles.summaryHead}>
                 <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BAŞLANGIÇ</Text>

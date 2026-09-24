@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -56,7 +56,7 @@ export default function SubscriptionScreen() {
         ) : null}
 
         {state === "ready" && isPremium ? (
-          <Animated.View entering={FadeInDown.duration(420)} style={styles.gutter}>
+          <Animated.View style={styles.gutter}>
             <SubscriptionStatusCard
               periodLabel={info?.periodLabel}
               renewsLine={info?.renewsLine}
@@ -65,7 +65,7 @@ export default function SubscriptionScreen() {
           </Animated.View>
         ) : null}
 
-        <Animated.View entering={FadeInDown.delay(80).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="HESAP">
             <SettingsRow first label="Çıkış yap" danger onPress={handleLogout} />
             <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
@@ -80,7 +80,7 @@ export default function SubscriptionScreen() {
             onay ekraninin cumlesi "Premium 14 Eylul'e kadar acik" tarihe
             dayaniyor, tarihsiz o ekran dogru sey soyleyemez. */}
         {state === "ready" && isPremium && info?.endsAt && info?.willRenew ? (
-          <Animated.View entering={FadeInDown.delay(160).duration(420)} style={styles.gutter}>
+          <Animated.View style={styles.gutter}>
             <Pressable
               onPress={goCancel}
               accessibilityRole="button"

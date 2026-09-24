@@ -1,4 +1,4 @@
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { PeriodHero } from "./PeriodHero";
 import { PeriodBarChart } from "./PeriodBarChart";
@@ -8,7 +8,7 @@ import { PromiseCard } from "./PromiseCard";
 export function WeekSummaryBody({ data, onPromise }) {
   return (
     <>
-      <Animated.View entering={FadeInDown.delay(60).duration(500)}>
+      <Animated.View>
         <PeriodHero eyebrow={data.eyebrow} headline={data.headline} hero={data.hero} side={data.side} />
       </Animated.View>
       <BestLine line={data.bestLine} />

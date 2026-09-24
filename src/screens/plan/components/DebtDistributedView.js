@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Button, StatBlock } from "../../../components/design";
 import { EyebrowHeader } from "../../../components/common/EyebrowHeader";
 import { useC } from "../../../contexts/ThemeContext";
@@ -8,7 +8,6 @@ import { numberWord } from "../../../lib/trWords";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import DebtWeekRow from "./DebtWeekRow";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
 export function DebtDistributedView({ view, totalHours, committing, onCommit, onUndo }) {
   const C = useC();
@@ -28,13 +27,13 @@ export function DebtDistributedView({ view, totalHours, committing, onCommit, on
     <>
       <EyebrowHeader label="BORÇ DAĞITIMI" onBack={onUndo} />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={enter(0)}>
+        <Animated.View>
           <Text style={[TYPOGRAPHY.heading, s.headline, { color: C.text }]}>
             {`${formatNumber(totalHours, 1)} sa ${numberWord(view.weeksCount)} haftaya bölündü.`}
           </Text>
           <Text style={[TYPOGRAPHY.body, s.lede, { color: C.text3 }]}>{lede}</Text>
         </Animated.View>
-        <Animated.View entering={enter(1)} style={s.rows}>
+        <Animated.View style={s.rows}>
           {view.rows.map((row) => <DebtWeekRow key={row.key} row={row} />)}
         </Animated.View>
         <Text style={[TYPOGRAPHY.label, s.section, { color: C.text2 }]}>YENİ HAFTALIK YÜK</Text>

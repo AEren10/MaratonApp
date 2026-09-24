@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -67,12 +67,12 @@ export default function TrialSummaryScreen() {
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
             <TrialSummaryHero typeLabel={typeLabel} net={trial.totalNet} prevNet={summary.prevNet} delta={summary.delta} />
             {summary.hasChart ? (
-              <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.chart}>
+              <Animated.View style={styles.chart}>
                 <TrialSummaryRouteLine route={summary.route} />
               </Animated.View>
             ) : null}
             {summary.sentence ? (
-              <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
+              <Animated.View style={styles.section}>
                 <View style={[styles.sentence, { backgroundColor: C.surface, borderColor: C.elev }]}>
                   <Text style={[TYPOGRAPHY.topicName, { color: C.text }]}>{summary.sentence}</Text>
                 </View>
@@ -80,7 +80,7 @@ export default function TrialSummaryScreen() {
             ) : null}
             <TrialSummarySubjectDeltas bars={summary.bars} />
             <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
-            <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.actions}>
+            <Animated.View style={styles.actions}>
               <Button
                 size="lg"
                 fullWidth

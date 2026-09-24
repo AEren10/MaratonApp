@@ -1,5 +1,5 @@
 import { ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "../../components/design";
@@ -36,7 +36,7 @@ export default function AddStudyScreen() {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <RecordIntro>Zamanlayıcı olmadan çalıştıysan aynı formu doldur — süreyi sen giriyorsun.</RecordIntro>
           <StudyRecordFields form={a.form} groups={a.groups} />
-          <Animated.View entering={FadeInDown.delay(140).duration(500)} style={styles.cta}>
+          <Animated.View style={styles.cta}>
             <Button size="lg" fullWidth onPress={a.save} disabled={!a.form.canSave} loading={a.saving}>Kaydet</Button>
           </Animated.View>
         </ScrollView>

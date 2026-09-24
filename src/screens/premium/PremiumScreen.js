@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -49,7 +49,7 @@ export default function PremiumScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(520)}>
+        <Animated.View>
           <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>{PRO_PITCH.eyebrow}</Text>
           <Text style={[TYPOGRAPHY.display, s.title, { color: C.text }]}>{PRO_PITCH.title}</Text>
           <Text style={[TYPOGRAPHY.body, s.lead, { color: C.text3 }]}>{PRO_PITCH.lead}</Text>
@@ -61,7 +61,7 @@ export default function PremiumScreen() {
           ))}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.duration(520).delay(200)} style={s.plans}>
+        <Animated.View style={s.plans}>
           {planRows.map((plan) => (
             <ProPlanRow
               key={plan.id}
@@ -72,7 +72,7 @@ export default function PremiumScreen() {
           ))}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.duration(520).delay(280)} style={s.cta}>
+        <Animated.View style={s.cta}>
           <Button onPress={handlePurchase} loading={purchasing} size="lg" fullWidth>
             {PRO_PITCH.cta}
           </Button>

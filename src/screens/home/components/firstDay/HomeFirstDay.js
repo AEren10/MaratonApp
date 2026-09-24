@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../../components/design/Button";
 import { StatBlock } from "../../../../components/design/StatBlock";
@@ -22,14 +22,13 @@ function routeSentence(daysUntilExam, totalStops) {
 export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShowHome }) {
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
-  const enter = (i) => FadeInDown.delay(i * 80).duration(500);
   const daysLine = daysUntilExam == null
     ? "ilk durak hazır"
     : `YKS'ye ${Math.max(0, daysUntilExam)} gün · ilk durak hazır`;
 
   return (
     <View>
-      <Animated.View entering={enter(0)} style={s.top}>
+      <Animated.View style={s.top}>
         <StatBlock label="Bugün çözülen" value={0} unit={`/${dailyGoal}`} size="hero" color={C.text5}>
           <Text style={[TYPOGRAPHY.body, s.line, { color: C.text3 }]}>{daysLine}</Text>
         </StatBlock>
@@ -37,14 +36,14 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
 
       <FirstDayRouteLine targetNet={targetNet} />
 
-      <Animated.View entering={enter(1)}>
+      <Animated.View>
         <Text style={[TYPOGRAPHY.body, s.summary, { color: C.text2 }]}>
           {routeSentence(daysUntilExam, stopCounts?.total)}
         </Text>
         <FirstDayStop task={nextTask} />
       </Animated.View>
 
-      <Animated.View entering={enter(2)} style={s.actions}>
+      <Animated.View style={s.actions}>
         <Button variant="primary" size="lg" fullWidth onPress={() => onStartTask?.(nextTask)}>
           İlk durağa başla
         </Button>
@@ -61,7 +60,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
         ) : null}
       </Animated.View>
 
-      <Animated.View entering={enter(3)} style={[s.hint, { borderColor: C.elev }]}>
+      <Animated.View style={[s.hint, { borderColor: C.elev }]}>
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>Deneme girdikçe burada ne görünür?</Text>
         <Text style={[TYPOGRAPHY.caption, s.hintBody, { color: C.text3 }]}>
           Net ortalaman, tahmini sınav netin ve öncelikli konuların. Üç denemeden sonra rota geleceği de çizer.

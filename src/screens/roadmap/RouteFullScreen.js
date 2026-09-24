@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -12,7 +12,6 @@ import { RouteHeader } from "./components/RouteHeader";
 import RouteLinkRow from "./components/RouteLinkRow";
 import { RouteStatusLegend } from "./components/RouteStatusLegend";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
 export default function RouteFullScreen() {
   const C = useC();
@@ -29,7 +28,7 @@ export default function RouteFullScreen() {
         onPaywall={d.access.paywall}
       >
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={enter(0)} style={s.top}>
+          <Animated.View style={s.top}>
             <RouteFullSummary
               counts={d.counts}
               segments={d.segments}
@@ -37,10 +36,10 @@ export default function RouteFullScreen() {
               daysLeft={d.daysLeft}
             />
           </Animated.View>
-          <Animated.View entering={enter(1)} style={s.section}>
+          <Animated.View style={s.section}>
             <RouteStatusLegend />
           </Animated.View>
-          <Animated.View entering={enter(2)} style={s.section}>
+          <Animated.View style={s.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GÖRÜNÜMLER</Text>
             <View style={s.links}>
               <RouteLinkRow

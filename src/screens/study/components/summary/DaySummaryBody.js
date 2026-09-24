@@ -1,4 +1,4 @@
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { formatSignedPct } from "../../../../domain/summary/summaryFormat";
 import { SummaryTaskList } from "../SummaryTaskList";
@@ -12,7 +12,7 @@ export function DaySummaryBody({ data, onShare }) {
   const recent = data.recent;
   return (
     <>
-      <Animated.View entering={FadeInDown.delay(60).duration(500)}>
+      <Animated.View>
         <PeriodHero headline={data.headline} hero={data.hero} side={data.side} />
       </Animated.View>
       <SummaryShareRow value={data.hero.value} onPress={onShare} />

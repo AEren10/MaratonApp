@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 import { Icon, Button } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -109,7 +109,7 @@ export default function ChallengeScreen() {
         </View>
         <View style={{ padding: SPACING.lg, gap: SPACING.lg }}>
           {step === 0 && (
-            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
+            <Animated.View style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Arkadaş Seç</Text>
               {friends.length === 0 ? <EmptyState icon="users" title="Rakibini bul" message="Challenge başlatmak için arkadaş ekle" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
                 <Pressable key={f.id} onPress={() => { H.select(); setPick((p) => ({ ...p, friend: f })); setStep(1); }}
@@ -121,7 +121,7 @@ export default function ChallengeScreen() {
             </Animated.View>
           )}
           {step === 1 && (
-            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
+            <Animated.View style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Metrik Seç</Text>
               {METRICS.map((m) => (
                 <Pressable key={m.key} onPress={() => { H.select(); setPick((p) => ({ ...p, metric: m.key })); setStep(2); }}
@@ -133,7 +133,7 @@ export default function ChallengeScreen() {
             </Animated.View>
           )}
           {step === 2 && (
-            <Animated.View entering={FadeInDown.duration(400).springify()} style={{ gap: SPACING.md }}>
+            <Animated.View style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Hedef Seç</Text>
               {(METRICS.find((m) => m.key === pick.metric)?.targets || []).map((t) => (
                 <Pressable key={t} onPress={() => { H.select(); setPick((p) => ({ ...p, target: t })); }}
@@ -159,7 +159,7 @@ export default function ChallengeScreen() {
         <Pressable onPress={() => setCreating(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Yeni challenge" accessibilityHint="Yeni challenge oluşturmaya başlar"><Icon name="plus" size={20} color={C.accent} /></Pressable>
       </View>
 
-      <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={s.tabs}>
+      <Animated.View style={s.tabs}>
         {["active", "past"].map((t) => (
           <Pressable key={t} onPress={() => { H.tap(); setTab(t); }} accessibilityRole="tab" accessibilityLabel={t === "active" ? "Aktif" : "Geçmiş"} accessibilityHint="Challenge listesini filtreler" style={[s.tab, tab === t && { backgroundColor: C.accent + "18" }]}>
             <Text style={[s.tabText, tab === t && { color: C.accent }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>

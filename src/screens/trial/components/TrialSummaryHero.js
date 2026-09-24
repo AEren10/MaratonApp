@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -10,7 +10,7 @@ export function TrialSummaryHero({ typeLabel, net, prevNet, delta }) {
   const C = useC();
   const tone = delta > 0 ? C.up : delta < 0 ? C.down : C.text3;
   return (
-    <Animated.View entering={FadeInDown.duration(500)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Text style={[TYPOGRAPHY.label, styles.kicker, { color: C.text3 }]}>
         {`${typeLabel} · KAYDEDİLDİ`.toLocaleUpperCase("tr-TR")}
       </Text>

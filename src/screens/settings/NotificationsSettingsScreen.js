@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, Pressable, ScrollView, Linking, ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, ErrorState } from "../../components/design";
 import { NotificationsSettingsSkeleton } from "./components/NotificationsSettingsSkeleton";
@@ -62,7 +62,7 @@ function NotificationsSettingsContent() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(500)}>
+        <Animated.View>
           <SettingsGroup title="BİLDİRİMLER">
             <SettingsRow
               first

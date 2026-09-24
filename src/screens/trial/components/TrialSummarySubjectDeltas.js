@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -30,7 +30,7 @@ export function TrialSummarySubjectDeltas({ bars }) {
   const C = useC();
   if (!bars.length) return null;
   return (
-    <Animated.View entering={FadeInDown.delay(180).duration(500)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>DERS DERS DEĞİŞİM</Text>
       <View style={{ marginTop: 6 }}>
         {bars.map((bar) => <Row key={bar.key} bar={bar} C={C} />)}

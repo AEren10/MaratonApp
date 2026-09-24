@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, Pressable } from "react-native";
-import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import Animated, { Layout } from "react-native-reanimated";
 import { Icon, SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -10,7 +10,7 @@ import { todayTR } from "../../../lib/dateUtils";
 
 function TaskRow({ task, onToggle, onRemove, C }) {
   return (
-    <Animated.View entering={FadeInDown.duration(240)} layout={Layout.springify()}>
+    <Animated.View layout={Layout.springify()}>
       <Pressable
         onPress={() => { onToggle(task.id); H.tap(); }}
         style={({ pressed }) => [s.row, pressed && { opacity: 0.6 }]}

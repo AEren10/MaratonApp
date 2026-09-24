@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -27,7 +27,7 @@ export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }
   // Tasarimda buradaki sayi SERI: her gun degisen, takvime goturen bir sey.
   const days = Math.max(0, Math.round(Number(streak) || 0));
   return (
-    <Animated.View entering={FadeInDown.duration(350)} style={s.row}>
+    <Animated.View style={s.row}>
       <Pressable onPress={() => { H.tap(); onProfile?.(); }} hitSlop={STEP.s1 / 4}
         accessibilityRole="button" accessibilityLabel="Profil"
         style={[s.avatar, { backgroundColor: C.elev, borderColor: C.border }]}>

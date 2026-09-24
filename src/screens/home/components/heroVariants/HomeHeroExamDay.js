@@ -1,5 +1,5 @@
 import { View, Text, Share, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Svg, { Path, Circle } from "react-native-svg";
 import { Button } from "../../../../components/design/Button";
 import { useC } from "../../../../contexts/ThemeContext";
@@ -16,7 +16,6 @@ import { HomeHeroExamDayVenue } from "./HomeHeroExamDayVenue";
 // sinav yeri kullanicinin Sınav günü planından; plan yoksa hicbir kalem
 // isaretli gelmez ve yer karti cizilmez. Rota cizgisi olcek tasimayan bir
 // imza: son duragin varildigini gosterir, sayi iddia etmez.
-const FADE = (delay) => FadeInDown.delay(delay).duration(350);
 
 function dateLabel(examDate) {
   const d = examDate instanceof Date ? examDate : new Date(examDate);
@@ -40,13 +39,13 @@ export function HomeHeroExamDay({ examDate }) {
 
   return (
     <View>
-      <Animated.View entering={FADE(0)}>
+      <Animated.View>
         <HomeHeroEyebrow label={label ? `${label} · SINAV GÜNÜ` : "SINAV GÜNÜ"} />
         <Text style={[s.title, { color: C.text }]}>Yolun sonundasın.</Text>
         <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>{body}</Text>
       </Animated.View>
 
-      <Animated.View entering={FADE(100)} style={s.route}>
+      <Animated.View style={s.route}>
         <Svg viewBox="0 0 390 150" style={s.svg}>
           <Path d="M 26 126 C 92 118 128 100 176 82 C 240 58 300 40 356 28" fill="none" stroke={C.accent} strokeWidth={4.8} strokeLinecap="round" />
           {[[26, 126], [110, 112], [176, 82], [262, 52]].map(([cx, cy]) => (
@@ -58,7 +57,7 @@ export function HomeHeroExamDay({ examDate }) {
         <Text style={[TYPOGRAPHY.label, s.stop, { color: C.accentBright }]}>SON DURAK</Text>
       </Animated.View>
 
-      <Animated.View entering={FADE(180)} style={s.bag}>
+      <Animated.View style={s.bag}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ÇANTANDA OLMASI GEREKENLER</Text>
         <View style={s.list}>
           {bag.items.map((item) => <ExamCheckRow key={item.key} item={item} onToggle={bag.toggle} />)}
@@ -66,12 +65,12 @@ export function HomeHeroExamDay({ examDate }) {
       </Animated.View>
 
       {bag.venue ? (
-        <Animated.View entering={FADE(240)} style={s.block}>
+        <Animated.View style={s.block}>
           <HomeHeroExamDayVenue venue={bag.venue} place={bag.place} />
         </Animated.View>
       ) : null}
 
-      <Animated.View entering={FADE(300)} style={s.block}>
+      <Animated.View style={s.block}>
         <Button variant="primary" size="lg" fullWidth onPress={handleShare}>
           Rotamı paylaş
         </Button>

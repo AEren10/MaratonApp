@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, LockedValue } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -17,7 +17,7 @@ export function TrialSummaryTarget({ onDepartments }) {
   const { gapResult, canAccess, requestAccess } = useThresholdView();
   if (!targetDepartment || !gapResult || gapResult.reached) return null;
   return (
-    <Animated.View entering={FadeInDown.delay(220).duration(500)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BU NETLE NEREYE GİRİYORSUN</Text>
       <View style={[styles.card, { backgroundColor: C.brandTint, borderColor: C.border }]}>
         <View style={styles.copy}>

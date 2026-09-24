@@ -1,13 +1,13 @@
 import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Button, Icon } from "../../design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
 // Uc tamamlama aninin ortak iskeleti (AKIS 16). Tam ekran modal:
 // tasarimda artboardlarin tamami 390x844, kart degil.
-// Hareket: tek tur giris (FadeIn/FadeInDown). Konfeti/rozet/ses YOK.
+// Hareket: tek tur giris (FadeIn/FadeIn). Konfeti/rozet/ses YOK.
 export function CompletionShell({
   visible,
   onClose,
@@ -51,12 +51,12 @@ export function CompletionShell({
             ) : null}
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(120).duration(420)} style={s.content}>
+          <Animated.View entering={FadeIn.delay(120).duration(420)} style={s.content}>
             {children}
           </Animated.View>
         </ScrollView>
 
-        <Animated.View entering={FadeInDown.delay(220).duration(420)} style={s.footer}>
+        <Animated.View entering={FadeIn.delay(220).duration(420)} style={s.footer}>
           {primaryLabel ? (
             <Button size="lg" fullWidth onPress={onPrimary || onClose}>
               {primaryLabel}

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import { Icon, AnimatedPressable } from "../../components/design";
 import { ReferralSkeleton } from "./components/ReferralSkeleton";
@@ -82,7 +82,7 @@ export default function ReferralScreen() {
           Arkadaşlarını davet et, ikiniz de {rewardDays} gün Premium kazanın
         </Animated.Text>
 
-        <Animated.View entering={FadeInDown.delay(350)} style={[s.codeCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <Animated.View style={[s.codeCard, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[s.codeLabel, { color: C.sec }]}>DAVET KODUN</Text>
           <Text style={[s.codeText, { color: C.accent }]}>{code || "..."}</Text>
 
@@ -101,7 +101,7 @@ export default function ReferralScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(450)} style={[s.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <Animated.View style={[s.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
           <View style={[s.statIcon, { backgroundColor: C.green + "18" }]}>
             <Icon name="users" size={20} color={C.green} />
           </View>
@@ -118,7 +118,7 @@ export default function ReferralScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(550)} style={[s.inputCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <Animated.View style={[s.inputCard, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[s.inputLabel, { color: C.text }]}>Davet kodun var mı?</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginBottom: SPACING.md }]}>
             Arkadaşının davet kodunu gir, ikiniz de Premium kazanın
@@ -152,7 +152,7 @@ export default function ReferralScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(650)} style={[s.howCard, { backgroundColor: C.surface2 + "60" }]}>
+        <Animated.View style={[s.howCard, { backgroundColor: C.surface2 + "60" }]}>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, marginBottom: SPACING.sm }]}>Nasıl Çalışır?</Text>
           {[
             "Davet kodunu arkadaşınla paylaş",

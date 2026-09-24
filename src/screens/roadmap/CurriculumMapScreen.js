@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { ErrorState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -16,7 +16,6 @@ import CurriculumSubjectRow from "./components/CurriculumSubjectRow";
 import { CurriculumBottomActions } from "./components/CurriculumBottomActions";
 import { RouteHeader } from "./components/RouteHeader";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 const TABS = [
   { key: "curriculum", label: "Müfredat" },
   { key: "program", label: "Programım" },
@@ -65,10 +64,10 @@ function CurriculumMapInner() {
         <ErrorState preset="server" onPrimary={map.refresh} style={s.pad} />
       ) : (
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={enter(0)} style={s.pad}>
+          <Animated.View style={s.pad}>
             <CurriculumProgressCard done={map.done} total={map.total} left={map.left} pct={map.pct} />
           </Animated.View>
-          <Animated.View entering={enter(1)} style={[s.pad, s.groups]}>
+          <Animated.View style={[s.pad, s.groups]}>
             {map.groups.map((g) => (
               <View key={g.key}>
                 <View style={s.groupHead}>

@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -16,7 +16,6 @@ import { ForecastMissReasonCard } from "./components/ForecastMissReasonCard";
 // kalinca: eyebrow sakin tona doner, sebep karti acilir (sebep gercekse),
 // paylas butonu birincil olmaktan cikip sessiz cerceveye doner.
 // "Sırada ne var" satiri CIZILMIYOR: o ekran (kapsam #4) henuz yok.
-const FADE = (delay) => FadeInDown.delay(delay).duration(500);
 
 export default function ForecastAccuracyScreen() {
   const C = useC();
@@ -41,7 +40,7 @@ export default function ForecastAccuracyScreen() {
 
         {f.status === "ready" && v ? (
           <>
-            <Animated.View entering={FADE(0)}>
+            <Animated.View>
               <Text style={[TYPOGRAPHY.label, s.eyebrow, { color: v.emphasized ? C.accentBright : C.text3 }]}>
                 {v.eyebrow}
               </Text>
@@ -50,28 +49,28 @@ export default function ForecastAccuracyScreen() {
             </Animated.View>
 
             {f.chart ? (
-              <Animated.View entering={FADE(80)} style={s.block}>
+              <Animated.View style={s.block}>
                 <ForecastAccuracyChart chart={f.chart} view={v} />
               </Animated.View>
             ) : null}
 
             {v.showMissReason ? (
-              <Animated.View entering={FADE(160)} style={s.blockTight}>
+              <Animated.View style={s.blockTight}>
                 <ForecastMissReasonCard />
               </Animated.View>
             ) : null}
 
-            <Animated.View entering={FADE(160)} style={s.blockTight}>
+            <Animated.View style={s.blockTight}>
               <ForecastStatTrio view={v} />
             </Animated.View>
 
             {f.recap ? (
-              <Animated.View entering={FADE(240)} style={s.blockTight}>
+              <Animated.View style={s.blockTight}>
                 <ExamRecapCard recap={f.recap} />
               </Animated.View>
             ) : null}
 
-            <Animated.View entering={FADE(320)} style={s.cta}>
+            <Animated.View style={s.cta}>
               <Button size="lg" fullWidth variant={v.emphasized ? "primary" : "outline"} onPress={f.share}>
                 Yılın rotasını paylaş
               </Button>

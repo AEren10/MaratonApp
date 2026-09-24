@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { Layout, FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Animated, { Layout, FadeOutUp } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -46,7 +46,6 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
           {preview.map((item) => (
             <Animated.View key={item.id} layout={Layout.duration(240)}>
               <Animated.View
-                entering={FadeInDown.duration(240)}
                 exiting={FadeOutUp.duration(180)}
               >
                 <HomeStopRow

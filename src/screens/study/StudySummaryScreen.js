@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
 import { useSelector } from "react-redux";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 import * as H from "../../lib/haptics";
 import { Button, StatBlock } from "../../components/design";
@@ -83,12 +83,11 @@ export default function StudySummaryScreen() {
           <Text style={[TYPOGRAPHY.heading, { color: C.text, marginTop: STEP.s2 }]}>Rota ilerledi</Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(140).duration(500)} style={{ marginTop: STEP.s2 }}>
+        <Animated.View style={{ marginTop: STEP.s2 }}>
           <StatBlock value={String(duration)} unit="dakikalık çalışma tamamlandı" size="large" />
         </Animated.View>
 
         <Animated.View
-          entering={FadeInDown.delay(180).duration(500)}
           style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s2 }}
         >
           <View style={{ width: 7, height: 7, borderRadius: 1, backgroundColor: subjectColor }} />
@@ -97,7 +96,7 @@ export default function StudySummaryScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).duration(500)} style={{ marginTop: STEP.s4 }}>
+        <Animated.View style={{ marginTop: STEP.s4 }}>
           <StudySummaryStats
             C={C}
             todaySolved={todaySolved}
@@ -111,7 +110,7 @@ export default function StudySummaryScreen() {
 
         <StoryShareBlock moment={STORY_MOMENT.SESSION} emphasis="quiet" />
 
-        <Animated.View entering={FadeInDown.delay(320).duration(500)} style={{ gap: STEP.s1 }}>
+        <Animated.View style={{ gap: STEP.s1 }}>
           {wrongCount > 0 ? (
             <Button
               onPress={() => navigation.navigate(SCREENS.ADD_WRONG, { subjectKey: route.params?.subjectKey })}

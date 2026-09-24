@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, Card } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../themes/tokens";
@@ -39,7 +39,7 @@ export default function LevelScreen() {
 
   const header = (
     <>
-      <Animated.View entering={FadeInDown.delay(60).duration(500)}>
+      <Animated.View>
         <LevelHero
           badge={badge}
           heroXP={heroXP}
@@ -49,14 +49,13 @@ export default function LevelScreen() {
         />
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(140).duration(500)}>
+      <Animated.View>
         <Card tone="surface" radius="panel" style={styles.note}>
           <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 20 }]}>{NOTE}</Text>
         </Card>
       </Animated.View>
 
       <Animated.Text
-        entering={FadeInDown.delay(200).duration(500)}
         style={[TYPOGRAPHY.label, styles.sectionLabel, { color: C.text2 }]}
       >
         SEVİYE YOLU

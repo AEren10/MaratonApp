@@ -1,4 +1,4 @@
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { PeriodHero } from "./PeriodHero";
 import { MonthPoster } from "./MonthPoster";
@@ -13,7 +13,7 @@ export function MonthSummaryBody({ data }) {
   const trailing = data.chart.trailing;
   return (
     <>
-      <Animated.View entering={FadeInDown.delay(60).duration(500)}>
+      <Animated.View>
         {data.layout === "typographic" ? (
           <MonthPoster eyebrow={data.eyebrow} monthName={data.monthName} heroValue={data.hero.value} stats={data.posterStats} />
         ) : (

@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, EmptyState, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -94,7 +94,7 @@ function WeekProgramInner() {
               ) : null}
             </Animated.View>
             {p.agenda.length ? (
-              <Animated.View entering={FadeInDown.duration(600)} style={s.agenda}>
+              <Animated.View style={s.agenda}>
                 {p.agenda.map((item) => <ProgramAgendaItem key={item.key} item={item} />)}
               </Animated.View>
             ) : (

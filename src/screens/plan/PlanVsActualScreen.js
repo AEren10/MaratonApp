@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -72,7 +72,7 @@ export default function PlanVsActualScreen() {
       ) : (
         <>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-            <Animated.View entering={FadeInDown.duration(560)}>
+            <Animated.View>
               <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 1.5, marginBottom: STEP.s4 }]}>
                 PLANLANAN vs GERÇEKLEŞEN
               </Text>
@@ -82,7 +82,7 @@ export default function PlanVsActualScreen() {
               </Text>
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(120).duration(560)} style={{ marginTop: STEP.s5 }}>
+            <Animated.View style={{ marginTop: STEP.s5 }}>
               <PlanVsActualChart series={series} C={C} />
               <View style={styles.legend}>
                 <Legend C={C} color={C.text3} label="Plan" />
@@ -90,7 +90,7 @@ export default function PlanVsActualScreen() {
               </View>
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(200).duration(560)} style={styles.cards}>
+            <Animated.View style={styles.cards}>
               <CountCard C={C} eyebrow="PLANDA" value={plannedDue} caption="durak bitmeliydi" />
               <CountCard C={C} eyebrow="GERÇEKTE" value={doneDue} caption="durak bitti" accent />
             </Animated.View>

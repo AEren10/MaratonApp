@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -17,11 +17,11 @@ export function RouteConfirmLayout({
     <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <RouteHeader close onBack={onCancel} />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(600)} style={s.intro}>
+        <Animated.View style={s.intro}>
           <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text }]}>{title}</Text>
           <Text style={[TYPOGRAPHY.body, s.body, { color: C.text3 }]}>{body}</Text>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(80).duration(600)} style={s.cards}>
+        <Animated.View style={s.cards}>
           {children}
         </Animated.View>
         <View style={s.actions}>

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -79,7 +79,7 @@ function SetupIncompleteContent() {
           ) : null}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(160)} style={{ marginTop: STEP.s4 }}>
+        <Animated.View style={{ marginTop: STEP.s4 }}>
           <View style={styles.progressRow}>
             {steps.map((s) => (
               <View
@@ -94,12 +94,12 @@ function SetupIncompleteContent() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(220)} style={{ marginTop: STEP.s3 }}>
+        <Animated.View style={{ marginTop: STEP.s3 }}>
           <SetupProgressList steps={steps} nextStepKey={nextStep?.key} />
         </Animated.View>
       </View>
 
-      <Animated.View entering={FadeInDown.delay(280)} style={[styles.cta, { borderTopColor: C.line }]}>
+      <Animated.View style={[styles.cta, { borderTopColor: C.line }]}>
         <Button onPress={handleContinue} size="lg" fullWidth>
           Kurulumu tamamla
         </Button>

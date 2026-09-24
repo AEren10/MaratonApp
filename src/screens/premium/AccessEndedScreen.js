@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -33,7 +33,7 @@ export default function AccessEndedScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <Animated.View entering={FadeInDown.duration(620)} style={styles.hero}>
+        <Animated.View style={styles.hero}>
           <Text style={[TYPOGRAPHY.label, { color: C.warn }]}>{A.eyebrow}</Text>
           <Text style={[TYPOGRAPHY.display, styles.title, { color: C.text }]}>{A.title}</Text>
           <Text style={[TYPOGRAPHY.body, styles.body, { color: C.text2 }]}>{A.body}</Text>

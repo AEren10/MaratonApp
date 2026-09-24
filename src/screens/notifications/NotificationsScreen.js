@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { ErrorState, Icon, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -45,7 +45,7 @@ function NotificationsContent() {
   } = useNotifications();
 
   const renderEmpty = () => (
-    <Animated.View entering={FadeInDown.duration(500)} style={s.emptyContainer}>
+    <Animated.View style={s.emptyContainer}>
       <View style={s.emptyIcon}>
         <Icon name="bell" size={30} color={C.text3} />
       </View>

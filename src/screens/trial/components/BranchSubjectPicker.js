@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
@@ -15,7 +15,7 @@ export function BranchSubjectPicker({ value, onChange }) {
   const { examType, field } = useExam();
   const subjects = useMemo(() => getSubjectsForBranch(C, examType, field), [C, examType, field]);
   return (
-    <Animated.View entering={FadeInDown.duration(500)} style={styles.section}>
+    <Animated.View style={styles.section}>
       <TrialEntryRuleLabel>HANGİ DERS?</TrialEntryRuleLabel>
       <View style={styles.chips}>
         {subjects.map((subject) => (

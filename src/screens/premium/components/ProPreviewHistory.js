@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { useProPreviewHistory } from "../../../hooks/useProPreviewHistory";
@@ -24,7 +24,7 @@ export function ProPreviewHistory({ onOpen, onDismiss }) {
       onPrimary={onOpen}
       onDismiss={onDismiss}
     >
-      <Animated.View entering={FadeInDown.duration(620)} style={styles.hero}>
+      <Animated.View style={styles.hero}>
         <View style={styles.countRow}>
           <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{total}</Text>
           <Text style={[TYPOGRAPHY.bodyMedium, styles.meta, { color: C.text3 }]}>{P.countMeta(open)}</Text>

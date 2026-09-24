@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
@@ -15,7 +15,7 @@ export function HomeHeroComeback({ nextTask, recommendation, onStartTask, onDism
 
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(380)}>
+      <Animated.View>
         <HomeHeroEyebrow label="GERİ DÖNÜŞ MODU" />
         <Text style={[s.title, { color: C.text }]}>Yeniden başlamak için rotayı hafifletelim.</Text>
         <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s2 }]}>
@@ -24,7 +24,7 @@ export function HomeHeroComeback({ nextTask, recommendation, onStartTask, onDism
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(80).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <Pressable
           onPress={() => { H.select(); onStartTask?.(nextTask); }}
           style={[s.recCard, { backgroundColor: C.brandTint, borderColor: C.accent }]}

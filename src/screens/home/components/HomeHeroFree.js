@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Svg, { Path, Circle } from "react-native-svg";
 
 import { StatBlock } from "../../../components/design/StatBlock";
@@ -19,7 +19,7 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
 
   return (
     <View style={s.top}>
-      <Animated.View entering={FadeInDown.duration(500)}>
+      <Animated.View>
         <StatBlock label="Bugün çözülen" value={solvedToday} unit={`/${dailyGoal}`} size="hero">
           <Text style={[TYPOGRAPHY.bodyMedium, s.line, { color: C.text2 }]}>{line}</Text>
         </StatBlock>
@@ -43,7 +43,7 @@ export function HomeHeroFree({ solvedToday, dailyGoal, minutesToday, remainingTo
         </View>
       </View>
 
-      <Animated.View entering={FadeInDown.delay(200).duration(500)} style={s.cta}>
+      <Animated.View style={s.cta}>
         <HomeCTAButton title="Bugün ne çalıştın, kaydet" subtitle="Ders · konu · süre · soru" onPress={onRecord} />
       </Animated.View>
     </View>

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { StatBlock } from "../../../components/design/StatBlock";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -16,7 +16,7 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
   const examYear = parsed && !Number.isNaN(parsed.getTime()) ? parsed.getFullYear() : null;
 
   return (
-    <Animated.View entering={FadeInDown.duration(380)} style={s.row}>
+    <Animated.View style={s.row}>
       <StatBlock
         label="Bugün çözülen"
         value={solved}

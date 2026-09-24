@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../../../constants/screens";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
@@ -35,7 +35,7 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
 
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(380)}>
+      <Animated.View>
         <HomeHeroEyebrow label="SON HAFTA" trailing={formatExamDate(examDate)} />
         <Text style={[s.title, { color: C.text }]}>Rotanı değiştirdim.</Text>
         <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>
@@ -45,12 +45,12 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
       </Animated.View>
 
       {trialStats ? (
-        <Animated.View entering={FadeInDown.delay(80).duration(380)} style={s.block}>
+        <Animated.View style={s.block}>
           <HomeHeroTrialSummaryCard best={trialStats.best} average={trialStats.average} note={proofNote} />
         </Animated.View>
       ) : null}
 
-      <Animated.View entering={FadeInDown.delay(140).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
           BUGÜNÜN İŞİ
         </Text>
@@ -85,7 +85,7 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
         </Pressable>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(200).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <HomeHeroClosedCard items={CLOSED_ITEMS} note={CLOSED_NOTE} />
       </Animated.View>
 

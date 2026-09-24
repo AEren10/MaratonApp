@@ -6,7 +6,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from "react-nati
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, IconBox, Chip } from "../../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../../themes/tokens";
@@ -93,7 +93,7 @@ export function CommunityQuestionDetail() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(60).duration(400).springify()} style={[styles.subjectCard, { borderLeftColor: s.color }]}>
+        <Animated.View style={[styles.subjectCard, { borderLeftColor: s.color }]}>
           <IconBox icon={s.icon} color={s.color} size={44} rounded={14} />
           <View style={{ flex: 1 }}>
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{s.label || s.name}</Text>
@@ -102,13 +102,13 @@ export function CommunityQuestionDetail() {
         </Animated.View>
 
         {!community && (
-          <Animated.View entering={FadeInDown.delay(120).duration(400).springify()} style={styles.answersRow}>
+          <Animated.View style={styles.answersRow}>
             <AnswerBadge label="Benim cevabım" answer={item.my_answer ?? item.myAnswer ?? "-"} color={C.red} styles={styles} C={C} />
             <AnswerBadge label="Doğru cevap" answer={item.correct_answer ?? item.correctAnswer ?? "-"} color={C.green} styles={styles} C={C} />
           </Animated.View>
         )}
 
-        <Animated.View entering={FadeInDown.delay(180).duration(400).springify()} style={styles.section}>
+        <Animated.View style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
             DETAYLAR
           </Text>
@@ -116,7 +116,7 @@ export function CommunityQuestionDetail() {
           <InfoRow icon="bookOpen" label="Konu" value={item.topic} color={s.color} styles={styles} C={C} />
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={styles.section}>
+        <Animated.View style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
             NOTLARIM
           </Text>
@@ -128,7 +128,7 @@ export function CommunityQuestionDetail() {
         </Animated.View>
 
         {hasImage && (
-          <Animated.View entering={FadeInDown.delay(300).duration(400).springify()} style={styles.section}>
+          <Animated.View style={styles.section}>
             <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
               FOTOĞRAF
             </Text>
@@ -150,7 +150,7 @@ export function CommunityQuestionDetail() {
         )}
 
         {!community && !item.is_resolved && !localResolved && (
-          <Animated.View entering={FadeInDown.delay(360).duration(400).springify()}>
+          <Animated.View>
             <Pressable
               onPress={async () => {
                 if (resolving) return;
@@ -185,7 +185,7 @@ export function CommunityQuestionDetail() {
             subscribeToAnswers) zaten yazılıydı ama hiçbir ekran çağırmıyordu —
             "soruya cevap yaz" özelliği arayüzsüz duruyordu. */}
         {community && item?.id && (
-          <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
+          <Animated.View>
             <AnswerThread sharedQuestionId={item.shared_question_id || item.id} />
           </Animated.View>
         )}

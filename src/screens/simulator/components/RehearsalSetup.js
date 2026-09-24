@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Card } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { formatRehearsalDate, sessionLabel } from "../../../domain/exam/examRehearsal";
 import { RehearsalRow, RehearsalOptions, RehearsalInput } from "./RehearsalRow";
 
-const FADE = (delay) => FadeInDown.delay(delay).duration(500);
 
 // Tasarim "Deneme Provası" govdesi: baslik, dort satirlik form, PROVA GUNU
 // listesi ve not. Butonlar ekran dosyasinda.
@@ -17,14 +16,14 @@ export function RehearsalSetup({ r }) {
 
   return (
     <View>
-      <Animated.View entering={FADE(0)} style={s.intro}>
+      <Animated.View style={s.intro}>
         <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text }]}>Sınav saatinde prova.</Text>
         <Text style={[TYPOGRAPHY.body, s.sub, { color: C.text3 }]}>
           Gerçek oturum uzunluğu, gerçek saat. Prova sonrası netler rotaya işlenir.
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FADE(80)} style={s.block}>
+      <Animated.View style={s.block}>
         <Card tone="surface" radius="sheet" padded={false} style={[s.form, { borderColor: C.elev }]}>
           <RehearsalRow label="Tarih" value={formatRehearsalDate(form.dateKey)} open={open === "date"} onToggle={() => toggleOpen("date")}>
             <RehearsalOptions
@@ -49,7 +48,7 @@ export function RehearsalSetup({ r }) {
         </Card>
       </Animated.View>
 
-      <Animated.View entering={FADE(160)} style={s.blockTight}>
+      <Animated.View style={s.blockTight}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>PROVA GÜNÜ</Text>
         <View style={s.rules}>
           {rules.map((text) => (
@@ -61,7 +60,7 @@ export function RehearsalSetup({ r }) {
         </View>
       </Animated.View>
 
-      <Animated.View entering={FADE(240)} style={s.blockTight}>
+      <Animated.View style={s.blockTight}>
         <View style={[s.note, { backgroundColor: C.surface, borderColor: C.elev }]}>
           <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 20 }]}>
             Prova netleri tahmin bandına girer ama seriyi bozmaz. Yarım bırakırsan kayıt açılmaz.

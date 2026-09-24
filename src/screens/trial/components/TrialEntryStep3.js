@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useState } from "react";
 
 import { Button } from "../../../components/design";
@@ -21,21 +21,21 @@ export function TrialEntryStep3({ form, styles, onBack }) {
   return (
     <ScrollView contentContainerStyle={styles.scroll}
       showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-      <Animated.View entering={FadeInDown.duration(500)}>
+      <Animated.View>
         <Text style={styles.title}>Son kontrol</Text>
         <Text style={styles.body}>Kaydettiğinde rota yeniden çizilir ve tahminin güncellenir.</Text>
       </Animated.View>
-      <Animated.View entering={FadeInDown.delay(70).duration(500)} style={styles.section}>
+      <Animated.View style={styles.section}>
         <TrialEntryNetCard totalNet={Number(form.totalNet)} normalizedNet={normalizedNet}
           difficultyLevel={form.difficultyLevel} publisherName={publisherName} styles={styles} />
       </Animated.View>
-      <Animated.View entering={FadeInDown.delay(140).duration(500)} style={styles.section}>
+      <Animated.View style={styles.section}>
         <TrialEntryDetailsCard form={form} styles={styles} />
       </Animated.View>
-      <Animated.View entering={FadeInDown.delay(210).duration(500)} style={styles.section}>
+      <Animated.View style={styles.section}>
         <TrialEntryNotebookToggle value={addWrong} onValueChange={setAddWrong} count={totalWrong} />
       </Animated.View>
-      <Animated.View entering={FadeInDown.delay(280).duration(500)} style={styles.actions}>
+      <Animated.View style={styles.actions}>
         <Button size="lg" onPress={form.handleSave} loading={form.saving} fullWidth>
           Kaydet ve rotayı çiz
         </Button>

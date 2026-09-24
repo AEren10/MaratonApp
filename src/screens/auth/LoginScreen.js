@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon, Button } from "../../components/design";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -67,7 +67,7 @@ export default function LoginScreen() {
             </Pressable>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(80).duration(350)} style={{ marginTop: STEP.s2 }}>
+          <Animated.View style={{ marginTop: STEP.s2 }}>
             <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 280 }]}>
               Hesabına gir.
             </Text>
@@ -77,11 +77,11 @@ export default function LoginScreen() {
           </Animated.View>
 
           <View style={{ marginTop: STEP.s4 }}>
-            <Animated.View entering={FadeInDown.delay(150).duration(350)}>
+            <Animated.View>
               <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(210).duration(350)}>
+            <Animated.View>
               <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••" secureTextEntry error={errors.password} />
               <Pressable onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)} style={{ alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -STEP.s1 }} hitSlop={6}>
                 <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>Şifremi unuttum</Text>
@@ -89,13 +89,13 @@ export default function LoginScreen() {
             </Animated.View>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(280).duration(350)}>
+          <Animated.View>
             <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s1 }}>
               {busy ? "Giriş yapılıyor..." : "Giriş yap"}
             </Button>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(340).duration(350)}>
+          <Animated.View>
             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
               <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
               <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>

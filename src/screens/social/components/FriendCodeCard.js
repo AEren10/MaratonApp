@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import * as Clipboard from "expo-clipboard";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
@@ -62,7 +62,7 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
   return (
     <>
       {myCode && (
-        <Animated.View entering={FadeInDown.delay(40).duration(400).springify()} style={s.codeCard}>
+        <Animated.View style={s.codeCard}>
           <Text style={s.label}>SENİN KODUN</Text>
           <View style={s.codeRow}>
             <Text style={s.codeValue}>{myCode}</Text>
@@ -77,7 +77,7 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
         </Animated.View>
       )}
 
-      <Animated.View entering={FadeInDown.delay(80).duration(400).springify()} style={s.addBox}>
+      <Animated.View style={s.addBox}>
         <Text style={s.label}>KOD İLE EKLE</Text>
         <View style={s.inputRow}>
           <TextInput

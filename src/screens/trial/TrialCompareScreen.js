@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -63,11 +63,11 @@ export default function TrialCompareScreen() {
             <TrialComparePill C={C} label={titles.newer} active onPress={() => setPickerTarget("newer")} />
           </View>
 
-          <Animated.View entering={FadeInDown.duration(520)} style={{ marginTop: 30 }}>
+          <Animated.View style={{ marginTop: 30 }}>
             <TrialCompareHero C={C} {...hero} />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(120).duration(520)} style={{ marginTop: 28 }}>
+          <Animated.View style={{ marginTop: 28 }}>
             <TrialCompareTable
               C={C}
               rows={rows}

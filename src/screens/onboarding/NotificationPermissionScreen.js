@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Linking } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -90,7 +90,7 @@ function NotificationPermissionContent() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(160)} style={{ marginTop: STEP.s4 }}>
+        <Animated.View style={{ marginTop: STEP.s4 }}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.6 }]}>
             SANA NE GÖNDERİRİZ
           </Text>
@@ -108,7 +108,6 @@ function NotificationPermissionContent() {
       </ScrollView>
 
       <Animated.View
-        entering={FadeInDown.delay(240)}
         style={[styles.cta, { borderTopColor: C.line }]}
       >
         <Button onPress={handleAllow} size="lg" fullWidth loading={busy}>

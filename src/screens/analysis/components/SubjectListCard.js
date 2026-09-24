@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { Card, Icon } from "../../../components/design";
 import { SubjectTrendChart } from "./SubjectTrendChart";
@@ -24,7 +24,7 @@ function DeltaChip({ delta, C }) {
 export const SubjectListCard = React.memo(function SubjectListCard({ item, index, onPress, C }) {
   const { name, color, net, delta, lo, hi, trend } = item;
   return (
-    <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
+    <Animated.View>
       <Pressable
         onPress={onPress}
         accessibilityRole="button"

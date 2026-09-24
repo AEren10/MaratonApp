@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { getSubjectByKey } from "../../themes/subjects";
@@ -15,7 +15,7 @@ export default function QuizCard({ item, selected, feedback, onAnswer }) {
   const hasAnswer = !!item.correct_answer;
 
   return (
-    <Animated.View entering={FadeInDown.duration(300)} style={s.card}>
+    <Animated.View style={s.card}>
       <View style={s.chipRow}>
         <View style={[s.chip, { backgroundColor: subj?.color || C.amber }]}>
           <Text style={s.chipText}>{subj?.label || item.subject}</Text>

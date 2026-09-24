@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
@@ -17,7 +17,7 @@ export function NotebookEmpty({ onAdd }) {
   const C = useC();
   const copy = EMPTY_COPY.wrongNotebook;
   return (
-    <Animated.View entering={FadeInDown.duration(500)} style={styles.outer}>
+    <Animated.View style={styles.outer}>
       <View style={[styles.card, { borderColor: C.border }]}>
         <View style={styles.ghosts}>
           {GHOST.map((g) => (

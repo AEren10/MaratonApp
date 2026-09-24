@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -16,7 +16,6 @@ import { RouteProjectionCard } from "./components/RouteProjectionCard";
 import { RouteTempoSection } from "./components/RouteTempoSection";
 import { RouteUpcomingStops } from "./components/RouteUpcomingStops";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
 export default function RoadmapScreen() {
   const C = useC();
@@ -43,7 +42,7 @@ export default function RoadmapScreen() {
             />
           ) : (
             <>
-              <Animated.View entering={enter(0)}>
+              <Animated.View>
                 <View style={s.introHeader}>
                   <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>NET ORTALAMASI</Text>
                   {view.caption ? (
@@ -67,11 +66,11 @@ export default function RoadmapScreen() {
                 ) : null}
               </Animated.View>
               
-              <Animated.View entering={enter(1)} style={s.cardSection}>
+              <Animated.View style={s.cardSection}>
                 <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
               </Animated.View>
               
-              <Animated.View entering={enter(2)} style={s.section}>
+              <Animated.View style={s.section}>
                 {view.tempoRows?.length ? (
                   <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
                 ) : null}
@@ -87,7 +86,7 @@ export default function RoadmapScreen() {
                 </View>
               </Animated.View>
               
-              <Animated.View entering={enter(3)} style={s.section}>
+              <Animated.View style={s.section}>
                 {(d.upcoming?.length ?? 0) > 0 ? (
                   <RouteUpcomingStops items={d.upcoming} onStop={d.openStop} />
                 ) : null}

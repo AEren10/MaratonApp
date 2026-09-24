@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -52,7 +52,7 @@ export default function CancelSubscriptionScreen() {
 
       {state !== "loading" && endsDative ? (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={FadeInDown.duration(420)}>
+          <Animated.View>
             <Text style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>
               {`Premium ${endsDative} kadar açık.`}
             </Text>
@@ -61,15 +61,15 @@ export default function CancelSubscriptionScreen() {
             </Text>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(80).duration(420)} style={styles.block}>
+          <Animated.View style={styles.block}>
             <CancelLossCard dateLabel={endsLocative.toLocaleUpperCase("tr-TR")} />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(140).duration(420)} style={styles.blockTight}>
+          <Animated.View style={styles.blockTight}>
             <CancelKeepCard loading={loading} stats={stats} />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(200).duration(420)} style={styles.block}>
+          <Animated.View style={styles.block}>
             <Card tone="surface" radius="panel" style={[styles.note, { borderColor: C.elev }]}>
               <View style={[styles.dot, { backgroundColor: C.down }]} />
               <Text style={[TYPOGRAPHY.caption, { color: C.text2, flex: 1 }]}>

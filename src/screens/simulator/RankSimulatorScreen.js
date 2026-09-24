@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
 import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
@@ -57,7 +57,7 @@ export default function RankSimulatorScreen() {
       <Header onBack={() => navigation.goBack()} C={C} />
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s4 }} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(420)} style={{ marginTop: STEP.s2 }}>
+        <Animated.View style={{ marginTop: STEP.s2 }}>
           <Text style={{ ...TYPOGRAPHY.heading, color: C.text, maxWidth: 300 }}>
             {targetNet} net nereye yeter?
           </Text>
@@ -83,7 +83,7 @@ export default function RankSimulatorScreen() {
             </Text>
             <View style={{ gap: STEP.s1 }}>
               {gapResult.topContributors.slice(0, 6).map((item, i) => (
-                <Animated.View key={`${item.subject}-${item.topic}`} entering={FadeInDown.delay(60 + i * 50).duration(360)}>
+                <Animated.View key={`${item.subject}-${item.topic}`}>
                   <ThresholdContributorRow item={item} locked={!canAccess} />
                 </Animated.View>
               ))}

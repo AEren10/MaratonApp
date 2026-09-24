@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, StatBlock, Chip } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -8,7 +8,7 @@ export function TrialDetailHero({ C, latest, dateStr, typeMeta, rawNet, trend, p
   const trendColor = trend > 0 ? C.up || C.green : trend < 0 ? C.down || C.red : C.text3;
 
   return (
-    <Animated.View entering={FadeInDown.duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <View style={styles.metaRow}>
         {typeMeta ? (
           <Chip color={C.accentBright} bg={C.brandTint}>

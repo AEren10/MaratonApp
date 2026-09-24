@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Icon, Card, Button } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
@@ -37,7 +37,7 @@ export default function HowItWorksScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(520)}>
+        <Animated.View>
           <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{T.title}</Text>
           <Text style={[TYPOGRAPHY.body, styles.lede, { color: C.text2 }]}>{T.lede}</Text>
         </Animated.View>
@@ -46,7 +46,7 @@ export default function HowItWorksScreen() {
           {T.sourcesLabel}
         </Text>
         {T.sources.map((src, i) => (
-          <Animated.View key={src.key} entering={FadeInDown.delay(80 + i * 60).duration(520)}>
+          <Animated.View key={src.key}>
             <HowItWorksSource C={C} source={src} index={i + 1} />
           </Animated.View>
         ))}

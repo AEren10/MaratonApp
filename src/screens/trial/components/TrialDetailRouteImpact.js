@@ -1,5 +1,5 @@
 import { Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
@@ -9,7 +9,7 @@ export function TrialDetailRouteImpact({ C, routeImpact }) {
   const { before, after } = routeImpact;
   const verb = after >= before ? "çıkardı" : "düşürdü";
   return (
-    <Animated.View entering={FadeInDown.delay(260).duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <Card tone="tint" style={[styles.card, { borderWidth: 1, borderColor: C.border }]}>
         <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>ROTAYA ETKİSİ</Text>
         <Text style={[TYPOGRAPHY.topicName, { color: C.text, marginTop: STEP.s1 }]}>

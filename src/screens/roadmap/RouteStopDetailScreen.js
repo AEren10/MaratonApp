@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -14,7 +14,6 @@ import { RouteStopHero } from "./components/RouteStopHero";
 import { RouteStopPlace } from "./components/RouteStopPlace";
 import { RouteStopWhy } from "./components/RouteStopWhy";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
 // Tasarim AKIS 2 · "Durak Detayı": rotadaki tek durak.
 // Parametre: { stopKey } (routeOverview.routeStopKey).
@@ -37,16 +36,16 @@ export default function RouteStopDetailScreen() {
       >
         {stop ? (
           <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-            <Animated.View entering={enter(0)}>
+            <Animated.View>
               <RouteStopHero number={d.number} stop={stop} color={color} subjectCompleted={d.subjectCompleted} />
             </Animated.View>
-            <Animated.View entering={enter(1)}>
+            <Animated.View>
               <RouteStopWhy stop={stop} color={color} />
             </Animated.View>
-            <Animated.View entering={enter(2)}>
+            <Animated.View>
               <RouteStopPlace prev={d.prev} next={d.next} />
             </Animated.View>
-            <Animated.View entering={enter(3)}>
+            <Animated.View>
               <RouteStatTiles
                 tiles={[
                   { label: "SON ÇALIŞMA", value: studied ? `${Math.round(stop.neglectedDays || 0)} gün` : null },
@@ -55,7 +54,7 @@ export default function RouteStopDetailScreen() {
                 ]}
               />
             </Animated.View>
-            <Animated.View entering={enter(4)} style={s.actions}>
+            <Animated.View style={s.actions}>
               {d.canStart ? (
                 <Button size="lg" fullWidth onPress={d.start}>Çalışmaya Başla</Button>
               ) : null}

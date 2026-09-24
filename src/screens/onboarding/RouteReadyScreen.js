@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, AnimatedNumber } from "../../components/design";
 import RouteReadyStopRow from "./components/RouteReadyStopRow";
@@ -57,7 +57,7 @@ export default function RouteReadyScreen() {
         <Animated.View entering={FadeIn.delay(60)}>
           <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accent }]}>ROTAN HAZIR</Text>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(140)} style={styles.heroWrap}>
+        <Animated.View entering={FadeIn.delay(140)} style={styles.heroWrap}>
           <AnimatedNumber
             value={daysUntilExam || 0}
             duration={750}
@@ -65,14 +65,14 @@ export default function RouteReadyScreen() {
           />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text3 }]}>gün</Text>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(200)}>
+        <Animated.View entering={FadeIn.delay(200)}>
           <Text style={[TYPOGRAPHY.subheading, styles.headline, { color: C.text }]}>
             {stopCount > 0 ? `${stopCount} durak, tek yol. Bugünden sınav gününe kadar.` : "Rotan tek yol. Bugünden sınav gününe kadar."}
           </Text>
         </Animated.View>
 
         {targetNet != null && currentNet != null ? (
-          <Animated.View entering={FadeInDown.delay(260)} style={styles.compareRow}>
+          <Animated.View entering={FadeIn.delay(260)} style={styles.compareRow}>
             <View>
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>BUGÜN</Text>
               <Text style={[TYPOGRAPHY.heading, { color: C.text, marginTop: 4 }]}>{currentNet}</Text>
@@ -85,7 +85,7 @@ export default function RouteReadyScreen() {
         ) : null}
 
         {upcomingStops.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(320)} style={styles.stopList}>
+          <Animated.View entering={FadeIn.delay(320)} style={styles.stopList}>
             {upcomingStops.map((stop) => (
               <RouteReadyStopRow key={stop.key} stop={stop} />
             ))}
@@ -93,7 +93,7 @@ export default function RouteReadyScreen() {
         )}
 
         {firstStop && (
-          <Animated.View entering={FadeInDown.delay(380)} style={styles.taskBlock}>
+          <Animated.View entering={FadeIn.delay(380)} style={styles.taskBlock}>
             <RouteReadyFirstTask task={firstStop} />
           </Animated.View>
         )}

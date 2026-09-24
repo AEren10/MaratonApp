@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { View, Text, Modal, StyleSheet } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -14,16 +14,16 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
   return (
     <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onDismiss}>
       <View style={s.overlay}>
-        <Animated.View entering={FadeInDown.duration(320)} style={s.card}>
+        <Animated.View entering={FadeIn.duration(320)} style={s.card}>
           <View style={[s.badge, { backgroundColor: C.up + "18", borderColor: C.up + "33" }]}>
             <Icon name="checkCircle" size={32} color={C.up} />
           </View>
 
-          <Animated.Text entering={FadeInDown.delay(100).duration(280)} style={s.title}>
+          <Animated.Text entering={FadeIn.delay(100).duration(280)} style={s.title}>
             Günlük Hedef Tamam!
           </Animated.Text>
 
-          <Animated.View entering={FadeInDown.delay(180).duration(280)} style={s.statsRow}>
+          <Animated.View entering={FadeIn.delay(180).duration(280)} style={s.statsRow}>
             <View style={[s.statBox, { backgroundColor: C.up + "14" }]}>
               <Text style={[s.statNum, { color: C.up }]}>{solved}</Text>
               <Text style={[s.statLabel, { color: C.up }]}>soru</Text>
@@ -36,7 +36,7 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
             )}
           </Animated.View>
 
-          <Animated.Text entering={FadeInDown.delay(240).duration(280)} style={s.sub}>
+          <Animated.Text entering={FadeIn.delay(240).duration(280)} style={s.sub}>
             Harika gidiyorsun! Bugünkü hedefini tamamladın.
           </Animated.Text>
 

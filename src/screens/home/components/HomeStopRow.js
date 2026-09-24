@@ -1,10 +1,11 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { HomeStopCheckRing } from "./HomeStopCheckRing";
+import { Press, PRESS_ROW } from "../../../components/design/Press";
 
 function durationOf(item) {
   const mins = item.minutes || (item.count > 0 ? Math.round(item.count * 1.5) : null);
@@ -59,9 +60,9 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
       />
 
       {/* 3. Metin bloğu: [DERS ADI] ve [KONU BAŞLIĞI] */}
-      <Pressable
+      <Press
         onPress={handlePress}
-        accessibilityRole="button"
+        scaleTo={PRESS_ROW}
         accessibilityLabel={`${subjectLabel}, ${topicTitle}`}
         style={s.bodyArea}
       >
@@ -92,7 +93,7 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           </Text>
           {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
         </View>
-      </Pressable>
+      </Press>
     </View>
   );
 });

@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { BentoCard, Stat, Chip, Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -26,7 +26,7 @@ export function PeriodSummary({ current, previous, diff, improvementRate }) {
         : [C.surface2 + "12", C.surface, C.surface];
 
   return (
-    <Animated.View entering={FadeInDown.duration(420).springify()}>
+    <Animated.View>
       <BentoCard gradient={gradient} accent={accent}>
         <Chip color={accent}>DÖNEM KARŞILAŞTIRMASI</Chip>
 

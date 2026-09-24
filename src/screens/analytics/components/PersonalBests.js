@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon, Stat } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -11,7 +11,6 @@ export function PersonalBests({ bests }) {
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(250).duration(420).springify()}
       style={{ gap: STEP.s3 }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>

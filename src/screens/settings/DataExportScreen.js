@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, ErrorState } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -32,7 +32,7 @@ export default function DataExportScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + STEP.s4 }]}
       >
-        <Animated.View entering={FadeInDown.duration(600)} style={styles.hero}>
+        <Animated.View style={styles.hero}>
           <Text accessibilityRole="header" style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>
             Verilerinin kopyası
           </Text>

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { TrialEntryFooter } from "./TrialEntryFooter";
@@ -32,11 +32,11 @@ export function TrialEntryStep2({ form, styles, overflow, onNext }) {
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <Animated.View entering={FadeInDown.duration(500)}>
+        <Animated.View>
           <Text style={styles.label}>{headerLabel}</Text>
           <Text style={[styles.body, { marginTop: 6 }]}>Sayıya dokun, klavyeyle yaz. Artı-eksi ince ayar için.</Text>
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(70).duration(500)} style={{ marginTop: STEP.s3 + 2 }}>
+        <Animated.View style={{ marginTop: STEP.s3 + 2 }}>
           {form.subjects.map((subject) => (
             <TrialSubjectScoreRow key={subject.key} subject={subject}
               values={form.values[subject.key] || EMPTY_TRIAL_SCORE}
@@ -44,7 +44,7 @@ export function TrialEntryStep2({ form, styles, overflow, onNext }) {
               overflow={overflow?.subjectKey === subject.key ? overflow : null} onFix={handleFix} />
           ))}
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(140).duration(500)} style={{ marginTop: STEP.s3 + 6 }}>
+        <Animated.View style={{ marginTop: STEP.s3 + 6 }}>
           <TotalCard totalNet={form.totalNet} previousNet={previous?.totalNet} styles={styles} />
         </Animated.View>
       </ScrollView>

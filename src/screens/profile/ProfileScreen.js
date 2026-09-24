@@ -1,6 +1,6 @@
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
@@ -21,7 +21,6 @@ import { LeagueMiniCard } from "./components/LeagueMiniCard";
 import { ProfileSkeleton } from "./components/ProfileSkeleton";
 import { useProfileViewModel } from "./useProfileViewModel";
 
-const FADE = (delay) => FadeInDown.delay(delay).duration(350);
 
 export default function ProfileScreen() {
   const C = useC();
@@ -49,15 +48,15 @@ export default function ProfileScreen() {
           <ProfileSkeleton />
         ) : (
           <ScrollView contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
-            <Animated.View entering={FADE(0)}>
+            <Animated.View>
               <ProfileHero name={displayName} exam={examLabel} streak={streak} />
             </Animated.View>
 
-            <Animated.View entering={FADE(50)}>
+            <Animated.View>
               <TargetDepartmentCard targetDepartment={targetDepartment} />
             </Animated.View>
 
-            <Animated.View entering={FADE(100)}>
+            <Animated.View>
               <RouteCredentialsList
                 totalQuestions={careerStats.totalQuestions}
                 totalHours={careerStats.totalHours}
@@ -65,15 +64,15 @@ export default function ProfileScreen() {
               />
             </Animated.View>
 
-            <Animated.View entering={FADE(150)}>
+            <Animated.View>
               <YearRouteChart />
             </Animated.View>
 
-            <Animated.View entering={FADE(200)}>
+            <Animated.View>
               <StrengthMap strengths={strengths} />
             </Animated.View>
 
-            <Animated.View entering={FADE(250)} style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
+            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
               <ProfileLinkRow
                 label="Arkadaşını davet et"
                 meta="2 aktif"
@@ -109,11 +108,11 @@ export default function ProfileScreen() {
               <ExamFlowRow />
             </Animated.View>
 
-            <Animated.View entering={FADE(280)}>
+            <Animated.View>
               <LevelRow level={level?.level} xpInLevel={level?.xpInLevel} xpForNext={level?.xpForNext} />
             </Animated.View>
 
-            <Animated.View entering={FADE(320)} style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
+            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
               <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
             </Animated.View>
           </ScrollView>

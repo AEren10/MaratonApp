@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
@@ -10,7 +10,7 @@ import { formatDuration } from "../../../lib/format";
 export function RehearsalDone({ full, elapsed, onEnterResults, onClose }) {
   const C = useC();
   return (
-    <Animated.View entering={FadeInDown.duration(500)} style={s.wrap}>
+    <Animated.View entering={FadeIn.duration(500)} style={s.wrap}>
       <Text style={[TYPOGRAPHY.statLarge, { color: C.text }]} allowFontScaling={false}>
         {formatDuration(elapsed)}
       </Text>

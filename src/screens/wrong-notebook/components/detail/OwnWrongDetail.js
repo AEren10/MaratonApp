@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, ErrorState, Icon, Skeleton } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
@@ -63,7 +63,7 @@ export function OwnWrongDetail() {
         right={<Icon name="moreH" size={16} color={C.text3} />}
       />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(400)}>
+        <Animated.View>
           <DetailPhoto path={imagePath} subjectColor={sColor} />
           <View style={styles.titleBlock}>
             <Text style={[TYPOGRAPHY.label, { color: sColor, letterSpacing: 1.5 }]}>
@@ -74,7 +74,7 @@ export function OwnWrongDetail() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(70).duration(400)}>
+        <Animated.View>
           <WhyWrongCard note={item.note} onSave={d.saveNote} />
           <ReviewLadder item={item} />
         </Animated.View>

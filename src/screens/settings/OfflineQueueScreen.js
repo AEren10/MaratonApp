@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, Skeleton } from "../../components/design";
 import { OfflineStrip } from "../../components/common/OfflineStrip";
@@ -29,7 +29,7 @@ export default function OfflineQueueScreen() {
   const keyExtractor = useCallback((item) => String(item.id), []);
 
   const header = (
-    <Animated.View entering={FadeInDown.duration(600)}>
+    <Animated.View>
       {!isConnected ? <OfflineStrip pending={total} style={styles.strip} /> : null}
       <Text accessibilityRole="header" style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>
         {failedRows.length ? "Birkaç kayıt sunucuya ulaşamadı." : "Çalışmaya devam edebilirsin."}

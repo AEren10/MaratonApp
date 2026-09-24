@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, Card, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -27,7 +27,7 @@ export default function ReviewDoneScreen() {
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Animated.View entering={FadeInDown.duration(400)} style={styles.hero}>
+        <Animated.View entering={FadeIn.duration(400)} style={styles.hero}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.5 }]}>TEKRAR BİTTİ</Text>
           
           <View style={styles.heroTitleRow}>
@@ -41,7 +41,7 @@ export default function ReviewDoneScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+        <Animated.View entering={FadeIn.delay(100).duration(400)}>
           {closedCount > 0 ? (
             <View style={[styles.closedRow, { backgroundColor: C.success + "1A", borderColor: C.success }]}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 }}>
@@ -57,7 +57,7 @@ export default function ReviewDoneScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.metrics}>
+        <Animated.View entering={FadeIn.delay(200).duration(400)} style={styles.metrics}>
           <View style={styles.row}>
             <Card style={styles.halfCard}>
               <Text style={[TYPOGRAPHY.label, { color: C.text }]}>BİLDİM</Text>
@@ -90,7 +90,7 @@ export default function ReviewDoneScreen() {
           </Card>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.actions}>
+        <Animated.View entering={FadeIn.delay(300).duration(400)} style={styles.actions}>
           <Button
             size="lg"
             onPress={() => {

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import Svg, { Path, Circle } from "react-native-svg";
 
 import { Button, Icon } from "../../components/design";
@@ -62,7 +62,7 @@ export default function StudyProcessedScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s5 }}>
-        <Animated.View entering={FadeInDown.duration(600).springify()} style={{ paddingHorizontal: 26, paddingTop: STEP.s5 }}>
+        <Animated.View style={{ paddingHorizontal: 26, paddingTop: STEP.s5 }}>
           <Text style={[styles.eyebrow, { color: C.accentBright }]}>İLK OTURUM</Text>
           <Text style={[styles.title, { color: C.text }]}>Çalışman rotaya işlendi.</Text>
           <Text style={[styles.desc, { color: C.text2 }]}>
@@ -104,7 +104,7 @@ export default function StudyProcessedScreen() {
           </Svg>
         </View>
 
-        <Animated.View entering={FadeInDown.delay(140).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s1 }}>
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <Text style={[styles.statNumber, { color: C.text }]}>{hasStudyData ? minutes : "—"}</Text>
             <Text style={[styles.statText, { color: C.text2 }]}>
@@ -113,7 +113,7 @@ export default function StudyProcessedScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <Button
             title="Sıradaki durağı gör"
             onPress={handleAction}

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Card, Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -32,7 +32,7 @@ export function PaywallMoment({ purchase, onDismiss }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s4 }}>
-        <Animated.View entering={FadeInDown.duration(620)}>
+        <Animated.View>
           <PaywallMomentHero hero={data.hero} />
         </Animated.View>
 

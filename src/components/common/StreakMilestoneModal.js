@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { View, Text, Modal, StyleSheet } from "react-native";
-import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
 import { Icon, SparkBurst, AnimatedPressable, Button } from "../design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
@@ -30,17 +30,17 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
           </Animated.View>
 
           {/* Title */}
-          <Animated.Text entering={FadeInDown.delay(160)} style={s.title}>
+          <Animated.Text entering={FadeIn.delay(160)} style={s.title}>
             {milestone.title}
           </Animated.Text>
 
           {/* Day count */}
-          <Animated.Text entering={FadeInDown.delay(220)} style={[s.days, { color }]}>
+          <Animated.Text entering={FadeIn.delay(220)} style={[s.days, { color }]}>
             {milestone.day} Gün Serisi!
           </Animated.Text>
 
           {/* XP reward */}
-          <Animated.View entering={FadeInDown.delay(300)} style={[s.xpBadge, { backgroundColor: color + "18" }]}>
+          <Animated.View entering={FadeIn.delay(300)} style={[s.xpBadge, { backgroundColor: color + "18" }]}>
             <Text style={[s.xpText, { color }]}>+{milestone.xp} XP</Text>
           </Animated.View>
 

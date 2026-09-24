@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, ErrorState } from "../../components/design";
@@ -28,14 +28,14 @@ export default function EditStudyLogScreen() {
             </RecordIntro>
             <StudyRecordFields form={e.form} groups={e.groups} dateExtraKey={e.log.study_date} />
             {e.impact ? (
-              <Animated.View entering={FadeInDown.duration(500)} style={styles.block}>
+              <Animated.View style={styles.block}>
                 <View style={[styles.impact, { backgroundColor: C.brandTint, borderColor: C.border }]}>
                   <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>DEĞİŞİKLİĞİN ETKİSİ</Text>
                   <Text style={[TYPOGRAPHY.meta, styles.impactText, { color: C.text2 }]}>{e.impact}</Text>
                 </View>
               </Animated.View>
             ) : null}
-            <Animated.View entering={FadeInDown.delay(140).duration(500)} style={styles.block}>
+            <Animated.View style={styles.block}>
               <Button size="lg" fullWidth onPress={e.save} disabled={!e.form.canSave} loading={e.saving}>Kaydet</Button>
               <Pressable onPress={e.remove} accessibilityRole="button" style={styles.delete}>
                 <Text style={[TYPOGRAPHY.metaSemiBold, styles.deleteText, { color: C.text3 }]}>Kaydı sil</Text>

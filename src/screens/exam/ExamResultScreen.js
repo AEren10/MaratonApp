@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, ErrorState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -13,7 +13,7 @@ import { ExamResultFieldRow } from "./components/ExamResultFieldRow";
 // Tasarim AKIS 14 · "Sınav Sonucu". Alanlar rotanin sinav turunden gelir.
 // "Belgeyi fotoğrafla" ve altindaki OCR cumlesi CIZILMIYOR: uygulamada
 // belge okuma servisi yok (kapsam raporu #24), calismayan buton konmaz.
-const FADE = (delay) => FadeInDown.delay(delay).duration(500);
+const FADE = (delay) => FadeIn.delay(delay).duration(500);
 const DOT_KEYS = ["turkce", "matematik", "fizik"];
 
 export default function ExamResultScreen() {

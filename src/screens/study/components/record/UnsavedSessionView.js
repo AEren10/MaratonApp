@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
 import { ErrorState } from "../../../../components/design";
@@ -34,13 +34,13 @@ export function UnsavedSessionView({ unsaved, onBack }) {
     <SafeAreaView edges={["top", "bottom"]} style={[styles.fill, { backgroundColor: C.bg }]}>
       <RecordHeader title="Oturum" onBack={onBack} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(500)}
+        <Animated.View
           style={[styles.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>KAYDEDİLMEYİ BEKLEYEN OTURUM</Text>
           <Text style={[TYPOGRAPHY.statSmall, styles.headline, { color: C.text }]}>{headline}</Text>
           {meta ? <Text style={[TYPOGRAPHY.meta, styles.meta, { color: C.text3 }]}>{meta}</Text> : null}
         </Animated.View>
-        <Animated.View entering={FadeInDown.delay(80).duration(500)} style={styles.state}>
+        <Animated.View style={styles.state}>
           <CloudIcon C={C} />
           <ErrorState
             preset="sessionUnsaved"

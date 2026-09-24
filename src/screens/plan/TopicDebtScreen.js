@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SCREENS } from "../../constants/screens";
 import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -61,12 +61,12 @@ export default function TopicDebtScreen() {
             <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} />
 
             {hasHours ? (
-              <Animated.View entering={FadeInDown.delay(100).duration(500)}>
+              <Animated.View>
                 <TopicDebtImpactCard C={C} totalHours={totalHours} />
               </Animated.View>
             ) : null}
 
-            <Animated.View entering={FadeInDown.delay(140).duration(560)} style={styles.listWrap}>
+            <Animated.View style={styles.listWrap}>
               <View style={styles.listHead}>
                 <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>BİRİKEN DURAKLAR</Text>
                 <View style={[styles.rule, { backgroundColor: C.line }]} />

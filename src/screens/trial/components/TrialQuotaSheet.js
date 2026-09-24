@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -22,7 +22,7 @@ export function TrialQuotaSheet({ sheet, onPro, onClose }) {
         ))}
       </View>
       <Animated.View entering={FadeIn.duration(500)} style={[StyleSheet.absoluteFill, { backgroundColor: alpha(C.canvas, 72) }]} />
-      <Animated.View entering={FadeInDown.duration(600)} accessibilityViewIsModal
+      <Animated.View accessibilityViewIsModal
         style={[styles.sheet, { backgroundColor: C.bg, borderTopColor: C.elev }]}>
         <View style={[styles.handle, { backgroundColor: C.elev }]} />
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>AYLIK KOTA</Text>

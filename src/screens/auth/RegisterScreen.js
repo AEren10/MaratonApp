@@ -2,7 +2,7 @@ import { useState } from "react";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
@@ -83,7 +83,7 @@ export default function RegisterScreen() {
             </Pressable>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(80).duration(350)} style={{ marginTop: STEP.s2 }}>
+          <Animated.View style={{ marginTop: STEP.s2 }}>
             <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 280 }]}>
               Hesap oluştur.
             </Text>
@@ -93,21 +93,21 @@ export default function RegisterScreen() {
           </Animated.View>
 
           <View style={{ marginTop: STEP.s4 }}>
-            <Animated.View entering={FadeInDown.delay(140).duration(350)}>
+            <Animated.View>
               <AuthInput label="AD SOYAD" value={name} onChangeText={setName} placeholder="Arda Karaca" autoCapitalize="words" error={errors.name} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(190).duration(350)}>
+            <Animated.View>
               <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(240).duration(350)}>
+            <Animated.View>
               <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••••" secureTextEntry error={errors.password} />
               <PasswordStrength password={password} />
             </Animated.View>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(290).duration(350)} style={{ marginTop: STEP.s2 }}>
+          <Animated.View style={{ marginTop: STEP.s2 }}>
             <TermsCheckbox
               checked={agreed}
               onToggle={() => setAgreed((v) => !v)}
@@ -116,13 +116,13 @@ export default function RegisterScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(330).duration(350)}>
+          <Animated.View>
             <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s3 }}>
               {busy ? "Hesap açılıyor..." : "Hesabı oluştur"}
             </Button>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(370).duration(350)}>
+          <Animated.View>
             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
               <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
               <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
@@ -131,7 +131,7 @@ export default function RegisterScreen() {
             <SocialAuthButtons />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(410).duration(350)}>
+          <Animated.View>
             <Pressable onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
               <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın var mı?</Text>
               <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Giriş yap</Text>

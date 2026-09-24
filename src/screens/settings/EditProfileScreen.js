@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { EditProfileSkeleton } from "./components/EditProfileSkeleton";
@@ -66,11 +66,11 @@ export default function EditProfileScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.scroll}>
-          <Animated.View entering={FadeInDown.delay(80).duration(400).springify()}>
+          <Animated.View>
             <EditProfileAvatar name={name} />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(160).duration(400).springify()} style={{ marginTop: STEP.s4 }}>
+          <Animated.View style={{ marginTop: STEP.s4 }}>
             <EditProfileField
               label="AD SOYAD"
               value={name}
@@ -91,7 +91,7 @@ export default function EditProfileScreen() {
             ) : null}
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(240).duration(400).springify()} style={{ marginTop: STEP.s4 }}>
+          <Animated.View style={{ marginTop: STEP.s4 }}>
             <SettingsRow
               label="Profilim herkese açık"
               hint="Ligdeki diğer öğrenciler görebilir"

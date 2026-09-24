@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, Card } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -48,7 +48,7 @@ export default function AccountDeleteScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + STEP.s4 }]}
       >
-        <Animated.View entering={FadeInDown.duration(600)} style={styles.hero}>
+        <Animated.View style={styles.hero}>
           <Text accessibilityRole="header" style={[TYPOGRAPHY.heading, { color: C.text }]}>Bu geri alınamaz.</Text>
         </Animated.View>
 

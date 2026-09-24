@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { View, Text, Pressable, TextInput } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -24,7 +24,7 @@ export function TaskInputPanel({ onAdd }) {
   };
 
   return (
-    <Animated.View entering={FadeInDown.duration(240)} style={s.panel}>
+    <Animated.View style={s.panel}>
       <View style={s.presetRow}>
         {PRESETS.map((p) => (
           <Pressable

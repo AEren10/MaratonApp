@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useBlockBack } from "../../hooks/useBlockBack";
 
 import { Button, Icon } from "../../components/design";
@@ -46,7 +46,7 @@ export default function EighthDayLockScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s5 }}>
-        <Animated.View entering={FadeInDown.duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s2 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s2 }}>
           <Text style={[styles.eyebrow, { color: C.text2 }]}>8. GÜN</Text>
           <Text style={[styles.title, { color: C.text }]}>Bir haftadır rotanı kullanıyorsun. Buradan sonrası Pro.</Text>
           <Text style={[styles.desc, { color: C.text3 }]}>
@@ -54,7 +54,7 @@ export default function EighthDayLockScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <View style={[styles.statsCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <View style={styles.statItem}>
               <Text style={[styles.statValue, { color: C.text }]}>{moment.totals.routeStops || 0}</Text>
@@ -73,7 +73,7 @@ export default function EighthDayLockScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(600).springify()} style={styles.featureList}>
+        <Animated.View style={styles.featureList}>
           <View style={styles.featureCol}>
             <Text style={[styles.colTitle, { color: C.up }]}>Ücretsiz Kalır</Text>
             <FeatureItem color={C.up} text="Çalışma oturumu ve süre kaydı · sınırsız" C={C} />
@@ -91,7 +91,7 @@ export default function EighthDayLockScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s5 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s5 }}>
           <Button
             title="7 gün ücretsiz dene"
             onPress={handleTrial}

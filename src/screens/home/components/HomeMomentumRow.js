@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Svg, { Path, Line, Circle } from "react-native-svg";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
+import { Press, PRESS_ROW } from "../../../components/design/Press";
 
 const W = 132;
 const H_HEIGHT = 40;
@@ -31,23 +31,12 @@ export const HomeMomentumRow = React.memo(function HomeMomentumRow({ subject, on
   const delta = subject.delta === 0 ? "0" : `${up ? "+" : "−"}${fmt(Math.abs(subject.delta))}`;
 
   return (
-    <Pressable
-      onPress={() => {
-        H.tap();
-        onPress?.(subject.key, subject.name);
-      }}
-      accessibilityRole="button"
+    <Press
+      onPress={() => onPress?.(subject.key, subject.name)}
+      scaleTo={PRESS_ROW}
       accessible
       accessibilityLabel={`${subject.name}, ${fmt(subject.currentNet)} net, fark ${delta}. Ders detayına git.`}
-      style={({ pressed }) => [
-        s.card,
-        {
-          backgroundColor: C.surface,
-          borderColor: C.border,
-          opacity: pressed ? 0.88 : 1,
-          transform: [{ scale: pressed ? 0.985 : 1 }],
-        },
-      ]}
+      style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}
     >
       <View style={s.flex}>
         <View style={s.nameRow}>
@@ -65,7 +54,7 @@ export const HomeMomentumRow = React.memo(function HomeMomentumRow({ subject, on
         <Path d={g.d} fill="none" stroke={subject.color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
         <Circle cx={g.lx} cy={g.ly} r={4.5} fill={subject.color} />
       </Svg>
-    </Pressable>
+    </Press>
   );
 });
 

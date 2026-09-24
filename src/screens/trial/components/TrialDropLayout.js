@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, Icon, Card } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -35,7 +35,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
         ) : <View style={styles.close} />}
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(400)} style={styles.section}>
+        <Animated.View style={styles.section}>
           <Text style={[TYPOGRAPHY.label, { color: C.accentBright, letterSpacing: 1.5 }]}>ROTA GÜNCELLENDİ</Text>
           <Text style={[TYPOGRAPHY.hero, { color: C.text, marginTop: STEP.s2 }]}>Bu sonuç rotanın sonu değil.</Text>
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>
@@ -44,7 +44,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
         </Animated.View>
 
         {worstDrop && worstDrop.delta < 0 ? (
-          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
+          <Animated.View style={styles.section}>
             <Card style={styles.worstCard}>
               <View style={styles.worstHeader}>
                 <View style={[styles.dot, { backgroundColor: worstDrop.color || C.warn }]} />
@@ -81,7 +81,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
           </Animated.View>
         ) : null}
 
-        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
+        <Animated.View style={styles.section}>
           <View style={[styles.messageBox, { backgroundColor: C.brandTint, borderColor: C.accent }]}>
             <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>
               Netin düşmüş olabilir, ama artık hangi ders yüküne daha fazla zaman ayırman gerektiği daha görünür.
@@ -89,7 +89,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.actions}>
+        <Animated.View style={styles.actions}>
           <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
             Yeni rotayı gör
           </Button>

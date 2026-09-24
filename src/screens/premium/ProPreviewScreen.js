@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -64,7 +64,6 @@ export default function ProPreviewScreen() {
       </Animated.View>
 
       <Animated.View
-        entering={FadeInDown.duration(620)}
         style={[s.sheet, { paddingBottom: insets.bottom + STEP.s3 }]}
       >
         <View style={[s.grabber, { backgroundColor: C.elev }]} />

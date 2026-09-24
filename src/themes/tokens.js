@@ -195,6 +195,9 @@ export const ANIMATION = {
     easeInOut:  [0.45, 0, 0.55, 1],
     spring:     [0.34, 1.56, 0.64, 1],
   },
+  // Basma geri bildirimi. Gunde onlarca kez gorulur -> hissedilir olmamali.
+  // scale: kart/buton · row: tam genislikteki satir (genis yuzeyde 0.97 abartili durur).
+  press: { scale: 0.97, row: 0.985, duration: 130 },
   spring: {
     gentle:  { damping: 20, stiffness: 200 },
     default: { damping: 18, stiffness: 320 },

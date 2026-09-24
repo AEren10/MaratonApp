@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, EmptyState } from "../../components/design";
 import { EyebrowHeader } from "../../components/common/EyebrowHeader";
@@ -11,7 +11,6 @@ import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import GapOptionRow from "./components/GapOptionRow";
 import { GapResultCard } from "./components/GapResultCard";
 
-const enter = (i) => FadeInDown.delay(i * 80).duration(600);
 
 function GapClosureInner() {
   const C = useC();
@@ -24,11 +23,11 @@ function GapClosureInner() {
         <EmptyState title="Planınla aynı yerdesin." style={s.empty} />
       ) : (
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={enter(0)}>
+          <Animated.View>
             <Text style={[TYPOGRAPHY.heading, s.headline, { color: C.text }]}>{g.copy.headline}</Text>
             <Text style={[TYPOGRAPHY.body, s.lede, { color: C.text3 }]}>{g.copy.lede}</Text>
           </Animated.View>
-          <Animated.View entering={enter(1)} style={s.options}>
+          <Animated.View style={s.options}>
             {g.copy.options.map((o) => (
               <GapOptionRow key={o.key} option={o} selected={g.choice === o.key} onSelect={g.setChoice} />
             ))}

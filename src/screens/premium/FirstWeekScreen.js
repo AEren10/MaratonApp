@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -76,7 +76,7 @@ export default function FirstWeekScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s5 }}>
-        <Animated.View entering={FadeInDown.duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s2 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s2 }}>
           <Text style={[styles.introText, { color: C.text2 }]}>
             Her gün küçük bir iş. Yedi gün sonunda rotanın nasıl çalıştığını görmüş olacaksın.
           </Text>
@@ -99,7 +99,7 @@ export default function FirstWeekScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <View style={styles.sectionHeaderRow}>
             <Text style={[styles.sectionHeader, { color: C.text2 }]}>GÜN GÜN</Text>
             <View style={[styles.line, { backgroundColor: C.line }]} />
@@ -147,7 +147,7 @@ export default function FirstWeekScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(180).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s3 }}>
           <View style={[styles.infoCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
             <Text style={[styles.infoText, { color: C.text2 }]}>
               Bu hafta hiçbir şey kilitli değil. Duraklar, çalışma takibi ve yanlış defteri açık; Maraton önerir, karar senin.
@@ -155,7 +155,7 @@ export default function FirstWeekScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).duration(600).springify()} style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
+        <Animated.View style={{ paddingHorizontal: GUTTER, paddingTop: STEP.s4 }}>
           <Button
             title={activeStep ? `${activeStep.id}. adımı yap` : "Rotayı gör"}
             onPress={() => activeStep ? handleTaskAction(activeStep) : openRoute()}

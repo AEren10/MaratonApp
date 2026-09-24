@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { StyleSheet } from "react-native";
 
 import { TopicPicker } from "../../../../components/forms/TopicPicker";
@@ -27,7 +27,7 @@ export function StudyRecordFields({ form, groups, dateExtraKey }) {
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(70).duration(500)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <RecordFormCard>
         <RecordRow label="DERS" value={subject?.label || subject?.name || form.subjectLabel} placeholder="Seç" onPress={() => { H.select(); setSheet("subject"); }} />
         <RecordRow label="KONU" value={form.topic} placeholder="Seç" onPress={openTopic} />

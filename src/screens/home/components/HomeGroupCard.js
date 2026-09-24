@@ -1,30 +1,28 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function HomeGroupCard({ groupsData, onPress }) {
   const C = useC();
   const { hasGroup, primaryGroup, standing } = groupsData;
 
   const handlePress = () => {
-    H.tap();
     onPress?.();
   };
 
   if (!hasGroup) {
     return (
-      <Pressable
+      <Press
         onPress={handlePress}
-        accessibilityRole="button"
         accessibilityLabel="Çalışma grubu kur veya katıl"
-        style={({ pressed }) => [
+        style={[
           s.card,
           {
-            backgroundColor: pressed ? C.elev : C.surface,
+            backgroundColor: C.surface,
             borderColor: C.border,
           },
         ]}
@@ -47,7 +45,7 @@ export function HomeGroupCard({ groupsData, onPress }) {
           <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
           <Text style={[TYPOGRAPHY.button, s.ctaText, { color: C.accentInk }]}>Grup Kur / Katıl</Text>
         </View>
-      </Pressable>
+      </Press>
     );
   }
 
@@ -62,14 +60,13 @@ export function HomeGroupCard({ groupsData, onPress }) {
   }
 
   return (
-    <Pressable
+    <Press
       onPress={handlePress}
-      accessibilityRole="button"
       accessibilityLabel={`${groupName} grubunu aç`}
-      style={({ pressed }) => [
+      style={[
         s.card,
         {
-          backgroundColor: pressed ? C.elev : C.surface,
+          backgroundColor: C.surface,
           borderColor: C.border,
         },
       ]}
@@ -102,7 +99,7 @@ export function HomeGroupCard({ groupsData, onPress }) {
         <View style={s.flex} />
         <Icon name="chevR" size={13} color={C.text3} />
       </View>
-    </Pressable>
+    </Press>
   );
 }
 

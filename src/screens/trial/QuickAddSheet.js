@@ -1,7 +1,7 @@
 import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, {
-  FadeInDown, runOnJS, useAnimatedStyle, useSharedValue, withTiming,
+  runOnJS, useAnimatedStyle, useSharedValue, withTiming,
 } from "react-native-reanimated";
 
 import { SectionLabel } from "../../components/design";
@@ -38,7 +38,6 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Sayfa dışına dokun, kapat">
         <Animated.View
-          entering={FadeInDown.duration(280)}
           style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.border }, sheetAnimStyle]}
         >
           <Pressable onPress={(e) => e.stopPropagation()} style={StyleSheet.absoluteFill} />

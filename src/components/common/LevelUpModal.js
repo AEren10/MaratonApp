@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import Animated, {
-  FadeIn, FadeInDown, ZoomIn,
+  FadeIn, ZoomIn,
   useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing,
   cancelAnimation,
 } from "react-native-reanimated";
@@ -39,7 +39,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
     <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <View style={s.overlay}>
         <Animated.View entering={ZoomIn.springify().damping(14)} style={s.card}>
-          <Animated.Text entering={FadeInDown.delay(100)} style={s.eyebrow}>
+          <Animated.Text entering={FadeIn.delay(100)} style={s.eyebrow}>
             SEVİYE ATLADIN!
           </Animated.Text>
 
@@ -50,15 +50,15 @@ export function LevelUpModal({ visible, level, title, onClose }) {
             </Animated.View>
           </View>
 
-          <Animated.Text entering={FadeInDown.delay(300)} style={s.levelNum}>
+          <Animated.Text entering={FadeIn.delay(300)} style={s.levelNum}>
             Seviye {level}
           </Animated.Text>
 
-          <Animated.Text entering={FadeInDown.delay(400)} style={s.levelTitle}>
+          <Animated.Text entering={FadeIn.delay(400)} style={s.levelTitle}>
             {title}
           </Animated.Text>
 
-          <Animated.Text entering={FadeInDown.delay(450)} style={s.sub}>
+          <Animated.Text entering={FadeIn.delay(450)} style={s.sub}>
             Çalışmaların meyvesini veriyor! Devam et.
           </Animated.Text>
 

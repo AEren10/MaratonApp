@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -84,7 +84,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profil satiri: tasarim ad + "TYT + AYT Sayisal · 12. sinif" gosteriyor */}
-        <Animated.View entering={FadeInDown.duration(420)}>
+        <Animated.View>
           <SettingsGroup>
             <SettingsRow
               first
@@ -95,7 +95,7 @@ export default function SettingsScreen() {
           </SettingsGroup>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(60).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="ROTA">
             <SettingsRow first label="Hedef net" value={targetNetLabel} onPress={go(SCREENS.GOALS)} />
             <SettingsRow label="Sınav tarihi" value={examDateLabel} onPress={go(SCREENS.EXAM_DATE)} />
@@ -114,14 +114,14 @@ export default function SettingsScreen() {
         {/* Tasarimda ayri bir "CALISMA" grubu yok; bu iki ekranin BASKA hicbir
             giris noktasi olmadigi icin burada tutuluyorlar. Kendi akislarinda
             bir giris acilinca bu grup dusurulebilir. */}
-        <Animated.View entering={FadeInDown.delay(120).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="ÇALIŞMA">
             <SettingsRow first label="Çalışma geçmişi" onPress={go(SCREENS.STUDY_LOG)} />
             <SettingsRow label="Takvim" onPress={go(SCREENS.CALENDAR)} />
           </SettingsGroup>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(180).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="BİLDİRİMLER">
             <SettingsRow
               first
@@ -132,7 +132,7 @@ export default function SettingsScreen() {
           </SettingsGroup>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="UYGULAMA">
             <SettingsRow first label="Görünüm" value={themeLabel} onPress={go(SCREENS.APPEARANCE)} />
             <SettingsRow label="Titreşim" toggle value={hapticsOn} onToggle={toggleHaptics} />
@@ -144,11 +144,11 @@ export default function SettingsScreen() {
         </Animated.View>
 
         {/* Veri yedekleme / cevrimdisi kuyruk ve veri indirme */}
-        <Animated.View entering={FadeInDown.delay(300).duration(420)}>
+        <Animated.View>
           <SyncStatusGroup />
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(360).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="HESAP">
             {/* Abonelik satiri yalniz abone olanda: tasarimin Abonelik ekrani
                 aktif aboneligi anlatiyor, ucretsiz kullanicinin yolu Profil'deki
@@ -170,7 +170,7 @@ export default function SettingsScreen() {
         {/* Lig/arkadas akislari canli urun alani. Tasarimin ana Ayarlar
             ekraninda bu satirlar ayrica gosterilmese de Profil/Sosyal
             akislari erisilebilir kalmali; aksi halde ekranlar yetim kalir. */}
-        <Animated.View entering={FadeInDown.delay(420).duration(420)}>
+        <Animated.View>
           <SettingsGroup title="ARKADAŞLAR">
             <SettingsRow first label="Arkadaşlar" onPress={go(SCREENS.FRIENDS)} />
             <SettingsRow label="Yol arkadaşın" onPress={go(SCREENS.ROUTE_COMPANION)} />

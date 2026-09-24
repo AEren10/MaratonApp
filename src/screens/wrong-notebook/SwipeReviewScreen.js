@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
-  runOnJS, interpolate, Extrapolation, FadeInDown,
+  runOnJS, interpolate, Extrapolation, 
 } from "react-native-reanimated";
 
 import { Icon } from "../../components/design";
@@ -141,7 +141,7 @@ export default function SwipeReviewScreen() {
       </View>
 
       {finished ? (
-        <Animated.View entering={FadeInDown} style={s.center}>
+        <Animated.View style={s.center}>
           <Icon name="checkCircle" size={56} color={C.up} />
           <Text style={s.doneTitle}>{queue.length ? "Tekrar Tamamlandı!" : "Bugün tekrar yok"}</Text>
           <View style={s.statsRow}>

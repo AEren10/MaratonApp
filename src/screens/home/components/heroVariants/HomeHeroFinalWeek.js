@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
@@ -41,7 +41,7 @@ export function HomeHeroFinalWeek({
 
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(380)}>
+      <Animated.View>
         <HomeHeroEyebrow label="SON HAFTA" trailing={formatExamDate(examDate)} />
         <View style={s.heroRow}>
           <Text style={[s.heroNumber, { color: C.text }]} allowFontScaling={false}>{daysLeft}</Text>
@@ -52,12 +52,12 @@ export function HomeHeroFinalWeek({
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(60).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <HomeHeroWeekStrip dailyCounts={dailyCounts} dailyGoal={dailyGoal} />
       </Animated.View>
 
       {tasks.length > 0 ? (
-        <Animated.View entering={FadeInDown.delay(120).duration(380)} style={s.block}>
+        <Animated.View style={s.block}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
             BUGÜNÜN ÜÇ İŞİ
           </Text>
@@ -80,7 +80,7 @@ export function HomeHeroFinalWeek({
       ) : null}
 
       {trialStats ? (
-        <Animated.View entering={FadeInDown.delay(180).duration(380)} style={s.block}>
+        <Animated.View style={s.block}>
           <HomeHeroTrialSummaryCard
             lead="Geride kaldığın haftalarda rota yeni konuyla değil, defterinde bekleyen tekrarlarla ilerler."
             best={trialStats.best}
@@ -90,14 +90,14 @@ export function HomeHeroFinalWeek({
         </Animated.View>
       ) : null}
 
-      <Animated.View entering={FadeInDown.delay(240).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <HomeHeroClosedCard
           items={CLOSED_ITEMS}
           note="Son 6 günde tahmin, hedef ve sıralama gizlenir. Değiştiremediğin bir sayıyı göstermenin faydası yok. Sınavdan önceki 48 saatte performans bildirimi de gelmez."
         />
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(300).duration(380)} style={s.block}>
+      <Animated.View style={s.block}>
         <HomeHeroFinalWeekTips examDate={examDate} />
       </Animated.View>
 

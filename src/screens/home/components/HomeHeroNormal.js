@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { STEP } from "../../../themes/tokens";
 import { HomeHeroStat } from "./HomeHeroStat";
@@ -78,7 +78,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         onPress={stopCounts.total > 0 && onViewFullRoute ? onViewFullRoute : onViewRoute}
       />
 
-      <Animated.View entering={FadeInDown.delay(200).duration(500)} style={s.cta}>
+      <Animated.View style={s.cta}>
         <HomeCTAButton
           title={nextTask ? "Çalışmaya Başla" : "İlk durağını ekle"}
           subtitle={ctaSubtitle}

@@ -1,10 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { alpha } from "../../../themes/colorMix";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // "Defter" karti.
 //
@@ -23,14 +23,13 @@ export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
   const action = due ? onReview || onPress : onPress;
 
   return (
-    <Pressable
-      onPress={() => { H.tap(); action?.(); }}
-      accessibilityRole="button"
+    <Press
+      onPress={() => action?.()}
       accessibilityLabel={due ? `${dueCount} soru tekrar bekliyor, tekrar oturumunu başlat` : "Defter"}
-      style={({ pressed }) => [
+      style={[
         s.card,
         {
-          backgroundColor: pressed ? C.elev : C.surface,
+          backgroundColor: C.surface,
           borderColor: due ? alpha(C.accent, 38) : C.border,
         },
       ]}
@@ -47,7 +46,7 @@ export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
         ) : null}
       </View>
       <Icon name="chevR" size={12} color={due ? C.text3 : C.text5} />
-    </Pressable>
+    </Press>
   );
 }
 

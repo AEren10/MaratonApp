@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { TYPOGRAPHY, SPACING, STEP, GUTTER } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -16,7 +16,7 @@ export function TargetNetField({ value, onChange, netLabel, min, max }) {
   const trackWidth = width - GUTTER * 2 - SPACING.sm * 2;
 
   return (
-    <Animated.View entering={FadeInDown.delay(200)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <SectionLabel>Hedef net</SectionLabel>
       <View accessible accessibilityLabel={`Hedef net, ${value}`}>
         <StatBlock value={value} unit={`net · ${netLabel}`} size="large" />

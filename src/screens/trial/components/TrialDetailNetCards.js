@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { Card, StatBlock } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
 export function TrialDetailNetCards({ C, rawNet, normalizedNet, hasNormalization, publisherLabel, difficultyMultiplier }) {
   return (
-    <Animated.View entering={FadeInDown.delay(70).duration(420)} style={styles.wrap}>
+    <Animated.View style={styles.wrap}>
       <View style={styles.row}>
         <Card style={styles.card}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>HAM NET</Text>

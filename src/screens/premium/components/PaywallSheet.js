@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -30,7 +30,6 @@ export function PaywallSheet({ context, purchase, onDismiss }) {
       </Animated.View>
 
       <Animated.View
-        entering={FadeInDown.duration(620)}
         style={[styles.sheet, { backgroundColor: C.bg, borderTopColor: C.elev, maxHeight: height * 0.94 }]}
       >
         <ScrollView
