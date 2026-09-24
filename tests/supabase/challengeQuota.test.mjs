@@ -13,7 +13,7 @@ const createChallengeMigration = readFileSync(
   "utf8",
 );
 const initialChallengeMigration = readFileSync(
-  new URL("../../supabase/migrations/006_friends_challenges.sql", import.meta.url),
+  new URL("../../supabase/migrations_archived_not_in_live_ledger/006_friends_challenges.sql", import.meta.url),
   "utf8",
 );
 

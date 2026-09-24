@@ -3,11 +3,11 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const migration = readFileSync(
-  new URL("../../supabase/migrations/20260911231806_cdx_harden_storage_policies.sql", import.meta.url),
+  new URL("../../supabase/migrations_archived_not_in_live_ledger/20260911231806_cdx_harden_storage_policies.sql", import.meta.url),
   "utf8",
 );
 const privateWrongQuestionsBucketMigration = readFileSync(
-  new URL("../../supabase/migrations/20260915110000_cdx_private_wrong_question_bucket.sql", import.meta.url),
+  new URL("../../supabase/migrations_archived_not_in_live_ledger/20260915110000_cdx_private_wrong_question_bucket.sql", import.meta.url),
   "utf8",
 );
 

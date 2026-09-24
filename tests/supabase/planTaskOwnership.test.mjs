@@ -4,7 +4,7 @@ import test from "node:test";
 
 const plans = readFileSync(new URL("../../src/supabase/plans.js", import.meta.url), "utf8");
 const migration = readFileSync(
-  new URL("../../supabase/migrations/20260911142337_cdx_data_integrity_fixes.sql", import.meta.url),
+  new URL("../../supabase/migrations_archived_not_in_live_ledger/20260911142337_cdx_data_integrity_fixes.sql", import.meta.url),
   "utf8",
 );
 

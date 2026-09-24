@@ -5,11 +5,11 @@ import test from "node:test";
 const routePlan = readFileSync(new URL("../../src/supabase/routePlan.js", import.meta.url), "utf8");
 const useStudyRoute = readFileSync(new URL("../../src/hooks/useStudyRoute.js", import.meta.url), "utf8");
 const migration = readFileSync(
-  new URL("../../supabase/migrations/20260911233239_cdx_scope_route_state_by_exam.sql", import.meta.url),
+  new URL("../../supabase/migrations/20260913222418_cdx_scope_route_state_by_exam.sql", import.meta.url),
   "utf8",
 );
 const primaryKeyMigration = readFileSync(
-  new URL("../../supabase/migrations/20260911234250_cdx_restore_route_state_primary_key.sql", import.meta.url),
+  new URL("../../supabase/migrations_archived_not_in_live_ledger/20260911234250_cdx_restore_route_state_primary_key.sql", import.meta.url),
   "utf8",
 );
 

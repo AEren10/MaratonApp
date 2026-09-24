@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const migration = readFileSync(new URL("../../supabase/migrations/20260918120000_app_notifications.sql", import.meta.url), "utf8");
+const migration = readFileSync(new URL("../../supabase/migrations_archived_not_in_live_ledger/20260918120000_app_notifications.sql", import.meta.url), "utf8");
 const service = readFileSync(new URL("../../src/supabase/notifications.js", import.meta.url), "utf8");
 const hook = readFileSync(new URL("../../src/hooks/useNotifications.js", import.meta.url), "utf8");
 const screen = readFileSync(new URL("../../src/screens/notifications/NotificationsScreen.js", import.meta.url), "utf8");

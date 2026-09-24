@@ -33,7 +33,7 @@ test("route stop UI transitions use the offline-safe helper", () => {
 test("route stop version conflict is not advertised as retryable", () => {
   // 40001 = serialization_failure, yani "ayni istegi tekrar gonder". Surum
   // catismasi kalici bir hata; o kodla bildirilirse PostgREST sonsuz doner.
-  const sql = readFileSync("supabase/migrations/20260920020000_clde_route_stop_conflict_not_retryable.sql", "utf8");
+  const sql = readFileSync("supabase/migrations/20260920010917_clde_route_stop_conflict_not_retryable.sql", "utf8");
   assert.match(sql, /route stop version conflict' USING ERRCODE = 'PT409'/);
   assert.doesNotMatch(sql, /ERRCODE = '40001'/);
 });

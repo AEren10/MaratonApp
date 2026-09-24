@@ -9,7 +9,7 @@ const studyMeasured = readFileSync(new URL("../../src/screens/study/useStudySave
 const studyManual = readFileSync(new URL("../../src/screens/study/useAddStudyController.js", import.meta.url), "utf8");
 const trialSubmit = readFileSync(new URL("../../src/screens/trial/trialEntrySubmit.js", import.meta.url), "utf8");
 const migration = readFileSync(
-  new URL("../../supabase/migrations/20260911143115_cdx_challenge_progress_idempotency.sql", import.meta.url),
+  new URL("../../supabase/migrations/20260913222321_cdx_challenge_progress_idempotency.sql", import.meta.url),
   "utf8",
 );
 

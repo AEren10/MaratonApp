@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const migration = readFileSync("supabase/migrations/20260919120000_cdx_group_data_layer.sql", "utf8");
 const previewMigration = readFileSync("supabase/migrations/20260920002000_cdx_group_preview_by_code.sql", "utf8");
 const previewCreatorMigration = readFileSync("supabase/migrations/20260920002201_cdx_group_preview_creator_name.sql", "utf8");
-const userRankMigration = readFileSync("supabase/migrations/20260920010000_clde_my_groups_user_rank.sql", "utf8");
+const userRankMigration = readFileSync("supabase/migrations/20260920010941_clde_my_groups_user_rank.sql", "utf8");
 const groupsApi = readFileSync("src/supabase/groups.js", "utf8");
 const groupsTab = readFileSync("src/screens/league/GroupsTab.js", "utf8");
 const groupsController = readFileSync("src/screens/league/useGroupsController.js", "utf8");
@@ -120,7 +120,7 @@ test("the groups client carries user_rank through to the card", () => {
 });
 
 test("generate_group_code uses built-in random without pgcrypto dependency", () => {
-  const fixMigration = readFileSync("supabase/migrations/20260920050000_fix_generate_group_code_builtin_random.sql", "utf8");
+  const fixMigration = readFileSync("supabase/migrations/20260924011618_clde_group_code_builtin_random.sql", "utf8");
   assert.doesNotMatch(fixMigration, /gen_random_bytes\(\d+\)/);
   assert.match(fixMigration, /floor\(random\(\) \* length\(alphabet\) \+ 1\)::INTEGER/);
   assert.match(fixMigration, /REVOKE ALL ON FUNCTION private\.generate_group_code\(\) FROM PUBLIC, anon, authenticated;/);

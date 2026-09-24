@@ -4,7 +4,7 @@ import test from "node:test";
 
 const source = readFileSync(new URL("../../src/supabase/dataExport.js", import.meta.url), "utf8");
 const analyticsExportMigration = readFileSync(
-  new URL("../../supabase/migrations/20260912213933_cdx_allow_analytics_export.sql", import.meta.url),
+  new URL("../../supabase/migrations/20260913222426_cdx_allow_analytics_export.sql", import.meta.url),
   "utf8",
 );
 
