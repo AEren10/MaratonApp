@@ -24,3 +24,11 @@ test("AddWrongScreen wires AddWrongFooter and XPBoostToast cleanly", () => {
   assert.match(addWrongSource, /XPBoostToast/);
   assert.match(addWrongSource, /visible=\{form\.xpToast\.visible\}/);
 });
+
+test("AddWrongScreen keeps subject choices in a regular two-column grid", () => {
+  assert.match(addWrongSource, /<FormSection label="DERS" wrap=\{false\}>/);
+  assert.match(addWrongSource, /style=\{styles\.subjectGrid\}/);
+  assert.match(addWrongSource, /style=\{styles\.subjectChip\}/);
+  assert.match(addWrongSource, /justifyContent:\s*["']space-between["']/);
+  assert.match(addWrongSource, /subjectChip:\s*\{\s*width:\s*["']48\.5%["']/);
+});

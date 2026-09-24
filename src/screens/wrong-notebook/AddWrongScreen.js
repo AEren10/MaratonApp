@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -48,16 +48,19 @@ export default function AddWrongScreen() {
             <Segmented options={groupOptions} value={form.group} onChange={form.changeGroup} />
           </FormSection>
 
-          <FormSection label="DERS">
-            {form.subjects.map((s) => (
-              <ChoiceChip
-                key={s.key}
-                label={s.label || s.name}
-                dot={subjectColorOf(C, s.key)}
-                active={subject?.key === s.key}
-                onPress={() => form.changeSubject(s.key)}
-              />
-            ))}
+          <FormSection label="DERS" wrap={false}>
+            <View style={styles.subjectGrid}>
+              {form.subjects.map((s) => (
+                <ChoiceChip
+                  key={s.key}
+                  label={s.label || s.name}
+                  dot={subjectColorOf(C, s.key)}
+                  active={subject?.key === s.key}
+                  onPress={() => form.changeSubject(s.key)}
+                  style={styles.subjectChip}
+                />
+              ))}
+            </View>
           </FormSection>
 
           {subject ? (
@@ -112,6 +115,13 @@ export default function AddWrongScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: STEP.s5 },
+  subjectGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: STEP.s1 + 4,
+  },
+  subjectChip: { width: "48.5%" },
   input: {
     height: 104,
     padding: STEP.s3,

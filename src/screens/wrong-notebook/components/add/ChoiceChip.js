@@ -9,7 +9,7 @@ import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 // dot: ders rengi karesi (yalniz ders cipinde). badge: "TAHMİN" gibi ek.
 // dashed: "Konu ara" gibi eylem cipi.
 export const ChoiceChip = memo(function ChoiceChip({
-  label, active, onPress, dot, badge, dashed, icon, a11yLabel,
+  label, active, onPress, dot, badge, dashed, icon, a11yLabel, style,
 }) {
   const C = useC();
   return (
@@ -26,6 +26,7 @@ export const ChoiceChip = memo(function ChoiceChip({
           borderColor: active ? C.accent : C.border,
           borderStyle: dashed ? "dashed" : "solid",
         },
+        style,
       ]}
     >
       {dot ? <View style={[styles.dot, { backgroundColor: dot }]} /> : null}
