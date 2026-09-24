@@ -88,6 +88,28 @@ Sonucu: supabase db push bunları uygulanmamış sanıp tekrar çalıştırır.
 
 - [ ] Defter ile yerel klasör tek tek eşitlenmeli
 
+### B3. Çökme raporlama kapalı 🔴
+
+Bugün fark edildi: **hiçbir çökme raporu toplanmıyor.**
+
+- Paket kurulu (`@sentry/react-native` 7.11.0), `app.json`'da eklenti kayıtlı
+- Ama `.env.local`'da `EXPO_PUBLIC_SENTRY_DSN` satırı **yorum satırı**
+- `src/lib/errorReporting.js:11` DSN yoksa hemen dönüyor → `Sentry.init` hiç
+  çağrılmıyor
+- EAS ortamlarında da tanımlı değil
+
+Yani mağazada bir kullanıcının telefonunda çöktüğünde haberin olmaz.
+
+- [ ] sentry.io'da organizasyon + proje aç, DSN al
+- [ ] DSN'i EAS ortam değişkeni olarak ekle (production + preview)
+- [ ] Kaynak haritası yüklemesini aç: org/proje adı + auth token.
+      Şu an `SENTRY_DISABLE_AUTO_UPLOAD=true` ile kapalı (üç profilde de) —
+      açılmazsa çökme raporu küçültülmüş yığın olarak gelir, satır göstermez
+- [ ] `app.json`'da Sentry eklentisi İKİ KEZ kayıtlı (satır 71 ve 95),
+      biri fazla olabilir
+
+TestFlight için şart değil; herkese açık yayından önce şart.
+
 ### B2. Diğer
 
 - ✅ Storage bucket'ları: avatars, wrong-questions, community-answers
