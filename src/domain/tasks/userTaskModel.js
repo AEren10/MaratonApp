@@ -52,6 +52,23 @@ export function toUserTaskRow(input = {}) {
   });
 }
 
+export function buildOptimisticUserTask(parsed, userId, taskDate) {
+  const tempId = `temp_${Date.now()}`;
+  return {
+    id: tempId,
+    client_operation_id: `usertask_${tempId}`,
+    user_id: userId,
+    task_date: taskDate,
+    subject: parsed.subject,
+    topic: parsed.topic || null,
+    question_count: parsed.questionCount || 0,
+    target_minutes: parsed.targetMinutes || null,
+    note: parsed.note || null,
+    completed: false,
+    created_at: new Date().toISOString(),
+  };
+}
+
 export function userTaskFingerprint(input = {}) {
   const task = normalizeUserTask(input);
   return [

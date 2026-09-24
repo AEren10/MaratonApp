@@ -32,3 +32,25 @@ export function findPlanTaskByStudyContext(tasks = [], { subject, topic } = {}) 
     task?.subject === subject && normalizePlanTopic(task.topic) === normalizedTopic
   ) || null;
 }
+
+export function mapRemotePlanTasks(dbTasks = [], generatedTasks = []) {
+  const map = {};
+  const doneIds = [];
+  dbTasks.forEach((task) => {
+    const key = buildPlanTaskKey(task.subject, task.topic);
+    map[key] = task.id;
+    if (task.completed) doneIds.push(key);
+  });
+
+  generatedTasks.forEach((task) => {
+    const dbTask = dbTasks.find((row) =>
+      row.subject === task.subject && normalizePlanTopic(row.topic) === normalizePlanTopic(task.topic)
+    );
+    if (!dbTask) return;
+    const key = task.planTaskKey || buildPlanTaskKey(task);
+    map[key] = dbTask.id;
+    if (dbTask.completed) doneIds.push(key);
+  });
+
+  return { map, doneIds };
+}

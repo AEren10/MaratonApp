@@ -109,10 +109,12 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
   }, [items]);
 
   const toggle = useCallback(async (item) => {
+    // Tamamlanmış rota veya plan durakları geri alınamaz (müfredat ve gün tutarlılığı)
+    if (item.completed && (item.routeStop || item.source === "plan" || item.source === "ai")) {
+      H.select();
+      return;
+    }
     H.select();
-    // Durak kapandiginda PLANLANAN sayilari calisma kaydina yaziliyor;
-    // tik geri alininca kayit siliniyor. Eskiden tik yalnizca "completed"
-    // yaziyordu: gunun butun duraklari tiklenir, grafik sifirda kalirdi.
     const wasDone = !!item.completed;
     if (item.source === "user") toggleTask(item.id);
     else togglePlan(item.id);

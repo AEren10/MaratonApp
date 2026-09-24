@@ -5,17 +5,13 @@ import {
   setUserTasks,
   addUserTask,
   replaceUserTask,
-  toggleUserTask as toggleAction,
   setUserTaskCompleted,
   removeUserTask as removeAction,
   clearUserTasks,
   selectUserTasks,
   selectUserTasksProgress,
 } from "../store/slices/userTasksSlice";
-import {
-  getUserTasksByDate,
-  deleteUserTasksByDate,
-} from "../supabase/userTasks";
+import { getUserTasksByDate, deleteUserTasksByDate } from "../supabase/userTasks";
 import {
   saveUserTaskOffline,
   saveUserTaskUpdateOffline,
@@ -29,9 +25,12 @@ import { track } from "../lib/analytics";
 import { useGamification } from "./useGamification";
 import { EVENTS } from "../constants/analytics";
 import { todayTR } from "../lib/dateUtils";
-import { toUserTaskRow } from "../domain/tasks/userTaskModel";
+import { toUserTaskRow, buildOptimisticUserTask } from "../domain/tasks/userTaskModel";
+import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
+import { getJson, setJson } from "../lib/storage/appStorage";
 
 const today = todayTR;
+const getUserTaskRewardedKey = (userId) => datedUserKey(STORAGE_KEYS.USER_TASK_REWARDED_PREFIX, todayTR(), userId);
 
 export function useUserTasks() {
   const { reward } = useGamification();
@@ -45,15 +44,25 @@ export function useUserTasks() {
   const existingDay = useAppSelector((state) => state.userTasks.day);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const rewardedTaskIdsRef = useRef(new Set());
 
   useEffect(() => {
+    rewardedTaskIdsRef.current = new Set();
     if (!user?.id || user.id === "dev") return;
-    if (existingDay === today()) return;
+    getJson(getUserTaskRewardedKey(user.id), []).then((ids) => {
+      if (Array.isArray(ids)) ids.forEach((id) => rewardedTaskIdsRef.current.add(id));
+    });
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || user.id === "dev" || existingDay === today()) return;
     let cancelled = false;
     setLoading(true);
     getUserTasksByDate(user.id, today())
       .then((data) => {
-        if (!cancelled) dispatch(setUserTasks(data || []));
+        if (cancelled) return;
+        (data || []).forEach((t) => { if (t.completed) rewardedTaskIdsRef.current.add(t.id); });
+        dispatch(setUserTasks(data || []));
       })
       .catch((e) => { if (!cancelled) setError(e); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -61,47 +70,24 @@ export function useUserTasks() {
   }, [user?.id, dispatch, existingDay]);
 
   const createTask = useCallback(async (input) => {
-    if (!user?.id || user.id === "dev") {
-      throw new Error("Kullanıcı oturumu bulunamadı");
-    }
+    if (!user?.id || user.id === "dev") throw new Error("Kullanıcı oturumu bulunamadı");
     let parsed;
     try {
       parsed = userTaskSchema.parse(input);
     } catch (e) {
       throw new Error(e.errors?.[0]?.message || "Geçersiz görev bilgisi");
     }
-    const tempId = `temp_${Date.now()}`;
-    // Kuyruktaki kaydı sonradan bulabilmek için sabit bir kimlik.
-    // Eskiden yoktu: çevrimdışı görev kuyrukta kalıyor, iyimser satır
-    // sonsuza kadar temp_ id'siyle yaşıyordu.
-    const clientOperationId = `usertask_${tempId}`;
-    const optimistic = {
-      id: tempId,
-      client_operation_id: clientOperationId,
-      user_id: user?.id,
-      task_date: today(),
-      subject: parsed.subject,
-      topic: parsed.topic || null,
-      question_count: parsed.questionCount || 0,
-      target_minutes: parsed.targetMinutes || null,
-      note: parsed.note || null,
-      completed: false,
-      created_at: new Date().toISOString(),
-    };
+    const optimistic = buildOptimisticUserTask(parsed, user.id, today());
+    const tempId = optimistic.id;
     dispatch(addUserTask(optimistic));
-    const row = toUserTaskRow(optimistic);
-    saveUserTaskOffline(row)
+    saveUserTaskOffline(toUserTaskRow(optimistic))
       .then((result) => {
-        if (result.saved && result.data) {
-          dispatch(replaceUserTask({ tempId, real: result.data }));
-        }
+        if (result.saved && result.data) dispatch(replaceUserTask({ tempId, real: result.data }));
         const newTotal = tasks.length + 1;
         const newDone = tasks.filter((t) => t.completed).length;
         if (newDone < newTotal) scheduleTaskNotifications(newTotal, user?.id).catch(() => {});
       })
-      .catch(() => {
-        dispatch(removeAction(tempId));
-      });
+      .catch(() => { dispatch(removeAction(tempId)); });
     return optimistic;
   }, [user?.id, dispatch, tasks]);
 
@@ -112,48 +98,34 @@ export function useUserTasks() {
     const newCompleted = !previous;
     dispatch(setUserTaskCompleted({ id, completed: newCompleted }));
 
-    // Henüz sunucuda olmayan görev: güncellenecek satır yok, ama kuyrukta
-    // bekleyen INSERT var. Tamamlama bilgisini ONA yazıyoruz ki görev en
-    // baştan tamamlanmış oluşturulsun. Eskiden burada return ediliyordu ve
-    // tamamlama kalıcı olarak kayboluyordu.
     if (typeof id === "string" && id.startsWith("temp_")) {
       patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => {});
       return;
     }
 
     saveUserTaskUpdateOffline(id, { completed: newCompleted }, user?.id).then((result) => {
-      if (result.queued) return;
-      if (result.saved) return;
-      // Geri alma mutlak değerle: arada kullanıcı tekrar dokunmuş olsa bile
-      // görevi bilinen son doğru duruma döndür.
+      if (result.queued || result.saved) return;
       dispatch(setUserTaskCompleted({ id, completed: previous }));
     });
 
-    // Aktivasyonun ana metriği. Tanımlıydı ama hiçbir yerden gönderilmiyordu.
     if (newCompleted) {
-      track(EVENTS.PLAN_TASK_COMPLETED, {
-        subject: task.subject || null,
-        source: task.source || null,
-      });
-      // XP ÖDÜLÜ BURADA — ekranda değil. Önceden yalnızca ana ekrandaki
-      // callback ödül veriyordu; aynı görevi Plan Detay'dan işaretleyen
-      // kullanıcı hiç XP almıyordu.
-      rewardRef.current?.("plan_task_done");
+      track(EVENTS.PLAN_TASK_COMPLETED, { subject: task.subject || null, source: task.source || null });
+      if (!rewardedTaskIdsRef.current.has(id)) {
+        rewardedTaskIdsRef.current.add(id);
+        if (user?.id) setJson(getUserTaskRewardedKey(user.id), [...rewardedTaskIdsRef.current]).catch(() => {});
+        rewardRef.current?.("plan_task_done");
+      }
     }
 
-    const doneAfter = tasks.filter((t) => t.id === id ? newCompleted : t.completed).length;
-    if (doneAfter >= tasks.length) {
-      cancelTaskReminders().catch(() => {});
-    }
+    const doneAfter = tasks.filter((t) => (t.id === id ? newCompleted : t.completed)).length;
+    if (doneAfter >= tasks.length) cancelTaskReminders().catch(() => {});
   }, [dispatch, tasks, user?.id]);
 
   const removeTask = useCallback(async (id) => {
     const task = tasks.find((t) => t.id === id);
     dispatch(removeAction(id));
     if (typeof id === "string" && id.startsWith("temp_")) {
-      removeFromQueue(`usertask_${id}`).catch(() => {
-        if (task) dispatch(addUserTask(task));
-      });
+      removeFromQueue(`usertask_${id}`).catch(() => { if (task) dispatch(addUserTask(task)); });
       return;
     }
     deleteUserTaskOffline(id, user?.id).then((result) => {
