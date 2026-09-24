@@ -30,7 +30,7 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
           {avatarSource ? (
             <Image source={avatarSource} style={{ width: 60, height: 60 }} contentFit="cover" cachePolicy="memory-disk" transition={200} />
           ) : (
-            <Text style={{ fontFamily: "Archivo_600", fontSize: 20, color: C.text2 }}>{initials}</Text>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 22, color: C.accentBright }}>{initials}</Text>
           )}
           {uploading ? (
             <View style={{ position: "absolute", inset: 0, backgroundColor: C.scrimSoft, alignItems: "center", justifyContent: "center" }}>
@@ -41,7 +41,7 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
         <View style={{
           position: "absolute", right: -2, bottom: -2,
           width: 22, height: 22, borderRadius: 4,
-          backgroundColor: C.brandFill,
+          backgroundColor: C.accent,
           alignItems: "center", justifyContent: "center",
         }}>
           <Text style={{ fontFamily: "Archivo_700", fontSize: 13, color: C.accentInk }}>+</Text>
@@ -49,22 +49,32 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
       </Pressable>
 
       <View style={{ flex: 1, gap: 6 }}>
-        <Text style={{ fontFamily: "Bricolage_400", fontSize: 20, color: C.text }} numberOfLines={1}>
+        <Text style={{ fontFamily: "Bricolage_400", fontSize: 21, color: C.text }} numberOfLines={1}>
           {name}
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1, flexWrap: "wrap" }}>
           {exam ? (
-            <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 2, color: C.text3 }}>
-              {exam}
-            </Text>
+            <View style={{
+              height: 22, paddingHorizontal: 8, borderRadius: 6,
+              backgroundColor: C.surface, borderWidth: 1, borderColor: C.line,
+              justifyContent: "center",
+            }}>
+              <Text style={{ fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.2, color: C.text2 }}>
+                {exam}
+              </Text>
+            </View>
           ) : null}
           <View style={{
-            flexDirection: "row", alignItems: "center", gap: 6,
-            height: 22, paddingHorizontal: 9, borderRadius: 6,
-            backgroundColor: C.brandTint, borderWidth: 1, borderColor: C.border,
+            flexDirection: "row", alignItems: "center", gap: 5,
+            height: 22, paddingHorizontal: 8, borderRadius: 6,
+            backgroundColor: streak > 0 ? C.brandTint : C.surface,
+            borderWidth: 1, borderColor: streak > 0 ? C.accent : C.line,
           }}>
-            <Icon name="flame" size={11} color={C.text2} />
-            <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.1, color: C.text2 }}>
+            <Icon name="flame" size={12} color={streak > 0 ? C.accent : C.text3} />
+            <Text style={{
+              fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1,
+              color: streak > 0 ? C.accentBright : C.text3,
+            }}>
               {streak || 0} GÜN SERİ
             </Text>
           </View>

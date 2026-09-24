@@ -6,10 +6,10 @@ import { STEP } from "../../../themes/tokens";
 import { buildLinePath } from "../../../lib/routeChartPath";
 
 const VB_W = 346;
-const VB_H = 108;
+const VB_H = 126;
 const PAD_X = 14;
-const BASE_Y = 78;
-const NODE_STEP_Y = 13;
+const BASE_Y = 92;
+const NODE_STEP_Y = 16;
 
 function RouteSvgChartComponent({ points = [], currentIndex = 0 }) {
   const C = useC();

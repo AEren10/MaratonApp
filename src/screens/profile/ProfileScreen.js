@@ -21,7 +21,7 @@ import { LeagueMiniCard } from "./components/LeagueMiniCard";
 import { ProfileSkeleton } from "./components/ProfileSkeleton";
 import { useProfileViewModel } from "./useProfileViewModel";
 
-const FADE = (delay) => FadeInDown.delay(delay).duration(350).springify();
+const FADE = (delay) => FadeInDown.delay(delay).duration(350);
 
 export default function ProfileScreen() {
   const C = useC();

@@ -44,39 +44,16 @@ export function YearRouteChart() {
 
   return (
     <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 + 4 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s1 }}>
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.5, color: C.text2 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s2 }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.6, color: C.text2 }}>
           {currentInfo.title}
         </Text>
-        <View style={{ flexDirection: "row", backgroundColor: C.surface, borderRadius: 8, padding: 2, borderWidth: 1, borderColor: C.line }}>
-          {MODES.map((m, i) => {
-            const active = i === activeIdx;
-            return (
-              <Pressable
-                key={m.key}
-                onPress={() => handleSelectMode(i)}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityLabel={`${m.label} rotası`}
-                style={{
-                  paddingHorizontal: 8,
-                  paddingVertical: 3,
-                  borderRadius: 6,
-                  backgroundColor: active ? C.elev : "transparent",
-                }}
-              >
-                <Text style={{ fontFamily: "Archivo_600", fontSize: 10.5, color: active ? C.text : C.text3 }}>
-                  {m.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        {currentInfo.rightText ? (
+          <Text style={{ fontFamily: "Archivo_500", fontSize: 11.5, color: C.text3 }}>
+            {currentInfo.rightText}
+          </Text>
+        ) : null}
       </View>
-
-      <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.text, marginBottom: STEP.s2 }}>
-        {currentInfo.rightText}
-      </Text>
 
       <ScrollView
         ref={scrollRef}
@@ -97,18 +74,42 @@ export function YearRouteChart() {
         })}
       </ScrollView>
 
-      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 6, marginTop: STEP.s2 }}>
-        {MODES.map((_, i) => (
-          <View
-            key={i}
-            style={{
-              width: i === activeIdx ? 16 : 5,
-              height: 5,
-              borderRadius: 2.5,
-              backgroundColor: i === activeIdx ? C.accent : C.track,
-            }}
-          />
-        ))}
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: STEP.s1, marginTop: STEP.s2 + 2 }}>
+        {MODES.map((m, i) => {
+          const active = i === activeIdx;
+          return (
+            <Pressable
+              key={m.key}
+              onPress={() => handleSelectMode(i)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`${m.label} rotası`}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: active ? 10 : 8,
+                paddingVertical: 3,
+                borderRadius: 10,
+                backgroundColor: active ? C.surface : "transparent",
+                borderWidth: 1,
+                borderColor: active ? C.border : "transparent",
+              }}
+            >
+              <View
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 2.5,
+                  backgroundColor: active ? C.accent : C.text5,
+                  marginRight: 5,
+                }}
+              />
+              <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: active ? C.text : C.text3 }}>
+                {m.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
