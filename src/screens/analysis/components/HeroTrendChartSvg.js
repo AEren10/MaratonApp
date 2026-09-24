@@ -8,7 +8,7 @@ const PAD_R = 22;
 const PAD_T = 16;
 const PAD_B = 30;
 
-export function HeroTrendChartSvg({ C, data = [], labels }) {
+export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data = [], labels }) {
   if (!data || data.length < 2) return null;
 
   const { points, gridY, linePath, areaPath } = useMemo(() => {
@@ -71,15 +71,21 @@ export function HeroTrendChartSvg({ C, data = [], labels }) {
         <Circle key={idx} cx={p.cx} cy={p.cy} r={3.8} fill={C.bg} stroke={C.accent} strokeWidth={2.4} />
       ))}
 
-      <SvgText x={PAD_L} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600">
-        {labels[0].toUpperCase()}
-      </SvgText>
-      <SvgText x={W / 2} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600" textAnchor="middle">
-        {labels[1].toUpperCase()}
-      </SvgText>
-      <SvgText x={W - PAD_R} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600" textAnchor="end">
-        {labels[2].toUpperCase()}
-      </SvgText>
+      {Array.isArray(labels) && labels[0] ? (
+        <SvgText x={PAD_L} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600">
+          {String(labels[0]).toUpperCase()}
+        </SvgText>
+      ) : null}
+      {Array.isArray(labels) && labels.length >= 3 && labels[1] ? (
+        <SvgText x={W / 2} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600" textAnchor="middle">
+          {String(labels[1]).toUpperCase()}
+        </SvgText>
+      ) : null}
+      {Array.isArray(labels) && labels.length >= 2 && labels[labels.length - 1] ? (
+        <SvgText x={W - PAD_R} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600" textAnchor="end">
+          {String(labels[labels.length - 1]).toUpperCase()}
+        </SvgText>
+      ) : null}
     </Svg>
   );
-}
+});
