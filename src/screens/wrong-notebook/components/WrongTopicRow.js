@@ -8,7 +8,7 @@ import { REVIEW_LADDER } from "../../../lib/wrongReviewLadder";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { alpha } from "../../../themes/colorMix";
-import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { WrongThumb } from "./WrongThumb";
 
 function pillOf(group, C) {
@@ -25,6 +25,8 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
   const pill = pillOf(group, C);
   const subjectLabel = getSubjectByKey(group.subjectKey)?.label || group.subjectKey;
   const done = group.state === GROUP_STATE.DONE;
+  const lead = group.lead || {};
+  const imagePath = lead.image_path || lead.image_uri || lead.image_local_uri || null;
 
   return (
     <Pressable
@@ -33,7 +35,7 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
       accessibilityLabel={`${group.topic}, ${subjectLabel}, ${group.count} soru, ${pill.text}`}
       style={({ pressed }) => [styles.row, { borderTopColor: C.line }, pressed && { backgroundColor: C.surfacePressed }]}
     >
-      <WrongThumb color={subjectColorOf(C, group.subjectKey)} />
+      <WrongThumb color={subjectColorOf(C, group.subjectKey)} imagePath={imagePath} />
       <View style={styles.body}>
         <Text style={[TYPOGRAPHY.topicName, { color: done ? C.text3 : C.text }]} numberOfLines={2}>
           {group.topic}
@@ -41,6 +43,11 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
         <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 4 }]}>
           {subjectLabel} · {group.count} soru
         </Text>
+        {lead.note ? (
+          <Text style={[TYPOGRAPHY.micro, styles.note, { color: C.text2 }]} numberOfLines={2}>
+            {lead.note}
+          </Text>
+        ) : null}
         <View style={styles.meta}>
           <View style={[styles.pill, { backgroundColor: pill.bg, borderColor: pill.bd }]}>
             <Text style={[TYPOGRAPHY.tableHead, styles.pillText, { color: pill.color }]}>{pill.text}</Text>
@@ -62,11 +69,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s2,
-    paddingVertical: STEP.s2,
+    paddingVertical: STEP.s2 + 2,
     borderTopWidth: 1,
-    minHeight: CONTROL.tapMin,
+    minHeight: 106,
   },
   body: { flex: 1, minWidth: 0 },
+  note: { marginTop: STEP.s1 - 2, lineHeight: 16 },
   meta: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s1 },
   pill: {
     height: 21,

@@ -52,6 +52,8 @@ export function OwnWrongDetail() {
   const subjectName = sInfo?.name || item.subject;
   const sColor = subjectColorOf(C, item.subject);
   const meta = [item.source_title, dayMonthLocative(item.created_at, "da eklendi")].filter(Boolean).join(" · ");
+  const imagePath = item.image_path || item.image_uri || item.image_local_uri || null;
+  const topicTitle = item.topic_title || item.topic || "Konu seçilmedi";
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
@@ -62,18 +64,18 @@ export function OwnWrongDetail() {
       />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(400)}>
-          <DetailPhoto uri={item.image_uri} subjectColor={sColor} />
+          <DetailPhoto path={imagePath} subjectColor={sColor} />
           <View style={styles.titleBlock}>
             <Text style={[TYPOGRAPHY.label, { color: sColor, letterSpacing: 1.5 }]}>
               {subjectName.toLocaleUpperCase("tr-TR")}
             </Text>
-            <Text style={[TYPOGRAPHY.subheading, styles.topic, { color: C.text }]}>{item.topic_title}</Text>
+            <Text style={[TYPOGRAPHY.subheading, styles.topic, { color: C.text }]}>{topicTitle}</Text>
             <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s1 + 2 }]}>{meta}</Text>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(70).duration(400)}>
-          <WhyWrongCard item={item} />
+          <WhyWrongCard note={item.note} onSave={d.saveNote} />
           <ReviewLadder item={item} />
         </Animated.View>
 

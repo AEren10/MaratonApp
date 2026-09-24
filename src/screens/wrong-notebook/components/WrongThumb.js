@@ -1,20 +1,31 @@
 import { View, StyleSheet } from "react-native";
 
+import SignedImage from "../../../components/common/SignedImage";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP } from "../../../themes/tokens";
 
-// Soru kagidi kucuk resmi: uc satir cizgi + sekil kutusu, solda ders seridi.
-// Fotograf degil, tasarimin soyut kucuk resmi.
-export function WrongThumb({ color }) {
+// Soru kagidi kucuk resmi. Fotograf varsa gercek soruyu gosterir; yoksa
+// tasarimin soyut kagit placeholder'i kalir.
+export function WrongThumb({ color, imagePath }) {
   const C = useC();
   return (
     <View style={[styles.box, { backgroundColor: C.surface, borderColor: C.elev }]}>
-      <View style={styles.inner}>
-        <View style={[styles.line, { width: "76%", backgroundColor: C.elev }]} />
-        <View style={[styles.line, { width: "92%", backgroundColor: C.elev }]} />
-        <View style={[styles.line, { width: "64%", backgroundColor: C.elev }]} />
-        <View style={[styles.figure, { backgroundColor: C.track }]} />
-      </View>
+      {imagePath ? (
+        <SignedImage
+          bucket="wrong-questions"
+          path={imagePath}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          transition={160}
+        />
+      ) : (
+        <View style={styles.inner}>
+          <View style={[styles.line, { width: "76%", backgroundColor: C.elev }]} />
+          <View style={[styles.line, { width: "92%", backgroundColor: C.elev }]} />
+          <View style={[styles.line, { width: "64%", backgroundColor: C.elev }]} />
+          <View style={[styles.figure, { backgroundColor: C.track }]} />
+        </View>
+      )}
       <View style={[styles.stripe, { backgroundColor: color }]} />
     </View>
   );
@@ -22,8 +33,8 @@ export function WrongThumb({ color }) {
 
 const styles = StyleSheet.create({
   box: {
-    width: 62,
-    height: 62,
+    width: 82,
+    height: 82,
     borderRadius: SHAPE.cardTight,
     borderWidth: 1,
     overflow: "hidden",
