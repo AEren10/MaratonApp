@@ -80,9 +80,12 @@ export default function ProfileScreen() {
                 onPress={() => navigation.navigate(SCREENS.REFERRAL)}
                 first
               />
+              {/* Sosyal Merkez'in gruplar sekmesi. Eskiden ayri bir
+                  GroupsScreen'e gidiyordu: ayni sey icin iki farkli ekran,
+                  ikisi farkli hook'lardan besleniyordu. */}
               <ProfileLinkRow
                 label="Gruplarım"
-                onPress={() => navigation.navigate(SCREENS.GROUPS)}
+                onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
               />
               <ProfileLinkRow
                 label="Çalışma Geçmişi"

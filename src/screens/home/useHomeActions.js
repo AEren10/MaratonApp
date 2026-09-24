@@ -3,6 +3,8 @@ import { useCallback, useMemo } from "react";
 import { SCREENS } from "../../constants/screens";
 import { trackButtonTap } from "../../lib/analytics";
 import { buildStudyTimerParams } from "../../domain/plan/studyTimerParams";
+import { openInTab } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 
 // Ana Sayfa'nin tum cikislari. Kaldirilan eski kartlarin hedefleri tasarimdaki
 // karsiliklarina baglandi (bkz. HomeScreen basligi).
@@ -12,6 +14,15 @@ export function useHomeActions({ navigation, go }) {
     trackButtonTap("home_hero_cta_start", { subject: task.subject, targetScreen: SCREENS.STUDY_TIMER });
     navigation.navigate(SCREENS.STUDY_TIMER, buildStudyTimerParams(task));
   }, [go, navigation]);
+
+  // Sosyal, PROFIL yiginininda yasiyor. Ana Sayfa ROTA yiginindaydi, bu
+  // yuzden duz navigate hicbir navigator tarafindan karsilanmiyordu —
+  // ust sagdaki dugme "navigate hatasi" veriyordu. Sekmeye atlayarak
+  // gidiliyor; sosyal zaten Profil'in alani, sekmenin degismesi dogru.
+  const social = useCallback(() => {
+    trackButtonTap("home_social_open", { targetScreen: SCREENS.LEAGUE });
+    openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.LEAGUE, { tab: "groups" });
+  }, [navigation]);
 
   const subjectDetail = useCallback((subjectKey, subjectName) => {
     navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey, subjectName });
@@ -40,7 +51,8 @@ export function useHomeActions({ navigation, go }) {
     record: go(SCREENS.ADD_STUDY),
     proPreview: go(SCREENS.PRO_PREVIEW),
     firstWeek: go(SCREENS.FIRST_WEEK),
-    groups: go(SCREENS.LEAGUE, { tab: "groups" }),
-    league: go(SCREENS.LEAGUE, { tab: "groups" }),
-  }), [go, startTask, subjectDetail]);
+    social,
+    groups: social,
+    league: social,
+  }), [go, startTask, subjectDetail, social]);
 }

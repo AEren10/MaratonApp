@@ -86,7 +86,7 @@ export function useGroupSettingsActions({
           try {
             await leaveGroup(groupId);
             H.success();
-            navigation.navigate(SCREENS.GROUPS);
+            navigation.navigate(SCREENS.LEAGUE, { tab: "groups" });
           } catch {
             showAlert("Hata", "Gruptan ayrılınamadı.");
           }
@@ -108,7 +108,7 @@ export function useGroupSettingsActions({
             try {
               await deleteGroup(groupId);
               H.success();
-              navigation.navigate(SCREENS.GROUPS);
+              navigation.navigate(SCREENS.LEAGUE, { tab: "groups" });
             } catch {
               showAlert("Hata", "Grup silinemedi.");
             }
