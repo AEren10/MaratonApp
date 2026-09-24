@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useC } from "../contexts/ThemeContext";
@@ -75,7 +76,7 @@ function TabItem({ tab, active, onPress, C }) {
   const dotScale = useSharedValue(active ? 1 : 0);
 
   useEffect(() => {
-    dotScale.value = withSpring(active ? 1 : 0, { damping: 18, stiffness: 320 });
+    dotScale.value = withTiming(active ? 1 : 0, { duration: 180 });
   }, [active, dotScale]);
 
   const iconStyle = useAnimatedStyle(() => ({

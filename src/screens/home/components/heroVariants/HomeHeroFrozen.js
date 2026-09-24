@@ -31,7 +31,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
 
   return (
     <View>
-      <Animated.View entering={FadeInDown.duration(480).springify().damping(18)}>
+      <Animated.View entering={FadeInDown.duration(380)}>
         <HomeHeroEyebrow label="ROTA DONDU" />
         <Text style={[s.title, { color: C.text }]}>
           {frozenDays != null
@@ -44,7 +44,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
       </Animated.View>
 
       {frozenAtStop?.subjectLabel ? (
-        <Animated.View entering={FadeInDown.delay(80).duration(480).springify().damping(18)} style={s.block}>
+        <Animated.View entering={FadeInDown.delay(80).duration(380)} style={s.block}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.8 }]}>
             BURADA DURDU
           </Text>
@@ -61,7 +61,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
         </Animated.View>
       ) : null}
 
-      <Animated.View entering={FadeInDown.delay(160).duration(480).springify().damping(18)} style={s.block}>
+      <Animated.View entering={FadeInDown.delay(160).duration(380)} style={s.block}>
         <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>
           Bildirim göndermiyoruz. Rotan olduğu gibi yerinde duruyor.
         </Text>

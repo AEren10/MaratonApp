@@ -16,7 +16,7 @@ import { HomeHeroExamDayVenue } from "./HomeHeroExamDayVenue";
 // sinav yeri kullanicinin Sınav günü planından; plan yoksa hicbir kalem
 // isaretli gelmez ve yer karti cizilmez. Rota cizgisi olcek tasimayan bir
 // imza: son duragin varildigini gosterir, sayi iddia etmez.
-const FADE = (delay) => FadeInDown.delay(delay).duration(480).springify().damping(18);
+const FADE = (delay) => FadeInDown.delay(delay).duration(350);
 
 function dateLabel(examDate) {
   const d = examDate instanceof Date ? examDate : new Date(examDate);

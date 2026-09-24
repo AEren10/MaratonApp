@@ -16,7 +16,7 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
   const examYear = parsed && !Number.isNaN(parsed.getTime()) ? parsed.getFullYear() : null;
 
   return (
-    <Animated.View entering={FadeInDown.duration(480).springify().damping(18)} style={s.row}>
+    <Animated.View entering={FadeInDown.duration(380)} style={s.row}>
       <StatBlock
         label="Bugün çözülen"
         value={solved}

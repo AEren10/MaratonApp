@@ -10,7 +10,7 @@ import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 export function HomeHeroCTA({ label = "Çalışmaya Başla", subtitle, onPress, delay = 200, secondaryLabel, onSecondary }) {
   const C = useC();
   return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(480).springify().damping(18)} style={s.wrap}>
+    <Animated.View entering={FadeInDown.delay(delay).duration(380)} style={s.wrap}>
       <Button variant="primary" size="lg" fullWidth onPress={onPress}>
         {label}
       </Button>
