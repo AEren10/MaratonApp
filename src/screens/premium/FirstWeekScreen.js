@@ -121,7 +121,7 @@ export default function FirstWeekScreen() {
                 
                 {step.done ? (
                   <View style={[styles.taskIconDone, { backgroundColor: C.up }]}>
-                    <Icon name="check" size={14} color="#06210F" strokeWidth={2.1} />
+                    <Icon name="check" size={14} color={C.bg} strokeWidth={2.1} />
                   </View>
                 ) : step.active ? (
                   <View style={[styles.taskIconActive, { borderColor: C.accent }]} />

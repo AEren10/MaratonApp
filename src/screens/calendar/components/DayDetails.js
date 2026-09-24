@@ -39,23 +39,26 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   const trialTypes = getTrialTypes(C);
   const today = day === todayTR();
 
-  // Tasarım Image 5: Mock veya gerçek veri. Durak, dakika, soru sayısı.
-  const statMinutes = data?.totalMinutes || 70;
-  const statStops = data?.studyLogs?.length || 2;
-  const statQuestions = 81; // Mock, eklenebilir
-  const streakStatus = "SERİ SÜRDÜ"; // Mock
+  // Gercek veri: Durak, dakika, soru sayisi.
+  const statMinutes = data?.totalMinutes || 0;
+  const statStops = (data?.studyLogs || data?.logs)?.length || 0;
+  const statQuestions = data?.totalQuestions || 0;
+  const hasActivity = statStops > 0 || (data?.trialLogs || data?.trials)?.length > 0;
+  const streakStatus = hasActivity ? "SERİ SÜRDÜ" : "KAYIT YOK";
   
   const slots = useMemo(() => {
     if (!data) return [];
-    const logSlots = (data.studyLogs || []).map((l) => ({
+    const logs = data.studyLogs || data.logs || [];
+    const trials = data.trialLogs || data.trials || [];
+    const logSlots = logs.map((l) => ({
       key: `log_${l.id || l.created_at}`,
       time: formatTime(l.created_at),
       color: getSubjectByKey(l.subject)?.color || C.accent,
       name: l.topic || l.subject,
       subject: l.topic ? getSubjectByKey(l.subject)?.label : null,
-      dur: l.minutes ? `${l.minutes} dk` : "",
+      dur: (l.duration || l.duration_minutes || l.minutes) ? `${l.duration || l.duration_minutes || l.minutes} dk` : "",
     }));
-    const trialSlots = (data.trialLogs || []).map((t) => ({
+    const trialSlots = trials.map((t) => ({
       key: `trial_${t.id || t.created_at}`,
       time: formatTime(t.created_at),
       color: trialTypes[t.trialType]?.color || C.accent,
@@ -78,15 +81,15 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
 
       <View style={{ flexDirection: "row", gap: STEP.s4, marginBottom: STEP.s3 }}>
         <View>
-          <Text style={[TYPOGRAPHY.hero, { fontSize: 28, color: C.text }]}>{statMinutes}</Text>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statMinutes}</Text>
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>dk</Text>
         </View>
         <View>
-          <Text style={[TYPOGRAPHY.hero, { fontSize: 28, color: C.text }]}>{statStops}</Text>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statStops}</Text>
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>durak</Text>
         </View>
         <View>
-          <Text style={[TYPOGRAPHY.hero, { fontSize: 28, color: C.text }]}>{statQuestions}</Text>
+          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statQuestions}</Text>
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>soru</Text>
         </View>
       </View>
@@ -101,7 +104,14 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
       ) : (
         <View>
           {slots.map((s) => (
-            <Pressable key={s.key} disabled={!s.trial} onPress={() => s.trial && onTrialPress?.(s.trial)}>
+            <Pressable
+              key={s.key}
+              disabled={!s.trial}
+              hitSlop={s.trial ? 8 : undefined}
+              accessibilityRole={s.trial ? "button" : undefined}
+              accessibilityLabel={s.trial ? `${s.name} deneme detayı` : undefined}
+              onPress={() => s.trial && onTrialPress?.(s.trial)}
+            >
               <SlotRow time={s.time} color={s.color} name={s.name} subject={s.subject} dur={s.dur} C={C} />
             </Pressable>
           ))}

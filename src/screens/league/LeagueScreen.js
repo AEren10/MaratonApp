@@ -49,7 +49,7 @@ const AnimPressable = Animated.createAnimatedComponent(Pressable);
 
 const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C }) {
   const isYou = item.you;
-  const medalColor = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const medalColor = item.rank === 1 ? (C.warn || C.amber) : item.rank === 2 ? C.text2 : item.rank === 3 ? C.text3 : null;
   const zone = getZone(item.rank, totalUsers);
   const zoneColor = zone === ZONE.PROMOTION ? C.green : zone === ZONE.DEMOTION ? C.danger : null;
   const scale = useSharedValue(1);

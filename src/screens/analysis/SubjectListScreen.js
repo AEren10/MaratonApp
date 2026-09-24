@@ -29,10 +29,15 @@ export default function SubjectListScreen() {
   const active = TABS.find((t) => t.key === tab) || TABS[0];
   const solved = items.reduce((sum, item) => sum + item.totalQuestions, 0);
 
+  const handleBack = () => {
+    if (navigation.canGoBack()) navigation.goBack();
+    else navigation.navigate(SCREENS.ANALYSIS);
+  };
+
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Geri">
+        <Pressable onPress={handleBack} hitSlop={12} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
         </Pressable>
         <Text style={[s.title, { color: C.text }]}>Konu ilerlemesi</Text>
@@ -47,6 +52,7 @@ export default function SubjectListScreen() {
                 <Pressable
                   key={t.key}
                   onPress={() => setTab(t.key)}
+                  hitSlop={{ top: 4, bottom: 4 }}
                   style={[s.tabItem, on && { backgroundColor: C.elev }]}
                 >
                   <Text style={[s.tabText, { color: on ? C.text : C.text3 }]}>{t.label}</Text>
@@ -111,7 +117,7 @@ const s = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 8,
   },
-  backBtn: { padding: 4 },
+  backBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   title: { fontFamily: "Bricolage_400", fontSize: 22 },
   scroll: { paddingBottom: 50 },
   tabsWrap: { paddingHorizontal: GUTTER, paddingTop: 16 },

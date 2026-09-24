@@ -16,10 +16,10 @@ function CountCard({ C, eyebrow, value, caption, accent }) {
     <Card
       tone={accent ? "tint" : "surface"}
       radius="panel"
-      style={[styles.countCard, accent && { borderWidth: 1, borderColor: "rgba(255,255,255,0.08)" }]}
+      style={[styles.countCard, accent && { borderWidth: 1, borderColor: C.border }]}
     >
       <Text style={[TYPOGRAPHY.metaSemiBold, { color: accent ? C.text : C.text3, letterSpacing: 1 }]}>{eyebrow}</Text>
-      <Text style={[TYPOGRAPHY.hero, styles.countValue, { color: C.text, fontSize: 40, marginTop: STEP.s2 }]} allowFontScaling={false}>
+      <Text style={[TYPOGRAPHY.statPair, styles.countValue, { color: C.text, marginTop: STEP.s2 }]} allowFontScaling={false}>
         {value}
       </Text>
       <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 5 }]}>{caption}</Text>
@@ -42,10 +42,15 @@ export default function PlanVsActualScreen() {
   const { series, plannedDue, doneDue, gap, hasData, headline, gapBody, loading } = usePlanVsActual();
   const openGapClosure = () => navigation.navigate(SCREENS.GAP_CLOSURE);
 
+  const handleBack = () => {
+    if (navigation.canGoBack()) navigation.goBack();
+    else navigation.navigate(SCREENS.DAILY_PLAN);
+  };
+
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Pressable onPress={handleBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Söz ve gerçek</Text>
         </Pressable>
@@ -71,7 +76,7 @@ export default function PlanVsActualScreen() {
               <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 1.5, marginBottom: STEP.s4 }]}>
                 PLANLANAN vs GERÇEKLEŞEN
               </Text>
-              <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 26, marginBottom: STEP.s2 }]}>{headline}</Text>
+              <Text style={[TYPOGRAPHY.statSmall, { color: C.text, marginBottom: STEP.s2 }]}>{headline}</Text>
               <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, lineHeight: 22 }]}>
                 Soluk hat plana göre nerede olman gerektiğini, parlak hat gerçekte nerede olduğunu gösterir.
               </Text>

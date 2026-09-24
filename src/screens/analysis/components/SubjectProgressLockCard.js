@@ -12,17 +12,17 @@ export function SubjectProgressLockCard({ C, onPress }) {
 
       <View style={s.blurRows}>
         <View style={s.blurRow}>
-          <View style={[s.dot, { backgroundColor: C.subjects?.kimya || "#E8A0C4" }]} />
+          <View style={[s.dot, { backgroundColor: C.subjects?.kimya || C.accent }]} />
           <View style={[s.line, { backgroundColor: C.elev }]} />
           <View style={[s.tag, { backgroundColor: C.elev }]} />
         </View>
         <View style={s.blurRow}>
-          <View style={[s.dot, { backgroundColor: C.subjects?.biyoloji || "#86CE92" }]} />
+          <View style={[s.dot, { backgroundColor: C.subjects?.biyoloji || C.accent }]} />
           <View style={[s.line, { backgroundColor: C.elev }]} />
           <View style={[s.tag, { backgroundColor: C.elev }]} />
         </View>
         <View style={s.blurRow}>
-          <View style={[s.dot, { backgroundColor: C.subjects?.tarih || "#C9BE6A" }]} />
+          <View style={[s.dot, { backgroundColor: C.subjects?.tarih || C.accent }]} />
           <View style={[s.line, { backgroundColor: C.elev }]} />
           <View style={[s.tag, { backgroundColor: C.elev }]} />
         </View>
