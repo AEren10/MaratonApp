@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { selectTrials } from "../store/slices/trialSlice";
-import { getSubjectByKey } from "../themes/subjects";
+import { getSubjectLabel } from "../themes/subjects";
 
 const MAX_ROWS = 3;
 
@@ -31,7 +31,7 @@ export function useProPreviewData() {
         const previous = trials.slice(1).find((t) => t.subjects?.[key]);
         return {
           key,
-          name: getSubjectByKey(key)?.name || key,
+          name: getSubjectLabel(key),
           ratio: Math.max(0, Math.min(1, (entry.net || 0) / total)),
           value: previous
             ? `${fmt(previous.subjects[key].net || 0)} › ${fmt(entry.net || 0)}`

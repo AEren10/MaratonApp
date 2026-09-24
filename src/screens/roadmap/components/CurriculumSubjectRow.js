@@ -7,20 +7,7 @@ import * as H from "../../../lib/haptics";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-function getBadge(name = "") {
-  const clean = name.trim().toLocaleUpperCase("tr-TR");
-  if (clean.startsWith("TÜRK") || clean === "TÜRKÇE") return "TR";
-  if (clean.startsWith("MAT")) return "MAT";
-  if (clean.startsWith("FİZ")) return "FİZ";
-  if (clean.startsWith("KİM")) return "KİM";
-  if (clean.startsWith("BİY")) return "BİY";
-  if (clean.startsWith("TAR")) return "TAR";
-  if (clean.startsWith("COĞ")) return "COĞ";
-  if (clean.startsWith("FEL")) return "FEL";
-  if (clean.startsWith("DİN")) return "DİN";
-  if (clean.startsWith("GEO")) return "GEO";
-  return clean.slice(0, 3);
-}
+import { getSubjectBadge } from "../../../themes/subjects";
 
 // Ders karti: renkli rozet (TR, MAT..), 15.5px net baslik, tabular sayaç ve pürüzsüz ilerleme cubugu.
 function CurriculumSubjectRow({ subject, onPress }) {
@@ -50,7 +37,7 @@ function CurriculumSubjectRow({ subject, onPress }) {
       ]}
     >
       <View style={[s.badge, { backgroundColor: `${color}18`, borderColor: `${color}35` }]}>
-        <Text style={[s.badgeText, { color }]}>{getBadge(subject.name)}</Text>
+        <Text style={[s.badgeText, { color }]}>{getSubjectBadge(subject.name)}</Text>
       </View>
       <View style={s.body}>
         <View style={s.topRow}>

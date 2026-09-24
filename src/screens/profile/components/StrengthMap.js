@@ -4,21 +4,44 @@ import { SectionLabel, Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
+import { getSubjectBadge } from "../../../themes/subjects";
 import * as H from "../../../lib/haptics";
 
-function StrengthRow({ name, color, pct, last }) {
+function StrengthRow({ name, subjectKey, color, pct, last }) {
   const C = useC();
+  const badge = getSubjectBadge(subjectKey || name);
   return (
     <View style={{ paddingVertical: STEP.s2 + 2, borderBottomWidth: last ? 0 : 1, borderBottomColor: C.line }}>
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1 + 2 }}>
-        <View style={{ width: 8, height: 8, borderRadius: 1, backgroundColor: color }} />
-        <Text style={{ flex: 1, fontFamily: "Archivo_500", fontSize: 14.5, color: C.text }}>{name}</Text>
-        <Text style={{ fontFamily: "Bricolage_400", fontSize: 17, color: C.text, fontVariant: ["tabular-nums"] }}>
-          %{pct}
-        </Text>
-      </View>
-      <View style={{ height: 5, borderRadius: 2, backgroundColor: C.track, marginTop: STEP.s1 + 2, overflow: "hidden" }}>
-        <View style={{ width: `${pct}%`, height: "100%", borderRadius: 2, backgroundColor: color }} />
+      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2 }}>
+        <View
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            backgroundColor: `${color}18`,
+            borderWidth: 1,
+            borderColor: `${color}35`,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontFamily: "Archivo_700", fontSize: 11, color, letterSpacing: 0.5 }}>
+            {badge}
+          </Text>
+        </View>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
+            <Text style={{ fontFamily: "Archivo_500", fontSize: 14.5, color: C.text }} numberOfLines={1}>
+              {name}
+            </Text>
+            <Text style={{ fontFamily: "Bricolage_400", fontSize: 17, color: C.text, fontVariant: ["tabular-nums"] }}>
+              %{pct}
+            </Text>
+          </View>
+          <View style={{ height: 5, borderRadius: 2.5, backgroundColor: C.track, marginTop: STEP.s1, overflow: "hidden" }}>
+            <View style={{ width: `${pct}%`, height: "100%", borderRadius: 2.5, backgroundColor: color }} />
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -26,7 +49,7 @@ function StrengthRow({ name, color, pct, last }) {
 
 // Ders renkleri yalniz ders baglaminda — burada durum degil, sadece hangi
 // dersin barina baktigimizi gosteriyor.
-export function StrengthMap({ strengths }) {
+export function StrengthMap({ strengths = [] }) {
   const C = useC();
   const nav = useNavigation();
   const sorted = [...strengths].sort((a, b) => b.v - a.v);
@@ -58,7 +81,14 @@ export function StrengthMap({ strengths }) {
     <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 }}>
       <SectionLabel style={{ color: C.text2 }}>GÜÇ HARİTASI</SectionLabel>
       {sorted.map((s, i) => (
-        <StrengthRow key={s.name} name={s.name} color={s.c} pct={s.v} last={i === sorted.length - 1} />
+        <StrengthRow
+          key={s.name + (s.key || "")}
+          name={s.name}
+          subjectKey={s.key}
+          color={s.c}
+          pct={s.v}
+          last={i === sorted.length - 1}
+        />
       ))}
     </View>
   );

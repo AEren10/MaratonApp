@@ -1,3 +1,5 @@
+import { getSubjectLabel } from "../themes/subjects.js";
+
 const SUBJECT_NAMES = {
   tyt_turkce: "Türkçe", tyt_matematik: "TYT Mat", tyt_fen: "Fen",
   tyt_sosyal: "Sosyal", ayt_matematik: "AYT Mat", ayt_fizik: "Fizik",
@@ -161,7 +163,7 @@ export function forecastBySubject(trials, examDate) {
     const projected = Math.max(0, regression.slope
       * daysBetween(firstDate, exam) + regression.intercept);
     return [{
-      key, name: SUBJECT_NAMES[key] || key, current, projected,
+      key, name: SUBJECT_NAMES[key] || getSubjectLabel(key) || key, current, projected,
       weeklyGain: regression.slope * 7, improving: regression.slope > 0,
     }];
   }).sort((a, b) => b.weeklyGain - a.weeklyGain);

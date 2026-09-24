@@ -1,3 +1,5 @@
+import { getSubjectLabel } from '../themes/subjects.js';
+
 const SUBJECT_NAMES = {
   tyt_turkce: 'Türkçe',
   tyt_matematik: 'TYT Mat',
@@ -116,7 +118,7 @@ function subjectComparison(trials, periodDays = 30) {
 
     result.push({
       key,
-      name: SUBJECT_NAMES[key] || key,
+      name: SUBJECT_NAMES[key] || getSubjectLabel(key) || key,
       currentAvg,
       previousAvg,
       diff,
@@ -148,7 +150,7 @@ function personalBests(trials) {
   const subjects = Object.entries(subjectMap)
     .map(([key, { net, date }]) => ({
       key,
-      name: SUBJECT_NAMES[key] || key,
+      name: SUBJECT_NAMES[key] || getSubjectLabel(key) || key,
       bestNet: net,
       date: formatDateTR(date),
       trialDate: date,
