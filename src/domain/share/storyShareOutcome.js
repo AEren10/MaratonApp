@@ -5,6 +5,7 @@ export const STORY_SHARE = Object.freeze({
   OPENED: "opened",     // pano hazir + Instagram acildi
   COPIED: "copied",     // pano hazir, Instagram acilamadi
   SAVED: "saved",       // galeriye kaydedildi
+  PERMISSION_DENIED: "permission_denied",
   FAILED: "failed",     // etiket uretilemedi
 });
 

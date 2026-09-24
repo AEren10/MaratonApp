@@ -136,7 +136,7 @@ export async function saveStoryToGallery(ref) {
   if (!uri) return STORY_SHARE.FAILED;
   try {
     const { granted } = await MediaLibrary.requestPermissionsAsync(true);
-    if (!granted) return STORY_SHARE.FAILED;
+    if (!granted) return STORY_SHARE.PERMISSION_DENIED;
     await MediaLibrary.saveToLibraryAsync(uri);
     return STORY_SHARE.SAVED;
   } catch {

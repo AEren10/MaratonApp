@@ -37,11 +37,12 @@ export function useShareCardActions(cardRef, getShareMeta = null) {
   const handleSaveGallery = useCallback(async () => {
     try {
       const outcome = await saveStoryToGallery(cardRef);
-      if (outcome === STORY_SHARE.FAILED) {
+      if (outcome === STORY_SHARE.PERMISSION_DENIED) {
         H.warn();
         showAlert("Galeri izni gerekiyor", "Kartı kaydetmek için izin vermen gerekiyor.");
         return;
       }
+      if (outcome === STORY_SHARE.FAILED) throw new Error("story_gallery_save_failed");
       H.success();
       showAlert("Kaydedildi", "Kart galerine kaydedildi.");
     } catch {
