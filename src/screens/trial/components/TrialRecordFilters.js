@@ -38,14 +38,16 @@ export const TrialRecordFilters = React.memo(function TrialRecordFilters({ tabs,
           })}
         </View>
 
-        <Pressable
-          onPress={onOpenFilterMenu}
-          accessibilityRole="button"
-          accessibilityLabel="Filtrele"
-          style={[styles.filterBtn, { borderColor: C.border }]}
-        >
-          <Icon name="filter" size={15} color={C.text2} />
-        </Pressable>
+        {onOpenFilterMenu ? (
+          <Pressable
+            onPress={onOpenFilterMenu}
+            accessibilityRole="button"
+            accessibilityLabel="Filtrele"
+            style={[styles.filterBtn, { borderColor: C.border }]}
+          >
+            <Icon name="filter" size={15} color={C.text2} />
+          </Pressable>
+        ) : null}
       </View>
 
       <View style={styles.dropdownRow}>

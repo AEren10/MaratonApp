@@ -1,13 +1,33 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { SHAPE } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
+import { getSubjectBadge } from "../../../themes/subjects";
+import { subjectColorOf } from "../../../themes/subjectPalette";
+
+function rowBadge(item, C) {
+  if (item.trial?.trialType === "BRANCH") {
+    const color = subjectColorOf(C, item.trial.branchSubject);
+    return {
+      label: getSubjectBadge(item.trial.branchSubjectName || item.trial.branchSubject) || "BR",
+      color,
+      backgroundColor: `${color}20`,
+      borderColor: `${color}60`,
+    };
+  }
+  return {
+    label: item.badge,
+    color: C.accentBright,
+    backgroundColor: C.brandTint,
+    borderColor: C.bandEdge || `${C.accent}4D`,
+  };
+}
 
 export const TrialRecordRow = React.memo(function TrialRecordRow({ item, C, onPress }) {
-  const isTyt = (item.badge || "").toUpperCase().includes("TYT");
   const isUp = item.deltaUp;
   const isFirst = item.deltaLabel === "ilk";
   const deltaColor = isFirst ? C.text3 : isUp ? C.up : C.down;
+  const badge = rowBadge(item, C);
 
   return (
     <Pressable
@@ -22,18 +42,16 @@ export const TrialRecordRow = React.memo(function TrialRecordRow({ item, C, onPr
       <View
         style={[
           styles.badge,
-          isTyt
-            ? { backgroundColor: C.brandTint, borderColor: C.bandEdge || C.accent + "30" }
-            : { borderColor: C.border },
+          { backgroundColor: badge.backgroundColor, borderColor: badge.borderColor },
         ]}
       >
         <Text
           style={[
             styles.badgeText,
-            { color: isTyt ? C.accentBright : C.text3 },
+            { color: badge.color },
           ]}
         >
-          {item.badge.toLocaleUpperCase("tr-TR")}
+          {badge.label.toLocaleUpperCase("tr-TR")}
         </Text>
       </View>
 

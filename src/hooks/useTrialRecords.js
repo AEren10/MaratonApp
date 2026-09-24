@@ -6,6 +6,7 @@ import { useSync } from "../contexts/DataSyncContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { useFeatureEntry } from "./useFeatureEntry";
+import { getSubjectLabel } from "../themes/subjects";
 
 export const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
 const TYPE_TABS = ["ALL", "TYT", "AYT", "BRANCH"];
@@ -15,6 +16,26 @@ function typeBadge(trialType) {
   if (trialType?.startsWith("AYT")) return "AYT";
   if (trialType === "LGS") return "LGS";
   return "TYT";
+}
+
+function branchExamPrefix(subjectKey) {
+  const key = String(subjectKey || "").toLowerCase();
+  if (key.startsWith("ayt_")) return "AYT";
+  if (key.startsWith("tyt_")) return "TYT";
+  if (key.startsWith("lgs_")) return "LGS";
+  if (key.startsWith("ydt_")) return "YDT";
+  return "";
+}
+
+function trialTitle(item, badge) {
+  const custom = item.title?.trim();
+  if (custom) return custom;
+  if (item.trialType === "BRANCH") {
+    const subject = item.branchSubjectName || getSubjectLabel(item.branchSubject);
+    const prefix = branchExamPrefix(item.branchSubject);
+    return subject ? `${[prefix, subject].filter(Boolean).join(" ")} Denemesi` : "Branş Denemesi";
+  }
+  return `${badge} Denemesi`;
 }
 
 function matchesTypeFilter(trial, filter) {
@@ -97,7 +118,7 @@ export function useTrialRecords() {
         id: String(item.id ?? `${item.date}-${item.badge}`),
         trial: item,
         badge: item.badge,
-        title: item.title?.trim() || `${item.badge} Denemesi`,
+        title: trialTitle(item, item.badge),
         dateLabel: formatDate(item.date),
         netLabel: formatNet(item.net),
         deltaLabel: formatDelta(item.delta),
