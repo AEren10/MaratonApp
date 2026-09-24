@@ -26,39 +26,33 @@ export const createDailyPlan = async (plan, tasks) => {
       .single();
     if (planError) throw planError;
 
-    const tasksWithPlanId = tasks.map((t) => ({
-      ...t,
-      plan_id: planData.id,
-      user_id: plan.user_id,
-    }));
-
-    const { error: taskError } = await supabase
-      .from("plan_tasks")
-      .insert(tasksWithPlanId);
-    if (taskError) {
-      await supabase.from("daily_plans").delete().eq("id", planData.id);
-      throw taskError;
+    // AYNI DURAK IKI KEZ YAZILMAZ.
+    //
+    // syncPlan ayni anda birkac kez calisabiliyor; ucu de "bu planin gorevi
+    // yok" diye okuyup ayni listeyi yaziyordu (22 Eylul: uc parti, hepsi
+    // 00:14:06 icinde, ikisi birebir ayni). Kopyalar tik anahtarini
+    // paylastigi icin BIR tik hepsini birden kapatiyor; ana sayfa "16/16
+    // gunu kapattin" derken plan detayi ayni gun icin 3/15 gosteriyordu.
+    //
+    // Once parti kendi icinde tekillestiriliyor, sonra veritabanina "varsa
+    // dokunma" diye gidiliyor. plan_tasks_unique_per_plan indeksi zaten
+    // engelliyor; buradaki upsert o engeli hata degil sessiz atlama yapiyor.
+    const seen = new Set();
+    const tasksWithPlanId = [];
+    for (const t of tasks) {
+      const key = (t.subject || "") + "|" + String(t.topic || "").trim().toLocaleLowerCase("tr-TR");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      tasksWithPlanId.push({ ...t, plan_id: plan.id, user_id: plan.user_id });
     }
-
-    return getDailyPlan(plan.user_id, plan.plan_date);
-  } catch (e) {
-    handleSupabaseError(e, "createDailyPlan");
-    throw e;
-  }
-};
-
-export const createPlanTasks = async (plan, tasks) => {
-  try {
-    if (!plan?.id || !Array.isArray(tasks) || tasks.length === 0) return plan;
-    const tasksWithPlanId = tasks.map((t) => ({
-      ...t,
-      plan_id: plan.id,
-      user_id: plan.user_id,
-    }));
+    if (!tasksWithPlanId.length) return getDailyPlan(plan.user_id, plan.plan_date);
 
     const { error } = await supabase
       .from("plan_tasks")
-      .insert(tasksWithPlanId);
+      .upsert(tasksWithPlanId, {
+        onConflict: "plan_id,subject,topic",
+        ignoreDuplicates: true,
+      });
     if (error) throw error;
 
     return getDailyPlan(plan.user_id, plan.plan_date);

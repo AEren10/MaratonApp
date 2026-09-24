@@ -1,0 +1,16 @@
+-- "GRUP OLUSTUR" BUTONU HATA VERIYORDU.
+--
+-- public.create_group IKI kez tanimliydi:
+--   create_group(p_name text)
+--   create_group(p_name text, p_description text, p_weekly_target integer)
+--
+-- Ikisi de ayni private.create_group'u cagiriyor; tek argumanli olan eski bir
+-- kisayol ve istemci onu HIC cagirmiyor (createGroup her zaman uc parametreyi
+-- birden gonderiyor). Ama PostgREST ayni isimde birden fazla fonksiyon gorunce
+-- adayi secemeyip PGRST203 donduruyor -- "SQL'de calisir, API'den calismaz"
+-- belirtisi tam olarak bu. Istemcideki genel catch bunu "Grup olusturulamadi."
+-- diye gosteriyordu.
+--
+-- Mantik private.create_group'ta duruyor ve degismiyor; yalnizca bayat
+-- sarmalayici kaldiriliyor.
+DROP FUNCTION IF EXISTS public.create_group(text);
