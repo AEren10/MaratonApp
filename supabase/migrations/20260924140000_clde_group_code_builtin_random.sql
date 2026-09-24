@@ -1,8 +1,13 @@
--- =====================================================================
--- BU DOSYA CANLIYA HIC UYGULANMADI ve artik GECERSIZ.
--- Ayni icerik 2026-09-24'te 20260924140000_clde_group_code_builtin_random.sql
--- ile uygulandi. Defter temizliginde bu dosya kaldirilmali.
--- =====================================================================
+-- 2026-09-24'te CANLIYA UYGULANDI.
+--
+-- Ayni icerik 20260920050000_fix_generate_group_code_builtin_random.sql'de
+-- 20 Eylul'de yazilmis ama deftere HIC girmemis. Sonucu cihazda goruldu:
+-- "Grup Olustur" her denemede
+--   [Supabase:createGroup] function gen_random_bytes(integer) does not exist
+-- veriyordu. gen_random_bytes 'extensions' semasinda, generate_group_code ise
+-- search_path'i 'public, pg_temp' ile kilitliyor -- goremiyor.
+--
+-- Eski dosya defter temizligi sirasinda kaldirilmali (bkz. docs/CIKMADAN_ONCE_V1.md B1).
 
 -- Migration: 20260920050000_fix_generate_group_code_builtin_random.sql
 -- Fixes private.generate_group_code() to use PostgreSQL built-in random()
