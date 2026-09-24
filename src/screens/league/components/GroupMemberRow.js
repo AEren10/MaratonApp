@@ -7,7 +7,7 @@ import { Icon, Avatar } from "../../../components/design";
 export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
   const C = useC();
   const isYou = item.you;
-  const medal = item.rank === 1 ? C.amber : item.rank === 2 ? "#C0C5CE" : item.rank === 3 ? "#CD7F47" : null;
+  const medal = item.rank === 1 ? C.amber : item.rank === 2 ? C.text2 : item.rank === 3 ? C.text3 : null;
   const weeklyQuestions = item.weekly_questions ?? item.questions ?? item.weekly_xp ?? 0;
 
   return (

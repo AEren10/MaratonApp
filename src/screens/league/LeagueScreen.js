@@ -311,40 +311,28 @@ export default function LeagueScreen() {
       }}>
         <Pressable
           onPress={() => navigation.goBack()}
-          hitSlop={12}
+          hitSlop={14}
           accessibilityRole="button"
           accessibilityLabel="Geri"
-          style={{
-            width: 44, height: 44,
-            borderRadius: RADIUS.md,
-            backgroundColor: C.surface,
-            alignItems: "center", justifyContent: "center",
-            borderWidth: 1, borderColor: C.border,
-          }}
+          accessibilityHint="Önceki ekrana döner"
+          style={{ padding: SPACING.xs }}
         >
-          <Icon name="chevL" size={20} color={C.text} />
+          <Icon name="arrowL" size={22} color={C.text} />
         </Pressable>
-        <View style={{ flex: 1, marginHorizontal: SPACING.sm }}>
-          <Text style={[TYPOGRAPHY.heading, { color: C.text, fontSize: 20 }]}>Sosyal Hub</Text>
+        <View style={{ flex: 1, marginHorizontal: SPACING.md }}>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, fontSize: 18 }]}>Sosyal Hub</Text>
           <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2, marginTop: 2 }]}>
             {tab === "groups" ? "GRUPLARIM" : tab === "global" ? "LİG" : "ARKADAŞLAR"}
           </Text>
         </View>
         <Pressable
           onPress={goInvite}
-          hitSlop={12}
+          hitSlop={14}
           accessibilityRole="button"
           accessibilityLabel="Arkadaş davet et"
-          style={{
-            width: 38, height: 38,
-            borderRadius: 12,
-            backgroundColor: C.surface,
-            alignItems: "center", justifyContent: "center",
-            borderWidth: 1,
-            borderColor: C.border,
-          }}
+          style={{ padding: SPACING.xs }}
         >
-          <Icon name="users" size={18} color={C.text2} />
+          <Icon name="users" size={20} color={C.text2} />
         </Pressable>
       </View>
 
@@ -354,8 +342,8 @@ export default function LeagueScreen() {
         backgroundColor: C.surface,
         borderWidth: 1,
         borderColor: C.border,
-        borderRadius: 11,
-        padding: 4,
+        borderRadius: RADIUS.lg,
+        padding: SPACING.xs,
         marginHorizontal: SPACING.lg,
         marginBottom: SPACING.md,
       }}>
@@ -371,7 +359,7 @@ export default function LeagueScreen() {
               flex: 1,
               alignItems: "center",
               paddingVertical: SPACING.sm,
-              borderRadius: 8,
+              borderRadius: RADIUS.md,
               backgroundColor: tab === t.key ? C.accent : "transparent",
             }}
           >

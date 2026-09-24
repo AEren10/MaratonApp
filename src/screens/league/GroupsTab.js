@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, FlatList, StyleSheet, Share } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Share } from "react-native";
 
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../../components/design";
 import { GroupsSkeleton } from "./components/GroupsSkeleton";
 import { GroupMemberRow } from "./components/GroupMemberRow";
+import { GroupItemRow } from "./components/GroupItemRow";
+import { GroupCodeCard } from "./components/GroupCodeCard";
 import { GroupCodeModal } from "./components/GroupCodeModal";
 import { GroupCompetitionBanner } from "./components/GroupCompetitionBanner";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -13,6 +15,7 @@ import { groupLeaderboard } from "../../supabase/groups";
 import { useGroupsController } from "./useGroupsController";
 import { SCREENS } from "../../constants/screens";
 import { appUrl } from "../../navigation/routes";
+import * as H from "../../lib/haptics";
 
 export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
@@ -50,60 +53,77 @@ export function GroupsTab({ user, initialGroupCode }) {
     Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { groupCode: g.code })}` }).catch(() => {});
   };
 
-  const renderGroupChip = useCallback(({ item }) => {
-    const active = c.selected?.id === item.id;
-    return (
-      <Pressable onPress={() => c.setSelected(item)} onLongPress={() => c.doLeave(item)}
-        style={[s.chip, { backgroundColor: C.surface, borderColor: active ? C.accent : C.border }, active && { backgroundColor: C.accent + "18" }]}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: active ? C.accent : C.text2 }]}>{item.name}</Text>
-      </Pressable>
-    );
-  }, [c, C]);
-
-  const renderMemberItem = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
-
   if (c.loading) return <GroupsSkeleton />;
 
   return (
     <View style={s.fill}>
-      <View style={s.actions}>
-        <Pressable onPress={() => c.setCreateOpen(true)} style={[s.actBtn, { backgroundColor: C.accent }]}>
-          <Icon name="plus" size={15} color={C.accentInk} sw={2.5} /><Text style={[TYPOGRAPHY.button, { color: C.accentInk }]}>Yeni Grup Oluştur</Text>
-        </Pressable>
-        <Pressable onPress={() => c.setJoinOpen(true)} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
-          <Icon name="users" size={15} color={C.text} /><Text style={[TYPOGRAPHY.button, { color: C.text }]}>Kodu Gir</Text>
-        </Pressable>
-      </View>
-      {c.groups.length === 0 ? (
-        <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
-      ) : (
-        <>
-          <FlatList horizontal data={c.groups} keyExtractor={(g) => g.id} showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipList} renderItem={renderGroupChip} />
-          {c.selected ? (
-            <FlatList data={board.list} keyExtractor={(m) => String(m.user_id)} renderItem={renderMemberItem} windowSize={5} maxToRenderPerBatch={10}
-              ListHeaderComponent={<GroupCompetitionBanner standing={standing} group={c.selected} onShare={shareCode} />}
-              contentContainerStyle={s.boardList}
-              ListEmptyComponent={boardError ? (
-                <View style={s.boardError}><Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text><Pressable onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}><Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text></Pressable></View>
-              ) : <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>Bu hafta kimse aktif değil.</Text>}
-            />
-          ) : null}
-        </>
-      )}
-      <GroupCodeModal visible={c.createOpen} title="Yeni Grup Oluştur" placeholder="Grup adı (örn. 12-A Sayısal)" value={c.name} onChange={c.setName} onSubmit={c.doCreate} onClose={() => c.setCreateOpen(false)} busy={c.busy} cta="Oluştur" />
-      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" placeholder="6 haneli kod" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={() => c.setJoinOpen(false)} busy={c.busy} cta="Katıl" />
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <View style={s.actions}>
+          <Pressable onPress={() => { H.tap(); c.setCreateOpen(true); }} style={[s.actBtn, { backgroundColor: C.accent }]}>
+            <Icon name="plus" size={15} color={C.textOnFill} sw={2.5} />
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.textOnFill }]}>Yeni Grup Oluştur</Text>
+          </Pressable>
+          <Pressable onPress={() => { H.tap(); c.setJoinOpen(true); }} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+            <Icon name="users" size={15} color={C.text} />
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Kodu Gir</Text>
+          </Pressable>
+        </View>
+
+        {c.groups.length === 0 ? (
+          <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
+        ) : (
+          <>
+            <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>GRUPLARIN ({c.groups.length})</Text>
+            <View style={[s.groupListCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+              {c.groups.map((g, i) => (
+                <GroupItemRow key={g.id} group={g} isSelected={c.selected?.id === g.id} isLast={i === c.groups.length - 1} onSelect={() => c.setSelected(g)} onLeave={() => c.doLeave(g)} />
+              ))}
+            </View>
+
+            {c.selected ? (
+              <>
+                <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>{c.selected.name.toUpperCase()} · DAVET & BİLGİ</Text>
+                <GroupCodeCard group={c.selected} onShare={shareCode} />
+                <GroupCompetitionBanner standing={standing} />
+
+                <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>HAFTALIK SIRALAMA</Text>
+                {boardError ? (
+                  <View style={s.boardError}>
+                    <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text>
+                    <Pressable onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}>
+                      <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text>
+                    </Pressable>
+                  </View>
+                ) : board.list.length === 0 ? (
+                  <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>Bu hafta kimse aktif değil.</Text>
+                ) : (
+                  <View style={s.memberList}>
+                    {board.list.map((m) => (
+                      <GroupMemberRow key={String(m.user_id)} item={m} />
+                    ))}
+                  </View>
+                )}
+              </>
+            ) : null}
+          </>
+        )}
+      </ScrollView>
+
+      <GroupCodeModal visible={c.createOpen} title="Yeni Grup Oluştur" subtitle="Grubun için bir isim belirle" placeholder="Grup adı (örn. 12-A Sayısal)" value={c.name} onChange={c.setName} onSubmit={c.doCreate} onClose={() => c.setCreateOpen(false)} busy={c.busy} cta="Oluştur" />
+      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" subtitle="Arkadaşından aldığın 6 haneli kodu gir" placeholder="XXXXXX" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={() => c.setJoinOpen(false)} busy={c.busy} cta="Katıl" />
     </View>
   );
 }
 
 const s = StyleSheet.create({
   fill: { flex: 1 },
-  actions: { flexDirection: "row", gap: SPACING.sm, paddingHorizontal: 16, marginBottom: SPACING.sm },
-  actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, borderRadius: RADIUS.lg },
-  chipList: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1 },
-  boardList: { paddingHorizontal: 16, paddingBottom: 100, gap: 6 },
-  boardError: { alignItems: "center", gap: SPACING.sm, paddingTop: SPACING.lg },
+  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
+  actions: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.sm },
+  actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.xs, minHeight: 48, borderRadius: RADIUS.lg },
+  secLabel: { letterSpacing: 1.2, marginTop: SPACING.md, marginBottom: SPACING.xs },
+  groupListCard: { borderRadius: RADIUS.xl, borderWidth: 1, overflow: "hidden", marginBottom: SPACING.sm },
+  memberList: { gap: SPACING.xs, marginBottom: SPACING.md },
+  boardError: { alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.lg },
   retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1 },
-  emptySub: { textAlign: "center", paddingHorizontal: SPACING.xl, paddingTop: SPACING.lg },
+  emptySub: { textAlign: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg },
 });
