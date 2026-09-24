@@ -33,10 +33,8 @@ test("Input component uses TYPOGRAPHY.input and does not apply lineHeight", () =
   assert.doesNotMatch(inputSrc, /lineHeight/);
 });
 
-test("Group components use input typography without lineHeight", () => {
-  const editCard = readFileSync("src/screens/groups/components/GroupInfoEditCard.js", "utf8");
-  assert.match(editCard, /TYPOGRAPHY\.inputMedium/);
-
-  const joinInput = readFileSync("src/screens/groups/components/JoinCodeInput.js", "utf8");
-  assert.match(joinInput, /TYPOGRAPHY\.inputStat/);
+test("Group code modal uses input typography without lineHeight", () => {
+  const groupCodeModal = readFileSync("src/screens/league/components/GroupCodeModal.js", "utf8");
+  assert.match(groupCodeModal, /TYPOGRAPHY\.input/);
+  assert.doesNotMatch(groupCodeModal, /lineHeight/);
 });

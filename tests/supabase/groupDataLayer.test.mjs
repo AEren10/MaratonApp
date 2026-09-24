@@ -8,7 +8,7 @@ const previewCreatorMigration = readFileSync("supabase/migrations/20260920002201
 const userRankMigration = readFileSync("supabase/migrations/20260920010000_clde_my_groups_user_rank.sql", "utf8");
 const groupsApi = readFileSync("src/supabase/groups.js", "utf8");
 const groupsTab = readFileSync("src/screens/league/GroupsTab.js", "utf8");
-const groupsHook = readFileSync("src/hooks/useGroups.js", "utf8");
+const groupsController = readFileSync("src/screens/league/useGroupsController.js", "utf8");
 const groupDetailHook = readFileSync("src/hooks/useGroupDetail.js", "utf8");
 const groupActionsHook = readFileSync("src/hooks/useGroupActions.js", "utf8");
 
@@ -81,7 +81,9 @@ test("group code preview is limited and does not bypass member-scoped group read
 });
 
 test("group hooks keep the Antigravity UI contract while using Supabase data", () => {
-  assert.match(groupsHook, /refresh: \(\) => load\(\{ refresh: true \}\)/);
+  assert.match(groupsController, /listMyGroups/);
+  assert.match(groupsController, /setGroups\(list\)/);
+  assert.match(groupsController, /loadGroups/);
   assert.match(groupDetailHook, /leaderboard: members/);
   assert.match(groupDetailHook, /setLeaderboard: setMembers/);
   for (const name of [

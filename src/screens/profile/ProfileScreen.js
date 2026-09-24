@@ -81,7 +81,7 @@ export default function ProfileScreen() {
                 first
               />
               {/* Sosyal Merkez'in gruplar sekmesi. Eskiden ayri bir
-                  GroupsScreen'e gidiyordu: ayni sey icin iki farkli ekran,
+                  eski ayri grup ekranina gidiyordu: ayni sey icin iki farkli ekran,
                   ikisi farkli hook'lardan besleniyordu. */}
               <ProfileLinkRow
                 label="Gruplarım"
