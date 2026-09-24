@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, LockedValue } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -6,6 +6,7 @@ import { STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
 import { useThresholdView } from "../../../hooks/useThresholdView";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // GoalsScreen'e baglaniyor: hedef net oradan duzenleniyor ve band notu
 // hedef bolume gore ciziliyor.
@@ -26,19 +27,18 @@ export function TargetDepartmentCard({ targetDepartment }) {
     : null;
 
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Hedef bölüm"
       onPress={() => { H.tap(); nav.navigate(SCREENS.GOALS); }}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: "row", alignItems: "center", gap: STEP.s2,
         marginHorizontal: GUTTER, marginTop: STEP.s3,
         padding: STEP.s2 + STEP.s1,
         borderRadius: SHAPE.panel,
         backgroundColor: C.brandTint,
-        borderWidth: 1, borderColor: C.bandEdge,
-        opacity: pressed ? 0.85 : 1,
-      })}
+        borderWidth: 1, borderColor: C.bandEdge
+      }}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={{ fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 2, color: C.accentBright }}>
@@ -67,6 +67,6 @@ export function TargetDepartmentCard({ targetDepartment }) {
         )}
       </View>
       <Icon name="chevR" size={16} color={C.text3} />
-    </Pressable>
+    </Press>
   );
 }

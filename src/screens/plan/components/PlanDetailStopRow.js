@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isLast, onStart, onToggle }) {
   return (
@@ -14,13 +15,13 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isL
         isLast && { borderBottomWidth: 1, borderBottomColor: C.line },
       ]}
     >
-      <Pressable
+      <Press haptic="none" scaleTo={0.92}
         onPress={onToggle}
         hitSlop={STEP.s2}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
         accessibilityLabel={`${subject} tamamlandı olarak işaretle`}
-        style={({ pressed }) => [s.checkTouch, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
+        style={[s.checkTouch]}
       >
         <View
           style={[
@@ -34,7 +35,7 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isL
         >
           {done ? <Icon name="check" size={11} color={C.bg} sw={2.4} /> : null}
         </View>
-      </Pressable>
+      </Press>
 
       <View style={s.body}>
         <Text
@@ -54,7 +55,7 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isL
 
       {hasStart ? (
         <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
-          <Pressable
+          <Press haptic="none" scaleTo={0.92}
             accessibilityRole="button"
             accessibilityLabel={`${subject} çalışmaya başla`}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
@@ -62,14 +63,13 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isL
               H.tap();
               onStart?.(e);
             }}
-            style={({ pressed }) => [
+            style={[
               s.startBtn,
-              { backgroundColor: pressed ? (C.accent + "33") : (C.accent + "18") },
-              pressed && { transform: [{ scale: 0.96 }] },
+              { backgroundColor: C.accent + "18" },
             ]}
           >
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>Başla</Text>
-          </Pressable>
+          </Press>
         </Animated.View>
       ) : null}
     </View>

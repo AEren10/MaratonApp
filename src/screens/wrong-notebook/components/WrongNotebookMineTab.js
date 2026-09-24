@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
+import { View, Text, FlatList, RefreshControl, ScrollView } from "react-native";
 
 import { EmptyState } from "../../../components/common/EmptyState";
 import { Icon } from "../../../components/design";
@@ -12,6 +12,7 @@ import { DueBanner } from "./DueBanner";
 import { FilterPill, SubjectFilterPill } from "./FilterPills";
 import { SwipeableWrongCard } from "./SwipeableWrongCard";
 import { WrongNotebookSkeleton } from "./WrongNotebookSkeleton";
+import { Press } from "../../../components/design/Press";
 
 const STATUS_TABS = [
   { key: WRONG_NOTEBOOK_STATUS.OPEN, getLabel: (counts) => `Çözülmemiş · ${counts.open}`, colorKey: "accent" },
@@ -43,9 +44,9 @@ export function WrongNotebookMineTab({
   return (
     <View style={{ flex: 1 }}>
       {viewModel.counts.open > 0 && (
-        <Pressable
+        <Press haptic="none"
           onPress={() => handlers.onChangeTab(WRONG_NOTEBOOK_TAB.COMMUNITY)}
-          style={({ pressed }) => ({
+          style={{
             flexDirection: "row",
             alignItems: "center",
             gap: STEP.s2,
@@ -55,16 +56,15 @@ export function WrongNotebookMineTab({
             borderRadius: SHAPE.cardTight,
             padding: STEP.s3,
             borderWidth: 1,
-            borderColor: C.accent + "25",
-            opacity: pressed ? 0.8 : 1,
-          })}
+            borderColor: C.accent + "25"
+          }}
         >
           <Icon name="globe" size={18} color={C.accent} />
           <Text style={{ ...TYPOGRAPHY.caption, color: C.text, flex: 1 }}>
             Yanlışlarını paylaş, diğer adaylardan çözüm önerisi al
           </Text>
           <Icon name="chevR" size={14} color={C.accent} />
-        </Pressable>
+        </Press>
       )}
 
       <View style={styles.statusTabs}>
@@ -72,7 +72,7 @@ export function WrongNotebookMineTab({
           const active = filters.status === tab.key;
           const color = C[tab.colorKey];
           return (
-            <Pressable
+            <Press haptic="none"
               key={tab.key}
               accessibilityRole="tab"
               accessibilityLabel={tab.getLabel(viewModel.counts)}
@@ -95,7 +95,7 @@ export function WrongNotebookMineTab({
               >
                 {tab.getLabel(viewModel.counts)}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </View>
@@ -189,7 +189,7 @@ export function WrongNotebookMineTab({
 
 function TopicFilterChip({ C, active, accessibilityLabel, label, onPress, styles }) {
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="tab"
       accessibilityLabel={accessibilityLabel || label}
       accessibilityState={{ selected: active }}
@@ -205,7 +205,7 @@ function TopicFilterChip({ C, active, accessibilityLabel, label, onPress, styles
       <Text style={{ ...TYPOGRAPHY.captionMedium, color: active ? C.text : C.text3 }}>
         {label}
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

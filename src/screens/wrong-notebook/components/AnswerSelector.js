@@ -1,7 +1,8 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const ANSWERS = ["A", "B", "C", "D", "E"];
 
@@ -39,9 +40,9 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: STEP.s4, marginBottom: STEP.s2 }}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>Cevap</Text>
         {(myAnswer || correctAnswer) ? (
-          <Pressable onPress={clearAll} hitSlop={8}>
+          <Press haptic="none" onPress={clearAll} hitSlop={8}>
             <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Temizle</Text>
-          </Pressable>
+          </Press>
         ) : null}
       </View>
 
@@ -68,10 +69,10 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
           }
 
           return (
-            <Pressable
+            <Press haptic="none"
               key={letter}
               onPress={() => handlePress(letter)}
-              style={({ pressed }) => ({
+              style={{
                 flex: 1,
                 height: 48,
                 borderRadius: SHAPE.cardTight,
@@ -79,9 +80,8 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
                 borderWidth: 1.5,
                 borderColor: borderColor,
                 alignItems: "center",
-                justifyContent: "center",
-                opacity: pressed ? 0.75 : 1,
-              })}
+                justifyContent: "center"
+              }}
             >
               <Text style={{
                 fontFamily: "Bricolage_400",
@@ -100,7 +100,7 @@ export function AnswerSelector({ myAnswer, correctAnswer, onMyAnswer, onCorrectA
                   <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: C.up }} />
                 )}
               </View>
-            </Pressable>
+            </Press>
           );
         })}
       </View>

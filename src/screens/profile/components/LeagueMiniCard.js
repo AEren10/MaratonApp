@@ -1,10 +1,11 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
   const C = useC();
@@ -13,11 +14,11 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
   const xpToNext = nextTier ? nextTier.minXP - weeklyXP : 0;
 
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Haftalık Lig"
       onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE); }}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: C.surface,
@@ -25,9 +26,8 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
         borderColor: C.border,
         borderRadius: RADIUS.xxl,
         padding: SPACING.lg,
-        marginBottom: SPACING.lg,
-        opacity: pressed ? 0.8 : 1,
-      })}
+        marginBottom: SPACING.lg
+      }}
     >
       {/* Trophy icon */}
       <View style={{
@@ -67,6 +67,6 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
         </Text>
         <Icon name="chevR" size={16} color={C.muted} />
       </View>
-    </Pressable>
+    </Press>
   );
 }

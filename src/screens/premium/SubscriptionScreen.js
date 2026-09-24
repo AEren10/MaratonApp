@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -14,6 +14,7 @@ import { SettingsRow } from "../settings/components/SettingsRow";
 import { useSettingsActions } from "../settings/useSettingsActions";
 import { SubscriptionStatusCard } from "./components/SubscriptionStatusCard";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Abonelik ve hesap". Ayarlar > Abonelik satirindan aciliyor.
 // Fatura gecmisi bolumu cizilmiyor (tutar hicbir kaynakta yok, bkz.
@@ -33,9 +34,9 @@ export default function SubscriptionScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Abonelik ve hesap</Text>
       </View>
 
@@ -81,17 +82,17 @@ export default function SubscriptionScreen() {
             dayaniyor, tarihsiz o ekran dogru sey soyleyemez. */}
         {state === "ready" && isPremium && info?.endsAt && info?.willRenew ? (
           <Animated.View style={styles.gutter}>
-            <Pressable
+            <Press haptic="none"
               onPress={goCancel}
               accessibilityRole="button"
               accessibilityLabel="Aboneliği iptal et"
-              style={({ pressed }) => [styles.cancelRow, { opacity: pressed ? 0.7 : 1 }]}
+              style={[styles.cancelRow]}
             >
               <Text style={[TYPOGRAPHY.bodyMedium, { color: C.accentBright, flex: 1 }]}>
                 Aboneliği iptal et
               </Text>
               <Icon name="chevR" size={13} color={C.accent} />
-            </Pressable>
+            </Press>
           </Animated.View>
         ) : null}
       </ScrollView>

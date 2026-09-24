@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { formatMinutes } from "../../../lib/format";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export const SubjectTopicRow = React.memo(function SubjectTopicRow({
   topic,
@@ -37,7 +38,7 @@ export const SubjectTopicRow = React.memo(function SubjectTopicRow({
 
   return (
     <View style={styles.row}>
-      <Pressable
+      <Press haptic="none"
         onPress={handleToggle}
         hitSlop={10}
         accessibilityRole="checkbox"
@@ -56,11 +57,11 @@ export const SubjectTopicRow = React.memo(function SubjectTopicRow({
         >
           {isDone ? <Icon name="check" size={12} color={C.accentInk} sw={2.5} /> : null}
         </View>
-      </Pressable>
+      </Press>
 
-      <Pressable
+      <Press haptic="none"
         onPress={handlePress}
-        style={({ pressed }) => [styles.contentPressable, { opacity: pressed ? 0.7 : 1 }]}
+        style={[styles.contentPressable]}
         accessibilityRole="button"
         accessibilityLabel={`${topic.name} konusuna git`}
       >
@@ -103,7 +104,7 @@ export const SubjectTopicRow = React.memo(function SubjectTopicRow({
           </Text>
           <Icon name="chevR" size={12} color={C.text3} />
         </View>
-      </Pressable>
+      </Press>
     </View>
   );
 });

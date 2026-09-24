@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { useClassSchedule } from "../../../hooks/useClassSchedule";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function ProgramRulesSection({ onOpen }) {
   const C = useC();
@@ -13,10 +14,10 @@ export function ProgramRulesSection({ onOpen }) {
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PROGRAMIN KURALLARI</Text>
         <View style={[s.rule, { backgroundColor: C.line }]} />
       </View>
-      <Pressable
+      <Press haptic="none"
         onPress={onOpen}
         accessibilityRole="button"
-        style={({ pressed }) => [s.row, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
+        style={[s.row, { borderTopColor: C.line}]}
       >
         <View style={s.copy}>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Haftalık ders programı</Text>
@@ -30,7 +31,7 @@ export function ProgramRulesSection({ onOpen }) {
           )}
           <Icon name="chevR" size={14} color={C.text3} />
         </View>
-      </Pressable>
+      </Press>
     </View>
   );
 }

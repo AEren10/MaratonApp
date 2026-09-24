@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // Tasarimin alan satiri: buyuk harf etiket + 56px yukseklikte yuzey.
 // Duzenlenebilir (TextInput) ya da baska ekrana yonlendiren (onPress +
@@ -17,17 +18,17 @@ export function EditProfileField({ label, value, onChangeText, onPress, placehol
   };
 
   const body = onPress ? (
-    <Pressable
+    <Press haptic="none"
       onPress={() => { H.tap(); onPress(); }}
       accessibilityRole="button"
       accessibilityLabel={label}
-      style={({ pressed }) => [fieldStyle, { opacity: pressed ? 0.85 : 1 }]}
+      style={[fieldStyle]}
     >
       <Text style={[TYPOGRAPHY.bodyMedium, { flex: 1, color: C.text }]} numberOfLines={1}>
         {value}
       </Text>
       <Icon name="chevR" size={13} color={C.text5} />
-    </Pressable>
+    </Press>
   ) : (
     <View style={fieldStyle}>
       <TextInput

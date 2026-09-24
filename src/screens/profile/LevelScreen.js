@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { useLevelProgress } from "../../hooks/useLevelProgress";
 import { LevelHero } from "./components/LevelHero";
 import { LevelPathRow } from "./components/LevelPathRow";
 import { WeeklyGains } from "./components/WeeklyGains";
+import { Press } from "../../components/design/Press";
 
 const NOTE =
   "Halka emeği ölçer, rota sonucu. Neti düşen hafta bile soru ve süre XP " +
@@ -66,7 +67,7 @@ export default function LevelScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={navigation.goBack}
           hitSlop={12}
           accessibilityRole="button"
@@ -74,7 +75,7 @@ export default function LevelScreen() {
           style={styles.backBtn}
         >
           <Icon name="chevL" size={16} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Seviye</Text>
       </View>
 
@@ -86,17 +87,17 @@ export default function LevelScreen() {
         ListFooterComponent={
           <View>
             <WeeklyGains />
-            <Pressable
+            <Press haptic="none"
               onPress={() => navigation.navigate(SCREENS.MILESTONE)}
               accessibilityRole="button"
               accessibilityLabel="Kilometre taşlarını gör"
-              style={({ pressed }) => [styles.milestoneRow, { borderColor: C.border, opacity: pressed ? 0.7 : 1 }]}
+              style={[styles.milestoneRow, { borderColor: C.border}]}
             >
               <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>
                 Kilometre taşlarını gör
               </Text>
               <Icon name="chevR" size={13} color={C.text3} />
-            </Pressable>
+            </Press>
           </View>
         }
         contentContainerStyle={styles.scroll}

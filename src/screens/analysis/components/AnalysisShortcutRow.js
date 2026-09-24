@@ -1,8 +1,9 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function AnalysisShortcutRow({ C, go, screens }) {
   return (
@@ -24,11 +25,11 @@ export function AnalysisShortcutRow({ C, go, screens }) {
 
 function Shortcut({ C, color, icon, label, sub, onPress }) {
   return (
-    <Pressable
+    <Press haptic="none" scaleTo={0.98}
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         flex: 1,
         minHeight: CONTROL.tapMin,
         alignItems: "center",
@@ -37,10 +38,8 @@ function Shortcut({ C, color, icon, label, sub, onPress }) {
         borderRadius: SHAPE.sheet,
         backgroundColor: C.surface,
         borderWidth: 1,
-        borderColor: C.border,
-        opacity: pressed ? 0.85 : 1,
-        transform: [{ scale: pressed ? 0.98 : 1 }],
-      })}
+        borderColor: C.border
+      }}
     >
       <View style={{ width: 36, height: 36, borderRadius: SHAPE.iconBox, backgroundColor: color + "18", alignItems: "center", justifyContent: "center" }}>
         <Icon name={icon} size={18} color={color} />
@@ -49,6 +48,6 @@ function Shortcut({ C, color, icon, label, sub, onPress }) {
       {sub ? (
         <Text style={{ ...TYPOGRAPHY.micro, color: C.text3, textAlign: "center" }}>{sub}</Text>
       ) : null}
-    </Pressable>
+    </Press>
   );
 }

@@ -1,7 +1,8 @@
-import { Pressable, View, Text, Switch, StyleSheet } from "react-native";
+import { View, Text, Switch, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 /**
  * Tasarimin ayar satiri: etiket + (alt aciklama) + sagda deger + chevron.
@@ -61,14 +62,14 @@ export function SettingsRow({
   if (toggle || !onPress) return <View style={[styles.wrapper, border]}>{content}</View>;
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={hint ? `${label}, ${hint}` : label}
-      style={({ pressed }) => [styles.wrapper, border, { opacity: pressed ? 0.7 : 1 }]}
+      style={[styles.wrapper, border]}
     >
       {content}
-    </Pressable>
+    </Press>
   );
 }
 

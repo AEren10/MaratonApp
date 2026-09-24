@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -14,6 +14,7 @@ import { ShareStoryCard } from "./components/ShareStoryCard";
 import { ShareModeChips } from "./components/ShareModeChips";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../themes/tokens";
 import { STORY_HEIGHT, STORY_WIDTH } from "../../domain/share/storySticker";
+import { Press } from "../../components/design/Press";
 
 const PREVIEW_CARD_WIDTH = 214;
 const PREVIEW_CARD_HEIGHT = Math.round((PREVIEW_CARD_WIDTH * STORY_HEIGHT) / STORY_WIDTH);
@@ -46,9 +47,9 @@ export default function ShareCardScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => nav.goBack()} hitSlop={12} style={s.closeBtn}>
+        <Press haptic="none" onPress={() => nav.goBack()} hitSlop={12} style={s.closeBtn}>
           <Icon name="x" size={16} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={s.title}>Paylaş</Text>
         <View style={{ width: CONTROL.tapMin }} />
       </View>
@@ -85,17 +86,17 @@ export default function ShareCardScreen() {
               <Button onPress={handleShare} icon="share" fullWidth size="lg">
                 Paylaş
               </Button>
-              <Pressable
+              <Press haptic="none"
                 onPress={handleSaveGallery}
                 hitSlop={12}
                 accessibilityRole="button"
                 accessibilityLabel="Kartı galerine kaydet"
-                style={({ pressed }) => [s.saveRow, { opacity: pressed ? 0.7 : 1 }]}
+                style={[s.saveRow]}
               >
                 <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
                   Galeriye kaydet
                 </Text>
-              </Pressable>
+              </Press>
             </View>
           </>
         )}

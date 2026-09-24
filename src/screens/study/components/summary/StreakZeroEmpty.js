@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { EMPTY_COPY } from "../../../../constants/stateCopy";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { StreakZeroHero } from "./StreakZeroHero";
+import { Press } from "../../../../components/design/Press";
 
 const COPY = EMPTY_COPY.streakZero;
 
@@ -23,15 +24,15 @@ export function StreakZeroEmpty({ onPrimary, onSecondary }) {
         <Button size="lg" fullWidth onPress={onPrimary}>
           {COPY.primary}
         </Button>
-        <Pressable
+        <Press haptic="none"
           onPress={onSecondary}
           accessibilityRole="button"
-          style={({ pressed }) => [styles.secondary, { opacity: pressed ? 0.72 : 1 }]}
+          style={[styles.secondary]}
         >
           <Text style={[TYPOGRAPHY.button, { color: C.accentBright }]}>
             {COPY.secondary}
           </Text>
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

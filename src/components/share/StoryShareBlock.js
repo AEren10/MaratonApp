@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
 import { useStoryShare } from "../../hooks/useStoryShare";
@@ -7,6 +7,7 @@ import { STORY_MOMENT } from "../../domain/share/storySticker";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
+import { Press } from "../../components/design/Press";
 
 const THUMB_W = 124;
 const SELECTED_W = 148;
@@ -40,7 +41,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
           const active = i === s.selectedIndex;
           const w = active ? SELECTED_W : THUMB_W;
           return (
-            <Pressable
+            <Press haptic="none"
               key={v.key}
               onPress={() => { H.tap(); s.select(i); }}
               accessibilityRole="button"
@@ -58,30 +59,30 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
               <View style={[st.scaled, { transform: [{ scale: w / STORY_WIDTH }] }]} pointerEvents="none">
                 <StorySticker variant={v} photoUri={photoUri} />
               </View>
-            </Pressable>
+            </Press>
           );
         })}
       </ScrollView>
 
-      <Pressable
+      <Press haptic="none"
         onPress={() => { H.tap(); s.share(shotRef); }}
         disabled={s.busy}
         accessibilityRole="button"
         accessibilityLabel="Paylaş"
-        style={({ pressed }) => [
+        style={[
           st.cta,
           quiet
             ? { borderWidth: 1, borderColor: C.border, backgroundColor: "transparent" }
             : { backgroundColor: C.accent },
-          { opacity: s.busy ? 0.6 : pressed ? 0.92 : 1 },
+          { opacity: s.busy ? 0.6 : 1}
         ]}
       >
         <Text style={[TYPOGRAPHY.button, { color: quiet ? C.text : C.accentInk }]}>
           {s.busy ? "Hazırlanıyor…" : "Paylaş"}
         </Text>
-      </Pressable>
+      </Press>
 
-      <Pressable
+      <Press haptic="none"
         onPress={() => { H.tap(); s.save(shotRef); }}
         disabled={s.busy}
         accessibilityRole="button"
@@ -90,7 +91,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
         <Text style={[TYPOGRAPHY.captionMedium, st.secondaryText, { color: C.text2 }]}>
           Galeriye kaydet
         </Text>
-      </Pressable>
+      </Press>
 
       <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text4 }]}>
         {s.result ? MESSAGE[s.result] : "Etiketin Instagram story'ne gönderilir."}

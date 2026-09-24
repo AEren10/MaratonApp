@@ -1,8 +1,9 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
   return (
@@ -62,11 +63,11 @@ export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
 
 function DeepRow({ C, title, sub, onPress, last }) {
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel={title}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         minHeight: 58,
         flexDirection: "row",
         alignItems: "center",
@@ -74,22 +75,21 @@ function DeepRow({ C, title, sub, onPress, last }) {
         paddingHorizontal: SPACING.md,
         paddingVertical: SPACING.sm,
         borderBottomWidth: last ? 0 : 1,
-        borderBottomColor: C.line,
-        opacity: pressed ? 0.76 : 1,
-      })}
+        borderBottomColor: C.line
+      }}
     >
       <View style={{ flex: 1 }}>
         <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>{title}</Text>
         <Text style={{ ...TYPOGRAPHY.micro, color: C.text3, marginTop: 2 }}>{sub}</Text>
       </View>
       <Icon name="chevR" size={14} color={C.text3} />
-    </Pressable>
+    </Press>
   );
 }
 
 function PracticeButton({ C, color, icon, label, onPress }) {
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
@@ -109,6 +109,6 @@ function PracticeButton({ C, color, icon, label, onPress }) {
         <Icon name={icon} size={15} color={color} />
       </View>
       <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>{label}</Text>
-    </Pressable>
+    </Press>
   );
 }

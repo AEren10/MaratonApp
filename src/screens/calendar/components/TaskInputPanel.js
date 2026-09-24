@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { View, Text, Pressable, TextInput } from "react-native";
+import { View, Text, TextInput } from "react-native";
 import Animated from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const PRESETS = [
   { label: "Ders çalış", icon: "play" },
@@ -27,14 +28,14 @@ export function TaskInputPanel({ onAdd }) {
     <Animated.View style={s.panel}>
       <View style={s.presetRow}>
         {PRESETS.map((p) => (
-          <Pressable
+          <Press haptic="none"
             key={p.label}
             onPress={() => { submit(p.label); H.tap(); }}
-            style={({ pressed }) => [s.preset, { opacity: pressed ? 0.7 : 1 }]}
+            style={[s.preset]}
           >
             <Icon name={p.icon} size={13} color={C.accent} />
             <Text style={[s.presetText, { color: C.accent }]}>{p.label}</Text>
-          </Pressable>
+          </Press>
         ))}
       </View>
       <View style={s.inputRow}>
@@ -48,7 +49,7 @@ export function TaskInputPanel({ onAdd }) {
           returnKeyType="done"
           autoFocus
         />
-        <Pressable
+        <Press haptic="none"
           onPress={() => submit(text)}
           hitSlop={8}
           accessibilityLabel="Görevi ekle"
@@ -56,7 +57,7 @@ export function TaskInputPanel({ onAdd }) {
           style={[s.submitBtn, { backgroundColor: text.trim() ? C.accent : C.elev }]}
         >
           <Icon name="check" size={16} color={text.trim() ? C.accentInk : C.text3} />
-        </Pressable>
+        </Press>
       </View>
     </Animated.View>
   );

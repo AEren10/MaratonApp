@@ -1,19 +1,20 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import * as H from "../../../../lib/haptics";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Gunun Ozeti · "Hemen paylaş": kartin kucuk onizlemesi + paylasim kartina gecis.
 export function SummaryShareRow({ value, onPress }) {
   const C = useC();
   return (
     <View style={styles.wrap}>
-      <Pressable
+      <Press haptic="none" scaleTo={0.99}
         accessibilityRole="button"
         onPress={() => { H.tap(); onPress?.(); }}
-        style={({ pressed }) => [styles.row, { backgroundColor: C.elev, borderColor: C.border, transform: [{ scale: pressed ? 0.99 : 1 }] }]}
+        style={[styles.row, { backgroundColor: C.elev, borderColor: C.border}]}
       >
         <View style={[styles.thumb, { backgroundColor: C.bg, borderColor: C.border }]}>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]} numberOfLines={1}>{value}</Text>
@@ -24,7 +25,7 @@ export function SummaryShareRow({ value, onPress }) {
           <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: STEP.s1 / 2 }]}>Kart olarak ya da fotoğrafının üstüne</Text>
         </View>
         <Icon name="chevR" size={14} color={C.text3} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

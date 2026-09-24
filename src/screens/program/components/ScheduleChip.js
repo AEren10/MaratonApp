@@ -1,8 +1,9 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Ders programi cipi. tone: "subject" (kizil tint zemin, ders renginde yazi),
 // "dashed" (Deneme günü / Boş gün), "plain" (secilmemis secenek).
@@ -22,15 +23,15 @@ function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
 
   if (!onPress) return <View style={box}>{content}</View>;
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       hitSlop={{ top: STEP.s1 - 1, bottom: STEP.s1 - 1 }}
       accessibilityRole="button"
       accessibilityState={{ selected: Boolean(selected) }}
-      style={({ pressed }) => [box, { opacity: pressed ? 0.7 : 1 }]}
+      style={[box]}
     >
       {content}
-    </Pressable>
+    </Press>
   );
 }
 

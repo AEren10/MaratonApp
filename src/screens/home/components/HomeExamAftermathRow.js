@@ -1,4 +1,4 @@
-import { Text, Pressable, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -8,6 +8,7 @@ import { SCREENS } from "../../../constants/screens";
 import { getExamPhase } from "../../../domain/exam/examPhase";
 import { useExamResultEntry } from "../../../hooks/useExamResultEntry";
 import { trackButtonTap } from "../../../lib/analytics";
+import { Press } from "../../../components/design/Press";
 
 // Sinav sonrasi Ana Sayfa girisi (AKIS 14 · "SINAV SONRASI · 1 / 2").
 // Sonuc yoksa "Sınav Sonucu" basligiyla oraya, varsa Tahmin Dogrulugu'na.
@@ -25,19 +26,19 @@ export function HomeExamAftermathRow() {
   const label = entry ? "Tahmin ne kadar tuttu" : "Hazır olduğunda sonucunu gir.";
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => {
         trackButtonTap("home_exam_aftermath", { targetScreen: target });
         navigation.navigate(target);
       }}
       accessibilityRole="button"
       accessibilityLabel={label}
-      style={({ pressed }) => [s.row, { backgroundColor: C.surface, borderColor: C.elev, opacity: pressed ? 0.8 : 1 }]}
+      style={[s.row, { backgroundColor: C.surface, borderColor: C.elev}]}
     >
       <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>SINAV BİTTİ</Text>
       <Text style={[TYPOGRAPHY.bodyMedium, s.label, { color: C.text }]} numberOfLines={1}>{label}</Text>
       <Icon name="chevR" size={12} color={C.text3} />
-    </Pressable>
+    </Press>
   );
 }
 

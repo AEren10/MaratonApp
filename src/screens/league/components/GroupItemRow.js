@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, STEP, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export const GroupItemRow = React.memo(function GroupItemRow({
   group,
@@ -22,20 +23,19 @@ export const GroupItemRow = React.memo(function GroupItemRow({
   const initial = (group.name || "G").trim().slice(0, 1).toUpperCase();
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={handlePress}
       onLongPress={onLeave}
       accessibilityRole="button"
       accessibilityLabel={`${group.name} grubu${isSelected ? ", aktif seçili" : ""}`}
       accessibilityHint="Grubu seçer, uzun basışta ayrılma seçeneği sunar"
-      style={({ pressed }) => [
+      style={[
         s.row,
         {
           backgroundColor: isSelected ? C.accent + "0D" : "transparent",
           borderBottomColor: C.border,
-          borderBottomWidth: isLast ? 0 : 1,
-          opacity: pressed ? 0.75 : 1,
-        },
+          borderBottomWidth: isLast ? 0 : 1
+        }
       ]}
     >
       <View
@@ -73,7 +73,7 @@ export const GroupItemRow = React.memo(function GroupItemRow({
       ) : (
         <Icon name="chevR" size={14} color={C.text3} />
       )}
-    </Pressable>
+    </Press>
   );
 });
 

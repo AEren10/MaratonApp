@@ -1,9 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
 // Dogrudan expo-haptics KULLANILMAZ: haptics.js kullanicinin "titresim
 // kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPress }) {
   const handleSelect = (key) => {
@@ -22,19 +23,18 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
             const n = mode.label || String(mode.focus);
             const rest = mode.rest || `${mode.break || 5} DK`;
             return (
-              <Pressable
+              <Press haptic="none" scaleTo={0.94}
                 key={mode.key}
                 onPress={() => handleSelect(mode.key)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={`${n} dakika ${rest} mola modu`}
-                style={({ pressed }) => [
+                style={[
                   s.pill,
                   {
                     backgroundColor: active ? C.surface : "transparent",
-                    borderColor: active ? C.border : "transparent",
-                    transform: [{ scale: pressed ? 0.96 : 1 }],
-                  },
+                    borderColor: active ? C.border : "transparent"
+                  }
                 ]}
               >
                 <Text
@@ -54,26 +54,25 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 >
                   {rest}
                 </Text>
-              </Pressable>
+              </Press>
             );
           })}
         </View>
 
-        <Pressable
+        <Press haptic="none" scaleTo={0.94}
           onPress={onCustomPress || (() => {})}
           accessibilityRole="button"
           accessibilityLabel="Özel süre"
-          style={({ pressed }) => [
+          style={[
             s.editButton,
             {
               borderColor: C.border,
-              backgroundColor: pressed ? C.elev : C.surface,
-              transform: [{ scale: pressed ? 0.94 : 1 }],
-            },
+              backgroundColor: C.surface
+            }
           ]}
         >
           <Icon name="edit" size={16} color={C.text3} />
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

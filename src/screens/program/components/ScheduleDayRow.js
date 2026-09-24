@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { DAY_KINDS } from "../../../domain/program/classSchedule";
@@ -8,6 +8,7 @@ import { formatNumber } from "../../../lib/format";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import ScheduleChip from "./ScheduleChip";
 import ScheduleDayEditor from "./ScheduleDayEditor";
+import { Press } from "../../../components/design/Press";
 
 const KIND_LABEL = { [DAY_KINDS.TRIAL]: "Deneme günü", [DAY_KINDS.OFF]: "Boş gün" };
 
@@ -23,11 +24,11 @@ function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
 
   return (
     <View style={[s.wrap, { borderTopColor: C.line }, isLast && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
-      <Pressable
+      <Press haptic="none"
         onPress={() => editor.toggleOpen(day.weekday)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        style={({ pressed }) => [s.row, { opacity: pressed ? 0.75 : 1 }]}
+        style={[s.row]}
       >
         <Text style={[TYPOGRAPHY.tableHead, s.day, { color: dayColor }]}>{WEEKDAYS_SHORT_TR[day.weekday]}</Text>
         <View style={s.chips}>
@@ -40,7 +41,7 @@ function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
           )}
         </View>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{hoursLabel(day)}</Text>
-      </Pressable>
+      </Press>
       {open ? <ScheduleDayEditor day={day} editor={editor} /> : null}
     </View>
   );

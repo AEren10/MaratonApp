@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import Animated, {
   cancelAnimation,
   useSharedValue,
@@ -11,6 +11,7 @@ import Animated, {
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Card, Icon } from "../../../components/design";
+import { Press } from "../../../components/design/Press";
 
 function Bar({ name, color, net, max, delay, onPress, C }) {
   const pct = max > 0 ? Math.min(net / max, 1) : 0;
@@ -29,11 +30,11 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
   }));
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${name}: ${Number(net).toFixed(1)} / ${max}`}
-      style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: STEP.s1, opacity: pressed ? 0.7 : 1 }]}
+      style={[{ flexDirection: "row", alignItems: "center", gap: STEP.s1}]}
     >
       <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
       <Text
@@ -62,7 +63,7 @@ function Bar({ name, color, net, max, delay, onPress, C }) {
         {Number(net).toFixed(1)}<Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>/{max}</Text>
       </Text>
       <Icon name="chevR" size={12} color={C.text3} />
-    </Pressable>
+    </Press>
   );
 }
 

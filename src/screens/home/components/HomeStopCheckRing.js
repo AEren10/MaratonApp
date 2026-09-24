@@ -1,10 +1,11 @@
 import { useCallback } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, STEP } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const RING_SIZE = 22;
 
@@ -22,13 +23,13 @@ export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }
   }, [done, onToggle]);
 
   return (
-    <Pressable
+    <Press haptic="none" scaleTo={0.92}
       onPress={handlePress}
       hitSlop={STEP.s2}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: done }}
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [s.area, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
+      style={[s.area]}
     >
       <View
         style={[
@@ -42,7 +43,7 @@ export function HomeStopCheckRing({ done, isNext, onToggle, accessibilityLabel }
       >
         {done ? <Icon name="check" size={11} color={C.bg} sw={2.4} /> : null}
       </View>
-    </Pressable>
+    </Press>
   );
 }
 

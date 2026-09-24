@@ -1,12 +1,13 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Icon } from "../../../components/design";
+import { Press } from "../../../components/design/Press";
 
 export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
   return (
     <View style={styles.header}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
-        <Pressable
+        <Press haptic="none"
           onPress={onBack}
           hitSlop={10}
           accessibilityLabel="Geri"
@@ -14,7 +15,7 @@ export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
           style={[styles.backBtn, { backgroundColor: C.surface, borderColor: C.border }]}
         >
           <Icon name="arrowL" size={18} color={C.text} />
-        </Pressable>
+        </Press>
         <View>
           <Text style={{ fontFamily: "Archivo_400", fontSize: 12, color: C.muted }}>
             {counts.open} çözülmemiş · {counts.total} toplam
@@ -23,22 +24,21 @@ export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
         </View>
       </View>
 
-      <Pressable
+      <Press haptic="none"
         onPress={onAdd}
         accessibilityLabel="Yeni yanlış ekle"
         accessibilityRole="button"
         accessibilityHint="Yeni yanlış soru ekleme ekranına gider"
-        style={({ pressed }) => [
+        style={[
           styles.addBtn,
           {
             backgroundColor: C.orange,
-            shadowColor: C.orange,
-            opacity: pressed ? 0.92 : 1,
-          },
+            shadowColor: C.orange
+          }
         ]}
       >
         <Icon name="plus" size={22} color={C.textOnFill} sw={3} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

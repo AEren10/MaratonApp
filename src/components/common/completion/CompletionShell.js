@@ -1,9 +1,10 @@
-import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { Modal, View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Button, Icon } from "../../design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 // Uc tamamlama aninin ortak iskeleti (AKIS 16). Tam ekran modal:
 // tasarimda artboardlarin tamami 390x844, kart degil.
@@ -27,7 +28,7 @@ export function CompletionShell({
   return (
     <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
-        <Pressable
+        <Press haptic="none"
           onPress={onClose}
           hitSlop={16}
           accessibilityRole="button"
@@ -35,7 +36,7 @@ export function CompletionShell({
           style={s.close}
         >
           <Icon name="arrowL" size={16} color={C.text2} />
-        </Pressable>
+        </Press>
 
         <ScrollView
           contentContainerStyle={s.scroll}
@@ -63,16 +64,16 @@ export function CompletionShell({
             </Button>
           ) : null}
           {secondaryLabel ? (
-            <Pressable
+            <Press haptic="none"
               onPress={onSecondary || onClose}
               accessibilityRole="button"
-              style={({ pressed }) => [
+              style={[
                 s.secondary,
-                { borderColor: C.border, opacity: pressed ? 0.7 : 1 },
+                { borderColor: C.border}
               ]}
             >
               <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>{secondaryLabel}</Text>
-            </Pressable>
+            </Press>
           ) : null}
         </Animated.View>
       </SafeAreaView>

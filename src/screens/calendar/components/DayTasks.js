@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 import { Icon, SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
@@ -7,13 +7,14 @@ import { useC } from "../../../contexts/ThemeContext";
 import { TaskInputPanel } from "./TaskInputPanel";
 import * as H from "../../../lib/haptics";
 import { todayTR } from "../../../lib/dateUtils";
+import { Press } from "../../../components/design/Press";
 
 function TaskRow({ task, onToggle, onRemove, C }) {
   return (
     <Animated.View layout={Layout.springify()}>
-      <Pressable
+      <Press haptic="none"
         onPress={() => { onToggle(task.id); H.tap(); }}
-        style={({ pressed }) => [s.row, pressed && { opacity: 0.6 }]}
+        style={[s.row]}
       >
         <View style={[s.check, { borderColor: C.border }, task.done && { backgroundColor: C.up, borderColor: C.up }]}>
           {task.done && <Icon name="check" size={12} color={C.bg} sw={2.5} />}
@@ -24,10 +25,10 @@ function TaskRow({ task, onToggle, onRemove, C }) {
         >
           {task.title}
         </Text>
-        <Pressable onPress={() => { onRemove(task.id); H.tap(); }} hitSlop={10} style={s.del}>
+        <Press haptic="none" onPress={() => { onRemove(task.id); H.tap(); }} hitSlop={10} style={s.del}>
           <Icon name="x" size={14} color={C.text3} />
-        </Pressable>
-      </Pressable>
+        </Press>
+      </Press>
     </Animated.View>
   );
 }
@@ -52,9 +53,9 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen
       <View style={s.header}>
         <SectionLabel style={{ marginBottom: 0 }}>GÖREVLER</SectionLabel>
         {canAdd && !showInput && (
-          <Pressable onPress={() => { setShowInput(true); H.tap(); }} hitSlop={10} style={[s.miniAdd, { backgroundColor: C.brandTint }]}>
+          <Press haptic="none" onPress={() => { setShowInput(true); H.tap(); }} hitSlop={10} style={[s.miniAdd, { backgroundColor: C.brandTint }]}>
             <Icon name="plus" size={13} color={C.accent} />
-          </Pressable>
+          </Press>
         )}
       </View>
 
@@ -65,12 +66,12 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen
       {showInput && <TaskInputPanel onAdd={handleAdd} />}
 
       {canAdd && !showInput && (
-        <Pressable onPress={() => { setShowInput(true); H.tap(); }} style={({ pressed }) => [s.addBtn, { borderColor: C.accent + "55", opacity: pressed ? 0.7 : 1 }]}>
+        <Press haptic="none" onPress={() => { setShowInput(true); H.tap(); }} style={[s.addBtn, { borderColor: C.accent + "55"}]}>
           <View style={[s.addIcon, { backgroundColor: C.accent }]}>
             <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
           </View>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accent }]}>Görev Ekle</Text>
-        </Pressable>
+        </Press>
       )}
 
       {!canAdd && tasks.length === 0 && (

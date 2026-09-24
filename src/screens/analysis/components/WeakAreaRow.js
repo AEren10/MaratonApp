@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const STATUS_META = {
   critical: "Çok düşük başarı",
@@ -14,11 +15,11 @@ export const WeakAreaRow = React.memo(function WeakAreaRow({ item, C, onPress })
   const badgeColor = item.status === "critical" ? C.warn : C.text3;
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => { H.select(); onPress(item); }}
-      style={({ pressed }) => [
+      style={[
         styles.row,
-        { backgroundColor: C.surface, borderColor: C.elev, opacity: pressed ? 0.75 : 1 },
+        { backgroundColor: C.surface, borderColor: C.elev}
       ]}
       accessibilityRole="button"
       accessibilityLabel={`${item.name} konusuna git`}
@@ -39,7 +40,7 @@ export const WeakAreaRow = React.memo(function WeakAreaRow({ item, C, onPress })
       </View>
       <Text style={[TYPOGRAPHY.micro, { color: badgeColor }]}>{item.acc}%</Text>
       <Icon name="arrowR" size={12} color={C.text3} sw={2} />
-    </Pressable>
+    </Press>
   );
 });
 

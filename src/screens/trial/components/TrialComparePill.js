@@ -1,21 +1,21 @@
 import React from "react";
-import { Text, Pressable, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: iki deneme adi yan yana; secili olan brand-tint zeminli.
 export const TrialComparePill = React.memo(function TrialComparePill({ C, label, active, onPress }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${label}, değiştir`}
-      style={({ pressed }) => [
+      style={[
         styles.pill,
         {
           backgroundColor: active ? C.brandTint : "transparent",
-          borderColor: active ? C.accent : C.border,
-          opacity: pressed ? 0.75 : 1,
-        },
+          borderColor: active ? C.accent : C.border
+        }
       ]}
     >
       <Text
@@ -24,7 +24,7 @@ export const TrialComparePill = React.memo(function TrialComparePill({ C, label,
       >
         {label}
       </Text>
-    </Pressable>
+    </Press>
   );
 });
 

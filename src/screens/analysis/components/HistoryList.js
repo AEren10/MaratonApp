@@ -1,7 +1,8 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { Icon, Trend, Card, StatBlock } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 const TYPE_LABEL = {
   TYT: "TYT",
@@ -15,14 +16,13 @@ const TYPE_LABEL = {
 function HistoryRow({ item, onPress, C }) {
   const label = TYPE_LABEL[item.trialType] || null;
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         minHeight: CONTROL.tapMin,
         paddingVertical: STEP.s2,
-        paddingHorizontal: STEP.s3,
-        opacity: pressed ? 0.8 : 1,
-      })}
+        paddingHorizontal: STEP.s3
+      }}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
@@ -42,7 +42,7 @@ function HistoryRow({ item, onPress, C }) {
 
         <Icon name="chevR" size={16} color={C.text2} />
       </View>
-    </Pressable>
+    </Press>
   );
 }
 
@@ -54,15 +54,14 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
         <Icon name="clock" size={18} color={C.text2} />
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, flex: 1 }}>Deneme kayıtları</Text>
         {onSeeAll && totalCount > history.length && (
-          <Pressable
+          <Press haptic="none"
             onPress={onSeeAll}
             hitSlop={10}
             accessibilityRole="button"
             accessibilityLabel="Tüm deneme kayıtları"
-            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
             <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Tüm kayıtlar</Text>
-          </Pressable>
+          </Press>
         )}
       </View>
 
@@ -78,11 +77,10 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
       </Card>
 
       {history.length >= 2 && onCompare && (
-        <Pressable
+        <Press haptic="none"
           onPress={onCompare}
           accessibilityRole="button"
           accessibilityLabel="Denemeleri Karşılaştır"
-          style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
         >
           <Card
             tone="surface"
@@ -118,7 +116,7 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
             </View>
             <Icon name="chevR" size={18} color={C.accent} />
           </Card>
-        </Pressable>
+        </Press>
       )}
     </View>
   );

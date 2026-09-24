@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Tema bir DERS degil: eski hali her secenegi C.blue/C.purple/C.amber ile
 // boyuyordu, bunlar ders paletinin takma adlari. Secili hal accent ile
@@ -9,15 +10,14 @@ export const ThemeOptionRow = React.memo(function ThemeOptionRow({
   C, label, hint, active, onPress, first,
 }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected: active }}
       accessibilityLabel={hint ? `${label}, ${hint}` : label}
-      style={({ pressed }) => [
+      style={[
         styles.row,
-        !first && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line },
-        { opacity: pressed ? 0.7 : 1 },
+        !first && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line }
       ]}
     >
       <View style={styles.body}>
@@ -29,7 +29,7 @@ export const ThemeOptionRow = React.memo(function ThemeOptionRow({
       <View style={[styles.radio, { borderColor: active ? C.accent : C.border }]}>
         {active ? <View style={[styles.dot, { backgroundColor: C.accent }]} /> : null}
       </View>
-    </Pressable>
+    </Press>
   );
 });
 

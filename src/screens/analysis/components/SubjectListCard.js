@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { Card, Icon } from "../../../components/design";
 import { SubjectTrendChart } from "./SubjectTrendChart";
+import { Press } from "../../../components/design/Press";
 
 const num = (v) => Number(v ?? 0).toFixed(1).replace(".", ",");
 
@@ -25,11 +26,11 @@ export const SubjectListCard = React.memo(function SubjectListCard({ item, index
   const { name, color, net, delta, lo, hi, trend } = item;
   return (
     <Animated.View>
-      <Pressable
+      <Press haptic="none"
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${name}, ${num(net)} net`}
-        style={({ pressed }) => [{ opacity: pressed ? 0.75 : 1, marginBottom: STEP.s1 }]}
+        style={[{ marginBottom: STEP.s1 }]}
       >
         <Card tone="surface" radius="cardTight" style={s.card}>
           <View style={s.cardTop}>
@@ -50,7 +51,7 @@ export const SubjectListCard = React.memo(function SubjectListCard({ item, index
             <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{num(hi)} en yüksek</Text>
           </View>
         </Card>
-      </Pressable>
+      </Press>
     </Animated.View>
   );
 });

@@ -1,8 +1,9 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: brand-tint zeminli kart, "PREMIUM AKTIF" + donem + yenilenme
 // satiri + "Aboneligi yonet" cipi.
@@ -29,18 +30,18 @@ export function SubscriptionStatusCard({ periodLabel, renewsLine, onManage }) {
       ) : null}
 
       <View style={styles.actions}>
-        <Pressable
+        <Press haptic="none"
           onPress={onManage}
           hitSlop={{ top: 6, bottom: 6 }}
           accessibilityRole="button"
           accessibilityLabel="Aboneliği yönet, mağazada açılır"
-          style={({ pressed }) => [
+          style={[
             styles.chip,
-            { borderColor: C.border, opacity: pressed ? 0.7 : 1 },
+            { borderColor: C.border}
           ]}
         >
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Aboneliği yönet</Text>
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>mağazada açılır</Text>
       </View>
     </Card>

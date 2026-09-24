@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SHAPE } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { getSubjectBadge } from "../../../themes/subjects";
 import { subjectColorOf } from "../../../themes/subjectPalette";
+import { Press } from "../../../components/design/Press";
 
 function rowBadge(item, C) {
   if (item.trial?.trialType === "BRANCH") {
@@ -30,11 +31,11 @@ export const TrialRecordRow = React.memo(function TrialRecordRow({ item, C, onPr
   const badge = rowBadge(item, C);
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onPress(item.trial)}
-      style={({ pressed }) => [
+      style={[
         styles.row,
-        { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 },
+        { borderTopColor: C.line}
       ]}
       accessibilityRole="button"
       accessibilityLabel={`${item.title}, ${item.dateLabel}, net ${item.netLabel}`}
@@ -77,7 +78,7 @@ export const TrialRecordRow = React.memo(function TrialRecordRow({ item, C, onPr
       </View>
 
       <Icon name="chevR" size={13} color={C.text5 || C.text4} />
-    </Pressable>
+    </Press>
   );
 });
 

@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export const RecentSearches = React.memo(function RecentSearches({ C, items, onPick, onClear }) {
   if (!items.length) return null;
@@ -9,22 +10,22 @@ export const RecentSearches = React.memo(function RecentSearches({ C, items, onP
     <View style={styles.wrap}>
       <View style={styles.head}>
         <SectionLabel>SON ARAMALAR</SectionLabel>
-        <Pressable onPress={onClear} hitSlop={10} accessibilityRole="button" accessibilityLabel="Son aramaları temizle">
+        <Press haptic="none" onPress={onClear} hitSlop={10} accessibilityRole="button" accessibilityLabel="Son aramaları temizle">
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Temizle</Text>
-        </Pressable>
+        </Press>
       </View>
       <View style={styles.chips}>
         {items.map((term) => (
-          <Pressable
+          <Press haptic="none"
             key={term}
             onPress={() => onPick(term)}
             accessibilityRole="button"
             accessibilityLabel={`${term} için ara`}
             hitSlop={{ top: 5, bottom: 5 }}
-            style={({ pressed }) => [styles.chip, { borderColor: C.border, opacity: pressed ? 0.7 : 1 }]}
+            style={[styles.chip, { borderColor: C.border}]}
           >
             <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>{term}</Text>
-          </Pressable>
+          </Press>
         ))}
       </View>
     </View>

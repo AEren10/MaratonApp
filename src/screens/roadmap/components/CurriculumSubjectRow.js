@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
@@ -8,6 +8,7 @@ import { subjectColorOf } from "../../../themes/subjectPalette";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 import { getSubjectBadge } from "../../../themes/subjects";
+import { Press } from "../../../components/design/Press";
 
 // Ders karti: renkli rozet (TR, MAT..), 15.5px net baslik, tabular sayaç ve pürüzsüz ilerleme cubugu.
 function CurriculumSubjectRow({ subject, onPress }) {
@@ -22,18 +23,16 @@ function CurriculumSubjectRow({ subject, onPress }) {
   };
 
   return (
-    <Pressable
+    <Press haptic="none" scaleTo={0.985}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`${subject.name}, ${subject.done}/${subject.total} konu tamamlandı`}
-      style={({ pressed }) => [
+      style={[
         s.card,
         {
           backgroundColor: C.surface,
-          borderColor: pressed ? color : C.line,
-          transform: [{ scale: pressed ? 0.985 : 1 }],
-          opacity: pressed ? 0.92 : 1,
-        },
+          borderColor: C.line
+        }
       ]}
     >
       <View style={[s.badge, { backgroundColor: `${color}18`, borderColor: `${color}35` }]}>
@@ -51,7 +50,7 @@ function CurriculumSubjectRow({ subject, onPress }) {
         </View>
       </View>
       <Icon name="chevR" size={13} color={C.text4} />
-    </Pressable>
+    </Press>
   );
 }
 

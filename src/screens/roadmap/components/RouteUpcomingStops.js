@@ -1,16 +1,17 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const StopRow = memo(function StopRow({ item, onPress, C }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onPress(item.key)}
       accessibilityRole="button"
       accessibilityLabel={[item.name, item.note, item.date].filter(Boolean).join(", ")}
-      style={({ pressed }) => [s.row, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
+      style={[s.row, { borderTopColor: C.line}]}
     >
       <View style={[s.diamond, { borderColor: C.stop }]} />
       <View style={s.copy}>
@@ -22,7 +23,7 @@ const StopRow = memo(function StopRow({ item, onPress, C }) {
       {item.date ? (
         <Text style={[TYPOGRAPHY.tableHead, { color: C.text2 }]}>{item.date}</Text>
       ) : null}
-    </Pressable>
+    </Press>
   );
 });
 

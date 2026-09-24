@@ -1,7 +1,8 @@
-import { Modal, View, Text, Pressable, FlatList, StyleSheet } from "react-native";
+import { Modal, View, Text, FlatList, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 const TYPE_LABELS = {
   TYT: "TYT", AYT_SAY: "AYT SAY", AYT_EA: "AYT EA",
@@ -15,14 +16,14 @@ function PickerRow({ item, onSelect, isSelected, C }) {
   // Deneme turu bir ders degil -- rozet notr text3 ile ciziliyor.
   const label = TYPE_LABELS[item.trialType] || item.trialType;
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onSelect(item)}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
       accessibilityLabel={`${item.title || label}, ${fmtDate(item.date)}`}
-      style={({ pressed }) => [
+      style={[
         styles.row,
-        { backgroundColor: isSelected ? C.brandTint : "transparent", opacity: pressed ? 0.75 : 1 },
+        { backgroundColor: isSelected ? C.brandTint : "transparent"}
       ]}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -37,7 +38,7 @@ function PickerRow({ item, onSelect, isSelected, C }) {
         {Number(item.totalNet ?? 0).toFixed(1).replace(".", ",")}
       </Text>
       {isSelected && <Icon name="check" size={14} color={C.accent} style={{ marginLeft: STEP.s1 }} />}
-    </Pressable>
+    </Press>
   );
 }
 
@@ -45,13 +46,13 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
   const C = useC();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={[styles.backdrop, { backgroundColor: C.scrim }]} onPress={onClose} accessibilityLabel="Kapat">
-        <Pressable onPress={() => {}} style={[styles.sheet, { backgroundColor: C.surface, borderColor: C.border }]}>
+      <Press haptic="none" style={[styles.backdrop, { backgroundColor: C.scrim }]} onPress={onClose} accessibilityLabel="Kapat">
+        <Press haptic="none" onPress={() => {}} style={[styles.sheet, { backgroundColor: C.surface, borderColor: C.border }]}>
           <View style={styles.head}>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Deneme seç</Text>
-            <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat">
+            <Press haptic="none" onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat">
               <Icon name="x" size={18} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
 
           <FlatList
@@ -72,8 +73,8 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
             showsVerticalScrollIndicator={false}
           />
           <View style={{ height: STEP.s4 }} />
-        </Pressable>
-      </Pressable>
+        </Press>
+      </Press>
     </Modal>
   );
 }

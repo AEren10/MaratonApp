@@ -1,28 +1,27 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }) {
   return (
     <View style={s.container}>
-      <Pressable
+      <Press haptic="none" scaleTo={0.94}
         onPress={onBack}
         hitSlop={8}
         accessibilityLabel="Geri"
         accessibilityRole="button"
-        style={({ pressed }) => [
+        style={[
           s.iconBtn,
           {
             backgroundColor: C.surface,
-            borderColor: C.line,
-            opacity: pressed ? 0.7 : 1,
-            transform: [{ scale: pressed ? 0.94 : 1 }],
-          },
+            borderColor: C.line
+          }
         ]}
       >
         <Icon name="x" size={18} color={C.text2} sw={2} />
-      </Pressable>
+      </Press>
 
       <View style={[s.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
         <View style={[s.badgeDot, { backgroundColor: eyebrowColor || C.accent }]} />
@@ -38,23 +37,21 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
         </Text>
       </View>
 
-      <Pressable
+      <Press haptic="none" scaleTo={0.94}
         onPress={onHistory}
         hitSlop={8}
         accessibilityLabel="Geçmiş"
         accessibilityRole="button"
-        style={({ pressed }) => [
+        style={[
           s.iconBtn,
           {
             backgroundColor: C.surface,
-            borderColor: C.line,
-            opacity: pressed ? 0.7 : 1,
-            transform: [{ scale: pressed ? 0.94 : 1 }],
-          },
+            borderColor: C.line
+          }
         ]}
       >
         <Icon name="clock" size={20} color={C.text2} sw={2} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

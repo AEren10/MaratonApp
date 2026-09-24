@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, memo } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl, ScrollView } from "react-native";
+import { View, Text, FlatList, RefreshControl, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
@@ -14,6 +14,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
 import { useExam } from "../../contexts/ExamContext";
 import { getSubjectsForExam } from "../../themes/subjects";
+import { Press } from "../../components/design/Press";
 
 // Filtreler SABİT DEĞİL: kullanıcının sınav tipine göre türetiliyor.
 // Önceden sabit YKS listesiydi — LGS öğrencisine Fizik/Kimya/Biyoloji
@@ -45,13 +46,12 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
   const hasImage = !!item.image_path;
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onAnswer(item)}
-      style={({ pressed }) => ({
+      style={{
         backgroundColor: C.surface, borderRadius: 22,
-        borderWidth: 1, borderColor: C.border, padding: 14,
-        opacity: pressed ? 0.95 : 1,
-      })}
+        borderWidth: 1, borderColor: C.border, padding: 14
+      }}
     >
       {/* Header: avatar + user + subject chip */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -122,21 +122,21 @@ const SharedCard = memo(function SharedCard({ item, C, onAnswer }) {
           </View>
         ) : null}
         <View style={{ flex: 1 }} />
-        <Pressable
+        <Press haptic="none"
           onPress={() => onAnswer(item)}
-          style={({ pressed }) => ({
+          style={{
             flexDirection: "row", alignItems: "center", gap: 6,
             backgroundColor: C.accent, paddingHorizontal: 16, paddingVertical: 9,
-            borderRadius: SHAPE.pill, opacity: pressed ? 0.85 : 1,
-          })}
+            borderRadius: SHAPE.pill
+          }}
         >
           <Icon name="edit" size={14} color={C.textOnFill} />
           <Text style={{ fontSize: 13, fontFamily: "Archivo_600", color: C.textOnFill }}>
             Cevap Yaz
           </Text>
-        </Pressable>
+        </Press>
       </View>
-    </Pressable>
+    </Press>
   );
 });
 
@@ -204,7 +204,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
           const clr = subj?.color || C.accent;
           const on = filter === f.key;
           return (
-            <Pressable key={f.key} onPress={() => setFilter(f.key)} style={{
+            <Press haptic="none" key={f.key} onPress={() => setFilter(f.key)} style={{
               flexDirection: "row", alignItems: "center", gap: 6,
               paddingHorizontal: 14, paddingVertical: 9, borderRadius: SHAPE.pill,
               backgroundColor: on ? clr + "1A" : "transparent",
@@ -214,7 +214,7 @@ export function CommunityTab({ visible, onSwitchToMine }) {
               <Text style={{ fontSize: 13, fontFamily: on ? "Archivo_600" : "Archivo_500", color: on ? clr : C.text2 }}>
                 {f.label}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </ScrollView>

@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 
@@ -6,6 +6,7 @@ import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { RouteHeader } from "./RouteHeader";
+import { Press } from "../../../components/design/Press";
 
 // Ara Verme ve Rotayi Yeniden Ciz'in ortak iskeleti: kapat X, Bricolage
 // cumle, aciklama, sayi kartlari (children), birincil aksiyon + vazgec.
@@ -26,14 +27,14 @@ export function RouteConfirmLayout({
         </Animated.View>
         <View style={s.actions}>
           <Button size="lg" fullWidth loading={loading} onPress={onPrimary}>{primaryLabel}</Button>
-          <Pressable
+          <Press haptic="none"
             onPress={onCancel}
             disabled={loading}
             accessibilityRole="button"
-            style={({ pressed }) => [s.cancel, { opacity: pressed ? 0.7 : 1 }]}
+            style={[s.cancel]}
           >
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>{cancelLabel}</Text>
-          </Pressable>
+          </Press>
         </View>
       </ScrollView>
     </SafeAreaView>

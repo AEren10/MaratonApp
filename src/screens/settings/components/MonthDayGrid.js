@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const DAY_HEADS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
@@ -18,16 +19,16 @@ function buildCells(year, month) {
 function DayCell({ day, selected, disabled, onPress, C }) {
   if (day == null) return <View style={styles.cell} />;
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onPress(day)}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityState={{ selected, disabled }}
       accessibilityLabel={`${day}`}
-      style={({ pressed }) => [
+      style={[
         styles.cell,
         selected && { backgroundColor: C.accent, borderRadius: SHAPE.chip },
-        { opacity: disabled ? 0.3 : pressed ? 0.6 : 1 },
+        { opacity: disabled ? 0.3 : 1}
       ]}
     >
       <Text
@@ -39,7 +40,7 @@ function DayCell({ day, selected, disabled, onPress, C }) {
       >
         {day}
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

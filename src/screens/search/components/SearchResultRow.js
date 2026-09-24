@@ -1,17 +1,18 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export const SearchResultRow = React.memo(function SearchResultRow({
   C, title, meta, dotColor, trailing, trailingAccent, onPress,
 }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={meta ? `${title}, ${meta}` : title}
-      style={({ pressed }) => [styles.row, { borderTopColor: C.line, opacity: pressed ? 0.7 : 1 }]}
+      style={[styles.row, { borderTopColor: C.line}]}
     >
       {dotColor ? <View style={[styles.dot, { backgroundColor: dotColor }]} /> : null}
       <View style={styles.body}>
@@ -29,7 +30,7 @@ export const SearchResultRow = React.memo(function SearchResultRow({
       ) : (
         <Icon name="chevR" size={12} color={C.text5} />
       )}
-    </Pressable>
+    </Press>
   );
 });
 

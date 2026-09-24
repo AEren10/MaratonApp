@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import { TrialPickerModal } from "./components/TrialPickerModal";
 import { TrialCompareHero } from "./components/TrialCompareHero";
 import { TrialCompareTable } from "./components/TrialCompareTable";
 import { TrialComparePill } from "./components/TrialComparePill";
+import { Press } from "../../components/design/Press";
 
 export default function TrialCompareScreen() {
   const C = useC();
@@ -34,9 +35,9 @@ export default function TrialCompareScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>KARŞILAŞTIRMA</Text>
       </View>
 
@@ -85,19 +86,19 @@ export default function TrialCompareScreen() {
             </Card>
           )}
 
-          <Pressable
+          <Press haptic="none"
             onPress={() => setPickerTarget("older")}
             accessibilityRole="button"
             accessibilityLabel="Başka deneme seç"
-            style={({ pressed }) => [
+            style={[
               styles.footerBtn,
-              { borderColor: C.border, opacity: pressed ? 0.7 : 1 },
+              { borderColor: C.border}
             ]}
           >
             <Text style={[TYPOGRAPHY.tableName, { fontFamily: "Archivo_600", color: C.text2 }]}>
               Başka deneme seç
             </Text>
-          </Pressable>
+          </Press>
         </ScrollView>
       )}
 

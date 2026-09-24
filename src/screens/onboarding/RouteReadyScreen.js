@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -15,6 +15,7 @@ import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
 import { routeActionTimerParams } from "../../domain/route/routeStartAction";
+import { Press } from "../../components/design/Press";
 
 export default function RouteReadyScreen() {
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
@@ -109,17 +110,17 @@ export default function RouteReadyScreen() {
         <Button onPress={handleGoHome} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
           Ana sayfaya git
         </Button>
-        <Pressable
+        <Press haptic="none"
           onPress={handleViewRoute}
           accessibilityRole="button"
           accessibilityLabel="Rotanın tamamını gör"
           hitSlop={8}
-          style={({ pressed }) => [styles.homeLink, { opacity: pressed ? 0.7 : 1 }]}
+          style={[styles.homeLink]}
         >
           <Text style={[TYPOGRAPHY.captionMedium, styles.homeLinkText, { color: C.text2 }]}>
             Rotanın tamamını gör
           </Text>
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
           Rotanı her zaman değiştirebilirsin. Deneme girdikçe kendini de günceller.
         </Text>
