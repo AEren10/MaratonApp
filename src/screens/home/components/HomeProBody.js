@@ -28,9 +28,11 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
     <View>
       <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
 
-      <HomeGroupCard groupsData={groupsData} onPress={go.groups} />
-
       {dueCount > 0 ? <View style={s.due}>{notebook}</View> : null}
+
+      {/* Grup karti bugunun isi DEGIL, sosyal bir davet. Durak -> tekrar
+          komsulugunu bolmemesi icin ikisinden sonra gelir. */}
+      <HomeGroupCard groupsData={groupsData} onPress={go.groups} />
 
       {momentum.length ? (
         <View style={s.attention}>

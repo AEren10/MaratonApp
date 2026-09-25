@@ -1,3 +1,6 @@
+> **ARŞİV.** Güncel durum için [`DURUM.md`](DURUM.md)'ye bak.
+> Bu dosya magaza/backend kontrol listesi; detayı burada duruyor ama açık iş listesi DURUM.md'de.
+
 # Çıkmadan önce — v1 yayın listesi
 
 Durum tarihi: 2026-09-24. Aşağıdakiler **repoda ve canlı veritabanında

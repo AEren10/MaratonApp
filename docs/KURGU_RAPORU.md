@@ -1,3 +1,6 @@
+> **ARŞİV.** Güncel durum için [`DURUM.md`](DURUM.md)'ye bak.
+> Bu dosya akis raporu; detayı burada duruyor ama açık iş listesi DURUM.md'de.
+
 # Kurgu raporu — akışlar, öne çıkarma, yer değiştirmeler
 
 Kaynak: Antigravity, 2026-09-22. Claude 2026-09-23'te maddeleri kodda
