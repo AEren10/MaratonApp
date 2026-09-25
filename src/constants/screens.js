@@ -112,8 +112,8 @@ export const SCREENS = {
   PLAN_VS_ACTUAL: "PlanVsActual",
   // AKIS 7 · Program ve plan
   CURRICULUM_MAP: "CurriculumMap",
+  CURRICULUM_MAP_ROOT: "CurriculumMapRoot",
   WEEK_PROGRAM: "WeekProgram",
-  WEEK_PROGRAM_ROOT: "WeekProgramRoot",
   CLASS_SCHEDULE: "ClassSchedule",
   MONTH_PLAN: "MonthPlan",
   GAP_CLOSURE: "GapClosure",

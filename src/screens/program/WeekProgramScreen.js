@@ -73,7 +73,7 @@ function WeekProgramInner() {
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <RouteHeader
         title="Programım"
-        onBack={navigation.canGoBack() ? () => navigation.goBack() : null}
+        onBack={() => navigation.goBack()}
         onMore={() => navigation.navigate(SCREENS.CALENDAR)}
         moreIcon="calendar"
         moreLabel="Takvim"
