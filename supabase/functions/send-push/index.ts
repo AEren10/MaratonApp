@@ -31,24 +31,24 @@ type PushTemplate = {
 
 // DİKKAT — bu URL'ler istemcideki src/navigation/routes.js yollarına ELLE
 // karşılık gelir (appUrl() burada çalışmıyor, ayrı runtime).
-// Doğrulandı 2026-09-07: home -> "home", weekly-review -> "weekly-review".
+// Doğrulandı 2026-09-25: plan -> "plan", ozet/week -> Summary(period=week).
 // routes.js'te bir yol değişirse BURASI DA değişmeli; aksi halde push
 // bildirimi sessizce hiçbir ekrana gitmez.
 const TEMPLATES: Partial<Record<ReengagementPayload["type"], PushTemplate>> = {
   inactive_3d: {
     title: "Seni ozledik!",
     body: "3 gundur calisma kaydetmedin. Hedefe kalan her gun onemli!",
-    data: { type: "inactive_3d", url: "maraton://home" },
+    data: { type: "inactive_3d", url: "maraton://plan" },
   },
   streak_risk: {
     title: "Streak'in tehlikede!",
     body: "Bugun hic calisma kaydetmedin. Seriyi bozma!",
-    data: { type: "streak_risk", url: "maraton://home" },
+    data: { type: "streak_risk", url: "maraton://plan" },
   },
   weekly_summary: {
     title: "Haftalik raporun hazir",
     body: "Bu haftanin ozetine goz at, gelisimini incele!",
-    data: { type: "weekly_summary", url: "maraton://weekly-review" },
+    data: { type: "weekly_summary", url: "maraton://ozet/week" },
   },
 };
 

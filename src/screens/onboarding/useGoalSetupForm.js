@@ -5,12 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useExam } from "../../contexts/ExamContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
-import {
-  requestNotificationPermissions,
-  applyNotifPrefs,
-  getNotifPrefs,
-  ensurePushTokenRegistered,
-} from "../../lib/notifications";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
 import { SYNC_PENDING_COPY } from "../../constants/stateCopy";
@@ -90,16 +84,8 @@ export function useGoalSetupForm() {
       if (res && res.synced === false) setTargetNetPending(true);
     });
 
-    requestNotificationPermissions().then(async (granted) => {
-      if (granted) {
-        const prefs = await getNotifPrefs(user?.id);
-        await applyNotifPrefs(prefs, undefined, user?.id);
-        await ensurePushTokenRegistered(user?.id);
-      }
-    }).catch(() => {});
-
     navigation.navigate(SCREENS.LEVEL_TEST);
-  }, [navigation, saveGoalsAndNet, user?.id]);
+  }, [navigation, saveGoalsAndNet]);
 
   const skipToHome = useCallback(async () => {
     H.tap();

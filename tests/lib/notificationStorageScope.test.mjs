@@ -35,8 +35,9 @@ test("notification callers pass user id when reading prefs and scheduling remind
   assert.match(dataSync, /applyNotifPrefs\(prefs, \{ streak: streakToday, studiedToday \}, userId\)/);
   assert.match(prefsHook, /getNotifPrefs\(user\?\.id\)/);
   assert.match(prefsHook, /applyNotifPrefs\(next, undefined, user\?\.id\)/);
-  assert.match(goalSetup, /getNotifPrefs\(user\?\.id\)/);
-  assert.match(goalSetup, /applyNotifPrefs\(prefs, undefined, user\?\.id\)/);
+  assert.doesNotMatch(goalSetup, /requestNotificationPermissions/);
+  assert.doesNotMatch(goalSetup, /getNotifPrefs\(/);
+  assert.doesNotMatch(goalSetup, /applyNotifPrefs\(/);
   assert.match(permissionScreen, /getNotifPrefs\(user\?\.id\)/);
   assert.match(permissionScreen, /applyNotifPrefs\(prefs, undefined, user\?\.id\)/);
   assert.match(userTasks, /scheduleTaskNotifications\(newTotal, user\?\.id\)/);

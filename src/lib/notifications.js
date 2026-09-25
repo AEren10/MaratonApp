@@ -179,7 +179,7 @@ export async function scheduleStreakRiskReminder(streak = 0, studiedToday = fals
       content: {
         title,
         body,
-        data: { type: "streak_risk", url: notificationUrl(SCREENS.HOME) },
+        data: { type: "streak_risk", url: notificationUrl(SCREENS.PLAN_DETAIL) },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
