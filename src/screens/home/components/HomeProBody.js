@@ -12,9 +12,11 @@ import { HomeGroupCard } from "./HomeGroupCard";
 import { useMyGroups } from "../../../hooks/useMyGroups";
 import { Press } from "../../../components/design/Press";
 
-// Ana Sayfa (Pro) govdesi: bugunun duraklari, calisma grubu karti, dikkat ceken iki ders,
-// konu borcu + haftalik rapor satirlari, Defter karti.
-export const HomeProBody = React.memo(function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
+// Ana Sayfa (Pro) govdesi: bugunun duraklari, Defter karti, calisma grubu
+// karti, dikkat ceken iki ders.
+// Konu borcu ve haftalik rapor satirlari KALDIRILDI: ikisi de ana sayfanin
+// dibinde birikiyordu ve baska kapilari var.
+export const HomeProBody = React.memo(function HomeProBody({ stops, momentum, dueCount = 0, go }) {
   const C = useC();
   const groupsData = useMyGroups();
   // Tekrar bekleyen varsa Defter karti yukari, duraklarin hemen altina cikar:
