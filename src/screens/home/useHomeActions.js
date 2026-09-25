@@ -39,7 +39,6 @@ export function useHomeActions({ navigation, go }) {
     plan: go(SCREENS.PLAN_DETAIL),
     analysis: go(SCREENS.ANALYSIS),
     debt: go(SCREENS.TOPIC_DEBT),
-    weekReport: go(SCREENS.SUMMARY, { period: "week" }),
     // Haftalik grafige dokununca: haftanin RAPORU degil, o gunlerin
     // KAYITLARI. Grafik zaten toplamlari gosteriyor; rapora gitmek yandan
     // yana gitmek olurdu. Bir cubuk yanlis gorunuyorsa duzeltilecek yer de

@@ -49,9 +49,12 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
         </View>
       ) : null}
 
+      {/* "Bu haftanın raporu" satiri kaldirildi: hafta raporu bir MENU
+          MADDESI degil, bir AN. Hafta bitince (HomeCompletionOverlays),
+          gun bitince ve haftalik bildirimle zaten aciliyor. Ustteki
+          haftalik grafige dokunus da calisma gecmisine gidiyor. */}
       <View style={s.links}>
         <HomeLinkRow label="Konu borcu" value={debtHours > 0 ? `${debtHours} sa` : null} onPress={go.debt} />
-        <HomeLinkRow label="Bu haftanın raporu" onPress={go.weekReport} />
       </View>
 
       <View style={s.notebook}>{dueCount > 0 ? null : notebook}</View>

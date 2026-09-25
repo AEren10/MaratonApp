@@ -94,6 +94,32 @@ function failedRouteRead(source, result) {
  *   Borç Dağıtıldı    → debtPlan.weeks
  *   Plan vs Gerçek    → debt.items[i].completion
  */
+// Onbellek anahtari icin satir imzasi.
+//
+// Eskiden burada yalnizca dizi UZUNLUGU vardi. Mevcut bir calisma kaydinin
+// soru sayisini duzeltince uzunluk ayni kaliyor, rota yeniden HESAPLANMIYORDU.
+// Calisma gecmisi ekraninda satir duzenlenebildigi icin erisilebilir bir yoldu.
+//
+// FNV-1a: anahtar kisa kalsin diye. Diziler usePlanContext'te onbellekli,
+// yani bu yalniz veri gercekten degisince calisir.
+function rowsHash(rows) {
+  if (!rows || !rows.length) return "0";
+  let h = 0x811c9dc5;
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    for (const key of Object.keys(row)) {
+      const v = row[key];
+      if (v === null || v === undefined || typeof v === "object") continue;
+      const str = key + ":" + v + ";";
+      for (let i = 0; i < str.length; i += 1) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 0x01000193);
+      }
+    }
+  }
+  return (h >>> 0).toString(36) + "." + rows.length;
+}
+
 export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const { examType, field, examDate } = useExam();
   const { user } = useAuth();
@@ -166,8 +192,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     recoveryWeek ?? "",
     dataHealth?.logs || "",
     weakSubjectKeys.join(","),
-    (weekLogs || []).length,
-    (topicRows || []).length,
+    rowsHash(weekLogs),
+    rowsHash(topicRows),
   ].join("|"), [
     examType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
     recoveryWeek, dataHealth?.logs, weakSubjectKeys, weekLogs, topicRows,
