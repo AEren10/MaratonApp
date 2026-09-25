@@ -23,6 +23,11 @@ const PALETTE = {
   text3: "#9794A0",
   text4: "#6B6870",
   track: "#33333A",
+  // buildPalette(dark) ciktisindan DOGRULANDI: line #2A2A31. AGENTS.md'de
+  // yazan #34343F tasarim dokumaninin degeri; turetilmis palet boyle
+  // hesaplamiyor. Widget'lar paletin GERCEK ciktisini kullanir.
+  accentBright: "#FF4D57",
+  line: "#2A2A31",
 };
 
 const sourceOf = (name) =>
