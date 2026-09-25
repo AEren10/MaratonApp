@@ -61,3 +61,24 @@ test("scheduled notifications use fail-closed deep links", () => {
   assert.match(notifications, /notificationUrl\(SCREENS\.PLAN_DETAIL\)/);
   assert.match(notifications, /notificationUrl\(SCREENS\.SUMMARY, \{ period: "week" \}\)/);
 });
+
+test("notification timing is personalized and foreground banners stay quiet", () => {
+  assert.match(notifications, /function notificationJitterMinutes\(userId, type, window = 40\)/);
+  assert.match(notifications, /function withNotificationJitter\(hour, minute, userId, type, window = 40\)/);
+  assert.match(notifications, /withNotificationJitter\(useHour, minute, userId, "daily_reminder"\)/);
+  assert.match(notifications, /withNotificationJitter\(22, 0, userId, "streak_risk", 30\)/);
+  assert.match(notifications, /withNotificationJitter\(20, 0, userId, "weekly_summary"\)/);
+  assert.match(notifications, /withNotificationJitter\(18, 0, userId, "trial_reminder"\)/);
+  assert.match(notifications, /notificationJitterMinutes\(userId, "task_reminder_interval", 1200\)/);
+  assert.match(notifications, /shouldShowBanner: false/);
+  assert.match(notifications, /shouldShowList: false/);
+});
+
+test("notification copy avoids pressure language", () => {
+  assert.doesNotMatch(templates, /Rakiplerin/);
+  assert.doesNotMatch(templates, /Hemen başla/);
+  assert.doesNotMatch(templates, /seriyi bozma/i);
+  assert.doesNotMatch(templates, /Bitir!/);
+  assert.doesNotMatch(notifications, /Seriyi bozma/i);
+  assert.doesNotMatch(notifications, /Son bir hamle/i);
+});

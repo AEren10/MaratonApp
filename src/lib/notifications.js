@@ -20,11 +20,13 @@ function notifContextKey(userId) {
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
+    // Uygulama öndeyken OS banner'ı basma. Kullanıcı zaten içerideyse bilgi
+    // ekran içinde görünmeli; push banner'ı aynı anda ikinci bir bağırış olur.
+    shouldShowAlert: false,
+    shouldPlaySound: false,
     shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
+    shouldShowBanner: false,
+    shouldShowList: false,
   }),
 });
 
@@ -120,11 +122,37 @@ const PREF_MANAGED_TYPES = [
   "trial_reminder",
 ];
 
+function hashString(value = "") {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function notificationJitterMinutes(userId, type, window = 40) {
+  if (!userId) return 0;
+  const span = Math.max(0, Math.floor(window));
+  return (hashString(`${userId}:${type}`) % (span + 1)) - Math.floor(span / 2);
+}
+
+function withNotificationJitter(hour, minute, userId, type, window = 40) {
+  const minTotal = 8 * 60;
+  const maxTotal = 22 * 60 + 30;
+  const base = Math.max(0, Math.min(23 * 60 + 59, (Number(hour) || 0) * 60 + (Number(minute) || 0)));
+  const shifted = Math.max(minTotal, Math.min(maxTotal, base + notificationJitterMinutes(userId, type, window)));
+  return {
+    hour: Math.floor(shifted / 60),
+    minute: shifted % 60,
+  };
+}
+
 export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null) {
   if (Platform.OS === "web") return null;
   try {
     const optHour = await getOptimalHour(userId).catch(() => hour);
     const useHour = Math.abs(optHour - hour) <= 3 ? optHour : hour;
+    const time = withNotificationJitter(useHour, minute, userId, "daily_reminder");
     const { title, body } = getDaily();
     return await Notifications.scheduleNotificationAsync({
       content: {
@@ -134,8 +162,8 @@ export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: useHour,
-        minute,
+        hour: time.hour,
+        minute: time.minute,
       },
     });
   } catch (_) {
@@ -145,14 +173,15 @@ export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null
 
 // Bir sonraki 22:00'ı döndürür. O gün 22:00 geçtiyse yarını verir.
 // studiedToday ise bugünü atlayıp doğrudan yarını hedefler.
-function nextStreakRiskDate(studiedToday) {
+function nextStreakRiskDate(studiedToday, userId = null) {
   const target = new Date();
+  const time = withNotificationJitter(22, 0, userId, "streak_risk", 30);
   target.setSeconds(0, 0);
-  target.setMinutes(0);
-  if (studiedToday || target.getHours() >= 22) {
+  target.setMinutes(time.minute);
+  target.setHours(time.hour);
+  if (studiedToday || target.getTime() <= Date.now()) {
     target.setDate(target.getDate() + 1);
   }
-  target.setHours(22);
   return target;
 }
 
@@ -169,12 +198,12 @@ function nextStreakRiskDate(studiedToday) {
  * push (send-push / streak_risk) devrede — o zaten "bugün aktif olmayan"ları
  * hedefliyor, yani ikisi çakışmaz.
  */
-export async function scheduleStreakRiskReminder(streak = 0, studiedToday = false) {
+export async function scheduleStreakRiskReminder(streak = 0, studiedToday = false, userId = null) {
   if (Platform.OS === "web") return null;
   try {
     const { title, body } = streak > 0
       ? getStreakRisk(streak)
-      : { title: "Streak'in tehlikede!", body: "Bugün hiç çalışma kaydetmedin. Seriyi bozma!" };
+      : { title: "Bugün kayıt yok gibi görünüyor", body: "Kısa bir oturum seriyi canlı tutar." };
     return await Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -183,7 +212,7 @@ export async function scheduleStreakRiskReminder(streak = 0, studiedToday = fals
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: nextStreakRiskDate(studiedToday),
+        date: nextStreakRiskDate(studiedToday, userId),
       },
     });
   } catch (_) {
@@ -191,9 +220,10 @@ export async function scheduleStreakRiskReminder(streak = 0, studiedToday = fals
   }
 }
 
-export async function scheduleWeeklySummary(weeklyVars = {}) {
+export async function scheduleWeeklySummary(weeklyVars = {}, userId = null) {
   if (Platform.OS === "web") return null;
   try {
+    const time = withNotificationJitter(20, 0, userId, "weekly_summary");
     const hasVars = weeklyVars.xp || weeklyVars.questions || weeklyVars.minutes;
     const { title, body } = hasVars
       ? getWeekly({ xp: weeklyVars.xp || 0, questions: weeklyVars.questions || 0, minutes: weeklyVars.minutes || 0 })
@@ -211,8 +241,8 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
         // kapanirken okunur, sonraki haftanin rotasi onunde durur.
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday: 1,
-        hour: 20,
-        minute: 0,
+        hour: time.hour,
+        minute: time.minute,
       },
     });
   } catch (_) {
@@ -220,9 +250,10 @@ export async function scheduleWeeklySummary(weeklyVars = {}) {
   }
 }
 
-export async function scheduleTrialReminder() {
+export async function scheduleTrialReminder(userId = null) {
   if (Platform.OS === "web") return null;
   try {
+    const time = withNotificationJitter(18, 0, userId, "trial_reminder");
     return await Notifications.scheduleNotificationAsync({
       content: {
         title: "Deneme zamanı 📝",
@@ -232,8 +263,8 @@ export async function scheduleTrialReminder() {
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday: 4,
-        hour: 18,
-        minute: 0,
+        hour: time.hour,
+        minute: time.minute,
       },
     });
   } catch {
@@ -248,8 +279,8 @@ export async function scheduleTrialReminder() {
  * iptal edip yeniden kuruyor. Ama üç yer (App.js açılışı, onboarding'de
  * hedef kaydı, bildirim ayarları) bunu bağlam VERMEDEN çağırıyordu.
  * Bağlam boş olunca streak=0 ve studiedToday=false varsayılıyor; sonuç:
- * bugün çalışmış, 40 günlük serisi olan kullanıcı "Bugün hiç çalışma
- * kaydetmedin, seriyi bozma!" bildirimi alıyordu. Üstelik useDataSync'in
+ * bugün çalışmış, 40 günlük serisi olan kullanıcı yanlış bir seri uyarısı
+ * alıyordu. Üstelik useDataSync'in
  * doğru bağlamla kurduğu bildirim de bu sırada siliniyordu.
  *
  * Artık bağlam diske yazılıyor ve verilmediğinde oradan okunuyor.
@@ -334,13 +365,13 @@ export async function applyNotifPrefs(prefs, context, userId = null) {
   // bildirimi KURULMAZ. Kurulsaydı studiedToday=false varsayımıyla yanlış
   // uyarı giderdi; useDataSync birkaç saniye sonra doğru bağlamla çağırıyor.
   if (prefs.streakRiskEnabled && context.studiedToday !== undefined) {
-    await scheduleStreakRiskReminder(context.streak, context.studiedToday);
+    await scheduleStreakRiskReminder(context.streak, context.studiedToday, userId);
   }
   if (prefs.weeklySummaryEnabled !== false) {
-    await scheduleWeeklySummary(context.weeklyVars);
+    await scheduleWeeklySummary(context.weeklyVars, userId);
   }
   if (prefs.trialReminderEnabled) {
-    await scheduleTrialReminder();
+    await scheduleTrialReminder(userId);
   }
 }
 
@@ -359,21 +390,22 @@ export async function scheduleTaskNotifications(taskCount, userId = null) {
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 9000,
+        seconds: 9000 + notificationJitterMinutes(userId, "task_reminder_interval", 1200),
       },
     });
     const now = new Date();
     if (now.getHours() < 20) {
+      const time = withNotificationJitter(20, 0, userId, "task_reminder_daily");
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Bugünkü hedeflerine ulaşmadın 🎯",
-          body: "Hâlâ tamamlanmamış görevlerin var. Son bir hamle!",
+          body: "Açık duran durakların var. Uygunsa birini kapatabilirsin.",
           data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour: 20,
-          minute: 0,
+          hour: time.hour,
+          minute: time.minute,
         },
       });
     }

@@ -2,23 +2,23 @@ import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "./storage/appStorage";
 
 const DAILY = [
-  { title: "Bugünkü planın hazır", body: "Küçük adımlar büyük fark yaratır. Planına göz at!" },
-  { title: "15 dakika bile yeter", body: "Bugün hâlâ kayıt girmedin. Hemen başla!" },
-  { title: "Rakiplerin çalışıyor", body: "Ligdeki sıranı korumak için bugün de çalış!" },
-  { title: "Kendine yatırım yap", body: "Bugün 20 dk ayırmak yarın puan olarak döner." },
-  { title: "Hedefine yaklaşıyorsun", body: "Birkaç soru daha ve günlük hedefini tamamlarsın!" },
+  { title: "Bugünkü rota hazır", body: "İstersen sıradaki durağı şimdi açabilirsin." },
+  { title: "Kısa bir oturum yeter", body: "Bugün için küçük bir başlangıç rotayı canlı tutar." },
+  { title: "Planında bekleyen durak var", body: "Kaldığın yerden devam etmek için rota hazır." },
+  { title: "Bugünün ritmi açık", body: "Bir sonraki adımı görmek için planına bakabilirsin." },
+  { title: "Hedefe sakin bir adım", body: "Bugünkü yükünü küçük parçalara bölebilirsin." },
 ];
 
 const STREAK_RISK = [
-  { title: "{streak} günlük serin tehlikede!", body: "Birazcık çalış, seriyi bozma!" },
-  { title: "{streak} gün! Bırakma", body: "Kayıt girersen streak devam eder. Hemen başla!" },
-  { title: "Serini koru", body: "{streak} günlük emek boşa gitmesin. Birkaç soru bile yeter." },
+  { title: "{streak} günlük seri donmak üzere", body: "Bugün kısa bir kayıt seriyi canlı tutar." },
+  { title: "Seri için son pencere", body: "{streak} günlük ritmi korumak için küçük bir oturum yeter." },
+  { title: "Bugün kayıt yok gibi görünüyor", body: "Planına dönersen seri kaldığı yerden devam eder." },
 ];
 
 const ZEIGARNIK = [
   { title: "Yarım kalan konun var", body: "{subject} konusunda kaldığın yerden devam et." },
-  { title: "Bitmemiş görevlerin bekliyor", body: "{count} görev tamamlanmamış. Bitir!" },
-  { title: "Az kaldı, bırakma", body: "Günlük hedefinin %{percent}'ine ulaştın. Tamamla!" },
+  { title: "Bitmemiş görevlerin var", body: "{count} durak hâlâ açık. Uygunsa birini kapatabilirsin." },
+  { title: "Rota yarım kaldı", body: "Günlük hedefinin %{percent}'i tamam. Kalan parçayı görebilirsin." },
 ];
 
 const WEEKLY = [
