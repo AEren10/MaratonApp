@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
-import { View, Text, FlatList, RefreshControl, StyleSheet } from "react-native";
+import { View, Text, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { LinearTransition, FadeIn } from "react-native-reanimated";
 
 import { ErrorState, Skeleton } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -56,7 +56,8 @@ export default function StudyHistoryScreen() {
     body = <HistoryEmpty onStart={h.startTimer} onManual={h.addManual} />;
   } else {
     body = (
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.duration(220)}
         data={items}
         keyExtractor={(item) => item.key}
         renderItem={renderItem}

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { Layout, FadeOutUp } from "react-native-reanimated";
+import Animated, { LinearTransition, FadeOutUp } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -7,6 +7,9 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
 import * as H from "../../../lib/haptics";
 import { HomeStopRow } from "./HomeStopRow";
+
+// Satir eklenip cikinca liste zipla­masin diye.
+const REFLOW = LinearTransition.duration(220);
 
 const PREVIEW = 3;
 
@@ -44,7 +47,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
       {preview.length ? (
         <View style={s.list}>
           {preview.map((item) => (
-            <Animated.View key={item.id} layout={Layout.duration(240)}>
+            <Animated.View key={item.id} layout={REFLOW}>
               <Animated.View
                 exiting={FadeOutUp.duration(180)}
               >

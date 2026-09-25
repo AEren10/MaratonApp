@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text } from "react-native";
-import Animated, { Layout } from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { Icon, SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -9,9 +9,12 @@ import * as H from "../../../lib/haptics";
 import { todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
 
+// Satir eklenip cikinca liste zipla­masin diye.
+const REFLOW = LinearTransition.duration(220);
+
 function TaskRow({ task, onToggle, onRemove, C }) {
   return (
-    <Animated.View layout={Layout.springify()}>
+    <Animated.View layout={REFLOW}>
       <Press haptic="none"
         onPress={() => { onToggle(task.id); H.tap(); }}
         style={[s.row]}

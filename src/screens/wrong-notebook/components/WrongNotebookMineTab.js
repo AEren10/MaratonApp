@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { View, Text, FlatList, RefreshControl, ScrollView } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
+import { View, Text, RefreshControl, ScrollView } from "react-native";
 
 import { EmptyState } from "../../../components/common/EmptyState";
 import { Icon } from "../../../components/design";
@@ -157,7 +158,8 @@ export function WrongNotebookMineTab({
       {loading ? (
         <WrongNotebookSkeleton />
       ) : (
-        <FlatList
+        <Animated.FlatList
+          itemLayoutAnimation={LinearTransition.duration(220)}
           data={viewModel.filtered}
           keyExtractor={(item) => item.id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handlers.onRefresh} tintColor={C.accent} colors={[C.accent]} />}

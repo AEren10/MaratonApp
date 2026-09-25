@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, FlatList, RefreshControl } from "react-native";
+import { View, Text, Pressable, StyleSheet, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 import { ErrorState, Icon, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -137,7 +137,8 @@ function NotificationsContent() {
         ) : null}
       </View>
 
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.duration(220)}
         data={data}
         keyExtractor={item => item.id}
         renderItem={renderItem}

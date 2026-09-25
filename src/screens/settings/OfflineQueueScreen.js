@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 import { Button, Skeleton } from "../../components/design";
 import { OfflineStrip } from "../../components/common/OfflineStrip";
@@ -75,7 +75,8 @@ export default function OfflineQueueScreen() {
   return (
     <View style={[styles.root, { backgroundColor: C.bg, paddingTop: insets.top }]}>
       <SystemHeader onPress={goBack} />
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.duration(220)}
         data={rows}
         renderItem={renderItem}
         keyExtractor={keyExtractor}

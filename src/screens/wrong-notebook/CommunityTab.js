@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, memo } from "react";
-import { View, Text, FlatList, RefreshControl, ScrollView } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
+import { View, Text, RefreshControl, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import { useC, useSubjectIdentity } from "../../contexts/ThemeContext";
@@ -242,7 +243,8 @@ export function CommunityTab({ visible, onSwitchToMine }) {
           color="accent"
         />
       ) : (
-        <FlatList
+        <Animated.FlatList
+          itemLayoutAnimation={LinearTransition.duration(220)}
           data={filtered} renderItem={renderItem}
           keyExtractor={(i) => i.id} showsVerticalScrollIndicator={false}
           windowSize={5}
