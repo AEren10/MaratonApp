@@ -23,6 +23,7 @@ export function HomeHero({
   solvedToday = 0,
   dailyGoal = 100,
   generatedTasks = [],
+  stops = [],
   weeklyDailyCounts,
   weekLogs,
   previousQuestions = null,
@@ -39,7 +40,7 @@ export function HomeHero({
   renderBelow,
 }) {
   const { examDate } = useExam();
-  const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, weekLogs, previousQuestions, streak });
+  const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, stops, weekLogs, previousQuestions, streak });
   const {
     daysUntilExam,
     hasRouteAccess,

@@ -29,6 +29,7 @@ const PALETTE = {
   accentBright: "#FF4D57",
   line: "#2A2A31",
   accentDeep: "#A81C26",
+  accentInk: "#F7F2F0",
 };
 
 const sourceOf = (name) =>

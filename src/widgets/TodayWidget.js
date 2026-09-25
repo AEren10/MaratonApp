@@ -1,139 +1,191 @@
-import { Chart, HStack, ProgressView, Spacer, Text, VStack } from "@expo/ui/swift-ui";
-import { containerBackground, font, foregroundStyle, padding, tint } from "@expo/ui/swift-ui/modifiers";
+import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
+import {
+  background, containerBackground, font, foregroundStyle, frame, padding, shapes, strikethrough,
+} from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
-// ANA EKRAN WIDGET'I — "Bugün" (tasarim: Maraton Widget.dc.html, Widget 1).
+// ANA EKRAN WIDGET'I — "Bugünün İşleri".
 //
-// Tasarimin kurali: en fazla UC bilgi, tek kahraman oge etrafinda. Burada
-// kahraman gunun sayisi; seri ve kalan soru ona destek. Hareket yok.
+// NEDEN SAYI DEGIL LISTE
+// Onceki surum gunun soru sayisini buyutup altina bir ilerleme cubugu
+// koyuyordu; ayni bilgi Hafta widget'inda zaten var. Bu widget'in isi
+// "simdi ne yapayim" sorusuna cevap vermek. O yuzden kahraman oge
+// SIRADAKI IS, sayi ona destek.
 //
-// RENKLER FONKSIYONUN ICINDE, TOKENDAN IMPORT DEGIL
-// `'widget'` direktifi bu fonksiyonu ayri bir pakete cikarip dis kapsamla
-// bagini kesiyor; modul govdesindeki bir sabit burada YOKTUR (cihazda
-// "Can't find variable" ile patliyor). Kaymayi test yakaliyor:
-// tests/widgets/weekWidgetPalette.test.mjs.
+// KUCUK BOY KIRMIZI ZEMINLI: ana ekranda bir cagri gibi durur, digerlerinden
+// ayrilir. Genis boy koyu zeminli, cunku listeyi tasiyor ve kirmizi zemin
+// uzerinde dort satir okunmuyor.
 //
-// Tasarim dosyasinin kendi paleti eski (#FF3B47/#0A0808). Duzen oradan,
-// renkler uygulamanin canli tokenlarindan — yoksa widget baska bir
-// uygulamadan gelmis gibi durur.
-
+// NEDEN ISLER TIKLENEMIYOR
+// Tasarim widget icinde kutucuk isaretlemeyi oneriyor; bunun icin App Intents
+// gerekiyor ve expo-widgets bunu disari vermiyor. Satirlar simdilik salt
+// okunur; dokunulunca uygulama aciliyor.
+//
+// NEDEN HOOK YOK, ASYNC YOK
+// Widget AYRI bir JS calisma zamaninda: uygulama state'ine, Redux'a,
+// Supabase'e erisemez. Gordugu her sey props'tan gelir, uygulama bunu
+// updateSnapshot ile yazar (bkz. src/lib/widgetSync.ios.js).
+//
+// NEDEN RENKLER FONKSIYONUN ICINDE, TOKENDAN IMPORT DEGIL
+// 'widget' direktifi bu fonksiyonu ayri bir pakete cikarip dis kapsamla
+// bagini kesiyor; disaridan okunan sabit cihazda "Can't find variable" ile
+// patliyor. tests/widgets/widgetPalette.test.mjs degerleri paletle
+// karsilastiriyor.
 //
 // CIHAZDA COZULEN COKME
-// Widget galeride dogru ciziliyor ama ana ekrana yerlestirilince kirmizi bir
-// yer tutucu oluyordu. Sebep: iOS 17+ agacinda hic `containerBackground`
-// cagrilmayan widget'i DUSURUYOR ve yerine sistem yer tutucusunu koyuyor
-// (expo/expo#49015). Kok VStack artik zemini kendisi bildiriyor.
+// iOS 17+ agacinda hic containerBackground cagrilmayan widget'i DUSURUYOR ve
+// yerine kirmizi sistem yer tutucusunu koyuyor (expo/expo#49015).
 const TodayWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
+  const accentInk = "#F7F2F0";
   const bg = "#1C1C23";
   const up = "#34D399";
   const text = "#F5F2EF";
   const text2 = "#A3A0A8";
   const text3 = "#9794A0";
+  const text4 = "#6B6870";
   const track = "#33333A";
 
-  const solved = Number(props?.solved) || 0;
-  const goal = Number(props?.goal) || 0;
-  const streak = Number(props?.streak) || 0;
-  const nextStop = props?.nextStop || null;
-  const days = Array.isArray(props?.days) ? props.days : [];
+  const tasks = Array.isArray(props?.tasks) ? props.tasks : [];
+  const dayMinutes = Array.isArray(props?.dayMinutes) ? props.dayMinutes : [];
+  const weekMinutes = Number(props?.weekMinutes) || 0;
+  const weekGoal = Number(props?.weeklyMinutesGoal) || 0;
   const compact = environment?.widgetFamily === "systemSmall";
 
-  const remaining = goal > 0 ? Math.max(0, goal - solved) : 0;
-  const done = goal > 0 && remaining === 0;
-  const ratio = goal > 0 ? Math.min(1, solved / goal) : 0;
+  const total = tasks.length;
+  const doneCount = tasks.filter((t) => t?.done).length;
+  const next = tasks.find((t) => !t?.done) || null;
 
-  // Hedef tutunca kahraman satir yesile doner: gunun bittigini soyleyen tek
-  // isaret bu, ayrica bir rozet eklemiyoruz.
-  const barColor = done ? up : accent;
+  const asHours = (m) => {
+    const h = Math.floor(m / 60);
+    const r = m % 60;
+    if (h <= 0) return `${r} dk`;
+    return r > 0 ? `${h} sa ${r} dk` : `${h} sa`;
+  };
 
-  // Genis boyda haftanin cubuklari da var: kucuk boyla arasindaki fark tek
-  // satir olmasin, genislik bir ise yarasin. Gunun kendisi vurgulu, digerleri
-  // soluk -- widget'in kahramani bugunun sayisi, hafta destek.
-  // BOS HAFTADA DA CIZILIR.
-  // Once "veri yoksa cizme" demistim; sonuc: hic soru cozulmemis haftada
-  // genis boy kucuk boydan farksiz kaliyordu. Uygulamadaki grafikte bunun
-  // icin hayalet kutular var, widget'ta da olmali. Calisilmamis gun en
-  // kucuk degeri alip track renginde duruyor: yerini gosteriyor, dolu
-  // gibi gorunmuyor.
-  const peak = days.reduce((max, d) => Math.max(max, Number(d.questions) || 0), 0);
-  const ghost = Math.max(1, Math.round(peak * 0.06));
-  const weekData = days.map((day) => {
-    const q = Number(day.questions) || 0;
-    return { x: day.label, y: q > 0 ? q : ghost, color: q > 0 ? accent : track };
-  });
+  const R = shapes.roundedRectangle({ cornerRadius: 3 });
+  const CAP = shapes.capsule();
+
+  // ---- KUCUK BOY: kirmizi zemin, tek is ----
+  if (compact) {
+    return (
+      <VStack
+        alignment="leading"
+        spacing={6}
+        modifiers={[containerBackground(next ? accent : bg, "widget"), padding({ all: 13 })]}
+      >
+        <HStack spacing={2}>
+          <Text modifiers={[font({ size: 34 }), foregroundStyle(next ? accentInk : text)]}>
+            {String(doneCount)}
+          </Text>
+          <Text modifiers={[font({ size: 13 }), foregroundStyle(next ? accentInk : text3)]}>
+            {`/${total || 0}`}
+          </Text>
+          <Spacer />
+        </HStack>
+
+        <Spacer />
+
+        <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(next ? accentInk : text4)]}>
+          {next ? "SIRADAKİ İŞ" : "BUGÜN"}
+        </Text>
+        <Text modifiers={[font({ size: 14, weight: "semibold" }), foregroundStyle(next ? accentInk : text)]}>
+          {next ? next.label : (total > 0 ? "Günün işleri bitti" : "Bugün iş yok")}
+        </Text>
+        {next && next.minutes > 0 ? (
+          <Text modifiers={[font({ size: 11 }), foregroundStyle(next ? accentInk : text3)]}>
+            {`${next.minutes} dakika sürer`}
+          </Text>
+        ) : null}
+      </VStack>
+    );
+  }
+
+  // ---- GENIS BOY: liste + haftanin seridi ----
+  const rows = tasks.map((t, i) => (
+    <HStack key={`t${i}`} spacing={8}>
+      <VStack
+        modifiers={[
+          frame({ width: 13, height: 13 }),
+          background(t.done ? up : track, R),
+        ]}
+      >
+        <Spacer />
+      </VStack>
+      <Text
+        modifiers={[
+          font({ size: 12.5, weight: t.done ? "regular" : "semibold" }),
+          foregroundStyle(t.done ? text4 : text),
+          ...(t.done ? [strikethrough(true)] : []),
+        ]}
+      >
+        {t.label}
+      </Text>
+      <Spacer />
+      <Text
+        modifiers={[
+          font({ size: 11, weight: "medium" }),
+          foregroundStyle(t.done ? text4 : accent),
+        ]}
+      >
+        {t.done ? "bitti" : (t.minutes > 0 ? `${t.minutes} dk` : "")}
+      </Text>
+    </HStack>
+  ));
+
+  // Haftanin yedi parcasi: dolu gun accent, bos gun track. Cubuk DEGIL --
+  // sure karsilastirmasi Hafta widget'inin isi, burada yalnizca "kac gun
+  // calistim" okunuyor.
+  const strip = dayMinutes.map((m, i) => (
+    <VStack
+      key={`d${i}`}
+      modifiers={[frame({ width: 26, height: 4 }), background(m > 0 ? accent : track, CAP)]}
+    >
+      <Spacer />
+    </VStack>
+  ));
 
   return (
-    <VStack modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 14 : 16 })]}>
+    <VStack
+      alignment="leading"
+      spacing={9}
+      modifiers={[containerBackground(bg, "widget"), padding({ all: 14 })]}
+    >
       <HStack>
-        <Text modifiers={[font({ size: 9.5, weight: "bold" }), foregroundStyle(accent)]}>
-          BUGÜN
+        <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(accent)]}>
+          BUGÜNÜN İŞLERİ
         </Text>
         <Spacer />
-        {streak > 0 ? (
-          <Text modifiers={[font({ size: 10, weight: "semibold" }), foregroundStyle(text3)]}>
-            {`${streak} gün seri`}
-          </Text>
-        ) : null}
-      </HStack>
-
-      <Spacer />
-
-      <HStack>
-        <Text modifiers={[font({ size: compact ? 50 : 44 }), foregroundStyle(text)]}>
-          {String(solved)}
+        <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(text4)]}>
+          {`${doneCount}/${total || 0}`}
         </Text>
-        {goal > 0 ? (
-          <Text modifiers={[font({ size: 15, weight: "semibold" }), foregroundStyle(text3)]}>
-            {` /${goal}`}
-          </Text>
-        ) : null}
-        <Spacer />
       </HStack>
 
-      <Spacer />
-
-      {goal > 0 ? (
-        <VStack>
-          <ProgressView value={ratio} modifiers={[tint(barColor)]} />
-          <HStack>
-            <Text modifiers={[font({ size: 11.5, weight: "medium" }), foregroundStyle(text2)]}>
-              {done ? "Günlük hedef tamam" : `${remaining} soru kaldı`}
-            </Text>
-            <Spacer />
-          </HStack>
-        </VStack>
+      {rows.length ? (
+        <VStack alignment="leading" spacing={7}>{rows}</VStack>
       ) : (
-        <HStack>
-          <Text modifiers={[font({ size: 11.5, weight: "medium" }), foregroundStyle(text2)]}>
-            Günlük hedefini koy
-          </Text>
-          <Spacer />
-        </HStack>
+        <Text modifiers={[font({ size: 12.5, weight: "medium" }), foregroundStyle(text2)]}>
+          Bugün için durak yok. Rotanı aç, bir tane ekle.
+        </Text>
       )}
 
-      {/* Orta boy: siradaki durak ve haftanin cubuklari. */}
-      {!compact && nextStop ? (
-        <HStack>
-          <Text modifiers={[font({ size: 11, weight: "medium" }), foregroundStyle(accent)]}>
-            {`sıradaki · ${nextStop}`}
-          </Text>
-          <Spacer />
-        </HStack>
-      ) : null}
+      <Spacer />
 
-      {!compact && weekData.length ? (
-        <Chart
-          data={weekData}
-          type="bar"
-          showGrid={false}
-          showLegend={false}
-          animate={false}
-          barStyle={{ cornerRadius: 2 }}
-        />
-      ) : null}
+      <HStack>
+        <Text modifiers={[font({ size: 11 }), foregroundStyle(text2)]}>
+          {`Bu hafta ${asHours(weekMinutes)}`}
+        </Text>
+        <Spacer />
+        {weekGoal > 0 ? (
+          <Text modifiers={[font({ size: 11 }), foregroundStyle(text4)]}>
+            {`hedef ${asHours(weekGoal)}`}
+          </Text>
+        ) : null}
+      </HStack>
+
+      {strip.length ? <HStack spacing={4}>{strip}</HStack> : null}
     </VStack>
   );
 };

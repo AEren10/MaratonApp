@@ -55,10 +55,33 @@ export function syncWeekWidget({ week, solved = 0 } = {}) {
 }
 
 /** Bugunun sayisi, seri ve siradaki durak. */
-export function syncTodayWidget({ solved = 0, goal = 0, streak = 0, nextStop = null, week = null } = {}) {
+export function syncTodayWidget({
+  solved = 0, goal = 0, streak = 0, nextStop = null, week = null,
+  stops = [], weeklyMinutesGoal = 0,
+} = {}) {
+  // Widget'a en fazla dort is gidiyor: daha fazlasi orta boy widget'ta
+  // okunmuyor, listeyi kaydiramiyorsun. Bitmemisler once, bitenler sonra --
+  // widget'in isi "simdi ne yapayim", gecmisi anlatmak degil.
+  const tasks = (stops || [])
+    .map((stop) => ({
+      label: [stop?.subject && stop?.topic ? stop.topic : stop?.label].filter(Boolean).join(""),
+      minutes: Number(stop?.minutes) || 0,
+      done: Boolean(stop?.completed),
+    }))
+    .filter((t) => t.label)
+    .sort((a, b) => Number(a.done) - Number(b.done))
+    .slice(0, 4);
+
+  const weekMinutes = (week?.days || []).reduce((sum, d) => sum + (Number(d.minutes) || 0), 0);
+
   return push("today", TodayWidget, {
     solved: Number(solved) || 0,
     goal: Number(goal) || 0,
+    tasks,
+    weekMinutes,
+    weeklyMinutesGoal: Number(weeklyMinutesGoal) || 0,
+    // Serit icin gun basina dakika: cubuk degil, haftanin yedi parcasi.
+    dayMinutes: (week?.days || []).map((d) => Number(d.minutes) || 0),
     streak: Number(streak) || 0,
     nextStop: nextStop || null,
     // Genis boy haftanin cubuklarini da tasiyor: kucuk boyla arasindaki fark

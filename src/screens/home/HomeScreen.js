@@ -79,6 +79,7 @@ export default function HomeScreen() {
           solvedToday={dashboard.solvedToday}
           dailyGoal={h.dailyGoal}
           generatedTasks={dashboard.generatedTasks}
+          stops={h.stops}
           weeklyDailyCounts={dashboard.weeklyActivity.counts}
           weekLogs={dashboard.weekLogs}
           previousQuestions={dashboard.weeklyActivity.previous}
