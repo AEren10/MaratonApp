@@ -28,13 +28,18 @@ Aşağıdaki her satır **25 Eylül'de kodda doğrulandı**. Tahmin yok.
 
 Sıra, "kullanıcı bunu ne kadar çabuk hisseder"e göre.
 
-### 🔴 1. İlk gün / boş durumlar — en büyük kör nokta
-Bu ay yapılan her şey **dolu bir hesap** varsayıyor. Haftalık çubuklar, net
-trendi, tekrar bekleyen sorular, grup sıralaması — yeni kullanıcıda hiçbiri yok.
-O boş hâllerin çoğu hiç tasarlanmadı.
+### 🟡 1. İlk gün — sanıldığı kadar kötü değil, ÖLÇÜLDÜ
 
-Sekme sırasından çok daha fazla terk üretecek yer burası. Mağazaya çıkmadan
-önce kapatılmalı, çünkü ilk açılışı gören herkes buradan geçiyor.
+24 Eylül raporu "boş hâllerin çoğu hiç tasarlanmadı" diyordu. **25 Eylül'de
+ölçüldü, bu abartıydı:**
+
+- 109 ekranın 40'ında boş durum bileşeni var
+- Ana sayfanın ayrı bir ilk gün hâli var (`home/components/firstDay/`),
+  `useHomeController.js:140` koşuluyla gösteriliyor
+- Ana veri ekranlarından yalnızca **AnalysisScreen** boş durumu karşılamıyor
+
+Kalan gerçek iş dar: Analiz ekranının boş hâli, bir de ilk gün ile ilk çalışma
+oturumu arasındaki geçiş (aşağıda madde 4). Günlerce sürecek bir iş değil.
 
 ### 🔴 2. Ana sayfa bütçesi yok
 Ana sayfada 14 blok var. Ekran **"nasıl gidiyorum"** sorusunu beş kez
@@ -149,7 +154,7 @@ Font yükseklikleri, elevation, safe area, geri tuşu, klavye — hepsi farklı
 ## 5. Sırf sıra sorarsan
 
 1. Gizlilik + destek sayfası (yarım gün, en sert engel)
-2. İlk gün / boş durumlar (kod tarafında en önemli)
+2. Ana sayfa bütçesi — kod tarafında en önemli, senin gözün gerekli
 3. Demo hesabı + içini doldur
 4. Ekran görüntüleri + mağaza metni
 5. Sentry
