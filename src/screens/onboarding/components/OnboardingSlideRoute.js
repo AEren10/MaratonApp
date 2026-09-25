@@ -20,6 +20,7 @@ export function OnboardingSlideRoute({ C }) {
   const reduced = useReducedMotion();
   const draw = useSharedValue(reduced ? 1 : 0);
   const pulse = useSharedValue(reduced ? 1 : 0);
+  const flowOffset = useSharedValue(0);
 
   useEffect(() => {
     if (reduced) return;
@@ -32,10 +33,19 @@ export function OnboardingSlideRoute({ C }) {
       -1,
       false
     );
-  }, [draw, pulse, reduced]);
+    flowOffset.value = withRepeat(
+      withTiming(-120, { duration: 2200, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, [draw, pulse, flowOffset, reduced]);
 
   const pathProps = useAnimatedProps(() => ({
     strokeDashoffset: PATH_LEN * (1 - draw.value),
+  }));
+
+  const flowProps = useAnimatedProps(() => ({
+    strokeDashoffset: flowOffset.value,
   }));
 
   const haloProps = useAnimatedProps(() => ({
@@ -72,6 +82,17 @@ export function OnboardingSlideRoute({ C }) {
           strokeLinecap="round"
           strokeDasharray={PATH_LEN}
           animatedProps={pathProps}
+        />
+
+        {/* Canlı akan enerji/ışık akımı */}
+        <AnimatedPath
+          d="M 24 140 C 90 135 120 115 170 85"
+          fill="none"
+          stroke={C.accentBright || C.accent}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeDasharray="10 50"
+          animatedProps={flowProps}
         />
 
         {/* Geçmiş duraklar */}
