@@ -4,11 +4,13 @@ import Svg, { Circle } from "react-native-svg";
 import { Icon, Stat } from "../../../components/design";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { useCountUp, useRingFill } from "../../../hooks/useCountUp";
 
 function StaticRing({ size = 120, stroke = 10, value = 0, color, C, children }) {
+  const grown = useRingFill(value);
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const offset = c * (1 - Math.min(Math.max(value, 0), 1));
+  const offset = c * (1 - Math.min(Math.max(grown, 0), 1));
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={{ position: "absolute" }}>
@@ -24,6 +26,7 @@ export function PlanHeader({ done, total, soru, hours }) {
   const C = useC();
   const styles = useMemo(() => makeStyles(C), [C]);
   const pct = total > 0 ? done / total : 0;
+  const countedDone = useCountUp(done);
   const showMotiv = pct > 0.5;
 
   return (
@@ -36,7 +39,7 @@ export function PlanHeader({ done, total, soru, hours }) {
         C={C}
       >
         <Stat size={36} color={C.text}>
-          {done}/{total}
+          {countedDone}/{total}
         </Stat>
       </StaticRing>
 

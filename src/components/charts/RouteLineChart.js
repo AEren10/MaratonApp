@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import { View } from "react-native";
 import Svg, { Path, Circle, Defs, LinearGradient, Stop, Text as SvgText } from "react-native-svg";
 import { RouteChartLayers } from "./components/RouteChartLayers";
+import { DrawnPath } from "./components/DrawnPath";
 import { RouteChartNodes } from "./components/RouteChartNodes";
 import { useC } from "../../contexts/ThemeContext";
 import {
@@ -12,6 +13,7 @@ import {
   buildAreaPath,
   buildBandPath,
   splitPastFuture,
+  estimatePathLength,
 } from "../../lib/routeChartPath";
 import {
   CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT,
@@ -90,8 +92,9 @@ export const RouteLineChart = memo(function RouteLineChart({
           width={W} padLeft={PAD_LEFT} padRight={PAD_RIGHT} ticks={ticks} C={C} />
 
         {pastD ? (
-          <Path
+          <DrawnPath
             d={pastD}
+            length={estimatePathLength(pastPoints)}
             fill="none"
             stroke={C.past}
             strokeWidth={STROKE.past}

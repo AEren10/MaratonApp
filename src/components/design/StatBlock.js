@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../themes/tokens";
+import { useCountUp } from "../../hooks/useCountUp";
 
 // Tasarimin kahraman sayisi: Bricolage 400, negatif harf araligi, tabular.
 // size: hero 96 | page 68 (ekran basi) | large 48 | count 30 | value 26
@@ -24,6 +25,10 @@ export function StatBlock({
 }) {
   const C = useC();
   const s = SIZES[size] || SIZES.value;
+  // Sayisal degerler acilista sifirdan cikar; metin degerler oldugu gibi durur.
+  const isNumeric = typeof value === "number" && Number.isFinite(value);
+  const counted = useCountUp(isNumeric ? value : 0);
+  const shown = isNumeric ? counted : value;
 
   return (
     <View style={[align === "center" && styles.center, style]}>
@@ -45,7 +50,7 @@ export function StatBlock({
           adjustsFontSizeToFit
           minimumFontScale={0.6}
         >
-          {value}
+          {shown}
         </Text>
         {unit ? (
           <Text style={[TYPOGRAPHY.meta, styles.unit, { color: C.text3 }]}>{unit}</Text>
