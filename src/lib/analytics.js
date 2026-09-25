@@ -11,9 +11,11 @@ import * as appStorage from "./storage/appStorage";
 // olaylar en fazla yerel tamponda birikip düşer.
 
 const BUFFER_KEY = STORAGE_KEYS.ANALYTICS_BUFFER;
+const PENDING_KEY = STORAGE_KEYS.ANALYTICS_PENDING;
 const MAX_BUFFER = 200;
 const FLUSH_SIZE = 10;
 const FLUSH_INTERVAL_MS = 30_000;
+const MAX_PENDING = 120;
 
 let buffer = [];
 let userId = null;
@@ -53,6 +55,12 @@ async function persistBuffer() {
   } catch (_) {}
 }
 
+async function persistPending() {
+  try {
+    if (PENDING_KEY) await appStorage.setJson(PENDING_KEY, pendingEvents.slice(-MAX_PENDING));
+  } catch (_) {}
+}
+
 export async function flushAnalytics() {
   if (flushing || buffer.length === 0 || !userId) return;
   flushing = true;
@@ -82,13 +90,8 @@ export async function flushAnalytics() {
   }
 }
 
-// Kullanıcı kimliği daha atanmadan gelen olaylar. Soğuk açılışta bildirime
-// dokunup uygulamayı açan kullanıcının PUSH_OPENED olayı burada tutulur:
-// linking.js getInitialURL() içinde track çağırıyor ama initAnalytics henüz
-// çalışmamış oluyordu, olay sessizce düşüyordu — push→açılış hunisi ölçülemez
-// haldeydi. initAnalytics kimliği atadıktan sonra bunlar akıtılır.
+// Kullanıcı kimliği daha atanmadan gelen olaylar (Onboarding adımları, soğuk açılış push'u).
 let pendingEvents = [];
-const MAX_PENDING = 20;
 
 export function track(event, props = {}) {
   if (!event) return;
@@ -102,6 +105,7 @@ export function track(event, props = {}) {
       if (pendingEvents.length > MAX_PENDING) {
         pendingEvents = pendingEvents.slice(-MAX_PENDING);
       }
+      persistPending();
       return;
     }
     if (!sessionId) startAnalyticsSession();
@@ -144,20 +148,27 @@ export function trackNotificationOpened(type, props = {}) {
 }
 
 export async function initAnalytics(id) {
-  // onAuthStateChange her TOKEN_REFRESHED'de de tetikleniyor. Koşulsuz init
-  // her seferinde yeni bir sessionId üretip oturum sayısını/süresini şişiriyor,
-  // ayrıca loadBuffer() bellekteki henüz yazılmamış olayları diskle eziyordu.
   if (id && id === userId && sessionId) return;
 
   setAnalyticsUser(id);
   startAnalyticsSession();
   await loadBuffer();
 
-  // Kimlik yokken tamponlanan olayları (soğuk açılış push'u gibi) şimdi akıt.
-  if (pendingEvents.length) {
-    const drained = pendingEvents;
-    pendingEvents = [];
-    for (const e of drained) track(e.event, e.props);
+  // Kimlik yokken tamponlanan olayları (onboarding hünisi ve soğuk açılış) akıt.
+  let queued = [...pendingEvents];
+  try {
+    if (PENDING_KEY) {
+      const saved = await appStorage.getJson(PENDING_KEY, null);
+      if (Array.isArray(saved) && saved.length) {
+        queued = [...saved, ...pendingEvents.filter((p) => !saved.some((s) => s.at === p.at && s.event === p.event))];
+      }
+      await appStorage.setJson(PENDING_KEY, []);
+    }
+  } catch (_) {}
+
+  pendingEvents = [];
+  if (queued.length) {
+    for (const e of queued) track(e.event, e.props);
   }
 
   clearInterval(flushTimer);

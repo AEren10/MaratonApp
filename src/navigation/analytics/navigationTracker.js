@@ -1,6 +1,15 @@
 import { EVENTS } from "../../constants/analytics";
 import { getRouteAnalyticsMeta } from "../routes";
 
+function categorizeDuration(ms) {
+  if (ms < 1500) return "instant";
+  if (ms < 4000) return "quick";
+  if (ms < 15000) return "brief";
+  if (ms < 45000) return "medium";
+  if (ms < 180000) return "long";
+  return "deep";
+}
+
 export function createNavigationTracker(trackFn) {
   let currentRouteName = null;
   let currentRouteKey = null;
@@ -25,15 +34,21 @@ export function createNavigationTracker(trackFn) {
 
   function exit(route, reason) {
     if (!currentRouteName || !active) return;
-    const durationMs = Date.now() - enteredAt;
+    const durationMs = Math.max(0, Date.now() - enteredAt);
+    const durationSec = Math.round(durationMs / 1000);
+    const isNavigation = reason === "navigation";
+    const nextScreen = isNavigation ? (route?.name || null) : null;
+    const isBounce = durationMs < 2500;
     const props = {
       screen: currentRouteName,
       routeKey: currentRouteKey,
       durationMs,
-      durationSec: Math.round(durationMs / 1000),
+      durationSec,
+      isBounce,
+      stayCategory: categorizeDuration(durationMs),
       reason,
-      nextScreen: route?.name || null,
-      nextFlow: route?.name ? getRouteAnalyticsMeta(route.name).flow : null,
+      nextScreen,
+      nextFlow: nextScreen ? getRouteAnalyticsMeta(nextScreen).flow : null,
       ...currentRouteMeta,
     };
     trackFn(EVENTS.SCREEN_EXIT, props);
@@ -43,16 +58,20 @@ export function createNavigationTracker(trackFn) {
 
   return {
     ready(route) {
-      view(route);
+      if (route?.name) {
+        view(route);
+      }
     },
     change(route) {
       if (!route?.name) return;
       if (route.name === currentRouteName && (route.key || null) === currentRouteKey) return;
-      exit(route, "navigation");
+      if (active) {
+        exit(route, "navigation");
+      }
       view(route);
     },
     pause(route, reason = "background") {
-      exit(route, reason);
+      exit(null, reason);
     },
     resume(route) {
       if (!route?.name || active) return;

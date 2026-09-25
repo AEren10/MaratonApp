@@ -207,8 +207,16 @@ export const LINKING_SCREENS = {
   ...ROOT_LEVEL,
 };
 
+const ROOT_ALIAS_MAP = {
+  [SCREENS.HOME_ROOT]: SCREENS.HOME,
+  [SCREENS.WEEK_PROGRAM_ROOT]: SCREENS.WEEK_PROGRAM,
+  [SCREENS.ANALYSIS_ROOT]: SCREENS.ANALYSIS,
+  [SCREENS.PROFILE_ROOT]: SCREENS.PROFILE,
+};
+
 export function getRouteConfig(screen) {
-  return ROUTE_CONFIGS[screen] || null;
+  const canonical = ROOT_ALIAS_MAP[screen] || screen;
+  return ROUTE_CONFIGS[canonical] || null;
 }
 
 export function getRouteAnalyticsMeta(screen) {

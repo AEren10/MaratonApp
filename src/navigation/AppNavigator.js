@@ -196,13 +196,10 @@ function SessionProviders({ children }) {
   );
 }
 
+import { AppLaunchLoading } from "../components/common/AppLaunchLoading";
+
 function Loading() {
-  const C = useC();
-  return (
-    <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
-      <ActivityIndicator color={C.accent} size="large" />
-    </View>
-  );
+  return <AppLaunchLoading />;
 }
 
 export default function AppNavigator() {

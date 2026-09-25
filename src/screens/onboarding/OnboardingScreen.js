@@ -1,79 +1,137 @@
-import { useCallback } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useState, useRef, useCallback } from "react";
+import { View, FlatList, useWindowDimensions, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn } from "react-native-reanimated";
-
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { setAuthIntent } from "../../lib/authIntent";
-import { Button } from "../../components/design";
-import { RouteIllustration } from "./components/RouteIllustration";
-import { QuestionPreviewList } from "./components/QuestionPreviewList";
-import { Press } from "../../components/design/Press";
+import * as H from "../../lib/haptics";
+import { OnboardingPagination } from "./components/OnboardingPagination";
+import { OnboardingSlideItem } from "./components/OnboardingSlideItem";
+import { OnboardingSlideRoute } from "./components/OnboardingSlideRoute";
+import { OnboardingSlideDaily } from "./components/OnboardingSlideDaily";
+import { OnboardingSlideForecast } from "./components/OnboardingSlideForecast";
+import { OnboardingFooter } from "./components/OnboardingFooter";
 
-export default function OnboardingScreen() {
+const SLIDES_COUNT = 3;
+
+function OnboardingScreenInner() {
   const C = useC();
+  const { width } = useWindowDimensions();
   const { markSlidesAsSeen } = useExam();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const listRef = useRef(null);
 
   const createRoute = useCallback(() => {
+    H.success();
     setAuthIntent("register");
     markSlidesAsSeen();
   }, [markSlidesAsSeen]);
 
   const goToLogin = useCallback(() => {
+    H.tap();
     setAuthIntent("login");
     markSlidesAsSeen();
   }, [markSlidesAsSeen]);
 
+  const jumpToSlide = useCallback((index) => {
+    H.select();
+    setCurrentSlide(index);
+    listRef.current?.scrollToIndex({ index, animated: true });
+  }, []);
+
+  const goToNextSlide = useCallback(() => {
+    H.tap();
+    const next = Math.min(currentSlide + 1, SLIDES_COUNT - 1);
+    jumpToSlide(next);
+  }, [currentSlide, jumpToSlide]);
+
+  const onMomentumScrollEnd = useCallback((e) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / width);
+    if (index !== currentSlide && index >= 0 && index < SLIDES_COUNT) {
+      H.select();
+      setCurrentSlide(index);
+    }
+  }, [currentSlide, width]);
+
+  const renderSlide = useCallback(({ item }) => {
+    return (
+      <View style={{ width }}>
+        {item === 0 ? (
+          <OnboardingSlideItem
+            tag="MARATON · KİŞİYE ÖZEL ROTA"
+            title="Sınava giden yol bir rotaya dönüşür."
+            description="Yüzlerce konuyu gün gün duraklara böldük. Ne çalışacağını düşünmezsin; rotan her sabah hazırdır."
+            C={C}
+          >
+            <OnboardingSlideRoute C={C} />
+          </OnboardingSlideItem>
+        ) : item === 1 ? (
+          <OnboardingSlideItem
+            tag="GÜNLÜK RİTİM · DİSİPLİN"
+            title="Her sabah kalktığında ne yapacağını bil."
+            description="Gelişigüzel soru çözmek yok. Sistem zayıf olduğun konuları ve borçlarını otomatik olarak günün duraklarına yerleştirir."
+            C={C}
+          >
+            <OnboardingSlideDaily C={C} />
+          </OnboardingSlideItem>
+        ) : (
+          <OnboardingSlideItem
+            tag="DİNAMİK TAHMİN · KALİBRASYON"
+            title="Her denemede rotan yeniden hesaplansın."
+            description="Netin düştüğünde sistem pes etmez; tempoyu anında günceller, eksiklerini tespit eder ve yeni rotayı çizer."
+            C={C}
+          >
+            <OnboardingSlideForecast C={C} />
+          </OnboardingSlideItem>
+        )}
+      </View>
+    );
+  }, [width, C]);
+
   return (
-    <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
-        <View style={styles.scroll}>
-          <Animated.View entering={FadeIn.duration(350)}>
-            <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>
-              MARATON
-            </Text>
-            <Text style={[styles.headline, { color: C.text }]}>
-              Sınava kadar olan yolu bir rotaya çeviriyoruz.
-            </Text>
-            <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s2, maxWidth: 300 }]}>
-              Her gün nereye gideceğini biliyorsun, her denemede rotanın nereye çıktığını görüyorsun.
-            </Text>
-          </Animated.View>
+    <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <OnboardingPagination
+        total={SLIDES_COUNT}
+        current={currentSlide}
+        onSelect={jumpToSlide}
+        onSkip={createRoute}
+        C={C}
+      />
 
-          <Animated.View>
-            <RouteIllustration />
-          </Animated.View>
+      <FlatList
+        ref={listRef}
+        data={[0, 1, 2]}
+        keyExtractor={(item) => String(item)}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        renderItem={renderSlide}
+        style={s.list}
+      />
 
-          <Animated.View>
-            <QuestionPreviewList />
-          </Animated.View>
-        </View>
-
-        <View style={{ flex: 1 }} />
-
-        <Animated.View style={styles.footer}>
-          <Button onPress={createRoute} size="lg" fullWidth>
-            Rotamı kur
-          </Button>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2, marginBottom: STEP.s1 }]}>
-            Hesap sonra. Önce rotanı görüyorsun.
-          </Text>
-          <Press haptic="none" onPress={goToLogin} hitSlop={12} style={styles.loginLink} accessibilityRole="button">
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
-              Hesabım var, giriş yap
-            </Text>
-          </Press>
-        </Animated.View>
-      </SafeAreaView>
-    </View>
+      <OnboardingFooter
+        isLastSlide={currentSlide === SLIDES_COUNT - 1}
+        onNext={goToNextSlide}
+        onStart={createRoute}
+        onLogin={goToLogin}
+        C={C}
+      />
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
-  headline: { ...TYPOGRAPHY.title, fontSize: 32, lineHeight: 36, marginTop: STEP.s2, maxWidth: 280 },
-  footer: { paddingHorizontal: GUTTER, paddingBottom: STEP.s3 },
-  loginLink: { alignItems: "center", marginTop: STEP.s1, minHeight: 44, justifyContent: "center" },
+export default function OnboardingScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <OnboardingScreenInner />
+    </ScreenErrorBoundary>
+  );
+}
+
+const s = StyleSheet.create({
+  safe: { flex: 1 },
+  list: { flex: 1 },
 });
