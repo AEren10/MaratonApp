@@ -134,7 +134,11 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
       } else {
         H.success();
       }
-      await reward("question_solved", { count: 1, statUpdates: [{ type: "increment", key: "totalQuestions" }] });
+      await reward("question_solved", {
+        count: 1,
+        sourceOperationId: result.clientOperationId,
+        statUpdates: [{ type: "increment", key: "totalQuestions" }],
+      });
       if (keepOpen) {
         resetForNext();
       } else {

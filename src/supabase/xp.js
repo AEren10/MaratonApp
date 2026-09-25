@@ -12,12 +12,13 @@ import { startOfWeekTR } from "../lib/dateUtils";
  *
  * @returns sunucunun gerçekten yazdığı miktar (kırpılmış olabilir)
  */
-export async function logXP(userId, amount, action) {
+export async function logXP(userId, amount, action, clientOperationId = null) {
   if (!userId || userId === "dev" || !amount) return 0;
   try {
     const { data, error } = await supabase.rpc("award_xp", {
       p_action: action,
       p_amount: Math.round(amount),
+      p_client_operation_id: clientOperationId,
     });
     if (error) throw error;
     return data?.amount ?? 0;

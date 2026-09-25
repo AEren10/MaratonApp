@@ -167,6 +167,7 @@ export async function submitTrialEntry({
     queued: result.queued,
   });
   reward("trial_entry", {
+    sourceOperationId: result.clientOperationId || result.data?.client_operation_id,
     statUpdates: [
       { type: "increment", key: "totalTrials" },
       { type: "max", key: "maxNet", value: netVal },

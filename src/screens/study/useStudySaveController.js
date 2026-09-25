@@ -231,7 +231,11 @@ export function useStudySaveController() {
       routeSubjectKey,
       routeTopicName,
     });
-    if (planCompletion.planCompleted) reward("plan_task_done");
+    if (planCompletion.planCompleted) {
+      reward("plan_task_done", {
+        sourceOperationId: planCompletion.planTaskOperationId || result.clientOperationId,
+      });
+    }
     if (planCompletion.planError || planCompletion.routeError) {
       captureError(planCompletion.planError || planCompletion.routeError, {
         context: "study_save_plan_completion",
@@ -242,13 +246,14 @@ export function useStudySaveController() {
     completeForm({ minutes: duration, questions: qc, subjectKey });
     track(EVENTS.STUDY_COMPLETED, { minutes: duration, questions: qc });
     reward("study_log", {
+      sourceOperationId: result.clientOperationId,
       minutes: duration,
       statUpdates: [
         { type: "increment", key: "totalQuestions", value: qc },
         { type: "increment", key: "totalMinutes", value: duration },
       ],
     });
-    if (qc > 0) reward("question_solved", { count: qc });
+    if (qc > 0) reward("question_solved", { count: qc, sourceOperationId: result.clientOperationId });
 
     // Oturum artık güvende (kaydedildi ya da kuyrukta) — kurtarma anlık
     // görüntüsü ancak BURADA silinir. Kronometre ekranında silinmesi,

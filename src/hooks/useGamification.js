@@ -19,6 +19,7 @@ import { getAllUnclaimedMilestones, claimMilestone } from "../lib/streakMileston
 import { useAuth } from "../contexts/AuthContext";
 import { logXP } from "../supabase/xp";
 import { saveGamificationToSupabase, claimStreakMilestoneReward } from "../supabase/profiles";
+import { todayTR } from "../lib/dateUtils";
 
 // Module-level guard: prevents concurrent reward/milestone operations
 // across multiple hook instances mounted simultaneously.
@@ -63,9 +64,18 @@ function _setSharedMilestone(next) {
 // Serialized XP log queue: ensures revert operations execute in order
 // and don't corrupt XP totals when multiple logXP calls overlap.
 let _xpQueue = Promise.resolve();
-function enqueueXPLog(dispatch, userId, amount, action) {
+function xpOperationId(action, data = {}) {
+  const source = data.xpOperationId || data.sourceOperationId || data.clientOperationId || data.operationId;
+  if (source) return `${source}:${action}`;
+  if (action === "daily_login" || action === "daily_goal_complete") return `${action}:${todayTR()}`;
+  if (action === "comeback_bonus") return `${action}:${todayTR()}:${data.daysAway ?? ""}`;
+  if (action === "streak_milestone" && data.milestoneDay) return `${action}:${data.milestoneDay}`;
+  return null;
+}
+
+function enqueueXPLog(dispatch, userId, amount, action, operationId = null) {
   _xpQueue = _xpQueue.then(() =>
-    logXP(userId, amount, action).catch(() => dispatch(revertXP({ amount }))),
+    logXP(userId, amount, action, operationId).catch(() => dispatch(revertXP({ amount }))),
   );
 }
 
@@ -144,7 +154,7 @@ export function useGamification() {
         const currentXP = totalXPRef.current;
         const prevLevel = getLevelForXP(currentXP);
         dispatch(earnXP({ amount }));
-        if (user?.id) enqueueXPLog(dispatch, user.id, amount, action);
+        if (user?.id) enqueueXPLog(dispatch, user.id, amount, action, xpOperationId(action, data));
         setXpToast({ visible: true, amount, multiplier });
 
         const newLevel = getLevelForXP(currentXP + amount);
@@ -201,7 +211,13 @@ export function useGamification() {
           dispatch(earnXP({ amount: milestone.xp }));
           totalMilestoneXP += milestone.xp;
           if (user?.id) {
-            enqueueXPLog(dispatch, user.id, milestone.xp, "streak_milestone");
+            enqueueXPLog(
+              dispatch,
+              user.id,
+              milestone.xp,
+              "streak_milestone",
+              xpOperationId("streak_milestone", { milestoneDay: milestone.day }),
+            );
             if (milestone.premiumDays > 0) claimStreakMilestoneReward(milestone.day).catch(() => {});
           }
           showMilestone = milestone;

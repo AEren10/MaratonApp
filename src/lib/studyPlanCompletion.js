@@ -76,6 +76,7 @@ export async function completeStudyPlanContext({
     if (dbTask && !dbTask.completed) {
       await savePlanTaskToggleOffline(dbTask.id, true, userId);
       result.planCompleted = true;
+      result.planTaskOperationId = `plan_task_${dbTask.id}`;
     } else if (dbTask?.completed) {
       result.planAlreadyCompleted = true;
     } else {
