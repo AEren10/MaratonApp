@@ -34,7 +34,7 @@ export default function HomeScreen() {
   useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} debtHours={debtHours} dueCount={dueCount} go={actions} />
+    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} dueCount={dueCount} go={actions} />
     : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
   ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, dueCount, actions]);
 

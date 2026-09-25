@@ -6,7 +6,6 @@ import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { HomeTodayStops } from "./HomeTodayStops";
 import { HomeMomentumRow } from "./HomeMomentumRow";
-import { HomeLinkRow } from "./HomeLinkRow";
 import { HomeNotebookCard } from "./HomeNotebookCard";
 import { HomeGroupCard } from "./HomeGroupCard";
 import { useMyGroups } from "../../../hooks/useMyGroups";
@@ -49,13 +48,6 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
         </View>
       ) : null}
 
-      {/* "Bu haftanın raporu" satiri kaldirildi: hafta raporu bir MENU
-          MADDESI degil, bir AN. Hafta bitince (HomeCompletionOverlays),
-          gun bitince ve haftalik bildirimle zaten aciliyor. Ustteki
-          haftalik grafige dokunus da calisma gecmisine gidiyor. */}
-      <View style={s.links}>
-        <HomeLinkRow label="Konu borcu" value={debtHours > 0 ? `${debtHours} sa` : null} onPress={go.debt} />
-      </View>
 
       <View style={s.notebook}>{dueCount > 0 ? null : notebook}</View>
     </View>
@@ -69,6 +61,5 @@ const s = StyleSheet.create({
   rule: { flex: 1, height: 1 },
   link: { flexDirection: "row", alignItems: "center", gap: STEP.s1 - 1, minHeight: CONTROL.tapMin },
   linkText: { letterSpacing: 0, textTransform: "none" },
-  links: { paddingTop: STEP.s3 + 6 },
   notebook: { paddingBottom: STEP.s4 + 2 },
 });

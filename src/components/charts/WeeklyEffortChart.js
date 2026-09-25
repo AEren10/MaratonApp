@@ -31,15 +31,22 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
   // cubukta.
   const barW = Math.min(34, slot * 0.68);
 
-  // Tuval tepe payı (headroom): Hedef çizgisi tavana yapışmasın;
-  // hedefte veya 300 soru gibi yüksek sayılarda çubuklar taşmadan
-  // orantılı ve ferah kalsın.
+  // Tuval tepe payı (headroom): hedef çizgisi tavana yapışmasın ama
+  // üstünde ÖLÜ ALAN da kalmasın.
+  //
+  // Eskiden goal * 1.55 idi: hedef 100 olan boş bir haftada ölçek 155'e
+  // çıkıyor, hedef çizgisi tuvalin %64'ünde kalıyor ve üstündeki %36
+  // tamamen boş duruyordu. Ana sayfanın en görünür yerinde ~60px ölü alan.
+  // Sabit 100 tabanı da düşük hedefli kullanıcıda (günde 20 soru) aynı
+  // boşluğu daha beter üretiyordu.
+  //
+  // 1.22: hedefi aşınca hâlâ yer var, aşmayınca boşluk göze batmıyor.
   const peak = (week.days || []).reduce((max, d) => Math.max(max, d.questions), 0);
   const goal = week.goal || 0;
   const chartMax = Math.max(
-    Math.round(peak * 1.2),
-    Math.round(goal * 1.55),
-    100
+    Math.round(peak * 1.15),
+    Math.round(goal * 1.22),
+    10
   );
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;

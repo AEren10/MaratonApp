@@ -6,12 +6,14 @@ import Animated, {
   withSpring,
   withTiming,
   withDelay,
-  
+  withSequence,
+  Easing,
+  useReducedMotion,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "../design";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL, ANIMATION } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import * as haptic from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
@@ -26,33 +28,51 @@ const POPUP_COLORS = {
 };
 
 const AUTO_DISMISS_MS = 4500;
+const OFF_Y = 120;
+const ENTER_MS = 220;
+const EXIT_MS = 240;
+const ENTER_SPRING = { duration: 420, dampingRatio: 0.85 };
+const EASE_OUT = Easing.bezier(...ANIMATION.easing.easeOut);
 
 export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
   const C = useC();
   const insets = useSafeAreaInsets();
-  const translateY = useSharedValue(120);
+  const reduced = useReducedMotion();
+  const translateY = useSharedValue(OFF_Y);
   const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.92);
 
   useEffect(() => {
     if (!visible || !nudge) return;
 
     haptic.tap();
-    translateY.value = withSpring(0, { damping: 18, stiffness: 200 });
-    opacity.value = withTiming(1, { duration: 250 });
-    scale.value = withSpring(1, { damping: 16, stiffness: 260 });
 
-    translateY.value = withDelay(
-      AUTO_DISMISS_MS,
-      withTiming(120, { duration: 350 }, () => {
-        opacity.value = withTiming(0, { duration: 200 });
-        if (onDismiss) scheduleOnRN(onDismiss);
-      }),
+    if (reduced) {
+      translateY.value = 0;
+      opacity.value = withTiming(1, { duration: ENTER_MS });
+      return;
+    }
+
+    // DIKKAT: burada iki ayri atama YAPILMAZ.
+    //
+    // Eskiden once withSpring(0), hemen ardindan translateY.value = withDelay(...)
+    // yaziliyordu. Ikinci atama birinciyi ANINDA iptal ediyor, yani kart hic
+    // yukari kaymiyor, 120px asagida 4.5 saniye bekliyordu. Ustune translateY
+    // ve scale iki AYRI yayla farkli hizlarda gidiyor, kart eziliyordu.
+    // Tek eksen, tek yay, withSequence ile sirali.
+    translateY.value = withSequence(
+      withSpring(0, ENTER_SPRING),
+      withDelay(AUTO_DISMISS_MS, withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT })),
+    );
+    opacity.value = withSequence(
+      withTiming(1, { duration: ENTER_MS }),
+      withDelay(AUTO_DISMISS_MS, withTiming(0, { duration: EXIT_MS }, (finished) => {
+        if (finished && onDismiss) scheduleOnRN(onDismiss);
+      })),
     );
   }, [visible, nudge]);
 
   const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    transform: [{ translateY: translateY.value }],
     opacity: opacity.value,
   }));
 
@@ -62,16 +82,16 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
 
   const handlePress = () => {
     haptic.tap();
-    translateY.value = withTiming(120, { duration: 250 });
-    opacity.value = withTiming(0, { duration: 200 }, () => {
-      if (onAction) scheduleOnRN(onAction, nudge);
+    translateY.value = withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT });
+    opacity.value = withTiming(0, { duration: EXIT_MS }, (finished) => {
+      if (finished && onAction) scheduleOnRN(onAction, nudge);
     });
   };
 
   const handleDismiss = () => {
-    translateY.value = withTiming(120, { duration: 250 });
-    opacity.value = withTiming(0, { duration: 200 }, () => {
-      if (onDismiss) scheduleOnRN(onDismiss);
+    translateY.value = withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT });
+    opacity.value = withTiming(0, { duration: EXIT_MS }, (finished) => {
+      if (finished && onDismiss) scheduleOnRN(onDismiss);
     });
   };
 
