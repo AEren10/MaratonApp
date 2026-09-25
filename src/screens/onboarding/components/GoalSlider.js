@@ -1,5 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, runOnJS, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as H from "../../../lib/haptics";
 
@@ -37,8 +38,8 @@ export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, acc
       const snapped = Math.max(min, Math.min(max, snap(raw, step)));
       if (snapped !== lastSnapped.value) {
         lastSnapped.value = snapped;
-        runOnJS(H.select)();
-        runOnJS(onChange)(snapped);
+        scheduleOnRN(H.select);
+        scheduleOnRN(onChange, snapped);
       }
     })
     .onEnd(() => {

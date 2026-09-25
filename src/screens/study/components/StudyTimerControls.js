@@ -7,6 +7,7 @@ import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../../themes/tokens
 // Dogrudan expo-haptics KULLANILMAZ: haptics.js kullanicinin "titresim
 // kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -81,29 +82,26 @@ export function StudyTimerControls({
         </Text>
       </AnimatedPressable>
 
-      <Pressable
+      <Press haptic="none"
         onPress={handleFinish}
         hitSlop={10}
         accessibilityRole="button"
         accessibilityLabel="Durağı bitir"
-        style={({ pressed }) => [
-          s.linkBtn,
-          { opacity: pressed ? 0.65 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
-        ]}
+        style={s.linkBtn}
       >
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>Durağı bitir</Text>
-      </Pressable>
+      </Press>
 
       {isPomodoro && running && (
-        <Pressable
+        <Press haptic="none"
           onPress={handleSkip}
           hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel="Fazı atla"
-          style={({ pressed }) => [s.skipBtn, { opacity: pressed ? 0.65 : 1 }]}
+          style={s.skipBtn}
         >
           <Text style={[TYPOGRAPHY.caption, { color: C.text4 }]}>Fazı atla</Text>
-        </Pressable>
+        </Press>
       )}
     </View>
   );

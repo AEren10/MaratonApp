@@ -1,8 +1,9 @@
 import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, {
-  runOnJS, useAnimatedStyle, useSharedValue, withTiming,
+  useAnimatedStyle, useSharedValue, withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../themes/tokens";
@@ -20,7 +21,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
   const translateY = useSharedValue(0);
   const sheetAnimStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
 
-  const close = () => { "worklet"; translateY.value = 0; runOnJS(onClose)(); };
+  const close = () => { "worklet"; translateY.value = 0; scheduleOnRN(onClose); };
 
   const pan = Gesture.Pan()
     .onUpdate((e) => { if (e.translationY > 0) translateY.value = e.translationY; })

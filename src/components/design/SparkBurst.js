@@ -2,8 +2,9 @@ import { useEffect, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withDelay,
-  withSequence, Easing, runOnJS,
+  withSequence, Easing, 
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import * as haptic from "../../lib/haptics";
 
 const SPARK_COUNT = 14;
@@ -94,7 +95,7 @@ export function SparkBurst({ trigger, onDone }) {
     progress.value = withDelay(
       50,
       withTiming(1, { duration: DURATION, easing: Easing.out(Easing.cubic) }, (fin) => {
-        if (fin) runOnJS(handleDone)();
+        if (fin) scheduleOnRN(handleDone);
       }),
     );
   }, [trigger]);

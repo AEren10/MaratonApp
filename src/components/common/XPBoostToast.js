@@ -8,11 +8,14 @@ import Animated, {
   withSequence,
   withDelay,
   cancelAnimation,
-  runOnJS,
+  
   Easing,
 } from "react-native-reanimated";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../themes/tokens";
+import { scheduleOnRN } from "react-native-worklets";
+import { TYPOGRAPHY, STEP, SHAPE, ANIMATION } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+
+const EASE_OUT = Easing.bezier(...ANIMATION.easing.easeOut);
 import { Icon } from "../design";
 
 const SHOW_MS = 280;
@@ -35,13 +38,13 @@ export function XPBoostToast({ visible, amount, multiplier = 1, onDismiss }) {
     };
 
     translateY.value = withSequence(
-      withTiming(0, { duration: SHOW_MS, easing: Easing.out(Easing.cubic) }),
-      withDelay(VISIBLE_MS, withTiming(-50, { duration: HIDE_MS, easing: Easing.in(Easing.cubic) })),
+      withTiming(0, { duration: SHOW_MS, easing: EASE_OUT }),
+      withDelay(VISIBLE_MS, withTiming(-50, { duration: HIDE_MS, easing: EASE_OUT })),
     );
     opacity.value = withSequence(
       withTiming(1, { duration: SHOW_MS }),
       withDelay(VISIBLE_MS, withTiming(0, { duration: HIDE_MS }, () => {
-        runOnJS(handleDismiss)();
+        scheduleOnRN(handleDismiss);
       })),
     );
     return () => {

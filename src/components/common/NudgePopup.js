@@ -6,8 +6,9 @@ import Animated, {
   withSpring,
   withTiming,
   withDelay,
-  runOnJS,
+  
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "../design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../themes/tokens";
@@ -44,7 +45,7 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
       AUTO_DISMISS_MS,
       withTiming(120, { duration: 350 }, () => {
         opacity.value = withTiming(0, { duration: 200 });
-        if (onDismiss) runOnJS(onDismiss)();
+        if (onDismiss) scheduleOnRN(onDismiss);
       }),
     );
   }, [visible, nudge]);
@@ -62,14 +63,14 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
     haptic.tap();
     translateY.value = withTiming(120, { duration: 250 });
     opacity.value = withTiming(0, { duration: 200 }, () => {
-      if (onAction) runOnJS(onAction)(nudge);
+      if (onAction) scheduleOnRN(onAction, nudge);
     });
   };
 
   const handleDismiss = () => {
     translateY.value = withTiming(120, { duration: 250 });
     opacity.value = withTiming(0, { duration: 200 }, () => {
-      if (onDismiss) runOnJS(onDismiss)();
+      if (onDismiss) scheduleOnRN(onDismiss);
     });
   };
 

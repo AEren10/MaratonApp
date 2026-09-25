@@ -6,8 +6,9 @@ import { useNavigation } from "@react-navigation/native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
-  runOnJS, interpolate, Extrapolation, 
+  interpolate, Extrapolation, 
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { Icon } from "../../components/design";
 import { SwipeReviewSkeleton } from "./components/SwipeReviewSkeleton";
@@ -87,10 +88,10 @@ export default function SwipeReviewScreen() {
       "worklet";
       if (e.translationX > SWIPE_THRESHOLD) {
         translateX.value = withTiming(SW * 1.5, { duration: 300 });
-        runOnJS(handleGrade)(true);
+        scheduleOnRN(handleGrade, true);
       } else if (e.translationX < -SWIPE_THRESHOLD) {
         translateX.value = withTiming(-SW * 1.5, { duration: 300 });
-        runOnJS(handleGrade)(false);
+        scheduleOnRN(handleGrade, false);
       } else {
         translateX.value = withSpring(0);
         translateY.value = withSpring(0);

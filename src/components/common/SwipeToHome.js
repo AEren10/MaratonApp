@@ -1,5 +1,6 @@
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
-import { runOnJS, useSharedValue } from "react-native-reanimated";
+import { useSharedValue } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { SCREENS } from "../../constants/screens";
@@ -54,7 +55,7 @@ export function SwipeToHome({ children }) {
       if (e.translationX < MIN_TRANSLATION) return;
       if (e.velocityX < MIN_VELOCITY) return;
       if (Math.abs(e.translationY) > Math.abs(e.translationX) * 0.4) return;
-      runOnJS(goHome)();
+      scheduleOnRN(goHome);
     });
 
   return <GestureDetector gesture={pan}>{children}</GestureDetector>;
