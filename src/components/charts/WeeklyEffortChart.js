@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { Fragment, memo } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Line, Text as SvgText } from "react-native-svg";
 
@@ -6,7 +6,7 @@ import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
 import { useC } from "../../contexts/ThemeContext";
 import {
-  CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom,
+  CHART_W, CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
 } from "./chartStyle";
 
 const BAR_RADIUS = 3;
@@ -23,7 +23,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
   const bottom = plotBottom({ hasAxis: true });
   const top = PAD_TOP;
   const usableH = bottom - top;
-  const usableW = CHART_W - PAD_LEFT - PAD_RIGHT;
+  const usableW = CHART_W - EFFORT_PAD_LEFT - PAD_RIGHT;
   const slot = usableW / week.days.length;
   // Cubuk genisligi: yuvanin yarisindan az oldugunda haftalik grafik yedi
   // ince cizgiye donuyor ve aradaki bosluk cubuktan genis kaliyor. Oran
@@ -60,13 +60,36 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
     >
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
         <EffortSlotDefs color={C.line} />
+
+        {/* Sol eksen: olcek. Izgara cizgileri cubuklarin ARKASINDA kalir,
+            hayalet kutularin kenarligiyla yarismasin diye opaklik dusuk.
+            Etiket rengi text4 -- tokens.js'e gore yalniz eksen/izgara
+            etiketinde kullanilan ton. */}
+        {gridSteps(chartMax).map((v) => {
+          const gy = yOf(v);
+          return (
+            <Fragment key={`grid-${v}`}>
+              <Line
+                x1={EFFORT_PAD_LEFT} y1={gy} x2={CHART_W - PAD_RIGHT} y2={gy}
+                stroke={C.line} strokeWidth={1} strokeOpacity={0.55}
+              />
+              <SvgText
+                x={EFFORT_PAD_LEFT - 6} y={gy + 3.5}
+                fill={C.text4} fontSize={10.5} textAnchor="end"
+              >
+                {v}
+              </SvgText>
+            </Fragment>
+          );
+        })}
+
         <Line
-          x1={PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
+          x1={EFFORT_PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
           stroke={C.line} strokeWidth={1}
         />
 
         {week.days.map((day, i) => {
-          const cx = PAD_LEFT + slot * i + slot / 2;
+          const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
           return (
             <EffortDay
               key={day.label}
@@ -88,7 +111,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
         {goalY != null ? (
           <>
             <Line
-              x1={PAD_LEFT} y1={goalY} x2={CHART_W - PAD_RIGHT} y2={goalY}
+              x1={EFFORT_PAD_LEFT} y1={goalY} x2={CHART_W - PAD_RIGHT} y2={goalY}
               stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
             />
             <SvgText
@@ -101,7 +124,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
         ) : null}
 
         {week.days.map((day, i) => {
-          const cx = PAD_LEFT + slot * i + slot / 2;
+          const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
           const isToday = i === todayIndex;
           return (
             <SvgText

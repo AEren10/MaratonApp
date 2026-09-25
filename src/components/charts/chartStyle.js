@@ -25,6 +25,30 @@ export const CHART_H = 256;
 export const PAD_LEFT = 20;
 export const PAD_RIGHT = 28;
 export const PAD_TOP = 26;
+
+// Haftalik grafikte SOL EKSEN sayilari duruyor (25/50/75...); rota
+// grafiklerinde yok. PAD_LEFT ucu birden paylasiyor, o yuzden ayri deger.
+// 34: uc haneli bir hedef ("100") sigacak kadar, cubuklari 1.3px'den fazla
+// daraltmayacak kadar.
+export const EFFORT_PAD_LEFT = 34;
+
+// Sol eksen kademeleri. 1-2-5 ilerlemesi: her hedefte OKUNABILIR
+// sayilar cikar (100 -> 25/50/75, 20 -> 5/10/15, 250 -> 50/100/...).
+//
+// Hedefi dorde bolmeyi denedim, en ustteki cizgi hep hedef oluyordu ama
+// hedef 250 iken 63/125/188 gibi sayilar cikiyordu. Hedef zaten KENDI
+// cizgisiyle ve etiketiyle isaretli; izgaranin isi olcek vermek, hedefi
+// tekrar etmek degil.
+export function gridSteps(chartMax, target = 4) {
+  if (!chartMax || chartMax <= 0) return [];
+  const raw = chartMax / target;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const norm = raw / mag;
+  const step = (norm <= 1.5 ? 1 : norm <= 3.5 ? 2 : norm <= 7.5 ? 5 : 10) * mag;
+  const out = [];
+  for (let v = step; v < chartMax; v += step) out.push(Math.round(v));
+  return out;
+}
 export const PAD_BOTTOM = 20;
 
 // Alt seritte tarih etiketleri duruyor; hat onlarin uzerinde kalir.
