@@ -15,7 +15,7 @@ import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
 import { useHomeController } from "./useHomeController";
 import { useDueReviews } from "../../hooks/useDueReviews";
-import { syncReviewWidget } from "../../lib/widgetSync";
+import { syncReviewWidget, syncStreakWidget } from "../../lib/widgetSync";
 import { useAuth } from "../../contexts/AuthContext";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
@@ -32,6 +32,11 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { dueCount } = useDueReviews(user?.id);
   useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
+  // Seri izgarasi 28 gun geriye bakiyor; weekLogs adi yaniltici, icinde
+  // 45 gunluk kayit var (usePlanContext LOG_WINDOW_DAYS).
+  useEffect(() => {
+    syncStreakWidget({ logs: dashboard.weekLogs, streak: h.streak, longest: h.longestStreak });
+  }, [dashboard.weekLogs, h.streak, h.longestStreak]);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
     ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} dueCount={dueCount} go={actions} />

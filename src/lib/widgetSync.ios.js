@@ -2,6 +2,7 @@ import WeekWidget from "../widgets/WeekWidget";
 import TodayWidget from "../widgets/TodayWidget";
 import ReviewWidget from "../widgets/ReviewWidget";
 import RouteWidget from "../widgets/RouteWidget";
+import StreakWidget from "../widgets/StreakWidget";
 
 // WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
@@ -91,5 +92,49 @@ export function syncReviewWidget({ due = 0, subjects = 0 } = {}) {
   return push("review", ReviewWidget, {
     due: Number(due) || 0,
     subjects: Number(subjects) || 0,
+  });
+}
+
+/**
+ * Seri: son 28 gunun izgarasi.
+ *
+ * 0 = calisilmadi · 1 = calisildi · 2 = calisildi VE suren serinin icinde.
+ * Seri uyeligi SONDAN geriye yuruyerek bulunur: bugun (ya da bugun bosken
+ * dun) baslayip ilk bos gune kadar. Sunucudaki streak degeriyle carpismasin
+ * diye uzunluk oradan aliniyor, izgara yalnizca BOYAMA icin kullaniliyor.
+ */
+export function syncStreakWidget({ logs = [], streak = 0, longest = 0 } = {}) {
+  const DAY = 86400000;
+  const key = (d) => {
+    const t = new Date(d);
+    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  };
+
+  const worked = new Set();
+  for (const log of logs || []) {
+    const raw = log?.study_date || log?.studyDate;
+    if (!raw) continue;
+    if ((Number(log.question_count ?? log.questionCount ?? 0) || 0) > 0
+      || (Number(log.duration_minutes ?? log.durationMinutes ?? 0) || 0) > 0) {
+      worked.add(String(raw).slice(0, 10));
+    }
+  }
+
+  const today = new Date();
+  const days = [];
+  for (let i = 27; i >= 0; i -= 1) {
+    days.push(worked.has(key(today.getTime() - i * DAY)) ? 1 : 0);
+  }
+
+  // Suren seriyi sondan geriye boya. Bugun bos olabilir: seri henuz
+  // kirilmadi, gece yarisina kadar suresi var.
+  let i = days.length - 1;
+  if (days[i] === 0) i -= 1;
+  while (i >= 0 && days[i] === 1) { days[i] = 2; i -= 1; }
+
+  return push("streak", StreakWidget, {
+    days,
+    streak: Number(streak) || 0,
+    longest: Number(longest) || 0,
   });
 }

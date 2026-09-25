@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 // gercek degerleriyle karsilastiriliyor: palet degisir de widget'lar
 // guncellenmezse burasi kirilir ve kimse iki yerde farkli renk gormez.
 // check-design-drift.js bu klasoru ayni gerekce ile muaf tutuyor.
-const WIDGETS = ["WeekWidget", "TodayWidget", "ReviewWidget", "RouteWidget"];
+const WIDGETS = ["WeekWidget", "TodayWidget", "ReviewWidget", "RouteWidget", "StreakWidget"];
 
 // buildPalette("dark") ciktisi; track gibi turetilmis olanlar dahil.
 const PALETTE = {
@@ -28,6 +28,7 @@ const PALETTE = {
   // hesaplamiyor. Widget'lar paletin GERCEK ciktisini kullanir.
   accentBright: "#FF4D57",
   line: "#2A2A31",
+  accentDeep: "#A81C26",
 };
 
 const sourceOf = (name) =>
