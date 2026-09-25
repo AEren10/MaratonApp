@@ -59,7 +59,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
       accessibilityLabel={week.summary || "Bu hafta henüz çalışma kaydın yok."}
     >
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
-        <EffortSlotDefs color={C.accent} />
+        <EffortSlotDefs color={C.line} />
         <Line
           x1={PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
           stroke={C.line} strokeWidth={1}
