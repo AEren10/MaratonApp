@@ -134,7 +134,7 @@ export function useHomeController() {
   return {
     C, navigation, dailyGoal, daysUntilExam, comeback, comebackFlow, dismissComeback, gamification, goalReward, completion,
     nudges, nudge, dashboard, stops, recent, actions, onRefresh, refreshing,
-    streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace,
+    streak, freezeCount, longestStreak, freezeResetAt, lastStudyDate, isInGrace, trials,
     loading: !readyRef.current,
     syncError: syncError && !hasLocalData ? syncError : null,
     firstDay: syncedOnce && !hasRouteProgress && !hasLocalData && streak === 0 && !firstDayDismissed,

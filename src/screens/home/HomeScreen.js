@@ -15,7 +15,7 @@ import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
 import { useHomeController } from "./useHomeController";
 import { useDueReviews } from "../../hooks/useDueReviews";
-import { syncReviewWidget, syncStreakWidget } from "../../lib/widgetSync";
+import { syncReviewWidget, syncStreakWidget, syncTrialWidget } from "../../lib/widgetSync";
 import { useAuth } from "../../contexts/AuthContext";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
@@ -37,6 +37,7 @@ export default function HomeScreen() {
   useEffect(() => {
     syncStreakWidget({ logs: dashboard.weekLogs, streak: h.streak, longest: h.longestStreak });
   }, [dashboard.weekLogs, h.streak, h.longestStreak]);
+  useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
     ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} dueCount={dueCount} go={actions} />

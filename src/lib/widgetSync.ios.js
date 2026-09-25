@@ -3,6 +3,7 @@ import TodayWidget from "../widgets/TodayWidget";
 import ReviewWidget from "../widgets/ReviewWidget";
 import RouteWidget from "../widgets/RouteWidget";
 import StreakWidget from "../widgets/StreakWidget";
+import TrialWidget from "../widgets/TrialWidget";
 
 // WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
@@ -160,4 +161,37 @@ export function syncStreakWidget({ logs = [], streak = 0, longest = 0 } = {}) {
     streak: Number(streak) || 0,
     longest: Number(longest) || 0,
   });
+}
+
+/**
+ * Deneme netleri: son bes denemenin egrisi + son iki deneme arasindaki
+ * ders kirilimi.
+ *
+ * trials ENIDEN ESKIYE gelir (Redux'ta boyle tutuluyor); widget soldan saga
+ * okundugu icin ters cevriliyor.
+ */
+export function syncTrialWidget({ trials = [] } = {}) {
+  const recent = (trials || []).slice(0, 5).reverse();
+  const points = recent.map((t) => ({
+    label: t?.date || "",
+    net: Number(t?.totalNet ?? t?.rawTotalNet ?? 0) || 0,
+  }));
+
+  // Ders kirilimi yalniz SON IKI deneme arasinda. Daha uzun bir pencere
+  // ortalamaya doner ve "bu deneme ne oldu" sorusunu cevaplamaz.
+  const a = recent.length > 1 ? recent[recent.length - 2] : null;
+  const b = recent.length ? recent[recent.length - 1] : null;
+  const subjects = [];
+  if (a && b && b.subjects) {
+    for (const key of Object.keys(b.subjects)) {
+      const now = Number(b.subjects[key]?.net) || 0;
+      const before = Number(a.subjects?.[key]?.net);
+      if (!Number.isFinite(before)) continue;
+      subjects.push({ key, label: b.subjects[key]?.label || key, delta: Number((now - before).toFixed(1)) });
+    }
+    // En cok DUSEN en altta: cumle onu aliyor, goz oraya insin.
+    subjects.sort((x, y) => y.delta - x.delta);
+  }
+
+  return push("trial", TrialWidget, { points, subjects });
 }

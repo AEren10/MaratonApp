@@ -11,3 +11,4 @@ export function syncTodayWidget() { return false; }
 export function syncReviewWidget() { return false; }
 export function syncRouteWidget() { return false; }
 export function syncStreakWidget() { return false; }
+export function syncTrialWidget() { return false; }
