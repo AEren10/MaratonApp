@@ -1,6 +1,7 @@
 import { CommonActions } from "@react-navigation/native";
 
 import { ROOT_STACK } from "./routes";
+import { navigationRef } from "./navigationRef";
 
 // `then` verilirse sekme yiginin ustune bir kok ekran binir (ornegin
 // kurulum bitince dogrudan calisma zamanlayicisi). Tek dispatch: once
@@ -10,7 +11,10 @@ export function resetToTabStackScreen(navigation, tab, screen, params, then) {
     ? { name: tab, state: { routes: [{ name: screen, params }], index: 0 } }
     : { name: tab };
 
-  navigation.dispatch(
+  const targetNav = navigation?.dispatch ? navigation : (navigationRef.isReady() ? navigationRef : null);
+  if (!targetNav) return;
+
+  targetNav.dispatch(
     CommonActions.reset({
       index: then ? 1 : 0,
       routes: [

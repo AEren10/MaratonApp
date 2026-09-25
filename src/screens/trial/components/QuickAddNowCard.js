@@ -6,7 +6,7 @@ import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 export function QuickAddNowCard({ C, nextAction, onStart }) {
   const title = nextAction ? nextAction.title : "Serbest çalışma başlat";
   const subtitle = nextAction
-    ? "Bugünün sıradaki durağı" + (nextAction.minutes ? " · ${nextAction.minutes} dk" : "")
+    ? "Bugünün sıradaki durağı" + (nextAction.minutes ? ` · ${nextAction.minutes} dk` : "")
     : "Rotan bugün için durak önermiyor";
 
   return (

@@ -174,8 +174,12 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.CARD_DETAIL, CardDetailScreen, detailOptions),
   screen(SCREENS.SETTINGS, SettingsScreen),
   screen(SCREENS.ONBOARDING, OnboardingScreen),
+  screen(SCREENS.SETUP_INCOMPLETE, SetupIncompleteScreen),
   screen(SCREENS.EXAM_SETUP, ExamSetupScreen),
   screen(SCREENS.GOAL_SETUP, GoalSetupScreen),
+  screen(SCREENS.LEVEL_TEST, LevelTestScreen),
+  screen(SCREENS.ROUTE_READY, RouteReadyScreen),
+  screen(SCREENS.NOTIFICATION_PERMISSION, NotificationPermissionScreen),
   // Eski StudyLog rotasi (Ayarlar satiri, calisma/gecmis deep linki) birlesik ekrana bagli.
   screen(SCREENS.STUDY_LOG, StudyHistoryScreen),
   screen(SCREENS.SUBJECT_DETAIL, SubjectDetailScreen, detailOptions),

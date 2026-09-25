@@ -226,7 +226,7 @@ export function ExamProvider({ children }) {
         baselineNet: baselineNetValue,
         dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
-        setupCompleted: !!local.setupCompleted || (!!p.exam_type && (p.target_net != null || p.baseline_net != null || !!p.daily_question_goal || !!p.target_ranking)),
+        setupCompleted: !!local.setupCompleted || !!p.gamification_stats?.setup_completed || (p.study_session_count != null && p.study_session_count > 0),
       };
       setExamType(config.examType);
       setField(config.field);
@@ -433,7 +433,16 @@ export function ExamProvider({ children }) {
       const existing = await appStorage.getJson(storageKey, {});
       await appStorage.setJson(storageKey, { ...existing, setupCompleted: true });
     } catch {}
-  }, [storageKey]);
+    if (session?.user?.id) {
+      try {
+        const p = await getProfile(session.user.id).catch(() => null);
+        const currentStats = p?.gamification_stats || {};
+        await updateProf(session.user.id, {
+          gamification_stats: { ...currentStats, setup_completed: true },
+        });
+      } catch {}
+    }
+  }, [session?.user?.id, storageKey]);
 
   const skipSetup = useCallback(async () => {
     setSetupSkipped(true);

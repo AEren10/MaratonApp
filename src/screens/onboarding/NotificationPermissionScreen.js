@@ -32,8 +32,9 @@ function NotificationPermissionContent() {
   const { complete } = useFinishOnboarding();
   
   const leave = useCallback(() => {
-    if (onboardingSummary) complete(onboardingSummary, onboardingOptions || {}).catch(() => {});
-    else navigation.goBack();
+    complete(onboardingSummary || {}, onboardingOptions || {}).catch(() => {
+      if (navigation.canGoBack()) navigation.goBack();
+    });
   }, [complete, navigation, onboardingSummary, onboardingOptions]);
 
   const handleAllow = useCallback(async () => {

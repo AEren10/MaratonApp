@@ -14,6 +14,7 @@ import { TYPOGRAPHY } from "../themes/tokens";
 import { Icon } from "../components/design";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
+import { TAB_ROOT_MAP } from "./tabJump";
 
 const TABS = [
   { key: SCREENS.HOME, label: "ROTA", icon: "home", hint: "Rota ana sayfasına gider" },
@@ -164,7 +165,21 @@ export function TabBar({ state, navigation }) {
               key={tab.key}
               tab={tab}
               active={active}
-              onPress={() => navigation.navigate(tab.key)}
+              onPress={() => {
+                // ZATEN BU SEKMEDEYSEK yigini kokune don.
+                //
+                // Duz navigate(tab.key) odaklanmis sekmede HICBIR SEY yapmiyor:
+                // ic yigin oldugu yerde kaliyor. Home'a bagli bir ekrandayken
+                // Home'a basan kullanici ekranda sikisip kaliyordu -- ozellikle
+                // geri tusu olmayan ekranlarda tek cikis yolu buydu.
+                //
+                // Kok ekranin adina navigate etmek yigini oraya kadar acar.
+                if (active) {
+                  navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
+                  return;
+                }
+                navigation.navigate(tab.key);
+              }}
               C={C}
             />
           );

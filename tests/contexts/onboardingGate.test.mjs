@@ -18,5 +18,29 @@ test("examType hala sart: onsuz uygulama calisamaz", () => {
 
 test("completeOnboarding bayragi kaliciya yazar", () => {
   // Yalniz bellege yazsaydi uygulama kapaninca kilit geri gelirdi.
-  assert.match(src, /setSetupCompleted\(true\)[\s\S]{0,220}setupCompleted: true/);
+  assert.match(src, /setSetupCompleted\(true\)[\s\S]{0,320}setupCompleted: true/);
 });
+
+test("setupCompleted hedef net veya soru sayisindan tetiklenmez (premature stack unmount engeli)", () => {
+  // Adim 2'de (Hedef Net) kaydedilen target_net veya daily_question_goal
+  // kurulumu bitmis saymamalidir. Aksi halde Seviye Testi ve Rota Hazir
+  // adimlari atlanir ve LevelTest navigator hatasi verir.
+  assert.doesNotMatch(src, /setupCompleted:\s*![^,\n]*\(\s*!*p\.exam_type\s*&&[^,\n]*p\.target_net/);
+  assert.doesNotMatch(src, /setupCompleted:\s*![^,\n]*\(\s*!*p\.exam_type\s*&&[^,\n]*p\.daily_question_goal/);
+});
+
+test("tum kurulum ekranlari APP_STACK_SCREENS ve ROOT_ONLY icinde tanimlidir", () => {
+  const regSrc = readFileSync("src/navigation/screenRegistry.js", "utf8");
+  const tabSrc = readFileSync("src/navigation/tabAssignment.js", "utf8");
+
+  assert.match(regSrc, /screen\(SCREENS\.LEVEL_TEST,\s*LevelTestScreen\)/);
+  assert.match(regSrc, /screen\(SCREENS\.ROUTE_READY,\s*RouteReadyScreen\)/);
+  assert.match(regSrc, /screen\(SCREENS\.NOTIFICATION_PERMISSION,\s*NotificationPermissionScreen\)/);
+  assert.match(regSrc, /screen\(SCREENS\.SETUP_INCOMPLETE,\s*SetupIncompleteScreen\)/);
+
+  assert.match(tabSrc, /SCREENS\.LEVEL_TEST/);
+  assert.match(tabSrc, /SCREENS\.ROUTE_READY/);
+  assert.match(tabSrc, /SCREENS\.NOTIFICATION_PERMISSION/);
+  assert.match(tabSrc, /SCREENS\.SETUP_INCOMPLETE/);
+});
+
