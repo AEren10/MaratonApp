@@ -4,7 +4,7 @@ import Svg, { Path } from "react-native-svg";
 import { scalePoints, buildSmoothPath } from "../../../lib/routeChartPath";
 import { formatMinutes } from "../../../lib/format";
 
-const hero = (size) => ({ fontFamily: "Bricolage_400", fontSize: size, lineHeight: size * 0.78 });
+const hero = (size) => ({ fontFamily: "Bricolage_400", fontSize: size, lineHeight: Math.round(size * 1.05) });
 const label = { fontFamily: "Archivo_600", fontSize: 10.5, letterSpacing: 1.9 };
 
 // SAYILAR — gunun rakami one cikar, altinda sure/seri ve kucuk bir egri.
@@ -92,7 +92,7 @@ const s = StyleSheet.create({
   rule: { height: 2, marginTop: 22 },
   statsRow: { flexDirection: "row", alignItems: "flex-end", gap: 28, marginTop: 16 },
   stat: { gap: 5 },
-  statValue: { fontFamily: "Bricolage_400", fontSize: 28, lineHeight: 28, letterSpacing: -0.56 },
+  statValue: { fontFamily: "Bricolage_400", fontSize: 28, lineHeight: 32, letterSpacing: -0.56 },
   spark: { flex: 1, alignItems: "flex-end", justifyContent: "flex-end", paddingBottom: 3 },
 
   simpleWrap: { position: "absolute", left: 40, right: 40, top: 224 },

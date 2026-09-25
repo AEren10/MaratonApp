@@ -16,7 +16,7 @@ export function QuickAddNowCard({ C, nextAction, onStart }) {
         <Text style={[TYPOGRAPHY.topicName, { color: C.text }]} numberOfLines={2}>{title}</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 5 }]}>{subtitle}</Text>
       </View>
-      <Button size="md" onPress={onStart} accessibilityLabel={"Başla: ${title}"}>
+      <Button size="md" onPress={onStart} accessibilityLabel={`Başla: ${title}`}>
         Başla
       </Button>
     </View>

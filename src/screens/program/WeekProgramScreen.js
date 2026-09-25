@@ -33,7 +33,7 @@ function shortMinutes(minutes) {
 function WeekSummary({ p, C, onMonth }) {
   const ratio = p.totalStops > 0 ? p.completedStops / p.totalStops : 0;
   return (
-    <View style={[s.summary, { backgroundColor: C.surface, borderColor: C.elev }]}>
+    <View style={[s.summary, { backgroundColor: C.surface, borderColor: C.border, borderTopColor: "rgba(255,255,255,0.09)" }]}>
       <View style={s.summaryHead}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BU HAFTA</Text>
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>{p.weekRange}</Text>
@@ -45,7 +45,7 @@ function WeekSummary({ p, C, onMonth }) {
         </Text>
       </View>
       <View style={[s.progressTrack, { backgroundColor: C.track }]}>
-        <View style={[s.progressFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: C.accent }]} />
+        <View style={[s.progressFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: C.up }]} />
       </View>
       <View style={s.summaryFoot}>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{shortMinutes(p.weeklyCompletedMinutes)} çalışıldı</Text>

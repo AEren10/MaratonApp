@@ -118,5 +118,5 @@ const st = StyleSheet.create({
   secondary: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
   secondaryText: { textDecorationLine: "underline" },
   note: { textAlign: "center", paddingHorizontal: STEP.s4, marginTop: STEP.s1 },
-  offscreen: { position: "absolute", left: -9999, top: 0, opacity: 0 },
+  offscreen: { position: "absolute", top: 0, left: 0, zIndex: -100 },
 });

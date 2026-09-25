@@ -7,13 +7,12 @@ import * as H from "../../../lib/haptics";
 function DayChip({ day, selected, onPress, C }) {
   const isSelected = selected;
   const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
-  const filled = isPastDone;
 
-  const bg = filled ? C.brandFill : isSelected ? "transparent" : day.isFuture ? "transparent" : C.surface;
-  const border = filled ? C.brandFill : isSelected ? C.accent : day.isFuture ? C.line : C.elev;
-  const letterColor = filled ? C.accentInk : isSelected ? C.accentBright : C.text3;
-  const numColor = filled ? C.accentInk : isSelected ? C.text : day.isFuture ? C.text3 : C.text2;
-  const dotColor = filled ? C.accentInk : isSelected ? C.accent : day.active ? C.accent : day.isFuture ? "transparent" : C.text5;
+  const bg = isSelected ? C.elev : isPastDone ? C.surface : day.isFuture ? "transparent" : C.surface;
+  const border = isSelected ? C.text : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
+  const letterColor = isSelected ? C.text : isPastDone ? C.text2 : C.text3;
+  const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
+  const dotColor = isPastDone ? C.up : isSelected ? C.accent : day.active ? C.up : day.isFuture ? "transparent" : C.text5;
 
   return (
     <Pressable
@@ -22,15 +21,16 @@ function DayChip({ day, selected, onPress, C }) {
       onPress={onPress}
       style={{
         flex: 1,
-        minHeight: 48,
+        minHeight: 52,
         paddingVertical: 10,
         borderRadius: 14,
         backgroundColor: bg,
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: border,
         borderStyle: day.isFuture && !isSelected ? "dashed" : "solid",
         alignItems: "center",
-        gap: 5,
+        justifyContent: "space-between",
+        paddingBottom: 8,
       }}
     >
       <Text style={{ fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.1, color: letterColor }}>
@@ -39,7 +39,16 @@ function DayChip({ day, selected, onPress, C }) {
       <Text style={{ fontFamily: "Bricolage_400", fontSize: 17, color: numColor, fontVariant: ["tabular-nums"] }}>
         {day.dayNum}
       </Text>
-      <View style={{ width: 5, height: 5, borderRadius: 1, backgroundColor: dotColor }} />
+      <View style={{
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: dotColor,
+        shadowColor: isPastDone ? C.up : "transparent",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 3,
+      }} />
     </Pressable>
   );
 }
@@ -65,7 +74,7 @@ export function WeekDayStrip({ days, selectedDate, onSelect, style }) {
         ))}
       </View>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2, marginTop: STEP.s2 }}>
-        <Legend color={C.accent} label="tamamlandı" C={C} />
+        <Legend color={C.up} label="tamamlandı" C={C} />
         <Legend color={C.text5} label="bekleyen" C={C} />
         <Legend color="transparent" dashed label="boş gün" C={C} />
       </View>

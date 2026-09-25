@@ -68,6 +68,6 @@ const s = StyleSheet.create({
   days: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
   day: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 1 },
   total: { marginTop: 34, flexDirection: "row", alignItems: "baseline", gap: 12 },
-  hero: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 75, letterSpacing: -4.6 },
+  hero: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 96, letterSpacing: -4.6 },
   unit: { fontFamily: "Bricolage_400", fontSize: 20 },
 });

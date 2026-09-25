@@ -102,7 +102,7 @@ export function StoryHonestBody({ data, p }) {
 const s = StyleSheet.create({
   countWrap: { position: "absolute", left: 36, right: 36, top: 196 },
   countRow: { flexDirection: "row", alignItems: "flex-end", gap: 16, marginTop: 18 },
-  countHero: { fontFamily: "Bricolage_400", fontSize: 210, lineHeight: 155, letterSpacing: -14.7 },
+  countHero: { fontFamily: "Bricolage_400", fontSize: 210, lineHeight: 218, letterSpacing: -14.7 },
   countUnit: { fontFamily: "Bricolage_400", fontSize: 30, paddingBottom: 26 },
   bar: { height: 6, borderRadius: 2, marginTop: 34, overflow: "hidden" },
   barFill: { height: "100%", borderRadius: 2 },
@@ -111,7 +111,7 @@ const s = StyleSheet.create({
 
   netWrap: { position: "absolute", left: 36, right: 36, top: 182 },
   netRow: { flexDirection: "row", alignItems: "flex-end", gap: 14, marginTop: 16 },
-  netHero: { fontFamily: "Bricolage_400", fontSize: 138, lineHeight: 105, letterSpacing: -8 },
+  netHero: { fontFamily: "Bricolage_400", fontSize: 138, lineHeight: 144, letterSpacing: -8 },
   netUnit: { fontFamily: "Bricolage_400", fontSize: 26, paddingBottom: 16 },
   chip: {
     alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 7,

@@ -92,7 +92,7 @@ const s = StyleSheet.create({
   chipText: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 2.2 },
   date: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.76 },
   spacer: { flex: 1, minHeight: 0 },
-  hero: { fontFamily: "Bricolage_400", fontSize: 132, lineHeight: 106, letterSpacing: -6.9 },
+  hero: { fontFamily: "Bricolage_400", fontSize: 132, lineHeight: 138, letterSpacing: -6.9 },
   heroUnit: { fontFamily: "Bricolage_400", fontSize: 22, marginTop: 12 },
   line: { fontFamily: "Archivo_400", fontSize: 15, lineHeight: 23, marginTop: 12, maxWidth: 290 },
   chart: { marginHorizontal: -34, marginTop: 20 },
