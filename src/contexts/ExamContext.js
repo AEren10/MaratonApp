@@ -155,6 +155,8 @@ export function ExamProvider({ children }) {
         setTargetRanking(null);
         setTargetDepartment(null);
         setTargetNet(null);
+        setTargetNetTYT(null);
+        setTargetNetAYT(null);
         setBaselineNet(null);
         setDailyGoalSet(false);
         setLevelTestDone(false);
@@ -182,6 +184,8 @@ export function ExamProvider({ children }) {
           setTargetRanking(local.targetRanking || null);
           setTargetDepartment(local.targetDepartment || null);
           setTargetNet(local.targetNet ?? null);
+          setTargetNetTYT(local.targetNetTYT ?? null);
+          setTargetNetAYT(local.targetNetAYT ?? null);
           setBaselineNet(local.baselineNet ?? null);
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
           setSetupCompleted(!!local.setupCompleted);
@@ -217,10 +221,12 @@ export function ExamProvider({ children }) {
         targetRanking: rankingPending ? (local.targetRanking || null) : (p.target_ranking || null),
         targetDepartment: rankingPending ? (local.targetDepartment || null) : (p.target_department || null),
         targetNet: targetNetValue,
+        targetNetTYT: local.targetNetTYT ?? null,
+        targetNetAYT: local.targetNetAYT ?? null,
         baselineNet: baselineNetValue,
         dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
-        setupCompleted: !!local.setupCompleted,
+        setupCompleted: !!local.setupCompleted || (!!p.exam_type && (p.target_net != null || p.baseline_net != null || !!p.daily_question_goal || !!p.target_ranking)),
       };
       setExamType(config.examType);
       setField(config.field);
@@ -228,6 +234,8 @@ export function ExamProvider({ children }) {
       setTargetRanking(config.targetRanking);
       setTargetDepartment(config.targetDepartment);
       setTargetNet(config.targetNet);
+      setTargetNetTYT(config.targetNetTYT);
+      setTargetNetAYT(config.targetNetAYT);
       setBaselineNet(config.baselineNet);
       if (config.dailyGoalSet) setDailyGoalSet(true);
       setLevelTestDone(config.levelTestDone);
@@ -241,7 +249,8 @@ export function ExamProvider({ children }) {
         targetRanking: config.targetRanking,
         targetDepartment: config.targetDepartment,
         targetNet: config.targetNet,
-        baselineNet: config.baselineNet,
+        targetNetTYT: config.targetNetTYT,
+        targetNetAYT: config.targetNetAYT,
         dailyGoalSet: config.dailyGoalSet,
         levelTestDone: config.levelTestDone,
         setupCompleted: config.setupCompleted,
@@ -344,11 +353,26 @@ export function ExamProvider({ children }) {
   // Hedef net. Sunucu yazimi sessizce yutulMUYOR: basarisizsa yerelde kaliyor
   // ve bir sonraki profil okumasinda geri dolduruluyor (getProfile dalindaki
   // "profil yoksa yerelden oku" yolu). Cevrimdisi girilen hedef kaybolmasin.
-  const updateTargetNet = useCallback(async (net) => {
-    const value = coerceNet(net);
+  const updateTargetNet = useCallback(async (net, extra = {}) => {
+    let total = net;
+    let tyt = extra?.tyt ?? null;
+    let ayt = extra?.ayt ?? null;
+    if (typeof net === "object" && net !== null) {
+      tyt = net.tyt ?? null;
+      ayt = net.ayt ?? null;
+      total = (tyt || 0) + (ayt || 0);
+    }
+    const value = coerceNet(total);
     setTargetNet(value);
+    if (tyt != null) setTargetNetTYT(Number(tyt));
+    if (ayt != null) setTargetNetAYT(Number(ayt));
     try {
-      await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false }, userId);
+      await persistExamConfigPatch({
+        targetNet: value,
+        targetNetTYT: tyt != null ? Number(tyt) : undefined,
+        targetNetAYT: ayt != null ? Number(ayt) : undefined,
+        targetNetSyncPending: false,
+      }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
@@ -458,16 +482,10 @@ export function ExamProvider({ children }) {
   }, [session, storageKey, examType, field, examDate]);
 
   // Kurulumu ACIKCA bitirmis olmak baglayicidir.
-  //
-  // Eskiden ucu de gerekiyordu ve bu bir kilit uretiyordu: hedef sürgüsü bir
-  // worklet hatasiyla cokunce gunluk hedef hic kaydedilmiyor, dailyGoalSet
-  // false kaliyor, kullanici kurulumu bitirse bile onboardingDone asla true
-  // olmuyordu. Her acilista ayni kurulum ekranina dusuyor ve Ana Sayfa'yi hic
-  // goremiyordu -- cikis yolu olmayan bir dongu.
-  //
-  // examType hala sart: onsuz uygulama calisamaz. Ama gunluk hedef eksikse
-  // kullaniciyi kurulumda hapsetmek yerine iceri alip hedefi sonra sorariz.
-  const onboardingDone = !!examType && (setupCompleted || dailyGoalSet);
+  // setupCompleted tek basina yeterlidir; dailyGoalSet hedef ekraninda
+  // true oldugu icin burada kullanilirsa kullaniciyi henuz seviye testi
+  // ve rota hazir ekranlarini gormeden prematur olarak MainTabs'e atiyordu.
+  const onboardingDone = !!examType && (setupCompleted || setupSkipped);
 
   const daysUntilExam = useMemo(() => {
     if (!examDate) return null;
@@ -480,13 +498,15 @@ export function ExamProvider({ children }) {
   const combinedLoading = loading;
 
   const value = useMemo(() => ({
-    examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
+    examType, field, examDate, targetRanking, targetDepartment, targetNet,
+    targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
     markSlidesAsSeen,
-  }), [examType, field, examDate, targetRanking, targetDepartment, targetNet, baselineNet,
+  }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
+    targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,

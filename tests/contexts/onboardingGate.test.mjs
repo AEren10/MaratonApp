@@ -5,10 +5,10 @@ import { readFileSync } from "node:fs";
 const src = readFileSync("src/contexts/ExamContext.js", "utf8");
 
 test("kurulumu acikca bitiren kullanici kurulumda hapsolmaz", () => {
-  // Uc bayragin VE'si bir kilit uretiyordu: hedef surgusu cokunce dailyGoalSet
-  // hic true olmuyor, kullanici kurulumu bitirse bile her acilista kurulum
-  // ekranina dusuyordu. setupCompleted tek basina yeterli olmali.
-  assert.match(src, /const onboardingDone = !!examType && \(setupCompleted \|\| dailyGoalSet\)/);
+  // setupCompleted tek basina yeterli olmali: dailyGoalSet adim 2'de true
+  // oldugu icin onboardingDone'a dahil edilirse adim 3 ve 4 (Seviye Testi,
+  // Rota Hazir) calismadan kullaniciyi prematurely MainTabs'e atar.
+  assert.match(src, /const onboardingDone = !!examType && \(setupCompleted \|\| setupSkipped\)/);
   assert.doesNotMatch(src, /const onboardingDone = !!examType && dailyGoalSet && setupCompleted/);
 });
 

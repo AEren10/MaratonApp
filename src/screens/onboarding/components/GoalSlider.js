@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -17,15 +18,36 @@ function snap(val, step) {
 
 // Hedef Seç · günlük soru hedefi sürgüsü — sınırlar arasında snap'lenir.
 export function GoalSlider({ value, onChange, C, trackWidth, min, max, step, accessibilityLabel }) {
-  const pct = (value - min) / (max - min);
+  const pct = max > min ? Math.max(0, Math.min(1, (value - min) / (max - min))) : 0;
   const thumbX = useSharedValue(pct * trackWidth);
   const startX = useSharedValue(0);
   const thumbScale = useSharedValue(1);
   const lastSnapped = useSharedValue(value);
 
+  useEffect(() => {
+    if (trackWidth > 0 && max > min) {
+      const p = Math.max(0, Math.min(1, (value - min) / (max - min)));
+      thumbX.value = p * trackWidth;
+      lastSnapped.value = value;
+    }
+  }, [value, min, max, trackWidth]);
+
   const gesture = Gesture.Pan()
-    .onBegin(() => {
+    .activeOffsetX([-8, 8])
+    .failOffsetY([-14, 14])
+    .onBegin((e) => {
       thumbScale.value = withSpring(1.18, { damping: 15, stiffness: 350 });
+      if (trackWidth > 0 && e.x != null) {
+        const nx = Math.max(0, Math.min(trackWidth, e.x));
+        thumbX.value = nx;
+        const raw = min + (nx / trackWidth) * (max - min);
+        const snapped = Math.max(min, Math.min(max, snap(raw, step)));
+        if (snapped !== lastSnapped.value) {
+          lastSnapped.value = snapped;
+          scheduleOnRN(H.select);
+          scheduleOnRN(onChange, snapped);
+        }
+      }
     })
     .onStart(() => {
       startX.value = thumbX.value;

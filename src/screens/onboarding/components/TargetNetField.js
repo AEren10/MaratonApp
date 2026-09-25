@@ -8,18 +8,27 @@ import { SectionLabel } from "../../../components/design/SectionLabel";
 import { GoalSlider } from "./GoalSlider";
 
 // Tasarim: "Hedef Sec" artboard'indaki hedef net sorusu — buyuk sayi +
-// surgu (40-120, varsayilan 72). Onboarding'in ANA sorusu bu, gunluk soru
-// hedefi ikincil alana indi.
-export function TargetNetField({ value, onChange, netLabel, min, max }) {
+// surgu. Hem tek sinavlar (TYT, LGS) hem de bilesik sinavlar (TYT ve AYT/YDT)
+// tarafindan tekrar kullanilabilir.
+export function TargetNetField({
+  title = "Hedef net",
+  value,
+  onChange,
+  netLabel,
+  min,
+  max,
+  size = "large",
+  style,
+}) {
   const C = useC();
   const { width } = useWindowDimensions();
   const trackWidth = width - GUTTER * 2 - SPACING.sm * 2;
 
   return (
-    <Animated.View style={styles.wrap}>
-      <SectionLabel>Hedef net</SectionLabel>
-      <View accessible accessibilityLabel={`Hedef net, ${value}`}>
-        <StatBlock value={value} unit={`net · ${netLabel}`} size="large" />
+    <Animated.View style={[styles.wrap, style]}>
+      {title ? <SectionLabel>{title}</SectionLabel> : null}
+      <View accessible accessibilityLabel={`${title}, ${value}`}>
+        <StatBlock value={value} unit={`net · ${netLabel}`} size={size} />
       </View>
 
       <View style={styles.sliderWrap}>
@@ -31,7 +40,7 @@ export function TargetNetField({ value, onChange, netLabel, min, max }) {
           min={min}
           max={max}
           step={1}
-          accessibilityLabel="Hedef net sürgüsü"
+          accessibilityLabel={`${title} sürgüsü`}
         />
         <View style={styles.rangeRow}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{min}</Text>
@@ -43,7 +52,7 @@ export function TargetNetField({ value, onChange, netLabel, min, max }) {
 }
 
 const styles = StyleSheet.create({
-  wrap:       { marginTop: STEP.s4 },
-  sliderWrap: { paddingHorizontal: SPACING.sm, marginTop: STEP.s3 },
+  wrap:       { marginTop: STEP.s3 },
+  sliderWrap: { paddingHorizontal: SPACING.sm, marginTop: STEP.s2 },
   rangeRow:   { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s1 },
 });

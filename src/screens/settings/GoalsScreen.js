@@ -3,9 +3,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useExam } from "../../contexts/ExamContext";
 import { Icon, Button } from "../../components/design";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
 import { GoalNetStepper } from "./components/GoalNetStepper";
+import { GoalMultiNetSection } from "./components/GoalMultiNetSection";
 import { GoalBandNote } from "./components/GoalBandNote";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -15,21 +17,16 @@ import { openInTab } from "../../navigation/tabJump";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 import { Press } from "../../components/design/Press";
 
-// Tasarim: "Hedef Duzenle" artboard'i — Ayarlar > Hedef net satirindan
-// acilan duzenleyici.
-//
-// Tasarim yalniz hedef neti gosteriyor ama gunluk soru hedefi de burada:
-// Ayarlar'daki "Gunluk soru hedefi" satiri bu ekrana geliyor ve tek alana
-// indirmek o satiri cikmaz sokaga cevirirdi. daily_question_goal gercek ve
-// yazilabilir bir kolon, ustelik rotanin kapasite girdisi.
-//
-// Sinav tarihi artik Tarih Secici ekranina aciliyor (SCREENS.EXAM_DATE).
-export default function GoalsScreen() {
+// Tasarim: "Hedef Duzenle" — Ayarlar > Hedef net satirindan acilan duzenleyici.
+// TYT+AYT/YDT sinavlarinda TYT ve AYT netleri ayri ayri duzenlenir.
+// Gunluk soru hedefi max 500'e kadar artirilabilir.
+function GoalsContent() {
   const C = useC();
   const navigation = useNavigation();
   const { examDate } = useExam();
   const {
-    value, dec, inc, save, cancel, saving, pendingNote,
+    isMulti, secondLabel, tytValue, decTyt, incTyt, aytValue, decAyt, incAyt,
+    aytMin, aytMax, value, dec, inc, save, cancel, saving, pendingNote,
     netLabel, currentNet, gapResult, targetDepartment, min, max,
     daily, decDaily, incDaily, dailyMin, dailyMax,
   } = useGoalNetEditor();
@@ -52,10 +49,25 @@ export default function GoalsScreen() {
           Rota bu sayıya göre çizilir. Değiştirince haftalık yük yeniden hesaplanır.
         </Text>
 
-        <GoalNetStepper
-          value={value} min={min} max={max} netLabel={netLabel}
-          currentNet={currentNet} onDec={dec} onInc={inc}
-        />
+        {isMulti ? (
+          <GoalMultiNetSection
+            value={value}
+            tytValue={tytValue}
+            secondLabel={secondLabel}
+            aytValue={aytValue}
+            decTyt={decTyt}
+            incTyt={incTyt}
+            decAyt={decAyt}
+            incAyt={incAyt}
+            aytMin={aytMin}
+            aytMax={aytMax}
+          />
+        ) : (
+          <GoalNetStepper
+            value={value} min={min} max={max} netLabel={netLabel}
+            currentNet={currentNet} onDec={dec} onInc={inc}
+          />
+        )}
 
         <GoalBandNote value={value} targetDepartment={targetDepartment} gapResult={gapResult} />
 
@@ -63,7 +75,7 @@ export default function GoalsScreen() {
           GÜNLÜK SORU HEDEFİ
         </Text>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
-          Rotanın haftalık kapasitesi bu sayıdan hesaplanır.
+          Rotanın haftalık kapasitesi bu sayıdan hesaplanır (maks. {dailyMax}).
         </Text>
         <GoalNetStepper
           value={daily}
@@ -101,12 +113,20 @@ export default function GoalsScreen() {
   );
 }
 
+export default function GoalsScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <GoalsContent />
+    </ScreenErrorBoundary>
+  );
+}
+
 const styles = StyleSheet.create({
   header:      { flexDirection: "row", alignItems: "center", paddingHorizontal: STEP.s3, paddingTop: STEP.s1 },
   closeBtn:    { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginLeft: -STEP.s2 },
   scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
   actions:     { marginTop: STEP.s4 },
-  section:     { marginTop: STEP.s5, marginBottom: STEP.s1 },
+  section:     { marginTop: STEP.s4, marginBottom: STEP.s1 },
   cancelBtn:   { height: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
   pendingNote: { marginTop: STEP.s1, textAlign: "center" },
 });
