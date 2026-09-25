@@ -49,30 +49,24 @@ sorusu ikincisi.
 
 Kural gerekiyor: yeni özellik kart eklemek istiyorsa mevcut bir kartı çıkarmalı.
 
-### 🔴 3. Rota önbelleği içerik değil uzunluk izliyor — Codex
-`src/hooks/useStudyRoute.js:170` — anahtar `weekLogs.length` ve
-`topicRows.length` kullanıyor. Mevcut bir kaydı **düzenlersen** uzunluk aynı
-kalır, rota yeniden hesaplanmaz. Çalışma geçmişinde satır düzenlenebildiği için
-erişilebilir bir yol. Veri katmanı → Codex.
-
 ### 🟡 4. Onboarding
 - 6 ekran, kısaltılmalı
 - Onboarding bitişi → ilk çalışma oturumu arası hiç tasarlanmadı
-
-### 🟡 5. PROGRAM sekmesi yanlış ekranı açıyor
-Müfredat ekranını açıyor. Tasarım testi sekme adını kilitliyor; değişmesi
-gereken ekran. Navigasyon işi, cihaz testi ister.
 
 ### 🟡 6. Ufak temizlikler
 - `src/screens/groups/` boş `components/` klasörü kalmış, silinebilir
 - `check:orphans` ulaşılabilirliğe bakmıyor: kayıtlı ama hiçbir yerden
   navigate edilmeyen ekranı yakalamıyor
-- "Bu haftanın raporu" satırı ile haftalık grafik dokunuşu iki ayrı yere gidiyor
 - Hareket: `useReducedMotion` Reanimated kullanan 165 dosyanın 11'inde
 - Hareket: 18 `<Modal>` elle yapılmış, sürüklenip kapanmıyor
   (skill `presentation: 'formSheet'` diyor — platformun gerçek sheet'i)
 
 ### ✅ 25 Eylül'de kapananlar
+- **Bulgu 1** rota önbelleği artık satır içeriğini hash'liyor; kayıt
+  düzenleyince rota yeniden hesaplanıyor (`useStudyRoute.js`)
+- **Bulgu 4** "Bu haftanın raporu" satırı kaldırıldı; hafta raporu bir menü
+  maddesi değil, bir an — beş ayrı yerden zaten açılıyor. Ana sayfa 14 → 13 blok
+- **Bulgu 5** PROGRAM sekmesi artık "Programım" ekranını açıyor, Müfredat'ı değil
 - Grup kartı durak → tekrar komşuluğunu bölüyordu, sona alındı (Bulgu 3)
 - `FadeInDown` 268 yerden kaldırıldı, sevilmeyen animasyon
 - 50 dosyada animasyonsuz basma sıçraması gerçek eğriye çevrildi
@@ -158,6 +152,8 @@ Font yükseklikleri, elevation, safe area, geri tuşu, klavye — hepsi farklı
 3. Demo hesabı + içini doldur
 4. Ekran görüntüleri + mağaza metni
 5. Sentry
-6. Ana sayfa bütçesi
-7. Onboarding kısaltma
-8. Migration defteri
+6. Onboarding kısaltma
+7. Migration defteri
+
+**24 Eylül taramasının altı bulgusu kapandı.** Kalan tek madde ana sayfa
+bütçesi (Bulgu 2) ve o senin kararını bekliyor.
