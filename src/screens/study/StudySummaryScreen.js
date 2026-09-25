@@ -13,7 +13,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
 import { useInAppReview } from "../../hooks/useInAppReview";
-import { ROOT_STACK } from "../../navigation/routes";
+import { openInTab } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
 import RouteNextActionPanel from "../roadmap/components/RouteNextActionPanel";
@@ -64,12 +65,7 @@ export default function StudySummaryScreen() {
   const goalReached = todaySolved >= safeGoal;
 
   const dismiss = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: ROOT_STACK.MAIN_TABS, state: { routes: [{ name: SCREENS.HOME }] } }],
-      }),
-    );
+    openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
   };
 
   return (

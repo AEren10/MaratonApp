@@ -21,6 +21,7 @@ export function CompletionShell({
   onPrimary,
   secondaryLabel,
   onSecondary,
+  closeLabel = "Ana sayfada kal",
 }) {
   const C = useC();
   if (!visible) return null;
@@ -35,7 +36,7 @@ export function CompletionShell({
           accessibilityLabel="Kapat"
           style={s.close}
         >
-          <Icon name="arrowL" size={16} color={C.text2} />
+          <Icon name="x" size={16} color={C.text2} />
         </Press>
 
         <ScrollView
@@ -69,10 +70,20 @@ export function CompletionShell({
               accessibilityRole="button"
               style={[
                 s.secondary,
-                { borderColor: C.border}
+                { borderColor: C.border }
               ]}
             >
               <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>{secondaryLabel}</Text>
+            </Press>
+          ) : null}
+          {closeLabel ? (
+            <Press haptic="none"
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Kapat"
+              style={s.tertiaryBtn}
+            >
+              <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>{closeLabel}</Text>
             </Press>
           ) : null}
         </Animated.View>
@@ -104,6 +115,11 @@ const s = StyleSheet.create({
     height: CONTROL.buttonTertiary + 2,
     borderRadius: SHAPE.button,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tertiaryBtn: {
+    minHeight: CONTROL.tapMin,
     alignItems: "center",
     justifyContent: "center",
   },

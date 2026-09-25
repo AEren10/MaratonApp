@@ -129,16 +129,10 @@ export function HomeOverlays({
         onAction={(nudge) => {
           onCloseNudgeModal();
           if (nudge.actionLabel === "Plana Ekle" && nudge.subject) {
-            trackButtonTap("home_nudge_modal_add_plan", {
-              subject: nudge.subject,
-              targetScreen: SCREENS.ADD_TASK,
-            });
+            trackButtonTap("home_nudge_modal_add_plan", { subject: nudge.subject, targetScreen: SCREENS.ADD_TASK });
             navigation.navigate(SCREENS.ADD_TASK, { preSubject: nudge.subject });
           } else if (nudge.subject) {
-            trackButtonTap("home_nudge_modal_subject", {
-              subject: nudge.subject,
-              targetScreen: SCREENS.SUBJECT_DETAIL,
-            });
+            trackButtonTap("home_nudge_modal_subject", { subject: nudge.subject, targetScreen: SCREENS.SUBJECT_DETAIL });
             navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: nudge.subject });
           } else {
             trackButtonTap("home_nudge_modal_plan", { targetScreen: SCREENS.PLAN_DETAIL });

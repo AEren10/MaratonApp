@@ -41,15 +41,14 @@ export function useCompletionMoments({ currentWeek, totals, userId }) {
   // useTodayStops'un onAllDone'i: maddelerin tamami isaretlendiginde cagrilir.
   const markDayDone = useCallback((items = []) => {
     const planItems = items.filter((item) => item.source === "plan");
-    // Rota/plan gorevleri henuz yuklenmeden yalniz kullanici gorevleri
-    // bitmis gorunebilir; o anda "gun kapandi" demek erken olur.
     if (!planItems.length) return;
     setDayDone({ date: todayTR(), items });
   }, []);
 
   const dismiss = useCallback(() => {
-    if (!seen) return;
-    const next = markCompletionSeen({ seen, routeComplete, week, dayKey });
+    setDayDone(null);
+    const currentSeen = seen || {};
+    const next = markCompletionSeen({ seen: currentSeen, routeComplete, week, dayKey });
     setSeen(next);
     setJson(storeKey, next).catch(() => {});
   }, [dayKey, routeComplete, seen, storeKey, week]);

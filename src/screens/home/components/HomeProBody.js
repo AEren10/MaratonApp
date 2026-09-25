@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design/Icon";
@@ -13,7 +14,7 @@ import { Press } from "../../../components/design/Press";
 
 // Ana Sayfa (Pro) govdesi: bugunun duraklari, calisma grubu karti, dikkat ceken iki ders,
 // konu borcu + haftalik rapor satirlari, Defter karti.
-export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
+export const HomeProBody = React.memo(function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
   const C = useC();
   const groupsData = useMyGroups();
   // Tekrar bekleyen varsa Defter karti yukari, duraklarin hemen altina cikar:
@@ -52,7 +53,7 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
       <View style={s.notebook}>{dueCount > 0 ? null : notebook}</View>
     </View>
   );
-}
+});
 
 const s = StyleSheet.create({
   due: { paddingTop: STEP.s3 },

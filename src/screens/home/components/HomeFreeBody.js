@@ -21,7 +21,7 @@ const RecentRow = React.memo(function RecentRow({ row }) {
 
 // Ücretsiz Ana Sayfa govdesi: "SON ÇALIŞMALARIN" (bu haftanin gercek
 // kayitlari) + tek notr cikis "Rotanı gör" -> Pro Önizleme.
-export function HomeFreeBody({ recent, onSeeRoute, onFirstWeek }) {
+export const HomeFreeBody = React.memo(function HomeFreeBody({ recent, onSeeRoute, onFirstWeek }) {
   const C = useC();
   return (
     <View>
@@ -41,7 +41,7 @@ export function HomeFreeBody({ recent, onSeeRoute, onFirstWeek }) {
       </View>
     </View>
   );
-}
+});
 
 const s = StyleSheet.create({
   section: { paddingTop: STEP.s4 - 2 },
