@@ -117,7 +117,7 @@ const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(C
 
 export const TAB_SCREENS = [
   screen(SCREENS.HOME, HomeScreen),
-  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
+  screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
   screen(SCREENS.ANALYSIS, AnalysisScreen),
   screen(SCREENS.PROFILE, ProfileScreen),
 ];
@@ -213,7 +213,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
   screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
   screen(SCREENS.DAILY_PLAN, DerslerScreen),
-  screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
+  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
   screen(SCREENS.MONTH_PLAN, MonthPlanScreen),
   screen(SCREENS.SEARCH, SearchScreen),

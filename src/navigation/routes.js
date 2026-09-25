@@ -23,7 +23,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SETUP_INCOMPLETE]: { path: "kurulum/yarim", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
 
   [SCREENS.HOME]: { path: "home", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: true, tab: true },
-  [SCREENS.CURRICULUM_MAP]: { path: "mufredat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },
+  [SCREENS.CURRICULUM_MAP]: { path: "mufredat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.STUDY_LOG]: { path: "calisma/gecmis", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: true },
   [SCREENS.ANALYSIS]: { path: "analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true, tab: true },
   [SCREENS.PROFILE]: { path: "profil", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true, tab: true },
@@ -66,7 +66,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.PLAN_VS_ACTUAL]: { path: "program/plan-gercek", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.DAILY_PLAN]: { path: "program/dersler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
-  [SCREENS.WEEK_PROGRAM]: { path: "program/hafta", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
+  [SCREENS.WEEK_PROGRAM]: { path: "program/hafta", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },
   [SCREENS.CLASS_SCHEDULE]: { path: "program/ders-programi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.MONTH_PLAN]: { path: "program/ay", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.GAP_CLOSURE]: { path: "program/bosluk-kapat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },

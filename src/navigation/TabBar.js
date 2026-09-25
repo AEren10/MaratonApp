@@ -17,7 +17,7 @@ import { SCREENS } from "../constants/screens";
 
 const TABS = [
   { key: SCREENS.HOME, label: "ROTA", icon: "home", hint: "Rota ana sayfasına gider" },
-  { key: SCREENS.CURRICULUM_MAP, label: "PROGRAM", icon: "book", hint: "Program ekranını gösterir" },
+  { key: SCREENS.WEEK_PROGRAM, label: "PROGRAM", icon: "book", hint: "Program ekranını gösterir" },
   { key: "Add", label: "Kaydet", icon: "plus", center: true },
   { key: SCREENS.ANALYSIS, label: "ANALİZ", icon: "chart", hint: "Analiz ekranına gider" },
   { key: SCREENS.PROFILE, label: "PROFİL", icon: "user", hint: "Profil sayfanı açar" },

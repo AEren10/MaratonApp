@@ -16,7 +16,7 @@ import { SCREENS } from "../constants/screens.js";
 
 export const TAB_KEYS = Object.freeze({
   ROTA: SCREENS.HOME,
-  PROGRAM: SCREENS.CURRICULUM_MAP,
+  PROGRAM: SCREENS.WEEK_PROGRAM,
   ANALIZ: SCREENS.ANALYSIS,
   PROFIL: SCREENS.PROFILE,
 });
@@ -59,11 +59,11 @@ export const ROTA_STACK = [
 ];
 
 export const PROGRAM_STACK = [
+  SCREENS.CURRICULUM_MAP,   // Mufredat Haritasi (artik sekme koku DEGIL)
   SCREENS.DAILY_PLAN,       // Program Hub: Hafta (Programim 2. sayfa)
   SCREENS.ROADMAP,          // Rota Detay (paylasimli)
   SCREENS.ROUTE_FULL,       // Rotanin tamami (paylasimli)
   SCREENS.ROUTE_STOP_DETAIL,// Durak Detayi (paylasimli)
-  SCREENS.WEEK_PROGRAM,     // Program: gunun duraklari
   SCREENS.MONTH_PLAN,       // Aylik Plan
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
   SCREENS.GAP_CLOSURE,      // (paylasimli)
