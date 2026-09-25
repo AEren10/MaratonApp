@@ -1,6 +1,6 @@
 import { HStack, Spacer, Text, VStack, ZStack } from "@expo/ui/swift-ui";
 import {
-  background, containerBackground, font, foregroundStyle, frame, padding, shapes, strokeBorder,
+  background, containerBackground, font, foregroundStyle, frame, padding, strokeBorder, cornerRadius,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
@@ -80,8 +80,6 @@ const WeekWidget = (props, environment) => {
       : best && Number(best.questions) > 0
         ? `En iyi günün ${best.label}: ${best.questions}.`
         : "Bugünün hedefi tamam.";
-
-  const R = shapes.roundedRectangle({ cornerRadius: 3 });
   const DASH = { lineWidth: 1, dash: [3, 3] };
 
   const bars = days.map((day, i) => {
@@ -102,7 +100,7 @@ const WeekWidget = (props, environment) => {
           <VStack
             modifiers={[
               frame({ width: barW, height: capH }),
-              background(track, R),
+              background(track), cornerRadius(3),
               ...(isToday
                 ? [strokeBorder({ content: accent, style: DASH, shape: "roundedRectangle", cornerRadius: 3 })]
                 : []),
@@ -111,7 +109,7 @@ const WeekWidget = (props, environment) => {
             <Spacer />
           </VStack>
           {h > 0 ? (
-            <VStack modifiers={[frame({ width: barW, height: h }), background(fill, R)]}>
+            <VStack modifiers={[frame({ width: barW, height: h }), background(fill), cornerRadius(3)]}>
               <Spacer />
             </VStack>
           ) : null}

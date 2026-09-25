@@ -1,6 +1,6 @@
 import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import {
-  background, containerBackground, font, foregroundStyle, frame, padding, shapes, strikethrough,
+  background, containerBackground, font, foregroundStyle, frame, padding, strikethrough, cornerRadius,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
@@ -65,9 +65,6 @@ const TodayWidget = (props, environment) => {
     return r > 0 ? `${h} sa ${r} dk` : `${h} sa`;
   };
 
-  const R = shapes.roundedRectangle({ cornerRadius: 3 });
-  const CAP = shapes.capsule();
-
   // ---- KUCUK BOY: kirmizi zemin, tek is ----
   if (compact) {
     return (
@@ -109,7 +106,7 @@ const TodayWidget = (props, environment) => {
       <VStack
         modifiers={[
           frame({ width: 13, height: 13 }),
-          background(t.done ? up : track, R),
+          background(t.done ? up : track), cornerRadius(3),
         ]}
       >
         <Spacer />
@@ -118,7 +115,7 @@ const TodayWidget = (props, environment) => {
         modifiers={[
           font({ size: 12.5, weight: t.done ? "regular" : "semibold" }),
           foregroundStyle(t.done ? text4 : text),
-          ...(t.done ? [strikethrough(true)] : []),
+          ...(t.done ? [strikethrough({ isActive: true, pattern: "solid" })] : []),
         ]}
       >
         {t.label}
@@ -141,7 +138,7 @@ const TodayWidget = (props, environment) => {
   const strip = dayMinutes.map((m, i) => (
     <VStack
       key={`d${i}`}
-      modifiers={[frame({ width: 26, height: 4 }), background(m > 0 ? accent : track, CAP)]}
+      modifiers={[frame({ width: 26, height: 4 }), background(m > 0 ? accent : track), cornerRadius(2)]}
     >
       <Spacer />
     </VStack>

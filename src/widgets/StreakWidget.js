@@ -1,6 +1,6 @@
 import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import {
-  background, containerBackground, font, foregroundStyle, frame, padding, shapes, strokeBorder,
+  background, containerBackground, font, foregroundStyle, frame, padding, strokeBorder, cornerRadius,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
@@ -54,7 +54,6 @@ const StreakWidget = (props, environment) => {
 
   const cell = compact ? 11 : 14;
   const gapCell = compact ? 3 : 4;
-  const R = shapes.roundedRectangle({ cornerRadius: 3 });
 
   // Rekora yaklasmak seriyi surdurmenin en iyi gerekcesi; yoksa bugunun
   // durumu soylenir. Kuru "13 gun" tek basina bir sey istemiyor.
@@ -81,7 +80,7 @@ const StreakWidget = (props, environment) => {
             key={`c${i}`}
             modifiers={[
               frame({ width: cell, height: cell }),
-              background(isToday && !todayDone ? bg : fill, R),
+              background(isToday && !todayDone ? bg : fill), cornerRadius(3),
               ...(isToday
                 ? [strokeBorder({
                     content: todayDone ? accentBright : accent,
