@@ -19,3 +19,11 @@ test("send-push accepts both Expo push token formats", () => {
   assert.match(source, /ExponentPushToken\[/);
   assert.match(source, /ExpoPushToken\[/);
 });
+
+test("send-push templates avoid pressure language and route to context", () => {
+  assert.doesNotMatch(source, /Seriyi bozma/i);
+  assert.doesNotMatch(source, /tehlikede/i);
+  assert.doesNotMatch(source, /Seni ozledik/i);
+  assert.match(source, /maraton:\/\/plan/);
+  assert.match(source, /maraton:\/\/ozet\/week/);
+});

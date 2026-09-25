@@ -36,18 +36,18 @@ type PushTemplate = {
 // bildirimi sessizce hiçbir ekrana gitmez.
 const TEMPLATES: Partial<Record<ReengagementPayload["type"], PushTemplate>> = {
   inactive_3d: {
-    title: "Seni ozledik!",
-    body: "3 gundur calisma kaydetmedin. Hedefe kalan her gun onemli!",
+    title: "Rota seni bekliyor",
+    body: "Birkaç gündür kayıt yok. Uygunsa bugünkü ilk durağı açabilirsin.",
     data: { type: "inactive_3d", url: "maraton://plan" },
   },
   streak_risk: {
-    title: "Streak'in tehlikede!",
-    body: "Bugun hic calisma kaydetmedin. Seriyi bozma!",
+    title: "Seri için son pencere",
+    body: "Bugün kısa bir kayıt seriyi canlı tutar.",
     data: { type: "streak_risk", url: "maraton://plan" },
   },
   weekly_summary: {
-    title: "Haftalik raporun hazir",
-    body: "Bu haftanin ozetine goz at, gelisimini incele!",
+    title: "Haftalık özet hazır",
+    body: "Bu haftanın ritmini ve kalan yükünü sakin bir şekilde görebilirsin.",
     data: { type: "weekly_summary", url: "maraton://ozet/week" },
   },
 };
