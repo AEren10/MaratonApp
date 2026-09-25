@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -13,6 +13,7 @@ import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { ProFeatureItem } from "./components/ProFeatureItem";
 import { ProPlanRow } from "./components/ProPlanRow";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Premium". Baglamsiz, tam sunum. Baglama ozel paywall ayri
 // ekran (PaywallScreen). Satin alma mantigi usePaywallPurchase'te.
@@ -29,23 +30,23 @@ export default function PremiumScreen() {
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
       <View style={s.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => { H.tap(); navigation.goBack(); }}
           style={s.close}
           accessibilityRole="button"
           accessibilityLabel="Kapat"
         >
           <Icon name="x" size={14} color={C.text2} sw={1.7} />
-        </Pressable>
+        </Press>
         <View style={s.spacer} />
-        <Pressable
+        <Press haptic="none"
           onPress={handleRestore}
           disabled={purchasing}
           style={s.restore}
           accessibilityRole="button"
         >
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{PRO_PITCH.restore}</Text>
-        </Pressable>
+        </Press>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>

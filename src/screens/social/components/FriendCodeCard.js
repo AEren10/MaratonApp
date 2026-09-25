@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
+import { View, Text, TextInput, ActivityIndicator, StyleSheet, Share } from "react-native";
 import Animated from "react-native-reanimated";
 import * as Clipboard from "expo-clipboard";
 import { Icon } from "../../../components/design";
@@ -11,6 +11,7 @@ import { getMyFriendCode, sendFriendRequestByCode } from "../../../supabase/frie
 import * as H from "../../../lib/haptics";
 import { SCREENS } from "../../../constants/screens";
 import { appUrl } from "../../../navigation/routes";
+import { Press } from "../../../components/design/Press";
 
 export function FriendCodeCard({ onRequestSent, initialCode }) {
   const C = useC();
@@ -66,12 +67,12 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
           <Text style={s.label}>SENİN KODUN</Text>
           <View style={s.codeRow}>
             <Text style={s.codeValue}>{myCode}</Text>
-            <Pressable onPress={copyCode} style={s.btn} hitSlop={8}>
+            <Press haptic="none" onPress={copyCode} style={s.btn} hitSlop={8}>
               <Icon name={copied ? "check" : "copy"} size={16} color={copied ? C.green : C.accent} />
-            </Pressable>
-            <Pressable onPress={shareCode} style={s.btn} hitSlop={8}>
+            </Press>
+            <Press haptic="none" onPress={shareCode} style={s.btn} hitSlop={8}>
               <Icon name="share" size={16} color={C.accent} />
-            </Pressable>
+            </Press>
           </View>
           <Text style={s.hint}>Bu kodu arkadaşlarınla paylaş, seni eklesinler</Text>
         </Animated.View>
@@ -89,9 +90,9 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
             maxLength={6}
             style={s.input}
           />
-          <Pressable onPress={addByCode} disabled={codeBusy || codeInput.length < 4} style={[s.sendBtn, (codeBusy || codeInput.length < 4) && { opacity: 0.5 }]}>
+          <Press haptic="none" onPress={addByCode} disabled={codeBusy || codeInput.length < 4} style={[s.sendBtn, (codeBusy || codeInput.length < 4) && { opacity: 0.5 }]}>
             {codeBusy ? <ActivityIndicator size="small" color={C.bg} /> : <Icon name="plus" size={16} color={C.bg} sw={2.5} />}
-          </Pressable>
+          </Press>
         </View>
       </Animated.View>
     </>

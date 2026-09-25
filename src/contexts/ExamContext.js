@@ -100,6 +100,8 @@ export function ExamProvider({ children }) {
   const [targetDepartment, setTargetDepartment] = useState(null);
   // Tasarimin onboarding 1. adimi: HEDEF NET (slider 40-120). profiles.target_net.
   const [targetNet, setTargetNet] = useState(null);
+  const [targetNetTYT, setTargetNetTYT] = useState(null);
+  const [targetNetAYT, setTargetNetAYT] = useState(null);
   // Rotanin baslangic noktasi (Seviye Testi 3/4). profiles.baseline_net.
   const [baselineNet, setBaselineNet] = useState(null);
   const [dailyGoalSet, setDailyGoalSet] = useState(false);
@@ -128,6 +130,8 @@ export function ExamProvider({ children }) {
         setTargetRanking(d.targetRanking || null);
         setTargetDepartment(d.targetDepartment || null);
         setTargetNet(d.targetNet ?? null);
+        setTargetNetTYT(d.targetNetTYT ?? null);
+        setTargetNetAYT(d.targetNetAYT ?? null);
         setBaselineNet(d.baselineNet ?? null);
         if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
         setLevelTestDone(!!d.levelTestDone || d.baselineNet != null);

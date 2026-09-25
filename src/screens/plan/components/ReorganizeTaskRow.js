@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function ReorganizeTaskRow({
   task,
@@ -47,7 +48,7 @@ export function ReorganizeTaskRow({
 
       {!isDone ? (
         <View style={s.actionsRow}>
-          <Pressable
+          <Press haptic="none"
             disabled={!canMoveUp}
             onPress={onMoveUp}
             hitSlop={STEP.s1}
@@ -55,8 +56,8 @@ export function ReorganizeTaskRow({
             accessibilityLabel="Yukarı taşı"
           >
             <Icon name="chevU" size={16} color={C.text} />
-          </Pressable>
-          <Pressable
+          </Press>
+          <Press haptic="none"
             disabled={!canMoveDown}
             onPress={onMoveDown}
             hitSlop={STEP.s1}
@@ -64,15 +65,15 @@ export function ReorganizeTaskRow({
             accessibilityLabel="Aşağı taşı"
           >
             <Icon name="chevD" size={16} color={C.text} />
-          </Pressable>
-          <Pressable
+          </Press>
+          <Press haptic="none"
             onPress={onRemove}
             hitSlop={STEP.s1}
             style={s.iconBtn}
             accessibilityLabel="Duraktan çıkar"
           >
             <Icon name="x" size={16} color={C.text3} />
-          </Pressable>
+          </Press>
         </View>
       ) : (
         <View style={[s.donePill, { backgroundColor: C.up + "20" }]}>

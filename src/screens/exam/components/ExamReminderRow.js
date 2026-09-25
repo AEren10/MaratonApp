@@ -1,14 +1,15 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { ExamSwitch } from "./ExamSwitch";
+import { Press } from "../../../components/design/Press";
 
 // "Bir gün önce hatırlat" — alt satir hatirlatma anini gosterir. Sinav
 // tarihi yoksa ya da an gectiyse alt satir cizilmez.
 export function ExamReminderRow({ on, caption, onToggle }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onToggle}
       accessibilityRole="switch"
       accessibilityState={{ checked: on }}
@@ -22,7 +23,7 @@ export function ExamReminderRow({ on, caption, onToggle }) {
         ) : null}
       </View>
       <ExamSwitch on={on} />
-    </Pressable>
+    </Press>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { emailSchema, validate } from "../../validations/auth";
+import { Press } from "../../components/design/Press";
 
 export default function ForgotPasswordScreen() {
   const C = useC();
@@ -60,7 +61,7 @@ export default function ForgotPasswordScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable
+            <Press haptic="none"
               onPress={goBack}
               hitSlop={12}
               accessibilityLabel="Geri"
@@ -68,7 +69,7 @@ export default function ForgotPasswordScreen() {
               style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
             >
               <Icon name="arrowL" size={18} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
 
           {sent ? (
@@ -92,9 +93,9 @@ export default function ForgotPasswordScreen() {
                 <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s1 }}>
                   {busy ? "Gönderiliyor..." : "Bağlantıyı gönder"}
                 </Button>
-                <Pressable onPress={goBack} style={{ alignItems: "center", justifyContent: "center", minHeight: 44, marginTop: STEP.s2 }} hitSlop={6}>
+                <Press haptic="none" onPress={goBack} style={{ alignItems: "center", justifyContent: "center", minHeight: 44, marginTop: STEP.s2 }} hitSlop={6}>
                   <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Giriş ekranına dön</Text>
-                </Pressable>
+                </Press>
               </Animated.View>
             </>
           )}

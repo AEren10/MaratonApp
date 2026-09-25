@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
@@ -9,6 +9,7 @@ import { navigateFromOutside } from "../../navigation/navigationRef";
 import { usePendingWrites } from "../../hooks/usePendingWrites";
 import { flushQueue, retryDeadLetter, getDeadLetterCount } from "../../lib/offlineQueue";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 // Kalıcı olarak gönderilemeyen kayıt varsa ana ekranda uyarı şeridi.
 // Ayarlardaki satır yeterli değil: kullanıcı ayarlara girmezse veri kaybını
@@ -54,10 +55,10 @@ export function SyncProblemBanner() {
         <Text style={styles.title}>{failed} kayıt gönderilemedi</Text>
         <Text style={styles.sub}>{note || "Cihazında duruyor. Tekrar denemek için dokun."}</Text>
       </View>
-      <Pressable onPress={retry} hitSlop={8} style={styles.action}>
+      <Press haptic="none" onPress={retry} hitSlop={8} style={styles.action}>
         <Text style={styles.actionText}>{busy ? "..." : "Tekrar dene"}</Text>
-      </Pressable>
-      <Pressable
+      </Press>
+      <Press haptic="none"
         onPress={() => {
           if (navigateFromOutside(SCREENS.OFFLINE_QUEUE)) H.tap();
         }}
@@ -66,7 +67,7 @@ export function SyncProblemBanner() {
         accessibilityLabel="Gönderilemeyen kayıtları aç"
       >
         <Icon name="chevR" size={16} color={C.muted} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

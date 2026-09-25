@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -12,6 +12,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { emailSchema, validate } from "../../validations/auth";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 // Tasarimda bu ekranin ayri bir artboard'u yok (akista aniliyor, 4/2).
 // Duzen uydurulmadi: tasarim SISTEMI uygulandi.
@@ -59,9 +60,9 @@ export default function EditEmailScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>E-posta değiştir</Text>
       </View>
 

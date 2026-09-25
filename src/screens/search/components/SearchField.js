@@ -1,7 +1,8 @@
 import React from "react";
-import { View, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: geri chevron + h42 r12 `void` zeminli alan, sagda temizleme.
 export const SearchField = React.memo(function SearchField({
@@ -9,9 +10,9 @@ export const SearchField = React.memo(function SearchField({
 }) {
   return (
     <View style={styles.wrap}>
-      <Pressable onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+      <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
         <Icon name="arrowL" size={18} color={C.text2} />
-      </Pressable>
+      </Press>
       <View style={[styles.field, { backgroundColor: C.void, borderColor: C.border }]}>
         <Icon name="search" size={14} color={C.text3} />
         <TextInput
@@ -27,7 +28,7 @@ export const SearchField = React.memo(function SearchField({
           style={[TYPOGRAPHY.inputMedium, styles.input, { color: C.text }]}
         />
         {value ? (
-          <Pressable
+          <Press haptic="none"
             onPress={onClear}
             hitSlop={14}
             accessibilityRole="button"
@@ -35,7 +36,7 @@ export const SearchField = React.memo(function SearchField({
             style={[styles.clear, { backgroundColor: C.elev }]}
           >
             <Icon name="x" size={9} color={C.text3} sw={2} />
-          </Pressable>
+          </Press>
         ) : null}
       </View>
     </View>

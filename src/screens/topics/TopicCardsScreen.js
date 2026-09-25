@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -12,6 +12,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getTopicProgress } from "../../supabase/topicProgress";
 import { CardItem } from "./components/CardItem";
 import { TopicCardsSkeleton } from "./components/TopicCardsSkeleton";
+import { Press } from "../../components/design/Press";
 
 const ItemSeparator = () => <View style={{ height: STEP.s2 }} />;
 
@@ -63,15 +64,15 @@ export default function TopicCardsScreen() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12}>
+        <Press haptic="none" onPress={goBack} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           Konu Kartları
         </Text>
-        <Pressable onPress={() => navigation.navigate(SCREENS.HOW_IT_WORKS)} hitSlop={12} style={{ marginRight: STEP.s2 }}>
+        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.HOW_IT_WORKS)} hitSlop={12} style={{ marginRight: STEP.s2 }}>
           <Icon name="info" size={22} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>
           {cards.length} konu
         </Text>

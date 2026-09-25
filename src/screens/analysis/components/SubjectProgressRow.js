@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SHAPE, STEP } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function SubjectProgressRow({ C, item, onPress }) {
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel={`${item.name} detayı`}
       onPress={onPress}
@@ -22,7 +23,7 @@ export function SubjectProgressRow({ C, item, onPress }) {
         </View>
         <Text style={[s.meta, { color: C.text3 }]}>{item.meta}</Text>
       </View>
-    </Pressable>
+    </Press>
   );
 }
 

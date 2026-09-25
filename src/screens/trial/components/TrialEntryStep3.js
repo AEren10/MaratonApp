@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useState } from "react";
 
@@ -6,6 +6,7 @@ import { Button } from "../../../components/design";
 import { trialDifficultyMultiplier } from "../../../domain/trial/trialModel";
 import { TrialEntryDetailsCard, TrialEntryNotebookToggle } from "./TrialEntryDetailsCard";
 import { TrialEntryNetCard } from "./TrialEntryNetCard";
+import { Press } from "../../../components/design/Press";
 
 export function TrialEntryStep3({ form, styles, onBack }) {
   const normalizedNet = Number(form.totalNet) * trialDifficultyMultiplier(form.difficultyLevel);
@@ -39,9 +40,9 @@ export function TrialEntryStep3({ form, styles, onBack }) {
         <Button size="lg" onPress={form.handleSave} loading={form.saving} fullWidth>
           Kaydet ve rotayı çiz
         </Button>
-        <Pressable onPress={onBack} style={styles.tertiary} accessibilityRole="button">
+        <Press haptic="none" onPress={onBack} style={styles.tertiary} accessibilityRole="button">
           <Text style={styles.tertiaryText}>Adım 2'ye dön</Text>
-        </Pressable>
+        </Press>
       </Animated.View>
     </ScrollView>
   );

@@ -1,9 +1,10 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
 import * as H from "../../lib/haptics";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { Press } from "../../components/design/Press";
 
 // Esit genislikte cerceveli sekmeler (tasarim: Aylik Plan "Hafta / Ay",
 // Kart Modlari "Emek / İvme / Tam"). Secili: kizil tint + accent kenar.
@@ -15,7 +16,7 @@ function PillTabs({ options, value, onChange, height = 40 }) {
       {options.map((o) => {
         const on = o.key === value;
         return (
-          <Pressable
+          <Press haptic="none"
             key={o.key}
             onPress={() => { if (!on) { H.select(); onChange(o.key); } }}
             hitSlop={{ top: (CONTROL.tapMin - height) / 2, bottom: (CONTROL.tapMin - height) / 2 }}
@@ -29,7 +30,7 @@ function PillTabs({ options, value, onChange, height = 40 }) {
             <Text style={[on ? TYPOGRAPHY.metaSemiBold : TYPOGRAPHY.meta, { color: on ? C.text : C.text2 }]}>
               {o.label}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

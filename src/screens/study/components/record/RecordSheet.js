@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useC } from "../../../../contexts/ThemeContext";
 import { alpha } from "../../../../themes/colorMix";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Alt sayfa kabugu: soluk arka plan, bg yuzey + ust kenarlik, tutamak, bolum etiketi.
 export function RecordSheet({ visible, label, onClose, children }) {
@@ -26,7 +27,7 @@ export function RecordSheet({ visible, label, onClose, children }) {
 export function SheetOption({ title, meta, color, selected, onPress }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
@@ -36,7 +37,7 @@ export function SheetOption({ title, meta, color, selected, onPress }) {
       <Text numberOfLines={1} style={[TYPOGRAPHY.bodyMedium, styles.flex, { color: selected ? C.text : C.text2 }]}>{title}</Text>
       {meta ? <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{meta}</Text> : null}
       <View style={[styles.radio, { borderColor: selected ? C.accent : C.border, backgroundColor: selected ? C.accent : "transparent" }]} />
-    </Pressable>
+    </Press>
   );
 }
 

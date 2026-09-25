@@ -1,9 +1,10 @@
 import { memo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // Tasarimin segment kontrolu: surface zemin, 4px ic bosluk, secili dilim elev.
 // Dilim h36; dokunma alani dikeyde 44'e seffaf olarak buyutulur.
@@ -14,7 +15,7 @@ export const Segmented = memo(function Segmented({ options, value, onChange }) {
       {options.map((opt) => {
         const active = opt.key === value;
         return (
-          <Pressable
+          <Press haptic="none"
             key={opt.key}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
@@ -30,7 +31,7 @@ export const Segmented = memo(function Segmented({ options, value, onChange }) {
             <Text style={[TYPOGRAPHY.metaSemiBold, styles.text, { color: active ? C.text : C.text3 }]}>
               {opt.label}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

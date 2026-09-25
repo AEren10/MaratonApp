@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, STEP } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
+import { Press } from "../../../components/design/Press";
 
 export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
   const items = [
@@ -38,7 +39,7 @@ export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular,
 
       <View style={s.list}>
         {items.map((item) => (
-          <Pressable
+          <Press haptic="none"
             key={item.name}
             accessibilityRole="button"
             accessibilityLabel={item.name}
@@ -50,7 +51,7 @@ export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular,
               <Text style={[s.itemNote, { color: C.text3 }]}>{item.note}</Text>
             </View>
             <Icon name="chevR" size={15} color={C.text4} />
-          </Pressable>
+          </Press>
         ))}
       </View>
     </View>

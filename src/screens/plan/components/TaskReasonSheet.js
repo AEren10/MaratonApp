@@ -6,6 +6,7 @@ import { Icon } from "../../../components/design";
 import { TrendChart } from "../../../components/charts/TrendChart";
 import { TRIAL_TO_CURRICULUM } from "../../../domain/trial/trialKeyMap";
 import AssignmentInsightPanel from "./AssignmentInsightPanel";
+import { Press } from "../../../components/design/Press";
 
 // Görev gerekçesi + son denemelerde bu dersin net trendi.
 function trialKeysForCurriculum(curriculumKey) {
@@ -62,9 +63,9 @@ export function TaskReasonSheet({ task, trials, onClose }) {
                 <Text style={s.empty}>Net trendi için en az 2 deneme gerek.</Text>
               )}
 
-              <Pressable onPress={onClose} style={s.closeBtn}>
+              <Press haptic="none" onPress={onClose} style={s.closeBtn}>
                 <Text style={s.closeText}>Kapat</Text>
-              </Pressable>
+              </Press>
             </>
           ) : null}
         </Pressable>

@@ -1,8 +1,9 @@
 import { useMemo } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
+import { Press } from "../../../components/design/Press";
 
 function getFilters(examType) {
   if (examType === "lgs") {
@@ -48,7 +49,7 @@ export function TrialFilter({ value, onChange }) {
       {FILTERS.map((f) => {
         const active = value === f.key;
         return (
-          <Pressable
+          <Press haptic="none"
             key={f.key}
             accessibilityRole="tab"
             accessibilityLabel={f.label}
@@ -70,7 +71,7 @@ export function TrialFilter({ value, onChange }) {
             >
               {f.label}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

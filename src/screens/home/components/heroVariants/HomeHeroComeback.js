@@ -1,10 +1,11 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
 import { HomeHeroComebackAction } from "./HomeHeroComebackAction";
 import * as H from "../../../../lib/haptics";
+import { Press } from "../../../../components/design/Press";
 
 // Tasarim AKIS 14 · "Geri Dönüş Modu": uzun aradan sonra ilk açılışta gelir.
 // Borç sayısı, kaçan seri ve geçmiş burada gösterilmez — tek iş kullanıcıyı
@@ -25,7 +26,7 @@ export function HomeHeroComeback({ nextTask, recommendation, onStartTask, onDism
       </Animated.View>
 
       <Animated.View style={s.block}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => { H.select(); onStartTask?.(nextTask); }}
           style={[s.recCard, { backgroundColor: C.brandTint, borderColor: C.accent }]}
           accessibilityRole="button"
@@ -47,7 +48,7 @@ export function HomeHeroComeback({ nextTask, recommendation, onStartTask, onDism
           <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: 6 }]}>
             {rec.effort || "Bugünkü plandan küçük bir adım"}
           </Text>
-        </Pressable>
+        </Press>
 
         <HomeHeroComebackAction
           label={rec.primaryLabel || "Küçük adımla başla"}

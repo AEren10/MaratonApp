@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const TABS = [
   { key: "ALL", label: "Tümü" },
@@ -16,7 +17,7 @@ export function AnalysisFilterPills({ C, value, onChange }) {
         {TABS.map((tab) => {
           const active = value === tab.key;
           return (
-            <Pressable
+            <Press haptic="none"
               key={tab.key}
               accessibilityRole="tab"
               accessibilityState={{ selected: active }}
@@ -34,7 +35,7 @@ export function AnalysisFilterPills({ C, value, onChange }) {
               >
                 {tab.label}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </View>

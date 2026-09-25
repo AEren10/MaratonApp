@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
-import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -18,6 +18,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { registerSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
+import { Press } from "../../components/design/Press";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
@@ -72,7 +73,7 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable
+            <Press haptic="none"
               onPress={() => navigation.goBack()}
               hitSlop={12}
               accessibilityLabel="Geri"
@@ -80,7 +81,7 @@ export default function RegisterScreen() {
               style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
             >
               <Icon name="arrowL" size={18} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
 
           <Animated.View style={{ marginTop: STEP.s2 }}>
@@ -132,10 +133,10 @@ export default function RegisterScreen() {
           </Animated.View>
 
           <Animated.View>
-            <Pressable onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
+            <Press haptic="none" onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
               <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın var mı?</Text>
               <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Giriş yap</Text>
-            </Pressable>
+            </Press>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

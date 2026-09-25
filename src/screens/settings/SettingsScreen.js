@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +23,7 @@ import { displayNameOf } from "../../lib/displayName";
 import { useSelector } from "react-redux";
 import { selectGoals } from "../../store/slices/goalsSlice";
 import appConfig from "../../../app.json";
+import { Press } from "../../components/design/Press";
 
 const EXAM_LABELS = { tyt: "TYT", tyt_ayt: "TYT + AYT", dil: "TYT + YDT", lgs: "LGS" };
 const FIELD_LABELS = { sayisal: "Sayısal", ea: "Eşit Ağırlık", sozel: "Sözel", dil: "Dil" };
@@ -73,9 +74,9 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Ayarlar</Text>
       </View>
 

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useEditProfileForm } from "../../hooks/useEditProfileForm";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Profil Düzenle" artboard'u. SINIF ve KULLANICI ADI alanları
 // tasarımda var ama profiles tablosunda karşılığı yok (grade/username
@@ -41,16 +42,16 @@ export default function EditProfileScreen() {
           kullanicisina hicbir baglam vermiyor: baslik gorunmez bir
           erisilebilirlik etiketi olarak veriliyor. */}
       <View style={s.header} accessibilityRole="header" accessibilityLabel="Profil düzenle">
-        <Pressable
+        <Press haptic="none"
           onPress={() => navigation.goBack()}
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Geri"
         >
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <View style={{ flex: 1 }} />
-        <Pressable
+        <Press haptic="none"
           onPress={save}
           disabled={saving}
           hitSlop={12}
@@ -61,7 +62,7 @@ export default function EditProfileScreen() {
           <Text style={[s.save, { color: C.accentBright, opacity: saving ? 0.5 : 1 }]}>
             {saving ? "Kaydediliyor…" : "Kaydet"}
           </Text>
-        </Pressable>
+        </Press>
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>

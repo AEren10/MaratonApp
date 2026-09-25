@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, View, Text, Pressable, RefreshControl } from "react-native";
+import { ScrollView, View, Text, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
@@ -15,6 +15,7 @@ import { WeekDayStrip } from "./components/WeekDayStrip";
 import { SelectedDayPanel } from "./components/SelectedDayPanel";
 import { ProgramRulesSection } from "./components/ProgramRulesSection";
 import SegmentTabs from "../../components/common/SegmentTabs";
+import { Press } from "../../components/design/Press";
 
 const TABS = [{ key: "week", label: "Haftalık" }, { key: "month", label: "Aylık" }];
 // Mufredat ekranindaki segmentin AYNISI, ters yonu. Gecis eskiden tek
@@ -31,7 +32,7 @@ function Header({ C, navigation }) {
   // (ya da müfredattan vs push edilmiş olabilir).
   return (
     <View style={{ flexDirection: "row", alignItems: "center", paddingTop: 4 }}>
-      <Pressable
+      <Press haptic="none"
         accessibilityRole="button"
         accessibilityLabel="Geri"
         hitSlop={10}
@@ -42,11 +43,11 @@ function Header({ C, navigation }) {
         style={{ width: 40, height: 44, justifyContent: "center" }}
       >
         <Icon name="chevL" size={17} color={C.text} />
-      </Pressable>
+      </Press>
       <Text style={{ flex: 1, fontFamily: "Bricolage_400", fontSize: 22, color: C.text }}>
         Programım
       </Text>
-      <Pressable
+      <Press haptic="none"
         accessibilityRole="button"
         accessibilityLabel="Takvim"
         hitSlop={10}
@@ -54,7 +55,7 @@ function Header({ C, navigation }) {
         style={{ width: 44, height: 44, alignItems: "flex-end", justifyContent: "center" }}
       >
         <Icon name="calendar" size={19} color={C.text3} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

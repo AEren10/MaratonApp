@@ -3,12 +3,13 @@ import { View, Text, Pressable } from "react-native";
 import { SectionLabel } from "../../../components/design";
 import { useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 function SubjectChip({ subject, selected, onPress, C }) {
   const id = useSubjectIdentity(subject.key);
   const color = id?.solid || subject.color || C.accent;
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
@@ -30,7 +31,7 @@ function SubjectChip({ subject, selected, onPress, C }) {
       <Text style={[TYPOGRAPHY.captionMedium, { color: selected ? color : C.text, flexShrink: 1 }]} numberOfLines={1}>
         {subject.label || subject.name}
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

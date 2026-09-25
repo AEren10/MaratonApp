@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -10,6 +10,7 @@ import { formatDelta, formatNumber } from "../../../lib/format";
 import { SCREENS } from "../../../constants/screens";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../../navigation/rootStackActions";
+import { Press } from "../../../components/design/Press";
 
 export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }) {
   const C = useC();
@@ -21,17 +22,17 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.popToTop()} style={styles.close}
+        <Press haptic="none" onPress={() => navigation.popToTop()} style={styles.close}
           accessibilityLabel="Kapat" accessibilityRole="button">
           <Icon name="x" size={14} color={C.text2} sw={1.7} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
           {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}
         </Text>
         {onShare ? (
-          <Pressable onPress={onShare} style={styles.close} accessibilityLabel="Paylaş" accessibilityRole="button">
+          <Press haptic="none" onPress={onShare} style={styles.close} accessibilityLabel="Paylaş" accessibilityRole="button">
             <Icon name="share" size={16} color={C.text2} />
-          </Pressable>
+          </Press>
         ) : <View style={styles.close} />}
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>

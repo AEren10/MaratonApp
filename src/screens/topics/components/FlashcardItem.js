@@ -1,14 +1,15 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const { width: SW } = Dimensions.get("window");
 const CARD_W = SW - 44;
 
 export function FlashcardItem({ card, flipped, onFlip, C }) {
   return (
-    <Pressable onPress={onFlip} style={[s.flashcard, { backgroundColor: C.surface, borderColor: C.border }]}>
+    <Press haptic="none" onPress={onFlip} style={[s.flashcard, { backgroundColor: C.surface, borderColor: C.border }]}>
       <View style={s.cardLabel}>
         <Icon name={flipped ? "eye" : "eyeOff"} size={14} color={C.text3} />
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
@@ -24,7 +25,7 @@ export function FlashcardItem({ card, flipped, onFlip, C }) {
       <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: STEP.s3 }]}>
         Çevirmek için dokun
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

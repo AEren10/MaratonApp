@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // DOGRU / YANLIS satiri: sayiya dokun-yaz, arti-eksi ince ayar. warn = Form Hatasi.
 export function TrialCountStepper({ label, value, max, warn, onChangeText, onStep }) {
@@ -19,14 +20,14 @@ export function TrialCountStepper({ label, value, max, warn, onChangeText, onSte
         style={[TYPOGRAPHY.inputTopic, styles.input, {
           color: C.text, backgroundColor: C.void, borderColor: warn ? C.warn : C.border,
         }]} />
-      <Pressable onPress={() => onStep(-1)} disabled={count <= 0} style={styles.step}
+      <Press haptic="none" onPress={() => onStep(-1)} disabled={count <= 0} style={styles.step}
         accessibilityRole="button" accessibilityLabel={`${label} bir azalt`}>
         <Icon name="minus" size={14} color={C.text3} sw={2} />
-      </Pressable>
-      <Pressable onPress={() => onStep(1)} disabled={count >= max} style={[styles.step, { backgroundColor: C.elev }]}
+      </Press>
+      <Press haptic="none" onPress={() => onStep(1)} disabled={count >= max} style={[styles.step, { backgroundColor: C.elev }]}
         accessibilityRole="button" accessibilityLabel={`${label} bir artır`}>
         <Icon name="plus" size={14} color={C.text} sw={2} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

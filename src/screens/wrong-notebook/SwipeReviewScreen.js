@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -22,6 +22,7 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { computeNextReview } from "../../lib/spacedRepetition";
 import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 const { width: SW } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SW * 0.3;
@@ -129,9 +130,9 @@ export default function SwipeReviewScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
           <Icon name="x" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={s.title}>Swipe Tekrar</Text>
         <Text style={s.counter}>{Math.min(idx + 1, queue.length)}/{queue.length}</Text>
       </View>
@@ -157,9 +158,9 @@ export default function SwipeReviewScreen() {
               <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>Bilmedim</Text>
             </View>
           </View>
-          <Pressable onPress={() => navigation.goBack()} style={s.closeBtn}>
+          <Press haptic="none" onPress={() => navigation.goBack()} style={s.closeBtn}>
             <Text style={s.closeText}>Bitir</Text>
-          </Pressable>
+          </Press>
         </Animated.View>
       ) : current ? (
         <View style={s.cardArea}>
@@ -213,7 +214,7 @@ export default function SwipeReviewScreen() {
 
           {/* Tap alternatives for accessibility */}
           <View style={s.tapRow}>
-            <Pressable
+            <Press haptic="none"
               onPress={() => handleGrade(false)}
               accessibilityRole="button"
               accessibilityLabel="Bilmedim"
@@ -221,8 +222,8 @@ export default function SwipeReviewScreen() {
             >
               <Icon name="x" size={18} color={C.red} />
               <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Bilmedim</Text>
-            </Pressable>
-            <Pressable
+            </Press>
+            <Press haptic="none"
               onPress={() => handleGrade(true)}
               accessibilityRole="button"
               accessibilityLabel="Bildim"
@@ -230,7 +231,7 @@ export default function SwipeReviewScreen() {
             >
               <Icon name="check" size={18} color={C.up} />
               <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.up }}>Bildim</Text>
-            </Pressable>
+            </Press>
           </View>
         </View>
       ) : null}

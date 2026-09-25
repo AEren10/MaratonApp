@@ -1,7 +1,8 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const HOUR_OPTIONS = [
   { h: 8, label: "08:00" },
@@ -23,7 +24,7 @@ export function ReminderHourPicker({ hour, onSelect }) {
         {HOUR_OPTIONS.map((o) => {
           const active = hour === o.h;
           return (
-            <Pressable
+            <Press haptic="none"
               key={o.h}
               onPress={() => {
                 H.select();
@@ -42,7 +43,7 @@ export function ReminderHourPicker({ hour, onSelect }) {
               <Text style={[TYPOGRAPHY.captionMedium, { color: active ? C.accentInk : C.text2 }]}>
                 {o.label}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </View>

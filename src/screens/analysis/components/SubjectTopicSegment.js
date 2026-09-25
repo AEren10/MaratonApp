@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL, GUTTER } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const TABS = [
   { key: "all", label: "Tümü" },
@@ -20,7 +21,7 @@ export const SubjectTopicSegment = React.memo(function SubjectTopicSegment({ C, 
       {TABS.map((tab) => {
         const isActive = tab.key === active;
         return (
-          <Pressable
+          <Press haptic="none"
             key={tab.key}
             onPress={() => handlePress(tab.key)}
             style={[styles.tab, isActive && { backgroundColor: C.elev }]}
@@ -31,7 +32,7 @@ export const SubjectTopicSegment = React.memo(function SubjectTopicSegment({ C, 
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: isActive ? C.text : C.text3 }]}>
               {tab.label}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

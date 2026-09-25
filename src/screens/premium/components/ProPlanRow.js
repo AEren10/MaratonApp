@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: secili plan yuzey tonu + kizil kenarlikla one cikar (golge yok).
 // Radio yok; secim kartin kendisiyle anlatiliyor.
@@ -16,7 +17,7 @@ export const ProPlanRow = React.memo(function ProPlanRow({ plan, selected, onSel
   }, [onSelect, plan.id]);
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={press}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
@@ -45,7 +46,7 @@ export const ProPlanRow = React.memo(function ProPlanRow({ plan, selected, onSel
         <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>{plan.price}</Text>
         <Text style={[TYPOGRAPHY.micro, styles.per, { color: C.text3 }]}>{plan.per}</Text>
       </View>
-    </Pressable>
+    </Press>
   );
 });
 

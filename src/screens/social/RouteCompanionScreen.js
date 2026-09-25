@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -10,6 +10,7 @@ import { useRouteCompanion } from "../../hooks/useRouteCompanion";
 import { RADIUS, SPACING, TYPOGRAPHY } from "../../themes/tokens";
 import { CompanionEffortCard } from "./components/CompanionEffortCard";
 import { RouteCompanionSkeleton } from "./components/RouteCompanionSkeleton";
+import { Press } from "../../components/design/Press";
 
 const PendingRow = memo(function PendingRow({ item, onRespond }) {
   const C = useC();
@@ -19,14 +20,14 @@ const PendingRow = memo(function PendingRow({ item, onRespond }) {
         <Text style={[styles.pendingName, { color: C.text }]}>{item.companion?.name}</Text>
         <Text style={[styles.pendingNote, { color: C.sec }]}>Birlikte emek çizginizi görmek istiyor.</Text>
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını kabul et"
+      <Press haptic="none" accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını kabul et"
         onPress={() => onRespond(item.id, true)} style={[styles.accept, { backgroundColor: C.accent }]}>
         <Text style={[styles.acceptText, { color: C.textOnAccent }]}>Kabul et</Text>
-      </Pressable>
-      <Pressable accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını reddet"
+      </Press>
+      <Press haptic="none" accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını reddet"
         onPress={() => onRespond(item.id, false)} style={styles.reject}>
         <Text style={[styles.rejectText, { color: C.sec }]}>Reddet</Text>
-      </Pressable>
+      </Press>
     </View>
   );
 });
@@ -39,10 +40,10 @@ const FriendRow = memo(function FriendRow({ item, onRequest }) {
         <Text style={[styles.pendingName, { color: C.text }]}>{item.name}</Text>
         <Text style={[styles.pendingNote, { color: C.sec }]}>Yalnızca haftalık emek toplamlarınız paylaşılır.</Text>
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${item.name} kişisine yol arkadaşlığı isteği gönder`}
+      <Press haptic="none" accessibilityRole="button" accessibilityLabel={`${item.name} kişisine yol arkadaşlığı isteği gönder`}
         onPress={() => onRequest(item.id)} style={[styles.accept, { backgroundColor: C.accent }]}>
         <Text style={[styles.acceptText, { color: C.textOnAccent }]}>Davet et</Text>
-      </Pressable>
+      </Press>
     </View>
   );
 });
@@ -63,20 +64,20 @@ export default function RouteCompanionScreen() {
   const header = useMemo(() => dashboard ? (
     <View>
       <CompanionEffortCard dashboard={dashboard} />
-      <Pressable accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını bitir"
+      <Press haptic="none" accessibilityRole="button" accessibilityLabel="Yol arkadaşlığını bitir"
         onPress={() => active && end(active.id)} style={styles.endButton}>
         <Text style={[styles.endText, { color: C.sec }]}>Yol arkadaşlığını bitir</Text>
-      </Pressable>
+      </Press>
     </View>
   ) : null, [C.sec, active, dashboard, end]);
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button"
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button"
           accessibilityLabel="Geri" style={styles.back}>
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[styles.title, { color: C.text }]}>Yol Arkadaşın</Text>
         <View style={styles.back} />
       </View>

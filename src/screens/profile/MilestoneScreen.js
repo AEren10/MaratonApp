@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { MilestoneHero } from "./components/MilestoneHero";
 import { MilestoneStats } from "./components/MilestoneStats";
 import { MilestoneBadges } from "./components/MilestoneBadges";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 export default function MilestoneScreen() {
   const C = useC();
@@ -30,7 +31,7 @@ export default function MilestoneScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => navigation.goBack()}
           hitSlop={12}
           accessibilityRole="button"
@@ -38,7 +39,7 @@ export default function MilestoneScreen() {
           style={styles.back}
         >
           <Icon name="chevL" size={15} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Kilometre taşı</Text>
       </View>
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,6 +14,7 @@ import { Icon } from "../design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import * as haptic from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 const POPUP_COLORS = {
   red: (C) => ({ bg: C.red, icon: C.red }),
@@ -76,7 +77,7 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
 
   return (
     <Animated.View style={[styles.container, { bottom: insets.bottom + STEP.s4 }, animStyle]}>
-      <Pressable onPress={handlePress} style={[styles.card, { backgroundColor: C.surface, borderColor: C.line }]}>
+      <Press haptic="none" onPress={handlePress} style={[styles.card, { backgroundColor: C.surface, borderColor: C.line }]}>
         <View style={[styles.iconBox, { backgroundColor: colors.bg + "20" }]}>
           <Icon name={nudge.icon || "bell"} size={20} color={colors.icon} />
         </View>
@@ -86,10 +87,10 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
             <Text style={[styles.action, { color: colors.icon }]}>{nudge.actionLabel.toUpperCase()}</Text>
           )}
         </View>
-        <Pressable onPress={handleDismiss} hitSlop={12} style={styles.close}>
+        <Press haptic="none" onPress={handleDismiss} hitSlop={12} style={styles.close}>
           <Icon name="x" size={16} color={C.text3} />
-        </Pressable>
-      </Pressable>
+        </Press>
+      </Press>
     </Animated.View>
   );
 }

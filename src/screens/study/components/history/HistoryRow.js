@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { Icon } from "../../../../components/design";
@@ -7,6 +7,7 @@ import { useC, useSubjectIdentity } from "../../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../../themes/subjects";
 import { formatStudyMinutes } from "../../../../domain/study/studyHistoryModel";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Satira dokun duzenle, sola kaydir sil.
 export const HistoryRow = React.memo(function HistoryRow({ row, last, onOpen, onDelete }) {
@@ -21,17 +22,17 @@ export const HistoryRow = React.memo(function HistoryRow({ row, last, onOpen, on
   const remove = useCallback(() => { ref.current?.close(); onDelete(log); }, [onDelete, log]);
 
   const renderRight = useCallback(() => (
-    <Pressable onPress={remove} accessibilityRole="button" accessibilityLabel="Sil"
+    <Press haptic="none" onPress={remove} accessibilityRole="button" accessibilityLabel="Sil"
       style={[styles.delete, { backgroundColor: C.brandFill }]}>
       <Icon name="trash" size={16} color={C.accentInk} />
       <Text style={[TYPOGRAPHY.micro, styles.deleteText, { color: C.accentInk }]}>Sil</Text>
-    </Pressable>
+    </Press>
   ), [C, remove]);
 
   return (
     <View style={[styles.wrap, { borderTopColor: C.line }, last && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
       <Swipeable ref={ref} renderRightActions={renderRight} overshootRight={false} friction={2} rightThreshold={40}>
-        <Pressable onPress={open} accessibilityRole="button" accessibilityHint="Kaydı düzenler, sola kaydırınca silinir"
+        <Press haptic="none" onPress={open} accessibilityRole="button" accessibilityHint="Kaydı düzenler, sola kaydırınca silinir"
           style={[styles.row, { backgroundColor: C.bg }]}>
           <View style={[styles.dot, { backgroundColor: sid?.solid || C.text3 }]} />
           <View style={styles.flex}>
@@ -43,7 +44,7 @@ export const HistoryRow = React.memo(function HistoryRow({ row, last, onOpen, on
             <Text style={[TYPOGRAPHY.tableHead, styles.q, { color: C.text3 }]}>{`${questions} soru`}</Text>
           </View>
           <Icon name="chevR" size={12} color={C.text5} />
-        </Pressable>
+        </Press>
       </Swipeable>
     </View>
   );

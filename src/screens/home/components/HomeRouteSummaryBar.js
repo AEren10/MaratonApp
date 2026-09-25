@@ -1,9 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { LockedValue } from "../../../components/design/LockedValue";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // "Rotanın tamamı · X/Y durak · Z sa borç" seridi (tasarim birimi SAAT).
 // Ücretsizde deger
@@ -13,7 +14,7 @@ export function HomeRouteSummaryBar({ hasAccess, total, done, debtHours, onPress
 
   if (total === 0) {
     return (
-      <Pressable
+      <Press haptic="none"
         onPress={() => { H.tap(); onPress?.(); }}
         style={s.wrap}
         accessibilityRole="button"
@@ -21,12 +22,12 @@ export function HomeRouteSummaryBar({ hasAccess, total, done, debtHours, onPress
       >
         <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Rotanda henüz durak yok</Text>
         <Icon name="chevR" size={16} color={C.text3} />
-      </Pressable>
+      </Press>
     );
   }
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => { H.tap(); onPress?.(); }}
       style={s.wrap}
       accessibilityRole="button"
@@ -46,7 +47,7 @@ export function HomeRouteSummaryBar({ hasAccess, total, done, debtHours, onPress
         ) : null}
         <Icon name="chevR" size={16} color={C.text3} />
       </View>
-    </Pressable>
+    </Press>
   );
 }
 

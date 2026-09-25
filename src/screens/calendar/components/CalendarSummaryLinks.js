@@ -1,9 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Takvim -> ozetler. Tasarim capraz baglari: "Takvim ve Seri · güne dokun ->
 // Günün Özeti", "Program'ın ay sekmesi · Ayın Özeti de buraya".
@@ -17,7 +18,7 @@ export function CalendarSummaryLinks({ showDay, onDay, onMonth }) {
   return (
     <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
       {rows.map((row, i) => (
-        <Pressable
+        <Press haptic="none"
           key={row.key}
           accessibilityRole="button"
           onPress={() => { H.tap(); row.onPress?.(); }}
@@ -25,7 +26,7 @@ export function CalendarSummaryLinks({ showDay, onDay, onMonth }) {
         >
           <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, flex: 1 }]}>{row.label}</Text>
           <Icon name="chevR" size={14} color={C.text3} />
-        </Pressable>
+        </Press>
       ))}
     </View>
   );

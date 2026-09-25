@@ -1,8 +1,9 @@
-import { ScrollView, Pressable, Text, StyleSheet } from "react-native";
+import { ScrollView, Text, StyleSheet } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: "Paylas Ekrani" mod sekmeleri — burada sekiz Story kartından
 // hangisinin gorunecegini seciyor (yalniz verisi olanlar listede).
@@ -18,7 +19,7 @@ export function ShareModeChips({ cards, selectedId, onSelect }) {
       {cards.map((card) => {
         const selected = card.id === selectedId;
         return (
-          <Pressable
+          <Press haptic="none"
             key={card.id}
             onPress={() => {
               H.select();
@@ -41,7 +42,7 @@ export function ShareModeChips({ cards, selectedId, onSelect }) {
             >
               {card.title}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </ScrollView>

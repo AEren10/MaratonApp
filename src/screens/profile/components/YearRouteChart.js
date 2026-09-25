@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback } from "react";
-import { View, Text, Pressable, ScrollView, Dimensions } from "react-native";
+import { View, Text, ScrollView, Dimensions } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER } from "../../../themes/tokens";
 import { useRouteActivity } from "../../../hooks/useRouteActivity";
 import { RouteSvgChart } from "./RouteSvgChart";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const CHART_W = SCREEN_W - GUTTER * 2;
@@ -78,7 +79,7 @@ export function YearRouteChart() {
         {MODES.map((m, i) => {
           const active = i === activeIdx;
           return (
-            <Pressable
+            <Press haptic="none"
               key={m.key}
               onPress={() => handleSelectMode(i)}
               hitSlop={8}
@@ -107,7 +108,7 @@ export function YearRouteChart() {
               <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: active ? C.text : C.text3 }}>
                 {m.label}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </View>

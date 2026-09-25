@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const HIT = { top: 3, bottom: 3 };
 
@@ -10,7 +11,7 @@ const HIT = { top: 3, bottom: 3 };
 export function TrialEntryChip({ label, active, onPress, accessibilityLabel }) {
   const C = useC();
   return (
-    <Pressable onPress={onPress} hitSlop={HIT} accessibilityRole="radio"
+    <Press haptic="none" onPress={onPress} hitSlop={HIT} accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel || label} accessibilityState={{ selected: active }}
       style={[styles.chip, {
         backgroundColor: active ? C.brandTint : "transparent",
@@ -23,7 +24,7 @@ export function TrialEntryChip({ label, active, onPress, accessibilityLabel }) {
       }]}>
         {label}
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

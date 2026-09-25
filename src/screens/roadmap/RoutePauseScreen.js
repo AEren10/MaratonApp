@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useRouteConfirm } from "../../hooks/useRouteConfirm";
 import { RouteConfirmLayout } from "./components/RouteConfirmLayout";
 import { RouteNumbersCard } from "./components/RouteNumbersCard";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../themes/tokens";
+import { Press } from "../../components/design/Press";
 
 const OPTIONS = [
   { id: "week", label: "1 hafta" },
@@ -36,7 +37,7 @@ export default function RoutePauseScreen() {
           {OPTIONS.map((opt) => {
             const isSelected = duration === opt.id;
             return (
-              <Pressable
+              <Press haptic="none"
                 key={opt.id}
                 onPress={() => setDuration(opt.id)}
                 style={[
@@ -48,7 +49,7 @@ export default function RoutePauseScreen() {
                 <Text style={[TYPOGRAPHY.bodyMedium, { color: isSelected ? C.text : C.text3 }]}>
                   {opt.label}
                 </Text>
-              </Pressable>
+              </Press>
             );
           })}
         </View>

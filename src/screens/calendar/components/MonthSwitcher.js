@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { MONTHS_TR } from "../../../lib/trWords";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
   const monthName = MONTHS_TR[monthDate.getMonth()];
@@ -9,7 +10,7 @@ export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
 
   return (
     <View style={s.row}>
-      <Pressable
+      <Press haptic="none"
         hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel="Önceki ay"
@@ -17,11 +18,11 @@ export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
         style={s.tap}
       >
         <Icon name="chevL" size={16} color={C.text3} />
-      </Pressable>
+      </Press>
       <Text style={[TYPOGRAPHY.topicName, s.title, { color: C.text, fontVariant: ["tabular-nums"] }]}>
         {`${monthName} ${year}`}
       </Text>
-      <Pressable
+      <Press haptic="none"
         hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel="Sonraki ay"
@@ -29,7 +30,7 @@ export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
         style={s.tap}
       >
         <Icon name="chevR" size={16} color={C.text3} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

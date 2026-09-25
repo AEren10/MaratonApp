@@ -2,7 +2,7 @@
 // Sosyal v1 disi; bu yol yeni tasarima TASINMADI, eski WrongDetailScreen
 // govdesi degistirilmeden buraya alindi ki derin baglanti kirilmasin.
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Modal } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -19,6 +19,7 @@ import { useGamification } from "../../../../hooks/useGamification";
 import { useAlert } from "../../../../contexts/AlertContext";
 import * as H from "../../../../lib/haptics";
 import { AnswerThread } from "../AnswerThread";
+import { Press } from "../../../../components/design/Press";
 
 function InfoRow({ icon, label, value, color, styles, C }) {
   return (
@@ -79,9 +80,9 @@ export function CommunityQuestionDetail() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s3 }]}>
           Soru Detayı
         </Text>
@@ -132,7 +133,7 @@ export function CommunityQuestionDetail() {
             <Text style={[TYPOGRAPHY.label, { color: C.text2, marginBottom: STEP.s3 }]}>
               FOTOĞRAF
             </Text>
-            <Pressable onPress={() => setPhotoZoom(true)}>
+            <Press haptic="none" onPress={() => setPhotoZoom(true)}>
               <SignedImage
                 bucket="wrong-questions"
                 path={item.image_path}
@@ -145,13 +146,13 @@ export function CommunityQuestionDetail() {
                 <Icon name="eye" size={14} color={C.text} />
                 <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Büyütmek için dokun</Text>
               </View>
-            </Pressable>
+            </Press>
           </Animated.View>
         )}
 
         {!community && !item.is_resolved && !localResolved && (
           <Animated.View>
-            <Pressable
+            <Press haptic="none"
               onPress={async () => {
                 if (resolving) return;
                 setResolving(true);
@@ -177,7 +178,7 @@ export function CommunityQuestionDetail() {
               <Text style={[TYPOGRAPHY.button, { color: C.bg }]}>
                 {resolving ? "İşleniyor..." : "Çözüldü İşaretle"}
               </Text>
-            </Pressable>
+            </Press>
           </Animated.View>
         )}
 
@@ -194,9 +195,9 @@ export function CommunityQuestionDetail() {
       {hasImage && (
         <Modal visible={photoZoom} transparent animationType="fade">
           <View style={styles.zoomOverlay}>
-            <Pressable style={styles.zoomClose} onPress={() => setPhotoZoom(false)} accessibilityLabel="Kapat" accessibilityRole="button">
+            <Press haptic="none" style={styles.zoomClose} onPress={() => setPhotoZoom(false)} accessibilityLabel="Kapat" accessibilityRole="button">
               <Icon name="x" size={22} color={C.text} />
-            </Pressable>
+            </Press>
             <SignedImage
               bucket="wrong-questions"
               path={item.image_path}

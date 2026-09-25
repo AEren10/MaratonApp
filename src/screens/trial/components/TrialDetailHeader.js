@@ -1,16 +1,17 @@
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { STEP, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function TrialDetailHeader({ C, onBack, onMenu }) {
   return (
     <View style={styles.row}>
-      <Pressable onPress={onBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
+      <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
         <Icon name="arrowL" size={20} color={C.text2} />
-      </Pressable>
+      </Press>
       <View style={{ flex: 1 }} />
-      <Pressable
+      <Press haptic="none"
         onPress={onMenu}
         hitSlop={8}
         accessibilityLabel="Deneme seçenekleri"
@@ -18,7 +19,7 @@ export function TrialDetailHeader({ C, onBack, onMenu }) {
         style={styles.menuBtn}
       >
         <Icon name="more" fill={C.text3} color="transparent" size={16} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

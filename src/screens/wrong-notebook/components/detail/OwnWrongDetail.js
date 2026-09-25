@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -15,6 +15,7 @@ import { DetailPhoto } from "./DetailPhoto";
 import { ReviewLadder } from "./ReviewLadder";
 import { WhyWrongCard } from "./WhyWrongCard";
 import { useAlert } from "../../../../contexts/AlertContext";
+import { Press } from "../../../../components/design/Press";
 
 export function OwnWrongDetail() {
   const C = useC();
@@ -94,14 +95,14 @@ export function OwnWrongDetail() {
             >
               Topluluğa sor
             </Button>
-            <Pressable
+            <Press haptic="none"
               onPress={d.remove}
               accessibilityRole="button"
               accessibilityLabel="Soruyu sil"
               style={[styles.trash, { borderColor: C.border }]}
             >
               <Icon name="trash" size={16} color={C.text3} />
-            </Pressable>
+            </Press>
           </View>
         </View>
       </ScrollView>

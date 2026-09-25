@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -13,6 +13,7 @@ import { TopicDebtHero } from "./components/TopicDebtHero";
 import { TopicDebtImpactCard } from "./components/TopicDebtImpactCard";
 import { DebtDistributedView } from "./components/DebtDistributedView";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 export default function TopicDebtScreen() {
   const C = useC();
@@ -25,7 +26,7 @@ export default function TopicDebtScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => navigation.goBack()}
           hitSlop={12}
           accessibilityRole="button"
@@ -34,7 +35,7 @@ export default function TopicDebtScreen() {
         >
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Konu borcu</Text>
-        </Pressable>
+        </Press>
       </View>
 
       {loading ? (

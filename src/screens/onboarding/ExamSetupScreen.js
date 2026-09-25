@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -11,6 +11,7 @@ import { useExam } from "../../contexts/ExamContext";
 import { useExamSetupPrefill } from "../../hooks/useExamSetupPrefill";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 function buildCategoryOptions() {
   return [
@@ -112,14 +113,14 @@ export default function ExamSetupScreen() {
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>SINAV TARİHİ</Text>
             <View style={styles.dateRow}>
               {MONTHS.map((m) => (
-                <Pressable
+                <Press haptic="none"
                   key={m}
                   onPress={() => setExamDate(m)}
                   style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.elev }]}
                 >
                   <Icon name="calendar" size={14} color={examDate === m ? C.accent : C.text3} />
                   <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.text2 }]}>{m}</Text>
-                </Pressable>
+                </Press>
               ))}
             </View>
           </View>

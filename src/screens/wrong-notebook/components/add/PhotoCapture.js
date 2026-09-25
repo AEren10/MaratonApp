@@ -1,9 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
   const C = useC();
@@ -14,7 +15,7 @@ export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
           <>
             <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" cachePolicy="memory-disk" />
             {onRemove ? (
-              <Pressable
+              <Press haptic="none"
                 onPress={onRemove}
                 hitSlop={8}
                 accessibilityRole="button"
@@ -22,7 +23,7 @@ export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
                 style={[styles.removeBtn, { backgroundColor: C.surface, borderColor: C.border }]}
               >
                 <Icon name="x" size={14} color={C.text} />
-              </Pressable>
+              </Press>
             ) : null}
           </>
         ) : (
@@ -37,7 +38,7 @@ export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
         <View style={[styles.corner, styles.br, { borderColor: C.accent }]} />
       </View>
       <View style={styles.actions}>
-        <Pressable
+        <Press haptic="none"
           onPress={onCamera}
           accessibilityRole="button"
           style={[styles.btn, { backgroundColor: C.brandTint, borderColor: C.accent }]}
@@ -46,14 +47,14 @@ export function PhotoCapture({ image, onCamera, onGallery, onRemove }) {
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>
             {image ? "Yeniden çek" : "Fotoğraf çek"}
           </Text>
-        </Pressable>
-        <Pressable
+        </Press>
+        <Press haptic="none"
           onPress={onGallery}
           accessibilityRole="button"
           style={[styles.btn, { borderColor: C.border }]}
         >
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>Galeriden seç</Text>
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

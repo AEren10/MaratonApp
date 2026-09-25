@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
@@ -8,6 +8,7 @@ import { STEP, GUTTER, RADIUS, TYPOGRAPHY } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
 import { useAvatarUpload } from "../../../hooks/useAvatarUpload";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function ProfileHero({ name = "Öğrenci", exam, streak }) {
   const C = useC();
@@ -22,7 +23,7 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
 
   return (
     <View style={s.container}>
-      <Pressable onPress={handleEditProfile} style={s.avatarWrap} accessibilityRole="button" accessibilityLabel="Profili ve fotoğrafı düzenle">
+      <Press haptic="none" onPress={handleEditProfile} style={s.avatarWrap} accessibilityRole="button" accessibilityLabel="Profili ve fotoğrafı düzenle">
         <View style={[s.avatarCircle, { backgroundColor: C.elev, borderColor: C.border }]}>
           {avatarSource ? (
             <Image source={avatarSource} style={s.avatarImage} contentFit="cover" cachePolicy="memory-disk" transition={200} />
@@ -39,7 +40,7 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
         <View style={[s.editBadge, { backgroundColor: C.accent, borderColor: C.bg }]}>
           <Icon name="edit" size={11} color={C.textOnFill} />
         </View>
-      </Pressable>
+      </Press>
 
       <View style={s.metaCol}>
         <Text style={[s.nameText, { color: C.text }]} numberOfLines={1}>

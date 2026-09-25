@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  Pressable,
+  
   ScrollView,
   StyleSheet,
   ActivityIndicator,
@@ -21,6 +21,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useReferrals } from "../../hooks/useReferrals";
+import { Press } from "../../components/design/Press";
 
 export default function ReferralScreen() {
   const C = useC();
@@ -48,9 +49,9 @@ export default function ReferralScreen() {
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.header}>
-          <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12}>
             <Icon name="arrowL" size={22} color={C.text} />
-          </Pressable>
+          </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Arkadaşını Davet Et</Text>
         </View>
         <ReferralSkeleton />
@@ -61,9 +62,9 @@ export default function ReferralScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12}>
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
           Arkadaşını Davet Et
         </Text>

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -8,6 +8,7 @@ import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useTheme, useC } from "../../contexts/ThemeContext";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { ThemeOptionRow } from "./components/ThemeOptionRow";
+import { Press } from "../../components/design/Press";
 
 // Tasarim sirasi: Koyu (varsayilan) · Acik · Sistem.
 const OPTIONS = [
@@ -25,9 +26,9 @@ export default function AppearanceScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Görünüm</Text>
       </View>
 
@@ -59,7 +60,7 @@ export default function AppearanceScreen() {
               const swatch = pref === "light" ? preset.light : preset.dark;
               const active = accentKey === preset.key;
               return (
-                <Pressable
+                <Press haptic="none"
                   key={preset.key}
                   onPress={() => setAccent(active ? null : preset.key)}
                   accessibilityRole="button"
@@ -71,7 +72,7 @@ export default function AppearanceScreen() {
                   ]}
                 >
                   {active ? <Icon name="check" size={15} color={C.accentInk} sw={2.6} /> : null}
-                </Pressable>
+                </Press>
               );
             })}
           </View>

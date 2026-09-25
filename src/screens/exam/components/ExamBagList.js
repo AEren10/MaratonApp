@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
 import { ExamCheckRow } from "./ExamCheckRow";
+import { Press } from "../../../components/design/Press";
 
 // ÇANTA: sabit kalemler + kullanicinin ekledikleri. "Kendin ekle" satiri
 // dokununca ayni yerde yazma alanina donusur.
@@ -31,7 +32,7 @@ export function ExamBagList({ items, onToggle, onAdd }) {
         {items.map((item) => (
           <ExamCheckRow key={item.key} item={item} onToggle={onToggle} />
         ))}
-        <Pressable
+        <Press haptic="none"
           onPress={() => setAdding(true)}
           accessibilityRole="button"
           accessibilityLabel="Kendin ekle"
@@ -54,7 +55,7 @@ export function ExamBagList({ items, onToggle, onAdd }) {
           ) : (
             <Text style={[TYPOGRAPHY.bodyMedium, s.input, { color: C.text3 }]}>Kendin ekle</Text>
           )}
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

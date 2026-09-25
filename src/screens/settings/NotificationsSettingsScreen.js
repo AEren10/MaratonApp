@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, Linking, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Linking, ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -15,6 +15,7 @@ import { ReminderHourPicker } from "./components/ReminderHourPicker";
 import { useNotificationPrefs } from "../../hooks/useNotificationPrefs";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
+import { Press } from "../../components/design/Press";
 
 function NotificationsSettingsContent() {
   const C = useC();
@@ -34,9 +35,9 @@ function NotificationsSettingsContent() {
     return (
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
             <Icon name="arrowL" size={18} color={C.text2} />
-          </Pressable>
+          </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Bildirimler</Text>
         </View>
         <ErrorState
@@ -55,9 +56,9 @@ function NotificationsSettingsContent() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Bildirimler</Text>
       </View>
 

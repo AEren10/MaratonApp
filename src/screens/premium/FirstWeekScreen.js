@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Ilk 7 Gun". Ilk haftanin rehber gorev listesi.
 export default function FirstWeekScreen() {
@@ -68,9 +69,9 @@ export default function FirstWeekScreen() {
   return (
     <View style={[styles.container, { backgroundColor: C.bg, paddingTop: insets.top }]}>
       <View style={[styles.header, { paddingHorizontal: GUTTER }]}>
-        <Pressable onPress={handleClose} hitSlop={10}>
+        <Press haptic="none" onPress={handleClose} hitSlop={10}>
           <Icon name="x" size={24} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[styles.headerTitle, { color: C.text }]}>İlk haftan</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -108,7 +109,7 @@ export default function FirstWeekScreen() {
 
           <View style={styles.taskList}>
             {decoratedSteps.map((step) => (
-              <Pressable
+              <Press haptic="none"
                 key={step.id}
                 onPress={() => handleTaskAction(step)}
                 disabled={step.done}
@@ -142,7 +143,7 @@ export default function FirstWeekScreen() {
                     size="small"
                   />
                 )}
-              </Pressable>
+              </Press>
             ))}
           </View>
         </Animated.View>
@@ -161,9 +162,9 @@ export default function FirstWeekScreen() {
             onPress={() => activeStep ? handleTaskAction(activeStep) : openRoute()}
             size="large"
           />
-          <Pressable onPress={handleClose} style={styles.backButton}>
+          <Press haptic="none" onPress={handleClose} style={styles.backButton}>
             <Text style={[styles.backText, { color: C.text3 }]}>Ana sayfaya dön</Text>
-          </Pressable>
+          </Press>
         </Animated.View>
       </ScrollView>
     </View>

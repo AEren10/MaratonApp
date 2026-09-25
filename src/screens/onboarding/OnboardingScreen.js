@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 
@@ -10,6 +10,7 @@ import { setAuthIntent } from "../../lib/authIntent";
 import { Button } from "../../components/design";
 import { RouteIllustration } from "./components/RouteIllustration";
 import { QuestionPreviewList } from "./components/QuestionPreviewList";
+import { Press } from "../../components/design/Press";
 
 export default function OnboardingScreen() {
   const C = useC();
@@ -59,11 +60,11 @@ export default function OnboardingScreen() {
           <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2, marginBottom: STEP.s1 }]}>
             Hesap sonra. Önce rotanı görüyorsun.
           </Text>
-          <Pressable onPress={goToLogin} hitSlop={12} style={styles.loginLink} accessibilityRole="button">
+          <Press haptic="none" onPress={goToLogin} hitSlop={12} style={styles.loginLink} accessibilityRole="button">
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
               Hesabım var, giriş yap
             </Text>
-          </Pressable>
+          </Press>
         </Animated.View>
       </SafeAreaView>
     </View>

@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { AccessEndedFreeList } from "./components/AccessEndedFreeList";
 import { AccessEndedLocked } from "./components/AccessEndedLocked";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Deneme Bitti". Ilk hafta erisimi bittiginde bir kez
 // (useAccessEndedMoment). Kayip degil geri donus: once acik kalanlar.
@@ -47,9 +48,9 @@ export default function AccessEndedScreen() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + STEP.s2, borderTopColor: C.line }]}>
         <Button onPress={goPro} size="lg" fullWidth>{A.primary}</Button>
-        <Pressable onPress={stayFree} style={styles.secondary} accessibilityRole="button">
+        <Press haptic="none" onPress={stayFree} style={styles.secondary} accessibilityRole="button">
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>{A.secondary}</Text>
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

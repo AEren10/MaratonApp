@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function AddTaskPillRow({ presets, value, onChange, formatLabel, C, suffix, placeholder }) {
   const isPreset = presets.includes(parseInt(value, 10));
@@ -10,7 +11,7 @@ export function AddTaskPillRow({ presets, value, onChange, formatLabel, C, suffi
       {presets.map((p) => {
         const active = value === String(p);
         return (
-          <Pressable
+          <Press haptic="none"
             key={p}
             onPress={() => { H.tap(); onChange(String(p)); }}
             style={[
@@ -24,7 +25,7 @@ export function AddTaskPillRow({ presets, value, onChange, formatLabel, C, suffi
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: active ? C.accent : C.text }]}>
               {formatLabel(p)}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
       <View style={[st.pill, st.inputPill, { backgroundColor: C.surface, borderColor: !isPreset && value ? C.accent : C.border }]}>

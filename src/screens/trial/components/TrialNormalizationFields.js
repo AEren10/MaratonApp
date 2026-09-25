@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
@@ -7,11 +7,12 @@ import * as H from "../../../lib/haptics";
 import { TRIAL_DIFFICULTY_LEVELS } from "../trialDifficultyLevels";
 import { TrialEntryChip } from "./TrialEntryChip";
 import { TrialEntryRuleLabel } from "./TrialEntryRuleLabel";
+import { Press } from "../../../components/design/Press";
 
 function Level({ level, active, onPress }) {
   const C = useC();
   return (
-    <Pressable onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: active }}
+    <Press haptic="none" onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: active }}
       accessibilityLabel={`${level.label} ${level.factor}`}
       style={[styles.level, {
         backgroundColor: active ? C.brandTint : "transparent",
@@ -23,7 +24,7 @@ function Level({ level, active, onPress }) {
       <Text style={[TYPOGRAPHY.micro, styles.factor, { color: active ? C.accentBright : C.text3 }]}>
         {level.factor}
       </Text>
-    </Pressable>
+    </Press>
   );
 }
 

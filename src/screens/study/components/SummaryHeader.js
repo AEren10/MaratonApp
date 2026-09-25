@@ -1,15 +1,16 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function SummaryHeader({ dateLabel, onClose }) {
   const C = useC();
 
   return (
     <View style={styles.row}>
-      <Pressable
+      <Press haptic="none"
         accessibilityLabel="Kapat"
         accessibilityRole="button"
         hitSlop={12}
@@ -17,7 +18,7 @@ export function SummaryHeader({ dateLabel, onClose }) {
         style={styles.closeBtn}
       >
         <Icon name="x" size={14} color={C.text2} />
-      </Pressable>
+      </Press>
       <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>{dateLabel}</Text>
     </View>
   );

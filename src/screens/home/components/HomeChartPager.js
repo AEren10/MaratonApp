@@ -1,8 +1,9 @@
 import { useCallback, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Grafik alani iki sayfa: "Bu hafta" (varsayilan) ve "Rota".
 //
@@ -60,9 +61,9 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   if (!visible.length) return null;
   if (visible.length === 1) {
     return (
-      <Pressable onPress={() => onPressPage?.(visible[0].key)} disabled={!onPressPage}>
+      <Press haptic="none" onPress={() => onPressPage?.(visible[0].key)} disabled={!onPressPage}>
         {body(visible[0])}
-      </Pressable>
+      </Press>
     );
   }
 
@@ -77,7 +78,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
         decelerationRate="fast"
       >
         {visible.map((page) => (
-          <Pressable
+          <Press haptic="none"
             key={page.key}
             style={{ width: pageWidth }}
             onPress={() => onPressPage?.(page.key)}
@@ -86,7 +87,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
             accessibilityLabel={page.a11y}
           >
             {body(page)}
-          </Pressable>
+          </Press>
         ))}
       </ScrollView>
 

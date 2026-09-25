@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,6 +9,7 @@ import { RecordHeader } from "./components/record/RecordHeader";
 import { RecordIntro } from "./components/record/RecordIntro";
 import { StudyRecordFields } from "./components/record/StudyRecordFields";
 import { useEditStudyLogController } from "./useEditStudyLogController";
+import { Press } from "../../components/design/Press";
 
 // "Kaydı Düzenle" (MOD 3 · Düzeltme). Çalışma Geçmişi satırından açılır.
 export default function EditStudyLogScreen() {
@@ -37,9 +38,9 @@ export default function EditStudyLogScreen() {
             ) : null}
             <Animated.View style={styles.block}>
               <Button size="lg" fullWidth onPress={e.save} disabled={!e.form.canSave} loading={e.saving}>Kaydet</Button>
-              <Pressable onPress={e.remove} accessibilityRole="button" style={styles.delete}>
+              <Press haptic="none" onPress={e.remove} accessibilityRole="button" style={styles.delete}>
                 <Text style={[TYPOGRAPHY.metaSemiBold, styles.deleteText, { color: C.text3 }]}>Kaydı sil</Text>
-              </Pressable>
+              </Press>
             </Animated.View>
           </ScrollView>
         )}

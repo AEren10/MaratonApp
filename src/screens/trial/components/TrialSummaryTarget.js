@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Icon, LockedValue } from "../../../components/design";
@@ -7,6 +7,7 @@ import { useExam } from "../../../contexts/ExamContext";
 import { useThresholdView } from "../../../hooks/useThresholdView";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { formatNet } from "../../../lib/format";
+import { Press } from "../../../components/design/Press";
 
 // BU NETLE NEREYE GIRIYORSUN: hedef bolum ve kalan net acigi.
 // TAHMINI SIRALAMA satiri cizilmiyor: tek deneme turunden aralik ureten
@@ -28,11 +29,11 @@ export function TrialSummaryTarget({ onDepartments }) {
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>net kaldı</Text>
           </View>
         </View>
-        <Pressable onPress={onDepartments} accessibilityRole="button"
+        <Press haptic="none" onPress={onDepartments} accessibilityRole="button"
           style={[styles.button, { borderColor: C.border }]}>
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Bölümleri gör</Text>
           <Icon name="chevR" size={11} color={C.text5} sw={2} />
-        </Pressable>
+        </Press>
       </View>
     </Animated.View>
   );

@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
+import { Press } from "../../../components/design/Press";
 
 export const TopicWrongNoteRow = React.memo(function TopicWrongNoteRow({ item, C }) {
   const navigation = useNavigation();

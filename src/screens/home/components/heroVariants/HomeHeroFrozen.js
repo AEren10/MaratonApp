@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { Button } from "../../../../components/design/Button";
 import { Card } from "../../../../components/design/Card";
@@ -9,6 +9,7 @@ import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../../../constants/screens";
 import * as H from "../../../../lib/haptics";
+import { Press } from "../../../../components/design/Press";
 
 // Tasarim AKIS 2 · "Rota Donduruldu": tasarimin kendi notu bu ekranin
 // dondurulmus halde uygulama acilinca Ana Sayfa'nin YERINE geldigini
@@ -76,7 +77,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
           Rotaya geri dön
         </Button>
       </Animated.View>
-      <Pressable
+      <Press haptic="none"
         onPress={() => navigation.navigate(SCREENS.SETTINGS)}
         hitSlop={10}
         accessibilityRole="button"
@@ -85,7 +86,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
           Hesabımı ve verilerimi indir
         </Text>
-      </Pressable>
+      </Press>
     </View>
   );
 }

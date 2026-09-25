@@ -1,8 +1,9 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Defter akisinin ust satiri: geri oku ya da kapat carpisi, basik baslik
 // (Bricolage 22) veya harf aralikli bolum etiketi, sagda istege bagli oge.
@@ -10,14 +11,14 @@ export function WrongScreenHeader({ icon = "arrowL", title, label, right, onPres
   const C = useC();
   return (
     <View style={styles.row}>
-      <Pressable
+      <Press haptic="none"
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={a11yLabel || (icon === "x" ? "Kapat" : "Geri")}
         style={styles.hit}
       >
         <Icon name={icon} size={icon === "x" ? 16 : 18} color={C.text2} />
-      </Pressable>
+      </Press>
       {title ? (
         <Text style={[TYPOGRAPHY.subheading, styles.flex, { color: C.text }]} numberOfLines={1}>
           {title}

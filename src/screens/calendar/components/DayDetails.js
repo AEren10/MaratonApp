@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Card, Icon, EmptyState } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -7,6 +7,7 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
 import { todayTR } from "../../../lib/dateUtils";
+import { Press } from "../../../components/design/Press";
 
 function formatDayLabel(iso) {
   const d = new Date(iso);
@@ -104,7 +105,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
       ) : (
         <View>
           {slots.map((s) => (
-            <Pressable
+            <Press haptic="none"
               key={s.key}
               disabled={!s.trial}
               hitSlop={s.trial ? 8 : undefined}
@@ -113,7 +114,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
               onPress={() => s.trial && onTrialPress?.(s.trial)}
             >
               <SlotRow time={s.time} color={s.color} name={s.name} subject={s.subject} dur={s.dur} C={C} />
-            </Pressable>
+            </Press>
           ))}
         </View>
       )}

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -14,6 +14,7 @@ import * as H from "../../lib/haptics";
 import { RehearsalSetup } from "./components/RehearsalSetup";
 import { RehearsalRunning } from "./components/RehearsalRunning";
 import { RehearsalDone } from "./components/RehearsalDone";
+import { Press } from "../../components/design/Press";
 
 // Tasarim AKIS 14 · "Deneme Provası". Girisler: Son Hafta "Deneme provası
 // kur", Analiz pratik satiri, Ana Sayfa hizli eylem ve prova sabahi bildirimi.
@@ -61,9 +62,9 @@ export default function ExamSimulatorScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
-        <Pressable onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Kapat" style={s.close}>
+        <Press haptic="none" onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Kapat" style={s.close}>
           <Icon name="x" size={14} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
       <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -83,9 +84,9 @@ export default function ExamSimulatorScreen() {
                 Provayı kur
               </Button>
             )}
-            <Pressable onPress={navigation.goBack} accessibilityRole="button" accessibilityLabel="Vazgeç" style={s.cancel}>
+            <Press haptic="none" onPress={navigation.goBack} accessibilityRole="button" accessibilityLabel="Vazgeç" style={s.cancel}>
               <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
-            </Pressable>
+            </Press>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

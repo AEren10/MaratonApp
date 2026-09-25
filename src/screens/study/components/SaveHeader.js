@@ -1,14 +1,15 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Tasarım: geri + "Atla" — başlık gerçek süreyle kişiselleşir.
 export function SaveHeader({ C, duration, onBack }) {
   return (
     <View>
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingTop: STEP.s2 }}>
-        <Pressable
+        <Press haptic="none"
           onPress={onBack}
           hitSlop={12}
           accessibilityRole="button"
@@ -22,7 +23,7 @@ export function SaveHeader({ C, duration, onBack }) {
           }}
         >
           <Icon name="chevL" size={16} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
 
       <View style={{ paddingHorizontal: GUTTER, marginTop: STEP.s2 }}>

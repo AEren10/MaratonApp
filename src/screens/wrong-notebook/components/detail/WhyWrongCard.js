@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 
 import { Button, Card } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // "NEDEN YANLIŞ YAPTIM" karti. Govde kullanicinin notu; "Düzenle" yerinde
 // duzenleme acar. Hata tipi cipi (Bilgi eksiği vb.) icin veri alani yok --
@@ -27,14 +28,14 @@ export function WhyWrongCard({ note, onSave }) {
         <View style={styles.head}>
           <Text style={[TYPOGRAPHY.label, styles.flex, { color: C.text2 }]}>NEDEN YANLIŞ YAPTIM</Text>
           {!editing ? (
-            <Pressable
+            <Press haptic="none"
               onPress={() => { setDraft(note || ""); setEditing(true); }}
               accessibilityRole="button"
               hitSlop={{ top: 14, bottom: 14, left: 12, right: 12 }}
               style={styles.edit}
             >
               <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Düzenle</Text>
-            </Pressable>
+            </Press>
           ) : null}
         </View>
         {editing ? (

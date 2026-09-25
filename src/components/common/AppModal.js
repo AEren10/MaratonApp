@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { DialogAction } from "./appModal/DialogAction";
+import { Press } from "../../components/design/Press";
 
 const WARNING_ICONS = ["alert", "warning", "alertTriangle"];
 

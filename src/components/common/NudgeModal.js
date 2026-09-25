@@ -4,6 +4,7 @@ import { Icon, Button } from "../design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
+import { Press } from "../../components/design/Press";
 
 const NudgeItem = React.memo(function NudgeItem({ nudge, onAction, C, styles }) {
   const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
@@ -24,9 +25,9 @@ const NudgeItem = React.memo(function NudgeItem({ nudge, onAction, C, styles }) 
       </View>
       <Text style={styles.message}>{nudge.message}</Text>
       {nudge.actionLabel && (
-        <Pressable onPress={() => onAction(nudge)} style={[styles.actionBtn, { borderColor: color + "60" }]}>
+        <Press haptic="none" onPress={() => onAction(nudge)} style={[styles.actionBtn, { borderColor: color + "60" }]}>
           <Text style={[styles.actionText, { color }]}>{nudge.actionLabel}</Text>
-        </Pressable>
+        </Press>
       )}
     </View>
   );

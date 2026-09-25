@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import Animated, { FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,6 +11,7 @@ import { STEP } from "../../themes/tokens";
 import { navigationRef, navigateFromOutside, onNavigationReady } from "../../navigation/navigationRef";
 import * as H from "../../lib/haptics";
 import { OfflineStrip, offlineStripBody } from "./OfflineStrip";
+import { Press } from "../../components/design/Press";
 
 const POLL_MS = 15000;
 
@@ -58,14 +59,14 @@ export default function OfflineBanner() {
       exiting={FadeOutUp.duration(500)}
       style={[s.container, { top: insets.top + STEP.s1 }]}
     >
-      <Pressable
+      <Press haptic="none"
         onPress={pending > 0 ? open : undefined}
         disabled={!(pending > 0)}
         accessibilityRole={pending > 0 ? "button" : "alert"}
         accessibilityLabel={`${ERROR_COPY.offline.bannerTitle}. ${offlineStripBody(pending)}`}
       >
         <OfflineStrip pending={pending} />
-      </Pressable>
+      </Press>
     </Animated.View>
   );
 }

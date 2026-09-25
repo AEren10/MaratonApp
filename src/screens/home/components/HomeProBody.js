@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
@@ -10,6 +10,7 @@ import { HomeLinkRow } from "./HomeLinkRow";
 import { HomeNotebookCard } from "./HomeNotebookCard";
 import { HomeGroupCard } from "./HomeGroupCard";
 import { useMyGroups } from "../../../hooks/useMyGroups";
+import { Press } from "../../../components/design/Press";
 
 // Ana Sayfa (Pro) govdesi: bugunun duraklari, calisma grubu karti, dikkat ceken iki ders,
 // konu borcu + haftalik rapor satirlari, Defter karti.
@@ -36,11 +37,11 @@ export function HomeProBody({ stops, momentum, debtHours, dueCount = 0, go }) {
           <View style={s.head}>
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>DİKKAT ÇEKEN İKİ DERS</Text>
             <View style={[s.rule, { backgroundColor: C.line }]} />
-            <Pressable onPress={() => { H.tap(); go.analysis(); }} accessibilityRole="button"
+            <Press haptic="none" onPress={() => { H.tap(); go.analysis(); }} accessibilityRole="button"
               accessibilityLabel="Analiz" style={s.link}>
               <Text style={[TYPOGRAPHY.label, s.linkText, { color: C.text2 }]}>Analiz</Text>
               <Icon name="chevR" size={11} color={C.text5} />
-            </Pressable>
+            </Press>
           </View>
           {momentum.map((m) => <HomeMomentumRow key={m.key} subject={m} onPress={go.subjectDetail} />)}
         </View>

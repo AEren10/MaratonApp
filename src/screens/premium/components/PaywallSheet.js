@@ -10,6 +10,7 @@ import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens
 import { PaywallContextBlock } from "./PaywallContextBlock";
 import { PaywallPlanPicker } from "./PaywallPlanPicker";
 import { PaywallLegalRow } from "./PaywallLegalRow";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: baglam paywall'i isin USTUNDE alt sayfa olarak cikar; arkadaki
 // ekran karartilmis halde gorunur kalir (secim, liste korunur).
@@ -56,9 +57,9 @@ export function PaywallSheet({ context, purchase, onDismiss }) {
           >
             {context.primary}
           </Button>
-          <Pressable onPress={onDismiss} style={styles.secondary} accessibilityRole="button">
+          <Press haptic="none" onPress={onDismiss} style={styles.secondary} accessibilityRole="button">
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>{context.secondary}</Text>
-          </Pressable>
+          </Press>
           <Text style={[TYPOGRAPHY.micro, styles.center, { color: C.text3 }]}>{PAYWALL_FOOTNOTE}</Text>
           <PaywallLegalRow onRestore={purchase.handleRestore} disabled={purchase.purchasing} />
         </ScrollView>

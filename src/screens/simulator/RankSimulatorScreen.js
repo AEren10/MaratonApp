@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useThresholdView } from "../../hooks/useThresholdView";
 import { ThresholdContributorRow } from "./components/ThresholdContributorRow";
+import { Press } from "../../components/design/Press";
 
 // AKIŞ 2 · Bölüm Eşiği — Rota Detay'daki "72 net ≈ hangi bölümler?" bağlantısı.
 //
@@ -89,9 +90,9 @@ export default function RankSimulatorScreen() {
               ))}
             </View>
             {!canAccess ? (
-              <Pressable onPress={requestAccess} accessibilityRole="button" accessibilityLabel="Kilidi aç" style={{ marginTop: STEP.s2, minHeight: 44, justifyContent: "center" }}>
+              <Press haptic="none" onPress={requestAccess} accessibilityRole="button" accessibilityLabel="Kilidi aç" style={{ marginTop: STEP.s2, minHeight: 44, justifyContent: "center" }}>
                 <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textAlign: "center" }}>Kilidi açmak için dokun</Text>
-              </Pressable>
+              </Press>
             ) : null}
           </View>
         ) : null}
@@ -122,9 +123,9 @@ export default function RankSimulatorScreen() {
 function Header({ onBack, C }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 }}>
-      <Pressable onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
+      <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
         <Icon name="arrowL" size={22} color={C.text} />
-      </Pressable>
+      </Press>
       <Text style={{ ...TYPOGRAPHY.label, color: C.text3, marginLeft: STEP.s1 }}>NET EŞİĞİ</Text>
     </View>
   );

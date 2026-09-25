@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -14,6 +14,7 @@ import { SubjectProgressBanner } from "./components/SubjectProgressBanner";
 import { SubjectProgressRow } from "./components/SubjectProgressRow";
 import { SubjectProgressLockCard } from "./components/SubjectProgressLockCard";
 import { PREMIUM_ENABLED } from "../../constants/premium";
+import { Press } from "../../components/design/Press";
 
 const TABS = [
   { key: SUBJECT_PROGRESS_TAB.PRIORITY, label: "Öncelikli", section: "ROTA ÖNCELİĞİ", empty: "Öncelik verecek bir konu yok." },
@@ -37,9 +38,9 @@ export default function SubjectListScreen() {
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
-        <Pressable onPress={handleBack} hitSlop={12} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={handleBack} hitSlop={12} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[s.title, { color: C.text }]}>Konu ilerlemesi</Text>
       </View>
 
@@ -49,14 +50,14 @@ export default function SubjectListScreen() {
             {TABS.map((t) => {
               const on = tab === t.key;
               return (
-                <Pressable
+                <Press haptic="none"
                   key={t.key}
                   onPress={() => setTab(t.key)}
                   hitSlop={{ top: 4, bottom: 4 }}
                   style={[s.tabItem, on && { backgroundColor: C.elev }]}
                 >
                   <Text style={[s.tabText, { color: on ? C.text : C.text3 }]}>{t.label}</Text>
-                </Pressable>
+                </Press>
               );
             })}
           </View>

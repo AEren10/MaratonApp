@@ -17,6 +17,7 @@ import { ProLockedRow } from "./components/ProLockedRow";
 import { ProPreviewHistory } from "./components/ProPreviewHistory";
 import { ProPreviewOcr } from "./components/ProPreviewOcr";
 import { ProPreviewTempo } from "./components/ProPreviewTempo";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Pro Onizleme". Kilitli bir ozellige ILK dokunusta bu cikar,
 // odeme ekrani degil: ustte kullanicinin kendi ucretsiz verisi, altinda
@@ -90,9 +91,9 @@ export default function ProPreviewScreen() {
         <Button onPress={variant ? openPreview : openPaywall} size="lg" fullWidth style={s.cta}>
           {PRO_PREVIEW.primary}
         </Button>
-        <Pressable onPress={dismiss} style={s.secondary} accessibilityRole="button">
+        <Press haptic="none" onPress={dismiss} style={s.secondary} accessibilityRole="button">
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>{PRO_PREVIEW.secondary}</Text>
-        </Pressable>
+        </Press>
       </Animated.View>
     </View>
   );

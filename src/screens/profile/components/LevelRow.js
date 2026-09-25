@@ -1,10 +1,11 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 // Profil > SEVIYE satiri. Dokunulunca tasarimin "Seviye" ekranini acar.
 export function LevelRow({ level, xpInLevel, xpForNext }) {
@@ -18,7 +19,7 @@ export function LevelRow({ level, xpInLevel, xpForNext }) {
   };
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={open}
       accessibilityRole="button"
       accessibilityLabel={`Seviye ${level ?? ""}, ${xpInLevel ?? 0} / ${xpForNext ?? 0} XP. Seviye yolunu aç`}
@@ -38,6 +39,6 @@ export function LevelRow({ level, xpInLevel, xpForNext }) {
       <Text style={{ fontFamily: "Archivo_500", fontSize: 12, color: C.text2, fontVariant: ["tabular-nums"] }}>
         {`${xpInLevel ?? 0} / ${xpForNext ?? 0} XP`}
       </Text>
-    </Pressable>
+    </Press>
   );
 }

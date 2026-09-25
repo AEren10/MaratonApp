@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const LABELS = { ALL: "Tümü", TYT: "TYT", AYT: "AYT", BRANCH: "Branş" };
 
@@ -22,7 +23,7 @@ export const TrialRecordFilters = React.memo(function TrialRecordFilters({ tabs,
           {tabs.map((tab) => {
             const isActive = tab === active;
             return (
-              <Pressable
+              <Press haptic="none"
                 key={tab}
                 onPress={() => handlePress(tab)}
                 style={[styles.tab, isActive && { backgroundColor: C.elev }]}
@@ -33,20 +34,20 @@ export const TrialRecordFilters = React.memo(function TrialRecordFilters({ tabs,
                 <Text style={[styles.tabText, { color: isActive ? C.text : C.text3 }]}>
                   {LABELS[tab]}
                 </Text>
-              </Pressable>
+              </Press>
             );
           })}
         </View>
 
         {onOpenFilterMenu ? (
-          <Pressable
+          <Press haptic="none"
             onPress={onOpenFilterMenu}
             accessibilityRole="button"
             accessibilityLabel="Filtrele"
             style={[styles.filterBtn, { borderColor: C.border }]}
           >
             <Icon name="filter" size={15} color={C.text2} />
-          </Pressable>
+          </Press>
         ) : null}
       </View>
 

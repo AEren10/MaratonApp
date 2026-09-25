@@ -1,7 +1,8 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { LockedValue } from "../../../components/design/LockedValue";
+import { Press } from "../../../components/design/Press";
 
 const LABELS = {
   less: "Haftada %10 daha az",
@@ -15,7 +16,7 @@ export function ScenarioCard({ item, selected, locked, onPress }) {
   const deltaColor = positive ? C.green : item.deltaNet < 0 ? C.red : C.text3;
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
@@ -47,6 +48,6 @@ export function ScenarioCard({ item, selected, locked, onPress }) {
         {item.questionsPerWeek} soru/hafta
         {item.minutesPerDayDelta ? ` · günde ${item.minutesPerDayDelta >= 0 ? "+" : ""}${item.minutesPerDayDelta.toFixed(0)} dk` : ""}
       </Text>
-    </Pressable>
+    </Press>
   );
 }

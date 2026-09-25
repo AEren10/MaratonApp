@@ -1,10 +1,11 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { Icon, Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useCountdown } from "../../../hooks/useCountdown";
 import { openMailApp } from "../../../lib/openMailApp";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 const RESEND_SECONDS = 42;
 
@@ -41,11 +42,11 @@ export function EmailSentPanel({ email, onResend }) {
         Mail uygulamasını aç
       </Button>
 
-      <Pressable onPress={handleResend} disabled={!isDone} style={{ alignItems: "center", justifyContent: "center", minHeight: 44, marginTop: STEP.s1 }}>
+      <Press haptic="none" onPress={handleResend} disabled={!isDone} style={{ alignItems: "center", justifyContent: "center", minHeight: 44, marginTop: STEP.s1 }}>
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
           {isDone ? "Tekrar gönder" : `Tekrar gönder · ${label}`}
         </Text>
-      </Pressable>
+      </Press>
 
       <Text style={[TYPOGRAPHY.caption, { color: C.text3, textAlign: "center", marginTop: STEP.s2, fontSize: 12 }]}>
         Mail gelmediyse spam klasörüne bak.

@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 const FIELD = {
   correct: { name: "Doğru", object: "Doğruyu" },
@@ -32,12 +33,12 @@ export function TrialScoreOverflow({ overflow, onFix }) {
         </View>
       </View>
       <View style={styles.actions}>
-        <Pressable onPress={() => onFix(overflow)} hitSlop={HIT} accessibilityRole="button"
+        <Press haptic="none" onPress={() => onFix(overflow)} hitSlop={HIT} accessibilityRole="button"
           style={[styles.chip, { backgroundColor: C.elev }]}>
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text }]}>
             {`${field.object} ${overflow.excess} düzelt`}
           </Text>
-        </Pressable>
+        </Press>
       </View>
     </Animated.View>
   );

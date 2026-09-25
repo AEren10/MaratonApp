@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Icon, Card, Button, StatBlock } from "../../components/design";
@@ -6,6 +6,7 @@ import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExamDatePicker } from "../../hooks/useExamDatePicker";
 import { MonthDayGrid } from "./components/MonthDayGrid";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Tarih Secici". Ayarlar > Sinav tarihi satirindan aciliyor.
 // Uc sayi (gun / hafta / durak-hafta) TURETILMIS: gun tarihten, hafta
@@ -20,9 +21,9 @@ export default function ExamDateScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat">
+        <Press haptic="none" onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat">
           <Icon name="x" size={15} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Sınav tarihi</Text>
       </View>
 
@@ -40,7 +41,7 @@ export default function ExamDateScreen() {
         </View>
 
         <View style={styles.monthRow}>
-          <Pressable
+          <Press haptic="none"
             onPress={() => shiftMonth(-1)}
             hitSlop={10}
             accessibilityRole="button"
@@ -48,11 +49,11 @@ export default function ExamDateScreen() {
             style={styles.monthBtn}
           >
             <Icon name="chevL" size={14} color={C.text2} />
-          </Pressable>
+          </Press>
           <Text style={[TYPOGRAPHY.bodySemiBold, styles.monthLabel, { color: C.text }]}>
             {monthLabel}
           </Text>
-          <Pressable
+          <Press haptic="none"
             onPress={() => shiftMonth(1)}
             hitSlop={10}
             accessibilityRole="button"
@@ -60,7 +61,7 @@ export default function ExamDateScreen() {
             style={styles.monthBtn}
           >
             <Icon name="chevR" size={14} color={C.text2} />
-          </Pressable>
+          </Press>
         </View>
 
         <MonthDayGrid
@@ -101,9 +102,9 @@ export default function ExamDateScreen() {
         <Button onPress={save} size="lg" fullWidth loading={saving} disabled={!changed}>
           Kaydet
         </Button>
-        <Pressable onPress={cancel} style={styles.cancelBtn} accessibilityRole="button" accessibilityLabel="Vazgeç">
+        <Press haptic="none" onPress={cancel} style={styles.cancelBtn} accessibilityRole="button" accessibilityLabel="Vazgeç">
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
-        </Pressable>
+        </Press>
       </View>
     </SafeAreaView>
   );

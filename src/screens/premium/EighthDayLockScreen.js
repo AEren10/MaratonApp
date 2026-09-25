@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { useFirstWeekMomentData } from "../../hooks/useFirstWeekMomentData";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { formatStudyMinutes } from "../../domain/study/studyHistoryModel";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "8. Gun" (Artboard 118). Ilk 7 gunluk deneme suresinin bitisi ve Pro paywall.
 export default function EighthDayLockScreen() {
@@ -40,9 +41,9 @@ export default function EighthDayLockScreen() {
     <View style={[styles.container, { backgroundColor: C.bg, paddingTop: insets.top }]}>
       <View style={[styles.header, { paddingHorizontal: GUTTER }]}>
         <View style={{ width: 24 }} />
-        <Pressable onPress={handleClose} hitSlop={10}>
+        <Press haptic="none" onPress={handleClose} hitSlop={10}>
           <Icon name="x" size={24} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s5 }}>

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useExam } from "../../contexts/ExamContext";
@@ -13,6 +13,7 @@ import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Hedef Duzenle" artboard'i — Ayarlar > Hedef net satirindan
 // acilan duzenleyici.
@@ -40,9 +41,9 @@ export default function GoalsScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={styles.closeBtn}>
+        <Press haptic="none" onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={styles.closeBtn}>
           <Icon name="x" size={14} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -88,9 +89,9 @@ export default function GoalsScreen() {
           <Button onPress={save} size="lg" fullWidth loading={saving}>
             Kaydet
           </Button>
-          <Pressable onPress={cancel} style={styles.cancelBtn} accessibilityRole="button">
+          <Press haptic="none" onPress={cancel} style={styles.cancelBtn} accessibilityRole="button">
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
-          </Pressable>
+          </Press>
           {pendingNote ? (
             <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{pendingNote}</Text>
           ) : null}

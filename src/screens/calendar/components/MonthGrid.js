@@ -1,8 +1,9 @@
 import React, { useMemo, useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
+import { Press } from "../../../components/design/Press";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
@@ -34,7 +35,7 @@ function cellLook(data, dailyGoal, isFuture, C) {
 function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
   const look = cellLook(data, dailyGoal, isFuture, C);
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onSelect(iso)}
       hitSlop={2}
       accessibilityRole="button"
@@ -48,7 +49,7 @@ function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, on
       ]}
     >
       <Text style={[styles.dayText, { color: look.color }]}>{date.getDate()}</Text>
-    </Pressable>
+    </Press>
   );
 }
 

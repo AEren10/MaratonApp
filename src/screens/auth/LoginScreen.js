@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import { Icon, Button } from "../../components/design";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { loginSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
+import { Press } from "../../components/design/Press";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -56,7 +57,7 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable
+            <Press haptic="none"
               onPress={() => navigation.goBack()}
               hitSlop={12}
               accessibilityLabel="Geri"
@@ -64,7 +65,7 @@ export default function LoginScreen() {
               style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
             >
               <Icon name="arrowL" size={18} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
 
           <Animated.View style={{ marginTop: STEP.s2 }}>
@@ -83,9 +84,9 @@ export default function LoginScreen() {
 
             <Animated.View>
               <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••" secureTextEntry error={errors.password} />
-              <Pressable onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)} style={{ alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -STEP.s1 }} hitSlop={6}>
+              <Press haptic="none" onPress={() => navigation.navigate(SCREENS.FORGOT_PASSWORD)} style={{ alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -STEP.s1 }} hitSlop={6}>
                 <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>Şifremi unuttum</Text>
-              </Pressable>
+              </Press>
             </Animated.View>
           </View>
 
@@ -104,10 +105,10 @@ export default function LoginScreen() {
 
             <SocialAuthButtons />
 
-            <Pressable onPress={() => navigation.navigate(SCREENS.REGISTER)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
+            <Press haptic="none" onPress={() => navigation.navigate(SCREENS.REGISTER)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
               <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın yok mu?</Text>
               <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Kayıt ol</Text>
-            </Pressable>
+            </Press>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,7 +1,8 @@
-import { View, Text, Pressable, Linking, Platform, StyleSheet } from "react-native";
+import { View, Text, Linking, Platform, StyleSheet } from "react-native";
 import { Card } from "../../../../components/design/Card";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // "SINAV YERİ" karti — Sınav günü planında girilen yer ve salon.
 // Tasarimdaki "Kapılar 09:15'te kapanıyor" satiri CIZILMIYOR: kapi saati
@@ -21,7 +22,7 @@ export function HomeHeroExamDayVenue({ venue, place }) {
       <Text style={[TYPOGRAPHY.topicName, s.venue, { color: C.text }]}>{venue}</Text>
       {place ? (
         <View style={s.row}>
-          <Pressable
+          <Press haptic="none"
             onPress={() => openDirections(place)}
             hitSlop={8}
             accessibilityRole="link"
@@ -29,7 +30,7 @@ export function HomeHeroExamDayVenue({ venue, place }) {
             style={s.link}
           >
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>Yol tarifi</Text>
-          </Pressable>
+          </Press>
         </View>
       ) : null}
     </Card>

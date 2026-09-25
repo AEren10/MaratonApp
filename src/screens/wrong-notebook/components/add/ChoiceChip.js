@@ -1,9 +1,10 @@
 import { memo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Tasarimin secim cipi: h38 r6. Secili: marka tonu zemin + accent kenar.
 // dot: ders rengi karesi (yalniz ders cipinde). badge: "TAHMİN" gibi ek.
@@ -13,7 +14,7 @@ export const ChoiceChip = memo(function ChoiceChip({
 }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected: !!active }}
@@ -45,7 +46,7 @@ export const ChoiceChip = memo(function ChoiceChip({
       {badge ? (
         <Text style={[TYPOGRAPHY.tableHead, { color: C.accentBright }]}>{badge}</Text>
       ) : null}
-    </Pressable>
+    </Press>
   );
 });
 

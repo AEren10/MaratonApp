@@ -1,13 +1,14 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Kayıt ekranındaki Kullanım Şartları / Gizlilik Politikası onay kutusu.
 export function TermsCheckbox({ checked, onToggle, onOpenTerms, onOpenPrivacy }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onToggle}
       style={{ flexDirection: "row", alignItems: "flex-start", gap: STEP.s2 - 1, minHeight: 44 }}
       accessibilityRole="checkbox"
@@ -45,6 +46,6 @@ export function TermsCheckbox({ checked, onToggle, onOpenTerms, onOpenPrivacy })
         </Text>
         {"'nı okudum, onaylıyorum."}
       </Text>
-    </Pressable>
+    </Press>
   );
 }

@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "../../../components/design";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function CalendarHeader({ C, isPastMonth, onBack, onWeekTab }) {
   return (
     <View style={s.wrap}>
       <View style={s.row}>
-        <Pressable
+        <Press haptic="none"
           accessibilityRole="button"
           accessibilityLabel="Geri"
           hitSlop={STEP.s1}
@@ -14,7 +15,7 @@ export function CalendarHeader({ C, isPastMonth, onBack, onWeekTab }) {
           style={s.backTap}
         >
           <Icon name="chevL" size={17} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>Programım</Text>
         {isPastMonth ? (
           <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>geçmiş ay</Text>
@@ -22,14 +23,14 @@ export function CalendarHeader({ C, isPastMonth, onBack, onWeekTab }) {
       </View>
 
       <View style={[s.segWrap, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <Pressable
+        <Press haptic="none"
           accessibilityRole="tab"
           accessibilityLabel="Haftalık görünüm"
           onPress={onWeekTab}
           style={s.segTab}
         >
           <Text style={[TYPOGRAPHY.captionBold, { color: C.text3 }]}>Haftalık</Text>
-        </Pressable>
+        </Press>
         <View style={[s.segActive, { backgroundColor: C.elev }]}>
           <Text style={[TYPOGRAPHY.captionBold, { color: C.text }]}>Aylık</Text>
         </View>

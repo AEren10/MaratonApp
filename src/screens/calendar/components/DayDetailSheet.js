@@ -6,6 +6,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { DayTasks } from "./DayTasks";
 import { todayTR } from "../../../lib/dateUtils";
+import { Press } from "../../../components/design/Press";
 
 function formatDayLabel(iso) {
   return new Date(iso).toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
@@ -51,9 +52,9 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
           <View style={s.handle} />
           <View style={s.headerRow}>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>{formatDayLabel(day)}</Text>
-            <Pressable onPress={onClose} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
+            <Press haptic="none" onPress={onClose} hitSlop={12} accessibilityLabel="Kapat" accessibilityRole="button">
               <Icon name="x" size={20} color={C.text3} />
-            </Pressable>
+            </Press>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>

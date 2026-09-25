@@ -1,9 +1,10 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
 import * as H from "../../lib/haptics";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { Press } from "../../components/design/Press";
 
 // Segment kontrolu (tasarim: Programım "Haftalık / Aylık"): surface kutu,
 // secili segment elev zemin. Segment h36, dokunma alani 44.
@@ -15,7 +16,7 @@ function SegmentTabs({ options, value, onChange }) {
       {options.map((o) => {
         const on = o.key === value;
         return (
-          <Pressable
+          <Press haptic="none"
             key={o.key}
             onPress={() => { if (!on) { H.select(); onChange(o.key); } }}
             hitSlop={{ top: slop, bottom: slop }}
@@ -24,7 +25,7 @@ function SegmentTabs({ options, value, onChange }) {
             style={[s.seg, on && { backgroundColor: C.elev }]}
           >
             <Text style={[TYPOGRAPHY.metaSemiBold, s.text, { color: on ? C.text : C.text3 }]}>{o.label}</Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

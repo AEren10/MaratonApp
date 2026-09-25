@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
 import { HOW_IT_WORKS as T } from "../../constants/howItWorks";
 import { HowItWorksSource } from "./components/HowItWorksSource";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Neye Gore Oneriyoruz". Rota Detay'daki "Bu siralama neye gore?"
 // ve Premium'daki "Neye dayanarak oneriyor?" satirlarinin ortak hedefi.
@@ -30,9 +31,9 @@ export default function HowItWorksScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>{T.eyebrow}</Text>
       </View>
 

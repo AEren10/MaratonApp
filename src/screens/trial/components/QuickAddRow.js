@@ -1,12 +1,13 @@
-import { Pressable, Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, dotColor }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => { H.tap(); onPress(); }}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
@@ -18,7 +19,7 @@ export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, d
         <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{subtitle}</Text>
       </View>
       <Icon name="chevR" size={14} color={C.text3} />
-    </Pressable>
+    </Press>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -15,6 +15,7 @@ import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
+import { Press } from "../../components/design/Press";
 
 export default function LevelTestScreen() {
   const C = useC();
@@ -53,9 +54,9 @@ export default function LevelTestScreen() {
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.headerRow}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri">
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>3 / 4</Text>
       </View>
       <View style={styles.progressRow}>
@@ -105,9 +106,9 @@ export default function LevelTestScreen() {
         <Button onPress={handleContinue} size="lg" fullWidth loading={saving} disabled={!hasAnyEntry}>
           Devam
         </Button>
-        <Pressable onPress={handleSkip} hitSlop={8} style={styles.skip}>
+        <Press haptic="none" onPress={handleSkip} hitSlop={8} style={styles.skip}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Denemem yok, atla</Text>
-        </Pressable>
+        </Press>
       </View>
     </SafeAreaView>
   );

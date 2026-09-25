@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import { dayMonthDative, dayMonthLocative } from "../../lib/trSuffix";
 import { CancelLossCard } from "./components/CancelLossCard";
 import { CancelKeepCard } from "./components/CancelKeepCard";
 import { CancelActions } from "./components/CancelActions";
+import { Press } from "../../components/design/Press";
 
 // Tasarim: "Abonelik Iptali" -- ONAY ekrani, iptalin kendisi burada olmuyor.
 // iOS/Android'de abonelik magazadan iptal edilir; ekran ne zaman duracagini
@@ -30,14 +31,14 @@ export default function CancelSubscriptionScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={close}
           accessibilityRole="button"
           accessibilityLabel="Kapat"
           style={styles.closeBtn}
         >
           <Icon name="x" size={14} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
 
       {state === "loading" ? (

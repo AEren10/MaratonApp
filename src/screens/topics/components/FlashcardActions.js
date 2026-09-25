@@ -1,28 +1,29 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function FlashcardActions({ onPrev, onNext, isFirst, isLast, C }) {
   return (
     <View style={s.actions}>
-      <Pressable onPress={onPrev} style={[s.navBtn, { backgroundColor: C.surface }, isFirst && s.disabled]}>
+      <Press haptic="none" onPress={onPrev} style={[s.navBtn, { backgroundColor: C.surface }, isFirst && s.disabled]}>
         <Icon name="arrowL" size={20} color={C.text} />
-      </Pressable>
+      </Press>
 
-      <Pressable onPress={() => onNext(false)} style={[s.actionBtn, { backgroundColor: C.danger + "20" }]}>
+      <Press haptic="none" onPress={() => onNext(false)} style={[s.actionBtn, { backgroundColor: C.danger + "20" }]}>
         <Icon name="x" size={20} color={C.danger} />
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.danger }]}>Tekrar et</Text>
-      </Pressable>
+      </Press>
 
-      <Pressable onPress={() => onNext(true)} style={[s.actionBtn, { backgroundColor: C.up + "20" }]}>
+      <Press haptic="none" onPress={() => onNext(true)} style={[s.actionBtn, { backgroundColor: C.up + "20" }]}>
         <Icon name="check" size={20} color={C.up} />
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.up }]}>Bildim</Text>
-      </Pressable>
+      </Press>
 
-      <Pressable onPress={() => onNext(false)} style={[s.navBtn, { backgroundColor: C.surface }, isLast && s.disabled]}>
+      <Press haptic="none" onPress={() => onNext(false)} style={[s.navBtn, { backgroundColor: C.surface }, isLast && s.disabled]}>
         <Icon name="arrowR" size={20} color={C.text} />
-      </Pressable>
+      </Press>
     </View>
   );
 }

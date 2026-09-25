@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet, Platform } from "react-native";
+import { View, Text, FlatList, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -11,6 +11,7 @@ import { openInTab } from "../../navigation/tabJump";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeakAreas } from "../../hooks/useWeakAreas";
 import { WeakAreaRow } from "./components/WeakAreaRow";
+import { Press } from "../../components/design/Press";
 
 export default function WeakAreasScreen() {
   const C = useC();
@@ -37,14 +38,14 @@ export default function WeakAreasScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => navigation.goBack()}
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Geri"
         >
           <Icon name="arrowL" size={20} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ÖNCELİKLİ KONULAR</Text>
       </View>
 

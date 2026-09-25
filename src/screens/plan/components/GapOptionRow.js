@@ -1,16 +1,17 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Uc yoldan biri: kare secim kutusu, baslik, aciklama. Secili kizil tint.
 function GapOptionRow({ option, selected, onSelect }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => { if (!option.disabled) { H.select(); onSelect(option.key); } }}
       disabled={option.disabled}
       accessibilityRole="radio"
@@ -32,7 +33,7 @@ function GapOptionRow({ option, selected, onSelect }) {
           <Text style={[TYPOGRAPHY.meta, s.body, { color: C.text3 }]}>{option.body}</Text>
         ) : null}
       </View>
-    </Pressable>
+    </Press>
   );
 }
 

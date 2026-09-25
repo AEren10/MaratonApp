@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Icon, Button } from "../../components/design";
@@ -10,6 +10,7 @@ import { AddTaskExamSegment } from "./components/AddTaskExamSegment";
 import { TopicPickerModal } from "./components/TopicPickerModal";
 import { ADD_TASK_DURATIONS } from "./addTaskOptions";
 import { useAddTaskState } from "./useAddTaskState";
+import { Press } from "../../components/design/Press";
 
 function SectionHeader({ title, C }) {
   return (
@@ -21,12 +22,12 @@ function SectionHeader({ title, C }) {
 
 function Pill({ label, selected, onPress, C }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       style={[s.pill, { borderColor: selected ? C.accent : C.elev, backgroundColor: selected ? C.brandTint : C.surface }]}
     >
       <Text style={[TYPOGRAPHY.metaSemiBold, { color: selected ? C.text : C.text3 }]}>{label}</Text>
-    </Pressable>
+    </Press>
   );
 }
 
@@ -37,10 +38,10 @@ function AddTaskInner() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
-        <Pressable onPress={() => state.navigation.goBack()} hitSlop={STEP.s2} style={s.backRow}>
+        <Press haptic="none" onPress={() => state.navigation.goBack()} hitSlop={STEP.s2} style={s.backRow}>
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Durak ekle</Text>
-        </Pressable>
+        </Press>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -59,7 +60,7 @@ function AddTaskInner() {
         </View>
 
         <SectionHeader title="KONU" C={C} />
-        <Pressable
+        <Press haptic="none"
           onPress={() => state.setPickerOpen(true)}
           style={[s.picker, { backgroundColor: C.surface, borderColor: C.elev }]}
           accessibilityRole="button"
@@ -69,7 +70,7 @@ function AddTaskInner() {
             {state.topicName || "Konu seçin..."}
           </Text>
           <Icon name="chevR" size={16} color={C.text3} />
-        </Pressable>
+        </Press>
 
         <SectionHeader title="SÜRE" C={C} />
         <View style={s.pillsRow}>

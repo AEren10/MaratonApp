@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Share } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Share } from "react-native";
 
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -16,6 +16,7 @@ import { useGroupsController } from "./useGroupsController";
 import { SCREENS } from "../../constants/screens";
 import { appUrl } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
@@ -59,14 +60,14 @@ export function GroupsTab({ user, initialGroupCode }) {
     <View style={s.fill}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.actions}>
-          <Pressable onPress={() => { H.tap(); c.setCreateOpen(true); }} style={[s.actBtn, { backgroundColor: C.accent }]}>
+          <Press haptic="none" onPress={() => { H.tap(); c.setCreateOpen(true); }} style={[s.actBtn, { backgroundColor: C.accent }]}>
             <Icon name="plus" size={15} color={C.textOnFill} sw={2.5} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.textOnFill }]}>Yeni Grup Oluştur</Text>
-          </Pressable>
-          <Pressable onPress={() => { H.tap(); c.setJoinOpen(true); }} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+          </Press>
+          <Press haptic="none" onPress={() => { H.tap(); c.setJoinOpen(true); }} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
             <Icon name="users" size={15} color={C.text} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Kodu Gir</Text>
-          </Pressable>
+          </Press>
         </View>
 
         {c.groups.length === 0 ? (
@@ -90,9 +91,9 @@ export function GroupsTab({ user, initialGroupCode }) {
                 {boardError ? (
                   <View style={s.boardError}>
                     <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text>
-                    <Pressable onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}>
+                    <Press haptic="none" onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}>
                       <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text>
-                    </Pressable>
+                    </Press>
                   </View>
                 ) : board.list.length === 0 ? (
                   <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>Bu hafta kimse aktif değil.</Text>

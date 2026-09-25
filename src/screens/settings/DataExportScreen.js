@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { useDataExport } from "../../hooks/useDataExport";
 import * as H from "../../lib/haptics";
 import { SystemHeader } from "./components/system/SystemHeader";
 import { DataContentsCard } from "./components/system/DataContentsCard";
+import { Press } from "../../components/design/Press";
 
 // Tasarim "Veri İndir". Disa aktarma mantigi useDataExport'ta (JSON, paylasim
 // sayfasi); tasarimin CSV/JSON secimi ve e-posta teslimi uygulamada yok, o
@@ -59,9 +60,9 @@ export default function DataExportScreen() {
               {`${progress.label} (${progress.done}/${progress.total})`}
             </Text>
           ) : null}
-          <Pressable onPress={goBack} accessibilityRole="button" style={styles.secondary}>
+          <Press haptic="none" onPress={goBack} accessibilityRole="button" style={styles.secondary}>
             <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Vazgeç</Text>
-          </Pressable>
+          </Press>
         </View>
       </ScrollView>
     </View>

@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { alpha } from "../../../themes/colorMix";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Deneme Kotasi Doldu: soluk 1/3 arka plan + alt sayfa. Kayitli denemeler
 // listede durur; ikincil aksiyon yalniz kapatir.
@@ -44,9 +45,9 @@ export function TrialQuotaSheet({ sheet, onPro, onClose }) {
           </View>
         ) : null}
         <Button size="lg" fullWidth onPress={onPro} style={{ marginTop: STEP.s3 }}>Pro ile sınırsız kaydet</Button>
-        <Pressable onPress={onClose} style={styles.close} accessibilityRole="button">
+        <Press haptic="none" onPress={onClose} style={styles.close} accessibilityRole="button">
           <Text style={[TYPOGRAPHY.tableName, { fontFamily: "Archivo_600", color: C.text2 }]}>Tamam</Text>
-        </Pressable>
+        </Press>
       </Animated.View>
     </View>
   );

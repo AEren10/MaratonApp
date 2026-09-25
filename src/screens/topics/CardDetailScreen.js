@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -9,6 +9,7 @@ import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { FlashcardItem } from "./components/FlashcardItem";
 import { FlashcardActions } from "./components/FlashcardActions";
+import { Press } from "../../components/design/Press";
 
 function CardDetailContent() {
   const C = useC();
@@ -27,9 +28,9 @@ function CardDetailContent() {
     return (
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+          <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
             <Icon name="arrowL" size={22} color={C.text} />
-          </Pressable>
+          </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
             Kart Detay
           </Text>
@@ -66,9 +67,9 @@ function CardDetailContent() {
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           {cardTitle}
         </Text>

@@ -1,8 +1,9 @@
 import React, { useMemo, useCallback } from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon, Chip } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, onStart, onInfo }) {
   const C = useC();
@@ -16,7 +17,7 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
 
   return (
     <View style={[styles.card, { borderLeftColor: s.color }]}>
-      <Pressable
+      <Press haptic="none"
         accessibilityLabel={done ? "Görevi tamamlandı olarak işaretle" : "Görevi tamamla"}
         accessibilityRole="button"
         onPress={handleToggle}
@@ -27,9 +28,9 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
           size={24}
           color={done ? s.color : C.border}
         />
-      </Pressable>
+      </Press>
 
-      <Pressable
+      <Press haptic="none"
         accessibilityLabel={`${topic}, ${q} soru`}
         accessibilityRole="button"
         onPress={done ? handleInfo : handleStart}
@@ -47,10 +48,10 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
         <Text style={{ ...TYPOGRAPHY.caption, color: C.muted, marginTop: 2 }}>
           {q} soru
         </Text>
-      </Pressable>
+      </Press>
 
       <View style={styles.right}>
-        <Pressable
+        <Press haptic="none"
           accessibilityLabel="Görev nedenini göster"
           accessibilityRole="button"
           onPress={handleInfo}
@@ -59,16 +60,16 @@ export const PlanTaskItem = React.memo(function PlanTaskItem({ task, onToggle, o
           <Chip color={reasonColor} style={styles.reasonChip}>
             {reason}
           </Chip>
-        </Pressable>
+        </Press>
         {!done && (
-          <Pressable
+          <Press haptic="none"
             accessibilityLabel="Çalışmayı başlat"
             accessibilityRole="button"
             onPress={handleStart}
             style={styles.playBtn}
           >
             <Icon name="play" size={14} color={s.color} />
-          </Pressable>
+          </Press>
         )}
       </View>
     </View>

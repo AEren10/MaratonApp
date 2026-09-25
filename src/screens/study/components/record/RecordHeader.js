@@ -1,17 +1,18 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Kayit akisinin ust satiri: geri chevron + Bricolage 22 baslik.
 export function RecordHeader({ title, onBack }) {
   const C = useC();
   return (
     <View style={styles.row}>
-      <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Geri" style={styles.hit}>
+      <Press haptic="none" onPress={onBack} accessibilityRole="button" accessibilityLabel="Geri" style={styles.hit}>
         <Icon name="chevL" size={16} color={C.text2} />
-      </Pressable>
+      </Press>
       <Text accessibilityRole="header" numberOfLines={1} style={[TYPOGRAPHY.subheading, styles.title, { color: C.text }]}>
         {title}
       </Text>

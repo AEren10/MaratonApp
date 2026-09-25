@@ -16,6 +16,7 @@ import { PeriodSummary } from "./components/PeriodSummary";
 import { SubjectProgress } from "./components/SubjectProgress";
 import { PersonalBests } from "./components/PersonalBests";
 import * as H from "../../lib/haptics";
+import { Press } from "../../components/design/Press";
 
 const PERIODS = [
   { key: 7, label: "Hafta" },
@@ -41,9 +42,9 @@ export default function ComparativeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s3 }}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, marginLeft: STEP.s3, flex: 1 }}>
           Karşılaştırmalı Analiz
         </Text>

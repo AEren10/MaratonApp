@@ -12,6 +12,7 @@ import { SCREENS } from "../../constants/screens";
 import { useQuickAddActions } from "../../hooks/useQuickAddActions";
 import { QuickAddNowCard } from "./components/QuickAddNowCard";
 import { QuickAddRow } from "./components/QuickAddRow";
+import { Press } from "../../components/design/Press";
 
 const DISMISS_DISTANCE = 90;
 
@@ -50,9 +51,9 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
 
           <View style={styles.headerRow}>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Ne kaydediyorsun?</Text>
-            <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat">
+            <Press haptic="none" onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat">
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Kapat</Text>
-            </Pressable>
+            </Press>
           </View>
 
           <View style={styles.section}>

@@ -1,8 +1,9 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Etiket solda, deger + chevron sagda. onPress yoksa salt gosterim.
 export function RecordRow({ label, value, placeholder, onPress, children }) {
@@ -21,9 +22,9 @@ export function RecordRow({ label, value, placeholder, onPress, children }) {
   );
   if (!onPress) return <View style={styles.row}>{body}</View>;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value || placeholder || ""}`} style={styles.row}>
+    <Press haptic="none" onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value || placeholder || ""}`} style={styles.row}>
       {body}
-    </Pressable>
+    </Press>
   );
 }
 

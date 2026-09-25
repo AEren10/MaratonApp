@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Icon, Card } from "../../../components/design";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getTopicNote, saveTopicNote } from "../../../supabase/topicNotes";
+import { Press } from "../../../components/design/Press";
 
 // Konuya özel kalıcı not (DB'de saklanır).
 export function TopicNoteCard({ subjectKey, topicName }) {
@@ -49,7 +50,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
           <Text style={{ ...TYPOGRAPHY.micro, color: C.danger }}>Kaydedilemedi</Text>
         ) : null}
         {dirty ? (
-          <Pressable
+          <Press haptic="none"
             onPress={save}
             disabled={saving}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -58,7 +59,7 @@ export function TopicNoteCard({ subjectKey, topicName }) {
             style={s.saveBtn}
           >
             <Text style={s.saveText}>{saving ? "..." : "Kaydet"}</Text>
-          </Pressable>
+          </Press>
         ) : null}
       </View>
       <TextInput

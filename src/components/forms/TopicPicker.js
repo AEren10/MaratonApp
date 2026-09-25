@@ -4,6 +4,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../design";
 import { getSubjectByKey } from "../../themes/subjects";
+import { Press } from "../../components/design/Press";
 
 export function TopicPicker({ visible, subject, onClose, onSelect }) {
   const C = useC();
@@ -36,10 +37,10 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
   }, [onSelect, onClose, reset]);
 
   const renderTopicItem = useCallback(({ item }) => (
-    <Pressable onPress={() => pick(item, "curriculum")} style={s.row}>
+    <Press haptic="none" onPress={() => pick(item, "curriculum")} style={s.row}>
       <Text style={s.rowText}>{item}</Text>
       <Icon name="chevR" size={14} color={C.muted} />
-    </Pressable>
+    </Press>
   ), [pick, s, C.muted]);
 
   return (
@@ -60,12 +61,12 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
                   autoFocus
                   style={s.input}
                 />
-                <Pressable onPress={() => customText.trim() && pick(customText.trim(), "custom")} style={s.primaryBtn}>
+                <Press haptic="none" onPress={() => customText.trim() && pick(customText.trim(), "custom")} style={s.primaryBtn}>
                   <Text style={s.primaryBtnText}>Ekle</Text>
-                </Pressable>
-                <Pressable onPress={() => setCustomMode(false)} style={s.linkBtn}>
+                </Press>
+                <Press haptic="none" onPress={() => setCustomMode(false)} style={s.linkBtn}>
                   <Text style={s.linkText}>Listeden seç</Text>
-                </Pressable>
+                </Press>
               </View>
             ) : (
               <>
@@ -91,10 +92,10 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
                   ListEmptyComponent={<Text style={s.emptyText}>Eşleşen konu yok</Text>}
                 />
 
-                <Pressable onPress={() => setCustomMode(true)} style={s.customRow}>
+                <Press haptic="none" onPress={() => setCustomMode(true)} style={s.customRow}>
                   <Icon name="edit" size={15} color={C.accent} />
                   <Text style={s.customText}>Listede yok, elle yaz</Text>
-                </Pressable>
+                </Press>
               </>
             )}
           </Pressable>

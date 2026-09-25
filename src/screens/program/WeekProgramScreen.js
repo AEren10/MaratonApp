@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { RouteHeader } from "../roadmap/components/RouteHeader";
 import { WeekDayStrip } from "../dersler/components/WeekDayStrip";
 import ProgramAgendaItem from "./components/ProgramAgendaItem";
+import { Press } from "../../components/design/Press";
 
 function plannedLabel(minutes) {
   if (!minutes) return null;
@@ -54,9 +55,9 @@ function WeekSummary({ p, C, onMonth }) {
         <View style={[s.segmentActive, { backgroundColor: C.elev }]}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Haftalık</Text>
         </View>
-        <Pressable accessibilityRole="button" onPress={onMonth} style={s.segmentIdle}>
+        <Press haptic="none" accessibilityRole="button" onPress={onMonth} style={s.segmentIdle}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Aylık</Text>
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

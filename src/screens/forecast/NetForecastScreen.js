@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -9,6 +9,7 @@ import { SCREENS } from "../../constants/screens";
 import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useScenarioView } from "../../hooks/useScenarioView";
 import { ScenarioCard } from "./components/ScenarioCard";
+import { Press } from "../../components/design/Press";
 
 // AKIŞ 2 · Senaryolar — Rota Detay'daki "Senaryoları aç" satırının hedefi.
 // Üç tempo senaryosu aynı hedef netini farklı haftalık yükle çiziyor.
@@ -23,9 +24,9 @@ export default function NetForecastScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 }}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={{ ...TYPOGRAPHY.label, color: C.text3, marginLeft: STEP.s1 }}>SENARYOLAR</Text>
       </View>
 

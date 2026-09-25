@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
+import { View, Text, Modal, StyleSheet } from "react-native";
 
 import SignedImage from "../../../../components/common/SignedImage";
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // Soru fotografi: 230px kadraj, solda ders seridi, "Tam ekran" etiketi.
 // Dokununca karartilmis zeminde tam ekran acilir.
@@ -15,7 +16,7 @@ export function DetailPhoto({ path, subjectColor }) {
 
   return (
     <View style={styles.wrap}>
-      <Pressable
+      <Press haptic="none"
         onPress={() => setZoom(true)}
         accessibilityRole="imagebutton"
         accessibilityLabel="Soru fotoğrafı, tam ekran aç"
@@ -26,18 +27,18 @@ export function DetailPhoto({ path, subjectColor }) {
           <Text style={[TYPOGRAPHY.tableHead, styles.tagText, { color: C.text2 }]}>Tam ekran</Text>
         </View>
         <View style={[styles.stripe, { backgroundColor: subjectColor }]} />
-      </Pressable>
+      </Press>
 
       <Modal visible={zoom} transparent animationType="fade" onRequestClose={() => setZoom(false)}>
         <View style={[styles.overlay, { backgroundColor: C.scrim }]}>
-          <Pressable
+          <Press haptic="none"
             onPress={() => setZoom(false)}
             accessibilityRole="button"
             accessibilityLabel="Kapat"
             style={[styles.close, { backgroundColor: C.surface, borderColor: C.border }]}
           >
             <Icon name="x" size={18} color={C.text} />
-          </Pressable>
+          </Press>
           <SignedImage bucket="wrong-questions" path={path} style={styles.zoomImage} contentFit="contain" cachePolicy="memory-disk" />
         </View>
       </Modal>

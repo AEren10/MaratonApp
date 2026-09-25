@@ -1,9 +1,10 @@
-import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useAvatarUpload } from "../../../hooks/useAvatarUpload";
+import { Press } from "../../../components/design/Press";
 
 function initialsOf(name) {
   const parts = (name || "").trim().split(/\s+/).filter(Boolean);
@@ -20,7 +21,7 @@ export function EditProfileAvatar({ name }) {
   const { avatarSource, uploading, pickAvatar } = useAvatarUpload();
 
   return (
-    <Pressable onPress={pickAvatar} style={{ alignItems: "center", marginTop: STEP.s1 }}>
+    <Press haptic="none" onPress={pickAvatar} style={{ alignItems: "center", marginTop: STEP.s1 }}>
       <View>
         <View
           style={{
@@ -52,6 +53,6 @@ export function EditProfileAvatar({ name }) {
         </View>
       </View>
       <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3, marginTop: STEP.s2 + 2 }]}>Fotoğrafı değiştir</Text>
-    </Pressable>
+    </Press>
   );
 }

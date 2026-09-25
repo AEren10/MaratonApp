@@ -1,7 +1,8 @@
-import { View, Text, Pressable, ScrollView, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TextInput, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Prova formunun satiri: etiket · deger · ok. Dokununca satirin altinda
 // secenekler (cip) ya da yazma alani acilir; ayri bir sayfa acilmaz.
@@ -9,7 +10,7 @@ export function RehearsalRow({ label, value, open, onToggle, last, children }) {
   const C = useC();
   return (
     <View style={!last && { borderBottomWidth: 1, borderBottomColor: C.line }}>
-      <Pressable
+      <Press haptic="none"
         onPress={onToggle}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
@@ -19,7 +20,7 @@ export function RehearsalRow({ label, value, open, onToggle, last, children }) {
         <Text style={[TYPOGRAPHY.bodyMedium, s.label, { color: C.text }]}>{label}</Text>
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]} numberOfLines={1}>{value}</Text>
         <Icon name={open ? "chevDown" : "chevR"} size={12} color={C.text5} />
-      </Pressable>
+      </Press>
       {open ? <View style={s.panel}>{children}</View> : null}
     </View>
   );
@@ -32,7 +33,7 @@ export function RehearsalOptions({ options, selected, onSelect }) {
       {options.map((o) => {
         const on = o.value === selected;
         return (
-          <Pressable
+          <Press haptic="none"
             key={o.value}
             onPress={() => onSelect(o.value)}
             accessibilityRole="button"
@@ -40,7 +41,7 @@ export function RehearsalOptions({ options, selected, onSelect }) {
             style={[s.chip, on ? { backgroundColor: C.brandTint, borderColor: C.accent } : { borderColor: C.border }]}
           >
             <Text style={[TYPOGRAPHY.captionMedium, { color: on ? C.text : C.text2 }]}>{o.label}</Text>
-          </Pressable>
+          </Press>
         );
       })}
     </ScrollView>

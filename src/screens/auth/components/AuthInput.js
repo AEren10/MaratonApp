@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput } from "react-native";
 import { useState } from "react";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function AuthInput({
   label,
@@ -50,9 +51,9 @@ export function AuthInput({
           style={[TYPOGRAPHY.inputMedium, { flex: 1, color: C.text, paddingVertical: 0 }]}
         />
         {isPassword ? (
-          <Pressable onPress={() => setShow((v) => !v)} hitSlop={10} style={{ padding: STEP.s1 }} accessibilityRole="button" accessibilityLabel={show ? "Şifreyi gizle" : "Şifreyi göster"}>
+          <Press haptic="none" onPress={() => setShow((v) => !v)} hitSlop={10} style={{ padding: STEP.s1 }} accessibilityRole="button" accessibilityLabel={show ? "Şifreyi gizle" : "Şifreyi göster"}>
             <Icon name={show ? "eyeOff" : "eye"} size={17} color={C.text4} />
-          </Pressable>
+          </Press>
         ) : null}
       </View>
       {error ? (

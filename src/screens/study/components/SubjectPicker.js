@@ -1,15 +1,16 @@
 import { memo, useCallback } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYT_DERSLER } from "../../../data/curriculum";
+import { Press } from "../../../components/design/Press";
 
 const SubjectPill = memo(function SubjectPill({ subject, active, onPress }) {
   const C = useC();
   const handlePress = useCallback(() => onPress(subject.key), [onPress, subject.key]);
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
@@ -41,7 +42,7 @@ const SubjectPill = memo(function SubjectPill({ subject, active, onPress }) {
       >
         {subject.label}
       </Text>
-    </Pressable>
+    </Press>
   );
 });
 

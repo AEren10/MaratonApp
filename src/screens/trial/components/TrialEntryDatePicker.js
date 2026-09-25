@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { formatDateISO } from "../trialEntryDates";
+import { Press } from "../../../components/design/Press";
 
 // TARIH satirinin acilan son 14 gun seridi.
 export function TrialEntryDatePicker({ recentDays, trialDate, onChangeDate }) {
@@ -14,7 +15,7 @@ export function TrialEntryDatePicker({ recentDays, trialDate, onChangeDate }) {
       {recentDays.map((day) => {
         const active = selected === day.iso;
         return (
-          <Pressable key={day.iso} onPress={() => onChangeDate(day.date)}
+          <Press haptic="none" key={day.iso} onPress={() => onChangeDate(day.date)}
             accessibilityRole="radio" accessibilityLabel={`${day.dayName} ${day.day}`}
             accessibilityState={{ selected: active }}
             style={[styles.chip, {
@@ -25,7 +26,7 @@ export function TrialEntryDatePicker({ recentDays, trialDate, onChangeDate }) {
               {day.dayName}
             </Text>
             <Text style={[TYPOGRAPHY.topicName, { color: C.text, fontVariant: ["tabular-nums"] }]}>{day.day}</Text>
-          </Pressable>
+          </Press>
         );
       })}
     </Animated.View>

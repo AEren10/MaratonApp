@@ -1,7 +1,8 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon, StatBlock } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: "Hedef Duzenle" — eksi/artı 52x52 kutular + ortada buyuk sayi,
 // altinda min/su-an/max ile ilerleme cubugu.
@@ -18,27 +19,27 @@ export function GoalNetStepper({
   return (
     <View style={styles.wrap}>
       <View style={styles.row}>
-        <Pressable
+        <Press haptic="none"
           onPress={onDec}
           accessibilityRole="button"
           accessibilityLabel={`${label} azalt`}
           style={[styles.side, { borderColor: C.border }]}
         >
           <Icon name="minus" size={16} color={C.text2} />
-        </Pressable>
+        </Press>
 
         <View style={styles.center}>
           <StatBlock value={value} unit={unit ?? `net · ${netLabel}`} size="page" align="center" />
         </View>
 
-        <Pressable
+        <Press haptic="none"
           onPress={onInc}
           accessibilityRole="button"
           accessibilityLabel={`${label} artir`}
           style={[styles.side, { backgroundColor: C.brandFill }]}
         >
           <Icon name="plus" size={16} color={C.accentInk} />
-        </Pressable>
+        </Press>
       </View>
 
       <View style={styles.track}>

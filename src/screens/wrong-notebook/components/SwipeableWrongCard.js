@@ -1,11 +1,12 @@
 import React, { useRef, useCallback } from "react";
-import { Text, Pressable } from "react-native";
+import { Text } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY } from "../../../themes/tokens";
 import { WrongCard } from "./WrongCard";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item, onPress, onResolve, onShare, onDelete, shared }) {
   const C = useC();
@@ -36,7 +37,7 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
   const renderRight = useCallback(() => {
     if (item.is_resolved) return null;
     return (
-      <Pressable
+      <Press haptic="none"
         accessibilityRole="button"
         accessibilityLabel="Çözdüm"
         accessibilityHint="Yanlışı çözülmüş olarak işaretler"
@@ -45,14 +46,14 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
       >
         <Icon name="check" size={24} color={C.accentInk} sw={2.5} />
         <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Çözdüm</Text>
-      </Pressable>
+      </Press>
     );
   }, [C, handleResolve, item.is_resolved]);
 
   const renderLeft = useCallback(() => {
     if (!onDelete) return null;
     return (
-      <Pressable
+      <Press haptic="none"
         accessibilityRole="button"
         accessibilityLabel="Sil"
         accessibilityHint="Yanlış soruyu siler"
@@ -61,7 +62,7 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
       >
         <Icon name="trash" size={24} color={C.accentInk} sw={2} />
         <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Sil</Text>
-      </Pressable>
+      </Press>
     );
   }, [C, handleDelete, onDelete]);
 

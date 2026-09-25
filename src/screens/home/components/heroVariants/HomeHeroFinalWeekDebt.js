@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../../../constants/screens";
 import Animated from "react-native-reanimated";
@@ -8,6 +8,7 @@ import { HomeHeroEyebrow } from "./HomeHeroEyebrow";
 import { HomeHeroTrialSummaryCard } from "./HomeHeroTrialSummaryCard";
 import { HomeHeroClosedCard } from "./HomeHeroClosedCard";
 import { HomeHeroCTA } from "../HomeHeroCTA";
+import { Press } from "../../../../components/design/Press";
 
 const CLOSED_ITEMS = ["Hedef net", "Tahmini net", "Sıralama", "Konu borcu", "Projeksiyon çizgisi", "Lig"];
 const CLOSED_NOTE = "Değiştiremediğin bir sayıyı göstermek yardım etmez. Son 48 saatte performans bildirimi de gelmez, \"hedefe ulaşamadın\" ekranı hiç yok.";
@@ -70,7 +71,7 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
             ) : null}
           </View>
         ) : null}
-        <Pressable
+        <Press haptic="none"
           onPress={openPlan}
           accessibilityRole="button"
           accessibilityLabel="Sınav günü planı"
@@ -82,7 +83,7 @@ export function HomeHeroFinalWeekDebt({ examDate, nextTask, trialStats, onStartT
             <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 4 }]}>Saat, çanta, yol · şimdi hazırla</Text>
           </View>
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>10 dk</Text>
-        </Pressable>
+        </Press>
       </Animated.View>
 
       <Animated.View style={s.block}>

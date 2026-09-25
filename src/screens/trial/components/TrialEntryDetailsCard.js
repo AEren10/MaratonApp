@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, TextInput, View, Switch } from "react-native";
+import { StyleSheet, Text, TextInput, View, Switch } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { TrialEntryDatePicker } from "./TrialEntryDatePicker";
+import { Press } from "../../../components/design/Press";
 
 const HIT = { top: 3, bottom: 3 };
 
@@ -21,11 +22,11 @@ export function TrialEntryDetailsCard({ form, styles: shared }) {
       <View style={[styles.divider, { backgroundColor: C.line }]} />
       <View style={styles.row}>
         <Text style={[shared.label, styles.key]}>TARİH</Text>
-        <Pressable onPress={() => form.setShowDatePicker((open) => !open)} hitSlop={HIT} style={well}
+        <Press haptic="none" onPress={() => form.setShowDatePicker((open) => !open)} hitSlop={HIT} style={well}
           accessibilityRole="button" accessibilityLabel={`Tarih: ${dateLabel}`}
           accessibilityState={{ expanded: form.showDatePicker }}>
           <Text style={[TYPOGRAPHY.tableName, { color: C.text }]}>{dateLabel}</Text>
-        </Pressable>
+        </Press>
       </View>
       {form.showDatePicker ? (
         <TrialEntryDatePicker recentDays={form.recentDays} trialDate={form.trialDate}

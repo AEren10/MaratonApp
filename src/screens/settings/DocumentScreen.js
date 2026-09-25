@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -7,6 +7,7 @@ import { Icon, Card, EmptyState } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { LEGAL_DOCS, readingMinutes } from "../../constants/legalDocs";
+import { Press } from "../../components/design/Press";
 
 // Tasarimin "Belge" ekrani: BELGE etiketi + baslik + son guncelleme +
 // okuma suresi + bolumler. Gizlilik ve Kullanim Sartlari ayni duzeni
@@ -24,9 +25,9 @@ export default function DocumentScreen({ fallbackDocKey }) {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>BELGE</Text>
       </View>
 

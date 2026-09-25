@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { PAYWALL_LEGAL } from "../../../constants/paywallMoment";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Geri yukleme + yasal baglantilar. Her oge 44px dokunma alani.
 export const PaywallLegalRow = React.memo(function PaywallLegalRow({ onRestore, disabled }) {
@@ -15,17 +16,17 @@ export const PaywallLegalRow = React.memo(function PaywallLegalRow({ onRestore, 
 
   return (
     <View style={styles.wrap}>
-      <Pressable onPress={onRestore} disabled={disabled} style={styles.hit} accessibilityRole="button">
+      <Press haptic="none" onPress={onRestore} disabled={disabled} style={styles.hit} accessibilityRole="button">
         <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.restore}</Text>
-      </Pressable>
+      </Press>
       <View style={styles.links}>
-        <Pressable onPress={() => navigation.navigate(SCREENS.PRIVACY)} style={styles.hit} accessibilityRole="link">
+        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.PRIVACY)} style={styles.hit} accessibilityRole="link">
           <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.privacy}</Text>
-        </Pressable>
+        </Press>
         <Text style={text}>·</Text>
-        <Pressable onPress={() => navigation.navigate(SCREENS.TERMS)} style={styles.hit} accessibilityRole="link">
+        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.TERMS)} style={styles.hit} accessibilityRole="link">
           <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.terms}</Text>
-        </Pressable>
+        </Press>
       </View>
     </View>
   );

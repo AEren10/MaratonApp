@@ -1,11 +1,12 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Card, Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 function StepBtn({ C, icon, onPress, disabled }) {
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       disabled={disabled}
       hitSlop={6}
@@ -23,7 +24,7 @@ function StepBtn({ C, icon, onPress, disabled }) {
       }}
     >
       <Icon name={icon} size={14} color={C.text2} sw={2} />
-    </Pressable>
+    </Press>
   );
 }
 

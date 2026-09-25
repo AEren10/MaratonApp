@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
 import { useExam } from "../../../contexts/ExamContext";
@@ -7,6 +7,7 @@ import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { trialShortLabel } from "../trialLabels";
 import { TrialEntryRuleLabel } from "./TrialEntryRuleLabel";
+import { Press } from "../../../components/design/Press";
 
 // DENEME TURU: esit genislikte segment; secili = marka tonu + vurgu kenari.
 export function TrialTypeSelector({ value, onChange }) {
@@ -20,7 +21,7 @@ export function TrialTypeSelector({ value, onChange }) {
         {list.map((type) => {
           const active = value === type.code;
           return (
-            <Pressable key={type.code} accessibilityRole="radio" accessibilityLabel={type.label}
+            <Press haptic="none" key={type.code} accessibilityRole="radio" accessibilityLabel={type.label}
               accessibilityState={{ selected: active }}
               onPress={() => { H.select(); onChange(type.code); }}
               style={[styles.item, {
@@ -33,7 +34,7 @@ export function TrialTypeSelector({ value, onChange }) {
               }]}>
                 {trialShortLabel(type.code, type.label)}
               </Text>
-            </Pressable>
+            </Press>
           );
         })}
       </View>

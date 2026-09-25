@@ -1,5 +1,6 @@
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
+import { Press } from "../../../components/design/Press";
 
 const SUBJECT_LABELS = {
   turkce: "Türkçe", matematik: "Matematik", fizik: "Fizik", kimya: "Kimya",
@@ -9,7 +10,7 @@ const SUBJECT_LABELS = {
 
 export function FilterPill({ label, count, active, color, onPress }) {
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="tab"
       accessibilityLabel={count > 0 ? `${label}, ${count} yanlış` : label}
       accessibilityState={{ selected: active }}
@@ -34,7 +35,7 @@ export function FilterPill({ label, count, active, color, onPress }) {
           {count}
         </Text>
       ) : null}
-    </Pressable>
+    </Press>
   );
 }
 

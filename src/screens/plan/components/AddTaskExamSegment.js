@@ -1,6 +1,7 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function AddTaskExamSegment({ value, onChange, C }) {
   const options = [
@@ -13,7 +14,7 @@ export function AddTaskExamSegment({ value, onChange, C }) {
       {options.map((opt) => {
         const active = value === opt.key;
         return (
-          <Pressable
+          <Press haptic="none"
             key={opt.key}
             onPress={() => {
               if (!active) {
@@ -38,7 +39,7 @@ export function AddTaskExamSegment({ value, onChange, C }) {
             >
               {opt.label}
             </Text>
-          </Pressable>
+          </Press>
         );
       })}
     </View>

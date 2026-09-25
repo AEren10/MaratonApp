@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { SHAPE, STEP } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 function formatNum(n) {
   if (n == null || isNaN(n)) return "0,00";
@@ -19,7 +20,7 @@ export function TrialHistoryItem({ C, item, onPress }) {
   const dc = isUp ? C.up : C.down;
 
   return (
-    <Pressable
+    <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel={`${item.type} deneme detayı`}
       onPress={onPress}
@@ -47,7 +48,7 @@ export function TrialHistoryItem({ C, item, onPress }) {
 
       <Text style={[s.moodText, { color: C.text3 }]}>{item.mood}</Text>
       <Icon name="chevR" size={14} color={C.text5 || C.text4} />
-    </Pressable>
+    </Press>
   );
 }
 

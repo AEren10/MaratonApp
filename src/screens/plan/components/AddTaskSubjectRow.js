@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY } from "../../../themes/tokens";
 import { subjectColorOf } from "../../../themes/subjectPalette";
+import { Press } from "../../../components/design/Press";
 
 export const AddTaskSubjectRow = React.memo(function AddTaskSubjectRow({ subject, selected, onPress, C }) {
   const color = subjectColorOf(C, subject.key);
@@ -13,7 +14,7 @@ export const AddTaskSubjectRow = React.memo(function AddTaskSubjectRow({ subject
   if (subject.key === "tarih") topicsLeft = 9;
 
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
@@ -28,7 +29,7 @@ export const AddTaskSubjectRow = React.memo(function AddTaskSubjectRow({ subject
       <View style={[st.radio, { borderColor: selected ? color : C.border }]}>
         {selected ? <View style={[st.radioDot, { backgroundColor: color }]} /> : null}
       </View>
-    </Pressable>
+    </Press>
   );
 });
 

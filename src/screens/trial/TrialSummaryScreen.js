@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -21,6 +21,7 @@ import { TrialSummaryRouteLine } from "./components/TrialSummaryRouteLine";
 import { TrialSummarySubjectDeltas } from "./components/TrialSummarySubjectDeltas";
 import { TrialSummaryTarget } from "./components/TrialSummaryTarget";
 import { TrialDropLayout } from "./components/TrialDropLayout";
+import { Press } from "../../components/design/Press";
 
 // Deneme Ozeti: kayit sonrasi ekran. Imza ani rota cizgisinde.
 export default function TrialSummaryScreen() {
@@ -52,17 +53,17 @@ export default function TrialSummaryScreen() {
       ) : (
         <>
           <View style={styles.header}>
-            <Pressable onPress={() => navigation.popToTop()} style={styles.close}
+            <Press haptic="none" onPress={() => navigation.popToTop()} style={styles.close}
               accessibilityLabel="Kapat" accessibilityRole="button">
               <Icon name="x" size={14} color={C.text2} sw={1.7} />
-            </Pressable>
+            </Press>
             <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
               {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}
             </Text>
-            <Pressable onPress={handleShare} style={styles.close}
+            <Press haptic="none" onPress={handleShare} style={styles.close}
               accessibilityLabel="Paylaş" accessibilityRole="button">
               <Icon name="share" size={16} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
             <TrialSummaryHero typeLabel={typeLabel} net={trial.totalNet} prevNet={summary.prevNet} delta={summary.delta} />

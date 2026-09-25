@@ -4,7 +4,7 @@ import {
   View,
   Text,
   ScrollView,
-  Pressable,
+  
   StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { ReorganizeTaskRow } from "./ReorganizeTaskRow";
 import { ReorganizeScheduleCard, ReorganizeClearButton } from "./ReorganizeActions";
+import { Press } from "../../../components/design/Press";
 
 export function ReorganizeDayModal({
   visible,
@@ -37,9 +38,9 @@ export function ReorganizeDayModal({
               <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Günü Yeniden Düzenle</Text>
               {dayLabel ? <Text style={[TYPOGRAPHY.meta, { color: C.accent }]}>{dayLabel}</Text> : null}
             </View>
-            <Pressable onPress={onClose} hitSlop={STEP.s2}>
+            <Press haptic="none" onPress={onClose} hitSlop={STEP.s2}>
               <Icon name="x" size={20} color={C.text2} />
-            </Pressable>
+            </Press>
           </View>
 
           <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>

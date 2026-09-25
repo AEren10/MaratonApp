@@ -1,12 +1,13 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function PlanDetailHeader({ dayLabel, onBack, C }) {
   return (
     <View style={s.header}>
-      <Pressable
+      <Press haptic="none"
         accessibilityRole="button"
         accessibilityLabel="Geri"
         hitSlop={STEP.s2}
@@ -15,7 +16,7 @@ export function PlanDetailHeader({ dayLabel, onBack, C }) {
       >
         <Icon name="chevL" size={18} color={C.text} />
         <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>{dayLabel}</Text>
-      </Pressable>
+      </Press>
     </View>
   );
 }

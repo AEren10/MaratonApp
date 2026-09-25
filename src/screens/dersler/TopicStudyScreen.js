@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, ScrollView, Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, View, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Button, ErrorState } from "../../components/design";
@@ -15,6 +15,7 @@ import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
 import { TopicInfoList } from "./components/TopicInfoList";
 import { TopicWrongNotesList } from "./components/TopicWrongNotesList";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
+import { Press } from "../../components/design/Press";
 
 function formatMinutesShort(min) {
   if (!min) return "0 dk";
@@ -57,9 +58,9 @@ export default function TopicStudyScreen() {
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.headerBar}>
-        <Pressable hitSlop={10} onPress={() => navigation.goBack()} style={s.iconBtn}>
+        <Press haptic="none" hitSlop={10} onPress={() => navigation.goBack()} style={s.iconBtn}>
           <Icon name="chevL" size={16} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.metaSemiBold, s.headerMeta, { color: C.text3 }]}>KONU DETAYI</Text>
         <Pressable hitSlop={10} style={s.iconBtn}>
           <Icon name="moreVertical" size={20} color={C.text} />

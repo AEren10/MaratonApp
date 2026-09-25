@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { Pressable, View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { usePlanVsActual } from "../../hooks/usePlanVsActual";
 import { PlanVsActualChart } from "./components/PlanVsActualChart";
+import { Press } from "../../components/design/Press";
 
 function CountCard({ C, eyebrow, value, caption, accent }) {
   return (
@@ -50,10 +51,10 @@ export default function PlanVsActualScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={handleBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Press haptic="none" onPress={handleBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Icon name="chevL" size={18} color={C.text} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Söz ve gerçek</Text>
-        </Pressable>
+        </Press>
       </View>
 
       {!hasData ? (

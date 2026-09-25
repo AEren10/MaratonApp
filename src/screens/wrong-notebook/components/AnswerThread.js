@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, TextInput, ActivityIndicator, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
@@ -8,6 +8,7 @@ import { useQuestionAnswers } from "../../../hooks/useQuestionAnswers";
 import * as H from "../../../lib/haptics";
 import { AnswerRow } from "./AnswerRow";
 import { AnswerThreadSkeleton } from "./AnswerThreadSkeleton";
+import { Press } from "../../../components/design/Press";
 
 const MAX_LEN = 600;
 
@@ -71,7 +72,7 @@ export function AnswerThread({ sharedQuestionId }) {
           accessibilityLabel="Cevabın"
         />
         <View style={s.composerFoot}>
-          <Pressable
+          <Press haptic="none"
             onPress={() => setAnonymous((v) => !v)}
             accessibilityRole="switch"
             accessibilityState={{ checked: anonymous }}
@@ -80,11 +81,11 @@ export function AnswerThread({ sharedQuestionId }) {
           >
             <Icon name={anonymous ? "checkCircle" : "circle"} size={16} color={anonymous ? C.accent : C.text3} />
             <Text style={[s.anonText, anonymous && { color: C.text }]}>Anonim</Text>
-          </Pressable>
+          </Press>
 
           <Text style={s.counter}>{draft.length}/{MAX_LEN}</Text>
 
-          <Pressable
+          <Press haptic="none"
             onPress={onSend}
             disabled={!canSend}
             accessibilityRole="button"
@@ -94,7 +95,7 @@ export function AnswerThread({ sharedQuestionId }) {
             {posting
               ? <ActivityIndicator size="small" color={C.textOnFill} />
               : <Icon name="arrowR" size={16} color={C.textOnFill} />}
-          </Pressable>
+          </Press>
         </View>
         {hint ? <Text style={s.hint}>{hint}</Text> : null}
       </View>

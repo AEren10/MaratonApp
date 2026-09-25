@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 
@@ -12,6 +12,7 @@ import { PaywallMomentHero } from "./PaywallMomentHero";
 import { PaywallBullet } from "./PaywallBullet";
 import { PaywallProCard } from "./PaywallProCard";
 import { PaywallLegalRow } from "./PaywallLegalRow";
+import { Press } from "../../../components/design/Press";
 
 // Tasarim: "Paywall Anı". Baglami olmayan kaynaklarda (kilitli rota
 // ekrani) tam ekran. Once ucretsizde acik kalanlar, sonra Pro teklifi.
@@ -23,9 +24,9 @@ export function PaywallMoment({ purchase, onDismiss }) {
   return (
     <View style={[styles.root, { backgroundColor: C.bg, paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Pressable onPress={onDismiss} style={styles.close} accessibilityRole="button" accessibilityLabel={M.secondary}>
+        <Press haptic="none" onPress={onDismiss} style={styles.close} accessibilityRole="button" accessibilityLabel={M.secondary}>
           <Icon name="x" size={14} color={C.text2} sw={1.7} />
-        </Pressable>
+        </Press>
         {data.dayNumber ? (
           <Text style={[TYPOGRAPHY.label, styles.eyebrow, { color: C.text3 }]}>{M.dayEyebrow(data.dayNumber)}</Text>
         ) : null}
@@ -55,13 +56,13 @@ export function PaywallMoment({ purchase, onDismiss }) {
             <PaywallProCard purchase={purchase} />
           </View>
 
-          <Pressable
+          <Press haptic="none"
             onPress={onDismiss}
             style={[styles.secondary, { borderColor: C.border }]}
             accessibilityRole="button"
           >
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>{M.secondary}</Text>
-          </Pressable>
+          </Press>
           <PaywallLegalRow onRestore={purchase.handleRestore} disabled={purchase.purchasing} />
         </Animated.View>
       </ScrollView>

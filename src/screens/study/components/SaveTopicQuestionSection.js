@@ -1,7 +1,8 @@
-import { View, Text, Pressable, TextInput } from "react-native";
+import { View, Text, TextInput } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function SaveTopicQuestionSection({
   C,
@@ -16,7 +17,7 @@ export function SaveTopicQuestionSection({
     <>
       <View style={{ marginTop: STEP.s4 }}>
         <SectionLabel>KONU (isteğe bağlı)</SectionLabel>
-        <Pressable
+        <Press haptic="none"
           onPress={onOpenTopicPicker}
           accessibilityRole="button"
           accessibilityLabel="Konu seç"
@@ -30,7 +31,7 @@ export function SaveTopicQuestionSection({
             {topic || "Konu seç..."}
           </Text>
           <Icon name="chevDown" size={14} color={C.text3} />
-        </Pressable>
+        </Press>
       </View>
 
       <View style={{ marginTop: STEP.s4 }}>

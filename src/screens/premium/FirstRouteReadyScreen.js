@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
@@ -14,6 +14,7 @@ import { resetToTabStackScreen } from "../../navigation/rootStackActions";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { useBlockBack } from "../../hooks/useBlockBack";
+import { Press } from "../../components/design/Press";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -57,9 +58,9 @@ export default function FirstRouteReadyScreen() {
       <View style={[styles.header, { paddingHorizontal: GUTTER }]}>
         <View style={{ width: 24 }} />
         <Text style={[styles.headerTitle, { color: C.text }]}></Text>
-        <Pressable onPress={handleClose} hitSlop={10}>
+        <Press haptic="none" onPress={handleClose} hitSlop={10}>
           <Icon name="x" size={24} color={C.text2} />
-        </Pressable>
+        </Press>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + STEP.s5 }}>

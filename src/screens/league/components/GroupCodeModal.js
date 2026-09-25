@@ -4,6 +4,7 @@ import { Icon } from "../../../components/design/Icon";
 import { TYPOGRAPHY, SPACING, STEP, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
+import { Press } from "../../../components/design/Press";
 
 export function GroupCodeModal({ visible, title, subtitle, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen }) {
   const C = useC();
@@ -25,9 +26,9 @@ export function GroupCodeModal({ visible, title, subtitle, placeholder, value, o
               <View style={[s.iconBadge, { backgroundColor: C.accent + "18", borderColor: C.accent + "30" }]}>
                 <Icon name={isCode ? "users" : "plus"} size={18} color={C.accent} />
               </View>
-              <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={s.closeBtn}>
+              <Press haptic="none" onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={s.closeBtn}>
                 <Icon name="x" size={18} color={C.text3} />
-              </Pressable>
+              </Press>
             </View>
 
             <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>{title}</Text>
@@ -46,13 +47,13 @@ export function GroupCodeModal({ visible, title, subtitle, placeholder, value, o
               style={[s.input, isCode && s.codeInput, { backgroundColor: C.bg, borderColor: C.border, color: isCode ? C.accent : C.text }]}
             />
 
-            <Pressable onPress={handleSubmit} disabled={disabled} accessibilityRole="button" style={[s.submit, { backgroundColor: disabled ? C.surface2 : C.accent }]}>
+            <Press haptic="none" onPress={handleSubmit} disabled={disabled} accessibilityRole="button" style={[s.submit, { backgroundColor: disabled ? C.surface2 : C.accent }]}>
               {busy ? <ActivityIndicator size="small" color={C.textOnFill} /> : <Text style={[TYPOGRAPHY.button, { color: disabled ? C.text3 : C.textOnFill }]}>{cta}</Text>}
-            </Pressable>
+            </Press>
 
-            <Pressable onPress={onClose} hitSlop={8} accessibilityRole="button" style={s.cancelBtn}>
+            <Press haptic="none" onPress={onClose} hitSlop={8} accessibilityRole="button" style={s.cancelBtn}>
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Vazgeç</Text>
-            </Pressable>
+            </Press>
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>

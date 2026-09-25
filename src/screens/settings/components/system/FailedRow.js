@@ -1,9 +1,10 @@
 import { memo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 
 // GONDERILEMEYEN satiri: kayit adi + ayrinti, sagda "Sil".
 //
@@ -27,7 +28,7 @@ function FailedRowBase({ title, meta, onDiscard }) {
           {meta ? `${meta} · sunucu kabul etmedi` : "Sunucu bu kaydı kabul etmedi"}
         </Text>
       </View>
-      <Pressable
+      <Press haptic="none"
         onPress={onDiscard}
         hitSlop={12}
         accessibilityRole="button"
@@ -35,7 +36,7 @@ function FailedRowBase({ title, meta, onDiscard }) {
         style={styles.action}
       >
         <Text style={[TYPOGRAPHY.label, styles.tag, { color: C.text3 }]}>SİL</Text>
-      </Pressable>
+      </Press>
     </View>
   );
 }

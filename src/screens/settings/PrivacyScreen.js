@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -11,6 +11,7 @@ import { LEGAL_DOCS } from "../../constants/legalDocs";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
 import { useSettingsActions } from "./useSettingsActions";
+import { Press } from "../../components/design/Press";
 
 // Tasarimin "Gizlilik" ekrani bir HUB: belge satirlari + VERILERIN grubu.
 // Politika METNI artik burada degil, "Belge" ekraninda (DocumentScreen);
@@ -30,9 +31,9 @@ export default function PrivacyScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>
           Gizlilik ve şartlar
         </Text>

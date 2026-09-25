@@ -1,9 +1,10 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 
 import { Icon, SectionLabel } from "../../../components/design";
 import { AnimatedCard } from "../../../components/design/AnimatedCard";
 import { TrendChart } from "../../../components/charts/TrendChart";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
   if (!analysis.heroLine || analysis.heroLine.length <= 1) return null;
@@ -18,7 +19,7 @@ export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
           title="Net Trendin"
           color={C.accent}
         />
-        <Pressable
+        <Press haptic="none"
           accessibilityRole="button"
           accessibilityLabel="Detaylı Analiz"
           accessibilityHint="Deneme trendlerinin detaylı analizine gider"
@@ -41,7 +42,7 @@ export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
           <Icon name="trendUp" size={16} color={C.accent} />
           <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.accent }}>Detaylı Analiz</Text>
           <Icon name="chevR" size={14} color={C.accent} />
-        </Pressable>
+        </Press>
       </AnimatedCard>
     </View>
   );

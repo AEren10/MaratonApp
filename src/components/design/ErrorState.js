@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { Button } from "./Button";
 import { Card } from "./Card";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../themes/tokens";
 import { ERROR_COPY } from "../../constants/stateCopy";
+import { Press } from "../../components/design/Press";
 
 // Hata durumu. Tasarim kurali: suc kullanicida degil ("Bizde bir sorun var."),
 // hata kodu ana metnin icine sokulmaz — altta kopyalanabilir satir olarak durur.
@@ -65,7 +66,7 @@ export function ErrorState({
       ) : null}
 
       {code ? (
-        <Pressable
+        <Press haptic="none"
           accessibilityRole="button"
           accessibilityLabel={`Hata kodunu kopyala: ${code}`}
           onPress={() => Clipboard.setStringAsync(code)}
@@ -73,7 +74,7 @@ export function ErrorState({
         >
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Hata kodu {code}</Text>
           <Text style={[TYPOGRAPHY.meta, { color: C.accentBright }]}>Kopyala</Text>
-        </Pressable>
+        </Press>
       ) : null}
     </View>
   );

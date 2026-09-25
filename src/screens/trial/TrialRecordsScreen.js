@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, Pressable, SectionList, StyleSheet, Platform } from "react-native";
+import { View, Text, SectionList, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -12,6 +12,7 @@ import { TrialRecordFilters } from "./components/TrialRecordFilters";
 import { TrialRecordRow } from "./components/TrialRecordRow";
 import { TrialRecordUnlockCard } from "./components/TrialRecordUnlockCard";
 import { TrialRecordsSkeleton } from "./components/TrialRecordsSkeleton";
+import { Press } from "../../components/design/Press";
 
 export default function TrialRecordsScreen() {
   const C = useC();
@@ -43,7 +44,7 @@ export default function TrialRecordsScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
-        <Pressable
+        <Press haptic="none"
           onPress={() => navigation.goBack()}
           hitSlop={12}
           accessibilityRole="button"
@@ -51,7 +52,7 @@ export default function TrialRecordsScreen() {
           style={styles.backBtn}
         >
           <Icon name="arrowL" size={18} color={C.text2} />
-        </Pressable>
+        </Press>
         <Text style={[styles.title, { color: C.text }]}>Deneme kayıtları</Text>
         <Text style={[styles.count, { color: C.text3 }]}>{totalCount}</Text>
       </View>

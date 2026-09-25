@@ -1,15 +1,16 @@
 import { memo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
+import { Press } from "../../../components/design/Press";
 
 // Canta satiri: kare isaret kutusu + kalem + (zorunluysa) "zorunlu".
 // Sinav Gunu Plani ve Ana Sayfa "Sınav Günü" modu ayni satiri kullanir.
 export const ExamCheckRow = memo(function ExamCheckRow({ item, onToggle, last = false }) {
   const C = useC();
   return (
-    <Pressable
+    <Press haptic="none"
       onPress={() => onToggle?.(item.key)}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: item.done }}
@@ -28,7 +29,7 @@ export const ExamCheckRow = memo(function ExamCheckRow({ item, onToggle, last = 
         {item.label}
       </Text>
       {item.required ? <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>zorunlu</Text> : null}
-    </Pressable>
+    </Press>
   );
 });
 

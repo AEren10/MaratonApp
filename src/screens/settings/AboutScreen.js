@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { Press } from "../../components/design/Press";
 
 const INFO_ROWS = [
   { label: "Geliştirici", value: "Maraton Team" },
@@ -21,9 +22,9 @@ export default function AboutScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
+        <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
           <Icon name="arrowL" size={22} color={C.text} />
-        </Pressable>
+        </Press>
         <Text style={s.headerTitle}>Hakkında</Text>
         <View style={{ width: 22 }} />
       </View>

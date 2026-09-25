@@ -1,10 +1,11 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useAlert } from "../../../contexts/AlertContext";
 import { getMastery } from "../../../lib/mastery";
+import { Press } from "../../../components/design/Press";
 
 // Tasarimda yer almiyor ama mevcut, gercek veriye dayali bir ozellik —
 // kaldirmak yerine korunuyor (dogruluk orani + soru sayisi hakimiyeti).
@@ -42,7 +43,7 @@ export function TopicMasteryRing({ q, acc, color }) {
           {(q || 0) === 0 ? "Soru çözdükçe hakimiyetin oluşacak" : "Hakimiyet"}
         </Text>
         {(q || 0) > 0 && (
-          <Pressable
+          <Press haptic="none"
             hitSlop={10}
             onPress={() =>
               showAlert(
@@ -52,7 +53,7 @@ export function TopicMasteryRing({ q, acc, color }) {
             }
           >
             <Icon name="info" size={15} color={C.muted} />
-          </Pressable>
+          </Press>
         )}
       </View>
       <View style={[s.badge, { backgroundColor: badgeColor + "1A" }]}>
