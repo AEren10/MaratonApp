@@ -40,7 +40,7 @@ export function HomeHero({
   renderBelow,
 }) {
   const { examDate } = useExam();
-  const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, stops, weekLogs, previousQuestions, streak });
+  const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops: stops, weekLogs, previousQuestions, streak });
   const {
     daysUntilExam,
     hasRouteAccess,

@@ -12,7 +12,7 @@ import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetS
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
-export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, stops = [], weekLogs, previousQuestions = null, streak = 0 }) {
+export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops = [], weekLogs, previousQuestions = null, streak = 0 }) {
   const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const weeklyMinutesGoal = useSelector(selectWeeklyMinutesGoal);
   const {
@@ -122,7 +122,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, stops 
       // Widget'ta BITEN isler de var: tasarim ustu cizili satir istiyor,
       // generatedTasks ise yalnizca bitmemisleri tutuyor (planEngine eliyor).
       // Bu yuzden kaynak stops.
-      stops,
+      stops: todayStops,
       weeklyMinutesGoal,
       // Konu adi bos olabiliyor; birlestirmeden once eleniyor, yoksa
       // widget'ta "Türkçe · null" yaziyordu.
@@ -132,7 +132,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, stops 
       week: weeklyEffort,
     });
     syncRouteWidget({ examDate, chart: chartData, target: targetNet });
-  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, stops, weeklyMinutesGoal, examDate, chartData, targetNet]);
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, targetNet]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`

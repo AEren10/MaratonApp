@@ -63,7 +63,11 @@ export function syncTodayWidget({
   // Widget'a en fazla dort is gidiyor: daha fazlasi orta boy widget'ta
   // okunmuyor, listeyi kaydiramiyorsun. Bitmemisler once, bitenler sonra --
   // widget'in isi "simdi ne yapayim", gecmisi anlatmak degil.
-  const tasks = (stops || [])
+  // useTodayStops bir DIZI degil { items, doneCount, nextId, toggle } donuyor.
+  // Burasi bir sinir: cagiran taraf ne gonderirse gondersin widget'i
+  // cokertmemeli -- bir widget susleme, ana ekrani dusurmemeli.
+  const list = Array.isArray(stops) ? stops : (Array.isArray(stops?.items) ? stops.items : []);
+  const tasks = list
     .map((stop) => ({
       label: [stop?.subject && stop?.topic ? stop.topic : stop?.label].filter(Boolean).join(""),
       minutes: Number(stop?.minutes) || 0,
