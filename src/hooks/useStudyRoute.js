@@ -24,6 +24,9 @@ import { summarizeRouteRevision } from "../domain/route/routeRevisionSummary";
 import { routePersistenceDecision } from "../domain/route/routePersistenceDecision";
 import { isRoutePausedForExam, routePausedAtForExam } from "../domain/route/routePauseState";
 import { captureError } from "../lib/errorReporting";
+import { PREMIUM_ENABLED } from "../constants/premium";
+import * as appStorage from "../lib/storage/appStorage";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 
 let _lastRouteCache = {
   key: "",
@@ -124,7 +127,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const { examType, field, examDate } = useExam();
   const { user } = useAuth();
   const { accessError, accessLoading, checkFeature, refreshUsage } = usePremium();
-  const hasRouteAccess = !accessLoading && checkFeature("detailed_roadmap");
+  const hasRouteAccess = !PREMIUM_ENABLED || (!accessLoading && checkFeature("detailed_roadmap"));
   const [pastWeeks, setPastWeeks] = useState([]);
   const [routeState, setRouteStateLocal] = useState(null);
   const [routeCreating, setRouteCreating] = useState(false);
@@ -320,19 +323,34 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       getRouteWeeks(user.id, { examType }),
       getRouteState(user.id, examType),
       getLatestRouteStops(user.id, examType),
-    ]).then(([weeksResult, stateResult, stopsResult]) => {
+    ]).then(async ([weeksResult, stateResult, stopsResult]) => {
       if (cancelled) return;
       if (routeLoadKeyRef.current !== loadKey) return;
-      if (weeksResult.status === "fulfilled") setPastWeeks(weeksResult.value);
-      if (stateResult.status === "fulfilled") setRouteStateLocal(stateResult.value);
-      if (stopsResult.status === "fulfilled") setPersistedStops(stopsResult.value);
+      let loadedWeeks = weeksResult.status === "fulfilled" ? weeksResult.value : [];
+      let loadedState = stateResult.status === "fulfilled" ? stateResult.value : null;
+      let loadedStops = stopsResult.status === "fulfilled" ? stopsResult.value : [];
+
+      if (!loadedStops || loadedStops.length === 0) {
+        try {
+          loadedStops = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), [])) || [];
+        } catch (_) {}
+      }
+      if (!loadedWeeks || loadedWeeks.length === 0) {
+        try {
+          loadedWeeks = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, user.id), [])) || [];
+        } catch (_) {}
+      }
+
+      setPastWeeks(loadedWeeks);
+      if (loadedState) setRouteStateLocal(loadedState);
+      setPersistedStops(loadedStops);
 
       const failures = [
         failedRouteRead("route_weeks", weeksResult),
         failedRouteRead("route_state", stateResult),
         failedRouteRead("route_stops", stopsResult),
       ].filter(Boolean);
-      if (failures.length) {
+      if (failures.length && (!loadedStops || loadedStops.length === 0)) {
         const error = new RouteReadError(failures);
         setRouteLoadError(error);
         captureError(error, {
@@ -382,19 +400,83 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         nextWeeks: computedRoute.weeks,
         nextRevision: computedRoute.revision,
       });
-      const savedWeekCount = await saveRouteWeeks(
-        user.id,
-        computedRoute.weeks,
-        examType,
-        computedRoute.revision,
-      );
-      if (savedWeekCount <= 0) {
-        throw new Error("route_persist_failed");
+
+      // Prepare local stops fallback with first upcoming stop promoted to active
+      let isFirstUpcoming = true;
+      const localStops = [];
+      for (const week of computedRoute.weeks) {
+        for (const stop of week.stops || []) {
+          const isActive = isFirstUpcoming && (!stop.lifecycleStatus || stop.lifecycleStatus === "upcoming");
+          if (isActive) isFirstUpcoming = false;
+          localStops.push({
+            id: `local_${stop.logicalStopKey}`,
+            logical_key: stop.logicalStopKey,
+            root_key: stop.rootStopKey || stop.logicalStopKey,
+            subject: stop.subject,
+            subject_label: stop.subjectLabel || stop.subject,
+            topic: stop.topic,
+            week_start: week.weekStart,
+            position: stop.position ?? 0,
+            segment_index: stop.segmentIndex ?? 0,
+            stop_kind: stop.isReview ? "review" : "learn",
+            lifecycle_status: isActive ? "active" : (stop.lifecycleStatus || "upcoming"),
+            version: 1,
+            metadata: stop,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
       }
-      const [stops, rows] = await Promise.all([
-        getLatestRouteStops(user.id, examType),
-        getRouteWeeks(user.id, { examType }),
-      ]);
+
+      const localWeeks = computedRoute.weeks.map((w, i) => ({
+        weekNo: i + 1,
+        weekStart: w.weekStart,
+        plannedQuestions: Math.max(0, Math.round(w.plannedQuestions || 0)),
+        plannedMinutes: Math.max(0, Math.round(w.plannedMinutes || 0)),
+        stops: w.stops || [],
+        examType,
+      }));
+
+      // Cache locally immediately to ensure durability (offline & 42501 resilience)
+      try {
+        await Promise.all([
+          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), localStops),
+          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, user.id), localWeeks),
+        ]);
+      } catch (_) {}
+
+      try {
+        await saveRouteWeeks(
+          user.id,
+          computedRoute.weeks,
+          examType,
+          computedRoute.revision,
+        );
+      } catch (err) {
+        captureError(err, { context: "create_route_save_remote", examType });
+      }
+
+      let stops = [];
+      let rows = [];
+      try {
+        [stops, rows] = await Promise.all([
+          getLatestRouteStops(user.id, examType),
+          getRouteWeeks(user.id, { examType }),
+        ]);
+      } catch (_) {}
+
+      if (!stops || stops.length === 0) {
+        stops = localStops;
+      } else {
+        try {
+          await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), stops);
+        } catch (_) {}
+      }
+
+      if (!rows || rows.length === 0) {
+        rows = localWeeks;
+      }
+
       setPersistedStops(stops);
       setPastWeeks(rows);
       track(EVENTS.ROUTE_CREATED, {
@@ -449,6 +531,32 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const transitionStop = useCallback(async (stop, transition, payload = {}) => {
     if (!stop?.stopId) throw new Error("route_stop_not_persisted");
     const version = stop.version ?? 1;
+
+    if (String(stop.stopId).startsWith("local_")) {
+      const updated = {
+        id: stop.stopId,
+        lifecycle_status: transition,
+        updated_at: new Date().toISOString(),
+        version: version + 1,
+        subject: stop.subject,
+      };
+      setPersistedStops((current) => {
+        const next = (current || []).map((item) => (
+          item.id === updated.id ? { ...item, ...updated } : item
+        ));
+        if (user?.id) {
+          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), next).catch(() => {});
+        }
+        return next;
+      });
+      track(EVENTS.ROUTE_STOP_TRANSITIONED, {
+        transition,
+        subject: updated.subject || stop.subject,
+        source: payload.source || "unknown",
+      });
+      return updated;
+    }
+
     const routeResult = await saveRouteStopTransitionOffline({
       userId: user?.id,
       stopId: stop.stopId,
@@ -503,7 +611,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     forecast,
     hasRouteAccess,
     routeAccessError: accessError,
-    routeAccessLoading: accessLoading,
+    routeAccessLoading: PREMIUM_ENABLED ? accessLoading : false,
     refreshRouteAccess: refreshUsage,
     routeCreated,
     routeStopsLoaded: stopsLoaded,

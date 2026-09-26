@@ -55,6 +55,10 @@ export const STORAGE_KEYS = {
   HOME_FIRST_DAY_DISMISSED: "@maraton:homeFirstDayDismissed",
   // Yol haritasi konu tamamlama (userScopedKey). Manuel tik atilan konularin kaydi.
   COMPLETED_TOPICS: "@maraton:completed_topics",
+  // Rota plani ve duraklari (userScopedKey). Cevrimdisi ve erisim dayanikliligi.
+  ROUTE_WEEKS: "@maraton:route_weeks",
+  ROUTE_STOPS: "@maraton:route_stops",
+  ROUTE_STATE: "@maraton:route_state",
 };
 
 // Gün sınırı TR saatiyle. toISOString() UTC verir; TR = UTC+3 olduğu için

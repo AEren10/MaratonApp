@@ -1,6 +1,8 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { createRouteRevision } from "../domain/route/routeIdentity";
+import * as appStorage from "../lib/storage/appStorage";
+import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 
 // Rota planının kalıcılığı.
 //
@@ -37,7 +39,7 @@ const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, exam_type, updated_
 
 /** Rota çizildiğinde haftaları yaz. Aynı hafta varsa üzerine yazar. */
 export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRevision = null) {
-  if (!userId || userId === "dev" || !Array.isArray(weeks) || weeks.length === 0) return 0;
+  if (!userId || !Array.isArray(weeks) || weeks.length === 0) return 0;
 
   const rows = weeks
     .filter((w) => w.weekStart)
@@ -73,6 +75,12 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
   if (!rows.length) return 0;
 
   try {
+    await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), rows);
+  } catch (_) {}
+
+  if (userId === "dev") return rows.length;
+
+  try {
     const revision = suppliedRevision || createRouteRevision({
       weeks,
       examType: examType || "unknown",
@@ -89,12 +97,18 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
     return rows.length;
   } catch (e) {
     handleSupabaseError(e, "saveRouteWeeks");
+    if (e?.code === "42501" || e?.status === 403 || e?.message?.includes?.("route access required") || e?.message?.includes?.("Network request failed")) {
+      return rows.length;
+    }
     throw e;
   }
 }
 
 export async function getLatestRouteStops(userId, examType = null) {
-  if (!userId || userId === "dev") return [];
+  if (!userId) return [];
+  if (userId === "dev") {
+    return (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
+  }
   try {
     let query = supabase
       .from("route_revisions")
@@ -105,11 +119,17 @@ export async function getLatestRouteStops(userId, examType = null) {
     if (examType) query = query.eq("exam_type", examType);
     const { data, error } = await query.maybeSingle();
     if (error) throw error;
-    return data?.id ? getRouteStops(userId, data.id) : [];
+    if (data?.id) {
+      const serverStops = await getRouteStops(userId, data.id);
+      if (serverStops && serverStops.length > 0) {
+        await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), serverStops);
+        return serverStops;
+      }
+    }
   } catch (e) {
     handleSupabaseError(e, "getLatestRouteStops");
-    throw e;
   }
+  return (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
 }
 
 export async function getRouteStops(userId, revisionId = null) {
@@ -225,33 +245,54 @@ export async function transitionRouteStop({
  * @param sinceWeekStart "YYYY-MM-DD"
  */
 export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
-  if (!userId || userId === "dev") return [];
-  try {
-    let q = supabase
-      .from(TABLE)
-      .select("week_start, planned_questions, planned_minutes, stops, exam_type")
-      .eq("user_id", userId)
-      .order("week_start", { ascending: true });
+  if (!userId) return [];
+  if (userId !== "dev") {
+    try {
+      let q = supabase
+        .from(TABLE)
+        .select("week_start, planned_questions, planned_minutes, stops, exam_type")
+        .eq("user_id", userId)
+        .order("week_start", { ascending: true });
 
-    if (sinceWeekStart) q = q.gte("week_start", sinceWeekStart);
-    // Sınav tipi değiştiyse eski müfredatın planı borç sayılmamalı.
-    if (examType) q = q.eq("exam_type", examType);
+      if (sinceWeekStart) q = q.gte("week_start", sinceWeekStart);
+      // Sınav tipi değiştiyse eski müfredatın planı borç sayılmamalı.
+      if (examType) q = q.eq("exam_type", examType);
 
-    const { data, error } = await q;
-    if (error) throw error;
+      const { data, error } = await q;
+      if (error) throw error;
 
-    return (data || []).map((r, i) => ({
-      weekNo: i + 1,
-      weekStart: r.week_start,
-      plannedQuestions: r.planned_questions || 0,
-      plannedMinutes: r.planned_minutes || 0,
-      stops: r.stops || [],
-      examType: r.exam_type,
-    }));
-  } catch (e) {
-    handleSupabaseError(e, "getRouteWeeks");
-    throw e;
+      if (data && data.length > 0) {
+        const mapped = data.map((r, i) => ({
+          weekNo: i + 1,
+          weekStart: r.week_start,
+          plannedQuestions: r.planned_questions || 0,
+          plannedMinutes: r.planned_minutes || 0,
+          stops: r.stops || [],
+          examType: r.exam_type,
+        }));
+        await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), data);
+        return mapped;
+      }
+    } catch (e) {
+      handleSupabaseError(e, "getRouteWeeks");
+    }
   }
+
+  // Local fallback
+  const local = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), [])) || [];
+  const filtered = local.filter((r) => {
+    if (sinceWeekStart && r.week_start < sinceWeekStart) return false;
+    if (examType && r.exam_type && r.exam_type !== examType) return false;
+    return true;
+  });
+  return filtered.map((r, i) => ({
+    weekNo: i + 1,
+    weekStart: r.week_start,
+    plannedQuestions: r.planned_questions || 0,
+    plannedMinutes: r.planned_minutes || 0,
+    stops: r.stops || [],
+    examType: r.exam_type,
+  }));
 }
 
 /** Sınav tipi değişince eski rotayı temizle — yanlış müfredat borcu kalmasın. */

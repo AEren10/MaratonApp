@@ -30,3 +30,11 @@ test("route stop lifecycle carryover is scoped by revision exam type", () => {
   assert.match(routeWeeksMigration, /rr\.exam_type = p_exam_type/);
   assert.match(routeWeeksMigration, /rr\.exam_type IS NULL AND p_exam_type IS NULL/);
 });
+
+test("route persistence includes offline local storage durability and fallback", () => {
+  assert.match(source, /STORAGE_KEYS\.ROUTE_WEEKS/);
+  assert.match(source, /STORAGE_KEYS\.ROUTE_STOPS/);
+  assert.match(source, /userId === "dev"/);
+  assert.match(source, /42501/);
+});
+
