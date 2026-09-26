@@ -22,8 +22,11 @@ export function isHapticEnabled() { return _enabled; }
 const guard = (fn) => () => { if (_enabled) fn().catch(() => {}); };
 
 export const tap = guard(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
+export const light = tap;
 export const select = guard(() => Haptics.selectionAsync());
 export const medium = guard(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium));
+export const heavy = guard(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy));
 export const success = guard(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success));
 export const warn = guard(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning));
+export const warning = warn;
 export const error = guard(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error));

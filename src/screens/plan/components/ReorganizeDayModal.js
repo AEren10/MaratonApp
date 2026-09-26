@@ -86,7 +86,7 @@ export function ReorganizeDayModal({
             {incompleteTasks.length > 0 ? (
               <ReorganizeClearButton
                 onPress={() => {
-                  H.warning();
+                  H.warn();
                   onClearRemaining();
                 }}
                 C={C}

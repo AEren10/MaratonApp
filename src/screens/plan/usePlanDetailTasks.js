@@ -114,14 +114,24 @@ export function usePlanDetailTasks({
   const removeTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);
     if (task?.userTask && removeUserTask) removeUserTask(id);
+    if (task?.routeStop && transitionStop) {
+      transitionStop(task.routeStop, "skipped", { source: "reorganize_day" }).catch?.(() => {});
+    }
     setTasks((prev) => prev.filter((t) => t.id !== id));
-    haptic.warning();
-  }, [removeUserTask]);
+    haptic.warn();
+  }, [removeUserTask, transitionStop]);
 
   const clearRemaining = useCallback(() => {
+    const remaining = tasksRef.current.filter((t) => !t.done);
+    for (const task of remaining) {
+      if (task.userTask && removeUserTask) removeUserTask(task.id);
+      if (task.routeStop && transitionStop) {
+        transitionStop(task.routeStop, "skipped", { source: "reorganize_day_clear" }).catch?.(() => {});
+      }
+    }
     setTasks((prev) => prev.filter((t) => t.done));
-    haptic.warning();
-  }, []);
+    haptic.warn();
+  }, [removeUserTask, transitionStop]);
 
   const showReason = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);

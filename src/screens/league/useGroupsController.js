@@ -111,7 +111,7 @@ export function useGroupsController({ user, initialGroupCode }) {
   };
 
   const doLeave = (g) => {
-    H.warning();
+    H.warn();
     showAlert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
       { text: "İptal", style: "cancel" },
       { text: "Ayrıl", style: "destructive", onPress: async () => {
