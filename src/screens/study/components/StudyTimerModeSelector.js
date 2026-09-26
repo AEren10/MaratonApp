@@ -14,6 +14,13 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
     }
   };
 
+  const isCustomActive = modeKey === "CUSTOM";
+
+  const handleCustom = () => {
+    H.select();
+    if (onCustomPress) onCustomPress();
+  };
+
   return (
     <View style={s.container}>
       <View style={s.row}>
@@ -60,18 +67,19 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
         </View>
 
         <Press haptic="none" scaleTo={0.94}
-          onPress={onCustomPress || (() => {})}
+          onPress={handleCustom}
           accessibilityRole="button"
-          accessibilityLabel="Özel süre"
+          accessibilityState={{ selected: isCustomActive }}
+          accessibilityLabel="Özel süre ve mola ayarla"
           style={[
             s.editButton,
             {
-              borderColor: C.border,
-              backgroundColor: C.surface
+              borderColor: isCustomActive ? C.accent : C.border,
+              backgroundColor: isCustomActive ? C.elev : C.surface
             }
           ]}
         >
-          <Icon name="edit" size={16} color={C.text3} />
+          <Icon name="edit" size={16} color={isCustomActive ? (C.accentBright || C.accent) : C.text3} />
         </Press>
       </View>
     </View>

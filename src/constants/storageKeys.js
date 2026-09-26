@@ -5,6 +5,7 @@ export const STORAGE_KEYS = {
   THEME_ACCENT: "@maraton:themeAccent",
   // Çalışan kronometre oturumu — uygulama öldürülürse kurtarmak için.
   ACTIVE_TIMER_SESSION: "@maraton:activeTimerSession",
+  CUSTOM_TIMER_CONFIG: "@maraton:custom_timer_config",
   EXAM_CONFIG: "@exam_config",
   HAS_SEEN_ONBOARDING: "@has_seen_onboarding",
   NOTIF_PREFS: "@maraton:notifPrefs",

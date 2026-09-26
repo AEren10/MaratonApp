@@ -24,6 +24,10 @@ import {
   getPhaseTargetSeconds,
 } from "../../domain/study/studyTimerModel";
 import { getSubjectByKey } from "../../themes/subjects";
+import { getJson, setJson } from "../../lib/storage/appStorage";
+import { STORAGE_KEYS } from "../../constants/storageKeys";
+
+const DEFAULT_CUSTOM_CONFIG = { focus: 30, break: 5, cycles: 4 };
 
 export function useStudyTimerController(C) {
   const showAlert = useAlert();
@@ -54,6 +58,8 @@ export function useStudyTimerController(C) {
     routeTopicName: routeActionTopicName,
   });
   const [modeKey, setModeKey] = useState(route.params?.modeKey || "POMODORO_25");
+  const [customConfig, setCustomConfig] = useState(DEFAULT_CUSTOM_CONFIG);
+  const [customModalVisible, setCustomModalVisible] = useState(false);
   const [phase, setPhase] = useState(STUDY_TIMER_PHASE.FOCUS);
   const [cycleIndex, setCycleIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
@@ -64,6 +70,22 @@ export function useStudyTimerController(C) {
   const interval = useRef(null);
   const phaseTimeout = useRef(null);
 
+  useEffect(() => {
+    let active = true;
+    getJson(STORAGE_KEYS.CUSTOM_TIMER_CONFIG, DEFAULT_CUSTOM_CONFIG)
+      .then((saved) => {
+        if (active && saved?.focus) {
+          setCustomConfig({
+            focus: Math.min(180, Math.max(5, Math.round(Number(saved.focus)) || 30)),
+            break: Math.min(60, Math.max(1, Math.round(Number(saved.break)) || 5)),
+            cycles: Math.min(12, Math.max(1, Math.round(Number(saved.cycles)) || 4)),
+          });
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
   // DUVAR SAATİ ÇAPASI.
   // Süre artık tick sayısıyla değil gerçek zamanla hesaplanıyor. Önceden
   // setInterval her saniyede elapsed+1 yapıyordu; JS zamanlayıcıları arka
@@ -73,7 +95,61 @@ export function useStudyTimerController(C) {
   const sessionStartedAtRef = useRef(null); // oturumun ILK başlat anı (ms) — saat aralığı gösterimi
   const [recovery, setRecovery] = useState(null); // kurtarılabilir oturum
   const topic = topicName || "";
-  const mode = useMemo(() => modes.find((item) => item.key === modeKey), [modeKey, modes]);
+
+  const mode = useMemo(() => {
+    if (modeKey === "CUSTOM") {
+      return {
+        key: "CUSTOM",
+        label: String(customConfig.focus),
+        rest: `${customConfig.break} DK`,
+        desc: `${customConfig.focus} dk odak · ${customConfig.break} dk mola`,
+        color: C.accent,
+        focus: customConfig.focus,
+        break: customConfig.break,
+        longBreak: Math.max(10, customConfig.break * 2),
+        cycles: customConfig.cycles || 4,
+      };
+    }
+    return modes.find((item) => item.key === modeKey) || modes[1];
+  }, [modeKey, modes, customConfig, C.accent]);
+
+  const openCustomModal = useCallback(() => {
+    setCustomModalVisible(true);
+  }, []);
+
+  const closeCustomModal = useCallback(() => {
+    setCustomModalVisible(false);
+  }, []);
+
+  const applyCustomMode = useCallback((config) => {
+    const nextConfig = {
+      focus: Math.min(180, Math.max(5, Math.round(Number(config.focus)) || 30)),
+      break: Math.min(60, Math.max(1, Math.round(Number(config.break)) || 5)),
+      cycles: Math.min(12, Math.max(1, Math.round(Number(config.cycles)) || 4)),
+    };
+    setCustomConfig(nextConfig);
+    setJson(STORAGE_KEYS.CUSTOM_TIMER_CONFIG, nextConfig).catch(() => {});
+
+    const doApply = () => {
+      setModeKey("CUSTOM");
+      setPhase(STUDY_TIMER_PHASE.FOCUS);
+      setElapsed(0);
+      setCycleIndex(0);
+      setRunning(false);
+      setTotalFocusSeconds(0);
+      sessionStartedAtRef.current = null;
+      setCustomModalVisible(false);
+    };
+
+    if (elapsed > 30) {
+      showAlert("Özel modu uygula", "Çalışman sıfırlanacak. Emin misin?", [
+        { text: "İptal", style: "cancel" },
+        { text: "Uygula", onPress: doApply },
+      ]);
+    } else {
+      doApply();
+    }
+  }, [elapsed, showAlert]);
   const isPomodoro = modeKey !== "FREE";
   const hasSubject = !!selectedSubjectKey;
   const stopLabel = Number.isFinite(Number(taskContext.routeStopNumber))
@@ -175,8 +251,9 @@ export function useStudyTimerController(C) {
       correctCount,
       totalFocusSeconds,
       taskContext,
+      customConfig: modeKey === "CUSTOM" ? customConfig : undefined,
     });
-  }, [running, modeKey, phase, cycleIndex, selectedSubjectKey, topic, questions, correctCount, totalFocusSeconds, taskContext]);
+  }, [running, modeKey, phase, cycleIndex, selectedSubjectKey, topic, questions, correctCount, totalFocusSeconds, taskContext, customConfig]);
 
   // Uygulama arka plandan dönünce süreyi duvar saatinden TAZELE.
   // Bu olmadan ekran, arka planda duran tick'in kaldığı yerden devam ediyormuş
@@ -207,6 +284,7 @@ export function useStudyTimerController(C) {
     startedAtRef.current = null; // duraklatılmış olarak geri gel, kullanıcı başlatsın
     setElapsed(Math.round(accumulatedRef.current));
     setModeKey(r.modeKey || "FREE");
+    if (r.customConfig) setCustomConfig(r.customConfig);
     setPhase(r.phase || STUDY_TIMER_PHASE.FOCUS);
     setCycleIndex(r.cycleIndex || 0);
     if (r.subjectKey) setSelectedSubjectKey(r.subjectKey);
@@ -395,5 +473,10 @@ export function useStudyTimerController(C) {
     topic,
     totalFocusSeconds,
     displaySeconds: isPomodoro ? Math.max(0, phaseTargetSec - elapsed) : elapsed,
+    customConfig,
+    customModalVisible,
+    openCustomModal,
+    closeCustomModal,
+    applyCustomMode,
   };
 }

@@ -1,13 +1,6 @@
-import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolate,
-  Easing,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 import { STEP } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -20,44 +13,25 @@ import { StudyTimerQuestionCounters } from "./components/StudyTimerQuestionCount
 import { SubjectTopicCard } from "./components/SubjectTopicCard";
 import { TimerCenterDisplay } from "./components/TimerCenterDisplay";
 import { TimerRing } from "./components/TimerRing";
+import { CustomTimerModal } from "./components/CustomTimerModal";
 import { useStudyTimerController } from "./useStudyTimerController";
+import { useStudyTimerAnimations } from "./useStudyTimerAnimations";
 import { RecoveredSessionView } from "./components/record/RecoveredSessionView";
-
-const EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1);
 
 export default function StudyTimerScreen() {
   const C = useC();
   const timer = useStudyTimerController(C);
-  const focusProgress = useSharedValue(0);
 
   const {
     addCorrect, addQuestion, correctCount, cycleIndex, elapsed, exit, finish,
     handleModeChange, hasSubject, isPomodoro, mode, modeKey, modes, openHistory,
     pct, phaseColor, questions, removeCorrect, removeQuestion, running,
     selectedSubjectKey, setSelectedSubjectKey, skipPhase, stopLabel, subject,
-    toggle, topic,
+    toggle, topic, customConfig, customModalVisible, openCustomModal,
+    closeCustomModal, applyCustomMode,
   } = timer;
 
-  useEffect(() => {
-    focusProgress.value = withTiming(running ? 1 : 0, { duration: 320, easing: EASE_OUT });
-  }, [running, focusProgress]);
-
-  const timerAnimStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: interpolate(focusProgress.value, [0, 1], [1.0, 1.22]) },
-      { translateY: interpolate(focusProgress.value, [0, 1], [0, 36]) },
-    ],
-  }));
-
-  const topAnimStyle = useAnimatedStyle(() => ({
-    opacity: 1 - focusProgress.value,
-    transform: [{ translateY: interpolate(focusProgress.value, [0, 1], [0, -18]) }],
-  }));
-
-  const bottomCardsAnimStyle = useAnimatedStyle(() => ({
-    opacity: 1 - focusProgress.value,
-    transform: [{ translateY: interpolate(focusProgress.value, [0, 1], [0, 22]) }],
-  }));
+  const { timerAnimStyle, topAnimStyle, bottomCardsAnimStyle } = useStudyTimerAnimations(running);
 
   if (timer.recovery) {
     return (
@@ -80,7 +54,13 @@ export default function StudyTimerScreen() {
       <StudyTimerHeader C={C} eyebrow={eyebrow} eyebrowColor={isPomodoro ? phaseColor : C.text2} onBack={exit} onHistory={openHistory} />
 
       <Animated.View style={topAnimStyle} pointerEvents={running ? "none" : "auto"}>
-        <StudyTimerModeSelector C={C} modeKey={modeKey} modes={modes} onChange={handleModeChange} />
+        <StudyTimerModeSelector
+          C={C}
+          modeKey={modeKey}
+          modes={modes}
+          onChange={handleModeChange}
+          onCustomPress={openCustomModal}
+        />
       </Animated.View>
 
       {!hasSubject && elapsed === 0 && (
@@ -114,9 +94,6 @@ export default function StudyTimerScreen() {
           </TimerRing>
         </Animated.View>
 
-        {/* Odak modunda solup cekilen kisim: ders kimlik karti ve not.
-            Ikisi de "hangi durak" bilgisi -- oturum baslayinca kullanici
-            bunu zaten biliyor. */}
         <Animated.View style={[{ width: "100%" }, bottomCardsAnimStyle]} pointerEvents={running ? "none" : "auto"}>
           {hasSubject && (
             <>
@@ -126,15 +103,36 @@ export default function StudyTimerScreen() {
           )}
         </Animated.View>
 
-        {/* Soru sayaclari odak modunda SOLMAZ. Serbest calismada ekranin
-            asil isi bu: adam soruyu cozer, +1 der. Solan ve dokunulamayan
-            bir sayac, saymak icin oturumu durdurmayi zorunlu kilardi. */}
         {!isPomodoro && (
-          <StudyTimerQuestionCounters C={C} correctCount={correctCount} questions={questions} onAddCorrect={addCorrect} onAddQuestion={addQuestion} onRemoveCorrect={removeCorrect} onRemoveQuestion={removeQuestion} />
+          <StudyTimerQuestionCounters
+            C={C}
+            correctCount={correctCount}
+            questions={questions}
+            onAddCorrect={addCorrect}
+            onAddQuestion={addQuestion}
+            onRemoveCorrect={removeCorrect}
+            onRemoveQuestion={removeQuestion}
+          />
         )}
 
-        <StudyTimerControls C={C} hasSubject={hasSubject} isPomodoro={isPomodoro} running={running} onFinish={finish} onSkip={skipPhase} onToggle={toggle} />
+        <StudyTimerControls
+          C={C}
+          hasSubject={hasSubject}
+          isPomodoro={isPomodoro}
+          running={running}
+          onFinish={finish}
+          onSkip={skipPhase}
+          onToggle={toggle}
+        />
       </View>
+
+      <CustomTimerModal
+        visible={customModalVisible}
+        onClose={closeCustomModal}
+        onApply={applyCustomMode}
+        initialConfig={customConfig}
+        C={C}
+      />
     </SafeAreaView>
   );
 }
