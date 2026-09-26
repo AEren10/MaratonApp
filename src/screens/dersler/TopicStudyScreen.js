@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
-import { Pressable, View, ScrollView, StyleSheet, Text } from "react-native";
+import React, { useMemo } from "react";
+import { View, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Button, ErrorState } from "../../components/design";
 import { STEP, GUTTER, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { SCREENS } from "../../constants/screens";
 import { getSubjectByKey } from "../../themes/subjects";
 import { subjectColorOf } from "../../themes/subjectPalette";
@@ -16,16 +17,6 @@ import { TopicInfoList } from "./components/TopicInfoList";
 import { TopicWrongNotesList } from "./components/TopicWrongNotesList";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
 import { Press } from "../../components/design/Press";
-
-function formatMinutesShort(min) {
-  if (!min) return "0 dk";
-  if (min >= 60) {
-    const h = Math.floor(min / 60);
-    const m = min % 60;
-    return m > 0 ? `${h} sa ${m} dk` : `${h} sa`;
-  }
-  return `${min} dk`;
-}
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
@@ -48,12 +39,10 @@ export default function TopicStudyScreen() {
   }, [params.topic, params.topicName]);
 
   const color = subjectColorOf(C, subject?.key);
-  const { data, loading, error, refresh } = useTopicStudyDetail(subject?.key, topic?.name);
-
-  // Mock data for missing fields based on Image 2
-  const solved = data?.totalQuestions || 184;
-  const durationLabel = data?.totalMinutes ? formatMinutesShort(data.totalMinutes) : "4 sa";
-  const notebookCount = data?.notebookCount || 5;
+  const { user } = useAuth();
+  const detail = useTopicStudyDetail({ userId: user?.id, subjectKey: subject?.key, topicName: topic?.name });
+  const { loading, error, refetch } = detail;
+  const notebookCount = detail.wrongList.length;
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -62,32 +51,32 @@ export default function TopicStudyScreen() {
           <Icon name="chevL" size={16} color={C.text} />
         </Press>
         <Text style={[TYPOGRAPHY.metaSemiBold, s.headerMeta, { color: C.text3 }]}>KONU DETAYI</Text>
-        <Pressable hitSlop={10} style={s.iconBtn}>
-          <Icon name="moreVertical" size={20} color={C.text} />
-        </Pressable>
+        <View style={s.iconBtn} />
       </View>
 
       {loading ? (
         <TopicStudySkeleton C={C} />
       ) : error ? (
-        <ErrorState preset="server" onPrimary={refresh} style={{ marginTop: STEP.s5 }} />
+        <ErrorState preset="server" onPrimary={refetch} style={{ marginTop: STEP.s5 }} />
       ) : (
         <>
           <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
             <TopicHeroHeader C={C} subjectName={subject?.name} topicName={topic?.name} color={color} />
-            <TopicStatsRow C={C} solved={solved} durationLabel={durationLabel} notebookCount={notebookCount} />
-            <TopicAccumulationChart C={C} color={color} data={data} />
-            <TopicInfoList C={C} data={data} color={color} />
-            <TopicWrongNotesList C={C} data={data} subjectKey={subject?.key} />
+            <TopicStatsRow C={C} solved={detail.totalQuestions} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} />
+            <TopicAccumulationChart color={color} chart={detail.chart} />
+            <TopicInfoList C={C} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} lastStudyText={detail.lastStudyText} />
+            <TopicWrongNotesList C={C} items={detail.wrongList} />
           </ScrollView>
 
           <View style={[s.bottom, { backgroundColor: C.bg }]}>
             <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey: subject?.key, topicName: topic?.name })}>
               Bu konuya durak koy
             </Button>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-              {`Defterdeki ${notebookCount} soruyu tekrar et`}
-            </Text>
+            {notebookCount > 0 && (
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
+                {`Defterdeki ${notebookCount} soruyu tekrar et`}
+              </Text>
+            )}
           </View>
         </>
       )}

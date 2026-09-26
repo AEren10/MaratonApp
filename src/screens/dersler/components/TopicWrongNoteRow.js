@@ -10,6 +10,8 @@ export const TopicWrongNoteRow = React.memo(function TopicWrongNoteRow({ item, C
 
   return (
     <Pressable
+      accessibilityRole="button"
+      onPress={() => navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item: item.raw })}
       style={[s.row, { backgroundColor: "transparent", borderColor: C.line, borderBottomWidth: 1 }]}
     >
       <View style={[s.thumb, { backgroundColor: C.surface, borderColor: C.elev }]}>

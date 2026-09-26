@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStudyLogsByTopic } from "../supabase/studyLogs";
 import { getWrongQuestions } from "../supabase/wrongQuestions";
 import { formatMinutes } from "../lib/format";
+import { todayTR } from "../lib/dateUtils";
 
 // Defterdeki bir yanlisin "ne zaman tekrar edilecegi" etiketi. Tasarim bu
 // alani {{w.due}} olarak dinamik biraktigi icin bicimi biz seciyoruz —
@@ -12,6 +13,22 @@ function dueMeta(item) {
   if (days <= 0) return { label: "BUGÜN", tone: "warn" };
   if (days === 1) return { label: "YARIN", tone: "muted" };
   return { label: `${days} GÜN`, tone: "muted" };
+}
+
+function lastStudyLabel(studyDate) {
+  if (!studyDate) return "Henüz yok";
+  const days = Math.round((Date.parse(todayTR()) - Date.parse(String(studyDate).slice(0, 10))) / 86400000);
+  if (days <= 0) return "Bugün";
+  if (days === 1) return "Dün";
+  return `${days} gün önce`;
+}
+
+function shortDate(value) {
+  try {
+    return new Date(value).toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+  } catch {
+    return "";
+  }
 }
 
 function monthLabel(date) {
@@ -90,11 +107,19 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
   const chart = useMemo(() => buildChart(sortedLogs), [sortedLogs]);
 
   const wrongList = useMemo(
-    () => wrongItems.map((item) => ({ ...item, due: dueMeta(item) })),
+    () => wrongItems.map((item) => ({ ...item, due: dueMeta(item), dateLabel: shortDate(item.created_at) })),
     [wrongItems]
+  );
+
+  const totalQuestions = useMemo(
+    () => history.reduce((sum, h) => sum + (h.question_count || 0), 0),
+    [history]
   );
 
   const lastStudyDate = sortedLogs.length ? sortedLogs[sortedLogs.length - 1].study_date : null;
 
-  return { loading, error, refetch, totalDurationLabel, chart, wrongList, lastStudyDate };
+  return {
+    loading, error, refetch, totalDurationLabel, chart, wrongList, lastStudyDate,
+    totalQuestions, lastStudyText: lastStudyLabel(lastStudyDate),
+  };
 }

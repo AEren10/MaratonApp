@@ -11,13 +11,11 @@ function InfoRow({ label, value, isLast, C }) {
   );
 }
 
-export function TopicInfoList({ C, data, color }) {
-  // Tasarım (Image 2) verilerini sağlama:
+export function TopicInfoList({ C, durationLabel, notebookCount, lastStudyText }) {
   const rows = [
-    { label: "Çalışılan süre", value: "4 sa 20 dk" },
-    { label: "Defterde bekleyen", value: "5 soru" },
-    { label: "Geçilen durak", value: "3" }, // Tasarımda istenen satır
-    { label: "Son çalışma", value: "2 gün önce" },
+    { label: "Çalışılan süre", value: durationLabel },
+    { label: "Defterde bekleyen", value: `${notebookCount} soru` },
+    { label: "Son çalışma", value: lastStudyText },
   ];
 
   return (
