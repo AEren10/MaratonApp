@@ -1,8 +1,10 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
-import { createRouteRevision } from "../domain/route/routeIdentity";
+import { createRouteRevision, makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
+import { emitRouteUpdated } from "../lib/routeEvents";
+import { startOfWeekTR } from "../lib/dateUtils";
 
 // Rota planının kalıcılığı.
 //
@@ -281,17 +283,19 @@ export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
   // Local fallback
   const local = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), [])) || [];
   const filtered = local.filter((r) => {
-    if (sinceWeekStart && r.week_start < sinceWeekStart) return false;
-    if (examType && r.exam_type && r.exam_type !== examType) return false;
+    const ws = r.week_start || r.weekStart;
+    if (sinceWeekStart && ws < sinceWeekStart) return false;
+    const et = r.exam_type || r.examType;
+    if (examType && et && et !== examType) return false;
     return true;
   });
   return filtered.map((r, i) => ({
     weekNo: i + 1,
-    weekStart: r.week_start,
-    plannedQuestions: r.planned_questions || 0,
-    plannedMinutes: r.planned_minutes || 0,
+    weekStart: r.week_start || r.weekStart,
+    plannedQuestions: r.planned_questions ?? r.plannedQuestions ?? 0,
+    plannedMinutes: r.planned_minutes ?? r.plannedMinutes ?? 0,
     stops: r.stops || [],
-    examType: r.exam_type,
+    examType: r.exam_type || r.examType,
   }));
 }
 
@@ -365,3 +369,55 @@ export const pauseRoute = (userId, examType = null) =>
 
 export const resumeRoute = (userId, examType = null) =>
   setRouteState(userId, { resumed_at: new Date().toISOString() }, examType);
+
+/**
+ * Kullanıcı "Durak Ekle / Rotaya Ekle" formundan durak eklediğinde,
+ * durağı doğrudan rotaya yerleştirip aktif hale getirir ve güncellemeyi bildirir.
+ */
+export async function addStopToActiveRoute({
+  userId = "local_user",
+  examType = "tyt_ayt",
+  subjectKey,
+  topicName,
+  durationMinutes = 50,
+  subjectLabel = null,
+}) {
+  if (!subjectKey || !topicName) return null;
+  const rootKey = makeRouteStopRootKey({ subject: subjectKey, topic: topicName }, examType);
+  const currentStops = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
+  const currentWeeks = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), [])) || [];
+
+  const weekStart = currentWeeks[0]?.weekStart || currentWeeks[0]?.week_start || startOfWeekTR(new Date());
+
+  const newStop = {
+    id: `local_${rootKey}_${Date.now()}`,
+    logical_key: `${rootKey}:user_${Date.now()}`,
+    root_key: rootKey,
+    subject: subjectKey,
+    subject_label: subjectLabel || subjectKey,
+    topic: topicName,
+    week_start: weekStart,
+    position: 0,
+    segment_index: 0,
+    stop_kind: "learn",
+    lifecycle_status: "active",
+    version: 1,
+    metadata: {
+      questions: durationMinutes ? Math.round(durationMinutes * 0.8) : 20,
+      minutes: durationMinutes || 50,
+      userAdded: true,
+    },
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  // Varsa önceki aktif durakları "upcoming" yap
+  const updatedStops = [
+    newStop,
+    ...currentStops.map((s) => (s.lifecycle_status === "active" ? { ...s, lifecycle_status: "upcoming" } : s)),
+  ];
+
+  await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), updatedStops);
+  emitRouteUpdated({ action: "stop_added", stop: newStop, stops: updatedStops });
+  return newStop;
+}

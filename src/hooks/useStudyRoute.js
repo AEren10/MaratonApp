@@ -27,6 +27,8 @@ import { captureError } from "../lib/errorReporting";
 import { PREMIUM_ENABLED } from "../constants/premium";
 import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
+import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
+import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 
 let _lastRouteCache = {
   key: "",
@@ -126,6 +128,8 @@ function rowsHash(rows) {
 export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const { examType, field, examDate } = useExam();
   const { user } = useAuth();
+  const resolvedExamType = examType || "tyt_ayt";
+  const effectiveUserId = user?.id || "local_user";
   const { accessError, accessLoading, checkFeature, refreshUsage } = usePremium();
   const hasRouteAccess = !PREMIUM_ENABLED || (!accessLoading && checkFeature("detailed_roadmap"));
   const [pastWeeks, setPastWeeks] = useState([]);
@@ -135,15 +139,22 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const [routeLoadError, setRouteLoadError] = useState(null);
   const [routeLoadTick, setRouteLoadTick] = useState(0);
   const routeLoadKeyRef = useRef(null);
-  const isPaused = isRoutePausedForExam(routeState, examType);
+
+  useEffect(() => {
+    return onRouteUpdated(() => {
+      setRouteLoadTick((tick) => tick + 1);
+    });
+  }, []);
+
+  const isPaused = isRoutePausedForExam(routeState, resolvedExamType);
   const recoveryWeek = useMemo(() => {
     if (pausedWeeks != null) return pausedWeeks;
     if (!routeState?.paused_at || !routeState?.resumed_at || isPaused) return null;
-    if (routeState.exam_type && routeState.exam_type !== examType) return null;
+    if (routeState.exam_type && routeState.exam_type !== resolvedExamType) return null;
     const pauseWeeks = (new Date(routeState.resumed_at) - new Date(routeState.paused_at)) / 604800000;
     if (pauseWeeks < 1) return null;
     return Math.max(0, Math.floor((Date.now() - new Date(routeState.resumed_at)) / 604800000));
-  }, [examType, isPaused, pausedWeeks, routeState?.exam_type,
+  }, [resolvedExamType, isPaused, pausedWeeks, routeState?.exam_type,
     routeState?.paused_at, routeState?.resumed_at]);
   const [persistedStops, setPersistedStops] = useState([]);
   // persistedStops bos olmasi 'rota yok' demek DEGIL; henuz gelmemis de olabilir.
@@ -153,7 +164,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
   const allowedTrialTypes = useMemo(
-    () => trialTypesForRoute(examType, field), [examType, field],
+    () => trialTypesForRoute(resolvedExamType, field), [resolvedExamType, field],
   );
 
   const daysLeft = useMemo(() => {
@@ -187,7 +198,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   }, [allowedTrialTypes, trials]);
 
   const routeCacheKey = useMemo(() => [
-    examType || "",
+    resolvedExamType,
     field || "",
     hasRouteAccess ? "1" : "0",
     goals?.dailyQuestions || 20,
@@ -198,23 +209,21 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
-    examType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
+    resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
     recoveryWeek, dataHealth?.logs, weakSubjectKeys, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
-    // examType yoksa rota HESAPLANMAZ. "tyt" varsaymak LGS kullanıcısının
-    // rotasını yanlış müfredatla çizerdi.
-    pool: examType && hasRouteAccess ? getSubjectsForExam(examType, field) : [],
+    pool: hasRouteAccess ? getSubjectsForExam(resolvedExamType, field) : [],
     progressByKey,
     studyLogs: weekLogs || [],
     dailyQuestionGoal: goals?.dailyQuestions || 20,
     daysLeft,
     weakSubjectKeys,
     pausedWeeks: recoveryWeek,
-    examType,
+    examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
-  }, routeCacheKey), [dataHealth?.logs, examType, field, hasRouteAccess, progressByKey, weekLogs,
+  }, routeCacheKey), [dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
@@ -302,7 +311,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // examType filtresi kritik: kullanıcı YKS↔LGS geçtiyse eski müfredatın
   // planı borç sayılmamalı.
   useEffect(() => {
-    if (!user?.id || !examType || !hasRouteAccess) {
+    if (!hasRouteAccess) {
       routeLoadKeyRef.current = null;
       setPastWeeks([]);
       setRouteStateLocal(null);
@@ -312,7 +321,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       return;
     }
     let cancelled = false;
-    const loadKey = `${user.id}:${examType}`;
+    const loadKey = `${effectiveUserId}:${resolvedExamType}`;
     routeLoadKeyRef.current = loadKey;
     setStopsLoaded(false);
     setRouteLoadError(null);
@@ -320,9 +329,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     setRouteStateLocal(null);
     setPersistedStops([]);
     Promise.allSettled([
-      getRouteWeeks(user.id, { examType }),
-      getRouteState(user.id, examType),
-      getLatestRouteStops(user.id, examType),
+      user?.id && user.id !== "dev" ? getRouteWeeks(user.id, { examType }) : Promise.resolve([]),
+      user?.id && user.id !== "dev" ? getRouteState(user.id, examType) : Promise.resolve(null),
+      user?.id && user.id !== "dev" ? getLatestRouteStops(user.id, examType) : Promise.resolve([]),
     ]).then(async ([weeksResult, stateResult, stopsResult]) => {
       if (cancelled) return;
       if (routeLoadKeyRef.current !== loadKey) return;
@@ -332,12 +341,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
       if (!loadedStops || loadedStops.length === 0) {
         try {
-          loadedStops = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), [])) || [];
+          loadedStops = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, effectiveUserId), [])) || [];
         } catch (_) {}
       }
       if (!loadedWeeks || loadedWeeks.length === 0) {
         try {
-          loadedWeeks = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, user.id), [])) || [];
+          loadedWeeks = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, effectiveUserId), [])) || [];
         } catch (_) {}
       }
 
@@ -356,18 +365,18 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         captureError(error, {
           context: "route_read",
           sources: error.sourceKeys,
-          examType,
+          examType: resolvedExamType,
         });
       }
     }).finally(() => {
       if (!cancelled && routeLoadKeyRef.current === loadKey) setStopsLoaded(true);
     });
     return () => { cancelled = true; };
-  }, [user?.id, examType, hasRouteAccess, routeLoadTick]);
+  }, [effectiveUserId, resolvedExamType, hasRouteAccess, routeLoadTick, user?.id]);
 
   // Rota çizildiğinde haftaları sakla. Bu olmadan borç her zaman sıfır çıkar.
   useEffect(() => {
-    if (!persist || !user?.id || !examType || !hasRouteAccess || isPaused) return;
+    if (!persist || !user?.id || user.id === "dev" || !hasRouteAccess || isPaused) return;
     if (!computedRoute.weeks?.length) return;
     const persistence = routePersistenceDecision({
       mode: "auto",
@@ -375,21 +384,35 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       revisionSummary: routeRevisionPreview,
     });
     if (!persistence.shouldPersist) return;
-    saveRouteWeeks(user.id, computedRoute.weeks, examType, computedRoute.revision)
-      .then(() => getLatestRouteStops(user.id, examType))
+    saveRouteWeeks(user.id, computedRoute.weeks, resolvedExamType, computedRoute.revision)
+      .then(() => getLatestRouteStops(user.id, resolvedExamType))
       .then(setPersistedStops)
       .catch((error) => {
         setRouteLoadError(error);
-        captureError(error, { context: "route_auto_persist", examType });
+        captureError(error, { context: "route_auto_persist", examType: resolvedExamType });
       });
-  }, [persist, user?.id, examType, hasRouteAccess, isPaused,
+  }, [persist, user?.id, resolvedExamType, hasRouteAccess, isPaused,
     computedRoute.weeks, computedRoute.revision, routeCreated, routeRevisionPreview]);
 
-  const createRoute = useCallback(async () => {
-    if (!user?.id || !examType || !hasRouteAccess) {
+  const createRoute = useCallback(async (options = {}) => {
+    if (!hasRouteAccess) {
       throw new Error("route_access_unavailable");
     }
-    if (!computedRoute.weeks?.length) {
+    const targetWeeks = (computedRoute.weeks && computedRoute.weeks.length > 0)
+      ? computedRoute.weeks
+      : cachedBuildRoute({
+          pool: getSubjectsForExam(resolvedExamType, field),
+          progressByKey,
+          studyLogs: weekLogs || [],
+          dailyQuestionGoal: goals?.dailyQuestions || 20,
+          daysLeft,
+          weakSubjectKeys,
+          pausedWeeks: recoveryWeek,
+          examType: resolvedExamType,
+          studyLogDataState: dataHealth?.logs,
+        }, `fallback_${resolvedExamType}`).weeks;
+
+    if (!targetWeeks || targetWeeks.length === 0) {
       throw new Error("route_preview_unavailable");
     }
     setRouteCreating(true);
@@ -397,17 +420,17 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     try {
       const revisionSummary = summarizeRouteRevision({
         previousWeeks: pastWeeks,
-        nextWeeks: computedRoute.weeks,
+        nextWeeks: targetWeeks,
         nextRevision: computedRoute.revision,
       });
 
-      // Prepare local stops fallback with first upcoming stop promoted to active
-      let isFirstUpcoming = true;
+      // Prepare local stops fallback with ONLY the first stop active, rest upcoming
+      let activated = false;
       const localStops = [];
-      for (const week of computedRoute.weeks) {
+      for (const week of targetWeeks) {
         for (const stop of week.stops || []) {
-          const isActive = isFirstUpcoming && (!stop.lifecycleStatus || stop.lifecycleStatus === "upcoming");
-          if (isActive) isFirstUpcoming = false;
+          const isActive = !activated;
+          if (isActive) activated = true;
           localStops.push({
             id: `local_${stop.logicalStopKey}`,
             logical_key: stop.logicalStopKey,
@@ -419,7 +442,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             position: stop.position ?? 0,
             segment_index: stop.segmentIndex ?? 0,
             stop_kind: stop.isReview ? "review" : "learn",
-            lifecycle_status: isActive ? "active" : (stop.lifecycleStatus || "upcoming"),
+            lifecycle_status: isActive ? "active" : "upcoming",
             version: 1,
             metadata: stop,
             created_at: new Date().toISOString(),
@@ -428,48 +451,86 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         }
       }
 
-      const localWeeks = computedRoute.weeks.map((w, i) => ({
+      if (options.initialActiveStop) {
+        const { subjectKey, topicName, durationMinutes, subjectLabel } = options.initialActiveStop;
+        const customRootKey = makeRouteStopRootKey({ subject: subjectKey, topic: topicName }, resolvedExamType);
+        for (const s of localStops) {
+          if (s.lifecycle_status === "active") s.lifecycle_status = "upcoming";
+        }
+        const customStop = {
+          id: `local_${customRootKey}_${Date.now()}`,
+          logical_key: `${customRootKey}:custom_0`,
+          root_key: customRootKey,
+          subject: subjectKey,
+          subject_label: subjectLabel || subjectKey,
+          topic: topicName,
+          week_start: targetWeeks[0]?.weekStart || startOfWeekTR(new Date()),
+          position: 0,
+          segment_index: 0,
+          stop_kind: "learn",
+          lifecycle_status: "active",
+          version: 1,
+          metadata: {
+            questions: durationMinutes ? Math.round(durationMinutes * 0.8) : 20,
+            minutes: durationMinutes || 50,
+            userAdded: true,
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        localStops.unshift(customStop);
+      }
+
+      const localWeeks = targetWeeks.map((w, i) => ({
         weekNo: i + 1,
         weekStart: w.weekStart,
+        week_start: w.weekStart,
         plannedQuestions: Math.max(0, Math.round(w.plannedQuestions || 0)),
+        planned_questions: Math.max(0, Math.round(w.plannedQuestions || 0)),
         plannedMinutes: Math.max(0, Math.round(w.plannedMinutes || 0)),
+        planned_minutes: Math.max(0, Math.round(w.plannedMinutes || 0)),
         stops: w.stops || [],
-        examType,
+        examType: resolvedExamType,
+        exam_type: resolvedExamType,
       }));
 
       // Cache locally immediately to ensure durability (offline & 42501 resilience)
       try {
         await Promise.all([
-          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), localStops),
-          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, user.id), localWeeks),
+          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, effectiveUserId), localStops),
+          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, effectiveUserId), localWeeks),
         ]);
       } catch (_) {}
 
-      try {
-        await saveRouteWeeks(
-          user.id,
-          computedRoute.weeks,
-          examType,
-          computedRoute.revision,
-        );
-      } catch (err) {
-        captureError(err, { context: "create_route_save_remote", examType });
+      if (user?.id && user.id !== "dev") {
+        try {
+          await saveRouteWeeks(
+            user.id,
+            targetWeeks,
+            resolvedExamType,
+            computedRoute.revision,
+          );
+        } catch (err) {
+          captureError(err, { context: "create_route_save_remote", examType: resolvedExamType });
+        }
       }
 
       let stops = [];
       let rows = [];
-      try {
-        [stops, rows] = await Promise.all([
-          getLatestRouteStops(user.id, examType),
-          getRouteWeeks(user.id, { examType }),
-        ]);
-      } catch (_) {}
+      if (user?.id && user.id !== "dev") {
+        try {
+          [stops, rows] = await Promise.all([
+            getLatestRouteStops(user.id, resolvedExamType),
+            getRouteWeeks(user.id, { examType: resolvedExamType }),
+          ]);
+        } catch (_) {}
+      }
 
       if (!stops || stops.length === 0) {
         stops = localStops;
       } else {
         try {
-          await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), stops);
+          await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, effectiveUserId), stops);
         } catch (_) {}
       }
 
@@ -479,10 +540,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
       setPersistedStops(stops);
       setPastWeeks(rows);
+      emitRouteUpdated({ action: "created", stops, weeks: rows });
+
       track(EVENTS.ROUTE_CREATED, {
-        examType,
+        examType: resolvedExamType,
         confidence: computedRoute.intelligence?.confidence || "low",
-        weeks: computedRoute.weeks.length,
+        weeks: targetWeeks.length,
         changed: revisionSummary.changed,
         added: revisionSummary.counts.added,
         removed: revisionSummary.counts.removed,
@@ -492,13 +555,15 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       return { stops, weeks: rows, revisionSummary };
     } catch (e) {
       setRouteCreationError("Rota oluşturulamadı. Bağlantını kontrol edip tekrar dene.");
-      track(EVENTS.ROUTE_CREATION_FAILED, { examType });
+      track(EVENTS.ROUTE_CREATION_FAILED, { examType: resolvedExamType });
       throw e;
     } finally {
       setRouteCreating(false);
     }
   }, [computedRoute.intelligence?.confidence, computedRoute.revision,
-    computedRoute.weeks, examType, hasRouteAccess, pastWeeks, user?.id]);
+    computedRoute.weeks, dataHealth?.logs, daysLeft, effectiveUserId, field,
+    goals?.dailyQuestions, hasRouteAccess, pastWeeks, progressByKey,
+    recoveryWeek, resolvedExamType, user?.id, weakSubjectKeys, weekLogs]);
 
   // Borç: geçmiş haftaların planı ile gerçekleşeni karşılaştır.
   const debt = useMemo(() => {
@@ -544,11 +609,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         const next = (current || []).map((item) => (
           item.id === updated.id ? { ...item, ...updated } : item
         ));
-        if (user?.id) {
-          appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, user.id), next).catch(() => {});
-        }
+        appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, effectiveUserId), next).catch(() => {});
         return next;
       });
+      emitRouteUpdated({ action: "transition", stop: updated });
       track(EVENTS.ROUTE_STOP_TRANSITIONED, {
         transition,
         subject: updated.subject || stop.subject,
@@ -582,6 +646,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
           .then(setPersistedStops)
           .catch(() => {});
       }
+      emitRouteUpdated({ action: "transition", stop: updated });
       track(EVENTS.ROUTE_STOP_TRANSITIONED, {
         transition,
         subject: updated.subject || stop.subject,
@@ -589,7 +654,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       });
     }
     return updated;
-  }, [examType, user?.id]);
+  }, [effectiveUserId, examType, user?.id]);
   const distributeRouteDebt = useCallback(
     (weeks) => distributeDebt(debt.totalQuestions, weeks || route.weeks, route.capacity),
     [debt.totalQuestions, route.capacity, route.weeks],

@@ -2,6 +2,10 @@ import { useState, useMemo } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { useAlert } from "../../contexts/AlertContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useExam } from "../../contexts/ExamContext";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
+import { addStopToActiveRoute } from "../../supabase/routePlan";
 import * as H from "../../lib/haptics";
 import {
   ADD_TASK_TYT_SUBJECTS,
@@ -15,6 +19,9 @@ export function useAddTaskState() {
   const route = useRoute();
   const { createTask } = useUserTasks();
   const showAlert = useAlert();
+  const { user } = useAuth();
+  const { examType } = useExam();
+  const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
   const [examTab, setExamTab] = useState("tyt");
   const subjects = examTab === "tyt" ? ADD_TASK_TYT_SUBJECTS : ADD_TASK_AYT_SUBJECTS;
@@ -48,12 +55,29 @@ export function useAddTaskState() {
 
   const handleSubmit = async () => {
     try {
+      const minutes = parseDurationMinutes(durVal);
       await createTask({
         subject: subjectKey,
         topic: topicName,
-        targetMinutes: parseDurationMinutes(durVal),
+        targetMinutes: minutes,
         note: "Kullanıcı ekledi",
       });
+
+      const stopPayload = {
+        userId: user?.id || "local_user",
+        examType: examType || "tyt_ayt",
+        subjectKey,
+        topicName,
+        durationMinutes: minutes,
+        subjectLabel: selectedSubjectObj?.name || subjectKey,
+      };
+
+      if (!routeCreated) {
+        await createRoute({ initialActiveStop: stopPayload });
+      } else {
+        await addStopToActiveRoute(stopPayload);
+      }
+
       H.success();
       navigation.goBack();
     } catch (e) {
