@@ -73,13 +73,13 @@ export const SUBJECT_COLORS = {
   dark: {
     turkce: "#74A9E8",
     matematik: "#E0A570",
-    fizik: "#6ECFC0",
+    fizik: "#56C6D6",
     kimya: "#E8A0C4",
-    biyoloji: "#86CE92",
-    tarih: "#C9BE6A",
-    cografya: "#8B5CF6",
+    biyoloji: "#7FCB7A",
+    tarih: "#D6C25A",
+    cografya: "#A27BF8",
     felsefe: "#A78BFA",
-    din: "#B5D97A",
+    din: "#C8B8A6",
     // Tasarım paletinde karşılığı olmayanlar — ayırt edilebilir tonlar.
     edebiyat: "#f0abfc",
     ingilizce: "#7dd3fc",
