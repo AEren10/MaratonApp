@@ -81,19 +81,25 @@ export default function TrialSummaryScreen() {
             ) : null}
             <TrialSummarySubjectDeltas bars={summary.bars} />
             <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
+            {/* Kayit bitti: bir sonraki dogal adim yanlislari deftere eklemek.
+                Yoksa kullanici denemeyi girdigi yere doner. Eskiden ana buton
+                "Deneme kayitlarini gor" idi ve Analiz sekmesindeki genel
+                listeye atiyordu; kayitlar Analiz'de duruyor. */}
             <Animated.View style={styles.actions}>
-              <Button
-                size="lg"
-                fullWidth
-                onPress={() => openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.TRIAL_RECORDS)}
-              >
-                Deneme kayıtlarını gör
-              </Button>
               {summary.totalWrong > 0 ? (
-                <Button size="lg" variant="outline" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_WRONG)} style={{ marginTop: STEP.s2 }}>
+                <Button size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}>
                   Yanlışları deftere ekle
                 </Button>
               ) : null}
+              <Button
+                size="lg"
+                fullWidth
+                variant={summary.totalWrong > 0 ? "outline" : "primary"}
+                onPress={() => navigation.popToTop()}
+                style={summary.totalWrong > 0 ? { marginTop: STEP.s2 } : undefined}
+              >
+                Tamam
+              </Button>
             </Animated.View>
           </ScrollView>
         </>
