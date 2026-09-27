@@ -56,7 +56,7 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
                 <Text
                   style={[
                     s.pillRest,
-                    { color: active ? C.accent : C.text4 },
+                    { color: active ? C.text2 : C.text3 },
                   ]}
                 >
                   {rest}
@@ -114,7 +114,7 @@ const s = StyleSheet.create({
   },
   pillRest: {
     fontFamily: "Archivo_500Medium",
-    fontSize: 10.5,
+    fontSize: 12,
     letterSpacing: 0.8,
     marginTop: 1,
   },

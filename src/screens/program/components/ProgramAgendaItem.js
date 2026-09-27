@@ -13,7 +13,7 @@ function ProgramAgendaItem({ item }) {
   const color = subjectColorOf(C, item.subject);
   return (
     <View style={[s.row, { borderTopColor: C.line }]}>
-      <Text style={[TYPOGRAPHY.tableHead, s.time, { color: item.done ? C.text4 : C.text3 }]}>
+      <Text style={[TYPOGRAPHY.tableHead, s.time, { color: item.done ? C.text3 : C.text2 }]}>
         {formatMinutes(item.minutes)}
       </Text>
       <View style={[s.swatch, { backgroundColor: color, opacity: item.done ? 0.55 : 1 }]} />

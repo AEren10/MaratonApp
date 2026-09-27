@@ -93,7 +93,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
         </Text>
       </Press>
 
-      <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text4 }]}>
+      <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text3 }]}>
         {s.result ? MESSAGE[s.result] : "Etiketin Instagram story'ne gönderilir."}
       </Text>
 

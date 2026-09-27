@@ -100,7 +100,7 @@ export function StudyTimerControls({
           accessibilityLabel="Fazı atla"
           style={s.skipBtn}
         >
-          <Text style={[TYPOGRAPHY.caption, { color: C.text4 }]}>Fazı atla</Text>
+          <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Fazı atla</Text>
         </Press>
       )}
     </View>

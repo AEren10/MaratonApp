@@ -74,8 +74,8 @@ export default function PaymentSuccessScreen() {
           <Circle cx={224} cy={62} r={7} fill={C.accent} />
           <Circle cx={352} cy={32} r={7.5} fill={C.bg} stroke={C.text3} strokeWidth={2.6} />
           
-          <SvgText x={40} y={120} fontFamily="Archivo_700Bold" fontSize={11} letterSpacing={1.6} fill={C.text4}>23 HAZ</SvgText>
-          <SvgText x={366} y={120} textAnchor="end" fontFamily="Archivo_600SemiBold" fontSize={11} letterSpacing={1.2} fill={C.text4}>20 HAZ 2027</SvgText>
+          <SvgText x={40} y={120} fontFamily="Archivo_700Bold" fontSize={11} letterSpacing={1.6} fill={C.text3}>23 HAZ</SvgText>
+          <SvgText x={366} y={120} textAnchor="end" fontFamily="Archivo_600SemiBold" fontSize={11} letterSpacing={1.2} fill={C.text3}>20 HAZ 2027</SvgText>
         </Svg>
       </View>
 

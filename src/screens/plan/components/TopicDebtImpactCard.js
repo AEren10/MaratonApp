@@ -36,7 +36,7 @@ export function TopicDebtImpactCard({ C, totalHours }) {
         </View>
       </View>
 
-      <Text style={[TYPOGRAPHY.micro, s.disclaimer, { color: C.text4 }]}>
+      <Text style={[TYPOGRAPHY.micro, s.disclaimer, { color: C.text3 }]}>
         Rota tamamlanmadı ama yön doğru · uygulama içi rota göstergeleri, net tahmini değildir
       </Text>
     </Card>
