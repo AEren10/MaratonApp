@@ -67,7 +67,7 @@ export function TrendChart({ data, labels = [], color, title = "Net Trendi", com
           ))}
 
           {grids.map((g) => (
-            <SvgText key={`lbl-${g.label}`} x={PAD_L - 6} y={g.y + 3.5} fill={C.muted} fontSize="9" textAnchor="end">
+            <SvgText key={`lbl-${g.label}`} x={PAD_L - 6} y={g.y + 3.5} fill={C.muted} fontSize="11" textAnchor="end">
               {g.label}
             </SvgText>
           ))}

@@ -58,7 +58,7 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
       {gridY.map((g, idx) => (
         <React.Fragment key={idx}>
           <Line x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke={C.line} strokeWidth={1} />
-          <SvgText x={PAD_L - 8} y={g.y + 3.5} fill={C.text3} fontSize={10.5} fontFamily="Archivo_500" textAnchor="end">
+          <SvgText x={PAD_L - 8} y={g.y + 3.5} fill={C.text3} fontSize={11} fontFamily="Archivo_500" textAnchor="end">
             {g.val}
           </SvgText>
         </React.Fragment>

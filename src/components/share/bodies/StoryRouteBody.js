@@ -66,7 +66,7 @@ const s = StyleSheet.create({
   eyebrow: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 2.2 },
   chart: { marginTop: 22 },
   days: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
-  day: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 1 },
+  day: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1 },
   total: { marginTop: 34, flexDirection: "row", alignItems: "baseline", gap: 12 },
   hero: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 96, letterSpacing: -4.6 },
   unit: { fontFamily: "Bricolage_400", fontSize: 20 },

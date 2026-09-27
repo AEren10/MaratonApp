@@ -61,10 +61,10 @@ function editorial(size, { lh } = {}) {
 
 export const TYPE = {
   // --- Bölüm etiketleri: büyük harf + geniş aralık ---
-  labelMicro: ui(9, 700, { track: TRACKING.widest }),
-  labelSmall: ui(9.5, 700, { track: TRACKING.widest }),
-  label: ui(10.5, 600, { track: TRACKING.wider }),
-  labelLoose: ui(10.5, 600, { track: TRACKING.ultra }),
+  labelMicro: ui(11, 700, { track: TRACKING.widest }),
+  labelSmall: ui(11, 700, { track: TRACKING.widest }),
+  label: ui(11, 600, { track: TRACKING.wider }),
+  labelLoose: ui(11, 600, { track: TRACKING.ultra }),
 
   // --- Arayüz metni ---
   caption: ui(11, 500),

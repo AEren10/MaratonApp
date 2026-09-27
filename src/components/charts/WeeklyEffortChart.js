@@ -75,7 +75,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               />
               <SvgText
                 x={EFFORT_PAD_LEFT - 6} y={gy + 3.5}
-                fill={C.text4} fontSize={10.5} textAnchor="end"
+                fill={C.text4} fontSize={11} textAnchor="end"
               >
                 {v}
               </SvgText>

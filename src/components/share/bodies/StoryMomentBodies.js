@@ -107,7 +107,7 @@ const s = StyleSheet.create({
   bar: { height: 6, borderRadius: 2, marginTop: 34, overflow: "hidden" },
   barFill: { height: "100%", borderRadius: 2 },
   countFoot: { flexDirection: "row", justifyContent: "space-between", marginTop: 11 },
-  meta: { fontFamily: "Archivo_600", fontSize: 10.5, letterSpacing: 1.7 },
+  meta: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.7 },
 
   netWrap: { position: "absolute", left: 36, right: 36, top: 182 },
   netRow: { flexDirection: "row", alignItems: "flex-end", gap: 14, marginTop: 16 },
@@ -121,7 +121,7 @@ const s = StyleSheet.create({
   netRule: { height: 1, marginTop: 26 },
   netSubjects: { flexDirection: "row", justifyContent: "space-between", marginTop: 16 },
   netSubject: { gap: 6 },
-  netSubjectKey: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 1.4 },
+  netSubjectKey: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.4 },
   netSubjectValue: { fontFamily: "Bricolage_400", fontSize: 24, lineHeight: 24 },
 
   honestWrap: { position: "absolute", left: 40, right: 40, top: 236 },

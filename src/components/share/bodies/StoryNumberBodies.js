@@ -5,7 +5,7 @@ import { scalePoints, buildSmoothPath } from "../../../lib/routeChartPath";
 import { formatMinutes } from "../../../lib/format";
 
 const hero = (size) => ({ fontFamily: "Bricolage_400", fontSize: size, lineHeight: Math.round(size * 1.05) });
-const label = { fontFamily: "Archivo_600", fontSize: 10.5, letterSpacing: 1.9 };
+const label = { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.9 };
 
 // SAYILAR — gunun rakami one cikar, altinda sure/seri ve kucuk bir egri.
 export function StoryStatsBody({ data, p }) {

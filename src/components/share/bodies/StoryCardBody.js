@@ -98,7 +98,7 @@ const s = StyleSheet.create({
   chart: { marginHorizontal: -34, marginTop: 20 },
   stats: { flexDirection: "row", borderTopWidth: 1, marginTop: 16, paddingTop: 16 },
   stat: { flex: 1 },
-  statName: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 1.8 },
+  statName: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.8 },
   statValue: { fontFamily: "Bricolage_400", fontSize: 20, marginTop: 6 },
   footRail: { borderTopWidth: 1, marginTop: 18, paddingTop: 16, height: 44 },
 });
