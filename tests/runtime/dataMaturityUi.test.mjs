@@ -20,10 +20,13 @@ test("weekly program summary does not fall back to mock time or stop counts", ()
 });
 
 test("profile hides zero-dashboard stats until real activity exists", () => {
-  const credentials = read("src/screens/profile/components/RouteCredentialsList.js");
+  // "Yol kunyesi" kutulari kalkti (28 Eylul); soru/saat Calisma gecmisi
+  // satirinda ve yalniz sifir degilse gorunur.
+  const profile = read("src/screens/profile/ProfileScreen.js");
   const route = read("src/screens/profile/components/YearRouteChart.js");
-  assert.match(credentials, /hasAnyStat/);
-  assert.match(credentials, /İlk çalışma günün burada iz bırakacak/);
+  assert.doesNotMatch(profile, /RouteCredentialsList/);
+  assert.match(profile, /if \(totalQuestions > 0\)/);
+  assert.match(profile, /if \(totalHours > 0\)/);
   assert.match(route, /hasActivity/);
   assert.match(route, /Rota günlüğün ilk kayıtla başlayacak/);
 });
