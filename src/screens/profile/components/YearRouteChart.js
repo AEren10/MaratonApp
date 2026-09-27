@@ -42,6 +42,27 @@ export function YearRouteChart() {
     points: [],
     currentIndex: 0,
   };
+  const hasActivity = MODES.some((m) =>
+    (data?.[m.key]?.points || []).some((point) => (point.count || 0) > 0 || (point.level || 0) > 0),
+  );
+
+  if (!hasActivity) {
+    return (
+      <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 + 4 }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.6, color: C.text2, marginBottom: STEP.s2 }}>
+          YILIN ROTASI
+        </Text>
+        <View style={{ borderWidth: 1, borderColor: C.border, backgroundColor: C.surface, borderRadius: 20, padding: STEP.s3 }}>
+          <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, lineHeight: 22, color: C.text }}>
+            Rota günlüğün ilk kayıtla başlayacak.
+          </Text>
+          <Text style={{ fontFamily: "Archivo_400", fontSize: 13, lineHeight: 20, color: C.text2, marginTop: STEP.s1 }}>
+            Çalışma yaptığın günler yıl, ay ve hafta görünümünde gerçek iz olarak dolacak.
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 + 4 }}>

@@ -41,8 +41,10 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
     return {
       empty: true,
       filteredTrials: filtered,
-      latest: { net: 0, trend: 0, date: "İlk denemeni gir" },
+      latest: { net: null, trend: null, date: null, typeLabel: null },
       bars: [],
+      heroLine: [],
+      heroLabels: [],
       line: [],
       lineLabels: [],
       history: [],

@@ -6,16 +6,16 @@ import { useC } from "../../../contexts/ThemeContext";
 
 export function WeekProgressCard({ rangeLabel, activeDaysCount, totalMinutes, totalQuestions }) {
   const C = useC();
-  
-  // Tasarıma tam uyum: Durak sayıları statik mock veya hooktan hesaplanmalı.
-  // Kullanıcının attığı tasarımdaki görünüme (Image 3) uyması için yapıldı.
-  const completedStops = totalQuestions > 0 ? Math.min(18, Math.max(1, Math.round(totalQuestions / 10))) : 12;
-  const totalStops = 18;
+  const completedStops = Math.max(0, Math.min(7, Number(activeDaysCount) || 0));
+  const totalStops = 7;
   const pct = Math.min(1, completedStops / totalStops);
 
-  const hoursWorked = totalMinutes > 0 ? `${Math.floor(totalMinutes / 60)} sa ${totalMinutes % 60} dk` : "8 sa 40 dk";
-  const workedLabel = `${hoursWorked} çalışıldı`;
-  const plannedLabel = "13 sa planlı";
+  const hasWork = totalMinutes > 0 || totalQuestions > 0 || completedStops > 0;
+  const hoursWorked = totalMinutes > 0
+    ? `${Math.floor(totalMinutes / 60)} sa ${totalMinutes % 60} dk`
+    : null;
+  const workedLabel = hoursWorked ? `${hoursWorked} çalışıldı` : "Henüz çalışma yok";
+  const plannedLabel = totalQuestions > 0 ? `${totalQuestions} soru çözüldü` : "İlk durak bekliyor";
 
   return (
     <Card tone="surface" radius="card" style={{ marginTop: STEP.s2, padding: STEP.s3 }}>
@@ -30,12 +30,12 @@ export function WeekProgressCard({ rangeLabel, activeDaysCount, totalMinutes, to
           {completedStops}
         </Text>
         <Text style={{ ...TYPOGRAPHY.bodyMedium, color: C.text3, paddingBottom: 6 }}>
-          / {totalStops} durak tamamlandı
+          / {totalStops} aktif gün
         </Text>
       </View>
 
       <View style={[styles.track, { backgroundColor: C.track }]}>
-        <View style={[styles.fill, { backgroundColor: C.accent, width: `${Math.round(pct * 100)}%` }]} />
+        <View style={[styles.fill, { backgroundColor: hasWork ? C.accent : C.text5, width: `${Math.round(pct * 100)}%` }]} />
       </View>
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s2 }}>

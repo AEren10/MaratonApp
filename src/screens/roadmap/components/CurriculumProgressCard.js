@@ -8,6 +8,25 @@ import CurriculumCurve from "./CurriculumCurve";
 // Kutu/kart arkasi kaldirildi; grafik dogrudan sayfa zemininde (C.bg) nefes aliyor.
 export function CurriculumProgressCard({ done, total, left, pct }) {
   const C = useC();
+  const hasProgress = done > 0;
+
+  if (!hasProgress) {
+    return (
+      <View style={s.wrap} accessible accessibilityLabel={`Müfredat ilerlemesi: henüz tamamlanan konu yok, ${total} konu hazır`}>
+        <View style={s.head}>
+          <Text style={[TYPOGRAPHY.label, s.headLabel, { color: C.text3 }]}>MÜFREDAT İLERLEMESİ</Text>
+          <Text style={[TYPOGRAPHY.tableValue, s.headCount, { color: C.text2 }]}>{`${total} konu hazır`}</Text>
+        </View>
+        <View style={[s.emptyPanel, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>İlk etap hazır.</Text>
+          <Text style={[TYPOGRAPHY.caption, s.emptyText, { color: C.text2 }]}>
+            İlk konunu tamamladığında kızıl rota burada oluşmaya başlayacak.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={s.wrap} accessible accessibilityLabel={`Müfredat ilerlemesi: ${done}/${total} konu, yüzde ${pct}`}>
       <View style={s.head}>
@@ -67,6 +86,15 @@ const s = StyleSheet.create({
   foot: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: STEP.s1,
+  },
+  emptyPanel: {
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: STEP.s3,
+    marginTop: STEP.s2,
+  },
+  emptyText: {
     marginTop: STEP.s1,
   },
 });

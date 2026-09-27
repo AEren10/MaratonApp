@@ -7,6 +7,7 @@ import { TargetSvg, ClockSvg, FlameSvg } from "./RouteCredentialSvgs";
 
 export function RouteCredentialsList({ totalQuestions = 0, totalHours = 0, longestStreak = 0 }) {
   const C = useC();
+  const hasAnyStat = totalQuestions > 0 || totalHours > 0 || longestStreak > 0;
   const qDisplay = totalQuestions >= 1000
     ? totalQuestions.toLocaleString("tr-TR")
     : String(totalQuestions);
@@ -37,6 +38,22 @@ export function RouteCredentialsList({ totalQuestions = 0, totalHours = 0, longe
       svg: <FlameSvg color={flameColor} bg={alpha(flameColor, 16)} />,
     },
   ];
+
+  if (!hasAnyStat) {
+    return (
+      <View style={s.container}>
+        <View style={s.headRow}>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>YOL KÜNYESİ</Text>
+        </View>
+        <View style={[s.emptyCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[TYPOGRAPHY.topicName, { color: C.text }]}>İlk çalışma günün burada iz bırakacak.</Text>
+          <Text style={[TYPOGRAPHY.caption, s.emptyText, { color: C.text2 }]}>
+            Soru, süre ve seri bilgilerini gerçek kayıt oluşunca göstereceğim.
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={s.container}>
@@ -84,6 +101,14 @@ const s = StyleSheet.create({
     alignItems: "stretch",
     justifyContent: "space-between",
     paddingVertical: STEP.s1,
+  },
+  emptyCard: {
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: STEP.s3,
+  },
+  emptyText: {
+    marginTop: STEP.s1,
   },
   col: {
     flex: 1,
