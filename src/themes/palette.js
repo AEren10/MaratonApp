@@ -135,8 +135,8 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     ? {
         surface: mix(bg, 93, text),
         elev: mix(bg, 86, text),
-        border: mix(bg, 77, text),
-        line: mix(bg, 92, text),
+        border: overrides.border || "#5A5961",
+        line: overrides.line || "#3A3A42",
         track: mix(bg, 87, text),
         void: mix(bg, 97, text),
       }
