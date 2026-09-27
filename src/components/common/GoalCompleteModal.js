@@ -31,7 +31,7 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
             {xpEarned > 0 && (
               <View style={[s.statBox, { backgroundColor: C.accent + "14" }]}>
                 <Text style={[s.statNum, { color: C.accent }]}>+{xpEarned}</Text>
-                <Text style={[s.statLabel, { color: C.accent }]}>XP</Text>
+                <Text style={[s.statLabel, { color: C.accentText }]}>XP</Text>
               </View>
             )}
           </Animated.View>

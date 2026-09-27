@@ -40,7 +40,7 @@ export function AnalysisTrendSection({ C, analysis, filter, go, screens }) {
           }}
         >
           <Icon name="trendUp" size={16} color={C.accent} />
-          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.accent }}>Detaylı Analiz</Text>
+          <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.accentText }}>Detaylı Analiz</Text>
           <Icon name="chevR" size={14} color={C.accent} />
         </Press>
       </AnimatedCard>

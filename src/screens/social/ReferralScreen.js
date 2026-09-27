@@ -162,7 +162,7 @@ export default function ReferralScreen() {
           ].map((step, i) => (
             <View key={i} style={s.stepRow}>
               <View style={[s.stepNum, { backgroundColor: C.accent + "20" }]}>
-                <Text style={[TYPOGRAPHY.captionMedium, { color: C.accent }]}>{i + 1}</Text>
+                <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentText }]}>{i + 1}</Text>
               </View>
               <Text style={[TYPOGRAPHY.body, { color: C.sec, flex: 1 }]}>{step}</Text>
             </View>

@@ -29,5 +29,5 @@ const makeStyles = (C) =>
       backgroundColor: C.surface,
       borderRadius: RADIUS.md,
     },
-    backBtnText: { ...TYPOGRAPHY.body, color: C.accent, fontWeight: "600" },
+    backBtnText: { ...TYPOGRAPHY.body, color: C.accentText, fontWeight: "600" },
   });

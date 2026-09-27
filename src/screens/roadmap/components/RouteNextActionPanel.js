@@ -22,7 +22,7 @@ function RouteNextActionPanel({ action, C, disabled, onStart }) {
           <Icon name="play" size={16} color={C.accent} />
         </View>
         <View style={styles.copy}>
-          <Text style={[styles.eyebrow, { color: C.accent }]}>SIRADAKİ ROTA HAMLESİ</Text>
+          <Text style={[styles.eyebrow, { color: C.accentText }]}>SIRADAKİ ROTA HAMLESİ</Text>
           <Text style={[styles.title, { color: C.text }]} numberOfLines={1}>
             {action.title}
           </Text>

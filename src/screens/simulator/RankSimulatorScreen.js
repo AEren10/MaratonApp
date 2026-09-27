@@ -91,7 +91,7 @@ export default function RankSimulatorScreen() {
             </View>
             {!canAccess ? (
               <Press haptic="none" onPress={requestAccess} accessibilityRole="button" accessibilityLabel="Kilidi aç" style={{ marginTop: STEP.s2, minHeight: 44, justifyContent: "center" }}>
-                <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent, textAlign: "center" }}>Kilidi açmak için dokun</Text>
+                <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accentText, textAlign: "center" }}>Kilidi açmak için dokun</Text>
               </Press>
             ) : null}
           </View>

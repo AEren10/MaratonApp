@@ -60,7 +60,7 @@ export function HistoryList({ history, onPress, onCompare, onSeeAll, totalCount 
             accessibilityRole="button"
             accessibilityLabel="Tüm deneme kayıtları"
           >
-            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accent }}>Tüm kayıtlar</Text>
+            <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.accentText }}>Tüm kayıtlar</Text>
           </Press>
         )}
       </View>

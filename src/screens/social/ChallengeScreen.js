@@ -162,7 +162,7 @@ export default function ChallengeScreen() {
       <Animated.View style={s.tabs}>
         {["active", "past"].map((t) => (
           <Pressable key={t} onPress={() => { H.tap(); setTab(t); }} accessibilityRole="tab" accessibilityLabel={t === "active" ? "Aktif" : "Geçmiş"} accessibilityHint="Challenge listesini filtreler" style={[s.tab, tab === t && { backgroundColor: C.accent + "18" }]}>
-            <Text style={[s.tabText, tab === t && { color: C.accent }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
+            <Text style={[s.tabText, tab === t && { color: C.accentText }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
           </Pressable>
         ))}
       </Animated.View>

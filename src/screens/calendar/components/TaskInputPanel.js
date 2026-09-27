@@ -34,7 +34,7 @@ export function TaskInputPanel({ onAdd }) {
             style={[s.preset]}
           >
             <Icon name={p.icon} size={13} color={C.accent} />
-            <Text style={[s.presetText, { color: C.accent }]}>{p.label}</Text>
+            <Text style={[s.presetText, { color: C.accentText }]}>{p.label}</Text>
           </Press>
         ))}
       </View>

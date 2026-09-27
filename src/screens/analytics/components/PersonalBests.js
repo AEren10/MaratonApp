@@ -64,7 +64,7 @@ export function PersonalBests({ bests }) {
               <Text
                 style={[
                   TYPOGRAPHY.bodySemiBold,
-                  { color: C.accent, marginRight: STEP.s3 },
+                  { color: C.accentText, marginRight: STEP.s3 },
                 ]}
               >
                 {s.bestNet}

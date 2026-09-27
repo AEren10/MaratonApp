@@ -60,7 +60,7 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
         <Text style={{
           fontFamily: "Bricolage_400",
           fontSize: 13,
-          color: C.accent,
+          color: C.accentText,
           letterSpacing: 0.5,
         }}>
           {tier?.name?.toUpperCase() || "BRONZ"}

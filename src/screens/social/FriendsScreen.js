@@ -102,7 +102,7 @@ export default function FriendsScreen() {
                       ) : (
                         <Pressable onPress={() => addFriend(u.id)} disabled={sending === u.id} style={[s.actionBtn, sending === u.id && { opacity: 0.5 }]}>
                           {sending === u.id ? <ActivityIndicator size={14} color={C.accent} /> : <Icon name="plus" size={14} color={C.accent} />}
-                          <Text style={{ ...TYPOGRAPHY.micro, color: C.accent }}>Ekle</Text>
+                          <Text style={{ ...TYPOGRAPHY.micro, color: C.accentText }}>Ekle</Text>
                         </Pressable>
                       )
                     }

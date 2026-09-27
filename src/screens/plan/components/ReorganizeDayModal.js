@@ -36,7 +36,7 @@ export function ReorganizeDayModal({
           <View style={[s.header, { borderBottomColor: C.line }]}>
             <View style={s.headerTextWrap}>
               <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Günü Yeniden Düzenle</Text>
-              {dayLabel ? <Text style={[TYPOGRAPHY.meta, { color: C.accent }]}>{dayLabel}</Text> : null}
+              {dayLabel ? <Text style={[TYPOGRAPHY.meta, { color: C.accentText }]}>{dayLabel}</Text> : null}
             </View>
             <Press haptic="none" onPress={onClose} hitSlop={STEP.s2}>
               <Icon name="x" size={20} color={C.text2} />

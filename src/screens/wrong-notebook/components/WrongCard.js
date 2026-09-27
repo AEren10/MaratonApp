@@ -1,4 +1,4 @@
-﻿import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
@@ -163,8 +163,8 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
                 },
               ]}
             >
-              <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.up : C.accent} />
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: shared ? C.up : C.accent }]}>
+              <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.up : C.accentText} />
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: shared ? C.up : C.accentText }]}>
                 {shared ? "Paylaşıldı" : "Paylaş"}
               </Text>
             </Pressable>

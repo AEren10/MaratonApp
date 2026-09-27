@@ -39,7 +39,7 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.accent,
     letterSpacing: -2,
   },
-  netLabel: { ...TYPOGRAPHY.label, color: C.accent, marginTop: -SPACING.xs },
+  netLabel: { ...TYPOGRAPHY.label, color: C.accentText, marginTop: -SPACING.xs },
   barsWrap: { gap: SPACING.sm },
   barRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   dot: { width: 8, height: 8, borderRadius: 4 },

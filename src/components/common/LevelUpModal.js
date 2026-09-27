@@ -78,11 +78,11 @@ function makeStyles(C) {
       width: "100%", maxWidth: 340, borderRadius: RADIUS.xxl, padding: SPACING.xxxl,
       alignItems: "center", backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
     },
-    eyebrow: { ...TYPOGRAPHY.label, color: C.accent, letterSpacing: 1.5, marginBottom: SPACING.lg },
+    eyebrow: { ...TYPOGRAPHY.label, color: C.accentText, letterSpacing: 1.5, marginBottom: SPACING.lg },
     iconWrap: { width: 120, height: 120, alignItems: "center", justifyContent: "center", marginBottom: SPACING.lg },
     glow: { position: "absolute", width: 110, height: 110, borderRadius: 55 },
     levelNum: { ...TYPOGRAPHY.stat, color: C.text },
-    levelTitle: { ...TYPOGRAPHY.subheading, color: C.accent, marginTop: SPACING.xs },
+    levelTitle: { ...TYPOGRAPHY.subheading, color: C.accentText, marginTop: SPACING.xs },
     sub: { ...TYPOGRAPHY.bodyMedium, color: C.sec, textAlign: "center", marginTop: SPACING.md, lineHeight: 22 },
   });
 }

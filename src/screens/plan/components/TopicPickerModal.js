@@ -33,7 +33,7 @@ export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, top
           <View style={[s.header, { borderBottomColor: C.line }]}>
             <View style={{ flex: 1 }}>
               <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Konu Seç</Text>
-              {subjectLabel ? <Text style={[TYPOGRAPHY.meta, { color: C.accent }]}>{subjectLabel}</Text> : null}
+              {subjectLabel ? <Text style={[TYPOGRAPHY.meta, { color: C.accentText }]}>{subjectLabel}</Text> : null}
             </View>
             <Pressable onPress={onClose} hitSlop={STEP.s2}>
               <Icon name="x" size={20} color={C.text2} />
@@ -62,7 +62,7 @@ export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, top
               style={[s.customRow, { backgroundColor: C.brandTint, borderColor: C.bandEdge }]}
             >
               <Icon name="plus" size={16} color={C.accent} />
-              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accent, flex: 1 }]}>
+              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText, flex: 1 }]}>
                 Özel ekle: "{query.trim()}"
               </Text>
             </Pressable>

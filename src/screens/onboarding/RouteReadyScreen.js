@@ -56,7 +56,7 @@ export default function RouteReadyScreen() {
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.delay(60)}>
-          <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accent }]}>ROTAN HAZIR</Text>
+          <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accentText }]}>ROTAN HAZIR</Text>
         </Animated.View>
         <Animated.View entering={FadeIn.delay(140)} style={styles.heroWrap}>
           <AnimatedNumber

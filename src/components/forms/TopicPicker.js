@@ -150,7 +150,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingVertical: SPACING.md,
     marginTop: SPACING.sm,
   },
-  customText: { ...TYPOGRAPHY.bodySemiBold, color: C.accent },
+  customText: { ...TYPOGRAPHY.bodySemiBold, color: C.accentText },
   input: {
     backgroundColor: C.surface2,
     borderWidth: 1,

@@ -73,7 +73,7 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen
           <View style={[s.addIcon, { backgroundColor: C.accent }]}>
             <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
           </View>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accent }]}>Görev Ekle</Text>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText }]}>Görev Ekle</Text>
         </Press>
       )}
 

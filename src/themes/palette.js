@@ -37,7 +37,7 @@ const FIXED = {
     text4: "#6B6870",
     text5: "#3B3941",
     accentInk: "#F7F2F0",
-    accentBright: "#FF4D57",
+    accentBright: "#FF6A72",
     down: "#8A8790",
     warn: "#E0A93F",
     danger: "#F0555F",
@@ -161,6 +161,7 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#C4262F"),
     brandFillPress: isDark ? "#A81C26" : "#A31C24",
     brandPress: isDark ? "#A81C26" : "#A31C24",
+    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#D12430"),
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
@@ -229,6 +230,7 @@ function legacyAliases(p) {
     textInverse: p.accentInk,
 
     // Marka
+    accentText: p.accentText,
     accentLight: p.brandTint,
     accentPressed: p.accentPress,
     accentDark: p.accentPress,

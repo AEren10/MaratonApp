@@ -21,7 +21,7 @@ export function PlanDetailEmptyState({ C }) {
             <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>dk</Text>
           </View>
         </View>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accent, marginBottom: STEP.s1 / 2 }]}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText, marginBottom: STEP.s1 / 2 }]}>
           20 dakikalık dönüş durağı
         </Text>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>

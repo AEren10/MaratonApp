@@ -62,7 +62,7 @@ export function PlanHeader({ done, total, soru, hours }) {
       {showMotiv && (
         <View style={styles.motivRow}>
           <Icon name="flame" size={16} color={C.accent} />
-          <Text style={{ ...TYPOGRAPHY.caption, color: C.accent, marginLeft: 6 }}>
+          <Text style={{ ...TYPOGRAPHY.caption, color: C.accentText, marginLeft: 6 }}>
             Yarısını bitirdin, devam et!
           </Text>
         </View>

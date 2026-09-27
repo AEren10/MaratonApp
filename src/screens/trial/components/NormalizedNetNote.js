@@ -10,7 +10,7 @@ export function NormalizedNetNote({ C, trial }) {
   return (
     <View style={styles.row} accessible accessibilityLabel={`Normalize net ${normalized.toFixed(2)}`}>
       <Text style={[styles.text, { color: C.sec }]}>Normalize net</Text>
-      <Text style={[styles.value, { color: C.accent }]}>{normalized.toFixed(2)}</Text>
+      <Text style={[styles.value, { color: C.accentText }]}>{normalized.toFixed(2)}</Text>
       {trial.publisherNameSnapshot ? (
         <Text style={[styles.text, { color: C.muted }]}>· {trial.publisherNameSnapshot}</Text>
       ) : null}

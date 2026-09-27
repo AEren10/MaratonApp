@@ -68,7 +68,7 @@ export const GroupItemRow = React.memo(function GroupItemRow({
       {isSelected ? (
         <View style={[s.badge, { backgroundColor: C.accent + "18" }]}>
           <Icon name="check" size={11} color={C.accent} />
-          <Text style={[s.badgeText, { color: C.accent }]}>Seçili</Text>
+          <Text style={[s.badgeText, { color: C.accentText }]}>Seçili</Text>
         </View>
       ) : (
         <Icon name="chevR" size={14} color={C.text3} />

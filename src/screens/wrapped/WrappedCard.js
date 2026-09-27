@@ -66,7 +66,7 @@ export default function WrappedCard({ stats, period = "weekly" }) {
             <Text style={[s.metaValue, { color: C.amber }]}>{streak}</Text>
           </View>
           <View style={s.metaItem}>
-            <Text style={[s.metaValue, { color: C.accent }]}>{xp} XP</Text>
+            <Text style={[s.metaValue, { color: C.accentText }]}>{xp} XP</Text>
           </View>
           {totalTrials > 0 && (
             <View style={s.metaItem}>

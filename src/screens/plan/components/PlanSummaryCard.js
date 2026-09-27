@@ -88,7 +88,7 @@ const makeStyles = (C) => StyleSheet.create({
     width: 44,
   },
   copy: { flex: 1 },
-  eyebrow: { ...TYPOGRAPHY.micro, color: C.accent },
+  eyebrow: { ...TYPOGRAPHY.micro, color: C.accentText },
   title: { ...TYPOGRAPHY.bodySemiBold, color: C.text, marginTop: SPACING.xs },
   body: { ...TYPOGRAPHY.caption, color: C.sec, marginTop: SPACING.xs },
   pills: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
