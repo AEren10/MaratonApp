@@ -2,7 +2,6 @@ import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Button } from "../../../../components/design/Button";
-import { StatBlock } from "../../../../components/design/StatBlock";
 import { useC } from "../../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { FirstDayRouteLine } from "./FirstDayRouteLine";
@@ -23,15 +22,15 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
   const C = useC();
   const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
   const daysLine = daysUntilExam == null
-    ? "ilk durak hazır"
-    : `YKS'ye ${Math.max(0, daysUntilExam)} gün · ilk durak hazır`;
+    ? "İlk durağın hazır."
+    : `YKS'ye ${Math.max(0, daysUntilExam)} gün. İlk durağın hazır.`;
 
   return (
     <View>
+      {/* Ilk ekranin ilk gordugu sey dev, soluk bir "0 / hedef" idi. Sifir
+          kahraman olmaz (kullanici karari, 28 Eylul): yerine yolun kendisi. */}
       <Animated.View style={s.top}>
-        <StatBlock label="Bugün çözülen" value={0} unit={`/${dailyGoal}`} size="hero" color={C.text5}>
-          <Text style={[TYPOGRAPHY.body, s.line, { color: C.text3 }]}>{daysLine}</Text>
-        </StatBlock>
+        <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{daysLine}</Text>
       </Animated.View>
 
       <FirstDayRouteLine targetNet={targetNet} />
@@ -72,7 +71,6 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
 
 const s = StyleSheet.create({
   top: { paddingTop: STEP.s4 },
-  line: { marginTop: STEP.s2 + 2 },
   summary: { marginTop: STEP.s2 + 2 },
   actions: { marginTop: STEP.s4 - 4, gap: STEP.s2 },
   hint: {

@@ -15,7 +15,9 @@ test("home ilk gun state'i sinav baglamini saklamaz", () => {
   assert.match(screen, /<HomeTopBar name=\{dashboard\.displayName\} streak=\{h\.streak\}/);
   assert.doesNotMatch(screen, /HomeTopBar[^>]*daysUntilExam/, "ust cip gun sayacini tekrarlamaz");
   assert.doesNotMatch(screen, /h\.firstDay\s*\?\s*null/);
-  assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün · ilk durak hazır/);
+  // Dev "0 / hedef" kalkti (28 Eylul); ekran yolun cumlesiyle aciliyor.
+  assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün\. İlk durağın hazır\./);
+  assert.doesNotMatch(firstDay, /size="hero"/);
   assert.match(firstDay, /YKS'ye \$\{days\} gün, rotanda \$\{totalStops\} durak var/);
 });
 
