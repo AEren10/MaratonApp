@@ -13,8 +13,6 @@ import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
 import { NotebookHeaderTabs } from "./components/NotebookHeaderTabs";
-import { SectionSwitch } from "../../components/common/SectionSwitch";
-import { ANALYSIS_SECTIONS } from "../../constants/analysisSections";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
 export default function WrongNotebookScreen() {
@@ -37,12 +35,6 @@ export default function WrongNotebookScreen() {
   const header = useMemo(() => (
     <View>
       <PhotoLostBanner C={C} count={nb.lostPhotoCount} onRetry={nb.dismissLostPhotos} />
-      {/* Analiz'deki segmentin AYNISI, ters yonu — gecis cift yonlu olsun. */}
-      <SectionSwitch
-        options={ANALYSIS_SECTIONS}
-        value="notebook"
-        onChange={nb.goAnalysis}
-      />
       <View style={[styles.gutter, styles.segment]}>
         <Segmented options={filterOptions} value={nb.filter} onChange={nb.changeFilter} />
       </View>
@@ -55,7 +47,7 @@ export default function WrongNotebookScreen() {
         <SectionLabel style={[styles.gutter, styles.section, { color: C.text2 }]}>KONUYA GÖRE</SectionLabel>
       ) : null}
     </View>
-  ), [C, nb.lostPhotoCount, nb.dismissLostPhotos, nb.goAnalysis, filterOptions, nb.filter, nb.changeFilter, view.dueCount, nb.goReview, view.groups.length]);
+  ), [C, nb.lostPhotoCount, nb.dismissLostPhotos, filterOptions, nb.filter, nb.changeFilter, view.dueCount, nb.goReview, view.groups.length]);
 
   const footer = useMemo(() => (
     <View style={[styles.gutter, styles.footer]}>
