@@ -11,8 +11,8 @@ export function GroupCompetitionBanner({ standing }) {
   let text = "Grubundaki yarışa katıl, birlikte hedefe koşun!";
   if (standing.isLeader) {
     text = standing.diff > 0
-      ? `Zirvedesin! 🔥 2. sırayla aranda ${standing.diff} soru fark var.`
-      : "Zirvedesin! 🔥 Liderliği elden bırakma.";
+      ? `Zirvedesin! 2. sırayla aranda ${standing.diff} soru fark var.`
+      : "Zirvedesin! Liderliği elden bırakma.";
   } else if (standing.rank) {
     text = `${standing.leaderName} ${standing.leaderQuestions} soru çözdü, liderle aranda ${standing.diff} soru var!`;
   }

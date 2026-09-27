@@ -256,7 +256,7 @@ export async function scheduleTrialReminder(userId = null) {
     const time = withNotificationJitter(18, 0, userId, "trial_reminder");
     return await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Deneme zamanı 📝",
+        title: "Deneme zamanı",
         body: "Bu hafta henüz deneme girmedin. Kendini test et!",
         data: { type: "trial_reminder", url: notificationUrl(SCREENS.TRIAL_ENTRY) },
       },
@@ -398,7 +398,7 @@ export async function scheduleTaskNotifications(taskCount, userId = null) {
       const time = withNotificationJitter(20, 0, userId, "task_reminder_daily");
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Bugünkü hedeflerine ulaşmadın 🎯",
+          title: "Bugünkü hedeflerine ulaşmadın",
           body: "Açık duran durakların var. Uygunsa birini kapatabilirsin.",
           data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
         },

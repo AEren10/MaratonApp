@@ -47,7 +47,7 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
           {/* Premium gift */}
           {milestone.premiumDays > 0 && (
             <Animated.Text entering={FadeIn.delay(380)} style={s.premium}>
-              {"🎁"} {milestone.premiumDays} gün Premium hediye!
+              {milestone.premiumDays} gün Premium hediye!
             </Animated.Text>
           )}
 

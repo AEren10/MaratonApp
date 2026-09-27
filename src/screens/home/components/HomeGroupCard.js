@@ -53,8 +53,8 @@ export function HomeGroupCard({ groupsData, onPress }) {
   let statusText = "Grupta durumunu gör ve yarışa katıl";
   if (standing?.isLeader) {
     statusText = standing.diff > 0
-      ? `Zirvedesin! 🔥 2. sırayla farkın ${standing.diff} soru.`
-      : "Zirvedesin! 🔥 Harika gidiyorsun.";
+      ? `Zirvedesin! 2. sırayla farkın ${standing.diff} soru.`
+      : "Zirvedesin! Harika gidiyorsun.";
   } else if (standing?.rank) {
     statusText = `${standing.rank}. sıradasın · Liderle fark ${standing.diff} soru!`;
   }
