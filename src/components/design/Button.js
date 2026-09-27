@@ -8,13 +8,13 @@ import * as H from "../../lib/haptics";
 const ReanimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const VARIANTS = {
-  primary:   (C) => ({ bg: C.accent,  text: C.textOnBrand, pressed: C.accentPressed }),
-  orange:    (C) => ({ bg: C.orange,  text: C.textOnBrand, pressed: C.orangePressed }),
-  secondary: (C) => ({ bg: C.accentLight, text: C.accent, pressed: C.surfacePressed }),
+  primary:   (C) => ({ bg: C.brandFill || C.accent,  text: "#FFFFFF", pressed: C.brandFillPress || C.accentPressed }),
+  orange:    (C) => ({ bg: C.orange,  text: "#FFFFFF", pressed: C.orangePressed }),
+  secondary: (C) => ({ bg: C.accentLight, text: C.accentText || C.accent, pressed: C.surfacePressed }),
   outline:   (C) => ({ bg: "transparent", text: C.text,   pressed: C.surfacePressed, border: C.border }),
-  ghost:     (C) => ({ bg: "transparent", text: C.accent, pressed: C.surfacePressed }),
-  danger:    (C) => ({ bg: C.danger,  text: C.textOnBrand, pressed: C.red }),
-  success:   (C) => ({ bg: C.success, text: C.textOnBrand, pressed: C.green }),
+  ghost:     (C) => ({ bg: "transparent", text: C.accentText || C.accent, pressed: C.surfacePressed }),
+  danger:    (C) => ({ bg: C.danger,  text: "#FFFFFF", pressed: C.red }),
+  success:   (C) => ({ bg: C.success, text: "#FFFFFF", pressed: C.green }),
 };
 
 // Tasarimin uc kademesi: birincil/ikincil h52, ucuncul h44. Pill yok.

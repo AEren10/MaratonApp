@@ -23,18 +23,18 @@ export function HomeCTAButton({ title, subtitle, onPress }) {
       accessibilityLabel={subtitle ? `${title}, ${subtitle}` : title}
       style={({ pressed }) => [
         s.btn,
-        { backgroundColor: pressed ? C.accentPress : C.brandFill },
+        { backgroundColor: pressed ? (C.brandFillPress || C.accentPress) : C.brandFill },
         pressed && s.pressed,
       ]}
     >
       <View style={s.texts}>
-        <Text numberOfLines={1} style={[TYPOGRAPHY.button, s.title, { color: C.accentInk }]}>{title}</Text>
+        <Text numberOfLines={1} style={[TYPOGRAPHY.button, s.title, { color: "#FFFFFF" }]}>{title}</Text>
         {subtitle ? (
-          <Text numberOfLines={1} style={[TYPOGRAPHY.metaSemiBold, s.sub, { color: C.accentInk }]}>{subtitle}</Text>
+          <Text numberOfLines={1} style={[TYPOGRAPHY.metaSemiBold, s.sub, { color: "#FFFFFF" }]}>{subtitle}</Text>
         ) : null}
       </View>
-      <View style={[s.arrow, { backgroundColor: alpha(C.accentInk, 16) }]}>
-        <Icon name="chevR" size={14} color={C.accentInk} sw={2.2} />
+      <View style={[s.arrow, { backgroundColor: alpha("#FFFFFF", 16) }]}>
+        <Icon name="chevR" size={14} color="#FFFFFF" sw={2.2} />
       </View>
     </Pressable>
   );

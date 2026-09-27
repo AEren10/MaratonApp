@@ -1,4 +1,4 @@
-import { mix, alpha } from "./colorMix";
+import { mix, alpha } from "./colorMix.js";
 
 // Yeni tasarımın palet sistemi. Sabit renk listesi DEĞİL — üç tohumdan
 // (accent / bg / text) türetiliyor. Tasarım dosyasındaki kök <section>
@@ -158,7 +158,9 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     ...fixed,
 
     // Marka türevleri
-    brandFill: accent,
+    brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#C4262F"),
+    brandFillPress: isDark ? "#A81C26" : "#A31C24",
+    brandPress: isDark ? "#A81C26" : "#A31C24",
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
@@ -221,9 +223,9 @@ function legacyAliases(p) {
     surfacePressed: alpha(p.text, 6),
 
     // Dolgu üstü mürekkep
-    textOnFill: p.accentInk,
-    textOnBrand: p.accentInk,
-    textOnAccent: p.accentInk,
+    textOnFill: "#FFFFFF",
+    textOnBrand: "#FFFFFF",
+    textOnAccent: "#FFFFFF",
     textInverse: p.accentInk,
 
     // Marka
