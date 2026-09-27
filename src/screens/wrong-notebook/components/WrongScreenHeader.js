@@ -20,7 +20,7 @@ export function WrongScreenHeader({ icon = "arrowL", title, label, right, onPres
         <Icon name={icon} size={icon === "x" ? 16 : 18} color={C.text2} />
       </Press>
       {title ? (
-        <Text style={[TYPOGRAPHY.subheading, styles.flex, { color: C.text }]} numberOfLines={1}>
+        <Text style={[TYPOGRAPHY.heading, styles.flex, { color: C.text }]} numberOfLines={1}>
           {title}
         </Text>
       ) : (
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     gap: STEP.s1,
     paddingLeft: GUTTER - STEP.s2,
     paddingRight: GUTTER,
-    paddingTop: 4,
+    paddingTop: STEP.s2,
   },
   hit: {
     width: CONTROL.tapMin,

@@ -8,9 +8,9 @@ import { Press } from "../../../components/design/Press";
 // Rota derinligi ekranlarinin ust satiri: geri oku (ya da kapat X) +
 // Bricolage baslik + istege bagli sag aksiyon (Durak Detayi'ndaki uc nokta).
 // Gorsel ikon tasarim boyutunda, dokunma alani 44px.
-export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, moreIcon, hideBack = false }) {
+export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, moreIcon, hideBack = false, isRoot = false }) {
   const C = useC();
-  const showBack = !hideBack && Boolean(onBack);
+  const showBack = !isRoot && !hideBack && Boolean(onBack);
   return (
     <View style={s.row}>
       {showBack ? (
@@ -24,7 +24,7 @@ export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, m
           <Icon name={close ? "x" : "chevL"} size={close ? 14 : 16} color={C.text2} />
         </Press>
       ) : null}
-      <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text, paddingLeft: showBack ? 0 : STEP.s1 }]} numberOfLines={1}>
+      <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text, paddingLeft: showBack ? 0 : STEP.s1 }]} numberOfLines={1}>
         {title || ""}
       </Text>
       {onMore ? (

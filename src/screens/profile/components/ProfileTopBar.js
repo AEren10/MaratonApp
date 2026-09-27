@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
+import { STEP, GUTTER, SHAPE, CONTROL, TYPOGRAPHY } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
@@ -17,9 +17,9 @@ export function ProfileTopBar() {
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: GUTTER,
-      paddingTop: STEP.s1,
+      paddingTop: STEP.s2,
     }}>
-      <Text style={{ fontFamily: "Bricolage_400", fontSize: 26, color: C.text }}>
+      <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>
         Profil
       </Text>
       <Press haptic="none"
