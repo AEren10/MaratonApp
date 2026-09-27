@@ -50,8 +50,8 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
     <Svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "100%" }}>
       <Defs>
         <LinearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={C.accent} stopOpacity="0.22" />
-          <Stop offset="1" stopColor={C.accent} stopOpacity="0" />
+          <Stop offset="0" stopColor={C.text} stopOpacity="0.10" />
+          <Stop offset="1" stopColor={C.text} stopOpacity="0" />
         </LinearGradient>
       </Defs>
 

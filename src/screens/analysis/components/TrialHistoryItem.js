@@ -40,14 +40,14 @@ export function TrialHistoryItem({ C, item, onPress }) {
         <View style={s.scoreRow}>
           <Text style={[s.netText, { color: C.text }]}>{formatNum(item.net)}</Text>
           <View style={s.deltaWrap}>
-            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={2} />
+            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={1.5} />
             <Text style={[s.deltaText, { color: dc }]}>{formatDelta(item.trend)}</Text>
           </View>
         </View>
       </View>
 
       <Text style={[s.moodText, { color: C.text3 }]}>{item.mood}</Text>
-      <Icon name="chevR" size={14} color={C.text5 || C.text4} />
+      <Icon name="chevR" size={14} color={C.text3} />
     </Press>
   );
 }

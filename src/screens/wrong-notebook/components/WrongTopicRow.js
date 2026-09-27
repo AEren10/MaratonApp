@@ -14,7 +14,7 @@ import { WrongThumb } from "./WrongThumb";
 function pillOf(group, C) {
   switch (group.state) {
     case GROUP_STATE.TODAY: return { text: "TEKRAR ZAMANI", color: C.warn, bg: alpha(C.warn, 14), bd: "transparent" };
-    case GROUP_STATE.DONE: return { text: "KAPATILDI", color: C.up, bg: alpha(C.up, 14), bd: "transparent" };
+    case GROUP_STATE.DONE: return { text: "Kapatıldı", color: C.text2, bg: alpha(C.text2, 14), bd: "transparent" };
     case GROUP_STATE.NEW: return { text: "YENİ", color: C.text2, bg: "transparent", bd: C.line };
     default: return { text: `${group.days} GÜN SONRA`, color: C.text3, bg: "transparent", bd: C.line };
   }

@@ -61,7 +61,7 @@ export function GroupsTab({ user, initialGroupCode }) {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.actions}>
           <Press haptic="none" onPress={() => { H.tap(); c.setCreateOpen(true); }} style={[s.actBtn, { backgroundColor: C.accent }]}>
-            <Icon name="plus" size={15} color={C.textOnFill} sw={2.5} />
+            <Icon name="plus" size={16} color={C.textOnFill} sw={1.5} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.textOnFill }]}>Yeni Grup Oluştur</Text>
           </Press>
           <Press haptic="none" onPress={() => { H.tap(); c.setJoinOpen(true); }} style={[s.actBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>

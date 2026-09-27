@@ -72,8 +72,8 @@ export default function ReferralScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.heroCircle, { backgroundColor: C.accent + "18" }]}>
-          <Icon name="users" size={36} color={C.accent} />
+        <Animated.View entering={ZoomIn.delay(100).springify()} style={[s.heroCircle, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Icon name="users" size={32} color={C.text} />
         </Animated.View>
 
         <Animated.Text entering={FadeInUp.delay(200)} style={[s.title, { color: C.text }]}>
@@ -103,8 +103,8 @@ export default function ReferralScreen() {
         </Animated.View>
 
         <Animated.View style={[s.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
-          <View style={[s.statIcon, { backgroundColor: C.green + "18" }]}>
-            <Icon name="users" size={20} color={C.green} />
+          <View style={[s.statIcon, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Icon name="users" size={20} color={C.text2} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[TYPOGRAPHY.stat, { color: C.text, fontSize: 24 }]}>
@@ -190,9 +190,10 @@ function makeStyles(C) {
       paddingBottom: 40,
     },
     heroCircle: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
+      width: 64,
+      height: 64,
+      borderRadius: 16,
+      borderWidth: 1,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -250,7 +251,8 @@ function makeStyles(C) {
     statIcon: {
       width: 44,
       height: 44,
-      borderRadius: 14,
+      borderRadius: 12,
+      borderWidth: 1,
       alignItems: "center",
       justifyContent: "center",
     },

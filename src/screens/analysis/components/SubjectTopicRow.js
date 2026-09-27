@@ -55,7 +55,7 @@ export const SubjectTopicRow = React.memo(function SubjectTopicRow({
             },
           ]}
         >
-          {isDone ? <Icon name="check" size={12} color={C.accentInk} sw={2.5} /> : null}
+          {isDone ? <Icon name="check" size={12} color={C.accentInk} sw={1.5} /> : null}
         </View>
       </Press>
 

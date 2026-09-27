@@ -34,7 +34,7 @@ export function HomeCTAButton({ title, subtitle, onPress }) {
         ) : null}
       </View>
       <View style={[s.arrow, { backgroundColor: alpha("#FFFFFF", 16) }]}>
-        <Icon name="chevR" size={14} color="#FFFFFF" sw={2.2} />
+        <Icon name="chevR" size={14} color="#FFFFFF" sw={1.5} />
       </View>
     </Pressable>
   );

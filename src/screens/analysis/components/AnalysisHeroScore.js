@@ -47,7 +47,7 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [] })
       <View style={s.scoreRow}>
         <Text style={[s.bigScore, { color: C.text }]}>{netText}</Text>
         <View style={s.deltaBadge}>
-          <Icon name={isUp ? "trendUp" : "trendDown"} size={14} color={deltaColor} sw={2.2} />
+          <Icon name={isUp ? "trendUp" : "trendDown"} size={14} color={deltaColor} sw={1.5} />
           <Text style={[s.deltaText, { color: deltaColor }]}>{formatDelta(trendVal).replace("+", "")}</Text>
         </View>
       </View>

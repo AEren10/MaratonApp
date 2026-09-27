@@ -15,11 +15,11 @@ export function SummaryRouteImpact({ impact }) {
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ROTAYA ETKİSİ</Text>
 
         <View style={styles.progressRow}>
-          <StatBlock size="value" value={`${impact.progressPct}%`} label="ROTA İLERLEMESİ" color={C.up} />
+          <StatBlock size="value" value={`${impact.progressPct}%`} label="ROTA İLERLEMESİ" color={C.text} />
         </View>
 
         <View style={[styles.track, { backgroundColor: C.track }]}>
-          <View style={[styles.fill, { width: `${impact.progressPct}%`, backgroundColor: C.up }]} />
+          <View style={[styles.fill, { width: `${impact.progressPct}%`, backgroundColor: C.text }]} />
         </View>
 
         {impact.remainingQuestions != null ? (

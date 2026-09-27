@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { SectionLabel, Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { alpha } from "../../../themes/palette";
 
 const SubtopicRow = React.memo(function SubtopicRow({ item, color }) {
   const C = useC();
@@ -10,14 +11,14 @@ const SubtopicRow = React.memo(function SubtopicRow({ item, color }) {
     <View
       style={[
         s.row,
-        { backgroundColor: item.done ? color + "14" : C.surface, borderColor: item.done ? color + "20" : C.border },
+        { backgroundColor: item.done ? alpha(color, 8) : C.surface, borderColor: item.done ? alpha(color, 18) : C.border },
       ]}
     >
       <Icon
         name={item.done ? "checkCircle" : "circle"}
         size={20}
-        color={item.done ? color : C.muted}
-        sw={item.done ? 2.5 : 1.8}
+        color={item.done ? C.text2 : C.text3}
+        sw={item.done ? 2 : 1.5}
       />
       <Text
         style={[

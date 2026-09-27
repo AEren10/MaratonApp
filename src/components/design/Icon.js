@@ -417,7 +417,7 @@ const ICONS = {
   ),
 };
 
-export function Icon({ name, size = 20, color = "#FFFFFF", sw = 2, fill = "none" }) {
+export function Icon({ name, size = 20, color = "#FFFFFF", sw = 1.5, fill = "none" }) {
   const path = ICONS[name];
   if (!path) return null;
   return (

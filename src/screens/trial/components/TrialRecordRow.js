@@ -5,6 +5,7 @@ import { Icon } from "../../../components/design";
 import { getSubjectBadge } from "../../../themes/subjects";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { Press } from "../../../components/design/Press";
+import { alpha } from "../../../themes/palette";
 
 function rowBadge(item, C) {
   if (item.trial?.trialType === "BRANCH") {
@@ -12,15 +13,15 @@ function rowBadge(item, C) {
     return {
       label: getSubjectBadge(item.trial.branchSubjectName || item.trial.branchSubject) || "BR",
       color,
-      backgroundColor: `${color}20`,
-      borderColor: `${color}60`,
+      backgroundColor: alpha(color, 12),
+      borderColor: alpha(color, 35),
     };
   }
   return {
     label: item.badge,
     color: C.accentBright,
     backgroundColor: C.brandTint,
-    borderColor: C.bandEdge || `${C.accent}4D`,
+    borderColor: C.bandEdge || alpha(C.accent, 30),
   };
 }
 

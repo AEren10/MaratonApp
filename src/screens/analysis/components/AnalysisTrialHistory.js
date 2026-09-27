@@ -65,7 +65,7 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
           <Text style={[s.btnTitle, { color: C.text }]}>Tüm deneme kayıtları</Text>
           <Text style={[s.btnSub, { color: C.text3 }]}>{btnSubtitle}</Text>
         </View>
-        <Icon name="chevR" size={16} color={C.accent} sw={2.2} />
+        <Icon name="chevR" size={14} color={C.accent} sw={1.5} />
       </Pressable>
     </View>
   );

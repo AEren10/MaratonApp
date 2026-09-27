@@ -80,13 +80,13 @@ export function Button({
         <ActivityIndicator size="small" color={v.text} />
       ) : (
         <>
-          {icon && <Icon name={icon} size={s.iconSize} color={v.text} sw={2.5} />}
+          {icon && <Icon name={icon} size={s.iconSize} color={v.text} sw={1.5} />}
           {label ? (
             <Text style={[styles.label, { color: v.text, fontSize: s.fontSize }]}>
               {label}
             </Text>
           ) : null}
-          {iconRight && <Icon name={iconRight} size={s.iconSize} color={v.text} sw={2.5} />}
+          {iconRight && <Icon name={iconRight} size={s.iconSize} color={v.text} sw={1.5} />}
         </>
       )}
     </ReanimatedPressable>

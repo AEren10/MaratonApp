@@ -1,6 +1,7 @@
 import { Text } from "react-native";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { Press } from "../../../components/design/Press";
+import { alpha } from "../../../themes/palette";
 
 const SUBJECT_LABELS = {
   turkce: "Türkçe", matematik: "Matematik", fizik: "Fizik", kimya: "Kimya",
@@ -22,16 +23,16 @@ export function FilterPill({ label, count, active, color, onPress }) {
         paddingHorizontal: 12,
         paddingVertical: 7,
         borderRadius: 999,
-        backgroundColor: active ? color + "1A" : "transparent",
+        backgroundColor: active ? alpha(color, 12) : "transparent",
         borderWidth: 1,
-        borderColor: active ? color : color + "30",
+        borderColor: active ? color : alpha(color, 25),
       }}
     >
       <Text style={{ fontFamily: active ? "Archivo_600" : "Archivo_500", fontSize: 12, color }}>
         {label}
       </Text>
       {count != null && count > 0 ? (
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: color + "99" }}>
+        <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: alpha(color, 65) }}>
           {count}
         </Text>
       ) : null}

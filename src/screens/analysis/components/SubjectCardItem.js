@@ -38,7 +38,7 @@ export function SubjectCardItem({ C, card, onPress }) {
         <Text style={[s.net, { color: C.text }]}>{formatNum(card.net)}</Text>
         {hasTrend ? (
           <View style={[s.badge, { backgroundColor: C.void }]}>
-            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={2.2} />
+            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={1.5} />
             <Text style={[s.badgeText, { color: dc }]}>{formatDelta(card.delta)}</Text>
           </View>
         ) : null}

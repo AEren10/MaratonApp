@@ -35,7 +35,7 @@ export function ReviewLadder({ item }) {
                       : { borderWidth: 2, borderColor: isNext ? C.accent : C.track },
                   ]}
                 >
-                  {done ? <Icon name="check" size={11} color={C.bg} sw={2.4} /> : null}
+                  {done ? <Icon name="check" size={11} color={C.bg} sw={1.5} /> : null}
                 </View>
                 <Text style={[TYPOGRAPHY.micro, { color: isNext ? C.accentBright : done ? C.text2 : C.text3 }]}>
                   {day}. gün

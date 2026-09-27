@@ -14,10 +14,11 @@ import { FilterPill, SubjectFilterPill } from "./FilterPills";
 import { SwipeableWrongCard } from "./SwipeableWrongCard";
 import { WrongNotebookSkeleton } from "./WrongNotebookSkeleton";
 import { Press } from "../../../components/design/Press";
+import { alpha } from "../../../themes/palette";
 
 const STATUS_TABS = [
   { key: WRONG_NOTEBOOK_STATUS.OPEN, getLabel: (counts) => `Çözülmemiş · ${counts.open}`, colorKey: "accent" },
-  { key: WRONG_NOTEBOOK_STATUS.RESOLVED, getLabel: (counts) => `Çözüldü · ${counts.total - counts.open}`, colorKey: "success" },
+  { key: WRONG_NOTEBOOK_STATUS.RESOLVED, getLabel: (counts) => `Çözüldü · ${counts.total - counts.open}`, colorKey: "text2" },
   { key: WRONG_NOTEBOOK_STATUS.ALL, getLabel: () => "Tümü", colorKey: "text" },
 ];
 
@@ -53,11 +54,11 @@ export function WrongNotebookMineTab({
             gap: STEP.s2,
             marginHorizontal: GUTTER,
             marginBottom: STEP.s2,
-            backgroundColor: C.accent + "12",
+            backgroundColor: alpha(C.accent, 8),
             borderRadius: SHAPE.cardTight,
             padding: STEP.s3,
             borderWidth: 1,
-            borderColor: C.accent + "25"
+            borderColor: alpha(C.accent, 20),
           }}
         >
           <Icon name="globe" size={18} color={C.accent} />
@@ -82,8 +83,8 @@ export function WrongNotebookMineTab({
               style={[
                 styles.statusChip,
                 {
-                  backgroundColor: active ? color + "18" : "transparent",
-                  borderColor: active ? color + "40" : C.border,
+                  backgroundColor: active ? alpha(color, 12) : "transparent",
+                  borderColor: active ? alpha(color, 30) : C.border,
                 },
               ]}
             >

@@ -39,7 +39,7 @@ export const WeakAreaRow = React.memo(function WeakAreaRow({ item, C, onPress })
         </View>
       </View>
       <Text style={[TYPOGRAPHY.micro, { color: badgeColor }]}>{item.acc}%</Text>
-      <Icon name="arrowR" size={12} color={C.text3} sw={2} />
+      <Icon name="arrowR" size={14} color={C.text3} sw={1.5} />
     </Press>
   );
 });

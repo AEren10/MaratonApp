@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 
 import { STEP, GUTTER } from "../../../themes/tokens";
+import { alpha } from "../../../themes/palette";
 
 export function SubjectTopicCard({ C, subject, topic, stopLabel }) {
   const subjectName = subject?.label || subject?.name || "";
@@ -13,7 +14,7 @@ export function SubjectTopicCard({ C, subject, topic, stopLabel }) {
   return (
     <View style={s.wrap}>
       <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <View style={[s.jewelBox, { backgroundColor: subColor + "18", borderColor: subColor + "35" }]}>
+        <View style={[s.jewelBox, { backgroundColor: alpha(subColor, 12), borderColor: alpha(subColor, 24) }]}>
           <View style={[s.jewelDot, { backgroundColor: subColor }]} />
         </View>
         <View style={s.content}>

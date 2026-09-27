@@ -16,7 +16,7 @@ export const AccessEndedFreeList = React.memo(function AccessEndedFreeList() {
       <View style={styles.list}>
         {A.free.map((line) => (
           <View key={line} style={[styles.row, { borderTopColor: C.line }]}>
-            <Icon name="check" size={14} color={C.up} sw={2.2} />
+            <Icon name="check" size={14} color={C.up} sw={1.5} />
             <Text style={[TYPOGRAPHY.captionMedium, styles.text, { color: C.text2 }]}>{line}</Text>
           </View>
         ))}
