@@ -18,7 +18,6 @@ export const SCREENS = {
   // Main Tabs
   HOME: "Home",
   HOME_ROOT: "HomeRoot",
-  DAILY_PLAN: "DailyPlan",
   STUDY_LOG: "StudyLog",
   ANALYSIS: "Analysis",
   ANALYSIS_ROOT: "AnalysisRoot",
@@ -70,7 +69,6 @@ export const SCREENS = {
   REVIEW_DONE: "ReviewDone",
 
   // Calendar
-  CALENDAR: "Calendar",
 
   // Goals
   GOALS: "Goals",
@@ -113,9 +111,7 @@ export const SCREENS = {
   // AKIS 7 · Program ve plan
   CURRICULUM_MAP: "CurriculumMap",
   CURRICULUM_MAP_ROOT: "CurriculumMapRoot",
-  WEEK_PROGRAM: "WeekProgram",
   CLASS_SCHEDULE: "ClassSchedule",
-  MONTH_PLAN: "MonthPlan",
   GAP_CLOSURE: "GapClosure",
   SEARCH: "Search",
   DOCUMENT: "Document",

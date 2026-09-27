@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../constants/screens";
 import { TAB_KEYS } from "../navigation/tabAssignment";
 import { openInTab } from "../navigation/tabJump";
+import { openProgram as openProgramTab, PROGRAM_VIEWS } from "../navigation/openProgram";
 import { usePremium } from "../contexts/PremiumContext";
 import { buildPlanVsActual } from "../domain/route/planVsActual";
 import { flattenRouteStops, routeProgressSegments, routeStopCounts } from "../domain/route/routeOverview";
@@ -42,8 +43,8 @@ export function useRouteFull() {
     weekStops: currentWeek?.stops?.length ?? null,
     promiseGap: promise.hasData ? promise.gap : null,
     goBack: () => navigation.goBack(),
-    openCurriculum: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP),
-    openProgram: () => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.WEEK_PROGRAM),
+    openCurriculum: () => openProgramTab(navigation, PROGRAM_VIEWS.CURRICULUM),
+    openProgram: () => openProgramTab(navigation),
     openDebt: () => navigation.navigate(SCREENS.TOPIC_DEBT),
     openPromise: () => navigation.navigate(SCREENS.PLAN_VS_ACTUAL),
     openRedraw: () => navigation.navigate(SCREENS.ROUTE_REDRAW),

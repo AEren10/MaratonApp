@@ -10,7 +10,6 @@ import {
 } from "./screenOptions";
 
 import HomeScreen from "../screens/home/HomeScreen";
-import DerslerScreen from "../screens/dersler/DerslerScreen";
 import AnalysisScreen from "../screens/analysis/AnalysisScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import LeagueScreen from "../screens/league/LeagueScreen";
@@ -46,10 +45,8 @@ import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
 import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
 import GapClosureScreen from "../screens/plan/GapClosureScreen";
-import CurriculumMapScreen from "../screens/roadmap/CurriculumMapScreen";
-import WeekProgramScreen from "../screens/program/WeekProgramScreen";
+import ProgramScreen from "../screens/program/ProgramScreen";
 import ClassScheduleScreen from "../screens/program/ClassScheduleScreen";
-import MonthPlanScreen from "../screens/program/MonthPlanScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
@@ -67,7 +64,6 @@ import SubjectListScreen from "../screens/analysis/SubjectListScreen";
 import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
-import CalendarScreen from "../screens/calendar/CalendarScreen";
 
 const AppearanceScreen = React.lazy(() => import("../screens/settings/AppearanceScreen"));
 const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
@@ -117,7 +113,7 @@ const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(C
 
 export const TAB_SCREENS = [
   screen(SCREENS.HOME, HomeScreen),
-  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
+  screen(SCREENS.CURRICULUM_MAP, ProgramScreen),
   screen(SCREENS.ANALYSIS, AnalysisScreen),
   screen(SCREENS.PROFILE, ProfileScreen),
 ];
@@ -196,7 +192,6 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TERMS, TermsScreen),
   screen(SCREENS.ABOUT, AboutScreen),
   screen(SCREENS.LEAGUE, LeagueScreen),
-  screen(SCREENS.CALENDAR, CalendarScreen),
   screen(SCREENS.GOALS, GoalsScreen),
   screen(SCREENS.FRIENDS, FriendsScreen),
   screen(SCREENS.RANK_SIMULATOR, RankSimulatorScreen),
@@ -216,10 +211,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
   screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
   screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
-  screen(SCREENS.DAILY_PLAN, DerslerScreen),
-  screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
-  screen(SCREENS.MONTH_PLAN, MonthPlanScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),

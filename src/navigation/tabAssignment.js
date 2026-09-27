@@ -45,8 +45,6 @@ export const ROTA_STACK = [
   SCREENS.WEEKLY_REVIEW,    // eski rota: SummaryScreen week (bildirim/derin baglanti)
   SCREENS.WEEKLY_TRIAL_REVIEW,
   SCREENS.HOW_IT_WORKS,     // (paylasimli)
-  SCREENS.CALENDAR,         // Takvim
-  SCREENS.MONTH_PLAN,       // Takvim -> Aylik Plan
   SCREENS.WRONG_NOTEBOOK,   // Defter (Home Defter karti)
   SCREENS.WRONG_DETAIL,     // Soru detayi
   SCREENS.REVIEW_SESSION,   // Tekrar baslat
@@ -59,16 +57,13 @@ export const ROTA_STACK = [
 ];
 
 export const PROGRAM_STACK = [
-  SCREENS.DAILY_PLAN,       // Program Hub: Hafta (Programim 2. sayfa)
+  SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
   SCREENS.ROADMAP,          // Rota Detay (paylasimli)
   SCREENS.ROUTE_FULL,       // Rotanin tamami (paylasimli)
   SCREENS.ROUTE_STOP_DETAIL,// Durak Detayi (paylasimli)
-  SCREENS.WEEK_PROGRAM,     // Program: gunun duraklari
-  SCREENS.MONTH_PLAN,       // Aylik Plan
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
   SCREENS.GAP_CLOSURE,      // (paylasimli)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
-  SCREENS.CALENDAR,         // Takvim ve Seri · Takvim
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari (ANALIZ'de de var)
   SCREENS.TOPIC_DEBT,       // Konu Borcu

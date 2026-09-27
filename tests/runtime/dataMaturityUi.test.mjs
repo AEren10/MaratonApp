@@ -11,11 +11,12 @@ test("analysis empty state does not manufacture a zero-net trial", () => {
 });
 
 test("weekly program summary does not fall back to mock time or stop counts", () => {
-  const card = read("src/screens/dersler/components/WeekProgressCard.js");
-  assert.doesNotMatch(card, /8 sa 40 dk/);
-  assert.doesNotMatch(card, /13 sa planlı/);
-  assert.doesNotMatch(card, /:\s*12\b/);
-  assert.match(card, /Henüz çalışma yok/);
+  // Eski "BU HAFTA" karti kalkti; ozet artik Program > Hafta'da tek satir.
+  const view = read("src/screens/program/views/ProgramWeekView.js");
+  assert.doesNotMatch(view, /8 sa 40 dk/);
+  assert.doesNotMatch(view, /13 sa planlı/);
+  assert.match(view, /if \(totalMinutes > 0\)/);
+  assert.match(view, /if \(totalQuestions > 0\)/);
 });
 
 test("profile hides zero-dashboard stats until real activity exists", () => {

@@ -8,6 +8,7 @@ import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/desig
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { openProgram } from "../../navigation/openProgram";
 import { usePlanVsActual } from "../../hooks/usePlanVsActual";
 import { PlanVsActualChart } from "./components/PlanVsActualChart";
 import { Press } from "../../components/design/Press";
@@ -45,7 +46,7 @@ export default function PlanVsActualScreen() {
 
   const handleBack = () => {
     if (navigation.canGoBack()) navigation.goBack();
-    else navigation.navigate(SCREENS.DAILY_PLAN);
+    else openProgram(navigation);
   };
 
   return (

@@ -36,7 +36,6 @@ export const ROUTE_CONFIGS = {
   [SCREENS.ROUTE_STOP_DETAIL]: { path: "rota/durak", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
   [SCREENS.ROUTE_PAUSE]: { path: "rota/ara-ver", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
   [SCREENS.ROUTE_REDRAW]: { path: "rota/yeniden-ciz", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
-  [SCREENS.CALENDAR]: { path: "takvim", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.GOALS]: { path: "hedefler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
 
   [SCREENS.ADD_STUDY]: { path: "calisma/kaydet", flow: PRODUCT_FLOW_IDS.QUICK_ENTRY, deepLink: true },
@@ -65,10 +64,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SEARCH]: { path: "ara", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.PLAN_VS_ACTUAL]: { path: "program/plan-gercek", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
-  [SCREENS.DAILY_PLAN]: { path: "program/dersler", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
-  [SCREENS.WEEK_PROGRAM]: { path: "program/hafta", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.CLASS_SCHEDULE]: { path: "program/ders-programi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
-  [SCREENS.MONTH_PLAN]: { path: "program/ay", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.GAP_CLOSURE]: { path: "program/bosluk-kapat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.COMPARATIVE]: { path: "karsilastirmali-analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.RANK_SIMULATOR]: { path: "siralama", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
@@ -209,7 +205,7 @@ export const LINKING_SCREENS = {
 
 const ROOT_ALIAS_MAP = {
   [SCREENS.HOME_ROOT]: SCREENS.HOME,
-  [SCREENS.WEEK_PROGRAM_ROOT]: SCREENS.WEEK_PROGRAM,
+  [SCREENS.CURRICULUM_MAP_ROOT]: SCREENS.CURRICULUM_MAP,
   [SCREENS.ANALYSIS_ROOT]: SCREENS.ANALYSIS,
   [SCREENS.PROFILE_ROOT]: SCREENS.PROFILE,
 };

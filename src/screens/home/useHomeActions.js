@@ -5,6 +5,7 @@ import { trackButtonTap } from "../../lib/analytics";
 import { buildStudyTimerParams } from "../../domain/plan/studyTimerParams";
 import { openInTab } from "../../navigation/tabJump";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 
 // Ana Sayfa'nin tum cikislari. Kaldirilan eski kartlarin hedefleri tasarimdaki
 // karsiliklarina baglandi (bkz. HomeScreen basligi).
@@ -32,11 +33,11 @@ export function useHomeActions({ navigation, go }) {
     startTask,
     subjectDetail,
     profile: go(SCREENS.PROFILE),
-    calendar: go(SCREENS.CALENDAR),
+    calendar: () => openProgram(navigation, PROGRAM_VIEWS.MONTH),
     route: go(SCREENS.ROADMAP),
     fullRoute: go(SCREENS.ROUTE_FULL),
     redrawRoute: go(SCREENS.ROUTE_REDRAW),
-    plan: go(SCREENS.PLAN_DETAIL),
+    plan: () => openProgram(navigation),
     analysis: go(SCREENS.ANALYSIS),
     // Haftalik grafige dokununca: haftanin RAPORU degil, o gunlerin
     // KAYITLARI. Grafik zaten toplamlari gosteriyor; rapora gitmek yandan

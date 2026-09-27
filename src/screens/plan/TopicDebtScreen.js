@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 import { SCREENS } from "../../constants/screens";
+import { openProgram } from "../../navigation/openProgram";
 import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -53,7 +54,7 @@ export default function TopicDebtScreen() {
             title="Konu borcun yok."
             body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
             primary="Günün Planına Dön"
-            onPrimary={() => navigation.navigate(SCREENS.DAILY_PLAN)}
+            onPrimary={() => openProgram(navigation)}
           />
         </View>
       ) : (

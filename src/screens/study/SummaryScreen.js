@@ -14,6 +14,7 @@ import { useRoadmapNextAction } from "../roadmap/useRoadmapNextAction";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { SHARE_CARD_IDS } from "../../domain/share/shareCards";
 import { normalizePeriod } from "../../domain/summary/periodRange";
 import { STEP, GUTTER, SHAPE } from "../../themes/tokens";
@@ -50,7 +51,7 @@ function SummaryScreenInner() {
   }, [navigation]);
 
   const handlePrimary = useCallback(() => {
-    if (period === "month") openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.MONTH_PLAN, { monthOffset: 1 });
+    if (period === "month") openProgram(navigation, PROGRAM_VIEWS.MONTH);
     else navigation.navigate(SCREENS.ROADMAP);
   }, [navigation, period]);
 
