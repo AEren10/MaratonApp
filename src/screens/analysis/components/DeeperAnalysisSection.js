@@ -27,8 +27,11 @@ export function DeeperAnalysisSection({ C, onYanlisDefteri, onKonuIlerlemesi, on
       onPress: onNetTahmini,
     },
     {
-      name: "Yayın karşılaştırması",
-      note: "Zor yayınlarda net düşüşün normal mi, panik mi?",
+      // Bu satir ComparativeScreen'e gider: donem karsilastirmasi (bu donem
+      // vs onceki, en iyi netler, tutarlilik). Yayin karsilastirmasi degil;
+      // o, Analiz'in kendi kartinda.
+      name: "Dönem karşılaştırması",
+      note: "Bu dönem öncekine göre nasıl, en iyi netlerin, tutarlılık",
       onPress: onYayinKarsilastirmasi,
     },
     {
