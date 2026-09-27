@@ -42,7 +42,7 @@ export function HomeGroupCard({ groupsData, onPress }) {
         </Text>
 
         <View style={[s.cta, { backgroundColor: C.accent }]}>
-          <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
+          <Icon name="plus" size={16} color={C.accentInk} sw={1.5} />
           <Text style={[TYPOGRAPHY.button, s.ctaText, { color: C.accentInk }]}>Grup kur / katıl</Text>
         </View>
       </Press>

@@ -17,7 +17,7 @@ export function AnalysisHeader({ C, onAddTrial }) {
             { backgroundColor: pressed ? C.accentPress || C.accent : C.accent },
           ]}
         >
-          <Icon name="plus" size={13} color={C.accentInk} sw={2.5} />
+          <Icon name="plus" size={13} color={C.accentInk} sw={1.5} />
           <Text style={[s.btnText, { color: C.accentInk }]}>Deneme gir</Text>
         </Pressable>
       ) : null}

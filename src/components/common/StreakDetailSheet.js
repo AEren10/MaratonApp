@@ -50,7 +50,7 @@ function StreakCalendar({ lastStudyDate, streak, C }) {
                 : { backgroundColor: C.surface2, borderWidth: 1, borderColor: C.border },
               isToday && !active && { borderColor: C.orange, borderWidth: 2 },
             ]}>
-              {active && <Icon name="check" size={12} color={C.textOnFill} sw={3} />}
+              {active && <Icon name="check" size={12} color={C.textOnFill} sw={1.5} />}
             </View>
           </View>
         );
@@ -95,7 +95,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
               style={s.heroBg}
             />
             <View style={[s.flameCircle, { backgroundColor: streak > 0 ? C.orange + "1A" : C.surface2 }]}>
-              <Icon name="flame" size={36} color={streak > 0 ? C.orange : C.muted} sw={2.4} />
+              <Icon name="flame" size={36} color={streak > 0 ? C.orange : C.muted} sw={1.5} />
             </View>
             <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{streak}</Text>
             <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec }]}>

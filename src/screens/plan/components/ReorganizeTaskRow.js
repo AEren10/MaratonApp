@@ -78,7 +78,7 @@ export function ReorganizeTaskRow({
         </View>
       ) : (
         <View style={[s.donePill, { backgroundColor: alpha(C.text2, 12) }]}>
-          <Icon name="check" size={12} color={C.text2} sw={2} />
+          <Icon name="check" size={12} color={C.text2} sw={1.5} />
         </View>
       )}
     </View>

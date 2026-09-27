@@ -20,7 +20,7 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
           }
         ]}
       >
-        <Icon name="x" size={18} color={C.text2} sw={2} />
+        <Icon name="x" size={18} color={C.text2} sw={1.5} />
       </Press>
 
       <View style={[s.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
@@ -50,7 +50,7 @@ export function StudyTimerHeader({ C, eyebrow, eyebrowColor, onBack, onHistory }
           }
         ]}
       >
-        <Icon name="clock" size={20} color={C.text2} sw={2} />
+        <Icon name="clock" size={20} color={C.text2} sw={1.5} />
       </Press>
     </View>
   );

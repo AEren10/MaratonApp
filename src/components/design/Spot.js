@@ -34,7 +34,7 @@ export function Spot({ name = "empty", size = 120, icon, color }) {
         <Circle cx={size * 0.80} cy={size * 0.74} r={size * 0.03} fill={hue} opacity={0.5} />
         <Path d={`M${size * 0.2} ${size * 0.72} l${size * 0.05} 0`} stroke={hue} strokeWidth={size * 0.02} strokeLinecap="round" opacity={0.4} />
       </Svg>
-      <Icon name={glyph} size={size * 0.34} color={hue} sw={2.2} />
+      <Icon name={glyph} size={size * 0.34} color={hue} sw={1.5} />
     </View>
   );
 }

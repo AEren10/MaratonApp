@@ -129,14 +129,14 @@ export default function FriendsScreen() {
                       user={r.requester}
                       action={
                         <View style={{ flexDirection: "row", gap: 6 }}>
-                          <Pressable onPress={() => respond(r.id, true)} style={[s.actionBtn, { backgroundColor: C.green + "20" }]}>
-                            <Icon name="check" size={14} color={C.green} />
+                          <Pressable onPress={() => respond(r.id, true)} style={s.actionBtn}>
+                            <Icon name="check" size={14} color={C.text} />
                           </Pressable>
-                          <Pressable onPress={() => respond(r.id, false)} style={[s.actionBtn, { backgroundColor: C.red + "20" }]}>
-                            <Icon name="x" size={14} color={C.red} />
+                          <Pressable onPress={() => respond(r.id, false)} style={s.actionBtn}>
+                            <Icon name="x" size={14} color={C.text3} />
                           </Pressable>
-                          <Pressable onPress={() => block(r.requester)} style={[s.actionBtn, { backgroundColor: C.muted + "15" }]} accessibilityLabel="Engelle">
-                            <Icon name="shield" size={14} color={C.muted} />
+                          <Pressable onPress={() => block(r.requester)} style={s.actionBtn} accessibilityLabel="Engelle">
+                            <Icon name="shield" size={14} color={C.text3} />
                           </Pressable>
                         </View>
                       }
@@ -155,9 +155,9 @@ export default function FriendsScreen() {
                       key={o.id}
                       user={o.addressee}
                       action={
-                        <Pressable onPress={() => cancelOutgoing(o.id)} style={[s.actionBtn, { backgroundColor: C.red + "15" }]}>
-                          <Icon name="x" size={14} color={C.red} />
-                          <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>İptal</Text>
+                        <Pressable onPress={() => cancelOutgoing(o.id)} style={s.actionBtn}>
+                          <Icon name="x" size={14} color={C.text3} />
+                          <Text style={{ ...TYPOGRAPHY.micro, color: C.text3 }}>İptal</Text>
                         </Pressable>
                       }
                     />
@@ -277,26 +277,30 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: C.accent + "15",
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 8,
   },
   challengeBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.md,
     padding: SPACING.lg,
-    backgroundColor: C.accent + "0A",
+    backgroundColor: C.surface,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: C.accent + "20",
+    borderColor: C.border,
   },
   challengeIcon: {
     width: 44,
     height: 44,
-    borderRadius: 14,
-    backgroundColor: C.accent + "18",
+    borderRadius: 12,
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
     alignItems: "center",
     justifyContent: "center",
   },

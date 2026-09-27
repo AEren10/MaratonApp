@@ -45,7 +45,7 @@ export function LockedValue({
         {value}
       </Text>
       {showLock ? (
-        <Icon name="lock" size={iconSize} color={C.text3} sw={2} />
+        <Icon name="lock" size={iconSize} color={C.text3} sw={1.5} />
       ) : null}
     </View>
   );

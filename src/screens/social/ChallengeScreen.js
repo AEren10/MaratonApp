@@ -259,13 +259,13 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
 
         {isPendingForMe && (
           <View style={{ flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.md }}>
-            <Pressable onPress={() => handleRespond(item.id, true)} style={[s.respondBtn, { backgroundColor: C.green + "18" }]}>
-              <Icon name="check" size={14} color={C.green} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.green }}>Kabul Et</Text>
+            <Pressable onPress={() => handleRespond(item.id, true)} style={[s.respondBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+              <Icon name="check" size={14} color={C.text} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text }}>Kabul et</Text>
             </Pressable>
-            <Pressable onPress={() => handleRespond(item.id, false)} style={[s.respondBtn, { backgroundColor: C.red + "18" }]}>
-              <Icon name="x" size={14} color={C.red} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Reddet</Text>
+            <Pressable onPress={() => handleRespond(item.id, false)} style={[s.respondBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+              <Icon name="x" size={14} color={C.text3} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.text3 }}>Reddet</Text>
             </Pressable>
           </View>
         )}

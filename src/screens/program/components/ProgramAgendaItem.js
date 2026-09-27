@@ -28,7 +28,7 @@ function ProgramAgendaItem({ item }) {
       </View>
       {item.done ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <Icon name="check" size={12} color={C.text2} sw={2} />
+          <Icon name="check" size={12} color={C.text2} sw={1.5} />
           <Text style={[TYPOGRAPHY.tableHead, s.meta, { color: C.text2 }]}>
             Bitti
           </Text>

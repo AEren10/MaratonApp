@@ -35,7 +35,7 @@ export const SearchField = React.memo(function SearchField({
             accessibilityLabel="Aramayı temizle"
             style={[styles.clear, { backgroundColor: C.elev }]}
           >
-            <Icon name="x" size={9} color={C.text3} sw={2} />
+            <Icon name="x" size={9} color={C.text3} sw={1.5} />
           </Press>
         ) : null}
       </View>

@@ -22,11 +22,11 @@ export function TrialCountStepper({ label, value, max, warn, onChangeText, onSte
         }]} />
       <Press haptic="none" onPress={() => onStep(-1)} disabled={count <= 0} style={styles.step}
         accessibilityRole="button" accessibilityLabel={`${label} bir azalt`}>
-        <Icon name="minus" size={14} color={C.text3} sw={2} />
+        <Icon name="minus" size={14} color={C.text3} sw={1.5} />
       </Press>
       <Press haptic="none" onPress={() => onStep(1)} disabled={count >= max} style={[styles.step, { backgroundColor: C.elev }]}
         accessibilityRole="button" accessibilityLabel={`${label} bir artır`}>
-        <Icon name="plus" size={14} color={C.text} sw={2} />
+        <Icon name="plus" size={14} color={C.text} sw={1.5} />
       </Press>
     </View>
   );

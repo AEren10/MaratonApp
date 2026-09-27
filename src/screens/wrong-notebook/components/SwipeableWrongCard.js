@@ -44,7 +44,7 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
         onPress={handleResolve}
         style={{ ...actionStyle, backgroundColor: C.up, marginLeft: 8 }}
       >
-        <Icon name="check" size={24} color={C.accentInk} sw={2.5} />
+        <Icon name="check" size={24} color={C.accentInk} sw={1.5} />
         <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Çözdüm</Text>
       </Press>
     );
@@ -60,7 +60,7 @@ export const SwipeableWrongCard = React.memo(function SwipeableWrongCard({ item,
         onPress={handleDelete}
         style={{ ...actionStyle, backgroundColor: C.red, marginRight: 8 }}
       >
-        <Icon name="trash" size={24} color={C.accentInk} sw={2} />
+        <Icon name="trash" size={24} color={C.accentInk} sw={1.5} />
         <Text style={{ ...TYPOGRAPHY.micro, color: C.accentInk, marginTop: 4 }}>Sil</Text>
       </Press>
     );

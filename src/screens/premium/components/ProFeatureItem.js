@@ -13,7 +13,7 @@ export const ProFeatureItem = React.memo(function ProFeatureItem({ name, desc })
   return (
     <View style={[styles.row, { borderTopColor: C.line }]}>
       <View style={styles.icon}>
-        <Icon name="check" size={16} color={C.up} sw={2} />
+        <Icon name="check" size={16} color={C.up} sw={1.5} />
       </View>
       <View style={styles.body}>
         <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{name}</Text>

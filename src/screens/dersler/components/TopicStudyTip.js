@@ -33,7 +33,7 @@ export function TopicStudyTip({ mastery, q, studyCount, color }) {
         borderColor: alpha(tipColor, 20),
       }}
     >
-      <Icon name={tip.icon} size={18} color={tipColor} sw={2} />
+      <Icon name={tip.icon} size={18} color={tipColor} sw={1.5} />
       <Text style={[TYPOGRAPHY.caption, { color: C.text, flex: 1 }]}>{tip.text}</Text>
     </View>
   );

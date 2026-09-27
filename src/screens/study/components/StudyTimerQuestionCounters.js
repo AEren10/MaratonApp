@@ -23,7 +23,7 @@ function StepBtn({ C, icon, onPress, disabled }) {
         opacity: disabled ? 0.4 : 1,
       }}
     >
-      <Icon name={icon} size={14} color={C.text2} sw={2} />
+      <Icon name={icon} size={14} color={C.text2} sw={1.5} />
     </Press>
   );
 }

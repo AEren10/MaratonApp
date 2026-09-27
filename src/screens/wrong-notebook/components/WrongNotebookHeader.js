@@ -32,12 +32,12 @@ export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
         style={[
           styles.addBtn,
           {
-            backgroundColor: C.orange,
-            shadowColor: C.orange
+            backgroundColor: C.accent,
+            shadowColor: C.accent
           }
         ]}
       >
-        <Icon name="plus" size={22} color={C.textOnFill} sw={3} />
+        <Icon name="plus" size={20} color={C.textOnFill} sw={1.5} />
       </Press>
     </View>
   );

@@ -32,7 +32,7 @@ export function TrialSummaryTarget({ onDepartments }) {
         <Press haptic="none" onPress={onDepartments} accessibilityRole="button"
           style={[styles.button, { borderColor: C.border }]}>
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Bölümleri gör</Text>
-          <Icon name="chevR" size={11} color={C.text5} sw={2} />
+          <Icon name="chevR" size={13} color={C.text3} sw={1.5} />
         </Press>
       </View>
     </Animated.View>

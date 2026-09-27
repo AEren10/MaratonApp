@@ -25,7 +25,7 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
           <Animated.View entering={ZoomIn.delay(100).springify().damping(11)} style={s.iconWrap}>
             <View style={[s.iconGlow, { backgroundColor: color }]} />
             <View style={[s.iconCircle, { backgroundColor: color + "22" }]}>
-              <Icon name={milestone.icon || "flame"} size={44} color={color} sw={2.2} />
+              <Icon name={milestone.icon || "flame"} size={44} color={color} sw={1.5} />
             </View>
           </Animated.View>
 
