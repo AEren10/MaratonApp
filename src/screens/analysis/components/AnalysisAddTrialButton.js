@@ -1,7 +1,7 @@
 import { StyleSheet, Text } from "react-native";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
-import { CONTROL, GUTTER, STEP } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 // Analiz'in tek birincil eylemi. Basligin yaninda diger kontrollerle
 // yarisiyordu; artik ekranin sag altinda sabit, kaydirirken de erisilir.
@@ -15,7 +15,7 @@ export function AnalysisAddTrialButton({ C, onPress }) {
       style={[s.btn, { backgroundColor: C.brandFill || C.accent }]}
     >
       <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
-      <Text style={[s.text, { color: C.accentInk }]}>Deneme gir</Text>
+      <Text style={[TYPOGRAPHY.button, { color: C.accentInk }]}>Deneme gir</Text>
     </Press>
   );
 }
@@ -32,5 +32,4 @@ const s = StyleSheet.create({
     alignItems: "center",
     gap: STEP.s1,
   },
-  text: { fontFamily: "Archivo_700", fontSize: 15 },
 });

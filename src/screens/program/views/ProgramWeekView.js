@@ -6,7 +6,7 @@ import { Press } from "../../../components/design/Press";
 import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useWeekProgram } from "../../../hooks/useWeekProgram";
-import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
 import { SelectedDayPanel } from "../../dersler/components/SelectedDayPanel";
@@ -65,7 +65,7 @@ const s = StyleSheet.create({
     marginTop: STEP.s3,
     paddingTop: STEP.s2 + 2,
     borderTopWidth: 1,
-    minHeight: 44,
+    minHeight: CONTROL.tapMin,
   },
   copy: { gap: 2, flex: 1 },
 });
