@@ -4,15 +4,15 @@ import { useC } from "../../../contexts/ThemeContext";
 import { STEP, GUTTER } from "../../../themes/tokens";
 import { useRouteActivity } from "../../../hooks/useRouteActivity";
 import { RouteSvgChart } from "./RouteSvgChart";
+import SegmentTabs from "../../../components/common/SegmentTabs";
 import * as H from "../../../lib/haptics";
-import { Press } from "../../../components/design/Press";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const CHART_W = SCREEN_W - GUTTER * 2;
 const MODES = [
-  { key: "year", label: "YIL" },
-  { key: "month", label: "AY" },
-  { key: "week", label: "HAFTA" },
+  { key: "year", label: "Yıl" },
+  { key: "month", label: "Ay" },
+  { key: "week", label: "Hafta" },
 ];
 
 export function YearRouteChart() {
@@ -96,42 +96,15 @@ export function YearRouteChart() {
         })}
       </ScrollView>
 
-      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: STEP.s1, marginTop: STEP.s2 + 2 }}>
-        {MODES.map((m, i) => {
-          const active = i === activeIdx;
-          return (
-            <Press haptic="none"
-              key={m.key}
-              onPress={() => handleSelectMode(i)}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={`${m.label} rotası`}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: active ? 10 : 8,
-                paddingVertical: 3,
-                borderRadius: 10,
-                backgroundColor: active ? C.surface : "transparent",
-                borderWidth: 1,
-                borderColor: active ? C.border : "transparent",
-              }}
-            >
-              <View
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: 2.5,
-                  backgroundColor: active ? C.accent : C.text5,
-                  marginRight: 5,
-                }}
-              />
-              <Text style={{ fontFamily: "Archivo_600", fontSize: 11, color: active ? C.text : C.text3 }}>
-                {m.label}
-              </Text>
-            </Press>
-          );
-        })}
+      <View style={{ marginTop: STEP.s2 + 2 }}>
+        <SegmentTabs
+          options={MODES}
+          value={activeMode}
+          onChange={(key) => {
+            const idx = MODES.findIndex((m) => m.key === key);
+            if (idx >= 0) handleSelectMode(idx);
+          }}
+        />
       </View>
     </View>
   );

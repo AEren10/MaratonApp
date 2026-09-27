@@ -8,11 +8,11 @@ import { Press } from "../../components/design/Press";
 
 // Segment kontrolu (tasarim: Programım "Haftalık / Aylık"): surface kutu,
 // secili segment elev zemin. Segment h36, dokunma alani 44.
-function SegmentTabs({ options, value, onChange }) {
+function SegmentTabs({ options, value, onChange, style }) {
   const C = useC();
   const slop = (CONTROL.tapMin - CONTROL.segment) / 2;
   return (
-    <View style={[s.box, { backgroundColor: C.surface, borderColor: C.elev }]} accessibilityRole="tablist">
+    <View style={[s.box, { backgroundColor: C.surface, borderColor: C.elev }, style]} accessibilityRole="tablist">
       {options.map((o) => {
         const on = o.key === value;
         return (
