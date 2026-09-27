@@ -231,7 +231,7 @@ export function generateDailyPlan({
       badge = "DÜŞÜŞ VAR";
     } else if (daysSince !== null && daysSince > 14) {
       // 2 haftadan uzun süredir dokunulmamış — kritik.
-      reason = `🚨 Bu konuya ${daysSince} gündür dönmedin!`;
+      reason = `Bu konuya ${daysSince} gündür dönmedin!`;
       rkind = "red";
       tier = "critical";
       badge = "ACİL";

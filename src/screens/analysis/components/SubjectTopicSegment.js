@@ -1,8 +1,6 @@
-import React, { useCallback } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL, GUTTER } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
-import { Press } from "../../../components/design/Press";
+import { memo } from "react";
+import SegmentTabs from "../../../components/common/SegmentTabs";
+import { GUTTER, STEP } from "../../../themes/tokens";
 
 const TABS = [
   { key: "all", label: "Tümü" },
@@ -10,50 +8,15 @@ const TABS = [
   { key: "remaining", label: "Kalan" },
 ];
 
-export const SubjectTopicSegment = React.memo(function SubjectTopicSegment({ C, active, onChange }) {
-  const handlePress = useCallback(
-    (key) => { H.tap(); onChange(key); },
-    [onChange],
-  );
-
+export const SubjectTopicSegment = memo(function SubjectTopicSegment({ active, onChange }) {
   return (
-    <View style={[styles.wrap, { backgroundColor: C.surface, borderColor: C.elev }]}>
-      {TABS.map((tab) => {
-        const isActive = tab.key === active;
-        return (
-          <Press haptic="none"
-            key={tab.key}
-            onPress={() => handlePress(tab.key)}
-            style={[styles.tab, isActive && { backgroundColor: C.elev }]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: isActive }}
-            accessibilityLabel={tab.label}
-          >
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: isActive ? C.text : C.text3 }]}>
-              {tab.label}
-            </Text>
-          </Press>
-        );
-      })}
-    </View>
+    <SegmentTabs
+      options={TABS}
+      value={active}
+      onChange={onChange}
+      style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}
+    />
   );
 });
 
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    gap: 4,
-    padding: 4,
-    marginHorizontal: GUTTER,
-    marginTop: STEP.s3,
-    borderWidth: 1,
-    borderRadius: SHAPE.segment,
-  },
-  tab: {
-    flex: 1,
-    height: CONTROL.segment,
-    borderRadius: SHAPE.segment,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default SubjectTopicSegment;

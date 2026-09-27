@@ -20,7 +20,7 @@ function shortDate(date) {
 export function TrialEntryStep2({ form, styles, overflow, onNext }) {
   const C = useC();
   const typeMeta = useMemo(() => getTrialTypes(C)[form.trialType], [C, form.trialType]);
-  const headerLabel = `${typeMeta?.label || form.trialType} · ${shortDate(form.trialDate)}`.toLocaleUpperCase("tr-TR");
+  const headerLabel = `${typeMeta?.label || form.trialType} · ${shortDate(form.trialDate)}`;
   const previous = useTrialEntryPrevious({ trialType: form.trialType, branchSubject: form.branchSubject });
 
   const handleFix = useCallback((info) => {

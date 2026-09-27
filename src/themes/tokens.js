@@ -172,7 +172,7 @@ export const TYPOGRAPHY = {
     fontFamily: "Archivo_600",
     fontSize: 11.5,
     lineHeight: 15,
-    letterSpacing: 1.84,
+    letterSpacing: 0.92,
     textTransform: "uppercase",
   },
 };

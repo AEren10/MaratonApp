@@ -29,11 +29,11 @@ export const TRACKING = {
   tightest: -0.03,
   tight: -0.01,
   normal: 0,
-  wide: 0.1,
-  wider: 0.14,
-  widest: 0.16,
-  ultra: 0.2,
-  extreme: 0.22,
+  wide: 0.05,
+  wider: 0.07,
+  widest: 0.08,
+  ultra: 0.1,
+  extreme: 0.12,
 };
 
 /** em cinsinden harf aralığını px'e çevirir (RN letterSpacing px ister). */

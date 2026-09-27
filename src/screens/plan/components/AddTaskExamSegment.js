@@ -1,70 +1,21 @@
-import { View, Text, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
-import { Press } from "../../../components/design/Press";
+import { memo } from "react";
+import SegmentTabs from "../../../components/common/SegmentTabs";
+import { STEP } from "../../../themes/tokens";
 
-export function AddTaskExamSegment({ value, onChange, C }) {
-  const options = [
-    { key: "tyt", label: "TYT" },
-    { key: "ayt", label: "AYT" },
-  ];
+const OPTIONS = [
+  { key: "tyt", label: "TYT" },
+  { key: "ayt", label: "AYT" },
+];
 
+export const AddTaskExamSegment = memo(function AddTaskExamSegment({ value, onChange }) {
   return (
-    <View style={[s.wrap, { backgroundColor: C.elev, borderColor: C.line }]}>
-      {options.map((opt) => {
-        const active = value === opt.key;
-        return (
-          <Press haptic="none"
-            key={opt.key}
-            onPress={() => {
-              if (!active) {
-                H.select();
-                onChange(opt.key);
-              }
-            }}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            accessibilityLabel={opt.label}
-            style={[
-              s.tab,
-              active && [s.tabActive, { backgroundColor: C.surface, borderColor: C.line }],
-            ]}
-          >
-            <Text
-              style={[
-                TYPOGRAPHY.bodySemiBold,
-                s.label,
-                { color: active ? C.accentBright : C.text3 },
-              ]}
-            >
-              {opt.label}
-            </Text>
-          </Press>
-        );
-      })}
-    </View>
+    <SegmentTabs
+      options={OPTIONS}
+      value={value}
+      onChange={onChange}
+      style={{ marginBottom: STEP.s3 }}
+    />
   );
-}
-
-const s = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    height: 44,
-    borderRadius: SHAPE.chip,
-    borderWidth: 1,
-    padding: STEP.s1 / 2,
-    marginBottom: STEP.s3,
-  },
-  tab: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: SHAPE.chip - 2,
-  },
-  tabActive: {
-    borderWidth: 1,
-  },
-  label: {
-    letterSpacing: 0.8,
-  },
 });
+
+export default AddTaskExamSegment;

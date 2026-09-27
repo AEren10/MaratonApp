@@ -44,7 +44,7 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
             {onShare && (
               <Button onPress={onShare} variant="outline" icon="share" style={{ flex: 1 }}>Paylaş</Button>
             )}
-            <Button onPress={onDismiss} variant="primary" style={{ flex: 1 }}>Devam Et</Button>
+            <Button onPress={onDismiss} variant="primary" style={{ flex: 1 }}>Devam et</Button>
           </Animated.View>
         </Animated.View>
       </View>

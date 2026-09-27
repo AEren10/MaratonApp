@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
-import { GUTTER, SHAPE } from "../../../themes/tokens";
+import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 export function AnalysisHeader({ C, onAddTrial }) {
   return (
     <View style={s.header}>
-      <Text style={[s.title, { color: C.text }]}>Analiz</Text>
+      <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>Analiz</Text>
       {onAddTrial ? (
         <Pressable
           accessibilityRole="button"
@@ -31,7 +31,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: GUTTER,
-    paddingTop: 6,
+    paddingTop: STEP.s2,
     paddingBottom: 4,
   },
   title: {

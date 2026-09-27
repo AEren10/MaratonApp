@@ -19,7 +19,7 @@ export function ExamScreenHeader({ title, onBack, icon = "chevL", label = "Geri"
       >
         <Icon name={icon} size={icon === "x" ? 14 : 16} color={C.text2} />
       </Press>
-      {title ? <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>{title}</Text> : null}
+      {title ? <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text }]}>{title}</Text> : null}
     </View>
   );
 }
@@ -27,7 +27,7 @@ export function ExamScreenHeader({ title, onBack, icon = "chevL", label = "Geri"
 const s = StyleSheet.create({
   row: {
     flexDirection: "row", alignItems: "center", gap: STEP.s1,
-    paddingLeft: GUTTER - 12, paddingRight: GUTTER, paddingTop: 4,
+    paddingLeft: GUTTER - 12, paddingRight: GUTTER, paddingTop: STEP.s2,
   },
   back: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
   title: { flex: 1 },

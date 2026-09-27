@@ -80,12 +80,12 @@ export function getAllSubjects(C) {
 export function getTrialTypes(C) {
   C = palette(C);
   return {
-    TYT: { code: "TYT", label: "TYT Denemesi", description: "120 soru · 4 ders", icon: "bookOpen", color: C.blue, subjects: getTYTSubjects(C), totalQuestions: 120 },
-    AYT_SAY: { code: "AYT_SAY", label: "AYT Sayısal", description: "80 soru · Mat-Fizik-Kimya-Biyoloji", icon: "hash", color: C.amber, subjects: getAYTSaySubjects(C), totalQuestions: 80 },
-    AYT_EA: { code: "AYT_EA", label: "AYT Eşit Ağırlık", description: "80 soru · Mat-Ede-Tarih-Coğ", icon: "layers", color: C.purple, subjects: getAYTEASubjects(C), totalQuestions: 80 },
-    AYT_SOZ: { code: "AYT_SOZ", label: "AYT Sözel", description: "80 soru · Ede-Tarih-Coğ-Fel-Din", icon: "bookOpen", color: C.green, subjects: getAYTSozSubjects(C), totalQuestions: 80 },
-    LGS: { code: "LGS", label: "LGS Denemesi", description: "90 soru · 6 ders", icon: "shield", color: C.green, subjects: getLGSSubjects(C), totalQuestions: 90 },
-    BRANCH: { code: "BRANCH", label: "Branş Denemesi", description: "Tek derslik branş denemesi", icon: "target", color: C.teal, subjects: getAllSubjects(C), totalQuestions: null },
+    TYT: { code: "TYT", label: "TYT denemesi", description: "120 soru · 4 ders", icon: "bookOpen", color: C.blue, subjects: getTYTSubjects(C), totalQuestions: 120 },
+    AYT_SAY: { code: "AYT_SAY", label: "AYT sayısal", description: "80 soru · Mat-Fizik-Kimya-Biyoloji", icon: "hash", color: C.amber, subjects: getAYTSaySubjects(C), totalQuestions: 80 },
+    AYT_EA: { code: "AYT_EA", label: "AYT eşit ağırlık", description: "80 soru · Mat-Ede-Tarih-Coğ", icon: "layers", color: C.purple, subjects: getAYTEASubjects(C), totalQuestions: 80 },
+    AYT_SOZ: { code: "AYT_SOZ", label: "AYT sözel", description: "80 soru · Ede-Tarih-Coğ-Fel-Din", icon: "bookOpen", color: C.green, subjects: getAYTSozSubjects(C), totalQuestions: 80 },
+    LGS: { code: "LGS", label: "LGS denemesi", description: "90 soru · 6 ders", icon: "shield", color: C.green, subjects: getLGSSubjects(C), totalQuestions: 90 },
+    BRANCH: { code: "BRANCH", label: "Branş denemesi", description: "Tek derslik branş denemesi", icon: "target", color: C.teal, subjects: getAllSubjects(C), totalQuestions: null },
   };
 }
 
