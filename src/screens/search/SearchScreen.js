@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -87,10 +88,10 @@ export default function SearchScreen() {
               variant="outline"
               size="md"
               fullWidth
-              onPress={() => openHere(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}
+              onPress={() => openProgram(navigation, PROGRAM_VIEWS.CURRICULUM)}
               style={{ marginTop: STEP.s2 }}
             >
-              Tüm yol haritasına bak
+              Müfredatın tamamına bak
             </Button>
           </View>
         ) : (

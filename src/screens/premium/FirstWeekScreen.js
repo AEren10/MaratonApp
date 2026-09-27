@@ -28,7 +28,7 @@ export default function FirstWeekScreen() {
 
   const openRoute = useCallback(() => {
     H.select();
-    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA);
   }, [navigation]);
 
   const handleTaskAction = useCallback((step) => {

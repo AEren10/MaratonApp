@@ -52,14 +52,13 @@ function SummaryScreenInner() {
 
   const handlePrimary = useCallback(() => {
     if (period === "month") openProgram(navigation, PROGRAM_VIEWS.MONTH);
-    else navigation.navigate(SCREENS.ROADMAP);
+    else openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
   }, [navigation, period]);
 
   const handleShare = useCallback(() => {
     navigation.navigate(SCREENS.SHARE_CARD, SHARE_IDS[period] ? { cardId: SHARE_IDS[period] } : undefined);
   }, [navigation, period]);
 
-  const handlePromise = useCallback(() => navigation.navigate(SCREENS.PLAN_VS_ACTUAL), [navigation]);
   const handleUnlock = useCallback(() => { openMonthlyReport(); }, [openMonthlyReport]);
 
   const handleStart = useCallback(() => {
@@ -91,7 +90,7 @@ function SummaryScreenInner() {
     body = (
       <>
         {period === "day" ? <DaySummaryBody data={data} onShare={handleShare} /> : null}
-        {period === "week" ? <WeekSummaryBody data={data} onPromise={handlePromise} /> : null}
+        {period === "week" ? <WeekSummaryBody data={data} /> : null}
         {period === "month" ? <MonthSummaryBody data={data} /> : null}
         <SummaryActions
           period={period}

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { openProgram } from "../../../navigation/openProgram";
 import { useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 import { SCREENS } from "../../../constants/screens";
@@ -48,7 +49,7 @@ export function HomeCompletionOverlays({
         onExamDayPlan={daysLeft != null && daysLeft >= 0
           ? go("home_route_complete_exam_day_plan", SCREENS.EXAM_DAY_PLAN)
           : undefined}
-        onYearRoute={go("home_route_complete_roadmap", SCREENS.ROADMAP)}
+        onYearRoute={go("home_route_complete_profile", SCREENS.PROFILE)}
       />
     );
   }
@@ -58,7 +59,7 @@ export function HomeCompletionOverlays({
       <HomeWeekComplete
         week={week}
         onClose={dismiss}
-        onNextWeek={go("home_week_complete_next", SCREENS.ROADMAP)}
+        onNextWeek={() => { trackButtonTap("home_week_complete_next", { targetScreen: "Program" }); dismiss(); openProgram(navigation); }}
         onWeeklySummary={go("home_week_complete_summary", SCREENS.SUMMARY, { period: "week" })}
       />
     );

@@ -43,8 +43,6 @@ import TrialCompareScreen from "../screens/trial/TrialCompareScreen";
 
 import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
-import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
-import GapClosureScreen from "../screens/plan/GapClosureScreen";
 import ProgramScreen from "../screens/program/ProgramScreen";
 import ClassScheduleScreen from "../screens/program/ClassScheduleScreen";
 import SearchScreen from "../screens/search/SearchScreen";
@@ -83,9 +81,6 @@ const RouteCompanionScreen = React.lazy(() => import("../screens/social/RouteCom
 const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
-const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
-const RouteFullScreen = React.lazy(() => import("../screens/roadmap/RouteFullScreen"));
-const RouteStopDetailScreen = React.lazy(() => import("../screens/roadmap/RouteStopDetailScreen"));
 const RoutePauseScreen = React.lazy(() => import("../screens/roadmap/RoutePauseScreen"));
 const RouteRedrawScreen = React.lazy(() => import("../screens/roadmap/RouteRedrawScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
@@ -199,9 +194,6 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.COMPARATIVE, ComparativeScreen),
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
   screen(SCREENS.REVIEW_DONE, ReviewDoneScreen, celebrationOptions),
-  screen(SCREENS.ROADMAP, RoadmapScreen),
-  screen(SCREENS.ROUTE_FULL, RouteFullScreen),
-  screen(SCREENS.ROUTE_STOP_DETAIL, RouteStopDetailScreen),
   screen(SCREENS.ROUTE_PAUSE, RoutePauseScreen, modalOptions),
   screen(SCREENS.ROUTE_REDRAW, RouteRedrawScreen, modalOptions),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
@@ -209,8 +201,6 @@ export const APP_STACK_SCREENS = [
 
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
-  screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
-  screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),

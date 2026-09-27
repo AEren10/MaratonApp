@@ -59,10 +59,7 @@ export const SCREENS = {
 
   // Simülatör / Roadmap / SR
   RANK_SIMULATOR: "RankSimulator",
-  ROADMAP: "Roadmap",
   // Rota derinligi (AKIS 2): Rotanin tamami, Durak Detayi, Ara Verme, Rotayi Yeniden Ciz
-  ROUTE_FULL: "RouteFull",
-  ROUTE_STOP_DETAIL: "RouteStopDetail",
   ROUTE_PAUSE: "RoutePause",
   ROUTE_REDRAW: "RouteRedraw",
   REVIEW_SESSION: "ReviewSession",
@@ -107,12 +104,10 @@ export const SCREENS = {
   // User Tasks
   ADD_TASK: "AddTask",
   TOPIC_DEBT: "TopicDebt",
-  PLAN_VS_ACTUAL: "PlanVsActual",
   // AKIS 7 · Program ve plan
   CURRICULUM_MAP: "CurriculumMap",
   CURRICULUM_MAP_ROOT: "CurriculumMapRoot",
   CLASS_SCHEDULE: "ClassSchedule",
-  GAP_CLOSURE: "GapClosure",
   SEARCH: "Search",
   DOCUMENT: "Document",
   HOW_IT_WORKS: "HowItWorks",

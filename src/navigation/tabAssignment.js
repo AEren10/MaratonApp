@@ -25,14 +25,9 @@ export const TAB_KEYS = Object.freeze({
 // ROTA sekmesinin KOKU Ana Sayfa'dir (tasarimcinin kendi ifadesi).
 
 export const ROTA_STACK = [
-  SCREENS.ROADMAP,          // Rota Detay (PROGRAM'da da var; "Yol Haritası" DEGIL, o CURRICULUM_MAP)
-  SCREENS.ROUTE_FULL,       // Rotanin tamami
-  SCREENS.ROUTE_STOP_DETAIL, // Durak Detayi (tek durak)
   SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (paylasimli)
   SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
-  SCREENS.PLAN_VS_ACTUAL,   // Soz ve gercek (Rota Detay satiri; PROGRAM'da da var)
-  SCREENS.GAP_CLOSURE,      // Boslugu Kapatma Plani (Soz ve gercek butonu; PROGRAM'da da var)
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
   SCREENS.EXAM_SIMULATOR,   // Deneme Provasi
@@ -58,16 +53,11 @@ export const ROTA_STACK = [
 
 export const PROGRAM_STACK = [
   SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
-  SCREENS.ROADMAP,          // Rota Detay (paylasimli)
-  SCREENS.ROUTE_FULL,       // Rotanin tamami (paylasimli)
-  SCREENS.ROUTE_STOP_DETAIL,// Durak Detayi (paylasimli)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
-  SCREENS.GAP_CLOSURE,      // (paylasimli)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari (ANALIZ'de de var)
   SCREENS.TOPIC_DEBT,       // Konu Borcu
-  SCREENS.PLAN_VS_ACTUAL,   // Plan vs Gercek
   SCREENS.SEARCH,           // Arama (konu + yanlis defteri)
   SCREENS.COMPARATIVE,      // Plan vs Gercek
   SCREENS.WRONG_NOTEBOOK,   // Defter
