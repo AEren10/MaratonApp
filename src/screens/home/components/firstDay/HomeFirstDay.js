@@ -48,7 +48,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
           İlk durağa başla
         </Button>
         <Button variant="outline" size="md" fullWidth onPress={onViewRoute}>
-          Rotayı gözden geçir
+          Programı gör
         </Button>
         {/* Ilk Gun hero'su Home govdesinin tamamini gizliyor ve eski tek
             cikisi veri girmekti. Bu buton kapiyi aciyor: ilk duragi yapmadan
@@ -63,7 +63,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
       <Animated.View style={[s.hint, { borderColor: C.elev }]}>
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>Deneme girdikçe burada ne görünür?</Text>
         <Text style={[TYPOGRAPHY.caption, s.hintBody, { color: C.text3 }]}>
-          Net ortalaman, tahmini sınav netin ve öncelikli konuların. Üç denemeden sonra rota geleceği de çizer.
+          Net ortalaman, tahmini sınav netin ve zayıf derslerin. Üç denemeden sonra rota geleceği de çizer.
         </Text>
       </Animated.View>
     </View>
