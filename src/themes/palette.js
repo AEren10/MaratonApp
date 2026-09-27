@@ -15,7 +15,7 @@ export const SEEDS = {
     accent: "#E5343F",
     bg: "#1C1C23",
     canvas: "#1C1C23",
-    text: "#F5F2EF",
+    text: "#ECE8E4",
     up: "#34D399",
   },
   light: {
@@ -30,15 +30,14 @@ export const SEEDS = {
 // Tohumdan türetilmeyen, şemaya sabit değerler.
 const FIXED = {
   dark: {
-    text2: "#A3A0A8",
-    // AA: bg 5.92 / surface 5.11 / elev 4.26.
-    // elev uzerinde 4.5 alti — text3 ucuncu seviye yuzeyde METIN olarak kullanilmaz.
-    text3: "#9794A0",
-    text4: "#6B6870",
+    text2: "#B0ADB5",
+    // AA: bg 6.59 / surface 5.70 / elev 4.74 — AA her yerde gecer.
+    text3: "#A3A0AB",
+    text4: "#827F88",
     text5: "#3B3941",
     accentInk: "#F7F2F0",
     accentBright: "#FF6A72",
-    down: "#8A8790",
+    down: "#9A97A0",
     warn: "#E0A93F",
     danger: "#F0555F",
   },
