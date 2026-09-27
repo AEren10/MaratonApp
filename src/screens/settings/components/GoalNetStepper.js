@@ -43,8 +43,8 @@ export function GoalNetStepper({
       </View>
 
       <View style={styles.track}>
-        <View style={[styles.trackBg, { backgroundColor: C.track }]}>
-          <View style={[styles.trackFill, { width: `${pct * 100}%`, backgroundColor: C.accent }]} />
+        <View style={[styles.trackBg, { backgroundColor: C.elev }]}>
+          <View style={[styles.trackFill, { width: `${pct * 100}%`, backgroundColor: C.text }]} />
         </View>
         <View style={styles.rangeRow}>
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{min}</Text>

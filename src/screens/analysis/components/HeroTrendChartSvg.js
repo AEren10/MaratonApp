@@ -65,11 +65,22 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
       ))}
 
       <Path d={areaPath} fill="url(#heroGrad)" />
-      <Path d={linePath} fill="none" stroke={C.accent} strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d={linePath} fill="none" stroke="#D9D5D0" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
 
-      {points.map((p, idx) => (
-        <Circle key={idx} cx={p.cx} cy={p.cy} r={3.8} fill={C.bg} stroke={C.accent} strokeWidth={2.4} />
-      ))}
+      {points.map((p, idx) => {
+        const isLast = idx === points.length - 1;
+        return (
+          <Circle
+            key={idx}
+            cx={p.cx}
+            cy={p.cy}
+            r={isLast ? 4.5 : 3.8}
+            fill={isLast ? C.accent : C.bg}
+            stroke={isLast ? C.accent : "#D9D5D0"}
+            strokeWidth={2.4}
+          />
+        );
+      })}
 
       {Array.isArray(labels) && labels[0] ? (
         <SvgText x={PAD_L} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600">

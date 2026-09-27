@@ -4,12 +4,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-const SEGMENT_TONE = { completed: "accent", rescheduled: "barIdle", queued: "track" };
+const SEGMENT_TONE = { completed: "text", rescheduled: "barIdle", queued: "track" };
 
 export function RouteFullSummary({ counts, segments, debtHours, daysLeft }) {
   const C = useC();
   const legend = [
-    { tone: "accent", text: "tamamlandı " },
+    { tone: "text", text: "tamamlandı " },
     { tone: "barIdle", text: "yeniden planlandı " },
     { tone: "track", text: "sırada " },
   ];

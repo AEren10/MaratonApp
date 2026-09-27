@@ -237,7 +237,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
         {item.status !== "pending" && (
           <View style={s.progressRow}>
             <Text style={s.progressLabel}>Sen: {myProgress || 0}</Text>
-            <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.accent }]} /></View>
+            <View style={s.bar}><View style={[s.barFill, { width: `${pct * 100}%`, backgroundColor: C.text }]} /></View>
             <Text style={s.progressLabel}>{opponent?.name?.split(" ")[0]}: {theirProgress || 0}</Text>
           </View>
         )}
@@ -302,7 +302,7 @@ function makeStyles(C) {
     statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
     progressRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginTop: SPACING.md },
     progressLabel: { ...TYPOGRAPHY.micro, color: C.sec, width: 70 },
-    bar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: C.surface2 },
+    bar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: C.elev },
     barFill: { height: 4, borderRadius: 2 },
     cancelBtn: { alignSelf: "flex-end", marginTop: SPACING.sm },
     respondBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.xs, paddingVertical: SPACING.sm, borderRadius: RADIUS.lg },

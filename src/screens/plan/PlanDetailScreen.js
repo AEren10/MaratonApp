@@ -48,8 +48,8 @@ function PlanDetailInner({ route }) {
         {hasTasks ? (
           <Animated.View>
             <View style={s.progressBarWrap}>
-              <View style={[s.progressBase, { backgroundColor: C.track }]}>
-                <View style={[s.progressFill, { backgroundColor: C.accent, width: `${Math.round((detail.doneCount / detail.tasks.length) * 100)}%` }]} />
+              <View style={[s.progressBase, { backgroundColor: C.elev }]}>
+                <View style={[s.progressFill, { backgroundColor: C.text, width: `${Math.round((detail.doneCount / detail.tasks.length) * 100)}%` }]} />
               </View>
             </View>
 

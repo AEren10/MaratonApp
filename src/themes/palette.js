@@ -170,17 +170,17 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     proj: mix(accent, isDark ? 52 : 62, bg),
     projNode: mix(accent, isDark ? 44 : 60, fixed.text2),
     stop: mix(accent, isDark ? 44 : 58, bg),
-    past: accent,
+    past: isDark ? "#D9D5D0" : mix(text, 80, bg),
     bandEdge: mix(accent, isDark ? 32 : 30, bg),
     targetLine: mix(accent, isDark ? 22 : 26, bg),
     targetLabel: mix(accent, isDark ? 28 : 34, fixed.text2),
     barIdle: mix(accent, isDark ? 22 : 20, bg),
 
-    // Isı haritası basamakları
-    heat1: mix(accent, isDark ? 18 : 14, bg),
-    heat2: mix(accent, isDark ? 40 : 32, bg),
-    heat3: mix(accent, isDark ? 62 : 56, bg),
-    heat4: mix(accent, isDark ? 82 : 80, bg),
+    // Isı haritası basamakları — nötr basamaklar
+    heat1: isDark ? "#45444F" : mix(text, 25, bg),
+    heat2: isDark ? "#6B6870" : mix(text, 45, bg),
+    heat3: isDark ? "#A3A0AB" : mix(text, 65, bg),
+    heat4: isDark ? "#ECE8E4" : mix(text, 85, bg),
 
     // Modal zemini ve gorsel ustu karartma. Satir ici rgba() yerine tek
     // kaynak: acik temada da dogru koyulukta kaliyor.

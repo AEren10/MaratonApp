@@ -84,7 +84,7 @@ function SetupIncompleteContent() {
             {steps.map((s) => (
               <View
                 key={s.key}
-                style={[styles.segment, { backgroundColor: s.done ? C.accent : C.track }]}
+                style={[styles.segment, { backgroundColor: s.done ? C.text : C.elev }]}
               />
             ))}
           </View>

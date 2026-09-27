@@ -93,7 +93,7 @@ export default function FirstWeekScreen() {
                 key={i}
                 style={[
                   styles.bar,
-                  { backgroundColor: i < completedTasks ? C.accent : C.track }
+                  { backgroundColor: i < completedTasks ? C.text : C.elev }
                 ]}
               />
             ))}

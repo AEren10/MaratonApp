@@ -16,11 +16,11 @@ export function SetupProgressList({ steps, nextStepKey }) {
               style={[
                 styles.box,
                 step.done
-                  ? { backgroundColor: C.accent, borderColor: C.accent }
+                  ? { backgroundColor: C.text, borderColor: C.text }
                   : { borderWidth: 1.8, borderColor: isCurrent ? C.accent : C.track },
               ]}
             >
-              {step.done ? <Icon name="check" size={10} color={C.accentInk} sw={1.7} /> : null}
+              {step.done ? <Icon name="check" size={10} color={C.bg} sw={1.7} /> : null}
             </View>
             <Text
               style={[

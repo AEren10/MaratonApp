@@ -83,8 +83,8 @@ export const RouteLineChart = memo(function RouteLineChart({
       <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
         <Defs>
           <LinearGradient id="hglow" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.16} />
-            <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
+            <Stop offset="0" stopColor={C.text} stopOpacity={0.06} />
+            <Stop offset="1" stopColor={C.text} stopOpacity={0} />
           </LinearGradient>
         </Defs>
 

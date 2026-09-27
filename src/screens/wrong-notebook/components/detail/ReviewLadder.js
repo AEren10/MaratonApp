@@ -25,17 +25,17 @@ export function ReviewLadder({ item }) {
           const isNext = i === current;
           return (
             <Fragment key={day}>
-              {i > 0 ? <View style={[styles.link, { backgroundColor: done ? C.accent : C.track }]} /> : null}
+              {i > 0 ? <View style={[styles.link, { backgroundColor: done ? C.text : C.track }]} /> : null}
               <View style={styles.node}>
                 <View
                   style={[
                     styles.box,
                     done
-                      ? { backgroundColor: C.accent }
+                      ? { backgroundColor: C.text }
                       : { borderWidth: 2, borderColor: isNext ? C.accent : C.track },
                   ]}
                 >
-                  {done ? <Icon name="check" size={11} color={C.accentInk} sw={2.4} /> : null}
+                  {done ? <Icon name="check" size={11} color={C.bg} sw={2.4} /> : null}
                 </View>
                 <Text style={[TYPOGRAPHY.micro, { color: isNext ? C.accentBright : done ? C.text2 : C.text3 }]}>
                   {day}. gün

@@ -20,10 +20,10 @@ export const ExamCheckRow = memo(function ExamCheckRow({ item, onToggle, last = 
       <View
         style={[
           s.box,
-          item.done ? { backgroundColor: C.brandFill } : { borderWidth: 1.8, borderColor: C.border },
+          item.done ? { backgroundColor: C.text } : { borderWidth: 1.8, borderColor: C.border },
         ]}
       >
-        {item.done ? <Icon name="check" size={12} color={C.accentInk} sw={2.1} /> : null}
+        {item.done ? <Icon name="check" size={12} color={C.bg} sw={2.1} /> : null}
       </View>
       <Text style={[TYPOGRAPHY.bodyMedium, s.label, { color: item.done ? C.text : C.text2 }]}>
         {item.label}
