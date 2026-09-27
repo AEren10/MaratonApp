@@ -22,7 +22,7 @@ export function RehearsalDone({ full, elapsed, onEnterResults, onClose }) {
       </Text>
       <View style={s.cta}>
         {full ? (
-          <Button size="lg" fullWidth onPress={onEnterResults}>Sonuçlarını Gir</Button>
+          <Button size="lg" fullWidth onPress={onEnterResults}>Sonuçlarını gir</Button>
         ) : null}
         <Button variant={full ? "outline" : "primary"} size="lg" fullWidth onPress={onClose} style={full && s.gap}>
           Kapat

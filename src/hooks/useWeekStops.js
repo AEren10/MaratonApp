@@ -9,7 +9,7 @@ import { subjectPaletteKey } from "../themes/subjectPalette";
 import { todayTR } from "../lib/dateUtils";
 import { MONTHS_TR, WEEKDAYS_SHORT_TR } from "../lib/trWords";
 
-const WEEKDAY_LONG = ["PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ", "PAZAR"];
+const WEEKDAY_LONG = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 
 // PROGRAM — bu haftanin rota duraklari, haftalik ders programina gore
 // gunlere dusurulmus. Durak saati rotada tutulmuyor; yalniz sure gosterilir.

@@ -58,9 +58,10 @@ function formatDelta(delta) {
   return `${sign}${formatNet(Math.abs(delta))}`;
 }
 
-/** Ay adini buyuk harfle dondurur (HAZIRAN, MAYIS...). */
+/** Ay adini cumle duzeninde dondurur (Haziran, Mayis...). */
 function monthKey(date) {
-  return new Date(date).toLocaleDateString("tr-TR", { month: "long" }).toLocaleUpperCase("tr-TR");
+  const m = new Date(date).toLocaleDateString("tr-TR", { month: "long" });
+  return m ? m[0].toLocaleUpperCase("tr-TR") + m.slice(1).toLocaleLowerCase("tr-TR") : "";
 }
 
 export function useTrialRecords() {

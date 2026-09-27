@@ -63,7 +63,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
           </Animated.Text>
 
           <Animated.View entering={FadeIn.delay(550)} style={{ width: "100%" }}>
-            <Button onPress={onClose} icon="zap" fullWidth>Devam Et</Button>
+            <Button onPress={onClose} icon="zap" fullWidth>Devam et</Button>
           </Animated.View>
         </Animated.View>
       </View>

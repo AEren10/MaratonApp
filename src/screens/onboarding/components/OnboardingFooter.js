@@ -12,7 +12,7 @@ export function OnboardingFooter({ isLastSlide = false, onNext, onStart, onLogin
         </Button>
       ) : (
         <Button variant="primary" size="lg" fullWidth onPress={onNext}>
-          Devam Et
+          Devam et
         </Button>
       )}
 

@@ -56,7 +56,7 @@ export default function RouteStopDetailScreen() {
             </Animated.View>
             <Animated.View style={s.actions}>
               {d.canStart ? (
-                <Button size="lg" fullWidth onPress={d.start}>Çalışmaya Başla</Button>
+                <Button size="lg" fullWidth onPress={d.start}>Çalışmaya başla</Button>
               ) : null}
               {d.canPostpone ? (
                 <Button variant="outline" size="md" fullWidth loading={d.postponing} onPress={d.postpone}>

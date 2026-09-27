@@ -15,7 +15,7 @@ function AddWrongFooterComponent({ C, onSave, onSaveAndNew, saving }) {
             loading={saving}
             fullWidth
           >
-            Yeni Ekle
+            Yeni ekle
           </Button>
         </View>
         <View style={styles.buttonCol}>

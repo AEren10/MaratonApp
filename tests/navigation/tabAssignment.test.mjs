@@ -22,9 +22,9 @@ function setupStackScreenKeys() {
 
 const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
 
-test("tabbar tasarim etiketleri ROTA PROGRAM ANALIZ PROFIL olarak kalir", () => {
+test("tabbar tasarim etiketleri Rota Program Analiz Profil olarak kalir", () => {
   const src = readFileSync("src/navigation/TabBar.js", "utf8");
-  for (const label of ["ROTA", "PROGRAM", "ANALİZ", "PROFİL"]) {
+  for (const label of ["Rota", "Program", "Analiz", "Profil"]) {
     assert.match(src, new RegExp(`label: "${label}"`));
   }
   assert.doesNotMatch(src, /label: "Ana Sayfa"|label: "Dersler"/);
