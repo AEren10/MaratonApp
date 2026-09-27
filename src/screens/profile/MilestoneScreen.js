@@ -10,7 +10,6 @@ import { SCREENS } from "../../constants/screens";
 import { useMilestone } from "../../hooks/useMilestone";
 import { MilestoneHero } from "./components/MilestoneHero";
 import { MilestoneStats } from "./components/MilestoneStats";
-import { MilestoneBadges } from "./components/MilestoneBadges";
 import * as H from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
 
@@ -62,10 +61,6 @@ export default function MilestoneScreen() {
 
             <Animated.View entering={FadeIn.delay(140).duration(500)} style={styles.stats}>
               <MilestoneStats questions={questions} hours={hours} net={net} />
-            </Animated.View>
-
-            <Animated.View entering={FadeIn.delay(200).duration(500)}>
-              <MilestoneBadges />
             </Animated.View>
 
             <Animated.View entering={FadeIn.delay(280).duration(500)} style={styles.cta}>
