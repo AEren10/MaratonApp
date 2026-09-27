@@ -1,68 +1,28 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
-import { Icon } from "../../../components/design/Icon";
-import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import * as H from "../../../lib/haptics";
+import { STEP } from "../../../themes/tokens";
 import { HomeTodayStops } from "./HomeTodayStops";
-import { HomeMomentumRow } from "./HomeMomentumRow";
 import { HomeNotebookCard } from "./HomeNotebookCard";
-import { HomeGroupCard } from "./HomeGroupCard";
-import { useMyGroups } from "../../../hooks/useMyGroups";
-import { Press } from "../../../components/design/Press";
 
-// Ana Sayfa (Pro) govdesi: bugunun duraklari, Defter karti, calisma grubu
-// karti, dikkat ceken iki ders.
-// Konu borcu ve haftalik rapor satirlari KALDIRILDI: ikisi de ana sayfanin
-// dibinde birikiyordu ve baska kapilari var.
-export const HomeProBody = React.memo(function HomeProBody({ stops, momentum, dueCount = 0, go }) {
-  const C = useC();
-  const groupsData = useMyGroups();
-  // Tekrar bekleyen varsa Defter karti yukari, duraklarin hemen altina cikar:
-  // o da bugunun isi. Bekleyen yoksa sayfanin sonunda sakin bir giris olarak
-  // kalir ve dikkati bolmez.
-  const notebook = (
-    <HomeNotebookCard dueCount={dueCount} onPress={go.notebook} onReview={go.review} />
-  );
-
+// Ana Sayfa (Pro) govdesi: bugunun duraklari ve -- yalniz tekrar bekleyen
+// varsa -- Defter. Ana sayfa "simdi ne yapayim" sorusuna cevap verir;
+// "dikkat ceken iki ders" Analiz'deki ders trendinin tekrariydi, grup karti
+// Profil'deki Gruplarim'in tekrariydi, ikisi de kaldirildi.
+export const HomeProBody = React.memo(function HomeProBody({ stops, dueCount = 0, go }) {
   return (
-    <View>
+    <View style={s.wrap}>
       <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
-
-      {dueCount > 0 ? <View style={s.due}>{notebook}</View> : null}
-
-      {/* Grup karti bugunun isi DEGIL, sosyal bir davet. Durak -> tekrar
-          komsulugunu bolmemesi icin ikisinden sonra gelir. */}
-      <HomeGroupCard groupsData={groupsData} onPress={go.groups} />
-
-      {momentum.length ? (
-        <View style={s.attention}>
-          <View style={s.head}>
-            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>DİKKAT ÇEKEN İKİ DERS</Text>
-            <View style={[s.rule, { backgroundColor: C.line }]} />
-            <Press haptic="none" onPress={() => { H.tap(); go.analysis(); }} accessibilityRole="button"
-              accessibilityLabel="Analiz" style={s.link}>
-              <Text style={[TYPOGRAPHY.label, s.linkText, { color: C.text2 }]}>Analiz</Text>
-              <Icon name="chevR" size={11} color={C.text5} />
-            </Press>
-          </View>
-          {momentum.map((m) => <HomeMomentumRow key={m.key} subject={m} onPress={go.subjectDetail} />)}
+      {dueCount > 0 ? (
+        <View style={s.due}>
+          <HomeNotebookCard dueCount={dueCount} onPress={go.notebook} onReview={go.review} />
         </View>
       ) : null}
-
-
-      <View style={s.notebook}>{dueCount > 0 ? null : notebook}</View>
     </View>
   );
 });
 
 const s = StyleSheet.create({
+  wrap: { paddingBottom: STEP.s4 + 2 },
   due: { paddingTop: STEP.s3 },
-  attention: { paddingTop: STEP.s5 - 8 },
-  head: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 2, paddingBottom: STEP.s1 - 2 },
-  rule: { flex: 1, height: 1 },
-  link: { flexDirection: "row", alignItems: "center", gap: STEP.s1 - 1, minHeight: CONTROL.tapMin },
-  linkText: { letterSpacing: 0, textTransform: "none" },
-  notebook: { paddingBottom: STEP.s4 + 2 },
 });

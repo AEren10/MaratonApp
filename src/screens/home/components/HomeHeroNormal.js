@@ -5,18 +5,18 @@ import Animated from "react-native-reanimated";
 import { STEP } from "../../../themes/tokens";
 import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
-import { HomeRouteSummaryBar } from "./HomeRouteSummaryBar";
 import { HomeCTAButton } from "./HomeCTAButton";
 import { HomeChartPager } from "./HomeChartPager";
 import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart";
 
-// Ana Sayfa hero'sunun normal (Pro) hali: dev sayi + rota grafigi + ozet
-// seridi + "Çalışmaya Başla". HomeHero'nun eski normal dali buraya tasindi.
-export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewFullRoute, onViewWeek }) {
+// Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
+// grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
+// bilgiyi tekrar ediyordu, kaldirildi.
+export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewWeek }) {
   const {
     remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess,
     chartData, declared, declaredAxis, weeklyEffort, todayIndex,
-    stopCounts, debtHours, nextTask, ctaSubtitle,
+    nextTask, ctaSubtitle,
   } = hero;
 
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
@@ -69,14 +69,6 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       <View style={s.chart}>
         <HomeChartPager pages={pages} onPressPage={onPressPage} />
       </View>
-
-      <HomeRouteSummaryBar
-        hasAccess={hasRouteAccess}
-        total={stopCounts.total}
-        done={stopCounts.done}
-        debtHours={debtHours}
-        onPress={stopCounts.total > 0 && onViewFullRoute ? onViewFullRoute : onViewRoute}
-      />
 
       <Animated.View style={s.cta}>
         <HomeCTAButton
