@@ -70,7 +70,7 @@ export default function SearchScreen() {
               "{query.trim()}" için sonuç yok.
             </Text>
             <Text style={[TYPOGRAPHY.caption, styles.emptyBody, { color: C.text3 }]}>
-              Yol haritasında bu adla bir konu bulunmuyor.
+              Müfredatta bu adla bir konu bulunmuyor.
               {suggestion ? ` "${suggestion}" olarak aramayı dene.` : ""}
             </Text>
             {suggestion ? (

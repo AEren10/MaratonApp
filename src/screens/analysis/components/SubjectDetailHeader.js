@@ -4,13 +4,13 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
-export const SubjectDetailHeader = React.memo(function SubjectDetailHeader({ C, onBack, onSearch }) {
+export const SubjectDetailHeader = React.memo(function SubjectDetailHeader({ C, title = "Müfredat", onBack, onSearch }) {
   return (
     <View style={styles.row}>
       <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
         <Icon name="arrowL" size={22} color={C.text2} />
       </Press>
-      <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Yol haritası</Text>
+      <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>{title}</Text>
       <Press haptic="none"
         onPress={onSearch}
         style={styles.searchBtn}
