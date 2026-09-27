@@ -10,6 +10,7 @@ import { formatDelta, formatNumber } from "../../../lib/format";
 import { SCREENS } from "../../../constants/screens";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { resetToTabStackScreen } from "../../../navigation/rootStackActions";
+import { openProgram } from "../../../navigation/openProgram";
 import { Press } from "../../../components/design/Press";
 
 export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }) {
@@ -91,11 +92,11 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
         </Animated.View>
 
         <Animated.View style={styles.actions}>
-          <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
+          <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA)}>
             Yeni rotayı gör
           </Button>
           <View style={{ height: STEP.s2 }} />
-          <Button size="lg" variant="outline" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.PROGRAM, SCREENS.DAILY_PLAN)}>
+          <Button size="lg" variant="outline" fullWidth onPress={() => openProgram(navigation)}>
             Bugün küçük bir durak seç
           </Button>
           <View style={{ height: STEP.s2 }} />

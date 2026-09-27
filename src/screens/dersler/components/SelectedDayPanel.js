@@ -58,15 +58,12 @@ export function SelectedDayPanel({ selectedDay, logs }) {
     return `${weekday} · ${rest}`;
   }, [selectedDay.key]);
 
-  const displayLogs = logs && logs.length > 0 ? logs : [
-    { time: "08:30", minutes: 45, subjectLabel: "Türkçe", topic: "Paragraf - Anlatım Biçimleri", completed: true, status: "done" },
-    { time: "10:00", minutes: 50, subjectLabel: "Matematik", topic: "Permütasyon - Kombinasyon" },
-    { time: "16:00", minutes: 40, subjectLabel: "Biyoloji", topic: "Nükleik Asitler" },
-    { time: "19:30", minutes: 25, subjectLabel: "Matematik", topic: "Defter tekrarı · 6 soru" },
-  ];
+  // Bos gun bos gorunur: eskiden burada tasarim gorselinden kopyalanmis
+  // 4 sahte durak basiliyordu.
+  const displayLogs = Array.isArray(logs) ? logs : [];
 
   const totalMinutes = displayLogs.reduce((s, l) => s + (l.minutes || 0), 0);
-  const meta = `${formatMinutes(totalMinutes)} planlı`;
+  const meta = totalMinutes > 0 ? `${formatMinutes(totalMinutes)} planlı` : "";
 
   const openDetail = () => navigation.navigate(SCREENS.PLAN_DETAIL, { date: selectedDay.key, dateLabel });
 
@@ -78,7 +75,9 @@ export function SelectedDayPanel({ selectedDay, logs }) {
       </Pressable>
 
       <View style={s.listWrap}>
-        {displayLogs.map((log, i) => (
+        {displayLogs.length === 0 ? (
+          <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>Bu güne durak yok.</Text>
+        ) : displayLogs.map((log, i) => (
           <StopRow key={i} log={log} C={C} onPress={openDetail} />
         ))}
       </View>

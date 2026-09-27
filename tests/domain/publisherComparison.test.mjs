@@ -50,7 +50,9 @@ const YASAKLI = [
   ["SubjectTrendCards.js", /net: 5\.5|net: 32\.0|series: \[\d/],
   ["PublisherComparisonCard.js", /name: "Limit"|name: "3D"|name: "Karek/],
   ["AnalysisHeroScore.js", /\[54, 56\.5|"58,25"|23 HAZ/],
-  ["AnalysisInsightsCard.js", /Permütasyon|son 5 denemede/],
+  // Bos icgoru karti kaldirildi (27 Eylul). "Daha derine" satirlari sabit
+  // bir net ve konu sayisi gosteriyordu; geri gelmesin.
+  ["DeeperAnalysisSection.js", /\d+ net"|Altı konuda/],
 ];
 
 for (const [dosya, kalip] of YASAKLI) {

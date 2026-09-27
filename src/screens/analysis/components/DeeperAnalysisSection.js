@@ -4,11 +4,16 @@ import { GUTTER, STEP } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 
-export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
+export function DeeperAnalysisSection({ C, onYanlisDefteri, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
   const items = [
     {
+      name: "Yanlış defteri",
+      note: "Kaydettiğin yanlışlar ve tekrarı gelenler",
+      onPress: onYanlisDefteri,
+    },
+    {
       name: "Konu İlerlemesi",
-      note: "Altı konuda defter yükü veya çalışma açığı",
+      note: "Konu konu çalışma ve defter durumu",
       onPress: onKonuIlerlemesi,
     },
     {
@@ -18,7 +23,7 @@ export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular,
     },
     {
       name: "Net Tahmini",
-      note: "Bu tempoyla sınav günü 71 net",
+      note: "Bu tempoyla sınav gününde nereye varırsın",
       onPress: onNetTahmini,
     },
     {

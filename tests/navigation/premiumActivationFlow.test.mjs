@@ -22,7 +22,8 @@ test("first week guide sends active steps to their own flow instead of one dead 
   assert.match(screen, /navigation\.navigate\(step\.screen\)/);
   assert.match(screen, /step\?\.key === "second_day"/);
   assert.match(screen, /navigation\.navigate\(SCREENS\.ADD_TASK\)/);
-  assert.match(screen, /resetToTabStackScreen\(navigation, TAB_KEYS\.ROTA, SCREENS\.ROADMAP\)/);
+  // Rota detay ekrani kaldirildi; son adim sekmenin kokune (Ana sayfa) doner.
+  assert.match(screen, /resetToTabStackScreen\(navigation, TAB_KEYS\.ROTA\)/);
   assert.doesNotMatch(screen, /title="4\. adımı yap"/);
   assert.doesNotMatch(screen, /variant="tint"/);
 });

@@ -111,7 +111,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "low",
             subject: key,
             icon: "trendUp",
-            message: `${subjectLabel(key)}'te +${(latestNet - prevNet).toFixed(1)} net artış!`,
+            message: `${subjectLabel(key)} netin ${(latestNet - prevNet).toFixed(1).replace(".", ",")} arttı.`,
             detail: "Harika gidiyorsun, bu tempoyu koru!",
             color: "green",
           });

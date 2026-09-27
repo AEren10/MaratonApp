@@ -107,7 +107,7 @@ export default function ReviewDoneScreen() {
             size="lg"
             onPress={() => {
               haptic.select();
-              openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
+              openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
             }}
             style={styles.actionBtn}
           >

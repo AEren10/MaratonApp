@@ -10,7 +10,6 @@ import {
 } from "./screenOptions";
 
 import HomeScreen from "../screens/home/HomeScreen";
-import DerslerScreen from "../screens/dersler/DerslerScreen";
 import AnalysisScreen from "../screens/analysis/AnalysisScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import LeagueScreen from "../screens/league/LeagueScreen";
@@ -44,12 +43,8 @@ import TrialCompareScreen from "../screens/trial/TrialCompareScreen";
 
 import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
-import PlanVsActualScreen from "../screens/plan/PlanVsActualScreen";
-import GapClosureScreen from "../screens/plan/GapClosureScreen";
-import CurriculumMapScreen from "../screens/roadmap/CurriculumMapScreen";
-import WeekProgramScreen from "../screens/program/WeekProgramScreen";
+import ProgramScreen from "../screens/program/ProgramScreen";
 import ClassScheduleScreen from "../screens/program/ClassScheduleScreen";
-import MonthPlanScreen from "../screens/program/MonthPlanScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
@@ -67,7 +62,6 @@ import SubjectListScreen from "../screens/analysis/SubjectListScreen";
 import WeakAreasScreen from "../screens/analysis/WeakAreasScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import GoalsScreen from "../screens/settings/GoalsScreen";
-import CalendarScreen from "../screens/calendar/CalendarScreen";
 
 const AppearanceScreen = React.lazy(() => import("../screens/settings/AppearanceScreen"));
 const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
@@ -87,9 +81,6 @@ const RouteCompanionScreen = React.lazy(() => import("../screens/social/RouteCom
 const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
-const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
-const RouteFullScreen = React.lazy(() => import("../screens/roadmap/RouteFullScreen"));
-const RouteStopDetailScreen = React.lazy(() => import("../screens/roadmap/RouteStopDetailScreen"));
 const RoutePauseScreen = React.lazy(() => import("../screens/roadmap/RoutePauseScreen"));
 const RouteRedrawScreen = React.lazy(() => import("../screens/roadmap/RouteRedrawScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
@@ -117,7 +108,7 @@ const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(C
 
 export const TAB_SCREENS = [
   screen(SCREENS.HOME, HomeScreen),
-  screen(SCREENS.CURRICULUM_MAP, CurriculumMapScreen),
+  screen(SCREENS.CURRICULUM_MAP, ProgramScreen),
   screen(SCREENS.ANALYSIS, AnalysisScreen),
   screen(SCREENS.PROFILE, ProfileScreen),
 ];
@@ -196,7 +187,6 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TERMS, TermsScreen),
   screen(SCREENS.ABOUT, AboutScreen),
   screen(SCREENS.LEAGUE, LeagueScreen),
-  screen(SCREENS.CALENDAR, CalendarScreen),
   screen(SCREENS.GOALS, GoalsScreen),
   screen(SCREENS.FRIENDS, FriendsScreen),
   screen(SCREENS.RANK_SIMULATOR, RankSimulatorScreen),
@@ -204,9 +194,6 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.COMPARATIVE, ComparativeScreen),
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
   screen(SCREENS.REVIEW_DONE, ReviewDoneScreen, celebrationOptions),
-  screen(SCREENS.ROADMAP, RoadmapScreen),
-  screen(SCREENS.ROUTE_FULL, RouteFullScreen),
-  screen(SCREENS.ROUTE_STOP_DETAIL, RouteStopDetailScreen),
   screen(SCREENS.ROUTE_PAUSE, RoutePauseScreen, modalOptions),
   screen(SCREENS.ROUTE_REDRAW, RouteRedrawScreen, modalOptions),
   screen(SCREENS.STUDY_SUMMARY, StudySummaryScreen, celebrationOptions),
@@ -214,12 +201,7 @@ export const APP_STACK_SCREENS = [
 
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
-  screen(SCREENS.PLAN_VS_ACTUAL, PlanVsActualScreen),
-  screen(SCREENS.GAP_CLOSURE, GapClosureScreen),
-  screen(SCREENS.DAILY_PLAN, DerslerScreen),
-  screen(SCREENS.WEEK_PROGRAM, WeekProgramScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
-  screen(SCREENS.MONTH_PLAN, MonthPlanScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),

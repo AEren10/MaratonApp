@@ -3,9 +3,8 @@ import Animated from "react-native-reanimated";
 import { PeriodHero } from "./PeriodHero";
 import { PeriodBarChart } from "./PeriodBarChart";
 import { BestLine } from "./BestLine";
-import { PromiseCard } from "./PromiseCard";
 
-export function WeekSummaryBody({ data, onPromise }) {
+export function WeekSummaryBody({ data }) {
   return (
     <>
       <Animated.View>
@@ -13,7 +12,6 @@ export function WeekSummaryBody({ data, onPromise }) {
       </Animated.View>
       <BestLine line={data.bestLine} />
       <PeriodBarChart label={data.chart.label} trailing={data.chart.trailing} bars={data.chart.bars} />
-      <PromiseCard promise={data.promise} onPress={onPromise} />
     </>
   );
 }

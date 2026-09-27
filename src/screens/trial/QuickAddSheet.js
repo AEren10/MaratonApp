@@ -5,12 +5,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-import { SectionLabel } from "../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { useQuickAddActions } from "../../hooks/useQuickAddActions";
-import { QuickAddNowCard } from "./components/QuickAddNowCard";
 import { QuickAddRow } from "./components/QuickAddRow";
 import { Press } from "../../components/design/Press";
 
@@ -18,7 +15,6 @@ const DISMISS_DISTANCE = 90;
 
 export default function QuickAddSheet({ visible, onClose, onAction }) {
   const C = useC();
-  const { nextAction, startScreen, startParams } = useQuickAddActions();
   const translateY = useSharedValue(0);
   const sheetAnimStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
 
@@ -56,28 +52,19 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
             </Press>
           </View>
 
-          <View style={styles.section}>
-            <SectionLabel>ŞİMDİ</SectionLabel>
-            <QuickAddNowCard C={C} nextAction={nextAction} onStart={() => go(startScreen, startParams)} />
-          </View>
-
-          <View style={styles.section}>
-            <SectionLabel>KAYDET</SectionLabel>
-            <View style={{ gap: STEP.s1 }}>
-              <QuickAddRow C={C} title="Çalışma kaydet" subtitle="Yaptığın çalışmayı gir · sayaç açmadan"
-                icon="bookOpen"
-                onPress={() => go(SCREENS.ADD_STUDY)} />
-              <QuickAddRow C={C} title="Deneme gir" subtitle="Fotoğraftan veya elle"
-                icon="target"
-                onPress={() => go(SCREENS.TRIAL_ENTRY)} />
-              <QuickAddRow C={C} title="Yanlış ekle" subtitle="Deftere soru kaydet"
-                icon="notebook"
-                onPress={() => go(SCREENS.ADD_WRONG)} />
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <SectionLabel>PLANA EKLE</SectionLabel>
+          {/* Tek niyet: kayit. "Simdi · Basla" karti kalkti -- siradaki duraga
+              baslamak Ana sayfanin isi; burada "ne kaydediyorsun" sorusuyla
+              yarisiyordu. Dort eylem tek duz liste, bolum basligi yok. */}
+          <View style={[styles.section, { gap: STEP.s1 }]}>
+            <QuickAddRow C={C} title="Çalışma kaydet" subtitle="Yaptığın çalışmayı gir · sayaç açmadan"
+              icon="bookOpen"
+              onPress={() => go(SCREENS.ADD_STUDY)} />
+            <QuickAddRow C={C} title="Deneme gir" subtitle="Fotoğraftan veya elle"
+              icon="target"
+              onPress={() => go(SCREENS.TRIAL_ENTRY)} />
+            <QuickAddRow C={C} title="Yanlış ekle" subtitle="Deftere soru kaydet"
+              icon="notebook"
+              onPress={() => go(SCREENS.ADD_WRONG)} />
             <QuickAddRow C={C} title="Durak ekle" subtitle="Programa · gün ve süre seçerek"
               icon="calendar"
               onPress={() => go(SCREENS.ADD_TASK)} />

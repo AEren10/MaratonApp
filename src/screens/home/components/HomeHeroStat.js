@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { StatBlock } from "../../../components/design/StatBlock";
-import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
 const EXAM_LABELS = { tyt: "TYT", tyt_ayt: "YKS", dil: "YKS DİL", lgs: "LGS" };
 
-// "BUGÜN ÇÖZÜLEN" — tasarimin kahraman sayisi. Sag ustte sinav gun sayaci.
+// "BUGÜN ÇÖZÜLEN" ve sag ustte sinav gun sayaci: esit agirlikta iki sayi.
+// Ekranin kahramani rota grafigi; bu satir eskiden 96px ile onunla yarisiyordu.
 export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, examType, examDate }) {
   const C = useC();
   const examLabel = EXAM_LABELS[examType] || "SINAV";
@@ -21,7 +21,7 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
         label="Bugün çözülen"
         value={solved}
         unit={`/${goal}`}
-        size="hero"
+        size="count"
       >
         {/* GUNUN BASINDA BU SATIR YOK.
             Ustteki "0 /110" hedefi zaten soyluyor; "hedefe 110 kaldı" ayni
@@ -49,7 +49,6 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
               {Math.max(0, daysUntilExam)}
             </Text>
             <Text style={[TYPOGRAPHY.body, s.daysUnit, { color: C.text2, fontSize: 18 }]}>gün</Text>
-            <Icon name="chevR" size={18} color={C.text3} />
           </View>
         </View>
       ) : null}

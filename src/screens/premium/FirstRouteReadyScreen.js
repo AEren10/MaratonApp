@@ -35,7 +35,7 @@ export default function FirstRouteReadyScreen() {
 
   const handleAction = useCallback(() => {
     H.select();
-    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP);
+    resetToTabStackScreen(navigation, TAB_KEYS.ROTA);
   }, [navigation]);
 
   // SVG Animation values

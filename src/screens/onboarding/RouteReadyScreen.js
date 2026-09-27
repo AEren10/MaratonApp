@@ -50,7 +50,6 @@ export default function RouteReadyScreen() {
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
   const handleGoHome = useCallback(() => finishOnboarding({}), [finishOnboarding]);
-  const handleViewRoute = useCallback(() => finishOnboarding({ screen: SCREENS.ROADMAP }), [finishOnboarding]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -110,17 +109,6 @@ export default function RouteReadyScreen() {
         <Button onPress={handleGoHome} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
           Ana sayfaya git
         </Button>
-        <Press haptic="none"
-          onPress={handleViewRoute}
-          accessibilityRole="button"
-          accessibilityLabel="Rotanın tamamını gör"
-          hitSlop={8}
-          style={[styles.homeLink]}
-        >
-          <Text style={[TYPOGRAPHY.captionMedium, styles.homeLinkText, { color: C.text2 }]}>
-            Rotanın tamamını gör
-          </Text>
-        </Press>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
           Rotanı her zaman değiştirebilirsin. Deneme girdikçe kendini de günceller.
         </Text>

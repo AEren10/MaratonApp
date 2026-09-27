@@ -23,7 +23,7 @@ export const PAYWALL_MOMENT = {
     "yerden devam eder.",
   proChecks: [
     "Bugünün durakları · rota sana ne çalışacağını söyler",
-    "Rotanın tamamı ve tahmin bandı",
+    "Net tahmini ve tahmin bandı",
     "Tempo senaryoları ve öncelikli konuların tamamı",
   ],
   cta: "7 gün ücretsiz dene",

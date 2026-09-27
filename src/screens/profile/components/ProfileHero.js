@@ -10,7 +10,8 @@ import { useAvatarUpload } from "../../../hooks/useAvatarUpload";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
-export function ProfileHero({ name = "Öğrenci", exam, streak }) {
+// Seri cipi kalkti: seri Ana sayfanin ust cubugunda zaten var.
+export function ProfileHero({ name = "Öğrenci", exam }) {
   const C = useC();
   const navigation = useNavigation();
   const initials = (name || "??").slice(0, 2).toUpperCase();
@@ -53,13 +54,6 @@ export function ProfileHero({ name = "Öğrenci", exam, streak }) {
               <Text style={[s.pillText, { color: C.text2 }]}>{exam}</Text>
             </View>
           ) : null}
-
-          <View style={[s.pill, { backgroundColor: streak > 0 ? C.accent + "14" : C.surface, borderColor: streak > 0 ? C.accent + "40" : C.border }]}>
-            <Icon name="flame" size={12} color={streak > 0 ? C.accent : C.text3} />
-            <Text style={[s.pillText, { color: streak > 0 ? C.accentBright : C.text3 }]}>
-              {streak || 0} GÜN SERİ
-            </Text>
-          </View>
         </View>
       </View>
     </View>

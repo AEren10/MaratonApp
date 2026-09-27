@@ -12,8 +12,7 @@ import { useClassScheduleEditor } from "../../hooks/useClassScheduleEditor";
 import { todayTR } from "../../lib/dateUtils";
 import { formatNumber } from "../../lib/format";
 import * as H from "../../lib/haptics";
-import { TAB_KEYS } from "../../navigation/tabAssignment";
-import { openInTab } from "../../navigation/tabJump";
+import { openProgram } from "../../navigation/openProgram";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { RouteHeader } from "../roadmap/components/RouteHeader";
 import ScheduleDayRow from "./components/ScheduleDayRow";
@@ -28,7 +27,7 @@ function ClassScheduleInner() {
     await editor.submit();
     H.success();
     if (navigation.canGoBack()) navigation.goBack();
-    else openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.DAILY_PLAN);
+    else openProgram(navigation);
   }, [editor, navigation]);
 
   return (

@@ -5,11 +5,9 @@ import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { NudgePopup } from "../../components/common/NudgePopup";
 
-import { SectionSwitch } from "../../components/common/SectionSwitch";
-import { ANALYSIS_SECTIONS } from "../../constants/analysisSections";
 import { AnalysisHeader } from "./components/AnalysisHeader";
 import { AnalysisFilterPills } from "./components/AnalysisFilterPills";
-import { AnalysisInsightsCard } from "./components/AnalysisInsightsCard";
+import { AnalysisAddTrialButton } from "./components/AnalysisAddTrialButton";
 import { AnalysisHeroScore } from "./components/AnalysisHeroScore";
 import { SubjectTrendCards } from "./components/SubjectTrendCards";
 import { AnalysisTrialHistory } from "./components/AnalysisTrialHistory";
@@ -57,21 +55,7 @@ export default function AnalysisScreen() {
             />
           }
         >
-          <AnalysisHeader
-            C={C}
-            onAddTrial={() => go(screens.TRIAL_ENTRY, undefined, "analysis_header_trial_entry")}
-          />
-
-          {/* Yanlis Defteri Analiz'in ALT MENUSUNDE degil, YANINDA. Deneme
-              analiziyle ayni kademede: biri neyi bildigini olcer, oteki neyi
-              bilmedigini kapatir. Alt menude kalinca ikincisi hic acilmiyordu. */}
-          <SectionSwitch
-            options={ANALYSIS_SECTIONS}
-            value="trials"
-            onChange={(key) => {
-              if (key === "notebook") go(screens.WRONG_NOTEBOOK, undefined, "analysis_section_notebook");
-            }}
-          />
+          <AnalysisHeader C={C} />
 
           {loading ? (
             <AnalysisSkeleton />
@@ -82,8 +66,6 @@ export default function AnalysisScreen() {
                 value={filter}
                 onChange={changeFilter}
               />
-
-              <AnalysisInsightsCard C={C} />
 
               <AnalysisHeroScore
                 C={C}
@@ -118,6 +100,7 @@ export default function AnalysisScreen() {
 
               <DeeperAnalysisSection
                 C={C}
+                onYanlisDefteri={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_deeper_notebook")}
                 onKonuIlerlemesi={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_list")}
                 onOncelikliKonular={() => go(screens.WEAK_AREAS, undefined, "analysis_weak_areas")}
                 onNetTahmini={() => go(screens.NET_FORECAST, undefined, "analysis_forecast")}
@@ -127,6 +110,11 @@ export default function AnalysisScreen() {
             </>
           )}
         </ScrollView>
+
+        <AnalysisAddTrialButton
+          C={C}
+          onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_sticky_trial_entry")}
+        />
 
         <NudgePopup
           nudge={nudgePopup}
@@ -144,6 +132,6 @@ const s = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    paddingBottom: 110,
+    paddingBottom: 140,
   },
 });

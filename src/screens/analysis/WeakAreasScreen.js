@@ -6,8 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon, EmptyState, ErrorState, SectionLabel, Skeleton } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
-import { TAB_KEYS } from "../../navigation/tabAssignment";
-import { openInTab } from "../../navigation/tabJump";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeakAreas } from "../../hooks/useWeakAreas";
 import { WeakAreaRow } from "./components/WeakAreaRow";
@@ -61,7 +60,7 @@ export default function WeakAreasScreen() {
         <EmptyState
           preset="priorityTopics"
           style={styles.empty}
-          onPrimary={() => openInTab(navigation, TAB_KEYS.PROGRAM, SCREENS.CURRICULUM_MAP)}
+          onPrimary={() => openProgram(navigation, PROGRAM_VIEWS.CURRICULUM)}
           onSecondary={() => navigation.navigate(SCREENS.SUBJECT_LIST)}
         />
       ) : (

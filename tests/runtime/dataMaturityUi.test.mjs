@@ -11,18 +11,22 @@ test("analysis empty state does not manufacture a zero-net trial", () => {
 });
 
 test("weekly program summary does not fall back to mock time or stop counts", () => {
-  const card = read("src/screens/dersler/components/WeekProgressCard.js");
-  assert.doesNotMatch(card, /8 sa 40 dk/);
-  assert.doesNotMatch(card, /13 sa planlı/);
-  assert.doesNotMatch(card, /:\s*12\b/);
-  assert.match(card, /Henüz çalışma yok/);
+  // Eski "BU HAFTA" karti kalkti; ozet artik Program > Hafta'da tek satir.
+  const view = read("src/screens/program/views/ProgramWeekView.js");
+  assert.doesNotMatch(view, /8 sa 40 dk/);
+  assert.doesNotMatch(view, /13 sa planlı/);
+  assert.match(view, /if \(totalMinutes > 0\)/);
+  assert.match(view, /if \(totalQuestions > 0\)/);
 });
 
 test("profile hides zero-dashboard stats until real activity exists", () => {
-  const credentials = read("src/screens/profile/components/RouteCredentialsList.js");
+  // "Yol kunyesi" kutulari kalkti (28 Eylul); soru/saat Calisma gecmisi
+  // satirinda ve yalniz sifir degilse gorunur.
+  const profile = read("src/screens/profile/ProfileScreen.js");
   const route = read("src/screens/profile/components/YearRouteChart.js");
-  assert.match(credentials, /hasAnyStat/);
-  assert.match(credentials, /İlk çalışma günün burada iz bırakacak/);
+  assert.doesNotMatch(profile, /RouteCredentialsList/);
+  assert.match(profile, /if \(totalQuestions > 0\)/);
+  assert.match(profile, /if \(totalHours > 0\)/);
   assert.match(route, /hasActivity/);
   assert.match(route, /Rota günlüğün ilk kayıtla başlayacak/);
 });

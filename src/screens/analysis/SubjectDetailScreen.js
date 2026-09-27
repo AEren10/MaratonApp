@@ -85,7 +85,7 @@ export default function SubjectDetailScreen() {
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
         <SubjectDetailHeader
           C={C}
-          title="Yol haritası"
+          title="Müfredat"
           onBack={() => navigation.goBack()}
           onSearch={() => openHere(navigation, TAB_KEYS.ANALIZ, SCREENS.SEARCH)}
         />

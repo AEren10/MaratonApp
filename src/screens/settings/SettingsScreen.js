@@ -8,6 +8,7 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePremium } from "../../contexts/PremiumContext";
 
@@ -118,7 +119,7 @@ export default function SettingsScreen() {
         <Animated.View>
           <SettingsGroup title="ÇALIŞMA">
             <SettingsRow first label="Çalışma geçmişi" onPress={go(SCREENS.STUDY_LOG)} />
-            <SettingsRow label="Takvim" onPress={go(SCREENS.CALENDAR)} />
+            <SettingsRow label="Takvim" onPress={() => openProgram(navigation, PROGRAM_VIEWS.MONTH)} />
           </SettingsGroup>
         </Animated.View>
 

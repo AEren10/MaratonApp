@@ -11,7 +11,6 @@ import { STEP, GUTTER } from "../../themes/tokens";
 import { ProfileTopBar } from "./components/ProfileTopBar";
 import { ProfileHero } from "./components/ProfileHero";
 import { TargetDepartmentCard } from "./components/TargetDepartmentCard";
-import { RouteCredentialsList } from "./components/RouteCredentialsList";
 import { YearRouteChart } from "./components/YearRouteChart";
 import { StrengthMap } from "./components/StrengthMap";
 import { ProfileLinkRow } from "./components/ProfileLinkRow";
@@ -21,6 +20,13 @@ import { LeagueMiniCard } from "./components/LeagueMiniCard";
 import { ProfileSkeleton } from "./components/ProfileSkeleton";
 import { useProfileViewModel } from "./useProfileViewModel";
 
+
+function studyMeta({ totalQuestions = 0, totalHours = 0 } = {}) {
+  const parts = [];
+  if (totalQuestions > 0) parts.push(`${totalQuestions} soru`);
+  if (totalHours > 0) parts.push(`${totalHours} sa`);
+  return parts.length ? parts.join(" · ") : undefined;
+}
 
 export default function ProfileScreen() {
   const C = useC();
@@ -32,8 +38,6 @@ export default function ProfileScreen() {
     leagueNextTier,
     leagueTier,
     level,
-    longestStreak,
-    streak,
     strengths,
     targetDepartment,
     weeklyXP,
@@ -48,55 +52,45 @@ export default function ProfileScreen() {
           <ProfileSkeleton />
         ) : (
           <ScrollView contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
+            {/* Kimlik: kim, hangi sinav, hedef, seviye ve lig. Seviye ve lig
+                eskiden sayfanin en altinda, baglanti listesinin arkasindaydi. */}
             <Animated.View>
-              <ProfileHero name={displayName} exam={examLabel} streak={streak} />
+              <ProfileHero name={displayName} exam={examLabel} />
             </Animated.View>
-
             <Animated.View>
               <TargetDepartmentCard targetDepartment={targetDepartment} />
             </Animated.View>
-
             <Animated.View>
-              <RouteCredentialsList
-                totalQuestions={careerStats.totalQuestions}
-                totalHours={careerStats.totalHours}
-                longestStreak={longestStreak}
-              />
+              <LevelRow level={level?.level} xpInLevel={level?.xpInLevel} xpForNext={level?.xpForNext} />
+            </Animated.View>
+            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
+              <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
             </Animated.View>
 
+            {/* Ilerleme: veri yoksa ikisi de kendi bos halini gosterir. */}
             <Animated.View>
               <YearRouteChart />
             </Animated.View>
-
             <Animated.View>
               <StrengthMap strengths={strengths} />
             </Animated.View>
 
+            {/* "Yol kunyesi" kutulari (soru, saat, en uzun seri) kalkti; ayni
+                bilgi Calisma gecmisi satirinda, yalniz sifir degilse. */}
             <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
               <ProfileLinkRow
-                label="Arkadaşını davet et"
-                meta="2 aktif"
-                onPress={() => navigation.navigate(SCREENS.REFERRAL)}
+                label="Çalışma geçmişi"
+                meta={studyMeta(careerStats)}
+                onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
                 first
               />
-              {/* Sosyal Merkez'in gruplar sekmesi. Eskiden ayri bir
-                  eski ayri grup ekranina gidiyordu: ayni sey icin iki farkli ekran,
-                  ikisi farkli hook'lardan besleniyordu. */}
               <ProfileLinkRow
                 label="Gruplarım"
                 onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
               />
               <ProfileLinkRow
-                label="Çalışma Geçmişi"
-                onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
-              />
-              <ProfileLinkRow
-                label="Rotayı Dondur"
-                onPress={() => navigation.navigate(SCREENS.ROUTE_PAUSE)}
-              />
-              <ProfileLinkRow
-                label="Rotayı Yeniden Çiz"
-                onPress={() => navigation.navigate(SCREENS.ROUTE_REDRAW)}
+                label="Arkadaşını davet et"
+                onPress={() => navigation.navigate(SCREENS.REFERRAL)}
               />
               {PREMIUM_ENABLED ? (
                 <ProfileLinkRow
@@ -106,14 +100,14 @@ export default function ProfileScreen() {
                 />
               ) : null}
               <ExamFlowRow />
-            </Animated.View>
-
-            <Animated.View>
-              <LevelRow level={level?.level} xpInLevel={level?.xpInLevel} xpForNext={level?.xpForNext} />
-            </Animated.View>
-
-            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
-              <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
+              <ProfileLinkRow
+                label="Rotayı dondur"
+                onPress={() => navigation.navigate(SCREENS.ROUTE_PAUSE)}
+              />
+              <ProfileLinkRow
+                label="Rotayı yeniden çiz"
+                onPress={() => navigation.navigate(SCREENS.ROUTE_REDRAW)}
+              />
             </Animated.View>
           </ScrollView>
         )}

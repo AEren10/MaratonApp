@@ -20,7 +20,7 @@ export const PRO_FEATURES = [
     desc: "Ne çalışacağını Maraton söyler. Her sabah sıradaki durak hazır bekler.",
   },
   {
-    name: "Rotanın tamamı ve tahmin bandı",
+    name: "Net tahmini ve tahmin bandı",
     desc: "Gelecek duraklar, sınav günü tahmini ve güven bandı açılır.",
   },
   {
