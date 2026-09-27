@@ -11,7 +11,7 @@ import { HomeHeroFinalWeekTips } from "./HomeHeroFinalWeekTips";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../../../constants/screens";
 
-const CLOSED_ITEMS = ["Yeni konu", "Lig", "Konu borcu", "Tahmini net", "Sıralama"];
+const CLOSED_ITEMS = ["Yeni konu", "Lig", "Geride kalan konular", "Tahmini net", "Sıralama"];
 
 function formatExamDate(examDate) {
   if (!examDate) return null;

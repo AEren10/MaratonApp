@@ -12,7 +12,7 @@ const ROUTE_REASON_TEXT = {
   NEGLECTED: "Uzun süredir çalışılmadı",
   HIGH_EXAM_WEIGHT: "Sınav getirisi yüksek",
   PREREQUISITE: "Temel sırayı güçlendirir",
-  DEBT_RECOVERY: "Konu borcunu kapatır",
+  DEBT_RECOVERY: "Geride kalan konuyu kapatır",
   ROUTE_COMMITMENT: "Rotandaki sıradaki durak",
 };
 

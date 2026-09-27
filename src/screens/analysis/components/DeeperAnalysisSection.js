@@ -17,8 +17,8 @@ export function DeeperAnalysisSection({ C, onYanlisDefteri, onKonuIlerlemesi, on
       onPress: onKonuIlerlemesi,
     },
     {
-      name: "Öncelikli Konular",
-      note: "Rotanda geride kalan konular",
+      name: "Zayıf dersler",
+      note: "Son denemelerde ortalaması düşük dersler",
       onPress: onOncelikliKonular,
     },
     {

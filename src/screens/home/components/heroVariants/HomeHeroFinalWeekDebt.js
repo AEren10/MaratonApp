@@ -10,7 +10,7 @@ import { HomeHeroClosedCard } from "./HomeHeroClosedCard";
 import { HomeHeroCTA } from "../HomeHeroCTA";
 import { Press } from "../../../../components/design/Press";
 
-const CLOSED_ITEMS = ["Hedef net", "Tahmini net", "Sıralama", "Konu borcu", "Projeksiyon çizgisi", "Lig"];
+const CLOSED_ITEMS = ["Hedef net", "Tahmini net", "Sıralama", "Geride kalan konular", "Projeksiyon çizgisi", "Lig"];
 const CLOSED_NOTE = "Değiştiremediğin bir sayıyı göstermek yardım etmez. Son 48 saatte performans bildirimi de gelmez, \"hedefe ulaşamadın\" ekranı hiç yok.";
 
 function formatExamDate(examDate) {

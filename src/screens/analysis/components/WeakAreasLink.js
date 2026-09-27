@@ -9,7 +9,7 @@ import { useWeakAreas } from "../../../hooks/useWeakAreas";
 import * as H from "../../../lib/haptics";
 
 // Tasarim "Konu İlerlemesi": konu kiriliminin altindaki baglanti
-// Öncelikli Konular'a gider. Oncelikli konu yoksa cizilmez.
+// Zayif dersler sayfasina gider. Zayif ders yoksa cizilmez.
 export function WeakAreasLink() {
   const C = useC();
   const navigation = useNavigation();

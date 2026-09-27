@@ -35,7 +35,7 @@ export default function TopicDebtScreen() {
           style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
         >
           <Icon name="chevL" size={18} color={C.text} />
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Konu borcu</Text>
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Geride kalan konular</Text>
         </Press>
       </View>
 
@@ -51,7 +51,7 @@ export default function TopicDebtScreen() {
       ) : isEmpty ? (
         <View style={styles.emptyWrap}>
           <EmptyState
-            title="Konu borcun yok."
+            title="Geride kalan konu yok."
             body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
             primary="Günün Planına Dön"
             onPrimary={() => openProgram(navigation)}

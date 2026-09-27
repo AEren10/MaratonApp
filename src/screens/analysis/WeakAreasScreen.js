@@ -45,7 +45,7 @@ export default function WeakAreasScreen() {
         >
           <Icon name="arrowL" size={20} color={C.text2} />
         </Press>
-        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ÖNCELİKLİ KONULAR</Text>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ZAYIF DERSLER</Text>
       </View>
 
       {isEmpty && loading ? (

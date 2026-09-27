@@ -88,7 +88,7 @@ export default function EighthDayLockScreen() {
             <FeatureItem color={C.accent} text="Rota bugünün durakları" C={C} />
             <FeatureItem color={C.accent} text="Gelecek duraklar & tahmin bandı" C={C} />
             <FeatureItem color={C.accent} text="Tempo senaryoları" C={C} />
-            <FeatureItem color={C.accent} text="Öncelikli konular" C={C} />
+            <FeatureItem color={C.accent} text="Zayıf dersler" C={C} />
           </View>
         </Animated.View>
 

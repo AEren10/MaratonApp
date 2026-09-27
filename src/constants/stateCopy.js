@@ -27,7 +27,7 @@ export const EMPTY_COPY = {
     title: "Öncelik listesi şu an boş.",
     body: "Son üç denemede belirgin şekilde geride kalan konu yok. Liste yeni deneme girdikçe kendini günceller.",
     primary: "Müfredata bak",
-    secondary: "Konu borcunu gör",
+    secondary: "Geride kalan konuları gör",
   },
   // Defter bos -- Bos Durumlar artboardinin ilk karti.
   wrongNotebook: {

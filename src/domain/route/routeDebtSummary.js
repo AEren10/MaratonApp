@@ -22,7 +22,7 @@ export function buildRouteDebtSummary({ debt = null, debtPlan = null, debtWeeks 
     : " Kalan haftalara kapasiteyi aşmadan dağıtılabilir.";
 
   return {
-    title: "Konu borcu kontrol altında",
+    title: "Geride kalan konular kontrol altında",
     body: `Plan kaçan işi ceza gibi büyütmez; gerçek tempoya göre kapatır.${cappedText}${uncoveredText}`,
     stats: [
       { label: "Borç", value: effort },
