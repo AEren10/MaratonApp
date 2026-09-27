@@ -45,7 +45,7 @@ function WeekSummary({ p, C, onMonth }) {
         </Text>
       </View>
       <View style={[s.progressTrack, { backgroundColor: C.track }]}>
-        <View style={[s.progressFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: C.up }]} />
+        <View style={[s.progressFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: C.text }]} />
       </View>
       <View style={s.summaryFoot}>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{shortMinutes(p.weeklyCompletedMinutes)} çalışıldı</Text>

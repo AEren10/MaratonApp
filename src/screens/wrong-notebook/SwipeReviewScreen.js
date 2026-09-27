@@ -23,6 +23,7 @@ import { computeNextReview } from "../../lib/spacedRepetition";
 import { useGamification } from "../../hooks/useGamification";
 import * as haptic from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
+import { alpha } from "../../themes/palette";
 
 const { width: SW } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SW * 0.3;
@@ -144,18 +145,18 @@ export default function SwipeReviewScreen() {
 
       {finished ? (
         <Animated.View style={s.center}>
-          <Icon name="checkCircle" size={56} color={C.up} />
+          <Icon name="checkCircle" size={56} color={C.text2} />
           <Text style={s.doneTitle}>{queue.length ? "Tekrar Tamamlandı!" : "Bugün tekrar yok"}</Text>
           <View style={s.statsRow}>
-            <View style={[s.statBadge, { backgroundColor: C.up + "18" }]}>
+            <View style={[s.statBadge, { backgroundColor: alpha(C.up, 12) }]}>
               <Icon name="check" size={14} color={C.up} />
               <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.up }}>{stats.knew}</Text>
               <Text style={{ ...TYPOGRAPHY.micro, color: C.up }}>Bildim</Text>
             </View>
-            <View style={[s.statBadge, { backgroundColor: C.red + "18" }]}>
-              <Icon name="x" size={14} color={C.red} />
-              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.red }}>{stats.didnt}</Text>
-              <Text style={{ ...TYPOGRAPHY.micro, color: C.red }}>Bilmedim</Text>
+            <View style={[s.statBadge, { backgroundColor: alpha(C.danger, 12) }]}>
+              <Icon name="x" size={14} color={C.danger} />
+              <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.danger }}>{stats.didnt}</Text>
+              <Text style={{ ...TYPOGRAPHY.micro, color: C.danger }}>Bilmedim</Text>
             </View>
           </View>
           <Press haptic="none" onPress={() => navigation.goBack()} style={s.closeBtn}>
@@ -184,7 +185,7 @@ export default function SwipeReviewScreen() {
               {(() => {
                 const subj = resolveSubject(current.subject, C);
                 return (
-                  <View style={[s.subjChip, { backgroundColor: subj.color + "18" }]}>
+                  <View style={[s.subjChip, { backgroundColor: alpha(subj.color, 12) }]}>
                     <Icon name={subj.icon} size={14} color={subj.color} />
                     <Text style={{ ...TYPOGRAPHY.captionMedium, color: subj.color }}>{subj.label}</Text>
                   </View>
@@ -204,7 +205,7 @@ export default function SwipeReviewScreen() {
               {current.correct_answer && (
                 <View style={s.answerRow}>
                   <Text style={s.answerLabel}>Doğru cevap:</Text>
-                  <View style={[s.answerBadge, { backgroundColor: C.up + "18" }]}>
+                  <View style={[s.answerBadge, { backgroundColor: alpha(C.up, 12) }]}>
                     <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.up }}>{current.correct_answer}</Text>
                   </View>
                 </View>
@@ -218,16 +219,16 @@ export default function SwipeReviewScreen() {
               onPress={() => handleGrade(false)}
               accessibilityRole="button"
               accessibilityLabel="Bilmedim"
-              style={[s.tapBtn, { borderColor: C.red + "40", backgroundColor: C.red + "14" }]}
+              style={[s.tapBtn, { borderColor: alpha(C.danger, 25), backgroundColor: alpha(C.danger, 10) }]}
             >
-              <Icon name="x" size={18} color={C.red} />
-              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.red }}>Bilmedim</Text>
+              <Icon name="x" size={18} color={C.danger} />
+              <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.danger }}>Bilmedim</Text>
             </Press>
             <Press haptic="none"
               onPress={() => handleGrade(true)}
               accessibilityRole="button"
               accessibilityLabel="Bildim"
-              style={[s.tapBtn, { borderColor: C.up + "40", backgroundColor: C.up + "14" }]}
+              style={[s.tapBtn, { borderColor: alpha(C.up, 25), backgroundColor: alpha(C.up, 10) }]}
             >
               <Icon name="check" size={18} color={C.up} />
               <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.up }}>Bildim</Text>

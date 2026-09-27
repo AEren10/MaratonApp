@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import { TYPOGRAPHY } from "../../../themes/tokens";
 import { formatTimerDuration } from "../../../domain/study/studyTimerModel";
+import { alpha } from "../../../themes/palette";
 
 export function TimerCenterDisplay({
   C,
@@ -14,8 +15,8 @@ export function TimerCenterDisplay({
   topicSubtitle,
 }) {
   const badgeColor = running && subject?.color ? subject.color : C.text3;
-  const badgeBg = running && subject?.color ? subject.color + "18" : C.surface;
-  const badgeBorder = running && subject?.color ? subject.color + "30" : C.line;
+  const badgeBg = running && subject?.color ? alpha(subject.color, 12) : C.surface;
+  const badgeBorder = running && subject?.color ? alpha(subject.color, 24) : C.line;
 
   const label = running && hasSubject
     ? `${subject.label} · ${topicSubtitle}`

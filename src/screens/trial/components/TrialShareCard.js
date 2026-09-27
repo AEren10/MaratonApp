@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StatBlock } from "../../../components/design/StatBlock";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { alpha } from "../../../themes/palette";
 
 function SubjectBar({ name, net, bestNet, color }) {
   const C = useC();
@@ -31,7 +32,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
 
   return (
     <View ref={ref} collapsable={false} style={[styles.card, { backgroundColor: C.void, borderColor: C.elev }]}>
-      <LinearGradient colors={[`${C.accent}18`, "transparent"]} style={styles.glow} />
+      <LinearGradient colors={[alpha(C.accent, 10), "transparent"]} style={styles.glow} />
 
       <View style={styles.header}>
         <Text style={[TYPOGRAPHY.label, { color: C.accentBright, letterSpacing: 2 }]}>MARATON</Text>
@@ -47,7 +48,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
       <View style={styles.netSection}>
         <StatBlock value={net.toFixed(1)} unit="TOPLAM NET" size="hero" color={C.accentBright} align="center" />
         {trend !== 0 && (
-          <View style={[styles.trendPill, { backgroundColor: `${trendColor}18` }]}>
+          <View style={[styles.trendPill, { backgroundColor: alpha(trendColor, 12) }]}>
             <Text style={[TYPOGRAPHY.captionMedium, { color: trendColor }]}>
               {trend > 0 ? "Yükseliyor" : "Düşüyor"} · {Math.abs(trend).toFixed(1)} net
             </Text>

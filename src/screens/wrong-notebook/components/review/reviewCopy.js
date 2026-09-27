@@ -20,7 +20,7 @@ export function reviewStatus(item, answer, C) {
     };
   }
   if (answer.closes) {
-    return { next: "Kapatıldı", color: C.up, hint: DEFAULT_HINT };
+    return { next: "Kapatıldı", color: C.text2, hint: DEFAULT_HINT };
   }
   if (isLastStage(answer.nextStage)) {
     return {

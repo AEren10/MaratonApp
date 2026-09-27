@@ -1,4 +1,5 @@
 import { mix, alpha } from "./colorMix.js";
+export { mix, alpha };
 
 // Yeni tasarımın palet sistemi. Sabit renk listesi DEĞİL — üç tohumdan
 // (accent / bg / text) türetiliyor. Tasarım dosyasındaki kök <section>
@@ -186,6 +187,8 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     // kaynak: acik temada da dogru koyulukta kaliyor.
     scrim: alpha("#000000", isDark ? 74 : 52),
     scrimSoft: alpha("#000000", isDark ? 45 : 32),
+
+    alpha: (color, percent) => alpha(color, percent),
 
     subjects: SUBJECT_COLORS[isDark ? "dark" : "light"],
   };

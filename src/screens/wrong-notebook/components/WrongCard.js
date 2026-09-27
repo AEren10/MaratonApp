@@ -7,6 +7,7 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import SignedImage from "../../../components/common/SignedImage";
 import { getTopicDifficulty } from "../../../lib/topicDifficulty";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { alpha } from "../../../themes/palette";
 
 function relativeDate(iso) {
   if (!iso) return "";
@@ -57,13 +58,13 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
         s.card,
         {
           backgroundColor: C.surface,
-          borderColor: item.is_resolved ? C.up + "30" : C.border,
+          borderColor: item.is_resolved ? C.line : C.border,
         },
       ]}
     >
       <Animated.View style={pressStyle}>
         <View style={s.headRow}>
-          <View style={[s.avatar, { backgroundColor: subjColor + "1A" }]}>
+          <View style={[s.avatar, { backgroundColor: alpha(subjColor, 10) }]}>
             <Icon name={subj.icon} size={20} color={subjColor} />
           </View>
 
@@ -89,13 +90,13 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
             style={[
               s.resolveChip,
               {
-                backgroundColor: item.is_resolved ? C.up + "1A" : C.warn + "14",
-                borderColor: item.is_resolved ? C.up + "40" : C.warn + "30",
+                backgroundColor: item.is_resolved ? alpha(C.text2, 10) : alpha(C.warn, 10),
+                borderColor: item.is_resolved ? alpha(C.text2, 25) : alpha(C.warn, 25),
               },
             ]}
           >
-            <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.up : C.warn} sw={item.is_resolved ? 3 : 1.5} />
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: item.is_resolved ? C.up : C.warn }]}>
+            <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.text2 : C.warn} sw={item.is_resolved ? 3 : 1.5} />
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: item.is_resolved ? C.text2 : C.warn }]}>
               {item.is_resolved ? "Çözüldü" : "Çözdüm"}
             </Text>
           </Pressable>
@@ -137,7 +138,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           ) : null}
 
           {diff ? (
-            <View style={[s.diffChip, { backgroundColor: C[diff.colorKey] + "16" }]}>
+            <View style={[s.diffChip, { backgroundColor: alpha(C[diff.colorKey] || C.text3, 10) }]}>
               <Icon name="users" size={10} color={C[diff.colorKey]} />
               <Text style={[TYPOGRAPHY.label, { color: C[diff.colorKey] }]}>
                 ~%{diff.correctRate} doğru · -{diff.netLoss}
@@ -157,14 +158,14 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
               style={({ pressed }) => [
                 s.shareBtn,
                 {
-                  backgroundColor: shared ? C.up + "18" : C.accent + "14",
-                  borderColor: shared ? C.up + "30" : C.accent + "30",
+                  backgroundColor: shared ? alpha(C.text2, 10) : alpha(C.accent, 8),
+                  borderColor: shared ? alpha(C.text2, 20) : alpha(C.accent, 20),
                   opacity: pressed ? 0.85 : 1,
                 },
               ]}
             >
-              <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.up : C.accentText} />
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: shared ? C.up : C.accentText }]}>
+              <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.text2 : C.accentText} />
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: shared ? C.text2 : C.accentText }]}>
                 {shared ? "Paylaşıldı" : "Paylaş"}
               </Text>
             </Pressable>

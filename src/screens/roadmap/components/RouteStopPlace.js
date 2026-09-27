@@ -10,13 +10,13 @@ const pad2 = (n) => String(n).padStart(2, "0");
 function NeighbourRow({ item, last, C }) {
   const done = item.status === S.COMPLETED;
   const open = item.status === S.UPCOMING || item.status === S.ACTIVE;
-  const trailing = done ? "GEÇİLDİ" : open ? item.date : routeStopStatusLabel(item.status).toLocaleUpperCase("tr-TR");
+  const trailing = done ? "Geçildi" : open ? item.date : routeStopStatusLabel(item.status);
   return (
     <View style={[s.row, { borderTopColor: C.line }, last && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
       <Text style={[TYPOGRAPHY.topicName, s.num, { color: C.text3 }]}>{pad2(item.number)}</Text>
       <Text style={[TYPOGRAPHY.tableName, s.flex, { color: C.text3 }]} numberOfLines={1}>{item.topic}</Text>
       {trailing ? (
-        <Text style={[done || !open ? TYPOGRAPHY.tableHead : TYPOGRAPHY.meta, { color: done ? C.up : C.text3 }]}>
+        <Text style={[done || !open ? TYPOGRAPHY.tableHead : TYPOGRAPHY.meta, { color: done ? C.text2 : C.text3 }]}>
           {trailing}
         </Text>
       ) : null}

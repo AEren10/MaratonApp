@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
+import { alpha } from "../../../themes/palette";
 
 export function ReorganizeTaskRow({
   task,
@@ -76,8 +77,8 @@ export function ReorganizeTaskRow({
           </Press>
         </View>
       ) : (
-        <View style={[s.donePill, { backgroundColor: C.up + "20" }]}>
-          <Icon name="check" size={12} color={C.up} sw={2.6} />
+        <View style={[s.donePill, { backgroundColor: alpha(C.text2, 12) }]}>
+          <Icon name="check" size={12} color={C.text2} sw={2} />
         </View>
       )}
     </View>

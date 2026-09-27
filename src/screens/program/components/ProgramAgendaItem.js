@@ -5,6 +5,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { formatMinutes } from "../../../lib/format";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Icon } from "../../../components/design";
 
 // Program gundemi: sol sutunda sure, dikey hat + ders renkli dugum, sagda
 // kart (DERS etiketi, BİTTİ, konu adi). Biten durak sonuk.
@@ -25,9 +26,18 @@ function ProgramAgendaItem({ item }) {
           {item.subjectLabel} · {item.topic}
         </Text>
       </View>
-      <Text style={[TYPOGRAPHY.tableHead, s.meta, { color: item.done ? C.up : C.text3 }]}>
-        {item.done ? "BİTTİ" : formatMinutes(item.minutes)}
-      </Text>
+      {item.done ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <Icon name="check" size={12} color={C.text2} sw={2} />
+          <Text style={[TYPOGRAPHY.tableHead, s.meta, { color: C.text2 }]}>
+            Bitti
+          </Text>
+        </View>
+      ) : (
+        <Text style={[TYPOGRAPHY.tableHead, s.meta, { color: C.text3 }]}>
+          {formatMinutes(item.minutes)}
+        </Text>
+      )}
     </View>
   );
 }

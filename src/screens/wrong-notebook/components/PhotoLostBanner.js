@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Button, Icon } from "../../../components/design";
 import { STEP, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
+import { alpha } from "../../../themes/palette";
 
 // Bilinen açık: OS önbelleği temizlenince kuyruktaki fotoğraf gönderilemeyip
 // dead-letter'a düşer, soru metni kalır ama fotoğraf sessizce kaybolur.
@@ -9,7 +10,7 @@ import { STEP, SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 export function PhotoLostBanner({ C, count, onRetry }) {
   if (!count) return null;
   return (
-    <View style={[styles.wrap, { backgroundColor: C.warn + "14", borderColor: C.warn + "40" }]}>
+    <View style={[styles.wrap, { backgroundColor: alpha(C.warn, 10), borderColor: alpha(C.warn, 25) }]}>
       <Icon name="alert" size={18} color={C.warn} />
       <Text style={[TYPOGRAPHY.caption, styles.text, { color: C.text }]}>
         {count === 1

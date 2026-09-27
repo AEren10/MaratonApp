@@ -5,7 +5,8 @@ import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
-export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, dotColor }) {
+export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, icon = "plus", iconColor }) {
+  const icColor = iconColor || C.text2;
   return (
     <Press haptic="none"
       onPress={() => { H.tap(); onPress(); }}
@@ -13,7 +14,9 @@ export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, d
       accessibilityLabel={accessibilityLabel || title}
       style={[styles.row, { backgroundColor: C.surface, borderColor: C.elev }]}
     >
-      <View style={[styles.dot, { backgroundColor: dotColor || C.text3 }]} />
+      <View style={[styles.iconBox, { backgroundColor: C.elev }]}>
+        <Icon name={icon} size={16} color={icColor} sw={1.5} />
+      </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{title}</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{subtitle}</Text>
@@ -29,5 +32,11 @@ const styles = StyleSheet.create({
     minHeight: CONTROL.tapMin, paddingVertical: STEP.s2, paddingHorizontal: STEP.s2,
     borderRadius: SHAPE.card, borderWidth: 1,
   },
-  dot: { width: 8, height: 8, borderRadius: 1 },
+  iconBox: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

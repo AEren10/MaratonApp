@@ -6,6 +6,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Button, Card, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { STEP, SHAPE, TYPOGRAPHY, GUTTER } from "../../themes/tokens";
+import { alpha } from "../../themes/palette";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
@@ -43,9 +44,9 @@ export default function ReviewDoneScreen() {
 
         <Animated.View entering={FadeIn.delay(100).duration(400)}>
           {closedCount > 0 ? (
-            <View style={[styles.closedRow, { backgroundColor: C.success + "1A", borderColor: C.success }]}>
+            <View style={[styles.closedRow, { backgroundColor: alpha(C.text2, 10), borderColor: alpha(C.text2, 25) }]}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s1 }}>
-                <Icon name="checkCircle" size={18} color={C.success} />
+                <Icon name="checkCircle" size={18} color={C.text2} />
                 <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{closedCount} soru kapandı</Text>
               </View>
               <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>defterde <Text style={{ color: C.text, fontFamily: "Archivo_600" }}>{pendingBefore}</Text></Text>
@@ -80,8 +81,8 @@ export default function ReviewDoneScreen() {
             </View>
             <View style={styles.progressRow}>
               <View style={[styles.bar, { flex: 3, backgroundColor: C.warn }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.success }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.up }]} />
+              <View style={[styles.bar, { flex: 2, backgroundColor: C.text2 }]} />
+              <View style={[styles.bar, { flex: 2, backgroundColor: C.text3 }]} />
               <View style={[styles.bar, { flex: 1, backgroundColor: C.line }]} />
             </View>
             <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s2 }]}>
