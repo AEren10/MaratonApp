@@ -57,19 +57,20 @@ Kaynak: `design/extracted/tokens.md` (tasarimin kendi token referansi) ve
 - Palet TURETILMIS: uc tohumdan (`accent`, `bg`, `text`) `color-mix(in oklab)`
   ile hesaplaniyor. RN'de oklab yok -> `src/themes/colorMix.js` (tarayici
   ciktisina karsi 19/19 dogrulandi). Kullanici temasi bu yuzden mumkun.
-- Marka: accent `#E5343F` (kizil). Kirmizi metin `accent-bright #FF4D57`,
-  basili `accent-press #C22730`, kirmizi zemin ustu metin `accent-ink #F7F2F0`.
-- Yuzey merdiveni: `bg #1C1C23` · `surface #26262F` · `elev #30303B` ·
-  `void #212129` (girinti) · `track #30303B` · `line #34343F` · `border #3E3E4B`.
+- Marka: accent `#E5343F` (kizil), birincil buton dolgusu `brandFill #CF2833` (basili `brandFillPress #A81C26`),
+  kirmizi metin `accentText #FF6A72` (koyu) / `#D12430` (acik), kirmizi vurgu `accentBright #FF6A72` (koyu) / `#D12430` (acik),
+  basili `accent-press #C22730`, kirmizi zemin ustu metin `accent-ink #F7F2F0` (butonlarda `#FFFFFF`).
+- Yuzey merdiveni: `bg #1C1C23` · `surface #28282F` · `elev #35353B` ·
+  `void #212129` (girinti) · `track #30303B` · `line #3A3A42` · `border #5A5961`.
   **Derinlik golgeyle degil yuzey tonu + 1px kenarlikla kurulur.**
-- Metin: `text #F5F2EF` · `text2 #A3A0A8` · `text3 #9794A0` (en kucuk okunur ton).
-  `text4 #6B6870` YALNIZ grafik ekseni/izgara etiketi — govde metninde kullanilmaz.
+- Metin: `text #ECE8E4` · `text2 #B0ADB5` · `text3 #A3A0AB` (en kucuk okunur ton).
+  `text4 #827F88` YALNIZ grafik ekseni/izgara etiketi — govde metninde kullanilmaz.
   `text5 #3B3941` metin degil (hayalet rakam, pasif halka).
-- Anlam: `up #34D399` yalniz artis · `down #8A8790` dusus (kirmizi DEGIL, kotu
+- Anlam: `up #34D399` yalniz artis · `down #9A97A0` dusus (kirmizi DEGIL, kotu
   haber bagirmaz) · `warn #E0A93F` · `danger #F0555F` yalniz yikici aksiyon.
 - Ders renkleri yalniz ders baglaminda, durum anlatmaz:
-  `s-tur #74A9E8` · `s-mat #E0A570` · `s-fiz #6ECFC0` · `s-kim #E8A0C4` ·
-  `s-bio #86CE92` · `s-tar #C9BE6A` · `s-cog #8B5CF6` · `s-fel #A78BFA` · `s-din #B5D97A`
+  `s-tur #74A9E8` · `s-mat #E0A570` · `s-fiz #56C6D6` · `s-kim #E8A0C4` ·
+  `s-bio #7FCB7A` · `s-tar #D6C25A` · `s-cog #A27BF8` · `s-fel #A78BFA` · `s-din #C8B8A6`
 - Tipografi: kahraman sayi 96px Bricolage 400 (`letter-spacing -.04em`),
   ekran basligi 22-34px Bricolage, net degeri 26px Bricolage,
   govde 13-14px Archivo (`line-height 1.55-1.65`), buton 16px Archivo 700,
