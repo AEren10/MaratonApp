@@ -50,8 +50,8 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
     <Svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "100%" }}>
       <Defs>
         <LinearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={C.text} stopOpacity="0.10" />
-          <Stop offset="1" stopColor={C.text} stopOpacity="0" />
+          <Stop offset="0" stopColor={C.accent} stopOpacity="0.14" />
+          <Stop offset="1" stopColor={C.accent} stopOpacity="0" />
         </LinearGradient>
       </Defs>
 
@@ -65,7 +65,7 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
       ))}
 
       <Path d={areaPath} fill="url(#heroGrad)" />
-      <Path d={linePath} fill="none" stroke="#D9D5D0" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d={linePath} fill="none" stroke={C.accent} strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
 
       {points.map((p, idx) => {
         const isLast = idx === points.length - 1;
@@ -76,7 +76,7 @@ export const HeroTrendChartSvg = React.memo(function HeroTrendChartSvg({ C, data
             cy={p.cy}
             r={isLast ? 4.5 : 3.8}
             fill={isLast ? C.accent : C.bg}
-            stroke={isLast ? C.accent : "#D9D5D0"}
+            stroke={C.accent}
             strokeWidth={2.4}
           />
         );

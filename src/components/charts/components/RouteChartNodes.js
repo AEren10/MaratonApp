@@ -19,7 +19,7 @@ export function RouteChartNodes({ pastPoints = [], todayPoint, endPoint, hasFutu
           cy={p.y}
           r={NODE.past}
           fill={C.bg}
-          stroke={C.past}
+          stroke={C.accent}
           strokeWidth={STROKE.pastNode}
         />
       ))}
