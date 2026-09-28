@@ -80,6 +80,12 @@ export default function SwipeReviewScreen() {
     setIdx((i) => i + 1);
   }, [current, reward, user?.id]);
 
+  const swipeOut = useCallback((knew) => {
+    translateX.value = withTiming(knew ? SW * 1.5 : -SW * 1.5, { duration: 250 }, (finished) => {
+      if (finished) scheduleOnRN(handleGrade, knew);
+    });
+  }, [handleGrade]);
+
   const pan = Gesture.Pan()
     .onUpdate((e) => {
       "worklet";
@@ -88,15 +94,20 @@ export default function SwipeReviewScreen() {
     })
     .onEnd((e) => {
       "worklet";
-      if (e.translationX > SWIPE_THRESHOLD) {
-        translateX.value = withTiming(SW * 1.5, { duration: 300 });
-        scheduleOnRN(handleGrade, true);
-      } else if (e.translationX < -SWIPE_THRESHOLD) {
-        translateX.value = withTiming(-SW * 1.5, { duration: 300 });
-        scheduleOnRN(handleGrade, false);
+      const isRight = e.translationX > SWIPE_THRESHOLD || (e.translationX > 40 && e.velocityX > 600);
+      const isLeft = e.translationX < -SWIPE_THRESHOLD || (e.translationX < -40 && e.velocityX < -600);
+
+      if (isRight) {
+        translateX.value = withTiming(SW * 1.5, { duration: 250 }, (finished) => {
+          if (finished) scheduleOnRN(handleGrade, true);
+        });
+      } else if (isLeft) {
+        translateX.value = withTiming(-SW * 1.5, { duration: 250 }, (finished) => {
+          if (finished) scheduleOnRN(handleGrade, false);
+        });
       } else {
-        translateX.value = withSpring(0);
-        translateY.value = withSpring(0);
+        translateX.value = withSpring(0, { dampingRatio: 0.8 });
+        translateY.value = withSpring(0, { dampingRatio: 0.8 });
       }
     });
 
@@ -216,7 +227,7 @@ export default function SwipeReviewScreen() {
           {/* Tap alternatives for accessibility */}
           <View style={s.tapRow}>
             <Press haptic="none"
-              onPress={() => handleGrade(false)}
+              onPress={() => swipeOut(false)}
               accessibilityRole="button"
               accessibilityLabel="Bilmedim"
               style={[s.tapBtn, { borderColor: alpha(C.danger, 25), backgroundColor: alpha(C.danger, 10) }]}
@@ -225,7 +236,7 @@ export default function SwipeReviewScreen() {
               <Text style={{ ...TYPOGRAPHY.captionMedium, color: C.danger }}>Bilmedim</Text>
             </Press>
             <Press haptic="none"
-              onPress={() => handleGrade(true)}
+              onPress={() => swipeOut(true)}
               accessibilityRole="button"
               accessibilityLabel="Bildim"
               style={[s.tapBtn, { borderColor: alpha(C.up, 25), backgroundColor: alpha(C.up, 10) }]}
