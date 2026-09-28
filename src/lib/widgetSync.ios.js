@@ -4,6 +4,7 @@ import ReviewWidget from "../widgets/ReviewWidget";
 import RouteWidget from "../widgets/RouteWidget";
 import StreakWidget from "../widgets/StreakWidget";
 import TrialWidget from "../widgets/TrialWidget";
+import { getSubjectLabel } from "../themes/subjects";
 
 // WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
@@ -45,13 +46,20 @@ function toDays(week) {
   }));
 }
 
-/** Haftanin emegi (cubuklar). */
-export function syncWeekWidget({ week, solved = 0 } = {}) {
+// Bu haftanin Pazartesi'si "YYYY-MM-DD". Widget bununla verinin hangi
+// haftaya ait oldugunu bilir; hafta donmusse eski sayilari gostermez.
+function mondayKey(d = new Date()) {
+  const m = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+  return `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}-${String(m.getDate()).padStart(2, "0")}`;
+}
+
+/** Haftanin emegi (cubuklar). Bugunun sayisi widget'ta days'ten okunur. */
+export function syncWeekWidget({ week } = {}) {
   if (!week) return false;
   return push("week", WeekWidget, {
     days: toDays(week),
     goal: Number(week.goal) || 0,
-    solved: Number(solved) || 0,
+    weekStart: mondayKey(),
   });
 }
 
@@ -60,22 +68,31 @@ export function syncTodayWidget({
   solved = 0, goal = 0, streak = 0, nextStop = null, week = null,
   stops = [], weeklyMinutesGoal = 0,
 } = {}) {
-  // Widget'a en fazla dort is gidiyor: daha fazlasi orta boy widget'ta
+  // Widget'a en fazla uc is gidiyor: daha fazlasi orta boy widget'ta
   // okunmuyor, listeyi kaydiramiyorsun. Bitmemisler once, bitenler sonra --
   // widget'in isi "simdi ne yapayim", gecmisi anlatmak degil.
   // useTodayStops bir DIZI degil { items, doneCount, nextId, toggle } donuyor.
   // Burasi bir sinir: cagiran taraf ne gonderirse gondersin widget'i
   // cokertmemeli -- bir widget susleme, ana ekrani dusurmemeli.
   const list = Array.isArray(stops) ? stops : (Array.isArray(stops?.items) ? stops.items : []);
-  const tasks = list
+  const all = list
     .map((stop) => ({
-      label: [stop?.subject && stop?.topic ? stop.topic : stop?.label].filter(Boolean).join(""),
+      // "Matematik · EBOB": ders adi konuyu baglamina oturtur. Ic skor
+      // ("(%20)") hicbir zaman widget'a gitmez.
+      label: (stop?.topic
+        ? `${getSubjectLabel(stop.subject).split(" ")[0]} · ${stop.topic}`
+        : String(stop?.label || "")).replace(/\s*\(%\d+\)/g, ""),
       minutes: Number(stop?.minutes) || 0,
       done: Boolean(stop?.completed),
     }))
-    .filter((t) => t.label)
-    .sort((a, b) => Number(a.done) - Number(b.done))
-    .slice(0, 4);
+    .filter((t) => t.label);
+  // Tasarim 3d: bitenler ustte (ustu cizili), siradaki is altta one cikar.
+  // En fazla uc satir; siradaki is her zaman gorunur.
+  const open = all.filter((t) => !t.done);
+  const closed = all.filter((t) => t.done);
+  const openShown = open.slice(0, 3);
+  const room = 3 - openShown.length;
+  const tasks = [...(room > 0 ? closed.slice(-room) : []), ...openShown];
 
   const weekMinutes = (week?.days || []).reduce((sum, d) => sum + (Number(d.minutes) || 0), 0);
 
@@ -83,6 +100,8 @@ export function syncTodayWidget({
     solved: Number(solved) || 0,
     goal: Number(goal) || 0,
     tasks,
+    total: all.length,
+    doneCount: closed.length,
     weekMinutes,
     weeklyMinutesGoal: Number(weeklyMinutesGoal) || 0,
     // Serit icin gun basina dakika: cubuk degil, haftanin yedi parcasi.
@@ -175,7 +194,11 @@ export function syncStreakWidget({ logs = [], streak = 0, longest = 0 } = {}) {
  * okundugu icin ters cevriliyor.
  */
 export function syncTrialWidget({ trials = [] } = {}) {
-  const recent = (trials || []).slice(0, 5).reverse();
+  // TEK sinav turu: TYT 65 ile AYT 30'u ayni cizgiye koymak anlamsiz dalga
+  // cizer. Son ana denemenin turu secilir; brans denemeleri disarda.
+  const type = (trials || []).find((t) => t?.trialType && t.trialType !== "BRANCH")?.trialType || null;
+  const recent = (trials || []).filter((t) => t?.trialType === type).slice(0, 5).reverse();
+  const exam = !type ? "" : type.startsWith("AYT") ? "AYT" : type;
   const points = recent.map((t) => ({
     label: t?.date || "",
     net: Number(t?.totalNet ?? t?.rawTotalNet ?? 0) || 0,
@@ -191,11 +214,13 @@ export function syncTrialWidget({ trials = [] } = {}) {
       const now = Number(b.subjects[key]?.net) || 0;
       const before = Number(a.subjects?.[key]?.net);
       if (!Number.isFinite(before)) continue;
-      subjects.push({ key, label: b.subjects[key]?.label || key, delta: Number((now - before).toFixed(1)) });
+      // Widget dar: "Türk Dili ve Edebiyatı" satira sigmaz, ilk kelime yeter.
+      const label = String(b.subjects[key]?.label || getSubjectLabel(key) || key);
+      subjects.push({ key, label: label.split(" ")[0], delta: Number((now - before).toFixed(1)) });
     }
     // En cok DUSEN en altta: cumle onu aliyor, goz oraya insin.
     subjects.sort((x, y) => y.delta - x.delta);
   }
 
-  return push("trial", TrialWidget, { points, subjects });
+  return push("trial", TrialWidget, { points, subjects, exam });
 }

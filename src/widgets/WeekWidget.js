@@ -1,174 +1,163 @@
 import { HStack, Spacer, Text, VStack, ZStack } from "@expo/ui/swift-ui";
 import {
-  background, containerBackground, font, foregroundStyle, frame, padding, strokeBorder, cornerRadius,
+  background, containerBackground, cornerRadius, font, foregroundStyle, frame, padding, strokeBorder, widgetURL,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
-// ANA EKRAN WIDGET'I — haftanin emegi.
+// ANA EKRAN WIDGET'I — HAFTA (tasarim 3b).
 //
-// NEDEN BU GRAFIK
-// Rota egrisi widget'a girmez: ayda bir kipirdar, ana ekranda olu durur.
-// Haftalik cubuklar her gun degisiyor ve tek bakista okunuyor.
+// Cubuklar ELLE ciziliyor: @expo/ui Chart bos gunu, deger etiketini ve
+// cubuk basina kesikli kabi veremiyor. Hedefi gecen gun dolu accent,
+// gecemeyen koyu accent, bugun en acik ton; bugunun cubugu HEDEF boyunda
+// kesikli bir kap, ici doluyor. Hedef cizgisi kesikli.
 //
-// NEDEN <Chart> DEGIL, ELLE CIZIM
-// @expo/ui'nin Chart'i bos gunu cizemiyor: calisilmamis gune %5'lik SAHTE bir
-// cubuk koymak zorunda kaliyorduk, yoksa tuval bombos duruyordu. Ayrica tek
-// Chart tek mark tipi aliyor; cubuk basina kesikli cerceve ya da deger
-// etiketi vermiyor. ZStack + frame + background ile hepsi cikiyor ve
-// uygulamadaki grafikle AYNI dili konusuyor: bos gun bir yuzey (dolacak yer),
-// dolu gun accent.
+// BUGUN WIDGET'IN KENDI SAATINDEN: eskiden dizinin son gunu (Pazar) bugun
+// sayiliyordu; Pazartesi acilan widget Pazar'i isaretliyordu. Veri baska bir
+// haftaya aitse (uygulama o hafta hic acilmadi) cubuklar bos cizilir, eski
+// haftanin sayilari bu haftaymis gibi gosterilmez.
 //
-// NEDEN HOOK YOK, ASYNC YOK
-// Widget AYRI bir JS calisma zamaninda: uygulama state'ine, Redux'a,
-// Supabase'e erisemez. Gordugu her sey props'tan gelir, uygulama bunu
-// updateSnapshot ile yazar (bkz. src/lib/widgetSync.ios.js).
-//
-// NEDEN RENKLER FONKSIYONUN ICINDE, TOKENDAN IMPORT DEGIL
-// 'widget' direktifi bu fonksiyonu ayri bir pakete cikariyor ve DIS KAPSAMLA
-// bagini kopariyor. Modul govdesinde const C = buildPalette(...) yazip
-// iceride kullanmak cihazda "Can't find variable: C" ile patliyor — denendi.
-// Degerler bu yuzden fonksiyonun icinde, duz sabit olarak duruyor.
-// tests/widgets/widgetPalette.test.mjs bunlari buildPalette("dark")
-// ciktisiyla karsilastiriyor; palet degisir de burasi degismezse test kirilir.
-//
-// CIHAZDA COZULEN COKME
-// iOS 17+ agacinda hic containerBackground cagrilmayan widget'i DUSURUYOR ve
-// yerine kirmizi sistem yer tutucusunu koyuyor (expo/expo#49015). Kok VStack
-// zemini kendisi bildiriyor.
+// Renkler fonksiyonun ICINDE duz sabit: 'widget' direktifi dis kapsami
+// koparir (cihazda "Can't find variable" ile patladi). Paletle esitligini
+// tests/widgets/widgetPalette.test.mjs denetler.
 const WeekWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
-  const accentBright = "#FF4D57";
+  const accentBright = "#FF6A72";
+  const accentDeep = "#A81C26";
   const bg = "#1C1C23";
-  const up = "#34D399";
-  const text = "#F5F2EF";
-  const text2 = "#A3A0A8";
-  const text3 = "#9794A0";
-  const text4 = "#6B6870";
-  const track = "#33333A";
+  const text = "#ECE8E4";
+  const text2 = "#B0ADB5";
+  const text3 = "#A3A0AB";
+  const text4 = "#827F88";
+  const track = "#333239";
 
-  const days = Array.isArray(props?.days) ? props.days : [];
+  const SHORT = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pa"];
+  const LONG = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+  const LOC = ["'de", "'de", "'te", "'te", "'te", "'da", "'de"]; // 1'de 2'de 3'te 4'te 5'te 6'da 7'de
+
+  const now = environment?.date instanceof Date ? environment.date : new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - todayIdx);
+  const mondayKey = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, "0")}-${String(monday.getDate()).padStart(2, "0")}`;
+  const sameWeek = !props?.weekStart || props.weekStart === mondayKey;
+
+  const raw = Array.isArray(props?.days) ? props.days : [];
+  const q = SHORT.map((_, i) => (sameWeek ? Number(raw[i]?.questions) || 0 : 0));
   const goal = Number(props?.goal) || 0;
-  const solved = Number(props?.solved) || 0;
+  const solved = q[todayIdx];
   const compact = environment?.widgetFamily === "systemSmall";
 
-  // Widget'ta olcum yok: yukseklikler sabit, oran elle hesaplanir.
-  const plotH = compact ? 38 : 56;
-  const barW = compact ? 10 : 13;
+  const plotH = compact ? 36 : 68;
+  const barW = compact ? 13 : 20;
+  const gap = compact ? 5 : 8;
+  const plotW = barW * 7 + gap * 6;
+  const peak = Math.max(...q, goal, 1);
+  const top = peak * 1.1;
+  const hOf = (v) => (v > 0 ? Math.max(4, Math.min(plotH, (v / top) * plotH)) : 0);
+  const goalH = goal > 0 ? hOf(goal) : 0;
 
-  const peak = days.reduce((max, d) => Math.max(max, Number(d.questions) || 0), 0);
-  // Tavan uygulamadaki grafikle AYNI kuraldan (WeeklyEffortChart).
-  const chartMax = Math.max(Math.round(peak * 1.15), Math.round(goal * 1.22), 10);
-  const goalH = goal > 0 ? Math.min(plotH, (goal / chartMax) * plotH) : 0;
-
-  const worked = peak > 0;
-  const todayIndex = days.length - 1;
-
-  // Cumle bugunu bir seye BAGLAR; kuru bir toplamdan cok daha ise yarar.
-  let bestIndex = -1;
-  days.forEach((d, i) => {
-    if ((Number(d.questions) || 0) > (Number(days[bestIndex]?.questions) || 0)) bestIndex = i;
-  });
-  const best = bestIndex >= 0 ? days[bestIndex] : null;
+  // Cumle: bugunu haftanin en iyi gunuyle ya da hedefle baglar.
+  let best = -1;
+  q.forEach((v, i) => { if (i !== todayIdx && v > 0 && (best < 0 || v > q[best])) best = i; });
   const remaining = goal > 0 ? Math.max(0, goal - solved) : 0;
+  const metBefore = goal > 0 ? q.filter((v, i) => i < todayIdx && v >= goal).length : 0;
+  const dayNo = todayIdx + 1;
+  let sentence;
+  if (solved === 0 && best < 0) sentence = "Haftanın ilk sorusunu çöz.";
+  else if (compact && best >= 0 && q[best] > solved) sentence = `${LONG[best]} ${q[best]}'di`;
+  else if (remaining > 0) sentence = `${remaining} soru daha, hafta ${dayNo}${LOC[todayIdx]} ${metBefore + 1} olur`;
+  else sentence = `Hedef tamam. Hafta ${dayNo}${LOC[todayIdx]} ${metBefore + 1}.`;
+  if (compact && remaining > 0 && !(best >= 0 && q[best] > solved)) sentence = `${remaining} soru daha`;
 
-  const sentence = !worked
-    ? "Bu haftanın ilk sorusunu çöz."
-    : remaining > 0
-      ? `${remaining} soru daha.`
-      : best && Number(best.questions) > 0
-        ? `En iyi günün ${best.label}: ${best.questions}.`
-        : "Bugünün hedefi tamam.";
-  const DASH = { lineWidth: 1, dash: [3, 3] };
+  // Kesikli hedef cizgisi: kucuk parcalardan; Chart'in rule'u burada yok.
+  const dashes = Array.from({ length: Math.floor(plotW / 6) }, (_, i) => (
+    <VStack key={`g${i}`} modifiers={[frame({ width: 3, height: 1 }), background(text4)]}><Spacer /></VStack>
+  ));
 
-  const bars = days.map((day, i) => {
-    const q = Number(day.questions) || 0;
-    const isToday = i === todayIndex;
-    const h = q > 0 ? Math.max(3, Math.min(plotH, (q / chartMax) * plotH)) : 0;
-    // Hedefi tutturan gun yesil, tutturamayan accent, bugun en acik ton.
-    const fill = goal > 0 && q >= goal ? up : (isToday ? accentBright : accent);
-    // Kap HEDEF boyunda: o gun doldurulabilecek alan bu kadar. Hedefi asan
-    // gun kabin disina tasar, kirpilmaz.
-    const capH = Math.max(goalH, h, 3);
-
+  const colH = plotH + (compact ? 0 : 16);
+  const bars = q.map((v, i) => {
+    const isToday = i === todayIdx;
+    const future = i > todayIdx;
+    const h = hOf(v);
+    const fill = isToday ? accentBright : goal > 0 && v >= goal ? accent : accentDeep;
+    const showValue = !compact && !future && (v > 0 || isToday);
     return (
-      <VStack key={day.label || String(i)} spacing={3}>
-        <ZStack alignment="bottom" modifiers={[frame({ width: barW, height: plotH, alignment: "bottom" })]}>
-          {/* Bos yuva KIRMIZI DEGIL, bir yuzey: dolacak yer. Bugun kesikli
-              cerceveyle isaretli — burasi henuz dolmadi demenin en sessiz hali. */}
-          <VStack
-            modifiers={[
-              frame({ width: barW, height: capH }),
-              background(track), cornerRadius(3),
-              ...(isToday
-                ? [strokeBorder({ content: accent, style: DASH, shape: "roundedRectangle", cornerRadius: 3 })]
-                : []),
-            ]}
-          >
-            <Spacer />
-          </VStack>
-          {h > 0 ? (
-            <VStack modifiers={[frame({ width: barW, height: h }), background(fill), cornerRadius(3)]}>
+      <VStack key={`b${i}`} spacing={2} modifiers={[frame({ width: barW, height: colH, alignment: "bottom" })]}>
+        {showValue ? (
+          <Text modifiers={[font({ size: 11, weight: "semibold" }), foregroundStyle(isToday ? accentBright : text3)]}>
+            {String(v)}
+          </Text>
+        ) : null}
+        <ZStack alignment="bottom">
+          {isToday && goalH > h ? (
+            <VStack modifiers={[frame({ width: barW, height: goalH }),
+              strokeBorder({ content: accentBright, style: { lineWidth: 1, dash: [3, 3] }, shape: "roundedRectangle", cornerRadius: 4 })]}>
               <Spacer />
             </VStack>
           ) : null}
+          <VStack modifiers={[frame({ width: barW, height: h > 0 ? h : 3 }), background(h > 0 ? fill : track), cornerRadius(h > 0 ? 4 : 1.5)]}>
+            <Spacer />
+          </VStack>
         </ZStack>
-
-        <Text
-          modifiers={[
-            font({ size: compact ? 8.5 : 9.5, weight: isToday ? "semibold" : "regular" }),
-            foregroundStyle(isToday ? accentBright : text4),
-          ]}
-        >
-          {String(day.label || "").slice(0, 2)}
-        </Text>
       </VStack>
     );
   });
 
-  return (
-    <VStack
-      alignment="leading"
-      spacing={compact ? 6 : 8}
-      modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 11 : 14 })]}
-    >
-      <HStack>
-        <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(text2)]}>
-          BU HAFTA
-        </Text>
-        <Spacer />
-        {goal > 0 ? (
-          <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(text4)]}>
-            {`HEDEF ${goal}`}
-          </Text>
+  const labels = SHORT.map((d, i) => (
+    <Text key={`l${i}`} modifiers={[frame({ width: barW }),
+      font({ size: 11, weight: i === todayIdx ? "bold" : "medium" }), foregroundStyle(i === todayIdx ? accentBright : text4)]}>
+      {d}
+    </Text>
+  ));
+
+  const plot = (
+    <VStack spacing={4}>
+      <ZStack alignment="bottom">
+        <HStack alignment="bottom" spacing={gap}>{bars}</HStack>
+        {goalH > 0 ? (
+          <VStack spacing={0} modifiers={[frame({ width: plotW, height: colH, alignment: "bottom" })]}>
+            <HStack spacing={3}>{dashes}</HStack>
+            <VStack modifiers={[frame({ width: 1, height: goalH })]}><Spacer /></VStack>
+          </VStack>
         ) : null}
-      </HStack>
+      </ZStack>
+      <HStack spacing={gap}>{labels}</HStack>
+    </VStack>
+  );
 
-      <HStack spacing={2}>
-        <Text modifiers={[font({ size: compact ? 30 : 38 }), foregroundStyle(text)]}>
-          {String(solved)}
-        </Text>
-        <Text modifiers={[font({ size: 13 }), foregroundStyle(text3)]}>
-          {goal > 0 ? `/${goal}` : " soru"}
-        </Text>
-        <Spacer />
-      </HStack>
+  const hero = (size) => (
+    <HStack alignment="lastTextBaseline" spacing={2}>
+      <Text modifiers={[font({ size, weight: "regular" }), foregroundStyle(text)]}>{String(solved)}</Text>
+      <Text modifiers={[font({ size: 15 }), foregroundStyle(text3)]}>{goal > 0 ? `/${goal}` : " soru"}</Text>
+    </HStack>
+  );
 
-      {days.length ? <HStack spacing={compact ? 5 : 7}>{bars}</HStack> : null}
-
-      <HStack>
-        <Text
-          modifiers={[
-            font({ size: compact ? 10.5 : 11.5, weight: "medium" }),
-            foregroundStyle(worked ? text2 : accentBright),
-          ]}
-        >
+  if (compact) {
+    return (
+      <VStack alignment="leading" spacing={4}
+        modifiers={[containerBackground(bg, "widget"), padding({ all: 12 }), widgetURL("maraton://home")]}>
+        {hero(34)}
+        <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(solved === 0 && best < 0 ? accentBright : text)]}>
           {sentence}
         </Text>
         <Spacer />
-      </HStack>
-    </VStack>
+        {plot}
+      </VStack>
+    );
+  }
+
+  return (
+    <HStack spacing={12} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), widgetURL("maraton://home")]}>
+      <VStack alignment="leading" spacing={2}>
+        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>BUGÜN</Text>
+        {hero(46)}
+        <Spacer />
+        <Text modifiers={[font({ size: 13, weight: "semibold" }), foregroundStyle(text2)]}>{sentence}</Text>
+      </VStack>
+      <Spacer />
+      {plot}
+    </HStack>
   );
 };
 

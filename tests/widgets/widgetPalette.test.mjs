@@ -13,24 +13,23 @@ import { readFileSync } from "node:fs";
 // check-design-drift.js bu klasoru ayni gerekce ile muaf tutuyor.
 const WIDGETS = ["WeekWidget", "TodayWidget", "ReviewWidget", "RouteWidget", "StreakWidget", "TrialWidget"];
 
-// buildPalette("dark") ciktisi; track gibi turetilmis olanlar dahil.
+// buildPalette("dark") ciktisi (28 Eylul 2026'da yeniden olculdu); test
+// asagida paletin kendisiyle de karsilastiriyor.
 const PALETTE = {
   accent: "#E5343F",
-  bg: "#1C1C23",
-  up: "#34D399",
-  text: "#F5F2EF",
-  text2: "#A3A0A8",
-  text3: "#9794A0",
-  text4: "#6B6870",
-  track: "#33333A",
-  // buildPalette(dark) ciktisindan DOGRULANDI: line #2A2A31. AGENTS.md'de
-  // yazan #34343F tasarim dokumaninin degeri; turetilmis palet boyle
-  // hesaplamiyor. Widget'lar paletin GERCEK ciktisini kullanir.
-  accentBright: "#FF4D57",
-  line: "#2A2A31",
+  accentBright: "#FF6A72",
   accentDeep: "#A81C26",
   accentInk: "#F7F2F0",
-  down: "#8A8790",
+  bg: "#1C1C23",
+  surface: "#28282E",
+  line: "#3A3A42",
+  track: "#333239",
+  up: "#34D399",
+  down: "#9A97A0",
+  text: "#ECE8E4",
+  text2: "#B0ADB5",
+  text3: "#A3A0AB",
+  text4: "#827F88",
 };
 
 const sourceOf = (name) =>
@@ -58,3 +57,11 @@ for (const name of WIDGETS) {
     );
   });
 }
+
+test("PALETTE tablosu paletin gercek ciktisiyla ayni", async () => {
+  const { buildPalette } = await import("../../src/themes/palette.js");
+  const real = buildPalette("dark");
+  for (const [key, value] of Object.entries(PALETTE)) {
+    assert.equal(real[key]?.toUpperCase(), value.toUpperCase(), `palette.${key} degismis; widget'lari guncelle`);
+  }
+});

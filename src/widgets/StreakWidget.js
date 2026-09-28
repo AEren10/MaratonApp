@@ -1,96 +1,75 @@
 import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import {
-  background, containerBackground, font, foregroundStyle, frame, padding, strokeBorder, cornerRadius,
+  background, containerBackground, cornerRadius, font, foregroundStyle, frame, padding, strokeBorder, widgetURL,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget } from "expo-widgets";
 
-// ANA EKRAN WIDGET'I — seri.
+// ANA EKRAN WIDGET'I — SERI (tasarim 3a).
 //
-// NEDEN IZGARA
-// Seri tek bir sayidan ibaret degil: kullanici "kac gun kacirdim, nerede
-// kirildi" diye bakiyor. 4x7'lik izgara son dort haftayi tek bakista veriyor,
-// sayinin kendisi de ustte duruyor.
+// Izgara HAFTA GUNLERINE hizali: son satir bu hafta, sutunlar Pt..Pa.
+// Suren serinin gunleri parlak kirmizi, seriden once calisilan gunler koyu
+// kirmizi, calisilmayan gun yuzey; bu haftanin gelecek gunleri kesikli.
+// Bugun bossa karesi kirmizi cerceveli: "burasi bu gece dolmali".
 //
-// NEDEN CHART DEGIL
-// Bu bir grafik degil, bir takvim. <Chart> kare izgara cizemiyor;
-// VStack + HStack + RoundedRectangle tam istenen seyi veriyor.
-//
-// NEDEN HOOK YOK, ASYNC YOK
-// Widget AYRI bir JS calisma zamaninda: uygulama state'ine, Redux'a,
-// Supabase'e erisemez. Gordugu her sey props'tan gelir, uygulama bunu
-// updateSnapshot ile yazar (bkz. src/lib/widgetSync.ios.js).
-//
-// NEDEN RENKLER FONKSIYONUN ICINDE, TOKENDAN IMPORT DEGIL
-// 'widget' direktifi bu fonksiyonu ayri bir pakete cikariyor ve DIS KAPSAMLA
-// bagini kopariyor; disaridan okunan sabit cihazda "Can't find variable" ile
-// patliyor. tests/widgets/widgetPalette.test.mjs degerleri paletle
-// karsilastiriyor.
-//
-// containerBackground SART: iOS 17+ onu cagirmayan widget'i dusurup yerine
-// kirmizi sistem yer tutucusu koyuyor (expo/expo#49015).
+// days: son 28 gun, eskiden yeniye. 0 bos · 1 calisildi · 2 suren seride.
+// Renkler fonksiyonun ICINDE; paletle esitligini widgetPalette testi denetler.
 const StreakWidget = (props, environment) => {
   "widget";
 
   const accent = "#E5343F";
-  const accentBright = "#FF4D57";
-  const bg = "#1C1C23";
-  const text = "#F5F2EF";
-  const text2 = "#A3A0A8";
-  const text3 = "#9794A0";
-  const text4 = "#6B6870";
+  const accentBright = "#FF6A72";
   const accentDeep = "#A81C26";
-  const track = "#33333A";
+  const bg = "#1C1C23";
+  const text = "#ECE8E4";
+  const text2 = "#B0ADB5";
+  const text3 = "#A3A0AB";
+  const text4 = "#827F88";
+  const track = "#333239";
 
-  // days: eskiden yeniye 28 gun. 0 = calisilmadi, 1 = calisildi,
-  // 2 = calisildi VE suren serinin icinde.
-  const raw = Array.isArray(props?.days) ? props.days : [];
-  const days = raw.slice(-28);
-  while (days.length < 28) days.unshift(0);
+  const SHORT = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pa"];
+  const LONG = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 
+  const raw = Array.isArray(props?.days) ? props.days.slice(-28) : [];
+  while (raw.length < 28) raw.unshift(0);
   const streak = Number(props?.streak) || 0;
-  const longest = Number(props?.longest) || 0;
-  const todayDone = days[days.length - 1] > 0;
+  const longest = Math.max(Number(props?.longest) || 0, streak);
+  const todayDone = raw[27] > 0;
   const compact = environment?.widgetFamily === "systemSmall";
 
-  const cell = compact ? 11 : 14;
-  const gapCell = compact ? 3 : 4;
+  const now = environment?.date instanceof Date ? environment.date : new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
 
-  // Rekora yaklasmak seriyi surdurmenin en iyi gerekcesi; yoksa bugunun
-  // durumu soylenir. Kuru "13 gun" tek basina bir sey istemiyor.
-  const toRecord = longest > streak ? longest - streak + 1 : 0;
-  const sentence = !todayDone
-    ? "Seri bu gece 23:59'da biter."
-    : toRecord > 0
-      ? `Rekora ${toRecord} gün var.`
-      : streak > 0
-        ? "Rekorun şu an kırılıyor."
-        : "İlk gününü başlat.";
+  // Rekoru gecme gunu: seri bugun surerse kac gun sonra rekor asilir.
+  const gapToRecord = longest - streak;
+  let sentence;
+  if (!todayDone) sentence = "Seri bu gece 23:59'da biter";
+  else if (streak > 0 && gapToRecord === 0) sentence = "Rekorun şu an kırılıyor.";
+  else if (gapToRecord > 0) {
+    const passDay = LONG[(todayIdx + gapToRecord + 1) % 7];
+    sentence = compact || gapToRecord > 5
+      ? `Rekora ${gapToRecord} gün var.`
+      : `Rekora ${gapToRecord} gün var. ${passDay} geçersin.`;
+  } else sentence = "İlk gününü başlat.";
+
+  const cell = compact ? 14 : 21;
+  const gap = 4;
 
   const rows = [0, 1, 2, 3].map((r) => (
-    <HStack key={`r${r}`} spacing={gapCell}>
-      {[0, 1, 2, 3, 4, 5, 6].map((c) => {
-        const i = r * 7 + c;
-        const v = days[i];
-        const isToday = i === 27;
-        // Seri ICI accent, seri disi calisilan gun koyu accent, calisilmayan
-        // gun track. Bos gun kirmizi DEGIL: accent "olan sey" demek.
-        const fill = v === 2 ? accent : v === 1 ? accentDeep : track;
+    <HStack key={`r${r}`} spacing={gap}>
+      {SHORT.map((_, c) => {
+        const ago = (3 - r) * 7 + (todayIdx - c);
+        const future = ago < 0;
+        const v = !future && ago <= 27 ? raw[27 - ago] : 0;
+        const isToday = ago === 0;
+        const fill = future ? bg : isToday && !todayDone ? bg : v === 2 ? accent : v === 1 ? accentDeep : track;
+        const ring = future
+          ? [strokeBorder({ content: text4, style: { lineWidth: 1, dash: [2, 2] }, shape: "roundedRectangle", cornerRadius: 4 })]
+          : isToday
+            ? [strokeBorder({ content: todayDone ? text : accent, style: { lineWidth: 1.5 }, shape: "roundedRectangle", cornerRadius: 4 })]
+            : [];
         return (
-          <VStack
-            key={`c${i}`}
-            modifiers={[
-              frame({ width: cell, height: cell }),
-              background(isToday && !todayDone ? bg : fill), cornerRadius(3),
-              ...(isToday
-                ? [strokeBorder({
-                    content: todayDone ? accentBright : accent,
-                    style: { lineWidth: 1.5 },
-                    shape: "roundedRectangle",
-                    cornerRadius: 3,
-                  })]
-                : []),
-            ]}
-          >
+          <VStack key={`c${c}`} modifiers={[frame({ width: cell, height: cell }), background(isToday && todayDone ? accentBright : fill),
+            cornerRadius(4), ...ring]}>
             <Spacer />
           </VStack>
         );
@@ -98,46 +77,54 @@ const StreakWidget = (props, environment) => {
     </HStack>
   ));
 
+  const grid = <VStack spacing={gap}>{rows}</VStack>;
+  const url = widgetURL("maraton://home");
+
+  if (compact) {
+    return (
+      <VStack alignment="leading" spacing={4} modifiers={[containerBackground(bg, "widget"), padding({ all: 13 }), url]}>
+        <HStack alignment="lastTextBaseline" spacing={3}>
+          <Text modifiers={[font({ size: 38 }), foregroundStyle(accentBright)]}>{String(streak)}</Text>
+          <Text modifiers={[font({ size: 14 }), foregroundStyle(text3)]}>gün</Text>
+        </HStack>
+        <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(text)]}>{sentence}</Text>
+        <Spacer />
+        {grid}
+      </VStack>
+    );
+  }
+
+  const header = (
+    <HStack spacing={gap}>
+      {SHORT.map((d, i) => (
+        <Text key={`h${i}`} modifiers={[frame({ width: cell }), font({ size: 11, weight: i === todayIdx ? "bold" : "medium" }),
+          foregroundStyle(i === todayIdx ? text : text4)]}>
+          {d}
+        </Text>
+      ))}
+    </HStack>
+  );
+
   return (
-    <VStack
-      alignment="leading"
-      spacing={compact ? 6 : 9}
-      modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 11 : 14 })]}
-    >
-      <HStack>
-        <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(accent)]}>
-          SERİ
-        </Text>
-        <Spacer />
+    <HStack spacing={10} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), url]}>
+      <VStack alignment="leading" spacing={2}>
+        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>SERİ</Text>
+        <HStack alignment="lastTextBaseline" spacing={3}>
+          <Text modifiers={[font({ size: 44 }), foregroundStyle(text)]}>{String(streak)}</Text>
+          <Text modifiers={[font({ size: 15 }), foregroundStyle(text3)]}>gün</Text>
+        </HStack>
         {longest > 0 ? (
-          <Text modifiers={[font({ size: 9.5, weight: "semibold" }), foregroundStyle(text4)]}>
-            {`EN UZUN ${longest}`}
-          </Text>
+          <Text modifiers={[font({ size: 12 }), foregroundStyle(text3)]}>{`en uzun ${longest}`}</Text>
         ) : null}
-      </HStack>
-
-      <HStack spacing={3}>
-        <Text modifiers={[font({ size: compact ? 30 : 38 }), foregroundStyle(text)]}>
-          {String(streak)}
-        </Text>
-        <Text modifiers={[font({ size: 13 }), foregroundStyle(text3)]}>gün</Text>
         <Spacer />
-      </HStack>
-
-      <VStack alignment="leading" spacing={gapCell}>{rows}</VStack>
-
-      <HStack>
-        <Text
-          modifiers={[
-            font({ size: compact ? 10.5 : 11.5, weight: "medium" }),
-            foregroundStyle(todayDone ? text2 : accentBright),
-          ]}
-        >
-          {sentence}
-        </Text>
-        <Spacer />
-      </HStack>
-    </VStack>
+        <Text modifiers={[font({ size: 13, weight: "semibold" }), foregroundStyle(todayDone ? text : text2)]}>{sentence}</Text>
+      </VStack>
+      <Spacer />
+      <VStack spacing={5}>
+        {header}
+        {grid}
+      </VStack>
+    </HStack>
   );
 };
 
