@@ -39,7 +39,7 @@ export function useGoalNetEditor() {
   } = useExam();
   const dispatch = useDispatch();
   const goals = useSelector(selectGoals);
-  const { currentNet, gapResult } = useThresholdView();
+  const { currentNet, gapResult, examLabel } = useThresholdView();
 
   const isMulti = isMultiNetExam(examType);
   const isDil = examType === "dil";
@@ -47,8 +47,20 @@ export function useGoalNetEditor() {
   const aytMin = isDil ? YDT_NET_MIN : AYT_NET_MIN;
   const aytMax = isDil ? YDT_NET_MAX : AYT_NET_MAX;
 
-  const [tytValue, setTytValue] = useState(targetNetTYT || 75);
-  const [aytValue, setAytValue] = useState(targetNetAYT || (isDil ? 55 : 45));
+  // Ayri TYT/AYT hedefleri yalniz cihazda tutuluyor; yeni cihazda ya da
+  // yeniden kurulumda bos gelir, sunucuda yalniz TOPLAM vardir. Eskiden
+  // adimlayicilar 75+45'e dusuyor ve kaydet (yalniz gunluk soru icin bile)
+  // toplami sessizce 120'ye cekiyordu. Artik: bolunme bilinmiyorsa gercek
+  // toplam varsayilan oranla bolunur; net adimlayicisina dokunulmadikca
+  // hedef hic yazilmaz.
+  const defTyt = 75;
+  const defSecond = isDil ? 55 : 45;
+  const splitKnown = targetNetTYT != null && targetNetAYT != null;
+  const seedTyt = splitKnown || !targetNet ? (targetNetTYT || defTyt) : Math.round((targetNet * defTyt) / (defTyt + defSecond));
+  const seedAyt = splitKnown || !targetNet ? (targetNetAYT || defSecond) : Math.round(targetNet) - seedTyt;
+  const [tytValue, setTytValue] = useState(seedTyt);
+  const [aytValue, setAytValue] = useState(seedAyt);
+  const [netTouched, setNetTouched] = useState(false);
   const [value, setValue] = useState(targetNet || (isMulti ? 120 : TARGET_NET_MIN));
   const [saving, setSaving] = useState(false);
   const [pendingNote, setPendingNote] = useState(null);
@@ -56,8 +68,9 @@ export function useGoalNetEditor() {
   const [daily, setDaily] = useState(goals?.dailyQuestions || 80);
 
   useEffect(() => {
-    if (targetNetTYT != null) setTytValue(targetNetTYT);
-    if (targetNetAYT != null) setAytValue(targetNetAYT);
+    if (netTouched) return;
+    setTytValue(seedTyt);
+    setAytValue(seedAyt);
     if (targetNet != null) setValue(targetNet);
   }, [targetNet, targetNetTYT, targetNetAYT]);
 
@@ -71,12 +84,13 @@ export function useGoalNetEditor() {
 
   const decDaily = useCallback(() => { H.tap(); setDaily((v) => Math.max(DAILY_MIN, v - DAILY_STEP)); }, []);
   const incDaily = useCallback(() => { H.tap(); setDaily((v) => Math.min(DAILY_MAX, v + DAILY_STEP)); }, []);
-  const decTyt = useCallback(() => { H.tap(); setTytValue((v) => Math.max(TYT_NET_MIN, v - 1)); }, []);
-  const incTyt = useCallback(() => { H.tap(); setTytValue((v) => Math.min(TYT_NET_MAX, v + 1)); }, []);
-  const decAyt = useCallback(() => { H.tap(); setAytValue((v) => Math.max(aytMin, v - 1)); }, [aytMin]);
-  const incAyt = useCallback(() => { H.tap(); setAytValue((v) => Math.min(aytMax, v + 1)); }, [aytMax]);
-  const dec = useCallback(() => { H.tap(); setValue((v) => Math.max(TARGET_NET_MIN, v - 1)); }, []);
-  const inc = useCallback(() => { H.tap(); setValue((v) => Math.min(TARGET_NET_MAX, v + 1)); }, []);
+  const touch = (fn) => { H.tap(); setNetTouched(true); fn(); };
+  const decTyt = useCallback(() => touch(() => setTytValue((v) => Math.max(TYT_NET_MIN, v - 1))), []);
+  const incTyt = useCallback(() => touch(() => setTytValue((v) => Math.min(TYT_NET_MAX, v + 1))), []);
+  const decAyt = useCallback(() => touch(() => setAytValue((v) => Math.max(aytMin, v - 1))), [aytMin]);
+  const incAyt = useCallback(() => touch(() => setAytValue((v) => Math.min(aytMax, v + 1))), [aytMax]);
+  const dec = useCallback(() => touch(() => setValue((v) => Math.max(TARGET_NET_MIN, v - 1))), []);
+  const inc = useCallback(() => touch(() => setValue((v) => Math.min(TARGET_NET_MAX, v + 1))), []);
 
   const save = useCallback(async () => {
     setSaving(true);
@@ -87,22 +101,26 @@ export function useGoalNetEditor() {
       updateGoal(daily);
     }
 
-    const totalToSave = isMulti ? tytValue + aytValue : value;
-    const extra = isMulti ? { tyt: tytValue, ayt: aytValue } : {};
-    const res = await updateTargetNet(totalToSave, extra);
+    // Hedef yalniz degistirildiyse (ya da hic yoksa) yazilir.
+    let res = null;
+    if (netTouched || targetNet == null) {
+      const totalToSave = isMulti ? tytValue + aytValue : value;
+      const extra = isMulti ? { tyt: tytValue, ayt: aytValue } : {};
+      res = await updateTargetNet(totalToSave, extra);
+    }
     setSaving(false);
     const pending = res && res.synced === false;
     setPendingNote(pending ? SYNC_PENDING_COPY.targetNet : null);
     H.success();
     if (!pending) navigation.goBack();
-  }, [daily, goals, isMulti, tytValue, aytValue, value, updateTargetNet, navigation, dispatch, user?.id, updateGoal]);
+  }, [daily, goals, isMulti, tytValue, aytValue, value, netTouched, targetNet, updateTargetNet, navigation, dispatch, user?.id, updateGoal]);
 
   const cancel = useCallback(() => { navigation.goBack(); }, [navigation]);
 
   return {
     isMulti, secondLabel, tytValue, decTyt, incTyt, aytValue, decAyt, incAyt,
     aytMin, aytMax, value, dec, inc, save, cancel, saving, pendingNote, seeded,
-    netLabel: examNetLabel(examType), currentNet, gapResult, targetDepartment,
+    netLabel: examNetLabel(examType), currentNet, gapResult, examLabel, targetDepartment,
     daysUntilExam, min: TARGET_NET_MIN, max: TARGET_NET_MAX,
     daily, decDaily, incDaily, dailyMin: DAILY_MIN, dailyMax: DAILY_MAX,
   };
