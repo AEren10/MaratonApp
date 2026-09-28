@@ -79,10 +79,14 @@ export default function ProfileScreen() {
                 bilgi Calisma gecmisi satirinda, yalniz sifir degilse. */}
             <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
               <ProfileLinkRow
+                label="Yanlış defteri"
+                onPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK)}
+                first
+              />
+              <ProfileLinkRow
                 label="Çalışma geçmişi"
                 meta={studyMeta(careerStats)}
                 onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
-                first
               />
               <ProfileLinkRow
                 label="Gruplarım"

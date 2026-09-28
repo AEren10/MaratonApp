@@ -8,6 +8,7 @@ import { NudgePopup } from "../../components/common/NudgePopup";
 import { AnalysisHeader } from "./components/AnalysisHeader";
 import { AnalysisFilterPills } from "./components/AnalysisFilterPills";
 import { AnalysisAddTrialButton } from "./components/AnalysisAddTrialButton";
+import { AnalysisNotebookLink } from "./components/AnalysisNotebookLink";
 import { AnalysisHeroScore } from "./components/AnalysisHeroScore";
 import { SubjectTrendCards } from "./components/SubjectTrendCards";
 import { AnalysisTrialHistory } from "./components/AnalysisTrialHistory";
@@ -72,6 +73,11 @@ export default function AnalysisScreen() {
                 latest={analysis.latest}
                 heroLine={analysis.heroLine}
                 heroLabels={analysis.heroLabels}
+              />
+
+              <AnalysisNotebookLink
+                C={C}
+                onPress={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_notebook_link")}
               />
 
               {/* DERS BAZLI TREND */}

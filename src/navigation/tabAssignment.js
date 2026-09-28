@@ -107,6 +107,8 @@ export const ANALIZ_STACK = [
 ];
 
 export const PROFIL_STACK = [
+  SCREENS.WRONG_NOTEBOOK,   // Profil > Yanlis defteri (sekme degismez)
+  SCREENS.WRONG_DETAIL,
   SCREENS.SETTINGS,
   SCREENS.APPEARANCE,       // Gorunum
   SCREENS.NOTIFICATIONS,    // Rota haberleri
