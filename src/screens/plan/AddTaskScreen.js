@@ -85,7 +85,7 @@ function AddTaskInner() {
 
       <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
         <Button variant="primary" size="lg" fullWidth onPress={state.handleSubmit}>
-          Rotaya ekle
+          Bugünün planına ekle
         </Button>
       </View>
 

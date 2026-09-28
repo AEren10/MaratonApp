@@ -39,12 +39,13 @@ test("routePlan: exports addStopToActiveRoute that promotes stop to active and e
   assert.match(routePlanSource, /emitRouteUpdated\(\{ action: "stop_added"/);
 });
 
-test("useAddTaskState: connects 'Rotaya ekle' to createRoute or addStopToActiveRoute", () => {
-  assert.match(useAddTaskStateSource, /import \{ addStopToActiveRoute \} from "\.\.\/\.\.\/supabase\/routePlan"/);
-  assert.match(useAddTaskStateSource, /import \{ useStudyRoute \} from "\.\.\/\.\.\/hooks\/useStudyRoute"/);
-  assert.match(useAddTaskStateSource, /if \(!routeCreated\) \{/);
-  assert.match(useAddTaskStateSource, /await createRoute\(\{ initialActiveStop: stopPayload \}\)/);
-  assert.match(useAddTaskStateSource, /await addStopToActiveRoute\(stopPayload\)/);
+// "Durak ekle" bugunun ek gorevini yazar (uc listede aninda gorunur). Yalniz
+// telefonda duran sahte rota duragi (addStopToActiveRoute) artik yazilmaz.
+test("useAddTaskState: adds today's task, creates the route if missing, no local-only stop", () => {
+  assert.match(useAddTaskStateSource, /await createTask\(\{/);
+  assert.match(useAddTaskStateSource, /if \(!routeCreated\) await createRoute\(\)/);
+  assert.doesNotMatch(useAddTaskStateSource, /addStopToActiveRoute/);
+  assert.doesNotMatch(useAddTaskStateSource, /targetMinutes: minutes,/, "null sure dogrulamayi dusurmesin");
 });
 
 test("useStudyRoute: ensures resilient route creation with effectiveUserId and resolvedExamType", () => {

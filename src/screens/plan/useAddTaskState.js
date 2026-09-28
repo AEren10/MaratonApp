@@ -2,10 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { useAlert } from "../../contexts/AlertContext";
-import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
-import { addStopToActiveRoute } from "../../supabase/routePlan";
 import * as H from "../../lib/haptics";
 import {
   addTaskSubjectGroups,
@@ -19,7 +17,6 @@ export function useAddTaskState() {
   const route = useRoute();
   const { createTask } = useUserTasks();
   const showAlert = useAlert();
-  const { user } = useAuth();
   const { examType, field } = useExam();
   const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
@@ -68,28 +65,22 @@ export function useAddTaskState() {
 
   const handleSubmit = async () => {
     try {
+      // Eklenen durak BUGUNUN ek gorevi (user_tasks): Ana sayfa, Gunun plani
+      // ve Program > Hafta'da aninda gorunur. "Belirtme" null veriyordu ve
+      // dogrulama reddediyordu -- buton sessizce calismiyordu (uyari modalin
+      // arkasinda kaliyordu). Eskiden ayrica yalniz telefonda duran bir rota
+      // duragi yaziliyordu: sunucuya gitmiyor, ders programina gore baska bir
+      // gune dusuyor, ana sayfada ikinci kopya oluyordu.
       const minutes = parseDurationMinutes(durVal);
       await createTask({
         subject: subjectKey,
         topic: topicName,
-        targetMinutes: minutes,
+        ...(minutes ? { targetMinutes: minutes } : {}),
         note: "Kullanıcı ekledi",
       });
-
-      const stopPayload = {
-        userId: user?.id || "local_user",
-        examType: examType || "tyt_ayt",
-        subjectKey,
-        topicName,
-        durationMinutes: minutes,
-        subjectLabel: selectedSubjectObj?.name || subjectKey,
-      };
-
-      if (!routeCreated) {
-        await createRoute({ initialActiveStop: stopPayload });
-      } else {
-        await addStopToActiveRoute(stopPayload);
-      }
+      // Rotasi olmayan kullanicinin rotasi da kurulur; kurulamazsa (erisim
+      // yok, cevrimdisi) ek gorev yine kaydedilmis olur.
+      if (!routeCreated) await createRoute().catch(() => {});
 
       H.success();
       navigation.goBack();

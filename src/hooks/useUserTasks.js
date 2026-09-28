@@ -75,7 +75,8 @@ export function useUserTasks() {
     try {
       parsed = userTaskSchema.parse(input);
     } catch (e) {
-      throw new Error(e.errors?.[0]?.message || "Geçersiz görev bilgisi");
+      // Zod 4: issues (errors kalkti).
+      throw new Error((e.issues || e.errors)?.[0]?.message || "Geçersiz görev bilgisi");
     }
     const optimistic = buildOptimisticUserTask(parsed, user.id, today());
     const tempId = optimistic.id;
