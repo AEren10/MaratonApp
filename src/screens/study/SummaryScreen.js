@@ -27,7 +27,7 @@ import { WeekSummaryBody } from "./components/summary/WeekSummaryBody";
 import { MonthSummaryBody } from "./components/summary/MonthSummaryBody";
 
 const WEEK_ROUTES = new Set([SCREENS.WEEKLY_REVIEW, SCREENS.WEEKLY_TRIAL_REVIEW]);
-const SHARE_IDS = { day: SHARE_CARD_IDS.STUDY_DAY, week: SHARE_CARD_IDS.WEEKLY_ROUTE };
+const SHARE_IDS = { day: SHARE_CARD_IDS.STUDY_DAY, week: SHARE_CARD_IDS.QUESTIONS };
 
 function SummaryScreenInner() {
   const C = useC();

@@ -52,7 +52,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
         {bars.map((bar) => (
           <View key={bar.key} style={[styles.col, styles.meta]}>
             <Text style={[TYPOGRAPHY.micro, { color: bar.highlight ? C.text : C.text3 }]}>{bar.questions}</Text>
-            <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>{bar.label}</Text>
+            <Text style={[TYPOGRAPHY.tableHead, styles.dayLabel, { color: bar.highlight ? C.text : C.text3 }]}>{bar.label}</Text>
           </View>
         ))}
       </View>
@@ -70,5 +70,6 @@ const styles = StyleSheet.create({
   bar: { width: "100%", borderTopLeftRadius: 8, borderTopRightRadius: 8, borderBottomLeftRadius: 4, borderBottomRightRadius: 4 },
   avgLine: { position: "absolute", left: 0, right: 0, height: 0, borderTopWidth: 1, borderStyle: "dashed" },
   avgLabel: { position: "absolute", right: 0, paddingHorizontal: STEP.s1 / 2 },
+  dayLabel: { letterSpacing: 0.5, fontSize: 11.5 },
   meta: { height: undefined, gap: STEP.s1 / 2, marginTop: STEP.s1 },
 });

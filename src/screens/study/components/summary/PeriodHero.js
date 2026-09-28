@@ -32,7 +32,7 @@ export function PeriodHero({ eyebrow, headline, hero, side = [] }) {
 
       <View style={[styles.row, { borderColor: C.line }]}>
         <View style={styles.flex}>
-          <Text style={[TYPOGRAPHY.statHeroTight, { color: C.text }]} allowFontScaling={false}>{hero.value}</Text>
+          <Text style={[TYPOGRAPHY.statHeroTight, styles.heroValue, { color: C.text }]} allowFontScaling={false}>{hero.value}</Text>
           <Text style={[TYPOGRAPHY.label, { color: C.text2, marginTop: STEP.s2 }]}>{hero.label}</Text>
         </View>
         <View style={styles.side}>
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     paddingBottom: STEP.s3,
     borderBottomWidth: 1,
   },
+  heroValue: { includeFontPadding: false },
   flex: { flex: 1, minWidth: 0 },
   side: { gap: STEP.s3, alignItems: "flex-end" },
   sideStat: { alignItems: "flex-end" },
