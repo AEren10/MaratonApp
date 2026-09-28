@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { Modal, Pressable, Text, View, StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, {
-  useAnimatedStyle, useSharedValue, withTiming,
+  useAnimatedStyle, useSharedValue, withTiming, withSpring,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
@@ -19,26 +20,45 @@ const DISMISS_DISTANCE = 90;
 export default function QuickAddSheet({ visible, onClose, onAction }) {
   const C = useC();
   const { nextAction, startScreen, startParams } = useQuickAddActions();
-  const translateY = useSharedValue(0);
+  const translateY = useSharedValue(500);
   const sheetAnimStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
 
-  const close = () => { "worklet"; translateY.value = 0; scheduleOnRN(onClose); };
+  useEffect(() => {
+    if (visible) {
+      translateY.value = 500;
+      translateY.value = withSpring(0, { damping: 18, stiffness: 280 });
+    }
+  }, [visible]);
+
+  const close = () => {
+    "worklet";
+    translateY.value = withTiming(500, { duration: 220 }, (finished) => {
+      if (finished) scheduleOnRN(onClose);
+    });
+  };
 
   const pan = Gesture.Pan()
-    .onUpdate((e) => { if (e.translationY > 0) translateY.value = e.translationY; })
+    .onUpdate((e) => {
+      "worklet";
+      if (e.translationY > 0) translateY.value = e.translationY;
+    })
     .onEnd((e) => {
-      if (e.translationY > DISMISS_DISTANCE || e.velocityY > 800) close();
-      else translateY.value = withTiming(0);
+      "worklet";
+      if (e.translationY > DISMISS_DISTANCE || e.velocityY > 700) {
+        close();
+      } else {
+        translateY.value = withSpring(0, { damping: 18, stiffness: 280 });
+      }
     });
 
   const go = (screen, params) => {
-    onClose();
-    setTimeout(() => onAction(screen, params), 100);
+    close();
+    setTimeout(() => onAction(screen, params), 220);
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Sayfa dışına dokun, kapat">
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={close}>
+      <Pressable style={styles.backdrop} onPress={close} accessibilityLabel="Sayfa dışına dokun, kapat">
         <Animated.View
           style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.border }, sheetAnimStyle]}
         >
