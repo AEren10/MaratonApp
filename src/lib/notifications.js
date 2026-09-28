@@ -151,7 +151,9 @@ export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null
   if (Platform.OS === "web") return null;
   try {
     const optHour = await getOptimalHour(userId).catch(() => hour);
-    const useHour = Math.abs(optHour - hour) <= 3 ? optHour : hour;
+    // Aliskanlik saati secilen saatten en fazla 1 saat sapabilir. 3 saatlik
+    // kayma (19:00 secen kullaniciya 16:00) hata gibi okunuyordu.
+    const useHour = Math.abs(optHour - hour) <= 1 ? optHour : hour;
     const time = withNotificationJitter(useHour, minute, userId, "daily_reminder");
     const { title, body } = getDaily();
     return await Notifications.scheduleNotificationAsync({
@@ -373,6 +375,26 @@ export async function applyNotifPrefs(prefs, context, userId = null) {
   if (prefs.trialReminderEnabled) {
     await scheduleTrialReminder(userId);
   }
+}
+
+/**
+ * Bugun calisma kaydedildi: o gecenin seri-riski bildirimi iptal, yarina kur.
+ *
+ * Seri bildirimi yalniz acilis senkronunda kuruluyordu. Uygulama acikken
+ * kayit giren ogrenciye gece 22:00'de yine "Bugun kayit yok gibi gorunuyor"
+ * gidiyordu -- bildirimleri kapattiran turden bir yanlis-pozitif.
+ * Yalniz "calisti" yonunde calisir: "calismadi" kararini acilis senkronu
+ * (dogru veriyle) verir.
+ */
+export async function onStudiedToday(streak = 0, userId = null) {
+  if (Platform.OS === "web") return;
+  try {
+    const prefs = await getNotifPrefs(userId);
+    await cancelScheduledByType(["streak_risk"]);
+    const context = await readNotifContext(userId);
+    await saveNotifContext({ ...(context || {}), streak, studiedToday: true }, userId);
+    if (prefs?.streakRiskEnabled) await scheduleStreakRiskReminder(streak, true, userId);
+  } catch (_) {}
 }
 
 export async function scheduleTaskNotifications(taskCount, userId = null) {

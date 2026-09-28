@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { useDataSync } from "../hooks/useDataSync";
+import { useStreakReminderSync } from "../hooks/useStreakReminderSync";
 
 const DataSyncContext = createContext({
   syncing: false,
@@ -10,6 +11,7 @@ const DataSyncContext = createContext({
 
 export function DataSyncProvider({ children }) {
   const value = useDataSync();
+  useStreakReminderSync();
   return (
     <DataSyncContext.Provider value={value}>
       {children}
