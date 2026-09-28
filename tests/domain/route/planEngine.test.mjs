@@ -204,3 +204,28 @@ test("when quota is full with completed today stops, no new active stops are spa
   assert.ok(plan.tasks.every((t) => t.completed));
   assert.ok(!plan.tasks.some((t) => t.stopId === "extra"));
 });
+
+test("route day: the plan is exactly today's schedule stops, in order, no filler subjects", () => {
+  const plan = generateDailyPlan({
+    examType: "tyt",
+    dailyTarget: 80,
+    routeActive: true,
+    routeWeekStops: [
+      { id: "b", subject: "turkce", topic: "Paragraf", logicalStopKey: "tr:b", cost: { questions: 12 } },
+      { id: "a", subject: "matematik", topic: "Problemler", logicalStopKey: "math:a", score: 99, cost: { questions: 30 } },
+    ],
+  });
+  assert.deepEqual(plan.tasks.map((t) => t.topic), ["Paragraf", "Problemler"]);
+  assert.deepEqual(plan.tasks.map((t) => t.questionCount), [12, 30]);
+});
+
+test("route day with no stops stays empty (no adaptive suggestions)", () => {
+  const plan = generateDailyPlan({ examType: "tyt", dailyTarget: 80, routeActive: true, routeWeekStops: [] });
+  assert.equal(plan.tasks.length, 0);
+});
+
+test("route day keeps more stops than the 3-4 cap when the schedule gives them", () => {
+  const stops = ["A", "B", "C", "D", "E"].map((t, i) => ({ id: t, subject: "matematik", topic: t, logicalStopKey: `m:${i}` }));
+  const plan = generateDailyPlan({ examType: "tyt", dailyTarget: 40, routeActive: true, routeWeekStops: stops });
+  assert.equal(plan.tasks.length, 5);
+});

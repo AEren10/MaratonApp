@@ -147,7 +147,19 @@ export function generateDailyPlan({
   const remainingTarget = Math.max(0, dailyTarget - completedQuestionsCount);
 
   let candidates = [];
-  if (remainingActiveSlots > 0 && remainingTarget > 0) {
+  // ROTA GUNU: ders programi bugune hangi duraklari dusurduyse plan ODUR --
+  // sirasi ve kendi soru/sure yuku ile. Soru dagitici burada devreye girmez;
+  // girince duraklari puana gore yeniden siraliyor, 3-4 ile kesiyor ve bos
+  // kalan yerleri konusuz "oneri" derslerle dolduruyordu. Ana sayfa ile
+  // Program > Hafta ayni gunu farkli gosteriyordu.
+  if (routeActive) {
+    candidates = uncompletedRouteStops.map((routeStop, i) => ({
+      key: routeStop.subject,
+      routeStop,
+      questionCount: Number(routeStop.cost?.questions ?? routeStop.questions ?? routeStop.questionCount) || 20,
+      priority: completedTodayTasks.length + i + 1,
+    }));
+  } else if (remainingActiveSlots > 0 && remainingTarget > 0) {
     if (uncompletedRouteStops.length > 0) {
       const routeCandidates = uncompletedRouteStops.map((routeStop) => ({
         key: routeStop.subject,
@@ -176,14 +188,14 @@ export function generateDailyPlan({
         : [];
 
       candidates = [...routeAllocations, ...adaptiveFallback];
-    } else if (validRouteStops.length === 0 && !routeActive) {
+    } else if (validRouteStops.length === 0) {
       candidates = allocateAdaptiveCandidates(scored, remainingTarget, remainingActiveSlots);
     }
   }
 
   const tasks = [...completedTodayTasks];
   let remaining = remainingTarget;
-  for (let i = 0; i < candidates.length && remaining > 0; i++) {
+  for (let i = 0; i < candidates.length && (remaining > 0 || routeActive); i++) {
     const {
       key,
       routeStop = null,
@@ -195,7 +207,7 @@ export function generateDailyPlan({
     if (!subject) continue;
 
     const count = questionCount == null ? remaining : questionCount;
-    const actual = Math.min(count, remaining);
+    const actual = routeActive ? count : Math.min(count, remaining);
 
     // Konu seçimi: ROTA öncelikli.
     // Rota bu hafta bu derste hangi durağı gösteriyorsa günlük görev de onu
