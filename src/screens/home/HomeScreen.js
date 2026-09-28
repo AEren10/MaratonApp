@@ -16,13 +16,13 @@ import { HomeOverlays } from "./components/HomeOverlays";
 import { useHomeController } from "./useHomeController";
 import { useDueReviews } from "../../hooks/useDueReviews";
 import { syncReviewWidget, syncStreakWidget, syncTrialWidget } from "../../lib/widgetSync";
+import { updateReminderContent } from "../../lib/notifications";
 import { useAuth } from "../../contexts/AuthContext";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
 // Bağlantı Yok). Kaldirilan eski kartlarin hedefleri:
 //   ExamCountdown -> ust bant gun cipi (Takvim) + hero sinav sayaci
 //   TodayPlanCard -> BUGÜNÜN DURAKLARI + "Programın tamamı"; Görev Ekle -> + sheet
-//   SubjectMomentum / WeeklyActivityCard -> DİKKAT ÇEKEN İKİ DERS + Analiz
 //   Haftalik rapor kartlari -> "Bu haftanın raporu"; tekrar karti -> Defter
 //   Hizli eylemler -> + sheet (kayit/deneme/yanlis/gorev) ve ilgili sekmeler
 export default function HomeScreen() {
@@ -30,7 +30,7 @@ export default function HomeScreen() {
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
   const { user } = useAuth();
   const { dueCount } = useDueReviews(user?.id);
-  useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
+  useEffect(() => { syncReviewWidget({ due: dueCount }); updateReminderContent({ reviewDue: dueCount }, user?.id); }, [dueCount, user?.id]);
   // Seri izgarasi 28 gun geriye bakar: recentLogs 45 gunluk kayit tasir.
   useEffect(() => {
     syncStreakWidget({ logs: dashboard.recentLogs, streak: h.streak, longest: h.longestStreak });

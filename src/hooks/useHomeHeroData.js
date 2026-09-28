@@ -14,6 +14,9 @@ import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
+import { updateReminderContent } from "../lib/notifications";
+import { todayTR } from "../lib/dateUtils";
+import { useAuth } from "../contexts/AuthContext";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
@@ -21,6 +24,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
   const { targetNet, targetNetTYT, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const weeklyMinutesGoal = useSelector(selectWeeklyMinutesGoal);
   const trials = useSelector(selectTrials);
+  const { user } = useAuth();
   // Iki sinavli kullanicida ana sayfa grafiginin TYT · AYT sayfasi.
   const examSeries = useMemo(() => {
     if (examType !== "tyt_ayt" && examType !== "dil") return null;
@@ -167,7 +171,17 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
       week: weeklyEffort,
     });
     syncRouteWidget({ examDate, chart: chartData, target: examTarget.target });
-  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, examTarget.target]);
+    // Bildirimler de ayni gunu anlatsin: gunluk hatirlatma ve Pazar karnesi.
+    const openStops = (Array.isArray(todayStops) ? todayStops : []).filter((i) => !i.completed);
+    updateReminderContent({
+      todayPlan: {
+        day: todayTR(),
+        open: openStops.length,
+        next: nextTask ? { label: [nextTask.subjectLabel, nextTask.topicLabel].filter(Boolean).join(" · "), minutes: nextTask.estimatedMinutes || 0 } : null,
+      },
+      weeklyVars: { questions: weeklyEffort?.totalQuestions || 0, minutes: weeklyEffort?.totalMinutes || 0 },
+    }, user?.id && user.id !== "dev" ? user.id : null);
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, examTarget.target, user?.id]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   // Ana buton yalniz rota gorevlerine bakiyordu: rota yokken listede
   // baslanabilir bir durak (kullanicinin ekledigi ya da oneri) olsa bile

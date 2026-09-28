@@ -3,9 +3,10 @@ import { Platform } from "react-native";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { SCREENS } from "../constants/screens";
 import { notificationUrl } from "../navigation/routes";
-import { getDaily, getStreakRisk, getWeekly, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
+import { getDaily, getStreakRisk, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
 import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from "../supabase/profiles";
 import * as appStorage from "./storage/appStorage";
+import { dailyReminderContent, weeklySummaryContent } from "./reminderContent";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 const CONTEXT_KEY = STORAGE_KEYS.NOTIF_CONTEXT;
@@ -114,6 +115,16 @@ export async function cancelScheduledByType(types) {
   } catch (_) {}
 }
 
+// Bildirim kurma islemleri TEK SIRADA: "iptal et + kur" adimlari ayni anda
+// iki yerden (acilis senkronu, ana sayfa, calisma kaydi) calisirsa ayni
+// bildirim iki kez kurulabiliyordu.
+let notifQueue = Promise.resolve();
+function serial(fn) {
+  const run = notifQueue.then(fn, fn);
+  notifQueue = run.catch(() => {});
+  return run;
+}
+
 // applyNotifPrefs'in yönettiği tipler. task_reminder BİLEREK yok.
 const PREF_MANAGED_TYPES = [
   "daily_reminder",
@@ -147,6 +158,11 @@ function withNotificationJitter(hour, minute, userId, type, window = 40) {
   };
 }
 
+// Gunluk hatirlatma: onumuzdeki 7 gun icin TEK SEFERLIK kayitlar. Tekrarlayan
+// (DAILY) tetik her gun ayni metni gonderiyordu; artik gunun plani biliniyorsa
+// o gunun kaydi somut (kac durak, siradaki, kac dakika), gun bittiyse o gun
+// hic gonderilmez (bkz. reminderContent). Ana sayfa her acilista yeniden kurar;
+// hic acmayan kullaniciyi sunucu push'u (3 gun pasif) yakalar.
 export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null) {
   if (Platform.OS === "web") return null;
   try {
@@ -155,23 +171,32 @@ export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null
     // kayma (19:00 secen kullaniciya 16:00) hata gibi okunuyordu.
     const useHour = Math.abs(optHour - hour) <= 1 ? optHour : hour;
     const time = withNotificationJitter(useHour, minute, userId, "daily_reminder");
-    const { title, body } = getDaily();
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        data: { type: "daily_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: time.hour,
-        minute: time.minute,
-      },
-    });
+    const context = await readNotifContext(userId);
+    const now = new Date();
+    for (let i = 0; i < 7; i += 1) {
+      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, time.hour, time.minute, 0);
+      if (date.getTime() <= Date.now()) continue;
+      const content = dailyReminderContent(context, localDayKey(date), getDaily());
+      if (!content) continue;
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: content.title,
+          body: content.body,
+          data: {
+            type: "daily_reminder",
+            url: notificationUrl(content.kind === "review" ? SCREENS.REVIEW_SESSION : SCREENS.PLAN_DETAIL),
+          },
+        },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date },
+      });
+    }
+    return true;
   } catch (_) {
     return null;
   }
 }
+
+const localDayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 // Bir sonraki 22:00'ı döndürür. O gün 22:00 geçtiyse yarını verir.
 // studiedToday ise bugünü atlayıp doğrudan yarını hedefler.
@@ -222,31 +247,26 @@ export async function scheduleStreakRiskReminder(streak = 0, studiedToday = fals
   }
 }
 
+// Pazar 20:00 karnesi. Sayilar hic doldurulmuyordu (weeklyVars kimse
+// yazmiyordu), hep genel metin gidiyordu. Artik ana sayfa haftanin soru ve
+// dakikasini baglama yaziyor; bu Pazar'in kaydi o sayilarla, sonraki uc
+// Pazar genel metinle kurulur.
 export async function scheduleWeeklySummary(weeklyVars = {}, userId = null) {
   if (Platform.OS === "web") return null;
   try {
     const time = withNotificationJitter(20, 0, userId, "weekly_summary");
-    const hasVars = weeklyVars.xp || weeklyVars.questions || weeklyVars.minutes;
-    const { title, body } = hasVars
-      ? getWeekly({ xp: weeklyVars.xp || 0, questions: weeklyVars.questions || 0, minutes: weeklyVars.minutes || 0 })
-      : { title: "Haftalık raporun hazır", body: "Bu haftanın özetine göz at!" };
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        data: { type: "weekly_summary", url: notificationUrl(SCREENS.SUMMARY, { period: "week" }) },
-      },
-      trigger: {
-        // Tasarim: "Haftalik rapor · Pazar 20:00". weekday 1 = Pazar
-        // (Calendar.DAY_OF_WEEK). Saat 10 yaziliydi, yani ekranin metni ile
-        // gercek gonderim saati uyusmuyordu. Aksam secimi bilincli: hafta
-        // kapanirken okunur, sonraki haftanin rotasi onunde durur.
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: 1,
-        hour: time.hour,
-        minute: time.minute,
-      },
-    });
+    const now = new Date();
+    const daysToSunday = (7 - now.getDay()) % 7;
+    for (let i = 0; i < 4; i += 1) {
+      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysToSunday + i * 7, time.hour, time.minute, 0);
+      if (date.getTime() <= Date.now()) continue;
+      const { title, body } = weeklySummaryContent(i === 0 ? weeklyVars || {} : {});
+      await Notifications.scheduleNotificationAsync({
+        content: { title, body, data: { type: "weekly_summary", url: notificationUrl(SCREENS.SUMMARY, { period: "week" }) } },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date },
+      });
+    }
+    return true;
   } catch (_) {
     return null;
   }
@@ -355,11 +375,20 @@ export async function saveNotifContext(context = {}, userId = null) {
   try { await appStorage.setJson(notifContextKey(userId), context); } catch (_) {}
 }
 
-export async function applyNotifPrefs(prefs, context, userId = null) {
+export function applyNotifPrefs(prefs, context, userId = null) {
+  return serial(() => applyNotifPrefsNow(prefs, context, userId));
+}
+
+async function applyNotifPrefsNow(prefs, context, userId = null) {
   await cancelScheduledByType(PREF_MANAGED_TYPES);
   if (!prefs) return;
-  if (context) await saveNotifContext(context, userId);
-  else context = await readNotifContext(userId);
+  // Birlestir: acilis senkronu seri bilgisini, ana sayfa gunun planini ve
+  // hafta toplamini yazar; biri digerini silmesin.
+  const stored = await readNotifContext(userId);
+  if (context) {
+    context = { ...stored, ...context };
+    await saveNotifContext(context, userId);
+  } else context = stored;
   if (prefs.dailyReminderEnabled) {
     await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute, userId);
   }
@@ -386,14 +415,48 @@ export async function applyNotifPrefs(prefs, context, userId = null) {
  * Yalniz "calisti" yonunde calisir: "calismadi" kararini acilis senkronu
  * (dogru veriyle) verir.
  */
-export async function onStudiedToday(streak = 0, userId = null) {
-  if (Platform.OS === "web") return;
+export function onStudiedToday(streak = 0, userId = null) {
+  if (Platform.OS === "web") return Promise.resolve();
+  return serial(() => onStudiedTodayNow(streak, userId));
+}
+
+async function onStudiedTodayNow(streak, userId) {
   try {
     const prefs = await getNotifPrefs(userId);
     await cancelScheduledByType(["streak_risk"]);
     const context = await readNotifContext(userId);
     await saveNotifContext({ ...(context || {}), streak, studiedToday: true }, userId);
     if (prefs?.streakRiskEnabled) await scheduleStreakRiskReminder(streak, true, userId);
+  } catch (_) {}
+}
+
+/**
+ * Ana sayfadan: bugunun plani (acik durak, siradaki), tekrari gelen yanlis
+ * sayisi ve hafta toplami. Degismediyse bir sey yapmaz; degistiyse gunluk
+ * hatirlatma ve Pazar karnesi yeni metinle yeniden kurulur. Kismi alan
+ * gonderilebilir (ornegin yalniz reviewDue).
+ */
+let lastReminderKey = null;
+export function updateReminderContent(partial = {}, userId = null) {
+  if (Platform.OS === "web") return Promise.resolve();
+  return serial(() => updateReminderContentNow(partial, userId));
+}
+
+async function updateReminderContentNow(partial, userId) {
+  try {
+    const context = await readNotifContext(userId);
+    const next = { ...context, ...partial };
+    const key = JSON.stringify([userId, next.todayPlan, next.reviewDue, next.weeklyVars]);
+    if (key === lastReminderKey) return;
+    lastReminderKey = key;
+    await saveNotifContext(next, userId);
+    const prefs = await getNotifPrefs(userId);
+    if (!prefs) return;
+    await cancelScheduledByType(["daily_reminder", "weekly_summary"]);
+    if (prefs.dailyReminderEnabled) {
+      await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute, userId);
+    }
+    if (prefs.weeklySummaryEnabled !== false) await scheduleWeeklySummary(next.weeklyVars, userId);
   } catch (_) {}
 }
 
