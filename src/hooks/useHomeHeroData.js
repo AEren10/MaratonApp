@@ -7,6 +7,7 @@ import { useForecastTarget } from "./useForecastTarget";
 import { useExam } from "../contexts/ExamContext";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { useStudyRoute } from "./useStudyRoute";
+import { useTodayKey } from "./useTodayKey";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
 import { routeDeclaredPath } from "../domain/route/declaredPath";
@@ -137,10 +138,12 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal, previousQuestions }),
     [weekLogs, dailyGoal, previousQuestions],
   );
+  // Gun degisince (gece yarisi / uygulama one gelince) yeniden hesaplanir.
+  const todayKey = useTodayKey();
   const todayIndex = useMemo(() => {
     const js = new Date().getDay();
     return js === 0 ? 6 : js - 1;
-  }, []);
+  }, [todayKey]);
 
   // Bugun biten duraklar planin BASINDA duruyor; ana buton bitmis duragi
   // gostermesin diye ilk ACIK gorev alinir (ŞİMDİ karti ile ayni kural).

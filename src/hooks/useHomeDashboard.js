@@ -4,6 +4,7 @@ import { getAllSubjects } from "../domain/trial/trialTypes";
 import { generateDailyPlan } from "../lib/planEngine";
 import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
+import { useTodayKey } from "./useTodayKey";
 import { todayPlanStops } from "../domain/program/todayStops";
 import { dateKey, todayTR } from "../lib/dateUtils";
 import { useHomeWeekLogs } from "./useHomeWeekLogs";
@@ -68,6 +69,8 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
   );
 
   const { schedule, ready: scheduleReady } = useClassSchedule();
+  // Acik kalan ana sayfada gece yarisindan sonra dunun plani kalmasin.
+  const todayKey = useTodayKey();
 
   const { plan, generatedTasks } = useMemo(() => {
     // Rota bu haftaki durakları veriyorsa günlük plan onlardan türesin.
@@ -94,7 +97,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),
