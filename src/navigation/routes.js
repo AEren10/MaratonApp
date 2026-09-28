@@ -62,6 +62,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.EXAM_DATE]: { path: "sinav-tarihi", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.HOW_IT_WORKS]: { path: "nasil-calisir", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
   [SCREENS.DOCUMENT]: { path: "belge/:docKey", flow: PRODUCT_FLOW_IDS.SETTINGS, deepLink: false },
+  [SCREENS.LEGAL_DOC]: { path: "yasal/:docKey", flow: PRODUCT_FLOW_IDS.PREMIUM, deepLink: false },
   [SCREENS.SEARCH]: { path: "ara", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.CLASS_SCHEDULE]: { path: "program/ders-programi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },

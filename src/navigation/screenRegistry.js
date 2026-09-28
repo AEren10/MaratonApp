@@ -212,6 +212,8 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
+  // Paywall kok yiginda: gizlilik/kosullar oradan da acilabilsin (App Review).
+  screen(SCREENS.LEGAL_DOC, DocumentScreen),
   screen(SCREENS.HOW_IT_WORKS, HowItWorksScreen),
   screen(SCREENS.EXAM_DATE, ExamDateScreen, modalOptions),
   screen(SCREENS.WEEKLY_REVIEW, SummaryScreen), // eski rota -> Haftalik Ozet

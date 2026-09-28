@@ -88,6 +88,7 @@ export const SCREENS = {
   FORECAST_ACCURACY: "ForecastAccuracy",
   SHARE_CARD: "ShareCard",
   WIDGET_GUIDE: "WidgetGuide",
+  LEGAL_DOC: "LegalDoc",
   MILESTONE: "Milestone",
 
   // Social

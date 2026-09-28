@@ -9,6 +9,8 @@ import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Geri yukleme + yasal baglantilar. Her oge 44px dokunma alani.
+// Paywall kok yiginda; PRIVACY/TERMS yalniz Profil yigininda oldugu icin
+// baglantilar hicbir sey acmiyordu -> kokteki LEGAL_DOC.
 export const PaywallLegalRow = React.memo(function PaywallLegalRow({ onRestore, disabled }) {
   const C = useC();
   const navigation = useNavigation();
@@ -20,11 +22,11 @@ export const PaywallLegalRow = React.memo(function PaywallLegalRow({ onRestore, 
         <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.restore}</Text>
       </Press>
       <View style={styles.links}>
-        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.PRIVACY)} style={styles.hit} accessibilityRole="link">
+        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.LEGAL_DOC, { docKey: "privacy" })} style={styles.hit} accessibilityRole="link">
           <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.privacy}</Text>
         </Press>
         <Text style={text}>·</Text>
-        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.TERMS)} style={styles.hit} accessibilityRole="link">
+        <Press haptic="none" onPress={() => navigation.navigate(SCREENS.LEGAL_DOC, { docKey: "terms" })} style={styles.hit} accessibilityRole="link">
           <Text style={[text, styles.underline]}>{PAYWALL_LEGAL.terms}</Text>
         </Press>
       </View>

@@ -178,6 +178,7 @@ export const ROOT_ONLY = [
   // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,
+  SCREENS.LEGAL_DOC,        // Paywall -> Gizlilik / Kullanim kosullari
   SCREENS.ACCESS_ENDED,     // Deneme Bitti (bir kez, erisim bitince)
   SCREENS.FIRST_WEEK,
   SCREENS.FIRST_ROUTE_READY,
