@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, STEP, RADIUS, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 import { GroupAvatarStack } from "./GroupAvatarStack";
@@ -28,87 +28,107 @@ export const GroupItemRow = React.memo(function GroupItemRow({
     ? (group.member_preview ?? group.memberPreview)
     : [];
 
+  const rankColor = userRank === 1 ? C.amber : userRank === 2 ? C.text2 : userRank === 3 ? C.text3 : null;
+
   return (
-    <Press haptic="none"
+    <Press
+      haptic="none"
       onPress={handlePress}
       onLongPress={onLeave}
       accessibilityRole="button"
       accessibilityLabel={`${group.name} grubuna gir`}
-      accessibilityHint="Grup odasını açar, uzun basışta ayrılma seçeneği sunar"
+      accessibilityHint="Grup odasını açar, basılı tutunca ayrılma seçeneği sunar"
       style={[
-        s.row,
+        s.card,
         {
-          backgroundColor: isSelected ? C.accent + "10" : C.surface,
+          backgroundColor: isSelected ? C.accent + "12" : C.surface,
           borderColor: isSelected ? C.accent + "70" : C.border,
-        }
+        },
       ]}
     >
-      <View style={s.info}>
-        <View style={s.titleRow}>
-          <Text
-            style={[s.name, { color: isSelected ? C.accent : C.text }]}
-            numberOfLines={1}
-          >
+      <View style={[s.badge, { backgroundColor: C.accent + "14", borderColor: C.accent + "30" }]}>
+        <Text style={[TYPOGRAPHY.subheading, { color: C.accent }]}>{initial}</Text>
+      </View>
+
+      <View style={s.content}>
+        <View style={s.topRow}>
+          <Text style={[s.name, { color: isSelected ? C.accent : C.text }]} numberOfLines={1}>
             {group.name}
           </Text>
           {userRank ? (
-            <View style={[s.rankPill, { backgroundColor: C.elev, borderColor: C.border }]}>
-              <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>#{userRank}</Text>
+            <View style={[s.rankPill, { backgroundColor: rankColor ? rankColor + "18" : C.elev, borderColor: rankColor || C.border }]}>
+              {userRank <= 3 ? <Icon name="trophy" size={11} color={rankColor} style={s.trophy} /> : null}
+              <Text style={[TYPOGRAPHY.micro, { color: rankColor || C.text2 }]}>#{userRank}</Text>
             </View>
           ) : null}
         </View>
-        <Text
-          style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 1 }]}
-          numberOfLines={1}
-        >
-          Bu hafta {weeklyQuestions} soru
+
+        <Text style={[TYPOGRAPHY.caption, s.statsText, { color: C.text3 }]} numberOfLines={1}>
+          {weeklyQuestions > 0 ? `Bu hafta ${weeklyQuestions} soru çözüldü` : "Bu hafta henüz soru çözülmedi"}
         </Text>
+
         <GroupAvatarStack initial={initial} memberCount={memberCount} members={preview} />
       </View>
 
-      <View style={[s.enter, { backgroundColor: C.elev, borderColor: C.border }]}>
-        <Icon name="chevR" size={14} color={C.text2} />
+      <View style={s.chevWrap}>
+        <Icon name="chevR" size={15} color={C.text3} />
       </View>
     </Press>
   );
 });
 
 const s = StyleSheet.create({
-  row: {
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    minHeight: 84,
+    minHeight: 90,
     paddingHorizontal: SPACING.md,
-    paddingVertical: STEP.s2 + 2,
+    paddingVertical: SPACING.md,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
   },
-  info: {
-    flex: 1,
-    marginRight: SPACING.sm,
+  badge: {
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: SPACING.md,
+    alignSelf: "flex-start",
+    marginTop: 2,
   },
-  titleRow: {
+  content: {
+    flex: 1,
+    marginRight: SPACING.xs,
+  },
+  topRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: SPACING.sm,
+    justifyContent: "space-between",
+    gap: SPACING.xs,
   },
   name: {
     flex: 1,
     ...TYPOGRAPHY.bodySemiBold,
   },
   rankPill: {
-    minHeight: 24,
-    justifyContent: "center",
-    paddingHorizontal: SPACING.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 20,
+    paddingHorizontal: SPACING.xs + 2,
     borderRadius: RADIUS.full,
     borderWidth: 1,
   },
-  enter: {
-    width: CONTROL.tapMin,
-    height: CONTROL.tapMin,
-    alignItems: "center",
+  trophy: {
+    marginRight: 2,
+  },
+  statsText: {
+    marginTop: 1,
+    marginBottom: 2,
+  },
+  chevWrap: {
+    paddingLeft: SPACING.xs,
     justifyContent: "center",
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
   },
 });

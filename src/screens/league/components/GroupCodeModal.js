@@ -6,7 +6,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
-export function GroupCodeModal({ visible, title, subtitle, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen }) {
+export function GroupCodeModal({ visible, title, subtitle, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen, error }) {
   const C = useC();
   const isCode = autoCap && maxLen === 6;
   const disabled = busy || !value?.trim() || (isCode && value.trim().length < 4);
@@ -44,8 +44,23 @@ export function GroupCodeModal({ visible, title, subtitle, placeholder, value, o
               autoCapitalize={autoCap ? "characters" : "none"}
               maxLength={maxLen}
               autoFocus
-              style={[s.input, isCode && s.codeInput, { backgroundColor: C.bg, borderColor: C.border, color: isCode ? C.accent : C.text }]}
+              style={[
+                s.input,
+                isCode && s.codeInput,
+                {
+                  backgroundColor: C.bg,
+                  borderColor: error ? C.danger : C.border,
+                  color: isCode ? (error ? C.danger : C.accent) : C.text,
+                },
+              ]}
             />
+
+            {error ? (
+              <View style={[s.errorBox, { backgroundColor: C.danger + "14", borderColor: C.danger + "35" }]}>
+                <Icon name="alertCircle" size={15} color={C.danger} />
+                <Text style={[TYPOGRAPHY.caption, s.errorText, { color: C.danger }]}>{error}</Text>
+              </View>
+            ) : null}
 
             <Press haptic="none" onPress={handleSubmit} disabled={disabled} accessibilityRole="button" style={[s.submit, { backgroundColor: disabled ? C.surface2 : C.accent }]}>
               {busy ? <ActivityIndicator size="small" color={C.textOnFill} /> : <Text style={[TYPOGRAPHY.button, { color: disabled ? C.text3 : C.textOnFill }]}>{cta}</Text>}
@@ -72,6 +87,17 @@ const s = StyleSheet.create({
   subtitle: { marginTop: SPACING.xs, marginBottom: SPACING.md },
   input: { borderWidth: 1, borderRadius: RADIUS.lg, paddingHorizontal: SPACING.md, paddingVertical: STEP.s2, ...TYPOGRAPHY.input },
   codeInput: { ...TYPOGRAPHY.inputHeading, letterSpacing: 4, textAlign: "center", paddingVertical: STEP.s2 },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.xs + 2,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: STEP.s1 + 2,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    marginTop: SPACING.sm,
+  },
+  errorText: { flex: 1 },
   submit: { minHeight: 48, borderRadius: RADIUS.lg, alignItems: "center", justifyContent: "center", marginTop: SPACING.md },
   cancelBtn: { minHeight: 38, alignItems: "center", justifyContent: "center", marginTop: SPACING.xs },
 });

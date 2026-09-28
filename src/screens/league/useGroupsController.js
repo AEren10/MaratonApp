@@ -9,16 +9,11 @@ import { appUrl } from "../../navigation/routes";
 
 export function useGroupsController({ user, initialGroupCode }) {
   const showAlert = useAlert();
-  const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
-  const [board, setBoard] = useState({ list: [] });
-  const [boardError, setBoardError] = useState(null);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [joinOpen, setJoinOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [groups, setGroups] = useState([]), [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null), [board, setBoard] = useState({ list: [] });
+  const [boardError, setBoardError] = useState(null), [busy, setBusy] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false), [joinOpen, setJoinOpen] = useState(false);
+  const [name, setName] = useState(""), [code, setCode] = useState(""), [codeError, setCodeError] = useState(null);
 
   const loadGroups = useCallback(async () => {
     if (!user?.id) return;
@@ -57,7 +52,6 @@ export function useGroupsController({ user, initialGroupCode }) {
       setBoardError(e?.message || "Sıralama yüklenemedi.");
     }
   }, [selected?.id, user?.id]);
-
   useEffect(() => { loadBoard(); }, [loadBoard]);
 
   const standing = useMemo(() => {
@@ -100,19 +94,30 @@ export function useGroupsController({ user, initialGroupCode }) {
   };
 
   const doJoin = async () => {
-    if (code.trim().length < 6) return;
+    const clean = code.trim().toUpperCase();
+    if (clean.length < 6) {
+      H.warn();
+      setCodeError("Lütfen 6 haneli kodu eksiksiz gir.");
+      return;
+    }
     setBusy(true);
+    setCodeError(null);
     try {
-      await joinByCode(code);
+      await joinByCode(clean);
       H.success();
-      setJoinOpen(false);
+      closeJoin();
       setCode("");
       await loadGroups();
-    } catch {
-      showAlert("Hata", "Kod geçersiz ya da grup bulunamadı.");
+    } catch (err) {
+      H.error();
+      const msg = err?.message?.includes("zaten") ? "Bu gruba zaten üyesin." : "Kod geçersiz ya da grup bulunamadı.";
+      setCodeError(msg);
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
   };
+
+  const closeJoin = () => { setJoinOpen(false); setCodeError(null); };
 
   const doLeave = (g) => {
     H.warn();
@@ -136,8 +141,9 @@ export function useGroupsController({ user, initialGroupCode }) {
 
   return {
     groups, loading, selected, setSelected, board, boardError, standing,
-    createOpen, setCreateOpen, joinOpen, setJoinOpen,
-    name, setName, code, setCode, busy,
+    createOpen, setCreateOpen, joinOpen, setJoinOpen, closeJoin,
+    name, setName, code, setCode: (v) => { setCode(v); if (codeError) setCodeError(null); },
+    codeError, busy,
     loadBoard, doCreate, doJoin, doLeave, shareCode,
   };
 }

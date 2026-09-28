@@ -6,7 +6,7 @@ import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/nativ
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW } from "../../components/design";
+import { Icon, Avatar, AnimatedCard, GlowBackground, getCrimsonGlow } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
@@ -298,9 +298,11 @@ export default function LeagueScreen() {
     return <EmptyState icon="award" title="Henüz kimse yok" message="Bu haftanın sıralaması henüz oluşmadı" color="accent" />;
   }, [error, tab, goAddFriend]);
 
+  const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
+
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground blobs={WARM_GLOW} />
+      <GlowBackground blobs={crimsonBlobs} />
       {/* Header */}
       <View style={{
         flexDirection: "row",

@@ -28,12 +28,7 @@ export function GroupCodeCard({ group, onShare }) {
   if (!group) return null;
 
   return (
-    <View
-      style={[
-        s.card,
-        { backgroundColor: C.surface, borderColor: C.border },
-      ]}
-    >
+    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
       <View style={s.header}>
         <View style={s.copy}>
           <Text style={[s.label, { color: C.sec }]}>DAVET KODU</Text>
@@ -51,25 +46,10 @@ export function GroupCodeCard({ group, onShare }) {
           haptic="tap"
           accessibilityRole="button"
           accessibilityLabel="Grup kodunu kopyala"
-          style={[
-            s.actionBtn,
-            {
-              backgroundColor: C.surface,
-              borderColor: copied ? C.green : C.border,
-            },
-          ]}
+          style={[s.actionBtn, { backgroundColor: C.surface, borderColor: copied ? C.green : C.border }]}
         >
-          <Icon
-            name={copied ? "check" : "copy"}
-            size={16}
-            color={copied ? C.green : C.text}
-          />
-          <Text
-            style={[
-              s.actionBtnText,
-              { color: copied ? C.green : C.text },
-            ]}
-          >
+          <Icon name={copied ? "check" : "copy"} size={16} color={copied ? C.green : C.text} />
+          <Text style={[s.actionBtnText, { color: copied ? C.green : C.text }]}>
             {copied ? "Kopyalandı" : "Kopyala"}
           </Text>
         </AnimatedPressable>
@@ -79,13 +59,7 @@ export function GroupCodeCard({ group, onShare }) {
           haptic="medium"
           accessibilityRole="button"
           accessibilityLabel="Grup kodunu paylaş"
-          style={[
-            s.actionBtn,
-            {
-              backgroundColor: C.accent,
-              borderColor: C.accent,
-            },
-          ]}
+          style={[s.actionBtn, { backgroundColor: C.accent, borderColor: C.accent }]}
         >
           <Icon name="share" size={16} color={C.textOnFill} />
           <Text style={[s.actionBtnText, { color: C.textOnFill }]}>Paylaş</Text>

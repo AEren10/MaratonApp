@@ -27,3 +27,13 @@ export const WARM_GLOW = [
   { x: 0.15, y: 0.35, r: 0.50, color: "#ff6b35", opacity: 0.05 },
   { x: 0.55, y: 0.75, r: 0.40, color: "#7c3aed", opacity: 0.04 },
 ];
+
+export function getCrimsonGlow(C) {
+  const accent = C?.accent;
+  const bright = C?.accentBright || C?.accentText || accent;
+  return [
+    { x: 0.85, y: 0.06, r: 0.55, color: accent, opacity: 0.14 },
+    { x: 0.10, y: 0.30, r: 0.50, color: bright, opacity: 0.09 },
+    { x: 0.65, y: 0.75, r: 0.45, color: accent, opacity: 0.07 },
+  ];
+}

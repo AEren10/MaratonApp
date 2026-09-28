@@ -1,9 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { FlatList, Modal, View, Text, StyleSheet } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
+import { GlowBackground, getCrimsonGlow } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { GroupCodeCard } from "./GroupCodeCard";
@@ -23,9 +24,8 @@ export function GroupDetailPanel({
   const C = useC();
   const insets = useSafeAreaInsets();
   const members = board?.list || [];
-  const renderMember = useCallback(({ item }) => (
-    <GroupMemberRow item={item} />
-  ), []);
+  const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
+  const renderMember = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
   const keyExtractor = useCallback((item) => String(item.user_id), []);
 
   if (!group) return null;
@@ -33,6 +33,7 @@ export function GroupDetailPanel({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView edges={["bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
+        <GlowBackground blobs={crimsonBlobs} />
         <View style={[s.topBar, { paddingTop: Math.max(insets.top, SPACING.xl) + SPACING.sm }]}>
           <Press haptic="none" onPress={onClose} accessibilityRole="button" accessibilityLabel="Grup listesini aç" style={s.backHit}>
             <Icon name="chevL" size={20} color={C.text2} />
@@ -40,7 +41,7 @@ export function GroupDetailPanel({
           <View style={s.titleCol}>
             <Text style={[s.title, { color: C.text }]} numberOfLines={1}>{group.name}</Text>
             <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]} numberOfLines={1}>
-              {Number(group.member_count ?? group.memberCount ?? members.length) || members.length} üye · haftalık oda
+              {Number(group.member_count ?? group.memberCount ?? members.length) || members.length} üye · haftalık yarış
             </Text>
           </View>
         </View>
@@ -57,8 +58,8 @@ export function GroupDetailPanel({
               <GroupCodeCard group={group} onShare={onShare} />
               <GroupCompetitionBanner standing={standing} />
               <View style={s.memberHead}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ÜYELER</Text>
-                <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Bu hafta</Text>
+                <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>HAFTALIK SIRALAMA</Text>
+                <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Soru & Süre</Text>
               </View>
               {boardError ? (
                 <View style={[s.boardError, { borderColor: C.border, backgroundColor: C.surface }]}>
@@ -74,7 +75,7 @@ export function GroupDetailPanel({
           )}
           ListEmptyComponent={!boardError ? (
             <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>
-              Bu hafta kimse aktif değil.
+              Bu hafta henüz kimse soru çözmedi.
             </Text>
           ) : null}
         />

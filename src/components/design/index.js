@@ -13,7 +13,7 @@ export { AnimatedCard } from "./AnimatedCard";
 export { SectionLabel } from "./SectionLabel";
 
 export { Spot } from "./Spot";
-export { GlowBackground, WARM_GLOW } from "./GlowBackground";
+export { GlowBackground, WARM_GLOW, getCrimsonGlow } from "./GlowBackground";
 export { SparkBurst } from "./SparkBurst";
 export { AnimatedPressable } from "./AnimatedPressable";
 export { Button } from "./Button";

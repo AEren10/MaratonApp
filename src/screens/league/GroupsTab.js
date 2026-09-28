@@ -64,7 +64,7 @@ export function GroupsTab({ user, initialGroupCode }) {
         onShare={c.shareCode}
       />
       <GroupCodeModal visible={c.createOpen} title="Yeni Grup Oluştur" subtitle="Grubun için bir isim belirle" placeholder="Grup adı (örn. 12-A Sayısal)" value={c.name} onChange={c.setName} onSubmit={c.doCreate} onClose={() => c.setCreateOpen(false)} busy={c.busy} cta="Oluştur" />
-      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" subtitle="Arkadaşından aldığın 6 haneli kodu gir" placeholder="XXXXXX" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={() => c.setJoinOpen(false)} busy={c.busy} cta="Katıl" />
+      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" subtitle="Arkadaşından aldığın 6 haneli kodu gir" placeholder="XXXXXX" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={c.closeJoin} busy={c.busy} cta="Katıl" error={c.codeError} />
     </View>
   );
 }
