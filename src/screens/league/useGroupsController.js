@@ -6,6 +6,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
 import { appUrl } from "../../navigation/routes";
+import { formatGroupJoinError } from "./groupErrors";
 
 export function useGroupsController({ user, initialGroupCode }) {
   const showAlert = useAlert();
@@ -35,7 +36,7 @@ export function useGroupsController({ user, initialGroupCode }) {
     setBusy(true);
     joinByCode(initialGroupCode)
       .then(() => { H.success(); loadGroups(); })
-      .catch(() => showAlert("Hata", "Grup kodu geçersiz veya zaten üyesin."))
+      .catch((err) => showAlert("Hata", formatGroupJoinError(err, initialGroupCode, groups)))
       .finally(() => setBusy(false));
   }, [initialGroupCode, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -56,24 +57,14 @@ export function useGroupsController({ user, initialGroupCode }) {
 
   const standing = useMemo(() => {
     if (!board.list?.length) return null;
-    const leader = board.list[0];
-    const mine = board.list.find((m) => m.you);
+    const leader = board.list[0], mine = board.list.find((m) => m.you);
     if (!mine) return null;
-    const isLeader = mine.rank === 1;
-    const second = board.list[1];
-    const myQuestions = mine.weekly_questions ?? mine.questions ?? 0;
-    const leaderQuestions = leader.weekly_questions ?? leader.questions ?? 0;
-    const secondQuestions = second ? (second.weekly_questions ?? second.questions ?? 0) : 0;
-    const diff = isLeader
-      ? Math.max(0, myQuestions - secondQuestions)
-      : Math.max(0, leaderQuestions - myQuestions);
-    return {
-      isLeader,
-      rank: mine.rank,
-      diff,
-      leaderName: leader.name || "Lider",
-      leaderQuestions,
-    };
+    const isLeader = mine.rank === 1, second = board.list[1];
+    const myQ = mine.weekly_questions ?? mine.questions ?? 0;
+    const leaderQ = leader.weekly_questions ?? leader.questions ?? 0;
+    const secondQ = second ? (second.weekly_questions ?? second.questions ?? 0) : 0;
+    const diff = isLeader ? Math.max(0, myQ - secondQ) : Math.max(0, leaderQ - myQ);
+    return { isLeader, rank: mine.rank, diff, leaderName: leader.name || "Lider", leaderQuestions: leaderQ };
   }, [board.list]);
 
   const doCreate = async () => {
@@ -100,6 +91,11 @@ export function useGroupsController({ user, initialGroupCode }) {
       setCodeError("Lütfen 6 haneli kodu eksiksiz gir.");
       return;
     }
+    if (groups.some((g) => (g.code || "").toUpperCase() === clean)) {
+      H.warn();
+      setCodeError("Bu gruba zaten üyesin.");
+      return;
+    }
     setBusy(true);
     setCodeError(null);
     try {
@@ -110,8 +106,7 @@ export function useGroupsController({ user, initialGroupCode }) {
       await loadGroups();
     } catch (err) {
       H.error();
-      const msg = err?.message?.includes("zaten") ? "Bu gruba zaten üyesin." : "Kod geçersiz ya da grup bulunamadı.";
-      setCodeError(msg);
+      setCodeError(formatGroupJoinError(err, clean, groups));
     } finally {
       setBusy(false);
     }
