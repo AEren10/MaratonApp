@@ -16,6 +16,9 @@ export function initErrorReporting() {
     Sentry = require("@sentry/react-native");
     Sentry.init({
       dsn: DSN,
+      // Gelistirme hatalari gercek kullanici cokmeleriyle karismasin:
+      // Sentry'de "environment" filtresiyle ayrilir.
+      environment: __DEV__ ? "development" : "production",
       enableAutoSessionTracking: true,
       sessionTrackingIntervalMillis: 30000,
       tracesSampleRate: 0.1,
