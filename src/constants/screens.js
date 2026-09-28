@@ -107,6 +107,10 @@ export const SCREENS = {
   // AKIS 7 · Program ve plan
   CURRICULUM_MAP: "CurriculumMap",
   CURRICULUM_MAP_ROOT: "CurriculumMapRoot",
+  // Rota sayfalari kullanici karariyla geri geldi (28 Eylul).
+  ROADMAP: "Roadmap",
+  ROUTE_FULL: "RouteFull",
+  ROUTE_STOP_DETAIL: "RouteStopDetail",
   CLASS_SCHEDULE: "ClassSchedule",
   SEARCH: "Search",
   DOCUMENT: "Document",

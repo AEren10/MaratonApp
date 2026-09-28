@@ -103,6 +103,9 @@ const EighthDayLockScreen = React.lazy(() => import("../screens/premium/EighthDa
 const DataExportScreen = React.lazy(() => import("../screens/settings/DataExportScreen"));
 const AccountDeleteScreen = React.lazy(() => import("../screens/settings/AccountDeleteScreen"));
 const OfflineQueueScreen = React.lazy(() => import("../screens/settings/OfflineQueueScreen"));
+const RoadmapScreen = React.lazy(() => import("../screens/roadmap/RoadmapScreen"));
+const RouteFullScreen = React.lazy(() => import("../screens/roadmap/RouteFullScreen"));
+const RouteStopDetailScreen = React.lazy(() => import("../screens/roadmap/RouteStopDetailScreen"));
 
 const screen = (name, Comp, options) => ({ name, component: withScreenBoundary(Comp), options });
 
@@ -148,6 +151,9 @@ export const SETUP_STACK_SCREENS = [
 ];
 
 export const APP_STACK_SCREENS = [
+  screen(SCREENS.ROADMAP, RoadmapScreen),
+  screen(SCREENS.ROUTE_FULL, RouteFullScreen),
+  screen(SCREENS.ROUTE_STOP_DETAIL, RouteStopDetailScreen),
   screen(SCREENS.WRONG_NOTEBOOK, WrongNotebookScreen),
   screen(SCREENS.ADD_WRONG, AddWrongScreen),
   screen(SCREENS.WRONG_DETAIL, WrongDetailScreen, detailOptions),

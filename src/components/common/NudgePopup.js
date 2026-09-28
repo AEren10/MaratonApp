@@ -1,161 +1,124 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  withDelay,
-  withSequence,
-  Easing,
-  useReducedMotion,
+  useSharedValue, useAnimatedStyle, withSpring, withTiming, Easing, useReducedMotion,
 } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "../design";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL, ANIMATION } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import * as haptic from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
 
 const POPUP_COLORS = {
-  red: (C) => ({ bg: C.red, icon: C.red }),
-  amber: (C) => ({ bg: C.amber, icon: C.amber }),
-  green: (C) => ({ bg: C.green, icon: C.green }),
-  blue: (C) => ({ bg: C.blue, icon: C.blue }),
-  purple: (C) => ({ bg: C.purple, icon: C.purple }),
-  coral: (C) => ({ bg: C.accent, icon: C.accent }),
+  red: (C) => C.red, amber: (C) => C.amber, green: (C) => C.green,
+  blue: (C) => C.blue, purple: (C) => C.purple, coral: (C) => C.accent,
 };
 
 const AUTO_DISMISS_MS = 4500;
-const OFF_Y = 120;
-const ENTER_MS = 220;
+const OFF_Y = -160;               // ekranin ustunde, gorunmez
+const ENTER_MS = 320;
 const EXIT_MS = 240;
-const ENTER_SPRING = { duration: 420, dampingRatio: 0.85 };
-const EASE_OUT = Easing.bezier(...ANIMATION.easing.easeOut);
+const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
+const SNAP_BACK = { duration: 400, dampingRatio: 0.8 };
+const DISMISS_DISTANCE = -40;     // yukari 40px ya da hizli bir fiske kapatir
+const DISMISS_VELOCITY = -500;
 
+// Uygulama ici bildirim: ustten, durum cubugunun altina iner; yukari
+// kaydirinca ya da dokununca kapanir. Eskiden alttan geliyordu ve otomatik
+// kapanma animasyona gomulu oldugu icin dokunmayla catisiyordu. Sure artik
+// JS zamanlayicisinda; hareket UI thread'de kalir.
 export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
   const C = useC();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
-  const translateY = useSharedValue(OFF_Y);
+  const y = useSharedValue(OFF_Y);
   const opacity = useSharedValue(0);
+  const timer = useRef(null);
+
+  const hide = useCallback((after) => {
+    clearTimeout(timer.current);
+    if (!reduced) y.set(withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT }));
+    opacity.set(withTiming(0, { duration: EXIT_MS }, (finished) => {
+      if (finished && after) scheduleOnRN(after);
+    }));
+  }, [reduced, y, opacity]);
 
   useEffect(() => {
-    if (!visible || !nudge) return;
-
+    if (!visible || !nudge) return undefined;
     haptic.tap();
-
-    if (reduced) {
-      translateY.value = 0;
-      opacity.value = withTiming(1, { duration: ENTER_MS });
-      return;
-    }
-
-    // DIKKAT: burada iki ayri atama YAPILMAZ.
-    //
-    // Eskiden once withSpring(0), hemen ardindan translateY.value = withDelay(...)
-    // yaziliyordu. Ikinci atama birinciyi ANINDA iptal ediyor, yani kart hic
-    // yukari kaymiyor, 120px asagida 4.5 saniye bekliyordu. Ustune translateY
-    // ve scale iki AYRI yayla farkli hizlarda gidiyor, kart eziliyordu.
-    // Tek eksen, tek yay, withSequence ile sirali.
-    translateY.value = withSequence(
-      withSpring(0, ENTER_SPRING),
-      withDelay(AUTO_DISMISS_MS, withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT })),
-    );
-    opacity.value = withSequence(
-      withTiming(1, { duration: ENTER_MS }),
-      withDelay(AUTO_DISMISS_MS, withTiming(0, { duration: EXIT_MS }, (finished) => {
-        if (finished && onDismiss) scheduleOnRN(onDismiss);
-      })),
-    );
+    y.set(reduced ? 0 : OFF_Y);
+    if (!reduced) y.set(withTiming(0, { duration: ENTER_MS, easing: EASE_OUT }));
+    opacity.set(withTiming(1, { duration: reduced ? 200 : ENTER_MS / 2 }));
+    timer.current = setTimeout(() => hide(onDismiss), AUTO_DISMISS_MS);
+    return () => clearTimeout(timer.current);
   }, [visible, nudge]);
 
+  const pan = Gesture.Pan()
+    .onUpdate((e) => {
+      // Yukari serbest, asagi direncli (lastik etkisi).
+      y.set(e.translationY < 0 ? e.translationY : e.translationY * 0.2);
+    })
+    .onEnd((e) => {
+      if (e.translationY < DISMISS_DISTANCE || e.velocityY < DISMISS_VELOCITY) {
+        y.set(withSpring(OFF_Y, { ...SNAP_BACK, duration: 300, velocity: e.velocityY }));
+        opacity.set(withTiming(0, { duration: EXIT_MS }, (finished) => {
+          if (finished && onDismiss) scheduleOnRN(onDismiss);
+        }));
+      } else {
+        y.set(withSpring(0, { ...SNAP_BACK, velocity: e.velocityY }));
+      }
+    });
+
   const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
+    transform: [{ translateY: y.get() }],
+    opacity: opacity.get(),
   }));
 
   if (!visible || !nudge) return null;
-
-  const colors = (POPUP_COLORS[nudge.color] || POPUP_COLORS.amber)(C);
-
-  const handlePress = () => {
-    haptic.tap();
-    translateY.value = withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT });
-    opacity.value = withTiming(0, { duration: EXIT_MS }, (finished) => {
-      if (finished && onAction) scheduleOnRN(onAction, nudge);
-    });
-  };
-
-  const handleDismiss = () => {
-    translateY.value = withTiming(OFF_Y, { duration: EXIT_MS, easing: EASE_OUT });
-    opacity.value = withTiming(0, { duration: EXIT_MS }, (finished) => {
-      if (finished && onDismiss) scheduleOnRN(onDismiss);
-    });
-  };
+  const tint = (POPUP_COLORS[nudge.color] || POPUP_COLORS.amber)(C);
 
   return (
-    <Animated.View style={[styles.container, { bottom: insets.bottom + STEP.s4 }, animStyle]}>
-      <Press haptic="none" onPress={handlePress} style={[styles.card, { backgroundColor: C.surface, borderColor: C.line }]}>
-        <View style={[styles.iconBox, { backgroundColor: colors.bg + "20" }]}>
-          <Icon name={nudge.icon || "bell"} size={20} color={colors.icon} />
-        </View>
-        <View style={styles.body}>
-          <Text style={[styles.message, { color: C.text }]}>{nudge.message}</Text>
-          {nudge.actionLabel && (
-            <Text style={[styles.action, { color: colors.icon }]}>{nudge.actionLabel.toUpperCase()}</Text>
-          )}
-        </View>
-        <Press haptic="none" onPress={handleDismiss} hitSlop={12} style={styles.close}>
-          <Icon name="x" size={16} color={C.text3} />
+    <GestureDetector gesture={pan}>
+      <Animated.View style={[styles.container, { top: insets.top + STEP.s1 }, animStyle]}>
+        <Press
+          haptic="tap"
+          onPress={() => hide(onAction ? () => onAction(nudge) : onDismiss)}
+          style={[styles.card, { backgroundColor: C.surface, borderColor: C.line }]}
+        >
+          <View style={[styles.iconBox, { backgroundColor: tint + "20" }]}>
+            <Icon name={nudge.icon || "bell"} size={20} color={tint} />
+          </View>
+          <View style={styles.body}>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{nudge.message}</Text>
+            {nudge.actionLabel ? (
+              <Text style={[TYPOGRAPHY.metaSemiBold, styles.action, { color: tint }]}>{nudge.actionLabel}</Text>
+            ) : null}
+          </View>
+          <Press haptic="none" onPress={() => hide(onDismiss)} hitSlop={12} style={styles.close}
+            accessibilityRole="button" accessibilityLabel="Bildirimi kapat">
+            <Icon name="x" size={16} color={C.text3} />
+          </Press>
         </Press>
-      </Press>
-    </Animated.View>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    left: GUTTER,
-    right: GUTTER,
-    zIndex: 10000,
-  },
+  container: { position: "absolute", left: GUTTER, right: GUTTER, zIndex: 10000 },
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: SHAPE.card,
-    borderWidth: 1,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    flexDirection: "row", alignItems: "center", borderRadius: SHAPE.card, borderWidth: 1,
+    overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25, shadowRadius: 16, elevation: 10,
   },
   iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: SHAPE.badge,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: STEP.s2,
+    width: 36, height: 36, borderRadius: SHAPE.badge,
+    alignItems: "center", justifyContent: "center", marginLeft: STEP.s2,
   },
   body: { flex: 1, paddingHorizontal: STEP.s2, paddingVertical: STEP.s3 },
-  message: {
-    fontFamily: "Archivo_600",
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  action: {
-    fontFamily: "Archivo_700",
-    fontSize: 11,
-    marginTop: 2,
-    letterSpacing: 0.5,
-  },
-  close: {
-    padding: STEP.s2,
-    marginRight: 4,
-  },
+  action: { marginTop: 4 },
+  close: { padding: STEP.s2, marginRight: 4 },
 });

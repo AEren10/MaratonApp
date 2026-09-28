@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { GUTTER } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { HeroTrendChartSvg } from "./HeroTrendChartSvg";
+import { HeroMultiTrendChartSvg } from "./HeroMultiTrendChartSvg";
 import { PendingSection } from "../../../components/common/PendingSection";
 
 function formatNumber(n) {
@@ -16,7 +17,7 @@ function formatDelta(n) {
   return n > 0 ? `+${abs}` : n < 0 ? `-${abs}` : "0,0";
 }
 
-export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [] }) {
+export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [], heroSeries = [] }) {
   // Burada net, trend, tarih ve grafigin TAMAMI icin uydurma yedek vardi:
   // deneme girmemis biri "58,25 · +2,3 · 23 HAZIRAN 2026" goruyordu.
   if (latest?.net == null) {
@@ -36,6 +37,9 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [] })
   const deltaColor = isUp ? C.up : C.down;
   const label = [latest.typeLabel, latest.date && String(latest.date).toUpperCase()]
     .filter(Boolean).join(" · ");
+  // "Tumu"de iki tur de varsa TYT kirmizi, AYT krem cizgiyle birlikte cizilir.
+  const multiSeries = heroSeries.map((line) => ({ ...line, color: line.key === "AYT" ? C.text : C.accent }));
+  const multi = multiSeries.length > 1;
   const labels = heroLabels.length >= 3
     ? [heroLabels[0], heroLabels[Math.floor(heroLabels.length / 2)], heroLabels[heroLabels.length - 1]]
     : heroLabels;
@@ -52,8 +56,21 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [] })
         </View>
       </View>
 
+      {multi ? (
+        <View style={s.legend}>
+          {multiSeries.map((line) => (
+            <View key={line.key} style={s.legendItem}>
+              <View style={[s.legendDot, { backgroundColor: line.color }]} />
+              <Text style={[s.legendText, { color: C.text2 }]}>{line.key}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
       <View style={s.chartContainer}>
-        <HeroTrendChartSvg C={C} data={data} labels={labels} />
+        {multi
+          ? <HeroMultiTrendChartSvg C={C} series={multiSeries} />
+          : <HeroTrendChartSvg C={C} data={data} labels={labels} />}
       </View>
     </View>
   );
@@ -91,6 +108,10 @@ const s = StyleSheet.create({
     fontFamily: "Archivo_600",
     fontSize: 15,
   },
+  legend: { flexDirection: "row", gap: 16, marginTop: 12, paddingHorizontal: GUTTER },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontFamily: "Archivo_600", fontSize: 12 },
   chartContainer: {
     marginTop: 10,
     width: "100%",

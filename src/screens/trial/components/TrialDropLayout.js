@@ -92,7 +92,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
         </Animated.View>
 
         <Animated.View style={styles.actions}>
-          <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA)}>
+          <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
             Yeni rotayı gör
           </Button>
           <View style={{ height: STEP.s2 }} />

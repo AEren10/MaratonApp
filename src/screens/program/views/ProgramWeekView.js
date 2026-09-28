@@ -7,6 +7,7 @@ import { Press } from "../../../components/design/Press";
 import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useWeekProgram } from "../../../hooks/useWeekProgram";
+import { useDayRouteStops } from "../../../hooks/useDayRouteStops";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
@@ -24,6 +25,16 @@ export function ProgramWeekView() {
   const C = useC();
   const navigation = useNavigation();
   const w = useWeekProgram();
+  // Gunun listesi = rotanin o gune dusen duraklari (ders programi ve
+  // "Durak ekle" ikisi de rotaya yazar) + o gun yapilmis kayitlar. Eskiden
+  // yalniz kayitlar gorunuyordu; eklenen duraklar Program'da cikmiyordu.
+  const dayRoute = useDayRouteStops(w.selectedDate);
+  const dayItems = useMemo(() => {
+    const logs = w.selectedDayLogs || [];
+    const doneKeys = new Set(dayRoute.stops.filter((st) => st.completed).map((st) => `${st.subjectKey}|${st.topic}`));
+    const extraLogs = logs.filter((l) => !doneKeys.has(`${l.subjectKey}|${l.topic}`));
+    return [...dayRoute.stops, ...extraLogs];
+  }, [dayRoute.stops, w.selectedDayLogs]);
 
   const selectedDateObj = useMemo(() => {
     if (!w.selectedDate) return new Date();
@@ -58,7 +69,7 @@ export function ProgramWeekView() {
 
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
 
-      {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={w.selectedDayLogs} /> : null}
+      {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
 
       <ProgramRulesSection onOpen={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)} />
       <Press haptic="none"

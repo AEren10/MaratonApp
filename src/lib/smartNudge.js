@@ -46,10 +46,10 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
         priority: "high",
         subject: key,
         icon: "alertCircle",
-        message: `${days} gündür ${subject.label} çalışmadın!`,
-        detail: "Bu kadar ara vermek konuları unutturur. Bugün en az 15 soru çöz.",
-        actionLabel: "Çalışmaya Başla",
-        color: "red",
+        message: `${subject.label} seni bekliyor: ${days} gündür açılmadı. Kısa bir durakla dönebilirsin.`,
+        detail: "Uzun aradan sonra küçük başlamak en iyisi. Bugün 15 soru yeter.",
+        actionLabel: "Çalışmaya başla",
+        color: "amber",
       });
     } else if (days >= 7) {
       nudges.push({
@@ -57,9 +57,9 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
         priority: "medium",
         subject: key,
         icon: "clock",
-        message: `${subject.label}'i ${days} gündür açmadın`,
+        message: `${subject.label} ${days} gündür boşta. Programına bir durak ekleyelim mi?`,
         detail: "Düzenli tekrar başarının anahtarı. Bugün kısa bir oturum yeter.",
-        actionLabel: "Plana Ekle",
+        actionLabel: "Plana ekle",
         color: "amber",
       });
     }
@@ -87,10 +87,10 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "high",
             subject: key,
             icon: "trendDown",
-            message: `${subjectLabel(key)}'te ${drop.toFixed(1)} net düştün`,
-            detail: "Bu derste yoğunlaşman gerek. Zayıf konularını analiz et.",
-            actionLabel: "Analiz Et",
-            color: "red",
+            message: `${subjectLabel(key)} son denemede ${drop.toFixed(1).replace(".", ",")} net geride. Nereden kaybettiğini birlikte bulalım.`,
+            detail: "Tek deneme her şeyi söylemez. Hangi konudan geldiğine bakmak yeter.",
+            actionLabel: "Nerede kaybettim?",
+            color: "amber",
           });
         } else if (drop >= 3) {
           nudges.push({
@@ -98,9 +98,9 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "medium",
             subject: key,
             icon: "trendDown",
-            message: `${subjectLabel(key)}'te ${drop.toFixed(1)} net düşüş`,
+            message: `${subjectLabel(key)} biraz geriledi (${drop.toFixed(1).replace(".", ",")} net). Küçük dalgalanmalar normal.`,
             detail: "Küçük düşüşler normal ama takip etmen önemli.",
-            actionLabel: "Konu Analizi",
+            actionLabel: "Konuya bak",
             color: "amber",
           });
         }
@@ -111,7 +111,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
             priority: "low",
             subject: key,
             icon: "trendUp",
-            message: `${subjectLabel(key)} netin ${(latestNet - prevNet).toFixed(1).replace(".", ",")} arttı.`,
+            message: `${subjectLabel(key)} netin ${(latestNet - prevNet).toFixed(1).replace(".", ",")} arttı. Böyle devam!`,
             detail: "Harika gidiyorsun, bu tempoyu koru!",
             color: "green",
           });
@@ -133,7 +133,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
       priority: acc < 30 ? "high" : "medium",
       subject: key,
       icon: "target",
-      message: `${subjectLabel(key)}'te doğruluk oranın %${acc}`,
+      message: `${subjectLabel(key)} doğruluğun %${acc}. Az ama dikkatli soru, çok soru kadar kazandırır.`,
       detail: "Bu alanda daha fazla pratik yapman gerekiyor.",
       actionLabel: "Çalış",
       color: acc < 30 ? "red" : "amber",
@@ -151,9 +151,9 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
         priority: "medium",
         subject: fresh[0],
         icon: "eyeOff",
-        message: `Sadece ${subjectLabel(fresh[0])} çalışıyorsun`,
-        detail: `${stale.slice(0, 2).map(subjectLabel).join(" ve ")} ihmal ediliyor. Dengeli çalış!`,
-        actionLabel: "Plan Güncelle",
+        message: `Son günlerde hep ${subjectLabel(fresh[0])}. Başka bir derse uğramak iyi gelir.`,
+        detail: `${stale.slice(0, 2).map(subjectLabel).join(" ve ")} bir süredir açılmadı.`,
+        actionLabel: "Planı güncelle",
         color: "purple",
       });
     }
@@ -166,9 +166,9 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
       type: NUDGE_TYPES.TEMPO_LOW,
       priority: "medium",
       icon: "zap",
-      message: `Bugün henüz ${todayTotal} soru çözdün`,
-      detail: `Hedefe ${remaining} soru daha var. Hızlan!`,
-      actionLabel: "Hızlı Çalış",
+      message: `Bugün ${todayTotal} soru çözdün. Kısa bir durakla hedefe yaklaşırsın.`,
+      detail: `Hedefe ${remaining} soru kaldı.`,
+      actionLabel: "Hızlı çalış",
       color: "amber",
     });
   }
@@ -179,9 +179,9 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
       type: NUDGE_TYPES.STREAK_RISK,
       priority: "medium",
       icon: "flame",
-      message: `${streak} günlük serini kaybetme!`,
+      message: `${streak} günlük serin sürüyor. Bugün tek durak yeter.`,
       detail: "Bugün en az 20 soru çözerek serini koru.",
-      actionLabel: "Hızlı Çalış",
+      actionLabel: "Hızlı çalış",
       color: "coral",
     });
   }
@@ -199,7 +199,7 @@ export function generateNudges({ recentStudy, trials, streak, weakAreas, todayTo
         priority: "low",
         subject: key,
         icon: "lightbulb",
-        message: `${subjectLabel(key)} çalışsan iyi olur`,
+        message: `Bugün ${subjectLabel(key)} için iyi bir gün.`,
         detail: `${studyDays[key]} gündür bu derse bakmadın. Kısa bir tekrar yap.`,
         actionLabel: "Başla",
         color: "blue",
