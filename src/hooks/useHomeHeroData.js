@@ -62,7 +62,14 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
       label: p.dateStr,
     }));
     const todayIndex = stops.length - 1;
-    const projection = Number.isFinite(forecast.projected) ? [forecast.projected] : [];
+    // Az sayida deneme dususte olunca dogrusal uzatma sinav gunune 0 net
+    // cikariyordu ("TAHMIN 0 · hedefin 126 net altinda"). Anlamsiz ve moral
+    // bozucu: son netin yarisinin altina dusen tahmin gosterilmez.
+    const lastNet = forecast.dataPoints[todayIndex]?.net;
+    const plausible = Number.isFinite(forecast.projected)
+      && forecast.projected > 0
+      && (!Number.isFinite(lastNet) || forecast.projected >= lastNet * 0.5);
+    const projection = plausible ? [forecast.projected] : [];
     const band = projection.length
       ? { upper: [forecast.range?.high ?? forecast.projected], lower: [forecast.range?.low ?? forecast.projected] }
       : undefined;
@@ -79,7 +86,9 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
         firstDate: forecast.dataPoints[0]?.date,
         examDate,
       }),
-      sentence: forecastSentence({ projected: forecast.projected, target: targetNet }),
+      sentence: plausible
+        ? forecastSentence({ projected: forecast.projected, target: targetNet })
+        : "Tahmin için birkaç deneme daha gerekiyor.",
     };
   }, [forecast, examDate, targetNet]);
 
@@ -134,9 +143,16 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     syncRouteWidget({ examDate, chart: chartData, target: targetNet });
   }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, targetNet]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
+  // Ana buton yalniz rota gorevlerine bakiyordu: rota yokken listede
+  // baslanabilir bir durak (kullanicinin ekledigi ya da oneri) olsa bile
+  // "Ilk duragini ekle" diyordu. Artik ilk acik durak da sayilir.
+  const openStop = Array.isArray(todayStops) ? todayStops.find((item) => !item.completed) : null;
+  const ctaTask = nextTask || openStop || null;
   const ctaSubtitle = nextTask
     ? `${nextTask.subjectLabel} · ${nextTask.topicLabel}${nextTask.estimatedMinutes ? ` · ${nextTask.estimatedMinutes} dk` : ""}`
-    : null;
+    : openStop
+      ? `${openStop.label}${openStop.minutes ? ` · ${openStop.minutes} dk` : ""}`
+      : null;
 
   const remainingToGoal = Math.max(0, (dailyGoal || 0) - (solvedToday || 0));
 
@@ -169,7 +185,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
       : null,
     hasDebt: !!debt?.hasDebt,
     comebackRecommendation,
-    nextTask,
+    nextTask: ctaTask,
     ctaSubtitle,
   };
 }
