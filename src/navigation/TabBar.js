@@ -57,6 +57,13 @@ function CenterFab({ onPress, C }) {
               backgroundColor: C.accent,
               alignItems: "center", justifyContent: "center",
               marginTop: -18,
+              // Kirmizi isilti geri geldi (kullanici karari, 28 Eylul): eski
+              // + dugmesinin en sevilen yani buydu.
+              shadowColor: C.accent,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.32,
+              shadowRadius: 14,
+              elevation: 8,
             }}
           >
             <Icon name="plus" size={24} color={C.textOnFill} sw={3} />
