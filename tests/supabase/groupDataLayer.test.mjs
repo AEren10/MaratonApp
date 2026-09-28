@@ -6,9 +6,11 @@ const migration = readFileSync("supabase/migrations/20260919120000_cdx_group_dat
 const previewMigration = readFileSync("supabase/migrations/20260920002000_cdx_group_preview_by_code.sql", "utf8");
 const previewCreatorMigration = readFileSync("supabase/migrations/20260920002201_cdx_group_preview_creator_name.sql", "utf8");
 const userRankMigration = readFileSync("supabase/migrations/20260920010941_clde_my_groups_user_rank.sql", "utf8");
+const memberMinutesMigration = readFileSync("supabase/migrations/20260928020140_cdx_group_member_weekly_minutes.sql", "utf8");
 const groupsApi = readFileSync("src/supabase/groups.js", "utf8");
 const groupsTab = readFileSync("src/screens/league/GroupsTab.js", "utf8");
 const groupsController = readFileSync("src/screens/league/useGroupsController.js", "utf8");
+const groupMemberRow = readFileSync("src/screens/league/components/GroupMemberRow.js", "utf8");
 const groupDetailHook = readFileSync("src/hooks/useGroupDetail.js", "utf8");
 const groupActionsHook = readFileSync("src/hooks/useGroupActions.js", "utf8");
 
@@ -61,8 +63,8 @@ test("group API surfaces errors instead of silent empty states", () => {
   assert.match(groupsApi, /throw error/);
   assert.match(groupsApi, /ensureOk/);
   assert.doesNotMatch(groupsApi, /catch\s*\(\s*\)\s*=>\s*\{\s*\}/);
-  assert.match(groupsTab, /setBoardError/);
-  assert.match(groupsTab, /Sıralama yüklenemedi/);
+  assert.match(groupsController, /setBoardError/);
+  assert.match(groupsController, /Sıralama yüklenemedi/);
   assert.doesNotMatch(groupsTab, /catch\s*\(\s*\)\s*=>\s*setBoard\(\{ list: \[\] \}\)/);
 });
 
@@ -117,6 +119,15 @@ test("recreating get_my_groups restores the grants the drop removed", () => {
 test("the groups client carries user_rank through to the card", () => {
   assert.match(groupsApi, /user_rank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
   assert.match(groupsApi, /userRank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
+});
+
+test("group members expose weekly study minutes without faking hours", () => {
+  assert.match(memberMinutesMigration, /weekly_minutes BIGINT/);
+  assert.match(memberMinutesMigration, /COALESCE\(sum\(sl\.duration_minutes\), 0\)::BIGINT AS weekly_minutes/);
+  assert.match(groupsApi, /weekly_minutes: weeklyMinutes/);
+  assert.match(groupsApi, /weeklyMinutes/);
+  assert.match(groupMemberRow, /formatMinutes\(weeklyMinutes\)/);
+  assert.match(groupMemberRow, /image=\{item\.avatar_url\}/);
 });
 
 test("generate_group_code uses built-in random without pgcrypto dependency", () => {

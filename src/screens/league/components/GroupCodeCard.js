@@ -4,7 +4,7 @@ import * as Clipboard from "expo-clipboard";
 
 import { Icon, AnimatedPressable } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, STEP, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
 export function GroupCodeCard({ group, onShare }) {
@@ -34,17 +34,17 @@ export function GroupCodeCard({ group, onShare }) {
         { backgroundColor: C.surface, borderColor: C.border },
       ]}
     >
-      <Text style={[s.label, { color: C.sec }]}>GRUP DAVET KODU</Text>
-      <Text style={[TYPOGRAPHY.caption, s.groupName, { color: C.text2 }]} numberOfLines={1}>
-        {group.name}
-      </Text>
-
-      <Text style={[s.code, { color: C.accent }]}>{group.code || "..."}</Text>
-
-      <Text style={[TYPOGRAPHY.caption, s.hint, { color: C.text3 }]}>
-        Arkadaşlarını bu kodla gruba davet et, haftalık sıralamada yarışın.
-      </Text>
-
+      <View style={s.header}>
+        <View style={s.copy}>
+          <Text style={[s.label, { color: C.sec }]}>DAVET KODU</Text>
+          <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]} numberOfLines={1}>
+            Arkadaşların bu kodla katılır.
+          </Text>
+        </View>
+        <View style={[s.codePill, { backgroundColor: C.accent + "12", borderColor: C.accent + "45" }]}>
+          <Text style={[s.code, { color: C.accentText }]}>{group.code || "..."}</Text>
+        </View>
+      </View>
       <View style={s.actions}>
         <AnimatedPressable
           onPress={handleCopy}
@@ -98,35 +98,40 @@ export function GroupCodeCard({ group, onShare }) {
 const s = StyleSheet.create({
   card: {
     width: "100%",
-    alignItems: "center",
-    padding: SPACING.xl,
-    borderRadius: RADIUS.xxl,
+    padding: SPACING.md,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
     marginBottom: SPACING.md,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
+  },
+  copy: {
+    flex: 1,
+  },
   label: {
     ...TYPOGRAPHY.label,
-    letterSpacing: 1.5,
-    marginBottom: SPACING.xs,
+    letterSpacing: 1.3,
+    marginBottom: 2,
   },
-  groupName: {
-    marginBottom: SPACING.xs,
+  codePill: {
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
   },
   code: {
-    ...TYPOGRAPHY.display,
-    letterSpacing: 4,
-    marginVertical: SPACING.xs,
-  },
-  hint: {
-    textAlign: "center",
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.sm,
-    lineHeight: 18,
+    ...TYPOGRAPHY.statSmall,
+    letterSpacing: 2.5,
   },
   actions: {
     flexDirection: "row",
     gap: SPACING.sm,
-    marginTop: SPACING.md,
+    marginTop: SPACING.sm,
     width: "100%",
   },
   actionBtn: {
@@ -135,11 +140,11 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.xs,
-    paddingVertical: STEP.s2,
-    borderRadius: RADIUS.xl,
+    minHeight: 44,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
   },
   actionBtnText: {
-    ...TYPOGRAPHY.bodySemiBold,
+    ...TYPOGRAPHY.captionMedium,
   },
 });

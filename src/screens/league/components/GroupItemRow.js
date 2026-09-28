@@ -11,7 +11,6 @@ export const GroupItemRow = React.memo(function GroupItemRow({
   isSelected,
   onSelect,
   onLeave,
-  isLast,
 }) {
   const C = useC();
 
@@ -21,6 +20,9 @@ export const GroupItemRow = React.memo(function GroupItemRow({
   };
 
   const initial = (group.name || "G").trim().slice(0, 1).toUpperCase();
+  const weeklyQuestions = Number(group.weekly_questions ?? group.weeklyQuestions ?? 0) || 0;
+  const memberCount = Number(group.member_count ?? group.memberCount ?? 0) || 0;
+  const userRank = Number(group.user_rank ?? group.userRank) || null;
 
   return (
     <Press haptic="none"
@@ -32,9 +34,8 @@ export const GroupItemRow = React.memo(function GroupItemRow({
       style={[
         s.row,
         {
-          backgroundColor: isSelected ? C.accent + "0D" : "transparent",
-          borderBottomColor: C.border,
-          borderBottomWidth: isLast ? 0 : 1
+          backgroundColor: isSelected ? C.accent + "10" : C.surface,
+          borderColor: isSelected ? C.accent + "70" : C.border,
         }
       ]}
     >
@@ -59,16 +60,16 @@ export const GroupItemRow = React.memo(function GroupItemRow({
         >
           {group.name}
         </Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 1 }]}>
-          Kod: <Text style={TYPOGRAPHY.tableName}>{group.code}</Text>
-          {isSelected ? " · Aktif" : ""}
+        <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 1 }]} numberOfLines={1}>
+          {memberCount} üye · bu hafta {weeklyQuestions} soru
+          {userRank ? ` · ${userRank}. sıra` : ""}
         </Text>
       </View>
 
       {isSelected ? (
         <View style={[s.badge, { backgroundColor: C.accent + "18" }]}>
           <Icon name="check" size={11} color={C.accent} />
-          <Text style={[s.badgeText, { color: C.accentText }]}>Seçili</Text>
+          <Text style={[s.badgeText, { color: C.accentText }]}>Açık</Text>
         </View>
       ) : (
         <Icon name="chevR" size={14} color={C.text3} />
@@ -81,8 +82,11 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 74,
     paddingHorizontal: SPACING.md,
     paddingVertical: STEP.s2,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
   },
   avatar: {
     width: 38,

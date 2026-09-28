@@ -1,58 +1,21 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, ScrollView, StyleSheet, Share } from "react-native";
+import React from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../../components/design";
 import { GroupsSkeleton } from "./components/GroupsSkeleton";
-import { GroupMemberRow } from "./components/GroupMemberRow";
+import { GroupDetailPanel } from "./components/GroupDetailPanel";
 import { GroupItemRow } from "./components/GroupItemRow";
-import { GroupCodeCard } from "./components/GroupCodeCard";
 import { GroupCodeModal } from "./components/GroupCodeModal";
-import { GroupCompetitionBanner } from "./components/GroupCompetitionBanner";
 import { EmptyState } from "../../components/common/EmptyState";
-import { groupLeaderboard } from "../../supabase/groups";
 import { useGroupsController } from "./useGroupsController";
-import { SCREENS } from "../../constants/screens";
-import { appUrl } from "../../navigation/routes";
 import * as H from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
 
 export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
   const c = useGroupsController({ user, initialGroupCode });
-  const [board, setBoard] = useState({ list: [] });
-  const [boardError, setBoardError] = useState(null);
-
-  const loadBoard = useCallback(async () => {
-    if (!c.selected?.id || !user?.id) return;
-    setBoardError(null);
-    try {
-      setBoard(await groupLeaderboard(c.selected.id, user.id));
-    } catch (e) {
-      setBoardError(e?.message || "Sıralama yüklenemedi.");
-    }
-  }, [c.selected?.id, user?.id]);
-
-  useEffect(() => { loadBoard(); }, [loadBoard]);
-
-  const standing = useMemo(() => {
-    if (!board.list?.length) return null;
-    const leader = board.list[0];
-    const mine = board.list.find((m) => m.you);
-    if (!mine) return null;
-    const isLeader = mine.rank === 1;
-    const second = board.list[1];
-    const myQ = mine.weekly_questions ?? mine.questions ?? 0;
-    const leaderQ = leader.weekly_questions ?? leader.questions ?? 0;
-    const secQ = second ? (second.weekly_questions ?? second.questions ?? 0) : 0;
-    const diff = isLeader ? Math.max(0, myQ - secQ) : Math.max(0, leaderQ - myQ);
-    return { isLeader, rank: mine.rank, diff, leaderName: leader.name || "Lider", leaderQuestions: leaderQ };
-  }, [board.list]);
-
-  const shareCode = (g) => {
-    Share.share({ message: `Maraton'da "${g.name}" grubuma katıl!\nKod: ${g.code}\n${appUrl(SCREENS.LEAGUE, { groupCode: g.code })}` }).catch(() => {});
-  };
 
   if (c.loading) return <GroupsSkeleton />;
 
@@ -75,36 +38,21 @@ export function GroupsTab({ user, initialGroupCode }) {
         ) : (
           <>
             <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>GRUPLARIN ({c.groups.length})</Text>
-            <View style={[s.groupListCard, { backgroundColor: C.surface, borderColor: C.border }]}>
-              {c.groups.map((g, i) => (
-                <GroupItemRow key={g.id} group={g} isSelected={c.selected?.id === g.id} isLast={i === c.groups.length - 1} onSelect={() => c.setSelected(g)} onLeave={() => c.doLeave(g)} />
+            <View style={s.groupStack}>
+              {c.groups.map((g) => (
+                <GroupItemRow key={g.id} group={g} isSelected={c.selected?.id === g.id} onSelect={() => c.setSelected(g)} onLeave={() => c.doLeave(g)} />
               ))}
             </View>
 
             {c.selected ? (
-              <>
-                <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>{c.selected.name.toUpperCase()} · DAVET & BİLGİ</Text>
-                <GroupCodeCard group={c.selected} onShare={shareCode} />
-                <GroupCompetitionBanner standing={standing} />
-
-                <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>HAFTALIK SIRALAMA</Text>
-                {boardError ? (
-                  <View style={s.boardError}>
-                    <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.</Text>
-                    <Press haptic="none" onPress={loadBoard} style={[s.retryBtn, { borderColor: C.border }]}>
-                      <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text>
-                    </Press>
-                  </View>
-                ) : board.list.length === 0 ? (
-                  <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>Bu hafta kimse aktif değil.</Text>
-                ) : (
-                  <View style={s.memberList}>
-                    {board.list.map((m) => (
-                      <GroupMemberRow key={String(m.user_id)} item={m} />
-                    ))}
-                  </View>
-                )}
-              </>
+              <GroupDetailPanel
+                group={c.selected}
+                board={c.board}
+                boardError={c.boardError}
+                standing={c.standing}
+                onRetry={c.loadBoard}
+                onShare={c.shareCode}
+              />
             ) : null}
           </>
         )}
@@ -122,9 +70,5 @@ const s = StyleSheet.create({
   actions: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.sm },
   actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.xs, minHeight: 48, borderRadius: RADIUS.lg },
   secLabel: { letterSpacing: 1.2, marginTop: SPACING.md, marginBottom: SPACING.xs },
-  groupListCard: { borderRadius: RADIUS.xl, borderWidth: 1, overflow: "hidden", marginBottom: SPACING.sm },
-  memberList: { gap: SPACING.xs, marginBottom: SPACING.md },
-  boardError: { alignItems: "center", gap: SPACING.sm, paddingVertical: SPACING.lg },
-  retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1 },
-  emptySub: { textAlign: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg },
+  groupStack: { gap: SPACING.sm, marginBottom: SPACING.sm },
 });
