@@ -3,8 +3,6 @@ import { useCallback, useMemo } from "react";
 import { SCREENS } from "../../constants/screens";
 import { trackButtonTap } from "../../lib/analytics";
 import { buildStudyTimerParams } from "../../domain/plan/studyTimerParams";
-import { openInTab } from "../../navigation/tabJump";
-import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 
 // Ana Sayfa'nin tum cikislari. Kaldirilan eski kartlarin hedefleri tasarimdaki
@@ -16,13 +14,12 @@ export function useHomeActions({ navigation, go }) {
     navigation.navigate(SCREENS.STUDY_TIMER, buildStudyTimerParams(task));
   }, [go, navigation]);
 
-  // Sosyal, PROFIL yiginininda yasiyor. Ana Sayfa ROTA yiginindaydi, bu
-  // yuzden duz navigate hicbir navigator tarafindan karsilanmiyordu —
-  // ust sagdaki dugme "navigate hatasi" veriyordu. Sekmeye atlayarak
-  // gidiliyor; sosyal zaten Profil'in alani, sekmenin degismesi dogru.
+  // Lig/Gruplar ve alt ekranlari ROTA yigininda da kayitli: dugme ekrani
+  // bu sekmede acar, geri tusu Ana sayfaya doner. Eskiden Profil sekmesine
+  // atlatiliyordu ve geri basinca kullanici Profil'de kaliyordu.
   const social = useCallback(() => {
     trackButtonTap("home_social_open", { targetScreen: SCREENS.LEAGUE });
-    openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.LEAGUE, { tab: "groups" });
+    navigation.navigate(SCREENS.LEAGUE, { tab: "groups" });
   }, [navigation]);
 
   const subjectDetail = useCallback((subjectKey, subjectName) => {

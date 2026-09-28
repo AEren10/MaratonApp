@@ -12,8 +12,6 @@ import { GoalBandNote } from "./components/GoalBandNote";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { TAB_KEYS } from "../../navigation/tabAssignment";
-import { openInTab } from "../../navigation/tabJump";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
 import { Press } from "../../components/design/Press";
 
@@ -93,7 +91,7 @@ function GoalsContent() {
             first
             label="Sınav tarihi"
             value={examDateLabel}
-            onPress={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.EXAM_DATE)}
+            onPress={() => navigation.navigate(SCREENS.EXAM_DATE)}
           />
         </SettingsGroup>
 

@@ -25,6 +25,15 @@ export const TAB_KEYS = Object.freeze({
 // ROTA sekmesinin KOKU Ana Sayfa'dir (tasarimcinin kendi ifadesi).
 
 export const ROTA_STACK = [
+  // Ana sayfanin grup dugmesi Lig/Gruplar'i bu sekmede acar; geri tusu
+  // Ana sayfaya doner (eskiden Profil'e atiyordu). Alt ekranlari da burada.
+  SCREENS.LEAGUE,
+  SCREENS.FRIENDS,
+  SCREENS.REFERRAL,
+  SCREENS.ROUTE_COMPANION,
+  SCREENS.CHALLENGE,
+  SCREENS.EXAM_DATE,        // Hedefler -> Sinav tarihi (sekme degismez)
+  SCREENS.DATA_EXPORT,      // Nasil calisir -> Verilerimi indir
   SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (paylasimli)
   SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
@@ -52,6 +61,8 @@ export const ROTA_STACK = [
 ];
 
 export const PROGRAM_STACK = [
+  SCREENS.EXAM_DATE,        // Hedefler -> Sinav tarihi (sekme degismez)
+  SCREENS.DATA_EXPORT,      // Nasil calisir -> Verilerimi indir
   SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
