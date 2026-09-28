@@ -175,13 +175,19 @@ function canonicalTabFor(screen) {
   return TAB_ORDER.find((tab) => (TAB_STACKS[tab] || []).includes(screen)) || null;
 }
 
+// MUTLAK YOL: sekme icindeki ekranin yolu sekmenin yoluna EKLENMEZ.
+// Eskiden "plan" yalniz "home/plan" olarak eslesiyordu; maraton://plan,
+// maraton://rota, maraton://yanlis/tekrar (widget'lar ve bildirimler)
+// hicbir yere gitmiyordu. exact: true ile yol oldugu gibi eslesir.
+const exact = (config) => (typeof config === "string" ? { path: config, exact: true } : { ...config, exact: true });
+
 const NESTED_BY_TAB = new Map(TAB_ORDER.map((tab) => [tab, {}]));
 const ROOT_LEVEL = {};
 
 for (const [screen, path] of Object.entries(DEEP_LINK_ROUTE_PATHS)) {
   if (TAB_SCREEN_KEYS.includes(screen)) continue; // sekme kokleri asagida
   const tab = canonicalTabFor(screen);
-  if (tab) NESTED_BY_TAB.get(tab)[screen] = withParse(screen, path);
+  if (tab) NESTED_BY_TAB.get(tab)[screen] = exact(withParse(screen, path));
   else ROOT_LEVEL[screen] = withParse(screen, path);
 }
 
