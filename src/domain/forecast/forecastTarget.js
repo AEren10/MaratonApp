@@ -16,6 +16,13 @@ export function forecastExamLabel(types = []) {
   return types.length ? "AYT" : null;
 }
 
+// Seviye testi yalniz TYT (ya da LGS) derslerini soruyor; baslangic neti
+// bu yuzden TYT. Baslangic ile kiyaslanacak hedef de TYT hedefi olmali,
+// TYT+AYT toplami degil.
+export function baselineTarget({ examType, targetNet, targetNetTYT } = {}) {
+  return forecastTarget({ types: examType === "lgs" ? ["LGS"] : ["TYT"], examType, targetNet, targetNetTYT });
+}
+
 export function forecastTarget({ types = [], examType, targetNet, targetNetTYT, targetNetAYT } = {}) {
   const label = forecastExamLabel(types);
   const multi = examType === "tyt_ayt" || examType === "dil";

@@ -15,17 +15,23 @@ import { flattenRouteStops, routeDateTag, upcomingRouteStops } from "../domain/r
 import { useRouteCreate } from "./useRouteCreate";
 import { useStudyRoute } from "./useStudyRoute";
 import { useFeatureEntry } from "./useFeatureEntry";
+import { useForecastTarget } from "./useForecastTarget";
+import { baselineTarget } from "../domain/forecast/forecastTarget";
 
 // Rota Detay ekraninin tum verisi ve aksiyonlari. Ekran yalniz render eder.
 export function useRouteDetail() {
   const navigation = useNavigation();
-  const { targetNet, baselineNet, examDate } = useExam();
+  const { examType, targetNet: targetSum, targetNetTYT, baselineNet, examDate } = useExam();
   const { accessLoading, accessError, accessSnapshot, showPaywall } = usePremium();
   const { open: openScenarioGate } = useFeatureEntry(PRODUCT_FEATURES.route_scenarios, "route_scenarios");
   const route = useStudyRoute({ persist: false });
   const {
-    weeks, daysLeft, forecast, tempoScenarios, isPaused, routeCreated, routeCreating, createRoute,
+    weeks, daysLeft, forecast, forecastTypes, tempoScenarios, isPaused, routeCreated, routeCreating, createRoute,
   } = route;
+  // Tahmin tek sinavin denemelerinden; kiyas o sinavin hedefiyle (TYT+AYT
+  // toplami ile degil). Baslangic cizgisi TYT seviye testinden, hedefi TYT.
+  const { target: targetNet, label: examLabel } = useForecastTarget(forecastTypes);
+  const startGoal = baselineTarget({ examType, targetNet: targetSum, targetNetTYT }).target;
 
   const flat = useMemo(() => flattenRouteStops(weeks, { routeFrozen: isPaused }), [weeks, isPaused]);
   const upcoming = useMemo(() => upcomingRouteStops(flat, 3).map((item) => ({
@@ -44,8 +50,8 @@ export function useRouteDetail() {
   // girdigi baslangic ve hedef net. Ekran bunlari geri soylemek yerine
   // "HENUZ TAHMIN YOK" yaziyordu.
   const declared = useMemo(
-    () => routeDeclaredPath({ baselineNet, targetNet, daysLeft, stopCount: flat.length }),
-    [baselineNet, targetNet, daysLeft, flat.length],
+    () => routeDeclaredPath({ baselineNet, targetNet: startGoal, daysLeft, stopCount: flat.length }),
+    [baselineNet, startGoal, daysLeft, flat.length],
   );
 
   const scenariosOpen = canAccessProductFeature({
@@ -79,6 +85,7 @@ export function useRouteDetail() {
     daysLeft,
     examDateTag: routeDateTag(examDate, { withYear: true }),
     targetNet: Number.isFinite(targetNet) ? Math.round(targetNet) : null,
+    examLabel,
     view,
     declared,
     scenariosLocked: !scenariosOpen,
