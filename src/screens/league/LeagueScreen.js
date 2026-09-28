@@ -6,6 +6,7 @@ import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/nativ
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { PREMIUM_ENABLED } from "../../constants/premium";
 import { Icon, Avatar, AnimatedCard, GlowBackground, WARM_GLOW } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
@@ -157,7 +158,7 @@ function SocialActionCard({ C, onInvite, onCompanion }) {
           opacity: pressed ? 0.75 : 1,
         })}
       >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et · +1 hafta premium</Text>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>{PREMIUM_ENABLED ? "Arkadaşını davet et · +1 hafta premium" : "Arkadaşını davet et"}</Text>
         <Icon name="chevR" size={14} color={C.text3} />
       </Pressable>
       <Pressable
