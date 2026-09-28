@@ -28,22 +28,20 @@ import { useAuth } from "../../contexts/AuthContext";
 export default function HomeScreen() {
   const h = useHomeController();
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
-  // Tekrari gelen yanlislar: veri katmani vardi ama hicbir ekran okumuyordu.
   const { user } = useAuth();
   const { dueCount } = useDueReviews(user?.id);
   useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
-  // Seri izgarasi 28 gun geriye bakiyor; weekLogs adi yaniltici, icinde
-  // 45 gunluk kayit var (usePlanContext LOG_WINDOW_DAYS).
+  // Seri izgarasi 28 gun geriye bakar; weekLogs 45 gunluk kayit tasir.
   useEffect(() => {
     syncStreakWidget({ logs: dashboard.weekLogs, streak: h.streak, longest: h.longestStreak });
   }, [dashboard.weekLogs, h.streak, h.longestStreak]);
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
 
+  const discoverEligible = (h.longestStreak || h.streak || 0) > 0;
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} dueCount={dueCount} go={actions}
-        discoverEligible={(h.longestStreak || h.streak || 0) > 0} />
+    ? <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />
     : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
-  ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, dueCount, actions]);
+  ), [h.stops, h.recent, h.isInGrace, discoverEligible, dueCount, actions]);
 
   let body;
   if (h.loading) {
