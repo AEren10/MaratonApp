@@ -19,7 +19,7 @@ const DISMISS_DISTANCE = 90;
 
 export default function QuickAddSheet({ visible, onClose, onAction }) {
   const C = useC();
-  const { nextAction, startScreen, startParams } = useQuickAddActions();
+  const { nextAction, startScreen, startParams } = useQuickAddActions(visible);
   const translateY = useSharedValue(500);
   const sheetAnimStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
 

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { selectWeeklyMinutesGoal } from "../store/slices/goalsSlice";
 import { useForecastTarget } from "./useForecastTarget";
 import { useExam } from "../contexts/ExamContext";
+import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
@@ -121,7 +122,12 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     return js === 0 ? 6 : js - 1;
   }, []);
 
-  const nextTask = generatedTasks?.[0] || null;
+  // Bugun biten duraklar planin BASINDA duruyor; ana buton bitmis duragi
+  // gostermesin diye ilk ACIK gorev alinir (ŞİMDİ karti ile ayni kural).
+  const listKnown = Array.isArray(todayStops) && todayStops.length > 0;
+  const openIds = new Set((Array.isArray(todayStops) ? todayStops : []).filter((i) => !i.completed).map((i) => i.id));
+  const nextTask = (generatedTasks || []).find((task) => !task.completed
+    && (!listKnown || openIds.has(task.planTaskKey || buildPlanTaskKey(task)))) || null;
 
   // Ana ekran widget'lari ayni verilerden besleniyor. Burada yaziliyor cunku
   // veri burada doguyor; ekran dosyasinin haberi olmasina gerek yok.
