@@ -17,6 +17,11 @@ const MONTH_ABLATIVE = ["'tan", "'tan", "'tan", "'dan", "'tan", "'dan", "'dan", 
 export const DAYS_SHORT = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 export const DAYS_FULL = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 
+// "Pazartesi, 28 Eylül"
+export function dayLongLabel(d) {
+  return `${DAYS_FULL[(d.getDay() + 6) % 7]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
 export function upperTr(text) {
   return String(text || "").replace(/i/g, "İ").replace(/ı/g, "I").toUpperCase();
 }

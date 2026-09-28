@@ -3,6 +3,9 @@ import { useMemo } from "react";
 import { getAllSubjects } from "../domain/trial/trialTypes";
 import { generateDailyPlan } from "../lib/planEngine";
 import { useStudyRoute } from "./useStudyRoute";
+import { useClassSchedule } from "./useClassSchedule";
+import { todayPlanStops } from "../domain/program/todayStops";
+import { dateKey, todayTR } from "../lib/dateUtils";
 import { useHomeWeekLogs } from "./useHomeWeekLogs";
 import { displayNameOf } from "../lib/displayName";
 import { useRehearsalToday } from "./useRehearsalToday";
@@ -39,6 +42,9 @@ function buildSubjectMomentum(trials, C) {
     .slice(0, 2);
 }
 
+const completedToday = (stop) => stop.lifecycleStatus === "completed"
+  && (stop.completedToday === true || (stop.completedAt && dateKey(new Date(stop.completedAt)) === todayTR()));
+
 export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
   // Ana sayfa rotanın SAHİBİ: rota burada çiziliyor ve kalıcılaştırılıyor
   // (route_weeks). Diğer ekranlar persist:false ile sadece okuyor, böylece
@@ -61,12 +67,18 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
     [todayLogs],
   );
 
+  const { schedule } = useClassSchedule();
+
   const { plan, generatedTasks } = useMemo(() => {
     // Rota bu haftaki durakları veriyorsa günlük plan onlardan türesin.
     // Deneme provasi gunu: "O gün başka durak açılmaz" (AKIS 14).
     const generated = rehearsalToday
       ? { tasks: [], totalQuestions: 0, estimatedMinutes: 0 }
-      : generateDailyPlan({ ...planCtx, routeWeekStops: routeCurrentWeek?.stops || [] });
+      : generateDailyPlan({
+        ...planCtx,
+        routeWeekStops: todayPlanStops(routeCurrentWeek, schedule, todayTR(), { isCompletedToday: completedToday }),
+        routeActive: (routeCurrentWeek?.stops || []).length > 0,
+      });
     const estHours = generated.estimatedMinutes >= 60
       ? `~${Math.round(generated.estimatedMinutes / 60)} saat`
       : `~${generated.estimatedMinutes} dk`;
@@ -80,7 +92,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),

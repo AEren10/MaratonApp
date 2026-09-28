@@ -34,7 +34,9 @@ export function useHomeActions({ navigation, go }) {
     route: go(SCREENS.ROADMAP),
     fullRoute: go(SCREENS.ROUTE_FULL),
     redrawRoute: go(SCREENS.ROUTE_REDRAW),
-    plan: () => openProgram(navigation),
+    // "Programın tamamı" = bugunun plani (ayni duraklar, detayli). Haftanin
+    // tamami Program sekmesinde.
+    plan: go(SCREENS.PLAN_DETAIL),
     analysis: go(SCREENS.ANALYSIS),
     // Haftalik grafige dokununca: haftanin RAPORU degil, o gunlerin
     // KAYITLARI. Grafik zaten toplamlari gosteriyor; rapora gitmek yandan
