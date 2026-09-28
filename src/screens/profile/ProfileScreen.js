@@ -92,6 +92,12 @@ export default function ProfileScreen() {
                 label="Gruplarım"
                 onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
               />
+              {/* Meydan okuma yalniz Arkadaslar ekraninin en altindaydi. */}
+              <ProfileLinkRow
+                label="Meydan okumalar"
+                meta="Arkadaşınla yarış"
+                onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
+              />
               <ProfileLinkRow
                 label="Arkadaşını davet et"
                 onPress={() => navigation.navigate(SCREENS.REFERRAL)}
