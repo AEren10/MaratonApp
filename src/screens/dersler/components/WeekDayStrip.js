@@ -12,7 +12,7 @@ function DayChip({ day, selected, onPress, C }) {
   const border = isSelected ? C.text : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
   const letterColor = isSelected ? C.text : isPastDone ? C.text2 : C.text3;
   const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
-  const dotColor = isPastDone ? C.up : isSelected ? C.accent : day.active ? C.up : day.isFuture ? "transparent" : C.text5;
+  const dotColor = isSelected ? C.accent : (day.active || isPastDone) ? C.accentBright : day.isFuture ? "transparent" : C.line;
 
   return (
     <Pressable
@@ -40,14 +40,10 @@ function DayChip({ day, selected, onPress, C }) {
         {day.dayNum}
       </Text>
       <View style={{
-        width: 6,
-        height: 6,
-        borderRadius: 3,
+        width: 5,
+        height: 5,
+        borderRadius: 2.5,
         backgroundColor: dotColor,
-        shadowColor: isPastDone ? C.up : "transparent",
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 3,
       }} />
     </Pressable>
   );

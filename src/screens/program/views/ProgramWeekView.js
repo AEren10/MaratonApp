@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -6,7 +7,7 @@ import { Press } from "../../../components/design/Press";
 import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useWeekProgram } from "../../../hooks/useWeekProgram";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
 import { SelectedDayPanel } from "../../dersler/components/SelectedDayPanel";
@@ -19,12 +20,24 @@ function weekSummary({ weekRangeLabel, activeDaysCount, totalMinutes, totalQuest
   return parts.filter(Boolean).join(" · ");
 }
 
-// Hafta: gun seridi ve secili gunun duraklari. Eskiden ustte ayri bir
-// "BU HAFTA" karti, iki segment ve iki buyuk buton vardi; ozet tek satira indi.
 export function ProgramWeekView() {
   const C = useC();
   const navigation = useNavigation();
   const w = useWeekProgram();
+
+  const selectedDateObj = useMemo(() => {
+    if (!w.selectedDate) return new Date();
+    return new Date(w.selectedDate + "T12:00:00");
+  }, [w.selectedDate]);
+
+  const weekdayName = useMemo(() => {
+    const raw = selectedDateObj.toLocaleDateString("tr-TR", { weekday: "long" });
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }, [selectedDateObj]);
+
+  const dateFormatted = useMemo(() => {
+    return selectedDateObj.toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
+  }, [selectedDateObj]);
 
   if (w.loading) {
     return <View style={s.pad}><DerslerSkeleton /></View>;
@@ -37,8 +50,16 @@ export function ProgramWeekView() {
       refreshControl={<RefreshControl refreshing={w.loading} onRefresh={w.refresh} tintColor={C.accent} colors={[C.accent]} />}
     >
       <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{weekSummary(w)}</Text>
+
+      <View style={s.dayHeading}>
+        <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{weekdayName}</Text>
+        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, marginTop: 2 }]}>{dateFormatted}</Text>
+      </View>
+
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
+
       {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={w.selectedDayLogs} /> : null}
+
       <ProgramRulesSection onOpen={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)} />
       <Press haptic="none"
         onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)}
@@ -58,14 +79,7 @@ export function ProgramWeekView() {
 const s = StyleSheet.create({
   pad: { paddingHorizontal: GUTTER },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: STEP.s3,
-    paddingTop: STEP.s2 + 2,
-    borderTopWidth: 1,
-    minHeight: CONTROL.tapMin,
-  },
-  copy: { gap: 2, flex: 1 },
+  dayHeading: { marginTop: STEP.s2, marginBottom: STEP.s2 },
+  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, marginTop: STEP.s4 },
+  copy: { flex: 1, gap: 2 },
 });
