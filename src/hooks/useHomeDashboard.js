@@ -67,12 +67,14 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
     [todayLogs],
   );
 
-  const { schedule } = useClassSchedule();
+  const { schedule, ready: scheduleReady } = useClassSchedule();
 
   const { plan, generatedTasks } = useMemo(() => {
     // Rota bu haftaki durakları veriyorsa günlük plan onlardan türesin.
     // Deneme provasi gunu: "O gün başka durak açılmaz" (AKIS 14).
-    const generated = rehearsalToday
+    // Ders programi okunmadan plan kurulmaz: varsayilan dagilimla kurulan
+    // plan gunun gorev setine yanlis duraklarla yazilabiliyordu.
+    const generated = rehearsalToday || !scheduleReady
       ? { tasks: [], totalQuestions: 0, estimatedMinutes: 0 }
       : generateDailyPlan({
         ...planCtx,
@@ -92,7 +94,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),
