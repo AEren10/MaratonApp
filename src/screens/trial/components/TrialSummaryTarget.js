@@ -15,7 +15,7 @@ import { Press } from "../../../components/design/Press";
 export function TrialSummaryTarget({ onDepartments }) {
   const C = useC();
   const { targetDepartment } = useExam();
-  const { gapResult, canAccess, requestAccess } = useThresholdView();
+  const { gapResult, examLabel, canAccess, requestAccess } = useThresholdView();
   if (!targetDepartment || !gapResult || gapResult.reached) return null;
   return (
     <Animated.View style={styles.wrap}>
@@ -26,7 +26,7 @@ export function TrialSummaryTarget({ onDepartments }) {
           <View style={styles.gap}>
             <LockedValue value={formatNet(gapResult.gap)} locked={!canAccess} variant="statSmall"
               onPress={requestAccess} label="Net açığı Pro ile açılır" style={canAccess ? { color: C.accentBright } : null} />
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>net kaldı</Text>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>{examLabel ? `${examLabel} neti kaldı` : "net kaldı"}</Text>
           </View>
         </View>
         <Press haptic="none" onPress={onDepartments} accessibilityRole="button"

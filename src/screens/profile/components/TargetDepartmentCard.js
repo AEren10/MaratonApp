@@ -18,12 +18,12 @@ import { Press } from "../../../components/design/Press";
 export function TargetDepartmentCard({ targetDepartment }) {
   const C = useC();
   const nav = useNavigation();
-  const { gapResult, canAccess, requestAccess } = useThresholdView();
+  const { gapResult, examLabel, canAccess, requestAccess } = useThresholdView();
 
   if (!targetDepartment) return null;
 
   const metaText = gapResult
-    ? (gapResult.reached ? "Hedefi geçtin · bölümleri gör" : null)
+    ? (gapResult.reached ? `${examLabel ? `${examLabel} hedefini` : "Hedefi"} geçtin · bölümleri gör` : null)
     : null;
 
   return (
@@ -54,7 +54,7 @@ export function TargetDepartmentCard({ targetDepartment }) {
         ) : !gapResult ? null : (
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 4, marginTop: 5 }}>
             <LockedValue
-              value={`${gapResult.gap} net kaldı`}
+              value={`${examLabel ? `${examLabel} ` : ""}${gapResult.gap} net kaldı`}
               locked={!canAccess}
               variant="micro"
               onPress={requestAccess}
