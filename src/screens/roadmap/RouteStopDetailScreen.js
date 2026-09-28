@@ -37,7 +37,7 @@ export default function RouteStopDetailScreen() {
         {stop ? (
           <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
             <Animated.View>
-              <RouteStopHero number={d.number} stop={stop} color={color} subjectCompleted={d.subjectCompleted} />
+              <RouteStopHero number={d.number} stop={stop} color={color} subjectCompleted={d.subjectCompleted} part={d.part} when={d.when} />
             </Animated.View>
             <Animated.View>
               <RouteStopWhy stop={stop} color={color} />
