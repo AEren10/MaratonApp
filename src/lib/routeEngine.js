@@ -131,8 +131,11 @@ export function buildRoute({
             }),
             reasonCodes: ["REVIEW_DUE"],
             scoreComponents: {
+              expectedNetGain: topicShare,
+              effortQuestions: rCost,
               retention: rs.retention,
               examShare: Math.round(topicShare * 100) / 100,
+              reviewDaysSince: rs.daysSince,
             },
             dataConfidence: q >= 20 ? "high" : "medium",
           });

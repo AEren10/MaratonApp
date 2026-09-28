@@ -83,12 +83,15 @@ test("stop explanation prefers the dominant route reason", () => {
   const insight = explainRouteStop({
     reasonCodes: ["LOW_ACCURACY", "HIGH_EXAM_WEIGHT"],
     dataConfidence: "medium",
+    q: 10,
+    acc: 30,
     scoreComponents: { expectedNetGain: 1.234, effortQuestions: 18 },
   });
 
   assert.equal(insight.reasonCode, "LOW_ACCURACY");
   assert.equal(insight.confidence, "medium");
   assert.equal(insight.expectedNetGain, 1.23);
+  assert.match(insight.reasonText, /10 soruda doğruluk %30/);
 });
 
 test("route treats topic-level low accuracy as a weak signal without subject flag", () => {
@@ -153,4 +156,8 @@ test("route intelligence exposes neglected topic recency as an explainable signa
   assert.equal(route.intelligence.signals.neglectedStops, 1);
   assert.equal(recency.status, "ok");
   assert.match(recency.detail, /uzun ara verilen/);
+  assert.match(
+    route.weeks.flatMap((week) => week.stops)[0].insight.reasonText,
+    /gündür temas yok|soruda doğruluk|getirisi yüksek/,
+  );
 });

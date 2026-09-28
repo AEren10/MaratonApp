@@ -22,6 +22,7 @@ test("trial duration migration keeps old create_trial callers compatible", () =>
 test("trial duration travels through form, rpc payload and official defaults", () => {
   assert.match(types, /TYT[\s\S]*durationMinutes: 165/);
   assert.match(types, /AYT_SAY[\s\S]*durationMinutes: 180/);
+  assert.match(types, /YDT[\s\S]*durationMinutes: 180/);
   assert.match(submit, /duration_minutes: durationValue/);
   assert.match(trials, /p_duration_minutes:\s*trial\.duration_minutes \?\? trial\.durationMinutes \?\? null/);
   assert.match(details, /keyboardType="number-pad"/);

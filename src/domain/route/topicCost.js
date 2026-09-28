@@ -118,6 +118,7 @@ export function priorityScoreDetails({
       expectedNetGain: yieldPart,
       effortQuestions: cost.questions,
       urgency: Math.round(urgency * 100) / 100,
+      neglectedDays,
       retention: Math.round(decay * 100) / 100,
       weakAreaBoost: weakBoost,
       sequenceReadiness: Math.round(sequencePenalty * 100) / 100,

@@ -46,6 +46,7 @@ function cachedBuildRoute(inputs, key) {
 
 function trialTypesForRoute(examType, field) {
   if (examType === "lgs") return ["LGS"];
+  if (examType === "dil") return ["TYT", "YDT"];
   if (examType !== "tyt_ayt") return ["TYT"];
   const ayt = field === "sayisal" ? "AYT_SAY"
     : field === "ea" ? "AYT_EA" : field === "sozel" ? "AYT_SOZ" : null;
@@ -68,10 +69,24 @@ function latestNetOf(trials = []) {
 
 function forecastProfilesForRoute(examType, field) {
   if (examType === "lgs") return [{ types: ["LGS"], max: 90 }];
+  if (examType === "dil") return [{ types: ["TYT"], max: 120 }, { types: ["YDT"], max: 80 }];
   if (examType !== "tyt_ayt") return [{ types: ["TYT"], max: 120 }];
   const ayt = field === "sayisal" ? "AYT_SAY"
     : field === "ea" ? "AYT_EA" : field === "sozel" ? "AYT_SOZ" : "AYT_SAY";
   return [{ types: ["TYT"], max: 120 }, { types: [ayt, "AYT"], max: 80 }];
+}
+
+function pickForecastCandidate(profiles = [], trials = [], examDate) {
+  const candidates = profiles.map((profile) => {
+    const profileTrials = (trials || []).filter((trial) => profile.types.includes(trial.trialType));
+    const forecast = forecastNet(profileTrials, examDate, profile.max, profile.types);
+    return { ...profile, trials: profileTrials, forecast, count: profileTrials.length };
+  });
+  return candidates
+    .sort((a, b) => {
+      if (Boolean(a.forecast) !== Boolean(b.forecast)) return a.forecast ? -1 : 1;
+      return b.count - a.count;
+    })[0] || null;
 }
 
 class RouteReadError extends Error {
@@ -264,20 +279,14 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     };
   }, [computedRoute, persistedStops]);
 
-  const forecastProfile = useMemo(() => forecastProfilesForRoute(examType, field)
-    .map((profile) => ({
-      ...profile,
-      count: (trials || []).filter((trial) => profile.types.includes(trial.trialType)).length,
-    }))
-    .sort((a, b) => b.count - a.count)[0], [examType, field, trials]);
-  const forecastTrials = useMemo(
-    () => (trials || []).filter((trial) => forecastProfile?.types.includes(trial.trialType)),
-    [forecastProfile?.types, trials],
+  const forecastCandidate = useMemo(
+    () => pickForecastCandidate(forecastProfilesForRoute(examType, field), trials, examDate),
+    [examDate, examType, field, trials],
   );
+  const forecastProfile = forecastCandidate;
+  const forecastTrials = forecastCandidate?.trials || [];
   const forecastMax = forecastProfile?.max ?? 120;
-  const forecast = useMemo(() => forecastNet(
-    forecastTrials, examDate, forecastMax, forecastProfile?.types,
-  ), [examDate, forecastMax, forecastTrials, forecastProfile?.types]);
+  const forecast = forecastCandidate?.forecast || null;
   const tempoScenarios = useMemo(() => buildTempoScenarios({
     forecast,
     questionsPerWeek: route.capacity?.questionsPerWeek,

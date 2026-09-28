@@ -1,6 +1,6 @@
 const TYPE_ALIASES = {
   tyt: "TYT", ayt: "AYT", ayt_say: "AYT_SAY", ayt_ea: "AYT_EA",
-  ayt_soz: "AYT_SOZ", lgs: "LGS", branch: "BRANCH",
+  ayt_soz: "AYT_SOZ", ydt: "YDT", lgs: "LGS", branch: "BRANCH",
 };
 
 export const TRIAL_DIFFICULTY = Object.freeze({

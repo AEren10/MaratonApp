@@ -72,6 +72,45 @@ function dominantReason(stop = {}) {
   return codes.find((code) => REASON_TEXT[code]) || codes[0] || "ROUTE_COMMITMENT";
 }
 
+function percent(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? `%${Math.round(number)}` : null;
+}
+
+function reasonTextFor(stop = {}) {
+  const reasonCode = dominantReason(stop);
+  const components = stop.scoreComponents || {};
+  const questions = Number(stop.q) || 0;
+  const accuracy = percent(stop.acc);
+  const neglectedDays = Number(stop.neglectedDays) || Number(components.neglectedDays) || 0;
+  const netGain = Number(components.expectedNetGain) || 0;
+  if (reasonCode === "REVIEW_DUE") {
+    const retention = percent(Number(stop.retention ?? components.retention) * 100);
+    const days = Number(components.reviewDaysSince);
+    const dayText = Number.isFinite(days) && days > 0 ? `${Math.round(days)} gün önce çalışılmış; ` : "";
+    return `${dayText}${retention || "hatırlama"} seviyesine düşmüş görünüyor. Kısa tekrar neti korur.`;
+  }
+  if (reasonCode === "LOW_ACCURACY") {
+    if (questions > 0 && accuracy) return `${questions} soruda doğruluk ${accuracy}; zayıf sinyal verdiği için öne alındı.`;
+    return "Son deneme/konu verilerinde zayıf sinyal verdiği için öne alındı.";
+  }
+  if (reasonCode === "NEGLECTED") {
+    return `${Math.round(neglectedDays)} gündür temas yok; unutma riski büyümeden kısa durak iyi olur.`;
+  }
+  if (reasonCode === "HIGH_EXAM_WEIGHT") {
+    return netGain > 0
+      ? `Bu konu sınavda yaklaşık ${Math.round(netGain * 10) / 10} netlik paya temas ediyor; getirisi yüksek.`
+      : "Sınavdaki soru payı yüksek olduğu için getirisi iyi.";
+  }
+  if (reasonCode === "PREREQUISITE") {
+    const missing = Number(stop.unpreparedBefore) || 0;
+    return missing > 0
+      ? `Öncesinde hazır olmayan ${missing} konu var; sırayı güçlendirmek için burada duruyoruz.`
+      : REASON_TEXT.PREREQUISITE;
+  }
+  return REASON_TEXT[reasonCode] || REASON_TEXT.ROUTE_COMMITMENT;
+}
+
 function sumStopCost(stops = [], field) {
   return stops.reduce((sum, stop) => sum + (Number(stop.cost?.[field]) || 0), 0);
 }
@@ -105,7 +144,7 @@ function focusAreas(items = []) {
       subjectLabel: item.subjectLabel || item.subject,
       topic: item.topic,
       reasonCode: dominantReason(item),
-      reasonText: REASON_TEXT[dominantReason(item)] || REASON_TEXT.ROUTE_COMMITMENT,
+      reasonText: reasonTextFor(item),
       confidence: item.dataConfidence || "low",
       expectedNetGain: round(Number(item.scoreComponents?.expectedNetGain) || 0),
     }));
@@ -257,7 +296,7 @@ export function explainRouteStop(stop = {}) {
   const confidence = stop.dataConfidence || "low";
   return {
     reasonCode,
-    reasonText: REASON_TEXT[reasonCode] || REASON_TEXT.ROUTE_COMMITMENT,
+    reasonText: reasonTextFor(stop),
     confidence,
     expectedNetGain: round(Number(components.expectedNetGain) || 0),
     effortQuestions: Number(components.effortQuestions) || Number(stop.cost?.questions) || 0,

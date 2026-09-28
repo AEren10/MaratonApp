@@ -43,7 +43,7 @@ export const trialSubjectSchema = z.object({
 export const trialEntrySchema = z.object({
   name: z.string().min(1, "Deneme adı gir").max(100),
   trial_date: z.string().min(1),
-  exam_type: z.enum(["TYT", "AYT", "AYT_SAY", "AYT_EA", "AYT_SOZ", "LGS", "BRANCH"]),
+  exam_type: z.enum(["TYT", "AYT", "AYT_SAY", "AYT_EA", "AYT_SOZ", "YDT", "LGS", "BRANCH"]),
   total_net: z.number().min(-200).max(500),
   duration_minutes: z.number().int().min(1).max(600).nullable().optional(),
   subjects: z.array(trialSubjectSchema).min(1),

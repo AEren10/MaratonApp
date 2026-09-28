@@ -27,6 +27,8 @@ test("ExamContext updateTargetNet TYT ve AYT degerlerini kabul eder", () => {
   assert.match(examContextSrc, /updateTargetNet\s*=\s*useCallback\(async\s*\(net,\s*extra/);
   assert.match(examContextSrc, /targetNetTYT/);
   assert.match(examContextSrc, /targetNetAYT/);
+  assert.match(examContextSrc, /target_net_tyt/);
+  assert.match(examContextSrc, /target_net_second/);
 });
 
 test("GoalSetupScreen coklu net bolumu ve kaydirmali gorunumu icerir", () => {

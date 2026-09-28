@@ -66,6 +66,13 @@ export function getLGSSubjects(C) {
   ];
 }
 
+export function getYDTSubjects(C) {
+  C = palette(C);
+  return [
+    { key: "ydt_ingilizce", name: "İngilizce", color: S(C, "ydt_ingilizce"), icon: "globe", max: 80, parent: "YDT" },
+  ];
+}
+
 export function getAllSubjects(C) {
   C = palette(C);
   return [
@@ -73,6 +80,7 @@ export function getAllSubjects(C) {
     ...getAYTSaySubjects(C),
     ...getAYTEASubjects(C).filter((s) => s.key !== "ayt_matematik"),
     ...getAYTSozSubjects(C).filter((s) => !["ayt_edebiyat", "ayt_tarih1", "ayt_cografya1"].includes(s.key)),
+    ...getYDTSubjects(C),
     ...getLGSSubjects(C),
   ];
 }
@@ -84,6 +92,7 @@ export function getTrialTypes(C) {
     AYT_SAY: { code: "AYT_SAY", label: "AYT sayısal", description: "80 soru · Mat-Fizik-Kimya-Biyoloji", icon: "hash", color: C.amber, subjects: getAYTSaySubjects(C), totalQuestions: 80, durationMinutes: 180 },
     AYT_EA: { code: "AYT_EA", label: "AYT eşit ağırlık", description: "80 soru · Mat-Ede-Tarih-Coğ", icon: "layers", color: C.purple, subjects: getAYTEASubjects(C), totalQuestions: 80, durationMinutes: 180 },
     AYT_SOZ: { code: "AYT_SOZ", label: "AYT sözel", description: "80 soru · Ede-Tarih-Coğ-Fel-Din", icon: "bookOpen", color: C.green, subjects: getAYTSozSubjects(C), totalQuestions: 80, durationMinutes: 180 },
+    YDT: { code: "YDT", label: "YDT dil", description: "80 soru · Yabancı dil", icon: "globe", color: S(C, "ydt_ingilizce"), subjects: getYDTSubjects(C), totalQuestions: 80, durationMinutes: 180 },
     LGS: { code: "LGS", label: "LGS denemesi", description: "90 soru · 6 ders", icon: "shield", color: C.green, subjects: getLGSSubjects(C), totalQuestions: 90, durationMinutes: 155 },
     BRANCH: { code: "BRANCH", label: "Branş denemesi", description: "Tek derslik branş denemesi", icon: "target", color: C.teal, subjects: getAllSubjects(C), totalQuestions: null },
   };
@@ -102,6 +111,7 @@ export function getSubjectsForBranch(C, examType, field) {
   if (examType === "lgs") return getLGSSubjects(C);
   if (!examType) return getTYTSubjects(C);
   const subjects = [...getTYTSubjects(C)];
+  if (examType === "dil") subjects.push(...getYDTSubjects(C));
   if (examType === "tyt_ayt") {
     if (field === "sayisal") subjects.push(...getAYTSaySubjects(C));
     else if (field === "ea") subjects.push(...getAYTEASubjects(C));
@@ -113,10 +123,10 @@ export function getSubjectsForBranch(C, examType, field) {
 export function getTrialTypesForExam(C, examType, field) {
   const all = getTrialTypeList(C);
   if (examType === "lgs") return all.filter((t) => ["LGS", "BRANCH"].includes(t.code));
+  if (examType === "dil" || field === "dil") return all.filter((t) => ["TYT", "YDT", "BRANCH"].includes(t.code));
   if (field === "sayisal") return all.filter((t) => ["TYT", "AYT_SAY", "BRANCH"].includes(t.code));
   if (field === "ea") return all.filter((t) => ["TYT", "AYT_EA", "BRANCH"].includes(t.code));
   if (field === "sozel") return all.filter((t) => ["TYT", "AYT_SOZ", "BRANCH"].includes(t.code));
-  if (field === "dil") return all.filter((t) => ["TYT", "BRANCH"].includes(t.code));
   if (!field) return all.filter((t) => ["TYT", "BRANCH"].includes(t.code));
   return all;
 }

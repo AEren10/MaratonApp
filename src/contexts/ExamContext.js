@@ -33,13 +33,25 @@ function coerceNet(value) {
  */
 async function retryPendingNetSync(userId, local, isCancelled) {
   const jobs = [
-    { flag: "targetNetSyncPending", value: local?.targetNet, column: "target_net", patchKey: "targetNet" },
+    {
+      flag: "targetNetSyncPending",
+      value: local?.targetNet,
+      patch: {
+        target_net: local?.targetNet,
+        target_net_tyt: local?.targetNetTYT,
+        target_net_second: local?.targetNetAYT,
+      },
+      patchKey: "targetNet",
+    },
     { flag: "baselineNetSyncPending", value: local?.baselineNet, column: "baseline_net", patchKey: "baselineNet" },
   ];
   for (const job of jobs) {
     if (!local?.[job.flag] || job.value == null) continue;
     try {
-      await updateProf(userId, { [job.column]: job.value });
+      const payload = job.patch
+        ? Object.fromEntries(Object.entries(job.patch).filter(([, value]) => value !== undefined))
+        : { [job.column]: job.value };
+      await updateProf(userId, payload);
       if (isCancelled()) return;
       await persistExamConfigPatch({ [job.patchKey]: job.value, [job.flag]: false }, userId);
     } catch {
@@ -206,6 +218,12 @@ export function ExamProvider({ children }) {
       const targetNetValue = local.targetNetSyncPending && local.targetNet != null
         ? Number(local.targetNet)
         : (p.target_net == null ? local.targetNet ?? null : Number(p.target_net));
+      const targetNetTYTValue = local.targetNetSyncPending && local.targetNetTYT != null
+        ? Number(local.targetNetTYT)
+        : (p.target_net_tyt == null ? local.targetNetTYT ?? null : Number(p.target_net_tyt));
+      const targetNetSecondValue = local.targetNetSyncPending && local.targetNetAYT != null
+        ? Number(local.targetNetAYT)
+        : (p.target_net_second == null ? local.targetNetAYT ?? null : Number(p.target_net_second));
       const baselineNetValue = local.baselineNetSyncPending && local.baselineNet != null
         ? Number(local.baselineNet)
         : (p.baseline_net == null ? local.baselineNet ?? null : Number(p.baseline_net));
@@ -221,8 +239,8 @@ export function ExamProvider({ children }) {
         targetRanking: rankingPending ? (local.targetRanking || null) : (p.target_ranking || null),
         targetDepartment: rankingPending ? (local.targetDepartment || null) : (p.target_department || null),
         targetNet: targetNetValue,
-        targetNetTYT: local.targetNetTYT ?? null,
-        targetNetAYT: local.targetNetAYT ?? null,
+        targetNetTYT: targetNetTYTValue,
+        targetNetAYT: targetNetSecondValue,
         baselineNet: baselineNetValue,
         dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
@@ -258,6 +276,8 @@ export function ExamProvider({ children }) {
       // Sunucuda hic deger yoksa yerelden doldur (ilk kurulum / eski surum).
       const pending = {};
       if (p.target_net == null && local.targetNet != null) pending.target_net = Number(local.targetNet);
+      if (p.target_net_tyt == null && local.targetNetTYT != null) pending.target_net_tyt = Number(local.targetNetTYT);
+      if (p.target_net_second == null && local.targetNetAYT != null) pending.target_net_second = Number(local.targetNetAYT);
       if (p.baseline_net == null && local.baselineNet != null) pending.baseline_net = Number(local.baselineNet);
       if (Object.keys(pending).length) {
         updateProf(userId, pending).catch(() => {});
@@ -363,20 +383,25 @@ export function ExamProvider({ children }) {
       total = (tyt || 0) + (ayt || 0);
     }
     const value = coerceNet(total);
+    const tytValue = tyt != null ? Number(tyt) : null;
+    const secondValue = ayt != null ? Number(ayt) : null;
     setTargetNet(value);
-    if (tyt != null) setTargetNetTYT(Number(tyt));
-    if (ayt != null) setTargetNetAYT(Number(ayt));
+    if (tyt != null) setTargetNetTYT(tytValue);
+    if (ayt != null) setTargetNetAYT(secondValue);
     try {
       await persistExamConfigPatch({
         targetNet: value,
-        targetNetTYT: tyt != null ? Number(tyt) : undefined,
-        targetNetAYT: ayt != null ? Number(ayt) : undefined,
+        targetNetTYT: tyt != null ? tytValue : undefined,
+        targetNetAYT: ayt != null ? secondValue : undefined,
         targetNetSyncPending: false,
       }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
-        await updateProf(session.user.id, { target_net: value });
+        const payload = { target_net: value };
+        if (tyt != null) payload.target_net_tyt = tytValue;
+        if (ayt != null) payload.target_net_second = secondValue;
+        await updateProf(session.user.id, payload);
         await persistExamConfigPatch({ targetNet: value, targetNetSyncPending: false }, userId);
         return { synced: true };
       } catch (e) {
