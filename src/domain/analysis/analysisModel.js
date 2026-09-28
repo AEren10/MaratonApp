@@ -100,7 +100,9 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
   // "Tumu"de TYT ve AYT ayni grafikte iki cizgi (kullanici istegi, 28 Eylul).
   // Tarihleri farkli oldugu icin noktalar zaman eksenine yerlesir.
   const typeSeries = (type) => sorted
-    .filter((trial) => trial.trialType === type)
+    // AYT denemeleri AYT_SAY / AYT_EA / AYT_SOZ olarak kaydediliyor; tam
+    // esitlik AYT cizgisini cogu kullanicida hic cizmiyordu.
+    .filter((trial) => (type === "AYT" ? String(trial.trialType || "").startsWith("AYT") : trial.trialType === type))
     .slice(0, 12)
     .reverse()
     .map((trial) => ({ t: new Date(trial.date).getTime(), v: trial.totalNet || 0 }))
