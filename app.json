@@ -113,9 +113,9 @@
             {
               "name": "MaratonToday",
               "displayName": "Bugün",
-              "description": "Günlük hedefin, serin ve sıradaki durağın.",
+              "description": "Bugünün işleri ve sıradaki durağın. Kilit ekranına da eklenir.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"]
+                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"]
               }
             },
             {
@@ -123,21 +123,37 @@
               "displayName": "Tekrar",
               "description": "Tekrarı gelen yanlış soruların.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"]
+                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"]
               }
             },
             {
               "name": "MaratonRoute",
               "displayName": "Rota",
-              "description": "Sınava kalan gün ve net artışın.",
+              "description": "Sınava kalan gün ve net çizgin. Kilit ekranına da eklenir.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"]
+                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"]
               }
             },
             {
               "name": "MaratonWeek",
               "displayName": "Bu hafta",
               "description": "Haftanın çözülen soruları ve günlük hedef.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            },
+            {
+              "name": "MaratonStreak",
+              "displayName": "Seri",
+              "description": "Serin ve son dört haftanın çalışma ızgarası.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium"]
+              }
+            },
+            {
+              "name": "MaratonTrial",
+              "displayName": "Deneme",
+              "description": "Son denemelerinin net çizgisi ve ders ders değişim.",
               "ios": {
                 "supportedFamilies": ["systemSmall", "systemMedium"]
               }
