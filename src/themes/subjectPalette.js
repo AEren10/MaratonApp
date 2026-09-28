@@ -10,10 +10,18 @@
 
 const EXAM_PREFIX = /^(tyt|ayt|lgs|ydt)_/;
 const TRAILING_INDEX = /\d+$/;
+// Alan nitelikleri: `ayt_ea_matematik`, `ayt_tarih_soz`, `ayt_cografya_ea`.
+// Eslenmeyince ders kirmizi (accent) gorunuyordu.
+const FIELD_PREFIX = /^(ea|say|soz)_/;
+const FIELD_SUFFIX = /_(ea|say|soz)$/;
 
 export function subjectPaletteKey(subjectKey) {
   if (!subjectKey) return null;
-  return String(subjectKey).replace(EXAM_PREFIX, "").replace(TRAILING_INDEX, "");
+  return String(subjectKey)
+    .replace(EXAM_PREFIX, "")
+    .replace(FIELD_PREFIX, "")
+    .replace(FIELD_SUFFIX, "")
+    .replace(TRAILING_INDEX, "");
 }
 
 /** Paletle eslesmeyen ders accent'e duser — sessizce gri kalmaz. */

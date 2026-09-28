@@ -3,25 +3,25 @@ import {
   AYT_SAY_DERSLER,
   AYT_EA_DERSLER,
   AYT_SOZ_DERSLER,
+  YDT_DERSLER,
+  LGS_DERSLER,
   getAllSubjectsFlat,
-} from "../../data/curriculum";
+} from "../../data/curriculum.js";
 
-const aytMap = new Map();
-[...AYT_SAY_DERSLER, ...AYT_EA_DERSLER, ...AYT_SOZ_DERSLER].forEach((s) => {
-  if (!aytMap.has(s.key)) aytMap.set(s.key, s);
-});
+const toOption = (s) => ({ key: s.key, name: s.label, topics: s.topics || [] });
+const AYT_BY_FIELD = { sayisal: AYT_SAY_DERSLER, ea: AYT_EA_DERSLER, sozel: AYT_SOZ_DERSLER };
 
-export const ADD_TASK_TYT_SUBJECTS = TYT_DERSLER.map((s) => ({
-  key: s.key,
-  name: s.label,
-  topics: s.topics || [],
-}));
-
-export const ADD_TASK_AYT_SUBJECTS = Array.from(aytMap.values()).map((s) => ({
-  key: s.key,
-  name: s.label,
-  topics: s.topics || [],
-}));
+// Durak ekle ders listesi KULLANICININ sinavina ve alanina gore. Eskiden AYT
+// sekmesi uc alanin derslerini birlestiriyordu: YDT secen ogrenci Fizik
+// goruyordu, Matematik/Tarih/Edebiyat ikiser kez cikiyordu.
+export function addTaskSubjectGroups(examType, field) {
+  if (examType === "lgs") return [{ key: "lgs", label: "LGS", subjects: LGS_DERSLER.map(toOption) }];
+  const tyt = { key: "tyt", label: "TYT", subjects: TYT_DERSLER.map(toOption) };
+  if (examType === "tyt") return [tyt];
+  if (examType === "dil") return [tyt, { key: "ydt", label: "YDT", subjects: YDT_DERSLER.map(toOption) }];
+  const ayt = AYT_BY_FIELD[field] || AYT_SAY_DERSLER;
+  return [tyt, { key: "ayt", label: "AYT", subjects: ayt.map(toOption) }];
+}
 
 export function getTopicsForSubject(subjectKey) {
   const all = getAllSubjectsFlat();

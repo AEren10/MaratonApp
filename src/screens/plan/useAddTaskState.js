@@ -8,8 +8,7 @@ import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { addStopToActiveRoute } from "../../supabase/routePlan";
 import * as H from "../../lib/haptics";
 import {
-  ADD_TASK_TYT_SUBJECTS,
-  ADD_TASK_AYT_SUBJECTS,
+  addTaskSubjectGroups,
   getTopicsForSubject,
   parseDurationMinutes,
 } from "./addTaskOptions";
@@ -20,11 +19,15 @@ export function useAddTaskState() {
   const { createTask } = useUserTasks();
   const showAlert = useAlert();
   const { user } = useAuth();
-  const { examType } = useExam();
+  const { examType, field } = useExam();
   const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
-  const [examTab, setExamTab] = useState("tyt");
-  const subjects = examTab === "tyt" ? ADD_TASK_TYT_SUBJECTS : ADD_TASK_AYT_SUBJECTS;
+  const groups = useMemo(() => addTaskSubjectGroups(examType, field), [examType, field]);
+  const paramKey = route.params?.subjectKey;
+  const [examTab, setExamTab] = useState(
+    () => groups.find((g) => g.subjects.some((x) => x.key === paramKey))?.key || groups[0].key,
+  );
+  const subjects = (groups.find((g) => g.key === examTab) || groups[0]).subjects;
 
   const initialSubject = route.params?.subjectKey || subjects[0]?.key || "matematik";
   const [subjectKey, setSubjectKey] = useState(initialSubject);
@@ -38,7 +41,7 @@ export function useAddTaskState() {
 
   const handleExamChange = (nextTab) => {
     setExamTab(nextTab);
-    const nextSubjects = nextTab === "tyt" ? ADD_TASK_TYT_SUBJECTS : ADD_TASK_AYT_SUBJECTS;
+    const nextSubjects = (groups.find((g) => g.key === nextTab) || groups[0]).subjects;
     if (nextSubjects.length > 0) {
       const nextSub = nextSubjects[0];
       setSubjectKey(nextSub.key);
@@ -88,6 +91,7 @@ export function useAddTaskState() {
   return {
     navigation,
     examTab,
+    examTabs: groups.map((g) => ({ key: g.key, label: g.label })),
     subjects,
     subjectKey,
     selectedSubjectObj,

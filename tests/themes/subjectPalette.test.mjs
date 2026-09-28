@@ -24,3 +24,11 @@ test("eslesen ders kendi rengini alir", () => {
   assert.equal(subjectColorOf(C, "ayt_matematik"), "#E0A570");
   assert.equal(subjectColorOf(C, "ayt_cografya1"), "#8B5CF6");
 });
+
+test("field-qualified AYT keys map to their subject color, not the accent fallback", () => {
+  assert.equal(subjectPaletteKey("ayt_ea_matematik"), "matematik");
+  assert.equal(subjectPaletteKey("ayt_tarih_soz"), "tarih");
+  assert.equal(subjectPaletteKey("ayt_cografya_ea"), "cografya");
+  assert.equal(subjectPaletteKey("ayt_edebiyat_soz"), "edebiyat");
+  assert.equal(subjectPaletteKey("ydt_ingilizce"), "ingilizce");
+});
