@@ -1,11 +1,14 @@
 import { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Card, Icon, EmptyState } from "../../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { useNavigation } from "@react-navigation/native";
+import { Card, Icon } from "../../../components/design";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { SCREENS } from "../../../constants/screens";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
+import { DaySlotRow } from "./DaySlotRow";
 import { todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
 
@@ -21,22 +24,9 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function SlotRow({ time, color, name, subject, dur, C }) {
-  return (
-    <View style={{ flexDirection: "row", alignItems: "flex-start", gap: STEP.s2, paddingVertical: STEP.s2, marginTop: 4 }}>
-      <Text style={[TYPOGRAPHY.metaSemiBold, { width: 36, color: C.text3, paddingTop: 1 }]}>{time}</Text>
-      <View style={{ width: 2, height: 28, backgroundColor: color, borderRadius: 1, marginTop: 1 }} />
-      <View style={{ flex: 1 }}>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]} numberOfLines={1}>{name}</Text>
-        {subject ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{subject}</Text> : null}
-      </View>
-      <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>{dur}</Text>
-    </View>
-  );
-}
-
 export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, onOpenDetail, style }) {
   const C = useC();
+  const navigation = useNavigation();
   const trialTypes = getTrialTypes(C);
   const today = day === todayTR();
 
@@ -71,8 +61,6 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
     return [...logSlots, ...trialSlots];
   }, [data, trialTypes, C.accent]);
 
-  const isEmpty = slots.length === 0 && !calendarTasks.length;
-
   return (
     <Card tone="surface" radius="panel" style={[styles.card, style]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s2 }}>
@@ -80,42 +68,53 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 0.8 }]}>{streakStatus}</Text>
       </View>
 
-      <View style={{ flexDirection: "row", gap: STEP.s4, marginBottom: STEP.s3 }}>
-        <View>
-          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statMinutes}</Text>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>dk</Text>
-        </View>
-        <View>
-          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statStops}</Text>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>durak</Text>
-        </View>
-        <View>
-          <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statQuestions}</Text>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>soru</Text>
-        </View>
-      </View>
+      {hasActivity ? (
+        <>
+          <View style={{ flexDirection: "row", gap: STEP.s4, marginBottom: STEP.s3 }}>
+            <View>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statMinutes}</Text>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>dk</Text>
+            </View>
+            <View>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statStops}</Text>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>durak</Text>
+            </View>
+            <View>
+              <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statQuestions}</Text>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>soru</Text>
+            </View>
+          </View>
 
-      {isEmpty ? (
-        <EmptyState
-          preset="calendarEmptyDay"
-          primary=""
-          secondary=""
-          style={{ paddingVertical: STEP.s3, alignItems: "center" }}
-        />
+          <View>
+            {slots.map((s) => (
+              <Press haptic="none"
+                key={s.key}
+                disabled={!s.trial}
+                hitSlop={s.trial ? 8 : undefined}
+                accessibilityRole={s.trial ? "button" : undefined}
+                accessibilityLabel={s.trial ? `${s.name} deneme detayı` : undefined}
+                onPress={() => s.trial && onTrialPress?.(s.trial)}
+              >
+                <DaySlotRow time={s.time} color={s.color} name={s.name} subject={s.subject} dur={s.dur} C={C} />
+              </Press>
+            ))}
+          </View>
+        </>
       ) : (
-        <View>
-          {slots.map((s) => (
-            <Press haptic="none"
-              key={s.key}
-              disabled={!s.trial}
-              hitSlop={s.trial ? 8 : undefined}
-              accessibilityRole={s.trial ? "button" : undefined}
-              accessibilityLabel={s.trial ? `${s.name} deneme detayı` : undefined}
-              onPress={() => s.trial && onTrialPress?.(s.trial)}
-            >
-              <SlotRow time={s.time} color={s.color} name={s.name} subject={s.subject} dur={s.dur} C={C} />
-            </Press>
-          ))}
+        <View style={styles.emptyWrap}>
+          <Text style={[TYPOGRAPHY.body, { color: C.text3, marginBottom: STEP.s2 }]}>
+            Bu güne ait çalışma kaydı yok.
+          </Text>
+          <Press
+            haptic="tap"
+            accessibilityRole="button"
+            accessibilityLabel="Durak ekle"
+            onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+            style={[styles.addStopBtn, { borderColor: C.border, backgroundColor: C.void }]}
+          >
+            <Icon name="plus" size={14} color={C.accent} />
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Durak ekle</Text>
+          </Press>
         </View>
       )}
 
@@ -126,4 +125,17 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
 
 const styles = StyleSheet.create({
   card: { marginTop: STEP.s3 },
+  emptyWrap: {
+    paddingVertical: STEP.s2,
+    alignItems: "flex-start",
+  },
+  addStopBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1,
+    height: CONTROL.buttonTertiary,
+    paddingHorizontal: STEP.s3,
+    borderRadius: SHAPE.cardTight,
+    borderWidth: 1,
+  },
 });

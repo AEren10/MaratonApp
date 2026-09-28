@@ -20,7 +20,7 @@ function TaskRow({ task, onToggle, onRemove, C }) {
         style={[s.row]}
       >
         <View style={[s.check, { borderColor: C.border }, task.done && { backgroundColor: C.up, borderColor: C.up }]}>
-          {task.done && <Icon name="check" size={12} color={C.bg} sw={2.5} />}
+          {task.done && <Icon name="check" size={12} color={C.bg} sw={1.5} />}
         </View>
         <Text
           style={[TYPOGRAPHY.body, { color: task.done ? C.text3 : C.text, flex: 1 }, task.done && { textDecorationLine: "line-through" }]}
@@ -52,56 +52,38 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen
   return (
     <View style={{ marginTop: STEP.s3 }}>
       <View style={{ height: 1, backgroundColor: C.line, marginBottom: STEP.s2 }} />
-
-      <View style={s.header}>
-        <SectionLabel style={{ marginBottom: 0 }}>GÖREVLER</SectionLabel>
-        {canAdd && !showInput && (
-          <Press haptic="none" onPress={() => { setShowInput(true); H.tap(); }} hitSlop={10} style={[s.miniAdd, { backgroundColor: C.brandTint }]}>
-            <Icon name="plus" size={13} color={C.accent} />
-          </Press>
-        )}
-      </View>
+      <SectionLabel style={{ marginBottom: STEP.s1 }}>GÖREVLER</SectionLabel>
 
       {tasks.map((t) => (
         <TaskRow key={t.id} task={t} onToggle={(id) => onToggle(date, id)} onRemove={(id) => onRemove(date, id)} C={C} />
       ))}
 
-      {showInput && <TaskInputPanel onAdd={handleAdd} />}
-
-      {canAdd && !showInput && (
-        <Press haptic="none" onPress={() => { setShowInput(true); H.tap(); }} style={[s.addBtn, { borderColor: C.accent + "55"}]}>
-          <View style={[s.addIcon, { backgroundColor: C.accent }]}>
-            <Icon name="plus" size={14} color={C.accentInk} sw={2.5} />
-          </View>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText }]}>Görev Ekle</Text>
+      {showInput ? (
+        <TaskInputPanel onAdd={handleAdd} />
+      ) : canAdd ? (
+        <Press
+          haptic="tap"
+          onPress={() => setShowInput(true)}
+          style={s.singleLineAdd}
+          accessibilityRole="button"
+          accessibilityLabel="Görev ekle"
+        >
+          <Icon name="plus" size={14} color={C.accent} sw={1.5} />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Görev ekle</Text>
         </Press>
-      )}
-
-      {!canAdd && tasks.length === 0 && (
-        <Text style={[TYPOGRAPHY.caption, { color: C.text3, textAlign: "center", paddingVertical: STEP.s1 }]}>
-          Geçmiş gün — görev eklenemez
-        </Text>
-      )}
+      ) : null}
     </View>
   );
 }
 
 const s = {
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: STEP.s1 },
-  miniAdd: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  addBtn: {
+  singleLineAdd: {
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s1,
-    marginTop: STEP.s2,
     paddingVertical: STEP.s2,
-    paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1.5,
-    borderStyle: "dashed",
   },
-  addIcon: { width: 26, height: 26, borderRadius: 8, alignItems: "center", justifyContent: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingVertical: 10, minHeight: 44 },
-  check: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  check: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, alignItems: "center", justifyContent: "center" },
   del: { padding: 4 },
 };
