@@ -51,7 +51,7 @@ export function SettingsRow({
               {value}
             </Text>
           ) : null}
-          {onPress ? <Icon name="chevR" size={13} color={C.text5} /> : null}
+          {onPress ? <Icon name="chevR" size={13} color={danger ? C.danger : C.text3} /> : null}
         </>
       )}
     </View>
