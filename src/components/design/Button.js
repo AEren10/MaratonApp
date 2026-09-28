@@ -27,6 +27,8 @@ SIZES.small = SIZES.sm;
 SIZES.medium = SIZES.md;
 SIZES.large = SIZES.lg;
 
+const RETENTION = { top: 12, bottom: 12, left: 12, right: 12 };
+
 export function Button({
   children,
   title,
@@ -39,6 +41,7 @@ export function Button({
   disabled,
   fullWidth,
   style,
+  hitSlop,
   accessibilityLabel,
   accessibilityHint,
 }) {
@@ -57,6 +60,8 @@ export function Button({
       onPressIn={() => { scale.value = withSpring(0.97, ANIMATION.spring.default); }}
       onPressOut={() => { scale.value = withSpring(1, ANIMATION.spring.default); }}
       disabled={isDisabled}
+      hitSlop={hitSlop}
+      pressRetentionOffset={RETENTION}
       accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
