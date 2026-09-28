@@ -9,7 +9,7 @@ import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens
 import { formatDelta, formatNumber } from "../../../lib/format";
 import { SCREENS } from "../../../constants/screens";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
-import { resetToTabStackScreen } from "../../../navigation/rootStackActions";
+import { openInTab } from "../../../navigation/tabJump";
 import { openProgram } from "../../../navigation/openProgram";
 import { Press } from "../../../components/design/Press";
 
@@ -92,7 +92,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
         </Animated.View>
 
         <Animated.View style={styles.actions}>
-          <Button size="lg" fullWidth onPress={() => resetToTabStackScreen(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
+          <Button size="lg" fullWidth onPress={() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
             Yeni rotayı gör
           </Button>
           <View style={{ height: STEP.s2 }} />
