@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
+import { alpha } from "../../../themes/palette";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
 
@@ -21,19 +22,23 @@ function getCalendarDays(monthDate) {
   return days;
 }
 
-// Tasarim (Takvim ve Seri) lejandi: hedef tuttu = kizil dolgu, seri surdu
-// (calisildi, hedefin altinda) = tint + kenar, gelecek = ince kenar.
+// Takvim ve Seri ısı haritası:
+// Hedef tuttu = dolu accent, Seri sürdü = accent tonu, Bugün = halka.
 function cellLook(data, dailyGoal, isFuture, C) {
-  if (data?.logs?.length && data.totalQuestions >= dailyGoal) {
-    return { backgroundColor: C.brandFill, borderColor: C.brandFill, color: C.accentInk };
+  const hasWorked = Boolean(data?.logs?.length || data?.trials?.length || (data?.totalQuestions && data.totalQuestions > 0));
+  if (hasWorked && data.totalQuestions >= dailyGoal) {
+    return { backgroundColor: C.accent, borderColor: C.accent, color: C.accentInk };
   }
-  if (data?.logs?.length) return { backgroundColor: C.brandTint, borderColor: C.bandEdge, color: C.text };
+  if (hasWorked) {
+    return { backgroundColor: alpha(C.accent, 24), borderColor: alpha(C.accent, 45), color: C.accentBright || C.text };
+  }
   if (isFuture) return { backgroundColor: "transparent", borderColor: C.line, color: C.text3 };
   return { backgroundColor: "transparent", borderColor: "transparent", color: C.text3 };
 }
 
 function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
   const look = cellLook(data, dailyGoal, isFuture, C);
+  const isFilled = look.backgroundColor === C.accent;
   return (
     <Press haptic="none"
       onPress={() => onSelect(iso)}
@@ -44,11 +49,11 @@ function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, on
       style={[
         styles.dayCell,
         { backgroundColor: look.backgroundColor, borderColor: look.borderColor },
-        isToday && !isSelected && { borderColor: C.accent, borderStyle: "dashed" },
-        isSelected && { borderColor: look.backgroundColor === C.brandFill ? C.text : C.accent, borderWidth: 1.5 },
+        isToday && { borderColor: C.accent, borderWidth: 1.5 },
+        isSelected && { borderColor: isFilled ? C.text : C.accent, borderWidth: 2 },
       ]}
     >
-      <Text style={[styles.dayText, { color: look.color }]}>{date.getDate()}</Text>
+      <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
     </Press>
   );
 }

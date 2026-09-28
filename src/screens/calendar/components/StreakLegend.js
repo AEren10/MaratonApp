@@ -1,16 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
+import { alpha } from "../../../themes/palette";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Takvim lejandi. "Donduruldu" ogesi yok: donma gunleri gun bazinda
-// tutulmuyor, izgarada o hal cizilemiyor.
 export function StreakLegend() {
   const C = useC();
   const items = [
-    { label: "Hedef tuttu", box: { backgroundColor: C.brandFill, borderColor: C.brandFill } },
-    { label: "Seri sürdü", box: { backgroundColor: C.brandTint, borderColor: C.bandEdge } },
-    { label: "Donduruldu", box: { borderColor: C.border, borderStyle: "dashed" } },
+    { label: "Hedef tuttu", box: { backgroundColor: C.accent, borderColor: C.accent } },
+    { label: "Seri sürdü", box: { backgroundColor: alpha(C.accent, 24), borderColor: alpha(C.accent, 45) } },
+    { label: "Bugün", box: { borderColor: C.accent, borderWidth: 1.5 } },
     { label: "Gelecek", box: { borderColor: C.line } },
   ];
   return (
