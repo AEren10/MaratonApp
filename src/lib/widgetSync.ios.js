@@ -22,12 +22,28 @@ import { getSubjectLabel } from "../themes/subjects";
 // Her yazma widget'i yeniden cizdiriyor; degismeyen veri icin yazmiyoruz.
 const last = {};
 
-function push(key, widget, snapshot) {
-  const serialized = JSON.stringify(snapshot);
+// Gune bagli widget'lar (Hafta, Rota, Seri) TIMELINE ile yazilir: simdi + sonraki
+// 7 gece yarisi, ayni veriyle. Widget environment.date'i her girdide o anin
+// tarihi olarak alir; uygulama acilmasa da "bugun", sinav sayaci ve seri
+// izgarasi gun gun ilerler. Eskiden tek snapshot yaziliyordu ve widget'in
+// "bugun"u son yazma aninda donuyordu (Pazartesi hala Pazar gorunuyordu).
+function timelineEntries(props, days = 7) {
+  const now = new Date();
+  const entries = [{ date: now, props }];
+  for (let i = 1; i <= days; i += 1) {
+    entries.push({ date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, 0, 0, 5), props });
+  }
+  return entries;
+}
+
+function push(key, widget, snapshot, { timeline = false } = {}) {
+  // Timeline'li widget'ta ayni veri bile ertesi gun yeniden yazilmali.
+  const serialized = JSON.stringify(snapshot) + (timeline ? mondayKey() + new Date().getDate() : "");
   if (serialized === last[key]) return false;
   last[key] = serialized;
   try {
-    widget.updateSnapshot(snapshot);
+    if (timeline) widget.updateTimeline(timelineEntries(snapshot));
+    else widget.updateSnapshot(snapshot);
     return true;
   } catch {
     // Widget bir suslemedir: yazmasi basarisiz olursa uygulama etkilenmez.
@@ -60,7 +76,7 @@ export function syncWeekWidget({ week } = {}) {
     days: toDays(week),
     goal: Number(week.goal) || 0,
     weekStart: mondayKey(),
-  });
+  }, { timeline: true });
 }
 
 /** Bugunun sayisi, seri ve siradaki durak. */
@@ -130,8 +146,9 @@ export function syncRouteWidget({ examDate = null, chart = null, target = 0 } = 
     delta: first != null && last != null ? last - first : null,
     trialCount: stops.length,
     target: Number(target) || 0,
-    points: stops.map((s) => ({ label: s.label, net: Number(s.y) || 0 })),
-  });
+    // Son 8 nokta: fazlasi dar widget'ta ust uste biner.
+    points: stops.slice(-8).map((s) => ({ label: s.label, net: Number(s.y) || 0 })),
+  }, { timeline: true });
 }
 
 /** Tekrari gelen yanlislar. */
@@ -183,7 +200,9 @@ export function syncStreakWidget({ logs = [], streak = 0, longest = 0 } = {}) {
     days,
     streak: Number(streak) || 0,
     longest: Number(longest) || 0,
-  });
+    // Izgaranin son hucresi bu gun; widget sonraki gunlerde kaydirir.
+    asOf: key(today),
+  }, { timeline: true });
 }
 
 /**
@@ -197,7 +216,8 @@ export function syncTrialWidget({ trials = [] } = {}) {
   // TEK sinav turu: TYT 65 ile AYT 30'u ayni cizgiye koymak anlamsiz dalga
   // cizer. Son ana denemenin turu secilir; brans denemeleri disarda.
   const type = (trials || []).find((t) => t?.trialType && t.trialType !== "BRANCH")?.trialType || null;
-  const recent = (trials || []).filter((t) => t?.trialType === type).slice(0, 5).reverse();
+  const sameType = (trials || []).filter((t) => t?.trialType === type);
+  const recent = sameType.slice(0, 5).reverse();
   const exam = !type ? "" : type.startsWith("AYT") ? "AYT" : type;
   const points = recent.map((t) => ({
     label: t?.date || "",
@@ -222,5 +242,6 @@ export function syncTrialWidget({ trials = [] } = {}) {
     subjects.sort((x, y) => y.delta - x.delta);
   }
 
-  return push("trial", TrialWidget, { points, subjects, exam });
+  // Baslik "20. TYT DENEME" demeli; cizgi yalniz son 5 noktayi tasir.
+  return push("trial", TrialWidget, { points, subjects, exam, total: sameType.length });
 }

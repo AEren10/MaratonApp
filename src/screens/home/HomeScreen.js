@@ -31,10 +31,10 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { dueCount } = useDueReviews(user?.id);
   useEffect(() => { syncReviewWidget({ due: dueCount }); }, [dueCount]);
-  // Seri izgarasi 28 gun geriye bakar; weekLogs 45 gunluk kayit tasir.
+  // Seri izgarasi 28 gun geriye bakar: recentLogs 45 gunluk kayit tasir.
   useEffect(() => {
-    syncStreakWidget({ logs: dashboard.weekLogs, streak: h.streak, longest: h.longestStreak });
-  }, [dashboard.weekLogs, h.streak, h.longestStreak]);
+    syncStreakWidget({ logs: dashboard.recentLogs, streak: h.streak, longest: h.longestStreak });
+  }, [dashboard.recentLogs, h.streak, h.longestStreak]);
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
 
   const discoverEligible = (h.longestStreak || h.streak || 0) > 0;

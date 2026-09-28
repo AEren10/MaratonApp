@@ -29,20 +29,31 @@ const StreakWidget = (props, environment) => {
   const SHORT = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pa"];
   const LONG = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 
-  const raw = Array.isArray(props?.days) ? props.days.slice(-28) : [];
+  const now = environment?.date instanceof Date ? environment.date : new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
+
+  // Veri "asOf" gununde yazildi; timeline'in sonraki gunlerinde izgara o
+  // kadar kayar (yeni gunler bos). Iki gun ve fazlasi: seri muhtemelen koptu.
+  let shift = 0;
+  if (props?.asOf) {
+    const [y, m, d] = String(props.asOf).split("-").map(Number);
+    const a = Date.UTC(y, m - 1, d);
+    const b = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    shift = Math.max(0, Math.round((b - a) / 86400000));
+  }
+  let raw = Array.isArray(props?.days) ? props.days.slice(-28) : [];
   while (raw.length < 28) raw.unshift(0);
-  const streak = Number(props?.streak) || 0;
+  if (shift > 0) raw = raw.slice(Math.min(shift, 28)).concat(Array(Math.min(shift, 28)).fill(0));
+  const streak = shift >= 2 ? 0 : Number(props?.streak) || 0;
   const longest = Math.max(Number(props?.longest) || 0, streak);
   const todayDone = raw[27] > 0;
   const compact = environment?.widgetFamily === "systemSmall";
 
-  const now = environment?.date instanceof Date ? environment.date : new Date();
-  const todayIdx = (now.getDay() + 6) % 7;
-
   // Rekoru gecme gunu: seri bugun surerse kac gun sonra rekor asilir.
   const gapToRecord = longest - streak;
   let sentence;
-  if (!todayDone) sentence = "Seri bu gece 23:59'da biter";
+  if (streak === 0) sentence = todayDone ? "Seri başladı." : "İlk gününü başlat.";
+  else if (!todayDone) sentence = "Seri bu gece 23:59'da biter";
   else if (streak > 0 && gapToRecord === 0) sentence = "Rekorun şu an kırılıyor.";
   else if (gapToRecord > 0) {
     const passDay = LONG[(todayIdx + gapToRecord + 1) % 7];
@@ -51,7 +62,7 @@ const StreakWidget = (props, environment) => {
       : `Rekora ${gapToRecord} gün var. ${passDay} geçersin.`;
   } else sentence = "İlk gününü başlat.";
 
-  const cell = compact ? 14 : 21;
+  const cell = compact ? 12 : 21;
   const gap = 4;
 
   const rows = [0, 1, 2, 3].map((r) => (
@@ -84,7 +95,7 @@ const StreakWidget = (props, environment) => {
     return (
       <VStack alignment="leading" spacing={4} modifiers={[containerBackground(bg, "widget"), padding({ all: 13 }), url]}>
         <HStack alignment="lastTextBaseline" spacing={3}>
-          <Text modifiers={[font({ size: 38 }), foregroundStyle(accentBright)]}>{String(streak)}</Text>
+          <Text modifiers={[font({ size: 34 }), foregroundStyle(accentBright)]}>{String(streak)}</Text>
           <Text modifiers={[font({ size: 14 }), foregroundStyle(text3)]}>gün</Text>
         </HStack>
         <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(text)]}>{sentence}</Text>

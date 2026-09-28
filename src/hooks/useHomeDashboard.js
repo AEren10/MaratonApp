@@ -114,5 +114,8 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
     weekFailed,
     weekLoaded,
     weekLogs,
+    // Son 45 gunun kayitlari (usePlanContext); seri widget'inin 28 gunluk
+    // izgarasi bunu ister, weekLogs yalniz Pazartesi-bugun.
+    recentLogs: planCtx?.weekLogs || weekLogs,
   };
 }

@@ -142,7 +142,7 @@ const TrialWidget = (props, environment) => {
   return (
     <HStack spacing={12} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), widgetURL("maraton://analiz")]}>
       <VStack alignment="leading" spacing={2}>
-        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>{`${points.length}. ${props?.exam ? `${props.exam} ` : ""}DENEME`}</Text>
+        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>{`${Number(props?.total) || points.length}. ${props?.exam ? `${props.exam} ` : ""}DENEME`}</Text>
         <HStack alignment="firstTextBaseline" spacing={6}>
           <Text modifiers={[font({ size: 38 }), foregroundStyle(text)]}>{fmt(last)}</Text>
           {deltaFirst != null ? (
