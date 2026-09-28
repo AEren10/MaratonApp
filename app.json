@@ -21,7 +21,8 @@
         "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
         "NSCameraUsageDescription": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli.",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSUserNotificationsUsageDescription": "Çalışma hatırlatmaları ve streak bildirimleri göndermek için bildirim izni gerekli."
+        "NSUserNotificationsUsageDescription": "Çalışma hatırlatmaları ve streak bildirimleri göndermek için bildirim izni gerekli.",
+        "CADisableMinimumFrameDurationOnPhone": true
       }
     },
     "android": {
