@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -19,46 +20,63 @@ function initialsOf(name = "") {
   return letters.toLocaleUpperCase("tr");
 }
 
-// Ana Sayfa ust bandi: bas harf kutusu, selam + ad, sinava kalan gun cipi ve sosyal kisayol.
+function heroDateTR() {
+  const d = new Date();
+  const rawDay = d.toLocaleDateString("tr-TR", { weekday: "long" });
+  const day = d.getDate();
+  const rawMonth = d.toLocaleDateString("tr-TR", { month: "long" });
+  const capDay = rawDay.charAt(0).toUpperCase() + rawDay.slice(1);
+  const capMonth = rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1);
+  return `${capDay}, ${day} ${capMonth}`;
+}
+
+// Ana Sayfa ust bandi: bas harf kutusu, selam + ad, Structured tarzı hero tarih basligi ve aksiyonlar.
 export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }) {
   const C = useC();
-  // Bu cip eskiden sinava kalan gunu yaziyordu — ama ayni sayi hemen altinda
-  // "YKS 2028 / 632 gun" olarak zaten duruyor. Ayni ekranda ayni sayi iki kez.
-  // Tasarimda buradaki sayi SERI: her gun degisen, takvime goturen bir sey.
   const days = Math.max(0, Math.round(Number(streak) || 0));
+  const dateHeading = useMemo(() => heroDateTR(), []);
+
   return (
-    <Animated.View style={s.row}>
-      <Pressable onPress={() => { H.tap(); onProfile?.(); }} hitSlop={STEP.s1 / 4}
-        accessibilityRole="button" accessibilityLabel="Profil"
-        style={[s.avatar, { backgroundColor: C.elev, borderColor: C.border }]}>
-        <Text style={[TYPOGRAPHY.button, s.initials, { color: C.accentBright }]}>{initialsOf(name)}</Text>
-      </Pressable>
-      <View style={s.flex}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
-        <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.name, { color: C.text }]}>{name}</Text>
+    <Animated.View style={s.wrap}>
+      <View style={s.row}>
+        <Pressable onPress={() => { H.tap(); onProfile?.(); }} hitSlop={STEP.s1 / 4}
+          accessibilityRole="button" accessibilityLabel="Profil"
+          style={[s.avatar, { backgroundColor: C.elev, borderColor: C.border }]}>
+          <Text style={[TYPOGRAPHY.button, s.initials, { color: C.accentBright }]}>{initialsOf(name)}</Text>
+        </Pressable>
+        <View style={s.flex}>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
+          <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.name, { color: C.text }]}>{name}</Text>
+        </View>
+        <Pressable onPress={() => { H.tap(); onSocial?.(); }}
+          accessibilityRole="button"
+          accessibilityLabel="Sosyal ve Gruplar"
+          style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+          <Icon name="users" size={16} color={C.text2} />
+        </Pressable>
+        <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
+          accessibilityRole="button"
+          accessibilityLabel={days > 0 ? `${days} günlük seri, takvimi aç` : "Takvimi aç"}
+          style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+          <Icon name="calendar" size={14} color={C.accent} />
+          {days > 0 ? (
+            <Text style={[TYPOGRAPHY.metaSemiBold, s.chipText, { color: C.text }]}>{`${days} GÜN`}</Text>
+          ) : null}
+        </Pressable>
       </View>
-      <Pressable onPress={() => { H.tap(); onSocial?.(); }}
-        accessibilityRole="button"
-        accessibilityLabel="Sosyal ve Gruplar"
-        style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-        <Icon name="users" size={16} color={C.text2} />
-      </Pressable>
-      <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
-        accessibilityRole="button"
-        accessibilityLabel={days > 0 ? `${days} günlük seri, takvimi aç` : "Takvimi aç"}
-        style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-        <Icon name="calendar" size={14} color={C.accent} />
-        {/* Seri 0 iken "0 GÜN" yazmak cesaret kirar; ikon tek basina kalir. */}
-        {days > 0 ? (
-          <Text style={[TYPOGRAPHY.metaSemiBold, s.chipText, { color: C.text }]}>{`${days} GÜN`}</Text>
-        ) : null}
-      </Pressable>
+
+      <View style={s.dateRow}>
+        <Text style={[TYPOGRAPHY.heading, s.dateText, { color: C.text }]}>{dateHeading}</Text>
+      </View>
     </Animated.View>
   );
 }
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 1, paddingTop: STEP.s1 - 2 },
+  wrap: { paddingTop: STEP.s1 - 2 },
+  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 1 },
+  dateRow: { marginTop: STEP.s3, marginBottom: STEP.s1 },
+  dateText: { fontSize: 26, lineHeight: 32, letterSpacing: -0.6 },
   avatar: {
     width: CONTROL.tapMin - 2, height: CONTROL.tapMin - 2, borderRadius: SHAPE.iconBox, borderWidth: 1,
     alignItems: "center", justifyContent: "center",

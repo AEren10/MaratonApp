@@ -37,27 +37,17 @@ export function EffortSlot({ x, y, width, height, radius, isToday, isFuture, C }
   const stroke = isToday ? (C?.accent || "#E5343F") : (C?.line || "#34343F");
 
   return (
-    <G>
-      <Rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rx={radius}
-        fill={fill}
-      />
-      <Rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rx={radius}
-        fill={`url(#${HATCH_ID})`}
-        stroke={stroke}
-        strokeWidth={1}
-        strokeOpacity={isToday ? 0.55 : 0.9}
-        strokeDasharray={isFuture ? "4 3" : undefined}
-      />
-    </G>
+    <Rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      rx={radius}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={1}
+      strokeOpacity={isToday ? 0.6 : 0.4}
+      strokeDasharray={isFuture ? "4 3" : undefined}
+    />
   );
 }

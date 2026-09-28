@@ -4,6 +4,7 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
+import { WeeklyEffortEmpty } from "./components/WeeklyEffortEmpty";
 import { useC } from "../../contexts/ThemeContext";
 import {
   CHART_W, CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
@@ -12,42 +13,24 @@ import {
 const BAR_RADIUS = 3;
 
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
-// Ustte kesikli gunluk hedef cizgisi. Rota grafigiyle AYNI tuval olcusunu
-// kullanir (chartStyle) — ikisi slider'da yan yana duruyor, birbirinden
-// farkli boyda olurlarsa kaydirirken zipliyorlar.
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
 
   if (!week) return null;
+
+  const hasActivity = (week.days || []).some((d) => d.questions > 0 || d.minutesOnly);
+  if (!hasActivity) return <WeeklyEffortEmpty height={height} />;
 
   const bottom = plotBottom({ hasAxis: true });
   const top = PAD_TOP;
   const usableH = bottom - top;
   const usableW = CHART_W - EFFORT_PAD_LEFT - PAD_RIGHT;
   const slot = usableW / week.days.length;
-  // Cubuk genisligi: yuvanin yarisindan az oldugunda haftalik grafik yedi
-  // ince cizgiye donuyor ve aradaki bosluk cubuktan genis kaliyor. Oran
-  // 0.52 -> 0.68, tavan 26 -> 34: aralar hala nefes aliyor ama agirlik
-  // cubukta.
   const barW = Math.min(34, slot * 0.68);
 
-  // Tuval tepe payı (headroom): hedef çizgisi tavana yapışmasın ama
-  // üstünde ÖLÜ ALAN da kalmasın.
-  //
-  // Eskiden goal * 1.55 idi: hedef 100 olan boş bir haftada ölçek 155'e
-  // çıkıyor, hedef çizgisi tuvalin %64'ünde kalıyor ve üstündeki %36
-  // tamamen boş duruyordu. Ana sayfanın en görünür yerinde ~60px ölü alan.
-  // Sabit 100 tabanı da düşük hedefli kullanıcıda (günde 20 soru) aynı
-  // boşluğu daha beter üretiyordu.
-  //
-  // 1.22: hedefi aşınca hâlâ yer var, aşmayınca boşluk göze batmıyor.
   const peak = (week.days || []).reduce((max, d) => Math.max(max, d.questions), 0);
   const goal = week.goal || 0;
-  const chartMax = Math.max(
-    Math.round(peak * 1.15),
-    Math.round(goal * 1.22),
-    10
-  );
+  const chartMax = Math.max(Math.round(peak * 1.15), Math.round(goal * 1.22), 10);
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
