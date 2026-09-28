@@ -5,7 +5,7 @@ import { Icon } from "../../../components/design";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
-const LABELS = { ALL: "Tümü", TYT: "TYT", AYT: "AYT", BRANCH: "Branş" };
+const LABELS = { ALL: "Tümü", TYT: "TYT", AYT: "AYT", YDT: "YDT", LGS: "LGS", BRANCH: "Branş" };
 
 export const TrialRecordFilters = React.memo(function TrialRecordFilters({ tabs, active, onChange, C, onOpenFilterMenu }) {
   const handlePress = useCallback(

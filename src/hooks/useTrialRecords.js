@@ -3,18 +3,27 @@ import { useSelector } from "react-redux";
 import { selectTrials, selectTrialsLoading } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";
 import { useSync } from "../contexts/DataSyncContext";
+import { useExam } from "../contexts/ExamContext";
 import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { useFeatureEntry } from "./useFeatureEntry";
 import { getSubjectLabel } from "../themes/subjects";
 
 export const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
-const TYPE_TABS = ["ALL", "TYT", "AYT", "BRANCH"];
+// Sekmeler kullanicinin sinavina gore: LGS'ciye AYT, YKS'liye LGS sekmesi
+// cikmiyordu / cikiyordu. Sinav disi eski denemeler "Tumu"de kalir.
+export function trialRecordTabs(examType) {
+  if (examType === "lgs") return ["ALL", "LGS", "BRANCH"];
+  if (examType === "tyt") return ["ALL", "TYT", "BRANCH"];
+  if (examType === "dil") return ["ALL", "TYT", "YDT", "BRANCH"];
+  return ["ALL", "TYT", "AYT", "BRANCH"];
+}
 
 function typeBadge(trialType) {
   if (trialType === "BRANCH") return "Branş";
   if (trialType?.startsWith("AYT")) return "AYT";
   if (trialType === "LGS") return "LGS";
+  if (trialType === "YDT") return "YDT";
   return "TYT";
 }
 
@@ -67,6 +76,12 @@ function monthKey(date) {
 export function useTrialRecords() {
   const trials = useSelector(selectTrials);
   const trialsLoading = useSelector(selectTrialsLoading);
+  const { examType } = useExam();
+  // YDT deneme turu henuz yoksa bos sekme gostermeyelim.
+  const typeTabs = useMemo(
+    () => trialRecordTabs(examType).filter((t) => t !== "YDT" || trials.some((x) => x.trialType === "YDT")),
+    [examType, trials],
+  );
   const [filter, setFilter] = useState("ALL");
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const { syncedOnce, error: syncError, refresh } = useSync();
@@ -137,7 +152,7 @@ export function useTrialRecords() {
   return {
     filter,
     setFilter,
-    typeTabs: TYPE_TABS,
+    typeTabs,
     sections,
     lockedCount,
     totalCount,
