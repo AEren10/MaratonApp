@@ -11,10 +11,10 @@ const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
  * @param projected  tempoya gore sinav gunu beklenen net
  * @param target     kullanicinin beyan ettigi hedef net (yoksa mesafe yazilmaz)
  */
-export function forecastSentence({ projected, target } = {}) {
+export function forecastSentence({ projected, target, label } = {}) {
   const p = num(projected);
   if (p == null) return null;
-  const head = `Bu tempoyla sınav günü ${Math.round(p)} net`;
+  const head = `Bu tempoyla sınav günü ${label ? `${label} ` : ""}${Math.round(p)} net`;
 
   const t = num(target);
   if (t == null) return head;

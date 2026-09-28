@@ -14,7 +14,7 @@ import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart"
 // bilgiyi tekrar ediyordu, kaldirildi.
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewWeek }) {
   const {
-    remainingToGoal, daysUntilExam, examType, examDate, targetNet, hasRouteAccess,
+    remainingToGoal, daysUntilExam, examType, examDate, chartTarget, hasRouteAccess,
     chartData, declared, declaredAxis, weeklyEffort, todayIndex,
     nextTask, ctaSubtitle,
   } = hero;
@@ -49,7 +49,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
           data={chartData}
           declared={declared}
           declaredAxis={declaredAxis}
-          target={targetNet}
+          target={chartTarget}
         />
       ),
     },

@@ -674,6 +674,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     scenario,
     tempoScenarios,
     forecast,
+    forecastTypes: forecastProfile?.types || [],
     hasRouteAccess,
     routeAccessError: accessError,
     routeAccessLoading: PREMIUM_ENABLED ? accessLoading : false,

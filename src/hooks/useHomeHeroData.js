@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectWeeklyMinutesGoal } from "../store/slices/goalsSlice";
+import { useForecastTarget } from "./useForecastTarget";
 import { useExam } from "../contexts/ExamContext";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
@@ -18,12 +19,15 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
   const {
     weeks,
     forecast,
+    forecastTypes,
     debt,
     hasRouteAccess,
     routeAccessLoading,
     isPaused,
     pausedAt,
   } = useStudyRoute();
+
+  const examTarget = useForecastTarget(forecastTypes);
 
   const stopCounts = useMemo(() => {
     let total = 0;
@@ -87,10 +91,10 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
         examDate,
       }),
       sentence: plausible
-        ? forecastSentence({ projected: forecast.projected, target: targetNet })
+        ? forecastSentence({ projected: forecast.projected, target: examTarget.target, label: examTarget.label })
         : "Tahmin için birkaç deneme daha gerekiyor.",
     };
-  }, [forecast, examDate, targetNet]);
+  }, [forecast, examDate, examTarget]);
 
   // Olculmus tahmin (3 deneme) gelene kadar grafik bos kalmasin: kurulumda
   // kullanicinin KENDI girdigi baslangic ve hedef netini gosteririz.
@@ -140,8 +144,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
         : null,
       week: weeklyEffort,
     });
-    syncRouteWidget({ examDate, chart: chartData, target: targetNet });
-  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, targetNet]);
+    syncRouteWidget({ examDate, chart: chartData, target: examTarget.target });
+  }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, examTarget.target]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);
   // Ana buton yalniz rota gorevlerine bakiyordu: rota yokken listede
   // baslanabilir bir durak (kullanicinin ekledigi ya da oneri) olsa bile
@@ -164,6 +168,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     examType,
     examDate,
     targetNet,
+    chartTarget: examTarget.target,
     hasRouteAccess,
     routeAccessLoading,
     isPaused,
