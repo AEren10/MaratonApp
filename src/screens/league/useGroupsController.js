@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Share } from "react-native";
 
-import { createGroup, joinByCode, listMyGroups, leaveGroup, groupLeaderboard } from "../../supabase/groups";
+import { createGroup, joinByCode, listMyGroups, groupLeaderboard } from "../../supabase/groups";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
 import { appUrl } from "../../navigation/routes";
 import { formatGroupJoinError } from "./groupErrors";
+import { handleGroupExit } from "./groupExitHandler";
 
 export function useGroupsController({ user, initialGroupCode }) {
   const showAlert = useAlert();
@@ -115,17 +116,7 @@ export function useGroupsController({ user, initialGroupCode }) {
   const closeJoin = () => { setJoinOpen(false); setCodeError(null); };
 
   const doLeave = (g) => {
-    H.warn();
-    showAlert("Gruptan ayrıl", `${g.name} grubundan ayrılmak istiyor musun?`, [
-      { text: "İptal", style: "cancel" },
-      { text: "Ayrıl", style: "destructive", onPress: async () => {
-        try {
-          await leaveGroup(g.id, user.id);
-          if (selected?.id === g.id) setSelected(null);
-          loadGroups();
-        } catch (e) { showAlert("Hata", e.message || "Gruptan ayrılınamadı."); }
-      } },
-    ]);
+    handleGroupExit({ group: g, user, showAlert, setSelected, loadGroups });
   };
 
   const shareCode = (g) => {
