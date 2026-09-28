@@ -78,6 +78,7 @@ export function normalizeTrial(row = {}) {
   const version = row.normalizationVersion ?? row.normalization_version ?? 1;
   const confidence = row.normalizationConfidence
     ?? row.normalization_confidence ?? "self_reported";
+  const durationMinutes = optionalNumber(row.durationMinutes ?? row.duration_minutes);
   return {
     ...row, date: row.date || row.trial_date,
     trial_date: row.trial_date || row.date,
@@ -90,6 +91,7 @@ export function normalizeTrial(row = {}) {
     difficultyMultiplier, difficulty_multiplier: difficultyMultiplier,
     normalizationVersion: version, normalization_version: version,
     normalizationConfidence: confidence, normalization_confidence: confidence,
+    durationMinutes, duration_minutes: durationMinutes,
     subjects, trialType, exam_type: trialType,
     branchSubject: row.branchSubject ?? row.branch_subject ?? null,
     branch_subject: row.branch_subject ?? row.branchSubject ?? null,
@@ -109,6 +111,7 @@ export function toTrialRow(input = {}) {
     difficulty_multiplier: trial.difficultyMultiplier,
     normalization_version: trial.normalizationVersion,
     normalization_confidence: trial.normalizationConfidence,
+    duration_minutes: trial.durationMinutes,
     mood: trial.mood ?? null,
     client_operation_id: input.client_operation_id ?? input.clientOperationId,
   };

@@ -7,7 +7,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useFormLifecycleAnalytics } from "../../hooks/useFormLifecycleAnalytics";
 import { useGamification } from "../../hooks/useGamification";
 import { buildTrialSubjectScores } from "../../domain/trial/trialEntryModel";
-import { getSubjectsForType } from "../../domain/trial/trialTypes";
+import { getSubjectsForType, officialDurationForTrialType } from "../../domain/trial/trialTypes";
 import { wrongPenaltyForTrialType } from "../../domain/trial/trialModel";
 import { useAppDispatch } from "../../store/hooks";
 import { getRecentDays } from "./trialEntryDates";
@@ -33,6 +33,7 @@ export function useTrialEntryForm({ C, navigation }) {
   const [publishers, setPublishers] = useState([]);
   const [publisherId, setPublisherId] = useState(null);
   const [difficultyLevel, setDifficultyLevel] = useState("standard");
+  const [durationMinutes, setDurationMinutes] = useState(() => String(officialDurationForTrialType(trialType) || ""));
   const [trialDate, setTrialDate] = useState(() => new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const recentDays = useMemo(() => getRecentDays(14), []);
@@ -68,6 +69,7 @@ export function useTrialEntryForm({ C, navigation }) {
       if (draft.title) setTitle(draft.title);
       if (draft.publisherId !== undefined) setPublisherId(draft.publisherId);
       if (draft.difficultyLevel) setDifficultyLevel(draft.difficultyLevel);
+      if (draft.durationMinutes !== undefined) setDurationMinutes(String(draft.durationMinutes || ""));
       if (draft.trialDate) setTrialDate(new Date(draft.trialDate));
       setDraftReady(true);
     }).catch(() => setDraftReady(true));
@@ -86,11 +88,12 @@ export function useTrialEntryForm({ C, navigation }) {
     const timeout = setTimeout(() => {
       saveTrialEntryDraft(user?.id, {
         trialType, branchSubject, values, mood, title, publisherId, difficultyLevel,
+        durationMinutes,
         trialDate: trialDate.toISOString(),
       });
     }, 500);
     return () => clearTimeout(timeout);
-  }, [draftReady, isDirty, user?.id, trialType, branchSubject, values, mood, title, publisherId, difficultyLevel, trialDate]);
+  }, [draftReady, isDirty, user?.id, trialType, branchSubject, values, mood, title, publisherId, difficultyLevel, durationMinutes, trialDate]);
 
   const clearDraft = useCallback(() => clearTrialEntryDraft(user?.id), [user?.id]);
 
@@ -106,6 +109,7 @@ export function useTrialEntryForm({ C, navigation }) {
     markFormDirty({ field: "trial_type", trialType: newType });
     setTrialType(newType);
     setValues({});
+    setDurationMinutes(String(officialDurationForTrialType(newType) || ""));
     if (newType !== "BRANCH") setBranchSubject(null);
   }, [markFormDirty]);
 
@@ -133,6 +137,11 @@ export function useTrialEntryForm({ C, navigation }) {
     setTitle(value);
   }, [markFormDirty]);
 
+  const handleDurationChange = useCallback((value) => {
+    markFormDirty({ field: "duration_minutes" });
+    setDurationMinutes(value.replace(/\D/g, "").slice(0, 3));
+  }, [markFormDirty]);
+
   const handleMoodChange = useCallback((value) => {
     markFormDirty({ field: "mood" });
     setMood(value);
@@ -149,6 +158,7 @@ export function useTrialEntryForm({ C, navigation }) {
       completeForm,
       dispatch,
       difficultyLevel,
+      durationMinutes,
       mood,
       navigation,
       onSaved: clearDraft,
@@ -175,6 +185,7 @@ export function useTrialEntryForm({ C, navigation }) {
     completeForm,
     dispatch,
     difficultyLevel,
+    durationMinutes,
     mood,
     navigation,
     publisherId,
@@ -206,8 +217,10 @@ export function useTrialEntryForm({ C, navigation }) {
     handleTitleChange,
     handleTypeChange,
     mood,
+    durationMinutes,
     difficultyLevel,
     handleDifficultyChange: setDifficultyLevel,
+    handleDurationChange,
     handlePublisherChange: setPublisherId,
     publisherId,
     publishers,

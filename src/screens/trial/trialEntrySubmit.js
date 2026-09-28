@@ -20,6 +20,7 @@ export async function submitTrialEntry({
   completeForm,
   dispatch,
   difficultyLevel,
+  durationMinutes,
   mood,
   navigation,
   onSaved,
@@ -83,12 +84,15 @@ export async function submitTrialEntry({
   });
   const trialDateISO = formatDateISO(trialDate);
   const field = getFieldFromType(trialType);
+  const durationValue = durationMinutes === "" || durationMinutes == null
+    ? null : Number(durationMinutes);
 
   const parsed = trialEntrySchema.safeParse({
     name: trialName,
     trial_date: trialDateISO,
     exam_type: trialType,
     total_net: netVal,
+    duration_minutes: durationValue,
     subjects: subjectsArr,
   });
   if (!parsed.success) {
@@ -109,6 +113,8 @@ export async function submitTrialEntry({
     publisherId,
     difficultyLevel,
     difficultyMultiplier: trialDifficultyMultiplier(difficultyLevel),
+    durationMinutes: durationValue,
+    duration_minutes: durationValue,
     mood,
   };
   setSaving(true);
@@ -126,6 +132,7 @@ export async function submitTrialEntry({
         mood,
         publisher_id: publisherId,
         difficulty_level: difficultyLevel,
+        duration_minutes: durationValue,
       },
       subjectsArr,
     );
@@ -159,7 +166,7 @@ export async function submitTrialEntry({
     }).catch(() => {});
   }
 
-  completeForm({ net: netVal, trialType });
+  completeForm({ net: netVal, trialType, durationMinutes: durationValue });
   track(EVENTS.TRIAL_ENTERED, { net: netVal, trialType });
   track(EVENTS.TRIAL_NORMALIZED, {
     difficultyLevel,

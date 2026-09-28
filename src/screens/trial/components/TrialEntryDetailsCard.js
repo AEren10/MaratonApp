@@ -35,8 +35,18 @@ export function TrialEntryDetailsCard({ form, styles: shared }) {
       <View style={[styles.divider, { backgroundColor: C.line }]} />
       <View style={styles.row}>
         <Text style={[shared.label, styles.key]}>SÜRE</Text>
-        <View style={well}>
-          <Text style={[TYPOGRAPHY.tableName, { color: C.text }]}>135 dk</Text>
+        <View style={[well, styles.durationWell]}>
+          <TextInput
+            accessibilityLabel="Deneme süresi dakika"
+            keyboardType="number-pad"
+            value={form.durationMinutes}
+            onChangeText={form.handleDurationChange}
+            placeholder="—"
+            placeholderTextColor={C.text3}
+            maxLength={3}
+            style={[TYPOGRAPHY.tableName, styles.durationInput, { color: C.text }]}
+          />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>dk</Text>
         </View>
       </View>
     </View>
@@ -54,5 +64,7 @@ const styles = StyleSheet.create({
     height: 38, paddingHorizontal: STEP.s2 + 2, borderRadius: SHAPE.button, borderWidth: 1, justifyContent: "center",
   },
   input: { minWidth: 140, maxWidth: 190, paddingVertical: 0 },
+  durationWell: { flexDirection: "row", alignItems: "center", gap: 6 },
+  durationInput: { minWidth: 34, padding: 0, textAlign: "right" },
   divider: { height: 1, marginVertical: STEP.s2 + 4 },
 });

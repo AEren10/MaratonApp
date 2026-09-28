@@ -4,7 +4,7 @@ import Animated from "react-native-reanimated";
 import { Icon, StatBlock, Chip } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
-export function TrialDetailHero({ C, latest, dateStr, typeMeta, rawNet, trend, prev }) {
+export function TrialDetailHero({ C, latest, dateStr, typeMeta, rawNet, trend, prev, durationMinutes }) {
   const trendColor = trend > 0 ? C.up || C.green : trend < 0 ? C.down || C.red : C.text3;
 
   return (
@@ -16,6 +16,9 @@ export function TrialDetailHero({ C, latest, dateStr, typeMeta, rawNet, trend, p
           </Chip>
         ) : null}
         <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>{dateStr}</Text>
+        {durationMinutes ? (
+          <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>· {durationMinutes} dk</Text>
+        ) : null}
       </View>
 
       <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: STEP.s2 }]} numberOfLines={2}>

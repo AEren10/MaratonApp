@@ -76,6 +76,7 @@ export const addTrial = async (trial, subjects) => {
       p_publisher_id: trial.publisher_id ?? trial.publisherId ?? null,
       p_difficulty_level: trial.difficulty_level ?? trial.difficultyLevel ?? "standard",
       p_subjects: toTrialSubjectRows(subjects, trial.exam_type ?? trial.trialType),
+      p_duration_minutes: trial.duration_minutes ?? trial.durationMinutes ?? null,
     });
     if (error) throw error;
     if (!data?.ok) throw new TrialWriteError(data?.reason, data);

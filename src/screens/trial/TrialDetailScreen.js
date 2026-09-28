@@ -108,6 +108,7 @@ export default function TrialDetailScreen() {
         <TrialDetailHero
           C={C} latest={latest} dateStr={dateStr} typeMeta={detail.typeMeta}
           rawNet={detail.rawNet} trend={detail.trend} prev={detail.prev}
+          durationMinutes={detail.durationMinutes}
         />
         <TrialDetailNetCards
           C={C} rawNet={detail.rawNet} normalizedNet={detail.normalizedNet}

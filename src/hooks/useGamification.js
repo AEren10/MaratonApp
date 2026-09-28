@@ -154,6 +154,8 @@ export function useGamification() {
         const currentXP = totalXPRef.current;
         const prevLevel = getLevelForXP(currentXP);
         dispatch(earnXP({ amount }));
+        totalXPRef.current = currentXP + amount;
+        weeklyXPRef.current = weeklyXPRef.current + amount;
         if (user?.id) enqueueXPLog(dispatch, user.id, amount, action, xpOperationId(action, data));
         setXpToast({ visible: true, amount, multiplier });
 
@@ -177,6 +179,7 @@ export function useGamification() {
           });
         }
 
+        statsRef.current = updatedStats;
         debouncedSave();
       } finally {
         _opLock = false;
@@ -188,6 +191,10 @@ export function useGamification() {
   const syncStat = useCallback(
     (key, value) => {
       dispatch(setMaxStat({ key, value }));
+      statsRef.current = {
+        ...statsRef.current,
+        [key]: Math.max(statsRef.current[key] || 0, value),
+      };
       debouncedSave();
     },
     [dispatch, debouncedSave],
@@ -204,6 +211,7 @@ export function useGamification() {
         let showMilestone = null;
 
         let totalMilestoneXP = 0;
+        const currentXP = totalXPRef.current;
         for (const milestone of unclaimed) {
           claimedRef.current = [...claimedRef.current, milestone.day];
           dispatch(claimStreakMilestone(milestone.day));
@@ -224,8 +232,10 @@ export function useGamification() {
         }
 
         if (totalMilestoneXP > 0) {
-          const prevLevel = getLevelForXP(totalXPRef.current);
-          const newLevel = getLevelForXP(totalXPRef.current + totalMilestoneXP);
+          totalXPRef.current = currentXP + totalMilestoneXP;
+          weeklyXPRef.current += totalMilestoneXP;
+          const prevLevel = getLevelForXP(currentXP);
+          const newLevel = getLevelForXP(totalXPRef.current);
           if (newLevel.level > prevLevel.level) {
             clearTimeout(levelUpTimerRef.current);
             levelUpTimerRef.current = setTimeout(() => setLevelUpModal({ visible: true, level: newLevel.level, title: newLevel.title }), 4500);

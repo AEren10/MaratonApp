@@ -67,6 +67,7 @@ export function useTrialDetail({ latest, trials, C }) {
   })), [subjects, latest]);
 
   const difficultyLabel = DIFFICULTY_LABEL[latest.difficultyLevel] || null;
+  const durationMinutes = latest.durationMinutes ?? latest.duration_minutes ?? null;
   // Tasarımın "zor" kartı yalnızca hard/very_hard için birebir kopya taşıyor;
   // diğer seviyeler için uydurma metin yazmıyoruz.
   const showDifficultyCard = latest.difficultyLevel === "hard" || latest.difficultyLevel === "very_hard";
@@ -85,6 +86,7 @@ export function useTrialDetail({ latest, trials, C }) {
     subjects, bars, prev, totalMax, typeMeta,
     rawNet, normalizedNet, hasNormalization, trend,
     difficultyLabel, showDifficultyCard, routeImpact,
+    durationMinutes,
     publisherLabel: latest.publisherNameSnapshot || "Yayın",
     difficultyMultiplier: latest.difficultyMultiplier ?? 1,
   };

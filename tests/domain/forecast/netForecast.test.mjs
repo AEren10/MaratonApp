@@ -33,9 +33,11 @@ test("prefers normalized net and returns OLS prediction interval metadata", () =
 });
 
 test("uses only the most recent five trials and respects the exam ceiling", () => {
-  const trials = Array.from({ length: 7 }, (_, index) => (
-    trial(`2026-01-${String(1 + index * 3).padStart(2, "0")}`, 110 + index * 3)
-  ));
+  const dates = [
+    "2026-01-01", "2026-01-08", "2026-01-15", "2026-01-22",
+    "2026-01-29", "2026-02-05", "2026-02-12",
+  ];
+  const trials = dates.map((date, index) => trial(date, 110 + index * 3));
   const result = forecastNet(trials, "2026-06-20", 120);
   assert.equal(result.sampleSize, 5);
   assert.equal(result.projected, 120);
@@ -71,9 +73,27 @@ test("uzaga uzatilan tahminin payi yakina uzatilandan genistir", () => {
 
 test("pay ust sinira takilir, aralik okunamaz hale gelmez", () => {
   const result = forecastNet([
-    trial("2026-01-01", 40), trial("2026-01-03", 42), trial("2026-01-05", 44),
+    trial("2026-01-01", 40), trial("2026-01-15", 42), trial("2026-01-29", 44),
   ], "2030-01-01", 120);
   assert.ok(result.predictionInterval.margin <= 120 * 0.18 + 0.001);
+});
+
+test("14 gunden kisa ornekte sinav gunune uzatma yapmaz", () => {
+  const result = forecastNet([
+    trial("2026-01-01", 40), trial("2026-01-05", 42), trial("2026-01-10", 41),
+  ], "2026-06-20", 120);
+  assert.equal(result, null);
+});
+
+test("dususteki kisa seri sinav gununde sifira cokmez", () => {
+  const result = forecastNet([
+    trial("2026-09-01", 44.5),
+    trial("2026-09-15", 46.05),
+    trial("2026-09-28", 42.75),
+  ], "2027-06-20", 120);
+  assert.ok(result.projected >= 42.75 * 0.5);
+  assert.ok(result.range.low >= 42.75 * 0.5);
+  assert.equal(result.predictionInterval.projectionMethod, "damped_mean_reversion");
 });
 
 test("cok deneme ve kisa uzatma dar pay verir", () => {

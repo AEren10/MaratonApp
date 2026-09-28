@@ -12,6 +12,7 @@ const MS_PER_DAY = 86400000;
 const Z_95 = 1.96;
 // Tahmin aralığının en geniş hali, toplam netin oranı olarak.
 const UNCERTAINTY_CAP = 0.18;
+const MIN_SAMPLE_SPAN_DAYS = 14;
 const round = (value, digits = 4) => {
   const scale = 10 ** digits;
   return Math.round(value * scale) / scale;
@@ -83,8 +84,20 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
   const { slope, intercept, meanX, sxx, ssRes, r2 } = regression;
   const n = points.length;
   const examDays = daysBetween(firstDate, exam);
-  const cap = (value) => Math.min(maxNet ?? Infinity, Math.max(0, value));
-  const projected = cap(slope * examDays + intercept);
+  const measuredSpan = points[n - 1].x - points[0].x;
+  if (measuredSpan < MIN_SAMPLE_SPAN_DAYS) return null;
+  const lastNet = points[n - 1].y;
+  const netScale = maxNet || 100;
+  const plausibleFloor = Math.max(0, lastNet * 0.5);
+  const cap = (value) => Math.min(maxNet ?? Infinity, Math.max(plausibleFloor, value));
+  const linearProjected = slope * examDays + intercept;
+  const horizon = Math.max(0, examDays - points[n - 1].x);
+  const trendTrust = 1 / (1 + horizon / Math.max(measuredSpan * 2, 1));
+  const observedMean = points.reduce((sum, point) => sum + point.y, 0) / n;
+  const meanPull = observedMean + (lastNet - observedMean) * Math.exp(
+    -horizon / Math.max(measuredSpan * 3, 1),
+  );
+  const projected = cap(meanPull + (linearProjected - meanPull) * trendTrust);
   const mse = ssRes / (n - 2);
   const leverage = 1 + 1 / n + ((examDays - meanX) ** 2 / sxx);
   const standardError = Math.sqrt(Math.max(0, mse * leverage));
@@ -103,11 +116,8 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
   //
   // Üst sınır ürün kararıdır: bunun ötesinde aralık okunabilir olmaktan
   // çıkar, grafik "hiçbir şey bilmiyorum" der ve kimseye yardımı dokunmaz.
-  const measuredSpan = Math.max(1, points[n - 1].x - points[0].x);
-  const horizon = Math.max(0, examDays - points[n - 1].x);
   const reach = Math.sqrt(1 + horizon / measuredSpan);
   const sampleFactor = n < 4 ? 2.2 : n < 5 ? 1.6 : 1.2;
-  const netScale = maxNet || 100;
   const uncertaintyFloor = Math.min(
     netScale * 0.02 * sampleFactor * reach,
     netScale * UNCERTAINTY_CAP,
@@ -137,6 +147,10 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
       level: 0.95, method: "ols_prediction", criticalValue: Z_95,
       standardError, margin, leverage,
       uncertaintyFloor,
+      projectionMethod: "damped_mean_reversion",
+      measuredSpanDays: measuredSpan,
+      dampingFactor: round(trendTrust),
+      plausibleFloor: round(plausibleFloor),
       floorApplied: margin === uncertaintyFloor,
     },
   };
