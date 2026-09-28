@@ -35,7 +35,7 @@ export default function SettingsScreen() {
   const C = useC();
   const { handleHelp, handleLogout, handleDeleteAccount } = useSettingsActions();
   const { checkFeature, showPaywall, isPremium, isInGrace } = usePremium();
-  const { examType, field, examDate, targetNet } = useExam();
+  const { examType, field, examDate, targetNet, targetNetTYT, targetNetAYT } = useExam();
   const { pref } = useTheme();
   const goals = useSelector(selectGoals);
   const [hapticsOn, setHapticsOn] = useState(isHapticEnabled());
@@ -47,7 +47,11 @@ export default function SettingsScreen() {
   const examLabel = EXAM_LABELS[examType]
     ? [EXAM_LABELS[examType], FIELD_LABELS[field]].filter(Boolean).join(" · ")
     : null;
-  const targetNetLabel = targetNet != null ? String(targetNet) : null;
+  // Iki sinavda hedefler ayri yazilir; toplam tek basina yanlis okunuyordu.
+  const secondLabel = examType === "dil" ? "YDT" : "AYT";
+  const targetNetLabel = targetNetTYT != null && targetNetAYT != null && (examType === "tyt_ayt" || examType === "dil")
+    ? `TYT ${targetNetTYT} · ${secondLabel} ${targetNetAYT}`
+    : targetNet != null ? String(targetNet) : null;
   const examDateLabel = examDate
     ? examDate.toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })
     : null;
