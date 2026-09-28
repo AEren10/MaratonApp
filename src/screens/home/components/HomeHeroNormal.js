@@ -8,6 +8,12 @@ import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeCTAButton } from "./HomeCTAButton";
 import { HomeChartPager } from "./HomeChartPager";
 import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart";
+import { useNavigation } from "@react-navigation/native";
+import { SCREENS } from "../../../constants/screens";
+import { formatNet } from "../../../lib/format";
+import { TAB_KEYS } from "../../../navigation/tabAssignment";
+import { openInTab } from "../../../navigation/tabJump";
+import { HomeExamSeriesChart } from "./HomeExamSeriesChart";
 
 // Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
 // grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
@@ -15,9 +21,10 @@ import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart"
 export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewWeek }) {
   const {
     remainingToGoal, daysUntilExam, examType, examDate, chartTarget, hasRouteAccess,
-    chartData, declared, declaredAxis, weeklyEffort, todayIndex,
+    chartData, declared, declaredAxis, weeklyEffort, todayIndex, examSeries,
     nextTask, ctaSubtitle,
   } = hero;
+  const navigation = useNavigation();
 
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
   // soru "bugun ilerledim mi". Rota haftada bir bakilan bir sey, ikinci
@@ -28,7 +35,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   const onPressPage = useCallback((key) => {
     if (key === "route" && hasRouteAccess) onViewRoute?.();
     else if (key === "week") onViewWeek?.();
-  }, [hasRouteAccess, onViewRoute, onViewWeek]);
+    else if (key === "exams") openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.ANALYSIS);
+  }, [hasRouteAccess, onViewRoute, onViewWeek, navigation]);
 
   // Cumle sayfanin ICINDE tasiniyor: disarida dururken bir sayfada var bir
   // sayfada yok oluyor ve kaydirirken altindaki her sey bir satir zipliyordu.
@@ -53,6 +61,13 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         />
       ),
     },
+    // Iki sinavli kullanicida TYT ve AYT ayri cizgi (toplanmaz).
+    ...(examSeries ? [{
+      key: "exams",
+      a11y: "TYT ve AYT netlerini Analiz'de aç",
+      caption: examSeries.map((line) => `${line.key} ${formatNet(line.points[line.points.length - 1].v)}`).join(" · ") + " son denemede",
+      render: () => <HomeExamSeriesChart series={examSeries} />,
+    }] : []),
   ];
 
   return (

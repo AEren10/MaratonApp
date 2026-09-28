@@ -1,5 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { selectTrials } from "../store/slices/trialSlice";
+import { examSeries as buildExamSeries, showExamSeries } from "../domain/analysis/examSeries";
 import { selectWeeklyMinutesGoal } from "../store/slices/goalsSlice";
 import { useForecastTarget } from "./useForecastTarget";
 import { useExam } from "../contexts/ExamContext";
@@ -18,6 +20,13 @@ import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetS
 export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops = [], weekLogs, previousQuestions = null, streak = 0 }) {
   const { targetNet, targetNetTYT, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const weeklyMinutesGoal = useSelector(selectWeeklyMinutesGoal);
+  const trials = useSelector(selectTrials);
+  // Iki sinavli kullanicida ana sayfa grafiginin TYT · AYT sayfasi.
+  const examSeries = useMemo(() => {
+    if (examType !== "tyt_ayt" && examType !== "dil") return null;
+    const series = buildExamSeries(trials);
+    return showExamSeries(series) ? series : null;
+  }, [examType, trials]);
   const {
     weeks,
     forecast,
@@ -187,6 +196,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     isPaused,
     frozenAtStop,
     chartData,
+    examSeries,
     declared,
     declaredAxis,
     weeklyEffort,
