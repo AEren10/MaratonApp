@@ -13,13 +13,14 @@ import { PlanDetailStopRow } from "./components/PlanDetailStopRow";
 import { PlanDetailEmptyState } from "./components/PlanDetailEmptyState";
 import { PlanDetailSubjects } from "./components/PlanDetailSubjects";
 import { ReorganizeDayModal } from "./components/ReorganizeDayModal";
+import { dayLongLabel } from "../../domain/summary/summaryFormat";
 import { formatMinutes, usePlanDetailViewModel } from "./usePlanDetailViewModel";
 
 function PlanDetailInner({ route }) {
   const C = useC();
   const [reorganizeOpen, setReorganizeOpen] = useState(false);
   const isEmpty = Boolean(route?.params?.isEmpty);
-  const dayLabel = route?.params?.dateLabel || (isEmpty ? "Perşembe, 25 Haziran" : "Salı, 23 Haziran");
+  const dayLabel = route?.params?.dateLabel || dayLongLabel(new Date());
   const { detail, doneMinutes, hasTasks, loading, navigation, plannedMinutes } = usePlanDetailViewModel({
     C,
     forceEmpty: isEmpty,

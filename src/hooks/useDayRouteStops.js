@@ -2,8 +2,8 @@ import { useMemo } from "react";
 
 import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
-import { assignWeekStops } from "../domain/program/assignStopsToDays";
-import { mondayOf, parseDayKey } from "../domain/program/dayKeys";
+import { stopsForDate } from "../domain/program/todayStops";
+import { mondayOf } from "../domain/program/dayKeys";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { subjectPaletteKey } from "../themes/subjectPalette";
 
@@ -22,9 +22,7 @@ export function useDayRouteStops(dateKey) {
       (w) => w.weekStart && mondayOf(String(w.weekStart).slice(0, 10)) === monday,
     );
     if (!week) return [];
-    const dayIndex = Math.round((parseDayKey(dateKey) - parseDayKey(monday)) / 86400000);
-    const byDay = assignWeekStops(week.stops || [], schedule);
-    return (byDay[dayIndex] || []).map((stop, i) => {
+    return stopsForDate(week, schedule, dateKey).map((stop, i) => {
       const done = stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED;
       return {
         id: stop.logicalStopKey || `${stop.subject}-${stop.topic}-${i}`,

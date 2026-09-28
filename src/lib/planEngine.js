@@ -51,6 +51,9 @@ export function generateDailyPlan({
   dailyTarget = 80,
   // Haftalık rotanın bu haftaki durakları: [{ subject, topic, ... }]
   routeWeekStops = [],
+  // Rota var ama bugune durak dusmediyse (ders programinda bos gun) uydurma
+  // ders onerisi uretilmez; liste bos kalir.
+  routeActive = false,
 }) {
   const today = new Date();
   const daysLeft = examDate ? differenceInDays(examDate, today) : 180;
@@ -173,7 +176,7 @@ export function generateDailyPlan({
         : [];
 
       candidates = [...routeAllocations, ...adaptiveFallback];
-    } else if (validRouteStops.length === 0) {
+    } else if (validRouteStops.length === 0 && !routeActive) {
       candidates = allocateAdaptiveCandidates(scored, remainingTarget, remainingActiveSlots);
     }
   }

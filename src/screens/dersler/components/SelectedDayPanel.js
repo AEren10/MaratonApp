@@ -51,7 +51,9 @@ export function SelectedDayPanel({ selectedDay, logs }) {
   const totalMinutes = displayLogs.reduce((acc, l) => acc + (l.minutes || 0), 0);
   const meta = totalMinutes > 0 ? `${formatMinutes(totalMinutes)} planlı` : "";
 
-  const openDetail = () => navigation.navigate(SCREENS.PLAN_DETAIL, { date: selectedDay.key });
+  // Gunun plani ekrani yalniz BUGUNU anlatir (ana sayfanin "tumu"su).
+  // Baska gunun satiri eskiden oraya gidip bugunun duraklarini gosteriyordu.
+  const openDetail = selectedDay?.isToday ? () => navigation.navigate(SCREENS.PLAN_DETAIL) : undefined;
 
   return (
     <View style={s.wrap}>

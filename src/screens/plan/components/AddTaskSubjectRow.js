@@ -6,12 +6,8 @@ import { Press } from "../../../components/design/Press";
 
 export const AddTaskSubjectRow = React.memo(function AddTaskSubjectRow({ subject, selected, onPress, C }) {
   const color = subjectColorOf(C, subject.key);
-  // Mock remaining topics based on subject name
-  let topicsLeft = 12;
-  if (subject.key === "turkce") topicsLeft = 8;
-  if (subject.key === "matematik") topicsLeft = 16;
-  if (subject.key === "biyoloji") topicsLeft = 11;
-  if (subject.key === "tarih") topicsLeft = 9;
+  // Eskiden uydurma "12 konu kaldı" yaziyordu; mufredattaki gercek konu sayisi.
+  const topicCount = subject.topics?.length || 0;
 
   return (
     <Press haptic="none"
@@ -25,7 +21,9 @@ export const AddTaskSubjectRow = React.memo(function AddTaskSubjectRow({ subject
       <Text style={[TYPOGRAPHY.bodyMedium, st.name, { color: selected ? C.text : C.text2 }]} numberOfLines={1}>
         {subject.label || subject.name}
       </Text>
-      <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{topicsLeft} konu kaldı</Text>
+      {topicCount > 0 ? (
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{topicCount} konu</Text>
+      ) : null}
       <View style={[st.radio, { borderColor: selected ? color : C.border }]}>
         {selected ? <View style={[st.radioDot, { backgroundColor: color }]} /> : null}
       </View>

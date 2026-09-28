@@ -46,7 +46,7 @@ function AddTaskInner() {
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <SectionHeader title="DERS" C={C} />
-        <AddTaskExamSegment value={state.examTab} onChange={state.handleExamChange} C={C} />
+        <AddTaskExamSegment options={state.examTabs} value={state.examTab} onChange={state.handleExamChange} C={C} />
         <View style={{ borderTopWidth: 1, borderTopColor: C.line }}>
           {state.subjects.map((sub) => (
             <AddTaskSubjectRow

@@ -5,6 +5,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useUserTasks } from "../../hooks/useUserTasks";
+import { useClassSchedule } from "../../hooks/useClassSchedule";
+import { todayPlanStops } from "../../domain/program/todayStops";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import { generateDailyPlan } from "../../lib/planEngine";
@@ -28,14 +30,14 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const planCtx = usePlanContext();
   const { tasks: userTasks, toggleTask: toggleUserTask, removeTask: removeUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
+  const { schedule } = useClassSchedule();
 
   // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar (en fazla 3-4 durak)
   const generatedTasks = useMemo(() => {
-    const rawStops = studyRoute.currentWeek?.stops || [];
     const today = todayTR();
-    const routeWeekStops = rawStops.map((stop) => {
+    const doneToday = (stop) => {
       const stopKey = stop.logicalStopKey ? buildPlanTaskKey(stop.subject, stop.topic) : null;
-      const isCompletedToday = (
+      return (
         (stop.lifecycleStatus === "completed" && (
           (stop.completedAt && dateKey(new Date(stop.completedAt)) === today) ||
           stop.completedToday === true
@@ -43,14 +45,24 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
         (stopKey && isDone?.(stopKey)) ||
         isDone?.(stop.id)
       );
+    };
+    // Ana sayfa ve Program > Hafta ile ayni liste: ders programinin bugune
+    // dusurdugu duraklar (bkz. domain/program/todayStops).
+    const rawStops = todayPlanStops(studyRoute.currentWeek, schedule, today, { isCompletedToday: doneToday });
+    const routeWeekStops = rawStops.map((stop) => {
+      const isCompletedToday = doneToday(stop);
       if (isCompletedToday && stop.lifecycleStatus !== "completed") {
         return { ...stop, lifecycleStatus: "completed", completedToday: true };
       }
       return stop;
     });
-    const generated = generateDailyPlan({ ...planCtx, routeWeekStops });
+    const generated = generateDailyPlan({
+      ...planCtx,
+      routeWeekStops,
+      routeActive: (studyRoute.currentWeek?.stops || []).length > 0,
+    });
     return generated.tasks || [];
-  }, [planCtx, studyRoute.currentWeek?.stops, isDone]);
+  }, [planCtx, studyRoute.currentWeek, schedule, isDone]);
 
   const detail = usePlanDetailTasks({
     C,
