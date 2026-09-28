@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon, Card } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { SCREENS } from "../../constants/screens";
 import { LEGAL_DOCS } from "../../constants/legalDocs";
 import { SettingsGroup } from "./components/SettingsGroup";
@@ -20,6 +21,9 @@ export default function PrivacyScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { handleDeleteAccount } = useSettingsActions();
+  // Kayit ekranindan (giristen once) da aciliyor: veri indirme ve hesap
+  // silme oturum ister, o yigina kayitli da degil.
+  const { user } = useAuth();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const openExport = useCallback(() => navigation.navigate(SCREENS.DATA_EXPORT), [navigation]);
@@ -58,10 +62,12 @@ export default function PrivacyScreen() {
           />
         </SettingsGroup>
 
-        <SettingsGroup title="VERİLERİN">
-          <SettingsRow first label="Verilerimi indir" onPress={openExport} />
-          <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
-        </SettingsGroup>
+        {user ? (
+          <SettingsGroup title="VERİLERİN">
+            <SettingsRow first label="Verilerimi indir" onPress={openExport} />
+            <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
+          </SettingsGroup>
+        ) : null}
 
         <Card tone="surface" radius="panel" style={styles.note}>
           <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>

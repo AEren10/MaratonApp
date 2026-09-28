@@ -128,6 +128,8 @@ export const AUTH_STACK_SCREENS = [
   // navigate sessizce basarisiz olurdu.
   screen(SCREENS.TERMS, TermsScreen),
   screen(SCREENS.PRIVACY, PrivacyScreen),
+  // Gizlilik ekranindaki belge satirlari giristen once de acilabilsin.
+  screen(SCREENS.DOCUMENT, DocumentScreen),
 ];
 
 // Şifre sıfırlama yığını: link bir oturum kurduğu için normal seçim
