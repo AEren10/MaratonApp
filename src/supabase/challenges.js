@@ -89,8 +89,8 @@ export async function respondToChallenge(id, accept, userId) {
 }
 
 // NOT: Challenge tamamlanması ve kazanan seçimi ayrı bir istemci çağrısı
-// DEĞİL. bump_challenge_progress hedefe ulaşıldığında ikisini de sunucuda
-// yapıyor (bkz. 20260908150000 migration).
+// DEĞİL. sync_challenge_progress kayıt kimliğinden gerçek çalışma/deneme
+// miktarını okuyup hedefe ulaşıldığında ikisini de sunucuda yapıyor.
 
 export async function checkExpiredChallenges(userId) {
   try {
@@ -112,40 +112,22 @@ function isMissingFunction(e) {
 export async function syncMyChallengeProgress({
   source,
   sourceOperationId,
-  questions = 0,
-  minutes = 0,
 } = {}) {
   try {
     if (!sourceOperationId) return null;
     const { data, error } = await supabase.rpc("sync_challenge_progress", {
       p_source: source,
       p_source_operation_id: sourceOperationId,
-      p_questions: Math.max(0, Math.round(questions || 0)),
-      p_minutes: Math.max(0, Math.round(minutes || 0)),
+      // Backward-compatible RPC signature: server ignores these values and
+      // derives progress from the saved source record.
+      p_questions: 0,
+      p_minutes: 0,
     });
     if (error) throw error;
     return data ?? 0;
   } catch (e) {
     if (isMissingFunction(e)) return null;
     handleSupabaseError(e, "syncMyChallengeProgress");
-    throw e;
-  }
-}
-
-export async function bumpMyProgress(id, side, value) {
-  try {
-    if (!id || !UUID_RE.test(id)) throw new Error("Invalid challenge id");
-    if (side !== "creator" && side !== "opponent") throw new Error("Invalid side");
-    if (!Number.isFinite(value) || value <= 0) throw new Error("Invalid value");
-    const { data, error } = await supabase.rpc("bump_challenge_progress", {
-      challenge_id: id,
-      side,
-      increment_value: value,
-    });
-    if (error) throw error;
-    return data;
-  } catch (e) {
-    handleSupabaseError(e, "bumpMyProgress");
     throw e;
   }
 }
