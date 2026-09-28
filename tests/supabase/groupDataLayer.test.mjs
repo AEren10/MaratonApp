@@ -7,10 +7,12 @@ const previewMigration = readFileSync("supabase/migrations/20260920002000_cdx_gr
 const previewCreatorMigration = readFileSync("supabase/migrations/20260920002201_cdx_group_preview_creator_name.sql", "utf8");
 const userRankMigration = readFileSync("supabase/migrations/20260920010941_clde_my_groups_user_rank.sql", "utf8");
 const memberMinutesMigration = readFileSync("supabase/migrations/20260928020140_cdx_group_member_weekly_minutes.sql", "utf8");
+const memberPreviewMigration = readFileSync("supabase/migrations/20260928022939_cdx_group_member_preview_stack.sql", "utf8");
 const groupsApi = readFileSync("src/supabase/groups.js", "utf8");
 const groupsTab = readFileSync("src/screens/league/GroupsTab.js", "utf8");
 const groupsController = readFileSync("src/screens/league/useGroupsController.js", "utf8");
 const groupMemberRow = readFileSync("src/screens/league/components/GroupMemberRow.js", "utf8");
+const groupItemRow = readFileSync("src/screens/league/components/GroupItemRow.js", "utf8");
 const groupDetailHook = readFileSync("src/hooks/useGroupDetail.js", "utf8");
 const groupActionsHook = readFileSync("src/hooks/useGroupActions.js", "utf8");
 
@@ -119,6 +121,17 @@ test("recreating get_my_groups restores the grants the drop removed", () => {
 test("the groups client carries user_rank through to the card", () => {
   assert.match(groupsApi, /user_rank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
   assert.match(groupsApi, /userRank: Number\(row\.user_rank \?\? row\.userRank\) \|\| null/);
+});
+
+test("my groups returns a real member preview stack for group cards", () => {
+  assert.match(memberPreviewMigration, /member_preview JSONB/);
+  assert.match(memberPreviewMigration, /jsonb_agg\(jsonb_build_object/);
+  assert.match(memberPreviewMigration, /'avatar_url', preview\.avatar_url/);
+  assert.match(memberPreviewMigration, /LIMIT 4/);
+  assert.match(memberPreviewMigration, /GRANT EXECUTE ON FUNCTION public\.get_my_groups\(\) TO authenticated/);
+  assert.match(groupsApi, /member_preview: memberPreview/);
+  assert.match(groupItemRow, /GroupAvatarStack/);
+  assert.match(groupItemRow, /member_preview \?\? group\.memberPreview/);
 });
 
 test("group members expose weekly study minutes without faking hours", () => {

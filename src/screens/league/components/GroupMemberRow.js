@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { Icon, Avatar } from "../../../components/design";
+import { Avatar } from "../../../components/design";
 
 function formatMinutes(value) {
   const minutes = Math.max(0, Number(value) || 0);
@@ -15,7 +15,8 @@ function formatMinutes(value) {
 export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
   const C = useC();
   const isYou = item.you;
-  const medal = item.rank === 1 ? C.amber : item.rank === 2 ? C.text2 : item.rank === 3 ? C.text3 : null;
+  const rank = Number(item.rank) || 0;
+  const medal = rank === 1 ? C.amber : rank === 2 ? C.text2 : rank === 3 ? C.text3 : null;
   const weeklyQuestions = item.weekly_questions ?? item.questions ?? item.weekly_xp ?? 0;
   const weeklyMinutes = item.weekly_minutes ?? item.weeklyMinutes ?? item.minutes ?? 0;
 
@@ -25,12 +26,8 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
       { backgroundColor: C.surface, borderColor: C.border },
       isYou && { backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "40" },
     ]}>
-      <View style={s.rankCol}>
-        {medal ? (
-          <Icon name="trophy" size={16} color={medal} />
-        ) : (
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{item.rank}</Text>
-        )}
+      <View style={[s.rankCol, { backgroundColor: medal ? medal + "18" : C.elev, borderColor: medal || C.border }]}>
+        <Text style={[s.rankText, { color: medal || C.text2 }]}>{rank || "-"}</Text>
       </View>
       <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} image={item.avatar_url} size={34} color={isYou ? C.accent : undefined} />
       <View style={s.nameCol}>
@@ -38,12 +35,18 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
           {isYou ? "Sen" : item.name || "Öğrenci"}
         </Text>
         <Text style={[TYPOGRAPHY.micro, { color: item.is_studying_now ? C.green : C.muted }]} numberOfLines={1}>
-          {item.is_studying_now ? "Şu an çalışıyor" : formatMinutes(weeklyMinutes)}
+          {medal ? "Podyumda" : item.is_studying_now ? "Şu an çalışıyor" : "Haftalık yarış"}
         </Text>
       </View>
-      <View style={s.scoreCol}>
-        <Text style={[s.count, { color: C.text }]}>{weeklyQuestions}</Text>
-        <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>soru</Text>
+      <View style={s.statsCol}>
+        <View style={s.statBlock}>
+          <Text style={[s.count, { color: C.text }]}>{weeklyQuestions}</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>soru</Text>
+        </View>
+        <View style={s.statBlock}>
+          <Text style={[s.time, { color: C.text2 }]}>{formatMinutes(weeklyMinutes)}</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>süre</Text>
+        </View>
       </View>
     </View>
   );
@@ -59,9 +62,27 @@ const s = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
   },
-  rankCol: { width: 28, alignItems: "center" },
+  rankCol: {
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    marginRight: SPACING.sm,
+  },
+  rankText: {
+    ...TYPOGRAPHY.captionMedium,
+  },
   nameCol: { flex: 1, marginLeft: SPACING.sm },
   name: { marginBottom: 1 },
-  scoreCol: { minWidth: 56, alignItems: "flex-end" },
+  statsCol: {
+    minWidth: 104,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: SPACING.md,
+  },
+  statBlock: { alignItems: "flex-end" },
   count: { ...TYPOGRAPHY.statMedium },
+  time: { ...TYPOGRAPHY.tableValue },
 });

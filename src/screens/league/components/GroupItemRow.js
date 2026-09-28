@@ -5,6 +5,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, SPACING, STEP, RADIUS, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
+import { GroupAvatarStack } from "./GroupAvatarStack";
 
 export const GroupItemRow = React.memo(function GroupItemRow({
   group,
@@ -23,6 +24,9 @@ export const GroupItemRow = React.memo(function GroupItemRow({
   const weeklyQuestions = Number(group.weekly_questions ?? group.weeklyQuestions ?? 0) || 0;
   const memberCount = Number(group.member_count ?? group.memberCount ?? 0) || 0;
   const userRank = Number(group.user_rank ?? group.userRank) || null;
+  const preview = Array.isArray(group.member_preview ?? group.memberPreview)
+    ? (group.member_preview ?? group.memberPreview)
+    : [];
 
   return (
     <Press haptic="none"
@@ -39,31 +43,27 @@ export const GroupItemRow = React.memo(function GroupItemRow({
         }
       ]}
     >
-      <View
-        style={[
-          s.avatar,
-          {
-            backgroundColor: isSelected ? C.accent + "1C" : C.surface2,
-            borderColor: isSelected ? C.accent + "40" : C.border,
-          },
-        ]}
-      >
-        <Text style={[s.avatarText, { color: isSelected ? C.accent : C.text2 }]}>
-          {initial}
-        </Text>
-      </View>
-
       <View style={s.info}>
+        <View style={s.titleRow}>
+          <Text
+            style={[s.name, { color: isSelected ? C.accent : C.text }]}
+            numberOfLines={1}
+          >
+            {group.name}
+          </Text>
+          {userRank ? (
+            <View style={[s.rankPill, { backgroundColor: C.elev, borderColor: C.border }]}>
+              <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>#{userRank}</Text>
+            </View>
+          ) : null}
+        </View>
         <Text
-          style={[s.name, { color: isSelected ? C.accent : C.text }]}
+          style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 1 }]}
           numberOfLines={1}
         >
-          {group.name}
+          Bu hafta {weeklyQuestions} soru
         </Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: 1 }]} numberOfLines={1}>
-          {memberCount} üye · bu hafta {weeklyQuestions} soru
-          {userRank ? ` · ${userRank}. sıra` : ""}
-        </Text>
+        <GroupAvatarStack initial={initial} memberCount={memberCount} members={preview} />
       </View>
 
       <View style={[s.enter, { backgroundColor: C.elev, borderColor: C.border }]}>
@@ -83,24 +83,25 @@ const s = StyleSheet.create({
     borderRadius: RADIUS.xl,
     borderWidth: 1,
   },
-  avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: RADIUS.md,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  avatarText: {
-    ...TYPOGRAPHY.subheading,
-  },
   info: {
     flex: 1,
-    marginLeft: STEP.s2,
     marginRight: SPACING.sm,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
+  },
   name: {
+    flex: 1,
     ...TYPOGRAPHY.bodySemiBold,
+  },
+  rankPill: {
+    minHeight: 24,
+    justifyContent: "center",
+    paddingHorizontal: SPACING.sm,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
   },
   enter: {
     width: CONTROL.tapMin,

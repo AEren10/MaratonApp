@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { FlatList, Modal, View, Text, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
@@ -21,6 +21,7 @@ export function GroupDetailPanel({
   onShare,
 }) {
   const C = useC();
+  const insets = useSafeAreaInsets();
   const members = board?.list || [];
   const renderMember = useCallback(({ item }) => (
     <GroupMemberRow item={item} />
@@ -30,9 +31,9 @@ export function GroupDetailPanel({
   if (!group) return null;
 
   return (
-    <Modal visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-      <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
-        <View style={s.topBar}>
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <SafeAreaView edges={["bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
+        <View style={[s.topBar, { paddingTop: Math.max(insets.top, SPACING.xl) + SPACING.sm }]}>
           <Press haptic="none" onPress={onClose} accessibilityRole="button" accessibilityLabel="Grup listesini aç" style={s.backHit}>
             <Icon name="chevL" size={20} color={C.text2} />
           </Press>
@@ -89,11 +90,11 @@ function MemberGap() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   topBar: {
-    minHeight: 64,
+    minHeight: 82,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.sm,
+    paddingBottom: SPACING.md,
   },
   backHit: {
     width: CONTROL.tapMin,

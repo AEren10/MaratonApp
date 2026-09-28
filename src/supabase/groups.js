@@ -61,6 +61,11 @@ function reasonMessage(reason) {
 }
 
 function normalizeGroup(row = {}) {
+  const memberPreview = Array.isArray(row.member_preview)
+    ? row.member_preview
+    : Array.isArray(row.memberPreview)
+      ? row.memberPreview
+      : [];
   return {
     id: row.id,
     name: row.name,
@@ -83,6 +88,8 @@ function normalizeGroup(row = {}) {
     // yazmaz -- uydurma bir 0. sira gostermekten iyidir.
     user_rank: Number(row.user_rank ?? row.userRank) || null,
     userRank: Number(row.user_rank ?? row.userRank) || null,
+    member_preview: memberPreview,
+    memberPreview,
   };
 }
 
