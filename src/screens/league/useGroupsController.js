@@ -45,8 +45,12 @@ export function useGroupsController({ user, initialGroupCode }) {
   }, [initialGroupCode, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadBoard = useCallback(async () => {
-    if (!selected?.id || !user?.id) return;
+    if (!selected?.id || !user?.id) {
+      setBoard({ list: [] });
+      return;
+    }
     setBoardError(null);
+    setBoard({ list: [] });
     try {
       setBoard(await groupLeaderboard(selected.id, user.id));
     } catch (e) {

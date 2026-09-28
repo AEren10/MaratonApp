@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, SPACING, STEP, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, STEP, RADIUS, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
@@ -29,8 +29,8 @@ export const GroupItemRow = React.memo(function GroupItemRow({
       onPress={handlePress}
       onLongPress={onLeave}
       accessibilityRole="button"
-      accessibilityLabel={`${group.name} grubu${isSelected ? ", aktif seçili" : ""}`}
-      accessibilityHint="Grubu seçer, uzun basışta ayrılma seçeneği sunar"
+      accessibilityLabel={`${group.name} grubuna gir`}
+      accessibilityHint="Grup odasını açar, uzun basışta ayrılma seçeneği sunar"
       style={[
         s.row,
         {
@@ -66,14 +66,9 @@ export const GroupItemRow = React.memo(function GroupItemRow({
         </Text>
       </View>
 
-      {isSelected ? (
-        <View style={[s.badge, { backgroundColor: C.accent + "18" }]}>
-          <Icon name="check" size={11} color={C.accent} />
-          <Text style={[s.badgeText, { color: C.accentText }]}>Açık</Text>
-        </View>
-      ) : (
-        <Icon name="chevR" size={14} color={C.text3} />
-      )}
+      <View style={[s.enter, { backgroundColor: C.elev, borderColor: C.border }]}>
+        <Icon name="chevR" size={14} color={C.text2} />
+      </View>
     </Press>
   );
 });
@@ -82,9 +77,9 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    minHeight: 74,
+    minHeight: 84,
     paddingHorizontal: SPACING.md,
-    paddingVertical: STEP.s2,
+    paddingVertical: STEP.s2 + 2,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
   },
@@ -107,15 +102,12 @@ const s = StyleSheet.create({
   name: {
     ...TYPOGRAPHY.bodySemiBold,
   },
-  badge: {
-    flexDirection: "row",
+  enter: {
+    width: CONTROL.tapMin,
+    height: CONTROL.tapMin,
     alignItems: "center",
-    gap: SPACING.xs,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.full,
-  },
-  badgeText: {
-    ...TYPOGRAPHY.micro,
+    justifyContent: "center",
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
   },
 });
