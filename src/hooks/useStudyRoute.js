@@ -52,6 +52,12 @@ function trialTypesForRoute(examType, field) {
   return ayt ? ["TYT", ayt, "AYT"] : ["TYT"];
 }
 
+function latestNetOf(trials = []) {
+  const latest = [...trials].sort((a, b) => String(b?.date || b?.trial_date || "").localeCompare(String(a?.date || a?.trial_date || "")))[0];
+  const net = Number(latest?.totalNet ?? latest?.total_net);
+  return Number.isFinite(net) ? net : null;
+}
+
 function forecastProfilesForRoute(examType, field) {
   if (examType === "lgs") return [{ types: ["LGS"], max: 90 }];
   if (examType !== "tyt_ayt") return [{ types: ["TYT"], max: 120 }];
@@ -675,6 +681,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     tempoScenarios,
     forecast,
     forecastTypes: forecastProfile?.types || [],
+    // Tahminle ayni sinavin SON denemesi. Tahmin kisa veride (14 gunden az
+    // aralik) null donuyor; "su anki net" buna bagli kalmamali.
+    latestForecastNet: latestNetOf(forecastTrials),
     hasRouteAccess,
     routeAccessError: accessError,
     routeAccessLoading: PREMIUM_ENABLED ? accessLoading : false,

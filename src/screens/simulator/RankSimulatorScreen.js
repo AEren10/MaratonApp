@@ -19,10 +19,28 @@ import { Press } from "../../components/design/Press";
 // (src/data/programs.js sadece başarı sırası tutuyor). O blok bilerek
 // render edilmiyor; onun yerine hedefe olan net açığı ve açığı kapatan
 // gerçek konu verisi gösteriliyor.
+// Bos hal NEDENINI soyler: eskiden deneme eksikken de "hedef gerekiyor"
+// diyordu, hedefi girmis kullanici ne yapacagini bilemiyordu.
+function emptyCopy({ targetNet, currentNet, examLabel }) {
+  const exam = examLabel || "deneme";
+  if (targetNet == null) {
+    return {
+      title: `${examLabel ? `${examLabel} hedefin` : "Hedef netin"} eksik`,
+      body: "Hedeflerim'de TYT ve AYT netini ayrı ayrı gir; açığı burada göreceksin.",
+      primary: "Hedef Belirle",
+    };
+  }
+  return {
+    title: `Önce bir ${exam} denemesi gir`,
+    body: `Hedefin ${Math.round(targetNet)} net. Son denemenle arasındaki açığı burada göreceksin.`,
+    primary: "Deneme Gir",
+  };
+}
+
 export default function RankSimulatorScreen() {
   const navigation = useNavigation();
   const C = useC();
-  const { targetNet, currentNet, daysUntilExam, gapResult, canAccess, requestAccess, loading } = useThresholdView();
+  const { targetNet, examLabel, currentNet, daysUntilExam, gapResult, canAccess, requestAccess, loading } = useThresholdView();
 
   if (loading) {
     return (
@@ -43,10 +61,8 @@ export default function RankSimulatorScreen() {
         <Header onBack={() => navigation.goBack()} C={C} />
         <EmptyState
           eyebrow="NET EŞİĞİ"
-          title="Eşik için hedef net gerekiyor"
-          body="Hedef netini Hedeflerim'den belirle, en az bir deneme gir; açığı burada göreceksin."
-          primary="Hedef Belirle"
-          onPrimary={() => navigation.navigate(SCREENS.GOALS)}
+          {...emptyCopy({ targetNet, currentNet, examLabel })}
+          onPrimary={() => navigation.navigate(targetNet == null ? SCREENS.GOALS : SCREENS.TRIAL_ENTRY)}
           style={{ paddingHorizontal: GUTTER }}
         />
       </SafeAreaView>
