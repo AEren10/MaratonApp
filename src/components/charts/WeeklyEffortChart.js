@@ -4,7 +4,6 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
-import { WeeklyEffortEmpty } from "./components/WeeklyEffortEmpty";
 import { useC } from "../../contexts/ThemeContext";
 import {
   CHART_W, CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
@@ -12,14 +11,23 @@ import {
 
 const BAR_RADIUS = 3;
 
+// Cubugun ustundeki sure etiketi: dar alana sigsin diye "2s 15d" bicimi.
+function compactDuration(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = Math.round(minutes % 60);
+  if (h === 0) return `${m}d`;
+  return m > 0 ? `${h}s ${m}d` : `${h}s`;
+}
+
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
 
   if (!week) return null;
 
-  const hasActivity = (week.days || []).some((d) => d.questions > 0 || d.minutesOnly);
-  if (!hasActivity) return <WeeklyEffortEmpty height={height} />;
+  // Bos hafta da 7 bos kutuyla gorunur (kullanici karari, 28 Eylul): cubuklar
+  // her zaman yerinde, gun calisildikca dolar. Bos kart cubuklarin yerini
+  // aliyor ve ustteki sayilarin uzerine biniyordu.
 
   const bottom = plotBottom({ hasAxis: true });
   const top = PAD_TOP;
@@ -73,9 +81,18 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
         {week.days.map((day, i) => {
           const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
+          const barTop = day.questions > 0 ? yOf(day.questions) : bottom - 6;
           return (
+            <Fragment key={day.label}>
+            {day.minutes > 0 ? (
+              <SvgText
+                x={cx} y={Math.max(top + 9, barTop - 5)}
+                fill={C.text2} fontSize={11} fontWeight="600" textAnchor="middle"
+              >
+                {compactDuration(day.minutes)}
+              </SvgText>
+            ) : null}
             <EffortDay
-              key={day.label}
               day={day}
               index={i}
               todayIndex={todayIndex}
@@ -88,6 +105,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               radius={BAR_RADIUS}
               C={C}
             />
+            </Fragment>
           );
         })}
 
