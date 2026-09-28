@@ -171,7 +171,7 @@ const TAB_SCREEN_KEYS = Object.entries(ROUTE_CONFIGS)
 // ilk sekme, su sabit sirada. navigate() zaten her sekmede calisiyor.
 const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
 
-function canonicalTabFor(screen) {
+export function canonicalTabFor(screen) {
   return TAB_ORDER.find((tab) => (TAB_STACKS[tab] || []).includes(screen)) || null;
 }
 

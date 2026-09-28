@@ -8,6 +8,9 @@ import {
   markAllNotificationsRead,
 } from "../supabase/notifications";
 import { SCREENS } from "../constants/screens";
+import { canonicalTabFor } from "../navigation/routes";
+import { ROOT_ONLY, TAB_KEYS } from "../navigation/tabAssignment";
+import { openHere } from "../navigation/tabJump";
 import { captureError } from "../lib/errorReporting";
 
 function screenExists(screen) {
@@ -79,8 +82,13 @@ export function useNotifications() {
         captureError(e, { context: "notification_mark_read" });
       });
     }
+    // Bildirimler Profil sekmesinde listeleniyor; hedef ekran (Plan, Deneme,
+    // Ozet) cogunlukla baska sekmede. Duz navigate NAVIGATE hatasi verip
+    // hicbir sey acmiyordu: burada varsa burada, yoksa sahibi olan sekmede.
     if (screenExists(item.routeName)) {
-      navigation.navigate(item.routeName, item.routeParams || {});
+      const params = item.routeParams || {};
+      if (ROOT_ONLY.includes(item.routeName)) navigation.navigate(item.routeName, params);
+      else openHere(navigation, canonicalTabFor(item.routeName) || TAB_KEYS.ROTA, item.routeName, params);
     }
   }, [navigation, userId]);
 
