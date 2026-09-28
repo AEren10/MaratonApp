@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useExam } from "../contexts/ExamContext";
+import { examTrials } from "../domain/exam/examScope";
 import { useAppSelector } from "../store/hooks";
 import { selectTrials } from "../store/slices/trialSlice";
 import { selectTodayLogs } from "../store/slices/studyLogSlice";
@@ -109,11 +110,13 @@ export function usePlanContext() {
   }, [uid]);
 
   return useMemo(() => {
-    const weakAreas = weightedWeakAreas(trials);
+    // Zayif alan ve oneriler yalniz su anki sinavin denemelerinden.
+    const scoped = examTrials(trials, examType, field);
+    const weakAreas = weightedWeakAreas(scoped);
     // 7 günlük log varsa onu kullan; yoksa bugünküne düş (graceful fallback).
     const recentStudy = buildRecentStudy(weekLogs.length ? weekLogs : todayLogs);
     const topicWeakness = buildTopicWeakness(topicRows);
-    const nudges = generateNudges({ recentStudy, trials, streak: 0, weakAreas });
+    const nudges = generateNudges({ recentStudy, trials: scoped, streak: 0, weakAreas });
     const priorityReasons = nudgesToPriorityReasons(nudges);
     // weekLogs ve topicRows da dışarı veriliyor: rota motoru (useStudyRoute)
     // kapasiteyi geçmiş çalışmadan, konu ilerlemesini topic_progress'ten

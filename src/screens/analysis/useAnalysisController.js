@@ -13,14 +13,17 @@ import { useRecommendations } from "../../hooks/useRecommendations";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useTrialCompareEntry } from "../../hooks/useTrialCompareEntry";
 import * as H from "../../lib/haptics";
+import { examTrials } from "../../domain/exam/examScope";
 
 export function useAnalysisController(C) {
   const navigation = useNavigation();
-  const { examType } = useExam();
+  const { examType, field } = useExam();
   const { checkFeature, showPaywall } = usePremium();
   const openCompare = useTrialCompareEntry();
   const { refresh } = useSync();
-  const trials = useSelector(selectTrials);
+  // Yalniz su anki sinavin denemeleri (sinav degistirenlerde eski tur karismaz).
+  const allTrials = useSelector(selectTrials);
+  const trials = useMemo(() => examTrials(allTrials, examType, field), [allTrials, examType, field]);
   const nudges = useRecommendations();
   const { popup: nudgePopup, showNext: showNudgePopup, dismiss: dismissNudgePopup } = useNudgePopup(nudges);
   const [filter, setFilter] = useState("ALL");

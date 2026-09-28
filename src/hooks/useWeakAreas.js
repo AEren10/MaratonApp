@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials } from "../store/slices/trialSlice";
+import { examTrials } from "../domain/exam/examScope";
+import { useExam } from "../contexts/ExamContext";
 import { getAllSubjects } from "../domain/trial/trialTypes";
 import { useC } from "../contexts/ThemeContext";
 import { useSync } from "../contexts/DataSyncContext";
@@ -38,7 +40,9 @@ function computeWeakTopics(C, trials) {
 
 export function useWeakAreas() {
   const C = useC();
-  const trials = useSelector(selectTrials);
+  const { examType, field } = useExam();
+  const allTrials = useSelector(selectTrials);
+  const trials = useMemo(() => examTrials(allTrials, examType, field), [allTrials, examType, field]);
   const { syncedOnce, error: syncError, refresh } = useSync();
   const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const weakTopics = useMemo(() => computeWeakTopics(C, trials), [C, trials]);
