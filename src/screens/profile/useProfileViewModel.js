@@ -39,7 +39,7 @@ export function useProfileViewModel(C) {
   }, [gStats]);
 
   const leagueTier = getTier(weeklyXP);
-  const leagueNextTier = getNextTier(leagueTier);
+  const leagueNextTier = getNextTier(weeklyXP);
 
   const strengths = useMemo(() => {
     if (!trials || trials.length === 0) return [];
