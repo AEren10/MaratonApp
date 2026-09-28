@@ -96,6 +96,16 @@ export default function ProfileScreen() {
                 label="Arkadaşını davet et"
                 onPress={() => navigation.navigate(SCREENS.REFERRAL)}
               />
+              <ProfileLinkRow
+                label="Hikâyende paylaş"
+                meta="Haftanı arkadaşların görsün"
+                onPress={() => navigation.navigate(SCREENS.SHARE_CARD)}
+              />
+              <ProfileLinkRow
+                label="Ana ekrana widget ekle"
+                meta="Açmadan gör"
+                onPress={() => navigation.navigate(SCREENS.WIDGET_GUIDE)}
+              />
               {PREMIUM_ENABLED ? (
                 <ProfileLinkRow
                   label="Premium"

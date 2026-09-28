@@ -3,6 +3,8 @@ import { todayTR } from "../lib/dateUtils";
 export const STORAGE_KEYS = {
   THEME_PREF: "@maraton:themePref",
   THEME_ACCENT: "@maraton:themeAccent",
+  // Kesif ipuclari (widget ekle, hikayende paylas): kapatilan / gorulen.
+  DISCOVER_TIPS: "@maraton:discoverTips",
   // Çalışan kronometre oturumu — uygulama öldürülürse kurtarmak için.
   ACTIVE_TIMER_SESSION: "@maraton:activeTimerSession",
   CUSTOM_TIMER_CONFIG: "@maraton:custom_timer_config",

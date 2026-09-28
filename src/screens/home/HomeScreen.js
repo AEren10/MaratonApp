@@ -40,7 +40,8 @@ export default function HomeScreen() {
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
 
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} />
+    ? <HomeProBody stops={h.stops} dueCount={dueCount} go={actions}
+        discoverEligible={(h.longestStreak || h.streak || 0) > 0} />
     : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
   ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, dueCount, actions]);
 
