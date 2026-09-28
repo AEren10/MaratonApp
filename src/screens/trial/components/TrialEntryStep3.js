@@ -1,23 +1,19 @@
 import { ScrollView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { useState } from "react";
 
 import { Button } from "../../../components/design";
 import { trialDifficultyMultiplier } from "../../../domain/trial/trialModel";
-import { TrialEntryDetailsCard, TrialEntryNotebookToggle } from "./TrialEntryDetailsCard";
+import { TrialEntryDetailsCard } from "./TrialEntryDetailsCard";
 import { TrialEntryNetCard } from "./TrialEntryNetCard";
 import { Press } from "../../../components/design/Press";
 
 export function TrialEntryStep3({ form, styles, onBack }) {
   const normalizedNet = Number(form.totalNet) * trialDifficultyMultiplier(form.difficultyLevel);
   const publisherName = form.publishers?.find((p) => p.id === form.publisherId)?.name || null;
-  const [addWrong, setAddWrong] = useState(true);
-  
-  // Hesaplanan yanlis sayisi
-  const totalWrong = Object.values(form.values || {}).reduce(
-    (acc, sec) => acc + (parseInt(sec?.wrong, 10) || 0),
-    0,
-  );
+  // "Yanlislari deftere ekle" anahtari kalkti (kullanici karari, 28 Eylul):
+  // hicbir seye bagli degildi ve deneme konu bazli alinmadigi icin yanlislar
+  // deftere eklenemiyor. Deneme ozetindeki "Yanlislari deftere ekle" dugmesi
+  // kullaniciyi elle ekleme ekranina goturur.
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}
@@ -32,9 +28,6 @@ export function TrialEntryStep3({ form, styles, onBack }) {
       </Animated.View>
       <Animated.View style={styles.section}>
         <TrialEntryDetailsCard form={form} styles={styles} />
-      </Animated.View>
-      <Animated.View style={styles.section}>
-        <TrialEntryNotebookToggle value={addWrong} onValueChange={setAddWrong} count={totalWrong} />
       </Animated.View>
       <Animated.View style={styles.actions}>
         <Button size="lg" onPress={form.handleSave} loading={form.saving} fullWidth>
