@@ -25,6 +25,9 @@ export const TAB_KEYS = Object.freeze({
 // ROTA sekmesinin KOKU Ana Sayfa'dir (tasarimcinin kendi ifadesi).
 
 export const ROTA_STACK = [
+  SCREENS.ROADMAP,          // Rota: net rotasi, tahmin, siradaki duraklar
+  SCREENS.ROUTE_FULL,       // Rotanin tamami
+  SCREENS.ROUTE_STOP_DETAIL, // Durak detayi: bu durak neden verildi
   // Ana sayfanin grup dugmesi Lig/Gruplar'i bu sekmede acar; geri tusu
   // Ana sayfaya doner (eskiden Profil'e atiyordu). Alt ekranlari da burada.
   SCREENS.LEAGUE,

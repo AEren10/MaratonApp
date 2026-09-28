@@ -47,7 +47,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
           İlk durağa başla
         </Button>
         <Button variant="outline" size="md" fullWidth onPress={onViewRoute}>
-          Programı gör
+          Rotanı gör
         </Button>
         {/* Ilk Gun hero'su Home govdesinin tamamini gizliyor ve eski tek
             cikisi veri girmekti. Bu buton kapiyi aciyor: ilk duragi yapmadan

@@ -1,0 +1,78 @@
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Animated from "react-native-reanimated";
+
+import { Icon } from "../../components/design";
+import { useC } from "../../contexts/ThemeContext";
+import { useRouteFull } from "../../hooks/useRouteFull";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { RouteAccessGate } from "./components/RouteAccessGate";
+import { RouteFullSummary } from "./components/RouteFullSummary";
+import { RouteHeader } from "./components/RouteHeader";
+import RouteLinkRow from "./components/RouteLinkRow";
+import { RouteStatusLegend } from "./components/RouteStatusLegend";
+
+
+export default function RouteFullScreen() {
+  const C = useC();
+  const d = useRouteFull();
+
+  return (
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <RouteHeader title="Rotanın tamamı" onBack={d.goBack} />
+      <RouteAccessGate
+        loading={d.access.loading}
+        error={d.access.error}
+        hasAccess={d.access.hasAccess}
+        onRetry={d.access.retry}
+        onPaywall={d.access.paywall}
+      >
+        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+          <Animated.View style={s.top}>
+            <RouteFullSummary
+              counts={d.counts}
+              segments={d.segments}
+              debtHours={d.debtHours}
+              daysLeft={d.daysLeft}
+            />
+          </Animated.View>
+          <Animated.View style={s.section}>
+            <RouteStatusLegend />
+          </Animated.View>
+          <Animated.View style={s.section}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GÖRÜNÜMLER</Text>
+            <View style={s.links}>
+              <RouteLinkRow
+                title="Yol haritası"
+                subtitle="Müfredatın ay ay sırası"
+                value={d.monthsLeft != null ? `${d.monthsLeft} ay` : null}
+                onPress={d.openCurriculum}
+              />
+              <RouteLinkRow
+                title="Program"
+                subtitle="Durakların gün gün dağılımı"
+                value={d.weekStops != null ? "bu hafta " : null}
+                onPress={d.openProgram}
+              />
+              <RouteLinkRow
+                title="Geride kalan konular"
+                subtitle="Tamamlanmamış duraklar"
+                chip={d.debtHours > 0 ? `${d.debtHours} sa` : null}
+                onPress={d.openDebt}
+              />
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </RouteAccessGate>
+    </SafeAreaView>
+  );
+}
+
+const s = StyleSheet.create({
+  safe: { flex: 1 },
+  scroll: { paddingBottom: 100 },
+  top: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
+  section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  links: { gap: STEP.s1, marginTop: STEP.s2 },
+});
+

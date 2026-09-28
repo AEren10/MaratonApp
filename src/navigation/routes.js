@@ -23,6 +23,9 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SETUP_INCOMPLETE]: { path: "kurulum/yarim", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
 
   [SCREENS.HOME]: { path: "home", flow: PRODUCT_FLOW_IDS.DAILY_LOOP, deepLink: true, tab: true },
+  [SCREENS.ROADMAP]: { path: "rota", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
+  [SCREENS.ROUTE_FULL]: { path: "rota/tamami", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
+  [SCREENS.ROUTE_STOP_DETAIL]: { path: "rota/durak", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },
   [SCREENS.CURRICULUM_MAP]: { path: "mufredat", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true, tab: true },
   [SCREENS.STUDY_LOG]: { path: "calisma/gecmis", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: true },
   [SCREENS.ANALYSIS]: { path: "analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true, tab: true },
