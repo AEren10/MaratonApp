@@ -54,6 +54,7 @@ export const ROTA_STACK = [
   SCREENS.HOW_IT_WORKS,     // (paylasimli)
   SCREENS.WRONG_NOTEBOOK,   // Defter (Home Defter karti)
   SCREENS.WRONG_DETAIL,     // Soru detayi
+  SCREENS.QUICK_PRACTICE,
   SCREENS.REVIEW_SESSION,   // Tekrar baslat
   SCREENS.REVIEW_DONE,      // Tekrar bitti
   SCREENS.SWIPE_REVIEW,     // Hizli tekrar
@@ -77,6 +78,11 @@ export const PROGRAM_STACK = [
   SCREENS.COMPARATIVE,      // Plan vs Gercek
   SCREENS.WRONG_NOTEBOOK,   // Defter
   SCREENS.WRONG_DETAIL,     // Arama -> Soru detayi
+  SCREENS.REVIEW_SESSION,   // Defter -> Tekrar (eskiden NAVIGATE hatasi)
+  SCREENS.REVIEW_DONE,
+  SCREENS.SWIPE_REVIEW,
+  SCREENS.QUICK_PRACTICE,
+  SCREENS.TRIAL_COMPARE,    // Ay -> Deneme detayi -> Karsilastir
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.HOW_IT_WORKS,     // Nasil Calisir
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi (paylasimli)
@@ -111,6 +117,10 @@ export const PROFIL_STACK = [
   SCREENS.RANK_SIMULATOR,   // Ayarlar > Net esigi (eskiden NAVIGATE hatasi veriyordu)
   SCREENS.WRONG_NOTEBOOK,   // Profil > Yanlis defteri (sekme degismez)
   SCREENS.WRONG_DETAIL,
+  SCREENS.REVIEW_SESSION,   // Defter -> Tekrar (eskiden NAVIGATE hatasi)
+  SCREENS.REVIEW_DONE,
+  SCREENS.SWIPE_REVIEW,
+  SCREENS.QUICK_PRACTICE,
   SCREENS.SETTINGS,
   SCREENS.APPEARANCE,       // Gorunum
   SCREENS.NOTIFICATIONS,    // Rota haberleri

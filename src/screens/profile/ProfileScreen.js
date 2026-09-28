@@ -1,4 +1,4 @@
-import { ScrollView } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
@@ -101,11 +101,13 @@ export default function ProfileScreen() {
                 meta="Haftanı arkadaşların görsün"
                 onPress={() => navigation.navigate(SCREENS.SHARE_CARD)}
               />
-              <ProfileLinkRow
-                label="Ana ekrana widget ekle"
-                meta="Açmadan gör"
-                onPress={() => navigation.navigate(SCREENS.WIDGET_GUIDE)}
-              />
+              {Platform.OS === "ios" ? (
+                <ProfileLinkRow
+                  label="Ana ekrana widget ekle"
+                  meta="Açmadan gör"
+                  onPress={() => navigation.navigate(SCREENS.WIDGET_GUIDE)}
+                />
+              ) : null}
               {PREMIUM_ENABLED ? (
                 <ProfileLinkRow
                   label="Premium"

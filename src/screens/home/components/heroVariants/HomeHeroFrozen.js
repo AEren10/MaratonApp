@@ -78,7 +78,7 @@ export function HomeHeroFrozen({ daysUntilExam, frozenAtStop, frozenDays }) {
         </Button>
       </Animated.View>
       <Press haptic="none"
-        onPress={() => navigation.navigate(SCREENS.SETTINGS)}
+        onPress={() => navigation.navigate(SCREENS.DATA_EXPORT)}
         hitSlop={10}
         accessibilityRole="button"
         style={s.secondary}

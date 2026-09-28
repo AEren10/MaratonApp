@@ -3,6 +3,7 @@ import { SYNC_PENDING_COPY } from "../constants/stateCopy";
 
 import { useC } from "../contexts/ThemeContext";
 import { useExam } from "../contexts/ExamContext";
+import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { getTYTSubjects, getLGSSubjects } from "../domain/trial/trialTypes";
 import { wrongPenaltyForTrialType } from "../domain/trial/trialModel";
 import { track } from "../lib/analytics";
@@ -14,7 +15,9 @@ import * as H from "../lib/haptics";
 // olarak saklanir — deneme kaydi olarak DEGIL, gerekcesi submit'in uzerinde.
 export function useLevelTestForm() {
   const C = useC();
-  const { examType, targetNet, updateBaselineNet } = useExam();
+  const { examType, targetNet: targetSum, targetNetTYT, updateBaselineNet } = useExam();
+  // Seviye testi TYT (ya da LGS) dersleri: acik TYT hedefine gore, toplama degil.
+  const targetNet = baselineTarget({ examType, targetNet: targetSum, targetNetTYT }).target;
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [syncPending, setSyncPending] = useState(false);

@@ -72,9 +72,17 @@ export function useRouteStopDetail() {
     ]);
   }, [navigation, showAlert, stop?.topic]);
 
+  // Buyuk bir konu haftaya sigmayinca rota onu ardisik parcalara boler
+  // (ayni kok, segmentIndex 0,1,2). Etiketsiz ayni konu uc kez yaziyordu;
+  // parcaya ait durak "2. bölüm" diye okunur.
+  const partOf = (st) => {
+    if (!st || st.segmentIndex == null) return null;
+    const sameRoot = stop?.rootStopKey && st.rootStopKey === stop.rootStopKey;
+    return st.segmentIndex > 0 || sameRoot ? `${st.segmentIndex + 1}. bölüm` : null;
+  };
   const neighbour = (item) => (item ? {
     number: item.number,
-    topic: item.stop.topic,
+    topic: [item.stop.topic, partOf(item.stop)].filter(Boolean).join(" · "),
     status: item.status,
     date: routeDateTag(item.weekStart),
   } : null);
@@ -89,6 +97,8 @@ export function useRouteStopDetail() {
     },
     stop,
     number: found?.entry.number ?? null,
+    part: partOf(stop),
+    when: found?.entry.weekStart ? routeDateTag(found.entry.weekStart) : null,
     status: found?.entry.status ?? null,
     subjectCompleted: found?.subjectCompleted ?? 0,
     prev: neighbour(found?.prev),

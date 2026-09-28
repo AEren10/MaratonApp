@@ -2,8 +2,9 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { useExam } from "../contexts/ExamContext";
+import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { useStudyRoute } from "./useStudyRoute";
-import { selectLatestTrial } from "../store/slices/trialSlice";
+import { selectTYTTrials, selectLGSTrials } from "../store/slices/trialSlice";
 import { getAllSubjectsFlat } from "../data/curriculum";
 import { firstRouteAction } from "../domain/route/routeStartAction";
 import { resolveRouteReadyCurrentNet } from "../domain/route/routeReadySummary";
@@ -18,8 +19,12 @@ const SUBJECT_LABELS = Object.fromEntries(
 // Route henuz olusturulmadigi icin (persist:false) computedRoute onizlemesi
 // kullanilir — createRoute() ekranin "Ilk duraga basla" aksiyonunda cagrilir.
 export function useRouteReadySummary() {
-  const { daysUntilExam, targetNet, baselineNet } = useExam();
-  const latestTrial = useSelector(selectLatestTrial);
+  const { daysUntilExam, examType, targetNet: targetSum, targetNetTYT, baselineNet } = useExam();
+  // BUGUN ve HEDEF ayni sinavdan: TYT (LGS'de LGS). Eskiden BUGUN herhangi
+  // turden son deneme (brans dahil), HEDEF TYT+AYT toplamiydi.
+  const targetNet = baselineTarget({ examType, targetNet: targetSum, targetNetTYT }).target;
+  const sameExamTrials = useSelector(examType === "lgs" ? selectLGSTrials : selectTYTTrials);
+  const latestTrial = sameExamTrials[0] || null;
   const currentNet = resolveRouteReadyCurrentNet(latestTrial, baselineNet);
   const route = useStudyRoute({ persist: false });
 

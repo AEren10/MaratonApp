@@ -35,22 +35,9 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
 
   const items = useMemo(() => {
     const out = [];
-    userTasks.forEach((t) => {
-      if (t.subject === "__calendar") return;
-      const subj = getSubjectByKey(t.subject);
-      const minutes = t.targetMinutes ?? t.target_minutes ?? (t.questionCount ? Math.round(t.questionCount * 1.5) : 30);
-      out.push({
-        id: t.id,
-        subject: t.subject,
-        label: t.topic || subj?.label || t.subject,
-        topic: t.topic || null,
-        count: t.questionCount ?? t.question_count ?? 0,
-        minutes,
-        completed: t.completed,
-        source: "user",
-      });
-    });
-
+    // Sira: once rotanin bugunku duraklari (ders programi sirasiyla; ana
+    // buton ve ŞİMDİ karti da ilk acik rota duragini gosterir), sonra
+    // kullanicinin ekledikleri, en son oneri.
     generatedTasks.forEach((t) => {
       const pid = t.planTaskKey || buildPlanTaskKey(t);
       const isDone = Boolean(t.completed || isPlanDone(pid));
@@ -68,6 +55,22 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         rkind: t.rkind,
         source: "plan",
         routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
+      });
+    });
+
+    userTasks.forEach((t) => {
+      if (t.subject === "__calendar") return;
+      const subj = getSubjectByKey(t.subject);
+      const minutes = t.targetMinutes ?? t.target_minutes ?? (t.questionCount ? Math.round(t.questionCount * 1.5) : 30);
+      out.push({
+        id: t.id,
+        subject: t.subject,
+        label: t.topic || subj?.label || t.subject,
+        topic: t.topic || null,
+        count: t.questionCount ?? t.question_count ?? 0,
+        minutes,
+        completed: t.completed,
+        source: "user",
       });
     });
 

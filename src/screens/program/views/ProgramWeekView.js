@@ -8,6 +8,7 @@ import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useWeekProgram } from "../../../hooks/useWeekProgram";
 import { useDayRouteStops } from "../../../hooks/useDayRouteStops";
+import { subjectPaletteKey } from "../../../themes/subjectPalette";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
@@ -29,11 +30,17 @@ export function ProgramWeekView() {
   // "Durak ekle" ikisi de rotaya yazar) + o gun yapilmis kayitlar. Eskiden
   // yalniz kayitlar gorunuyordu; eklenen duraklar Program'da cikmiyordu.
   const dayRoute = useDayRouteStops(w.selectedDate);
+  // Kayit ile durak AYNI anahtarla eslesir (duraklar paletin ders anahtarini
+  // tasir, kayitlar ham anahtari). Duraga denk gelen kayit ayri satir olmaz,
+  // duragi "bitti" yapar.
   const dayItems = useMemo(() => {
     const logs = w.selectedDayLogs || [];
-    const doneKeys = new Set(dayRoute.stops.filter((st) => st.completed).map((st) => `${st.subjectKey}|${st.topic}`));
-    const extraLogs = logs.filter((l) => !doneKeys.has(`${l.subjectKey}|${l.topic}`));
-    return [...dayRoute.stops, ...extraLogs];
+    const keyOf = (subject, topic) => `${subjectPaletteKey(subject)}|${topic}`;
+    const logKeys = new Set(logs.map((l) => keyOf(l.subjectKey, l.topic)));
+    const stopKeys = new Set(dayRoute.stops.map((st) => keyOf(st.subjectKey, st.topic)));
+    const stops = dayRoute.stops.map((st) => (!st.completed && logKeys.has(keyOf(st.subjectKey, st.topic))
+      ? { ...st, completed: true, status: "done" } : st));
+    return [...stops, ...logs.filter((l) => !stopKeys.has(keyOf(l.subjectKey, l.topic)))];
   }, [dayRoute.stops, w.selectedDayLogs]);
 
   const selectedDateObj = useMemo(() => {

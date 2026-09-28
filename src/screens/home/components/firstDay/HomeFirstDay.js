@@ -7,23 +7,22 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { FirstDayRouteLine } from "./FirstDayRouteLine";
 import { FirstDayStop } from "./FirstDayStop";
 
-function routeSentence(daysUntilExam, totalStops) {
+// Gun sayisi zaten baslikta; cumle onu tekrarlamaz (eskiden "YKS'ye N gun"
+// iki satir ust uste yaziyordu).
+function routeSentence(totalStops) {
   const tail = "Bugün ilk durakla başlıyoruz; her durak geçtiğinde bu çizgi biraz daha uzuyor.";
-  const days = daysUntilExam == null ? null : Math.max(0, daysUntilExam);
-  if (days != null && totalStops) return `YKS'ye ${days} gün, rotanda ${totalStops} durak var. ${tail}`;
-  if (days != null) return `YKS'ye ${days} gün. ${tail}`;
-  if (totalStops) return `Rotanda ${totalStops} durak var. ${tail}`;
-  return tail;
+  return totalStops ? `Rotanda ${totalStops} durak var. ${tail}` : tail;
 }
 
 // İlk Gün: kayit ve deneme yokken Ana Sayfa. Hayalet "0", kesikli rota,
 // tek durak, "İlk durağa başla".
 export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShowHome }) {
   const C = useC();
-  const { daysUntilExam, stopCounts, nextTask, targetNet } = hero;
+  const { daysUntilExam, stopCounts, nextTask, targetNet, examType } = hero;
+  const exam = examType === "lgs" ? "LGS'ye" : "YKS'ye";
   const daysLine = daysUntilExam == null
     ? "İlk durağın hazır."
-    : `YKS'ye ${Math.max(0, daysUntilExam)} gün. İlk durağın hazır.`;
+    : `${exam} ${Math.max(0, daysUntilExam)} gün. İlk durağın hazır.`;
 
   return (
     <View>
@@ -37,7 +36,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
 
       <Animated.View>
         <Text style={[TYPOGRAPHY.body, s.summary, { color: C.text2 }]}>
-          {routeSentence(daysUntilExam, stopCounts?.total)}
+          {routeSentence(stopCounts?.total)}
         </Text>
         <FirstDayStop task={nextTask} />
       </Animated.View>

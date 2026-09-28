@@ -49,9 +49,11 @@ const WeekWidget = (props, environment) => {
   const compact = environment?.widgetFamily === "systemSmall";
 
   const plotH = compact ? 36 : 68;
-  const barW = compact ? 13 : 20;
-  const gap = compact ? 5 : 8;
-  const plotW = barW * 7 + gap * 6;
+  // Her gunun sutunu cubuktan genis: gun adi ve 3 haneli deger sigsin,
+  // cubuk sutunun ortasinda durur.
+  const barW = compact ? 13 : 16;
+  const colW = compact ? 18 : 24;
+  const plotW = colW * 7;
   const peak = Math.max(...q, goal, 1);
   const top = peak * 1.1;
   const hOf = (v) => (v > 0 ? Math.max(4, Math.min(plotH, (v / top) * plotH)) : 0);
@@ -65,10 +67,10 @@ const WeekWidget = (props, environment) => {
   const dayNo = todayIdx + 1;
   let sentence;
   if (solved === 0 && best < 0) sentence = "Haftanın ilk sorusunu çöz.";
-  else if (compact && best >= 0 && q[best] > solved) sentence = `${LONG[best]} ${q[best]}'di`;
+  else if (compact && best >= 0 && q[best] > solved) sentence = `En iyin ${LONG[best]}: ${q[best]}`;
   else if (remaining > 0) sentence = `${remaining} soru daha, hafta ${dayNo}${LOC[todayIdx]} ${metBefore + 1} olur`;
   else sentence = `Hedef tamam. Hafta ${dayNo}${LOC[todayIdx]} ${metBefore + 1}.`;
-  if (compact && remaining > 0 && !(best >= 0 && q[best] > solved)) sentence = `${remaining} soru daha`;
+  if (compact && remaining > 0 && (solved > 0 || best >= 0) && !(best >= 0 && q[best] > solved)) sentence = `${remaining} soru daha`;
 
   // Kesikli hedef cizgisi: kucuk parcalardan; Chart'in rule'u burada yok.
   const dashes = Array.from({ length: Math.floor(plotW / 6) }, (_, i) => (
@@ -83,7 +85,7 @@ const WeekWidget = (props, environment) => {
     const fill = isToday ? accentBright : goal > 0 && v >= goal ? accent : accentDeep;
     const showValue = !compact && !future && (v > 0 || isToday);
     return (
-      <VStack key={`b${i}`} spacing={2} modifiers={[frame({ width: barW, height: colH, alignment: "bottom" })]}>
+      <VStack key={`b${i}`} spacing={2} modifiers={[frame({ width: colW, height: colH, alignment: "bottom" })]}>
         {showValue ? (
           <Text modifiers={[font({ size: 11, weight: "semibold" }), foregroundStyle(isToday ? accentBright : text3)]}>
             {String(v)}
@@ -105,7 +107,7 @@ const WeekWidget = (props, environment) => {
   });
 
   const labels = SHORT.map((d, i) => (
-    <Text key={`l${i}`} modifiers={[frame({ width: barW }),
+    <Text key={`l${i}`} modifiers={[frame({ width: colW }),
       font({ size: 11, weight: i === todayIdx ? "bold" : "medium" }), foregroundStyle(i === todayIdx ? accentBright : text4)]}>
       {d}
     </Text>
@@ -114,7 +116,7 @@ const WeekWidget = (props, environment) => {
   const plot = (
     <VStack spacing={4}>
       <ZStack alignment="bottom">
-        <HStack alignment="bottom" spacing={gap}>{bars}</HStack>
+        <HStack alignment="bottom" spacing={0}>{bars}</HStack>
         {goalH > 0 ? (
           <VStack spacing={0} modifiers={[frame({ width: plotW, height: colH, alignment: "bottom" })]}>
             <HStack spacing={3}>{dashes}</HStack>
@@ -122,7 +124,7 @@ const WeekWidget = (props, environment) => {
           </VStack>
         ) : null}
       </ZStack>
-      <HStack spacing={gap}>{labels}</HStack>
+      <HStack spacing={0}>{labels}</HStack>
     </VStack>
   );
 

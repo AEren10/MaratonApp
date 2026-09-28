@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
@@ -7,25 +8,44 @@ import * as appStorage from "../lib/storage/appStorage";
 // anilmiyordu. Ana sayfada TEK ipucu gorunur; kapatilan ya da acilan bir
 // daha gelmez, sira bir sonrakine gecer. Kullanici en az bir gun
 // calismadan hic ipucu cikmaz: ilk gun ekran zaten yeterince dolu.
+//
+// Durum MODUL duzeyinde, tek kopya: Ana sayfa ile Widget rehberi ayni
+// kaydi gorur (rehberde kapatilan ipucu ana sayfadan hemen kalkar). Yazma
+// yuklemeyi bekler; eskiden rehber yukleme bitmeden bos kayitla yazip
+// daha once kapatilan ipuclarini geri getiriyordu.
 export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story" });
-const ORDER = [DISCOVER_TIPS.WIDGET, DISCOVER_TIPS.STORY];
+// Widget'lar yalniz iOS'ta var.
+const ORDER = Platform.OS === "ios" ? [DISCOVER_TIPS.WIDGET, DISCOVER_TIPS.STORY] : [DISCOVER_TIPS.STORY];
+
+let state = null;
+let loading = null;
+const listeners = new Set();
+const emit = () => listeners.forEach((fn) => fn(state));
+
+function load() {
+  if (!loading) {
+    loading = appStorage.getJson(STORAGE_KEYS.DISCOVER_TIPS, {})
+      .then((v) => { state = { ...(v || {}), ...(state || {}) }; emit(); })
+      .catch(() => { state = state || {}; emit(); });
+  }
+  return loading;
+}
 
 export function useDiscoverTips({ eligible = true } = {}) {
-  const [closed, setClosed] = useState(null);
+  const [closed, setClosed] = useState(state);
 
   useEffect(() => {
-    let alive = true;
-    appStorage.getJson(STORAGE_KEYS.DISCOVER_TIPS, {})
-      .then((v) => { if (alive) setClosed(v || {}); })
-      .catch(() => { if (alive) setClosed({}); });
-    return () => { alive = false; };
+    listeners.add(setClosed);
+    load();
+    return () => { listeners.delete(setClosed); };
   }, []);
 
   const close = useCallback((key) => {
-    setClosed((prev) => {
-      const next = { ...(prev || {}), [key]: Date.now() };
-      appStorage.setJson(STORAGE_KEYS.DISCOVER_TIPS, next).catch(() => {});
-      return next;
+    load().then(() => {
+      if (state?.[key]) return;
+      state = { ...(state || {}), [key]: Date.now() };
+      emit();
+      appStorage.setJson(STORAGE_KEYS.DISCOVER_TIPS, state).catch(() => {});
     });
   }, []);
 

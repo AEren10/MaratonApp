@@ -3,6 +3,7 @@ import { View, Text, Modal, StyleSheet } from "react-native";
 import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
 import { Icon, SparkBurst, AnimatedPressable, Button } from "../design";
 import { useC } from "../../contexts/ThemeContext";
+import { PREMIUM_ENABLED } from "../../constants/premium";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 
 export default function StreakMilestoneModal({ visible, milestone, onDismiss }) {
@@ -45,7 +46,7 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
           </Animated.View>
 
           {/* Premium gift */}
-          {milestone.premiumDays > 0 && (
+          {PREMIUM_ENABLED && milestone.premiumDays > 0 && (
             <Animated.Text entering={FadeIn.delay(380)} style={s.premium}>
               {milestone.premiumDays} gün Premium hediye!
             </Animated.Text>

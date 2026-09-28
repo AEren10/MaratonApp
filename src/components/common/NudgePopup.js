@@ -56,7 +56,16 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
     return () => clearTimeout(timer.current);
   }, [visible, nudge]);
 
+  // Parmak kartin uzerindeyken otomatik kapanma durur (kart parmagin altindan
+  // kaybolmasin); kucuk dikey kipirti dokunma sayilir, kaydirma degil.
+  const stopTimer = useCallback(() => clearTimeout(timer.current), []);
+  const restartTimer = useCallback(() => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => hide(onDismiss), AUTO_DISMISS_MS);
+  }, [hide, onDismiss]);
   const pan = Gesture.Pan()
+    .activeOffsetY([-8, 8])
+    .onStart(() => { scheduleOnRN(stopTimer); })
     .onUpdate((e) => {
       // Yukari serbest, asagi direncli (lastik etkisi).
       y.set(e.translationY < 0 ? e.translationY : e.translationY * 0.2);
@@ -69,6 +78,7 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
         }));
       } else {
         y.set(withSpring(0, { ...SNAP_BACK, velocity: e.velocityY }));
+        scheduleOnRN(restartTimer);
       }
     });
 

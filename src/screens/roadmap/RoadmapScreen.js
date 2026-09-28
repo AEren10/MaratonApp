@@ -77,7 +77,7 @@ export default function RoadmapScreen() {
                 <View style={s.links}>
                   {d.targetNet != null ? (
                     <RouteLinkRow
-                      title={`${d.targetNet} net ≈ hangi bölümler?`}
+                      title={`${d.examLabel ? `${d.examLabel} ` : ""}${d.targetNet} net ≈ hangi bölümler?`}
                       subtitle="Hedef netinin karşılığı · 24 devlet üniversitesi"
                       onPress={d.openThreshold}
                     />

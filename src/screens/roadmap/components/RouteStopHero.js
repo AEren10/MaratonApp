@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-export function RouteStopHero({ number, stop, color, subjectCompleted }) {
+export function RouteStopHero({ number, stop, color, subjectCompleted, part, when }) {
   const C = useC();
   const subject = stop.subjectLabel || stop.subject;
   const minutes = Math.round(Number(stop.cost?.minutes) || 0);
@@ -16,11 +16,14 @@ export function RouteStopHero({ number, stop, color, subjectCompleted }) {
         <Text style={[TYPOGRAPHY.label, { color }]}>{String(subject).toLocaleUpperCase("tr-TR")}</Text>
       </View>
       <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text }]}>{stop.topic}</Text>
+      {/* Eskiden her durakta sabit "Bugün 19:30" yaziyordu: duragin haftasi. */}
       <View style={s.metaRow}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Bugün 19:30</Text>
+        {part ? <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>{part}</Text> : null}
+        {part && when ? <View style={[s.dot, { backgroundColor: C.text5 }]} /> : null}
+        {when ? <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>{`${when} haftası`}</Text> : null}
+        {(part || when) && minutes > 0 ? <View style={[s.dot, { backgroundColor: C.text5 }]} /> : null}
         {minutes > 0 ? (
           <>
-            <View style={[s.dot, { backgroundColor: C.text5 }]} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>{minutes} dakika</Text>
           </>
         ) : null}
@@ -32,15 +35,8 @@ export function RouteStopHero({ number, stop, color, subjectCompleted }) {
             {subject} rotasında tamamlanan durak
           </Text>
         </View>
-        <View style={[s.tile, { backgroundColor: C.surface, borderColor: C.elev }]}>
-          <View style={s.momentumEyebrow}>
-            <View style={[s.square, { backgroundColor: C.up }]} />
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.up, flexShrink: 1 }]}>Bu haftanın ivmesi yükseldi</Text>
-          </View>
-          <Text style={[TYPOGRAPHY.micro, s.tileText, { color: C.text3 }]}>
-            Rota göstergesi · net tahmini değil
-          </Text>
-        </View>
+        {/* "Bu haftanın ivmesi yükseldi" herkese ayni sabit cumleydi; veriye
+            bagli degildi, kaldirildi. */}
       </View>
     </View>
   );
@@ -62,5 +58,4 @@ const s = StyleSheet.create({
     borderWidth: 1,
   },
   tileText: { marginTop: STEP.s1 / 2 },
-  momentumEyebrow: { flexDirection: "row", alignItems: "flex-start", gap: STEP.s1 },
 });

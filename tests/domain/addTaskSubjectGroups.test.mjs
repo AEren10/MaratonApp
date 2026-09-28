@@ -22,3 +22,13 @@ test("second tab holds only the student's field, no duplicate subjects", () => {
 test("LGS has a single group", () => {
   assert.deepEqual(addTaskSubjectGroups("lgs").map((g) => g.label), ["LGS"]);
 });
+
+test("trial keys from Analiz resolve to the student's subject, unknown keys to null", async () => {
+  const { resolveAddTaskSubject } = await import("../../src/screens/plan/addTaskOptions.js");
+  const say = addTaskSubjectGroups("tyt_ayt", "sayisal");
+  assert.equal(resolveAddTaskSubject(say, "tyt_matematik"), "matematik");
+  assert.equal(resolveAddTaskSubject(say, "ayt_matematik"), "ayt_matematik");
+  const ea = addTaskSubjectGroups("tyt_ayt", "ea");
+  assert.equal(resolveAddTaskSubject(ea, "ayt_matematik"), "ayt_ea_matematik");
+  assert.equal(resolveAddTaskSubject(say, "ayt_tarih1"), null);
+});

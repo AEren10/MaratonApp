@@ -9,6 +9,7 @@ import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useThresholdView } from "../../hooks/useThresholdView";
+import { useExam } from "../../contexts/ExamContext";
 import { ThresholdContributorRow } from "./components/ThresholdContributorRow";
 import { Press } from "../../components/design/Press";
 
@@ -21,12 +22,14 @@ import { Press } from "../../components/design/Press";
 // gerçek konu verisi gösteriliyor.
 // Bos hal NEDENINI soyler: eskiden deneme eksikken de "hedef gerekiyor"
 // diyordu, hedefi girmis kullanici ne yapacagini bilemiyordu.
-function emptyCopy({ targetNet, currentNet, examLabel }) {
+function emptyCopy({ targetNet, currentNet, examLabel, multi }) {
   const exam = examLabel || "deneme";
   if (targetNet == null) {
     return {
       title: `${examLabel ? `${examLabel} hedefin` : "Hedef netin"} eksik`,
-      body: "Hedeflerim'de TYT ve AYT netini ayrı ayrı gir; açığı burada göreceksin.",
+      body: multi
+        ? "Hedeflerim'de iki sınavın netini ayrı ayrı gir; açığı burada göreceksin."
+        : "Hedef netini Hedeflerim'den gir; açığı burada göreceksin.",
       primary: "Hedef Belirle",
     };
   }
@@ -40,6 +43,7 @@ function emptyCopy({ targetNet, currentNet, examLabel }) {
 export default function RankSimulatorScreen() {
   const navigation = useNavigation();
   const C = useC();
+  const { examType } = useExam();
   const { targetNet, examLabel, currentNet, daysUntilExam, gapResult, canAccess, requestAccess, loading } = useThresholdView();
 
   if (loading) {
@@ -61,7 +65,7 @@ export default function RankSimulatorScreen() {
         <Header onBack={() => navigation.goBack()} C={C} />
         <EmptyState
           eyebrow="NET EŞİĞİ"
-          {...emptyCopy({ targetNet, currentNet, examLabel })}
+          {...emptyCopy({ targetNet, currentNet, examLabel, multi: examType === "tyt_ayt" || examType === "dil" })}
           onPrimary={() => navigation.navigate(targetNet == null ? SCREENS.GOALS : SCREENS.TRIAL_ENTRY)}
           style={{ paddingHorizontal: GUTTER }}
         />
@@ -76,7 +80,7 @@ export default function RankSimulatorScreen() {
       <ScrollView contentContainerStyle={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s4 }} showsVerticalScrollIndicator={false}>
         <Animated.View style={{ marginTop: STEP.s2 }}>
           <Text style={{ ...TYPOGRAPHY.heading, color: C.text, maxWidth: 300 }}>
-            {targetNet} net nereye yeter?
+            {`${examLabel ? `${examLabel} ` : ""}${Math.round(targetNet)} net nereye yeter?`}
           </Text>
           <Text style={{ ...TYPOGRAPHY.body, color: C.text3, marginTop: STEP.s2, maxWidth: 306 }}>
             {gapResult?.reached
@@ -114,9 +118,10 @@ export default function RankSimulatorScreen() {
         ) : null}
 
         {!gapResult?.reached && gapResult && !gapResult.reachable ? (
-          <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3, borderColor: C.red }}>
-            <Text style={{ ...TYPOGRAPHY.caption, color: C.red }}>
-              Tüm konular ustalaşılsa bile ulaşılabilir en yüksek net ~{gapResult.maxPossibleNet}.
+          <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3, borderColor: C.warn }}>
+            <Text style={{ ...TYPOGRAPHY.caption, color: C.warn }}>
+              {/* maxPossibleNet EK net (konu kazanclarinin toplami), mutlak degil. */}
+              Tüm konular ustalaşılsa bile ulaşılabilir en yüksek net ~{Math.round(currentNet + gapResult.maxPossibleNet)}.
               Hedef netini gözden geçirmek isteyebilirsin.
             </Text>
           </Card>

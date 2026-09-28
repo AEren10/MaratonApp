@@ -6,6 +6,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { useClassSchedule } from "../../hooks/useClassSchedule";
+import { useRehearsalToday } from "../../hooks/useRehearsalToday";
 import { todayPlanStops } from "../../domain/program/todayStops";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
@@ -30,13 +31,19 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const planCtx = usePlanContext();
   const { tasks: userTasks, toggleTask: toggleUserTask, removeTask: removeUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
-  const { schedule } = useClassSchedule();
+  const { schedule, ready: scheduleReady } = useClassSchedule();
+  // Deneme provasi gunu baska durak acilmaz (Ana sayfa ile ayni kural).
+  const rehearsalToday = useRehearsalToday(user?.id);
 
   // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar (en fazla 3-4 durak)
   const generatedTasks = useMemo(() => {
+    if (rehearsalToday || !scheduleReady) return [];
     const today = todayTR();
     const doneToday = (stop) => {
-      const stopKey = stop.logicalStopKey ? buildPlanTaskKey(stop.subject, stop.topic) : null;
+      // Plan gorevinin anahtariyla AYNI: rota duraginda plan_<logicalStopKey>.
+      // Eskiden plan_<ders>_<konu> kuruluyordu; burada isaretlenen durak
+      // 'bugun bitti' sayilmiyordu.
+      const stopKey = buildPlanTaskKey(stop);
       return (
         (stop.lifecycleStatus === "completed" && (
           (stop.completedAt && dateKey(new Date(stop.completedAt)) === today) ||
@@ -62,7 +69,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
       routeActive: (studyRoute.currentWeek?.stops || []).length > 0,
     });
     return generated.tasks || [];
-  }, [planCtx, studyRoute.currentWeek, schedule, isDone]);
+  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady]);
 
   const detail = usePlanDetailTasks({
     C,
@@ -91,7 +98,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const hasTasks = detail.tasks.length > 0 && !forceEmpty;
   // Duraklar gelmeden bos gostermek kullaniciya yalan soyler: rota fetch'i
   // bitene kadar plan zaten bos gorunur.
-  const loading = !studyRoute.routeStopsLoaded;
+  const loading = !studyRoute.routeStopsLoaded || !scheduleReady;
 
   useEffect(() => {
     if (!generatedTasks.length) return;

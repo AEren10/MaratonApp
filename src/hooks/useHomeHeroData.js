@@ -3,10 +3,12 @@ import { useSelector } from "react-redux";
 import { selectWeeklyMinutesGoal } from "../store/slices/goalsSlice";
 import { useForecastTarget } from "./useForecastTarget";
 import { useExam } from "../contexts/ExamContext";
+import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { useStudyRoute } from "./useStudyRoute";
 import { getEffectiveRouteStopStatus, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { buildComebackRecommendation } from "../domain/route/comebackRecommendation";
 import { routeDeclaredPath } from "../domain/route/declaredPath";
+import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
@@ -14,7 +16,7 @@ import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetS
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
 export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops = [], weekLogs, previousQuestions = null, streak = 0 }) {
-  const { targetNet, baselineNet, daysUntilExam, examType, examDate } = useExam();
+  const { targetNet, targetNetTYT, baselineNet, daysUntilExam, examType, examDate } = useExam();
   const weeklyMinutesGoal = useSelector(selectWeeklyMinutesGoal);
   const {
     weeks,
@@ -99,8 +101,14 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
   // Olculmus tahmin (3 deneme) gelene kadar grafik bos kalmasin: kurulumda
   // kullanicinin KENDI girdigi baslangic ve hedef netini gosteririz.
   const declared = useMemo(
-    () => routeDeclaredPath({ baselineNet, targetNet, daysLeft: daysUntilExam, stopCount: stopCounts.total }),
-    [baselineNet, targetNet, daysUntilExam, stopCounts.total],
+    // Baslangic TYT seviye testinden: hedefi de TYT (toplam degil).
+    () => routeDeclaredPath({
+      baselineNet,
+      targetNet: baselineTarget({ examType, targetNet, targetNetTYT }).target,
+      daysLeft: daysUntilExam,
+      stopCount: stopCounts.total,
+    }),
+    [baselineNet, examType, targetNet, targetNetTYT, daysUntilExam, stopCounts.total],
   );
 
   // Beyan hattinin zaman ekseni: bugun -> sinav gunu. Olculmus grafikteki
@@ -121,7 +129,12 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     return js === 0 ? 6 : js - 1;
   }, []);
 
-  const nextTask = generatedTasks?.[0] || null;
+  // Bugun biten duraklar planin BASINDA duruyor; ana buton bitmis duragi
+  // gostermesin diye ilk ACIK gorev alinir (ŞİMDİ karti ile ayni kural).
+  const listKnown = Array.isArray(todayStops) && todayStops.length > 0;
+  const openIds = new Set((Array.isArray(todayStops) ? todayStops : []).filter((i) => !i.completed).map((i) => i.id));
+  const nextTask = (generatedTasks || []).find((task) => !task.completed
+    && (!listKnown || openIds.has(task.planTaskKey || buildPlanTaskKey(task)))) || null;
 
   // Ana ekran widget'lari ayni verilerden besleniyor. Burada yaziliyor cunku
   // veri burada doguyor; ekran dosyasinin haberi olmasina gerek yok.

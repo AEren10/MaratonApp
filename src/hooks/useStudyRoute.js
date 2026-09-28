@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { buildRoute, thresholdGap, computeDebt, capDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
 import { usePlanContext } from "./usePlanContext";
 import { useExam } from "../contexts/ExamContext";
-import { getSubjectsForExam } from "../data/curriculum";
+import { getSubjectsForExam, TYT_DERSLER } from "../data/curriculum";
 import { selectTrials } from "../store/slices/trialSlice";
 import { selectGoals } from "../store/slices/goalsSlice";
 import { startOfWeekTR } from "../lib/dateUtils";
@@ -52,9 +52,17 @@ function trialTypesForRoute(examType, field) {
   return ayt ? ["TYT", ayt, "AYT"] : ["TYT"];
 }
 
+const TYT_KEYS = new Set(TYT_DERSLER.map((s) => s.key));
+function examPool(pool, types = []) {
+  if (!types?.length || types.includes("LGS")) return pool;
+  const tyt = types.includes("TYT");
+  return pool.filter((s) => TYT_KEYS.has(s.key) === tyt);
+}
+
 function latestNetOf(trials = []) {
   const latest = [...trials].sort((a, b) => String(b?.date || b?.trial_date || "").localeCompare(String(a?.date || a?.trial_date || "")))[0];
-  const net = Number(latest?.totalNet ?? latest?.total_net);
+  // Tahminle ayni olcek: normalize net (varsa).
+  const net = Number(latest?.normalizedTotalNet ?? latest?.totalNet ?? latest?.total_net);
   return Number.isFinite(net) ? net : null;
 }
 
@@ -306,11 +314,13 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       currentNet,
       targetNet,
       route,
-      pool: examType ? getSubjectsForExam(examType, field) : [],
+      // Acik tek sinavin (tahminin sinavi) acigi: onu kapatacak konular da o
+      // sinavin derslerinden. Eskiden TYT acigi icin AYT konulari da geliyordu.
+      pool: examType ? examPool(getSubjectsForExam(examType, field), forecastProfile?.types) : [],
       progressByKey,
       trialType: examType === "lgs" ? "LGS" : undefined,
     }),
-    [route, examType, field, progressByKey],
+    [route, examType, field, progressByKey, forecastProfile?.types],
   );
 
   // Geçmiş planı sunucudan çek — borcun "planlanan" tarafı.

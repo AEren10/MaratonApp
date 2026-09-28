@@ -57,6 +57,6 @@ const s = StyleSheet.create({
     flexDirection: "row", alignItems: "flex-start", gap: STEP.s2,
     marginTop: STEP.s3, padding: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1,
   },
-  body: { flex: 1, gap: 3 },
+  body: { flex: 1, gap: STEP.s1 / 2 },
   action: { marginTop: STEP.s1, alignSelf: "flex-start" },
 });

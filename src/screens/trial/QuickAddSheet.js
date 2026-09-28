@@ -19,7 +19,7 @@ const DISMISS_DISTANCE = 90;
 
 export default function QuickAddSheet({ visible, onClose, onAction }) {
   const C = useC();
-  const { nextAction, startScreen, startParams } = useQuickAddActions();
+  const { nextAction, startScreen, startParams } = useQuickAddActions(visible);
   const translateY = useSharedValue(500);
   const sheetAnimStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
 
@@ -30,11 +30,24 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
     }
   }, [visible]);
 
-  const close = () => {
+  // Kapanis animasyonu BITINCE panel kapanir ve (varsa) secilen sayfa acilir.
+  // Eskiden sayfa ayri bir 220 ms zamanlayicisiyla aciliyordu ve kapanisla
+  // yarisiyordu; Modal hala acikken yeni ekran gelebiliyordu.
+  // iOS'ta RN Modal kapanirken yeni modal ekran sunulamayabiliyor: panel
+  // kapandiktan sonra kisa bir nefes.
+  const finish = (screen, params) => {
+    onClose();
+    if (screen) setTimeout(() => onAction(screen, params), 80);
+  };
+  const closeThen = (screen, params) => {
     "worklet";
     translateY.value = withTiming(500, { duration: 220 }, (finished) => {
-      if (finished) scheduleOnRN(onClose);
+      if (finished) scheduleOnRN(finish, screen, params);
     });
+  };
+  const close = () => {
+    "worklet";
+    closeThen(null, undefined);
   };
 
   const pan = Gesture.Pan()
@@ -51,10 +64,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
       }
     });
 
-  const go = (screen, params) => {
-    close();
-    setTimeout(() => onAction(screen, params), 220);
-  };
+  const go = (screen, params) => closeThen(screen, params);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={close}>
@@ -71,7 +81,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
 
           <View style={styles.headerRow}>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Ne kaydediyorsun?</Text>
-            <Press haptic="none" onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat">
+            <Press haptic="none" onPress={close} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat">
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Kapat</Text>
             </Press>
           </View>

@@ -6,13 +6,17 @@ import { useC } from "../../../contexts/ThemeContext";
 // Sadece gercek veri varken (hedef bolum + esik sonucu) gosteriliyor —
 // uydurma "haftalik yuk X duraktan Y'ye cikar" sayisi YOK, cunku rota
 // motorunda bu simulasyonu ureten bir kaynak yok.
-export function GoalBandNote({ value, targetDepartment, gapResult }) {
+// Acik SON DENEMEYE gore ve tek sinavin hedefiyle hesaplaniyor (TYT ise TYT);
+// cumle hangi sinav oldugunu soyler. Eskiden TYT+AYT toplamini yazip TYT
+// acigini soyluyordu ("130 net bandin icinde" yalniz TYT tutmusken).
+export function GoalBandNote({ examLabel, targetDepartment, gapResult }) {
   const C = useC();
   if (!targetDepartment || !gapResult) return null;
 
+  const exam = examLabel ? `${examLabel} ` : "";
   const text = gapResult.reached
-    ? `${value} net ${targetDepartment} bandının içinde.`
-    : `${targetDepartment} bandına ${gapResult.gap} net kaldı.`;
+    ? `Son ${exam}denemen ${targetDepartment} hedefine yetiyor.`
+    : `${targetDepartment} hedefine ${exam}${gapResult.gap} net kaldı.`;
 
   return (
     <View style={[styles.box, { backgroundColor: C.brandTint, borderColor: C.accent }]}>

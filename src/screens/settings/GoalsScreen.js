@@ -25,7 +25,7 @@ function GoalsContent() {
   const {
     isMulti, secondLabel, tytValue, decTyt, incTyt, aytValue, decAyt, incAyt,
     aytMin, aytMax, value, dec, inc, save, cancel, saving, pendingNote,
-    netLabel, currentNet, gapResult, targetDepartment, min, max,
+    netLabel, currentNet, gapResult, examLabel, targetDepartment, min, max,
     daily, decDaily, incDaily, dailyMin, dailyMax,
   } = useGoalNetEditor();
 
@@ -67,7 +67,7 @@ function GoalsContent() {
           />
         )}
 
-        <GoalBandNote value={value} targetDepartment={targetDepartment} gapResult={gapResult} />
+        <GoalBandNote examLabel={examLabel} targetDepartment={targetDepartment} gapResult={gapResult} />
 
         <Text style={[TYPOGRAPHY.label, styles.section, { color: C.text2 }]}>
           GÜNLÜK SORU HEDEFİ

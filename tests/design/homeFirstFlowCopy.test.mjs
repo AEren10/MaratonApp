@@ -16,9 +16,11 @@ test("home ilk gun state'i sinav baglamini saklamaz", () => {
   assert.doesNotMatch(screen, /HomeTopBar[^>]*daysUntilExam/, "ust cip gun sayacini tekrarlamaz");
   assert.doesNotMatch(screen, /h\.firstDay\s*\?\s*null/);
   // Dev "0 / hedef" kalkti (28 Eylul); ekran yolun cumlesiyle aciliyor.
-  assert.match(firstDay, /YKS'ye \$\{Math\.max\(0, daysUntilExam\)\} gün\. İlk durağın hazır\./);
+  // Sinav adi kullanicinin sinavindan (LGS'ye / YKS'ye); gun sayisi yalniz baslikta.
+  assert.match(firstDay, /\$\{exam\} \$\{Math\.max\(0, daysUntilExam\)\} gün\. İlk durağın hazır\./);
   assert.doesNotMatch(firstDay, /size="hero"/);
-  assert.match(firstDay, /YKS'ye \$\{days\} gün, rotanda \$\{totalStops\} durak var/);
+  assert.match(firstDay, /Rotanda \$\{totalStops\} durak var/);
+  assert.doesNotMatch(firstDay, /gün, rotanda/, "gun sayisi ikinci satirda tekrarlanmaz");
 });
 
 test("home rota kilidi eski pro paywall etiketi gibi gorunmez", () => {

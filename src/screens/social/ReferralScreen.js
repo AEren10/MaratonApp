@@ -117,9 +117,11 @@ export default function ReferralScreen() {
               kişiyi davet ettin
             </Text>
           </View>
-          <Text style={[TYPOGRAPHY.statSmall, { color: C.green }]}>
-            +{stats.referralCount * rewardDays} gün
-          </Text>
+          {PREMIUM_ENABLED ? (
+            <Text style={[TYPOGRAPHY.statSmall, { color: C.green }]}>
+              +{stats.referralCount * rewardDays} gün
+            </Text>
+          ) : null}
         </Animated.View>
 
         <Animated.View style={[s.inputCard, { backgroundColor: C.surface, borderColor: C.border }]}>
