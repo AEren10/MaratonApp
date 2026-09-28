@@ -73,6 +73,7 @@ export default function AnalysisScreen() {
                 latest={analysis.latest}
                 heroLine={analysis.heroLine}
                 heroLabels={analysis.heroLabels}
+                heroSeries={analysis.heroSeries}
               />
 
               <AnalysisNotebookLink

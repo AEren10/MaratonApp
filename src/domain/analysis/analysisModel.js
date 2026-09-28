@@ -44,6 +44,7 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
       latest: { net: null, trend: null, date: null, typeLabel: null },
       bars: [],
       heroLine: [],
+      heroSeries: [],
       heroLabels: [],
       line: [],
       lineLabels: [],
@@ -96,6 +97,17 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
     };
   });
   const heroLine = heroSlice.slice().reverse().map((trial) => trial.totalNet || 0);
+  // "Tumu"de TYT ve AYT ayni grafikte iki cizgi (kullanici istegi, 28 Eylul).
+  // Tarihleri farkli oldugu icin noktalar zaman eksenine yerlesir.
+  const typeSeries = (type) => sorted
+    .filter((trial) => trial.trialType === type)
+    .slice(0, 12)
+    .reverse()
+    .map((trial) => ({ t: new Date(trial.date).getTime(), v: trial.totalNet || 0 }))
+    .filter((point) => Number.isFinite(point.t));
+  const heroSeries = filter === "ALL"
+    ? ["TYT", "AYT"].map((type) => ({ key: type, points: typeSeries(type) })).filter((series) => series.points.length)
+    : [];
   const heroLabels = heroSlice.slice().reverse().map((trial) =>
     formatTrialDate(trial.date, { day: "numeric", month: "short" }),
   );
@@ -106,6 +118,7 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
     bars,
     heroLabels,
     heroLine,
+    heroSeries,
     history,
     latest: {
       net,
