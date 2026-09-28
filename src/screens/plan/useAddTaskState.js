@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUserTasks } from "../../hooks/useUserTasks";
 import { useAlert } from "../../contexts/AlertContext";
@@ -9,6 +9,7 @@ import { addStopToActiveRoute } from "../../supabase/routePlan";
 import * as H from "../../lib/haptics";
 import {
   addTaskSubjectGroups,
+  resolveAddTaskSubject,
   getTopicsForSubject,
   parseDurationMinutes,
 } from "./addTaskOptions";
@@ -23,21 +24,30 @@ export function useAddTaskState() {
   const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
   const groups = useMemo(() => addTaskSubjectGroups(examType, field), [examType, field]);
-  const paramKey = route.params?.subjectKey;
-  const [examTab, setExamTab] = useState(
-    () => groups.find((g) => g.subjects.some((x) => x.key === paramKey))?.key || groups[0].key,
-  );
+  const paramKey = resolveAddTaskSubject(groups, route.params?.subjectKey || route.params?.preSubject);
+  const tabOf = (key) => groups.find((g) => g.subjects.some((x) => x.key === key))?.key || groups[0].key;
+  const [examTab, setExamTab] = useState(() => tabOf(paramKey));
   const subjects = (groups.find((g) => g.key === examTab) || groups[0]).subjects;
 
-  const initialSubject = route.params?.subjectKey || subjects[0]?.key || "matematik";
-  const [subjectKey, setSubjectKey] = useState(initialSubject);
+  const [subjectKey, setSubjectKey] = useState(paramKey || subjects[0]?.key || "matematik");
   const currentTopics = useMemo(() => getTopicsForSubject(subjectKey), [subjectKey]);
 
   const [topicName, setTopicName] = useState(route.params?.topicName || currentTopics[0] || "Genel çalışma");
   const [durVal, setDurVal] = useState("50 dk");
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const selectedSubjectObj = subjects.find((s) => s.key === subjectKey) || subjects[0];
+  const selectedSubjectObj = groups.flatMap((g) => g.subjects).find((s) => s.key === subjectKey) || subjects[0];
+
+  // Sinav bilgisi ekran acildiktan sonra yuklenirse (ya da degisirse) secili
+  // ders yeni gruplarda olmayabilir: kayitta anahtar ile ad celismesin.
+  useEffect(() => {
+    if (groups.some((g) => g.subjects.some((x) => x.key === subjectKey))) return;
+    const next = paramKey || groups[0].subjects[0]?.key;
+    if (!next) return;
+    setExamTab(tabOf(next));
+    setSubjectKey(next);
+    setTopicName(getTopicsForSubject(next)[0] || "Genel çalışma");
+  }, [groups]);
 
   const handleExamChange = (nextTab) => {
     setExamTab(nextTab);

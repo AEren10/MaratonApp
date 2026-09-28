@@ -7,6 +7,7 @@ import {
   LGS_DERSLER,
   getAllSubjectsFlat,
 } from "../../data/curriculum.js";
+import { TRIAL_TO_CURRICULUM } from "../../domain/trial/trialKeyMap.js";
 
 const toOption = (s) => ({ key: s.key, name: s.label, topics: s.topics || [] });
 const AYT_BY_FIELD = { sayisal: AYT_SAY_DERSLER, ea: AYT_EA_DERSLER, sozel: AYT_SOZ_DERSLER };
@@ -21,6 +22,17 @@ export function addTaskSubjectGroups(examType, field) {
   if (examType === "dil") return [tyt, { key: "ydt", label: "YDT", subjects: YDT_DERSLER.map(toOption) }];
   const ayt = AYT_BY_FIELD[field] || AYT_SAY_DERSLER;
   return [tyt, { key: "ayt", label: "AYT", subjects: ayt.map(toOption) }];
+}
+
+// Disaridan gelen ders anahtari (Analiz'den "tyt_matematik", "ayt_tarih1"
+// gibi DENEME anahtarlari da gelebilir) bu gruplardaki bir ders anahtarina
+// cevrilir. Bulunamazsa null: yanlis bir dersin adiyla durak kaydedilmez.
+export function resolveAddTaskSubject(groups, key) {
+  if (!key) return null;
+  const all = groups.flatMap((g) => g.subjects);
+  if (all.some((s) => s.key === key)) return key;
+  const mapped = (TRIAL_TO_CURRICULUM[key] || []).find((k) => all.some((s) => s.key === k));
+  return mapped || null;
 }
 
 export function getTopicsForSubject(subjectKey) {
