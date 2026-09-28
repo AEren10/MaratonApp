@@ -10,23 +10,58 @@ import { subjectPaletteKey } from "../themes/subjectPalette";
 // Dersler palet anahtariyla tutulur (TYT ve AYT Matematik tek "matematik").
 export function useClassScheduleEditor() {
   const { schedule, loading, saving, save } = useClassSchedule();
-  const { subjects } = useCurriculum();
+  const { subjects, tytSubjects, aytSubjects, group1Label, group2Label } = useCurriculum();
   const [draft, setDraft] = useState(schedule);
   const [open, setOpen] = useState(null);
 
   useEffect(() => { setDraft(schedule); }, [schedule]);
 
-  const options = useMemo(() => {
+  const mapSubjectList = (list) => {
     const seen = new Map();
-    (subjects || []).forEach((sub) => {
-      const key = subjectPaletteKey(sub.key);
-      if (key && !seen.has(key)) seen.set(key, { key, label: sub.label || sub.name || key });
+    (list || []).forEach((sub) => {
+      const pKey = subjectPaletteKey(sub.key);
+      const key = sub.key || pKey;
+      if (key && !seen.has(key)) {
+        seen.set(key, { key, label: sub.label || sub.name || key, paletteKey: pKey });
+      }
     });
     return [...seen.values()];
-  }, [subjects]);
+  };
+
+  const tytOptions = useMemo(() => mapSubjectList(tytSubjects), [tytSubjects]);
+  const aytOptions = useMemo(() => mapSubjectList(aytSubjects), [aytSubjects]);
+
+  const options = useMemo(() => {
+    if (tytOptions.length === 0 && aytOptions.length === 0) {
+      return mapSubjectList(subjects);
+    }
+    const combined = [...tytOptions];
+    aytOptions.forEach((o) => {
+      if (!combined.some((existing) => existing.key === o.key)) {
+        combined.push(o);
+      }
+    });
+    return combined;
+  }, [tytOptions, aytOptions, subjects]);
 
   const labelOf = useCallback(
-    (key) => options.find((o) => o.key === subjectPaletteKey(key))?.label || key,
+    (key) => {
+      const match = options.find((o) => o.key === key || o.paletteKey === key);
+      return match?.label || key;
+    },
+    [options],
+  );
+
+  const displayLabelOf = useCallback(
+    (key) => {
+      const match = options.find((o) => o.key === key);
+      if (match) {
+        if (key.startsWith("ayt_")) return `AYT ${match.label}`;
+        return match.label;
+      }
+      const pMatch = options.find((o) => o.paletteKey === key);
+      return pMatch?.label || key;
+    },
     [options],
   );
 
@@ -57,7 +92,12 @@ export function useClassScheduleEditor() {
     saving,
     draft,
     options,
+    tytOptions,
+    aytOptions,
+    group1Label,
+    group2Label,
     labelOf,
+    displayLabelOf,
     open,
     toggleOpen: (weekday) => setOpen((cur) => (cur === weekday ? null : weekday)),
     toggleSubject,

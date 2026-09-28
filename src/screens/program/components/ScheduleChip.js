@@ -17,7 +17,7 @@ function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
       : { borderColor: C.bandEdge, backgroundColor: C.brandTint, color: color || C.text };
 
   const content = (
-    <Text style={[TYPOGRAPHY.micro, s.text, { color: look.color }]}>{label}</Text>
+    <Text style={[s.text, { color: look.color }]}>{label}</Text>
   );
   const box = [s.chip, { borderColor: look.borderColor, backgroundColor: look.backgroundColor, borderStyle: look.borderStyle }];
 
@@ -25,7 +25,7 @@ function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
   return (
     <Press haptic="none"
       onPress={onPress}
-      hitSlop={{ top: STEP.s1 - 1, bottom: STEP.s1 - 1 }}
+      hitSlop={{ top: 4, bottom: 4 }}
       accessibilityRole="button"
       accessibilityState={{ selected: Boolean(selected) }}
       style={[box]}
@@ -39,11 +39,16 @@ export default memo(ScheduleChip);
 
 const s = StyleSheet.create({
   chip: {
-    height: 30,
-    paddingHorizontal: STEP.s2 - 1,
+    height: 36,
+    paddingHorizontal: 10,
     borderRadius: SHAPE.chip,
     borderWidth: 1,
     justifyContent: "center",
+    alignItems: "center",
   },
-  text: { fontFamily: TYPOGRAPHY.metaSemiBold.fontFamily },
+  text: {
+    fontFamily: TYPOGRAPHY.captionMedium.fontFamily,
+    fontSize: 13,
+    lineHeight: 18,
+  },
 });
