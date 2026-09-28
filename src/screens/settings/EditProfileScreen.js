@@ -8,9 +8,12 @@ import { Icon } from "../../components/design";
 import { SettingsRow } from "./components/SettingsRow";
 import { EditProfileAvatar } from "./components/EditProfileAvatar";
 import { EditProfileField } from "./components/EditProfileField";
+import { EditProfileAccountSection } from "./components/EditProfileAccountSection";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { useEditProfileForm } from "../../hooks/useEditProfileForm";
 import { Press } from "../../components/design/Press";
 
@@ -86,7 +89,7 @@ export default function EditProfileScreen() {
                 <EditProfileField
                   label="HEDEF BÖLÜM"
                   value={targetDepartment}
-                  onPress={() => navigation.navigate(SCREENS.GOALS)}
+                  onPress={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)}
                 />
               </View>
             ) : null}
@@ -101,6 +104,10 @@ export default function EditProfileScreen() {
               onToggle={toggleLeaderboard}
             />
           </Animated.View>
+
+          <View style={{ marginHorizontal: -GUTTER }}>
+            <EditProfileAccountSection />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -112,6 +119,6 @@ const s = StyleSheet.create({
     flexDirection: "row", alignItems: "center",
     paddingHorizontal: GUTTER, paddingVertical: STEP.s1,
   },
-  save: { fontFamily: "Archivo_700", fontSize: 13 },
+  save: { ...TYPOGRAPHY.bodySemiBold },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 60 },
 });
