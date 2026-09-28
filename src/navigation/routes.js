@@ -32,6 +32,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.PROFILE]: { path: "profil", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true, tab: true },
 
   [SCREENS.PLAN_DETAIL]: { path: "plan", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
+  [SCREENS.WIDGET_GUIDE]: { path: "widget", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },
   [SCREENS.ADD_TASK]: { path: "plan/durak-ekle", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_STUDY]: { path: "konu/calis/:subjectKey?", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.ROUTE_PAUSE]: { path: "rota/ara-ver", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: false },

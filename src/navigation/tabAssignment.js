@@ -58,6 +58,7 @@ export const ROTA_STACK = [
   SCREENS.REVIEW_DONE,      // Tekrar bitti
   SCREENS.SWIPE_REVIEW,     // Hizli tekrar
   SCREENS.SHARE_CARD,       // Ozet -> Paylasim Karti
+  SCREENS.WIDGET_GUIDE,     // Ana sayfa kesif ipucu -> Widget rehberi
   SCREENS.GOALS,            // Bolum Esigi -> Hedef Duzenle
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari
@@ -127,6 +128,7 @@ export const PROFIL_STACK = [
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.CLASS_SCHEDULE,   // Ayarlar · Haftalik ders programi (paylasimli)
   SCREENS.SHARE_CARD,       // Paylasim Karti
+  SCREENS.WIDGET_GUIDE,     // Profil > Ana ekrana widget ekle
   SCREENS.MILESTONE,        // Kilometre Tasi
   SCREENS.LEVEL,            // Seviye
   SCREENS.EXAM_DAY_PLAN,    // (paylasimli) Profil satiri

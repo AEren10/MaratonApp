@@ -75,7 +75,8 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       out.push({
         id: "ai_suggestion",
         subject: aiSuggestion.subjectKey,
-        label: aiSuggestion.title,
+        // Ic skor ("Matematik (%20)") kullaniciya gosterilmez.
+        label: String(aiSuggestion.title || "").replace(/\s*\(%\d+\)/g, ""),
         count: 0,
         minutes: aiSuggestion.estimatedMinutes || 25,
         completed: isPlanDone("ai_suggestion"),
