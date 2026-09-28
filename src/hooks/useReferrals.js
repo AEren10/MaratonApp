@@ -5,6 +5,7 @@ import * as Clipboard from "expo-clipboard";
 import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { PREMIUM_ENABLED } from "../constants/premium";
 import * as appStorage from "../lib/storage/appStorage";
 import {
   getOrCreateReferralCode,
@@ -102,7 +103,12 @@ export function useReferrals({ routeCode, examType, showAlert } = {}) {
         });
         appStorage.remove(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
         await refreshPremium();
-        showAlert?.("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
+        showAlert?.(
+          "Başarılı!",
+          PREMIUM_ENABLED
+            ? `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`
+            : "Davet kodu uygulandı.",
+        );
         setFriendCode("");
       } else if (result.reason === "invalid") {
         showAlert?.("Geçersiz Kod", "Bu davet kodu bulunamadı.");
