@@ -11,7 +11,7 @@ export function SideStat({ stat, C, big = false }) {
         {stat.value}
         {stat.suffix ? <Text style={[TYPOGRAPHY.statSideUnit, { color: C.text3 }]}>{stat.suffix}</Text> : null}
       </Text>
-      <Text style={[TYPOGRAPHY.tableHead, { color: C.text3, marginTop: STEP.s1 }]}>{stat.label}</Text>
+      <Text style={[TYPOGRAPHY.tableHead, { color: C.text3, marginTop: STEP.s1 / 2 }]}>{stat.label}</Text>
     </View>
   );
 }
@@ -25,37 +25,45 @@ export function PeriodHero({ eyebrow, headline, hero, side = [] }) {
         <View style={styles.head}>
           {eyebrow ? <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>{eyebrow}</Text> : null}
           {headline ? (
-            <Text style={[TYPOGRAPHY.heroSentence, { color: C.text, marginTop: eyebrow ? STEP.s2 : 0 }]}>{headline}</Text>
+            <Text style={[TYPOGRAPHY.heroSentence, { color: C.text, marginTop: eyebrow ? STEP.s2 : 0 }]}>
+              {headline}
+            </Text>
           ) : null}
         </View>
       ) : null}
 
-      <View style={[styles.row, { borderColor: C.line }]}>
-        <View style={styles.flex}>
-          <Text style={[TYPOGRAPHY.statHeroTight, styles.heroValue, { color: C.text }]} allowFontScaling={false}>{hero.value}</Text>
-          <Text style={[TYPOGRAPHY.label, { color: C.text2, marginTop: STEP.s2 }]}>{hero.label}</Text>
+      {hero ? (
+        <View style={[styles.row, { borderColor: C.line }]}>
+          <View style={styles.flex}>
+            <Text style={[TYPOGRAPHY.statHeroTight, styles.heroValue, { color: C.text }]} allowFontScaling={false}>
+              {hero.value}
+            </Text>
+            <Text style={[TYPOGRAPHY.label, { color: C.text2, marginTop: STEP.s1 }]}>{hero.label}</Text>
+          </View>
+          {side.length > 0 ? (
+            <View style={styles.side}>
+              {side.map((stat) => <SideStat key={stat.label} stat={stat} C={C} />)}
+            </View>
+          ) : null}
         </View>
-        <View style={styles.side}>
-          {side.map((stat) => <SideStat key={stat.label} stat={stat} C={C} />)}
-        </View>
-      </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  head: { paddingHorizontal: GUTTER, maxWidth: 344 },
+  head: { paddingHorizontal: GUTTER, maxWidth: 360 },
   row: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: STEP.s3,
-    marginTop: STEP.s4,
+    marginTop: STEP.s3,
     marginHorizontal: GUTTER,
     paddingBottom: STEP.s3,
     borderBottomWidth: 1,
   },
   heroValue: { includeFontPadding: false },
   flex: { flex: 1, minWidth: 0 },
-  side: { gap: STEP.s3, alignItems: "flex-end" },
+  side: { gap: STEP.s2, alignItems: "flex-end", minWidth: 70 },
   sideStat: { alignItems: "flex-end" },
 });
