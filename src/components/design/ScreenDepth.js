@@ -17,8 +17,9 @@ import { subjectColorOf } from "../../themes/subjectPalette";
 // opak boyadigi icin altta kalsa gorunmezdi. Opaklik metin kontrastini
 // olculemeyecek kadar az degistirir.
 // Yalniz koyu tema: acik temada ayni isik yuzeyi kirletir.
-const TOP_LIGHT = 0.055;
-const SUBJECT_TINT = 0.1;
+// 0.055 -> 0.085 (kullanici: etkili, biraz artsin, 29 Eylul).
+const TOP_LIGHT = 0.085;
+const SUBJECT_TINT = 0.14;
 
 export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null }) {
   const C = useC();
@@ -32,7 +33,7 @@ export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null }) {
         <Defs>
           <LinearGradient id="sd-top" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={C.text} stopOpacity={TOP_LIGHT} />
-            <Stop offset="0.42" stopColor={C.text} stopOpacity={0} />
+            <Stop offset="0.5" stopColor={C.text} stopOpacity={0} />
           </LinearGradient>
           {tint ? (
             <RadialGradient id="sd-tint" cx="92%" cy="0%" r="70%">

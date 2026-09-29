@@ -128,6 +128,7 @@ function AuthStack() {
   return (
     <Stack.Navigator
       screenOptions={screenOptions}
+      screenLayout={DepthLayout}
       initialRouteName={intent === "register" ? SCREENS.REGISTER : SCREENS.LOGIN}
     >
       {AUTH_STACK_SCREENS.map(renderStackScreen)}
@@ -142,7 +143,7 @@ function AuthStack() {
 // yazamadan unmount olurdu. Kurtarma akışı bitene kadar bu yığın gösteriliyor.
 function RecoveryStack() {
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
       {RECOVERY_STACK_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
@@ -150,7 +151,7 @@ function RecoveryStack() {
 
 function SlidesStack() {
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
       {SLIDES_STACK_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
   );
@@ -166,6 +167,7 @@ function SetupStack() {
   return (
     <Stack.Navigator
       screenOptions={screenOptions}
+      screenLayout={DepthLayout}
       initialRouteName={resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP}
     >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
@@ -180,7 +182,7 @@ function AppStackInner() {
   useAccessEndedMoment();
 
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />
       {ROOT_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
