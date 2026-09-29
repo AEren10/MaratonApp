@@ -11,6 +11,13 @@ import { dateKey, startOfWeekTR } from "../../lib/dateUtils.js";
 // tempoya göre çizilir.
 
 const LOOKBACK_WEEKS = 4;
+// Kademeli yuklenme: plan gercek temponun biraz ustunde kurulur, beyan
+// edilen hedefe kadar. Rota ogrenciyi oldugu yerde tutan "kibar antrenor"
+// olmasin; ama tek seferde hedefe atlatip da kirmasin.
+export const STRETCH = 1.15;
+// Bos hafta temposu SIFIRLAMAZ, duzenliligi olcer: 4 haftanin 2'si bos
+// ise plan aktif haftalarin temposunun %62'sine iner (0.25 + 0.75 * 2/4).
+const consistencyFactor = (observed, total) => 0.25 + 0.75 * (observed / Math.max(1, total));
 const MS_WEEK = 7 * 86400000;
 
 /** Beyan edilen günlük hedeften haftalık taban kapasite. */
@@ -76,14 +83,27 @@ export function estimateWeeklyCapacity(
     return a.length % 2 ? a[i] : Math.round((a[i - 1] + a[i]) / 2);
   };
 
-  const questions = med(weeks.map((w) => w.q));
-  const minutes = med(weeks.map((w) => w.m));
-  const activeDays = med(weeks.map((w) => w.days.size));
+  // Eskiden bos haftalar da medyana giriyordu: 4 haftanin 2'si bossa tempo
+  // yariya, 3'u bossa sifira iniyordu (700 soruluk haftadan sonra "haftada
+  // 10 soru"). Tempo AKTIF haftalardan, duzenlilik ayri carpan.
+  const active = weeks.filter((week) => week.q > 0 || week.m > 0);
+  const consistency = consistencyFactor(observedWeeks, weeks.length);
+  const observedQ = Math.round(med(active.map((w) => w.q)) * consistency);
+  const observedM = Math.round(med(active.map((w) => w.m)) * consistency);
+  const activeDays = med(active.map((w) => w.days.size));
+
+  // Hedefe dogru esnet; hedefin ustunde calisan ogrenciyi yavaslatma.
+  const goalQ = Math.max(20, Math.round((Number(dailyQuestionGoal) || 20) * 7));
+  const plannedQ = observedQ >= goalQ ? observedQ : Math.min(goalQ, Math.round(observedQ * STRETCH));
+  const stretch = observedQ > 0 ? plannedQ / observedQ : 1;
 
   return {
-    questionsPerWeek: Math.max(10, questions),
-    minutesPerWeek: Math.max(30, minutes),
+    questionsPerWeek: Math.max(10, plannedQ),
+    minutesPerWeek: Math.max(30, Math.round(observedM * stretch)),
     activeDaysPerWeek: Math.max(1, Math.min(7, activeDays || 4)),
+    observedQuestionsPerWeek: observedQ,
+    goalQuestionsPerWeek: goalQ,
+    stretch: Math.round(stretch * 100) / 100,
     source: "history",
     confidence: observedWeeks >= 3 ? "high" : observedWeeks >= 2 ? "medium" : "low",
     weeksObserved: observedWeeks,
