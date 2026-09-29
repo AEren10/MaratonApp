@@ -176,3 +176,17 @@ export function buildChartSummary({ values = [], projection = [], target } = {})
 
   return `Net grafiği: ${nums.length} ölçüm, ${first} netten ${last} nete, ${yon}.${projeksiyon}${hedef}`;
 }
+
+// Net ekseninin kademeleri (50, 60, 70...). Rota ekrani ve ana sayfa ortak.
+export function netTicks(min, max, count = 4) {
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) return [];
+  const span = max - min;
+  const rawStep = span / (count - 1);
+  const step = rawStep > 15 ? 20 : rawStep > 7 ? 10 : 5;
+  const start = Math.ceil(min / step) * step;
+  const ticks = [];
+  for (let v = start; v <= max + step * 0.1 && ticks.length < count + 1; v += step) {
+    ticks.push(v);
+  }
+  return ticks.length >= 2 ? ticks : [Math.round(min), Math.round((min + max) / 2), Math.round(max)];
+}

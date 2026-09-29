@@ -8,7 +8,9 @@ import { forecastNetValue } from "../../lib/netForecast.js";
 // goremiyordu. Ilerlemeyi gormek motivasyonun kendisi: noktalar ikinci
 // denemeden itibaren cizilir, tahmin hazir olunca kesikli uc TAHMIN'e doner.
 
+// Ana sayfa slider'i son 8 deneme (bakis); Rota ekrani son 12 (analiz).
 export const NET_CHART_LIMIT = 8;
+export const NET_CHART_LIMIT_DETAIL = 12;
 // Gecmis genisligin payi; kalan pay sinava kadar olan zaman. Duz zaman
 // ekseninde 259 gunun yaninda 6 gunluk denemeler sol kenarda tek yigin
 // oluyordu.
@@ -68,8 +70,8 @@ export function netChartProjection({ series, forecast, target }) {
   return { mode: "none", projection: [], band: undefined, endLabel: null, projectedNet: null };
 }
 
-export function buildNetChart({ trials, types, forecast, target, minPoints = 2 }) {
-  const series = netChartSeries(trials, types);
+export function buildNetChart({ trials, types, forecast, target, minPoints = 2, limit = NET_CHART_LIMIT }) {
+  const series = netChartSeries(trials, types, limit);
   if (series.length < minPoints) return null;
   const proj = netChartProjection({ series, forecast, target });
   return {

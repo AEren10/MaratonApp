@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { RouteLineChart } from "../../../components/charts/RouteLineChart";
 import { useC } from "../../../contexts/ThemeContext";
-import { makeScale } from "../../../lib/routeChartPath";
+import { makeScale, netTicks } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { CHART_H, CHART_W, scaleOptions } from "../../../components/charts/chartStyle";
 
@@ -14,19 +14,6 @@ import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 // ayri pad/yukseklik yazilinca BUGUN ve HEDEF dugumden birkac px kayiyordu.
 const W = CHART_W;
 const TAG_W = 96;
-
-function makeTicks(min, max, count = 4) {
-  if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) return [];
-  const span = max - min;
-  const rawStep = span / (count - 1);
-  const step = rawStep > 15 ? 20 : rawStep > 7 ? 10 : 5;
-  const start = Math.ceil(min / step) * step;
-  const ticks = [];
-  for (let v = start; v <= max + step * 0.1 && ticks.length < count + 1; v += step) {
-    ticks.push(v);
-  }
-  return ticks.length >= 2 ? ticks : [Math.round(min), Math.round((min + max) / 2), Math.round(max)];
-}
 
 // Rota Detay grafigi: paylasilan RouteLineChart + tasarimin etiketleri
 // (NET, HEDEF, BUGUN, SINAV GUNU · N, sinav tarihi). Etiket konumu grafigin
@@ -55,7 +42,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
     const endValue = projection.length ? projection[projection.length - 1] : null;
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
-    const tickVals = makeTicks(minVal, maxVal);
+    const tickVals = netTicks(minVal, maxVal);
     const ticks = tickVals.map((v) => ({ val: v, y: sc.toY(v) }));
 
     return {
@@ -98,7 +85,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
             </Text>
           ))}
           {pos.targetY != null ? (
-            <Text style={[...tag, s.right, { top: pos.targetY * k - STEP.s3, color: C.targetLabel }]}>
+            <Text style={[...tag, s.targetTag, { top: pos.targetY * k - STEP.s3, color: C.targetLabel }]}>
               HEDEF {Math.round(target)}
             </Text>
           ) : null}
@@ -140,6 +127,8 @@ const s = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   right: { right: STEP.s1 },
+  // Sagda hedef bayragi duruyor; etiket cizginin sol basinda (tasarim).
+  targetTag: { left: 30 },
   center: { width: TAG_W, textAlign: "center" },
   bottom: { bottom: 0 },
 });

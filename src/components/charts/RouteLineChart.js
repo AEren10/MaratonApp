@@ -4,6 +4,8 @@ import Svg, { Path, Circle, Defs, LinearGradient, Stop, Text as SvgText } from "
 import { RouteChartLayers } from "./components/RouteChartLayers";
 import { DrawnPath } from "./components/DrawnPath";
 import { RouteChartNodes } from "./components/RouteChartNodes";
+import { RouteTargetFlag } from "./components/RouteTargetFlag";
+import { RouteTickLabels } from "./components/RouteTickLabels";
 import { useC } from "../../contexts/ThemeContext";
 import {
   makeScale,
@@ -14,9 +16,10 @@ import {
   buildBandPath,
   splitPastFuture,
   estimatePathLength,
+  netTicks,
 } from "../../lib/routeChartPath";
 import {
-  CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT,
+  CHART_W, CHART_H, PAD_RIGHT, EFFORT_PAD_LEFT,
   STROKE, LABEL, scaleOptions, axisAnchor,
 } from "./chartStyle";
 
@@ -26,14 +29,15 @@ const H = CHART_H;
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
 export const RouteLineChart = memo(function RouteLineChart({
   stops = [], todayIndex, projection = [], band, target, ticks, height = H,
-  todayLabel, endLabel, axisLabels, xs = null, mode = null,
+  todayLabel, endLabel, axisLabels, xs = null, mode = null, tickLabels = false,
 }) {
   const C = useC();
   const safeStops = Array.isArray(stops) ? stops : [];
   const safeProj = Array.isArray(projection) ? projection : [];
   const values = useMemo(() => safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0)), [safeStops]);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
-  const scaleOpts = { ...scaleOptions({ hasAxis }), xs };
+  // tickLabels: sol eksende net etiketleri (ana sayfa); yer acmak icin genis sol pay.
+  const scaleOpts = { ...scaleOptions({ hasAxis }), xs, ...(tickLabels ? { padLeft: EFFORT_PAD_LEFT } : {}) };
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
@@ -72,6 +76,7 @@ export const RouteLineChart = memo(function RouteLineChart({
   }, [points, pastPoints, futurePoints, band, sc, totalCount, scaleOpts.padBottom]);
 
   const targetY = typeof target === "number" ? sc.toY(target) : null;
+  const gridTicks = ticks || (tickLabels ? netTicks(sc.min, sc.max).map((v) => ({ val: v, y: sc.toY(v) })) : null);
   const todayPoint = pastPoints[pastPoints.length - 1];
   const endPoint = futurePoints[futurePoints.length - 1] || todayPoint;
 
@@ -86,13 +91,15 @@ export const RouteLineChart = memo(function RouteLineChart({
       <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
         <Defs>
           <LinearGradient id="hglow" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.14} />
+            <Stop offset="0" stopColor={C.accent} stopOpacity={0.32} />
+            <Stop offset="0.6" stopColor={C.accent} stopOpacity={0.08} />
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
           </LinearGradient>
         </Defs>
 
         <RouteChartLayers areaD={areaD} bandD={bandD} targetY={targetY} futD={futD}
-          width={W} padLeft={PAD_LEFT} padRight={PAD_RIGHT} ticks={ticks} C={C} />
+          width={W} padLeft={scaleOpts.padLeft} padRight={PAD_RIGHT} ticks={gridTicks} C={C} />
+        {tickLabels && gridTicks ? <RouteTickLabels ticks={gridTicks} x={scaleOpts.padLeft - 8} C={C} /> : null}
 
         {pastD ? (
           <DrawnPath
@@ -105,6 +112,8 @@ export const RouteLineChart = memo(function RouteLineChart({
             strokeLinejoin="round"
           />
         ) : null}
+
+        {targetY != null && safeProj.length ? <RouteTargetFlag x={endPoint?.x} y={targetY} C={C} /> : null}
 
         <RouteChartNodes
           pastPoints={pastPoints}

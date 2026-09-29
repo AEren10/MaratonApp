@@ -17,7 +17,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { useFeatureEntry } from "./useFeatureEntry";
 import { useForecastTarget } from "./useForecastTarget";
 import { baselineTarget } from "../domain/forecast/forecastTarget";
-import { buildNetChart } from "../domain/route/netChartData";
+import { buildNetChart, NET_CHART_LIMIT_DETAIL } from "../domain/route/netChartData";
 
 // Rota Detay ekraninin tum verisi ve aksiyonlari. Ekran yalniz render eder.
 export function useRouteDetail() {
@@ -44,7 +44,9 @@ export function useRouteDetail() {
   const view = useMemo(
     () => routeDetailForecast({
       forecast, targetNet, tempoScenarios,
-      netChart: buildNetChart({ trials: forecastTrials, types: forecastTypes, forecast, target: targetNet }),
+      netChart: buildNetChart({
+        trials: forecastTrials, types: forecastTypes, forecast, target: targetNet, limit: NET_CHART_LIMIT_DETAIL,
+      }),
     }),
     [forecast, targetNet, tempoScenarios, forecastTrials, forecastTypes],
   );

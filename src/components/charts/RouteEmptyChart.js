@@ -49,7 +49,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emp
       <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
         <Defs>
           <LinearGradient id="declaredGlow" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.13} />
+            <Stop offset="0" stopColor={C.accent} stopOpacity={0.3} />
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
           </LinearGradient>
         </Defs>

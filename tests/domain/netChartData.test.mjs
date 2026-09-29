@@ -41,3 +41,9 @@ test("eksen: gecmis %60, gelecek kalan pay; gelecek yoksa tum genislik", () => {
   assert.deepEqual(routeXs(3, 0), [0, 0.5, 1]);
   assert.deepEqual(routeXs(1, 1), [0, 1]);
 });
+
+test("Rota ekrani 12 denemeye kadar gosterir, ana sayfa 8", () => {
+  const trials = Array.from({ length: 14 }, (_, i) => tyt(`2026-08-${String(i + 1).padStart(2, "0")}`, 40 + i));
+  assert.equal(buildNetChart({ trials, types: ["TYT"], target: 78 }).stops.length, 8);
+  assert.equal(buildNetChart({ trials, types: ["TYT"], target: 78, limit: 12 }).stops.length, 12);
+});
