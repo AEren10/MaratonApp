@@ -4,6 +4,7 @@ import { GUTTER } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { HeroTrendChartSvg } from "./HeroTrendChartSvg";
 import { HeroMultiTrendChartSvg } from "./HeroMultiTrendChartSvg";
+import { AnalysisHeroChartEmpty } from "./AnalysisHeroChartEmpty";
 import { PendingSection } from "../../../components/common/PendingSection";
 
 function formatNumber(n) {
@@ -32,14 +33,22 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [], h
 
   const data = heroLine.length >= 2 ? heroLine : [latest.net];
   const netText = formatNumber(latest.net);
-  const trendVal = latest.trend ?? 0;
-  const isUp = trendVal >= 0;
+  const trendVal = latest.trend;
+  const isUp = trendVal != null && trendVal >= 0;
   const deltaColor = isUp ? C.up : C.down;
   const label = [latest.typeLabel, latest.date && String(latest.date).toUpperCase()]
     .filter(Boolean).join(" · ");
-  // "Tumu"de iki tur de varsa TYT kirmizi, AYT krem cizgiyle birlikte cizilir.
-  const multiSeries = heroSeries.map((line) => ({ ...line, color: line.key === "AYT" ? C.text : C.accent }));
+  // "Tumu"de iki tur de varsa TYT kirmizi, AYT krem, YDT mavi cizgiyle birlikte cizilir.
+  const multiSeries = heroSeries.map((line) => {
+    let color = C.accent;
+    if (line.key === "AYT") color = C.text;
+    else if (line.key === "YDT") color = C.subjects?.ydt_ingilizce || C.blue || C.text;
+    return { ...line, color };
+  });
   const multi = multiSeries.length > 1;
+  const hasChart = multi
+    ? multiSeries.some((s) => s.points?.length >= 2)
+    : data.length >= 2;
   const labels = heroLabels.length >= 3
     ? [heroLabels[0], heroLabels[Math.floor(heroLabels.length / 2)], heroLabels[heroLabels.length - 1]]
     : heroLabels;
@@ -50,13 +59,15 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [], h
 
       <View style={s.scoreRow}>
         <Text style={[s.bigScore, { color: C.text }]}>{netText}</Text>
-        <View style={s.deltaBadge}>
-          <Icon name={isUp ? "trendUp" : "trendDown"} size={14} color={deltaColor} sw={1.5} />
-          <Text style={[s.deltaText, { color: deltaColor }]}>{formatDelta(trendVal).replace("+", "")}</Text>
-        </View>
+        {trendVal != null ? (
+          <View style={s.deltaBadge}>
+            <Icon name={isUp ? "trendUp" : "trendDown"} size={14} color={deltaColor} sw={1.5} />
+            <Text style={[s.deltaText, { color: deltaColor }]}>{formatDelta(trendVal).replace("+", "")}</Text>
+          </View>
+        ) : null}
       </View>
 
-      {multi ? (
+      {multi && hasChart ? (
         <View style={s.legend}>
           {multiSeries.map((line) => (
             <View key={line.key} style={s.legendItem}>
@@ -68,9 +79,13 @@ export function AnalysisHeroScore({ C, latest, heroLine = [], heroLabels = [], h
       ) : null}
 
       <View style={s.chartContainer}>
-        {multi
-          ? <HeroMultiTrendChartSvg C={C} series={multiSeries} />
-          : <HeroTrendChartSvg C={C} data={data} labels={labels} />}
+        {hasChart ? (
+          multi
+            ? <HeroMultiTrendChartSvg C={C} series={multiSeries} />
+            : <HeroTrendChartSvg C={C} data={data} labels={labels} />
+        ) : (
+          <AnalysisHeroChartEmpty C={C} />
+        )}
       </View>
     </View>
   );
@@ -116,5 +131,6 @@ const s = StyleSheet.create({
     marginTop: 10,
     width: "100%",
     aspectRatio: 390 / 170,
+    justifyContent: "center",
   },
 });

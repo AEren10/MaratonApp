@@ -1,5 +1,4 @@
-// Domain-level trial catalog. UI code should import from here, not screens.
-import { C as DEFAULT_C } from "../../themes/tokens";
+import { C as DEFAULT_C } from "../../themes/tokens.js";
 
 // Ders renkleri palet ders haritasindan okunur. Eskiden eski takma
 // adlar (C.blue/C.teal...) kullaniliyordu; bunlar ders haritasina 1:1

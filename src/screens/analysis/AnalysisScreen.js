@@ -24,6 +24,7 @@ export default function AnalysisScreen() {
     analysis,
     changeFilter,
     dismissNudgePopup,
+    examType,
     filter,
     go,
     handleNudgeAction,
@@ -66,6 +67,7 @@ export default function AnalysisScreen() {
                 C={C}
                 value={filter}
                 onChange={changeFilter}
+                examType={examType}
               />
 
               <AnalysisHeroScore

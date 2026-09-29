@@ -1,4 +1,4 @@
-import { buildPalette, alpha } from "./palette";
+import { buildPalette, alpha } from "./palette.js";
 export { alpha };
 
 // Tasarim tokenlari.

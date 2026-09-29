@@ -1,20 +1,45 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, SHAPE } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
-const TABS = [
-  { key: "ALL", label: "Tümü" },
-  { key: "TYT", label: "TYT" },
-  { key: "AYT", label: "AYT" },
-  { key: "BRANCH", label: "Branş" },
-];
+function getTabsForExam(examType) {
+  if (examType === "dil") {
+    return [
+      { key: "ALL", label: "Tümü" },
+      { key: "TYT", label: "TYT" },
+      { key: "YDT", label: "YDT" },
+      { key: "BRANCH", label: "Branş" },
+    ];
+  }
+  if (examType === "lgs") {
+    return [
+      { key: "ALL", label: "Tümü" },
+      { key: "LGS", label: "LGS" },
+      { key: "BRANCH", label: "Branş" },
+    ];
+  }
+  if (examType === "tyt") {
+    return [
+      { key: "ALL", label: "Tümü" },
+      { key: "TYT", label: "TYT" },
+      { key: "BRANCH", label: "Branş" },
+    ];
+  }
+  return [
+    { key: "ALL", label: "Tümü" },
+    { key: "TYT", label: "TYT" },
+    { key: "AYT", label: "AYT" },
+    { key: "BRANCH", label: "Branş" },
+  ];
+}
 
-export function AnalysisFilterPills({ C, value, onChange }) {
+export function AnalysisFilterPills({ C, value, onChange, examType }) {
+  const tabs = useMemo(() => getTabsForExam(examType), [examType]);
   return (
     <View style={s.wrap}>
       <View style={[s.container, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const active = value === tab.key;
           return (
             <Press haptic="none"

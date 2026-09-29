@@ -78,6 +78,7 @@ export function useAnalysisController(C) {
   return {
     analysis,
     changeFilter,
+    examType,
     filter,
     go,
     handleNudgeAction,

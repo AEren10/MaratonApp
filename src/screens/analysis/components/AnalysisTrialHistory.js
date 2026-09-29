@@ -24,9 +24,9 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
     type: t.trialType || "TYT",
     date: t.date || "",
     net: t.net || 0,
-    trend: t.trend || 0,
+    trend: t.trend,
     latest: i === 0,
-    mood: (t.trend || 0) >= 0 ? "İYİ" : "ZOR",
+    mood: t.trend == null ? null : (t.trend >= 0 ? "İYİ" : "ZOR"),
     trial: t,
   }));
 

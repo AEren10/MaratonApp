@@ -16,7 +16,8 @@ function formatDelta(n) {
 }
 
 export function TrialHistoryItem({ C, item, onPress }) {
-  const isUp = item.trend >= 0;
+  const hasTrend = item.trend != null;
+  const isUp = hasTrend && item.trend >= 0;
   const dc = isUp ? C.up : C.down;
 
   return (
@@ -39,14 +40,16 @@ export function TrialHistoryItem({ C, item, onPress }) {
 
         <View style={s.scoreRow}>
           <Text style={[s.netText, { color: C.text }]}>{formatNum(item.net)}</Text>
-          <View style={s.deltaWrap}>
-            <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={1.5} />
-            <Text style={[s.deltaText, { color: dc }]}>{formatDelta(item.trend)}</Text>
-          </View>
+          {hasTrend && (
+            <View style={s.deltaWrap}>
+              <Icon name={isUp ? "trendUp" : "trendDown"} size={10} color={dc} sw={1.5} />
+              <Text style={[s.deltaText, { color: dc }]}>{formatDelta(item.trend)}</Text>
+            </View>
+          )}
         </View>
       </View>
 
-      <Text style={[s.moodText, { color: C.text3 }]}>{item.mood}</Text>
+      {item.mood ? <Text style={[s.moodText, { color: C.text3 }]}>{item.mood}</Text> : null}
       <Icon name="chevR" size={14} color={C.text3} />
     </Press>
   );
