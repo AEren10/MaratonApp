@@ -16,7 +16,6 @@ const MESSAGE = {
   placed: "Instagram'a gönderildi.",
   opened: "Etiket panoda. Instagram'da basılı tut, Yapıştır'a dokun.",
   copied: "Etiket panoya kopyalandı. Instagram'ı açıp yapıştırabilirsin.",
-  saved: "Galeriye kaydedildi.",
   failed: "Etiket hazırlanamadı. Tekrar dener misin?",
 };
 
@@ -32,12 +31,6 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
   const quiet = emphasis === "quiet";
   const photoMode = s.selected?.background === STORY_BG.FOTO;
   const bgUri = s.photo?.uri || photoUri;
-  // Galeriye kayit: fotografli varyantta once fotograf, sonra bir kare bekle
-  // (yeni zemin cizilsin), sonra yakala.
-  const save = async () => {
-    if (photoMode && !bgUri && !(await s.pickPhoto())) return;
-    setTimeout(() => s.save(shotRef), 60);
-  };
 
   if (s.loading || !s.selected) return null;
 
@@ -73,12 +66,20 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
         })}
       </ScrollView>
 
+      {/* Strava modeli: fotograf burada secilir ya da o an cekilir, Instagram'a
+          zemin olarak gider; veriler ustune seffaf etiket olarak biner. */}
       {photoMode ? (
-        <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto(); }} accessibilityRole="button" style={st.secondary}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>
-            {bgUri ? "Fotoğrafı değiştir" : "Fotoğrafını seç"}
-          </Text>
-        </Press>
+        <View style={st.photoRow}>
+          <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto("library"); }} accessibilityRole="button" style={st.secondary}>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>
+              {bgUri ? "Fotoğrafı değiştir" : "Galeriden seç"}
+            </Text>
+          </Press>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>·</Text>
+          <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto("camera"); }} accessibilityRole="button" style={st.secondary}>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>Kamerayla çek</Text>
+          </Press>
+        </View>
       ) : null}
 
       <Press haptic="none"
@@ -99,16 +100,6 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
         </Text>
       </Press>
 
-      <Press haptic="none"
-        onPress={() => { H.tap(); save(); }}
-        disabled={s.busy}
-        accessibilityRole="button"
-        style={st.secondary}
-      >
-        <Text style={[TYPOGRAPHY.captionMedium, st.secondaryText, { color: C.text2 }]}>
-          Galeriye kaydet
-        </Text>
-      </Press>
 
       <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text3 }]}>
         {s.result ? MESSAGE[s.result] : photoMode
@@ -137,7 +128,7 @@ const st = StyleSheet.create({
     borderRadius: SHAPE.button, alignItems: "center", justifyContent: "center",
   },
   secondary: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
-  secondaryText: { textDecorationLine: "underline" },
+  photoRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: STEP.s2 },
   note: { textAlign: "center", paddingHorizontal: STEP.s4, marginTop: STEP.s1 },
   offscreen: { position: "absolute", top: 0, left: -10000 },
 });

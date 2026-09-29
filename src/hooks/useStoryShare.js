@@ -109,7 +109,7 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     result,
     clearResult: () => setResult(null),
     photo,
-    pickPhoto: async () => { const p = await pickStoryPhoto(); if (p) setPhoto(p); return p; },
+    pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
     // Fotografli varyant: fotograf yoksa once sectirilir; etiket seffaf gider,
     // fotograf Instagram'a arka plan olarak. Marka varyanti oldugu gibi.
     share: async (overlayRef, fullRef) => {
