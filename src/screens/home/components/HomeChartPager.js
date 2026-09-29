@@ -34,7 +34,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   // Gorunen sayfalar uzerinden sayilir: `pages` icinde kosullu (null) bir
   // sayfa varsa indeks ile anahtar kayar ve yanlis sayfa bildirilir.
   const visible = pages.filter(Boolean);
-  const hasCaption = visible.some((page) => page.caption);
+  const hasFooter = visible.some((page) => page.caption || page.renderFooter);
 
   // Yan etki setIndex guncelleyicisinin ICINDE olmamali: React guncelleyiciyi
   // iki kez calistirabilir ve onPageChange iki kez tetiklenir.
@@ -50,10 +50,14 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   const body = (page) => (
     <>
       {page.render()}
-      {hasCaption ? (
-        <Text style={[TYPOGRAPHY.body, s.caption, { color: C.text2 }]}>
-          {page.caption || ""}
-        </Text>
+      {page.renderFooter ? (
+        page.renderFooter()
+      ) : hasFooter ? (
+        <View style={s.captionWrap}>
+          <Text style={[TYPOGRAPHY.body, s.caption, { color: C.text2 }]}>
+            {page.caption || ""}
+          </Text>
+        </View>
       ) : null}
     </>
   );
@@ -110,8 +114,13 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
 }
 
 const s = StyleSheet.create({
-  // Cumle yoksa da satir yer tutar: iki sayfa ayni yukseklikte kalsin.
-  caption: { marginTop: STEP.s1, minHeight: TYPOGRAPHY.body.lineHeight },
+  // Cumle yoksa da satir yer tutar: sayfalar ayni yukseklikte kalsin.
+  captionWrap: {
+    marginTop: STEP.s2,
+    minHeight: STEP.s5,
+    justifyContent: "center",
+  },
+  caption: { minHeight: TYPOGRAPHY.body.lineHeight },
   dots: {
     flexDirection: "row", justifyContent: "center", alignItems: "center",
     gap: STEP.s1 - 2, marginTop: STEP.s1,

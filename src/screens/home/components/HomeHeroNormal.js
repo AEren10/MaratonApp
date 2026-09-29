@@ -7,6 +7,7 @@ import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeCTAButton } from "./HomeCTAButton";
 import { HomeChartPager } from "./HomeChartPager";
+import { HomeWeeklyMetrics } from "./HomeWeeklyMetrics";
 import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart";
 import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../../../constants/screens";
@@ -44,8 +45,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
     {
       key: "week",
       a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Çalışma geçmişini aç` : "Çalışma geçmişini aç",
-      caption: weeklyEffort?.summary || null,
       render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
+      renderFooter: () => <HomeWeeklyMetrics weeklyEffort={weeklyEffort} />,
     },
     {
       key: "route",
