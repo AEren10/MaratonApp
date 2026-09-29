@@ -14,6 +14,7 @@ const REASON_TEXT = {
   WRONG_BACKLOG: "Yanlış defterinde bu konudan bekleyen sorular var.",
   WEEKLY_REVIEW: "Haftanın konularını bir arada tekrar eder; kalıcılığı artırır.",
   DAILY_HABIT: "Her gün yapmayı seçtiğin rutin.",
+  TARGET_KEEP: "Hedef netine ulaştın; şimdi kazandığını korumak en kârlı iş.",
 };
 
 const RISK_TRACE_TEXT = {
@@ -110,6 +111,12 @@ function reasonTextFor(stop = {}) {
     const names = (components.missingPrerequisites || []).map((ref) => String(ref).split(":").pop());
     if (names.length) return `${names.join(", ")} bu konunun temeli; o yüzden önce onlar, bu konu sonra.`;
     return REASON_TEXT.PREREQUISITE;
+  }
+  if (reasonCode === "WEEKLY_REVIEW") {
+    const topics = components.weeklyTopics || stop.weeklyTopics || [];
+    return topics.length
+      ? `Bu haftanın konuları bir arada: ${topics.join(", ")}. Karışık çözmek kalıcılığı artırır.`
+      : REASON_TEXT.WEEKLY_REVIEW;
   }
   if (reasonCode === "WRONG_REVIEW") {
     const due = Number(components.wrongsDue) || 0;

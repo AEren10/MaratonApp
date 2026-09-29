@@ -9,6 +9,7 @@ const REASON_LABELS = Object.freeze({
   WRONG_BACKLOG: "Bekleyen yanlış",
   WEEKLY_REVIEW: "Hafta tekrarı",
   DAILY_HABIT: "Günlük rutin",
+  TARGET_KEEP: "Hedefi koru",
 });
 
 function chip(key, label, tone) {

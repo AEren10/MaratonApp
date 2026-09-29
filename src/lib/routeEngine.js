@@ -10,6 +10,7 @@ import { startOfWeekTR, dateKey } from "./dateUtils.js";
 import { personalPace, minutesPerQuestionFor } from "../domain/route/personalPace.js";
 import { missingPrerequisites } from "../domain/route/prerequisites.js";
 import { wrongBoost, wrongReviewQuestions, WRONG_REVIEW_MIN_DUE } from "../domain/route/wrongSignal.js";
+import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -44,6 +45,7 @@ export function buildRoute({
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
+  targetReached = false,     // son net hedefte: hedefi koruma modu
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
@@ -214,10 +216,21 @@ export function buildRoute({
     }
   }
 
+  // HEDEFI KORUMA MODU: hedef nete ulasan ogrenci icin en kiymetli is
+  // kazanileni korumak. Tekrar ve yanlis duraklari one, yeni konu geriye.
+  if (targetReached) {
+    for (const item of items) {
+      item.score = Math.round(item.score * (item.isReview ? 1.6 : 0.8) * 100) / 100;
+      if (item.isReview && !item.reasonCodes.includes("TARGET_KEEP")) item.reasonCodes.push("TARGET_KEEP");
+    }
+  }
+
   items.sort((a, b) => b.score - a.score);
 
   const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft, { daysLeft });
-  const stamped = stampWeekDates(weeks, now);
+  const stamped = addWeeklyReviews(stampWeekDates(weeks, now), {
+    minutesPerQuestion: (key) => minutesPerQuestionFor(pace, key, 1) ?? 1.6,
+  });
   const scheduled = attachStopInsights(decorateScheduledRoute(stamped, { examType }));
   const revision = createRouteRevision({
     weeks: scheduled,
@@ -247,6 +260,7 @@ export function buildRoute({
   return {
     capacity,
     pace,
+    mode: targetReached ? "keep" : "reach",
     weeksLeft,
     weeks: scheduled,
     revision,

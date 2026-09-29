@@ -33,6 +33,7 @@ import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
+import { useForecastTarget } from "./useForecastTarget";
 
 const MIN_PER_QUESTION = 1.5;
 
@@ -245,6 +246,19 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       .map(([key]) => key);
   }, [allowedTrialTypes, trials]);
 
+  const forecastCandidate = useMemo(
+    () => pickForecastCandidate(forecastProfilesForRoute(examType, field), trials, examDate),
+    [examDate, examType, field, trials],
+  );
+  // Hedefi koruma modu: tahminin sinavindaki SON net hedefe ulastiysa rota
+  // yeni konu kovalamak yerine tekrari ve yanlislari one alir.
+  const { target: forecastTargetNet } = useForecastTarget(forecastCandidate?.types || []);
+  const targetReached = useMemo(() => {
+    const latest = latestNetOf(forecastCandidate?.trials || []);
+    return Number.isFinite(latest) && Number.isFinite(forecastTargetNet) && forecastTargetNet > 0
+      && latest >= forecastTargetNet;
+  }, [forecastCandidate, forecastTargetNet]);
+
   // Denemeden orantili ders agirligi: ne kadar gerideyse o kadar one.
   const subjectWeakness = useMemo(() => subjectWeaknessFactors(
     (trials || []).filter((trial) => allowedTrialTypes.includes(trial.trialType)),
@@ -261,11 +275,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     weakSubjectKeys.join(","),
     JSON.stringify(subjectWeakness),
     wrongsHash,
+    targetReached ? "keep" : "",
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -277,10 +292,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     weakSubjectKeys,
     subjectWeakness,
     wrongsByTopic,
+    targetReached,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, wrongsByTopic, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
@@ -309,10 +325,6 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     };
   }, [computedRoute, persistedStops]);
 
-  const forecastCandidate = useMemo(
-    () => pickForecastCandidate(forecastProfilesForRoute(examType, field), trials, examDate),
-    [examDate, examType, field, trials],
-  );
   const forecastProfile = forecastCandidate;
   const forecastTrials = forecastCandidate?.trials || [];
   const forecastMax = forecastProfile?.max ?? 120;
