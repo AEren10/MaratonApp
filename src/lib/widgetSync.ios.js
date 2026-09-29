@@ -36,7 +36,25 @@ function timelineEntries(props, days = 7) {
   return entries;
 }
 
-function push(key, widget, snapshot, { timeline = false } = {}) {
+// Native taraf props'u UserDefaults'a yaziyor. Icinde null/undefined kalirsa
+// NSNull property-list degil: iOS NSInvalidArgumentException atar ve
+// uygulama JS'e donmeden kapanir (try/catch yakalayamaz). Bos alanlar
+// yazmadan once atilir; widget eksik alani zaten bos sayiyor.
+function plistSafe(value) {
+  if (Array.isArray(value)) return value.filter((v) => v != null).map(plistSafe);
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v == null || (typeof v === "number" && !Number.isFinite(v))) continue;
+      out[k] = plistSafe(v);
+    }
+    return out;
+  }
+  return value;
+}
+
+function push(key, widget, rawSnapshot, { timeline = false } = {}) {
+  const snapshot = plistSafe(rawSnapshot);
   // Timeline'li widget'ta ayni veri bile ertesi gun yeniden yazilmali.
   const serialized = JSON.stringify(snapshot) + (timeline ? mondayKey() + new Date().getDate() : "");
   if (serialized === last[key]) return false;
