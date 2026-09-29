@@ -6,7 +6,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
 import { useTodayKey } from "./useTodayKey";
 import { todayPlanStops } from "../domain/program/todayStops";
-import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 import { useHabitStops } from "./useHabitStops";
 import { dateKey, todayTR } from "../lib/dateUtils";
 import { useHomeWeekLogs } from "./useHomeWeekLogs";
@@ -71,7 +71,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
   );
 
   const { schedule, ready: scheduleReady } = useClassSchedule();
-  const rhythm = useWeekdayRhythm();
+  const dayOpts = useDayPlanOptions();
   const habitStops = useHabitStops(todayTR());
   // Acik kalan ana sayfada gece yarisindan sonra dunun plani kalmasin.
   const todayKey = useTodayKey();
@@ -86,7 +86,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       : generateDailyPlan({
         ...planCtx,
         // Gunluk rutin (paragraf, problem...) listenin basinda: isinma.
-        routeWeekStops: [...habitStops, ...todayPlanStops(routeCurrentWeek, schedule, todayTR(), { isCompletedToday: completedToday, rhythm })],
+        routeWeekStops: [...habitStops, ...todayPlanStops(routeCurrentWeek, schedule, todayTR(), { isCompletedToday: completedToday, ...dayOpts })],
         routeActive: (routeCurrentWeek?.stops || []).length > 0,
       });
     const estHours = generated.estimatedMinutes >= 60
@@ -102,7 +102,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, rhythm, habitStops]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, dayOpts, habitStops]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),

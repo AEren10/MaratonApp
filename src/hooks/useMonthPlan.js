@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
 import { assignRouteStopsToDates } from "../domain/program/assignStopsToDays";
-import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 import { buildMonthPlan } from "../domain/program/monthPlan";
 import { weekdayIndex } from "../domain/program/dayKeys";
 import { MONTHS_TR } from "../lib/trWords";
@@ -21,8 +21,8 @@ export function useMonthPlan(initialOffset = 0) {
   const year = target.getFullYear();
   const month = target.getMonth();
 
-  const rhythm = useWeekdayRhythm();
-  const byDate = useMemo(() => assignRouteStopsToDates(weeks || [], schedule, { rhythm }), [weeks, schedule, rhythm]);
+  const dayOpts = useDayPlanOptions();
+  const byDate = useMemo(() => assignRouteStopsToDates(weeks || [], schedule, dayOpts), [weeks, schedule, dayOpts]);
   const plan = useMemo(() => buildMonthPlan(byDate, year, month), [byDate, year, month]);
   const leading = plan.days.length ? weekdayIndex(plan.days[0].key) : 0;
 

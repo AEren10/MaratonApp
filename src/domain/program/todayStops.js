@@ -21,14 +21,14 @@ export function stopsForDate(week, schedule, dateKey, opts = {}) {
   if (!week || !dateKey) return [];
   const monday = mondayOf(week.weekStart ? String(week.weekStart).slice(0, 10) : dateKey);
   if (mondayOf(dateKey) !== monday) return [];
-  return assignWeekStops(week.stops || [], schedule, opts)[weekdayIndex(dateKey)] || [];
+  return assignWeekStops(week.stops || [], schedule, { ...opts, monday })[weekdayIndex(dateKey)] || [];
 }
 
-export function todayPlanStops(week, schedule, todayKey, { isCompletedToday = () => false, rhythm = null } = {}) {
+export function todayPlanStops(week, schedule, todayKey, { isCompletedToday = () => false, rhythm = null, moves = null } = {}) {
   if (!week || !todayKey) return [];
   const monday = mondayOf(week.weekStart ? String(week.weekStart).slice(0, 10) : todayKey);
   if (mondayOf(todayKey) !== monday) return [];
-  const days = assignWeekStops(week.stops || [], schedule, { rhythm });
+  const days = assignWeekStops(week.stops || [], schedule, { rhythm, moves, monday });
   const todayIdx = weekdayIndex(todayKey);
   const own = days[todayIdx] || [];
   const ownSet = new Set(own);

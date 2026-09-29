@@ -12,6 +12,8 @@ import { addDays, mondayOf } from "./dayKeys.js";
 // - Gun kapasitesi: ders programindaki gun dakikasi; yoksa ogrencinin gun
 //   ritmi (weekdayRhythm); o da yoksa esit.
 // - Hafta tekrari haftanin SON calisma gunune duser: konular once gorulur.
+// - Ogrencinin tasidigi durak (opts.moves: logicalStopKey -> tarih) o gune
+//   yerlesir; algoritma sorgulamaz. Son soz ogrencinin.
 
 const FALLBACK_MINUTES = 30;
 const stopMinutes = (stop) => Number(stop?.cost?.minutes ?? stop?.minutes) || FALLBACK_MINUTES;
@@ -49,7 +51,15 @@ function leastFilled(candidates, load, cap, minutes) {
 }
 
 /** Tek hafta: 7 elemanli dizi, her eleman o gunun duraklari. */
-export function assignWeekStops(stops = [], schedule = null, { rhythm = null } = {}) {
+// Tasinmis durak bu haftanin hangi gunune (0..6)? Hafta disiysa null.
+function movedDayIndex(stop, moves, monday) {
+  const target = moves && stop?.logicalStopKey ? moves[stop.logicalStopKey] : null;
+  if (!target || !monday) return null;
+  const idx = Math.round((new Date(`${target}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000);
+  return idx >= 0 && idx < 7 ? idx : null;
+}
+
+export function assignWeekStops(stops = [], schedule = null, { rhythm = null, moves = null, monday = null } = {}) {
   const days = Array.from({ length: 7 }, () => []);
   const allowed = studyWeekdays(schedule);
   if (allowed.length === 0) return days;
@@ -57,7 +67,16 @@ export function assignWeekStops(stops = [], schedule = null, { rhythm = null } =
   const cap = dayCapacity(schedule, rhythm);
   const lastDay = Math.max(...allowed);
 
+  // Once ogrencinin tasidiklari: gunlerin yukune onlar sayilir.
+  const free = [];
   stops.forEach((stop) => {
+    const idx = movedDayIndex(stop, moves, monday);
+    if (idx == null) { free.push(stop); return; }
+    days[idx].push(stop);
+    load[idx] += stopMinutes(stop);
+  });
+
+  free.forEach((stop) => {
     const m = stopMinutes(stop);
     let day;
     if (isWeeklyReview(stop)) {
@@ -81,7 +100,7 @@ export function assignRouteStopsToDates(weeks = [], schedule = null, opts = {}) 
   weeks.forEach((week) => {
     if (!week?.weekStart) return;
     const monday = mondayOf(String(week.weekStart).slice(0, 10));
-    assignWeekStops(week.stops || [], schedule, opts).forEach((dayStops, i) => {
+    assignWeekStops(week.stops || [], schedule, { ...opts, monday }).forEach((dayStops, i) => {
       if (!dayStops.length) return;
       const key = addDays(monday, i);
       out[key] = (out[key] || []).concat(dayStops);

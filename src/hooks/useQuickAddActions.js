@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { firstRouteAction, routeActionTimerParams } from "../domain/route/routeStartAction";
 import { todayPlanStops } from "../domain/program/todayStops";
-import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 import { useHabitStops } from "./useHabitStops";
 import { isRehearsalDay } from "../domain/exam/examRehearsal";
 import { loadRehearsal } from "../lib/examRehearsalStore";
@@ -20,7 +20,7 @@ export function useQuickAddActions(visible = true) {
   const { user } = useAuth();
   const { currentWeek } = useStudyRoute({ persist: false });
   const { schedule, ready: scheduleReady } = useClassSchedule();
-  const rhythm = useWeekdayRhythm();
+  const dayOpts = useDayPlanOptions();
   const habitStops = useHabitStops(todayTR());
   const [rehearsal, setRehearsal] = useState(false);
 
@@ -34,12 +34,12 @@ export function useQuickAddActions(visible = true) {
 
   const nextAction = useMemo(() => {
     if (rehearsal || !scheduleReady) return null;
-    for (const stop of [...habitStops, ...todayPlanStops(currentWeek, schedule, todayTR(), { rhythm })]) {
+    for (const stop of [...habitStops, ...todayPlanStops(currentWeek, schedule, todayTR(), dayOpts)]) {
       const action = firstRouteAction([stop]);
       if (action) return action;
     }
     return null;
-  }, [rehearsal, currentWeek, schedule, scheduleReady, rhythm, habitStops]);
+  }, [rehearsal, currentWeek, schedule, scheduleReady, dayOpts, habitStops]);
 
   const startParams = useMemo(
     () => (nextAction ? routeActionTimerParams(nextAction) : undefined),

@@ -128,3 +128,15 @@ test("bos ders programi sablonunda (dakika yok) gun ritmi kullanilir", () => {
   const days = assignWeekStops([long("A"), long("B"), long("C"), long("D")], empty, { rhythm });
   assert.equal(days[5].length + days[6].length >= 2, true);
 });
+
+test("ogrencinin tasidigi durak o gune yerlesir; ertele bu haftanin sonraki calisma gunu", async () => {
+  const { postponeTarget, withMove } = await import("../../src/domain/program/stopMoves.js");
+  const s = (k) => ({ subject: "tyt_matematik", topic: k, logicalStopKey: k, cost: { minutes: 30 } });
+  const days = assignWeekStops([s("A"), s("B"), s("C")], null, { moves: { A: "2026-10-03" }, monday: "2026-09-28" });
+  assert.equal(days[5][0].topic, "A");
+  assert.equal(days[0][0].topic, "B");
+  assert.equal(postponeTarget("2026-09-30", null), "2026-10-01");
+  assert.equal(postponeTarget("2026-10-04", null), null);
+  const m = withMove({ old: "2026-09-01", keep: "2026-09-29" }, "X", "2026-10-02", "2026-09-30");
+  assert.deepEqual(m, { keep: "2026-09-29", X: "2026-10-02" });
+});

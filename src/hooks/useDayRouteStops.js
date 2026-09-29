@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
 import { stopsForDate } from "../domain/program/todayStops";
-import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 import { useHabitStops } from "./useHabitStops";
 import { mondayOf } from "../domain/program/dayKeys";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
@@ -20,7 +20,7 @@ import { useDatedUserTasks } from "./useDatedUserTasks";
 export function useDayRouteStops(dateKey) {
   const { weeks, routeStopsLoaded } = useStudyRoute({ persist: false });
   const { schedule, loading: scheduleLoading } = useClassSchedule();
-  const rhythm = useWeekdayRhythm();
+  const dayOpts = useDayPlanOptions();
   const habitStops = useHabitStops(dateKey);
   const { tasks: todayTasks } = useUserTasks();
   const isToday = dateKey === todayTR();
@@ -47,7 +47,7 @@ export function useDayRouteStops(dateKey) {
       }))
       : [];
     if (!week) return extras;
-    return [...[...habitStops, ...stopsForDate(week, schedule, dateKey, { rhythm })].map((stop, i) => {
+    return [...[...habitStops, ...stopsForDate(week, schedule, dateKey, dayOpts)].map((stop, i) => {
       const done = stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED;
       return {
         id: stop.logicalStopKey || `${stop.subject}-${stop.topic}-${i}`,
@@ -58,10 +58,15 @@ export function useDayRouteStops(dateKey) {
         topic: stop.topic,
         completed: done,
         status: done ? "done" : "planned",
-        source: "route",
+        source: stop.isHabit ? "habit" : "route",
+        // Tasima/erteleme yalniz rota duraginda (rutin her gun zaten gelir).
+        logicalStopKey: stop.isHabit ? null : stop.logicalStopKey || null,
+        movable: !stop.isHabit && !done && Boolean(stop.logicalStopKey),
+        // Gelecek haftalar taslak: algoritma o hafta baslayinca kesinlestirir.
+        draft: mondayOf(dateKey) > mondayOf(todayTR()),
       };
     }), ...extras];
-  }, [dateKey, weeks, schedule, userTasks, rhythm, habitStops]);
+  }, [dateKey, weeks, schedule, userTasks, dayOpts, habitStops]);
 
   return { stops, loading: scheduleLoading || !routeStopsLoaded };
 }
