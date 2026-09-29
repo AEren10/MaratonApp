@@ -1,63 +1,40 @@
-import React, { useState, useRef, useCallback } from "react";
-import { View, Text, ScrollView, Dimensions } from "react-native";
-import { useC } from "../../../contexts/ThemeContext";
-import { STEP, GUTTER } from "../../../themes/tokens";
-import { useRouteActivity } from "../../../hooks/useRouteActivity";
-import { RouteSvgChart } from "./RouteSvgChart";
-import SegmentTabs from "../../../components/common/SegmentTabs";
-import * as H from "../../../lib/haptics";
+import React, { memo } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
-const { width: SCREEN_W } = Dimensions.get("window");
-const CHART_W = SCREEN_W - GUTTER * 2;
-const MODES = [
-  { key: "year", label: "Yıl" },
-  { key: "month", label: "Ay" },
-  { key: "week", label: "Hafta" },
-];
+import { useC } from "../../../contexts/ThemeContext";
+import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { useStatsOverview } from "../../../hooks/useStatsOverview";
+import { formatNumber } from "../../../lib/format";
+import { YearRhythmBars } from "./YearRhythmBars";
 
 export function YearRouteChart() {
   const C = useC();
-  const { data } = useRouteActivity();
-  const [activeIdx, setActiveIdx] = useState(0);
-  const scrollRef = useRef(null);
+  const { data: statsData } = useStatsOverview();
 
-  const handleSelectMode = useCallback((idx) => {
-    H.select();
-    setActiveIdx(idx);
-    scrollRef.current?.scrollTo({ x: idx * CHART_W, animated: true });
-  }, []);
+  const study = statsData?.study;
+  const activeDays = study?.activeDays ?? 0;
+  const totalQuestions = study?.totalQuestions ?? 0;
+  const totalMinutes = study?.totalMinutes ?? 0;
+  const totalHours = Math.round(totalMinutes / 60);
+  const last8Weeks = study?.last8Weeks || [];
+  const bestWeek = study?.bestWeek;
 
-  const handleScrollEnd = useCallback((e) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / CHART_W);
-    if (idx >= 0 && idx < MODES.length && idx !== activeIdx) {
-      H.select();
-      setActiveIdx(idx);
-    }
-  }, [activeIdx]);
-
-  const activeMode = MODES[activeIdx].key;
-  const currentInfo = data?.[activeMode] || {
-    title: "YILIN ROTASI",
-    rightText: "",
-    points: [],
-    currentIndex: 0,
-  };
-  const hasActivity = MODES.some((m) =>
-    (data?.[m.key]?.points || []).some((point) => (point.count || 0) > 0 || (point.level || 0) > 0),
-  );
+  const hasActivity = activeDays >= 14;
 
   if (!hasActivity) {
     return (
-      <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 + 4 }}>
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.6, color: C.text2, marginBottom: STEP.s2 }}>
+      <View style={s.wrap}>
+        <Text style={[TYPOGRAPHY.tableHead, s.sectionHead, { color: C.text2 }]}>
           YILIN ROTASI
         </Text>
-        <View style={{ borderWidth: 1, borderColor: C.border, backgroundColor: C.surface, borderRadius: 20, padding: STEP.s3 }}>
-          <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, lineHeight: 22, color: C.text }}>
-            Rota günlüğün ilk kayıtla başlayacak.
+        <View style={[s.card, { borderColor: C.line, backgroundColor: C.surface }]}>
+          <Text style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>
+            Rota günlüğün ilk kayıtla başlayacak
           </Text>
-          <Text style={{ fontFamily: "Archivo_400", fontSize: 13, lineHeight: 20, color: C.text2, marginTop: STEP.s1 }}>
-            Çalışma yaptığın günler yıl, ay ve hafta görünümünde gerçek iz olarak dolacak.
+          <Text style={[TYPOGRAPHY.caption, s.desc, { color: C.text2 }]}>
+            {activeDays > 0
+              ? `14 aktif güne ulaştığında yıllık rota özeti burada açılacak · Şu an ${activeDays}/14 gün.`
+              : "Çalışma yaptığın günler yıl görünümünde gerçek iz olarak dolacak."}
           </Text>
         </View>
       </View>
@@ -65,47 +42,79 @@ export function YearRouteChart() {
   }
 
   return (
-    <View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 + STEP.s1 + 4 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s2 }}>
-        <Text style={{ fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.6, color: C.text2 }}>
-          {currentInfo.title}
-        </Text>
-        {currentInfo.rightText ? (
-          <Text style={{ fontFamily: "Archivo_500", fontSize: 11.5, color: C.text3 }}>
-            {currentInfo.rightText}
-          </Text>
-        ) : null}
+    <View style={s.wrap}>
+      <View style={s.headRow}>
+        <Text style={[TYPOGRAPHY.tableHead, { color: C.text2 }]}>YILIN ROTASI</Text>
+        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{activeDays} aktif gün</Text>
       </View>
 
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScrollEnd}
-        scrollEventThrottle={16}
-        style={{ width: CHART_W }}
-      >
-        {MODES.map((m) => {
-          const item = data?.[m.key];
-          return (
-            <View key={m.key} style={{ width: CHART_W }}>
-              <RouteSvgChart points={item?.points || []} currentIndex={item?.currentIndex || 0} />
-            </View>
-          );
-        })}
-      </ScrollView>
+      <View style={[s.card, { borderColor: C.line, backgroundColor: C.surface }]}>
+        <View style={s.statsRow}>
+          <View style={s.statCol}>
+            <Text style={[TYPOGRAPHY.subheading, s.num, { color: C.text }]}>{activeDays}</Text>
+            <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>GÜN</Text>
+          </View>
+          <View style={[s.divider, { backgroundColor: C.line }]} />
+          <View style={s.statCol}>
+            <Text style={[TYPOGRAPHY.subheading, s.num, { color: C.text }]}>{totalHours} sa</Text>
+            <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>SÜRE</Text>
+          </View>
+          <View style={[s.divider, { backgroundColor: C.line }]} />
+          <View style={s.statCol}>
+            <Text style={[TYPOGRAPHY.subheading, s.num, { color: C.text }]}>{formatNumber(totalQuestions)}</Text>
+            <Text style={[TYPOGRAPHY.tableHead, { color: C.text3 }]}>SORU</Text>
+          </View>
+        </View>
 
-      <View style={{ marginTop: STEP.s2 + 2 }}>
-        <SegmentTabs
-          options={MODES}
-          value={activeMode}
-          onChange={(key) => {
-            const idx = MODES.findIndex((m) => m.key === key);
-            if (idx >= 0) handleSelectMode(idx);
-          }}
-        />
+        <YearRhythmBars last8Weeks={last8Weeks} bestWeek={bestWeek} />
       </View>
     </View>
   );
 }
+
+export default memo(YearRouteChart);
+
+const s = StyleSheet.create({
+  wrap: {
+    marginHorizontal: GUTTER,
+    marginTop: STEP.s3 + STEP.s1,
+  },
+  sectionHead: {
+    marginBottom: STEP.s2,
+  },
+  headRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: STEP.s2,
+  },
+  card: {
+    borderWidth: 1,
+    borderRadius: SHAPE.card,
+    padding: STEP.s3,
+  },
+  title: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  desc: {
+    marginTop: STEP.s1,
+    lineHeight: 20,
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  statCol: {
+    alignItems: "center",
+    gap: 4,
+  },
+  num: {
+    fontVariant: ["tabular-nums"],
+  },
+  divider: {
+    width: 1,
+    height: 32,
+  },
+});
