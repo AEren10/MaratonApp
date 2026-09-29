@@ -17,6 +17,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { useFeatureEntry } from "./useFeatureEntry";
 import { useForecastTarget } from "./useForecastTarget";
 import { baselineTarget } from "../domain/forecast/forecastTarget";
+import { buildNetChart } from "../domain/route/netChartData";
 
 // Rota Detay ekraninin tum verisi ve aksiyonlari. Ekran yalniz render eder.
 export function useRouteDetail() {
@@ -26,7 +27,7 @@ export function useRouteDetail() {
   const { open: openScenarioGate } = useFeatureEntry(PRODUCT_FEATURES.route_scenarios, "route_scenarios");
   const route = useStudyRoute({ persist: false });
   const {
-    weeks, daysLeft, forecast, forecastTypes, tempoScenarios, isPaused, routeCreated, routeCreating, createRoute,
+    weeks, daysLeft, forecast, forecastTypes, forecastTrials, tempoScenarios, isPaused, routeCreated, routeCreating, createRoute,
   } = route;
   // Tahmin tek sinavin denemelerinden; kiyas o sinavin hedefiyle (TYT+AYT
   // toplami ile degil). Baslangic cizgisi TYT seviye testinden, hedefi TYT.
@@ -41,8 +42,11 @@ export function useRouteDetail() {
     date: routeDateTag(item.weekStart),
   })), [flat]);
   const view = useMemo(
-    () => routeDetailForecast({ forecast, targetNet, tempoScenarios }),
-    [forecast, targetNet, tempoScenarios],
+    () => routeDetailForecast({
+      forecast, targetNet, tempoScenarios,
+      netChart: buildNetChart({ trials: forecastTrials, types: forecastTypes, forecast, target: targetNet }),
+    }),
+    [forecast, targetNet, tempoScenarios, forecastTrials, forecastTypes],
   );
   const promise = useMemo(() => buildPlanVsActual(weeks), [weeks]);
 

@@ -721,6 +721,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     tempoScenarios,
     forecast,
     forecastTypes: forecastProfile?.types || [],
+    // Tahminle ayni sinav ailesinin denemeleri: net grafiginin noktalari
+    // tahmine bagli olmadan buradan cizilir (netChartData).
+    forecastTrials,
     // Tahminle ayni sinavin SON denemesi. Tahmin kisa veride (14 gunden az
     // aralik) null donuyor; "su anki net" buna bagli kalmamali.
     latestForecastNet: latestNetOf(forecastTrials),

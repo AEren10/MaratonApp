@@ -26,18 +26,18 @@ const H = CHART_H;
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
 export const RouteLineChart = memo(function RouteLineChart({
   stops = [], todayIndex, projection = [], band, target, ticks, height = H,
-  todayLabel, endLabel, axisLabels,
+  todayLabel, endLabel, axisLabels, xs = null,
 }) {
   const C = useC();
   const safeStops = Array.isArray(stops) ? stops : [];
   const safeProj = Array.isArray(projection) ? projection : [];
   const values = useMemo(() => safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0)), [safeStops]);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
-  const scaleOpts = scaleOptions({ hasAxis });
+  const scaleOpts = { ...scaleOptions({ hasAxis }), xs };
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
-    [values, safeProj, target],
+    [values, safeProj, target, xs],
   );
 
   const points = useMemo(() => sc.toPoints(values, { count: totalCount }), [sc, values, totalCount]);
@@ -61,9 +61,11 @@ export const RouteLineChart = memo(function RouteLineChart({
       pastD: buildLinePath(pastPoints),
       futD: buildSmoothPath(futurePoints),
       bandD: band?.upper && band?.lower
+        // Bant son olcumden acilan bir koni: tek noktalik ust/alt sinir
+        // eskiden tuvalin sol ucuna dusuyordu.
         ? buildBandPath(
-            sc.toPoints(band.upper, { count: totalCount }),
-            sc.toPoints(band.lower, { count: totalCount }),
+            sc.toPoints([values[values.length - 1], ...band.upper], { count: totalCount, offset: values.length - 1 }),
+            sc.toPoints([values[values.length - 1], ...band.lower], { count: totalCount, offset: values.length - 1 }),
           )
         : null,
     };
@@ -115,7 +117,7 @@ export const RouteLineChart = memo(function RouteLineChart({
 
         {hasAxis ? axisLabels.map((label, i) => {
           if (!label) return null;
-          const { x, anchor } = axisAnchor(i, axisLabels.length);
+          const { x, anchor } = axisAnchor(i, axisLabels.length, xs?.[todayIndex] ?? 0.5);
           return (
             <SvgText
               key={`axis-${i}`}

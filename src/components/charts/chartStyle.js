@@ -104,8 +104,9 @@ export function scaleOptions({ hasAxis }) {
 }
 
 // Eksenin uc etiketinin x konumu ve hizalamasi.
-export function axisAnchor(index, count) {
+// midShare: orta etiketin (bugun) 0..1 konumu; bolunmus eksende gecmisin sonu.
+export function axisAnchor(index, count, midShare = 0.5) {
   if (index === 0) return { x: PAD_LEFT, anchor: "start" };
   if (index === count - 1) return { x: CHART_W - PAD_RIGHT, anchor: "end" };
-  return { x: PAD_LEFT + (CHART_W - PAD_LEFT - PAD_RIGHT) / 2, anchor: "middle" };
+  return { x: PAD_LEFT + (CHART_W - PAD_LEFT - PAD_RIGHT) * midShare, anchor: "middle" };
 }

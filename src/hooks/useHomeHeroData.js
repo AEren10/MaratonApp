@@ -13,6 +13,7 @@ import { buildComebackRecommendation } from "../domain/route/comebackRecommendat
 import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
+import { buildNetChart } from "../domain/route/netChartData";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
 import { updateReminderContent } from "../lib/notifications";
@@ -36,6 +37,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     weeks,
     forecast,
     forecastTypes,
+    forecastTrials,
     debt,
     hasRouteAccess,
     routeAccessLoading,
@@ -75,42 +77,22 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
   }, [isPaused, weeks]);
 
   const chartData = useMemo(() => {
-    if (!forecast?.dataPoints?.length) return null;
-    const stops = forecast.dataPoints.map((p) => ({
-      y: p.net,
-      status: ROUTE_STOP_STATUS.COMPLETED,
-      label: p.dateStr,
-    }));
-    const todayIndex = stops.length - 1;
-    // Az sayida deneme dususte olunca dogrusal uzatma sinav gunune 0 net
-    // cikariyordu ("TAHMIN 0 · hedefin 126 net altinda"). Anlamsiz ve moral
-    // bozucu: son netin yarisinin altina dusen tahmin gosterilmez.
-    const lastNet = forecast.dataPoints[todayIndex]?.net;
-    const plausible = Number.isFinite(forecast.projected)
-      && forecast.projected > 0
-      && (!Number.isFinite(lastNet) || forecast.projected >= lastNet * 0.5);
-    const projection = plausible ? [forecast.projected] : [];
-    const band = projection.length
-      ? { upper: [forecast.range?.high ?? forecast.projected], lower: [forecast.range?.low ?? forecast.projected] }
-      : undefined;
-    // Hattin iki ucu ve zaman ekseni adlandiriliyor — tasarimda grafik
-    // etiketsiz degil: "BUGÜN", "TAHMİN 71", ve altta uc tarih.
+    // Noktalar tahmine bagli degil (netChartData): ikinci denemeden itibaren
+    // kirilmalar gorunur, uc tahmin hazir degilse hedefe gider.
+    const chart = buildNetChart({
+      trials: forecastTrials, types: forecastTypes, forecast, target: examTarget.target,
+    });
+    if (!chart) return null;
+    const count = chart.series.length;
     return {
-      stops,
-      todayIndex,
-      projection,
-      band,
+      ...chart,
       todayLabel: "BUGÜN",
-      endLabel: projection.length ? `TAHMİN ${Math.round(forecast.projected)}` : null,
-      axisLabels: chartAxisLabels({
-        firstDate: forecast.dataPoints[0]?.date,
-        examDate,
-      }),
-      sentence: plausible
+      axisLabels: chartAxisLabels({ firstDate: chart.series[0]?.date, examDate }),
+      sentence: chart.mode === "forecast"
         ? forecastSentence({ projected: forecast.projected, target: examTarget.target, label: examTarget.label })
-        : "Tahmin için birkaç deneme daha gerekiyor.",
+        : count < 3 ? "Tahmin 3. denemeden sonra açılır." : "Tahmin, denemelerin 2 haftaya yayılınca açılır.",
     };
-  }, [forecast, examDate, examTarget]);
+  }, [forecastTrials, forecastTypes, forecast, examDate, examTarget]);
 
   // Olculmus tahmin (3 deneme) gelene kadar grafik bos kalmasin: kurulumda
   // kullanicinin KENDI girdigi baslangic ve hedef netini gosteririz.

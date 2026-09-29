@@ -119,7 +119,7 @@ export function buildMiniChart(values, { width, height, tailCount = 2 }) {
 // viewBox'in disinda kaliyor ve kirpik goruunuyordu. Varsayilan 0 — mevcut
 // cagiranlar ve testler etkilenmez.
 export function makeScale(domainValues, {
-  width, height, padTop = 12, padBottom = 12, padLeft = 0, padRight = 0,
+  width, height, padTop = 12, padBottom = 12, padLeft = 0, padRight = 0, xs = null,
 }) {
   const nums = (domainValues || [])
     .map((v) => (typeof v === "number" ? v : v?.y))
@@ -140,8 +140,11 @@ export function makeScale(domainValues, {
     const total = count ?? list.length;
     const usableW = width - padLeft - padRight;
     const stepX = total > 1 ? usableW / (total - 1) : 0;
+    // xs: noktalarin 0..1 konumu (bolunmus eksen). Yoksa esit aralik.
     return list.map((v, i) => ({
-      x: total > 1 ? padLeft + (i + offset) * stepX : width / 2,
+      x: xs && xs[i + offset] != null
+        ? padLeft + xs[i + offset] * usableW
+        : total > 1 ? padLeft + (i + offset) * stepX : width / 2,
       y: toY(v),
     }));
   };

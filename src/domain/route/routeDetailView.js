@@ -3,7 +3,9 @@
 
 const round = (value) => (Number.isFinite(value) ? Math.round(value) : null);
 
-export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [] } = {}) {
+// netChart (netChartData.buildNetChart) verilirse noktalar ondan gelir: tahmin
+// hazir olmasa da olculmus denemeler cizilir.
+export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [], netChart = null } = {}) {
   const projected = round(forecast?.projected);
   const target = Number.isFinite(targetNet) ? targetNet : null;
   const points = forecast?.dataPoints || [];
@@ -18,7 +20,15 @@ export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [] }
   const low = round(forecast?.range?.low);
   const high = round(forecast?.range?.high);
 
-  const chart = points.length ? {
+  const chart = netChart ? {
+    stops: netChart.stops,
+    todayIndex: netChart.todayIndex,
+    projection: netChart.projection,
+    band: netChart.band || null,
+    projectedNet: projected,
+    xs: netChart.xs,
+    mode: netChart.mode,
+  } : points.length ? {
     stops: points.map((p) => ({ y: p.net })),
     todayIndex: points.length - 1,
     projection: projected != null ? [forecast.projected] : [],
@@ -35,7 +45,9 @@ export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [] }
   ].filter(Boolean);
 
   return {
-    caption: points.length ? `${points.length} deneme · bugün · sınav günü tahmini` : null,
+    caption: netChart
+      ? `${netChart.stops.length} deneme · bugün · ${netChart.mode === "forecast" ? "sınav günü tahmini" : "hedef"}`
+      : points.length ? `${points.length} deneme · bugün · sınav günü tahmini` : null,
     chart,
     projectedNet: projected,
     note,
