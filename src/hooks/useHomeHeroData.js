@@ -15,6 +15,11 @@ import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildNetChart } from "../domain/route/netChartData";
 import { feasibilityNote } from "../domain/route/feasibility";
+import { ctaHint } from "../domain/home/ctaHint";
+import { stopsForDate } from "../domain/program/todayStops";
+import { addDays, mondayOf } from "../domain/program/dayKeys";
+import { useClassSchedule } from "./useClassSchedule";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
 import { updateReminderContent } from "../lib/notifications";
@@ -187,6 +192,18 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
       ? `${openStop.label}${openStop.minutes ? ` · ${openStop.minutes} dk` : ""}`
       : null;
 
+  // Butonun altindaki tek satir: rota secti / yarin ne var (domain/home/ctaHint).
+  const { schedule } = useClassSchedule();
+  const dayOpts = useDayPlanOptions();
+  const dayDone = !ctaTask && Array.isArray(todayStops) && todayStops.length > 0 && todayStops.every((i) => i.completed);
+  const tomorrowStop = useMemo(() => {
+    if (!dayDone) return null;
+    const tomorrow = addDays(todayTR(), 1);
+    const week = (weeks || []).find((w) => w.weekStart && mondayOf(String(w.weekStart).slice(0, 10)) === mondayOf(tomorrow));
+    return stopsForDate(week, schedule, tomorrow, dayOpts).find((s) => s.lifecycleStatus !== "completed") || null;
+  }, [dayDone, weeks, schedule, dayOpts]);
+  const hint = ctaHint({ nextTask, dayDone, tomorrowStop });
+
   const remainingToGoal = Math.max(0, (dailyGoal || 0) - (solvedToday || 0));
 
   return {
@@ -220,8 +237,9 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     comebackRecommendation,
     nextTask: ctaTask,
     // Gunun listesi dolu ve hepsi bitti: ana buton 'Gunu kapattin'.
-    dayDone: !ctaTask && Array.isArray(todayStops) && todayStops.length > 0 && todayStops.every((i) => i.completed),
+    dayDone,
     ctaSubtitle,
+    ctaHint: hint,
     feasibility,
   };
 }

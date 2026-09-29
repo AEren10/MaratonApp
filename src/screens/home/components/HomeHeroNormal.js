@@ -1,8 +1,9 @@
 import { useCallback } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import Animated from "react-native-reanimated";
 
-import { STEP } from "../../../themes/tokens";
+import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { useC } from "../../../contexts/ThemeContext";
 import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeCTAButton } from "./HomeCTAButton";
@@ -27,6 +28,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
     nextTask, ctaSubtitle,
   } = hero;
   const navigation = useNavigation();
+  const C = useC();
 
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
   // soru "bugun ilerledim mi". Rota haftada bir bakilan bir sey, ikinci
@@ -93,6 +95,9 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
           subtitle={nextTask ? ctaSubtitle : hero.dayDone ? "Bir durak daha ekle" : null}
           onPress={() => onStartTask?.(nextTask)}
         />
+        {hero.ctaHint ? (
+          <Text style={[TYPOGRAPHY.meta, s.hint, { color: C.text3 }]} numberOfLines={1}>{hero.ctaHint}</Text>
+        ) : null}
       </Animated.View>
       <RouteFeasibilityNote note={hero.feasibility} style={s.note} />
     </View>
@@ -104,5 +109,6 @@ const s = StyleSheet.create({
   chart: { marginTop: -STEP.s2, marginBottom: STEP.s2 },
   cta: { marginTop: STEP.s4 },
   note: { marginTop: STEP.s3 },
+  hint: { marginTop: STEP.s1, textAlign: "center" },
 });
 

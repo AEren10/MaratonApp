@@ -46,6 +46,11 @@ function roundMinutes(value) {
   return minutes > 0 ? Math.max(5, minutes) : null;
 }
 
+/** Gerekce kodunun kisa etkisi ("Sinav getirisi yuksek"); yoksa null. */
+export function impactLabel(reasonCode) {
+  return IMPACT_BY_REASON[reasonCode] || null;
+}
+
 export function estimateAssignmentMinutes({ questionCount = 0, routeStop = null } = {}) {
   const questions = Math.max(0, Math.round(Number(questionCount) || 0));
   const stopQuestions = Number(routeStop?.cost?.questions ?? routeStop?.questions ?? 0);
