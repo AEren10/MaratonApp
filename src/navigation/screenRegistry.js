@@ -65,6 +65,7 @@ import GoalsScreen from "../screens/settings/GoalsScreen";
 
 const AppearanceScreen = React.lazy(() => import("../screens/settings/AppearanceScreen"));
 const WidgetGuideScreen = React.lazy(() => import("../screens/widgetGuide/WidgetGuideScreen"));
+const StatsScreen = React.lazy(() => import("../screens/stats/StatsScreen"));
 const SubjectAnalysisScreen = React.lazy(() => import("../screens/analysis/subjectAnalysis/SubjectAnalysisScreen"));
 const EditProfileScreen = React.lazy(() => import("../screens/settings/EditProfileScreen"));
 const ChangePasswordScreen = React.lazy(() => import("../screens/settings/ChangePasswordScreen"));
@@ -186,6 +187,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.STUDY_LOG, StudyHistoryScreen),
   screen(SCREENS.SUBJECT_DETAIL, SubjectDetailScreen, detailOptions),
   screen(SCREENS.SUBJECT_ANALYSIS, SubjectAnalysisScreen, detailOptions),
+  screen(SCREENS.STATS, StatsScreen),
   screen(SCREENS.SUBJECT_LIST, SubjectListScreen),
   screen(SCREENS.WEAK_AREAS, WeakAreasScreen),
   screen(SCREENS.TOPIC_STUDY, TopicStudyScreen, detailOptions),

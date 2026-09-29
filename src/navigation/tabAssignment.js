@@ -140,6 +140,7 @@ export const PROFIL_STACK = [
   SCREENS.CLASS_SCHEDULE,   // Ayarlar · Haftalik ders programi (paylasimli)
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.WIDGET_GUIDE,     // Profil > Ana ekrana widget ekle
+  SCREENS.STATS,            // Profil > Istatistiklerim
   SCREENS.MILESTONE,        // Kilometre Tasi
   SCREENS.LEVEL,            // Seviye
   SCREENS.EXAM_DAY_PLAN,    // (paylasimli) Profil satiri

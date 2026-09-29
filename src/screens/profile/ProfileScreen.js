@@ -84,6 +84,11 @@ export default function ProfileScreen() {
                 first
               />
               <ProfileLinkRow
+                label="İstatistiklerim"
+                meta="Tüm zamanlar · dersler · denemeler"
+                onPress={() => navigation.navigate(SCREENS.STATS)}
+              />
+              <ProfileLinkRow
                 label="Çalışma geçmişi"
                 meta={studyMeta(careerStats)}
                 onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
