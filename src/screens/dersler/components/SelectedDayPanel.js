@@ -1,65 +1,42 @@
-import React, { useMemo } from "react";
+import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
 import { todayTR } from "../../../lib/dateUtils";
-import { subjectColorOf } from "../../../themes/subjectPalette";
-
-function StopRow({ log, isLast, C, onPress }) {
-  const isDone = log.status === "done" || log.completed;
-  const dotColor = subjectColorOf(C, log.subjectKey || log.subjectLabel);
-
-  return (
-    <Pressable onPress={onPress} style={s.timelineRow}>
-      <View style={s.timeCol}>
-        <Text style={[TYPOGRAPHY.tableName, s.tabular, { color: C.text }]}>{log.time || "—"}</Text>
-      </View>
-
-      <View style={s.lineTrack}>
-        <View style={[s.dot, { backgroundColor: dotColor }]} />
-        {!isLast ? <View style={[s.vertLine, { backgroundColor: C.line }]} /> : null}
-      </View>
-
-      <View style={[s.stopCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <View style={s.cardHead}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, flex: 1 }]} numberOfLines={1}>
-            <Text style={{ color: dotColor }}>{log.subjectLabel}</Text>
-            {log.topic ? ` · ${log.topic}` : ""}
-          </Text>
-          {isDone ? (
-            <View style={s.doneBadge}>
-              <Icon name="check" size={12} color={C.text2} sw={1.5} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Bitti</Text>
-            </View>
-          ) : log.minutes ? (
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{`${log.minutes} dk`}</Text>
-          ) : null}
-        </View>
-      </View>
-    </Pressable>
-  );
-}
+import { mondayOf } from "../../../domain/program/dayKeys";
+import { SelectedDayStopRow } from "./SelectedDayStopRow";
+import { StopActionModal } from "../../program/components/StopActionModal";
 
 export function SelectedDayPanel({ selectedDay, logs }) {
   const C = useC();
   const navigation = useNavigation();
+  const [menuStop, setMenuStop] = useState(null);
 
   const displayLogs = Array.isArray(logs) ? logs : [];
   const totalMinutes = displayLogs.reduce((acc, l) => acc + (l.minutes || 0), 0);
   const meta = totalMinutes > 0 ? `${formatMinutes(totalMinutes)} planlı` : "";
 
-  // Gunun plani ekrani yalniz BUGUNU anlatir (ana sayfanin "tumu"su).
-  // Baska gunun satiri eskiden oraya gidip bugunun duraklarini gosteriyordu.
+  const isDraft = selectedDay?.key ? mondayOf(selectedDay.key) > mondayOf(todayTR()) : false;
+
   const openDetail = selectedDay?.isToday ? () => navigation.navigate(SCREENS.PLAN_DETAIL) : undefined;
-  // Secili gun bugun ya da ileride ise durak O GUNE eklenir; gecmis gun bugune.
-  const addTask = () => navigation.navigate(SCREENS.ADD_TASK, selectedDay?.key && selectedDay.key >= todayTR() ? { date: selectedDay.key } : undefined);
+  const addTask = () => navigation.navigate(
+    SCREENS.ADD_TASK,
+    selectedDay?.key && selectedDay.key >= todayTR() ? { date: selectedDay.key } : undefined,
+  );
 
   return (
     <View style={s.wrap}>
+      {isDraft ? (
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginBottom: STEP.s2 }]}>
+          Taslak · hafta başlayınca kesinleşir
+        </Text>
+      ) : null}
+
       {displayLogs.length > 0 ? (
         <View style={s.summaryRow}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>
@@ -90,7 +67,15 @@ export function SelectedDayPanel({ selectedDay, logs }) {
       ) : (
         <View style={s.listWrap}>
           {displayLogs.map((log, i) => (
-            <StopRow key={log.id || i} log={log} isLast={i === displayLogs.length - 1} C={C} onPress={openDetail} />
+            <SelectedDayStopRow
+              key={log.id || i}
+              log={log}
+              isLast={i === displayLogs.length - 1}
+              isDraft={isDraft}
+              C={C}
+              onPress={openDetail}
+              onOpenMenu={setMenuStop}
+            />
           ))}
           <Pressable
             onPress={addTask}
@@ -106,6 +91,13 @@ export function SelectedDayPanel({ selectedDay, logs }) {
           </Pressable>
         </View>
       )}
+
+      <StopActionModal
+        visible={Boolean(menuStop)}
+        stop={menuStop}
+        dateKey={selectedDay?.key}
+        onClose={() => setMenuStop(null)}
+      />
     </View>
   );
 }
@@ -115,15 +107,6 @@ const s = StyleSheet.create({
   summaryRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: STEP.s2 },
   listWrap: { marginTop: STEP.s1 },
   emptyBox: { paddingVertical: STEP.s2, alignItems: "flex-start" },
-  timelineRow: { flexDirection: "row", alignItems: "stretch", gap: STEP.s1 + 2, marginBottom: STEP.s2 },
-  timeCol: { width: 44, alignItems: "flex-start", paddingTop: 4 },
-  tabular: { fontVariant: ["tabular-nums"] },
-  lineTrack: { width: 14, alignItems: "center", paddingTop: 8 },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  vertLine: { width: 1.5, flex: 1, marginTop: 4 },
-  stopCard: { flex: 1, padding: STEP.s2 + 2, borderRadius: SHAPE.cardTight, borderWidth: 1 },
-  cardHead: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  doneBadge: { flexDirection: "row", alignItems: "center", gap: 3 },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
