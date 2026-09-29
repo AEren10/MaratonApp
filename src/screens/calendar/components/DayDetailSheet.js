@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, Pressable, Modal, ScrollView, StyleSheet } from "react-native";
-import { Icon, Card, StatBlock, Chip, EmptyState } from "../../../components/design";
+import { Icon, Chip, EmptyState } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -68,12 +68,19 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
             ) : (
               <>
                 <View style={s.statRow}>
-                  <Card tone="surface" radius="panel" style={{ flex: 1 }}>
-                    <StatBlock label="GERÇEKLEŞEN" value={totalMinutes} unit="dk" size="value" />
-                  </Card>
-                  <Card tone="surface" radius="panel" style={{ flex: 1 }}>
-                    <StatBlock label="SORU" value={totalQuestions} size="value" />
-                  </Card>
+                  <View style={s.statBox}>
+                    <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>GERÇEKLEŞEN</Text>
+                    <View style={s.valueRow}>
+                      <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]}>{totalMinutes}</Text>
+                      <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginLeft: 2 }]}>dk</Text>
+                    </View>
+                  </View>
+                  <View style={s.statBox}>
+                    <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>SORU</Text>
+                    <View style={s.valueRow}>
+                      <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]}>{totalQuestions}</Text>
+                    </View>
+                  </View>
                 </View>
 
                 {durations.length > 0 && (
@@ -87,10 +94,10 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
                 )}
 
                 {summary ? (
-                  <Card tone="surface" radius="panel" style={{ marginTop: STEP.s3 }}>
+                  <View style={s.summaryCard}>
                     <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>GÜNÜN ÖZETİ</Text>
                     <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{summary}</Text>
-                  </Card>
+                  </View>
                 ) : null}
               </>
             )}
@@ -122,6 +129,9 @@ const makeStyles = (C) =>
     },
     handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: STEP.s2 },
     headerRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginBottom: STEP.s2 },
-    statRow: { flexDirection: "row", gap: STEP.s1 },
+    statRow: { flexDirection: "row", gap: STEP.s3, paddingVertical: STEP.s2 },
+    statBox: { flex: 1 },
+    valueRow: { flexDirection: "row", alignItems: "baseline", marginTop: 2 },
     chipRow: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s1, marginTop: STEP.s2 },
+    summaryCard: { marginTop: STEP.s3, paddingTop: STEP.s2, borderTopWidth: 1, borderTopColor: C.line },
   });

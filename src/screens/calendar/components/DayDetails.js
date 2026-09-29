@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Card, Icon } from "../../../components/design";
+import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
@@ -28,7 +28,6 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   const C = useC();
   const navigation = useNavigation();
   const trialTypes = getTrialTypes(C);
-  const today = day === todayTR();
 
   // Gercek veri: Durak, dakika, soru sayisi.
   const statMinutes = data?.totalMinutes || 0;
@@ -36,7 +35,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   const statQuestions = data?.totalQuestions || 0;
   const hasActivity = statStops > 0 || (data?.trialLogs || data?.trials)?.length > 0;
   const streakStatus = hasActivity ? "SERİ SÜRDÜ" : "KAYIT YOK";
-  
+
   const slots = useMemo(() => {
     if (!data) return [];
     const logs = data.studyLogs || data.logs || [];
@@ -62,7 +61,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
   }, [data, trialTypes, C.accent]);
 
   return (
-    <Card tone="surface" radius="panel" style={[styles.card, style]}>
+    <View style={[styles.container, { borderTopWidth: 1, borderTopColor: C.line }, style]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s2 }}>
         <Text style={[TYPOGRAPHY.topicName, { color: C.text }]}>{formatDayLabel(day)}</Text>
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, letterSpacing: 0.8 }]}>{streakStatus}</Text>
@@ -87,7 +86,8 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
 
           <View>
             {slots.map((s) => (
-              <Press haptic="none"
+              <Press
+                haptic="none"
                 key={s.key}
                 disabled={!s.trial}
                 hitSlop={s.trial ? 8 : undefined}
@@ -119,12 +119,12 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
       )}
 
       <DayTasks date={day} tasks={calendarTasks} onAdd={onAddTask} onToggle={onToggleTask} onRemove={onRemoveTask} />
-    </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { marginTop: STEP.s3 },
+  container: { marginTop: STEP.s4, paddingTop: STEP.s3 },
   emptyWrap: {
     paddingVertical: STEP.s2,
     alignItems: "flex-start",

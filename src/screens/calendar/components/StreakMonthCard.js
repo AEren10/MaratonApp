@@ -54,13 +54,13 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
     : `${locative} henüz çalışma kaydı yok`;
 
   return (
-    <>
+    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}>
       <Press
         haptic="tap"
         onPress={onPress}
         disabled={!onPress}
         accessibilityLabel={`${MONTHS_TR[monthIdx]} özetini aç`}
-        style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}
+        style={s.topPress}
       >
         <View style={s.headRow}>
           <Text style={[TYPOGRAPHY.label, s.flex, { color: C.text3 }]}>
@@ -82,7 +82,7 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
         ) : null}
       </Press>
       {next ? (
-        <View style={[s.milestone, { backgroundColor: C.surface, borderColor: C.elev }]}>
+        <View style={[s.milestone, { borderTopWidth: 1, borderTopColor: C.line }]}>
           <View style={s.mHead}>
             <Text style={[TYPOGRAPHY.tableName, s.flex, { color: C.text }]}>{`${next.day} gün kilometre taşı`}</Text>
             <Text style={[TYPOGRAPHY.metaSemiBold, s.num, { color: C.accentBright }]}>{`${next.daysLeft} gün`}</Text>
@@ -90,24 +90,33 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
           <View style={s.mBar}><Bar ratio={streak / next.day} C={C} /></View>
         </View>
       ) : null}
-    </>
+    </View>
   );
 }
 
 export default memo(StreakMonthCard);
 
-const HAIR = 1;
-
 const s = StyleSheet.create({
-  card: { marginTop: STEP.s4 - 4, padding: STEP.s3, borderRadius: SHAPE.sheet, borderWidth: 1 },
+  card: {
+    marginTop: STEP.s4 - 4,
+    borderRadius: SHAPE.panel,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  topPress: {
+    padding: STEP.s3,
+  },
   summary: { marginTop: STEP.s2, letterSpacing: -0.4 },
   barRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s3 },
-  track: { flex: 1, height: 4, borderRadius: HAIR, overflow: "hidden" },
+  track: { flex: 1, height: 4, borderRadius: 2, overflow: "hidden" },
   fill: { position: "absolute", left: 0, top: 0, bottom: 0 },
   num: { letterSpacing: 0, fontVariant: ["tabular-nums"] },
-  milestone: { marginTop: STEP.s2, paddingVertical: STEP.s3 - 2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.panel, borderWidth: 1 },
+  milestone: {
+    paddingVertical: STEP.s2 + 2,
+    paddingHorizontal: STEP.s3,
+  },
   mHead: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
-  mBar: { flexDirection: "row", marginTop: STEP.s2 + 2 },
+  mBar: { flexDirection: "row", marginTop: STEP.s2 },
   flex: { flex: 1 },
   headRow: { flexDirection: "row", alignItems: "center" },
 });
