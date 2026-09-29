@@ -282,10 +282,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             ...stop,
             stopId: saved.id,
             lifecycleStatus: saved.lifecycle_status,
-            // Duragin son guncellenme zamani. "Bugun kac durak tamamlandi"
-            // sorusu buna dayaniyor (bkz. useSummary). Tamamlanmis bir durak
-            // icin son guncelleme pratikte tamamlanma anidir.
-            completedAt: saved.updated_at || null,
+            // Tamamlanma ani. "Bugun kac durak tamamlandi" buna dayaniyor.
+            // updated_at KULLANILMAZ: rota her yeniden cizildiginde yeni
+            // revizyona kopyalanan durakta updated_at o anki saat olur; gecen
+            // hafta biten durak "bugun bitti" sanilip bugunun listesine
+            // giriyordu. status_changed_at revizyonlar arasinda korunuyor.
+            completedAt: saved.completed_at || saved.status_changed_at || null,
             version: saved.version,
             insight: saved.metadata?.insight || stop.insight,
           } : stop;
@@ -639,10 +641,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     const version = stop.version ?? 1;
 
     if (String(stop.stopId).startsWith("local_")) {
+      const now = new Date().toISOString();
       const updated = {
         id: stop.stopId,
         lifecycle_status: transition,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
+        status_changed_at: now,
         version: version + 1,
         subject: stop.subject,
       };
@@ -675,6 +679,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       id: stop.stopId,
       lifecycle_status: transition,
       updated_at: new Date().toISOString(),
+      status_changed_at: new Date().toISOString(),
       version: version + 1,
       subject: stop.subject,
     } : null);

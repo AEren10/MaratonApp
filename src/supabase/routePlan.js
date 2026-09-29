@@ -33,6 +33,8 @@ const ROUTE_STOP_COLUMNS = [
   "predecessor_stop_id",
   "replacement_stop_id",
   "version",
+  "status_changed_at",
+  "completed_at",
   "metadata",
   "created_at",
   "updated_at",

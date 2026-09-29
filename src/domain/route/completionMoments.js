@@ -19,7 +19,8 @@ export function summarizeWeekCompletion(currentWeek) {
 }
 
 // Geri donus (AKIS 14) icin haftanin durak ozeti: bekleyen durak ve bugun
-// kapanan durak. completedAt = duragin updated_at'i (bkz. useStudyRoute).
+// kapanan durak. completedAt = completed_at ya da status_changed_at (bkz. useStudyRoute;
+// updated_at rota revizyonunda sifirlandigi icin kullanilmaz).
 export function summarizeComebackStops(currentWeek, now = new Date()) {
   const stops = currentWeek?.stops || [];
   const today = dateKey(now);

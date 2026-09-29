@@ -91,7 +91,10 @@ export function useHomeController() {
   );
   const stops = useTodayStops({
     generatedTasks: dashboard.generatedTasks,
-    aiSuggestion: suggestions?.length ? suggestions[0] : null,
+    // Rota gununde gunun listesi YALNIZ ders programinin duraklari + ek
+    // gorevler: oneri kalemi 'Programin tamami' ile sayilari ayristiriyordu
+    // (ana sayfa 4/4, plan 3).
+    aiSuggestion: !(dashboard.routeCurrentWeek?.stops?.length) && suggestions?.length ? suggestions[0] : null,
     onRouteComplete,
     onAllDone,
   });
