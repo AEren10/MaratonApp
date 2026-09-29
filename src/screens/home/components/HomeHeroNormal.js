@@ -6,6 +6,7 @@ import { STEP } from "../../../themes/tokens";
 import { HomeHeroStat } from "./HomeHeroStat";
 import { HomeHeroChart } from "./HomeHeroChart";
 import { HomeCTAButton } from "./HomeCTAButton";
+import { RouteFeasibilityNote } from "../../../components/route/RouteFeasibilityNote";
 import { HomeChartPager } from "./HomeChartPager";
 import { HomeWeeklyMetrics } from "./HomeWeeklyMetrics";
 import { WeeklyEffortChart } from "../../../components/charts/WeeklyEffortChart";
@@ -93,6 +94,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
           onPress={() => onStartTask?.(nextTask)}
         />
       </Animated.View>
+      <RouteFeasibilityNote note={hero.feasibility} style={s.note} />
     </View>
   );
 }
@@ -101,5 +103,6 @@ const s = StyleSheet.create({
   top: { paddingTop: STEP.s3 + 2 },
   chart: { marginTop: -STEP.s2, marginBottom: STEP.s2 },
   cta: { marginTop: STEP.s4 },
+  note: { marginTop: STEP.s3 },
 });
 

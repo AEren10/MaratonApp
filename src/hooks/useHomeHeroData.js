@@ -14,6 +14,7 @@ import { routeDeclaredPath } from "../domain/route/declaredPath";
 import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildNetChart } from "../domain/route/netChartData";
+import { feasibilityNote } from "../domain/route/feasibility";
 import { buildWeeklyEffort } from "../domain/home/weeklyEffort";
 import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetSync";
 import { updateReminderContent } from "../lib/notifications";
@@ -43,7 +44,14 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     routeAccessLoading,
     isPaused,
     pausedAt,
+    shortfall,
+    capacity,
+    route: routeModel,
   } = useStudyRoute();
+  // Rota sinava yetismiyorsa durust not (domain/route/feasibility).
+  const feasibility = useMemo(() => feasibilityNote({
+    shortfall, capacity, weeksLeft: routeModel?.weeksLeft,
+  }), [shortfall, capacity, routeModel?.weeksLeft]);
 
   const examTarget = useForecastTarget(forecastTypes);
 
@@ -214,5 +222,6 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     // Gunun listesi dolu ve hepsi bitti: ana buton 'Gunu kapattin'.
     dayDone: !ctaTask && Array.isArray(todayStops) && todayStops.length > 0 && todayStops.every((i) => i.completed),
     ctaSubtitle,
+    feasibility,
   };
 }

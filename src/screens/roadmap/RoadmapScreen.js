@@ -18,6 +18,8 @@ import { RouteEmptyState } from "./components/RouteEmptyState";
 import { RouteHeader } from "./components/RouteHeader";
 import RouteLinkRow from "./components/RouteLinkRow";
 import { RouteProjectionCard } from "./components/RouteProjectionCard";
+import { RouteFeasibilityNote } from "../../components/route/RouteFeasibilityNote";
+import { feasibilityNote } from "../../domain/route/feasibility";
 import { RouteTempoSection } from "./components/RouteTempoSection";
 import { RouteUpcomingStops } from "./components/RouteUpcomingStops";
 import { RouteThisWeekStrip } from "./components/RouteThisWeekStrip";
@@ -32,6 +34,9 @@ export default function RoadmapScreen() {
   const { view } = d;
   const route = useStudyRoute({ persist: false });
   const { weeks, isPaused, routeCreated } = route;
+  const feasibility = useMemo(() => feasibilityNote({
+    shortfall: route.shortfall, capacity: route.capacity, weeksLeft: route.route?.weeksLeft,
+  }), [route.shortfall, route.capacity, route.route?.weeksLeft]);
 
   const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({
     navigation,
@@ -100,6 +105,7 @@ export default function RoadmapScreen() {
 
               <RouteTopicDebtRow C={C} onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)} />
 
+              <RouteFeasibilityNote note={feasibility} style={s.feasible} />
               <Animated.View style={s.cardSection}>
                 <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
               </Animated.View>
@@ -137,6 +143,7 @@ export default function RoadmapScreen() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: 100 },
+  feasible: { marginHorizontal: GUTTER, marginTop: STEP.s3 },
   cardSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
   section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 + 4 },
   links: { gap: STEP.s1 + 2, marginTop: STEP.s2 + 4 },
