@@ -39,7 +39,8 @@ function TaskRow({ task, onToggle, onRemove, C }) {
 export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen = false }) {
   const C = useC();
   const [showInput, setShowInput] = useState(autoOpen);
-  const canAdd = date >= todayTR();
+  // onAdd verilmezse ekleme kapali (eski serbest gorevler yalniz listelenir).
+  const canAdd = Boolean(onAdd) && date >= todayTR();
 
   useEffect(() => { if (autoOpen) setShowInput(true); }, [autoOpen]);
 

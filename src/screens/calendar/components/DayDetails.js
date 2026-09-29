@@ -1,10 +1,7 @@
 import { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { SCREENS } from "../../../constants/screens";
 import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
@@ -27,7 +24,6 @@ function formatTime(iso) {
 
 export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, style }) {
   const C = useC();
-  const navigation = useNavigation();
   const trialTypes = getTrialTypes(C);
 
   const statMinutes = data?.totalMinutes || 0;
@@ -102,19 +98,10 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
         </>
       ) : day < todayTR() ? (
         <View style={styles.emptyWrap}>
+          {/* Gecmise durak eklenmez; buton bugune ekliyordu. */}
           <Text style={[TYPOGRAPHY.body, { color: C.text3, marginBottom: STEP.s2 }]}>
             Bu güne ait çalışma kaydı yok.
           </Text>
-          <Press
-            haptic="tap"
-            accessibilityRole="button"
-            accessibilityLabel="Durak ekle"
-            onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
-            style={[styles.addStopBtn, { borderColor: C.border, backgroundColor: C.void }]}
-          >
-            <Icon name="plus" size={14} color={C.accent} />
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Durak ekle</Text>
-          </Press>
         </View>
       ) : null}
 
@@ -122,7 +109,11 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
         <DayPlannedStops day={day} C={C} />
       ) : null}
 
-      <DayTasks date={day} tasks={calendarTasks} onAdd={onAddTask} onToggle={onToggleTask} onRemove={onRemoveTask} />
+      {/* Eski serbest "gorev"ler yalniz varsa listelenir; yenisi eklenmez --
+          ekleme tek yoldan: Durak ekle (ana sayfa ve Program'da da gorunur). */}
+      {calendarTasks.length ? (
+        <DayTasks date={day} tasks={calendarTasks} onToggle={onToggleTask} onRemove={onRemoveTask} />
+      ) : null}
     </View>
   );
 }
@@ -132,14 +123,5 @@ const styles = StyleSheet.create({
   emptyWrap: {
     paddingVertical: STEP.s2,
     alignItems: "flex-start",
-  },
-  addStopBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s1,
-    height: CONTROL.buttonTertiary,
-    paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
   },
 });
