@@ -1,26 +1,57 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useMemo } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
-import { Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteDetail } from "../../hooks/useRouteDetail";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
+import { useRoadmapNextAction } from "./useRoadmapNextAction";
+import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
+import { flattenRouteStops, routeDateTag, upcomingRouteStops } from "../../domain/route/routeOverview";
+import { SCREENS } from "../../constants/screens";
+import { GUTTER, STEP } from "../../themes/tokens";
 import { RouteAccessGate } from "./components/RouteAccessGate";
-import { RouteDetailChart } from "./components/RouteDetailChart";
-import { RouteEmptyChart } from "../../components/charts/RouteEmptyChart";
+import { RouteNetIntro } from "./components/RouteNetIntro";
 import { RouteEmptyState } from "./components/RouteEmptyState";
 import { RouteHeader } from "./components/RouteHeader";
 import RouteLinkRow from "./components/RouteLinkRow";
 import { RouteProjectionCard } from "./components/RouteProjectionCard";
 import { RouteTempoSection } from "./components/RouteTempoSection";
 import { RouteUpcomingStops } from "./components/RouteUpcomingStops";
-
+import { RouteThisWeekStrip } from "./components/RouteThisWeekStrip";
+import { RouteNextActionCard } from "./components/RouteNextActionCard";
+import { RouteWeeksTimeline } from "./components/RouteWeeksTimeline";
+import { RouteTopicDebtRow } from "./components/RouteTopicDebtRow";
 
 export default function RoadmapScreen() {
   const C = useC();
+  const navigation = useNavigation();
   const d = useRouteDetail();
   const { view } = d;
+  const route = useStudyRoute({ persist: false });
+  const { weeks, isPaused, routeCreated } = route;
+
+  const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({
+    navigation,
+    routeCreated,
+    weeks,
+  });
+
+  const enrichedUpcoming = useMemo(() => {
+    const flat = flattenRouteStops(weeks, { routeFrozen: isPaused });
+    return upcomingRouteStops(flat, 3).map((item) => {
+      const seg = item.stop?.segmentIndex;
+      return {
+        key: item.key,
+        name: item.stop.topic,
+        part: seg != null && seg > 0 ? `${seg + 1}. bölüm` : null,
+        note: item.stop.subjectLabel || null,
+        date: routeDateTag(item.weekStart),
+      };
+    });
+  }, [weeks, isPaused]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -42,34 +73,37 @@ export default function RoadmapScreen() {
             />
           ) : (
             <>
-              <Animated.View>
-                <View style={s.introHeader}>
-                  <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>NET ORTALAMASI</Text>
-                  {view.caption ? (
-                    <Text style={[TYPOGRAPHY.caption, s.caption, { color: C.text3 }]}>{view.caption}</Text>
-                  ) : null}
-                </View>
-                <View style={s.chart}>
-                  {d.chartReady && view.chart ? (
-                    <RouteDetailChart chart={view.chart} target={d.targetNet} examDateTag={d.examDateTag} />
-                  ) : (
-                    <RouteEmptyChart examDateTag={d.examDateTag} declared={d.declared} />
-                  )}
-                </View>
+              <RouteNetIntro
+                C={C}
+                view={view}
+                chartReady={d.chartReady}
+                targetNet={d.targetNet}
+                examDateTag={d.examDateTag}
+                declared={d.declared}
+              />
 
-                {/* Olculmus tahmin yokken bile yolun uzunlugu bilinir:
-                    kalan gun, durak sayisi ve haftalik tempo. Hepsi gercek. */}
-                {!d.chartReady && d.declared?.summary ? (
-                  <Text style={[TYPOGRAPHY.meta, s.declaredSummary, { color: C.text3 }]}>
-                    {d.declared.summary}
-                  </Text>
-                ) : null}
-              </Animated.View>
-              
+              <RouteThisWeekStrip
+                C={C}
+                currentWeek={weeks?.[0]}
+                promiseText={d.promiseText}
+                onPress={() => openProgram(navigation, PROGRAM_VIEWS.WEEK)}
+              />
+
+              {nextRouteAction ? (
+                <RouteNextActionCard
+                  C={C}
+                  action={nextRouteAction}
+                  onStart={startNextRouteAction}
+                  onOpenStop={() => d.openStop(nextRouteAction.stopId || nextRouteAction.topicName)}
+                />
+              ) : null}
+
+              <RouteTopicDebtRow C={C} onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)} />
+
               <Animated.View style={s.cardSection}>
                 <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
               </Animated.View>
-              
+
               <Animated.View style={s.section}>
                 {view.tempoRows?.length ? (
                   <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
@@ -84,10 +118,12 @@ export default function RoadmapScreen() {
                   ) : null}
                 </View>
               </Animated.View>
-              
+
+              <RouteWeeksTimeline C={C} weeks={weeks} />
+
               <Animated.View style={s.section}>
-                {(d.upcoming?.length ?? 0) > 0 ? (
-                  <RouteUpcomingStops items={d.upcoming} onStop={d.openStop} />
+                {enrichedUpcoming.length > 0 ? (
+                  <RouteUpcomingStops items={enrichedUpcoming} onStop={d.openStop} />
                 ) : null}
               </Animated.View>
             </>
@@ -101,10 +137,6 @@ export default function RoadmapScreen() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: 100 },
-  introHeader: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
-  caption: { marginTop: STEP.s1 / 2 },
-  chart: { marginTop: 12 },
-  declaredSummary: { paddingHorizontal: GUTTER, marginTop: STEP.s2 },
   cardSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
   section: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 + 4 },
   links: { gap: STEP.s1 + 2, marginTop: STEP.s2 + 4 },
