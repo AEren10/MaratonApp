@@ -9,7 +9,6 @@ import { HomeTopBar } from "./components/HomeTopBar";
 import { HomeHero } from "./components/HomeHero";
 import { HomeExamAftermathRow } from "./components/HomeExamAftermathRow";
 import { HomeProBody } from "./components/HomeProBody";
-import { HomeFreeBody } from "./components/HomeFreeBody";
 import { HomeLoading } from "./components/HomeLoading";
 import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
@@ -39,10 +38,9 @@ export default function HomeScreen() {
   }, [dashboard.weekLogs, h.streak, h.longestStreak]);
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
 
-  const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} dueCount={dueCount} go={actions} />
-    : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
-  ), [h.stops, h.recent, h.isInGrace, dashboard.subjectMomentum, dueCount, actions]);
+  const renderBelow = useCallback(() => (
+    <HomeProBody stops={h.stops} momentum={dashboard.subjectMomentum} dueCount={dueCount} go={actions} />
+  ), [h.stops, dashboard.subjectMomentum, dueCount, actions]);
 
   let body;
   if (h.loading) {

@@ -117,8 +117,6 @@ export const PROFIL_STACK = [
   SCREENS.DOCUMENT,         // Belge (gizlilik / kullanim sartlari metni)
   SCREENS.HOW_IT_WORKS,     // Neye Gore Oneriyoruz (ROTA'da da var)
   SCREENS.EXAM_DATE,        // Tarih Secici
-  SCREENS.SUBSCRIPTION,     // Abonelik ve Hesap
-  SCREENS.SUBSCRIPTION_CANCEL, // Abonelik Iptali (onay)
   SCREENS.ABOUT,
   SCREENS.DATA_EXPORT,      // Veri Indir
   SCREENS.ACCOUNT_DELETE,   // Hesap Silme (tam onay ekrani)
@@ -130,7 +128,6 @@ export const PROFIL_STACK = [
   SCREENS.EXAM_DAY_PLAN,    // (paylasimli) Profil satiri
   SCREENS.EXAM_RESULT,      // (paylasimli)
   SCREENS.FORECAST_ACCURACY, // (paylasimli)
-  SCREENS.PREMIUM,          // Maraton Pro (tam sunum)
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
   // Sosyal/Lig — Defter topluluk soru-cevap v1 disi; Lig ve arkadas
@@ -161,6 +158,9 @@ export const ROOT_ONLY = [
   SCREENS.PAYMENT_PROCESSING,
   SCREENS.PAYMENT_SUCCESS,
   SCREENS.PAYMENT_FAILED,
+  SCREENS.SUBSCRIPTION,
+  SCREENS.SUBSCRIPTION_CANCEL,
+  SCREENS.PREMIUM,
   // Pro Onizleme her sekmedeki kilitli ozellikten aciliyor; tek bir
   // sekme stack'ine koymak sekme atlatirdi.
   SCREENS.PRO_PREVIEW,
