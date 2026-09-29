@@ -29,7 +29,13 @@ export function RecordRow({ label, value, placeholder, onPress, children }) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 2, minHeight: CONTROL.tapMin },
-  label: { flex: 1, letterSpacing: 2.07 },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    minHeight: CONTROL.buttonPrimary,
+    paddingVertical: STEP.s1 / 2,
+  },
+  label: { flex: 1, letterSpacing: 1.8 },
   value: { flexShrink: 1, maxWidth: "62%" },
 });
