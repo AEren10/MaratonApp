@@ -1,14 +1,17 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
 import { Button } from "../../components/design";
+import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteStopDetail } from "../../hooks/useRouteStopDetail";
 import { GUTTER, STEP } from "../../themes/tokens";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { RouteAccessGate } from "./components/RouteAccessGate";
 import { RouteHeader } from "./components/RouteHeader";
+import RouteLinkRow from "./components/RouteLinkRow";
 import { RouteStatTiles } from "./components/RouteStatTiles";
 import { RouteStopHero } from "./components/RouteStopHero";
 import { RouteStopPlace } from "./components/RouteStopPlace";
@@ -19,6 +22,7 @@ import { RouteStopWhy } from "./components/RouteStopWhy";
 // Parametre: { stopKey } (routeOverview.routeStopKey).
 export default function RouteStopDetailScreen() {
   const C = useC();
+  const navigation = useNavigation();
   const d = useRouteStopDetail();
   const { stop } = d;
   const color = stop ? subjectColorOf(C, stop.subject) : C.accent;
@@ -54,6 +58,16 @@ export default function RouteStopDetailScreen() {
                 ]}
               />
             </Animated.View>
+            <Animated.View style={s.linkSection}>
+              <RouteLinkRow
+                title="Konuyu aç"
+                subtitle="Çalışma geçmişi, soru doğruluğu ve defter"
+                onPress={() => navigation.navigate(SCREENS.TOPIC_STUDY, {
+                  subjectKey: stop.subject,
+                  topicName: stop.topic,
+                })}
+              />
+            </Animated.View>
             <Animated.View style={s.actions}>
               {d.canStart ? (
                 <Button size="lg" fullWidth onPress={d.start}>Çalışmaya başla</Button>
@@ -74,5 +88,6 @@ export default function RouteStopDetailScreen() {
 const s = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: STEP.s4 },
+  linkSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   actions: { paddingHorizontal: GUTTER, paddingTop: STEP.s4, gap: STEP.s2 },
 });
