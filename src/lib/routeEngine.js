@@ -46,6 +46,7 @@ export function buildRoute({
   studyLogDataState = "ready",
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
   habitLoad = null,          // { questionsPerWeek, minutesPerWeek } gunluk rutinlerin haftalik yuku
+  knownTopics = {},          // { ders: { konu: "YYYY-MM-DD"|null } } ogrencinin "hallettim" tikleri
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
   targetReached = false,     // son net hedefte: hedefi koruma modu
@@ -131,7 +132,22 @@ export function buildRoute({
 
       const wrongs = wrongsByTopic?.[subject.key]?.[name] || null;
 
-      if (cost.done) {
+      // "HALLETTIM" TIKI: ogrenci konuyu (okulda) bitirdigini soyluyor. Ogrenme
+      // duragi verilmez; konu bilinen sayilir ve yalniz unutma egrisine gore
+      // ara sira kisa tekrar gelir. Yanlis defteri baska bir sey soylerse
+      // yanlis tekrari yine gelir. Son soz ogrencinin.
+      const knownAt = knownTopics?.[subject.key]?.[name];
+      const declaredKnown = knownAt !== undefined && !cost.done;
+      const reviewTp = declaredKnown ? {
+        ...tp,
+        total_questions: Math.max(q, 20),
+        correct_count: Math.max(Number(tp.correct_count) || 0, Math.round(Math.max(q, 20) * 0.85)),
+        study_count: Math.max(Number(tp.study_count) || 0, 2),
+        last_studied_at: [tp.last_studied_at, knownAt ? `${knownAt}T12:00:00Z` : now.toISOString()]
+          .filter(Boolean).sort().pop(),
+      } : tp;
+
+      if (cost.done || declaredKnown) {
         masteredCount += 1;
 
         // Ustalasilmis konuda zamani gelmis yanlislar: kisa yanlis tekrari.
@@ -166,7 +182,7 @@ export function buildRoute({
         // TEKRAR olarak geri girer. Maliyeti sıfırdan öğrenmenin çok altında,
         // önceliği ise yüksek: unutulmakta olanı tazelemek, yeniye baştan
         // başlamaktan neredeyse her zaman daha kârlı.
-        const rs = reviewStatus(tp, now);
+        const rs = reviewStatus(reviewTp, now);
         if (rs.needsReview) {
           const rCost = reviewCost(20, rs.retention);
           items.push({

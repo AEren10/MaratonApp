@@ -34,6 +34,8 @@ import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
+import { knownTopicsByKey } from "../domain/route/knownTopics";
+import { useKnownTopicsMap } from "../lib/topicCompletion";
 import { habitWeeklyLoad } from "../domain/route/habits";
 import { useRouteHabits } from "./useRouteHabits";
 import { useClassSchedule } from "./useClassSchedule";
@@ -279,6 +281,14 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     [habits, schedule],
   );
 
+  // "Hallettim" tikleri: ogrenme duragi verilmez, yalniz seyrek tekrar.
+  const knownMap = useKnownTopicsMap(user?.id);
+  const knownTopics = useMemo(() => knownTopicsByKey(knownMap), [knownMap]);
+  const knownHash = useMemo(
+    () => Object.entries(knownMap || {}).filter(([, v]) => v).map(([k]) => k).sort().join("|"),
+    [knownMap],
+  );
+
   // Durak sonrasi geri bildirim: konunun zorlugu kisiye gore.
   const topicFeel = useMemo(() => topicFeelFromLogs(weekLogs || []), [weekLogs]);
 
@@ -300,11 +310,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     wrongsHash,
     targetReached ? "keep" : "",
     habitLoad ? habitLoad.questionsPerWeek : "",
+    knownHash,
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, habitLoad, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, habitLoad, knownHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -319,10 +330,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     targetReached,
     topicFeel,
     habitLoad,
+    knownTopics,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, habitLoad, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {

@@ -63,3 +63,34 @@ export async function saveStopMoves(userId, moves) {
     throw e;
   }
 }
+
+// "Hallettim" isaretleri (route_prefs.known_topics): { "<ders>:<konu>": tarih | false }.
+export async function getKnownTopics(userId) {
+  if (!userId || userId === "dev") return {};
+  try {
+    const { data, error } = await supabase
+      .from("route_prefs")
+      .select("known_topics")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data?.known_topics && typeof data.known_topics === "object" ? data.known_topics : {};
+  } catch (e) {
+    handleSupabaseError(e, "getKnownTopics");
+    throw e;
+  }
+}
+
+export async function saveKnownTopics(userId, map) {
+  if (!userId || userId === "dev") return map;
+  try {
+    const { error } = await supabase
+      .from("route_prefs")
+      .upsert({ user_id: userId, known_topics: map || {}, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    if (error) throw error;
+    return map;
+  } catch (e) {
+    handleSupabaseError(e, "saveKnownTopics");
+    throw e;
+  }
+}
