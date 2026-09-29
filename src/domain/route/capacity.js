@@ -43,7 +43,7 @@ export function estimateWeeklyCapacity(
   logs = [],
   dailyQuestionGoal = 20,
   now = new Date(),
-  { dataState = "ready", weeklyMinutesGoal = 0 } = {},
+  { dataState = "ready", weeklyMinutesGoal = 0, recovering = false } = {},
 ) {
   // Ogrencinin beyan ettigi haftalik sure siniri: plan bunu asmaz (gozlenen
   // tempo zaten ustundeyse onu kesmeyiz). Eskiden hic okunmuyordu.
@@ -96,7 +96,18 @@ export function estimateWeeklyCapacity(
     .map(([, week]) => week);
   if (!weeks.length) return fallbackCapacity(dailyQuestionGoal);
   const observedWeeks = weeks.filter((week) => week.q > 0 || week.m > 0).length;
-  if (observedWeeks === 0) return fallbackCapacity(dailyQuestionGoal);
+  // Kayit var ama son haftalarda hic yok (uzun ara): hedefin tamamiyla
+  // degil, kademeli baslanir. Eskiden 4+ hafta ara verene 3 hafta ara
+  // verenden DAHA COK is dusuyordu (hedefin tamami).
+  if (observedWeeks === 0) {
+    const base = fallbackCapacity(dailyQuestionGoal);
+    return capMinutes({
+      ...base,
+      questionsPerWeek: Math.max(20, Math.round(base.questionsPerWeek * 0.6)),
+      minutesPerWeek: Math.max(60, Math.round(base.minutesPerWeek * 0.6)),
+      comeback: true,
+    });
+  }
 
   // Ortalama değil MEDYAN: tek bir maraton hafta ya da tek boş hafta
   // kapasiteyi yanıltmasın.
@@ -110,7 +121,9 @@ export function estimateWeeklyCapacity(
   // yariya, 3'u bossa sifira iniyordu (700 soruluk haftadan sonra "haftada
   // 10 soru"). Tempo AKTIF haftalardan, duzenlilik ayri carpan.
   const active = weeks.filter((week) => week.q > 0 || week.m > 0);
-  const consistency = consistencyFactor(observedWeeks, weeks.length);
+  // Dondurmadan donus: ara zaten bilinen bir ara; bos haftalar duzenlilik
+  // cezasi DEGIL (rampa ayrica kademeli getiriyor, ikisi ust uste binmesin).
+  const consistency = recovering ? 1 : consistencyFactor(observedWeeks, weeks.length);
   const observedQ = Math.round(med(active.map((w) => w.q)) * consistency);
   const observedM = Math.round(med(active.map((w) => w.m)) * consistency);
   const activeDays = med(active.map((w) => w.days.size));

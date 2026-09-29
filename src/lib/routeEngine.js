@@ -57,7 +57,8 @@ export function buildRoute({
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
-    studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState, weeklyMinutesGoal },
+    studyLogs, dailyQuestionGoal, now,
+    { dataState: studyLogDataState, weeklyMinutesGoal, recovering: pausedWeeks != null },
   );
   // Gunluk rutin (paragraf, problem...) rota butcesinin ICINDE: haftalik
   // yuku dusulur, yoksa ogrenci rutin + tam rota ile asiri yuklenir.
@@ -152,13 +153,18 @@ export function buildRoute({
       // yanlis tekrari yine gelir. Son soz ogrencinin.
       const knownAt = knownTopics?.[subject.key]?.[name];
       const declaredKnown = knownAt !== undefined && !cost.done;
+      // Bildirilen konu GUCLU hafiza sayilir (ilk tekrar ~18 gun sonra) ve
+      // tekrarlar konuya gore 0-6 gun kaydirilir: ayni gun tiklenen 25 konu
+      // eskiden 5 gun sonra ayni anda tekrara dusuyordu.
+      const jitterDays = [...String(name)].reduce((n, ch) => n + ch.charCodeAt(0), 0) % 7;
+      const knownBase = knownAt ? new Date(`${knownAt}T12:00:00Z`) : now;
+      const knownStamp = new Date(knownBase.getTime() + jitterDays * 86400000).toISOString();
       const reviewTp = declaredKnown ? {
         ...tp,
-        total_questions: Math.max(q, 20),
-        correct_count: Math.max(Number(tp.correct_count) || 0, Math.round(Math.max(q, 20) * 0.85)),
-        study_count: Math.max(Number(tp.study_count) || 0, 2),
-        last_studied_at: [tp.last_studied_at, knownAt ? `${knownAt}T12:00:00Z` : now.toISOString()]
-          .filter(Boolean).sort().pop(),
+        total_questions: Math.max(q, 100),
+        correct_count: Math.max(Number(tp.correct_count) || 0, Math.round(Math.max(q, 100) * 0.9)),
+        study_count: Math.max(Number(tp.study_count) || 0, 12),
+        last_studied_at: [tp.last_studied_at, knownStamp].filter(Boolean).sort().pop(),
       } : tp;
 
       if (cost.done || declaredKnown) {
@@ -277,6 +283,15 @@ export function buildRoute({
         reasonCodes,
         dataConfidence: q >= 20 ? "high" : q >= 5 ? "medium" : "low",
       });
+    }
+  }
+
+  // SINAVA YAKIN (30 gun): yeni ve hic calisilmamis konu kovalamak yerine
+  // tekrar ve yanlis one; hic dokunulmamis konu geri.
+  if (daysLeft != null && daysLeft <= 30) {
+    for (const item of items) {
+      if (item.isReview) item.score = Math.round(item.score * 1.5 * 100) / 100;
+      else if ((Number(item.q) || 0) === 0) item.score = Math.round(item.score * 0.6 * 100) / 100;
     }
   }
 

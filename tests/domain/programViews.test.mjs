@@ -149,3 +149,10 @@ test("deneme provasi gunune durak dusmez; ogrencinin tasidigi durak ise dusebili
   const moved = assignWeekStops([s("A")], null, { monday: "2026-09-28", blockedDates: ["2026-10-03"], moves: { A: "2026-10-03" } });
   assert.equal(moved[5][0].topic, "A");
 });
+
+test("sinav gunu ve sonrasina durak dusmez", () => {
+  const s = (k) => ({ subject: "tyt_matematik", topic: k, cost: { minutes: 30 } });
+  const days = assignWeekStops([s("A"), s("B"), s("C"), s("D")], null, { monday: "2026-06-08", examDate: "2026-06-11" });
+  assert.equal(days[3].length + days[4].length + days[5].length + days[6].length, 0);
+  assert.equal(days[0].length + days[1].length + days[2].length, 4);
+});

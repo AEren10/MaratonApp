@@ -60,7 +60,7 @@ function movedDayIndex(stop, moves, monday) {
 }
 
 export function assignWeekStops(stops = [], schedule = null, {
-  rhythm = null, moves = null, monday = null, blockedDates = null, firstDate = null,
+  rhythm = null, moves = null, monday = null, blockedDates = null, firstDate = null, examDate = null,
 } = {}) {
   const days = Array.from({ length: 7 }, () => []);
   // Deneme provasi gunu (blockedDates) calisma gunu sayilmaz: ana sayfa o gun
@@ -75,7 +75,11 @@ export function assignWeekStops(stops = [], schedule = null, {
     ? Math.round((new Date(`${firstDate}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000)
     : 0;
   const base = studyWeekdays(schedule).filter((d) => !blocked.has(d));
-  const fromFirst = base.filter((d) => d >= firstIdx);
+  // Sinav gunu ve sonrasina durak dusmez.
+  const examIdx = examDate && monday
+    ? Math.round((new Date(`${String(examDate).slice(0, 10)}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000)
+    : 99;
+  const fromFirst = base.filter((d) => d >= firstIdx && d < examIdx);
   const allowed = fromFirst.length ? fromFirst : base;
   if (allowed.length === 0) return days;
   const load = Array(7).fill(0);
