@@ -144,7 +144,7 @@ export async function savePlacementEstimates(userId, estimates = []) {
 }
 
 /** Seviye testi daha önce yapılmış mı — onboarding'de tekrar sormamak için. */
-export function hasPlacementData(userId) {
+export async function hasPlacementData(userId) {
   if (!userId || userId === "dev") return false;
   const key = makeInFlightKey("topic_progress", userId, { operation: "placement_count" });
   return shareInFlight(key, async () => {

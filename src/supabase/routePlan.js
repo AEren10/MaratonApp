@@ -150,7 +150,7 @@ export async function getLatestRouteStops(userId, examType = null) {
   });
 }
 
-export function getRouteStops(userId, revisionId = null) {
+export async function getRouteStops(userId, revisionId = null) {
   if (!userId || userId === "dev") return [];
   const key = makeInFlightKey("route_plan", userId, { operation: "stops", revisionId });
   return shareInFlight(key, async () => {
@@ -172,7 +172,7 @@ export function getRouteStops(userId, revisionId = null) {
   });
 }
 
-export function getRouteStopById(stopId, userId = null) {
+export async function getRouteStopById(stopId, userId = null) {
   if (!stopId || stopId === "dev") return null;
   const key = makeInFlightKey("route_plan", userId, { operation: "stop", stopId });
   return shareInFlight(key, async () => {
@@ -273,7 +273,7 @@ export async function transitionRouteStop({
  * Geçmiş haftaların planı — borç hesabının girdisi.
  * @param sinceWeekStart "YYYY-MM-DD"
  */
-export function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
+export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
   if (!userId) return [];
   const key = makeInFlightKey("route_plan", userId, { operation: "weeks", sinceWeekStart, examType });
   return shareInFlight(key, async () => {
