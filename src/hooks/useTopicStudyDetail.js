@@ -3,60 +3,12 @@ import { getStudyLogsByTopic } from "../supabase/studyLogs";
 import { getWrongQuestions } from "../supabase/wrongQuestions";
 import { getTopicProgress } from "../supabase/topicProgress";
 import { formatMinutes } from "../lib/format";
-import { todayTR } from "../lib/dateUtils";
-
-// Defterdeki bir yanlisin "ne zaman tekrar edilecegi" etiketi. Tasarim bu
-// alani {{w.due}} olarak dinamik biraktigi icin bicimi biz seciyoruz —
-// next_review_at gercek SR alanindan hesaplaniyor, uydurulmuyor.
-function dueMeta(item) {
-  if (!item.next_review_at) return { label: "YENİ", tone: "muted" };
-  const days = Math.ceil((new Date(item.next_review_at).getTime() - Date.now()) / 86400000);
-  if (days <= 0) return { label: "BUGÜN", tone: "warn" };
-  if (days === 1) return { label: "YARIN", tone: "muted" };
-  return { label: `${days} GÜN`, tone: "muted" };
-}
-
-function lastStudyLabel(studyDate) {
-  if (!studyDate) return "Henüz yok";
-  const days = Math.round((Date.parse(todayTR()) - Date.parse(String(studyDate).slice(0, 10))) / 86400000);
-  if (days <= 0) return "Bugün";
-  if (days === 1) return "Dün";
-  return `${days} gün önce`;
-}
-
-function shortDate(value) {
-  try {
-    return new Date(value).toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
-  } catch {
-    return "";
-  }
-}
-
-function monthLabel(date) {
-  try {
-    return date.toLocaleDateString("tr-TR", { month: "long" }).toUpperCase();
-  } catch {
-    return "";
-  }
-}
-
-// "Calisma birikimi" egrisi: gunluk kayitlardan kumulatif soru sayisi.
-// 2'den az veri noktasi varsa egri gosterilmiyor — cizgi uydurulmuyor.
-function buildChart(sortedLogs) {
-  if (sortedLogs.length < 2) return null;
-  let cumulative = 0;
-  const points = sortedLogs.map((log) => {
-    cumulative += log.question_count || 0;
-    return { date: new Date(log.study_date), value: cumulative };
-  });
-  if (points[points.length - 1].value <= 0) return null;
-  return {
-    points,
-    totalLabel: `${points[points.length - 1].value} SORU`,
-    startLabel: monthLabel(points[0].date),
-    endLabel: monthLabel(points[points.length - 1].date),
-  };
-}
+import {
+  dueMeta,
+  lastStudyLabel,
+  shortDate,
+  buildChart,
+} from "./topicStudyDetailHelpers";
 
 export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
   const [history, setHistory] = useState([]);
@@ -151,7 +103,17 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
   const lastStudyDate = sortedLogs.length ? sortedLogs[sortedLogs.length - 1].study_date : null;
 
   return {
-    loading, error, refetch, totalDurationLabel, chart, wrongList, lastStudyDate,
-    totalQuestions, correctCount, accuracy, recentLogs, lastStudyText: lastStudyLabel(lastStudyDate),
+    loading,
+    error,
+    refetch,
+    totalDurationLabel,
+    chart,
+    wrongList,
+    lastStudyDate,
+    totalQuestions,
+    correctCount,
+    accuracy,
+    recentLogs,
+    lastStudyText: lastStudyLabel(lastStudyDate),
   };
 }
