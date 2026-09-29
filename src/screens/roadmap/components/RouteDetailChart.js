@@ -5,7 +5,7 @@ import { RouteLineChart } from "../../../components/charts/RouteLineChart";
 import { useC } from "../../../contexts/ThemeContext";
 import { makeScale, netTicks } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { CHART_H, CHART_W, scaleOptions } from "../../../components/charts/chartStyle";
+import { CHART_H, CHART_W, lineScaleOptions } from "../../../components/charts/chartStyle";
 
 import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
@@ -36,7 +36,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
     const allValues = [...values, ...projection, ...(hasTarget ? [target] : [])];
     const total = values.length + projection.length;
     // Bolunmus eksen (netChartData.routeXs) grafikle ayni olcekten.
-    const sc = makeScale(allValues, { ...scaleOptions({ hasAxis: false }), xs: chart?.xs || null });
+    const sc = makeScale(allValues, lineScaleOptions({ flagged: hasTarget && projection.length > 0, xs: chart?.xs || null }));
     const last = Math.max(0, values.length - 1);
     const [todayPoint] = sc.toPoints([values[last]], { count: total, offset: last });
     const endValue = projection.length ? projection[projection.length - 1] : null;

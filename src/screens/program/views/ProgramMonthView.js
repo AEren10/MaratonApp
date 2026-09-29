@@ -34,7 +34,13 @@ export function ProgramMonthView() {
   }
 
   return (
-    <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+    // Gorev ekle girisi sayfanin dibinde: klavye acilinca iOS kaydirip gorunur tutsun.
+    <ScrollView
+      contentContainerStyle={s.scroll}
+      showsVerticalScrollIndicator={false}
+      automaticallyAdjustKeyboardInsets
+      keyboardShouldPersistTaps="handled"
+    >
       <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} />
       <MonthGrid
         monthDate={monthDate}
@@ -44,7 +50,11 @@ export function ProgramMonthView() {
         dailyGoal={dailyGoal}
       />
       <StreakLegend />
-      <StreakMonthCard monthDate={monthDate} stats={stats} />
+      <StreakMonthCard
+        monthDate={monthDate}
+        stats={stats}
+        onPress={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
+      />
       <DayDetails
         day={selectedDay}
         data={dayMap[selectedDay]}

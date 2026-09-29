@@ -69,6 +69,7 @@ export const PROGRAM_STACK = [
   SCREENS.EXAM_DATE,        // Hedefler -> Sinav tarihi (sekme degismez)
   SCREENS.DATA_EXPORT,      // Nasil calisir -> Verilerimi indir
   SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
+  SCREENS.SUMMARY,          // Ay ozeti karti -> Ayin ozeti (ROTA'da da var)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
   SCREENS.TOPIC_STUDY,      // Konu Detayi

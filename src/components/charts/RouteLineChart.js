@@ -19,8 +19,8 @@ import {
   netTicks,
 } from "../../lib/routeChartPath";
 import {
-  CHART_W, CHART_H, PAD_RIGHT, EFFORT_PAD_LEFT,
-  STROKE, LABEL, scaleOptions, axisAnchor,
+  CHART_W, CHART_H, PAD_RIGHT,
+  STROKE, LABEL, lineScaleOptions, axisAnchor,
 } from "./chartStyle";
 
 const W = CHART_W;
@@ -37,11 +37,12 @@ export const RouteLineChart = memo(function RouteLineChart({
   const values = useMemo(() => safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0)), [safeStops]);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
   // tickLabels: sol eksende net etiketleri (ana sayfa); yer acmak icin genis sol pay.
-  const scaleOpts = { ...scaleOptions({ hasAxis }), xs, ...(tickLabels ? { padLeft: EFFORT_PAD_LEFT } : {}) };
+  const flagged = typeof target === "number" && safeProj.length > 0; // bayrak diregine ust pay
+  const scaleOpts = lineScaleOptions({ hasAxis, tickLabels, flagged, xs });
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
-    [values, safeProj, target, xs],
+    [values, safeProj, target, xs, tickLabels, hasAxis],
   );
 
   const points = useMemo(() => sc.toPoints(values, { count: totalCount }), [sc, values, totalCount]);

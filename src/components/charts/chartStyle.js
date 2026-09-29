@@ -103,6 +103,19 @@ export function scaleOptions({ hasAxis }) {
   };
 }
 
+// Net cizgi grafiginin olcek ayari: RouteLineChart ve etiketlerini ayri
+// cizen RouteDetailChart AYNI fonksiyonu kullanir, yoksa etiketler kayar.
+// flagged: hedef bayragi cizilecek; bayrak diregi icin ust pay acilir.
+export function lineScaleOptions({ hasAxis = false, tickLabels = false, flagged = false, xs = null } = {}) {
+  const base = scaleOptions({ hasAxis });
+  return {
+    ...base,
+    xs,
+    ...(tickLabels ? { padLeft: EFFORT_PAD_LEFT } : {}),
+    ...(flagged ? { padTop: base.padTop + 16 } : {}),
+  };
+}
+
 // Eksenin uc etiketinin x konumu ve hizalamasi.
 // midShare: orta etiketin (bugun) 0..1 konumu; bolunmus eksende gecmisin sonu.
 export function axisAnchor(index, count, midShare = 0.5) {

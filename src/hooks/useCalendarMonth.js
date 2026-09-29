@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -24,6 +24,9 @@ export function useCalendarMonth(initialOffset = 0) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tick, setTick] = useState(0);
+  // Iskelet yalniz ILK yuklemede. Ay degisince tum sayfa iskelete donup
+  // yeniden yukleniyor gibi gorunuyordu; izgara yerinde kalir, veri dolar.
+  const loadedOnce = useRef(false);
 
   const from = useMemo(() => dateKey(new Date(monthDate.getFullYear(), monthDate.getMonth(), 1)), [monthDate]);
   const to = useMemo(() => dateKey(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0)), [monthDate]);
@@ -31,12 +34,12 @@ export function useCalendarMonth(initialOffset = 0) {
   useEffect(() => {
     if (!user?.id || user.id === "dev") { setLoading(false); return undefined; }
     let cancelled = false;
-    setLoading(true);
+    if (!loadedOnce.current) setLoading(true);
     setError(null);
     getStudyLogs(user.id, { from, to })
       .then((data) => { if (!cancelled) setLogs(data || []); })
       .catch((e) => { if (!cancelled) { setLogs([]); setError(e?.message || "load_failed"); } })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .finally(() => { if (!cancelled) { loadedOnce.current = true; setLoading(false); } });
     return () => { cancelled = true; };
   }, [user?.id, from, to, tick]);
 
