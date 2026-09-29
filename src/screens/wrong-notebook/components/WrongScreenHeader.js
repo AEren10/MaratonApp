@@ -2,16 +2,17 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Defter akisinin ust satiri: geri oku ya da kapat carpisi, basik baslik
-// (Bricolage 22) veya harf aralikli bolum etiketi, sagda istege bagli oge.
-export function WrongScreenHeader({ icon = "arrowL", title, label, right, onPress, a11yLabel }) {
+// (Bricolage 28) veya harf aralikli bolum etiketi, baslik rozeti, sagda istege bagli oge.
+export function WrongScreenHeader({ icon = "arrowL", title, label, badge, right, onPress, a11yLabel }) {
   const C = useC();
   return (
     <View style={styles.row}>
-      <Press haptic="none"
+      <Press
+        haptic="none"
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={a11yLabel || (icon === "x" ? "Kapat" : "Geri")}
@@ -20,9 +21,18 @@ export function WrongScreenHeader({ icon = "arrowL", title, label, right, onPres
         <Icon name={icon} size={icon === "x" ? 16 : 18} color={C.text2} />
       </Press>
       {title ? (
-        <Text style={[TYPOGRAPHY.heading, styles.flex, { color: C.text }]} numberOfLines={1}>
-          {title}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text style={[TYPOGRAPHY.heading, styles.titleText, { color: C.text }]} numberOfLines={1}>
+            {title}
+          </Text>
+          {badge !== undefined && badge !== null ? (
+            <View style={[styles.badge, { backgroundColor: C.surface, borderColor: C.line }]}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, styles.badgeText, { color: C.text2 }]}>
+                {badge}
+              </Text>
+            </View>
+          ) : null}
+        </View>
       ) : (
         <Text style={[TYPOGRAPHY.label, styles.flex, { color: C.text3 }]}>{label}</Text>
       )}
@@ -45,6 +55,26 @@ const styles = StyleSheet.create({
     height: CONTROL.tapMin,
     alignItems: "center",
     justifyContent: "center",
+  },
+  titleRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1,
+  },
+  titleText: {
+    flexShrink: 1,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: SHAPE.chip,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    fontVariant: ["tabular-nums"],
   },
   flex: { flex: 1 },
 });

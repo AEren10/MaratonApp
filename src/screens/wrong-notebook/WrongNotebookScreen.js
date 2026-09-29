@@ -12,7 +12,6 @@ import { ReviewDueCard } from "./components/ReviewDueCard";
 import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
-import { NotebookHeaderTabs } from "./components/NotebookHeaderTabs";
 import { useWrongNotebookController } from "./useWrongNotebookController";
 
 export default function WrongNotebookScreen() {
@@ -88,8 +87,7 @@ export default function WrongNotebookScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <WrongScreenHeader title="Defter" onPress={nb.goBack} />
-      <NotebookHeaderTabs C={C} count={view.openCount} />
+      <WrongScreenHeader title="Defterim" badge={view.openCount} onPress={nb.goBack} />
       {body}
     </SafeAreaView>
   );
