@@ -7,10 +7,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
 import { findRouteStop, flattenRouteStops, routeDateTag } from "../domain/route/routeOverview";
 import { routeActionTimerParams } from "../domain/route/routeStartAction";
-import { canTransitionRouteStop, ROUTE_STOP_STATUS as S } from "../domain/route/stopStatus";
+import { ROUTE_STOP_STATUS as S } from "../domain/route/stopStatus";
 import * as H from "../lib/haptics";
 import { getWrongQuestions } from "../supabase/wrongQuestions";
 import { useStudyRoute } from "./useStudyRoute";
+import { useStopMoves } from "./useStopMoves";
+import { useClassSchedule } from "./useClassSchedule";
 
 const STARTABLE = new Set([S.ACTIVE, S.UPCOMING]);
 
@@ -22,7 +24,9 @@ export function useRouteStopDetail() {
   const showAlert = useAlert();
   const { showPaywall } = usePremium();
   const route = useStudyRoute({ persist: false });
-  const { weeks, isPaused, transitionStop } = route;
+  const { weeks, isPaused } = route;
+  const { postponeStop } = useStopMoves();
+  const { schedule } = useClassSchedule();
   const [postponing, setPostponing] = useState(false);
   const [notebook, setNotebook] = useState(null);
 
@@ -49,21 +53,29 @@ export function useRouteStopDetail() {
     }));
   }, [found?.entry.number, navigation, stop]);
 
-  const canPostpone = Boolean(stop?.stopId && canTransitionRouteStop(found?.entry.status, S.RESCHEDULED));
+  // "Ertele" her yerde AYNI: sonraki calisma gunune tasi (useStopMoves).
+  // Eskiden burada duragi RESCHEDULED yapip listeden dusuruyordu; Program'daki
+  // "Ertele" ise yalniz tasiyordu -- ayni kelime iki farkli is.
+  const canPostpone = Boolean(stop?.logicalStopKey)
+    && [S.ACTIVE, S.UPCOMING].includes(found?.entry.status);
   const postpone = useCallback(async () => {
     if (!canPostpone || postponing) return;
     setPostponing(true);
     try {
-      await transitionStop(stop, S.RESCHEDULED, { source: "stop_detail" });
-      H.success();
-      navigation.goBack();
-    } catch {
-      H.error();
-      showAlert("Olmadı", "Bağlantını kontrol edip tekrar dene.");
+      const res = await postponeStop(stop.logicalStopKey, schedule);
+      if (res.ok) {
+        H.success();
+        navigation.goBack();
+      } else {
+        H.warn();
+        showAlert("Ertelenemedi", res.reason === "no_day"
+          ? "Bu hafta başka çalışma günü yok; kalan iş sonraki haftalara yeniden planlanır."
+          : "Bağlantını kontrol edip tekrar dene.");
+      }
     } finally {
       setPostponing(false);
     }
-  }, [canPostpone, navigation, postponing, showAlert, stop, transitionStop]);
+  }, [canPostpone, navigation, postponing, showAlert, stop, postponeStop, schedule]);
 
   const openMore = useCallback(() => {
     showAlert(stop?.topic || "Durak", null, [

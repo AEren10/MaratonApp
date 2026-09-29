@@ -11,7 +11,7 @@ import { startOfWeekTR } from "../lib/dateUtils";
 import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
 import { ensureSingleActiveRouteStop } from "../domain/route/stopStatus";
-import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, pauseRoute, resumeRoute } from "../supabase/routePlan";
+import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, getPastWeekStops, pauseRoute, resumeRoute } from "../supabase/routePlan";
 import { saveRouteStopTransitionOffline } from "../lib/offlineQueue";
 import { persistRouteOnce } from "../lib/routePersistOnce";
 import * as Crypto from "expo-crypto";
@@ -31,7 +31,8 @@ import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
-import { overdueStops } from "../domain/route/overdueStops";
+import { overdueStops, DEBT_WINDOW_DAYS } from "../domain/route/overdueStops";
+import { addDays } from "../domain/program/dayKeys";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { useTodayKey } from "./useTodayKey";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
@@ -712,13 +713,24 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     goals?.dailyQuestions, hasRouteAccess, pastWeeks, progressByKey,
     recoveryWeek, resolvedExamType, user?.id, weakSubjectKeys, weekLogs]);
 
-  // Borç: bitmiş haftaların kapanmamış durakları. Haftalık toplamdan değil,
-  // kullanıcının gerçekten açık kalan route stop'larından türetilir.
+  // Borç: bitmiş haftaların kapanmamış durakları. En son revizyon yalniz
+  // bu hafta ve sonrasini tasir; gecmis haftalar eski revizyonlardan okunur.
+  // thisMonday DUZ tarih: saatli metinle karsilastirma bu haftanin acik
+  // duraklarini "geride kalan" sayiyordu.
+  const [pastStops, setPastStops] = useState([]);
+  useEffect(() => {
+    if (!user?.id || user.id === "dev") return undefined;
+    let alive = true;
+    getPastWeekStops(user.id, { sinceWeek: addDays(thisMonday, -(DEBT_WINDOW_DAYS + 7)), beforeWeek: thisMonday })
+      .then((rows) => { if (alive) setPastStops(rows || []); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [user?.id, thisMonday, routeLoadTick]);
   const debt = useMemo(() => {
     const overdue = overdueStops({
-      stops: persistedStops,
+      stops: pastStops,
       logs: weekLogs,
-      thisMonday: startOfWeekTR(new Date()),
+      thisMonday,
       minutesPerWeek: route.capacity?.minutesPerWeek || 0,
     });
     const totalQuestions = Math.round((overdue.totalMinutes || 0) / MIN_PER_QUESTION);
@@ -727,7 +739,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       totalQuestions,
       hasDebt: (overdue.totalMinutes || 0) > 0,
     };
-  }, [route.capacity?.minutesPerWeek, weekLogs, persistedStops]);
+  }, [route.capacity?.minutesPerWeek, weekLogs, pastStops, thisMonday]);
 
   const pause = useCallback(async () => {
     if (!user?.id) return;
@@ -841,6 +853,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     // Kayitli duraklar (gecmis haftalar dahil) ve son 45 gunun kayitlari:
     // Geride kalan konular durak bazinda hesaplanir (overdueStops).
     savedStops: persistedStops,
+    pastStops,
     recentLogs: weekLogs,
     routeRevisionPreview,
     routeReadiness,

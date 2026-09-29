@@ -461,3 +461,38 @@ export async function addStopToActiveRoute({
   emitRouteUpdated({ action: "stop_added", stop: newStop, stops: updatedStops });
   return newStop;
 }
+
+/**
+ * Gecmis haftalarin duraklari -- "Geride kalan konular" icin.
+ * En son revizyon yalniz bu hafta ve sonrasini tasir; gecmis haftalar eski
+ * revizyonlarda. Ayni durak birden cok revizyonda olabilir: en yeni satir.
+ */
+export async function getPastWeekStops(userId, { sinceWeek, beforeWeek } = {}) {
+  if (!userId || userId === "dev" || !sinceWeek || !beforeWeek) return [];
+  // Rota kancasi bircok ekranda: ayni anda gelen ayni istek tek istek.
+  const key = makeInFlightKey("route_plan", userId, { operation: "past_stops", sinceWeek, beforeWeek });
+  return shareInFlight(key, () => readPastWeekStops(userId, sinceWeek, beforeWeek));
+}
+
+async function readPastWeekStops(userId, sinceWeek, beforeWeek) {
+  try {
+    const { data, error } = await supabase
+      .from("route_stops")
+      .select(ROUTE_STOP_COLUMNS)
+      .eq("user_id", userId)
+      .gte("week_start", sinceWeek)
+      .lt("week_start", beforeWeek)
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw error;
+    const seen = new Set();
+    return (data || []).filter((row) => {
+      if (seen.has(row.logical_key)) return false;
+      seen.add(row.logical_key);
+      return true;
+    });
+  } catch (e) {
+    handleSupabaseError(e, "getPastWeekStops");
+    throw e;
+  }
+}

@@ -4,7 +4,7 @@ import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { overdueStops } from "../domain/route/overdueStops";
 import { distributeDebt } from "../lib/routeEngine";
 import { buildDebtDistributionView } from "../domain/route/debtDistributionView";
-import { startOfWeekTR } from "../lib/dateUtils";
+import { startOfWeekTR, dateKey } from "../lib/dateUtils";
 
 const WEEK_MS = 7 * 86400000;
 const MIN_PER_QUESTION = 1.5;
@@ -24,14 +24,20 @@ const fmtHours = (minutes) => {
  * "Dagit" = duraklari RESCHEDULED'a tasimak (sunucuda kalici gecis).
  */
 export function useTopicDebt() {
-  const { route, savedStops, recentLogs, transitionStop, routeStopsLoaded } = useStudyRoute();
+  const { route, recentLogs, transitionStop, routeStopsLoaded, pastStops } = useStudyRoute();
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState(null);
   const minutesPerWeek = route?.capacity?.minutesPerWeek || 0;
+  // Karsilastirma DUZ tarihle: startOfWeekTR "YYYY-MM-DDT00:00:00+03:00"
+  // donduruyor; metin karsilastirmasinda bu haftanin duraklari "gecmis"
+  // sayiliyor, borc ekrani bu haftanin acik duraklarini gosteriyordu.
+  const thisMonday = dateKey(startOfWeekTR(new Date()));
 
+  // Gecmis haftalar en son revizyonda yok; useStudyRoute eski
+  // revizyonlardan okuyor (pastStops).
   const overdue = useMemo(() => overdueStops({
-    stops: savedStops, logs: recentLogs, thisMonday: startOfWeekTR(new Date()), minutesPerWeek,
-  }), [savedStops, recentLogs, minutesPerWeek]);
+    stops: pastStops, logs: recentLogs, thisMonday, minutesPerWeek,
+  }), [pastStops, recentLogs, thisMonday, minutesPerWeek]);
 
   const stops = useMemo(() => overdue.items.map((it) => ({
     key: it.key,

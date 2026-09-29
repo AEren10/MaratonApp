@@ -43,7 +43,7 @@ export function StopActionModal({ visible, stop, dateKey, onClose }) {
     const res = await postponeStop(stop.logicalStopKey, schedule, dateKey);
     if (res.ok) { H.select(); onClose(); return; }
     Alert.alert("Erteleme yapılamadı", res.reason === "no_day"
-      ? "Bu hafta başka çalışma günü yok; hafta bitince Geride kalan konulara düşer."
+      ? "Bu hafta başka çalışma günü yok; kalan iş sonraki haftalara yeniden planlanır."
       : "Kaydedilemedi. Bağlantını kontrol et.");
   };
 
