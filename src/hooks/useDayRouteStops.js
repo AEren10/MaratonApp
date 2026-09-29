@@ -4,6 +4,7 @@ import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
 import { stopsForDate } from "../domain/program/todayStops";
 import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { useHabitStops } from "./useHabitStops";
 import { mondayOf } from "../domain/program/dayKeys";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { subjectPaletteKey } from "../themes/subjectPalette";
@@ -20,6 +21,7 @@ export function useDayRouteStops(dateKey) {
   const { weeks, routeStopsLoaded } = useStudyRoute({ persist: false });
   const { schedule, loading: scheduleLoading } = useClassSchedule();
   const rhythm = useWeekdayRhythm();
+  const habitStops = useHabitStops(dateKey);
   const { tasks: todayTasks } = useUserTasks();
   const isToday = dateKey === todayTR();
   const datedTasks = useDatedUserTasks(isToday ? null : dateKey);
@@ -45,7 +47,7 @@ export function useDayRouteStops(dateKey) {
       }))
       : [];
     if (!week) return extras;
-    return [...stopsForDate(week, schedule, dateKey, { rhythm }).map((stop, i) => {
+    return [...[...habitStops, ...stopsForDate(week, schedule, dateKey, { rhythm })].map((stop, i) => {
       const done = stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED;
       return {
         id: stop.logicalStopKey || `${stop.subject}-${stop.topic}-${i}`,
@@ -59,7 +61,7 @@ export function useDayRouteStops(dateKey) {
         source: "route",
       };
     }), ...extras];
-  }, [dateKey, weeks, schedule, userTasks, rhythm]);
+  }, [dateKey, weeks, schedule, userTasks, rhythm, habitStops]);
 
   return { stops, loading: scheduleLoading || !routeStopsLoaded };
 }

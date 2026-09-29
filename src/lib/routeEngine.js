@@ -44,6 +44,7 @@ export function buildRoute({
   now = new Date(),
   studyLogDataState = "ready",
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
+  habitLoad = null,          // { questionsPerWeek, minutesPerWeek } gunluk rutinlerin haftalik yuku
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
   targetReached = false,     // son net hedefte: hedefi koruma modu
@@ -52,7 +53,15 @@ export function buildRoute({
   const baseCapacity = estimateWeeklyCapacity(
     studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState },
   );
-  const capacity = rampedCapacity(baseCapacity, pausedWeeks);
+  // Gunluk rutin (paragraf, problem...) rota butcesinin ICINDE: haftalik
+  // yuku dusulur, yoksa ogrenci rutin + tam rota ile asiri yuklenir.
+  const ramped = rampedCapacity(baseCapacity, pausedWeeks);
+  const capacity = habitLoad?.questionsPerWeek > 0 ? {
+    ...ramped,
+    questionsPerWeek: Math.max(10, ramped.questionsPerWeek - habitLoad.questionsPerWeek),
+    minutesPerWeek: Math.max(30, ramped.minutesPerWeek - (habitLoad.minutesPerWeek || 0)),
+    habitLoad,
+  } : ramped;
   // Kisinin kendi hizi: durak sureleri "35 dk" dediginde gercekten 35 dk olsun.
   const pace = personalPace(studyLogs);
 

@@ -39,6 +39,7 @@ export const ROTA_STACK = [
   SCREENS.DATA_EXPORT,      // Nasil calisir -> Verilerimi indir
   SCREENS.PLAN_DETAIL,      // Gunluk Plan (PROGRAM'da da var)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (paylasimli)
+  SCREENS.ROUTE_HABITS,     // Gunluk rutin (ders programi yaninda)
   SCREENS.TOPIC_DEBT,       // Konu Borcu (Rotanin tamami satiri; PROGRAM'da da var)
   SCREENS.NET_FORECAST,     // Senaryolar
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi
@@ -71,6 +72,7 @@ export const PROGRAM_STACK = [
   SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
   SCREENS.SUMMARY,          // Ay ozeti karti -> Ayin ozeti (ROTA'da da var)
   SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (PROFIL'de de var)
+  SCREENS.ROUTE_HABITS,     // Gunluk rutin (ders programi yaninda)
   SCREENS.PLAN_DETAIL,      // (paylasimli)
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari (ANALIZ'de de var)
@@ -139,6 +141,7 @@ export const PROFIL_STACK = [
   SCREENS.ACCOUNT_DELETE,   // Hesap Silme (tam onay ekrani)
   SCREENS.GOALS,            // Hedef Duzenle
   SCREENS.CLASS_SCHEDULE,   // Ayarlar · Haftalik ders programi (paylasimli)
+  SCREENS.ROUTE_HABITS,     // Gunluk rutin (ders programi yaninda)
   SCREENS.SHARE_CARD,       // Paylasim Karti
   SCREENS.WIDGET_GUIDE,     // Profil > Ana ekrana widget ekle
   SCREENS.STATS,            // Profil > Istatistiklerim

@@ -116,6 +116,7 @@ export const SCREENS = {
   ROUTE_FULL: "RouteFull",
   ROUTE_STOP_DETAIL: "RouteStopDetail",
   CLASS_SCHEDULE: "ClassSchedule",
+  ROUTE_HABITS: "RouteHabits",
   SEARCH: "Search",
   DOCUMENT: "Document",
   HOW_IT_WORKS: "HowItWorks",

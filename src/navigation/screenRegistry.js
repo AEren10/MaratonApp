@@ -45,6 +45,7 @@ import TrialRecordsScreen from "../screens/trial/TrialRecordsScreen";
 import TopicDebtScreen from "../screens/plan/TopicDebtScreen";
 import ProgramScreen from "../screens/program/ProgramScreen";
 import ClassScheduleScreen from "../screens/program/ClassScheduleScreen";
+import RouteHabitsScreen from "../screens/routeHabits/RouteHabitsScreen";
 import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
@@ -216,6 +217,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.TRIAL_RECORDS, TrialRecordsScreen),
   screen(SCREENS.TOPIC_DEBT, TopicDebtScreen),
   screen(SCREENS.CLASS_SCHEDULE, ClassScheduleScreen),
+  screen(SCREENS.ROUTE_HABITS, RouteHabitsScreen),
   screen(SCREENS.SEARCH, SearchScreen),
   screen(SCREENS.DOCUMENT, DocumentScreen),
   // Paywall kok yiginda: gizlilik/kosullar oradan da acilabilsin (App Review).

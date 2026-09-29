@@ -68,6 +68,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.SEARCH]: { path: "ara", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.TOPIC_DEBT]: { path: "program/konu-borcu", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.CLASS_SCHEDULE]: { path: "program/ders-programi", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
+  [SCREENS.ROUTE_HABITS]: { path: "program/gunluk-rutin", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
   [SCREENS.COMPARATIVE]: { path: "karsilastirmali-analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true },
   [SCREENS.RANK_SIMULATOR]: { path: "siralama", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },
   [SCREENS.EXAM_SIMULATOR]: { path: "sinav-prova", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },

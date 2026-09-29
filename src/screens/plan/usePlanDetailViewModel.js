@@ -9,6 +9,7 @@ import { useClassSchedule } from "../../hooks/useClassSchedule";
 import { useRehearsalToday } from "../../hooks/useRehearsalToday";
 import { todayPlanStops } from "../../domain/program/todayStops";
 import { useWeekdayRhythm } from "../../lib/weekdayRhythmStore";
+import { useHabitStops } from "../../hooks/useHabitStops";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import { generateDailyPlan } from "../../lib/planEngine";
@@ -34,6 +35,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
   const { schedule, ready: scheduleReady } = useClassSchedule();
   const rhythm = useWeekdayRhythm();
+  const habitStops = useHabitStops(todayTR());
   // Deneme provasi gunu baska durak acilmaz (Ana sayfa ile ayni kural).
   const rehearsalToday = useRehearsalToday(user?.id);
 
@@ -57,7 +59,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     };
     // Ana sayfa ve Program > Hafta ile ayni liste: ders programinin bugune
     // dusurdugu duraklar (bkz. domain/program/todayStops).
-    const rawStops = todayPlanStops(studyRoute.currentWeek, schedule, today, { isCompletedToday: doneToday, rhythm });
+    const rawStops = [...habitStops, ...todayPlanStops(studyRoute.currentWeek, schedule, today, { isCompletedToday: doneToday, rhythm })];
     const routeWeekStops = rawStops.map((stop) => {
       const isCompletedToday = doneToday(stop);
       if (isCompletedToday && stop.lifecycleStatus !== "completed") {
@@ -71,7 +73,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
       routeActive: (studyRoute.currentWeek?.stops || []).length > 0,
     });
     return generated.tasks || [];
-  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady, rhythm]);
+  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady, rhythm, habitStops]);
 
   const detail = usePlanDetailTasks({
     C,

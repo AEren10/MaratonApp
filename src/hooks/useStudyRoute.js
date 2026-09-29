@@ -34,6 +34,10 @@ import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
+import { habitWeeklyLoad } from "../domain/route/habits";
+import { useRouteHabits } from "./useRouteHabits";
+import { useClassSchedule } from "./useClassSchedule";
+import { studyWeekdays } from "../domain/program/classSchedule";
 import { useForecastTarget } from "./useForecastTarget";
 import { weekdayRhythm } from "../domain/program/weekdayRhythm";
 import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
@@ -267,6 +271,14 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       && latest >= forecastTargetNet;
   }, [forecastCandidate, forecastTargetNet]);
 
+  // Gunluk rutinlerin haftalik yuku: rota butcesinden dusulur.
+  const { habits } = useRouteHabits();
+  const { schedule } = useClassSchedule();
+  const habitLoad = useMemo(
+    () => (habits.length ? habitWeeklyLoad(habits, studyWeekdays(schedule).length) : null),
+    [habits, schedule],
+  );
+
   // Durak sonrasi geri bildirim: konunun zorlugu kisiye gore.
   const topicFeel = useMemo(() => topicFeelFromLogs(weekLogs || []), [weekLogs]);
 
@@ -287,11 +299,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     JSON.stringify(subjectWeakness),
     wrongsHash,
     targetReached ? "keep" : "",
+    habitLoad ? habitLoad.questionsPerWeek : "",
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, habitLoad, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -305,10 +318,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     wrongsByTopic,
     targetReached,
     topicFeel,
+    habitLoad,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, habitLoad, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
