@@ -13,7 +13,7 @@ import * as appStorage from "../lib/storage/appStorage";
 // kaydi gorur (rehberde kapatilan ipucu ana sayfadan hemen kalkar). Yazma
 // yuklemeyi bekler; eskiden rehber yukleme bitmeden bos kayitla yazip
 // daha once kapatilan ipuclarini geri getiriyordu.
-export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story", SCHEDULE: "schedule" });
+export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story", SCHEDULE: "schedule", HABIT: "habit" });
 // Widget'lar yalniz iOS'ta var.
 const ORDER = Platform.OS === "ios" ? [DISCOVER_TIPS.WIDGET, DISCOVER_TIPS.STORY] : [DISCOVER_TIPS.STORY];
 

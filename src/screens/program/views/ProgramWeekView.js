@@ -15,6 +15,7 @@ import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
 import { SelectedDayPanel } from "../../dersler/components/SelectedDayPanel";
 import { ProgramRulesSection } from "../../dersler/components/ProgramRulesSection";
 import { ScheduleDiscoverCard } from "../components/ScheduleDiscoverCard";
+import { HabitDiscoverCard } from "../components/HabitDiscoverCard";
 
 function weekSummary({ weekRangeLabel, activeDaysCount, totalMinutes, totalQuestions }) {
   const parts = [weekRangeLabel, `${activeDaysCount || 0}/7 aktif gün`];
@@ -77,6 +78,7 @@ export function ProgramWeekView() {
 
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
       <ScheduleDiscoverCard style={{ marginTop: STEP.s3 }} />
+      <HabitDiscoverCard style={{ marginTop: STEP.s2 }} />
 
       {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
 
