@@ -42,7 +42,7 @@ export default function StatsScreen() {
               <StatsTotals C={C} study={study} />
               {study?.bestWeek ? (
                 <Text style={[TYPOGRAPHY.meta, s.note, { color: C.text2 }]}>
-                  {`En iyi haftan ${weekLabel(study.bestWeek.weekStart)} haftası: ${fmtInt(study.bestWeek.questions)} soru · ${fmtHours(study.bestWeek.minutes)} sa`}
+                  {`En iyi haftan: ${weekLabel(study.bestWeek.weekStart, { long: true })} haftası · ${fmtInt(study.bestWeek.questions)} soru · ${fmtHours(study.bestWeek.minutes)} sa`}
                 </Text>
               ) : null}
 

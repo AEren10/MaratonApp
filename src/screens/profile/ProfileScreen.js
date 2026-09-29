@@ -11,7 +11,7 @@ import { STEP, GUTTER } from "../../themes/tokens";
 import { ProfileTopBar } from "./components/ProfileTopBar";
 import { ProfileHero } from "./components/ProfileHero";
 import { TargetDepartmentCard } from "./components/TargetDepartmentCard";
-import { YearRouteChart } from "./components/YearRouteChart";
+import { ProfileStatsCard } from "./components/ProfileStatsCard";
 import { StrengthMap } from "./components/StrengthMap";
 import { ProfileLinkRow } from "./components/ProfileLinkRow";
 import { LevelRow } from "./components/LevelRow";
@@ -69,7 +69,7 @@ export default function ProfileScreen() {
 
             {/* Ilerleme: veri yoksa ikisi de kendi bos halini gosterir. */}
             <Animated.View>
-              <YearRouteChart />
+              <ProfileStatsCard />
             </Animated.View>
             <Animated.View>
               <StrengthMap strengths={strengths} />
@@ -82,11 +82,6 @@ export default function ProfileScreen() {
                 label="Yanlış defteri"
                 onPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK)}
                 first
-              />
-              <ProfileLinkRow
-                label="İstatistiklerim"
-                meta="Tüm zamanlar · dersler · denemeler"
-                onPress={() => navigation.navigate(SCREENS.STATS)}
               />
               <ProfileLinkRow
                 label="Çalışma geçmişi"
