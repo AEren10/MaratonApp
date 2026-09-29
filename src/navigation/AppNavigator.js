@@ -4,6 +4,7 @@ import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ActivityIndicator, AppState, View } from "react-native";
+import { DepthLayout } from "./DepthLayout";
 
 import { useAuth } from "../contexts/AuthContext";
 import { useC } from "../contexts/ThemeContext";
@@ -73,7 +74,7 @@ const TAB_STACK_COMPONENTS = new Map(
 
     function TabStack() {
       return (
-        <Stack.Navigator screenOptions={screenOptions}>
+        <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
           <Stack.Screen name={rootScreenName} component={root.component} options={root.options} />
           {inner.map(renderStackScreen)}
         </Stack.Navigator>
