@@ -13,6 +13,7 @@
 // Hâlâ tahmin, ama artık DERSE ve KONUYA duyarlı ve dayanağı var.
 
 import { wrongPenaltyForTrialType } from "../trial/trialModel.js";
+import { withTopicShares } from "./topicShares.js";
 
 // Ustalık hedefi: mastery.js "%80 üstü doğruluk" diyor.
 const MASTERY_ACCURACY = 0.8;
@@ -24,13 +25,13 @@ const MASTERY_ACCURACY = 0.8;
  * @param tp       topic_progress satırı (mevcut durum)
  * @param trialType net cezası için ("LGS" 1/3, diğerleri 1/4)
  */
-export function netGainForTopic(subject, tp = {}, trialType) {
+export function netGainForTopic(subject, tp = {}, trialType, topicName = null) {
   const questionCount = Number(subject?.questionCount) || 0;
   const topicCount = subject?.topics?.length || 0;
   if (questionCount <= 0 || topicCount <= 0) return 0;
 
-  // Konunun sınavdaki payı.
-  const share = questionCount / topicCount;
+  // Konunun sınavdaki payı: gerçek ÖSYM sıklığı (topicShares), yoksa eşit pay.
+  const share = (topicName && subject?.topicShares?.[topicName]) || questionCount / topicCount;
 
   const q = Number(tp.total_questions) || 0;
   const currentAcc = q > 0 ? (Number(tp.correct_count) || 0) / q : 0;
@@ -65,13 +66,14 @@ export function topicsNeededForNet(pool = [], progressByKey = {}, netGap = 0, tr
   if (netGap <= 0) return { topics: 0, questions: 0, netCovered: 0, reachable: true, breakdown: [] };
 
   const candidates = [];
-  for (const subject of pool) {
+  for (const raw of pool) {
+    const subject = withTopicShares(raw);
     const prog = progressByKey[subject.key] || {};
     for (const t of subject.topics || []) {
       const name = typeof t === "string" ? t : t.name;
       if (!name) continue;
       const tp = prog[name] || {};
-      const gain = netGainForTopic(subject, tp, trialType);
+      const gain = netGainForTopic(subject, tp, trialType, name);
       if (gain > 0) {
         candidates.push({
           subject: subject.key,

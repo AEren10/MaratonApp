@@ -1,0 +1,3927 @@
+{
+  "generatedAt": "2026-09-30",
+  "method": "ÖSYM konu bazlı resmî dağılım yayımlamaz; veriler yayınevi/rehberlik sitelerinin yıl-yıl konu tablolarından alındı. Tablolar ham HTML/PDF'ten script ile ayrıştırıldı (LLM özetine güvenilmedi). Birincil kaynak çoğu derste unirehberi.com (2018-2026, 9 sınav); TYT 2018-2023 sütunları Maçka AİHL (MEB) PDF'i ile birebir aynı. Çapraz kontrol: universitego.com (2018-2025, MEB kazanım bazlı ayrı sınıflama; TYT Türkçe'de birincil), TYT/AYT matematik için bilgenc.com (bağımsız 3. sınıflama). 'years' = sınav yılı -> soru sayısı; kaynakta '–' olan 0 yazıldı. 'avg' listelenen tüm yılların aritmetik ortalaması. Kaynak birden fazla uygulama konusunu tek kalemde veriyorsa konu null bırakılıp 'buckets'a yazıldı (bölünmedi); iki kaynak satırı tamamen tek uygulama konusuna düşüyorsa toplandı (note'ta belirtildi). Her konuda 'source' alanı değerin geldiği tabloyu gösterir. 2020 (pandemi) ve 2023 (deprem, MEB kararı) YKS'de 12. sınıf 2. dönem konuları kapsam dışıydı; etkilenen konularda 'avgExcl2020_2023' ayrıca verildi. Konu sınırları kaynaktan kaynağa değişir: tekil yıllık değerler ±1 soru belirsizlik taşır.",
+  "aliases": {
+    "ayt_ea_matematik": "ayt_matematik (aynı AYT Matematik testi)",
+    "ayt_edebiyat_soz": "ayt_edebiyat (aynı test)"
+  },
+  "subjects": {
+    "turkce": {
+      "exam": "TYT",
+      "totalQuestions": 40,
+      "confidence": "medium-high",
+      "topics": {
+        "Sözcükte Anlam": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar sözcük/söz öbeği/deyim sorularını tek kalem veriyor -> 'Sözcükte Anlam' bucket'ı."
+        },
+        "Söz Yorumu": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı sayılmıyor -> 'Sözcükte Anlam' bucket'ı."
+        },
+        "Deyim ve Atasözleri": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı sayılmıyor -> 'Sözcükte Anlam' bucket'ı."
+        },
+        "Cümlede Anlam": {
+          "avg": null,
+          "years": null,
+          "note": "Cümle yorumu ile tek kalem -> 'Cümlede Anlam' bucket'ı."
+        },
+        "Cümle Yorumu": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı sayılmıyor -> 'Cümlede Anlam' bucket'ı."
+        },
+        "Paragraf (Ana Düşünce)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar paragraf anlam sorularını alt türe bölmüyor -> 'Paragrafta Anlam' bucket'ı."
+        },
+        "Paragraf (Yardımcı Düşünce)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar paragraf anlam sorularını alt türe bölmüyor -> 'Paragrafta Anlam' bucket'ı."
+        },
+        "Paragraf (Yapı)": {
+          "avg": 4.38,
+          "years": {
+            "2018": 4,
+            "2019": 4,
+            "2020": 5,
+            "2021": 4,
+            "2022": 6,
+            "2023": 5,
+            "2024": 3,
+            "2025": 4
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "Kaynak etiketi: 'Paragrafın Yapısı'."
+        },
+        "Ses Bilgisi": {
+          "avg": 0.5,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        "Yazım Kuralları": {
+          "avg": 2.0,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        "Noktalama İşaretleri": {
+          "avg": 2.0,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        "Sözcükte Yapı (Kök-Ek)": {
+          "avg": 0.75,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "Kaynak etiketi: 'Biçim Bilgisi'."
+        },
+        "Sözcük Türleri": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 3,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "Kaynak etiketi: 'İsim Soylu Sözcükler' (fiiller hariç)."
+        },
+        "Fiil Çekimleri": {
+          "avg": 0.38,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "Kaynak etiketi: 'Filler' (fiilimsi/ek fiil/çatı dahil olabilir)."
+        },
+        "Cümlenin Ögeleri": {
+          "avg": 1.38,
+          "years": {
+            "2018": 3,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        "Cümle Türleri": {
+          "avg": 0.25,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        "Anlatım Bozuklukları": {
+          "avg": 0.12,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "2019'dan beri sorulmadı (iki kaynakta da)."
+        }
+      },
+      "buckets": [
+        {
+          "label": "Sözcükte Anlam",
+          "covers": [
+            "Sözcükte Anlam",
+            "Söz Yorumu",
+            "Deyim ve Atasözleri"
+          ],
+          "avg": 3.62,
+          "years": {
+            "2018": 3,
+            "2019": 3,
+            "2020": 4,
+            "2021": 4,
+            "2022": 4,
+            "2023": 3,
+            "2024": 4,
+            "2025": 4
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "unirehberi 2018-2026: 3,3,1,5,4,3,5,4,3 -> ortalama benzer (~3.4)."
+        },
+        {
+          "label": "Cümlede Anlam",
+          "covers": [
+            "Cümlede Anlam",
+            "Cümle Yorumu"
+          ],
+          "avg": 3.12,
+          "years": {
+            "2018": 3,
+            "2019": 3,
+            "2020": 3,
+            "2021": 3,
+            "2022": 3,
+            "2023": 4,
+            "2024": 3,
+            "2025": 3
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "unirehberi 2018-2026: 7,3,6,3,3,4,5,3,3 (2018/2020 farklı sınıflama)."
+        },
+        {
+          "label": "Paragrafta Anlam",
+          "covers": [
+            "Paragraf (Ana Düşünce)",
+            "Paragraf (Yardımcı Düşünce)"
+          ],
+          "avg": 20.5,
+          "years": {
+            "2018": 18,
+            "2019": 18,
+            "2020": 21,
+            "2021": 22,
+            "2022": 20,
+            "2023": 21,
+            "2024": 23,
+            "2025": 21
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        {
+          "label": "Paragraf toplam (çapraz kontrol, farklı sınıflama)",
+          "covers": [
+            "Paragraf (Ana Düşünce)",
+            "Paragraf (Yardımcı Düşünce)",
+            "Paragraf (Yapı)"
+          ],
+          "avg": 25.11,
+          "years": {
+            "2018": 22,
+            "2019": 22,
+            "2020": 26,
+            "2021": 25,
+            "2022": 26,
+            "2023": 26,
+            "2024": 26,
+            "2025": 26,
+            "2026": 27
+          },
+          "source": "https://www.unirehberi.com/tyt-turkce-konulari/",
+          "note": "unirehberi 'Paragraf' satırı (2018-2026). universitego Yapı+Anlam toplamı 2018-2025: 22,22,26,26,26,26,26,25 (unirehberi 22,22,26,25,26,26,26,26) -> ±1 uyumlu."
+        },
+        {
+          "label": "Dil Bilgisi (çapraz kontrol)",
+          "covers": [
+            "Sözcükte Yapı (Kök-Ek)",
+            "Sözcük Türleri",
+            "Fiil Çekimleri",
+            "Cümlenin Ögeleri",
+            "Cümle Türleri"
+          ],
+          "avg": 2.78,
+          "years": {
+            "2018": 1,
+            "2019": 8,
+            "2020": 3,
+            "2021": 2,
+            "2022": 3,
+            "2023": 2,
+            "2024": 0,
+            "2025": 3,
+            "2026": 3
+          },
+          "source": "https://www.unirehberi.com/tyt-turkce-konulari/",
+          "note": "unirehberi 'Dil Bilgisi' satırı; 2024=0 (universitego'da ilgili satırlar toplamı 3) ve 2018=1 (universitego ~6) -> sınıflama farkı, düşük güven."
+        }
+      ],
+      "unmapped": [],
+      "notes": "universitego 2025 toplamı 39 (bir soru sınıflanmamış). Birincil kaynak universitego (daha ince kırılım). omernasuhibilmen AİHL PDF'i universitego ile birebir aynı (bağımsız değil). 2026 için yalnız unirehberi'nin kaba satırları var.",
+      "sources": [
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+        "https://www.unirehberi.com/tyt-turkce-konulari/",
+        "https://mackaihl.meb.k12.tr/meb_iys_dosyalar/61/07/203964/dosyalar/2023_09/28134012_YKS-2024-TYT-KONU-SORU-ISTATISTIKLERI.pdf",
+        "https://omernasuhibilmenaihl.meb.k12.tr/meb_iys_dosyalar/34/15/758286/dosyalar/2025_10/28094845_tytturkceyillaragoresorudagilimikonular20252024202320222021202020192018sozcukteanlam44344433cumledeanlam33433333paragrafinyapisi43564544paragraftaanla.pdf"
+      ]
+    },
+    "matematik": {
+      "exam": "TYT",
+      "totalQuestions": 40,
+      "confidence": "high (aritmetik/cebir + Problemler toplamı), medium (tekil küçük konular ±1), medium (geometri alt kırılımı)",
+      "topics": {
+        "Temel Kavramlar": {
+          "avg": 2.33,
+          "years": {
+            "2018": 4,
+            "2019": 4,
+            "2020": 1,
+            "2021": 3,
+            "2022": 3,
+            "2023": 2,
+            "2024": 1,
+            "2025": 3,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "bilgenc (farklı sınıflama) 2018-2025: 4,4,2,4,3,4,4,4 -> Temel Kavramlar/Rasyonel/Denklem sınırında kaynaklar ayrışıyor."
+        },
+        "Sayı Basamakları": {
+          "avg": 1.33,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 2,
+            "2022": 1,
+            "2023": 1,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Bölme ve Bölünebilme": {
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'Bölünebilme Kuralları'."
+        },
+        "EBOB - EKOK": {
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'EBOB-EKOK'."
+        },
+        "Rasyonel Sayılar": {
+          "avg": 1.33,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 3,
+            "2021": 0,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Basit Eşitsizlikler": {
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 3,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Mutlak Değer": {
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Üslü Sayılar": {
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Köklü Sayılar": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Çarpanlara Ayırma": {
+          "avg": 0.11,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Oran - Orantı": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'Oran-Orantı'."
+        },
+        "1. Dereceden Denklemler": {
+          "avg": 0.78,
+          "years": {
+            "2018": 2,
+            "2019": 1,
+            "2020": 0,
+            "2021": 2,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'Denklem Çözme'."
+        },
+        "Kümeler": {
+          "avg": 1.11,
+          "years": {
+            "2018": 2,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Fonksiyonlar": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "Permütasyon - Kombinasyon": {
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 3,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'Permütasyon-Kombinasyon'."
+        },
+        "Olasılık": {
+          "avg": 1.11,
+          "years": {
+            "2018": 2,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        "İstatistik (Ortalama, Medyan, Mod)": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "Kaynak etiketi: 'Veri - İstatistik'."
+        },
+        "Ondalık Sayılar": {
+          "avg": null,
+          "years": null,
+          "note": "Hiçbir kaynak ayrı saymıyor (Rasyonel Sayılar/Temel Kavramlar içinde)."
+        },
+        "Problemler (Dört İşlem)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Kesir)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Yüzde)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Kar-Zarar)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Hız)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (İşçi)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Yaş)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Problemler (Sayı)": {
+          "avg": null,
+          "years": null,
+          "note": "Problem alt türlerine yıllık kırılım veren güvenilir kaynak bulunamadı -> 'Problemler' bucket'ı."
+        },
+        "Üçgenler": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'Açılar ve Üçgenler' tek kalem veriyor -> bucket."
+        },
+        "Eşkenar ve İkizkenar Üçgen": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'Açılar ve Üçgenler' tek kalem veriyor -> bucket."
+        },
+        "Açı-Kenar Bağıntıları": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'Açılar ve Üçgenler' tek kalem veriyor -> bucket."
+        },
+        "Dik Üçgen ve Pisagor": {
+          "avg": 1.38,
+          "years": {
+            "2018": 3,
+            "2019": 2,
+            "2020": 1,
+            "2021": 0,
+            "2022": 2,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego 'Dik Üçgen ve Trigonometri' (farklı sınıflama). 'Açılar ve Üçgenler' bucket'ının İÇİNDEDİR, toplama ayrıca ekleme."
+        },
+        "Üçgende Alan": {
+          "avg": 0.25,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego 'Üçgenin Alanı'. Bucket'ın İÇİNDEDİR, toplama ayrıca ekleme."
+        },
+        "Çokgenler": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Dörtgenler (Paralelkenar, Yamuk)": {
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 2,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Yamuk' + 'Eşkenar Dörtgen' satırları toplamı (Deltoid unmapped)."
+        },
+        "Dikdörtgen ve Kare": {
+          "avg": 1.56,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 3,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Kare' + 'Dikdörtgen' satırları toplamı."
+        },
+        "Çember ve Daire": {
+          "avg": 0.33,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "2020'den beri TYT'de yok."
+        },
+        "Katı Cisimler (Prizma, Silindir, Koni, Küre)": {
+          "avg": 2.0,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 2018-2025 de her yıl 2."
+        }
+      },
+      "buckets": [
+        {
+          "label": "Problemler",
+          "covers": [
+            "Problemler (Dört İşlem)",
+            "Problemler (Kesir)",
+            "Problemler (Yüzde)",
+            "Problemler (Kar-Zarar)",
+            "Problemler (Hız)",
+            "Problemler (İşçi)",
+            "Problemler (Yaş)",
+            "Problemler (Sayı)"
+          ],
+          "avg": 12.0,
+          "years": {
+            "2018": 11,
+            "2019": 12,
+            "2020": 13,
+            "2021": 11,
+            "2022": 13,
+            "2023": 10,
+            "2024": 11,
+            "2025": 12,
+            "2026": 15
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "bilgenc 2018-2025: 11,12,13,10,12,11,12,13; universitego ('Denklem ve Eşitsizliklerle İlgili Uygulamalar') 2018-2025: 10,11,13,11,12,11,11,10 -> üç kaynakta da 10-13."
+        },
+        {
+          "label": "Açılar ve Üçgenler",
+          "covers": [
+            "Üçgenler",
+            "Eşkenar ve İkizkenar Üçgen",
+            "Dik Üçgen ve Pisagor",
+            "Üçgende Alan",
+            "Açı-Kenar Bağıntıları"
+          ],
+          "avg": 3.67,
+          "years": {
+            "2018": 3,
+            "2019": 2,
+            "2020": 2,
+            "2021": 4,
+            "2022": 4,
+            "2023": 5,
+            "2024": 5,
+            "2025": 4,
+            "2026": 4
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego üçgen satırları toplamı 2018-2025: 5,4,2,5,5,5,5,5 (unirehberi 3,2,2,4,4,5,5,4) -> sınıflama farkı ±1-2."
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Mantık",
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/",
+          "note": "2021'den beri her yıl 1-2."
+        },
+        {
+          "label": "Polinomlar",
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-matematik-konulari/"
+        },
+        {
+          "label": "Deltoid (geometri)",
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Analitik Geometri (TYT)",
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "notes": "unirehberi 2018-2023 sütunları Maçka AİHL (MEB) PDF'i ile birebir aynı (aynı veri ailesi). bilgenc farklı sınıflamayla bağımsız 3. kaynak. 2018 TYT: 29 matematik + 11 geometri.",
+      "sources": [
+        "https://www.unirehberi.com/tyt-matematik-konulari/",
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://mackaihl.meb.k12.tr/meb_iys_dosyalar/61/07/203964/dosyalar/2023_09/28134012_YKS-2024-TYT-KONU-SORU-ISTATISTIKLERI.pdf",
+        "https://www.bilgenc.com/tyt-matematik-konulari/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "fizik": {
+      "exam": "TYT",
+      "totalQuestions": 7,
+      "confidence": "high (unirehberi + MEB PDF 2018-2023 birebir; universitego kazanım kırılımıyla tutarlı)",
+      "topics": {
+        "Fizik Bilimine Giriş": {
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Madde ve Özellikleri": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Sıvıların Kaldırma Kuvveti": {
+          "avg": 0.56,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Kaynak etiketi: 'Kaldırma Kuvveti'."
+        },
+        "Basınç": {
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Sıcaklık ve Isı": {
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Kaynak etiketi: 'Isı, Sıcaklık ve Genleşme'."
+        },
+        "Elektrostatik": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Elektrik Akımı": {
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 2,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "unirehberi 'Elektrik ve Manyetizma' satırı; universitego 2018-2025'te bu soruların tamamı 'Elektrik Devreleri' (manyetizma satırları 0) -> tamamı Elektrik Akımı; bölme yapılmadı."
+        },
+        "Manyetizma": {
+          "avg": 0.0,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/ + https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 'Mıknatıs ve Manyetik Alan' + 'Akım ve Manyetik Alan' 2018-2025 hep 0; 2026'da birleşik satır 0."
+        },
+        "Dalgalar": {
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Optik": {
+          "avg": 1.33,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      },
+      "buckets": [],
+      "unmapped": [
+        {
+          "label": "Hareket ve Kuvvet",
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Her yıl 1 soru."
+        },
+        {
+          "label": "İş, Güç ve Enerji",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+        "https://mackaihl.meb.k12.tr/meb_iys_dosyalar/61/07/203964/dosyalar/2023_09/28134012_YKS-2024-TYT-KONU-SORU-ISTATISTIKLERI.pdf"
+      ]
+    },
+    "kimya": {
+      "exam": "TYT",
+      "totalQuestions": 7,
+      "confidence": "medium-high",
+      "topics": {
+        "Kimya Bilimi": {
+          "avg": 0.89,
+          "years": {
+            "2018": 2,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Atom ve Periyodik Sistem": {
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Atomun Yapısı' + 'Periyodik Tablo' satırları toplamı."
+        },
+        "Kimyasal Türler Arası Etkileşimler": {
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Maddenin Halleri": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Doğa ve Kimya": {
+          "avg": null,
+          "years": null,
+          "note": "Hiçbir kaynakta karşılık gelen satır yok."
+        },
+        "Kimyasal Tepkimeler": {
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Kimyasal Hesaplamalar' + 'Kimyanın Temel Kanunları' toplamı (MEB 10. sınıf ünitesi). Yaklaşık eşleme."
+        },
+        "Kimya Her Yerde": {
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      },
+      "buckets": [],
+      "unmapped": [
+        {
+          "label": "Asit, Baz ve Tuz",
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "2019'dan beri her yıl 1."
+        },
+        {
+          "label": "Karışımlar",
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "2019'dan beri her yıl 1."
+        }
+      ],
+      "notes": "unirehberi 2025 sütunu 6'ya toplanıyor (7 olmalı). universitego 2025'te 7 soru sınıflıyor; fazladan olan 'Kimyasal Tepkimelerde Hesaplamalar' -> 2025 'Kimyasal Tepkimeler' muhtemelen 1 eksik.",
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+        "https://mackaihl.meb.k12.tr/meb_iys_dosyalar/61/07/203964/dosyalar/2023_09/28134012_YKS-2024-TYT-KONU-SORU-ISTATISTIKLERI.pdf"
+      ]
+    },
+    "biyoloji": {
+      "exam": "TYT",
+      "totalQuestions": 6,
+      "confidence": "medium-high",
+      "topics": {
+        "Canlıların Ortak Özellikleri": {
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Hücre": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Hücre ve Organelleri' + 'Hücre Zarından Madde Geçişi' toplamı."
+        },
+        "Canlıların Sınıflandırılması": {
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Mitoz ve Eşeysiz Üreme": {
+          "avg": 0.62,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego; Mitoz+Mayoz toplamı unirehberi 'Hücre Bölünmeleri ve Üreme' (her yıl 1) ile birebir. 2026 kırılımı yok."
+        },
+        "Mayoz ve Eşeyli Üreme": {
+          "avg": 0.38,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego; 2026 kırılımı yok."
+        },
+        "Kalıtım": {
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 2018'de 1 veriyor (unirehberi 0)."
+        },
+        "Ekosistem Ekolojisi": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Çevre Sorunları": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Kaynak etiketi: 'Güncel Çevre Sorunları'."
+        }
+      },
+      "buckets": [
+        {
+          "label": "Hücre Bölünmeleri ve Üreme",
+          "covers": [
+            "Mitoz ve Eşeysiz Üreme",
+            "Mayoz ve Eşeyli Üreme"
+          ],
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Canlıların Temel Bileşenleri (inorganik/organik bileşikler)",
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Uygulamada karşılığı yok; çoğu yıl 1 soru."
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+        "https://mackaihl.meb.k12.tr/meb_iys_dosyalar/61/07/203964/dosyalar/2023_09/28134012_YKS-2024-TYT-KONU-SORU-ISTATISTIKLERI.pdf"
+      ]
+    },
+    "tarih": {
+      "exam": "TYT",
+      "totalQuestions": 5,
+      "confidence": "low-medium (tek veri ailesi; kaynak ünite adları uygulamadakinden farklı, eşleme yaklaşık)",
+      "topics": {
+        "Tarih Bilimi": {
+          "avg": 0.0,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Tarih ve Zaman' 2018'den beri 0."
+        },
+        "İlk Çağ Uygarlıkları": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynakta TYT için ayrı ünite yok."
+        },
+        "İlk Türk Devletleri": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'İlk ve Orta Çağlarda Türk Dünyası'."
+        },
+        "İslam Medeniyeti ve Türk-İslam Devletleri": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'İslam Medeniyetinin Doğuşu' (0) + 'Türklerin İslamiyet'i Kabulü ve İlk Türk İslam Devletleri' (1)."
+        },
+        "Osmanlı Kuruluş ve Yükselme": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Beylikten Devlete Osmanlı' + 'Dünya Gücü Osmanlı'."
+        },
+        "Osmanlı Duraklama ve Gerileme": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Değişim Çağında Avrupa ve Osmanlı' (0) + 'Uluslararası İlişkilerde Denge Stratejisi (1774-1914)'. Yaklaşık."
+        },
+        "Osmanlı Son Dönem ve I. Dünya Savaşı": {
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya'."
+        },
+        "Kurtuluş Savaşı": {
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Milli Mücadele'."
+        },
+        "Atatürk İlke ve İnkılapları": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Atatürkçülük ve Türk İnkılabı'."
+        }
+      },
+      "buckets": [],
+      "unmapped": [],
+      "notes": "universitego kazanım bazlı çok farklı bir sınıflama veriyor (örn. 2023'te 3 soru 'Büyük Selçuklu Devleti'); unirehberi ile birebir karşılaştırılamıyor.",
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "cografya": {
+      "exam": "TYT",
+      "totalQuestions": 5,
+      "confidence": "low-medium",
+      "topics": {
+        "Doğal Sistemler": {
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Doğa ve İnsan' satırı; yaklaşık eşleme."
+        },
+        "Dünya'nın Şekli ve Hareketleri": {
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Harita Bilgisi": {
+          "avg": 0.56,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "İklim Bilgisi": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego da 2019 hariç her yıl 1."
+        },
+        "Yerin Şekillenmesi (İç Kuvvetler)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'İç ve Dış Kuvvetler' tek kalem -> bucket."
+        },
+        "Yerin Şekillenmesi (Dış Kuvvetler)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'İç ve Dış Kuvvetler' tek kalem -> bucket."
+        },
+        "Nüfus ve Göç": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'Nüfus ve Yerleşme' tek kalem -> bucket."
+        },
+        "Yerleşme": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 'Nüfus ve Yerleşme' tek kalem -> bucket."
+        },
+        "Türkiye'nin Fiziki Coğrafyası": {
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Türkiye'nin Yer Şekilleri'."
+        },
+        "Türkiye'nin Beşeri Coğrafyası": {
+          "avg": null,
+          "years": null,
+          "note": "Doğrudan karşılık yok ('Ekonomik Faaliyetler' ve 'Bölgeler' unmapped)."
+        }
+      },
+      "buckets": [
+        {
+          "label": "İç ve Dış Kuvvetler",
+          "covers": [
+            "Yerin Şekillenmesi (İç Kuvvetler)",
+            "Yerin Şekillenmesi (Dış Kuvvetler)"
+          ],
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Nüfus ve Yerleşme",
+          "covers": [
+            "Nüfus ve Göç",
+            "Yerleşme"
+          ],
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Doğal Afetler",
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "Çoğu yıl 1 soru (universitego her yıl 1); uygulamada TYT konusu yok."
+        },
+        {
+          "label": "Bölgeler",
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Ekonomik Faaliyetler",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Coğrafi Konum",
+          "avg": 0.0,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Uluslararası Ulaşım Hatları",
+          "avg": 0.0,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "felsefe": {
+      "exam": "TYT",
+      "totalQuestions": 5,
+      "confidence": "low (kaynaklar sınıflamada ciddi ayrışıyor)",
+      "topics": {
+        "Felsefeye Giriş": {
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 2,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Felsefe'nin Konusu'."
+        },
+        "Bilgi Felsefesi": {
+          "avg": 1.44,
+          "years": {
+            "2018": 2,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 2,
+            "2023": 2,
+            "2024": 1,
+            "2025": 3,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Varlık Felsefesi": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Ahlak Felsefesi": {
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        "Din Felsefesi": {
+          "avg": 0.33,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      },
+      "buckets": [],
+      "unmapped": [
+        {
+          "label": "Bilim Felsefesi",
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Siyaset Felsefesi",
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Sanat Felsefesi",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "İlk Çağ Felsefesi",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "20. Yüzyıl Felsefesi",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "notes": "universitego aynı soruları büyük ölçüde felsefe tarihi dönemlerine (Platon-Aristoteles, 15-17. yy, 18-19. yy, 20. yy) göre sınıflıyor; unirehberi disiplin bazlı. Sayılar sınıflama tercihine çok duyarlı.",
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "din": {
+      "exam": "TYT",
+      "totalQuestions": 5,
+      "confidence": "low-medium",
+      "topics": {
+        "Bilgi ve İnanç": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 2018-2024 ile birebir."
+        },
+        "İbadetler": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'İslam ve İbadet'."
+        },
+        "Hz. Muhammed'in Hayatı": {
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Hz. Muhammed (S.A.V)'."
+        },
+        "Kur'an ve Yorumu": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 2,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Vahiy ve Akıl' satırı; yaklaşık eşleme."
+        },
+        "Yaşayan Dinler": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynakta TYT için satır yok."
+        },
+        "Ahlak ve Değerler": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+          "note": "'Gençlik ve Değerler'."
+        }
+      },
+      "buckets": [],
+      "unmapped": [
+        {
+          "label": "Din ve İslam",
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Allah İnsan İlişkisi",
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "İslam Düşüncesinde Yorumlar",
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Din, Kültür ve Medeniyet",
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/tyt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "ayt_matematik": {
+      "exam": "AYT",
+      "totalQuestions": 40,
+      "confidence": "high (ana başlıklar, 3 kaynak), low (türev/integral/trig alt kırılımı yok)",
+      "topics": {
+        "Fonksiyonlar": {
+          "avg": 2.0,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "note": "bilgenc (farklı sınıflama) 2018-2025: 2,3,3,2,2,3,4,2."
+        },
+        "Polinomlar": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        "Parabol": {
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        "Mutlak Değer": {
+          "avg": 0.56,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        "Karmaşık Sayılar": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "note": "2021'den beri ayrı satır 0; universitego karmaşık sayıları 'İkinci Dereceden Denklemler' ile birleştiriyor -> muhtemelen oraya sayılıyor."
+        },
+        "Logaritma": {
+          "avg": 2.11,
+          "years": {
+            "2018": 2,
+            "2019": 3,
+            "2020": 3,
+            "2021": 1,
+            "2022": 2,
+            "2023": 3,
+            "2024": 1,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "note": "bilgenc 2018-2025: 2,3,4,1,2,4,1,2; universitego ('Üstel ve Logaritmik Fonksiyon') 2,3,4,1,2,4,1,2."
+        },
+        "Diziler": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        "Limit": {
+          "avg": 1.56,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 0,
+            "2021": 2,
+            "2022": 2,
+            "2023": 0,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "avgExcl2020_2023": 2.0,
+          "note": "2020 (pandemi) ve 2023 (deprem; MEB kararı) YKS'de 12. sınıf 2. dönem konuları kapsam dışıydı -> 0. avgExcl2020_2023 normal yılların ortalaması. bilgenc ve universitego birebir aynı."
+        },
+        "2. Dereceden Denklemler": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak eşitsizliklerle tek kalem -> bucket."
+        },
+        "Eşitsizlikler": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak 2. dereceden denklemlerle tek kalem -> bucket. ('Basit Eşitsizlikler' ayrıca unmapped.)"
+        },
+        "Trigonometri (Temel)": {
+          "avg": 1.88,
+          "years": {
+            "2018": 1,
+            "2019": 3,
+            "2020": 3,
+            "2021": 1,
+            "2022": 2,
+            "2023": 1,
+            "2024": 2,
+            "2025": 2
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego 'Yönlü Açılar, Trigonometrik Fonksiyonlar'. universitego trig satırları toplamı her yıl unirehberi 'Trigonometri' ile birebir tutuyor."
+        },
+        "Trigonometri (Toplam-Fark)": {
+          "avg": 1.5,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 2,
+            "2022": 2,
+            "2023": 3,
+            "2024": 1,
+            "2025": 2
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+          "note": "universitego 'Toplam-Fark ve İki Kat Açı Formülleri'."
+        },
+        "Trigonometri (Dönüşüm Formülleri)": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı sayılmıyor; varsa 'Toplam-Fark ve İki Kat Açı' içinde."
+        },
+        "Türev (Kavram)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar türevi alt türe bölmüyor -> 'Türev' bucket'ı."
+        },
+        "Türev (Uygulamalar)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar türevi alt türe bölmüyor -> 'Türev' bucket'ı."
+        },
+        "Türev (Maks-Min Problemleri)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar türevi alt türe bölmüyor -> 'Türev' bucket'ı."
+        },
+        "İntegral (Belirsiz)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar integrali alt türe bölmüyor -> 'İntegral' bucket'ı."
+        },
+        "İntegral (Belirli)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar integrali alt türe bölmüyor -> 'İntegral' bucket'ı."
+        },
+        "İntegral (Alan-Hacim)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynaklar integrali alt türe bölmüyor -> 'İntegral' bucket'ı."
+        },
+        "Analitik Geometri (Doğru)": {
+          "avg": 1.56,
+          "years": {
+            "2018": 2,
+            "2019": 1,
+            "2020": 1,
+            "2021": 2,
+            "2022": 1,
+            "2023": 0,
+            "2024": 3,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "AYT geometri kısmı 'Doğrunun Analitiği'. universitego 2018-2025: 2,1,2,3,2,2,3,2."
+        },
+        "Analitik Geometri (Çember)": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "avgExcl2020_2023": 0.86,
+          "note": "AYT geometri kısmı 'Çemberin Analitiği'; 2023'te kapsam dışı (MEB kararı)."
+        }
+      },
+      "buckets": [
+        {
+          "label": "2. Dereceden Denklemler ve Eşitsizlikler",
+          "covers": [
+            "2. Dereceden Denklemler",
+            "Eşitsizlikler"
+          ],
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 2,
+            "2023": 2,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Trigonometri",
+          "covers": [
+            "Trigonometri (Temel)",
+            "Trigonometri (Dönüşüm Formülleri)",
+            "Trigonometri (Toplam-Fark)"
+          ],
+          "avg": 4.33,
+          "years": {
+            "2018": 3,
+            "2019": 3,
+            "2020": 4,
+            "2021": 5,
+            "2022": 4,
+            "2023": 5,
+            "2024": 5,
+            "2025": 5,
+            "2026": 5
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "note": "bilgenc 2018-2025 birebir aynı (3,3,4,5,4,5,5,5)."
+        },
+        {
+          "label": "Türev",
+          "covers": [
+            "Türev (Kavram)",
+            "Türev (Uygulamalar)",
+            "Türev (Maks-Min Problemleri)"
+          ],
+          "avg": 2.67,
+          "years": {
+            "2018": 4,
+            "2019": 4,
+            "2020": 0,
+            "2021": 3,
+            "2022": 4,
+            "2023": 0,
+            "2024": 3,
+            "2025": 3,
+            "2026": 3
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "avgExcl2020_2023": 3.43,
+          "note": "2020/2023 kapsam dışı. bilgenc 2018-2025: 3,4,0,4,4,0,3,3; universitego 3,4,0,4,4,0,3,3."
+        },
+        {
+          "label": "İntegral",
+          "covers": [
+            "İntegral (Belirsiz)",
+            "İntegral (Belirli)",
+            "İntegral (Alan-Hacim)"
+          ],
+          "avg": 3.0,
+          "years": {
+            "2018": 4,
+            "2019": 4,
+            "2020": 0,
+            "2021": 4,
+            "2022": 4,
+            "2023": 0,
+            "2024": 5,
+            "2025": 3,
+            "2026": 3
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "avgExcl2020_2023": 3.86,
+          "note": "2020/2023 kapsam dışı. bilgenc 2018-2025: 3,4,0,4,4,0,4,3; universitego 3,4,0,4,4,0,3,3."
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Permütasyon-Kombinasyon-Olasılık-Binom",
+          "avg": 2.67,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 3,
+            "2021": 2,
+            "2022": 3,
+            "2023": 3,
+            "2024": 3,
+            "2025": 3,
+            "2026": 3
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+          "note": "Uygulamanın AYT listesinde YOK ama her yıl 2-3 soru (universitego da 2-3)."
+        },
+        {
+          "label": "Temel Kavramlar (AYT içinde)",
+          "avg": 2.11,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 2,
+            "2021": 3,
+            "2022": 2,
+            "2023": 4,
+            "2024": 2,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Kümeler",
+          "avg": 1.0,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Mantık",
+          "avg": 1.22,
+          "years": {
+            "2018": 4,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Basit Eşitsizlikler",
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Sayı Basamakları",
+          "avg": 0.56,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 3,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Bölme ve Bölünebilme",
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "EBOB-EKOK",
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Üslü Sayılar",
+          "avg": 0.44,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Köklü Sayılar",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Çarpanlara Ayırma",
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-matematik-konulari-yks/"
+        },
+        {
+          "label": "Trigonometri: Kosinüs/Sinüs Teoremi",
+          "avg": 0.25,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        {
+          "label": "Trigonometri: Trigonometrik Denklemler",
+          "avg": 0.62,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 2,
+            "2025": 0
+          },
+          "source": "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+        },
+        {
+          "label": "Geometri: Doğruda ve Üçgende Açı",
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 3,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Özel Üçgenler",
+          "avg": 0.44,
+          "years": {
+            "2018": 2,
+            "2019": 0,
+            "2020": 2,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Üçgende Alan Benzerlik",
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Açı Kenar Bağıntıları",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Çokgenler",
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Özel Dörtgenler",
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Çember ve Daire",
+          "avg": 2.0,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 2,
+            "2021": 3,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Noktanın Analitiği",
+          "avg": 0.89,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 2,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Dönüşüm Geometrisi",
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Geometri: Katı Cisimler",
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 2,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "notInCurriculum": {
+        "Analitik Geometri (Konikler)": {
+          "avg": null,
+          "years": null,
+          "note": "Hiçbir kaynakta satır yok (güncel müfredatta yok gibi görünüyor)."
+        },
+        "Matrisler": {
+          "avg": null,
+          "years": null,
+          "note": "Hiçbir kaynakta satır yok (2018 sonrası müfredatta yok gibi görünüyor)."
+        },
+        "Determinant": {
+          "avg": null,
+          "years": null,
+          "note": "Hiçbir kaynakta satır yok."
+        },
+        "Özel Tanımlı Fonksiyonlar": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı sayılmıyor ('Fonksiyonlar' içinde)."
+        }
+      },
+      "notes": "İstenen listede olup güncel src/data/curriculum.js'te artık bulunmayan başlıklar 'notInCurriculum' altında (veri yok). AYT Matematik testi 40 soru = ~30-31 matematik + ~9-10 geometri. ayt_ea_matematik aynı testtir; bu veriler ona da uygulanır. krakademi.com tablosu (2020/2023 dahil her yıl sabit 4 türev/3 integral) gerçek sınavla çelişiyor -> kullanılmadı. dogrutercihler tablosu unirehberi ile aynı veri (bağımsız değil). universitego 2018 ve 2020 AYT matematik toplamları eksik (26/28).",
+      "sources": [
+        "https://www.unirehberi.com/ayt-matematik-konulari-yks/",
+        "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/",
+        "https://www.bilgenc.com/ayt-matematik-konulari/",
+        "https://dogrutercihler.com/2024-ayt-matematik-konulari-ve-soru-dagilimi/",
+        "https://www.meb.gov.tr/2023-lgsde-8-sinifin-yksde-12-sinifin-ikinci-donem-konulari-sinav-kapsamina-dahil-olmayacak/haber/29003/tr"
+      ]
+    },
+    "ayt_fizik": {
+      "exam": "AYT",
+      "totalQuestions": 14,
+      "confidence": "medium (tek ana kaynak; universitego kazanım kırılımıyla kabaca uyumlu)",
+      "topics": {
+        "Vektörler": {
+          "avg": 0.22,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Kuvvet ve Hareket": {
+          "avg": 1.33,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 2,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 2,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Hareket' + 'Atışlar' toplamı."
+        },
+        "Newton'un Hareket Yasaları": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Enerji ve Momentum": {
+          "avg": 1.44,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 2,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'İş, Güç ve Enerji' + 'İtme ve Momentum' toplamı."
+        },
+        "Tork ve Denge": {
+          "avg": 0.56,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Kuvvet, Tork ve Denge'."
+        },
+        "Düzgün Çembersel Hareket": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Basit Harmonik Hareket": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "universitego da her yıl 1."
+        },
+        "Dalga Mekaniği": {
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Elektrik Alan ve Potansiyel": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 2,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Elektrik Alan ve Potansiyel' + 'Paralel Levhalar ve Sığa'."
+        },
+        "Manyetik Alan ve Kuvvet": {
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Elektromanyetik İndüksiyon": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak alternatif akım/transformatör ile tek kalem -> bucket."
+        },
+        "Alternatif Akım": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak indüksiyon ile tek kalem -> bucket."
+        },
+        "Modern Fizik": {
+          "avg": 1.56,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 0,
+            "2021": 2,
+            "2022": 3,
+            "2023": 0,
+            "2024": 2,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "avgExcl2020_2023": 2.0,
+          "note": "'Modern Fizik' + 'Modern Fiziğin Teknolojideki Uygulamaları'. 2020/2023 kapsam dışı."
+        },
+        "Atom Fiziği ve Radyoaktivite": {
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "avgExcl2020_2023": 1.0,
+          "note": "2020/2023 kapsam dışı."
+        }
+      },
+      "buckets": [
+        {
+          "label": "İndüksiyon, Alternatif Akım ve Transformatörler",
+          "covers": [
+            "Elektromanyetik İndüksiyon",
+            "Alternatif Akım"
+          ],
+          "avg": 1.56,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Dönme, Yuvarlanma ve Açısal Momentum",
+          "avg": 0.56,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Kütle Çekim ve Kepler Yasaları",
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Basit Makineler",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "ayt_kimya": {
+      "exam": "AYT",
+      "totalQuestions": 13,
+      "confidence": "medium",
+      "topics": {
+        "Mol Kavramı": {
+          "avg": null,
+          "years": null,
+          "note": "AYT tablosunda ayrı satır yok (TYT konusu)."
+        },
+        "Kimyasal Hesaplamalar": {
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Gazlar": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Çözeltiler ve Derişim": {
+          "avg": 1.56,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Sıvı Çözeltiler'."
+        },
+        "Kimyasal Tepkimelerde Enerji": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Tepkime Hızları": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Kimyasal Tepkimelerde Hız'."
+        },
+        "Kimyasal Denge": {
+          "avg": 1.0,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Kimyasal Tepkimelerde Denge'."
+        },
+        "Asitler ve Bazlar": {
+          "avg": 0.78,
+          "years": {
+            "2018": 1,
+            "2019": 2,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Asit-Baz Dengesi'."
+        },
+        "Çözünürlük Dengesi": {
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Elektrokimya": {
+          "avg": 2.11,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 3,
+            "2021": 2,
+            "2022": 2,
+            "2023": 3,
+            "2024": 2,
+            "2025": 2,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Kimya ve Elektrik'."
+        },
+        "Organik Kimya (Temel)": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak organik kimyayı tek kalem veriyor -> bucket."
+        },
+        "Organik Kimya (Fonksiyonel Gruplar)": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Organik Kimya' bucket'ı."
+        },
+        "Organik Kimya (Tepkimeler)": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Organik Kimya' bucket'ı."
+        }
+      },
+      "buckets": [
+        {
+          "label": "Organik Kimya",
+          "covers": [
+            "Organik Kimya (Temel)",
+            "Organik Kimya (Fonksiyonel Gruplar)",
+            "Organik Kimya (Tepkimeler)"
+          ],
+          "avg": 2.89,
+          "years": {
+            "2018": 4,
+            "2019": 3,
+            "2020": 1,
+            "2021": 3,
+            "2022": 3,
+            "2023": 1,
+            "2024": 3,
+            "2025": 4,
+            "2026": 4
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "avgExcl2020_2023": 3.43,
+          "note": "2020/2023 düşük (12. sınıf 2. dönem kapsam dışı)."
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Modern Atom Teorisi",
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 2,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Periyodik Sistem",
+          "avg": 0.22,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Atom ve Yapısı",
+          "avg": 0.11,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "ayt_biyoloji": {
+      "exam": "AYT",
+      "totalQuestions": 13,
+      "confidence": "medium",
+      "topics": {
+        "Nükleik Asitler ve Protein Sentezi": {
+          "avg": 2.11,
+          "years": {
+            "2018": 3,
+            "2019": 2,
+            "2020": 3,
+            "2021": 2,
+            "2022": 2,
+            "2023": 1,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Genden Proteine'."
+        },
+        "Enzimler": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynakta satır yok."
+        },
+        "Hücre Zarından Madde Geçişi": {
+          "avg": null,
+          "years": null,
+          "note": "AYT tablosunda satır yok."
+        },
+        "Fotosentez": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak kemosentezle tek kalem -> bucket."
+        },
+        "Kemosentez": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Fotosentez ve Kemosentez' bucket'ı."
+        },
+        "Hücresel Solunum": {
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Bitki Biyolojisi": {
+          "avg": 1.67,
+          "years": {
+            "2018": 2,
+            "2019": 3,
+            "2020": 0,
+            "2021": 2,
+            "2022": 2,
+            "2023": 0,
+            "2024": 2,
+            "2025": 2,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "avgExcl2020_2023": 2.14,
+          "note": "2020/2023 kapsam dışı."
+        },
+        "Sinir Sistemi": {
+          "avg": 0.33,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Endokrin Sistem": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 0,
+            "2023": 2,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Duyu Organları": {
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Destek ve Hareket Sistemi": {
+          "avg": 0.44,
+          "years": {
+            "2018": 1,
+            "2019": 0,
+            "2020": 0,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Sindirim Sistemi": {
+          "avg": 0.56,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Dolaşım ve Bağışıklık Sistemi": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Dolaşım Sistemi'; universitego da her yıl 1."
+        },
+        "Solunum Sistemi": {
+          "avg": 0.67,
+          "years": {
+            "2018": 0,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Boşaltım Sistemi": {
+          "avg": 0.67,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Üriner Sistem'."
+        },
+        "Üreme Sistemi ve Embriyonik Gelişim": {
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 0,
+            "2024": 0,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Genetik Mühendisliği ve Biyoteknoloji": {
+          "avg": null,
+          "years": null,
+          "note": "Ayrı satır yok (varsa 'Genden Proteine' içinde)."
+        },
+        "Komünite ve Popülasyon Ekolojisi": {
+          "avg": 1.67,
+          "years": {
+            "2018": 2,
+            "2019": 0,
+            "2020": 2,
+            "2021": 2,
+            "2022": 2,
+            "2023": 2,
+            "2024": 2,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      },
+      "buckets": [
+        {
+          "label": "Fotosentez ve Kemosentez",
+          "covers": [
+            "Fotosentez",
+            "Kemosentez"
+          ],
+          "avg": 0.89,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "universitego ayrı veriyor ama 2023/2024'te unirehberi ile çelişiyor; bölünmedi."
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Canlılık ve Enerji (ATP)",
+          "avg": 0.33,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 0,
+            "2021": 0,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 0,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        {
+          "label": "Canlılar ve Çevre",
+          "avg": 0.56,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 0,
+            "2021": 1,
+            "2022": 0,
+            "2023": 1,
+            "2024": 0,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "sources": [
+        "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    },
+    "ayt_edebiyat": {
+      "exam": "AYT",
+      "totalQuestions": 24,
+      "confidence": "medium (dönem satırları 2 kaynakta kabaca uyumlu; Divan ±1-2)",
+      "topics": {
+        "Güzel Sanatlar ve Edebiyat": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynakta satır yok."
+        },
+        "Coşku ve Heyecana Bağlı Metinler (Şiir)": {
+          "avg": 2.44,
+          "years": {
+            "2018": 2,
+            "2019": 3,
+            "2020": 3,
+            "2021": 2,
+            "2022": 2,
+            "2023": 3,
+            "2024": 2,
+            "2025": 3,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Şiir Bilgisi'. universitego 2018-2025: 2,3,2,2,2,2,1,3."
+        },
+        "Olay Çevresinde Gelişen Metinler (Hikaye)": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Metin Türleri' bucket'ı."
+        },
+        "Olay Çevresinde Gelişen Metinler (Roman)": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Metin Türleri' bucket'ı."
+        },
+        "Olay Çevresinde Gelişen Metinler (Tiyatro)": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Metin Türleri' bucket'ı."
+        },
+        "Öğretici Metinler": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Metin Türleri' bucket'ı."
+        },
+        "İslamiyet Öncesi Türk Edebiyatı": {
+          "avg": 0.78,
+          "years": {
+            "2018": 0,
+            "2019": 0,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 0,
+            "2024": 1,
+            "2025": 1,
+            "2026": 2
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi'."
+        },
+        "İslamiyet Etkisindeki Türk Edebiyatı (Divan)": {
+          "avg": 4.44,
+          "years": {
+            "2018": 5,
+            "2019": 3,
+            "2020": 4,
+            "2021": 6,
+            "2022": 5,
+            "2023": 5,
+            "2024": 4,
+            "2025": 3,
+            "2026": 5
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 2018-2025: 4,2,5,4,4,3,4,3 (biraz daha düşük)."
+        },
+        "Halk Edebiyatı": {
+          "avg": 1.22,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 2,
+            "2022": 1,
+            "2023": 2,
+            "2024": 1,
+            "2025": 0,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Tanzimat Dönemi Edebiyatı": {
+          "avg": 1.33,
+          "years": {
+            "2018": 2,
+            "2019": 2,
+            "2020": 1,
+            "2021": 2,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Servetifünun Edebiyatı": {
+          "avg": null,
+          "years": null,
+          "note": "Kaynak Fecr-i Ati ile tek kalem -> bucket."
+        },
+        "Fecr-i Ati Edebiyatı": {
+          "avg": null,
+          "years": null,
+          "note": "-> 'Servet-i Fünun ve Fecr-i Ati' bucket'ı."
+        },
+        "Milli Edebiyat Dönemi": {
+          "avg": 1.22,
+          "years": {
+            "2018": 3,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        },
+        "Cumhuriyet Dönemi Türk Edebiyatı": {
+          "avg": 3.0,
+          "years": {
+            "2018": 4,
+            "2019": 5,
+            "2020": 2,
+            "2021": 3,
+            "2022": 3,
+            "2023": 2,
+            "2024": 3,
+            "2025": 2,
+            "2026": 3
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 2018-2025: 5,5,2,3,3,2,3,2."
+        },
+        "Dünya Edebiyatı": {
+          "avg": 1.0,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "'Batı Edebiyat Akımları'; yaklaşık eşleme. universitego da her yıl 1."
+        }
+      },
+      "buckets": [
+        {
+          "label": "Metin Türleri",
+          "covers": [
+            "Olay Çevresinde Gelişen Metinler (Hikaye)",
+            "Olay Çevresinde Gelişen Metinler (Roman)",
+            "Olay Çevresinde Gelişen Metinler (Tiyatro)",
+            "Öğretici Metinler"
+          ],
+          "avg": 0.56,
+          "years": {
+            "2018": 0,
+            "2019": 2,
+            "2020": 0,
+            "2021": 0,
+            "2022": 0,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 0
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "universitego 'Nesir Bilgisi' 2018-2025: 2,3,1,2,1,2,1,2 + 'Geleneksel Türk Tiyatrosu' ayrı -> sınıflama farkı büyük, bu bucket düşük güvenli."
+        },
+        {
+          "label": "Servet-i Fünun ve Fecr-i Ati",
+          "covers": [
+            "Servetifünun Edebiyatı",
+            "Fecr-i Ati Edebiyatı"
+          ],
+          "avg": 1.11,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 2,
+            "2021": 1,
+            "2022": 1,
+            "2023": 1,
+            "2024": 1,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "unmapped": [
+        {
+          "label": "Anlam Bilgisi (paragraf/sözcük/cümle)",
+          "avg": 5.11,
+          "years": {
+            "2018": 4,
+            "2019": 3,
+            "2020": 6,
+            "2021": 3,
+            "2022": 6,
+            "2023": 6,
+            "2024": 6,
+            "2025": 6,
+            "2026": 6
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+          "note": "Uygulamada karşılığı yok; son yıllarda 6 soru."
+        },
+        {
+          "label": "Edebi Sanatlar",
+          "avg": 1.33,
+          "years": {
+            "2018": 1,
+            "2019": 1,
+            "2020": 1,
+            "2021": 2,
+            "2022": 2,
+            "2023": 1,
+            "2024": 2,
+            "2025": 1,
+            "2026": 1
+          },
+          "source": "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/"
+        }
+      ],
+      "notes": "ayt_edebiyat_soz aynı testtir.",
+      "sources": [
+        "https://www.unirehberi.com/ayt-konulari-ve-soru-dagilimi/",
+        "https://www.universitego.com/tyt-ayt-konu-soru-dagilimlari/"
+      ]
+    }
+  }
+}

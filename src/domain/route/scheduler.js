@@ -10,6 +10,68 @@ import { spreadSubjects } from "./subjectSpread.js";
 // yanlış defteri için pay ayrılır. Aksi halde plan "sadece yeni konu"ya
 // dönüşür ve öğrenci öğrendiğini unutur.
 const NEW_TOPIC_SHARE = 0.65;
+// Oncelikli konu haftaya sigmiyorsa bolunur -- ama kalan butce bu kadardan
+// azsa bolmek anlamsiz kucuk bir parca uretir; o zaman kucuk konularla doldurulur.
+const MIN_CHUNK_QUESTIONS = 10;
+const MIN_CHUNK_MINUTES = 15;
+
+// OTURUM BOYU: bir durak tek oturumda bitmeli. Butun konu tek durak olunca
+// 57 soruluk Paragraf bir haftanin tamamini yiyordu (hafta boyu tek ders).
+// Buyuk konu kisinin gunluk tempo kadar parcalara onceden bolunur; parcalar
+// sirali kalir, spreadSubjects araya baska dersleri serpistirir.
+const SESSION_CLAMP = [12, 30];
+export function sessionQuestions(capacity = {}) {
+  const perDay = (Number(capacity.questionsPerWeek) || 140) / Math.max(1, Number(capacity.activeDaysPerWeek) || 5);
+  return Math.round(Math.min(SESSION_CLAMP[1], Math.max(SESSION_CLAMP[0], perDay)));
+}
+
+export function segmentItems(items = [], maxQuestions = 25) {
+  const out = [];
+  for (const item of items) {
+    const q = Math.max(1, Number(item.cost?.questions) || 1);
+    const n = Math.ceil(q / maxQuestions);
+    if (n <= 1) { out.push(item); continue; }
+    const m = Number(item.cost?.minutes) || 0;
+    for (let i = 0; i < n; i += 1) {
+      const qi = Math.round((q * (i + 1)) / n) - Math.round((q * i) / n);
+      const mi = Math.round((m * (i + 1)) / n) - Math.round((m * i) / n);
+      out.push({
+        ...item,
+        cost: { ...item.cost, questions: qi, minutes: mi },
+        partial: true,
+        plannedQuestions: qi,
+        ...(i > 0 ? { continued: true } : {}),
+      });
+    }
+  }
+  return out;
+}
+
+// Konuyu kalan butceye sigacak kadar boler; kalani kuyrugun basina doner.
+function takePartial(next, questionsLeft, minutesLeft, position) {
+  const questionCost = Math.max(1, Number(next.cost.questions) || 1);
+  const minuteCost = Math.max(1, Number(next.cost.minutes) || 1);
+  const ratio = Math.min(1, questionsLeft / questionCost, minutesLeft / minuteCost);
+  const allocatedQuestions = Math.min(questionsLeft, Math.max(1, Math.floor(questionCost * ratio)));
+  const allocatedMinutes = Math.min(minutesLeft, Math.max(1, Math.ceil(minuteCost * ratio)));
+  const stop = {
+    ...next,
+    cost: { ...next.cost, questions: allocatedQuestions, minutes: allocatedMinutes },
+    partial: allocatedQuestions < questionCost || allocatedMinutes < minuteCost,
+    plannedQuestions: allocatedQuestions,
+    position,
+  };
+  const remainingQuestions = questionCost - allocatedQuestions;
+  const remainingMinutes = minuteCost - allocatedMinutes;
+  const rest = remainingQuestions > 0 || remainingMinutes > 0
+    ? {
+      ...next,
+      cost: { ...next.cost, questions: Math.max(0, remainingQuestions), minutes: Math.max(0, remainingMinutes) },
+      continued: true,
+    }
+    : null;
+  return { stop, rest, allocatedQuestions, allocatedMinutes };
+}
 
 /**
  * @param items     [{ ...topic, cost, score }] öncelik sırasında
@@ -23,7 +85,7 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = 
   // Oncelik sirasi ayni dersi ust uste yigiyordu: ilk gun acilan kullanici
   // dort Turkce duragi goruyordu. spreadSubjects onceligi bozmadan ayni
   // dersten ust uste en fazla ikiye izin verir.
-  const queue = spreadSubjects(items);
+  const queue = spreadSubjects(segmentItems(items, sessionQuestions(capacity)));
   let overflow = [];
 
   for (let w = 0; w < weeksLeft; w++) {
@@ -35,9 +97,13 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = 
     let minutesLeft = minuteBudget;
     const stops = [];
 
-    // Öncelik sırasını koruyarak bütçeye SIĞAN ilk konuyu al. Sığmayan ilk
-    // konuda döngüyü kırmak haftaları yarı boş bırakıyordu (78 bütçelik
-    // haftada 36 soru), yani rota gereksiz uzuyordu.
+    // Öncelik sırasını koruyarak bütçeye SIĞAN ilk konuyu al.
+    //
+    // EN ONCELIKLI konu sigmiyorsa BOLUNUR, atlanmaz. Eskiden sigmayan
+    // konu atlanip kucuk konular aliniyordu; butceden buyuk konu (Paragraf:
+    // yilda ~20 soru, en yuksek oncelik) her hafta kucuklere yer kaptirip
+    // sinav sonrasina (overflow) dusuyordu. Kalan butce anlamli bir parcaya
+    // yetmiyorsa bosluk kucuk konularla doldurulur.
     let idx = 0;
     while (idx < queue.length && questionsLeft > 0 && minutesLeft > 0) {
       const questionCost = Math.max(1, Number(queue[idx].cost.questions) || 1);
@@ -50,40 +116,29 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = 
         idx = 0; // baştan tara: öncelik sırası korunsun
         continue;
       }
+      // Bolmek kirinti birakacaksa (kalan < 10 soru) bolme; sonraki hafta
+      // butun sigar. Bu arada bosluk kucuk konularla dolar.
+      const splitLeavesChunk = questionCost - Math.min(questionsLeft, questionCost) >= MIN_CHUNK_QUESTIONS;
+      if (idx === 0 && splitLeavesChunk && questionsLeft >= MIN_CHUNK_QUESTIONS && minutesLeft >= MIN_CHUNK_MINUTES) {
+        const head = queue.shift();
+        const part = takePartial(head, questionsLeft, minutesLeft, stops.length);
+        stops.push(part.stop);
+        if (part.rest) queue.unshift(part.rest);
+        questionsLeft -= part.allocatedQuestions;
+        minutesLeft -= part.allocatedMinutes;
+        continue;
+      }
       idx += 1;
     }
 
     // Hiçbiri sığmadıysa, en öncelikli konu tek başına bir haftadan büyüktür.
     // Bölerek koy ki plan tıkanmasın (tasarımda "devam eden durak").
     if (stops.length === 0 && queue.length > 0) {
-      const next = queue.shift();
-      const questionCost = Math.max(1, Number(next.cost.questions) || 1);
-      const minuteCost = Math.max(1, Number(next.cost.minutes) || 1);
-      const ratio = Math.min(1, questionsLeft / questionCost, minutesLeft / minuteCost);
-      const allocatedQuestions = Math.min(questionsLeft, Math.max(1, Math.floor(questionCost * ratio)));
-      const allocatedMinutes = Math.min(minutesLeft, Math.max(1, Math.ceil(minuteCost * ratio)));
-      stops.push({
-        ...next,
-        cost: { ...next.cost, questions: allocatedQuestions, minutes: allocatedMinutes },
-        partial: allocatedQuestions < questionCost || allocatedMinutes < minuteCost,
-        plannedQuestions: allocatedQuestions,
-        position: 0,
-      });
-      const remainingQuestions = questionCost - allocatedQuestions;
-      const remainingMinutes = minuteCost - allocatedMinutes;
-      if (remainingQuestions > 0 || remainingMinutes > 0) {
-        queue.unshift({
-          ...next,
-          cost: {
-            ...next.cost,
-            questions: Math.max(0, remainingQuestions),
-            minutes: Math.max(0, remainingMinutes),
-          },
-          continued: true,
-        });
-      }
-      questionsLeft -= allocatedQuestions;
-      minutesLeft -= allocatedMinutes;
+      const part = takePartial(queue.shift(), questionsLeft, minutesLeft, 0);
+      stops.push(part.stop);
+      if (part.rest) queue.unshift(part.rest);
+      questionsLeft -= part.allocatedQuestions;
+      minutesLeft -= part.allocatedMinutes;
     }
 
     if (stops.length === 0 && queue.length === 0) break;

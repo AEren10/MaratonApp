@@ -58,7 +58,7 @@ export function estimateTopicCost(topic, subject = {}, trialType, opts = {}) {
   const yieldScore = netGainForTopic(subject, {
     total_questions: q,
     correct_count: Math.round(q * acc / 100),
-  }, trialType);
+  }, trialType, topic.topic);
 
   return {
     questions,

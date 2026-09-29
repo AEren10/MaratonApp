@@ -21,16 +21,25 @@ test("scheduler never exceeds question or minute budget", () => {
   }
 });
 
-test("partial stops split questions and minutes proportionally", () => {
+test("buyuk konu oturum boyunda parcalara bolunur; soru ve dakika orantili", () => {
   const { weeks, overflow } = scheduleWeeks([
     item("Büyük konu", 100, 200),
   ], { questionsPerWeek: 100, minutesPerWeek: 100 }, 1);
+  // gunluk tempo 100/5 = 20 soru -> 5 parca, her biri 20 soru 40 dk
   const segment = weeks[0].stops[0];
-  assert.equal(segment.cost.questions, 32);
-  assert.equal(segment.cost.minutes, 65);
+  assert.equal(segment.cost.questions, 20);
+  assert.equal(segment.cost.minutes, 40);
   assert.equal(segment.partial, true);
-  assert.equal(overflow[0].cost.questions, 68);
-  assert.equal(overflow[0].cost.minutes, 135);
+  const rest = overflow.reduce((n, s) => n + s.cost.questions, 0);
+  assert.equal(rest + weeks[0].stops.reduce((n, s) => n + s.cost.questions, 0), 100);
+});
+
+test("oncelikli buyuk konu kucuk konulara yer kaptirip sinav sonrasina dusmez", () => {
+  const { weeks } = scheduleWeeks([
+    item("Paragraf", 60, 90),
+    ...Array.from({ length: 10 }, (_, i) => ({ ...item(`Kucuk ${i}`, 12, 15), subject: `d${i}` })),
+  ], { questionsPerWeek: 100, minutesPerWeek: 140 }, 3);
+  assert.equal(weeks[0].stops[0].topic, "Paragraf");
 });
 
 test("final partial week scales both budgets by remaining days", () => {

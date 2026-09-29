@@ -11,6 +11,7 @@ import { personalPace, minutesPerQuestionFor } from "../domain/route/personalPac
 import { missingPrerequisites } from "../domain/route/prerequisites.js";
 import { wrongBoost, wrongReviewQuestions, WRONG_REVIEW_MIN_DUE } from "../domain/route/wrongSignal.js";
 import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
+import { topicShares } from "../domain/route/topicShares.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -68,7 +69,9 @@ export function buildRoute({
     // ve topicCost'taki "sınav ağırlığı" mantığı tamamen ölüydü:
     // 40 soruluk Matematik ile 5 soruluk Felsefe aynı getiriyi alıyordu.
     const subjectWeight = Number(subject.questionCount ?? subject.weight) || 10;
-    const topicShare = subjectWeight / Math.max(1, subject.topics?.length || 1);
+    // Konu payi gercek OSYM sikligindan (topicShares); yoksa esit pay.
+    const shares = topicShares({ ...subject, questionCount: subjectWeight });
+    const equalShare = subjectWeight / Math.max(1, subject.topics?.length || 1);
 
     // On kosul artik mufredat sirasi DEGIL: yalniz gercek zincirler
     // (prerequisites.js). Mufredat sirasini dayatmak hic kaydi olmayan
@@ -99,9 +102,10 @@ export function buildRoute({
         neglectedDays,
       };
 
+      const topicShare = shares[name] ?? equalShare;
       const cost = estimateTopicCost(
         entry,
-        { ...subject, questionCount: subjectWeight },
+        { ...subject, questionCount: subjectWeight, topicShares: shares },
         examType === "lgs" ? "LGS" : "TYT",
         { pace, feel: topicFeel?.[subject.key]?.[name] },
       );
@@ -241,8 +245,10 @@ export function buildRoute({
 
   const remainingQuestions = items.reduce((n, i) => n + i.cost.questions, 0);
   const overflowQuestions = overflow.reduce((n, i) => n + i.cost.questions, 0);
+  // Konular oturum parcalarina bolunuyor; yetismeyen KONU sayisi tekil.
+  const overflowTopics = new Set(overflow.map((i) => `${i.subject}|${i.topic}|${i.reviewCycle || ""}`)).size;
   const shortfall = {
-    topics: overflow.length,
+    topics: overflowTopics,
     questions: overflowQuestions,
     extraQuestionsPerWeek: weeksLeft > 0 ? Math.ceil(overflowQuestions / weeksLeft) : 0,
   };
