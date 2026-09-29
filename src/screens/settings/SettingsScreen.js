@@ -49,7 +49,7 @@ export default function SettingsScreen() {
             <SettingsRow label="Sınav tarihi" value={vm.examDateLabel} onPress={vm.go(SCREENS.EXAM_DATE)} />
             <SettingsRow label="Günlük soru hedefi" value={vm.dailyGoalLabel} onPress={vm.go(SCREENS.GOALS)} />
             <SettingsRow label="Haftalık ders programı" onPress={vm.go(SCREENS.CLASS_SCHEDULE)} />
-            <SettingsRow label="Günlük rutin" value="Her gün paragraf, problem…" onPress={vm.go(SCREENS.ROUTE_HABITS)} />
+            <SettingsRow label="Günlük rutin" hint="Her gün paragraf, problem…" onPress={vm.go(SCREENS.ROUTE_HABITS)} />
             <SettingsRow label="Net eşiği" hint="Hedef bölüm karşılaştırması" onPress={vm.gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
           </SettingsGroup>
         </Animated.View>
