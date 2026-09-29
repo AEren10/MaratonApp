@@ -2,66 +2,42 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { Card } from "../../../components/design";
+import { alpha } from "../../../themes/colorMix";
 
-const COL = 52;
-const DIFF_COL = 50;
-
-function HeadCell({ C, text, width }) {
-  return (
-    <Text style={[TYPOGRAPHY.tableHead, { color: C.text3, width, textAlign: "right" }]}>{text}</Text>
-  );
-}
-
-// Tasarim: ders renkli 9px kare + ders adi + iki net + fark.
+// Ders ders fark: solda ders, ortada "eski → yeni", sagda fark etiketi.
+// Eski dort sutunlu tablo dar ekranda sikisiyordu; fark artik bir etiket
+// ve tek bakista okunuyor. Artis yesil, dusus notr gri (kotu haber bagirmaz).
 // Ders rengi YALNIZ kimlik olarak kullaniliyor, durum anlatmiyor.
-export const TrialCompareTable = React.memo(function TrialCompareTable({
-  C, rows, olderLabel, newerLabel,
-}) {
+export const TrialCompareTable = React.memo(function TrialCompareTable({ C, rows }) {
   return (
     <Card tone="surface" radius="sheet" padded={false} style={styles.card}>
-      <View style={styles.headRow}>
-        <Text style={[TYPOGRAPHY.tableHead, { color: C.text3, flex: 1 }]}>DERS</Text>
-        <HeadCell C={C} text={olderLabel} width={COL} />
-        <HeadCell C={C} text={newerLabel} width={COL} />
-        <HeadCell C={C} text="FARK" width={DIFF_COL} />
-      </View>
-
-      {rows.map((r, i) => (
-        <View
-          key={r.key}
-          style={[
-            styles.row,
-            i < rows.length - 1 && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.line },
-          ]}
-        >
-          <View style={[styles.swatch, { backgroundColor: r.color }]} />
-          <Text style={[TYPOGRAPHY.tableName, styles.name, { color: C.text }]} numberOfLines={1}>
-            {r.name}
-          </Text>
-          <Text style={[TYPOGRAPHY.tableValue, styles.value, { color: C.text3, width: COL }]} allowFontScaling={false}>
-            {r.olderNet}
-          </Text>
-          <Text style={[TYPOGRAPHY.tableValue, styles.value, { color: C.text, width: COL }]} allowFontScaling={false}>
-            {r.newerNet}
-          </Text>
-          <Text
-            style={[TYPOGRAPHY.tableValue, styles.value, styles.diff, { color: r.diffUp ? C.up : C.down, width: DIFF_COL }]}
-            allowFontScaling={false}
+      {rows.map((r, i) => {
+        const flat = r.diffLabel === "—" || /^[+−-]?0([,.]0+)?$/.test(String(r.diffLabel));
+        const tone = flat ? C.text3 : r.diffUp ? C.up : C.down;
+        return (
+          <View
+            key={r.key}
+            style={[styles.row, i < rows.length - 1 && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.line }]}
           >
-            {r.diffLabel}
-          </Text>
-        </View>
-      ))}
+            <View style={[styles.swatch, { backgroundColor: r.color }]} />
+            <Text style={[TYPOGRAPHY.bodyMedium, styles.name, { color: C.text }]} numberOfLines={1}>{r.name}</Text>
+            <Text style={[TYPOGRAPHY.tableValue, { color: C.text3 }]} allowFontScaling={false}>{r.olderNet}</Text>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text4 }]}>→</Text>
+            <Text style={[TYPOGRAPHY.tableValue, { color: C.text }]} allowFontScaling={false}>{r.newerNet}</Text>
+            <View style={[styles.pill, { backgroundColor: alpha(tone, 14) }]}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: tone }]} allowFontScaling={false}>{r.diffLabel}</Text>
+            </View>
+          </View>
+        );
+      })}
     </Card>
   );
 });
 
 const styles = StyleSheet.create({
-  card: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: STEP.s1, borderRadius: SHAPE.sheet },
-  headRow: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingTop: 14, paddingBottom: 10 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: 14 },
-  swatch: { width: 9, height: 9, borderRadius: 1 },
-  name: { flex: 1, minWidth: 0 },
-  value: { textAlign: "right" },
-  diff: { fontFamily: "Archivo_600" },
+  card: { paddingHorizontal: STEP.s3, paddingVertical: STEP.s1, borderRadius: SHAPE.sheet },
+  row: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingVertical: STEP.s2 + 4 },
+  swatch: { width: 9, height: 9, borderRadius: 2 },
+  name: { flex: 1, minWidth: 0, marginLeft: 4 },
+  pill: { minWidth: 58, alignItems: "center", paddingVertical: 4, paddingHorizontal: STEP.s1, borderRadius: SHAPE.chip, marginLeft: STEP.s1 },
 });

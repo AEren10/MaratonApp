@@ -12,6 +12,7 @@ import { useTrialCompare } from "../../hooks/useTrialCompare";
 import { TrialPickerModal } from "./components/TrialPickerModal";
 import { TrialCompareHero } from "./components/TrialCompareHero";
 import { TrialCompareTable } from "./components/TrialCompareTable";
+import { TrialCompareChart } from "./components/TrialCompareChart";
 import { TrialComparePill } from "./components/TrialComparePill";
 import { Press } from "../../components/design/Press";
 
@@ -68,7 +69,12 @@ export default function TrialCompareScreen() {
             <TrialCompareHero C={C} {...hero} />
           </Animated.View>
 
+          {/* Iki denemenin ders ders cizgisi (kullanici istegi, 29 Eylul). */}
           <Animated.View style={{ marginTop: 28 }}>
+            <TrialCompareChart C={C} rows={rows} olderLabel={hero.olderLabel} newerLabel={hero.newerLabel} />
+          </Animated.View>
+
+          <Animated.View style={{ marginTop: 20 }}>
             <TrialCompareTable
               C={C}
               rows={rows}

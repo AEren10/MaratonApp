@@ -78,6 +78,9 @@ export function useTrialCompare(C, params = {}) {
         newerNet: fmtNet(n),
         diffLabel: older ? fmtDelta(n - o) : "—",
         diffUp: older ? n - o > 0 : false,
+        // Grafik icin ham degerler.
+        oRaw: older ? o : null,
+        nRaw: n,
       };
     });
   }, [C, newer, older]);
