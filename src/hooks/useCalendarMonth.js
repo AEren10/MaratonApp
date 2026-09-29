@@ -46,7 +46,10 @@ export function useCalendarMonth(initialOffset = 0) {
   const dayMap = useMemo(() => {
     const map = {};
     const slot = (d) => (map[d] = map[d] || { logs: [], trials: [], totalMinutes: 0, totalQuestions: 0 });
+    // Ay degisirken yeni veri gelene kadar onceki ayin kayitlari duruyor;
+    // aralik disi atlanir ki yeni ayin ozeti eski ayin sayisini gostermesin.
     logs.forEach((l) => {
+      if (l.study_date < from || l.study_date > to) return;
       const day = slot(l.study_date);
       day.logs.push(l);
       day.totalMinutes += l.duration ?? l.duration_minutes ?? 0;
