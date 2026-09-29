@@ -229,6 +229,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     hasDebt: !!debt?.hasDebt,
     comebackRecommendation,
     nextTask: ctaTask,
+    // Gunun listesi dolu ve hepsi bitti: ana buton 'Gunu kapattin'.
+    dayDone: !ctaTask && Array.isArray(todayStops) && todayStops.length > 0 && todayStops.every((i) => i.completed),
     ctaSubtitle,
   };
 }
