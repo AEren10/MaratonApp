@@ -18,7 +18,7 @@
         "applinks:maraton.app"
       ],
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
+        "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek ve story paylaşımına arka plan seçmek için galeri erişimi gerekli.",
         "NSCameraUsageDescription": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli.",
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserNotificationsUsageDescription": "Çalışma hatırlatmaları ve streak bildirimleri göndermek için bildirim izni gerekli.",
@@ -82,7 +82,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Yanlış soru fotoğrafı eklemek için galeri erişimi gerekli.",
+          "photosPermission": "Yanlış soru fotoğrafı eklemek ve story paylaşımına arka plan seçmek için galeri erişimi gerekli.",
           "cameraPermission": "Yanlış soru fotoğrafı çekmek için kamera erişimi gerekli."
         }
       ],

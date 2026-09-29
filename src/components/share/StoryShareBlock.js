@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
 import { useStoryShare } from "../../hooks/useStoryShare";
-import { STORY_MOMENT } from "../../domain/share/storySticker";
+import { STORY_BG, STORY_MOMENT } from "../../domain/share/storySticker";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
@@ -27,8 +27,17 @@ const MESSAGE = {
 export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, emphasis = "primary" }) {
   const C = useC();
   const shotRef = useRef(null);
+  const overlayRef = useRef(null);
   const s = useStoryShare(moment);
   const quiet = emphasis === "quiet";
+  const photoMode = s.selected?.background === STORY_BG.FOTO;
+  const bgUri = s.photo?.uri || photoUri;
+  // Galeriye kayit: fotografli varyantta once fotograf, sonra bir kare bekle
+  // (yeni zemin cizilsin), sonra yakala.
+  const save = async () => {
+    if (photoMode && !bgUri && !(await s.pickPhoto())) return;
+    setTimeout(() => s.save(shotRef), 60);
+  };
 
   if (s.loading || !s.selected) return null;
 
@@ -57,15 +66,23 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
               ]}
             >
               <View style={[st.scaled, { transform: [{ scale: w / STORY_WIDTH }] }]} pointerEvents="none">
-                <StorySticker variant={v} photoUri={photoUri} />
+                <StorySticker variant={v} photoUri={bgUri} />
               </View>
             </Press>
           );
         })}
       </ScrollView>
 
+      {photoMode ? (
+        <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto(); }} accessibilityRole="button" style={st.secondary}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>
+            {bgUri ? "Fotoğrafı değiştir" : "Fotoğrafını seç"}
+          </Text>
+        </Press>
+      ) : null}
+
       <Press haptic="none"
-        onPress={() => { H.tap(); s.share(shotRef); }}
+        onPress={() => { H.tap(); s.share(overlayRef, shotRef); }}
         disabled={s.busy}
         accessibilityRole="button"
         accessibilityLabel="Paylaş"
@@ -83,7 +100,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
       </Press>
 
       <Press haptic="none"
-        onPress={() => { H.tap(); s.save(shotRef); }}
+        onPress={() => { H.tap(); save(); }}
         disabled={s.busy}
         accessibilityRole="button"
         style={st.secondary}
@@ -94,12 +111,16 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
       </Press>
 
       <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text3 }]}>
-        {s.result ? MESSAGE[s.result] : "Etiketin Instagram story'ne gönderilir."}
+        {s.result ? MESSAGE[s.result] : photoMode
+          ? "Veriler fotoğrafının üstüne biner; Instagram'da taşıyıp büyütebilirsin."
+          : "Kartın Instagram story'ne gönderilir."}
       </Text>
 
-      {/* Yakalanan asil etiket: tam olcu, ekran disinda. */}
+      {/* Yakalanan asil etiketler: tam olcu, EKRAN DISINDA. Eskiden sol ustte
+          duruyordu; zIndex RN'de gizlemedigi icin ozetin ustune biniyordu. */}
       <View style={st.offscreen} pointerEvents="none">
-        <StorySticker ref={shotRef} variant={s.selected} photoUri={photoUri} />
+        <StorySticker ref={shotRef} variant={s.selected} photoUri={bgUri} />
+        <StorySticker ref={overlayRef} variant={s.selected} overlay />
       </View>
     </View>
   );
@@ -118,5 +139,5 @@ const st = StyleSheet.create({
   secondary: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
   secondaryText: { textDecorationLine: "underline" },
   note: { textAlign: "center", paddingHorizontal: STEP.s4, marginTop: STEP.s1 },
-  offscreen: { position: "absolute", top: 0, left: 0, zIndex: -100 },
+  offscreen: { position: "absolute", top: 0, left: -10000 },
 });

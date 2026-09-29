@@ -6,23 +6,26 @@ import { LinearGradient } from "expo-linear-gradient";
 import { alpha } from "../../themes/colorMix";
 import { TYPOGRAPHY } from "../../themes/tokens";
 
-// Marka zemini: iki genis kizil hale, ustte ince bir isik cizgisi.
+// Marka zemini: kizil gecis (kullanici karari, 29 Eylul) -- ustte marka
+// kirmizisi, asagi dogru koyulasip zemine iner; ustte yumusak bir hale.
 export function BrandBackground({ C, width, height }) {
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Svg width={width} height={height}>
+      <LinearGradient
+        colors={[C.brandFill, C.accentDeep, C.bg]}
+        locations={[0, 0.48, 1]}
+        start={{ x: 0.15, y: 0 }}
+        end={{ x: 0.85, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
         <Defs>
           <RadialGradient id="storyGlowA" cx="50%" cy="50%" r="50%">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.32} />
-            <Stop offset="0.66" stopColor={C.accent} stopOpacity={0} />
-          </RadialGradient>
-          <RadialGradient id="storyGlowB" cx="50%" cy="50%" r="50%">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.2} />
-            <Stop offset="0.68" stopColor={C.accent} stopOpacity={0} />
+            <Stop offset="0" stopColor={C.accentBright} stopOpacity={0.35} />
+            <Stop offset="0.7" stopColor={C.accentBright} stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Rect x={-130} y={-160} width={470} height={470} fill="url(#storyGlowA)" />
-        <Rect x={width - 350} y={height - 330} width={520} height={520} fill="url(#storyGlowB)" />
+        <Rect x={-140} y={-180} width={520} height={520} fill="url(#storyGlowA)" />
       </Svg>
       <View style={[s.topLine, { backgroundColor: alpha(C.text, 22) }]} />
     </View>

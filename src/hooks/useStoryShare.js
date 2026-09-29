@@ -8,6 +8,8 @@ import { getSubjectByKey } from "../themes/subjects";
 import { useWeeklyReport } from "./useWeeklyReport";
 import { buildStoryVariants, STORY_MOMENT } from "../domain/share/storySticker";
 import { shareStoryToInstagram, saveStoryToGallery, STORY_SHARE } from "../lib/storyShare";
+import { pickStoryPhoto } from "../lib/storyPhoto";
+import { STORY_BG } from "../domain/share/storySticker";
 
 const EXAM_NAME = { tyt: "YKS", ayt: "YKS", lgs: "LGS" };
 
@@ -57,6 +59,8 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
+  // Fotografli varyantin arka plani: { uri, share } ya da null.
+  const [photo, setPhoto] = useState(null);
 
   const ctx = useMemo(() => {
     const logs = todayLogs || [];
@@ -104,7 +108,17 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     busy,
     result,
     clearResult: () => setResult(null),
-    share: (ref) => run(shareStoryToInstagram, ref),
+    photo,
+    pickPhoto: async () => { const p = await pickStoryPhoto(); if (p) setPhoto(p); return p; },
+    // Fotografli varyant: fotograf yoksa once sectirilir; etiket seffaf gider,
+    // fotograf Instagram'a arka plan olarak. Marka varyanti oldugu gibi.
+    share: async (overlayRef, fullRef) => {
+      if (selected?.background !== STORY_BG.FOTO) return run(shareStoryToInstagram, fullRef);
+      const p = photo || await pickStoryPhoto();
+      if (!p) return null;
+      if (!photo) setPhoto(p);
+      return run((ref) => shareStoryToInstagram(ref, { backgroundImage: p.share }), overlayRef);
+    },
     save: (ref) => run(saveStoryToGallery, ref),
     loading: report.loading,
     STORY_SHARE,

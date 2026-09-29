@@ -13,6 +13,7 @@ import {
 } from "./bodies/StoryNumberBodies";
 import { StoryRouteBody } from "./bodies/StoryRouteBody";
 import { StoryCardBody } from "./bodies/StoryCardBody";
+import { StoryTrackBody } from "./bodies/StoryTrackBody";
 import {
   StoryCountdownBody,
   StoryHonestBody,
@@ -37,12 +38,18 @@ const BODIES = {
   [STORY_KIND.GERISAYIM]: StoryCountdownBody,
   [STORY_KIND.NET]: StoryNetBody,
   [STORY_KIND.DURUST]: StoryHonestBody,
+  [STORY_KIND.IZ]: StoryTrackBody,
 };
 
 /**
  * Tek bir story etiketi. `ref` view-shot'in yakaladigi dugumdur.
+ *
+ * `overlay`: fotografli varyantin Instagram'a giden hali -- ZEMIN YOK,
+ * arkasi seffaf. Fotograf Instagram'a ayri arka plan olarak gider; etiket
+ * onun ustunde tasinip buyutulebilir (Strava gibi). Onizleme ve galeriye
+ * kaydetmede zemin cizilir.
  */
-export const StorySticker = forwardRef(function StorySticker({ variant, photoUri }, ref) {
+export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false }, ref) {
   const C = useC();
   if (!variant) return null;
   const Body = BODIES[variant.kind];
@@ -50,16 +57,16 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
 
   const p = storyPalette(C, variant.background);
   return (
-    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: C.bg }]}>
-      {p.photo ? (
-        <PhotoBackground uri={photoUri} label="SENİN FOTOĞRAFIN" />
+    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay && p.photo ? "transparent" : C.bg }]}>
+      {overlay && p.photo ? null : p.photo ? (
+        <PhotoBackground uri={photoUri} label="FOTOĞRAF SEÇ" />
       ) : (
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}
 
       <Body data={variant.data} p={p} C={C} />
 
-      {variant.kind !== STORY_KIND.KART ? (
+      {variant.kind !== STORY_KIND.KART && variant.kind !== STORY_KIND.IZ ? (
         <StoryFoot p={p} daysToExam={variant.data.daysToExam} />
       ) : null}
     </View>

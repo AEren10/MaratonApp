@@ -14,6 +14,8 @@ export const STORY_KIND = Object.freeze({
   SERI: "seri",
   NET: "net",
   DURUST: "durust",
+  // Strava tarzi: arkasi seffaf ust katman, kullanicinin fotografina biner.
+  IZ: "iz",
 });
 
 export const STORY_BG = Object.freeze({ MARKA: "marka", FOTO: "foto" });
@@ -63,6 +65,17 @@ function variantData(kind, ctx) {
         accuracy: num(today.accuracy),
         stops: pos(today.stops),
         series,
+        daysToExam: pos(ctx.daysToExam),
+      };
+
+    case STORY_KIND.IZ:
+      if (!pos(today.questions) && series.length < 2) return null;
+      return {
+        questions: pos(today.questions),
+        minutes: pos(today.minutes),
+        streak: pos(ctx.streak),
+        weekQuestions: pos(week.questions),
+        series: series.length >= 2 ? series : [],
         daysToExam: pos(ctx.daysToExam),
       };
 
@@ -123,8 +136,8 @@ function variantData(kind, ctx) {
 function rankFor(moment, ctx) {
   const soon = pos(ctx.daysToExam) != null && ctx.daysToExam <= COUNTDOWN_SOON_DAYS;
   const head = moment === STORY_MOMENT.TRIAL
-    ? [STORY_KIND.NET, STORY_KIND.ROTA, STORY_KIND.ISTATISTIK]
-    : [STORY_KIND.ISTATISTIK, STORY_KIND.ROTA, STORY_KIND.KART];
+    ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.ROTA, STORY_KIND.ISTATISTIK]
+    : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.ISTATISTIK, STORY_KIND.ROTA];
   const tail = [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.DURUST, STORY_KIND.GERISAYIM];
   const order = [...head, ...tail.filter((k) => !head.includes(k))];
   if (soon) {
@@ -142,10 +155,11 @@ export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
   for (const kind of rankFor(moment, ctx)) {
     const data = variantData(kind, ctx);
     if (!data) continue;
-    // "kart" tasarimda yalniz marka zemininde yasar, digerleri iki zeminde de.
+    // "kart" yalniz marka zemininde, "iz" yalniz fotograf ustunde yasar;
+    // digerleri iki zeminde de.
     const backgrounds = kind === STORY_KIND.KART
       ? [STORY_BG.MARKA]
-      : [STORY_BG.FOTO, STORY_BG.MARKA];
+      : kind === STORY_KIND.IZ ? [STORY_BG.FOTO] : [STORY_BG.FOTO, STORY_BG.MARKA];
     for (const background of backgrounds) {
       out.push({ key: `${kind}_${background}`, kind, background, data });
     }

@@ -58,14 +58,16 @@ async function capture(ref, result) {
  * yer degismez. Gerekenler: iOS'ta ozel pasteboard anahtarlari, Android'de
  * com.instagram.share.ADD_TO_STORY intent'i, ve kayitli bir Meta App ID.
  */
-export async function shareStoryToInstagram(ref) {
+// backgroundImage: kullanicinin sectigi fotograf (iOS'ta data URI, Android'de
+// dosya yolu). Verilirse Instagram onu arka plan yapar, etiket ustune biner.
+export async function shareStoryToInstagram(ref, { backgroundImage = null } = {}) {
   // TEK YAKALAMA. Once dogrudan gonderim kendi yakalamasini yapiyor, sonra
   // basarisiz olursa pano yolu BIR DAHA yakaliyordu: iki tam boy PNG ve iki
   // base64 arka arkaya. Goruntu bir kez uretilip iki yola da veriliyor.
   const shot = await capture(ref, Platform.OS === "ios" ? "base64" : "tmpfile");
   if (!shot) return STORY_SHARE.FAILED;
 
-  if (await placeStickerInStory(shot)) return STORY_SHARE.PLACED;
+  if (await placeStickerInStory(shot, backgroundImage)) return STORY_SHARE.PLACED;
   // Pano yolu base64 ister; Android'de dosya yakalandigi icin orada bir kez
   // daha uretmek gerekiyor. Nadir yol: yalnizca dogrudan gonderim reddedilirse.
   const base64 = Platform.OS === "ios" ? shot : await capture(ref, "base64");
@@ -83,7 +85,7 @@ export async function shareStoryToInstagram(ref) {
  * Instagram kurulu degilse ya da cagri reddedilirse firlatir; cagiran
  * pano yoluna duser.
  */
-async function placeStickerInStory(shot) {
+async function placeStickerInStory(shot, backgroundImage = null) {
   try {
     if (!shot) return false;
     const sticker = Platform.OS === "ios" ? `data:image/png;base64,${shot}` : shot;
@@ -92,8 +94,9 @@ async function placeStickerInStory(shot) {
       social: INSTAGRAM_STORIES_SOCIAL,
       appId: INSTAGRAM_APP_ID,
       stickerImage: sticker,
-      backgroundTopColor: STORY_BG_TOP,
-      backgroundBottomColor: STORY_BG_BOTTOM,
+      ...(backgroundImage
+        ? { backgroundImage }
+        : { backgroundTopColor: STORY_BG_TOP, backgroundBottomColor: STORY_BG_BOTTOM }),
     });
     return true;
   } catch {

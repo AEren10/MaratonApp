@@ -46,9 +46,18 @@ test("sinav etiketi yoksa geri sayim sunulmaz", () => {
   assert.ok(!kindsOf(buildStoryVariants(noLabel)).includes(STORY_KIND.GERISAYIM));
 });
 
-test("oturum aninda once sayilar gelir", () => {
+// Oturum aninda once Strava tarzi "iz" (fotograf ustune seffaf katman),
+// hemen ardindan kirmizi marka karti (kullanici karari, 29 Eylul).
+test("oturum aninda once iz, sonra marka karti gelir", () => {
   const list = buildStoryVariants({ ...full, daysToExam: 200 }, STORY_MOMENT.SESSION);
-  assert.equal(list[0].kind, STORY_KIND.ISTATISTIK);
+  assert.equal(list[0].kind, STORY_KIND.IZ);
+  assert.equal(list[0].background, "foto");
+  assert.equal(list[1].kind, STORY_KIND.KART);
+});
+
+test("iz yalniz fotograf ustunde sunulur", () => {
+  const list = buildStoryVariants({ ...full, daysToExam: 200 }, STORY_MOMENT.SESSION);
+  assert.ok(list.filter((v) => v.kind === STORY_KIND.IZ).every((v) => v.background === "foto"));
 });
 
 test("deneme aninda once net gelir", () => {
