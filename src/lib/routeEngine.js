@@ -7,6 +7,7 @@ import { topicsNeededForNet } from "../domain/route/netEstimate.js";
 import { decorateScheduledRoute, createRouteRevision } from "../domain/route/routeIdentity.js";
 import { attachStopInsights, buildRouteIntelligence } from "../domain/route/routeIntelligence.js";
 import { startOfWeekTR, dateKey } from "./dateUtils.js";
+import { personalPace, minutesPerQuestionFor } from "../domain/route/personalPace.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -38,12 +39,15 @@ export function buildRoute({
   examType = "unknown",
   now = new Date(),
   studyLogDataState = "ready",
+  topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
     studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState },
   );
   const capacity = rampedCapacity(baseCapacity, pausedWeeks);
+  // Kisinin kendi hizi: durak sureleri "35 dk" dediginde gercekten 35 dk olsun.
+  const pace = personalPace(studyLogs);
 
   const weakSet = new Set(weakSubjectKeys);
   const items = [];
@@ -95,6 +99,7 @@ export function buildRoute({
         entry,
         { ...subject, questionCount: subjectWeight },
         examType === "lgs" ? "LGS" : "TYT",
+        { pace, feel: topicFeel?.[subject.key]?.[name] },
       );
       const topicHasAccuracyGap = hasTopicAccuracyGap({ q, acc });
 
@@ -117,7 +122,7 @@ export function buildRoute({
             memoryStrength: rs.strength,
             cost: {
               questions: rCost,
-              minutes: Math.round(rCost * 1.4),
+              minutes: Math.round(rCost * (minutesPerQuestionFor(pace, subject.key, 0.875) ?? 1.4)),
               mastery: "review",
               difficulty: cost.difficulty,
               yield: topicShare,
@@ -202,6 +207,7 @@ export function buildRoute({
 
   return {
     capacity,
+    pace,
     weeksLeft,
     weeks: scheduled,
     revision,

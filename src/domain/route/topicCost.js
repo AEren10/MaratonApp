@@ -1,6 +1,7 @@
 import { getTopicDifficulty } from "../../lib/topicDifficulty.js";
 import { getMastery } from "../../lib/mastery.js";
 import { netGainForTopic } from "./netEstimate.js";
+import { BASE_MINUTES_PER_QUESTION, minutesPerQuestionFor } from "./personalPace.js";
 
 // Bir konuyu "ustalaştırmanın" tahmini maliyeti ve getirisi.
 //
@@ -15,12 +16,19 @@ const MASTERY_QUESTION_TARGET = 20;
 
 // Zorluk çarpanı — zor konu aynı seviyeye gelmek için daha çok soru ister.
 const DIFFICULTY_EFFORT = { kolay: 0.75, orta: 1, zor: 1.6 };
+// Sabit hizlar (dk/soru): kisisel olcum yokken.
+const DEFAULT_MPQ = { kolay: 1.1, orta: BASE_MINUTES_PER_QUESTION, zor: 2.4 };
 
 /**
  * @param topic      { subject, topic, q, acc }  — q: çözülen soru, acc: doğruluk %
  * @param subjectWeight  o dersin sınavdaki soru sayısı (getiri ağırlığı)
  */
-export function estimateTopicCost(topic, subject = {}, trialType) {
+// opts.pace: personalPace() ciktisi -- varsa sure kisinin kendi hizindan.
+// opts.feel: ogrencinin bu konu icin son geri bildirimi (easy|ok|hard);
+// zorluk carpanini kisiye gore kaydirir.
+const FEEL_EFFORT = { easy: 0.8, ok: 1, hard: 1.3 };
+
+export function estimateTopicCost(topic, subject = {}, trialType, opts = {}) {
   const q = Number(topic.q) || 0;
   const acc = Number(topic.acc) || 0;
   const { difficulty } = getTopicDifficulty(topic.topic);
@@ -30,7 +38,7 @@ export function estimateTopicCost(topic, subject = {}, trialType) {
     return { questions: 0, minutes: 0, mastery: mastery.level, difficulty, yield: 0, done: true };
   }
 
-  const effort = DIFFICULTY_EFFORT[difficulty] || 1;
+  const effort = (DIFFICULTY_EFFORT[difficulty] || 1) * (FEEL_EFFORT[opts.feel] || 1);
 
   // Kalan soru: hedefe ne kadar var. Doğruluk düşükse hedef yukarı kayar,
   // çünkü sadece soru çözmek değil, doğruluğu da yükseltmek gerekiyor.
@@ -40,7 +48,9 @@ export function estimateTopicCost(topic, subject = {}, trialType) {
   const questions = Math.max(5, Math.round((baseRemaining + accPenalty) * effort));
 
   // Süre: zor konuda soru başına daha uzun.
-  const minutesPerQuestion = difficulty === "zor" ? 2.4 : difficulty === "kolay" ? 1.1 : 1.6;
+  const baseMpq = DEFAULT_MPQ[difficulty] || BASE_MINUTES_PER_QUESTION;
+  const minutesPerQuestion = minutesPerQuestionFor(opts.pace, subject.key, baseMpq / BASE_MINUTES_PER_QUESTION)
+    ?? baseMpq;
   const minutes = Math.round(questions * minutesPerQuestion);
 
   // Getiri ile hedef-net hesabı aynı kaynaktan gelir. Dersin tüm soru
