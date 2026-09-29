@@ -35,7 +35,7 @@ export const ProfileShareTiles = memo(function ProfileShareTiles() {
             <Icon name={t.icon} size={16} color={C.accentBright} />
           </View>
           <Text style={[TYPOGRAPHY.bodyMedium, s.title, { color: C.text }]} numberOfLines={1}>{t.title}</Text>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>{t.meta}</Text>
+          <Text style={[TYPOGRAPHY.meta, s.meta, { color: C.text3 }]} numberOfLines={1}>{t.meta}</Text>
         </Press>
       ))}
     </View>
@@ -45,6 +45,7 @@ export const ProfileShareTiles = memo(function ProfileShareTiles() {
 const s = StyleSheet.create({
   row: { flexDirection: "row", gap: STEP.s2, marginHorizontal: GUTTER, marginTop: STEP.s4 },
   tile: { flex: 1, borderWidth: 1, borderRadius: SHAPE.panel, padding: STEP.s3 - 4 },
-  icon: { width: 32, height: 32, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  icon: { width: 32, height: 32, borderRadius: SHAPE.iconBox, alignItems: "center", justifyContent: "center" },
   title: { marginTop: STEP.s2 },
+  meta: { marginTop: 3 },
 });
