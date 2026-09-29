@@ -15,7 +15,7 @@ export const TRIAL_TO_CURRICULUM = {
   ayt_tarih2: ["ayt_tarih_soz"],
   ayt_cografya2: ["ayt_cografya_soz"],
   ayt_felsefe: ["ayt_felsefe_soz"],
-  ayt_din: [],
+  ayt_din: ["ayt_din_soz"],
   lgs_turkce: ["lgs_turkce"],
   lgs_matematik: ["lgs_matematik"],
   lgs_fen: ["lgs_fen"],

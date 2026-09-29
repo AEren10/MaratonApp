@@ -531,6 +531,27 @@ export const AYT_SOZ_DERSLER = [
       "Toplumsal Yapı ve Kurumlar",
     ],
   },
+  {
+    key: "ayt_din_soz",
+    label: "Din Kültürü",
+    color: "#84cc16",
+    icon: "star",
+    questionCount: 6,
+    exam: "ayt",
+    field: "sozel",
+    topics: [
+      "Dünya ve Ahiret",
+      "Kur'an'a Göre Hz. Muhammed",
+      "Kur'an'da Bazı Kavramlar",
+      "İnançla İlgili Meseleler",
+      "Yahudilik ve Hristiyanlık",
+      "İslam ve Bilim",
+      "Anadolu'da İslam",
+      "İslam Düşüncesinde Tasavvufi Yorumlar",
+      "Güncel Dini Meseleler",
+      "Hint ve Çin Dinleri",
+    ],
+  },
 ];
 
 export const YDT_DERSLER = [

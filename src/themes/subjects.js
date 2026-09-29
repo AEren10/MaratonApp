@@ -32,6 +32,7 @@ const TRIAL_SUBJECT_ALIASES = {
   ayt_tarih_soz: { key: "ayt_tarih_soz", label: "Tarih", name: "Tarih", exam: "ayt", icon: "clock" },
   ayt_cografya_soz: { key: "ayt_cografya_soz", label: "Coğrafya", name: "Coğrafya", exam: "ayt", icon: "globe" },
   ayt_felsefe_soz: { key: "ayt_felsefe_soz", label: "Felsefe Grubu", name: "Felsefe Grubu", exam: "ayt", icon: "layers" },
+  ayt_din_soz: { key: "ayt_din_soz", label: "Din Kültürü", name: "Din Kültürü", exam: "ayt", icon: "star" },
   lgs_turkce: { key: "lgs_turkce", label: "Türkçe", name: "Türkçe", exam: "lgs", icon: "bookOpen" },
   lgs_matematik: { key: "lgs_matematik", label: "Matematik", name: "Matematik", exam: "lgs", icon: "hash" },
   lgs_fen: { key: "lgs_fen", label: "Fen Bilimleri", name: "Fen Bilimleri", exam: "lgs", icon: "zap" },
