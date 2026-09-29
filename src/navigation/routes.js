@@ -56,6 +56,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.WEEKLY_TRIAL_REVIEW]: { path: "deneme/haftalik", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: false },
 
   [SCREENS.SUBJECT_DETAIL]: { path: "ders/:subjectKey", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
+  [SCREENS.SUBJECT_ANALYSIS]: { path: "analiz/ders/:subjectKey", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.SUBJECT_LIST]: { path: "dersler/liste", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.WEAK_AREAS]: { path: "analiz/zayif-konular", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: false },
   [SCREENS.NET_FORECAST]: { path: "net-tahmini", flow: PRODUCT_FLOW_IDS.ROUTE_DEPTH, deepLink: true },

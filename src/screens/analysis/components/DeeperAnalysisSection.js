@@ -4,13 +4,9 @@ import { GUTTER, STEP } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 
-export function DeeperAnalysisSection({ C, onYanlisDefteri, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
+// Yanlis defteri burada da vardi; grafigin altindaki satir tek giris.
+export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
   const items = [
-    {
-      name: "Yanlış defteri",
-      note: "Kaydettiğin yanlışlar ve tekrarı gelenler",
-      onPress: onYanlisDefteri,
-    },
     {
       name: "Konu İlerlemesi",
       note: "Konu konu çalışma ve defter durumu",

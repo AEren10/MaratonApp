@@ -100,6 +100,7 @@ export const ANALIZ_STACK = [
   SCREENS.NET_FORECAST,     // Net Tahmini
   SCREENS.EXAM_SIMULATOR,   // Simulasyon
   SCREENS.SUBJECT_DETAIL,   // (paylasimli)
+  SCREENS.SUBJECT_ANALYSIS, // Analiz > ders karti -> Ders analizi
   SCREENS.TOPIC_STUDY,      // (paylasimli)
   SCREENS.WRONG_NOTEBOOK,   // Yanlis Defteri
   SCREENS.WRONG_DETAIL,

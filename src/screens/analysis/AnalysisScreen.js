@@ -86,7 +86,7 @@ export default function AnalysisScreen() {
                 C={C}
                 bars={analysis.bars}
                 onSelectSubject={(subj) =>
-                  go(screens.SUBJECT_DETAIL, { subjectKey: subj.key, subjectName: subj.name }, "analysis_subject_card")
+                  go(screens.SUBJECT_ANALYSIS, { subjectKey: subj.key, subjectName: subj.name }, "analysis_subject_card")
                 }
               />
 
@@ -107,7 +107,6 @@ export default function AnalysisScreen() {
 
               <DeeperAnalysisSection
                 C={C}
-                onYanlisDefteri={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_deeper_notebook")}
                 onKonuIlerlemesi={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_list")}
                 onOncelikliKonular={() => go(screens.WEAK_AREAS, undefined, "analysis_weak_areas")}
                 onNetTahmini={() => go(screens.NET_FORECAST, undefined, "analysis_forecast")}

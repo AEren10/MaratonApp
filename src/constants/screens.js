@@ -89,6 +89,7 @@ export const SCREENS = {
   SHARE_CARD: "ShareCard",
   WIDGET_GUIDE: "WidgetGuide",
   LEGAL_DOC: "LegalDoc",
+  SUBJECT_ANALYSIS: "SubjectAnalysis",
   MILESTONE: "Milestone",
 
   // Social
