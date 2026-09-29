@@ -30,9 +30,10 @@ function makeTicks(min, max, count = 4) {
 // Rota Detay grafigi: paylasilan RouteLineChart + tasarimin etiketleri
 // (NET, HEDEF, BUGUN, SINAV GUNU · N, sinav tarihi). Etiket konumu grafigin
 // kendi olceginden hesaplanir; tuval genislige oturtulur ki ikisi ortussun.
-export function RouteDetailChart({ chart, target, examDateTag }) {
+export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
   const C = useC();
   const [width, setWidth] = useState(0);
+  const H = height;
   const k = width / W;
   const hasTarget = Number.isFinite(target);
 
@@ -63,7 +64,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
       targetY: hasTarget ? sc.toY(target) : null,
       ticks,
     };
-  }, [stops, projection, hasTarget, target]);
+  }, [stops, projection, hasTarget, target, H]);
 
   if (!stops.length) {
     return <RouteEmptyChart examDateTag={examDateTag} target={target} />;

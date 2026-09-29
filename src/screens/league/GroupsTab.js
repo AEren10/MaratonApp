@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
-import { TYPOGRAPHY, SPACING, RADIUS, CONTROL } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../../components/design";
 import { GroupsSkeleton } from "./components/GroupsSkeleton";
@@ -29,24 +29,46 @@ export function GroupsTab({ user, initialGroupCode }) {
     <View style={s.fill}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.actions}>
-          <Press haptic="none" onPress={() => { H.tap(); c.setCreateOpen(true); }} style={[s.actBtn, { backgroundColor: C.accent }]}>
-            <Icon name="plus" size={16} color={C.textOnFill} sw={1.5} />
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.textOnFill }]}>Yeni grup</Text>
+          <Press
+            haptic="none"
+            onPress={() => { H.tap(); c.setCreateOpen(true); }}
+            style={[s.actBtn, { backgroundColor: C.surface, borderColor: C.line }]}
+          >
+            <Icon name="plus" size={15} color={C.text} sw={1.5} />
+            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Yeni grup</Text>
           </Press>
-          <Press haptic="none" onPress={() => { H.tap(); c.setJoinOpen(true); }} style={[s.actBtn, s.joinBtn, { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border }]}>
+          <Press
+            haptic="none"
+            onPress={() => { H.tap(); c.setJoinOpen(true); }}
+            style={[s.actBtn, { backgroundColor: C.surface, borderColor: C.line }]}
+          >
             <Icon name="users" size={15} color={C.text} />
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Kod gir</Text>
           </Press>
         </View>
 
         {c.groups.length === 0 ? (
-          <EmptyState icon="users" title="Çalışma grubunu kur" message="Sınıf arkadaşlarınla grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!" color="accent" />
+          <EmptyState
+            icon="users"
+            title="Çalışma grubunu kur"
+            message="Sınıf arkadaşlarınla grup oluştur veya var olan bir gruba katıl. Kurmak 1 dakika sürer!"
+            color="accent"
+          />
         ) : (
           <>
-            <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>GRUPLARIN ({c.groups.length})</Text>
-            <View style={s.groupStack}>
-              {c.groups.map((g) => (
-                <GroupItemRow key={g.id} group={g} isSelected={c.selected?.id === g.id && detailOpen} onSelect={() => openGroup(g)} onLeave={() => c.doLeave(g)} />
+            <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>
+              GRUPLARIN ({c.groups.length})
+            </Text>
+            <View style={[s.groupPanel, { backgroundColor: C.surface, borderColor: C.line }]}>
+              {c.groups.map((g, idx) => (
+                <GroupItemRow
+                  key={g.id}
+                  group={g}
+                  isLast={idx === c.groups.length - 1}
+                  isSelected={c.selected?.id === g.id && detailOpen}
+                  onSelect={() => openGroup(g)}
+                  onLeave={() => c.doLeave(g)}
+                />
               ))}
             </View>
           </>
@@ -63,18 +85,56 @@ export function GroupsTab({ user, initialGroupCode }) {
         onRetry={c.loadBoard}
         onShare={c.shareCode}
       />
-      <GroupCodeModal visible={c.createOpen} title="Yeni Grup Oluştur" subtitle="Grubun için bir isim belirle" placeholder="Grup adı (örn. 12-A Sayısal)" value={c.name} onChange={c.setName} onSubmit={c.doCreate} onClose={() => c.setCreateOpen(false)} busy={c.busy} cta="Oluştur" />
-      <GroupCodeModal visible={c.joinOpen} title="Gruba Katıl" subtitle="Arkadaşından aldığın 6 haneli kodu gir" placeholder="XXXXXX" autoCap maxLen={6} value={c.code} onChange={c.setCode} onSubmit={c.doJoin} onClose={c.closeJoin} busy={c.busy} cta="Katıl" error={c.codeError} />
+      <GroupCodeModal
+        visible={c.createOpen}
+        title="Yeni Grup Oluştur"
+        subtitle="Grubun için bir isim belirle"
+        placeholder="Grup adı (örn. 12-A Sayısal)"
+        value={c.name}
+        onChange={c.setName}
+        onSubmit={c.doCreate}
+        onClose={() => c.setCreateOpen(false)}
+        busy={c.busy}
+        cta="Oluştur"
+      />
+      <GroupCodeModal
+        visible={c.joinOpen}
+        title="Gruba Katıl"
+        subtitle="Arkadaşından aldığın 6 haneli kodu gir"
+        placeholder="XXXXXX"
+        autoCap
+        maxLen={6}
+        value={c.code}
+        onChange={c.setCode}
+        onSubmit={c.doJoin}
+        onClose={c.closeJoin}
+        busy={c.busy}
+        cta="Katıl"
+        error={c.codeError}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
   fill: { flex: 1 },
-  scroll: { paddingHorizontal: SPACING.lg, paddingBottom: 100 },
-  actions: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.lg },
-  actBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.xs, minHeight: CONTROL.tapMin, borderRadius: RADIUS.md },
-  joinBtn: { flex: 0.74 },
-  secLabel: { letterSpacing: 1.2, marginTop: SPACING.xs, marginBottom: SPACING.sm },
-  groupStack: { gap: SPACING.md, marginBottom: SPACING.sm },
+  scroll: { paddingHorizontal: GUTTER, paddingBottom: 100 },
+  actions: { flexDirection: "row", gap: STEP.s2, marginBottom: STEP.s3 },
+  actBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: STEP.s1,
+    minHeight: 46,
+    borderRadius: SHAPE.button,
+    borderWidth: 1,
+  },
+  secLabel: { letterSpacing: 1.2, marginTop: STEP.s1, marginBottom: STEP.s2 },
+  groupPanel: {
+    borderRadius: SHAPE.panel,
+    borderWidth: 1,
+    overflow: "hidden",
+    marginBottom: STEP.s2,
+  },
 });

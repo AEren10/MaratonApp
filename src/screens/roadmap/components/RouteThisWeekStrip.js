@@ -39,7 +39,7 @@ export function RouteThisWeekStrip({ C, currentWeek, promiseText, onPress }) {
         </View>
       </View>
 
-      <View style={s.daysRow}>
+      <View style={[s.daysRow, { borderTopColor: C.line }]}>
         {days.map((day) => {
           const bg = day.active ? C.accent : day.isToday ? C.elev : C.void;
           const border = day.isToday ? C.accent : C.line;
@@ -92,7 +92,6 @@ const s = StyleSheet.create({
     marginTop: STEP.s2 + STEP.s1 / 2,
     paddingTop: STEP.s2,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
   },
   dayCol: {
     alignItems: "center",

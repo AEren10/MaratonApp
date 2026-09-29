@@ -1,4 +1,4 @@
-import { saveRouteWeeks, getLatestRouteStops } from "../supabase/routePlan";
+import { saveRouteWeeks, getLatestRouteStops, invalidateRoutePlanReads } from "../supabase/routePlan";
 
 // Ayni rota revizyonu tek yazim. useStudyRoute ekranda birden cok yerde
 // persist=true ile aciliyor (ana sayfada en az iki kanca); her biri ayni
@@ -13,12 +13,19 @@ const written = new Set();
 export function persistRouteOnce(userId, weeks, examType, revision) {
   const key = revision?.revisionKey ? `${userId}:${examType}:${revision.revisionKey}` : null;
   if (!key) {
-    return saveRouteWeeks(userId, weeks, examType, revision).then(() => getLatestRouteStops(userId, examType));
+    return saveRouteWeeks(userId, weeks, examType, revision).then(() => {
+      invalidateRoutePlanReads(userId);
+      return getLatestRouteStops(userId, examType);
+    });
   }
   if (inflight.has(key)) return inflight.get(key);
   if (written.has(key)) return getLatestRouteStops(userId, examType);
   const job = saveRouteWeeks(userId, weeks, examType, revision)
-    .then(() => { written.add(key); return getLatestRouteStops(userId, examType); })
+    .then(() => {
+      written.add(key);
+      invalidateRoutePlanReads(userId);
+      return getLatestRouteStops(userId, examType);
+    })
     .finally(() => inflight.delete(key));
   inflight.set(key, job);
   return job;

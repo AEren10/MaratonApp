@@ -1,7 +1,10 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
-export const getDailyPlan = async (userId, date) => {
+export const getDailyPlan = (userId, date) => {
+  const key = makeInFlightKey("daily_plans", userId, { date });
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("daily_plans")
@@ -15,6 +18,7 @@ export const getDailyPlan = async (userId, date) => {
     handleSupabaseError(e, "getDailyPlan");
     throw e;
   }
+  });
 };
 
 export const createDailyPlan = async (plan, tasks) => {
@@ -25,6 +29,7 @@ export const createDailyPlan = async (plan, tasks) => {
       .select()
       .single();
     if (planError) throw planError;
+    invalidateInFlightResource("daily_plans", plan.user_id);
 
     // AYNI DURAK IKI KEZ YAZILMAZ.
     //
@@ -55,6 +60,7 @@ export const createDailyPlan = async (plan, tasks) => {
       });
     if (error) throw error;
 
+    invalidateInFlightResource("daily_plans", plan.user_id);
     return getDailyPlan(plan.user_id, plan.plan_date);
   } catch (e) {
     handleSupabaseError(e, "createPlanTasks");
@@ -74,6 +80,7 @@ export const completeTask = async (taskId, userId) => {
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error("plan_task_not_found");
+    invalidateInFlightResource("daily_plans", userId);
     return data;
   } catch (e) {
     handleSupabaseError(e, "completeTask");
@@ -91,6 +98,7 @@ export const togglePlanTask = async (taskId, completed, userId = null) => {
     const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
     if (!data) throw new Error("plan_task_not_found");
+    invalidateInFlightResource("daily_plans", userId);
   } catch (e) {
     handleSupabaseError(e, "togglePlanTask");
     // FIRLATILMALI. Eskiden yutuluyordu ve handleSupabaseError de fırlatmadığı
