@@ -58,3 +58,13 @@ test("yeni kullanici: kayitlardan onceki haftalar bos sayilmaz, az veride hedefe
   // guven 1/3: 1/3 * 89 + 2/3 * 336 = 254
   assert.equal(c.questionsPerWeek, 254);
 });
+
+test("haftalik sure hedefi plani sinirlar; gozlenen tempo ustundeyse kesilmez", () => {
+  const now = new Date("2026-09-30T12:00:00+03:00");
+  const weekLogs = (q, m) => ["2026-09-01", "2026-09-08", "2026-09-15", "2026-09-22"]
+    .map((d) => ({ study_date: `${d}T12:00:00+03:00`, question_count: q, duration_minutes: m }));
+  const capped = estimateWeeklyCapacity(weekLogs(300, 400), 80, now, { weeklyMinutesGoal: 420 });
+  assert.equal(capped.minutesPerWeek, 420);
+  const over = estimateWeeklyCapacity(weekLogs(300, 600), 80, now, { weeklyMinutesGoal: 420 });
+  assert.equal(over.minutesPerWeek, 600);
+});

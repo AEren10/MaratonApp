@@ -316,11 +316,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     targetReached ? "keep" : "",
     habitLoad ? habitLoad.questionsPerWeek : "",
     knownHash,
+    goals?.weeklyMinutes || "",
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, targetReached, habitLoad, knownHash, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, goals?.weeklyMinutes, targetReached, habitLoad, knownHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -337,10 +338,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     habitLoad,
     knownTopics,
     subjectDrops,
+    weeklyMinutesGoal: goals?.weeklyMinutes || 0,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [goals?.weeklyMinutes, subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {

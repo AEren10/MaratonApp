@@ -49,13 +49,14 @@ export function buildRoute({
   habitLoad = null,          // { questionsPerWeek, minutesPerWeek } gunluk rutinlerin haftalik yuku
   knownTopics = {},          // { ders: { konu: "YYYY-MM-DD"|null } } ogrencinin "hallettim" tikleri
   subjectDrops = {},         // { ders: dusus } son denemede taze dusus (trialWeakness.subjectNetDrops)
+  weeklyMinutesGoal = 0,     // ogrencinin haftalik sure hedefi (plan bunu asmaz)
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
   targetReached = false,     // son net hedefte: hedefi koruma modu
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
-    studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState },
+    studyLogs, dailyQuestionGoal, now, { dataState: studyLogDataState, weeklyMinutesGoal },
   );
   // Gunluk rutin (paragraf, problem...) rota butcesinin ICINDE: haftalik
   // yuku dusulur, yoksa ogrenci rutin + tam rota ile asiri yuklenir.

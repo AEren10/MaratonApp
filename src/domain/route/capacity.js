@@ -43,13 +43,21 @@ export function estimateWeeklyCapacity(
   logs = [],
   dailyQuestionGoal = 20,
   now = new Date(),
-  { dataState = "ready" } = {},
+  { dataState = "ready", weeklyMinutesGoal = 0 } = {},
 ) {
+  // Ogrencinin beyan ettigi haftalik sure siniri: plan bunu asmaz (gozlenen
+  // tempo zaten ustundeyse onu kesmeyiz). Eskiden hic okunmuyordu.
+  const capMinutes = (cap) => {
+    const goalM = Number(weeklyMinutesGoal) || 0;
+    if (goalM <= 0 || cap.minutesPerWeek <= goalM) return cap;
+    const observedM = Number(cap.observedMinutesPerWeek) || 0;
+    return { ...cap, minutesPerWeek: Math.max(goalM, observedM), minutesCapped: true };
+  };
   if (dataState === "error") {
-    return { ...fallbackCapacity(dailyQuestionGoal), missingData: true };
+    return capMinutes({ ...fallbackCapacity(dailyQuestionGoal), missingData: true });
   }
   if (!Array.isArray(logs) || logs.length === 0) {
-    return fallbackCapacity(dailyQuestionGoal);
+    return capMinutes(fallbackCapacity(dailyQuestionGoal));
   }
 
   const currentWeek = new Date(startOfWeekTR(now));
@@ -120,9 +128,10 @@ export function estimateWeeklyCapacity(
     : Math.round(trust * stretchedQ + (1 - trust) * goalFloor);
   const stretch = observedQ > 0 ? plannedQ / observedQ : 1;
 
-  return {
+  return capMinutes({
     questionsPerWeek: Math.max(10, plannedQ),
     minutesPerWeek: Math.max(30, Math.round(observedM * stretch)),
+    observedMinutesPerWeek: observedM,
     activeDaysPerWeek: Math.max(1, Math.min(7, activeDays || 4)),
     observedQuestionsPerWeek: observedQ,
     goalQuestionsPerWeek: goalQ,
@@ -132,7 +141,7 @@ export function estimateWeeklyCapacity(
     weeksObserved: observedWeeks,
     calendarWeeks: weeks.length,
     zeroWeeks: weeks.length - observedWeeks,
-  };
+  });
 }
 
 /**

@@ -140,3 +140,12 @@ test("ogrencinin tasidigi durak o gune yerlesir; ertele bu haftanin sonraki cali
   const m = withMove({ old: "2026-09-01", keep: "2026-09-29" }, "X", "2026-10-02", "2026-09-30");
   assert.deepEqual(m, { keep: "2026-09-29", X: "2026-10-02" });
 });
+
+test("deneme provasi gunune durak dusmez; ogrencinin tasidigi durak ise dusebilir", () => {
+  const s = (k) => ({ subject: "tyt_matematik", topic: k, logicalStopKey: k, cost: { minutes: 30 } });
+  const days = assignWeekStops([s("A"), s("B"), s("C"), s("D"), s("E"), s("F"), s("G")], null,
+    { monday: "2026-09-28", blockedDates: ["2026-10-03"] });
+  assert.equal(days[5].length, 0);
+  const moved = assignWeekStops([s("A")], null, { monday: "2026-09-28", blockedDates: ["2026-10-03"], moves: { A: "2026-10-03" } });
+  assert.equal(moved[5][0].topic, "A");
+});

@@ -59,9 +59,16 @@ function movedDayIndex(stop, moves, monday) {
   return idx >= 0 && idx < 7 ? idx : null;
 }
 
-export function assignWeekStops(stops = [], schedule = null, { rhythm = null, moves = null, monday = null } = {}) {
+export function assignWeekStops(stops = [], schedule = null, {
+  rhythm = null, moves = null, monday = null, blockedDates = null,
+} = {}) {
   const days = Array.from({ length: 7 }, () => []);
-  const allowed = studyWeekdays(schedule);
+  // Deneme provasi gunu (blockedDates) calisma gunu sayilmaz: ana sayfa o gun
+  // durak gostermiyordu ama Program gosteriyordu.
+  const blocked = new Set((blockedDates || [])
+    .map((d) => (monday ? Math.round((new Date(`${d}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000) : -1))
+    .filter((i) => i >= 0 && i < 7));
+  const allowed = studyWeekdays(schedule).filter((d) => !blocked.has(d));
   if (allowed.length === 0) return days;
   const load = Array(7).fill(0);
   const cap = dayCapacity(schedule, rhythm);
