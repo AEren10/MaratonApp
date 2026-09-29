@@ -3,7 +3,7 @@ import { handleSupabaseError } from "./handleError";
 import { normalizeStudyLog, toStudyLogRow } from "../domain/study/studyLogModel";
 import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
-const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, note, notes, study_date, created_at, client_operation_id";
+const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, note, notes, study_date, created_at, client_operation_id, perceived";
 const PAGE_SIZE = 1000;
 
 function isIdempotencyConflict(error) {

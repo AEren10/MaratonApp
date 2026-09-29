@@ -66,6 +66,8 @@ export function useStudySaveController() {
   const [questionCount, setQC] = useState(initQuestions > 0 ? String(initQuestions) : "");
   const [correctCount, setCC] = useState(initCorrect > 0 ? String(initCorrect) : "");
   const [notes, setNotes] = useState("");
+  // "Nasildi?" -- istege bagli; rota konunun zorlugunu buna gore ayarlar.
+  const [perceived, setPerceived] = useState(null);
   const [saving, setSaving] = useState(false);
   // Kayıt tamamlandı mı — geri çıkış uyarısı bunun için.
   const savedRef = useRef(false);
@@ -188,6 +190,7 @@ export function useStudySaveController() {
         duration_minutes: duration,
         study_date: todayStr,
         ...(notesVal ? { notes: notesVal } : {}),
+        ...(perceived ? { perceived } : {}),
       });
     } catch (e) {
       setSaving(false);
@@ -285,7 +288,7 @@ export function useStudySaveController() {
     }
     H.success();
     navigation.replace(SCREENS.STUDY_SUMMARY, summaryParams);
-  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName, showUnsaved]);
+  }, [saving, canSave, subjectKey, topic, notes, duration, questionCount, correctCount, user, dispatch, reward, navigation, currentSubject, C, showAlert, completeForm, planSubjectKey, planTopicName, planTaskKey, routeStopId, routeStopVersion, routeSubjectKey, routeTopicName, showUnsaved, perceived]);
 
   return {
     C,
@@ -313,6 +316,8 @@ export function useStudySaveController() {
     setCorrectCount: (v) => { markFormDirty({ field: "correct_count" }); setCC(v); },
     setNotes: (v) => { markFormDirty({ field: "notes" }); setNotes(v); },
     save,
+    perceived,
+    setPerceived,
     // Kayit · Olculmus hali: zamanlayici dersle baslatildiysa form satirlari.
     measured: !!preSubjectKey,
     measuredRange: startedAtMs && endedAtMs ? `${clockLabel(startedAtMs)} – ${clockLabel(endedAtMs)}` : null,

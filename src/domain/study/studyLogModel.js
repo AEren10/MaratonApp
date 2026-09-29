@@ -1,3 +1,5 @@
+const PERCEIVED = new Set(["easy", "ok", "hard"]);
+
 function toNumber(value, fallback = 0) {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
@@ -53,6 +55,8 @@ export function toStudyLogRow(input = {}) {
     study_date: input.study_date,
     notes: has(input, "notes", "note") ? toOptionalText(notes) : undefined,
     client_operation_id: input.client_operation_id ?? input.clientOperationId,
+    // Durak sonrasi "Kolaydi / Tam kivaminda / Zorladi" (rota zorlugu ayarlar).
+    perceived: PERCEIVED.has(input.perceived) ? input.perceived : undefined,
   });
 }
 

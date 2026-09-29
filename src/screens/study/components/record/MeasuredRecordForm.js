@@ -13,6 +13,7 @@ import { RecordIntro } from "./RecordIntro";
 import { RecordNumberField } from "./RecordNumberField";
 import { RecordRow } from "./RecordRow";
 import { SubjectSheet } from "./SubjectSheet";
+import { FeelChips } from "./FeelChips";
 
 // "Kayıt · Ölçülmüş" (MOD 1): sure zamanlayicidan gelir ve kilitli; ayni
 // kayit denetleyicisini (useStudySaveController) kullanir.
@@ -38,6 +39,9 @@ export function MeasuredRecordForm({ s }) {
               <RecordNumberField locked value={s.duration} suffix="dk" a11yLabel={`Ölçülen süre ${s.duration} dakika`} />
             </RecordRow>
           </RecordFormCard>
+        </Animated.View>
+        <Animated.View style={styles.blockLg}>
+          <FeelChips value={s.perceived} onChange={s.setPerceived} />
         </Animated.View>
         <Animated.View style={styles.blockLg}>
           <Button size="lg" fullWidth onPress={s.save} disabled={!s.canSave} loading={s.saving}>Kaydet</Button>

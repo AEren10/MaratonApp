@@ -12,6 +12,7 @@ import { SaveTopicQuestionSection } from "./components/SaveTopicQuestionSection"
 import { SaveNotesSection } from "./components/SaveNotesSection";
 import { useStudySaveController } from "./useStudySaveController";
 import { MeasuredRecordForm } from "./components/record/MeasuredRecordForm";
+import { FeelChips } from "./components/record/FeelChips";
 import { UnsavedSessionView } from "./components/record/UnsavedSessionView";
 import { useBlockBack } from "../../hooks/useBlockBack";
 
@@ -66,6 +67,9 @@ export default function StudySaveScreen() {
 
           <Animated.View>
             <SaveNotesSection C={s.C} notes={s.notes} onChangeNotes={s.setNotes} />
+          </Animated.View>
+          <Animated.View style={{ paddingTop: STEP.s3 }}>
+            <FeelChips value={s.perceived} onChange={s.setPerceived} />
           </Animated.View>
         </ScrollView>
 

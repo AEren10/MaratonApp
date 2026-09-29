@@ -33,6 +33,7 @@ import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
+import { topicFeelFromLogs } from "../domain/route/topicFeel";
 import { useForecastTarget } from "./useForecastTarget";
 import { weekdayRhythm } from "../domain/program/weekdayRhythm";
 import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
@@ -266,6 +267,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       && latest >= forecastTargetNet;
   }, [forecastCandidate, forecastTargetNet]);
 
+  // Durak sonrasi geri bildirim: konunun zorlugu kisiye gore.
+  const topicFeel = useMemo(() => topicFeelFromLogs(weekLogs || []), [weekLogs]);
+
   // Denemeden orantili ders agirligi: ne kadar gerideyse o kadar one.
   const subjectWeakness = useMemo(() => subjectWeaknessFactors(
     (trials || []).filter((trial) => allowedTrialTypes.includes(trial.trialType)),
@@ -300,10 +304,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     subjectWeakness,
     wrongsByTopic,
     targetReached,
+    topicFeel,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
