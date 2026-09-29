@@ -40,26 +40,18 @@ export function StopActionModal({ visible, stop, dateKey, onClose }) {
 
   const handlePostpone = async () => {
     if (!loaded || !stop.logicalStopKey) return;
-    const ok = await postponeStop(stop.logicalStopKey, schedule);
-    if (!ok) {
-      Alert.alert(
-        "Erteleme yapılamadı",
-        "Bu hafta başka çalışma günü yok; hafta bitince Geride kalan konulara düşer",
-        [{ text: "Tamam" }],
-      );
-    } else {
-      H.select();
-      onClose();
-    }
+    const res = await postponeStop(stop.logicalStopKey, schedule, dateKey);
+    if (res.ok) { H.select(); onClose(); return; }
+    Alert.alert("Erteleme yapılamadı", res.reason === "no_day"
+      ? "Bu hafta başka çalışma günü yok; hafta bitince Geride kalan konulara düşer."
+      : "Kaydedilemedi. Bağlantını kontrol et.");
   };
 
   const handleMove = async (targetIso) => {
     if (!loaded || !stop.logicalStopKey) return;
     const ok = await moveStop(stop.logicalStopKey, targetIso);
-    if (ok) {
-      H.select();
-      onClose();
-    }
+    if (ok) { H.select(); onClose(); return; }
+    Alert.alert("Taşınamadı", "Kaydedilemedi. Bağlantını kontrol et.");
   };
 
   return (

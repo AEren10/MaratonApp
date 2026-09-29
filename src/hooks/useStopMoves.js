@@ -52,10 +52,15 @@ export function useStopMoves() {
     }
   }, [user?.id]);
 
-  // Yarina ertele: bu haftanin sonraki calisma gunu. Yoksa false (haftaya kalir).
-  const postponeStop = useCallback((logicalStopKey, schedule) => {
-    const target = postponeTarget(todayTR(), schedule);
-    return target ? moveStop(logicalStopKey, target) : Promise.resolve(false);
+  // Ertele: duragin KENDI gununden sonraki calisma gunu (ayni hafta).
+  // fromDate verilmezse bugun. Gelecek haftanin duragi bu haftaya kaymasin.
+  // Donus: { ok, reason } -- reason "no_day" (haftada gun kalmadi) | "save_failed".
+  const postponeStop = useCallback(async (logicalStopKey, schedule, fromDate = null) => {
+    const base = fromDate && fromDate > todayTR() ? fromDate : todayTR();
+    const target = postponeTarget(base, schedule);
+    if (!target) return { ok: false, reason: "no_day" };
+    const ok = await moveStop(logicalStopKey, target);
+    return ok ? { ok: true, target } : { ok: false, reason: "save_failed" };
   }, [moveStop]);
 
   const sameUser = state.userId === user?.id;
