@@ -191,6 +191,8 @@ export function buildRoute({
           items.push({
             ...entry,
             isReview: true,
+            // Her tekrar ayri kimlik: son calisma tarihine bagli.
+            reviewCycle: `review:${String(reviewTp.last_studied_at || "").slice(0, 10) || "x"}`,
             relearn: rs.relearn,
             retention: rs.retention,
             memoryStrength: rs.strength,
@@ -278,11 +280,18 @@ export function buildRoute({
 
   items.sort((a, b) => b.score - a.score);
 
-  const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft, { daysLeft });
+  // Bu hafta yalniz kalan gunler kadar: carsamba baslayana tam hafta yuklenmez.
+  const firstWeekFraction = (7 - ((now.getDay() + 6) % 7)) / 7;
+  const { weeks, overflow } = scheduleWeeks(items, capacity, weeksLeft, { daysLeft, firstWeekFraction });
   const stamped = addWeeklyReviews(stampWeekDates(weeks, now), {
     minutesPerQuestion: (key) => minutesPerQuestionFor(pace, key, 1) ?? 1.6,
   });
-  const scheduled = attachStopInsights(decorateScheduledRoute(stamped, { examType }));
+  // Bu haftanin plani bugun basliyor: gecmis gunlere durak dagitilmaz
+  // (planStart; frozenWeek sabitlenince korunur).
+  const planStart = dateKey(now);
+  const scheduled = attachStopInsights(decorateScheduledRoute(stamped, { examType })).map((week, i) => (i === 0
+    ? { ...week, planStartDay: planStart, stops: week.stops.map((s) => ({ ...s, planStart })) }
+    : week));
   const revision = createRouteRevision({
     weeks: scheduled,
     examType,

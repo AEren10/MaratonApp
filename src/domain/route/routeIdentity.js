@@ -39,7 +39,11 @@ export function decorateScheduledRoute(weeks, { examType = "unknown" } = {}) {
       return {
         ...stop,
         rootStopKey,
-        logicalStopKey: `${rootStopKey}:${segmentIndex}`,
+        // Kimlik HAFTAYI tasir: sunucu ayni anahtarli durağa onceki
+        // revizyonlarin durumunu (bitti/atlandi/ertelendi) kopyaliyor. Hafta
+        // olmadan bir haftada bitirilen durak sonraki haftalarin ayni
+        // anahtarli duragina "bitti" diye geciyor, is kayboluyordu.
+        logicalStopKey: `${rootStopKey}:${week.weekStart || "w"}:${segmentIndex}`,
         segmentIndex,
         position,
         lifecycleStatus,

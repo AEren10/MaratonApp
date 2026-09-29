@@ -82,7 +82,9 @@ function takePartial(next, questionsLeft, minutesLeft, position) {
  * @param capacity  { questionsPerWeek, minutesPerWeek }
  * @param weeksLeft kaç hafta planlanacak
  */
-export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = {}) {
+// firstWeekFraction: bu haftanin kalan payi (carsamba basliyorsa 5/7).
+// Hafta ortasinda baslayan ogrenciye tam hafta yuklenmesin.
+export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null, firstWeekFraction = 1 } = {}) {
   const fullQuestionBudget = Math.max(1, Math.round(capacity.questionsPerWeek * NEW_TOPIC_SHARE));
   const fullMinuteBudget = Math.max(1, Math.round(capacity.minutesPerWeek * NEW_TOPIC_SHARE));
   const weeks = [];
@@ -94,7 +96,8 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null } = 
 
   for (let w = 0; w < weeksLeft; w++) {
     const isPartialLastWeek = daysLeft != null && w === weeksLeft - 1 && daysLeft % 7 > 0;
-    const fraction = isPartialLastWeek ? (daysLeft % 7) / 7 : 1;
+    const lastFraction = isPartialLastWeek ? (daysLeft % 7) / 7 : 1;
+    const fraction = w === 0 ? Math.min(lastFraction, Math.max(0.15, firstWeekFraction)) : lastFraction;
     const questionBudget = Math.max(1, Math.floor(fullQuestionBudget * fraction));
     const minuteBudget = Math.max(1, Math.floor(fullMinuteBudget * fraction));
     let questionsLeft = questionBudget;

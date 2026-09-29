@@ -36,6 +36,7 @@ import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { useTodayKey } from "./useTodayKey";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
 import { knownTopicsByKey } from "../domain/route/knownTopics";
+import { frozenWeekFromRows } from "../domain/route/frozenWeek";
 import { useKnownTopicsMap } from "../lib/topicCompletion";
 import { habitWeeklyLoad } from "../domain/route/habits";
 import { useRouteHabits } from "./useRouteHabits";
@@ -352,11 +353,34 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
  }, routeCacheKey), [goals?.weeklyMinutes, subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
+  // BU HAFTA SABIT (domain/route/frozenWeek): hafta sunucuya bir kez
+  // yazildiysa bu haftanin durak seti oradan gelir; yeniden hesap yalniz
+  // gelecek haftalari degistirir. Yoksa her durak bitince yerine yenisi
+  // geliyor, biten durak listeden dusuyordu.
+  const thisMonday = useMemo(
+    () => toDateKey(startOfWeekTR(new Date(`${todayKey}T12:00:00+03:00`))),
+    [todayKey],
+  );
+  const frozen = useMemo(
+    () => frozenWeekFromRows(persistedStops, thisMonday, knownTopics),
+    [persistedStops, thisMonday, knownTopics],
+  );
+  const baseWeeks = useMemo(() => {
+    const w = computedRoute.weeks || [];
+    if (!frozen || !w.length || String(w[0].weekStart || "").slice(0, 10) !== thisMonday) return w;
+    return [{ ...w[0], stops: frozen.stops, planStartDay: frozen.planStartDay || w[0].planStartDay, frozen: true }, ...w.slice(1)];
+  }, [computedRoute.weeks, frozen, thisMonday]);
+  // Kayit effect'i buradan okur ama buna BAGIMLI DEGIL: baseWeeks kayitli
+  // satirlardan turuyor; bagimli olsaydi her okuma yeni kayit, her kayit
+  // yeni okuma tetiklerdi.
+  const baseWeeksRef = useRef(baseWeeks);
+  baseWeeksRef.current = baseWeeks;
+
   const route = useMemo(() => {
     const byKey = new Map((persistedStops || []).map((stop) => [stop.logical_key, stop]));
     return {
       ...computedRoute,
-      weeks: ensureSingleActiveRouteStop(computedRoute.weeks.map((week) => ({
+      weeks: ensureSingleActiveRouteStop(baseWeeks.map((week) => ({
         ...week,
         stops: week.stops.map((stop) => {
           const saved = byKey.get(stop.logicalStopKey);
@@ -376,7 +400,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         }),
       }))),
     };
-  }, [computedRoute, persistedStops]);
+  }, [computedRoute, baseWeeks, persistedStops]);
 
   const forecastProfile = forecastCandidate;
   const forecastTrials = forecastCandidate?.trials || [];
@@ -507,7 +531,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       revisionSummary: routeRevisionPreview,
     });
     if (!persistence.shouldPersist) return;
-    persistRouteOnce(user.id, computedRoute.weeks, resolvedExamType, computedRoute.revision)
+    persistRouteOnce(user.id, baseWeeksRef.current, resolvedExamType, computedRoute.revision)
       .then(setPersistedStops)
       .catch((error) => {
         setRouteLoadError(error);

@@ -21,7 +21,7 @@ export function stopsForDate(week, schedule, dateKey, opts = {}) {
   if (!week || !dateKey) return [];
   const monday = mondayOf(week.weekStart ? String(week.weekStart).slice(0, 10) : dateKey);
   if (mondayOf(dateKey) !== monday) return [];
-  return assignWeekStops(week.stops || [], schedule, { ...opts, monday })[weekdayIndex(dateKey)] || [];
+  return assignWeekStops(week.stops || [], schedule, { ...opts, monday, firstDate: week.planStartDay })[weekdayIndex(dateKey)] || [];
 }
 
 export function todayPlanStops(week, schedule, todayKey, {
@@ -30,7 +30,7 @@ export function todayPlanStops(week, schedule, todayKey, {
   if (!week || !todayKey) return [];
   const monday = mondayOf(week.weekStart ? String(week.weekStart).slice(0, 10) : todayKey);
   if (mondayOf(todayKey) !== monday) return [];
-  const days = assignWeekStops(week.stops || [], schedule, { rhythm, moves, monday, blockedDates });
+  const days = assignWeekStops(week.stops || [], schedule, { rhythm, moves, monday, blockedDates, firstDate: week.planStartDay });
   const todayIdx = weekdayIndex(todayKey);
   const own = days[todayIdx] || [];
   const ownSet = new Set(own);

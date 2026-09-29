@@ -60,7 +60,7 @@ function movedDayIndex(stop, moves, monday) {
 }
 
 export function assignWeekStops(stops = [], schedule = null, {
-  rhythm = null, moves = null, monday = null, blockedDates = null,
+  rhythm = null, moves = null, monday = null, blockedDates = null, firstDate = null,
 } = {}) {
   const days = Array.from({ length: 7 }, () => []);
   // Deneme provasi gunu (blockedDates) calisma gunu sayilmaz: ana sayfa o gun
@@ -68,7 +68,15 @@ export function assignWeekStops(stops = [], schedule = null, {
   const blocked = new Set((blockedDates || [])
     .map((d) => (monday ? Math.round((new Date(`${d}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000) : -1))
     .filter((i) => i >= 0 && i < 7));
-  const allowed = studyWeekdays(schedule).filter((d) => !blocked.has(d));
+  // Plan hafta ortasinda basladiysa (firstDate) onceki gunlere durak dusmez;
+  // yoksa yeni ogrenci "bu haftadan kalan" diye var olmadigi gunlerin isini
+  // bugune tasiyordu.
+  const firstIdx = firstDate && monday
+    ? Math.round((new Date(`${firstDate}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000)
+    : 0;
+  const base = studyWeekdays(schedule).filter((d) => !blocked.has(d));
+  const fromFirst = base.filter((d) => d >= firstIdx);
+  const allowed = fromFirst.length ? fromFirst : base;
   if (allowed.length === 0) return days;
   const load = Array(7).fill(0);
   const cap = dayCapacity(schedule, rhythm);
@@ -107,7 +115,7 @@ export function assignRouteStopsToDates(weeks = [], schedule = null, opts = {}) 
   weeks.forEach((week) => {
     if (!week?.weekStart) return;
     const monday = mondayOf(String(week.weekStart).slice(0, 10));
-    assignWeekStops(week.stops || [], schedule, { ...opts, monday }).forEach((dayStops, i) => {
+    assignWeekStops(week.stops || [], schedule, { ...opts, monday, firstDate: week.planStartDay }).forEach((dayStops, i) => {
       if (!dayStops.length) return;
       const key = addDays(monday, i);
       out[key] = (out[key] || []).concat(dayStops);

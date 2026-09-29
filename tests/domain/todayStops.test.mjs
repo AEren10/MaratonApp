@@ -43,3 +43,15 @@ test("bu haftanin kacirilan duragi bugune tasinir (en fazla 2); bitmis ya da atl
   assert.deepEqual(list.map((s) => s.topic), ["Cum1", "Pzt1", "Car1"]);
   assert.ok(list[1].carried);
 });
+
+test("plan carsamba basladiysa pazartesi-sali bos; tasinacak 'kalan' yok", () => {
+  const w = {
+    weekStart: "2026-09-28",
+    planStartDay: "2026-09-30",
+    stops: ["A", "B", "C"].map((t) => ({ subject: "a", topic: t, lifecycleStatus: "upcoming" })),
+  };
+  assert.deepEqual(stopsForDate(w, null, "2026-09-28"), []);
+  const today = todayPlanStops(w, null, "2026-09-30");
+  assert.ok(today.every((s) => !s.carried));
+  assert.equal(today[0].topic, "A");
+});

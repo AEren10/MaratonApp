@@ -70,6 +70,10 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
         logicalStopKey: s.logicalStopKey,
         rootStopKey: s.rootStopKey,
         segmentIndex: s.segmentIndex ?? 0,
+        // Sabitlenmis hafta bu alanlardan geri kurulur (frozenWeek).
+        reviewCycle: s.reviewCycle || null,
+        weeklyTopics: s.weeklyTopics || null,
+        planStart: s.planStart || null,
         position: s.position ?? 0,
         lifecycleStatus: s.lifecycleStatus,
         reasonCodes: s.reasonCodes || [],
