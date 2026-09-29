@@ -1,9 +1,10 @@
 import React, { useMemo, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { alpha } from "../../../themes/palette";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
+import { useMonthRoutePlan } from "../../../hooks/useMonthRoutePlan";
 import { Press } from "../../../components/design/Press";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
@@ -36,9 +37,12 @@ function cellLook(data, dailyGoal, isFuture, C) {
   return { backgroundColor: "transparent", borderColor: "transparent", color: C.text3 };
 }
 
-function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
+function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
   const look = cellLook(data, dailyGoal, isFuture, C);
   const isFilled = look.backgroundColor === C.accent;
+  const dotCount = planData?.count ? Math.min(planData.count, 3) : 0;
+  const isDraft = Boolean(planData?.draft);
+
   return (
     <Press haptic="none"
       onPress={() => onSelect(iso)}
@@ -54,6 +58,19 @@ function DayCell({ date, iso, data, dailyGoal, isSelected, isToday, isFuture, on
       ]}
     >
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
+      {dotCount > 0 ? (
+        <View style={[styles.dotsRow, isDraft && styles.draftDots]}>
+          {Array.from({ length: dotCount }).map((_, idx) => (
+            <View
+              key={idx}
+              style={[
+                styles.planDot,
+                { backgroundColor: isFilled ? C.accentInk : C.accent },
+              ]}
+            />
+          ))}
+        </View>
+      ) : null}
     </Press>
   );
 }
@@ -62,6 +79,7 @@ export const MonthGrid = React.memo(function MonthGrid({ monthDate, dayMap, sele
   const C = useC();
   const days = useMemo(() => getCalendarDays(monthDate), [monthDate]);
   const today = todayTR();
+  const routePlan = useMonthRoutePlan();
 
   const handleSelect = useCallback((iso) => onSelect(iso), [onSelect]);
 
@@ -82,6 +100,7 @@ export const MonthGrid = React.memo(function MonthGrid({ monthDate, dayMap, sele
                 date={d}
                 iso={iso}
                 data={dayMap[iso]}
+                planData={routePlan[iso]}
                 dailyGoal={dailyGoal}
                 isSelected={selectedDay === iso}
                 isToday={iso === today}
@@ -110,4 +129,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   dayText: { ...TYPOGRAPHY.captionMedium, fontVariant: ["tabular-nums"] },
+  dotsRow: {
+    position: "absolute",
+    bottom: SPACING.xs,
+    flexDirection: "row",
+    gap: SPACING.xs,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  draftDots: {
+    opacity: 0.45,
+  },
+  planDot: {
+    width: 3.5,
+    height: 3.5,
+    borderRadius: SHAPE.chip,
+  },
 });

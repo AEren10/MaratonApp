@@ -9,6 +9,7 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
 import { DaySlotRow } from "./DaySlotRow";
+import { DayPlannedStops } from "./DayPlannedStops";
 import { todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
 
@@ -24,12 +25,11 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, onOpenDetail, style }) {
+export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, onRemoveTask, onTrialPress, style }) {
   const C = useC();
   const navigation = useNavigation();
   const trialTypes = getTrialTypes(C);
 
-  // Gercek veri: Durak, dakika, soru sayisi.
   const statMinutes = data?.totalMinutes || 0;
   const statStops = (data?.studyLogs || data?.logs)?.length || 0;
   const statQuestions = data?.totalQuestions || 0;
@@ -100,7 +100,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
             ))}
           </View>
         </>
-      ) : (
+      ) : day < todayTR() ? (
         <View style={styles.emptyWrap}>
           <Text style={[TYPOGRAPHY.body, { color: C.text3, marginBottom: STEP.s2 }]}>
             Bu güne ait çalışma kaydı yok.
@@ -116,7 +116,11 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Durak ekle</Text>
           </Press>
         </View>
-      )}
+      ) : null}
+
+      {day >= todayTR() ? (
+        <DayPlannedStops day={day} C={C} />
+      ) : null}
 
       <DayTasks date={day} tasks={calendarTasks} onAdd={onAddTask} onToggle={onToggleTask} onRemove={onRemoveTask} />
     </View>
