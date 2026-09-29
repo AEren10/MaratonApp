@@ -64,3 +64,12 @@ test("same-day trials without created_at maintain order via Redux array index", 
   assert.equal(a.delta, 5);
   assert.ok(a.points[1].t > a.points[0].t);
 });
+
+test("chart axis follows the trial date, not the entry time (backdated trial stays in its day)", () => {
+  const a = subjectAnalysis([
+    { date: "2026-09-10", created_at: "2026-09-28T10:00:00Z", subjects: { turkce: { correct: 20, wrong: 4, empty: 0, net: 19 } } },
+    { date: "2026-09-20", created_at: "2026-09-20T10:00:00Z", subjects: { turkce: { correct: 22, wrong: 4, empty: 0, net: 21 } } },
+  ], "turkce");
+  assert.ok(a.points[0].t < a.points[1].t);
+  assert.equal(new Date(a.points[0].t).toISOString().slice(0, 10), "2026-09-10");
+});

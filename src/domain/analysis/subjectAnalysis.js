@@ -50,9 +50,10 @@ export function subjectAnalysis(trials = [], subjectKey) {
 
   let lastT = -Infinity;
   const points = rows.map((r) => {
-    let t = r.createdAt ? new Date(r.createdAt).getTime() : new Date(r.date).getTime();
+    // Eksen deneme tarihi; ayni gun 3 saat arayla (girilme ani degil).
+    let t = new Date(r.date).getTime();
     if (!Number.isFinite(t)) t = 0;
-    if (t <= lastT) t = lastT + 60000;
+    if (t <= lastT) t = lastT + 3 * 3600000;
     lastT = t;
     return { t, v: Number(r.net) || 0 };
   });

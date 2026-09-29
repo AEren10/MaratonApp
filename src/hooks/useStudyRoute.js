@@ -73,7 +73,8 @@ function latestNetOf(trials = []) {
       if (dateCmp !== 0) return dateCmp;
       const timeA = a.trial?.created_at || a.trial?.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial?.id) > 1e9 ? Number(a.trial.id) : 0);
       const timeB = b.trial?.created_at || b.trial?.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial?.id) > 1e9 ? Number(b.trial.id) : 0);
-      if (timeA !== timeB) return timeA - timeB;
+      // En yeni once: ayni gunde SONRA girilen deneme basa gelir.
+      if (timeA !== timeB) return timeB - timeA;
       return a.orderIndex - b.orderIndex;
     })[0]?.trial || null;
   // Tahminle ayni olcek: normalize net (varsa).

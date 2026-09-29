@@ -114,9 +114,11 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
       .slice(0, 12)
       .reverse()
       .map((trial) => {
-        let t = new Date(trial.created_at || trial.createdAt || trial.date).getTime();
+        // Eksen DENEME TARIHI; ayni gundekiler 3 saat arayla (girilme ani
+        // degil: gecmis tarihli deneme bugun girilince bugune kaymasin).
+        let t = new Date(trial.date).getTime();
         if (!Number.isFinite(t)) t = 0;
-        if (t <= lastT) t = lastT + 60000;
+        if (t <= lastT) t = lastT + 3 * 3600000;
         lastT = t;
         return { t, v: trial.totalNet || 0 };
       });

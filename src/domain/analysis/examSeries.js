@@ -26,9 +26,10 @@ export function examSeries(trials = [], limit = 12) {
 
       let lastT = -Infinity;
       const points = filtered.map(({ trial: t }) => {
-        let timestamp = new Date(t.created_at || t.createdAt || t.date || t.trial_date).getTime();
+        // Eksen deneme tarihi; ayni gun 3 saat arayla (girilme ani degil).
+        let timestamp = new Date(t.date || t.trial_date).getTime();
         if (!Number.isFinite(timestamp)) timestamp = 0;
-        if (timestamp <= lastT) timestamp = lastT + 60000;
+        if (timestamp <= lastT) timestamp = lastT + 3 * 3600000;
         lastT = timestamp;
         return { t: timestamp, v: Number(t.normalizedTotalNet ?? t.totalNet) || 0 };
       });
