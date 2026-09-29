@@ -13,8 +13,11 @@ export function EffortDay({
 }) {
   const isToday = index === todayIndex;
   // Kutu HEDEF yuksekliginde: o gun doldurulabilecek alan bu kadar.
-  // Hedefi asan gun kutunun disina tasar, kirpilmaz.
-  const slotH = goalY != null ? bottom - goalY : 0;
+  // Yalniz BUGUN ve ileriki gunlerde: gun bittiyse taslak kapanir, geriye
+  // yalniz dolan cubuk kalir (kullanici karari, 29 Eylul). Gecmis gunun bos
+  // kutusu ustteki sure etiketiyle de cakisiyordu.
+  const open = todayIndex == null || index >= todayIndex;
+  const slotH = open && goalY != null ? bottom - goalY : 0;
 
   const slot = slotH > 0 ? (
     <EffortSlot
@@ -55,6 +58,7 @@ export function EffortDay({
 
   // Kutunun disina tasan gun: hedefi gecmis demektir.
   const overflow = slotH > 0 && barH > slotH + 2;
+  // Gecmis gun kapali: tam opak, bugunun cubugu gibi.
 
   return (
     <Fragment>
@@ -77,7 +81,7 @@ export function EffortDay({
         height={barH}
         radius={radius}
         fill={fill}
-        fillOpacity={isToday ? 1 : 0.88}
+        fillOpacity={isToday || !open ? 1 : 0.88}
       />
     </Fragment>
   );
