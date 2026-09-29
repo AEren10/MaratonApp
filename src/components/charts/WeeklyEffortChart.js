@@ -34,7 +34,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
   const usableH = bottom - top;
   const usableW = CHART_W - EFFORT_PAD_LEFT - PAD_RIGHT;
   const slot = usableW / week.days.length;
-  const barW = Math.min(34, slot * 0.68);
+  // Ince cubuk (kullanici istegi, 29 Eylul): 34/0.68 -> 24/0.5.
+  const barW = Math.min(24, slot * 0.5);
 
   const peak = (week.days || []).reduce((max, d) => Math.max(max, d.questions), 0);
   const goal = week.goal || 0;

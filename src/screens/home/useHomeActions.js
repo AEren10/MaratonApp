@@ -9,7 +9,9 @@ import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 // karsiliklarina baglandi (bkz. HomeScreen basligi).
 export function useHomeActions({ navigation, go }) {
   const startTask = useCallback((task) => {
-    if (!task) { go(SCREENS.ADD_STUDY)(); return; }
+    // Acik durak yoksa (gun bitti ya da bos) Durak ekle -- eskiden Calisma
+    // kaydet aciliyordu, dugme 'Ilk duragini ekle' derken.
+    if (!task) { navigation.navigate(SCREENS.ADD_TASK); return; }
     trackButtonTap("home_hero_cta_start", { subject: task.subject, targetScreen: SCREENS.STUDY_TIMER });
     navigation.navigate(SCREENS.STUDY_TIMER, buildStudyTimerParams(task));
   }, [go, navigation]);
