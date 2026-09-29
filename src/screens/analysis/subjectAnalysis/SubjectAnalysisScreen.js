@@ -36,7 +36,7 @@ export default function SubjectAnalysisScreen() {
 
   const links = [
     { label: "Konu ilerlemesi", note: "Konu konu çalışma durumu", go: () => navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey, subjectName: name }) },
-    { label: "Yanlış defteri", note: "Bu dersin kaydettiğin yanlışları", go: () => navigation.navigate(SCREENS.WRONG_NOTEBOOK) },
+    { label: "Yanlış defteri", note: "Bu dersin kaydettiğin yanlışları", go: () => navigation.navigate(SCREENS.WRONG_NOTEBOOK, { subjectKey, subjectName: name }) },
     { label: "Deneme karşılaştır", note: "İki denemeyi ders ders yan yana koy", go: () => navigation.navigate(SCREENS.TRIAL_COMPARE) },
   ];
 

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { View, FlatList, RefreshControl, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, ErrorState, SectionLabel, Skeleton } from "../../components/design";
+import { Button, ErrorState, SectionLabel, Skeleton, EmptyState } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { NOTEBOOK_FILTER } from "../../domain/wrongNotebook/wrongTopicGroups";
 import { GUTTER, SHAPE, STEP } from "../../themes/tokens";
@@ -63,6 +63,16 @@ export default function WrongNotebookScreen() {
     body = (
       <ErrorState preset="server" secondary="" onPrimary={nb.retry} style={styles.gutter} />
     );
+  } else if (view.total === 0 && nb.subjectKey) {
+    body = (
+      <EmptyState
+        title={`${nb.subjectName || "Bu ders"} için yanlış yok`}
+        body="Bu dersten kaydettiğin yanlış olunca burada görünür."
+        primary="Tüm defteri gör"
+        onPrimary={nb.clearSubject}
+        style={styles.gutter}
+      />
+    );
   } else if (view.total === 0) {
     body = <NotebookEmpty onAdd={nb.goAddWrong} />;
   } else {
@@ -87,7 +97,7 @@ export default function WrongNotebookScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <WrongScreenHeader title="Defterim" badge={view.openCount} onPress={nb.goBack} />
+      <WrongScreenHeader title={nb.subjectName ? `${nb.subjectName} · Defter` : "Defterim"} badge={view.openCount} onPress={nb.goBack} />
       {body}
     </SafeAreaView>
   );

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import { wrongMatchesSubject } from "../../domain/wrongNotebook/subjectFilter";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
@@ -30,7 +31,10 @@ export function useWrongNotebookController() {
   // dead-letter'a duser ve fotograf sessizce kaybolur. Kullaniciya gosterilir.
   const [lostPhotoCount, setLostPhotoCount] = useState(0);
 
-  const view = useMemo(() => buildNotebookView(items, filter), [items, filter]);
+  // Ders analizinden gelince yalniz o dersin yanlislari.
+  const { subjectKey, subjectName } = useRoute().params || {};
+  const scoped = useMemo(() => (subjectKey ? items.filter((it) => wrongMatchesSubject(it, subjectKey)) : items), [items, subjectKey]);
+  const view = useMemo(() => buildNotebookView(scoped, filter), [scoped, filter]);
 
   const loadItems = useCallback(async () => {
     if (!user?.id) {
@@ -108,6 +112,9 @@ export function useWrongNotebookController() {
   }, [navigation]);
 
   return {
+    subjectKey,
+    subjectName,
+    clearSubject: () => navigation.setParams({ subjectKey: undefined, subjectName: undefined }),
     changeFilter,
     dismissLostPhotos,
     filter,

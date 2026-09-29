@@ -18,7 +18,8 @@ test("WrongScreenHeader accepts badge and places it alongside title", () => {
 });
 
 test("WrongNotebookScreen displays count badge next to header title without separate tab bar", () => {
-  assert.match(notebookScreenSource, /WrongScreenHeader\s+title="Defterim"\s+badge=\{view\.openCount\}/);
+  // Baslik ders suzgecinde "Ders · Defter", yoksa "Defterim"; rozet ayni.
+  assert.match(notebookScreenSource, /WrongScreenHeader\s+title=.*"Defterim".*badge=\{view\.openCount\}/);
   assert.doesNotMatch(notebookScreenSource, /<NotebookHeaderTabs/);
   assert.doesNotMatch(notebookScreenSource, /CommunityTab/);
 });
