@@ -27,4 +27,6 @@ test("groupExitHandler wires both deleteGroup and leaveGroup", () => {
   assert.match(handlerSource, /deleteGroup\(group\.id\)/);
   assert.match(handlerSource, /leaveGroup\(group\.id,\s*user\?\.id\)/);
   assert.match(handlerSource, /"Yöneticiliği devret"/);
+  assert.match(handlerSource, /transferGroupAdmin\(group\.id,\s*targetId\)/);
 });
+

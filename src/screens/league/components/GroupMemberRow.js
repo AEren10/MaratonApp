@@ -21,13 +21,13 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
   const weeklyMinutes = Number(item.weekly_minutes ?? item.weeklyMinutes ?? item.minutes ?? 0) || 0;
 
   const subtitle = rank === 1 && weeklyQuestions > 0
-    ? "Liderlik koltuğunda 👑"
+    ? "Liderlik koltuğunda"
     : rank === 2 && weeklyQuestions > 0
     ? "2. sıra · Zirve takibinde"
     : rank === 3 && weeklyQuestions > 0
     ? "3. sıra · Podyumda"
     : item.is_studying_now
-    ? "Şu an çalışıyor 🟢"
+    ? "Şu an çalışıyor"
     : item.streak
     ? `${item.streak} günlük seri`
     : "Haftalık yarış";
