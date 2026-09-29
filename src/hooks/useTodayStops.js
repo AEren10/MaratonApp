@@ -45,6 +45,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       out.push({
         id: pid,
         subject: t.subject,
+        subjectLabel: t.subjectLabel || t.subject,
         label: t.topicLabel || t.topic || t.subjectLabel,
         topic: t.topicLabel || t.topic || null,
         planTopicName: t.topic || null,
@@ -53,6 +54,8 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         completed: isDone,
         badge: t.badge,
         rkind: t.rkind,
+        reason: t.reason || null,
+        logicalStopKey: t.logicalStopKey || null,
         source: "plan",
         routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
       });

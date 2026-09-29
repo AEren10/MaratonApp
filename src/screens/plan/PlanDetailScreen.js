@@ -8,17 +8,20 @@ import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { todayTR } from "../../lib/dateUtils";
 import { PlanDetailHeader } from "./components/PlanDetailHeader";
 import { PlanDetailStopRow } from "./components/PlanDetailStopRow";
 import { PlanDetailEmptyState } from "./components/PlanDetailEmptyState";
 import { PlanDetailSummaryHero } from "./components/PlanDetailSummaryHero";
 import { ReorganizeDayModal } from "./components/ReorganizeDayModal";
+import { StopActionModal } from "../program/components/StopActionModal";
 import { dayLongLabel } from "../../domain/summary/summaryFormat";
 import { formatMinutes, usePlanDetailViewModel } from "./usePlanDetailViewModel";
 
 function PlanDetailInner({ route }) {
   const C = useC();
   const [reorganizeOpen, setReorganizeOpen] = useState(false);
+  const [menuStop, setMenuStop] = useState(null);
   const isEmpty = Boolean(route?.params?.isEmpty);
   const dayLabel = route?.params?.dateLabel || dayLongLabel(new Date());
   const { detail, doneMinutes, hasTasks, loading, navigation, plannedMinutes } = usePlanDetailViewModel({
@@ -49,20 +52,27 @@ function PlanDetailInner({ route }) {
             </View>
 
             <View style={s.stopsList}>
-              {detail.tasks.map((task, idx) => (
-                <PlanDetailStopRow
-                  key={task.id}
-                  done={task.done}
-                  C={C}
-                  subject={task.s?.label || task.s?.key || "Durak"}
-                  title={task.topic}
-                  meta={`${task.time ? `${task.time} · ` : ""}${formatMinutes(task.minutes ?? ((task.q || 0) * 2))}${task.q ? ` · ${task.q} soru` : ""}`}
-                  hasStart={!task.done}
-                  isLast={idx === detail.tasks.length - 1}
-                  onStart={() => detail.startTask(task.id)}
-                  onToggle={() => detail.toggleTask(task.id)}
-                />
-              ))}
+              {detail.tasks.map((task, idx) => {
+                const isCarried = Boolean(task.reason && String(task.reason).startsWith("Bu haftadan kalan"));
+                const canPostpone = !task.done && Boolean(task.logicalStopKey) && !String(task.logicalStopKey).startsWith("habit:");
+                return (
+                  <PlanDetailStopRow
+                    key={task.id}
+                    done={task.done}
+                    C={C}
+                    subject={task.s?.label || task.s?.key || "Durak"}
+                    title={task.topic}
+                    meta={`${task.time ? `${task.time} · ` : ""}${formatMinutes(task.minutes ?? ((task.q || 0) * 2))}${task.q ? ` · ${task.q} soru` : ""}`}
+                    hasStart={!task.done}
+                    isLast={idx === detail.tasks.length - 1}
+                    isCarried={isCarried}
+                    canPostpone={canPostpone}
+                    onOpenMenu={() => setMenuStop({ ...task, subjectLabel: task.s?.label || task.s?.key || "Durak" })}
+                    onStart={() => detail.startTask(task.id)}
+                    onToggle={() => detail.toggleTask(task.id)}
+                  />
+                );
+              })}
             </View>
 
             <Card tone="surface" radius="panel" style={s.summaryCard}>
@@ -109,6 +119,13 @@ function PlanDetailInner({ route }) {
         onClearRemaining={detail.clearRemaining}
         onOpenSchedule={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)}
         C={C}
+      />
+
+      <StopActionModal
+        visible={Boolean(menuStop)}
+        stop={menuStop}
+        dateKey={todayTR()}
+        onClose={() => setMenuStop(null)}
       />
     </SafeAreaView>
   );

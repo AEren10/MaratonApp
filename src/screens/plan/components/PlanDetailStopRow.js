@@ -2,11 +2,14 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
-export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isLast, onStart, onToggle }) {
+export function PlanDetailStopRow({
+  done, C, subject, title, meta, hasStart, isLast, onStart, onToggle,
+  isCarried, canPostpone, onOpenMenu,
+}) {
   return (
     <View
       style={[
@@ -38,20 +41,44 @@ export function PlanDetailStopRow({ done, C, subject, title, meta, hasStart, isL
       </Press>
 
       <View style={s.body}>
-        <Text
-          style={[
-            TYPOGRAPHY.tableName,
-            {
-              color: done ? C.text3 : C.text,
-              textDecorationLine: done ? "line-through" : "none",
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {subject} · {title}
-        </Text>
+        <View style={s.titleRow}>
+          <Text
+            style={[
+              TYPOGRAPHY.tableName,
+              {
+                color: done ? C.text3 : C.text,
+                textDecorationLine: done ? "line-through" : "none",
+                flex: 1,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            {subject} · {title}
+          </Text>
+          {isCarried ? (
+            <View style={[s.carriedBadge, { backgroundColor: C.void, borderColor: C.line }]}>
+              <Text style={[TYPOGRAPHY.micro, { color: C.warn }]}>Bu haftadan</Text>
+            </View>
+          ) : null}
+        </View>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 2 }]}>{meta}</Text>
       </View>
+
+      {canPostpone ? (
+        <Press
+          haptic="light"
+          onPress={(e) => {
+            e?.stopPropagation?.();
+            onOpenMenu?.();
+          }}
+          hitSlop={STEP.s2}
+          style={s.moreBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Durak seçenekleri"
+        >
+          <Icon name="more" size={14} color={C.text3} />
+        </Press>
+      ) : null}
 
       {hasStart ? (
         <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
@@ -88,6 +115,14 @@ const s = StyleSheet.create({
   checkTouch: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
   circle: { width: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center" },
   body: { flex: 1, minWidth: 0 },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  carriedBadge: {
+    paddingHorizontal: STEP.s1,
+    paddingVertical: SPACING.xs / 2,
+    borderRadius: SHAPE.chip,
+    borderWidth: 1,
+  },
+  moreBtn: { minWidth: 28, minHeight: 28, alignItems: "center", justifyContent: "center" },
   startBtn: {
     height: 32,
     paddingHorizontal: STEP.s2,

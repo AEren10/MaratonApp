@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { LinearTransition, FadeOutUp } from "react-native-reanimated";
 
@@ -5,8 +6,10 @@ import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
+import { todayTR } from "../../../lib/dateUtils";
 import * as H from "../../../lib/haptics";
 import { HomeStopRow } from "./HomeStopRow";
+import { StopActionModal } from "../../program/components/StopActionModal";
 
 // Satir eklenip cikinca liste zipla­masin diye.
 const REFLOW = LinearTransition.duration(220);
@@ -17,6 +20,7 @@ const PREVIEW = 3;
 // Liste en fazla uc satir oldugu icin FlatList yerine map (kaydirma yok).
 export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const C = useC();
+  const [menuStop, setMenuStop] = useState(null);
   const { items, doneCount, nextId, toggle } = stops;
   const isAllDone = items.length > 0 && doneCount === items.length;
   const preview = items.slice(0, PREVIEW);
@@ -56,6 +60,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
                   isNext={item.id === nextId}
                   onToggle={toggle}
                   onStart={onStartTask}
+                  onOpenMenu={setMenuStop}
                 />
               </Animated.View>
             </Animated.View>
@@ -78,20 +83,27 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
         ) : null}
         <Icon name="chevR" size={13} color={C.text3} />
       </Pressable>
+
+      <StopActionModal
+        visible={Boolean(menuStop)}
+        stop={menuStop}
+        dateKey={todayTR()}
+        onClose={() => setMenuStop(null)}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
   wrap: { paddingTop: STEP.s4 + 8, position: "relative" },
-  head: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s2 + 2 },
+  head: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingBottom: STEP.s2 },
   segs: { flex: 1, flexDirection: "row", gap: STEP.s1 / 2 },
-  seg: { flex: 1, height: 4, borderRadius: SHAPE.chip / 6 },
+  seg: { flex: 1, height: 4, borderRadius: SHAPE.chip },
   count: { letterSpacing: 0, fontVariant: ["tabular-nums"] },
   list: { gap: STEP.s1 },
   all: {
-    flexDirection: "row", alignItems: "center", gap: STEP.s2, height: STEP.s5 - 2, marginTop: STEP.s1 + 2,
-    paddingHorizontal: STEP.s3 - 2, borderRadius: SHAPE.cardTight - 2, borderWidth: 1,
+    flexDirection: "row", alignItems: "center", gap: STEP.s2, height: STEP.s5 - 2, marginTop: STEP.s1,
+    paddingHorizontal: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1,
   },
   flex: { flex: 1 },
   tab: { fontVariant: ["tabular-nums"] },

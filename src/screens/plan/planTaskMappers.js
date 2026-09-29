@@ -12,6 +12,7 @@ export function mapGeneratedTask(t, C, isPlanDone) {
     q: t.questionCount,
     minutes: t.minutes ?? t.estimatedMinutes ?? t.assignment?.estimatedMinutes ?? t.targetMinutes ?? t.target_minutes ?? ((t.questionCount || 0) * 2),
     reason: t.reason,
+    logicalStopKey: t.logicalStopKey || null,
     rkind: t.rkind || "gray",
     assignment: t.assignment || null,
     done: Boolean(t.completed || (isPlanDone ? isPlanDone(pid) : false)),

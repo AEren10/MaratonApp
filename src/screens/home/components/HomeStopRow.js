@@ -3,9 +3,10 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { HomeStopCheckRing } from "./HomeStopCheckRing";
 import { Press, PRESS_ROW } from "../../../components/design/Press";
+import { Icon } from "../../../components/design/Icon";
 
 function durationOf(item) {
   const mins = item.minutes || (item.count > 0 ? Math.round(item.count * 1.5) : null);
@@ -14,7 +15,7 @@ function durationOf(item) {
 
 // Bugünün durakları satırı:
 // [Dikey ders renk çubuğu] -> [Onay halkası] -> [Ders / Konu] -> [Sağda Süre + Durum]
-export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart }) {
+export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onOpenMenu }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
   const subjectLabel = getSubjectByKey(item.subject)?.label || item.subject || "";
@@ -31,12 +32,14 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
   }, [onStart, onToggle, item]);
 
   const durationStr = durationOf(item);
-
   const rawTopic = item.topic || item.planTopicName || item.label;
   const isDuplicate = !rawTopic
     || rawTopic.toLowerCase() === subjectLabel.toLowerCase()
     || rawTopic.toLowerCase() === (item.subject || "").toLowerCase();
   const topicTitle = isDuplicate ? "Genel çalışma" : rawTopic;
+
+  const isCarried = Boolean(item.reason && String(item.reason).startsWith("Bu haftadan kalan"));
+  const canPostpone = !isDone && Boolean(item.logicalStopKey) && !String(item.logicalStopKey).startsWith("habit:");
 
   return (
     <View
@@ -48,10 +51,8 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         },
       ]}
     >
-      {/* 1. Dikey ders rengi çubuğu (tikin solunda, kompakt ve zarif) */}
       <View style={[s.bar, { backgroundColor: isDone ? C.line : tone }]} />
 
-      {/* 2. Dairesel tik / onay halkası */}
       <HomeStopCheckRing
         done={isDone}
         isNext={isNext}
@@ -59,7 +60,6 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
       />
 
-      {/* 3. Metin bloğu: [DERS ADI] ve [KONU BAŞLIĞI] */}
       <Press
         onPress={handlePress}
         scaleTo={PRESS_ROW}
@@ -67,10 +67,17 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         style={s.bodyArea}
       >
         <View style={s.flex}>
-          <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
-            {subjectLabel.toUpperCase()}
-            {item.badge ? ` · ${String(item.badge).toUpperCase()}` : ""}
-          </Text>
+          <View style={s.labelRow}>
+            <Text numberOfLines={1} style={[TYPOGRAPHY.label, s.sub, { color: tone }]}>
+              {subjectLabel.toUpperCase()}
+              {item.badge ? ` · ${String(item.badge).toUpperCase()}` : ""}
+            </Text>
+            {isCarried ? (
+              <View style={[s.carriedBadge, { backgroundColor: C.void, borderColor: C.line }]}>
+                <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Bu haftadan</Text>
+              </View>
+            ) : null}
+          </View>
           <Text
             numberOfLines={1}
             style={[
@@ -86,12 +93,26 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           </Text>
         </View>
 
-        {/* 4. En sağ ortada: Süre (dakika) + Sıradaki göstergesi */}
         <View style={s.rightCol}>
           <Text style={[TYPOGRAPHY.tableValue, { color: isDone ? C.text3 : C.text2 }]}>
             {durationStr}
           </Text>
           {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
+          {canPostpone ? (
+            <Press
+              haptic="light"
+              onPress={(e) => {
+                e?.stopPropagation?.();
+                onOpenMenu?.(item);
+              }}
+              hitSlop={STEP.s2}
+              style={s.moreBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Durak seçenekleri"
+            >
+              <Icon name="more" size={14} color={C.text3} />
+            </Press>
+          ) : null}
         </View>
       </Press>
     </View>
@@ -106,37 +127,23 @@ const s = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: STEP.s2,
     paddingRight: STEP.s3,
-    paddingVertical: STEP.s2 + 2,
+    paddingVertical: STEP.s2,
     gap: STEP.s2,
     minHeight: 64,
   },
-  bar: {
-    width: 3,
-    height: 30,
-    borderRadius: SHAPE.chip / 4,
-  },
-  bodyArea: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s2,
-  },
+  bar: { width: 3, height: 30, borderRadius: SHAPE.chip },
+  bodyArea: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: STEP.s2 },
   flex: { flex: 1, minWidth: 0 },
-  sub: {
-    letterSpacing: 0.6,
+  labelRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  carriedBadge: {
+    paddingHorizontal: STEP.s1,
+    paddingVertical: SPACING.xs / 2,
+    borderRadius: SHAPE.chip,
+    borderWidth: 1,
   },
-  topic: {
-    marginTop: STEP.s1 / 4,
-  },
-  rightCol: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: STEP.s1 - 2,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: SHAPE.chip / 2,
-  },
+  sub: { letterSpacing: 0.6 },
+  topic: { marginTop: STEP.s1 / 4 },
+  rightCol: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  dot: { width: 6, height: 6, borderRadius: SHAPE.chip },
+  moreBtn: { minWidth: 28, minHeight: 28, alignItems: "center", justifyContent: "center" },
 });
