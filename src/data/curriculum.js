@@ -343,8 +343,10 @@ export const AYT_EA_DERSLER = [
     exam: "ayt",
     field: "ea",
     topics: [
+      "Anlam Bilgisi (Sözcük, Cümle, Paragraf)",
       "Güzel Sanatlar ve Edebiyat",
       "Coşku ve Heyecana Bağlı Metinler (Şiir)",
+      "Edebi Sanatlar",
       "Olay Çevresinde Gelişen Metinler (Hikaye)",
       "Olay Çevresinde Gelişen Metinler (Roman)",
       "Olay Çevresinde Gelişen Metinler (Tiyatro)",
@@ -448,8 +450,10 @@ export const AYT_SOZ_DERSLER = [
     exam: "ayt",
     field: "sozel",
     topics: [
+      "Anlam Bilgisi (Sözcük, Cümle, Paragraf)",
       "Güzel Sanatlar ve Edebiyat",
       "Coşku ve Heyecana Bağlı Metinler (Şiir)",
+      "Edebi Sanatlar",
       "Olay Çevresinde Gelişen Metinler (Hikaye)",
       "Olay Çevresinde Gelişen Metinler (Roman)",
       "Olay Çevresinde Gelişen Metinler (Tiyatro)",
