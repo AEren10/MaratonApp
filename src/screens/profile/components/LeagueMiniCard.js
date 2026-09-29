@@ -17,7 +17,7 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
     <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Haftalık Lig"
-      onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE); }}
+      onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE, { tab: "global" }); }}
       style={{
         flexDirection: "row",
         alignItems: "center",
