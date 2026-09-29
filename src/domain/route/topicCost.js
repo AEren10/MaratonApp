@@ -119,7 +119,9 @@ export function priorityScoreDetails({
   // Sert kilit DEĞİL: öğrenci önceki konuları okulda görmüş olabilir, bu
   // yüzden engellemek yerine ağırlık düşürüyoruz. Kendinden önce hazır
   // olmayan her konu skoru %12 kırpar, en fazla %70'e kadar.
-  const sequencePenalty = Math.max(0.3, 1 - unpreparedBefore * 0.12);
+  // unpreparedBefore artik yalniz GERCEK on kosullar (prerequisites.js);
+  // sayi kucuk oldugu icin her eksik on kosul daha agir: %25.
+  const sequencePenalty = Math.max(0.3, 1 - unpreparedBefore * 0.25);
 
   const score = (yieldPart / costPart) * urgency * decay * weakBoost * sequencePenalty;
   return {

@@ -8,6 +8,7 @@ import { decorateScheduledRoute, createRouteRevision } from "../domain/route/rou
 import { attachStopInsights, buildRouteIntelligence } from "../domain/route/routeIntelligence.js";
 import { startOfWeekTR, dateKey } from "./dateUtils.js";
 import { personalPace, minutesPerQuestionFor } from "../domain/route/personalPace.js";
+import { missingPrerequisites } from "../domain/route/prerequisites.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -64,10 +65,9 @@ export function buildRoute({
     const subjectWeight = Number(subject.questionCount ?? subject.weight) || 10;
     const topicShare = subjectWeight / Math.max(1, subject.topics?.length || 1);
 
-    // Müfredat sırası = öğretim sırası. Bir konudan ÖNCE gelen kaç konu
-    // henüz hazır değil, onu sayıyoruz; priorityScore bunu ağırlık olarak
-    // kullanıp sırayı bozan seçimleri geri plana atıyor.
-    let unpreparedSoFar = 0;
+    // On kosul artik mufredat sirasi DEGIL: yalniz gercek zincirler
+    // (prerequisites.js). Mufredat sirasini dayatmak hic kaydi olmayan
+    // ogrenciye dersleri bastan sona sirayla veriyordu.
 
     for (const t of subject.topics || []) {
       const name = typeof t === "string" ? t : t.name;
@@ -81,9 +81,8 @@ export function buildRoute({
         ? Math.max(0, Math.round((now - new Date(tp.last_studied_at)) / 86400000))
         : 0;
 
-      const unpreparedBefore = unpreparedSoFar;
-      // Bu konu "hazır" sayılır mı — en az bir miktar çalışılmışsa evet.
-      if (q < 10) unpreparedSoFar += 1;
+      const missingPrereqs = missingPrerequisites(subject.key, name, progressByKey);
+      const unpreparedBefore = missingPrereqs.length;
 
       const entry = {
         subject: subject.key,
@@ -168,7 +167,8 @@ export function buildRoute({
         cost,
         unpreparedBefore,
         score: priority.score,
-        scoreComponents: priority.components,
+        // Durak aciklamasi "once Limit" diyebilsin diye eksik on kosullar.
+        scoreComponents: { ...priority.components, missingPrerequisites: missingPrereqs },
         reasonCodes,
         dataConfidence: q >= 20 ? "high" : q >= 5 ? "medium" : "low",
       });
