@@ -4,7 +4,8 @@
 // aciliyordu; "neredeyim, neden, ne yapayim" sorusu cevapsiz kaliyordu.
 // Buradaki sayilar yalniz o dersin girildigi denemelerden (trials yeniden
 // eskiye gelir). Uydurma deger yok: veri yoksa alan null.
-const round1 = (n) => Math.round(n * 10) / 10;
+// Netler iki ondalik (28,75): Analiz'in ders kartiyla ayni sayi gorunsun.
+const round1 = (n) => Math.round(n * 100) / 100;
 const avg = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
 
 export function subjectAnalysis(trials = [], subjectKey) {

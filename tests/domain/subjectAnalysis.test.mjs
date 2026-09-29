@@ -37,8 +37,8 @@ test("same-day trials maintain correct chronological order and positive delta wh
 
   const a = subjectAnalysis([newerTrial, olderTrial], "ingilizce");
   assert.equal(a.count, 2);
-  assert.equal(a.last, 28.8);
-  assert.equal(a.delta, 5); // 28.8 - 23.8 = +5.0 (positive improvement)
+  assert.equal(a.last, 28.75);
+  assert.equal(a.delta, 5); // 28.75 - 23.75 = +5 (yukselis)
   assert.match(subjectAnalysisSentence(a), /Son denemede yükseldi/);
   // Chart points must have strictly increasing timestamps to prevent vertical collapse
   assert.equal(a.points.length, 2);
@@ -60,7 +60,7 @@ test("same-day trials without created_at maintain order via Redux array index", 
 
   const a = subjectAnalysis([newerTrial, olderTrial], "ingilizce");
   assert.equal(a.count, 2);
-  assert.equal(a.last, 28.8);
+  assert.equal(a.last, 28.75);
   assert.equal(a.delta, 5);
   assert.ok(a.points[1].t > a.points[0].t);
 });
