@@ -140,6 +140,7 @@ export const EXAM_TOPIC_FREQUENCY = {
     "Parabol": 0.78,
     "Mutlak Değer": 0.56,
     "Karmaşık Sayılar": 0.44,
+    "Permütasyon - Kombinasyon - Olasılık (Binom)": 2.67,
     "Logaritma": 2.11,
     "Diziler": 1.22,
     "Limit": 2.0,
@@ -155,7 +156,17 @@ export const EXAM_TOPIC_FREQUENCY = {
     "Türev (Maks-Min Problemleri)": 1.14,
     "İntegral (Belirsiz)": 1.29,
     "İntegral (Belirli)": 1.29,
-    "İntegral (Alan-Hacim)": 1.29
+    "İntegral (Alan-Hacim)": 1.29,
+    "Doğruda ve Üçgende Açı": 0.78,
+    "Özel Üçgenler": 0.44,
+    "Açı Kenar Bağıntıları": 0.11,
+    "Üçgende Alan Benzerlik": 0.33,
+    "Çokgenler": 0.44,
+    "Özel Dörtgenler": 0.22,
+    "Çember ve Daire": 2.0,
+    "Noktanın Analitiği": 0.89,
+    "Dönüşüm Geometrisi": 0.78,
+    "Katı Cisimler": 1.11
   },
   "ayt_fizik": {
     "Vektörler": 0.22,
@@ -205,7 +216,9 @@ export const EXAM_TOPIC_FREQUENCY = {
     "Kemosentez": 0.45
   },
   "ayt_edebiyat": {
+    "Anlam Bilgisi (Sözcük, Cümle, Paragraf)": 5.11,
     "Coşku ve Heyecana Bağlı Metinler (Şiir)": 2.44,
+    "Edebi Sanatlar": 1.33,
     "İslamiyet Öncesi Türk Edebiyatı": 0.78,
     "İslamiyet Etkisindeki Türk Edebiyatı (Divan)": 4.44,
     "Halk Edebiyatı": 1.22,
@@ -226,6 +239,7 @@ export const EXAM_TOPIC_FREQUENCY = {
     "Parabol": 0.78,
     "Mutlak Değer": 0.56,
     "Karmaşık Sayılar": 0.44,
+    "Permütasyon - Kombinasyon - Olasılık (Binom)": 2.67,
     "Logaritma": 2.11,
     "Diziler": 1.22,
     "Limit": 2.0,
@@ -241,10 +255,22 @@ export const EXAM_TOPIC_FREQUENCY = {
     "Türev (Maks-Min Problemleri)": 1.14,
     "İntegral (Belirsiz)": 1.29,
     "İntegral (Belirli)": 1.29,
-    "İntegral (Alan-Hacim)": 1.29
+    "İntegral (Alan-Hacim)": 1.29,
+    "Doğruda ve Üçgende Açı": 0.78,
+    "Özel Üçgenler": 0.44,
+    "Açı Kenar Bağıntıları": 0.11,
+    "Üçgende Alan Benzerlik": 0.33,
+    "Çokgenler": 0.44,
+    "Özel Dörtgenler": 0.22,
+    "Çember ve Daire": 2.0,
+    "Noktanın Analitiği": 0.89,
+    "Dönüşüm Geometrisi": 0.78,
+    "Katı Cisimler": 1.11
   },
   "ayt_edebiyat_soz": {
+    "Anlam Bilgisi (Sözcük, Cümle, Paragraf)": 5.11,
     "Coşku ve Heyecana Bağlı Metinler (Şiir)": 2.44,
+    "Edebi Sanatlar": 1.33,
     "İslamiyet Öncesi Türk Edebiyatı": 0.78,
     "İslamiyet Etkisindeki Türk Edebiyatı (Divan)": 4.44,
     "Halk Edebiyatı": 1.22,
