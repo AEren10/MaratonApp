@@ -22,7 +22,9 @@ export function useAddTaskState() {
   const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
   // Program > Hafta'dan secili gun (bugun ya da ileri); yoksa bugun.
-  const targetDate = route.params?.date || todayTR();
+  // Gecmis tarih gelirse bugun: gecmise durak eklenmez.
+  const requestedDate = route.params?.date;
+  const targetDate = requestedDate && requestedDate >= todayTR() ? requestedDate : todayTR();
   const groups = useMemo(() => addTaskSubjectGroups(examType, field), [examType, field]);
   const paramKey = resolveAddTaskSubject(groups, route.params?.subjectKey || route.params?.preSubject);
   const tabOf = (key) => groups.find((g) => g.subjects.some((x) => x.key === key))?.key || groups[0].key;
