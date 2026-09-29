@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { Button, Icon } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
@@ -10,20 +11,19 @@ import { useAuth } from "../../contexts/AuthContext";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { alpha } from "../../themes/palette";
 import * as H from "../../lib/haptics";
 import { trialShortLabel } from "./trialLabels";
 import { useTrialSummary } from "./useTrialSummary";
 import { useTrialSummaryShare } from "./useTrialSummaryShare";
 import { TrialShareCard } from "./components/TrialShareCard";
-import { TrialSummaryHero } from "./components/TrialSummaryHero";
-import { TrialSummaryRouteLine } from "./components/TrialSummaryRouteLine";
-import { TrialSummarySubjectDeltas } from "./components/TrialSummarySubjectDeltas";
+import { TrialSummaryReportCard } from "./components/TrialSummaryReportCard";
 import { TrialSummaryTarget } from "./components/TrialSummaryTarget";
 import { TrialDropLayout } from "./components/TrialDropLayout";
 import { Press } from "../../components/design/Press";
 
-// Deneme Ozeti: kayit sonrasi ekran. Imza ani rota cizgisinde.
+// Deneme Ozeti: kayit sonrasi resmi rapor kağıdı ve paylaşım ekranı.
 export default function TrialSummaryScreen() {
   const C = useC();
   const navigation = useNavigation();
@@ -48,6 +48,11 @@ export default function TrialSummaryScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+      <LinearGradient
+        colors={[alpha(C.accent, 16), alpha(C.accent, 2), "transparent"]}
+        style={styles.ambientGlow}
+        pointerEvents="none"
+      />
       {isDrop ? (
         <TrialDropLayout trial={trial} summary={summary} typeLabel={typeLabel} dayMonth={dayMonth} onShare={handleShare} />
       ) : (
@@ -60,43 +65,47 @@ export default function TrialSummaryScreen() {
             <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
               {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}
             </Text>
-            <Press haptic="none" onPress={handleShare} style={styles.close}
-              accessibilityLabel="Paylaş" accessibilityRole="button">
-              <Icon name="share" size={16} color={C.text2} />
-            </Press>
+            <View style={styles.close} />
           </View>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-            <TrialSummaryHero typeLabel={typeLabel} net={trial.totalNet} prevNet={summary.prevNet} delta={summary.delta} />
-            {summary.hasChart ? (
-              <Animated.View style={styles.chart}>
-                <TrialSummaryRouteLine route={summary.route} />
-              </Animated.View>
-            ) : null}
-            {summary.sentence ? (
-              <Animated.View style={styles.section}>
-                <View style={[styles.sentence, { backgroundColor: C.surface, borderColor: C.elev }]}>
-                  <Text style={[TYPOGRAPHY.topicName, { color: C.text }]}>{summary.sentence}</Text>
-                </View>
-              </Animated.View>
-            ) : null}
-            <TrialSummarySubjectDeltas bars={summary.bars} />
+            <TrialSummaryReportCard
+              C={C}
+              typeLabel={typeLabel}
+              dayMonth={dayMonth}
+              net={trial.totalNet}
+              prevNet={summary.prevNet}
+              delta={summary.delta}
+              sentence={summary.sentence}
+              bars={summary.bars}
+            />
+
             <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
-            {/* Kayit bitti: bir sonraki dogal adim yanlislari deftere eklemek.
-                Yoksa kullanici denemeyi girdigi yere doner. Eskiden ana buton
-                "Deneme kayitlarini gor" idi ve Analiz sekmesindeki genel
-                listeye atiyordu; kayitlar Analiz'de duruyor. */}
+
+            {/* Kayit bitti: bir sonraki dogal adimlar */}
             <Animated.View style={styles.actions}>
               {summary.totalWrong > 0 ? (
                 <Button size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_WRONG)}>
-                  Yanlışları deftere ekle
+                  {`Yanlışları deftere ekle (${summary.totalWrong})`}
                 </Button>
               ) : null}
+
               <Button
                 size="lg"
                 fullWidth
                 variant={summary.totalWrong > 0 ? "outline" : "primary"}
-                onPress={() => navigation.popToTop()}
+                icon="share"
+                onPress={handleShare}
                 style={summary.totalWrong > 0 ? { marginTop: STEP.s2 } : undefined}
+              >
+                Sonucu paylaş
+              </Button>
+
+              <Button
+                size="md"
+                fullWidth
+                variant="ghost"
+                onPress={() => navigation.popToTop()}
+                style={{ marginTop: STEP.s1 }}
               >
                 Tamam
               </Button>
@@ -114,14 +123,12 @@ export default function TrialSummaryScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, position: "relative" },
+  ambientGlow: { position: "absolute", top: 0, left: 0, right: 0, height: 380 },
   header: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingHorizontal: GUTTER - STEP.s2, paddingTop: 4 },
   close: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
   headerLabel: { flex: 1, fontFamily: "Archivo_700", fontSize: 13, lineHeight: 18, letterSpacing: 2.4 },
-  scroll: { paddingBottom: STEP.s4 + STEP.s1 },
-  chart: { marginTop: STEP.s3 + 4 },
-  section: { paddingHorizontal: GUTTER, marginTop: STEP.s2 + 2 },
-  sentence: { paddingVertical: STEP.s3 - 2, paddingHorizontal: STEP.s3, borderRadius: SHAPE.card + 2, borderWidth: 1 },
-  actions: { paddingHorizontal: GUTTER, marginTop: STEP.s4 - 6 },
+  scroll: { paddingBottom: STEP.s4 + STEP.s1, paddingTop: STEP.s1 },
+  actions: { paddingHorizontal: GUTTER, marginTop: STEP.s3 },
   offscreen: { position: "absolute", top: -9999, left: -9999 },
 });

@@ -73,13 +73,39 @@ export function useTrialSummary({ trial, C }) {
       sentence = "Tahmin " + numberWithCase(forecast.before, "ablative") + " " + numberWithCase(forecast.after, "dative") + " çıktı.";
       const top = bars.filter((b) => b.delta > 0).sort((a, b) => b.delta - a.delta)[0];
       if (top && bars.length > 1) sentence += " " + withCase(top.name, "locative") + "ki artış rotayı yukarı çekti.";
+    } else if (delta != null && delta > 0) {
+      const deltaStr = `+${delta.toFixed(2).replace(".", ",")}`;
+      const top = bars.filter((b) => b.delta > 0).sort((a, b) => b.delta - a.delta)[0];
+      if (top && bars.length > 1) {
+        sentence = `Geçmiş denemeye göre ${deltaStr} net yükseldin. En güçlü artış ${top.name} dersinde gerçekleşti.`;
+      } else {
+        sentence = `Geçmiş denemeye göre ${deltaStr} net yükseliştesin.`;
+      }
+    } else if (delta != null && delta === 0) {
+      sentence = "Önceki deneme ile aynı net seviyesini korudun.";
+    } else if (delta == null && !prev) {
+      sentence = "İlk denemen kaydedildi. İkinci denemeyle birlikte net gelişimin hesaplanacak.";
     }
 
+    const prevNet = prev ? netOf(prev) : null;
     const route = prev ? {
-      startNet: netOf(others[0]), prevNet: netOf(prev), newNet: net, forecast,
+      startNet: netOf(others[0]), prevNet, newNet: net, forecast,
     } : null;
 
     const typeName = getTrialTypes(C)[trial.trialType]?.label || trial.trialType;
-    return { typeName, subjects, bars, prev, net, delta, totalWrong, route, sentence, sameTypeCount: others.length + 1 };
+    return {
+      typeName,
+      subjects,
+      bars,
+      prev,
+      prevNet,
+      net,
+      delta,
+      totalWrong,
+      route,
+      hasChart: Boolean(route),
+      sentence,
+      sameTypeCount: others.length + 1,
+    };
   }, [trial, trials, C, examDate]);
 }
