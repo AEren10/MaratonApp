@@ -5,6 +5,7 @@ import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { emitRouteUpdated } from "../lib/routeEvents";
 import { startOfWeekTR } from "../lib/dateUtils";
+import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
 // Rota planının kalıcılığı.
 //
@@ -40,6 +41,10 @@ const ROUTE_STOP_COLUMNS = [
   "updated_at",
 ].join(", ");
 const ROUTE_STATE_COLUMNS = "user_id, paused_at, resumed_at, exam_type, updated_at";
+
+export function invalidateRoutePlanReads(userId) {
+  invalidateInFlightResource("route_plan", userId);
+}
 
 /** Rota çizildiğinde haftaları yaz. Aynı hafta varsa üzerine yazar. */
 export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRevision = null) {
@@ -81,8 +86,12 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
   try {
     await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), rows);
   } catch (_) {}
+  invalidateRoutePlanReads(userId);
 
-  if (userId === "dev") return rows.length;
+  if (userId === "dev") {
+    invalidateRoutePlanReads(userId);
+    return rows.length;
+  }
 
   try {
     const revision = suppliedRevision || createRouteRevision({
@@ -98,10 +107,12 @@ export async function saveRouteWeeks(userId, weeks, examType = null, suppliedRev
       p_weeks: rows,
     });
     if (revisionError) throw revisionError;
+    invalidateRoutePlanReads(userId);
     return rows.length;
   } catch (e) {
     handleSupabaseError(e, "saveRouteWeeks");
     if (e?.code === "42501" || e?.status === 403 || e?.message?.includes?.("route access required") || e?.message?.includes?.("Network request failed")) {
+      invalidateRoutePlanReads(userId);
       return rows.length;
     }
     throw e;
@@ -113,59 +124,68 @@ export async function getLatestRouteStops(userId, examType = null) {
   if (userId === "dev") {
     return (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
   }
-  try {
-    let query = supabase
-      .from("route_revisions")
-      .select("id")
-      .eq("user_id", userId)
-      .order("generated_at", { ascending: false })
-      .limit(1);
-    if (examType) query = query.eq("exam_type", examType);
-    const { data, error } = await query.maybeSingle();
-    if (error) throw error;
-    if (data?.id) {
-      const serverStops = await getRouteStops(userId, data.id);
-      if (serverStops && serverStops.length > 0) {
-        await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), serverStops);
-        return serverStops;
+  const key = makeInFlightKey("route_plan", userId, { operation: "latest_stops", examType });
+  return shareInFlight(key, async () => {
+    try {
+      let query = supabase
+        .from("route_revisions")
+        .select("id")
+        .eq("user_id", userId)
+        .order("generated_at", { ascending: false })
+        .limit(1);
+      if (examType) query = query.eq("exam_type", examType);
+      const { data, error } = await query.maybeSingle();
+      if (error) throw error;
+      if (data?.id) {
+        const serverStops = await getRouteStops(userId, data.id);
+        if (serverStops && serverStops.length > 0) {
+          await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), serverStops);
+          return serverStops;
+        }
       }
+    } catch (e) {
+      handleSupabaseError(e, "getLatestRouteStops");
     }
-  } catch (e) {
-    handleSupabaseError(e, "getLatestRouteStops");
-  }
-  return (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
+    return (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), [])) || [];
+  });
 }
 
-export async function getRouteStops(userId, revisionId = null) {
+export function getRouteStops(userId, revisionId = null) {
   if (!userId || userId === "dev") return [];
-  try {
-    let query = supabase
-      .from("route_stops")
-      .select(ROUTE_STOP_COLUMNS)
-      .eq("user_id", userId)
-      .order("week_start", { ascending: true })
-      .order("position", { ascending: true });
-    if (revisionId) query = query.eq("revision_id", revisionId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  } catch (e) {
-    handleSupabaseError(e, "getRouteStops");
-    throw e;
-  }
+  const key = makeInFlightKey("route_plan", userId, { operation: "stops", revisionId });
+  return shareInFlight(key, async () => {
+    try {
+      let query = supabase
+        .from("route_stops")
+        .select(ROUTE_STOP_COLUMNS)
+        .eq("user_id", userId)
+        .order("week_start", { ascending: true })
+        .order("position", { ascending: true });
+      if (revisionId) query = query.eq("revision_id", revisionId);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      handleSupabaseError(e, "getRouteStops");
+      throw e;
+    }
+  });
 }
 
-export async function getRouteStopById(stopId, userId = null) {
+export function getRouteStopById(stopId, userId = null) {
   if (!stopId || stopId === "dev") return null;
-  try {
-    let query = supabase.from("route_stops").select(ROUTE_STOP_COLUMNS).eq("id", stopId);
-    if (userId && userId !== "dev") query = query.eq("user_id", userId);
-    const { data, error } = await query.maybeSingle();
-    if (error) return null;
-    return data || null;
-  } catch {
-    return null;
-  }
+  const key = makeInFlightKey("route_plan", userId, { operation: "stop", stopId });
+  return shareInFlight(key, async () => {
+    try {
+      let query = supabase.from("route_stops").select(ROUTE_STOP_COLUMNS).eq("id", stopId);
+      if (userId && userId !== "dev") query = query.eq("user_id", userId);
+      const { data, error } = await query.maybeSingle();
+      if (error) return null;
+      return data || null;
+    } catch {
+      return null;
+    }
+  });
 }
 
 export async function transitionRouteStop({
@@ -191,6 +211,7 @@ export async function transitionRouteStop({
       p_payload: payload,
     });
     if (error) throw error;
+    invalidateRoutePlanReads(userId);
     return Array.isArray(data) ? data[0] || null : data;
   } catch (e) {
     const isConflict =
@@ -206,10 +227,12 @@ export async function transitionRouteStop({
         const serverStop = await getRouteStopById(stopId, userId);
 
         if (!serverStop) {
+          invalidateRoutePlanReads(userId);
           return { id: stopId, lifecycle_status: transition, reconciled: true, reason: "stop_not_found" };
         }
 
         if (serverStop.lifecycle_status === transition) {
+          invalidateRoutePlanReads(userId);
           return { ...serverStop, reconciled: true, reason: "already_in_state" };
         }
 
@@ -227,11 +250,13 @@ export async function transitionRouteStop({
             p_payload: payload,
           });
           if (!retryErr) {
+            invalidateRoutePlanReads(userId);
             return Array.isArray(retriedData) ? retriedData[0] || null : retriedData;
           }
         }
 
         if (serverStop.version > (expectedVersion ?? 0)) {
+          invalidateRoutePlanReads(userId);
           return { ...serverStop, reconciled: true, reason: "server_version_ahead" };
         }
       } catch {
@@ -248,10 +273,12 @@ export async function transitionRouteStop({
  * Geçmiş haftaların planı — borç hesabının girdisi.
  * @param sinceWeekStart "YYYY-MM-DD"
  */
-export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
+export function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
   if (!userId) return [];
-  if (userId !== "dev") {
-    try {
+  const key = makeInFlightKey("route_plan", userId, { operation: "weeks", sinceWeekStart, examType });
+  return shareInFlight(key, async () => {
+    if (userId !== "dev") {
+      try {
       let q = supabase
         .from(TABLE)
         .select("week_start, planned_questions, planned_minutes, stops, exam_type")
@@ -277,28 +304,29 @@ export async function getRouteWeeks(userId, { sinceWeekStart, examType } = {}) {
         await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), data);
         return mapped;
       }
-    } catch (e) {
-      handleSupabaseError(e, "getRouteWeeks");
+      } catch (e) {
+        handleSupabaseError(e, "getRouteWeeks");
+      }
     }
-  }
 
-  // Local fallback
-  const local = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), [])) || [];
-  const filtered = local.filter((r) => {
-    const ws = r.week_start || r.weekStart;
-    if (sinceWeekStart && ws < sinceWeekStart) return false;
-    const et = r.exam_type || r.examType;
-    if (examType && et && et !== examType) return false;
-    return true;
+    // Local fallback
+    const local = (await appStorage.getJson(userScopedKey(STORAGE_KEYS.ROUTE_WEEKS, userId), [])) || [];
+    const filtered = local.filter((r) => {
+      const ws = r.week_start || r.weekStart;
+      if (sinceWeekStart && ws < sinceWeekStart) return false;
+      const et = r.exam_type || r.examType;
+      if (examType && et && et !== examType) return false;
+      return true;
+    });
+    return filtered.map((r, i) => ({
+      weekNo: i + 1,
+      weekStart: r.week_start || r.weekStart,
+      plannedQuestions: r.planned_questions ?? r.plannedQuestions ?? 0,
+      plannedMinutes: r.planned_minutes ?? r.plannedMinutes ?? 0,
+      stops: r.stops || [],
+      examType: r.exam_type || r.examType,
+    }));
   });
-  return filtered.map((r, i) => ({
-    weekNo: i + 1,
-    weekStart: r.week_start || r.weekStart,
-    plannedQuestions: r.planned_questions ?? r.plannedQuestions ?? 0,
-    plannedMinutes: r.planned_minutes ?? r.plannedMinutes ?? 0,
-    stops: r.stops || [],
-    examType: r.exam_type || r.examType,
-  }));
 }
 
 /** Sınav tipi değişince eski rotayı temizle — yanlış müfredat borcu kalmasın. */
@@ -309,6 +337,7 @@ export async function clearRouteWeeks(userId, { exceptExamType } = {}) {
     if (exceptExamType) q = q.or(`exam_type.is.null,exam_type.neq.${exceptExamType}`);
     const { error } = await q;
     if (error) throw error;
+    invalidateRoutePlanReads(userId);
   } catch (e) {
     handleSupabaseError(e, "clearRouteWeeks");
   }
@@ -318,7 +347,9 @@ export async function clearRouteWeeks(userId, { exceptExamType } = {}) {
 
 export async function getRouteState(userId, examType = null) {
   if (!userId || userId === "dev") return null;
-  try {
+  const key = makeInFlightKey("route_plan", userId, { operation: "state", examType });
+  return shareInFlight(key, async () => {
+    try {
     let query = supabase
       .from(STATE_TABLE)
       .select(ROUTE_STATE_COLUMNS)
@@ -333,10 +364,11 @@ export async function getRouteState(userId, examType = null) {
     if (error) throw error;
     const rows = data || [];
     return rows.find((row) => row.exam_type === examType) || rows[0] || null;
-  } catch (e) {
-    handleSupabaseError(e, "getRouteState");
-    throw e;
-  }
+    } catch (e) {
+      handleSupabaseError(e, "getRouteState");
+      throw e;
+    }
+  });
 }
 
 export async function setRouteState(userId, patch, examType = null) {
@@ -356,6 +388,7 @@ export async function setRouteState(userId, patch, examType = null) {
       .select(ROUTE_STATE_COLUMNS)
       .maybeSingle();
     if (error) throw error;
+    invalidateRoutePlanReads(userId);
     return data || null;
   } catch (e) {
     handleSupabaseError(e, "setRouteState");
@@ -420,6 +453,7 @@ export async function addStopToActiveRoute({
   ];
 
   await appStorage.setJson(userScopedKey(STORAGE_KEYS.ROUTE_STOPS, userId), updatedStops);
+  invalidateRoutePlanReads(userId);
   emitRouteUpdated({ action: "stop_added", stop: newStop, stops: updatedStops });
   return newStop;
 }

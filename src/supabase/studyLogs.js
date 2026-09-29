@@ -1,6 +1,7 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { normalizeStudyLog, toStudyLogRow } from "../domain/study/studyLogModel";
+import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
 const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, note, notes, study_date, created_at, client_operation_id";
 const PAGE_SIZE = 1000;
@@ -11,17 +12,23 @@ function isIdempotencyConflict(error) {
 
 export async function getStudyLogByClientOperationId(userId, clientOperationId) {
   if (!userId || !clientOperationId) return null;
-  const { data, error } = await supabase
-    .from("study_logs")
-    .select(SL_COLUMNS)
-    .eq("user_id", userId)
-    .eq("client_operation_id", clientOperationId)
-    .maybeSingle();
-  if (error) throw error;
-  return data ? normalizeStudyLog(data) : null;
+  const key = makeInFlightKey("study_logs", userId, { clientOperationId });
+  return shareInFlight(key, async () => {
+    const { data, error } = await supabase
+      .from("study_logs")
+      .select(SL_COLUMNS)
+      .eq("user_id", userId)
+      .eq("client_operation_id", clientOperationId)
+      .maybeSingle();
+    if (error) throw error;
+    return data ? normalizeStudyLog(data) : null;
+  });
 }
 
-export const getStudyLogs = async (userId, { from, to } = {}) => {
+export const getStudyLogs = (userId, { from, to } = {}) => {
+  const limit = !from && !to ? 500 : PAGE_SIZE;
+  const key = makeInFlightKey("study_logs", userId, { from, to, limit });
+  return shareInFlight(key, async () => {
   try {
     const buildQuery = () => {
       let query = supabase
@@ -55,9 +62,12 @@ export const getStudyLogs = async (userId, { from, to } = {}) => {
     handleSupabaseError(e, "getStudyLogs");
     throw e;
   }
+  });
 };
 
-export const getStudyLogsByDate = async (userId, date) => {
+export const getStudyLogsByDate = (userId, date) => {
+  const key = makeInFlightKey("study_logs", userId, { date });
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("study_logs")
@@ -71,6 +81,7 @@ export const getStudyLogsByDate = async (userId, date) => {
     handleSupabaseError(e, "getStudyLogsByDate");
     throw e;
   }
+  });
 };
 
 export const addStudyLog = async (log) => {
@@ -81,11 +92,17 @@ export const addStudyLog = async (log) => {
       .select()
       .single();
     if (error) throw error;
+    invalidateInFlightResource("study_logs", log.user_id);
+    invalidateInFlightResource("topic_progress", log.user_id);
     return normalizeStudyLog(data);
   } catch (e) {
     if (isIdempotencyConflict(e)) {
       const existing = await getStudyLogByClientOperationId(log.user_id, log.client_operation_id);
-      if (existing) return existing;
+      if (existing) {
+        invalidateInFlightResource("study_logs", log.user_id);
+        invalidateInFlightResource("topic_progress", log.user_id);
+        return existing;
+      }
     }
     handleSupabaseError(e, "addStudyLog");
     throw e;
@@ -111,6 +128,8 @@ export const updateStudyLog = async (id, updates) => {
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error("study_log_not_found");
+    invalidateInFlightResource("study_logs", userId);
+    invalidateInFlightResource("topic_progress", userId);
     return normalizeStudyLog(data);
   } catch (e) {
     handleSupabaseError(e, "updateStudyLog");
@@ -123,13 +142,17 @@ export const deleteStudyLog = async (id, userId) => {
   try {
     const { error } = await supabase.from("study_logs").delete().eq("id", id).eq("user_id", userId);
     if (error) throw error;
+    invalidateInFlightResource("study_logs", userId);
+    invalidateInFlightResource("topic_progress", userId);
   } catch (e) {
     handleSupabaseError(e, "deleteStudyLog");
     throw e;
   }
 };
 
-export const getStudyLogsByTopic = async (userId, subjectKey, topicName, limit = 20) => {
+export const getStudyLogsByTopic = (userId, subjectKey, topicName, limit = 20) => {
+  const key = makeInFlightKey("study_logs", userId, { subjectKey, topicName, limit });
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("study_logs")
@@ -145,4 +168,5 @@ export const getStudyLogsByTopic = async (userId, subjectKey, topicName, limit =
     handleSupabaseError(e, "getStudyLogsByTopic");
     throw e;
   }
+  });
 };

@@ -1,7 +1,10 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
-export const getTopicProgress = async (userId) => {
+export const getTopicProgress = (userId) => {
+  const key = makeInFlightKey("topic_progress", userId, {});
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("topic_progress")
@@ -18,9 +21,12 @@ export const getTopicProgress = async (userId) => {
     handleSupabaseError(e, "getTopicProgress");
     throw e;
   }
+  });
 };
 
-export const getSubjectProgress = async (userId, subjectKey) => {
+export const getSubjectProgress = (userId, subjectKey) => {
+  const key = makeInFlightKey("topic_progress", userId, { subjectKey });
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("topic_progress")
@@ -34,4 +40,5 @@ export const getSubjectProgress = async (userId, subjectKey) => {
     handleSupabaseError(e, "getSubjectProgress");
     throw e;
   }
+  });
 };

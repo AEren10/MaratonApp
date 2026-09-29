@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
 const WQ_COLUMNS = "id, user_id, subject, topic, image_path, note, is_resolved, created_at, my_answer, correct_answer, next_review_at, interval_days, ease, last_reviewed_at, topic_source, client_operation_id";
 
@@ -9,17 +10,22 @@ function isIdempotencyConflict(error) {
 
 async function getWrongQuestionByClientOperationId(userId, clientOperationId) {
   if (!userId || !clientOperationId) return null;
-  const { data, error } = await supabase
-    .from("wrong_questions")
-    .select(WQ_COLUMNS)
-    .eq("user_id", userId)
-    .eq("client_operation_id", clientOperationId)
-    .maybeSingle();
-  if (error) throw error;
-  return data || null;
+  const key = makeInFlightKey("wrong_questions", userId, { clientOperationId });
+  return shareInFlight(key, async () => {
+    const { data, error } = await supabase
+      .from("wrong_questions")
+      .select(WQ_COLUMNS)
+      .eq("user_id", userId)
+      .eq("client_operation_id", clientOperationId)
+      .maybeSingle();
+    if (error) throw error;
+    return data || null;
+  });
 }
 
-export const getWrongQuestions = async (userId, { subject, resolved } = {}) => {
+export const getWrongQuestions = (userId, { subject, resolved } = {}) => {
+  const key = makeInFlightKey("wrong_questions", userId, { operation: "list", subject, resolved });
+  return shareInFlight(key, async () => {
   try {
     let query = supabase
       .from("wrong_questions")
@@ -37,9 +43,12 @@ export const getWrongQuestions = async (userId, { subject, resolved } = {}) => {
     handleSupabaseError(e, "getWrongQuestions");
     throw e;
   }
+  });
 };
 
-export const getWrongQuestionCount = async (userId) => {
+export const getWrongQuestionCount = (userId) => {
+  const key = makeInFlightKey("wrong_questions", userId, { operation: "count" });
+  return shareInFlight(key, async () => {
   try {
     const { count, error } = await supabase
       .from("wrong_questions")
@@ -51,6 +60,7 @@ export const getWrongQuestionCount = async (userId) => {
     handleSupabaseError(e, "getWrongQuestionCount");
     throw e;
   }
+  });
 };
 
 export const addWrongQuestion = async (question) => {
@@ -61,11 +71,15 @@ export const addWrongQuestion = async (question) => {
       .select()
       .single();
     if (error) throw error;
+    invalidateInFlightResource("wrong_questions", question.user_id);
     return data;
   } catch (e) {
     if (isIdempotencyConflict(e)) {
       const existing = await getWrongQuestionByClientOperationId(question.user_id, question.client_operation_id);
-      if (existing) return existing;
+      if (existing) {
+        invalidateInFlightResource("wrong_questions", question.user_id);
+        return existing;
+      }
     }
     handleSupabaseError(e, "addWrongQuestion");
     throw e;
@@ -74,8 +88,10 @@ export const addWrongQuestion = async (question) => {
 
 // Deep link (`yanlis/:id`) yalnızca id taşıyor. Detay ekranı yalnızca
 // route.params.item okuduğu için link BOŞ bir ekran açıyordu.
-export const getWrongQuestionById = async (id, userId) => {
+export const getWrongQuestionById = (id, userId) => {
   if (!userId) throw new Error("userId is required");
+  const key = makeInFlightKey("wrong_questions", userId, { id });
+  return shareInFlight(key, async () => {
   try {
     const { data, error } = await supabase
       .from("wrong_questions")
@@ -89,6 +105,7 @@ export const getWrongQuestionById = async (id, userId) => {
     handleSupabaseError(e, "getWrongQuestionById");
     throw e;
   }
+  });
 };
 
 export const resolveWrongQuestion = async (id, userId) => {
@@ -102,6 +119,7 @@ export const resolveWrongQuestion = async (id, userId) => {
       .select()
       .maybeSingle();
     if (error) throw error;
+    invalidateInFlightResource("wrong_questions", userId);
     return data;
   } catch (e) {
     handleSupabaseError(e, "resolveWrongQuestion");
@@ -110,7 +128,9 @@ export const resolveWrongQuestion = async (id, userId) => {
 };
 
 // G) SR: bugün tekrarı gelen yanlışlar (next_review_at <= now, çözülmemiş).
-export const getDueWrongQuestions = async (userId) => {
+export const getDueWrongQuestions = (userId) => {
+  const key = makeInFlightKey("wrong_questions", userId, { operation: "due_list" });
+  return shareInFlight(key, async () => {
   try {
     const nowIso = new Date().toISOString();
     const { data, error } = await supabase
@@ -127,11 +147,14 @@ export const getDueWrongQuestions = async (userId) => {
     handleSupabaseError(e, "getDueWrongQuestions");
     throw e;
   }
+  });
 };
 
 // Tekrarı gelenlerin SAYISI. Ana Sayfa yalnızca sayıyı gösteriyor; satırları
 // çekmek boşuna veri taşımak olur — head:true ile gövde hiç gelmiyor.
-export const getDueWrongCount = async (userId) => {
+export const getDueWrongCount = (userId) => {
+  const key = makeInFlightKey("wrong_questions", userId, { operation: "due_count" });
+  return shareInFlight(key, async () => {
   try {
     const nowIso = new Date().toISOString();
     const { count, error } = await supabase
@@ -147,6 +170,7 @@ export const getDueWrongCount = async (userId) => {
     handleSupabaseError(e, "getDueWrongCount");
     throw e;
   }
+  });
 };
 
 // SR güncellemesi (tekrar sonrası interval/ease/next_review_at).
@@ -161,6 +185,7 @@ export const reviewWrongQuestion = async (id, userId, updates) => {
       .select()
       .maybeSingle();
     if (error) throw error;
+    invalidateInFlightResource("wrong_questions", userId);
     return data;
   } catch (e) {
     handleSupabaseError(e, "reviewWrongQuestion");
@@ -177,6 +202,7 @@ export const deleteWrongQuestion = async (id, userId) => {
       .eq("id", id)
       .eq("user_id", userId);
     if (error) throw error;
+    invalidateInFlightResource("wrong_questions", userId);
   } catch (e) {
     handleSupabaseError(e, "deleteWrongQuestion");
     throw e;

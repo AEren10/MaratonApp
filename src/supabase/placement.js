@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
 
 // Seviye testi sonucunun kalıcılığı.
 //
@@ -134,6 +135,7 @@ export async function savePlacementEstimates(userId, estimates = []) {
     inserted += await insertChunk(withId);
     inserted += await insertChunk(withCustom);
 
+    if (inserted > 0) invalidateInFlightResource("topic_progress", userId);
     return { inserted, skipped };
   } catch (e) {
     handleSupabaseError(e, "savePlacementEstimates");
@@ -142,17 +144,20 @@ export async function savePlacementEstimates(userId, estimates = []) {
 }
 
 /** Seviye testi daha önce yapılmış mı — onboarding'de tekrar sormamak için. */
-export async function hasPlacementData(userId) {
+export function hasPlacementData(userId) {
   if (!userId || userId === "dev") return false;
-  try {
-    const { count, error } = await supabase
-      .from("topic_progress")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    if (error) throw error;
-    return (count || 0) > 0;
-  } catch (e) {
-    handleSupabaseError(e, "hasPlacementData");
-    return false;
-  }
+  const key = makeInFlightKey("topic_progress", userId, { operation: "placement_count" });
+  return shareInFlight(key, async () => {
+    try {
+      const { count, error } = await supabase
+        .from("topic_progress")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if (error) throw error;
+      return (count || 0) > 0;
+    } catch (e) {
+      handleSupabaseError(e, "hasPlacementData");
+      return false;
+    }
+  });
 }
