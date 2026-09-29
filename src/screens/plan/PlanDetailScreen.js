@@ -11,7 +11,7 @@ import { SCREENS } from "../../constants/screens";
 import { PlanDetailHeader } from "./components/PlanDetailHeader";
 import { PlanDetailStopRow } from "./components/PlanDetailStopRow";
 import { PlanDetailEmptyState } from "./components/PlanDetailEmptyState";
-import { PlanDetailSubjects } from "./components/PlanDetailSubjects";
+import { PlanDetailSummaryHero } from "./components/PlanDetailSummaryHero";
 import { ReorganizeDayModal } from "./components/ReorganizeDayModal";
 import { dayLongLabel } from "../../domain/summary/summaryFormat";
 import { formatMinutes, usePlanDetailViewModel } from "./usePlanDetailViewModel";
@@ -31,30 +31,16 @@ function PlanDetailInner({ route }) {
       <PlanDetailHeader dayLabel={dayLabel} onBack={() => navigation.goBack()} C={C} />
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View style={s.cardsRow}>
-          <Card tone="surface" radius="panel" style={s.statCard}>
-            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PLANLANAN</Text>
-            <Text style={[TYPOGRAPHY.statSmall, s.statNum, { color: C.text }]}>
-              {hasTasks ? formatMinutes(plannedMinutes) : "―"}
-            </Text>
-          </Card>
-          <Card tone="surface" radius="panel" style={s.statCard}>
-            <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>GERÇEKLEŞEN</Text>
-            <Text style={[TYPOGRAPHY.statSmall, s.statNum, { color: C.text }]}>
-              {hasTasks ? formatMinutes(doneMinutes) : "―"}
-            </Text>
-          </Card>
-        </Animated.View>
-
         {hasTasks ? (
           <Animated.View>
-            <View style={s.progressBarWrap}>
-              <View style={[s.progressBase, { backgroundColor: C.elev }]}>
-                <View style={[s.progressFill, { backgroundColor: C.text, width: `${Math.round((detail.doneCount / detail.tasks.length) * 100)}%` }]} />
-              </View>
-            </View>
-
-            <PlanDetailSubjects C={C} tasks={detail.tasks} />
+            <PlanDetailSummaryHero
+              C={C}
+              plannedMinutes={plannedMinutes}
+              doneMinutes={doneMinutes}
+              doneCount={detail.doneCount}
+              totalCount={detail.tasks.length}
+              tasks={detail.tasks}
+            />
 
             <View style={s.listHeader}>
               <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>GÜNÜN DURAKLARI</Text>
@@ -140,11 +126,9 @@ const s = StyleSheet.create({
   loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
   safe: { flex: 1 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s5 },
-  cardsRow: { flexDirection: "row", gap: STEP.s1 },
-  statCard: { flex: 1, padding: STEP.s2 }, statNum: { marginTop: STEP.s1 },
-  progressBarWrap: { marginTop: STEP.s2, height: 5 }, progressBase: { height: 5, borderRadius: STEP.s1 / 4, overflow: "hidden" }, progressFill: { height: "100%", borderRadius: STEP.s1 / 4 },
   listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s3, paddingBottom: STEP.s1 },
-  rule: { flex: 1, height: 1 }, stopsList: { marginTop: STEP.s1 },
-  summaryCard: { marginTop: STEP.s3, padding: STEP.s2 },
+  rule: { flex: 1, height: 1 },
+  stopsList: { marginTop: STEP.s1 },
+  summaryCard: { marginTop: STEP.s3, padding: STEP.s3 },
   actionsWrap: { marginTop: STEP.s3, paddingBottom: STEP.s3, gap: STEP.s2 },
 });
