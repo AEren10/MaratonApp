@@ -43,5 +43,14 @@ export function todayPlanStops(week, schedule, todayKey, { isCompletedToday = ()
 
   const doneElsewhere = (week.stops || [])
     .filter((s) => !ownSet.has(s) && !carriedSet.has(s) && isCompletedToday(s));
-  return [...own, ...carried.map((s) => ({ ...s, carried: true })), ...doneElsewhere];
+  // Listede neden durdugu belli olsun: gerekcenin basina "Bu haftadan kalan".
+  const carriedStops = carried.map((s) => ({
+    ...s,
+    carried: true,
+    insight: {
+      ...(s.insight || {}),
+      reasonText: `Bu haftadan kalan · ${s.insight?.reasonText || "yapılmamış durak"}`,
+    },
+  }));
+  return [...own, ...carriedStops, ...doneElsewhere];
 }
