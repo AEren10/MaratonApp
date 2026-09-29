@@ -3,16 +3,21 @@ import { View, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Button, ErrorState } from "../../components/design";
-import { STEP, GUTTER, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
+import { STEP, GUTTER, TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SCREENS } from "../../constants/screens";
 import { getSubjectByKey } from "../../themes/subjects";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { useTopicStudyDetail } from "../../hooks/useTopicStudyDetail";
+import { flattenRouteStops, routeDateTag } from "../../domain/route/routeOverview";
+import { ROUTE_STOP_STATUS } from "../../domain/route/stopStatus";
 import { TopicHeroHeader } from "./components/TopicHeroHeader";
 import { TopicStatsRow } from "./components/TopicStatsRow";
+import { TopicAccuracyBar } from "./components/TopicAccuracyBar";
 import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
+import { TopicRecentStudies } from "./components/TopicRecentStudies";
 import { TopicInfoList } from "./components/TopicInfoList";
 import { TopicWrongNotesList } from "./components/TopicWrongNotesList";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
@@ -44,6 +49,17 @@ export default function TopicStudyScreen() {
   const { loading, error, refetch } = detail;
   const notebookCount = detail.wrongList.length;
 
+  const { weeks, isPaused } = useStudyRoute({ persist: false });
+  const routePlace = useMemo(() => {
+    if (!topic?.name) return "Rotada planlı değil";
+    const flat = flattenRouteStops(weeks, { routeFrozen: isPaused });
+    const match = flat.find(
+      (it) => it.stop?.topic === topic.name && [ROUTE_STOP_STATUS.ACTIVE, ROUTE_STOP_STATUS.UPCOMING].includes(it.status)
+    );
+    if (!match) return "Rotada planlı değil";
+    return match.weekStart ? routeDateTag(match.weekStart) : "Bu hafta";
+  }, [weeks, isPaused, topic?.name]);
+
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.headerBar}>
@@ -63,9 +79,15 @@ export default function TopicStudyScreen() {
           <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
             <TopicHeroHeader C={C} subjectName={subject?.name} topicName={topic?.name} color={color} />
             <TopicStatsRow C={C} solved={detail.totalQuestions} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} />
+            <TopicAccuracyBar C={C} accuracy={detail.accuracy} correctCount={detail.correctCount} totalQuestions={detail.totalQuestions} />
             <TopicAccumulationChart color={color} chart={detail.chart} />
-            <TopicInfoList C={C} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} lastStudyText={detail.lastStudyText} />
-            <TopicWrongNotesList C={C} items={detail.wrongList} />
+            <TopicRecentStudies C={C} items={detail.recentLogs} />
+            <TopicInfoList C={C} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} lastStudyText={detail.lastStudyText} routePlace={routePlace} />
+            <TopicWrongNotesList
+              C={C}
+              items={detail.wrongList}
+              onAllPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK, { subjectKey: subject?.key })}
+            />
           </ScrollView>
 
           <View style={[s.bottom, { backgroundColor: C.bg }]}>
@@ -89,6 +111,6 @@ const s = StyleSheet.create({
   headerBar: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER - STEP.s1, paddingTop: STEP.s1, paddingBottom: STEP.s2 },
   iconBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   headerMeta: { flex: 1, textAlign: "center", letterSpacing: 1.5, opacity: 0.5 },
-  content: { paddingHorizontal: GUTTER, paddingBottom: 140 },
+  content: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 * 2 + STEP.s4 },
   bottom: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
 });

@@ -1,11 +1,15 @@
-import { View, Text } from "react-native";
-import { SectionLabel } from "../../../components/design";
-import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+
+import { Icon, SectionLabel } from "../../../components/design";
+import { Press } from "../../../components/design/Press";
+import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { TopicWrongNoteRow } from "./TopicWrongNoteRow";
 
-export function TopicWrongNotesList({ C, items: wrongs }) {
+export function TopicWrongNotesList({ C, items: wrongs = [], onAllPress }) {
   if (!wrongs?.length) return null;
-  const items = wrongs.map((w) => ({
+
+  const displayItems = wrongs.slice(0, 3).map((w) => ({
     id: w.id,
     raw: w,
     source: w.note?.trim() || "Not eklenmemiş",
@@ -15,17 +19,59 @@ export function TopicWrongNotesList({ C, items: wrongs }) {
   }));
 
   return (
-    <View style={{ marginTop: STEP.s4 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s2, marginBottom: STEP.s2 }}>
-        <SectionLabel style={{ marginBottom: 0, color: C.text3 }}>DEFTERDEKİ YANLIŞLARIM</SectionLabel>
-        <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-        <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3, fontSize: 13 }]}>{items.length}</Text>
+    <View style={s.wrap}>
+      <View style={s.header}>
+        <SectionLabel style={s.label}>DEFTERDEKİ YANLIŞLARIM</SectionLabel>
+        <View style={[s.divider, { backgroundColor: C.line }]} />
+        {onAllPress ? (
+          <Press
+            onPress={onAllPress}
+            accessibilityRole="button"
+            accessibilityLabel="Defterdeki tüm yanlışları göster"
+            style={s.allBtn}
+          >
+            <Text style={[TYPOGRAPHY.tableHead, { color: C.accentBright }]}>TÜMÜ</Text>
+            <Icon name="chevR" size={12} color={C.accentBright} />
+          </Press>
+        ) : (
+          <Text style={[TYPOGRAPHY.tableValue, { color: C.text3 }]}>{wrongs.length}</Text>
+        )}
       </View>
-      <View style={{ gap: STEP.s2 }}>
-        {items.map((item) => (
+
+      <View style={s.list}>
+        {displayItems.map((item) => (
           <TopicWrongNoteRow key={item.id} item={item} C={C} />
         ))}
       </View>
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  wrap: {
+    marginTop: STEP.s4,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    marginBottom: STEP.s2,
+  },
+  label: {
+    marginBottom: STEP.s1 - STEP.s1,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+  },
+  allBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1 / 4,
+    paddingVertical: STEP.s1 / 2,
+    paddingLeft: STEP.s1,
+  },
+  list: {
+    gap: STEP.s2,
+  },
+});
