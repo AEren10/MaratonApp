@@ -9,10 +9,16 @@ function DayChip({ day, selected, onPress, C }) {
   const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
 
   const bg = isSelected ? C.elev : isPastDone ? C.surface : day.isFuture ? "transparent" : C.surface;
-  const border = isSelected ? C.text : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
-  const letterColor = isSelected ? C.text : isPastDone ? C.text2 : C.text3;
+  const border = isSelected ? C.accent : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
+  const letterColor = isSelected ? C.accentBright : isPastDone ? C.text2 : C.text3;
   const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
-  const dotColor = isSelected ? C.accent : (day.active || isPastDone) ? C.accentBright : day.isFuture ? "transparent" : C.line;
+  const dotColor = isSelected
+    ? (day.active ? C.up : C.accent)
+    : (day.active || isPastDone)
+      ? C.up
+      : day.isFuture
+        ? "transparent"
+        : C.text5;
 
   return (
     <Pressable
@@ -40,9 +46,9 @@ function DayChip({ day, selected, onPress, C }) {
         {day.dayNum}
       </Text>
       <View style={{
-        width: 5,
-        height: 5,
-        borderRadius: 2.5,
+        width: 6,
+        height: 6,
+        borderRadius: 3,
         backgroundColor: dotColor,
       }} />
     </Pressable>
@@ -69,24 +75,29 @@ export function WeekDayStrip({ days, selectedDate, onSelect, style }) {
           />
         ))}
       </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: STEP.s2, marginTop: STEP.s2 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s3, marginTop: STEP.s2 }}>
         <Legend color={C.up} label="tamamlandı" C={C} />
         <Legend color={C.text5} label="bekleyen" C={C} />
-        <Legend color="transparent" dashed label="boş gün" C={C} />
+        <Legend color="transparent" hollow label="boş gün" C={C} />
       </View>
     </View>
   );
 }
 
-function Legend({ color, label, dashed, C }) {
+function Legend({ color, label, hollow, C }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-      <View style={{
-        width: 6, height: 6, borderRadius: 1, backgroundColor: dashed ? "transparent" : color,
-        borderWidth: dashed ? 1 : 0, borderColor: C.line, borderStyle: dashed ? "dashed" : "solid",
-      }}
+      <View
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: hollow ? "transparent" : color,
+          borderWidth: hollow ? 1.5 : 0,
+          borderColor: C.border || C.line,
+        }}
       />
-      <Text style={{ fontFamily: "Archivo_500", fontSize: 11, color: C.muted }}>{label}</Text>
+      <Text style={{ fontFamily: "Archivo_500", fontSize: 11.5, color: C.text3 }}>{label}</Text>
     </View>
   );
 }

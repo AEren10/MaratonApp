@@ -67,7 +67,7 @@ export function ProgramWeekView() {
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={w.loading} onRefresh={w.refresh} tintColor={C.accent} colors={[C.accent]} />}
     >
-      <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{weekSummary(w)}</Text>
+      <Text style={[TYPOGRAPHY.metaSemiBold, s.weekRange, { color: C.text3 }]}>{w.weekRangeLabel}</Text>
 
       <View style={s.dayHeading}>
         <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{weekdayName}</Text>
@@ -97,7 +97,8 @@ export function ProgramWeekView() {
 const s = StyleSheet.create({
   pad: { paddingHorizontal: GUTTER },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: 120 },
-  dayHeading: { marginTop: STEP.s2, marginBottom: STEP.s2 },
+  weekRange: { marginTop: STEP.s2, letterSpacing: 0.3 },
+  dayHeading: { marginTop: STEP.s1, marginBottom: STEP.s2 },
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: STEP.s3, borderTopWidth: 1, marginTop: STEP.s4 },
   copy: { flex: 1, gap: 2 },
 });
