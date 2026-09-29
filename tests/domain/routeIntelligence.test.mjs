@@ -124,9 +124,11 @@ test("route treats topic-level low accuracy as a weak signal without subject fla
     .flatMap((week) => week.stops)
     .find((stop) => stop.topic === "Oran Orantı");
 
+  // Dogru sayisi girilmemis kayit (correct 0) "%0 dogruluk" DEGIL, bilinmiyor:
+  // kayit formlarinin cogu dogru sormuyor (effectiveAccuracy). Zayif damgasi yok.
   assert.ok(zeroCorrectStop);
-  assert.equal(zeroCorrectStop.insight.reasonCode, "LOW_ACCURACY");
-  assert.equal(zeroCorrectStop.scoreComponents.weakAreaBoost, 1.35);
+  assert.notEqual(zeroCorrectStop.insight.reasonCode, "LOW_ACCURACY");
+  assert.equal(zeroCorrectStop.scoreComponents.weakAreaBoost, 1);
 });
 
 test("route intelligence exposes neglected topic recency as an explainable signal", () => {

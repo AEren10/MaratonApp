@@ -15,6 +15,7 @@ const REASON_TEXT = {
   WEEKLY_REVIEW: "Haftanın konularını bir arada tekrar eder; kalıcılığı artırır.",
   DAILY_HABIT: "Her gün yapmayı seçtiğin rutin.",
   TARGET_KEEP: "Hedef netine ulaştın; şimdi kazandığını korumak en kârlı iş.",
+  FINISH_TOPIC: "Başladığın konuyu bitir; yarım konu en çabuk unutulan konudur.",
 };
 
 const RISK_TRACE_TEXT = {
@@ -111,6 +112,12 @@ function reasonTextFor(stop = {}) {
     const names = (components.missingPrerequisites || []).map((ref) => String(ref).split(":").pop());
     if (names.length) return `${names.join(", ")} bu konunun temeli; o yüzden önce onlar, bu konu sonra.`;
     return REASON_TEXT.PREREQUISITE;
+  }
+  if (reasonCode === "FINISH_TOPIC") {
+    const left = Number(stop.cost?.questions) || 0;
+    return questions > 0
+      ? `Bu konuda ${questions} soru çözdün; ${left} soru daha ile konu oturur.`
+      : REASON_TEXT.FINISH_TOPIC;
   }
   if (reasonCode === "WEEKLY_REVIEW") {
     const topics = components.weeklyTopics || stop.weeklyTopics || [];

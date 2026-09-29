@@ -17,6 +17,7 @@ const IMPACT_BY_REASON = Object.freeze({
   WEEKLY_REVIEW: "Haftayı kalıcı yapma",
   DAILY_HABIT: "Günlük rutin",
   TARGET_KEEP: "Hedefi koruma",
+  FINISH_TOPIC: "Yarım konuyu kapatma",
 });
 
 const SIGNAL_LABELS = Object.freeze({
@@ -32,6 +33,7 @@ const SIGNAL_LABELS = Object.freeze({
   WEEKLY_REVIEW: "hafta tekrarı",
   DAILY_HABIT: "rutin",
   TARGET_KEEP: "hedef koruma",
+  FINISH_TOPIC: "yarım konu",
 });
 
 function round(value, digits = 1) {

@@ -15,6 +15,9 @@ const LOOKBACK_WEEKS = 4;
 // edilen hedefe kadar. Rota ogrenciyi oldugu yerde tutan "kibar antrenor"
 // olmasin; ama tek seferde hedefe atlatip da kirmasin.
 export const STRETCH = 1.15;
+// Veri azken hedefin bu payina yaslanilir (hedefin tamami degil: beyan
+// genelde iyimser).
+const GOAL_FLOOR_SHARE = 0.6;
 // Bos hafta temposu SIFIRLAMAZ, duzenliligi olcer: 4 haftanin 2'si bos
 // ise plan aktif haftalarin temposunun %62'sine iner (0.25 + 0.75 * 2/4).
 const consistencyFactor = (observed, total) => 0.25 + 0.75 * (observed / Math.max(1, total));
@@ -71,7 +74,19 @@ export function estimateWeeklyCapacity(
     b.days.add(dateKey(when));
   }
 
-  const weeks = [...buckets.values()];
+  // Kayitlarin basladigi haftadan ONCEKI haftalar sayilmaz: uygulamayi bir
+  // haftadir kullanan ogrenciye "3 hafta bos biraktin" duzenlilik cezasi
+  // veriliyordu (hedefi gunde 80 olan kullaniciya haftada 39 soru).
+  const firstWeek = logs.reduce((min, log) => {
+    const raw = log.study_date || log.studyDate;
+    if (!raw) return min;
+    const wk = startOfWeekTR(new Date(raw));
+    return !min || wk < min ? wk : min;
+  }, null);
+  const weeks = [...buckets.entries()]
+    .filter(([key]) => !firstWeek || key >= firstWeek)
+    .map(([, week]) => week);
+  if (!weeks.length) return fallbackCapacity(dailyQuestionGoal);
   const observedWeeks = weeks.filter((week) => week.q > 0 || week.m > 0).length;
   if (observedWeeks === 0) return fallbackCapacity(dailyQuestionGoal);
 
@@ -94,7 +109,15 @@ export function estimateWeeklyCapacity(
 
   // Hedefe dogru esnet; hedefin ustunde calisan ogrenciyi yavaslatma.
   const goalQ = Math.max(20, Math.round((Number(dailyQuestionGoal) || 20) * 7));
-  const plannedQ = observedQ >= goalQ ? observedQ : Math.min(goalQ, Math.round(observedQ * STRETCH));
+  const stretchedQ = observedQ >= goalQ ? observedQ : Math.min(goalQ, Math.round(observedQ * STRETCH));
+  // Az veride plan beyan edilen hedefe yaslanir: ilk haftalar alisma
+  // donemi, tek haftanin temposu kisinin gercek temposu degil. 3 gozlenen
+  // haftada tamamen olculen tempo.
+  const trust = Math.min(1, observedWeeks / 3);
+  const goalFloor = Math.round(goalQ * GOAL_FLOOR_SHARE);
+  const plannedQ = stretchedQ >= goalFloor || trust >= 1
+    ? stretchedQ
+    : Math.round(trust * stretchedQ + (1 - trust) * goalFloor);
   const stretch = observedQ > 0 ? plannedQ / observedQ : 1;
 
   return {

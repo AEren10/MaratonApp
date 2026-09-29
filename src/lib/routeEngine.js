@@ -12,6 +12,7 @@ import { missingPrerequisites } from "../domain/route/prerequisites.js";
 import { wrongBoost, wrongReviewQuestions, WRONG_REVIEW_MIN_DUE } from "../domain/route/wrongSignal.js";
 import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
 import { topicShares } from "../domain/route/topicShares.js";
+import { effectiveAccuracy } from "../domain/route/effectiveAccuracy.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -91,9 +92,13 @@ export function buildRoute({
       if (!name) continue;
       totalCount += 1;
 
-      const tp = prog[name] || {};
-      const q = tp.total_questions || 0;
-      const acc = q > 0 ? Math.round(((tp.correct_count || 0) / q) * 100) : 0;
+      const rawTp = prog[name] || {};
+      const q = rawTp.total_questions || 0;
+      const feel = topicFeel?.[subject.key]?.[name];
+      // Dogru sayisi girilmemisse dogruluk "bilinmiyor" (effectiveAccuracy);
+      // maliyet, ustalik ve hafiza bu etkin degerle hesaplanir.
+      const { acc, known: accuracyKnown } = effectiveAccuracy({ q, correct: rawTp.correct_count, feel });
+      const tp = accuracyKnown || q <= 0 ? rawTp : { ...rawTp, correct_count: Math.round((q * acc) / 100) };
       const neglectedDays = tp.last_studied_at
         ? Math.max(0, Math.round((now - new Date(tp.last_studied_at)) / 86400000))
         : 0;
@@ -118,7 +123,7 @@ export function buildRoute({
         examType === "lgs" ? "LGS" : "TYT",
         { pace, feel: topicFeel?.[subject.key]?.[name] },
       );
-      const topicHasAccuracyGap = hasTopicAccuracyGap({ q, acc });
+      const topicHasAccuracyGap = accuracyKnown && hasTopicAccuracyGap({ q, acc });
 
       const wrongs = wrongsByTopic?.[subject.key]?.[name] || null;
 
@@ -211,8 +216,13 @@ export function buildRoute({
       if ((weakFactor || 1) >= 1.15 || (weakFactor == null && weakSet.has(subject.key)) || topicHasAccuracyGap) {
         reasonCodes.push("LOW_ACCURACY");
       }
+      // Baslanmis ama bitmemis konu: zayiflik sinyalinden sonra, digerlerinden once.
+      if (q >= 10) reasonCodes.push("FINISH_TOPIC");
       if (neglectedDays >= 14) reasonCodes.push("NEGLECTED");
-      if (cost.yield >= 0.5) reasonCodes.push("HIGH_EXAM_WEIGHT");
+      // Gercek siklikla neredeyse her konunun getirisi 0.5'i asiyor; etiket
+      // yalniz dersin ortalamasindan belirgin cok soru getiren konuya.
+      if (topicShare >= equalShare * 1.5) reasonCodes.push("HIGH_EXAM_WEIGHT");
+
       if (unpreparedBefore > 0) reasonCodes.push("PREREQUISITE");
       if (!reasonCodes.length) reasonCodes.push("ROUTE_COMMITMENT");
       items.push({

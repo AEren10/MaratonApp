@@ -10,7 +10,8 @@ test("bos haftalar tempoyu sifirlamaz, duzenlilik carpani olur; mevcut kismi haf
     { study_date: "2026-09-08T12:00:00+03:00", question_count: 900, duration_minutes: 900 },
   ], 80, now);
 
-  // aktif hafta 700 x duzenlilik (0.25 + 0.75 * 1/4) = 306, %15 esnetme = 352 (hedef 560)
+  // aktif hafta 700 x duzenlilik (0.25 + 0.75 * 1/4) = 306, %15 esnetme = 352;
+  // 352 hedef tabaninin (560 * 0.6 = 336) ustunde: hedefe yaslanma gerekmez
   assert.equal(result.observedQuestionsPerWeek, 306);
   assert.equal(result.questionsPerWeek, 352);
   assert.equal(result.weeksObserved, 1);
@@ -44,4 +45,16 @@ test("hedefin altindaki ogrenci kademeli esnetilir, hedefin ustundeki yavaslatil
   assert.equal(fast.questionsPerWeek, 900);
   const near = estimateWeeklyCapacity(weekLogs(540), 80, now);
   assert.equal(near.questionsPerWeek, 560);
+});
+
+test("yeni kullanici: kayitlardan onceki haftalar bos sayilmaz, az veride hedefe yaslanir", () => {
+  const now = new Date("2026-09-30T12:00:00+03:00");
+  const logs = [
+    { study_date: "2026-09-23", question_count: 38, duration_minutes: 45 },
+    { study_date: "2026-09-27", question_count: 39, duration_minutes: 63 },
+  ];
+  const c = estimateWeeklyCapacity(logs, 80, now);
+  assert.equal(c.observedQuestionsPerWeek, 77); // duzenlilik cezasi yok
+  // guven 1/3: 1/3 * 89 + 2/3 * 336 = 254
+  assert.equal(c.questionsPerWeek, 254);
 });
