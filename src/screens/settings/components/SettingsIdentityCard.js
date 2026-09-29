@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Avatar, Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Press } from "../../../components/design/Press";
 
+// Kutusuz kimlik satiri: avatar + ad + meta, altinda ince ayirici.
 export function SettingsIdentityCard({
   displayName,
   examLabel,
@@ -29,10 +30,10 @@ export function SettingsIdentityCard({
         accessibilityRole="button"
         accessibilityLabel={`${displayName || "Profil"}, profili düzenle`}
         style={[
-          styles.card,
+          styles.row,
           {
-            backgroundColor: C.surface,
-            borderColor: C.border,
+            borderBottomWidth: 1,
+            borderBottomColor: C.line,
           },
         ]}
       >
@@ -65,16 +66,12 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: GUTTER,
     marginTop: STEP.s2,
-    marginBottom: STEP.s1,
   },
-  card: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: STEP.s3,
-    paddingVertical: STEP.s2 + 2,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    minHeight: 68,
+    paddingVertical: STEP.s3,
+    minHeight: CONTROL.tapMin + 12,
   },
   info: {
     flex: 1,

@@ -6,14 +6,8 @@ import { Press } from "../../../components/design/Press";
 
 /**
  * Tasarimin ayar satiri: etiket + (alt aciklama) + sagda deger + chevron.
- *
- * Eski hali her satira ayri renkli bir ikon kutusu koyuyordu (C.blue,
- * C.teal, C.amber...). Bu renkler ders paletinin takma adlari; "Sifre
- * Degistir" bir ders degil, dolayisiyla ders rengiyle boyanmaz (AGENTS.md).
- * `icon` prop'u geriye donuk uyumluluk icin kabul ediliyor ama artik
- * cizilmiyor -- cagri yerlerini tek tek degistirmeye gerek kalmasin.
- *
- * `danger`: yikici aksiyon (cikis yap / hesabi sil).
+ * Kutusuz, zeminde duran satir. Satirlar arasinda 1px C.line ayirici.
+ * Dokunma alani ve satir yuksekligi en az 48-52px.
  */
 export function SettingsRow({
   label, hint, value, toggle, onToggle, onPress, disabled, danger, first,
@@ -57,12 +51,13 @@ export function SettingsRow({
     </View>
   );
 
-  const border = first ? null : { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line };
+  const border = first ? null : { borderTopWidth: 1, borderTopColor: C.line };
 
   if (toggle || !onPress) return <View style={[styles.wrapper, border]}>{content}</View>;
 
   return (
-    <Press haptic="none"
+    <Press
+      haptic="none"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={hint ? `${label}, ${hint}` : label}
@@ -74,7 +69,15 @@ export function SettingsRow({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { paddingHorizontal: STEP.s3, justifyContent: "center", minHeight: CONTROL.tapMin + 12 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 },
+  wrapper: {
+    justifyContent: "center",
+    minHeight: CONTROL.tapMin + 8,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    paddingVertical: STEP.s2,
+  },
   body: { flex: 1, minWidth: 0 },
 });
