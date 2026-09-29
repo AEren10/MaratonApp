@@ -42,7 +42,7 @@ import { useKnownTopicsMap } from "../lib/topicCompletion";
 import { habitWeeklyLoad } from "../domain/route/habits";
 import { useRouteHabits } from "./useRouteHabits";
 import { useClassSchedule } from "./useClassSchedule";
-import { studyWeekdays } from "../domain/program/classSchedule";
+import { studyWeekdays, isScheduleDefined } from "../domain/program/classSchedule";
 import { useForecastTarget } from "./useForecastTarget";
 import { weekdayRhythm } from "../domain/program/weekdayRhythm";
 import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
@@ -283,6 +283,17 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // Gunluk rutinlerin haftalik yuku: rota butcesinden dusulur.
   const { habits, settled: habitsSettled } = useRouteHabits();
   const { schedule } = useClassSchedule();
+  // Ders programi tanimliysa plan onun dakikasini ve gun sayisini asmaz.
+  const scheduleLimit = useMemo(() => {
+    if (!isScheduleDefined(schedule)) return null;
+    const days = (schedule || []).filter((d) => d.kind === "study");
+    if (!days.length) return null;
+    const withMin = days.filter((d) => Number(d.minutes) > 0);
+    const avg = withMin.length ? withMin.reduce((n, d) => n + Number(d.minutes), 0) / withMin.length : 0;
+    const minutesPerWeek = withMin.length ? Math.round(days.reduce((n, d) => n + (Number(d.minutes) > 0 ? Number(d.minutes) : avg), 0)) : 0;
+    return { minutesPerWeek, studyDays: days.length };
+  }, [schedule]);
+
   const habitLoad = useMemo(
     () => (habits.length ? habitWeeklyLoad(habits, studyWeekdays(schedule).length) : null),
     [habits, schedule],
@@ -323,13 +334,14 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     wrongsHash,
     targetReached ? "keep" : "",
     habitLoad ? habitLoad.questionsPerWeek : "",
+    scheduleLimit ? `${scheduleLimit.minutesPerWeek}/${scheduleLimit.studyDays}` : "",
     knownHash,
     goals?.weeklyMinutes || "",
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    todayKey, recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, goals?.weeklyMinutes, targetReached, habitLoad, knownHash, weekLogs, topicRows,
+    todayKey, scheduleLimit, recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, goals?.weeklyMinutes, targetReached, habitLoad, knownHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -347,11 +359,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     knownTopics,
     subjectDrops,
     weeklyMinutesGoal: goals?.weeklyMinutes || 0,
+    scheduleLimit,
     now: new Date(`${todayKey}T12:00:00+03:00`),
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [goals?.weeklyMinutes, subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [scheduleLimit, goals?.weeklyMinutes, subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   // BU HAFTA SABIT (domain/route/frozenWeek): hafta sunucuya bir kez

@@ -68,3 +68,14 @@ test("haftalik sure hedefi plani sinirlar; gozlenen tempo ustundeyse kesilmez", 
   const over = estimateWeeklyCapacity(weekLogs(300, 600), 80, now, { weeklyMinutesGoal: 420 });
   assert.equal(over.minutesPerWeek, 600);
 });
+
+test("ders programi (2 gun x 60 dk) haftalik plani sinirlar; oturum boyu gun sayisina gore", async () => {
+  const { buildRoute } = await import("../../../src/lib/routeEngine.js");
+  const pool = [{ key: "matematik", label: "Matematik", questionCount: 40, topics: ["Kümeler", "Olasılık", "Fonksiyonlar", "Üçgenler"] }];
+  const r = buildRoute({ pool, daysLeft: 200, dailyQuestionGoal: 80, now: new Date("2026-09-28T12:00:00+03:00"),
+    scheduleLimit: { minutesPerWeek: 120, studyDays: 2 } });
+  assert.equal(r.capacity.minutesPerWeek, 120);
+  assert.equal(r.capacity.activeDaysPerWeek, 2);
+  const planned = r.weeks[0].stops.filter((s) => !s.isReview).reduce((n, s) => n + s.cost.minutes, 0);
+  assert.ok(planned <= 120, `planlanan ${planned} dk`);
+});

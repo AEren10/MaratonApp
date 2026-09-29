@@ -50,6 +50,7 @@ export function buildRoute({
   knownTopics = {},          // { ders: { konu: "YYYY-MM-DD"|null } } ogrencinin "hallettim" tikleri
   subjectDrops = {},         // { ders: dusus } son denemede taze dusus (trialWeakness.subjectNetDrops)
   weeklyMinutesGoal = 0,     // ogrencinin haftalik sure hedefi (plan bunu asmaz)
+  scheduleLimit = null,      // { minutesPerWeek, studyDays } ders programindan (tanimliysa)
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
   targetReached = false,     // son net hedefte: hedefi koruma modu
@@ -60,7 +61,17 @@ export function buildRoute({
   );
   // Gunluk rutin (paragraf, problem...) rota butcesinin ICINDE: haftalik
   // yuku dusulur, yoksa ogrenci rutin + tam rota ile asiri yuklenir.
-  const ramped = rampedCapacity(baseCapacity, pausedWeeks);
+  // Ders programi tanimliysa haftalik dakika ve calisma gunu ondan: 2 gun x
+  // 60 dk isaretleyen ogrenciye 4-5 saatlik gunler dusuyordu.
+  const scheduled0 = rampedCapacity(baseCapacity, pausedWeeks);
+  const ramped = scheduleLimit ? {
+    ...scheduled0,
+    minutesPerWeek: scheduleLimit.minutesPerWeek > 0
+      ? Math.min(scheduled0.minutesPerWeek, scheduleLimit.minutesPerWeek)
+      : scheduled0.minutesPerWeek,
+    activeDaysPerWeek: scheduleLimit.studyDays > 0 ? scheduleLimit.studyDays : scheduled0.activeDaysPerWeek,
+    scheduleCapped: true,
+  } : scheduled0;
   // Dusum en fazla butcenin yarisi: dusuk hedefli ogrencide iki rutin
   // rotayi haftada 10 soruya dusuruyordu.
   const habitQ = Math.min(Number(habitLoad?.questionsPerWeek) || 0, ramped.questionsPerWeek * 0.5);
