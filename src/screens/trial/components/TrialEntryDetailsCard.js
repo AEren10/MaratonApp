@@ -1,52 +1,75 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { useC } from "../../../contexts/ThemeContext";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { TrialEntryDatePicker } from "./TrialEntryDatePicker";
+import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
-
-const HIT = { top: 3, bottom: 3 };
+import { useC } from "../../../contexts/ThemeContext";
+import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { TrialEntryDatePicker } from "./TrialEntryDatePicker";
 
 export function TrialEntryDetailsCard({ form, styles: shared }) {
   const C = useC();
-  const well = [styles.well, { backgroundColor: C.void, borderColor: C.border }];
   const dateLabel = form.trialDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
+
   return (
     <View style={shared.panel}>
+      {/* DENEME ADI */}
       <View style={styles.row}>
-        <Text style={[shared.label, styles.key]}>DENEME ADI</Text>
-        <TextInput accessibilityLabel="Deneme adı" value={form.title} onChangeText={form.handleTitleChange}
-          placeholder="Deneme adı" placeholderTextColor={C.text3} maxLength={40}
-          style={[TYPOGRAPHY.inputTable, well, styles.input, { color: C.text }]} />
+        <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>DENEME ADI</Text>
+        <TextInput
+          accessibilityLabel="Deneme adı"
+          value={form.title}
+          onChangeText={form.handleTitleChange}
+          placeholder="İsteğe bağlı"
+          placeholderTextColor={C.text3}
+          maxLength={40}
+          style={[TYPOGRAPHY.bodyMedium, styles.titleInput, { color: C.text }]}
+        />
       </View>
+
       <View style={[styles.divider, { backgroundColor: C.line }]} />
-      <View style={styles.row}>
-        <Text style={[shared.label, styles.key]}>TARİH</Text>
-        <Press haptic="none" onPress={() => form.setShowDatePicker((open) => !open)} hitSlop={HIT} style={well}
-          accessibilityRole="button" accessibilityLabel={`Tarih: ${dateLabel}`}
-          accessibilityState={{ expanded: form.showDatePicker }}>
-          <Text style={[TYPOGRAPHY.tableName, { color: C.text }]}>{dateLabel}</Text>
-        </Press>
-      </View>
+
+      {/* TARİH */}
+      <Press
+        haptic="tap"
+        onPress={() => form.setShowDatePicker((open) => !open)}
+        accessibilityRole="button"
+        accessibilityLabel={`Tarih: ${dateLabel}`}
+        accessibilityState={{ expanded: form.showDatePicker }}
+        style={styles.row}
+      >
+        <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>TARİH</Text>
+        <View style={styles.valueRow}>
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{dateLabel}</Text>
+          <Icon name={form.showDatePicker ? "chevDown" : "chevR"} size={12} color={C.text5} />
+        </View>
+      </Press>
+
       {form.showDatePicker ? (
-        <TrialEntryDatePicker recentDays={form.recentDays} trialDate={form.trialDate}
-          onChangeDate={form.handleDateChange} />
+        <TrialEntryDatePicker
+          recentDays={form.recentDays}
+          trialDate={form.trialDate}
+          onChangeDate={form.handleDateChange}
+        />
       ) : null}
+
       <View style={[styles.divider, { backgroundColor: C.line }]} />
+
+      {/* SÜRE */}
       <View style={styles.row}>
-        <Text style={[shared.label, styles.key]}>SÜRE</Text>
-        <View style={[well, styles.durationWell]}>
+        <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>SÜRE</Text>
+        <View style={[styles.numberBox, { backgroundColor: C.void, borderColor: C.border }]}>
           <TextInput
             accessibilityLabel="Deneme süresi dakika"
             keyboardType="number-pad"
             value={form.durationMinutes}
             onChangeText={form.handleDurationChange}
-            placeholder="—"
+            placeholder="0"
             placeholderTextColor={C.text3}
             maxLength={3}
-            style={[TYPOGRAPHY.tableName, styles.durationInput, { color: C.text }]}
+            selectTextOnFocus
+            style={[TYPOGRAPHY.inputStat, styles.numberInput, { color: C.text }]}
           />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>dk</Text>
+          <Text style={[TYPOGRAPHY.bodyMedium, styles.suffix, { color: C.text3 }]}>dk</Text>
         </View>
       </View>
     </View>
@@ -54,17 +77,50 @@ export function TrialEntryDetailsCard({ form, styles: shared }) {
 }
 
 const styles = StyleSheet.create({
-  panel: {
-    flexDirection: "row", alignItems: "center", padding: STEP.s3,
-    borderRadius: SHAPE.panel, borderWidth: 1,
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: STEP.s2,
+    minHeight: CONTROL.buttonPrimary,
+    paddingVertical: STEP.s1 / 2,
   },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 2 },
-  key: { flex: 1 },
-  well: {
-    height: 38, paddingHorizontal: STEP.s2 + 2, borderRadius: SHAPE.button, borderWidth: 1, justifyContent: "center",
+  label: {
+    flex: 1,
+    letterSpacing: 1.8,
   },
-  input: { minWidth: 140, maxWidth: 190, paddingVertical: 0 },
-  durationWell: { flexDirection: "row", alignItems: "center", gap: 6 },
-  durationInput: { minWidth: 34, padding: 0, textAlign: "right" },
-  divider: { height: 1, marginVertical: STEP.s2 + 4 },
+  titleInput: {
+    minWidth: 140,
+    maxWidth: "60%",
+    textAlign: "right",
+    paddingVertical: STEP.s1 - STEP.s1,
+  },
+  valueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1,
+  },
+  numberBox: {
+    height: CONTROL.buttonTertiary,
+    minWidth: 80,
+    borderRadius: SHAPE.chip + 2,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: STEP.s1,
+  },
+  numberInput: {
+    paddingVertical: STEP.s1 - STEP.s1,
+    textAlign: "center",
+    minWidth: 36,
+    fontVariant: ["tabular-nums"],
+  },
+  suffix: {
+    marginLeft: STEP.s1 / 4,
+  },
+  divider: {
+    height: 1,
+    marginVertical: STEP.s1,
+  },
 });
