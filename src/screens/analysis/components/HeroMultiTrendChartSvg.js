@@ -36,16 +36,28 @@ export const HeroMultiTrendChartSvg = React.memo(function HeroMultiTrendChartSvg
     const vMax = Math.ceil(Math.max(...all.map((p) => p.v)) + 3);
     const innerW = W - PAD_L - PAD_R;
     const innerH = H - PAD_T - PAD_B;
-    const xOf = (t) => (tMax === tMin ? PAD_L + innerW / 2 : PAD_L + ((t - tMin) / (tMax - tMin)) * innerW);
     const yOf = (v) => PAD_T + (1 - (v - vMin) / (vMax - vMin || 1)) * innerH;
     const grid = [0, 1, 2, 3].map((i) => ({
       y: PAD_T + (i / 3) * innerH,
       val: Math.round(vMax - (i / 3) * (vMax - vMin)),
     }));
-    const lines = series.map((s) => ({
-      ...s,
-      pts: s.points.map((p) => ({ x: xOf(p.t), y: yOf(p.v) })),
-    }));
+    const isSingleTime = tMax === tMin;
+    const lines = series.map((s) => {
+      const count = s.points.length;
+      const pts = s.points.map((p, idx) => {
+        const x = isSingleTime
+          ? (count > 1 ? PAD_L + (idx / (count - 1)) * innerW : PAD_L + innerW / 2)
+          : PAD_L + ((p.t - tMin) / (tMax - tMin)) * innerW;
+        return { x, y: yOf(p.v) };
+      });
+      for (let i = 1; i < pts.length; i++) {
+        if (pts[i].x <= pts[i - 1].x) {
+          const minStep = Math.min(24, innerW / (count - 1 || 1));
+          pts[i].x = Math.min(W - PAD_R, pts[i - 1].x + minStep);
+        }
+      }
+      return { ...s, pts };
+    });
     return { grid, lines, left: dateLabel(tMin), right: dateLabel(tMax) };
   }, [series]);
 
@@ -78,13 +90,22 @@ export const HeroMultiTrendChartSvg = React.memo(function HeroMultiTrendChartSvg
         </React.Fragment>
       ))}
 
-      <SvgText x={PAD_L} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600">
-        {layout.left}
-      </SvgText>
-      <SvgText x={W - PAD_R} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2}
-        fontFamily="Archivo_600" textAnchor="end">
-        {layout.right}
-      </SvgText>
+      {layout.left === layout.right ? (
+        <SvgText x={W / 2} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2}
+          fontFamily="Archivo_600" textAnchor="middle">
+          {layout.left}
+        </SvgText>
+      ) : (
+        <>
+          <SvgText x={PAD_L} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2} fontFamily="Archivo_600">
+            {layout.left}
+          </SvgText>
+          <SvgText x={W - PAD_R} y={H - 8} fill={C.text4} fontSize={11} fontWeight="600" letterSpacing={1.2}
+            fontFamily="Archivo_600" textAnchor="end">
+            {layout.right}
+          </SvgText>
+        </>
+      )}
     </Svg>
   );
 });

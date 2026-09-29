@@ -23,8 +23,17 @@ export function buildMonthNets(trials = [], range, subjectMeta = {}) {
 
   const type = primaryType(inMonth);
   const list = inMonth
-    .filter((t) => t.trialType === type)
-    .sort((a, b) => trialKey(a).localeCompare(trialKey(b)));
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .filter(({ trial: t }) => t.trialType === type)
+    .sort((a, b) => {
+      const cmp = trialKey(a.trial).localeCompare(trialKey(b.trial));
+      if (cmp !== 0) return cmp;
+      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : 0;
+      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : 0;
+      if (timeA !== timeB) return timeA - timeB;
+      return b.orderIndex - a.orderIndex;
+    })
+    .map(({ trial }) => trial);
   const average = mean(list.map(netOf));
   const heroValue = Math.floor(average);
 
@@ -85,9 +94,17 @@ function primaryType(list) {
 
 export function trialNamesLabel(trials = [], range, limit = 2) {
   return trials
-    .filter((t) => inRange(trialKey(t), range.start, range.end) && t.name)
-    .sort((a, b) => trialKey(a).localeCompare(trialKey(b)))
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .filter(({ trial: t }) => inRange(trialKey(t), range.start, range.end) && t.name)
+    .sort((a, b) => {
+      const cmp = trialKey(a.trial).localeCompare(trialKey(b.trial));
+      if (cmp !== 0) return cmp;
+      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : 0;
+      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : 0;
+      if (timeA !== timeB) return timeA - timeB;
+      return b.orderIndex - a.orderIndex;
+    })
     .slice(0, limit)
-    .map((t) => t.name)
+    .map(({ trial: t }) => t.name)
     .join(" · ");
 }

@@ -52,7 +52,13 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
     };
   }
 
-  const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = [...filtered].sort((a, b) => {
+    const diff = new Date(b.date) - new Date(a.date);
+    if (diff !== 0) return diff;
+    const timeA = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt).getTime() : 0;
+    const timeB = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt).getTime() : 0;
+    return timeB - timeA;
+  });
   const latest = sorted[0];
   const previous = sorted[1];
   const net = latest.totalNet || 0;
@@ -99,14 +105,22 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
   const heroLine = heroSlice.slice().reverse().map((trial) => trial.totalNet || 0);
   // "Tumu"de TYT ve AYT ayni grafikte iki cizgi (kullanici istegi, 28 Eylul).
   // Tarihleri farkli oldugu icin noktalar zaman eksenine yerlesir.
-  const typeSeries = (type) => sorted
-    // AYT denemeleri AYT_SAY / AYT_EA / AYT_SOZ olarak kaydediliyor; tam
-    // esitlik AYT cizgisini cogu kullanicida hic cizmiyordu.
-    .filter((trial) => (type === "AYT" ? String(trial.trialType || "").startsWith("AYT") : trial.trialType === type))
-    .slice(0, 12)
-    .reverse()
-    .map((trial) => ({ t: new Date(trial.date).getTime(), v: trial.totalNet || 0 }))
-    .filter((point) => Number.isFinite(point.t));
+  const typeSeries = (type) => {
+    let lastT = -Infinity;
+    return sorted
+      // AYT denemeleri AYT_SAY / AYT_EA / AYT_SOZ olarak kaydediliyor; tam
+      // esitlik AYT cizgisini cogu kullanicida hic cizmiyordu.
+      .filter((trial) => (type === "AYT" ? String(trial.trialType || "").startsWith("AYT") : trial.trialType === type))
+      .slice(0, 12)
+      .reverse()
+      .map((trial) => {
+        let t = new Date(trial.created_at || trial.createdAt || trial.date).getTime();
+        if (!Number.isFinite(t)) t = 0;
+        if (t <= lastT) t = lastT + 60000;
+        lastT = t;
+        return { t, v: trial.totalNet || 0 };
+      });
+  };
   const heroSeries = filter === "ALL"
     ? ["TYT", "AYT"].map((type) => ({ key: type, points: typeSeries(type) })).filter((series) => series.points.length)
     : [];

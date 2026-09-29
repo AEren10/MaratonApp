@@ -73,7 +73,13 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
   const exam = new Date(examDate);
   if (!Number.isFinite(exam.getTime())) return null;
   const sameType = dominantTrialGroup(trials, expectedType)
-    .sort((a, b) => a.__date - b.__date).slice(-5);
+    .sort((a, b) => {
+      const diff = a.__date - b.__date;
+      if (diff !== 0) return diff;
+      const timeA = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt).getTime() : (Number(a.id) > 1e9 ? Number(a.id) : 0);
+      const timeB = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt).getTime() : (Number(b.id) > 1e9 ? Number(b.id) : 0);
+      return timeA - timeB;
+    }).slice(-5);
   if (sameType.length < 3) return null;
   const firstDate = sameType[0].__date;
   const points = sameType.map((trial) => ({
@@ -159,9 +165,17 @@ export function forecastNet(trials, examDate, maxNet = null, expectedType = null
 export function forecastBySubject(trials, examDate) {
   const exam = new Date(examDate);
   if (!Number.isFinite(exam.getTime())) return [];
-  const sorted = [...(trials || [])].sort(
-    (a, b) => new Date(a.date) - new Date(b.date),
-  );
+  const sorted = (trials || [])
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .sort((a, b) => {
+      const diff = new Date(a.trial.date) - new Date(b.trial.date);
+      if (diff !== 0) return diff;
+      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
+      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
+      if (timeA !== timeB) return timeA - timeB;
+      return b.orderIndex - a.orderIndex;
+    })
+    .map(({ trial }) => trial);
   if (sorted.length < 2) return [];
   const firstDate = new Date(sorted[0].date);
   const map = {};

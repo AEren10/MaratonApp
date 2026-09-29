@@ -24,7 +24,17 @@ function examLabel(examType, examDate) {
 
 function lastTrialOf(trials) {
   if (!trials?.length) return null;
-  const sorted = [...trials].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = (trials || [])
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .sort((a, b) => {
+      const diff = new Date(b.trial.date) - new Date(a.trial.date);
+      if (diff !== 0) return diff;
+      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
+      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
+      if (timeA !== timeB) return timeB - timeA;
+      return a.orderIndex - b.orderIndex;
+    })
+    .map(({ trial }) => trial);
   const latest = sorted[0];
   const net = Number(latest?.totalNet ?? latest?.total_net);
   if (!Number.isFinite(net)) return null;

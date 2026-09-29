@@ -28,7 +28,13 @@ const trialSlice = createSlice({
       const trial = normalizeTrial(action.payload);
       if (!state.trials.some((t) => t.id === trial.id)) {
         state.trials.push(trial);
-        state.trials.sort((a, b) => new Date(b.date) - new Date(a.date));
+        state.trials.sort((a, b) => {
+          const diff = new Date(b.date) - new Date(a.date);
+          if (diff !== 0) return diff;
+          const timeA = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt).getTime() : 0;
+          const timeB = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt).getTime() : 0;
+          return timeB - timeA;
+        });
       }
     },
   },

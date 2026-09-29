@@ -64,7 +64,18 @@ function examPool(pool, types = []) {
 }
 
 function latestNetOf(trials = []) {
-  const latest = [...trials].sort((a, b) => String(b?.date || b?.trial_date || "").localeCompare(String(a?.date || a?.trial_date || "")))[0];
+  const latest = [...trials]
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .sort((a, b) => {
+      const dateA = String(a.trial?.date || a.trial?.trial_date || "");
+      const dateB = String(b.trial?.date || b.trial?.trial_date || "");
+      const dateCmp = dateB.localeCompare(dateA);
+      if (dateCmp !== 0) return dateCmp;
+      const timeA = a.trial?.created_at || a.trial?.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial?.id) > 1e9 ? Number(a.trial.id) : 0);
+      const timeB = b.trial?.created_at || b.trial?.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial?.id) > 1e9 ? Number(b.trial.id) : 0);
+      if (timeA !== timeB) return timeA - timeB;
+      return a.orderIndex - b.orderIndex;
+    })[0]?.trial || null;
   // Tahminle ayni olcek: normalize net (varsa).
   const net = Number(latest?.normalizedTotalNet ?? latest?.totalNet ?? latest?.total_net);
   return Number.isFinite(net) ? net : null;

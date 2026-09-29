@@ -32,8 +32,18 @@ export function useTrialSummary({ trial, C }) {
     const sameType = (trials || []).filter((t) => t.trialType === trial.trialType
       && (trial.trialType !== "BRANCH" || t.branchSubject === trial.branchSubject));
     const stored = sameType.find((t) => isSameEntry(t, trial)) || trial;
-    const others = sameType.filter((t) => t !== stored && !isSameEntry(t, trial))
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    const others = sameType
+      .map((t, index) => ({ trial: t, orderIndex: index }))
+      .filter(({ trial: t }) => t !== stored && !isSameEntry(t, trial))
+      .sort((a, b) => {
+        const diff = new Date(a.trial.date) - new Date(b.trial.date);
+        if (diff !== 0) return diff;
+        const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
+        const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
+        if (timeA !== timeB) return timeA - timeB;
+        return b.orderIndex - a.orderIndex;
+      })
+      .map(({ trial: t }) => t);
     const prev = others[others.length - 1] || null;
     const net = netOf(trial);
     const delta = prev ? net - netOf(prev) : null;

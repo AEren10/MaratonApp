@@ -100,7 +100,17 @@ export function useTrialRecords() {
   const requestFullHistory = useCallback(() => openHistoryGate(), [openHistoryGate]);
 
   const { sections, lockedCount, totalCount } = useMemo(() => {
-    const sorted = [...trials].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const sorted = (trials || [])
+      .map((t, index) => ({ trial: t, orderIndex: index }))
+      .sort((a, b) => {
+        const diff = new Date(a.trial.date) - new Date(b.trial.date);
+        if (diff !== 0) return diff;
+        const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
+        const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
+        if (timeA !== timeB) return timeA - timeB;
+        return b.orderIndex - a.orderIndex;
+      })
+      .map(({ trial }) => trial);
 
     // Delta: ayni tur icindeki bir onceki denemeye gore net farki.
     const lastNetByType = {};
@@ -114,7 +124,13 @@ export function useTrialRecords() {
 
     const filtered = withDelta
       .filter((t) => matchesTypeFilter(t, filter))
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+      .sort((a, b) => {
+        const diff = new Date(b.date) - new Date(a.date);
+        if (diff !== 0) return diff;
+        const timeA = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt).getTime() : (Number(a.id) > 1e9 ? Number(a.id) : 0);
+        const timeB = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt).getTime() : (Number(b.id) > 1e9 ? Number(b.id) : 0);
+        return timeB - timeA;
+      });
 
     const cutoff = Date.now() - FREE_WINDOW_DAYS * 86400000;
     const visible = canAccessHistory

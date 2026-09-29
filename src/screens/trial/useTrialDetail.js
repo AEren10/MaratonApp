@@ -36,7 +36,17 @@ export function useTrialDetail({ latest, trials, C }) {
   const subjects = useMemo(() => getSubjectsForTrial(latest, C), [latest, C]);
 
   const sorted = useMemo(
-    () => [...trials].sort((a, b) => new Date(b.date) - new Date(a.date)),
+    () => (trials || [])
+      .map((t, index) => ({ trial: t, orderIndex: index }))
+      .sort((a, b) => {
+        const diff = new Date(b.trial.date) - new Date(a.trial.date);
+        if (diff !== 0) return diff;
+        const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
+        const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
+        if (timeA !== timeB) return timeB - timeA;
+        return a.orderIndex - b.orderIndex;
+      })
+      .map(({ trial }) => trial),
     [trials],
   );
 

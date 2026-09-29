@@ -21,6 +21,7 @@ export const getTrials = async (userId) => {
       .select("*, trial_subjects(*)")
       .eq("user_id", userId)
       .order("trial_date", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(30);
     if (error) throw error;
     return (data || []).map(normalizeTrial);

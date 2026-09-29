@@ -9,10 +9,25 @@ const avg = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
 
 export function subjectAnalysis(trials = [], subjectKey) {
   const rows = (trials || [])
-    .filter((t) => t?.subjects?.[subjectKey])
-    .map((t) => ({ date: t.date || t.trial_date, type: t.trialType, ...t.subjects[subjectKey] }))
+    .map((t, index) => ({ trial: t, orderIndex: index }))
+    .filter(({ trial: t }) => t?.subjects?.[subjectKey])
+    .map(({ trial: t, orderIndex }) => ({
+      date: t.date || t.trial_date,
+      createdAt: t.created_at || t.createdAt || null,
+      orderIndex,
+      type: t.trialType,
+      ...t.subjects[subjectKey],
+    }))
     .filter((r) => r.date)
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    .sort((a, b) => {
+      const dateCmp = String(a.date).localeCompare(String(b.date));
+      if (dateCmp !== 0) return dateCmp;
+      if (a.createdAt && b.createdAt) {
+        const timeCmp = String(a.createdAt).localeCompare(String(b.createdAt));
+        if (timeCmp !== 0) return timeCmp;
+      }
+      return b.orderIndex - a.orderIndex;
+    });
   if (!rows.length) return { count: 0 };
 
   const nets = rows.map((r) => Number(r.net) || 0);
@@ -33,9 +48,18 @@ export function subjectAnalysis(trials = [], subjectKey) {
   const lossFromEmpty = totals.empty;
   const leak = all === 0 ? null : lossFromWrong >= lossFromEmpty ? "wrong" : "empty";
 
+  let lastT = -Infinity;
+  const points = rows.map((r) => {
+    let t = r.createdAt ? new Date(r.createdAt).getTime() : new Date(r.date).getTime();
+    if (!Number.isFinite(t)) t = 0;
+    if (t <= lastT) t = lastT + 60000;
+    lastT = t;
+    return { t, v: Number(r.net) || 0 };
+  });
+
   return {
     count: rows.length,
-    points: rows.map((r) => ({ t: new Date(r.date).getTime(), v: Number(r.net) || 0 })),
+    points,
     last: round1(last),
     delta: prev == null ? null : round1(last - prev),
     best: round1(Math.max(...nets)),
