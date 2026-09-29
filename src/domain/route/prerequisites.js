@@ -27,7 +27,7 @@ const TYT_MAT = {
   "Problemler (Yüzde)": [...PROBLEM_BASE, "Oran - Orantı"],
   "Problemler (Kar-Zarar)": ["Problemler (Yüzde)"],
   "Problemler (Hız)": [...PROBLEM_BASE, "Oran - Orantı"],
-  "Problemler (İşçi-Havuz)": [...PROBLEM_BASE, "Oran - Orantı"],
+  "Problemler (İşçi)": [...PROBLEM_BASE, "Oran - Orantı"],
   "Problemler (Yaş)": PROBLEM_BASE,
   "Problemler (Sayı)": PROBLEM_BASE,
   "Olasılık": ["Permütasyon - Kombinasyon"],
@@ -60,15 +60,11 @@ const AYT_MAT = {
   "İntegral (Belirli)": ["İntegral (Belirsiz)"],
   "İntegral (Alan-Hacim)": ["İntegral (Belirli)"],
   "Analitik Geometri (Çember)": ["Analitik Geometri (Doğru)"],
-  "Analitik Geometri (Konikler)": ["Analitik Geometri (Çember)"],
-  "Determinant": ["Matrisler"],
-  "Özel Tanımlı Fonksiyonlar": ["Fonksiyonlar"],
 };
 
 // EA matematik mufredatinda sayisala ozgu konular yok.
 const SAY_ONLY = new Set([
   "Trigonometri (Toplam-Fark)", "Türev (Maks-Min Problemleri)", "İntegral (Alan-Hacim)",
-  "Analitik Geometri (Konikler)", "Özel Tanımlı Fonksiyonlar",
 ]);
 const AYT_EA_MAT = Object.fromEntries(Object.entries(AYT_MAT).filter(([topic]) => !SAY_ONLY.has(topic)));
 
