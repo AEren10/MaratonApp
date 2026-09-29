@@ -7,13 +7,13 @@ import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { useStatsOverview } from "../../../hooks/useStatsOverview";
-import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { fmtHours, fmtInt } from "../../stats/statsFormat";
 import * as H from "../../../lib/haptics";
 
 // Profilde temel istatistik: uc sayi. Ayrinti Istatistiklerim ekraninda.
-// "Yilin rotasi" 14 aktif gune kadar bos bir kart gosteriyordu; bu kart ilk
-// kayittan itibaren dolu.
+// Kutusuz (kullanici, 29 Eylul): her seyi kaba almak sayfayi agirlastiriyordu;
+// sayilar zeminde durur, bolum basligindaki "Tümü" ayrintiya goturur.
 export const ProfileStatsCard = memo(function ProfileStatsCard() {
   const C = useC();
   const navigation = useNavigation();
@@ -26,41 +26,34 @@ export const ProfileStatsCard = memo(function ProfileStatsCard() {
   ];
 
   return (
-    <View style={s.wrap}>
-      <Text style={[TYPOGRAPHY.tableHead, s.head, { color: C.text2 }]}>İSTATİSTİKLER</Text>
-      <Press
-        haptic="none"
-        accessibilityRole="button"
-        accessibilityLabel="Tüm istatistikler"
-        onPress={() => { H.tap(); navigation.navigate(SCREENS.STATS); }}
-        style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}
-      >
-        <View style={s.row}>
-          {cells.map((c) => (
-            <View key={c.label} style={s.cell}>
-              <Text style={[TYPOGRAPHY.statSmall, s.num, { color: C.text }]} numberOfLines={1}>{c.value}</Text>
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{c.label}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={[s.foot, { borderTopColor: C.line }]}>
-          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Tüm istatistikler</Text>
-          <Icon name="chevR" size={16} color={C.text3} />
-        </View>
-      </Press>
-    </View>
+    <Press
+      haptic="none"
+      accessibilityRole="button"
+      accessibilityLabel="Tüm istatistikler"
+      onPress={() => { H.tap(); navigation.navigate(SCREENS.STATS); }}
+      style={s.wrap}
+    >
+      <View style={s.head}>
+        <Text style={[TYPOGRAPHY.tableHead, s.flex, { color: C.text2 }]}>İSTATİSTİKLER</Text>
+        <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>Tümü</Text>
+        <Icon name="chevR" size={14} color={C.text3} />
+      </View>
+      <View style={s.row}>
+        {cells.map((c) => (
+          <View key={c.label} style={s.cell}>
+            <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]} numberOfLines={1}>{c.value}</Text>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{c.label}</Text>
+          </View>
+        ))}
+      </View>
+    </Press>
   );
 });
 
 const s = StyleSheet.create({
   wrap: { marginHorizontal: GUTTER, marginTop: STEP.s4 },
-  head: { marginBottom: STEP.s2 },
-  card: { borderWidth: 1, borderRadius: SHAPE.panel, paddingHorizontal: STEP.s3, paddingTop: STEP.s3 },
+  head: { flexDirection: "row", alignItems: "center", gap: 2, marginBottom: STEP.s2, minHeight: 24 },
+  flex: { flex: 1 },
   row: { flexDirection: "row", gap: STEP.s2 },
   cell: { flex: 1 },
-  num: { fontVariant: ["tabular-nums"] },
-  foot: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    borderTopWidth: 1, marginTop: STEP.s3, minHeight: 44,
-  },
 });

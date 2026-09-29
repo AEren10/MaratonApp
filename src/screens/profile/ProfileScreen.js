@@ -1,4 +1,4 @@
-import { Platform, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import { ProfileTopBar } from "./components/ProfileTopBar";
 import { ProfileHero } from "./components/ProfileHero";
 import { TargetDepartmentCard } from "./components/TargetDepartmentCard";
 import { ProfileStatsCard } from "./components/ProfileStatsCard";
+import { ProfileShareTiles } from "./components/ProfileShareTiles";
 import { StrengthMap } from "./components/StrengthMap";
 import { ProfileLinkRow } from "./components/ProfileLinkRow";
 import { LevelRow } from "./components/LevelRow";
@@ -63,30 +64,28 @@ export default function ProfileScreen() {
             <Animated.View>
               <LevelRow level={level?.level} xpInLevel={level?.xpInLevel} xpForNext={level?.xpForNext} />
             </Animated.View>
-            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
-              <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
-            </Animated.View>
-
-            {/* Ilerleme: veri yoksa ikisi de kendi bos halini gosterir. */}
+            {/* Istatistik ligden once ve kutusuz (kullanici, 29 Eylul). */}
             <Animated.View>
               <ProfileStatsCard />
+            </Animated.View>
+            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
+              <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
             </Animated.View>
             <Animated.View>
               <StrengthMap strengths={strengths} />
             </Animated.View>
+            <ProfileShareTiles />
 
             {/* "Yol kunyesi" kutulari (soru, saat, en uzun seri) kalkti; ayni
                 bilgi Calisma gecmisi satirinda, yalniz sifir degilse. */}
             <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
-              <ProfileLinkRow
-                label="Yanlış defteri"
-                onPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK)}
-                first
-              />
+              {/* Yanlis defteri ana sayfada ve Analiz'de; hikaye ve widget
+                  listeden cikip ustte kutucuk oldu. Liste hafifledi. */}
               <ProfileLinkRow
                 label="Çalışma geçmişi"
                 meta={studyMeta(careerStats)}
                 onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
+                first
               />
               <ProfileLinkRow
                 label="Gruplarım"
@@ -102,18 +101,6 @@ export default function ProfileScreen() {
                 label="Arkadaşını davet et"
                 onPress={() => navigation.navigate(SCREENS.REFERRAL)}
               />
-              <ProfileLinkRow
-                label="Hikâyende paylaş"
-                meta="Haftanı arkadaşların görsün"
-                onPress={() => navigation.navigate(SCREENS.SHARE_CARD)}
-              />
-              {Platform.OS === "ios" ? (
-                <ProfileLinkRow
-                  label="Ana ekrana widget ekle"
-                  meta="Açmadan gör"
-                  onPress={() => navigation.navigate(SCREENS.WIDGET_GUIDE)}
-                />
-              ) : null}
               {PREMIUM_ENABLED ? (
                 <ProfileLinkRow
                   label="Premium"
