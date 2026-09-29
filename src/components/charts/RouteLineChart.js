@@ -26,7 +26,7 @@ const H = CHART_H;
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
 export const RouteLineChart = memo(function RouteLineChart({
   stops = [], todayIndex, projection = [], band, target, ticks, height = H,
-  todayLabel, endLabel, axisLabels, xs = null,
+  todayLabel, endLabel, axisLabels, xs = null, mode = null,
 }) {
   const C = useC();
   const safeStops = Array.isArray(stops) ? stops : [];
@@ -76,8 +76,9 @@ export const RouteLineChart = memo(function RouteLineChart({
   const endPoint = futurePoints[futurePoints.length - 1] || todayPoint;
 
   const summary = useMemo(
-    () => buildChartSummary({ values, projection: safeProj, target }),
-    [values.join(","), safeProj.join(","), target],
+    // Hedefe giden kesikli uc tahmin degil; ekran okuyucu onu tahmin diye okumasin.
+    () => buildChartSummary({ values, projection: mode === "target" ? [] : safeProj, target }),
+    [values.join(","), safeProj.join(","), target, mode],
   );
 
   return (

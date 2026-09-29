@@ -5,13 +5,14 @@ import { RouteLineChart } from "../../../components/charts/RouteLineChart";
 import { useC } from "../../../contexts/ThemeContext";
 import { makeScale } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CHART_H, CHART_W, scaleOptions } from "../../../components/charts/chartStyle";
 
 import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
 // RouteLineChart'in tuval olcusu ve olcek kurali (tek ortak olcek).
-const W = 390;
-const H = 250;
-const PAD = 20;
+// Etiketler RouteLineChart'in KENDI olcegiyle (scaleOptions) konumlanir;
+// ayri pad/yukseklik yazilinca BUGUN ve HEDEF dugumden birkac px kayiyordu.
+const W = CHART_W;
 const TAG_W = 96;
 
 function makeTicks(min, max, count = 4) {
@@ -30,10 +31,10 @@ function makeTicks(min, max, count = 4) {
 // Rota Detay grafigi: paylasilan RouteLineChart + tasarimin etiketleri
 // (NET, HEDEF, BUGUN, SINAV GUNU · N, sinav tarihi). Etiket konumu grafigin
 // kendi olceginden hesaplanir; tuval genislige oturtulur ki ikisi ortussun.
-export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
+export function RouteDetailChart({ chart, target, examDateTag }) {
   const C = useC();
   const [width, setWidth] = useState(0);
-  const H = height;
+  const H = CHART_H;
   const k = width / W;
   const hasTarget = Number.isFinite(target);
 
@@ -47,11 +48,10 @@ export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
     const values = stops.map((p) => (typeof p === "number" ? p : p?.y ?? 0));
     const allValues = [...values, ...projection, ...(hasTarget ? [target] : [])];
     const total = values.length + projection.length;
-    const sc = makeScale(allValues, {
-      width: W, height: H, padTop: PAD, padBottom: PAD,
-    });
-    const stepX = total > 1 ? W / (total - 1) : 0;
+    // Bolunmus eksen (netChartData.routeXs) grafikle ayni olcekten.
+    const sc = makeScale(allValues, { ...scaleOptions({ hasAxis: false }), xs: chart?.xs || null });
     const last = Math.max(0, values.length - 1);
+    const [todayPoint] = sc.toPoints([values[last]], { count: total, offset: last });
     const endValue = projection.length ? projection[projection.length - 1] : null;
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
@@ -59,12 +59,12 @@ export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
     const ticks = tickVals.map((v) => ({ val: v, y: sc.toY(v) }));
 
     return {
-      today: { x: total > 1 ? last * stepX : W / 2, y: sc.toY(values[last]) ?? H / 2 },
+      today: { x: todayPoint?.x ?? W / 2, y: todayPoint?.y ?? H / 2 },
       end: endValue != null ? { y: sc.toY(endValue) } : null,
       targetY: hasTarget ? sc.toY(target) : null,
       ticks,
     };
-  }, [stops, projection, hasTarget, target, H]);
+  }, [stops, projection, hasTarget, target, H, chart?.xs]);
 
   if (!stops.length) {
     return <RouteEmptyChart examDateTag={examDateTag} target={target} />;
@@ -79,6 +79,8 @@ export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
           todayIndex={chart?.todayIndex}
           projection={projection}
           band={chart?.band}
+          xs={chart?.xs}
+          mode={chart?.mode}
           target={hasTarget ? target : undefined}
           ticks={pos.ticks}
           height={H * k}
@@ -113,7 +115,7 @@ export function RouteDetailChart({ chart, target, examDateTag, height = 250 }) {
               top: (pos.end ? pos.end.y * k : H * k / 2) + STEP.s2, color: C.text2,
             }]}
           >
-            {chart?.projectedNet != null ? `SINAV GÜNÜ · ${chart.projectedNet}` : "TAHMİN YOK"}
+            {chart?.projectedNet != null ? `SINAV GÜNÜ · ${chart.projectedNet}` : chart?.mode === "target" ? "" : "TAHMİN YOK"}
           </Text>
           {examDateTag ? (
             <Text style={[...tag, s.right, s.bottom, { color: C.text3 }]}>{examDateTag}</Text>

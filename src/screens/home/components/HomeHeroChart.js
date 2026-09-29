@@ -48,6 +48,7 @@ export function HomeHeroChart({ hasAccess, data, declared, declaredAxis, target,
       endLabel={data.endLabel}
       axisLabels={data.axisLabels}
       xs={data.xs}
+      mode={data.mode}
       target={target}
       height={height}
     />

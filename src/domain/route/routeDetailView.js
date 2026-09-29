@@ -25,7 +25,7 @@ export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [], 
     todayIndex: netChart.todayIndex,
     projection: netChart.projection,
     band: netChart.band || null,
-    projectedNet: projected,
+    projectedNet: netChart.projectedNet,
     xs: netChart.xs,
     mode: netChart.mode,
   } : points.length ? {
