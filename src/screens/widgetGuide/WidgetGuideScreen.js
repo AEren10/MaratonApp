@@ -9,6 +9,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { DISCOVER_TIPS, useDiscoverTips } from "../../hooks/useDiscoverTips";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { GuideSteps } from "./components/GuideSteps";
+import { WidgetMiniPreview } from "./components/WidgetMiniPreview";
 import { HOME_STEPS, LOCK_STEPS, WIDGETS } from "./widgetGuideContent";
 
 // "Ana ekranina ekle" rehberi. Widget'lar uygulamada hic anilmiyordu;
@@ -41,19 +42,27 @@ export default function WidgetGuideScreen() {
 
         <View style={s.list}>
           <SectionLabel>WIDGET'LAR</SectionLabel>
-          {WIDGETS.map((w, i) => (
-            <View key={w.key} style={[s.row, i > 0 && { borderTopWidth: 1, borderTopColor: C.line }]}>
-              <View style={s.rowText}>
-                <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{w.name}</Text>
-                <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{w.line}</Text>
-              </View>
-              {w.lock ? (
-                <View style={[s.chip, { borderColor: C.border }]}>
-                  <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>Kilit ekranı</Text>
+          <View style={s.cardStack}>
+            {WIDGETS.map((w) => (
+              <View
+                key={w.key}
+                style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}
+              >
+                <WidgetMiniPreview widgetKey={w.key} C={C} />
+                <View style={s.cardContent}>
+                  <View style={s.cardHeader}>
+                    <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{w.name}</Text>
+                    {w.lock ? (
+                      <View style={[s.chip, { borderColor: C.line, backgroundColor: C.void }]}>
+                        <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Kilit ekranı</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{w.line}</Text>
                 </View>
-              ) : null}
-            </View>
-          ))}
+              </View>
+            ))}
+          </View>
         </View>
 
         <Text style={[TYPOGRAPHY.meta, s.note, { color: C.text3 }]}>
@@ -69,9 +78,18 @@ const s = StyleSheet.create({
   header: { paddingHorizontal: GUTTER, height: CONTROL.tapMin, justifyContent: "center" },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 },
   lead: { marginTop: STEP.s1 },
-  list: { marginTop: STEP.s4, gap: STEP.s1 },
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2 },
-  rowText: { flex: 1, gap: 2 },
-  chip: { borderWidth: 1, borderRadius: SHAPE.chip, paddingHorizontal: STEP.s1, paddingVertical: 4 },
+  list: { marginTop: STEP.s4, gap: STEP.s2 },
+  cardStack: { gap: STEP.s2 },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    padding: STEP.s2,
+    borderRadius: SHAPE.cardTight,
+    borderWidth: 1,
+  },
+  cardContent: { flex: 1, gap: 4 },
+  cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: STEP.s1 },
+  chip: { borderWidth: 1, borderRadius: SHAPE.chip, paddingHorizontal: STEP.s1, paddingVertical: 2 },
   note: { marginTop: STEP.s3 },
 });
