@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { buildRoute, thresholdGap, computeDebt, capDebt, distributeDebt, debtInWeeks } from "../lib/routeEngine";
+import { buildRoute, thresholdGap, distributeDebt } from "../lib/routeEngine";
 import { usePlanContext } from "./usePlanContext";
 import { useExam } from "../contexts/ExamContext";
 import { getSubjectsForExam, TYT_DERSLER } from "../data/curriculum";
@@ -29,6 +29,9 @@ import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
+import { overdueStops } from "../domain/route/overdueStops";
+
+const MIN_PER_QUESTION = 1.5;
 
 let _lastRouteCache = {
   key: "",
@@ -590,21 +593,22 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     goals?.dailyQuestions, hasRouteAccess, pastWeeks, progressByKey,
     recoveryWeek, resolvedExamType, user?.id, weakSubjectKeys, weekLogs]);
 
-  // Borç: geçmiş haftaların planı ile gerçekleşeni karşılaştır.
+  // Borç: bitmiş haftaların kapanmamış durakları. Haftalık toplamdan değil,
+  // kullanıcının gerçekten açık kalan route stop'larından türetilir.
   const debt = useMemo(() => {
-    const actualByWeek = {};
-    for (const log of weekLogs || []) {
-      const raw = log.study_date || log.studyDate;
-      if (!raw) continue;
-      const wk = startOfWeekTR(new Date(raw));
-      if (!actualByWeek[wk]) actualByWeek[wk] = { questions: 0 };
-      actualByWeek[wk].questions += Number(log.question_count ?? log.questionCount ?? 0) || 0;
-    }
-    const thisWeek = startOfWeekTR(new Date());
-    // Sadece BİTMİŞ haftalar borç üretir; içinde bulunulan hafta henüz açık.
-    const finished = pastWeeks.filter((w) => w.weekStart < thisWeek);
-    return capDebt(computeDebt(finished, actualByWeek), route.capacity);
-  }, [route.capacity, weekLogs, pastWeeks]);
+    const overdue = overdueStops({
+      stops: persistedStops,
+      logs: weekLogs,
+      thisMonday: startOfWeekTR(new Date()),
+      minutesPerWeek: route.capacity?.minutesPerWeek || 0,
+    });
+    const totalQuestions = Math.round((overdue.totalMinutes || 0) / MIN_PER_QUESTION);
+    return {
+      ...overdue,
+      totalQuestions,
+      hasDebt: (overdue.totalMinutes || 0) > 0,
+    };
+  }, [route.capacity?.minutesPerWeek, weekLogs, persistedStops]);
 
   const pause = useCallback(async () => {
     if (!user?.id) return;
@@ -722,7 +726,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     createRoute,
     threshold,
     debt,
-    debtWeeks: debtInWeeks(debt.totalQuestions, route.capacity),
+    debtWeeks: debt.weeks,
     // Ara verme / dondurma — tasarım AKIŞ 2.
     isPaused,
     // Donma ani. Deger zaten routeState'te vardi ama disa verilmiyordu;

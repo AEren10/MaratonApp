@@ -4,7 +4,7 @@ import test from "node:test";
 import { buildRouteDebtSummary } from "../../src/domain/route/routeDebtSummary.js";
 
 test("returns null when there is no route debt", () => {
-  assert.equal(buildRouteDebtSummary({ debt: { hasDebt: false, totalQuestions: 0 } }), null);
+  assert.equal(buildRouteDebtSummary({ debt: { hasDebt: false, totalMinutes: 0 } }), null);
 });
 
 test("summarizes capped debt without shaming the user", () => {
@@ -12,7 +12,6 @@ test("summarizes capped debt without shaming the user", () => {
     debt: {
       capped: true,
       hasDebt: true,
-      originalQuestions: 600,
       totalMinutes: 600,
       totalQuestions: 300,
     },
@@ -24,5 +23,23 @@ test("summarizes capped debt without shaming the user", () => {
   assert.equal(summary.uncovered, 120);
   assert.equal(summary.stats[0].value, "~10 sa");
   assert.match(summary.body, /ceza gibi büyütmez/);
-  assert.match(summary.body, /600 sorudan 300 soruya/);
+  assert.match(summary.body, /haftalık kapasiteye/);
+});
+
+test("uses stop-based overdue debt shape from useStudyRoute", () => {
+  const summary = buildRouteDebtSummary({
+    debt: {
+      capped: false,
+      hasDebt: true,
+      items: [{ key: "mat|fonksiyon" }],
+      totalMinutes: 90,
+      totalQuestions: 60,
+      weeks: 0.5,
+    },
+    debtWeeks: 0.5,
+  });
+
+  assert.equal(summary.stats[0].value, "~2 sa");
+  assert.equal(summary.stats[1].value, "0.5 hafta");
+  assert.equal(summary.stats[2].value, "bekliyor");
 });

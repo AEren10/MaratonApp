@@ -10,12 +10,12 @@ function formatWeeks(value = 0) {
 }
 
 export function buildRouteDebtSummary({ debt = null, debtPlan = null, debtWeeks = 0 } = {}) {
-  if (!debt?.hasDebt || debt.totalQuestions <= 0) return null;
-  const effort = formatMinutes(debt.totalMinutes) || `${debt.totalQuestions} soru`;
+  if (!debt?.hasDebt || debt.totalMinutes <= 0) return null;
+  const effort = formatMinutes(debt.totalMinutes) || `${debt.totalQuestions || 0} soru`;
   const uncovered = Math.max(0, Math.round(Number(debtPlan?.uncovered) || 0));
   const assigned = Math.max(0, Math.round(Number(debtPlan?.assigned) || 0));
   const cappedText = debt.capped
-    ? ` Eski borç ${debt.originalQuestions} sorudan ${debt.totalQuestions} soruya tavanlandı.`
+    ? ` Eski borç haftalık kapasiteye tavanlandı.`
     : "";
   const uncoveredText = uncovered > 0
     ? ` ${uncovered} soru kapasiteyi aşmamak için açıkta tutuldu.`

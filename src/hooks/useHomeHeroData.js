@@ -219,10 +219,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     weeklyEffort,
     todayIndex,
     stopCounts,
-    // Tasarim borcu SAAT gosteriyor: "12 sa borc". computeDebt artik
-    // kacirilan sorunun dakika karsiligini haftanin plannedMinutes oraniyla
-    // turetiyor; dakika yoksa 0 gelir ve serit borcu hic gostermez —
-    // uydurma bir soru/saat orani kullanilmaz.
+    // Tasarim borcu SAAT gosteriyor: "12 sa borc". Kaynak haftalik toplam
+    // degil, overdueStops'un buldugu tamamlanmamis route duraklari.
     debtHours: debt?.totalMinutes ? Math.round(debt.totalMinutes / 60) : 0,
     // Rota kac gundur donuk. pausedAt yoksa null kalir, cumle sayisiz yazilir.
     frozenDays: pausedAt
