@@ -8,21 +8,33 @@ import { emitRouteUpdated } from "../lib/routeEvents";
 import { captureError } from "../lib/errorReporting";
 
 // Gunluk rutinler -- tek kopya (ana sayfa, gunun plani, Program ve rota
-// ayni listeyi gorur). Sunucu otoritedir: kaydetme sunucuya yazilinca
-// kabul edilir; basarisizsa eski liste geri gelir.
+// ayni listeyi gorur). Sunucu otoritedir.
+// - loaded: sunucudan basariyla okundu. Duzenleme YALNIZ bundan sonra;
+//   okunmadan kaydetmek sunucudaki listeyi ezerdi.
+// - settled: okuma denendi ve bitti (hata dahil). Rota kaydi bunu bekler;
+//   kalici bir hata rotanin hic kaydedilmemesine yol acmasin.
+// - Hata sonrasi bir sonraki mount'ta yeniden denenir.
+// - Kullanici degisirse eski kullanicinin yaniti atilir.
 const EMPTY = [];
-const store = { userId: null, saved: [], loaded: false, loading: false };
+const store = { userId: null, saved: EMPTY, loaded: false, settled: false, inflightFor: null };
 const listeners = new Set();
-const emit = () => listeners.forEach((l) => l());
 let snapshot = { ...store };
-const setStore = (patch) => { Object.assign(store, patch); snapshot = { ...store }; emit(); };
+const setStore = (patch) => { Object.assign(store, patch); snapshot = { ...store }; listeners.forEach((l) => l()); };
 
 function load(userId) {
-  if (!userId || store.loading || (store.loaded && store.userId === userId)) return;
-  setStore({ userId, loading: true, ...(store.userId !== userId ? { saved: [], loaded: false } : {}) });
+  if (!userId) return;
+  if (store.userId !== userId) setStore({ userId, saved: EMPTY, loaded: false, settled: false });
+  if (store.loaded || store.inflightFor === userId) return;
+  setStore({ inflightFor: userId });
   getRouteHabits(userId)
-    .then((saved) => setStore({ saved, loaded: true, loading: false }))
-    .catch(() => setStore({ loaded: true, loading: false }));
+    .then((saved) => {
+      if (store.userId !== userId) return;
+      setStore({ saved, loaded: true, settled: true, inflightFor: null });
+    })
+    .catch(() => {
+      if (store.userId !== userId) return;
+      setStore({ settled: true, inflightFor: null });
+    });
 }
 
 export function useRouteHabits() {
@@ -36,6 +48,7 @@ export function useRouteHabits() {
   useEffect(() => { load(user?.id); }, [user?.id]);
 
   const save = useCallback(async (next) => {
+    if (!store.loaded || store.userId !== user?.id) return false;
     const prev = store.saved;
     setStore({ saved: next });
     try {
@@ -44,7 +57,7 @@ export function useRouteHabits() {
       return true;
     } catch (e) {
       captureError(e, { context: "route_habits_save" });
-      setStore({ saved: prev });
+      if (store.userId === user?.id) setStore({ saved: prev });
       return false;
     }
   }, [user?.id]);
@@ -56,6 +69,7 @@ export function useRouteHabits() {
     saved,
     habits,
     loaded: sameUser && state.loaded,
+    settled: sameUser && state.settled,
     save,
   };
 }

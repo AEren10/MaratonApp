@@ -20,7 +20,7 @@ export default function RouteHabitsScreen() {
   const navigation = useNavigation();
   const showAlert = useAlert();
   const { examType } = useExam();
-  const { saved, save } = useRouteHabits();
+  const { saved, save, loaded } = useRouteHabits();
   const presets = presetsForExam(examType);
 
   const commit = useCallback(async (next) => {
@@ -52,7 +52,10 @@ export default function RouteHabitsScreen() {
           Her gün çözmek istediğin türleri seç. Rota bunları her çalışma gününün başına ekler; haftalık
           yükü buna göre hafifletir. Problem rutini her gün en zayıf olduğun problem türünü verir.
         </Text>
-        <View style={s.list}>
+        {!loaded ? (
+          <Text style={[TYPOGRAPHY.meta, s.list, { color: C.text3 }]}>Rutinlerin yükleniyor…</Text>
+        ) : null}
+        <View style={[s.list, !loaded && s.locked]} pointerEvents={loaded ? "auto" : "none"}>
           {presets.map((preset, i) => {
             const current = saved.find((h) => h.key === preset.key);
             return (
@@ -80,4 +83,5 @@ const s = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingHorizontal: GUTTER, paddingVertical: STEP.s2 },
   scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 },
   list: { marginTop: STEP.s3 },
+  locked: { opacity: 0.5 },
 });

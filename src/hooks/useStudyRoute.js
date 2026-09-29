@@ -217,7 +217,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // Bu ayrim olmadan Rota ekrani yuklenirken 'Yol buradan basliyor' bosunu basiyordu.
   const [stopsLoaded, setStopsLoaded] = useState(false);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
-  const { wrongsByTopic, wrongsHash } = useRouteWrongSignal(user?.id, routeLoadTick);
+  const { wrongsByTopic, wrongsHash, wrongsSettled } = useRouteWrongSignal(user?.id, routeLoadTick);
   // Gun ritmi: gun dagitiminin girdisi, tum ekranlar ayni degeri okur.
   useEffect(() => {
     setWeekdayRhythm(weekdayRhythm(weekLogs || [], toDateKey(startOfWeekTR(new Date()))));
@@ -272,7 +272,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   }, [forecastCandidate, forecastTargetNet]);
 
   // Gunluk rutinlerin haftalik yuku: rota butcesinden dusulur.
-  const { habits } = useRouteHabits();
+  const { habits, settled: habitsSettled } = useRouteHabits();
   const { schedule } = useClassSchedule();
   const habitLoad = useMemo(
     () => (habits.length ? habitWeeklyLoad(habits, studyWeekdays(schedule).length) : null),
@@ -471,6 +471,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   useEffect(() => {
     if (!persist || !user?.id || user.id === "dev" || !hasRouteAccess || isPaused) return;
     if (!computedRoute.weeks?.length) return;
+    // Girdiler gelmeden yazma: her acilista once rutinsiz/yanlissiz, sonra
+    // tam rota olmak uzere birden cok revizyon yaziliyordu.
+    if (!stopsLoaded || !habitsSettled || !wrongsSettled) return;
     const persistence = routePersistenceDecision({
       mode: "auto",
       routeCreated,
@@ -484,7 +487,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
         captureError(error, { context: "route_auto_persist", examType: resolvedExamType });
       });
   }, [persist, user?.id, resolvedExamType, hasRouteAccess, isPaused,
-    computedRoute.weeks, computedRoute.revision, routeCreated, routeRevisionPreview]);
+    computedRoute.weeks, computedRoute.revision, routeCreated, routeRevisionPreview,
+    stopsLoaded, habitsSettled, wrongsSettled]);
 
   const createRoute = useCallback(async (options = {}) => {
     if (!hasRouteAccess) {
