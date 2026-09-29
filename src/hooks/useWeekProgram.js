@@ -25,13 +25,33 @@ function weekRangeLabel(start) {
 // plan motoruna ozgu oldugu icin haftalik geriye donuk hesaplanamiyor —
 // bu yuzden hero metrik "aktif gun" ve "soru/dakika" gibi dogrulanabilir
 // degerlere dayanir.
-export function useWeekProgram() {
+export function useWeekProgram({ initialOffset = 0 } = {}) {
   const { user } = useAuth();
   const todayKey = todayTR();
-  const weekStart = useMemo(() => startOfWeek(), [todayKey]);
+  const [weekOffset, setWeekOffset] = useState(initialOffset);
+
+  const weekStart = useMemo(() => {
+    const base = startOfWeek();
+    if (weekOffset === 0) return base;
+    const d = new Date(base);
+    d.setDate(d.getDate() + weekOffset * 7);
+    return d;
+  }, [todayKey, weekOffset]);
+
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(todayKey);
+  const [selectedDate, setSelectedDate] = useState(() => (weekOffset === 0 ? todayKey : dateKey(weekStart)));
+
+  useEffect(() => {
+    if (weekOffset === 0) {
+      setSelectedDate(todayKey);
+    } else {
+      setSelectedDate(dateKey(weekStart));
+    }
+  }, [weekOffset, weekStart, todayKey]);
+
+  const prevWeek = useCallback(() => setWeekOffset((o) => o - 1), []);
+  const nextWeek = useCallback(() => setWeekOffset((o) => o + 1), []);
 
   const load = useCallback(() => {
     if (!user?.id || user.id === "dev") { setLoading(false); return Promise.resolve(); }
@@ -97,6 +117,10 @@ export function useWeekProgram() {
     setSelectedDate,
     selectedDay,
     selectedDayLogs,
+    weekOffset,
+    setWeekOffset,
+    prevWeek,
+    nextWeek,
     refresh: load,
   };
 }
