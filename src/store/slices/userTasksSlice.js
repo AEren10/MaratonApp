@@ -63,11 +63,13 @@ export default userTasksSlice.reducer;
 
 const EMPTY = [];
 
-export const selectUserTasks = (state) => {
-  const today = todayStr();
-  if (state.userTasks.day !== today) return EMPTY;
-  return state.userTasks.tasks.filter((t) => t.subject !== "__calendar");
-};
+// Memolu: her cagrida yeni dizi donduruyordu; Redux uyariyor ve listeyi
+// okuyan her ekran her state degisiminde yeniden ciziliyordu.
+const selectVisibleTasks = createSelector(
+  [(state) => state.userTasks.tasks],
+  (tasks) => tasks.filter((t) => t.subject !== "__calendar"),
+);
+export const selectUserTasks = (state) => (state.userTasks.day !== todayStr() ? EMPTY : selectVisibleTasks(state));
 
 export const selectUserTasksProgress = createSelector(
   selectUserTasks,
