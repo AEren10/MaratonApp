@@ -54,9 +54,13 @@ function reasonMessage(reason) {
     not_found: "Grup bulunamadı",
     not_member: "Bu gruba erişimin yok",
     not_admin: "Bu işlem için grup yöneticisi olmalısın",
+    invalid_new_admin: "Yeni yönetici seçilemedi",
+    already_admin: "Seçilen kişi zaten yönetici",
     admin_cannot_leave: "Grup yöneticisi gruptan ayrılamaz",
     cannot_remove_self: "Kendini gruptan çıkaramazsın",
     cannot_remove_admin: "Grup yöneticisi çıkarılamaz",
+    cannot_transfer_to_self: "Yöneticiliği kendine devredemezsin",
+    new_admin_not_member: "Yeni yönetici grubun üyesi olmalı",
   }[reason];
 }
 
@@ -219,6 +223,26 @@ export async function removeGroupMember(groupId, userId) {
     }, "removeGroupMember"));
   } catch (e) {
     handleSupabaseError(e, "removeGroupMember");
+    throw e;
+  }
+}
+
+export async function transferGroupAdmin(groupId, newAdminId) {
+  try {
+    if (!groupId || !newAdminId) throw new Error("groupId and newAdminId are required");
+    const result = ensureOk(await rpc("transfer_group_admin", {
+      p_group_id: groupId,
+      p_new_admin: newAdminId,
+    }, "transferGroupAdmin"));
+    const group = result?.group ? normalizeGroup(result.group) : normalizeGroup(result);
+    return {
+      ...result,
+      group,
+      newAdminId: result?.new_admin ?? newAdminId,
+      previousAdminId: result?.previous_admin ?? null,
+    };
+  } catch (e) {
+    handleSupabaseError(e, "transferGroupAdmin");
     throw e;
   }
 }

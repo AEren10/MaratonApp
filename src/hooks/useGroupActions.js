@@ -8,6 +8,7 @@ import {
   previewGroupByCode as previewGroup,
   removeGroupMember,
   regenerateGroupCode,
+  transferGroupAdmin,
   updateGroupSettings,
 } from "../supabase/groups";
 import { captureError } from "../lib/errorReporting";
@@ -59,6 +60,10 @@ export function useGroupActions({ onDone, showAlert } = {}) {
     run(`remove:${userId}`, () => removeGroupMember(groupId, userId), "Üye çıkarıldı.")
   ), [run]);
 
+  const transferAdmin = useCallback((groupId, userId) => (
+    run(`transfer:${userId}`, () => transferGroupAdmin(groupId, userId), "Yöneticilik devredildi.")
+  ), [run]);
+
   const regenerateCode = useCallback((groupId) => (
     run("regenerateCode", () => regenerateGroupCode(groupId), "Yeni kod oluşturuldu.")
   ), [run]);
@@ -93,6 +98,8 @@ export function useGroupActions({ onDone, showAlert } = {}) {
     leave,
     leaveGroup: leave,
     removeMember,
+    transferAdmin,
+    transferGroupAdmin: transferAdmin,
     regenerateCode,
     regenerateGroupCode: regenerateCodeValue,
     updateSettings,
