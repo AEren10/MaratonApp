@@ -14,7 +14,10 @@ export function feasibilityNote({ shortfall, capacity, weeksLeft } = {}) {
   // kadar artmasi gerektigi.
   const extraPerWeek = questions / weeksLeft / NEW_TOPIC_SHARE;
   const extraPerDay = Math.max(1, Math.ceil(extraPerWeek / 7));
-  const currentPerDay = Math.round((Number(capacity?.questionsPerWeek) || 0) / 7);
+  // Rutinler kapasiteden dusulmus olarak gelir; onerilen gunluk hedef
+  // rutinleri de kapsamali, yoksa hedefe uyulsa da not kalkmaz.
+  const habitPerDay = (Number(capacity?.habitLoad?.questionsPerWeek) || 0) / 7;
+  const currentPerDay = Math.round((Number(capacity?.questionsPerWeek) || 0) / 7 + habitPerDay);
   return {
     topics,
     extraPerDay,

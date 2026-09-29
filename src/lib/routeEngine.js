@@ -57,10 +57,14 @@ export function buildRoute({
   // Gunluk rutin (paragraf, problem...) rota butcesinin ICINDE: haftalik
   // yuku dusulur, yoksa ogrenci rutin + tam rota ile asiri yuklenir.
   const ramped = rampedCapacity(baseCapacity, pausedWeeks);
-  const capacity = habitLoad?.questionsPerWeek > 0 ? {
+  // Dusum en fazla butcenin yarisi: dusuk hedefli ogrencide iki rutin
+  // rotayi haftada 10 soruya dusuruyordu.
+  const habitQ = Math.min(Number(habitLoad?.questionsPerWeek) || 0, ramped.questionsPerWeek * 0.5);
+  const habitM = Math.min(Number(habitLoad?.minutesPerWeek) || 0, ramped.minutesPerWeek * 0.5);
+  const capacity = habitQ > 0 ? {
     ...ramped,
-    questionsPerWeek: Math.max(10, ramped.questionsPerWeek - habitLoad.questionsPerWeek),
-    minutesPerWeek: Math.max(30, ramped.minutesPerWeek - (habitLoad.minutesPerWeek || 0)),
+    questionsPerWeek: Math.max(10, Math.round(ramped.questionsPerWeek - habitQ)),
+    minutesPerWeek: Math.max(30, Math.round(ramped.minutesPerWeek - habitM)),
     habitLoad,
   } : ramped;
   // Kisinin kendi hizi: durak sureleri "35 dk" dediginde gercekten 35 dk olsun.
@@ -136,7 +140,9 @@ export function buildRoute({
           items.push({
             ...entry,
             isReview: true,
-            reviewCycle: "wrongs",
+            // Her hafta ayri kimlik: sabit "wrongs" anahtari bir kez bitirilince
+            // sunucu sonraki revizyonlarda da "bitti" diye tasiyordu.
+            reviewCycle: `wrongs:${dateKey(startOfWeekTR(now))}`,
             cost: {
               questions: wq,
               minutes: Math.round(wq * (minutesPerQuestionFor(pace, subject.key, 1.2) ?? 2)),

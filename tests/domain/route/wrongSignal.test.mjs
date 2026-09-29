@@ -33,5 +33,5 @@ test("ustalasilmis konuda zamani gelen yanlislar ayri 'yanlis tekrari' duragi ol
   const wr = all.find((s) => s.reasonCodes.includes("WRONG_REVIEW"));
   assert.ok(wr);
   assert.equal(wr.topic, "Kümeler");
-  assert.equal(wr.reviewCycle, "wrongs");
+  assert.ok(wr.reviewCycle.startsWith("wrongs:"));
 });

@@ -120,3 +120,11 @@ test("yuk dakikayla dengelenir; hafta sonu cok calisan ogrencinin ritmine uyar; 
   const w = assignWeekStops([review, short("E")], null);
   assert.equal(w[6][0].topic, "Haftalık tekrar");
 });
+
+test("bos ders programi sablonunda (dakika yok) gun ritmi kullanilir", () => {
+  const empty = normalizeSchedule(null);
+  const long = (t) => ({ subject: "tyt_matematik", topic: t, cost: { minutes: 60 } });
+  const rhythm = [0.5, 0.5, 0.5, 0.5, 0.5, 2, 2];
+  const days = assignWeekStops([long("A"), long("B"), long("C"), long("D")], empty, { rhythm });
+  assert.equal(days[5].length + days[6].length >= 2, true);
+});

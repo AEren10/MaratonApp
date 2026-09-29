@@ -26,7 +26,10 @@ function subjectDays(schedule, key) {
 
 function dayCapacity(schedule, rhythm) {
   const cap = Array(7).fill(1);
-  if (Array.isArray(schedule)) {
+  // Ders programi her zaman dizi (bos sablon dahil); dakika girilmemisse
+  // program kapasite soylemiyor demektir, ritim devreye girer.
+  const scheduleMinutes = Array.isArray(schedule) && schedule.some((d) => d.kind === "study" && Number(d.minutes) > 0);
+  if (scheduleMinutes) {
     // Dakikasi girilmemis calisma gunu, girilenlerin ortalamasini alir;
     // yoksa 1 ile 180 ayni olcekte karsilasirdi.
     const set = schedule.filter((d) => d.kind === "study" && Number(d.minutes) > 0);
