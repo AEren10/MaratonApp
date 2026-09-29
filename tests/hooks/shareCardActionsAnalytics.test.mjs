@@ -23,7 +23,8 @@ test("story share success records card metadata", () => {
   assert.match(actions, /import \{ EVENTS \} from "\.\.\/constants\/analytics"/);
   assert.match(actions, /track\(EVENTS\.WRAPPED_SHARED, \{ source: "share_card", \.\.\.\(getShareMeta\?\.\(\) \|\| \{\}\) \}\)/);
   assert.match(screen, /cardId: activeCard\?\.id \|\| null, mode/);
-  assert.match(screen, /useShareCardActions\(cardRef, shareMeta\)/);
+  // Instagram'a zeminsiz kopya (stickerRef) gider.
+  assert.match(screen, /useShareCardActions\(stickerRef, shareMeta\)/);
 });
 
 test("story share uses the native Instagram Stories social key", () => {

@@ -92,6 +92,7 @@ export function useShareCards() {
               // Bu haftanın gerçekleşeni: haftalık rapordan.
               completedQuestions: report.totalQuestions || 0,
               completedStops,
+              plannedStops: currentWeekStops.length,
             }
           : null,
         nextStop: nextRouteStop

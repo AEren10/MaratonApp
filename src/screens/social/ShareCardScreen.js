@@ -38,11 +38,13 @@ export default function ShareCardScreen() {
   const activeCard = modeCards.find((c) => c.id === selectedId) || modeCards[0] || null;
   const footRight = daysUntilExam != null ? `SINAVA ${daysUntilExam} GÜN` : null;
   const cardRef = useRef(null);
+  // Instagram'a giden: zeminsiz, cercevesiz ayni kart (Strava etiketi gibi).
+  const stickerRef = useRef(null);
   const shareMeta = useMemo(
     () => () => ({ cardId: activeCard?.id || null, mode }),
     [activeCard?.id, mode],
   );
-  const { handleShare, handleSaveGallery } = useShareCardActions(cardRef, shareMeta);
+  const { handleShare } = useShareCardActions(stickerRef, shareMeta);
 
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
@@ -78,6 +80,10 @@ export default function ShareCardScreen() {
               <View style={s.cardWrap}>
                 <ShareStoryCard ref={cardRef} card={activeCard} footRight={footRight} />
               </View>
+              {/* Ekran disi, tam genislikte yakalanan seffaf etiket. */}
+              <View style={s.offscreen} pointerEvents="none">
+                <ShareStoryCard ref={stickerRef} card={activeCard} footRight={footRight} transparent />
+              </View>
             </View>
 
             <ShareModeChips cards={modeCards} selectedId={activeCard.id} onSelect={setSelectedId} />
@@ -86,17 +92,9 @@ export default function ShareCardScreen() {
               <Button onPress={handleShare} icon="share" fullWidth size="lg">
                 Paylaş
               </Button>
-              <Press haptic="none"
-                onPress={handleSaveGallery}
-                hitSlop={12}
-                accessibilityRole="button"
-                accessibilityLabel="Kartı galerine kaydet"
-                style={[s.saveRow]}
-              >
-                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>
-                  Galeriye kaydet
-                </Text>
-              </Press>
+              <Text style={[TYPOGRAPHY.meta, s.hint, { color: C.text3 }]}>
+                Yalnız veriler gider; Instagram'da istediğin fotoğrafın üstüne koy.
+              </Text>
             </View>
           </>
         )}
@@ -119,5 +117,6 @@ const makeStyles = (C) => StyleSheet.create({
   preview: { height: PREVIEW_SLOT_HEIGHT, justifyContent: "center", alignItems: "center", paddingTop: STEP.s2, paddingBottom: STEP.s2 },
   cardWrap: { width: PREVIEW_CARD_WIDTH },
   actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
-  saveRow: { alignItems: "center", justifyContent: "center", minHeight: CONTROL.tapMin },
+  hint: { textAlign: "center", marginTop: STEP.s2 },
+  offscreen: { position: "absolute", left: -10000, top: 0, width: 360 },
 });

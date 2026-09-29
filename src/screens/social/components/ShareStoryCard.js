@@ -11,8 +11,11 @@ import { StoryCardVisual } from "./StoryCardVisual";
 // Tasarim kaynagi: "Maraton Story Karti" + AKIS 12B (8 Story kartı).
 // Derinlik yuzey tonu + kenarlikla; golge YOK. Kart 9:16 story oranina
 // yakin bir govde icinde, capture icin collapsable={false}.
+// transparent: Instagram'a giden hali -- zemin, cerceve ve ust marka satiri
+// YOK, yalniz veri ve grafik (Strava etiketi gibi); Instagram'da kullanici
+// istedigi fotografin ya da zeminin ustune koyar.
 export const ShareStoryCard = forwardRef(function ShareStoryCard(
-  { card, footRight },
+  { card, footRight, transparent = false },
   ref,
 ) {
   const C = useC();
@@ -25,21 +28,16 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
     <Animated.View
       ref={ref}
       collapsable={false}
-      entering={FadeIn.duration(500)}
-      style={[styles.card, { borderColor: "#2E2A34" }]}
+      entering={transparent ? undefined : FadeIn.duration(500)}
+      style={[styles.card, transparent ? styles.bare : { borderColor: C.border }]}
     >
-      <LinearGradient
-        colors={["#221F27", "#14121A", "#1B1820"]}
-        locations={[0, 0.58, 1]}
-        style={StyleSheet.absoluteFillObject}
-      />
-
-      <View style={styles.brandRow}>
-        <View style={[styles.mark, { backgroundColor: C.brandFill }]}>
-          <Text style={[styles.markText, { color: C.accentInk }]}>m</Text>
-        </View>
-        <Text style={[styles.brand, { color: "rgba(245,242,239,0.5)" }]}>MARATON</Text>
-      </View>
+      {transparent ? null : (
+        <LinearGradient
+          colors={[C.surface, C.bg, C.surface]}
+          locations={[0, 0.58, 1]}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
 
       <View style={styles.body}>
         <Text style={[TYPOGRAPHY.label, styles.kicker, { color: C.accentBright }]}>
@@ -108,11 +106,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     overflow: "hidden",
   },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  mark: { width: 18, height: 18, borderRadius: 5, alignItems: "center", justifyContent: "center" },
-  markText: { fontFamily: "Archivo_700", fontSize: 11.5, marginBottom: 1 },
-  brand: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.8 },
+  // Ust marka satiri kalkti (altta zaten marka var): baslik onunla ust uste
+  // biniyordu.
   body: { flex: 1, justifyContent: "center" },
+  bare: { borderWidth: 0, backgroundColor: "transparent" },
   kicker: { letterSpacing: 1.6, textTransform: "uppercase" },
   hero: { marginTop: STEP.s2 },
   caption: { marginTop: STEP.s2, maxWidth: 250 },

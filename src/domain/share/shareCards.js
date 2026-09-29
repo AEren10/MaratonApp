@@ -113,22 +113,25 @@ function stopCard({ route = {} }) {
   };
 }
 
+// Haftanin rotasi DURAK uzerinden: tamamlanan / planlanan durak. Eskiden
+// haftanin TUM sorulari (her dersten 50) rotanin planli sorusuna (7)
+// bolunuyordu ve kart "%714" diyordu. Toplam soru ayri satirda.
 function weeklyRouteCard({ route = {}, week = {} }) {
-  const done = route.currentWeek?.completedQuestions || 0;
-  const planned = route.currentWeek?.plannedQuestions || 0;
-  const pct = planned > 0 ? Math.round((done / planned) * 100) : 0;
+  const doneStops = route.currentWeek?.completedStops || 0;
+  const plannedStops = route.currentWeek?.plannedStops || 0;
+  const pct = plannedStops > 0 ? Math.min(100, Math.round((doneStops / plannedStops) * 100)) : 0;
   return {
     id: SHARE_CARD_IDS.WEEKLY_ROUTE,
     title: "Haftalık rota",
     heroValue: `%${pct}`,
     heroLabel: "bu haftanın rotası",
     stats: [
-      { label: "Yapılan", value: formatNumber(done) },
-      { label: "Planlanan", value: formatNumber(planned) },
+      { label: "Durak", value: `${formatNumber(doneStops)}/${formatNumber(plannedStops)}` },
+      { label: "Soru", value: formatNumber(route.currentWeek?.completedQuestions || 0) },
       { label: "Aktif gün", value: formatNumber(week.activeDays || 0) },
     ],
     caption: null,
-    available: planned > 0,
+    available: plannedStops > 0,
   };
 }
 
