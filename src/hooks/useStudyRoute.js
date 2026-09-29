@@ -34,6 +34,9 @@ import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { useForecastTarget } from "./useForecastTarget";
+import { weekdayRhythm } from "../domain/program/weekdayRhythm";
+import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
+import { dateKey as toDateKey } from "../lib/dateUtils";
 
 const MIN_PER_QUESTION = 1.5;
 
@@ -210,6 +213,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const [stopsLoaded, setStopsLoaded] = useState(false);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
   const { wrongsByTopic, wrongsHash } = useRouteWrongSignal(user?.id, routeLoadTick);
+  // Gun ritmi: gun dagitiminin girdisi, tum ekranlar ayni degeri okur.
+  useEffect(() => {
+    setWeekdayRhythm(weekdayRhythm(weekLogs || [], toDateKey(startOfWeekTR(new Date()))));
+  }, [weekLogs]);
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
   const allowedTrialTypes = useMemo(

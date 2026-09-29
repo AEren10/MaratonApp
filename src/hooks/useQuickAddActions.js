@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { firstRouteAction, routeActionTimerParams } from "../domain/route/routeStartAction";
 import { todayPlanStops } from "../domain/program/todayStops";
+import { useWeekdayRhythm } from "../lib/weekdayRhythmStore";
 import { isRehearsalDay } from "../domain/exam/examRehearsal";
 import { loadRehearsal } from "../lib/examRehearsalStore";
 import { todayTR } from "../lib/dateUtils";
@@ -18,6 +19,7 @@ export function useQuickAddActions(visible = true) {
   const { user } = useAuth();
   const { currentWeek } = useStudyRoute({ persist: false });
   const { schedule, ready: scheduleReady } = useClassSchedule();
+  const rhythm = useWeekdayRhythm();
   const [rehearsal, setRehearsal] = useState(false);
 
   // Panel her acildiginda tazelenir (TabBar'da ekran baglami yok, odak yok).
@@ -30,12 +32,12 @@ export function useQuickAddActions(visible = true) {
 
   const nextAction = useMemo(() => {
     if (rehearsal || !scheduleReady) return null;
-    for (const stop of todayPlanStops(currentWeek, schedule, todayTR())) {
+    for (const stop of todayPlanStops(currentWeek, schedule, todayTR(), { rhythm })) {
       const action = firstRouteAction([stop]);
       if (action) return action;
     }
     return null;
-  }, [rehearsal, currentWeek, schedule, scheduleReady]);
+  }, [rehearsal, currentWeek, schedule, scheduleReady, rhythm]);
 
   const startParams = useMemo(
     () => (nextAction ? routeActionTimerParams(nextAction) : undefined),

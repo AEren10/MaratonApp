@@ -27,3 +27,19 @@ test("a stop completed today stays in today's list even if it belongs to another
   const list = todayPlanStops(week, null, "2026-09-28", { isCompletedToday: (s) => s === done });
   assert.deepEqual(list.map((s) => s.topic), ["Paragraf", "Problemler"]);
 });
+
+test("bu haftanin kacirilan duragi bugune tasinir (en fazla 2); bitmis ya da atlanmis tasinmaz", () => {
+  const w = {
+    weekStart: "2026-09-28",
+    stops: [
+      { subject: "a", topic: "Pzt1", lifecycleStatus: "active" },
+      { subject: "b", topic: "Sal1", lifecycleStatus: "completed" },
+      { subject: "c", topic: "Car1", lifecycleStatus: "upcoming" },
+      { subject: "d", topic: "Per1", lifecycleStatus: "upcoming" },
+      { subject: "e", topic: "Cum1", lifecycleStatus: "upcoming" },
+    ],
+  };
+  const list = todayPlanStops(w, null, "2026-10-02");
+  assert.deepEqual(list.map((s) => s.topic), ["Cum1", "Pzt1", "Car1"]);
+  assert.ok(list[1].carried);
+});

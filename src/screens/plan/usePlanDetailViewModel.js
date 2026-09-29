@@ -8,6 +8,7 @@ import { useUserTasks } from "../../hooks/useUserTasks";
 import { useClassSchedule } from "../../hooks/useClassSchedule";
 import { useRehearsalToday } from "../../hooks/useRehearsalToday";
 import { todayPlanStops } from "../../domain/program/todayStops";
+import { useWeekdayRhythm } from "../../lib/weekdayRhythmStore";
 import { usePlanCompletion } from "../../hooks/usePlanCompletion";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import { generateDailyPlan } from "../../lib/planEngine";
@@ -32,6 +33,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const { tasks: userTasks, toggleTask: toggleUserTask, removeTask: removeUserTask } = useUserTasks();
   const { isDone, toggle, syncPlan } = usePlanCompletion(user?.id);
   const { schedule, ready: scheduleReady } = useClassSchedule();
+  const rhythm = useWeekdayRhythm();
   // Deneme provasi gunu baska durak acilmaz (Ana sayfa ile ayni kural).
   const rehearsalToday = useRehearsalToday(user?.id);
 
@@ -55,7 +57,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     };
     // Ana sayfa ve Program > Hafta ile ayni liste: ders programinin bugune
     // dusurdugu duraklar (bkz. domain/program/todayStops).
-    const rawStops = todayPlanStops(studyRoute.currentWeek, schedule, today, { isCompletedToday: doneToday });
+    const rawStops = todayPlanStops(studyRoute.currentWeek, schedule, today, { isCompletedToday: doneToday, rhythm });
     const routeWeekStops = rawStops.map((stop) => {
       const isCompletedToday = doneToday(stop);
       if (isCompletedToday && stop.lifecycleStatus !== "completed") {
@@ -69,7 +71,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
       routeActive: (studyRoute.currentWeek?.stops || []).length > 0,
     });
     return generated.tasks || [];
-  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady]);
+  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady, rhythm]);
 
   const detail = usePlanDetailTasks({
     C,

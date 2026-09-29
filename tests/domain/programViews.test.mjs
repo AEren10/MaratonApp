@@ -95,3 +95,28 @@ test("ivme karti aktif sinav turunu tercih eder", () => {
   assert.equal(trialMomentumCard(trials, 5, "AYT").heroValue, "+2,5");
   assert.equal(trialMomentumCard(trials.slice(0, 2), 5, "AYT").available, false);
 });
+
+test("yuk dakikayla dengelenir; hafta sonu cok calisan ogrencinin ritmine uyar; hafta tekrari son gune", () => {
+  const long = { subject: "tyt_matematik", topic: "A", cost: { minutes: 120 } };
+  const short = (t) => ({ subject: "tyt_turkce", topic: t, cost: { minutes: 20 } });
+  const days = assignWeekStops([long, short("B"), short("C")], null);
+  assert.equal(days[0][0].topic, "A");
+  assert.deepEqual([days[1][0].topic, days[2][0].topic], ["B", "C"]);
+  // Iki gunluk program: uzun durak bir gune, iki kisa durak digerine.
+  const two = normalizeSchedule([
+    { weekday: 0, kind: "study", subjects: [], minutes: 120 },
+    { weekday: 1, kind: "study", subjects: [], minutes: 120 },
+    ...[2, 3, 4, 5, 6].map((weekday) => ({ weekday, kind: "off" })),
+  ]);
+  const t = assignWeekStops([long, short("B"), short("C")], two);
+  assert.deepEqual(t[1].map((s) => s.topic), ["B", "C"]);
+
+  const rhythm = [0.5, 0.5, 0.5, 0.5, 0.5, 2, 2];
+  const r = assignWeekStops([long, { ...long, topic: "D" }], null, { rhythm });
+  assert.equal(r[5][0].topic, "A");
+  assert.equal(r[6][0].topic, "D");
+
+  const review = { subject: "tyt_matematik", topic: "Haftalık tekrar", reviewCycle: "weekly:2026-09-28", cost: { minutes: 20 } };
+  const w = assignWeekStops([review, short("E")], null);
+  assert.equal(w[6][0].topic, "Haftalık tekrar");
+});
