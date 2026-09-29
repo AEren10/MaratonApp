@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable } from "react-native";
 import Animated, {
   useSharedValue,
@@ -37,6 +38,11 @@ export function Press({
 }) {
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
+  // Pressable gibi `style={({ pressed }) => ...}` yazan cagiranlar var; dizi
+  // icindeki fonksiyon RN'de yok sayiliyordu ve kartin tum stili (bosluk,
+  // zemin, kenarlik) sessizce dusuyordu. Fonksiyon stil burada cozulur.
+  const [pressed, setPressed] = useState(false);
+  const dynamicStyle = typeof style === "function";
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
 
   const to = (v) => {
@@ -48,8 +54,8 @@ export function Press({
 
   return (
     <AnimatedPressable
-      onPressIn={() => to(scaleTo)}
-      onPressOut={() => to(1)}
+      onPressIn={() => { to(scaleTo); if (dynamicStyle) setPressed(true); }}
+      onPressOut={() => { to(1); if (dynamicStyle) setPressed(false); }}
       onPress={(e) => {
         if (disabled) return;
         fire?.();
@@ -61,7 +67,7 @@ export function Press({
       pressRetentionOffset={RETENTION}
       accessibilityRole={accessibilityRole}
       accessibilityState={{ disabled: !!disabled }}
-      style={[animStyle, style]}
+      style={[animStyle, dynamicStyle ? style({ pressed }) : style]}
       {...rest}
     >
       {children}
