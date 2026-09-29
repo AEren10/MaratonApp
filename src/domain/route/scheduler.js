@@ -30,7 +30,10 @@ export function segmentItems(items = [], maxQuestions = 25) {
   for (const item of items) {
     const q = Math.max(1, Number(item.cost?.questions) || 1);
     const n = Math.ceil(q / maxQuestions);
-    if (n <= 1) { out.push(item); continue; }
+    // Parca numarasi konuda cozulmus hacimden baslar (bkz. routeIdentity):
+    // 17 soru cozulmus konunun kalan isi 1. parcadan devam eder.
+    const segmentBase = item.isReview ? 0 : Math.round((Number(item.q) || 0) / maxQuestions);
+    if (n <= 1) { out.push(segmentBase ? { ...item, segmentBase } : item); continue; }
     const m = Number(item.cost?.minutes) || 0;
     for (let i = 0; i < n; i += 1) {
       const qi = Math.round((q * (i + 1)) / n) - Math.round((q * i) / n);
@@ -40,6 +43,7 @@ export function segmentItems(items = [], maxQuestions = 25) {
         cost: { ...item.cost, questions: qi, minutes: mi },
         partial: true,
         plannedQuestions: qi,
+        segmentBase,
         ...(i > 0 ? { continued: true } : {}),
       });
     }

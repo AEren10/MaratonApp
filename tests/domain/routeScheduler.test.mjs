@@ -54,3 +54,15 @@ test("final partial week scales both budgets by remaining days", () => {
   assert.ok(weeks[1].plannedQuestions <= 39);
   assert.ok(weeks[1].plannedMinutes <= 58);
 });
+
+test("ilk parca bitince kalan isin parcalari bitmis parcanin kimligini almaz", async () => {
+  const { decorateScheduledRoute } = await import("../../src/domain/route/routeIdentity.js");
+  const cap = { questionsPerWeek: 85, minutesPerWeek: 400, activeDaysPerWeek: 5 }; // oturum 17 soru
+  const keysFor = (q, questions) => {
+    const { weeks } = scheduleWeeks([{ ...item("Paragraf", questions, questions * 2), q }], cap, 4);
+    return decorateScheduledRoute(weeks).flatMap((w) => w.stops).map((s) => s.segmentIndex);
+  };
+  assert.deepEqual(keysFor(0, 51), [0, 1, 2]);
+  assert.deepEqual(keysFor(17, 34), [1, 2]);
+  assert.deepEqual(keysFor(34, 17), [2]);
+});

@@ -26,8 +26,12 @@ export function decorateScheduledRoute(weeks, { examType = "unknown" } = {}) {
     ...week,
     stops: (week.stops || []).map((stop, position) => {
       const rootStopKey = makeRouteStopRootKey(stop, examType);
-      const segmentIndex = segmentCounts.get(rootStopKey) || 0;
-      segmentCounts.set(rootStopKey, segmentIndex + 1);
+      // segmentBase: konuda cozulmus hacimden gelen baslangic (scheduler).
+      // Ilk parca bitince kalan is yeniden bolunuyor; numara 0'dan baslasa
+      // yeni ilk parca bitmis parcanin kimligini (ve "bitti" durumunu) alirdi.
+      const count = segmentCounts.get(rootStopKey) || 0;
+      segmentCounts.set(rootStopKey, count + 1);
+      const segmentIndex = (Number(stop.segmentBase) || 0) + count;
       const lifecycleStatus = activated
         ? ROUTE_STOP_STATUS.UPCOMING
         : ROUTE_STOP_STATUS.ACTIVE;
