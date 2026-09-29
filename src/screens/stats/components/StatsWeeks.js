@@ -14,13 +14,30 @@ export const StatsWeeks = memo(function StatsWeeks({ C, weeks = [], bestWeekStar
     <View style={s.row}>
       {weeks.map((w) => {
         const best = bestWeekStart && w.weekStart === bestWeekStart;
-        const h = w.questions > 0 ? Math.max(4, (w.questions / peak) * PLOT_H) : 3;
+        const h = w.questions > 0 ? Math.max(6, (w.questions / peak) * PLOT_H) : 3;
         return (
           <View key={w.weekStart} style={s.col}>
-            <Text style={[TYPOGRAPHY.meta, { color: best ? C.accentBright : C.text3 }]}>{w.questions || ""}</Text>
-            <View style={[s.bar, { height: h, backgroundColor: w.questions > 0 ? (best ? C.accent : C.accentDeep) : C.track }]} />
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{weekLabel(w.weekStart)}</Text>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{w.minutes ? `${fmtHours(w.minutes)}s` : " "}</Text>
+            <Text
+              numberOfLines={1}
+              style={[TYPOGRAPHY.micro, s.val, { color: best ? C.accentBright : C.text3 }]}
+            >
+              {w.questions || ""}
+            </Text>
+            <View
+              style={[
+                s.bar,
+                {
+                  height: h,
+                  backgroundColor: w.questions > 0 ? (best ? C.accentBright : C.accent) : C.track,
+                },
+              ]}
+            />
+            <Text numberOfLines={1} style={[TYPOGRAPHY.micro, s.label, { color: C.text3 }]}>
+              {weekLabel(w.weekStart)}
+            </Text>
+            <Text numberOfLines={1} style={[TYPOGRAPHY.micro, s.hours, { color: C.text4 }]}>
+              {w.minutes ? `${fmtHours(w.minutes)}s` : " "}
+            </Text>
           </View>
         );
       })}
@@ -29,7 +46,31 @@ export const StatsWeeks = memo(function StatsWeeks({ C, weeks = [], bestWeekStar
 });
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s1, marginTop: STEP.s2 },
-  col: { flex: 1, alignItems: "center", gap: 4 },
-  bar: { width: "70%", borderRadius: SHAPE.chip / 2 },
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: STEP.s1 / 2,
+    marginTop: STEP.s2,
+    paddingHorizontal: STEP.s1,
+  },
+  col: {
+    flex: 1,
+    alignItems: "center",
+    gap: STEP.s1 / 2,
+  },
+  val: {
+    fontVariant: ["tabular-nums"],
+    textAlign: "center",
+  },
+  bar: {
+    width: 14,
+    borderRadius: SHAPE.chip / 2,
+  },
+  label: {
+    letterSpacing: -0.2,
+    textAlign: "center",
+  },
+  hours: {
+    textAlign: "center",
+  },
 });
