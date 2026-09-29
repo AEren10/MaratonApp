@@ -709,6 +709,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     refreshRouteAccess: refreshUsage,
     routeCreated,
     routeStopsLoaded: stopsLoaded,
+    // Kayitli duraklar (gecmis haftalar dahil) ve son 45 gunun kayitlari:
+    // Geride kalan konular durak bazinda hesaplanir (overdueStops).
+    savedStops: persistedStops,
+    recentLogs: weekLogs,
     routeRevisionPreview,
     routeReadiness,
     routeCreating,

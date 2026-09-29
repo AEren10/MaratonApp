@@ -4,7 +4,7 @@ import { Skeleton } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 
-export function TopicDebtHero({ totalHours, hasHours, capped, loading }) {
+export function TopicDebtHero({ totalHours, hasHours, capped, weekShare, loading }) {
   const C = useC();
 
   if (loading) {
@@ -30,9 +30,13 @@ export function TopicDebtHero({ totalHours, hasHours, capped, loading }) {
       </View>
 
       <View style={[styles.note, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <View style={[styles.noteDot, { backgroundColor: C.up }]} />
+        <View style={[styles.noteDot, { backgroundColor: capped || (weekShare ?? 0) > 30 ? C.warn : C.up }]} />
         <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>
-          Bu, iki haftalık normal bir sapma
+          {capped
+            ? "Bir haftalık kapasiteye kısıtlandı, üstü sıraya düştü"
+            : weekShare == null ? "Geçen haftalardan kalan iş"
+              : weekShare <= 30 ? `Haftalık kapasitenin %${weekShare}'i · rahat kapanır`
+                : `Haftalık kapasitenin %${weekShare}'i · birkaç haftaya yay`}
         </Text>
       </View>
 

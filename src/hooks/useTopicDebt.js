@@ -1,10 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { useStudyRoute } from "./useStudyRoute";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
-import { subjectPaletteKey } from "../themes/subjectPalette";
+import { overdueStops } from "../domain/route/overdueStops";
+import { distributeDebt } from "../lib/routeEngine";
 import { buildDebtDistributionView } from "../domain/route/debtDistributionView";
+import { startOfWeekTR } from "../lib/dateUtils";
 
 const WEEK_MS = 7 * 86400000;
+const MIN_PER_QUESTION = 1.5;
 
 const fmtHours = (minutes) => {
   const h = (Number(minutes) || 0) / 60;
@@ -13,61 +16,64 @@ const fmtHours = (minutes) => {
 };
 
 /**
- * KONU BORCU — atlanmis duraklar ve bunlarin saat karsiligi.
+ * GERIDE KALAN KONULAR — durak bazinda (bkz. domain/route/overdueStops).
+ * Ekrandaki saat, liste ve dagitim AYNI kaynaktan: bitmis haftalarin
+ * tamamlanmamis, sonradan da calisilmamis duraklari. Eskiden saat haftalik
+ * toplamdan, liste yalniz "atlandi" duraklardan geliyordu ("0,8 sa · 0 durak").
  *
- * Toplam borc `computeDebt` ciktisindan gelir (haftalik plan/gerceklesen
- * farki, eskidikce degersizlesen). Listedeki tek tek duraklar ise rotanin
- * kendisinden: yasam dongusu "skipped" olan duraklar.
- *
- * "Dagit" = atlanan duragi RESCHEDULED'a tasimak. Bu, stopStatus'taki
- * gecerli bir gecis ve sunucuda kaliciliyor -- ekranda gosterip
- * kaydetmeyen sahte bir buton degil.
+ * "Dagit" = duraklari RESCHEDULED'a tasimak (sunucuda kalici gecis).
  */
 export function useTopicDebt() {
-  const { route, debt, debtWeeks, transitionStop, distributeDebt, routeStopsLoaded } = useStudyRoute();
+  const { route, savedStops, recentLogs, transitionStop, routeStopsLoaded } = useStudyRoute();
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState(null);
+  const minutesPerWeek = route?.capacity?.minutesPerWeek || 0;
 
-  const stops = useMemo(() => {
-    const out = [];
-    (route?.weeks || []).forEach((week) => {
-      (week.stops || []).forEach((stop) => {
-        if (stop.lifecycleStatus !== ROUTE_STOP_STATUS.SKIPPED) return;
-        const minutes = Number(stop.cost?.minutes) || 0;
-        out.push({
-          key: stop.logicalStopKey,
-          stop,
-          subject: stop.subjectLabel || stop.subject,
-          subjectKey: subjectPaletteKey(stop.subject),
-          title: `${stop.subjectLabel || stop.subject} · ${stop.topic}`,
-          hours: fmtHours(minutes),
-          minutes,
-        });
-      });
-    });
-    return out.sort((a, b) => b.minutes - a.minutes);
-  }, [route]);
+  const overdue = useMemo(() => overdueStops({
+    stops: savedStops, logs: recentLogs, thisMonday: startOfWeekTR(new Date()), minutesPerWeek,
+  }), [savedStops, recentLogs, minutesPerWeek]);
 
-  // Borc Dagitildi onizlemesi: siradaki (bitmemis) uc haftaya distributeDebt.
+  const stops = useMemo(() => overdue.items.map((it) => ({
+    key: it.key,
+    stop: { topic: it.topic },
+    ids: it.stops.map((s) => s.id).filter(Boolean),
+    raw: it.stops,
+    subject: it.subject,
+    subjectKey: it.subjectKey,
+    title: `${it.subject} · ${it.topic}`,
+    hours: fmtHours(it.minutes),
+    minutes: it.minutes,
+    statusLabel: it.skipped ? "atlandı" : `${it.ageDays === 0 ? "geçen hafta" : `${it.ageDays} gündür`}`,
+  })), [overdue]);
+
+  // Dagitim onizlemesi: siradaki uc haftaya, kapasiteyi asmadan.
   const preview = useMemo(() => {
+    if (!(overdue.totalMinutes > 0)) return null;
     const now = Date.now();
     const upcoming = (route?.weeks || [])
       .filter((w) => !w.weekStart || new Date(w.weekStart).getTime() + WEEK_MS > now)
       .slice(0, 3);
-    if (!upcoming.length || !(debt?.totalQuestions > 0)) return null;
-    return buildDebtDistributionView({ distribution: distributeDebt(upcoming), debt, stops });
-  }, [route, debt, distributeDebt, stops]);
-
-  // Yalniz kalici (stopId'si olan) duraklar tasinabilir.
-  const movable = useMemo(() => stops.filter((s) => s.stop.stopId), [stops]);
+    if (!upcoming.length) return null;
+    const questions = Math.round(overdue.totalMinutes / MIN_PER_QUESTION);
+    return buildDebtDistributionView({
+      distribution: distributeDebt(questions, upcoming, route?.capacity),
+      debt: { totalQuestions: questions, totalMinutes: overdue.totalMinutes },
+      stops,
+    });
+  }, [overdue, route, stops]);
 
   const distribute = useCallback(async () => {
-    if (!movable.length || distributing) return;
+    if (!stops.length || distributing) return false;
     setDistributing(true);
     setError(null);
     try {
-      for (const item of movable) {
-        await transitionStop(item.stop, ROUTE_STOP_STATUS.RESCHEDULED, { source: "topic_debt" });
+      for (const item of stops) {
+        for (const raw of item.raw) {
+          if (!raw.id) continue;
+          await transitionStop({ stopId: raw.id, version: raw.version, subject: raw.subject,
+            logicalStopKey: raw.logical_key, lifecycleStatus: raw.lifecycle_status },
+          ROUTE_STOP_STATUS.RESCHEDULED, { source: "topic_debt" });
+        }
       }
       return true;
     } catch (e) {
@@ -76,21 +82,23 @@ export function useTopicDebt() {
     } finally {
       setDistributing(false);
     }
-  }, [movable, distributing, transitionStop]);
+  }, [stops, distributing, transitionStop]);
 
   return {
     stops,
     stopCount: stops.length,
-    totalHours: fmtHours(debt?.totalMinutes),
-    hasHours: (debt?.totalMinutes || 0) > 0,
-    debtWeeks,
-    capped: Boolean(debt?.capped),
-    canDistribute: movable.length > 0,
+    totalHours: fmtHours(overdue.totalMinutes),
+    hasHours: overdue.totalMinutes > 0,
+    debtWeeks: overdue.weeks,
+    // Borcun haftalik kapasiteye orani: hero notu ve etki karti bunu soyler.
+    weekShare: minutesPerWeek > 0 ? Math.round((overdue.totalMinutes / minutesPerWeek) * 100) : null,
+    capped: overdue.capped,
+    canDistribute: stops.length > 0,
     distributing,
     error,
     distribute,
     preview,
-    isEmpty: stops.length === 0 && !(debt?.hasDebt),
+    isEmpty: stops.length === 0,
     loading: !routeStopsLoaded,
   };
 }

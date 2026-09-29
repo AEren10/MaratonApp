@@ -20,7 +20,7 @@ export default function TopicDebtScreen() {
   const C = useC();
   const navigation = useNavigation();
   const {
-    stops, stopCount, totalHours, hasHours, capped,
+    stops, stopCount, totalHours, hasHours, capped, weekShare,
     canDistribute, distributing, distribute, isEmpty, loading,
   } = useTopicDebt();
 
@@ -52,7 +52,7 @@ export default function TopicDebtScreen() {
         <View style={styles.emptyWrap}>
           <EmptyState
             title="Geride kalan konu yok."
-            body="Atlanmış durak oluştuğunda burada görünür; dağıtınca rota yeniden dengelenir."
+            body="Geçen haftalardan kapanmamış durak kalırsa burada görünür; dağıtınca rota yeniden dengelenir."
             primary="Günün Planına Dön"
             onPrimary={() => openProgram(navigation)}
           />
@@ -60,11 +60,11 @@ export default function TopicDebtScreen() {
       ) : (
         <>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-            <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} />
+            <TopicDebtHero totalHours={totalHours} hasHours={hasHours} capped={capped} weekShare={weekShare} />
 
             {hasHours ? (
               <Animated.View>
-                <TopicDebtImpactCard C={C} totalHours={totalHours} />
+                <TopicDebtImpactCard C={C} totalHours={totalHours} stopCount={stopCount} weekShare={weekShare} />
               </Animated.View>
             ) : null}
 
@@ -80,7 +80,7 @@ export default function TopicDebtScreen() {
                   item={{
                     subjectKey: item.subjectKey,
                     title: item.title,
-                    statusLabel: "atlandı",
+                    statusLabel: item.statusLabel,
                     dueLabel: `${item.hours} sa`,
                     minutesLabel: `${item.hours} sa`,
                   }}

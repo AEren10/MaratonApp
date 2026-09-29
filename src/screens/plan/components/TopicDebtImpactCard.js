@@ -3,7 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { Card } from "../../../components/design";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-export function TopicDebtImpactCard({ C, totalHours }) {
+// Iki cip eskiden sabit metindi ("Calisma yuku %18 azaldi"); artik veriden.
+export function TopicDebtImpactCard({ C, totalHours, stopCount = 0, weekShare = null }) {
   return (
     <Card tone="surface" radius="panel" style={s.card}>
       <Text style={[TYPOGRAPHY.tableHead, s.kicker, { color: C.accentBright }]}>
@@ -26,12 +27,12 @@ export function TopicDebtImpactCard({ C, totalHours }) {
       <View style={s.chipRow}>
         <View style={[s.chip, { backgroundColor: C.brandTint, borderColor: C.border }]}>
           <Text style={[s.chipText, { color: C.accentBright }]}>
-            Çalışma yükü %18 azaldı
+            {`${stopCount} konu kapanır`}
           </Text>
         </View>
         <View style={[s.chip, { backgroundColor: "transparent", borderColor: C.elev }]}>
           <Text style={[s.chipText, { color: C.text2 }]}>
-            Rota yeniden dengeleniyor
+            {weekShare != null ? `Haftanın %${weekShare}'i kadar iş` : "Rota yeniden dengelenir"}
           </Text>
         </View>
       </View>
