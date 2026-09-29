@@ -4,6 +4,7 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
+import { compactDuration, effortLabelLayout } from "./components/effortLabels";
 import { useC } from "../../contexts/ThemeContext";
 import {
   CHART_W, CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
@@ -11,13 +12,6 @@ import {
 
 const BAR_RADIUS = 3;
 
-// Cubugun ustundeki sure etiketi: dar alana sigsin diye "2s 15d" bicimi.
-function compactDuration(minutes) {
-  const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
-  if (h === 0) return `${m}d`;
-  return m > 0 ? `${h}s ${m}d` : `${h}s`;
-}
 
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
@@ -43,6 +37,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
+  const { labelYOf, goalLabelBelow } = effortLabelLayout({ week, todayIndex, goalY, top, slot });
 
   return (
     <View
@@ -87,7 +82,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
             <Fragment key={day.label}>
             {day.minutes > 0 ? (
               <SvgText
-                x={cx} y={Math.max(top + 9, barTop - 5)}
+                x={cx} y={labelYOf(i, barTop)}
                 fill={C.text2} fontSize={11} fontWeight="600" textAnchor="middle"
               >
                 {compactDuration(day.minutes)}
@@ -117,7 +112,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
             />
             <SvgText
-              x={CHART_W - PAD_RIGHT} y={goalY - 7}
+              x={CHART_W - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
               fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor="end"
             >
               {`GÜNLÜK HEDEF ${week.goal}`}

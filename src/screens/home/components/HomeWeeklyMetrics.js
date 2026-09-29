@@ -1,16 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
-import { formatMinutes, groupThousands } from "../../../domain/home/weeklyEffort";
+import { formatMinutes } from "../../../domain/home/weeklyEffort";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Haftalik cubuk grafigi altinda toplam sure ve cozulmus soru sayisi
+// Haftalik cubuk grafigi altinda toplam sure. Soru sayisi kalkti: grafik zaten
+// soruyu gosteriyor (kullanici karari, 29 Eylul).
 export function HomeWeeklyMetrics({ weeklyEffort }) {
   const C = useC();
   const totalMinutes = weeklyEffort?.totalMinutes || 0;
-  const totalQuestions = weeklyEffort?.totalQuestions || 0;
 
   const durationStr = formatMinutes(totalMinutes);
-  const questionsStr = groupThousands(totalQuestions);
 
   return (
     <View style={s.row}>
@@ -20,14 +19,6 @@ export function HomeWeeklyMetrics({ weeklyEffort }) {
         </Text>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
           bu hafta çalıştın
-        </Text>
-      </View>
-      <View style={s.colRight}>
-        <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]} numberOfLines={1}>
-          {questionsStr}
-        </Text>
-        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
-          soru
         </Text>
       </View>
     </View>
@@ -44,10 +35,6 @@ const s = StyleSheet.create({
   },
   colLeft: {
     flex: 1,
-    justifyContent: "flex-end",
-  },
-  colRight: {
-    alignItems: "flex-end",
     justifyContent: "flex-end",
   },
 });
