@@ -33,6 +33,7 @@ import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
+import { useTodayKey } from "./useTodayKey";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
 import { knownTopicsByKey } from "../domain/route/knownTopics";
 import { useKnownTopicsMap } from "../lib/topicCompletion";
@@ -220,10 +221,14 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const [stopsLoaded, setStopsLoaded] = useState(false);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
   const { wrongsByTopic, wrongsHash, wrongsSettled } = useRouteWrongSignal(user?.id, routeLoadTick);
+  // Gun degisince (uygulama gece yarisini acik gecirdi) rota yeniden
+  // kurulur: yoksa pazartesi weeks[0] hala gecen hafta kalir ve gunun
+  // listesi bos gorunurdu.
+  const todayKey = useTodayKey();
   // Gun ritmi: gun dagitiminin girdisi, tum ekranlar ayni degeri okur.
   useEffect(() => {
     setWeekdayRhythm(weekdayRhythm(weekLogs || [], toDateKey(startOfWeekTR(new Date()))));
-  }, [weekLogs]);
+  }, [weekLogs, todayKey]);
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
   const allowedTrialTypes = useMemo(
@@ -234,7 +239,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     if (!examDate) return null;
     const ms = new Date(examDate) - new Date();
     return Math.max(0, Math.ceil(ms / 86400000));
-  }, [examDate]);
+  }, [examDate, todayKey]);
 
   // topic_progress satırlarını { ders: { konu: {...} } } şekline indir.
   const progressByKey = useMemo(() => {
@@ -302,6 +307,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   ), [allowedTrialTypes, trials]);
 
   const routeCacheKey = useMemo(() => [
+    todayKey,
     resolvedExamType,
     field || "",
     hasRouteAccess ? "1" : "0",
@@ -321,7 +327,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, goals?.weeklyMinutes, targetReached, habitLoad, knownHash, weekLogs, topicRows,
+    todayKey, recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, goals?.weeklyMinutes, targetReached, habitLoad, knownHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -339,6 +345,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     knownTopics,
     subjectDrops,
     weeklyMinutesGoal: goals?.weeklyMinutes || 0,
+    now: new Date(`${todayKey}T12:00:00+03:00`),
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
