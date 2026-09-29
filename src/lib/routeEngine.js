@@ -41,6 +41,7 @@ export function buildRoute({
   now = new Date(),
   studyLogDataState = "ready",
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
+  subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
@@ -148,15 +149,20 @@ export function buildRoute({
         continue;
       }
 
+      const weakFactor = subjectWeakness[subject.key] || null;
       const priority = priorityScoreDetails({
         cost,
         neglectedDays,
         daysLeft: daysLeft ?? 180,
-        isWeakArea: weakSet.has(subject.key) || topicHasAccuracyGap,
+        // Orantili carpan varsa eski "ilk 3 ders" isareti ona yol verir.
+        isWeakArea: (weakFactor == null && weakSet.has(subject.key)) || topicHasAccuracyGap,
         unpreparedBefore,
+        weakFactor,
       });
       const reasonCodes = [];
-      if (weakSet.has(subject.key) || topicHasAccuracyGap) reasonCodes.push("LOW_ACCURACY");
+      if ((weakFactor || 1) >= 1.15 || (weakFactor == null && weakSet.has(subject.key)) || topicHasAccuracyGap) {
+        reasonCodes.push("LOW_ACCURACY");
+      }
       if (neglectedDays >= 14) reasonCodes.push("NEGLECTED");
       if (cost.yield >= 0.5) reasonCodes.push("HIGH_EXAM_WEIGHT");
       if (unpreparedBefore > 0) reasonCodes.push("PREREQUISITE");

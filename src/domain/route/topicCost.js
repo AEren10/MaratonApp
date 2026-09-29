@@ -99,6 +99,7 @@ export function priorityScoreDetails({
   daysLeft = 180,
   isWeakArea = false,
   unpreparedBefore = 0,
+  weakFactor = null,   // denemeden orantili ders carpani (trialWeakness)
 }) {
   if (cost.done) return { score: -1, components: {} };
 
@@ -106,7 +107,7 @@ export function priorityScoreDetails({
   const costPart = Math.max(1, cost.questions) / 20;        // ~1 civarı
   const urgency = daysLeft > 0 ? Math.min(2, 180 / Math.max(30, daysLeft)) : 1;
   const decay = Math.min(1.4, 1 + neglectedDays / 60);      // 60 günde +%40
-  const weakBoost = isWeakArea ? 1.35 : 1;
+  const weakBoost = Math.max(weakFactor || 1, isWeakArea ? 1.35 : 1);
 
   // MÜFREDAT SIRASI — en önemli düzeltme.
   //

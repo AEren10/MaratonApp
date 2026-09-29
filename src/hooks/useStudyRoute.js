@@ -18,6 +18,7 @@ import * as Crypto from "expo-crypto";
 import { track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
 import { weightedWeakAreas } from "../lib/buildPlanContext";
+import { subjectWeaknessFactors } from "../domain/route/trialWeakness";
 import { forecastNet } from "../lib/netForecast";
 import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
 import { routeReadinessSummary } from "../domain/route/routeCreation";
@@ -242,6 +243,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       .map(([key]) => key);
   }, [allowedTrialTypes, trials]);
 
+  // Denemeden orantili ders agirligi: ne kadar gerideyse o kadar one.
+  const subjectWeakness = useMemo(() => subjectWeaknessFactors(
+    (trials || []).filter((trial) => allowedTrialTypes.includes(trial.trialType)),
+  ), [allowedTrialTypes, trials]);
+
   const routeCacheKey = useMemo(() => [
     resolvedExamType,
     field || "",
@@ -251,11 +257,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     recoveryWeek ?? "",
     dataHealth?.logs || "",
     weakSubjectKeys.join(","),
+    JSON.stringify(subjectWeakness),
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -265,10 +272,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     dailyQuestionGoal: goals?.dailyQuestions || 20,
     daysLeft,
     weakSubjectKeys,
+    subjectWeakness,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
-  }, routeCacheKey), [dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+  }, routeCacheKey), [subjectWeakness, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {
