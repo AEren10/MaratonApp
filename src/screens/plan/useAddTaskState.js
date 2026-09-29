@@ -5,6 +5,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import * as H from "../../lib/haptics";
+import { todayTR } from "../../lib/dateUtils";
 import {
   addTaskSubjectGroups,
   resolveAddTaskSubject,
@@ -20,6 +21,8 @@ export function useAddTaskState() {
   const { examType, field } = useExam();
   const { routeCreated, createRoute } = useStudyRoute({ persist: false });
 
+  // Program > Hafta'dan secili gun (bugun ya da ileri); yoksa bugun.
+  const targetDate = route.params?.date || todayTR();
   const groups = useMemo(() => addTaskSubjectGroups(examType, field), [examType, field]);
   const paramKey = resolveAddTaskSubject(groups, route.params?.subjectKey || route.params?.preSubject);
   const tabOf = (key) => groups.find((g) => g.subjects.some((x) => x.key === key))?.key || groups[0].key;
@@ -77,7 +80,7 @@ export function useAddTaskState() {
         topic: topicName,
         ...(minutes ? { targetMinutes: minutes } : {}),
         note: "Kullanıcı ekledi",
-      });
+      }, { date: targetDate });
       // Rotasi olmayan kullanicinin rotasi da kurulur; kurulamazsa (erisim
       // yok, cevrimdisi) ek gorev yine kaydedilmis olur.
       if (!routeCreated) await createRoute().catch(() => {});
@@ -106,5 +109,6 @@ export function useAddTaskState() {
     handleExamChange,
     handleSubjectSelect,
     handleSubmit,
+    targetDate,
   };
 }

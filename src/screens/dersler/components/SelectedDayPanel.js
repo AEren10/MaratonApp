@@ -6,6 +6,7 @@ import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
+import { todayTR } from "../../../lib/dateUtils";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 
 function StopRow({ log, isLast, C, onPress }) {
@@ -54,6 +55,8 @@ export function SelectedDayPanel({ selectedDay, logs }) {
   // Gunun plani ekrani yalniz BUGUNU anlatir (ana sayfanin "tumu"su).
   // Baska gunun satiri eskiden oraya gidip bugunun duraklarini gosteriyordu.
   const openDetail = selectedDay?.isToday ? () => navigation.navigate(SCREENS.PLAN_DETAIL) : undefined;
+  // Secili gun bugun ya da ileride ise durak O GUNE eklenir; gecmis gun bugune.
+  const addTask = () => navigation.navigate(SCREENS.ADD_TASK, selectedDay?.key && selectedDay.key >= todayTR() ? { date: selectedDay.key } : undefined);
 
   return (
     <View style={s.wrap}>
@@ -72,7 +75,7 @@ export function SelectedDayPanel({ selectedDay, logs }) {
             Bu gün için henüz durak planlanmadı.
           </Text>
           <Pressable
-            onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+            onPress={addTask}
             style={({ pressed }) => [
               s.addButton,
               { borderColor: C.border, backgroundColor: pressed ? C.elev : C.surface },
@@ -90,7 +93,7 @@ export function SelectedDayPanel({ selectedDay, logs }) {
             <StopRow key={log.id || i} log={log} isLast={i === displayLogs.length - 1} C={C} onPress={openDetail} />
           ))}
           <Pressable
-            onPress={() => navigation.navigate(SCREENS.ADD_TASK)}
+            onPress={addTask}
             style={({ pressed }) => [
               s.addButton,
               { borderColor: C.border, backgroundColor: pressed ? C.elev : C.surface, marginTop: STEP.s2 },

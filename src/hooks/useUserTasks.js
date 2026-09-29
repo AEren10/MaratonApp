@@ -28,6 +28,7 @@ import { todayTR } from "../lib/dateUtils";
 import { toUserTaskRow, buildOptimisticUserTask } from "../domain/tasks/userTaskModel";
 import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
 import { getJson, setJson } from "../lib/storage/appStorage";
+import { createDatedTask } from "./useDatedUserTasks";
 
 const today = todayTR;
 const getUserTaskRewardedKey = (userId) => datedUserKey(STORAGE_KEYS.USER_TASK_REWARDED_PREFIX, todayTR(), userId);
@@ -69,7 +70,7 @@ export function useUserTasks() {
     return () => { cancelled = true; };
   }, [user?.id, dispatch, existingDay]);
 
-  const createTask = useCallback(async (input) => {
+  const createTask = useCallback(async (input, { date } = {}) => {
     if (!user?.id || user.id === "dev") throw new Error("Kullanıcı oturumu bulunamadı");
     let parsed;
     try {
@@ -78,6 +79,8 @@ export function useUserTasks() {
       // Zod 4: issues (errors kalkti).
       throw new Error((e.issues || e.errors)?.[0]?.message || "Geçersiz görev bilgisi");
     }
+    // Ileri bir gune eklenen gorev bugunun listesine girmez (bkz. useDatedUserTasks).
+    if (date && date !== today()) return createDatedTask(parsed, user.id, date);
     const optimistic = buildOptimisticUserTask(parsed, user.id, today());
     const tempId = optimistic.id;
     dispatch(addUserTask(optimistic));

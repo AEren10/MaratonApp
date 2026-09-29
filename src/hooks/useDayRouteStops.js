@@ -9,6 +9,7 @@ import { subjectPaletteKey } from "../themes/subjectPalette";
 import { getSubjectLabel } from "../themes/subjects";
 import { todayTR } from "../lib/dateUtils";
 import { useUserTasks } from "./useUserTasks";
+import { useDatedUserTasks } from "./useDatedUserTasks";
 
 // Secilen gunun ROTA duraklari: haftalik ders programina gore gunlere
 // dusurulmus. Bugun icin ayrica "Durak ekle" ile eklenen ek gorevler
@@ -17,7 +18,10 @@ import { useUserTasks } from "./useUserTasks";
 export function useDayRouteStops(dateKey) {
   const { weeks, routeStopsLoaded } = useStudyRoute({ persist: false });
   const { schedule, loading: scheduleLoading } = useClassSchedule();
-  const { tasks: userTasks } = useUserTasks();
+  const { tasks: todayTasks } = useUserTasks();
+  const isToday = dateKey === todayTR();
+  const datedTasks = useDatedUserTasks(isToday ? null : dateKey);
+  const userTasks = isToday ? todayTasks : datedTasks;
 
   const stops = useMemo(() => {
     if (!dateKey) return [];
@@ -25,7 +29,7 @@ export function useDayRouteStops(dateKey) {
     const week = (weeks || []).find(
       (w) => w.weekStart && mondayOf(String(w.weekStart).slice(0, 10)) === monday,
     );
-    const extras = dateKey === todayTR()
+    const extras = dateKey
       ? (userTasks || []).filter((t) => t.subject !== "__calendar").map((t) => ({
         id: t.id,
         time: null,

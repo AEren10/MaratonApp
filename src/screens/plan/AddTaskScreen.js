@@ -10,6 +10,10 @@ import { AddTaskExamSegment } from "./components/AddTaskExamSegment";
 import { TopicPickerModal } from "./components/TopicPickerModal";
 import { ADD_TASK_DURATIONS } from "./addTaskOptions";
 import { useAddTaskState } from "./useAddTaskState";
+import { todayTR } from "../../lib/dateUtils";
+
+const WEEKDAYS = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+const dayWord = (key) => WEEKDAYS[new Date(`${key}T12:00:00`).getDay()];
 import { Press } from "../../components/design/Press";
 
 function SectionHeader({ title, C }) {
@@ -34,6 +38,8 @@ function Pill({ label, selected, onPress, C }) {
 function AddTaskInner() {
   const C = useC();
   const state = useAddTaskState();
+  // Program'dan ileri bir gun secildiyse o gunun adi ("Çarşamba").
+  const planOf = state.targetDate === todayTR() ? "Bugünün" : dayWord(state.targetDate);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -79,13 +85,13 @@ function AddTaskInner() {
           ))}
         </View>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s2 }]}>
-          {state.durVal === "Belirtme" ? "Süre sınırı olmadan bugünün planına eklenir." : "Bugünün planına eklenir."}
+          {state.durVal === "Belirtme" ? `Süre sınırı olmadan ${planOf.toLocaleLowerCase("tr-TR")} planına eklenir.` : `${planOf} planına eklenir.`}
         </Text>
       </ScrollView>
 
       <View style={[s.bottomAction, { backgroundColor: C.bg }]}>
         <Button variant="primary" size="lg" fullWidth onPress={state.handleSubmit}>
-          Bugünün planına ekle
+          {`${planOf} planına ekle`}
         </Button>
       </View>
 
