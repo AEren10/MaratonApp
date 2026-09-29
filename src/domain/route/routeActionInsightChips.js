@@ -5,6 +5,10 @@ const REASON_LABELS = Object.freeze({
   HIGH_EXAM_WEIGHT: "Yüksek getiri",
   PREREQUISITE: "Ön koşul",
   ROUTE_COMMITMENT: "Rota dengesi",
+  WRONG_REVIEW: "Yanlış tekrarı",
+  WRONG_BACKLOG: "Bekleyen yanlış",
+  WEEKLY_REVIEW: "Hafta tekrarı",
+  DAILY_HABIT: "Günlük rutin",
 });
 
 function chip(key, label, tone) {

@@ -10,6 +10,10 @@ const REASON_TEXT = {
   HIGH_EXAM_WEIGHT: "Sınavda soru payı yüksek olduğu için getirisi iyi.",
   PREREQUISITE: "Sonraki konuların temelini güçlendiren durak.",
   ROUTE_COMMITMENT: "Haftalık rota dengesini tamamlayan sıradaki iş.",
+  WRONG_REVIEW: "Yanlış defterinde tekrar zamanı gelen sorular var.",
+  WRONG_BACKLOG: "Yanlış defterinde bu konudan bekleyen sorular var.",
+  WEEKLY_REVIEW: "Haftanın konularını bir arada tekrar eder; kalıcılığı artırır.",
+  DAILY_HABIT: "Her gün yapmayı seçtiğin rutin.",
 };
 
 const RISK_TRACE_TEXT = {
@@ -103,10 +107,16 @@ function reasonTextFor(stop = {}) {
       : "Sınavdaki soru payı yüksek olduğu için getirisi iyi.";
   }
   if (reasonCode === "PREREQUISITE") {
-    const missing = Number(stop.unpreparedBefore) || 0;
-    return missing > 0
-      ? `Öncesinde hazır olmayan ${missing} konu var; sırayı güçlendirmek için burada duruyoruz.`
-      : REASON_TEXT.PREREQUISITE;
+    const names = (components.missingPrerequisites || []).map((ref) => String(ref).split(":").pop());
+    if (names.length) return `${names.join(", ")} bu konunun temeli; o yüzden önce onlar, bu konu sonra.`;
+    return REASON_TEXT.PREREQUISITE;
+  }
+  if (reasonCode === "WRONG_REVIEW") {
+    const due = Number(components.wrongsDue) || 0;
+    return due > 0 ? `Yanlış defterinde tekrar zamanı gelen ${due} soru var; kısa bir yanlış tekrarı.` : REASON_TEXT.WRONG_REVIEW;
+  }
+  if (reasonCode === "WRONG_BACKLOG") {
+    return `Yanlış defterinde bu konudan bekleyen sorular var; konu henüz oturmamış.`;
   }
   return REASON_TEXT[reasonCode] || REASON_TEXT.ROUTE_COMMITMENT;
 }

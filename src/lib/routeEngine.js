@@ -9,6 +9,7 @@ import { attachStopInsights, buildRouteIntelligence } from "../domain/route/rout
 import { startOfWeekTR, dateKey } from "./dateUtils.js";
 import { personalPace, minutesPerQuestionFor } from "../domain/route/personalPace.js";
 import { missingPrerequisites } from "../domain/route/prerequisites.js";
+import { wrongBoost, wrongReviewQuestions, WRONG_REVIEW_MIN_DUE } from "../domain/route/wrongSignal.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -42,6 +43,7 @@ export function buildRoute({
   studyLogDataState = "ready",
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
+  wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
 } = {}) {
   const weeksLeft = weeksUntilExam(daysLeft);
   const baseCapacity = estimateWeeklyCapacity(
@@ -103,8 +105,35 @@ export function buildRoute({
       );
       const topicHasAccuracyGap = hasTopicAccuracyGap({ q, acc });
 
+      const wrongs = wrongsByTopic?.[subject.key]?.[name] || null;
+
       if (cost.done) {
         masteredCount += 1;
+
+        // Ustalasilmis konuda zamani gelmis yanlislar: kisa yanlis tekrari.
+        if ((wrongs?.due || 0) >= WRONG_REVIEW_MIN_DUE) {
+          const wq = wrongReviewQuestions(wrongs.due);
+          items.push({
+            ...entry,
+            isReview: true,
+            reviewCycle: "wrongs",
+            cost: {
+              questions: wq,
+              minutes: Math.round(wq * (minutesPerQuestionFor(pace, subject.key, 1.2) ?? 2)),
+              mastery: "review",
+              difficulty: cost.difficulty,
+              yield: topicShare,
+              done: false,
+            },
+            unpreparedBefore: 0,
+            // Tekrar zamani gelmis yanlis, unutmaya yuz tutmus konudan once gelir.
+            score: reviewPriority({ retention: 0.5, subjectWeight: topicShare, daysLeft: daysLeft ?? 180 }) * 1.15,
+            reasonCodes: ["WRONG_REVIEW"],
+            scoreComponents: { wrongsDue: wrongs.due, wrongsOpen: wrongs.open, examShare: Math.round(topicShare * 100) / 100 },
+            dataConfidence: "high",
+          });
+          reviewCount += 1;
+        }
 
         // USTALAŞMIŞ ≠ SONSUZA KADAR BİLİNİYOR.
         // Unutma eğrisine göre hatırlama eşiğin altına düştüyse konu rotaya
@@ -159,7 +188,11 @@ export function buildRoute({
         unpreparedBefore,
         weakFactor,
       });
+      // Bekleyen yanlislar oncelige: oturmamis konu one gelir.
+      const wb = wrongBoost(wrongs);
+      priority.score = Math.round(priority.score * wb * 100) / 100;
       const reasonCodes = [];
+      if ((wrongs?.open || 0) >= 3) reasonCodes.push("WRONG_BACKLOG");
       if ((weakFactor || 1) >= 1.15 || (weakFactor == null && weakSet.has(subject.key)) || topicHasAccuracyGap) {
         reasonCodes.push("LOW_ACCURACY");
       }

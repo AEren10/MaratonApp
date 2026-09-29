@@ -32,6 +32,7 @@ import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops } from "../domain/route/overdueStops";
+import { useRouteWrongSignal } from "./useRouteWrongSignal";
 
 const MIN_PER_QUESTION = 1.5;
 
@@ -207,6 +208,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // Bu ayrim olmadan Rota ekrani yuklenirken 'Yol buradan basliyor' bosunu basiyordu.
   const [stopsLoaded, setStopsLoaded] = useState(false);
   const { dataHealth, weekLogs, topicRows } = usePlanContext();
+  const { wrongsByTopic, wrongsHash } = useRouteWrongSignal(user?.id, routeLoadTick);
   const trials = useSelector(selectTrials);
   const goals = useSelector(selectGoals);
   const allowedTrialTypes = useMemo(
@@ -258,11 +260,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     dataHealth?.logs || "",
     weakSubjectKeys.join(","),
     JSON.stringify(subjectWeakness),
+    wrongsHash,
     rowsHash(weekLogs),
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -273,10 +276,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     daysLeft,
     weakSubjectKeys,
     subjectWeakness,
+    wrongsByTopic,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
-  }, routeCacheKey), [subjectWeakness, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, wrongsByTopic, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {

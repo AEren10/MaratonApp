@@ -12,6 +12,10 @@ const IMPACT_BY_REASON = Object.freeze({
   HIGH_EXAM_WEIGHT: "Sınav getirisi yüksek",
   PREREQUISITE: "Temeli güçlendirme",
   ROUTE_COMMITMENT: "Rota ritmini koruma",
+  WRONG_REVIEW: "Yanlışları kalıcı kapatma",
+  WRONG_BACKLOG: "Oturmamış konuyu sağlamlaştırma",
+  WEEKLY_REVIEW: "Haftayı kalıcı yapma",
+  DAILY_HABIT: "Günlük rutin",
 });
 
 const SIGNAL_LABELS = Object.freeze({
@@ -22,6 +26,10 @@ const SIGNAL_LABELS = Object.freeze({
   HIGH_EXAM_WEIGHT: "yüksek katsayı",
   PREREQUISITE: "ön koşul",
   ROUTE_COMMITMENT: "rota sırası",
+  WRONG_REVIEW: "yanlış tekrarı",
+  WRONG_BACKLOG: "bekleyen yanlış",
+  WEEKLY_REVIEW: "hafta tekrarı",
+  DAILY_HABIT: "rutin",
 });
 
 function round(value, digits = 1) {
