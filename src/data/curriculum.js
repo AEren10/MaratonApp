@@ -448,7 +448,7 @@ export const AYT_SOZ_DERSLER = [
     label: "Tarih",
     color: "#fbbf24",
     icon: "clock",
-    questionCount: 11,
+    questionCount: 21, // Tarih-1 (10) + Tarih-2 (11): konu listesi ikisini kapsar
     exam: "ayt",
     field: "sozel",
     topics: [
@@ -467,7 +467,7 @@ export const AYT_SOZ_DERSLER = [
     label: "Coğrafya",
     color: "#2dd4bf",
     icon: "globe",
-    questionCount: 11,
+    questionCount: 17, // Cografya-1 (6) + Cografya-2 (11): konu listesi ikisini kapsar
     exam: "ayt",
     field: "sozel",
     topics: [
