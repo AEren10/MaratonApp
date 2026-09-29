@@ -16,6 +16,7 @@ const REASON_TEXT = {
   DAILY_HABIT: "Her gün yapmayı seçtiğin rutin.",
   TARGET_KEEP: "Hedef netine ulaştın; şimdi kazandığını korumak en kârlı iş.",
   FINISH_TOPIC: "Başladığın konuyu bitir; yarım konu en çabuk unutulan konudur.",
+  NET_DROP: "Son denemede bu derste düşüş var; erken yakalamak için öne alındı.",
 };
 
 const RISK_TRACE_TEXT = {

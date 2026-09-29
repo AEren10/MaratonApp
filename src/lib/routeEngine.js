@@ -13,6 +13,7 @@ import { wrongBoost, wrongReviewQuestions, WRONG_REVIEW_MIN_DUE } from "../domai
 import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
 import { topicShares } from "../domain/route/topicShares.js";
 import { effectiveAccuracy } from "../domain/route/effectiveAccuracy.js";
+import { DROP_BOOST } from "../domain/route/trialWeakness.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -47,6 +48,7 @@ export function buildRoute({
   topicFeel = {},            // { ders: { konu: "easy"|"ok"|"hard" } } son geri bildirim
   habitLoad = null,          // { questionsPerWeek, minutesPerWeek } gunluk rutinlerin haftalik yuku
   knownTopics = {},          // { ders: { konu: "YYYY-MM-DD"|null } } ogrencinin "hallettim" tikleri
+  subjectDrops = {},         // { ders: dusus } son denemede taze dusus (trialWeakness.subjectNetDrops)
   subjectWeakness = {},      // { ders: 1..1.6 } denemeden orantili (trialWeakness)
   wrongsByTopic = {},        // { ders: { konu: { open, due } } } yanlis defteri (wrongSignal)
   targetReached = false,     // son net hedefte: hedefi koruma modu
@@ -220,7 +222,9 @@ export function buildRoute({
         continue;
       }
 
-      const weakFactor = subjectWeakness[subject.key] || null;
+      const drop = subjectDrops?.[subject.key] || 0;
+      const levelFactor = subjectWeakness[subject.key] || null;
+      const weakFactor = drop > 0 ? Math.round((levelFactor || 1) * DROP_BOOST * 100) / 100 : levelFactor;
       const priority = priorityScoreDetails({
         cost,
         neglectedDays,
@@ -234,6 +238,7 @@ export function buildRoute({
       const wb = wrongBoost(wrongs);
       priority.score = Math.round(priority.score * wb * 100) / 100;
       const reasonCodes = [];
+      if (drop > 0) reasonCodes.push("NET_DROP");
       if ((wrongs?.open || 0) >= 3) reasonCodes.push("WRONG_BACKLOG");
       if ((weakFactor || 1) >= 1.15 || (weakFactor == null && weakSet.has(subject.key)) || topicHasAccuracyGap) {
         reasonCodes.push("LOW_ACCURACY");

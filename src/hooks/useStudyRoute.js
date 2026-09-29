@@ -18,7 +18,7 @@ import * as Crypto from "expo-crypto";
 import { track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
 import { weightedWeakAreas } from "../lib/buildPlanContext";
-import { subjectWeaknessFactors } from "../domain/route/trialWeakness";
+import { subjectWeaknessFactors, subjectNetDrops } from "../domain/route/trialWeakness";
 import { forecastNet } from "../lib/netForecast";
 import { buildTempoScenarios } from "../domain/forecast/tempoScenario";
 import { routeReadinessSummary } from "../domain/route/routeCreation";
@@ -297,6 +297,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     (trials || []).filter((trial) => allowedTrialTypes.includes(trial.trialType)),
   ), [allowedTrialTypes, trials]);
 
+  const subjectDrops = useMemo(() => subjectNetDrops(
+    (trials || []).filter((trial) => allowedTrialTypes.includes(trial.trialType)),
+  ), [allowedTrialTypes, trials]);
+
   const routeCacheKey = useMemo(() => [
     resolvedExamType,
     field || "",
@@ -307,6 +311,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     dataHealth?.logs || "",
     weakSubjectKeys.join(","),
     JSON.stringify(subjectWeakness),
+    JSON.stringify(subjectDrops),
     wrongsHash,
     targetReached ? "keep" : "",
     habitLoad ? habitLoad.questionsPerWeek : "",
@@ -315,7 +320,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     rowsHash(topicRows),
   ].join("|"), [
     resolvedExamType, field, hasRouteAccess, goals?.dailyQuestions, daysLeft,
-    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, wrongsHash, targetReached, habitLoad, knownHash, weekLogs, topicRows,
+    recoveryWeek, dataHealth?.logs, weakSubjectKeys, subjectWeakness, subjectDrops, wrongsHash, targetReached, habitLoad, knownHash, weekLogs, topicRows,
   ]);
 
   const computedRoute = useMemo(() => cachedBuildRoute({
@@ -331,10 +336,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
     topicFeel,
     habitLoad,
     knownTopics,
+    subjectDrops,
     pausedWeeks: recoveryWeek,
     examType: resolvedExamType,
     studyLogDataState: dataHealth?.logs,
- }, routeCacheKey), [subjectWeakness, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
+ }, routeCacheKey), [subjectWeakness, subjectDrops, wrongsByTopic, targetReached, topicFeel, habitLoad, knownTopics, dataHealth?.logs, resolvedExamType, field, hasRouteAccess, progressByKey, weekLogs,
     goals?.dailyQuestions, daysLeft, weakSubjectKeys, recoveryWeek, routeCacheKey]);
 
   const route = useMemo(() => {

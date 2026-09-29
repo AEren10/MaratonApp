@@ -11,6 +11,7 @@ const REASON_LABELS = Object.freeze({
   DAILY_HABIT: "Günlük rutin",
   TARGET_KEEP: "Hedefi koru",
   FINISH_TOPIC: "Konuyu bitir",
+  NET_DROP: "Denemede düşüş",
 });
 
 function chip(key, label, tone) {

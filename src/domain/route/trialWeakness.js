@@ -49,3 +49,26 @@ export function subjectWeaknessFactors(trials = []) {
   }
   return out;
 }
+
+// DENEME DUSUSU: son denemede bir derste basari, onceki iki denemenin
+// ortalamasindan belirgin dusukse o dersin konulari one alinir ("Son
+// denemede dusus var"). Seviye (subjectWeaknessFactors) kalici zayifligi,
+// dusus ise TAZE kaymayi yakalar; ikisi carpilir.
+const DROP_THRESHOLD = 0.08; // basari oraninda 8 puan
+export const DROP_BOOST = 1.2;
+
+/** trials: yeniden eskiye. @returns { [curriculumKey]: dusus (0..1) } */
+export function subjectNetDrops(trials = []) {
+  const [latest, ...rest] = (trials || []).slice(0, 3);
+  if (!latest || !rest.length) return {};
+  const now = subjectSuccess(latest?.subjects);
+  const before = rest.map((t) => subjectSuccess(t?.subjects));
+  const out = {};
+  for (const [key, rate] of Object.entries(now)) {
+    const prev = before.map((b) => b[key]).filter((v) => v != null);
+    if (!prev.length) continue;
+    const drop = prev.reduce((a, b) => a + b, 0) / prev.length - rate;
+    if (drop >= DROP_THRESHOLD) out[key] = Math.round(drop * 100) / 100;
+  }
+  return out;
+}
