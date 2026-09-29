@@ -18,8 +18,8 @@ import { useDepthTone } from "../../lib/depthTone";
 // opak boyadigi icin altta kalsa gorunmezdi. Opaklik metin kontrastini
 // olculemeyecek kadar az degistirir.
 // Yalniz koyu tema: acik temada ayni isik yuzeyi kirletir.
-// 0.055 -> 0.085 (kullanici: etkili, biraz artsin, 29 Eylul).
-const TOP_LIGHT = 0.085;
+// 0.055 -> 0.085 (29 Eylul, fazla geldi) -> 0.065 (30 Eylul: bir tik kis).
+const TOP_LIGHT = 0.065;
 const SUBJECT_TINT = 0.14;
 // Ana sayfada gunun durumu: hedef tuttu (up) / sinav yakin (warn).
 const STATE_TINT = 0.12;
