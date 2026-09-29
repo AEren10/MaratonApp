@@ -79,7 +79,7 @@ export default function TrialSummaryScreen() {
               bars={summary.bars}
             />
 
-            <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)} />
+            <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.RANK_SIMULATOR, { tab: "preference" })} />
 
             {/* Kayit bitti: bir sonraki dogal adimlar */}
             <Animated.View style={styles.actions}>
