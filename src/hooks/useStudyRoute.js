@@ -13,6 +13,7 @@ import { usePremium } from "../contexts/PremiumContext";
 import { ensureSingleActiveRouteStop } from "../domain/route/stopStatus";
 import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, pauseRoute, resumeRoute } from "../supabase/routePlan";
 import { saveRouteStopTransitionOffline } from "../lib/offlineQueue";
+import { persistRouteOnce } from "../lib/routePersistOnce";
 import * as Crypto from "expo-crypto";
 import { track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
@@ -426,8 +427,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       revisionSummary: routeRevisionPreview,
     });
     if (!persistence.shouldPersist) return;
-    saveRouteWeeks(user.id, computedRoute.weeks, resolvedExamType, computedRoute.revision)
-      .then(() => getLatestRouteStops(user.id, resolvedExamType))
+    persistRouteOnce(user.id, computedRoute.weeks, resolvedExamType, computedRoute.revision)
       .then(setPersistedStops)
       .catch((error) => {
         setRouteLoadError(error);
