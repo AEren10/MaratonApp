@@ -13,7 +13,7 @@ import * as appStorage from "../lib/storage/appStorage";
 // kaydi gorur (rehberde kapatilan ipucu ana sayfadan hemen kalkar). Yazma
 // yuklemeyi bekler; eskiden rehber yukleme bitmeden bos kayitla yazip
 // daha once kapatilan ipuclarini geri getiriyordu.
-export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story" });
+export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story", SCHEDULE: "schedule" });
 // Widget'lar yalniz iOS'ta var.
 const ORDER = Platform.OS === "ios" ? [DISCOVER_TIPS.WIDGET, DISCOVER_TIPS.STORY] : [DISCOVER_TIPS.STORY];
 
@@ -49,6 +49,7 @@ export function useDiscoverTips({ eligible = true } = {}) {
     });
   }, []);
 
+  const isClosed = useCallback((key) => Boolean(closed?.[key]), [closed]);
   const tip = eligible && closed ? ORDER.find((key) => !closed[key]) || null : null;
-  return { tip, close };
+  return { tip, close, isClosed, closed };
 }

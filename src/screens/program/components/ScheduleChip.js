@@ -2,28 +2,52 @@ import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useC } from "../../../contexts/ThemeContext";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
-// Ders programi cipi. tone: "subject" (kizil tint zemin, ders renginde yazi),
+// Ders programi cipi. tone: "subject" (ders renginde tint zemin ve kenarlik),
 // "dashed" (Deneme günü / Boş gün), "plain" (secilmemis secenek).
-// Gorsel yukseklik 30; dokunulabilir olanlarda hitSlop ile 44'e tamamlanir.
 function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
   const C = useC();
+  const chipColor = color || C.accent;
+
   const look = tone === "dashed"
-    ? { borderColor: selected ? C.accent : C.border, borderStyle: "dashed", color: selected ? C.text : C.text3 }
+    ? {
+        borderColor: selected ? chipColor : C.border,
+        backgroundColor: selected ? chipColor + "18" : "transparent",
+        borderStyle: selected ? "solid" : "dashed",
+        color: selected ? C.text : C.text3,
+      }
     : tone === "plain"
-      ? { borderColor: C.elev, backgroundColor: C.void, color: C.text3 }
-      : { borderColor: C.bandEdge, backgroundColor: C.brandTint, color: color || C.text };
+      ? {
+          borderColor: C.line,
+          backgroundColor: C.surface,
+          borderStyle: "solid",
+          color: C.text3,
+        }
+      : {
+          borderColor: chipColor + "60",
+          backgroundColor: chipColor + "20",
+          borderStyle: "solid",
+          color: chipColor,
+        };
 
   const content = (
     <Text style={[s.text, { color: look.color }]}>{label}</Text>
   );
-  const box = [s.chip, { borderColor: look.borderColor, backgroundColor: look.backgroundColor, borderStyle: look.borderStyle }];
+  const box = [
+    s.chip,
+    {
+      borderColor: look.borderColor,
+      backgroundColor: look.backgroundColor,
+      borderStyle: look.borderStyle,
+    },
+  ];
 
   if (!onPress) return <View style={box}>{content}</View>;
   return (
-    <Press haptic="none"
+    <Press
+      haptic="none"
       onPress={onPress}
       hitSlop={{ top: 4, bottom: 4 }}
       accessibilityRole="button"
@@ -40,7 +64,7 @@ export default memo(ScheduleChip);
 const s = StyleSheet.create({
   chip: {
     height: 36,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     borderRadius: SHAPE.chip,
     borderWidth: 1,
     justifyContent: "center",

@@ -5,6 +5,7 @@ import { STEP } from "../../../themes/tokens";
 import { HomeTodayStops } from "./HomeTodayStops";
 import { HomeNotebookCard } from "./HomeNotebookCard";
 import { HomeDiscoverTip } from "./HomeDiscoverTip";
+import { ScheduleDiscoverCard } from "../../program/components/ScheduleDiscoverCard";
 
 // Ana Sayfa (Pro) govdesi: bugunun duraklari ve -- yalniz tekrar bekleyen
 // varsa -- Defter. Ana sayfa "simdi ne yapayim" sorusuna cevap verir;
@@ -19,6 +20,7 @@ export const HomeProBody = React.memo(function HomeProBody({ stops, dueCount = 0
           <HomeNotebookCard dueCount={dueCount} onPress={go.notebook} onReview={go.review} />
         </View>
       ) : null}
+      <ScheduleDiscoverCard style={{ marginTop: STEP.s3 }} />
       <HomeDiscoverTip eligible={discoverEligible} />
     </View>
   );

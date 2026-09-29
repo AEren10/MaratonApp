@@ -6,7 +6,8 @@ import { DAY_KINDS } from "../../../domain/program/classSchedule";
 import { WEEKDAYS_SHORT_TR } from "../../../lib/trWords";
 import { formatNumber } from "../../../lib/format";
 import { subjectPaletteKey } from "../../../themes/subjectPalette";
-import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { Icon } from "../../../components/design";
 import ScheduleChip from "./ScheduleChip";
 import ScheduleDayEditor from "./ScheduleDayEditor";
 import { Press } from "../../../components/design/Press";
@@ -21,17 +22,33 @@ function hoursLabel(day) {
 function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
   const C = useC();
   const kindLabel = KIND_LABEL[day.kind];
-  const dayColor = isToday ? C.accentBright : day.kind === DAY_KINDS.OFF ? C.text3 : C.text2;
+  const dayColor = isToday ? C.accentBright : day.kind === DAY_KINDS.OFF ? C.text3 : C.text;
 
   return (
-    <View style={[s.wrap, { borderTopColor: C.line }, isLast && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
-      <Press haptic="none"
+    <View
+      style={[
+        s.wrap,
+        {
+          borderColor: open ? C.accent + "40" : C.line,
+          backgroundColor: open ? C.void : "transparent",
+        },
+        isLast && { borderBottomWidth: 1 },
+      ]}
+    >
+      <Press
+        haptic="none"
         onPress={() => editor.toggleOpen(day.weekday)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        style={[s.row]}
+        style={s.row}
       >
-        <Text style={[TYPOGRAPHY.tableHead, s.day, { color: dayColor }]}>{WEEKDAYS_SHORT_TR[day.weekday]}</Text>
+        <View style={s.dayCol}>
+          <Text style={[TYPOGRAPHY.tableHead, s.dayText, { color: dayColor }]}>
+            {WEEKDAYS_SHORT_TR[day.weekday]}
+          </Text>
+          {isToday ? <View style={[s.todayDot, { backgroundColor: C.accent }]} /> : null}
+        </View>
+
         <View style={s.chips}>
           {kindLabel ? (
             <ScheduleChip tone="dashed" label={kindLabel} />
@@ -47,7 +64,11 @@ function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
             <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Ders seçilmedi</Text>
           )}
         </View>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{hoursLabel(day)}</Text>
+
+        <View style={s.endCol}>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{hoursLabel(day)}</Text>
+          <Icon name={open ? "chevUp" : "chevDown"} size={14} color={C.text3} />
+        </View>
       </Press>
       {open ? <ScheduleDayEditor day={day} editor={editor} /> : null}
     </View>
@@ -57,8 +78,42 @@ function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
 export default memo(ScheduleDayRow);
 
 const s = StyleSheet.create({
-  wrap: { borderTopWidth: 1 },
-  row: { flexDirection: "row", alignItems: "center", minHeight: 64, paddingVertical: STEP.s3, gap: STEP.s2 },
-  day: { width: 36 },
-  chips: { flex: 1, flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  wrap: {
+    borderTopWidth: 1,
+    borderRadius: SHAPE.cardTight,
+    overflow: "hidden",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 64,
+    paddingVertical: STEP.s2,
+    paddingHorizontal: STEP.s1,
+    gap: STEP.s2,
+  },
+  dayCol: {
+    width: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  dayText: {
+    fontVariant: ["tabular-nums"],
+  },
+  todayDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  chips: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  endCol: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
 });
