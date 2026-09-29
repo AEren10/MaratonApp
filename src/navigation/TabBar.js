@@ -145,9 +145,11 @@ export function TabBar({ state, navigation }) {
         onClose={() => setSheetOpen(false)}
         onAction={(screen, params) => navigation.navigate(screen, params)}
       />
+      {/* Icerik tabbar'a sert cizgiyle degil yumusak kararmayla girer: 20 -> 52px. */}
       <LinearGradient
-        colors={["transparent", C.surface + "CC", C.surface]}
-        style={{ position: "absolute", top: -20, left: 0, right: 0, height: 20 }}
+        colors={["transparent", C.surface + "59", C.surface + "D9", C.surface]}
+        locations={[0, 0.45, 0.85, 1]}
+        style={{ position: "absolute", top: -52, left: 0, right: 0, height: 52 }}
         pointerEvents="none"
       />
       <View style={{

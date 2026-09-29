@@ -19,7 +19,7 @@ export function DepthLayout({ children, route, options }) {
   return (
     <View style={fill}>
       {children}
-      <ScreenDepth subjectKey={route?.params?.subjectKey || null} />
+      <ScreenDepth subjectKey={route?.params?.subjectKey || null} home={route?.name === SCREENS.HOME_ROOT} />
     </View>
   );
 }

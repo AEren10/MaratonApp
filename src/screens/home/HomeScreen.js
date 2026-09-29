@@ -18,6 +18,7 @@ import { useDueReviews } from "../../hooks/useDueReviews";
 import { syncReviewWidget, syncStreakWidget, syncTrialWidget } from "../../lib/widgetSync";
 import { updateReminderContent } from "../../lib/notifications";
 import { useAuth } from "../../contexts/AuthContext";
+import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
 // Bağlantı Yok). Kaldirilan eski kartlarin hedefleri:
@@ -32,10 +33,9 @@ export default function HomeScreen() {
   const { dueCount } = useDueReviews(user?.id);
   useEffect(() => { syncReviewWidget({ due: dueCount }); updateReminderContent({ reviewDue: dueCount }, user?.id); }, [dueCount, user?.id]);
   // Seri izgarasi 28 gun geriye bakar: recentLogs 45 gunluk kayit tasir.
-  useEffect(() => {
-    syncStreakWidget({ logs: dashboard.recentLogs, streak: h.streak, longest: h.longestStreak });
-  }, [dashboard.recentLogs, h.streak, h.longestStreak]);
+  useEffect(() => { syncStreakWidget({ logs: dashboard.recentLogs, streak: h.streak, longest: h.longestStreak }); }, [dashboard.recentLogs, h.streak, h.longestStreak]);
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
+  useHomeDepthTone(dashboard.solvedToday, h.dailyGoal);
 
   const discoverEligible = (h.longestStreak || h.streak || 0) > 0;
   const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess

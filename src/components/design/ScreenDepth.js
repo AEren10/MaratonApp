@@ -4,6 +4,7 @@ import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-nat
 
 import { useC, useTheme } from "../../contexts/ThemeContext";
 import { subjectColorOf } from "../../themes/subjectPalette";
+import { useDepthTone } from "../../lib/depthTone";
 
 // EKRAN DERINLIGI
 //
@@ -20,12 +21,18 @@ import { subjectColorOf } from "../../themes/subjectPalette";
 // 0.055 -> 0.085 (kullanici: etkili, biraz artsin, 29 Eylul).
 const TOP_LIGHT = 0.085;
 const SUBJECT_TINT = 0.14;
+// Ana sayfada gunun durumu: hedef tuttu (up) / sinav yakin (warn).
+const STATE_TINT = 0.12;
 
-export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null }) {
+export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null, home = false }) {
   const C = useC();
   const { isDark } = useTheme();
+  const state = useDepthTone();
   if (!isDark) return null;
-  const tint = subjectKey ? subjectColorOf(C, subjectKey) : null;
+  const stateColor = home ? ({ up: C.up, warn: C.warn }[state] || null) : null;
+  const tint = stateColor || (subjectKey ? subjectColorOf(C, subjectKey) : null);
+  const tintOpacity = stateColor ? STATE_TINT : SUBJECT_TINT;
+  const tintX = stateColor ? "50%" : "92%";
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
@@ -36,8 +43,8 @@ export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null }) {
             <Stop offset="0.5" stopColor={C.text} stopOpacity={0} />
           </LinearGradient>
           {tint ? (
-            <RadialGradient id="sd-tint" cx="92%" cy="0%" r="70%">
-              <Stop offset="0" stopColor={tint} stopOpacity={SUBJECT_TINT} />
+            <RadialGradient id="sd-tint" cx={tintX} cy="0%" r="70%">
+              <Stop offset="0" stopColor={tint} stopOpacity={tintOpacity} />
               <Stop offset="1" stopColor={tint} stopOpacity={0} />
             </RadialGradient>
           ) : null}

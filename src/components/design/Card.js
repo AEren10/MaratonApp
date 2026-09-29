@@ -1,5 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import { useC } from "../../contexts/ThemeContext";
+import { useC, useTheme } from "../../contexts/ThemeContext";
+import { mix } from "../../themes/colorMix";
 import { SHAPE, STEP } from "../../themes/tokens";
 
 // Tasarimda derinlik golgeyle degil yuzey tonu + 1px kenarlikla kurulur.
@@ -21,7 +22,12 @@ export function Card({
   ...rest
 }) {
   const C = useC();
+  const { isDark } = useTheme();
   const t = (TONES[tone] || TONES.surface)(C);
+  // Ust kenar isigi: isik yukaridan geliyor (ScreenDepth), kartin ust kenari
+  // onu yakalar. Golge yok; yalniz kenarligin ust cizgisi bir ton acik.
+  // Yalniz koyu temada ve yukselen yuzeylerde -- girinti (void) isik almaz.
+  const lit = isDark && bordered && (tone === "surface" || tone === "elev");
 
   return (
     <View
@@ -31,6 +37,7 @@ export function Card({
           borderRadius: SHAPE[radius] ?? radius,
         },
         bordered && t.border !== "transparent" && { borderWidth: 1, borderColor: t.border },
+        lit && { borderTopColor: mix(C.text, 22, t.border) },
         padded && styles.padded,
         style,
       ]}
