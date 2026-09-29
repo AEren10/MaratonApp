@@ -14,7 +14,6 @@ import { getProductAccessSnapshot } from "../supabase/productAccess";
 import { getExamPhase } from "../domain/exam/examPhase";
 import { canAccessProductFeature, canShowPaywall, trialQuotaDecision } from "../domain/premium/paywallGate";
 import { DEV_ACCESS_SNAPSHOT } from "../domain/premium/devAccessSnapshot";
-import { initPurchases } from "../lib/purchases";
 
 const PremiumContext = createContext(null);
 
@@ -84,10 +83,7 @@ export function PremiumProvider({ children }) {
     setUsage(null);
     setAccessState("loading");
     if (!user?.id) return;
-    const requestedUserId = user.id;
-    initPurchases(requestedUserId).finally(() => {
-      if (isCurrentUser(requestedUserId)) refreshUsage();
-    });
+    refreshUsage();
   }, [isCurrentUser, refreshUsage, user?.id]);
 
   useEffect(() => {

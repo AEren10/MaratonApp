@@ -34,7 +34,7 @@ test("stale premium refresh results cannot overwrite a newer auth user", () => {
   assert.match(source, /const requestedUserId = user\?\.id \|\| null;/);
   assert.match(source, /if \(!isCurrentUser\(requestedUserId\)\) return null;\s+setSnapshot\(next\);/);
   assert.match(source, /if \(!isCurrentUser\(requestedUserId\)\) return null;\s+setUsage\(\{/);
-  assert.match(source, /initPurchases\(requestedUserId\)\.finally\(\(\) => \{\s+if \(isCurrentUser\(requestedUserId\)\) refreshUsage\(\);/);
+  assert.match(source, /if \(!user\?\.id\) return;\s+refreshUsage\(\);/);
 });
 
 test("manual paywall does not open before premium access snapshot is ready", () => {
