@@ -55,7 +55,7 @@ export function OnboardingSlideDaily({ C }) {
 
       {/* Görev Satırı */}
       <View style={[s.taskBox, { borderTopColor: C.line, borderBottomColor: C.line }]}>
-        <View style={[s.subjectBar, { backgroundColor: "#E0A570" }]} />
+        <View style={[s.subjectBar, { backgroundColor: C.subjects?.matematik || C.accent }]} />
 
         <View style={s.taskInfo}>
           <Text style={[TYPOGRAPHY.topicName, { color: C.text }]} numberOfLines={1}>
