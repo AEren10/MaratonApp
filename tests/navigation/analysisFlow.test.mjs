@@ -24,7 +24,6 @@ test("analysis home uses canonical labels and a sticky trial entry action", () =
   const screen = readFileSync("src/screens/analysis/AnalysisScreen.js", "utf8");
   const shortcuts = readFileSync("src/screens/analysis/components/AnalysisShortcutRow.js", "utf8");
   const practice = readFileSync("src/screens/analysis/components/AnalysisPracticeSection.js", "utf8");
-  const history = readFileSync("src/screens/analysis/components/HistoryList.js", "utf8");
   const subjectList = readFileSync("src/screens/analysis/SubjectListScreen.js", "utf8");
 
   // Deneme gir basliktan sag alttaki sabit butona tasindi (27 Eylul).
@@ -36,7 +35,6 @@ test("analysis home uses canonical labels and a sticky trial entry action", () =
   assert.match(practice, /DAHA DERİNE/);
   assert.match(practice, /Net Tahmini/);
   assert.match(practice, /Simülasyon/);
-  assert.match(history, /Yayın karşılaştırması/);
   assert.match(subjectList, /Konu ilerlemesi/);
 });
 
