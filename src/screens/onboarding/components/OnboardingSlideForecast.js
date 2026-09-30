@@ -77,7 +77,7 @@ export function OnboardingSlideForecast({ C }) {
 
           <Circle cx={24} cy={70} r={4.5} fill={C.bg} stroke={C.text3} strokeWidth={2} />
           <Circle cx={278} cy={18} r={6} fill={C.accentBright} />
-          <Circle cx={278} cy={18} r={2.5} fill={C.accentInk || "#FFF"} />
+          <Circle cx={278} cy={18} r={2.5} fill={C.accentInk} />
         </Svg>
       </View>
 
