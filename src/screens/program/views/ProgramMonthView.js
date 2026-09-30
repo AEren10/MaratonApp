@@ -50,11 +50,6 @@ export function ProgramMonthView() {
         dailyGoal={dailyGoal}
       />
       <StreakLegend />
-      <StreakMonthCard
-        monthDate={monthDate}
-        stats={stats}
-        onPress={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
-      />
       <DayDetails
         day={selectedDay}
         data={dayMap[selectedDay]}
@@ -63,6 +58,11 @@ export function ProgramMonthView() {
         onToggleTask={toggleTask}
         onRemoveTask={removeTask}
         onTrialPress={handleTrialPress}
+      />
+      <StreakMonthCard
+        monthDate={monthDate}
+        stats={stats}
+        onPress={() => navigation.navigate(SCREENS.SUMMARY, { period: "month" })}
       />
     </ScrollView>
   );

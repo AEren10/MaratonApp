@@ -7,7 +7,7 @@ import { formatNumber } from "../../../lib/format";
 import { getNextMilestone } from "../../../lib/streakMilestones";
 import { MONTHS_TR } from "../../../lib/trWords";
 import { selectStreak } from "../../../store/slices/studyLogSlice";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 
@@ -45,8 +45,6 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
   const locative = MONTH_LOCATIVES[monthIdx] || `${MONTHS_TR[monthIdx]}'de`;
   const totalWorkedDays = (stats?.goalDays || 0) + (stats?.keptDays || 0);
   const questions = stats?.questions || 0;
-  // Cubuk eskiden hedef tutulan gun oranini cizerdi; hedef hic tutmayan
-  // kullanicida bos kaliyordu. Ayin gecen gunlerinin kacinda calisildi.
   const elapsed = elapsedDays(monthDate);
 
   const summaryText = totalWorkedDays > 0
@@ -54,7 +52,7 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
     : `${locative} henüz çalışma kaydı yok`;
 
   return (
-    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}>
+    <View style={[s.wrap, { borderTopWidth: 1, borderTopColor: C.line }]}>
       <Press
         haptic="tap"
         onPress={onPress}
@@ -66,7 +64,12 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
           <Text style={[TYPOGRAPHY.label, s.flex, { color: C.text3 }]}>
             {MONTHS_TR[monthIdx].toLocaleUpperCase("tr-TR")} ÖZETİ
           </Text>
-          {onPress ? <Icon name="chevR" size={16} color={C.text3} /> : null}
+          {onPress ? (
+            <View style={s.linkRow}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>Ayın Özeti</Text>
+              <Icon name="chevR" size={14} color={C.accentBright} />
+            </View>
+          ) : null}
         </View>
         <Text style={[TYPOGRAPHY.subheading, s.summary, { color: C.text }]}>
           {summaryText}
@@ -97,26 +100,17 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
 export default memo(StreakMonthCard);
 
 const s = StyleSheet.create({
-  card: {
-    marginTop: STEP.s4 - 4,
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  topPress: {
-    padding: STEP.s3,
-  },
+  wrap: { marginTop: STEP.s4, paddingTop: STEP.s3 },
+  topPress: { paddingVertical: STEP.s1 },
+  headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  linkRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 / 2 },
   summary: { marginTop: STEP.s2, letterSpacing: -0.4 },
-  barRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s3 },
+  barRow: { flexDirection: "row", alignItems: "center", gap: STEP.s2, marginTop: STEP.s3 },
   track: { flex: 1, height: 4, borderRadius: 2, overflow: "hidden" },
   fill: { position: "absolute", left: 0, top: 0, bottom: 0 },
   num: { letterSpacing: 0, fontVariant: ["tabular-nums"] },
-  milestone: {
-    paddingVertical: STEP.s2 + 2,
-    paddingHorizontal: STEP.s3,
-  },
+  milestone: { marginTop: STEP.s3, paddingTop: STEP.s3 },
   mHead: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
   mBar: { flexDirection: "row", marginTop: STEP.s2 },
   flex: { flex: 1 },
-  headRow: { flexDirection: "row", alignItems: "center" },
 });
