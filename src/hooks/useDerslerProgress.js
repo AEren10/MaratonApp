@@ -3,12 +3,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { getTopicProgress } from "../supabase/topicProgress";
 import { captureError } from "../lib/errorReporting";
 import { getCompletedTopicsMap, isTopicDone } from "../lib/topicCompletion";
+import { rowAccuracy } from "../domain/route/effectiveAccuracy";
 
 const EXPECTED_QUESTIONS = 30;
 
 export function calcTopicProgress(tp) {
   const qScore = Math.min((tp.total_questions || 0) / EXPECTED_QUESTIONS, 1) * 40;
-  const accScore = tp.total_questions > 0 ? ((tp.correct_count || 0) / tp.total_questions) * 30 : 0;
+  const accScore = ((rowAccuracy(tp) || 0) / 100) * 30;
   const freqScore = Math.min((tp.study_count || 0) / 3, 1) * 30;
   return Math.min(100, Math.round(qScore + accScore + freqScore));
 }

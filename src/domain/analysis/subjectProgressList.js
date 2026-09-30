@@ -1,5 +1,6 @@
 import { ROUTE_STOP_STATUS, routeStopStatusLabel } from "../route/stopStatus.js";
 import { subjectPaletteKey } from "../../themes/subjectPalette.js";
+import { rowAccuracy } from "../route/effectiveAccuracy.js";
 
 export const SUBJECT_PROGRESS_TAB = Object.freeze({
   PRIORITY: "PRIORITY",
@@ -17,7 +18,7 @@ function topicPct(row) {
   if (!row) return 0;
   const q = row.total_questions || 0;
   const qScore = Math.min(q / EXPECTED_QUESTIONS, 1) * 40;
-  const accScore = q > 0 ? ((row.correct_count || 0) / q) * 30 : 0;
+  const accScore = ((rowAccuracy(row) || 0) / 100) * 30;
   const freqScore = Math.min((row.study_count || 0) / 3, 1) * 30;
   return Math.min(100, Math.round(qScore + accScore + freqScore));
 }
@@ -85,9 +86,7 @@ function collect({ progressRows, routeStops, notebookItems }) {
 function decorate(entry, now) {
   const row = entry.row;
   const totalQuestions = row?.total_questions || 0;
-  const accuracy = totalQuestions > 0
-    ? Math.round(((row.correct_count || 0) / totalQuestions) * 100)
-    : null;
+  const accuracy = rowAccuracy(row);
   const status = entry.stop?.lifecycleStatus || null;
   const pctValue = topicPct(row);
   return {

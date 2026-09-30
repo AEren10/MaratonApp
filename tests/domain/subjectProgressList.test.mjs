@@ -133,9 +133,25 @@ test("ayni konu birden fazla haftada durursa en erken hafta temsil eder", () => 
 
 test("ders rengi anahtari sinav on ekinden arindirilir", () => {
   const [item] = buildSubjectProgressList({
-    progressRows: [row("Turev", { total_questions: 4, correct_count: 0 })],
+    progressRows: [row("Turev", { total_questions: 4, correct_count: 1 })],
     tab: SUBJECT_PROGRESS_TAB.PRIORITY,
   });
   assert.equal(item.subjectKey, "matematik");
   assert.equal(item.meta, "4 soru");
+});
+
+test("dogru sayisi girilmemis konu zayif sayilmaz (bilinmiyor, %0 degil)", () => {
+  const items = buildSubjectProgressList({
+    progressRows: [row("Turev", { total_questions: 40, correct_count: 0 })],
+    tab: SUBJECT_PROGRESS_TAB.PRIORITY,
+  });
+  assert.equal(items.length, 0);
+});
+
+test("dogruluk yalniz dogrusu girilen sorulara gore (graded_questions)", () => {
+  const [item] = buildSubjectProgressList({
+    progressRows: [row("Turev", { total_questions: 100, correct_count: 8, graded_questions: 20 })],
+    tab: SUBJECT_PROGRESS_TAB.PRIORITY,
+  });
+  assert.equal(item.accuracy, 40); // 8/100 = %8 olurdu
 });

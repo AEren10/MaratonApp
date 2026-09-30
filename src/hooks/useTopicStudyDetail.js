@@ -10,6 +10,7 @@ import {
   buildChart,
 } from "./topicStudyDetailHelpers";
 import { todayTR } from "../lib/dateUtils";
+import { knownAccuracy, rowAccuracy } from "../domain/route/effectiveAccuracy";
 
 export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
   const [history, setHistory] = useState([]);
@@ -83,10 +84,11 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
     return history.reduce((sum, h) => sum + (h.correct_count || 0), 0);
   }, [progressRow, history]);
 
-  const accuracy = useMemo(
-    () => (totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : null),
-    [totalQuestions, correctCount]
-  );
+  const accuracy = useMemo(() => {
+    if (progressRow?.total_questions > 0) return rowAccuracy(progressRow);
+    const graded = history.reduce((sum, h) => sum + ((h.correct_count || 0) > 0 ? h.question_count || 0 : 0), 0);
+    return knownAccuracy({ q: totalQuestions, correct: correctCount, graded });
+  }, [progressRow, history, totalQuestions, correctCount]);
 
   const recentLogs = useMemo(() => {
     return [...history]

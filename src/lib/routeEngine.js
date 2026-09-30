@@ -117,8 +117,10 @@ export function buildRoute({
       const feel = topicFeel?.[subject.key]?.[name];
       // Dogru sayisi girilmemisse dogruluk "bilinmiyor" (effectiveAccuracy);
       // maliyet, ustalik ve hafiza bu etkin degerle hesaplanir.
-      const { acc, known: accuracyKnown } = effectiveAccuracy({ q, correct: rawTp.correct_count, feel });
-      const tp = accuracyKnown || q <= 0 ? rawTp : { ...rawTp, correct_count: Math.round((q * acc) / 100) };
+      const { acc, known: accuracyKnown } = effectiveAccuracy({ q, correct: rawTp.correct_count, graded: rawTp.graded_questions, feel });
+      // Asagidaki hesaplar correct_count / total_questions okuyor; etkin dogruluk
+      // (bilinen payla ya da tahminle) ona gore yeniden yazilir.
+      const tp = q <= 0 ? rawTp : { ...rawTp, correct_count: Math.round((q * acc) / 100) };
       const neglectedDays = tp.last_studied_at
         ? Math.max(0, Math.round((now - new Date(tp.last_studied_at)) / 86400000))
         : 0;

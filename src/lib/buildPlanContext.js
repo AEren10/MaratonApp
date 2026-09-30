@@ -2,6 +2,7 @@
 // HomeScreen ve PlanDetailScreen aynı bağlamı bu fonksiyonlarla üretir (DRY).
 
 import { trialSubjectsToCurriculumWeakAreas } from "../domain/trial/trialKeyMap";
+import { rowAccuracy } from "../domain/route/effectiveAccuracy";
 
 // Son 3 denemenin ağırlıklı ortalamasıyla zayıf alan (curriculum key → başarı %).
 // Ağırlık: en yeni 0.5, sonra 0.3, 0.2. Tek kötü deneme planı saptırmasın.
@@ -48,7 +49,8 @@ export function buildTopicWeakness(rows = []) {
   rows.forEach((r) => {
     const q = r.total_questions || 0;
     if (q < 5 || !r.topic_name) return; // anlamlı veri için min 5 soru
-    const acc = Math.round(((r.correct_count || 0) / q) * 100);
+    const acc = rowAccuracy(r);
+    if (acc == null) return; // dogruluk bilinmiyorsa 'zayif' denmez
     if (!bySubject[r.subject_key]) bySubject[r.subject_key] = [];
     bySubject[r.subject_key].push({ topic: r.topic_name, acc, q });
   });

@@ -11,6 +11,7 @@ import {
   isTopicDone,
   makeTopicKey,
 } from "../lib/topicCompletion";
+import { rowAccuracy } from "../domain/route/effectiveAccuracy";
 
 function formatMinutes(min) {
   if (!min) return null;
@@ -44,7 +45,7 @@ function buildTopics(curriculumKeys, progressRows, completedMap = {}, subjectKey
         isTopicDone(completedMap, ck, name, autoPct);
       const pct = done ? 100 : autoPct;
       const totalQuestions = tp?.total_questions || 0;
-      const accuracy = totalQuestions > 0 ? Math.round(((tp.correct_count || 0) / totalQuestions) * 100) : null;
+      const accuracy = rowAccuracy(tp);
       list.push({
         name,
         pct,

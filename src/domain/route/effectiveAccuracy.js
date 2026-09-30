@@ -15,11 +15,30 @@
 const FEEL_ACC = { easy: 85, ok: 72, hard: 55 };
 const VOLUME_MASTERY_Q = 40;
 
-export function effectiveAccuracy({ q = 0, correct = 0, feel = null } = {}) {
+// Payda: dogru sayisi GIRILMIS kayitlarin sorulari (topic_progress.graded_questions).
+// Bilinen ve bilinmeyen kayitlar ayni konuda karisinca correct / toplam soru
+// dogrulugu yanlis dusurur (100 sorunun 20'sinde 15 dogru -> %15, oysa %75).
+// graded yoksa (eski satir) toplam soruya duser.
+export function knownAccuracy({ q = 0, correct = 0, graded = 0 } = {}) {
   const questions = Number(q) || 0;
   const right = Number(correct) || 0;
+  if (questions <= 0 || right <= 0) return null;
+  const g = Number(graded) || 0;
+  const denom = g > 0 ? Math.min(g, questions) : questions;
+  return Math.min(100, Math.round((right / Math.max(denom, right)) * 100));
+}
+
+/** topic_progress satirindan bilinen dogruluk (%), bilinmiyorsa null. */
+export function rowAccuracy(row) {
+  if (!row) return null;
+  return knownAccuracy({ q: row.total_questions, correct: row.correct_count, graded: row.graded_questions });
+}
+
+export function effectiveAccuracy({ q = 0, correct = 0, graded = 0, feel = null } = {}) {
+  const questions = Number(q) || 0;
   if (questions <= 0) return { acc: 0, known: false };
-  if (right > 0) return { acc: Math.round((right / questions) * 100), known: true };
+  const known = knownAccuracy({ q: questions, correct, graded });
+  if (known != null) return { acc: known, known: true };
   if (FEEL_ACC[feel]) return { acc: FEEL_ACC[feel], known: false };
   return { acc: questions >= VOLUME_MASTERY_Q ? 82 : 70, known: false };
 }
