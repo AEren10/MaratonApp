@@ -100,16 +100,23 @@ export default function RouteReadyScreen() {
         )}
       </ScrollView>
 
-      <View style={styles.cta}>
+      <View style={[styles.cta, { borderTopColor: C.line }]}>
         <Button onPress={handleStart} size="lg" fullWidth loading={starting} disabled={!firstStop}>
           İlk durağa başla
         </Button>
         {syncPendingNote ? (
           <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>{syncPendingNote}</Text>
         ) : null}
-        <Button onPress={handleGoHome} variant="outline" size="md" fullWidth style={styles.secondaryBtn}>
-          Ana sayfaya git
-        </Button>
+        <Press
+          haptic="none"
+          onPress={handleGoHome}
+          hitSlop={8}
+          style={styles.homeLink}
+          accessibilityRole="button"
+          accessibilityLabel="Ana sayfaya git"
+        >
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Ana sayfaya git</Text>
+        </Press>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
           Rotanı her zaman değiştirebilirsin. Deneme girdikçe kendini de günceller.
         </Text>
@@ -126,10 +133,8 @@ const styles = StyleSheet.create({
   compareRow: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s3 },
   stopList: { marginTop: STEP.s3 },
   taskBlock: { marginTop: STEP.s3, marginBottom: STEP.s2 },
-  cta: { paddingHorizontal: GUTTER, paddingBottom: STEP.s2, paddingTop: STEP.s1 },
+  cta: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
   homeLink: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
-  homeLinkText: { textDecorationLine: "underline" },
-  secondaryBtn: { marginTop: STEP.s1 },
   pendingNote:  { marginTop: STEP.s1, textAlign: "center" },
   footnote: { marginTop: STEP.s2, textAlign: "center" },
 });
