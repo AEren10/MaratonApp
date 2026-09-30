@@ -46,7 +46,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
                     style={[
                       TYPOGRAPHY.micro,
                       styles.valTop,
-                      { color: bar.highlight ? C.accentBright : C.text2 },
+                      { color: bar.highlight ? C.accentBright : C.text },
                     ]}
                   >
                     {bar.questions}
@@ -60,7 +60,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
                     styles.bar,
                     {
                       height: barHeight,
-                      width: hasQuestions ? "100%" : 4,
+                      width: hasQuestions ? "100%" : "60%",
                       backgroundColor: barColor,
                     },
                   ]}
@@ -83,19 +83,22 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
       </View>
 
       <View style={styles.daysRow}>
-        {bars.map((bar) => (
-          <View key={bar.key} style={styles.dayCol}>
-            <Text
-              style={[
-                TYPOGRAPHY.tableHead,
-                styles.dayLabel,
-                { color: bar.highlight ? C.accentBright : C.text3 },
-              ]}
-            >
-              {bar.label}
-            </Text>
-          </View>
-        ))}
+        {bars.map((bar) => {
+          const hasQuestions = bar.questions > 0;
+          return (
+            <View key={bar.key} style={styles.dayCol}>
+              <Text
+                style={[
+                  TYPOGRAPHY.tableHead,
+                  styles.dayLabel,
+                  { color: bar.highlight ? C.accentBright : hasQuestions ? C.text2 : C.text3 },
+                ]}
+              >
+                {bar.label}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
