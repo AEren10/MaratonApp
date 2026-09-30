@@ -115,3 +115,16 @@ export function routeActionTimerParams(action) {
       : (hasRealPosition ? Math.max(1, Math.round(position) + 1) : undefined),
   };
 }
+
+// Rota Hazir'daki onizleme duraginin kimligi yok (rota henuz yazilmadi).
+// Kimliksiz zamanlayici kaydi duragi TAMAMLAMAZ; ilk durak tiklenmezdi.
+// Rota yazildiktan sonra ilk durak kayitli satirlardan secilir. Yerel yedek
+// kimlikleri ("local_") sunucuda yok: onlarla gecis kuyrukta takili kalir.
+export function firstPersistedRouteAction(createdStops, previewAction) {
+  const persisted = (createdStops || []).filter((stop) => {
+    const id = stop?.id || stop?.stopId;
+    return id && !String(id).startsWith("local_");
+  });
+  // Kayitli rotanin aktif duragi, Ana Sayfa'nin da gosterecegi duraktir.
+  return firstRouteAction(persisted) || previewAction || null;
+}

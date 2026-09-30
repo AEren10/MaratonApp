@@ -29,6 +29,7 @@ import {
   TAB_SCREENS,
 } from "./screenRegistry";
 import { useDeepLink } from "../hooks/useDeepLink";
+import { usePostSetupLanding } from "../hooks/usePostSetupLanding";
 import { consumeAuthIntent } from "../lib/authIntent";
 
 const Stack = createNativeStackNavigator();
@@ -178,6 +179,7 @@ function SetupStack() {
 
 function AppStackInner() {
   useDeepLink();
+  usePostSetupLanding();
 
   return (
     <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
