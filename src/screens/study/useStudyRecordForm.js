@@ -10,6 +10,8 @@ export function useStudyRecordForm(initial = {}, onDirty) {
   const [studyDate, setDate] = useState(initial.studyDate || todayTR());
   const [questions, setQ] = useState(initial.questions ? String(initial.questions) : "");
   const [minutes, setM] = useState(initial.minutes ? String(initial.minutes) : "");
+  // Dogru sayisi istege bagli: bos = bilinmiyor (0 yazilir, rota 0'i "bilinmiyor" okur).
+  const [correct, setC] = useState(initial.correct ? String(initial.correct) : "");
 
   const dirty = useCallback((field, extra) => onDirty?.({ field, ...extra }), [onDirty]);
 
@@ -25,8 +27,9 @@ export function useStudyRecordForm(initial = {}, onDirty) {
   const values = useMemo(() => {
     const qc = parseInt(questions, 10) || 0;
     const dur = parseInt(minutes, 10) || 0;
-    return { qc, dur, topicVal: topic.trim() };
-  }, [questions, minutes, topic]);
+    const cc = Math.min(parseInt(correct, 10) || 0, qc);
+    return { qc, dur, cc, topicVal: topic.trim() };
+  }, [questions, minutes, correct, topic]);
 
   return {
     subjectKey,
@@ -35,6 +38,7 @@ export function useStudyRecordForm(initial = {}, onDirty) {
     studyDate,
     questions,
     minutes,
+    correct,
     values,
     subjectLabel: initial.subjectLabel,
     pickSubject,
@@ -42,6 +46,7 @@ export function useStudyRecordForm(initial = {}, onDirty) {
     setStudyDate: (d) => { dirty("date"); setDate(d); },
     setQuestions: (v) => { dirty("question_count"); setQ(v); },
     setMinutes: (v) => { dirty("duration"); setM(v); },
+    setCorrect: (v) => { dirty("correct_count"); setC(v); },
     canSave: !!subjectKey && !!topic.trim() && values.dur >= 1 && values.dur <= 720,
   };
 }

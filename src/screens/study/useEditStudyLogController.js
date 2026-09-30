@@ -34,6 +34,7 @@ export function useEditStudyLogController() {
     studyDate: log?.study_date,
     questions: log?.questionCount ?? log?.question_count,
     minutes: log?.duration ?? log?.duration_minutes,
+    correct: log?.correctCount ?? log?.correct_count,
   });
 
   useEffect(() => {
@@ -58,8 +59,7 @@ export function useEditStudyLogController() {
 
   const save = useCallback(async () => {
     if (!log?.id || saving || !form.canSave) return;
-    const { qc, dur, topicVal } = form.values;
-    const correct = Math.min(log.correctCount ?? log.correct_count ?? 0, qc);
+    const { qc, dur, topicVal, cc: correct } = form.values;
     const parsed = studyLogSchema.safeParse({ subject: form.subjectKey, topic: topicVal, questionCount: qc, correctCount: correct, duration: dur });
     if (!parsed.success) {
       H.warn();

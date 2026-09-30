@@ -1,4 +1,4 @@
-import { getStudyLogByClientOperationId, deleteStudyLog } from "../supabase/studyLogs";
+import { getStudyLogByClientOperationId, deleteStudyLog, updateStudyLog } from "../supabase/studyLogs";
 import { saveStudyLogOffline, removeFromQueue } from "./offlineQueue";
 import { buildStopStudyLogs, stopLogOperationIds } from "../domain/plan/stopStudyLog";
 import { todayTR } from "./dateUtils";
@@ -43,4 +43,36 @@ export async function removeStopCompletion(userId, stop) {
     }
   }
   return ok;
+}
+
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Tikten sonra sorulan dogru sayisi yalniz tek konulu duraga yazilir. */
+export function canAskStopCorrect(stop) {
+  const topics = Array.isArray(stop?.weeklyTopics) ? stop.weeklyTopics.filter(Boolean) : [];
+  return Boolean(stop?.id) && (Number(stop?.count) || 0) > 0 && topics.length < 2;
+}
+
+/**
+ * Tikle yazilan kayda dogru sayisini ekler. Kayit tikle ayni anda yaziliyor;
+ * henuz sunucuda gorunmuyorsa kisa araliklarla birkac kez bakar. Cevrimdisi
+ * kuyrukta kalan kayitta dogru yazilmaz (bilinmiyor kalir) -- kayip degil.
+ */
+export async function recordStopCorrect(userId, stop, correct) {
+  const operationId = stopLogOperationIds(stop)[0];
+  const value = Math.max(0, Math.min(Number(correct) || 0, Number(stop?.count) || 0));
+  if (!userId || !operationId || value <= 0) return false;
+  for (let i = 0; i < 4; i += 1) {
+    try {
+      const log = await getStudyLogByClientOperationId(userId, operationId);
+      if (log?.id) {
+        await updateStudyLog(log.id, { user_id: userId, correct_count: Math.min(value, log.question_count || value) });
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    await wait(700);
+  }
+  return false;
 }

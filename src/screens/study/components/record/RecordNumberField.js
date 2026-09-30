@@ -5,7 +5,7 @@ import { useC } from "../../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 
 // Void kuyulu sayi girisi ("40", "50 dk"). locked: kesik kenar + kilit, duzenlenmez.
-export function RecordNumberField({ value, onChange, suffix, width = 76, locked, maxLength = 4, a11yLabel }) {
+export function RecordNumberField({ value, onChange, suffix, width = 76, locked, maxLength = 4, a11yLabel, placeholder = "0" }) {
   const C = useC();
   if (locked) {
     return (
@@ -24,7 +24,7 @@ export function RecordNumberField({ value, onChange, suffix, width = 76, locked,
         onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ""))}
         keyboardType="number-pad"
         maxLength={maxLength}
-        placeholder="0"
+        placeholder={placeholder}
         placeholderTextColor={C.text3}
         accessibilityLabel={a11yLabel}
         selectTextOnFocus

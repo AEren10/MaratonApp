@@ -15,7 +15,8 @@ import { RecordRow } from "./RecordRow";
 import { SubjectSheet } from "./SubjectSheet";
 import { QuickDurationChips } from "./QuickDurationChips";
 
-// Elle giris ve Kaydi Duzenle'nin ortak formu: DERS, KONU, TARIH, SORU, SURE.
+// Elle giris ve Kaydi Duzenle'nin ortak formu: DERS, KONU, TARIH, SORU, DOGRU, SURE.
+// DOGRU istege bagli; bos birakilirsa konu dogrulugu bilinmiyor sayilir.
 export function StudyRecordFields({ form, groups, dateExtraKey }) {
   const C = useC();
   const showAlert = useAlert();
@@ -62,6 +63,17 @@ export function StudyRecordFields({ form, groups, dateExtraKey }) {
             a11yLabel="Çözülen soru"
           />
         </RecordRow>
+        {form.values.qc > 0 ? (
+          <RecordRow label="DOĞRU">
+            <RecordNumberField
+              value={form.correct}
+              onChange={form.setCorrect}
+              maxLength={4}
+              placeholder="?"
+              a11yLabel="Doğru sayısı, isteğe bağlı"
+            />
+          </RecordRow>
+        ) : null}
         <RecordRow label="SÜRE">
           <RecordNumberField
             value={form.minutes}

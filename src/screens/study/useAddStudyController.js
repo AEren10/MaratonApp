@@ -49,12 +49,12 @@ export function useAddStudyController() {
       showAlert("Oturum bulunamadı", "Çalışmayı kaydetmek için tekrar giriş yapmalısın.");
       return;
     }
-    const { qc, dur: duration, topicVal } = form.values;
+    const { qc, cc, dur: duration, topicVal } = form.values;
     const { subjectKey, tier, studyDate } = form;
     const isToday = studyDate === todayTR();
     const current = [...tytSubjects, ...aytSubjects].find((s) => s.key === subjectKey);
 
-    const parsed = studyLogSchema.safeParse({ subject: subjectKey, topic: topicVal, questionCount: qc, correctCount: 0, duration });
+    const parsed = studyLogSchema.safeParse({ subject: subjectKey, topic: topicVal, questionCount: qc, correctCount: cc, duration });
     if (!parsed.success) {
       H.warn();
       showAlert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
@@ -65,7 +65,7 @@ export function useAddStudyController() {
     if (isToday) {
       dispatch(addLog({
         id: Date.now().toString(), subject: subjectKey, topic: topicVal,
-        questionCount: qc, correctCount: 0, duration, examTier: tier, study_date: studyDate,
+        questionCount: qc, correctCount: cc, duration, examTier: tier, study_date: studyDate,
       }));
     }
 
@@ -74,7 +74,7 @@ export function useAddStudyController() {
     try {
       result = await saveStudyLogOffline({
         user_id: user.id, subject: subjectKey, topic: topicVal,
-        question_count: qc, correct_count: 0, duration_minutes: duration,
+        question_count: qc, correct_count: cc, duration_minutes: duration,
         study_date: studyDate, notes: null,
       });
     } catch (e) {

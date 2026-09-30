@@ -10,6 +10,8 @@ import { todayTR } from "../../../lib/dateUtils";
 import * as H from "../../../lib/haptics";
 import { HomeStopRow } from "./HomeStopRow";
 import { StopActionModal } from "../../program/components/StopActionModal";
+import { useStopCorrectPrompt } from "../../../hooks/useStopCorrectPrompt";
+import { StopCorrectSheet } from "./StopCorrectSheet";
 
 // Satir eklenip cikinca liste zipla­masin diye.
 const REFLOW = LinearTransition.duration(220);
@@ -21,7 +23,8 @@ const PREVIEW = 3;
 export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
   const C = useC();
   const [menuStop, setMenuStop] = useState(null);
-  const { items, doneCount, nextId, toggle } = stops;
+  const { items, doneCount, nextId } = stops;
+  const correct = useStopCorrectPrompt(stops);
   const isAllDone = items.length > 0 && doneCount === items.length;
   const preview = items.slice(0, PREVIEW);
   const more = Math.max(0, items.length - PREVIEW);
@@ -58,7 +61,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
                 <HomeStopRow
                   item={item}
                   isNext={item.id === nextId}
-                  onToggle={toggle}
+                  onToggle={correct.toggleWithPrompt}
                   onStart={onStartTask}
                   onOpenMenu={setMenuStop}
                 />
@@ -90,6 +93,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
         dateKey={todayTR()}
         onClose={() => setMenuStop(null)}
       />
+      <StopCorrectSheet stop={correct.asking} onAnswer={correct.answer} onSkip={correct.skip} />
     </View>
   );
 }
