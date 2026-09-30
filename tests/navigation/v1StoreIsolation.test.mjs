@@ -18,6 +18,7 @@ test("production navigation keeps legacy premium names as Home redirects", () =>
   const registry = src("src/navigation/screenRegistry.js");
   const assignment = src("src/navigation/tabAssignment.js");
   const navigator = src("src/navigation/AppNavigator.js");
+  const orphanCheck = src("scripts/check-orphan-screens.js");
 
   assert.doesNotMatch(registry, /screens\/premium\//);
   assert.match(registry, /SCREENS\.PAYWALL, LegacyHomeRedirectScreen/);
@@ -25,6 +26,8 @@ test("production navigation keeps legacy premium names as Home redirects", () =>
   assert.match(registry, /SCREENS\.PREMIUM, LegacyHomeRedirectScreen/);
   assert.match(assignment, /ROOT_ONLY = \[[\s\S]*SCREENS\.SUBSCRIPTION/);
   assert.doesNotMatch(navigator, /useAccessEndedMoment/);
+  assert.match(orphanCheck, /V1 ucretsiz oldugu icin premium\/kart odeme ekranlari/);
+  assert.match(orphanCheck, /"PAYMENT_CARD", "PAYMENT_PROCESSING", "PAYMENT_SUCCESS", "PAYMENT_FAILED"/);
 });
 
 test("free V1 has no visible subscription or premium Home branch", () => {

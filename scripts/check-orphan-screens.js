@@ -33,11 +33,16 @@ const REGISTRY_FILES = new Set([
 // Bilerek girissiz: Defter topluluk v1 disi, navigator kapsayicilari, eski rota adinin
 // yeni ekrana yonlendigi takma adlar (derin baglanti icin kayitli), yigin
 // ilk ekrani ve yalniz e-posta baglantisiyla acilan sifre belirleme.
+// V1 ucretsiz oldugu icin premium/kart odeme ekranlari da bilerek canli
+// import grafiginden kopuk tutulur; screenRegistry bunlari LegacyHomeRedirectScreen'e baglar.
 const ALLOWED = new Set([
   "FRIEND_PROFILE", "COMMUNITY", "CHALLENGES",
   "SWIPE_REVIEW", "QUICK_PRACTICE", "STUDY_LOG", "WEEKLY_REVIEW",
   "WEEKLY_TRIAL_REVIEW", "TOPIC_CARDS", "CARD_DETAIL",
   "ONBOARDING", "SET_NEW_PASSWORD", "ACCESS_ENDED",
+  "PAYMENT_CARD", "PAYMENT_PROCESSING", "PAYMENT_SUCCESS", "PAYMENT_FAILED",
+  "SUBSCRIPTION", "SUBSCRIPTION_CANCEL", "FIRST_WEEK", "FIRST_ROUTE_READY",
+  "STUDY_PROCESSED", "ONE_WEEK_COMPLETED", "EIGHTH_DAY_LOCK",
 ]);
 
 const EXTS = [".js", ".jsx", ".ts", ".tsx"];
