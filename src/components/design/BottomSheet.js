@@ -26,7 +26,10 @@ function project(velocity, rate = 0.998) {
   return ((velocity / 1000) * rate) / (1 - rate);
 }
 
-export function BottomSheet({ visible, onClose, children, style, keyboard = false }) {
+// edge: ekran kenarina yapisik (tam genislik, alt bosluk yok; guvenli alan cagirana ait).
+// header: verilirse surukleme YALNIZ bu bolgeden -- icerik kaydirilabilir listeyse
+// tum panele baglanan surukleme listeyi kaydirmak yerine paneli kapatmaya calisir.
+export function BottomSheet({ visible, onClose, children, style, keyboard = false, edge = false, header = null }) {
   const C = useC();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
@@ -53,7 +56,7 @@ export function BottomSheet({ visible, onClose, children, style, keyboard = fals
   }, [visible, mounted, reduced, y, h]);
 
   const onLayout = (e) => {
-    const height = e.nativeEvent.layout.height + insets.bottom + STEP.s3;
+    const height = e.nativeEvent.layout.height + (edge ? 0 : insets.bottom + STEP.s3);
     h.set(height);
     if (opened.current || !visible) return;
     opened.current = true;
@@ -82,22 +85,26 @@ export function BottomSheet({ visible, onClose, children, style, keyboard = fals
 
   if (!mounted) return null;
   const Wrap = keyboard ? KeyboardAvoidingView : Animated.View;
+  const panel = [s.sheet, edge ? null : { marginBottom: insets.bottom + STEP.s3 }, { backgroundColor: C.surface, borderColor: C.elev }];
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <GestureHandlerRootView style={s.fill}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, backdropStyle]}>
           <Pressable style={s.fill} onPress={onClose} accessibilityLabel="Kapat" />
         </Animated.View>
-        <Wrap style={s.bottom} behavior={keyboard && Platform.OS === "ios" ? "padding" : undefined} pointerEvents="box-none">
-          <GestureDetector gesture={pan}>
-            <Animated.View
-              accessibilityViewIsModal
-              onLayout={onLayout}
-              style={[s.sheet, { marginBottom: insets.bottom + STEP.s3, backgroundColor: C.surface, borderColor: C.elev }, style, sheetStyle]}
-            >
+        <Wrap style={[s.bottom, edge && s.edge]} behavior={keyboard && Platform.OS === "ios" ? "padding" : undefined} pointerEvents="box-none">
+          {header ? (
+            <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
+              <GestureDetector gesture={pan}><Animated.View>{header}</Animated.View></GestureDetector>
               {children}
             </Animated.View>
-          </GestureDetector>
+          ) : (
+            <GestureDetector gesture={pan}>
+              <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
+                {children}
+              </Animated.View>
+            </GestureDetector>
+          )}
         </Wrap>
       </GestureHandlerRootView>
     </Modal>
@@ -107,5 +114,6 @@ export function BottomSheet({ visible, onClose, children, style, keyboard = fals
 const s = StyleSheet.create({
   fill: { flex: 1 },
   bottom: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end", paddingHorizontal: GUTTER },
+  edge: { paddingHorizontal: 0 },
   sheet: { borderWidth: 1 },
 });

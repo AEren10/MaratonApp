@@ -1,26 +1,29 @@
-import { Modal, Pressable, ScrollView, Text, View, StyleSheet } from "react-native";
+import { ScrollView, Text, View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useC } from "../../../../contexts/ThemeContext";
-import { alpha } from "../../../../themes/colorMix";
+import { BottomSheet } from "../../../../components/design/BottomSheet";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
 import { Press } from "../../../../components/design/Press";
 
-// Alt sayfa kabugu: soluk arka plan, bg yuzey + ust kenarlik, tutamak, bolum etiketi.
+// Alt sayfa kabugu: bg yuzey + ust kenarlik, tutamak, bolum etiketi.
+// BottomSheet (kenara yapisik): karartma artik panelle birlikte kaymiyor,
+// tutamaktan asagi cekince kapanir; liste kendi basina kaydirilir.
 export function RecordSheet({ visible, label, onClose, children }) {
   const C = useC();
+  const header = (
+    <View style={styles.header}>
+      <View style={[styles.handle, { backgroundColor: C.elev }]} />
+      <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>{label}</Text>
+    </View>
+  );
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={[styles.backdrop, { backgroundColor: alpha(C.canvas, 72) }]} onPress={onClose} accessibilityLabel="Kapat">
-        <Pressable onPress={(e) => e.stopPropagation()} style={[styles.sheet, { backgroundColor: C.bg, borderTopColor: C.elev }]}>
-          <SafeAreaView edges={["bottom"]}>
-            <View style={[styles.handle, { backgroundColor: C.elev }]} />
-            <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>{label}</Text>
-            <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>{children}</ScrollView>
-          </SafeAreaView>
-        </Pressable>
-      </Pressable>
-    </Modal>
+    <BottomSheet visible={visible} onClose={onClose} edge header={header}
+      style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.elev }]}>
+      <SafeAreaView edges={["bottom"]}>
+        <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>{children}</ScrollView>
+      </SafeAreaView>
+    </BottomSheet>
   );
 }
 
@@ -42,11 +45,11 @@ export function SheetOption({ title, meta, color, selected, onPress }) {
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: "flex-end" },
   sheet: {
-    maxHeight: "78%", borderTopWidth: 1, paddingHorizontal: GUTTER, paddingTop: STEP.s2,
+    maxHeight: "78%", borderWidth: 0, borderTopWidth: 1, paddingHorizontal: GUTTER,
     borderTopLeftRadius: SHAPE.sheet + STEP.s1, borderTopRightRadius: SHAPE.sheet + STEP.s1,
   },
+  header: { paddingTop: STEP.s2, minHeight: 44 },
   handle: { width: 38, height: 4, borderRadius: SHAPE.chip / 3, alignSelf: "center", marginBottom: STEP.s3 },
   scroll: { marginTop: STEP.s1, marginBottom: STEP.s3 },
   option: { flexDirection: "row", alignItems: "center", gap: STEP.s2, minHeight: 52, borderTopWidth: 1 },

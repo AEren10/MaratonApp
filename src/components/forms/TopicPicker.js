@@ -1,10 +1,11 @@
 import { useMemo, useState, useCallback } from "react";
-import { View, Text, Pressable, Modal, FlatList, TextInput, StyleSheet, Platform, KeyboardAvoidingView } from "react-native";
+import { View, Text, FlatList, TextInput, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../design";
 import { getSubjectByKey } from "../../themes/subjects";
 import { Press } from "../../components/design/Press";
+import { BottomSheet } from "../design/BottomSheet";
 
 export function TopicPicker({ visible, subject, onClose, onSelect }) {
   const C = useC();
@@ -44,71 +45,67 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
   ), [pick, s, C.muted]);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <Pressable style={s.backdrop} onPress={onClose}>
-          <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
-            <View style={s.handle} />
-            <Text style={s.title}>{subject?.label || "Ders"} · Konu Seç</Text>
+    <BottomSheet visible={visible} onClose={onClose} edge keyboard style={s.sheet} header={(
+      <View>
+        <View style={s.handle} />
+        <Text style={s.title}>{subject?.label || "Ders"} · Konu Seç</Text>
+      </View>
+    )}>
+      {customMode ? (
+        <View style={{ gap: SPACING.md }}>
+          <TextInput
+            value={customText}
+            onChangeText={setCustomText}
+            placeholder="Konu adını yaz"
+            placeholderTextColor={C.muted}
+            autoFocus
+            style={s.input}
+          />
+          <Press haptic="none" onPress={() => customText.trim() && pick(customText.trim(), "custom")} style={s.primaryBtn}>
+            <Text style={s.primaryBtnText}>Ekle</Text>
+          </Press>
+          <Press haptic="none" onPress={() => setCustomMode(false)} style={s.linkBtn}>
+            <Text style={s.linkText}>Listeden seç</Text>
+          </Press>
+        </View>
+      ) : (
+        <>
+          <View style={s.searchRow}>
+            <Icon name="search" size={16} color={C.muted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Konu ara"
+              placeholderTextColor={C.muted}
+              style={s.searchInput}
+            />
+          </View>
 
-            {customMode ? (
-              <View style={{ gap: SPACING.md }}>
-                <TextInput
-                  value={customText}
-                  onChangeText={setCustomText}
-                  placeholder="Konu adını yaz"
-                  placeholderTextColor={C.muted}
-                  autoFocus
-                  style={s.input}
-                />
-                <Press haptic="none" onPress={() => customText.trim() && pick(customText.trim(), "custom")} style={s.primaryBtn}>
-                  <Text style={s.primaryBtnText}>Ekle</Text>
-                </Press>
-                <Press haptic="none" onPress={() => setCustomMode(false)} style={s.linkBtn}>
-                  <Text style={s.linkText}>Listeden seç</Text>
-                </Press>
-              </View>
-            ) : (
-              <>
-                <View style={s.searchRow}>
-                  <Icon name="search" size={16} color={C.muted} />
-                  <TextInput
-                    value={query}
-                    onChangeText={setQuery}
-                    placeholder="Konu ara"
-                    placeholderTextColor={C.muted}
-                    style={s.searchInput}
-                  />
-                </View>
+          <FlatList
+            data={filtered}
+            keyExtractor={(item, i) => `${item}-${i}`}
+            style={{ maxHeight: 320 }}
+            keyboardShouldPersistTaps="handled"
+            windowSize={5}
+            maxToRenderPerBatch={10}
+            renderItem={renderTopicItem}
+            ListEmptyComponent={<Text style={s.emptyText}>Eşleşen konu yok</Text>}
+          />
 
-                <FlatList
-                  data={filtered}
-                  keyExtractor={(item, i) => `${item}-${i}`}
-                  style={{ maxHeight: 320 }}
-                  keyboardShouldPersistTaps="handled"
-                  windowSize={5}
-                  maxToRenderPerBatch={10}
-                  renderItem={renderTopicItem}
-                  ListEmptyComponent={<Text style={s.emptyText}>Eşleşen konu yok</Text>}
-                />
-
-                <Press haptic="none" onPress={() => setCustomMode(true)} style={s.customRow}>
-                  <Icon name="edit" size={15} color={C.accent} />
-                  <Text style={s.customText}>Listede yok, elle yaz</Text>
-                </Press>
-              </>
-            )}
-          </Pressable>
-        </Pressable>
-      </KeyboardAvoidingView>
-    </Modal>
+          <Press haptic="none" onPress={() => setCustomMode(true)} style={s.customRow}>
+            <Icon name="edit" size={15} color={C.accent} />
+            <Text style={s.customText}>Listede yok, elle yaz</Text>
+          </Press>
+        </>
+      )}
+    </BottomSheet>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.65)", justifyContent: "flex-end" },
   sheet: {
     backgroundColor: C.surface,
+    borderWidth: 0,
     borderTopLeftRadius: RADIUS.xxl,
     borderTopRightRadius: RADIUS.xxl,
     padding: SPACING.lg,
