@@ -2,52 +2,43 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { useNavigation } from "@react-navigation/native";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Button } from "../../components/design";
+import { Button, Icon, Press } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { TargetNetField } from "./components/TargetNetField";
 import { MultiNetSection } from "./components/MultiNetSection";
 import { DailyPaceField } from "./components/DailyPaceField";
 import {
-  useGoalSetupForm,
-  TYT_NET_MIN,
-  TYT_NET_MAX,
-  LGS_NET_MIN,
-  LGS_NET_MAX,
-  DAILY_Q_MIN,
-  DAILY_Q_MAX,
-  DAILY_Q_STEP,
+  useGoalSetupForm, TYT_NET_MIN, TYT_NET_MAX, LGS_NET_MIN, LGS_NET_MAX,
+  DAILY_Q_MIN, DAILY_Q_MAX, DAILY_Q_STEP,
 } from "./useGoalSetupForm";
 
-// Tasarim: "Hedef Sec" — 4 adimlik kurulumun 2. adimi.
-// YKS (TYT+AYT veya TYT+YDT) ogrencileri icin TYT ve AYT netleri
-// ayri ayri secilir; toplam net otomatik toplanir.
-// Gunluk soru hedefi max 500'e kadar yukseltilebilir.
 function GoalSetupContent() {
   const C = useC();
+  const navigation = useNavigation();
+  const canGoBack = navigation.canGoBack();
   const {
-    isMulti,
-    secondLabel,
-    tytNet,
-    setTytNet,
-    aytNet,
-    setAytNet,
-    singleNet,
-    setSingleNet,
-    totalNet,
-    dailyQuestions,
-    setDailyQuestions,
-    hours,
-    netLabel,
-    finish,
-    skipToHome,
-    targetNetPendingNote,
-    isLgs,
+    isMulti, secondLabel, tytNet, setTytNet, aytNet, setAytNet, singleNet, setSingleNet,
+    totalNet, dailyQuestions, setDailyQuestions, hours, netLabel, finish, skipToHome,
+    targetNetPendingNote, isLgs,
   } = useGoalSetupForm();
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={styles.header}>
+        {canGoBack ? (
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" style={styles.backBtn}>
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
+          </Press>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Hedef Belirleme</Text>
+        <View style={styles.backBtn} />
+      </View>
+
       <View style={styles.progressRow}>
         {[0, 1, 2, 3].map((i) => (
           <View
@@ -107,15 +98,17 @@ function GoalSetupContent() {
         <Button onPress={finish} size="lg" fullWidth>
           Devam
         </Button>
-        <Button
+        <Press
           onPress={skipToHome}
-          variant="ghost"
-          size="md"
-          fullWidth
+          hitSlop={8}
           style={styles.skipBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Şimdilik atla, ana sayfaya git"
         >
-          Şimdilik atla, ana sayfaya git
-        </Button>
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, textAlign: "center" }]}>
+            Şimdilik atla, ana sayfaya git
+          </Text>
+        </Press>
         {targetNetPendingNote ? (
           <Text style={[TYPOGRAPHY.micro, styles.pendingNote, { color: C.text3 }]}>
             {targetNetPendingNote}
@@ -135,10 +128,12 @@ export default function GoalSetupScreen() {
 }
 
 const styles = StyleSheet.create({
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
+  backBtn:     { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
   progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
   segment:     { flex: 1, height: 3, borderRadius: 1.5 },
   scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s4 },
   cta:         { paddingTop: STEP.s2, paddingHorizontal: GUTTER, paddingBottom: STEP.s2, borderTopWidth: 1 },
-  skipBtn:     { marginTop: STEP.s1 },
+  skipBtn:     { marginTop: STEP.s1, minHeight: CONTROL.tapMin, justifyContent: "center", alignItems: "center" },
   pendingNote: { marginTop: STEP.s1, textAlign: "center" },
 });
