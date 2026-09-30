@@ -1,11 +1,11 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 
-import { EmptyState, ErrorState, Skeleton } from "../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useSync } from "../../contexts/DataSyncContext";
 import { selectTrials } from "../../store/slices/trialSlice";
@@ -21,14 +21,14 @@ import { useResolvedTrial } from "./useResolvedTrial";
 import { useTrialDetail } from "./useTrialDetail";
 import { useTrialDetailMenu } from "./useTrialDetailMenu";
 import { TrialDetailHeader } from "./components/TrialDetailHeader";
-import { TrialDetailHero } from "./components/TrialDetailHero";
-import { TrialDetailNetCards } from "./components/TrialDetailNetCards";
 import { TrialDetailSubjectTable } from "./components/TrialDetailSubjectTable";
-import { TrialDetailDifficultyCard } from "./components/TrialDetailDifficultyCard";
-import { TrialDetailRouteImpact } from "./components/TrialDetailRouteImpact";
-import { TrialDetailActions } from "./components/TrialDetailActions";
+import { TrialDetailLinks } from "./components/TrialDetailLinks";
+import { TrialDetailStateViews } from "./components/TrialDetailStateViews";
+import { trialStory } from "../../domain/insight/storyLines";
 
-export default function TrialDetailScreen() {
+const fmtNet = (n) => String(Math.round(Number(n || 0) * 100) / 100).replace(".", ",");
+
+function TrialDetailScreenInner() {
   const C = useC();
   const navigation = useNavigation();
   const openCompare = useTrialCompareEntry();
@@ -56,74 +56,54 @@ export default function TrialDetailScreen() {
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
   const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
 
-  if (!latest && !syncedOnce) {
-    return (
-      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-        <TrialDetailHeader C={C} onBack={goBack} onMenu={() => {}} />
-        <View style={styles.loading}>
-          <Skeleton width="100%" height={146} radius={SHAPE.panel} />
-          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
-          <Skeleton width="100%" height={96} radius={SHAPE.card} style={styles.loadingGap} />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!latest && readError) {
-    return (
-      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-        <TrialDetailHeader C={C} onBack={goBack} onMenu={() => {}} />
-        <View style={styles.emptyBox}>
-          <ErrorState preset="server" onPrimary={refresh} code={readError.code || "sync_read_failed"} />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!latest) {
-    return (
-      <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-        <TrialDetailHeader C={C} onBack={goBack} onMenu={() => {}} />
-        <View style={styles.emptyBox}>
-          <EmptyState preset="trialRecords" onPrimary={() => navigation.navigate(SCREENS.TRIAL_ENTRY)} />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const dateStr = latest.date
+  const dateStr = latest?.date
     ? new Date(latest.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long" })
     : "—";
 
-  return (
-    <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
-      <TrialDetailHeader C={C} onBack={goBack} onMenu={handleMenu} />
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {fromEntry && (
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text, textAlign: "center", marginBottom: STEP.s2 }]}>
-            Deneme Kaydedildi!
-          </Text>
-        )}
+  const story = useMemo(
+    () => trialStory({ subjects: (detail.bars || []).map((b) => ({ label: b.name, net: b.net, empty: b.empty })) }),
+    [detail.bars]
+  );
 
-        <TrialDetailHero
-          C={C} latest={latest} dateStr={dateStr} typeMeta={detail.typeMeta}
-          rawNet={detail.rawNet} trend={detail.trend} prev={detail.prev}
-          durationMinutes={detail.durationMinutes}
-        />
-        <TrialDetailNetCards
-          C={C} rawNet={detail.rawNet} normalizedNet={detail.normalizedNet}
-          hasNormalization={detail.hasNormalization} publisherLabel={detail.publisherLabel}
-          difficultyMultiplier={detail.difficultyMultiplier}
-        />
+  const deltaText = detail.prev && detail.trend !== 0
+    ? `${detail.trend > 0 ? "+" : "−"}${fmtNet(Math.abs(detail.trend))} net`
+    : null;
+  const deltaColor = detail.trend > 0 ? C.up : C.down;
+
+  const links = useMemo(
+    () => [
+      { label: "Deneme karşılaştır", note: "İki denemeyi ders ders yan yana koy", go: () => openCompare() },
+      { label: "Yanlışları deftere ekle", note: "Bu denemedeki soruları kaydet", go: () => navigation.navigate(SCREENS.ADD_WRONG, { trialId: latest?.id }) },
+    ],
+    [openCompare, navigation, latest?.id]
+  );
+
+  if (!latest) {
+    return (
+      <TrialDetailStateViews
+        C={C} onBack={goBack} loading={!syncedOnce} readError={readError}
+        onRetry={refresh} onNavigateEntry={(s) => navigation.navigate(s)}
+      />
+    );
+  }
+
+  const typeLabel = (detail.typeMeta?.label || latest.trialType || "DENEME").toLocaleUpperCase("tr-TR");
+
+  return (
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <TrialDetailHeader C={C} onBack={goBack} onMenu={handleMenu} />
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <View style={s.heroSection}>
+          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${typeLabel} · ${dateStr.toLocaleUpperCase("tr-TR")}`}</Text>
+          <View style={s.heroRow}>
+            <Text style={[TYPOGRAPHY.stat, s.num, { color: C.text }]}>{fmtNet(detail.rawNet)}</Text>
+            {deltaText ? <Text style={[TYPOGRAPHY.bodySemiBold, { color: deltaColor }]}>{deltaText}</Text> : null}
+          </View>
+          <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
+        </View>
+
         <TrialDetailSubjectTable C={C} bars={detail.bars} />
-        {detail.showDifficultyCard && (
-          <TrialDetailDifficultyCard C={C} difficultyLabel={detail.difficultyLabel} />
-        )}
-        <TrialDetailRouteImpact C={C} routeImpact={detail.routeImpact} />
-        <TrialDetailActions
-          onAddWrong={() => navigation.navigate(SCREENS.ADD_WRONG)}
-          onCompare={() => openCompare()}
-        />
+        <TrialDetailLinks C={C} links={links} />
       </ScrollView>
 
       <NudgePopup
@@ -136,7 +116,7 @@ export default function TrialDetailScreen() {
         }}
       />
 
-      <View style={styles.offscreen} pointerEvents="none">
+      <View style={s.offscreen} pointerEvents="none">
         <TrialReportCard
           ref={cardRef}
           name={displayName}
@@ -150,11 +130,19 @@ export default function TrialDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+export default function TrialDetailScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <TrialDetailScreenInner />
+    </ScreenErrorBoundary>
+  );
+}
+
+const s = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingBottom: 40 },
-  emptyBox: { flex: 1, justifyContent: "center", paddingHorizontal: STEP.s3 },
-  loading: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
-  loadingGap: { marginTop: STEP.s3 },
+  scroll: { paddingBottom: STEP.s5 * 2 },
+  heroSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
+  heroRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2, marginTop: STEP.s1 },
+  num: { fontVariant: ["tabular-nums"] },
   offscreen: { position: "absolute", left: -10000, top: 0 },
 });
