@@ -536,7 +536,8 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       if (!cancelled && routeLoadKeyRef.current === loadKey) setStopsLoaded(true);
     });
     return () => { cancelled = true; };
-  }, [effectiveUserId, resolvedExamType, hasRouteAccess, routeLoadTick, user?.id]);
+  // field: SAY -> EA gecisinde kayitli duraklar yeniden okunsun.
+  }, [effectiveUserId, resolvedExamType, field, hasRouteAccess, routeLoadTick, user?.id]);
 
   // Rota çizildiğinde haftaları sakla. Bu olmadan borç her zaman sıfır çıkar.
   useEffect(() => {

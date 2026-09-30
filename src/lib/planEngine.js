@@ -306,6 +306,8 @@ export function generateDailyPlan({
       routeConfidence: routeInsight?.confidence || routeStop?.dataConfidence || null,
       routeInsight,
       routeAllocation: allocation,
+      // Hafta tekrari: tik kaydi bu konulara bolunur (stopStudyLog).
+      weeklyTopics: routeStop?.weeklyTopics || null,
     };
     task.assignment = buildDailyAssignmentNarrative({
       reason,

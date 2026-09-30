@@ -23,6 +23,35 @@ export function stopLogOperationId(stopId) {
 }
 
 /**
+ * Hafta tekrari birden cok konuyu kapsar: kayit o konulara esit bolunur.
+ * Tek "Haftalik tekrar" kaydi ayri bir ozel konu yaratiyor, tekrar edilen
+ * konularin ilerlemesi ve hafizasi hic guncellenmiyordu.
+ * @returns kayit dizisi (bos olabilir); kimlikler `${op}_${i}`.
+ */
+export function buildStopStudyLogs({ stop, userId, studyDate }) {
+  const topics = Array.isArray(stop?.weeklyTopics) ? stop.weeklyTopics.filter(Boolean) : [];
+  const single = buildStopStudyLog({ stop, userId, studyDate });
+  if (!single || topics.length < 2) return single ? [single] : [];
+  const n = topics.length;
+  const part = (total, i) => Math.round((total * (i + 1)) / n) - Math.round((total * i) / n);
+  return topics.map((topic, i) => ({
+    ...single,
+    topic,
+    question_count: part(single.question_count, i),
+    duration_minutes: part(single.duration_minutes, i),
+    client_operation_id: `${single.client_operation_id}_${i}`,
+  }));
+}
+
+/** Tiki geri alirken silinecek kayit kimlikleri. */
+export function stopLogOperationIds(stop) {
+  const base = stopLogOperationId(stop?.id);
+  if (!base) return [];
+  const topics = Array.isArray(stop?.weeklyTopics) ? stop.weeklyTopics.filter(Boolean) : [];
+  return topics.length < 2 ? [base] : topics.map((_, i) => `${base}_${i}`);
+}
+
+/**
  * Tiklenen duragin calisma kaydi. Kaydedilecek bir sey yoksa null doner:
  * ne soru ne dakika olan bir durak icin bos kayit yazmayiz.
  */

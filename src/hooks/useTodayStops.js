@@ -56,6 +56,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         rkind: t.rkind,
         reason: t.reason || null,
         logicalStopKey: t.logicalStopKey || null,
+        weeklyTopics: t.weeklyTopics || null,
         source: "plan",
         routeStop: t.stopId ? { stopId: t.stopId, version: t.version } : null,
       });
