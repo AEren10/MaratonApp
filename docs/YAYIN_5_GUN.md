@@ -100,12 +100,17 @@ Apple incelemecisinin ve her yeni kullanıcının ilk gördüğü yer burası.
 7. Hesap silme
 8. Hiçbir yerde ödeme ekranı, "Premium" vaadi ya da topluluk girişi çıkmıyor
 
+## Android (iOS gönderildikten sonra, ayrı takvim)
+Play kişisel hesapta yayından önce 12 test kullanıcısı x 14 gün kapalı test şart.
+- [ ] **Sen:** iOS gönderilince Play Console kapalı testi başlat (14 gün sayacı).
+- [ ] **Claude:** Kapalı test süresince Android widget'ları (6 widget, Jetpack Compose + widgetSync Android köprüsü, `expo-widgets` `enableAndroid`), tek Android build. Android yayını widget'lı çıkar.
+
 ## Bilerek v1.0.1'e bırakılanlar
 
 - Animasyon cilası (ekranlar oturduktan sonra, tek seferde)
 - Story Kademe B (Meta App ID)
 - Kaydırınca ışığın sönmesi
-- Android (Play Console hesabı ve 14 günlük kapalı test ayrı takvimde)
+- Deneme durakları (son 1-2 ay) ve düşen derse branş denemesi önerisi
 
 ## Riskler
 
