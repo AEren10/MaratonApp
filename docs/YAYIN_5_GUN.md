@@ -27,7 +27,7 @@ Uzun süren dış işler bugün başlamalı; onları beklerken kod işleri akar.
 - [ ] **Codex:** `eas.json` → `submit.production.ios` alanını doldur.
 - [ ] **Codex:** Belgelerdeki `com.maraton.app` kalıntılarını tekleştir.
 - [ ] **Codex:** Topluluk soru-cevabının v1 grafiğinden tam çıktığını doğrula (Guideline 1.2); premium ve ödeme de öyle.
-- [ ] **Claude:** Bekleyen dört kararı uygula:
+- [x] **Claude:** Bekleyen dört kararı uygula (1 Ekim, main):
   1. **Doğru sayısı:** Kayıt formlarında ve durak tikinde doğru sayısı sorulsun. Boş bırakılabilir; "bilinmiyor" 0 sayılmaz.
   2. **"Rotayı bitirdin · hedefe N soru":** Günün durakları bitti ama soru hedefi dolmadıysa gösterilecek metin.
   3. **"Gelecek haftadan öne çek":** Hafta bitince sonraki haftanın ilk durağını bugüne alma seçeneği.
