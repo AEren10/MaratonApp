@@ -42,6 +42,7 @@ export function useStudyTimerController(C) {
     routeStopId,
     routeStopNumber,
     routeStopVersion,
+    routeStopQuestions,
     routeSubjectKey: routeActionSubjectKey,
     routeTopicName: routeActionTopicName,
   } = route.params ?? {};
@@ -54,6 +55,7 @@ export function useStudyTimerController(C) {
     routeStopId,
     routeStopNumber,
     routeStopVersion,
+    routeStopQuestions,
     routeSubjectKey: routeActionSubjectKey,
     routeTopicName: routeActionTopicName,
   });

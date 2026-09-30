@@ -21,6 +21,8 @@ export async function completeStudyPlanContext({
   routeStopVersion,
   routeSubjectKey,
   routeTopicName,
+  routeStopQuestions = 0,
+  questionCount = null,
 } = {}) {
   const scope = resolveStudyCompletionScope({ userId, planTaskKey, routeStopId });
   if (scope.skipped) return { skipped: scope.skipped };
@@ -36,6 +38,15 @@ export async function completeStudyPlanContext({
   if (!matches) return { skipped: "study_changed" };
 
   const result = { planCompleted: false, routeCompleted: false };
+
+  // Planlananin yarisindan azi cozulduyse durak "bitti" sayilmaz: hafta
+  // sabit, bitmis sayilan durak bir daha gelmiyor ve kalan is kayboluyordu.
+  // Soru girilmediyse (okuma, konu calismasi) olculemez; kural devreye girmez.
+  const solved = Number(questionCount) || 0;
+  const planned = Number(routeStopQuestions) || 0;
+  if (planned > 0 && solved > 0 && solved < planned * 0.5) {
+    return { ...result, skipped: "partial", solved, planned };
+  }
 
   if (routeStopId) {
     try {

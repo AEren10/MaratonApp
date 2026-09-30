@@ -45,6 +45,7 @@ export function useStudySaveController() {
     planTopicName,
     routeStopId,
     routeStopVersion,
+    routeStopQuestions,
     routeSubjectKey,
     routeTopicName,
     startedAtMs,
@@ -233,6 +234,8 @@ export function useStudySaveController() {
       routeStopVersion,
       routeSubjectKey,
       routeTopicName,
+      routeStopQuestions,
+      questionCount: qc,
     });
     if (planCompletion.planCompleted) {
       reward("plan_task_done", {

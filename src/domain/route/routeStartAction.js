@@ -109,6 +109,7 @@ export function routeActionTimerParams(action) {
     routeTopicName: action.topicName,
     routeStopId: action.stopId || undefined,
     routeStopVersion: action.version ?? undefined,
+    ...(Number(action.questions) > 0 ? { routeStopQuestions: Number(action.questions) } : {}),
     routeStopNumber: Number.isFinite(stopNumber)
       ? Math.max(1, Math.round(stopNumber))
       : (hasRealPosition ? Math.max(1, Math.round(position) + 1) : undefined),

@@ -23,5 +23,8 @@ export function buildStudyTimerParams(task) {
     routeStopVersion: stopId ? (version ?? undefined) : undefined,
   };
   if (stopNumber != null) out.routeStopNumber = stopNumber;
+  // Duragin planlanan sorusu: yarisindan azi cozulurse durak "bitti" sayilmaz.
+  const plannedQuestions = Number(task.questionCount ?? task.count ?? task.routeStop?.cost?.questions) || 0;
+  if (stopId && plannedQuestions > 0) out.routeStopQuestions = plannedQuestions;
   return out;
 }
