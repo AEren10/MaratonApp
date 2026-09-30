@@ -164,6 +164,14 @@ export const signInWithGoogleToken = async ({ idToken }) => {
 export const deleteAccount = async () => {
   // Depolama temizliği önce ve istemciden — SQL tarafından storage.objects
   // silinemiyor (Supabase engelliyor), fonksiyon o yüzden patlıyordu.
+  //
+  // SIRA BILEREK BOYLE: dosya silme izni storage.objects RLS'inde
+  // auth.uid()'e bagli; RPC auth.users satirini sildikten sonra oturum
+  // artik gecerli bir kullaniciya ait degil ve dosyalar yetim kalir (sonradan
+  // kimse silemez). RPC'nin FK yuzunden patlama yolu
+  // 20261001120000_clde_account_delete_fk_cascade ile kapandi; geriye ag/oturum
+  // hatasi kaliyor -- o durumda dosyalar gider, hesap kalir, kullanici tekrar
+  // deneyebilir. Tersini (hesap var, dosya yok) yetim dosyaya tercih ediyoruz.
   const { data } = await supabase.auth.getUser();
   const userId = data?.user?.id;
   let storageFailures = [];
