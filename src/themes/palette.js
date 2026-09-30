@@ -21,10 +21,10 @@ export const SEEDS = {
   },
   light: {
     accent: "#DE2E39",
-    bg: "#F4EFEC",
-    canvas: "#E7DFDA",
+    bg: "#EEEAE6",
+    canvas: "#E4DFDA",
     text: "#171110",
-    up: "#15803D",
+    up: "#147437",
   },
 };
 
@@ -48,21 +48,21 @@ const FIXED = {
     text4: "#A69691",
     text5: "#B4A5A0",
     accentInk: "#FFFFFF",
-    accentBright: "#D12430",
+    accentBright: "#CD202C",
     down: "#6B7F8D",
     warn: "#92400E",
     danger: "#C4262F",
   },
 };
 
-// Açık temada yüzey basamakları color-mix ile değil, elle seçilmiş.
+// Açık temada yüzey basamakları — sıcak açık gri kâğıt merdiveni (Brief 22).
 const LIGHT_SURFACES = {
-  surface: "#FFFFFF",
-  elev: "#F2EAE5",
-  border: "#E2D8D2",
-  line: "#EEE6E1",
-  track: "#EAE1DC",
-  void: "#F6F1EE",
+  surface: "#F7F4F1",
+  elev: "#E7E2DD",
+  border: "#CCC4BD",
+  line: "#DCD5CF",
+  track: "#E0DAD4",
+  void: "#E4DFDA",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise
@@ -94,11 +94,11 @@ export const SUBJECT_COLORS = {
     matematik: "#D1631A",
     fizik: "#0E7490",
     kimya: "#D1477F",
-    biyoloji: "#15803D",
+    biyoloji: "#147437",
     tarih: "#92400E",
     cografya: "#5B5FD0",
     felsefe: "#8B4FD0",
-    din: "#65A30D",
+    din: "#57850C",
     edebiyat: "#A83BAF",
     ingilizce: "#0E7490",
     ydt_ingilizce: "#0E7490",
@@ -161,7 +161,7 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#C4262F"),
     brandFillPress: isDark ? "#A81C26" : "#A31C24",
     brandPress: isDark ? "#A81C26" : "#A31C24",
-    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#D12430"),
+    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#CD202C"),
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
