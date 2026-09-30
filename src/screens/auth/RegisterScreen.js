@@ -18,6 +18,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { registerSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
+import { SIGN_UP_OUTCOME, signUpOutcome } from "../../lib/signUpOutcome";
 import { Press } from "../../components/design/Press";
 
 export default function RegisterScreen() {
@@ -47,10 +48,14 @@ export default function RegisterScreen() {
 
     setBusy(true);
     try {
-      await signUp({ email, password, name });
+      // Oturum geldiyse AppNavigator kuruluma geciyor; gelmediyse dogrulama.
+      const data = await signUp({ email: email.trim(), password, name: name.trim() });
       track(EVENTS.AUTH_REGISTER);
       H.success();
-      showAlert("Hoş geldin!", "Hesabın oluşturuldu, e-postanı doğrulamayı unutma.");
+      if (signUpOutcome(data) === SIGN_UP_OUTCOME.CONFIRM_EMAIL) {
+        showAlert("E-postanı doğrula", "Sana bir bağlantı gönderdik. Bağlantıya dokunduktan sonra buradan giriş yap.");
+        navigation.navigate(SCREENS.LOGIN);
+      }
     } catch (err) {
       H.error();
       showAlert("Kayıt başarısız", authErrorMessage(err));

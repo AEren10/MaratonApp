@@ -14,7 +14,7 @@ import * as H from "../../lib/haptics";
 import { useFinishOnboarding } from "../../hooks/useFinishOnboarding";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
-import { routeActionTimerParams } from "../../domain/route/routeStartAction";
+import { firstPersistedRouteAction, routeActionTimerParams } from "../../domain/route/routeStartAction";
 import { Press } from "../../components/design/Press";
 
 export default function RouteReadyScreen() {
@@ -35,8 +35,9 @@ export default function RouteReadyScreen() {
 
   const handleStart = useCallback(async () => {
     setStarting(true);
+    let created = null;
     try {
-      await createRoute();
+      created = await createRoute();
     } catch {
       H.warn();
       setStarting(false);
@@ -45,7 +46,7 @@ export default function RouteReadyScreen() {
     }
     H.success();
     setStarting(false);
-    const params = routeActionTimerParams(firstStopAction);
+    const params = routeActionTimerParams(firstPersistedRouteAction(created?.stops, firstStopAction));
     finishOnboarding(params ? { then: { screen: SCREENS.STUDY_TIMER, params } } : {}).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 

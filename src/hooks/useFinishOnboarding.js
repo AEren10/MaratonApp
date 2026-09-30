@@ -9,6 +9,7 @@ import { resetToTabStackScreen } from "../navigation/rootStackActions";
 import { TAB_KEYS } from "../navigation/tabAssignment";
 import { EVENTS } from "../constants/analytics";
 import { track } from "../lib/analytics";
+import { landingDeferredToNewStack, setPostSetupLanding } from "../lib/postSetupLanding";
 
 async function permissionNotAsked() {
   if (Platform.OS === "web") return false;
@@ -26,18 +27,25 @@ async function permissionNotAsked() {
 // kaldirdigi icin izin ekrani ONCESINDE cagrilmaz.
 export function useFinishOnboarding() {
   const navigation = useNavigation();
-  const { completeOnboarding } = useExam();
+  const { completeOnboarding, onboardingDone } = useExam();
 
   const complete = useCallback(async (summary = {}, options = {}) => {
     track(EVENTS.ONBOARDING_COMPLETE, summary);
-    await completeOnboarding();
     // Kurulumdan cikan kullanici ANA SAYFA'ya iner, Rota Detay'a degil.
     // Rota Detay ilk gun bos gorunuyor (hicbir deneme, hicbir tamamlanmis
     // durak yok); ana sayfada ise selamlama, bugunun duragi ve rota cizgisi
     // var. Ilk izlenim orasi olmali. ROTA sekmesinin koku zaten Ana Sayfa,
     // o yuzden ekran adi VERMIYORUZ.
-    resetToTabStackScreen(navigation, TAB_KEYS.ROTA, options.screen, undefined, options.then);
-  }, [completeOnboarding, navigation]);
+    const landing = { tab: TAB_KEYS.ROTA, screen: options.screen, then: options.then };
+    if (landingDeferredToNewStack({ onboardingDone })) {
+      // Bayrak dusunce bu yigin kalkiyor; hedefi yeni yigin uygular.
+      setPostSetupLanding(landing);
+      await completeOnboarding();
+      return;
+    }
+    await completeOnboarding();
+    resetToTabStackScreen(navigation, landing.tab, landing.screen, undefined, landing.then);
+  }, [completeOnboarding, navigation, onboardingDone]);
 
   const finish = useCallback(async (summary = {}, options = {}) => {
     if (await permissionNotAsked()) {

@@ -33,7 +33,7 @@ export default function LoginScreen() {
 
     setBusy(true);
     try {
-      await signIn({ email, password });
+      await signIn({ email: email.trim(), password });
       H.success();
     } catch (err) {
       H.error();

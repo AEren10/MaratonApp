@@ -23,7 +23,7 @@ export default function LevelTestScreen() {
   const { daysUntilExam, markLevelTestDone } = useExam();
   const {
     subjects, values, setSubjectNet, hasAnyEntry, totalNet, targetNet,
-    gapMonths, saving, submit, syncPendingNote,
+    gapMonths, saving, submit,
   } = useLevelTestForm();
   const { threshold } = useStudyRoute({ persist: false });
 
@@ -33,8 +33,8 @@ export default function LevelTestScreen() {
   // Bu ekran submit'ten hemen sonra kapaniyor, bu yuzden bekleyen senkron
   // notu BURADA gosterilemez -- olu UI olur. Not varis ekranina tasiniyor.
   const goNext = useCallback(
-    () => navigation.navigate(SCREENS.ROUTE_READY, { syncPendingNote: syncPendingNote || undefined }),
-    [navigation, syncPendingNote],
+    (result) => navigation.navigate(SCREENS.ROUTE_READY, { syncPendingNote: result?.syncPendingNote || undefined }),
+    [navigation],
   );
 
   const handleContinue = useCallback(() => {
@@ -45,11 +45,12 @@ export default function LevelTestScreen() {
   // Atlamak da bir sinyal: kullanicinin elinde deneme yok demek, rota
   // baslangic noktasi olmadan ciziliyor. Huni bunu gormeli.
   const handleSkip = useCallback(() => {
+    if (saving) return; // Devam kaydederken atla ikinci kez ilerletirdi.
     H.select();
     track(EVENTS.LEVEL_TEST_SKIPPED);
     markLevelTestDone({ skipped: true }).catch(() => {});
-    goNext();
-  }, [goNext, markLevelTestDone]);
+    goNext(null);
+  }, [goNext, markLevelTestDone, saving]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>

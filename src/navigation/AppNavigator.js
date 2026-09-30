@@ -29,7 +29,9 @@ import {
   TAB_SCREENS,
 } from "./screenRegistry";
 import { useDeepLink } from "../hooks/useDeepLink";
+import { usePostSetupLanding } from "../hooks/usePostSetupLanding";
 import { consumeAuthIntent } from "../lib/authIntent";
+import { ROOT_GATE, resolveRootGate } from "./rootGate";
 
 const Stack = createNativeStackNavigator();
 
@@ -178,6 +180,7 @@ function SetupStack() {
 
 function AppStackInner() {
   useDeepLink();
+  usePostSetupLanding();
 
   return (
     <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
@@ -205,7 +208,7 @@ function Loading() {
 
 export default function AppNavigator() {
   const { session, loading, recoveryMode } = useAuth();
-  const { onboardingDone, hasSeenSlides, setupSkipped, loading: examLoading } = useExam();
+  const { onboardingDone, hasSeenSlides, profileSettling, loading: examLoading } = useExam();
   const navigationTracker = useMemo(() => createNavigationTracker(track), []);
 
   useEffect(() => {
@@ -232,14 +235,19 @@ export default function AppNavigator() {
 
   let content;
   // Kurtarma modu HER ŞEYDEN ÖNCE gelir: oturum kurulmuş olsa bile kullanıcı
-  // önce yeni şifresini belirlemeli.
-  if (recoveryMode) {
+  // önce yeni şifresini belirlemeli. Sira: navigation/rootGate.
+  const gate = resolveRootGate({
+    recoveryMode, hasSeenSlides, hasSession: !!session, onboardingDone, profileSettling,
+  });
+  if (gate === ROOT_GATE.RECOVERY) {
     content = <RecoveryStack />;
-  } else if (!hasSeenSlides) {
+  } else if (gate === ROOT_GATE.SLIDES) {
     content = <SlidesStack />;
-  } else if (!session) {
+  } else if (gate === ROOT_GATE.AUTH) {
     content = <AuthStack />;
-  } else if (!onboardingDone && !setupSkipped) {
+  } else if (gate === ROOT_GATE.PROFILE_LOADING) {
+    content = <Loading />;
+  } else if (gate === ROOT_GATE.SETUP) {
     content = (
       <SessionProviders>
         <SetupStack />

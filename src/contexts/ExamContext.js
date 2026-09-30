@@ -6,6 +6,7 @@ import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
 import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
+import { useProfileSettleGate } from "../hooks/useProfileSettleGate";
 
 const ExamContext = createContext(null);
 
@@ -125,6 +126,9 @@ export function ExamProvider({ children }) {
   const [hasSeenSlides, setHasSeenSlides] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dbLoading, setDbLoading] = useState(false);
+  // Profil okumasi hangi kullanici icin BITTI. Bitmeden kurulum yigini
+  // acilirsa ikinci cihazdaki donen kullanici once Sinav Sec'i goruyordu.
+  const [profileReadyFor, setProfileReadyFor] = useState(null);
   const dbLoadedFor = useRef(null);
 
   useEffect(() => {
@@ -173,6 +177,9 @@ export function ExamProvider({ children }) {
         setDailyGoalSet(false);
         setLevelTestDone(false);
         setSetupCompleted(false);
+        // Kurulumu atlamis A cikis yapip ayni cihazda B kaydolunca bayrak
+        // bellekte kaliyordu: B sinav secmeden Ana Sayfa'ya dusuyordu.
+        setSetupSkipped(false);
       }
       return;
     }
@@ -184,6 +191,7 @@ export function ExamProvider({ children }) {
     // B'nin sınav tipi/hedef sıralaması A'nınkiyle eziliyor ve diske yazılıyor.
     // Effect session değişince yeniden çalıştığı için cleanup bunu keser.
     let cancelled = false;
+    let finished = false;
 
     getProfile(userId).then(async (p) => {
       if (cancelled) return;
@@ -285,9 +293,17 @@ export function ExamProvider({ children }) {
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
       await retryPendingNetSync(userId, local, () => cancelled);
       await retryPendingProfileSettingsSync(userId, local, () => cancelled);
-    }).catch(() => {}).finally(() => { if (!cancelled) setDbLoading(false); });
+    }).catch(() => {}).finally(() => {
+      finished = true;
+      if (!cancelled) { setDbLoading(false); setProfileReadyFor(userId); }
+    });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      // Okuma bitmeden iptal edildiyse (session nesnesi yenilendi) sonraki
+      // calisma yeniden okusun; yoksa profil hic uygulanmiyordu.
+      if (!finished && dbLoadedFor.current === userId) dbLoadedFor.current = null;
+    };
   }, [loading, session, storageKey, userId]);
 
   const markSlidesAsSeen = useCallback(() => {
@@ -530,18 +546,19 @@ export function ExamProvider({ children }) {
   }, [examDate]);
 
   const combinedLoading = loading;
+  const profileSettling = useProfileSettleGate({ userId, profileReadyFor, examType });
 
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
-    daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides,
+    daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
     markSlidesAsSeen,
   }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
-    daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides,
+    daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
