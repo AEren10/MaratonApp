@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { frozenWeekFromRows } from "../../../src/domain/route/frozenWeek.js";
 
 const row = (topic, status, extra = {}) => ({
-  id: `id-${topic}`, week_start: "2026-09-28", subject: "matematik", subject_label: "Matematik", topic,
+  id: `id-${topic}`, week_start: "2026-09-28", created_at: "2026-09-28T09:00:00Z", subject: "matematik", subject_label: "Matematik", topic,
   logical_key: `k-${topic}`, root_key: "r", segment_index: 0, position: extra.position ?? 0, lifecycle_status: status,
   stop_kind: "learn", metadata: { questions: 20, minutes: 30, planStart: extra.planStart },
 });
@@ -22,4 +22,11 @@ test("bu hafta kayitliysa sabit set doner; bitenler yerinde kalir; hallettim den
   assert.equal(w.stops[1].cost.questions, 20);
   assert.equal(w.planStartDay, "2026-09-30");
   assert.equal(frozenWeekFromRows(rows, "2026-10-12"), null);
+});
+
+test("haftalar once cizilmis taslak bu haftayi sabitlemez; eski kayitta baslangic pazartesi", () => {
+  const draft = [{ ...row("A", "upcoming"), created_at: "2026-09-07T09:00:00Z" }];
+  assert.equal(frozenWeekFromRows(draft, "2026-09-28"), null);
+  const old = [{ ...row("A", "upcoming"), metadata: { questions: 10 } }];
+  assert.equal(frozenWeekFromRows(old, "2026-09-28").planStartDay, "2026-09-28");
 });

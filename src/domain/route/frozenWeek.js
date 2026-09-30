@@ -46,12 +46,18 @@ function rowToStop(row) {
  */
 export function frozenWeekFromRows(rows = [], weekStart, knownTopics = {}) {
   if (!weekStart) return null;
-  const own = (rows || []).filter((r) => String(r.week_start || "").slice(0, 10) === weekStart);
+  // Yalniz BU HAFTA icinde yazilmis satirlar sabitlenir. Haftalar once
+  // cizilmis bir taslak (3 hafta ara veren ogrenci, alan degisikligi) bu
+  // haftanin plani olmamali: o zaman yeni hesap yazilir ve o sabitlenir.
+  const own = (rows || []).filter((r) => String(r.week_start || "").slice(0, 10) === weekStart
+    && String(r.created_at || "").slice(0, 10) >= weekStart);
   if (!own.length) return null;
   const stops = own
     .map(rowToStop)
     .filter((s) => !(OPEN.has(s.lifecycleStatus) && !s.isReview && knownTopics?.[s.subject]?.[s.topic] !== undefined))
     .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const starts = own.map((r) => r.metadata?.planStart).filter(Boolean).sort();
-  return { stops, planStartDay: starts[0] || null };
+  // planStart yoksa (eski kayit) hafta pazartesiden baslar; "bugun"e dusmek
+  // her gun oncesini bosaltiyordu.
+  return { stops, planStartDay: starts[0] || weekStart };
 }

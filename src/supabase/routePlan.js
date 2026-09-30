@@ -487,6 +487,8 @@ async function readPastWeekStops(userId, sinceWeek, beforeWeek) {
     if (error) throw error;
     const seen = new Set();
     return (data || []).filter((row) => {
+      // "Dagit" ile ertelenen durugun yerine gelen satir borc degil.
+      if (row.predecessor_stop_id) return false;
       if (seen.has(row.logical_key)) return false;
       seen.add(row.logical_key);
       return true;

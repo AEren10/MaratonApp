@@ -19,6 +19,6 @@ test("hafta tekrari tik kaydi konulara bolunur; tek konulu durak tek kayit", asy
   const logs = buildStopStudyLogs({ stop, userId: "u", studyDate: "2026-09-30" });
   assert.deepEqual(logs.map((l) => l.topic), ["Kümeler", "Olasılık", "Fonksiyonlar"]);
   assert.equal(logs.reduce((n, l) => n + l.question_count, 0), 10);
-  assert.deepEqual(stopLogOperationIds(stop), ["stop_log_s1_0", "stop_log_s1_1", "stop_log_s1_2"]);
+  assert.deepEqual(stopLogOperationIds(stop), ["stop_log_s1", "stop_log_s1_0", "stop_log_s1_1", "stop_log_s1_2"]);
   assert.equal(buildStopStudyLogs({ stop: { id: "s2", subject: "x", topic: "y", count: 5 }, userId: "u", studyDate: "d" }).length, 1);
 });

@@ -13,6 +13,10 @@ import { getWrongQuestions } from "../supabase/wrongQuestions";
 import { useStudyRoute } from "./useStudyRoute";
 import { useStopMoves } from "./useStopMoves";
 import { useClassSchedule } from "./useClassSchedule";
+import { useDayPlanOptions } from "./useDayPlanOptions";
+import { assignRouteStopsToDates } from "../domain/program/assignStopsToDays";
+import { mondayOf } from "../domain/program/dayKeys";
+import { todayTR } from "../lib/dateUtils";
 
 const STARTABLE = new Set([S.ACTIVE, S.UPCOMING]);
 
@@ -27,6 +31,7 @@ export function useRouteStopDetail() {
   const { weeks, isPaused } = route;
   const { postponeStop } = useStopMoves();
   const { schedule } = useClassSchedule();
+  const dayOpts = useDayPlanOptions();
   const [postponing, setPostponing] = useState(false);
   const [notebook, setNotebook] = useState(null);
 
@@ -56,13 +61,20 @@ export function useRouteStopDetail() {
   // "Ertele" her yerde AYNI: sonraki calisma gunune tasi (useStopMoves).
   // Eskiden burada duragi RESCHEDULED yapip listeden dusuruyordu; Program'daki
   // "Ertele" ise yalniz tasiyordu -- ayni kelime iki farkli is.
+  // Ertele duragin ATANDIGI gunden sonraki gune; yalniz bu haftanin duragi.
+  const assignedDate = useMemo(() => {
+    if (!stop?.logicalStopKey) return null;
+    const byDate = assignRouteStopsToDates(weeks || [], schedule, dayOpts);
+    return Object.keys(byDate).find((d) => byDate[d].some((s) => s.logicalStopKey === stop.logicalStopKey)) || null;
+  }, [weeks, schedule, dayOpts, stop?.logicalStopKey]);
   const canPostpone = Boolean(stop?.logicalStopKey)
-    && [S.ACTIVE, S.UPCOMING].includes(found?.entry.status);
+    && [S.ACTIVE, S.UPCOMING].includes(found?.entry.status)
+    && Boolean(assignedDate) && mondayOf(assignedDate) === mondayOf(todayTR());
   const postpone = useCallback(async () => {
     if (!canPostpone || postponing) return;
     setPostponing(true);
     try {
-      const res = await postponeStop(stop.logicalStopKey, schedule);
+      const res = await postponeStop(stop.logicalStopKey, schedule, assignedDate);
       if (res.ok) {
         H.success();
         navigation.goBack();
@@ -75,7 +87,7 @@ export function useRouteStopDetail() {
     } finally {
       setPostponing(false);
     }
-  }, [canPostpone, navigation, postponing, showAlert, stop, postponeStop, schedule]);
+  }, [canPostpone, navigation, postponing, showAlert, stop, postponeStop, schedule, assignedDate]);
 
   const openMore = useCallback(() => {
     showAlert(stop?.topic || "Durak", null, [

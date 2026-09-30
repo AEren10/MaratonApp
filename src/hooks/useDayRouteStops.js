@@ -62,7 +62,8 @@ export function useDayRouteStops(dateKey) {
           .filter((s) => s.carried).map((s) => s.logicalStopKey))
         : null;
       routeStops = stopsForDate(week, schedule, dateKey, dayOpts)
-        .filter((s) => !carriedKeys?.has(s.logicalStopKey) && !(dateKey !== today && doneToday(s) && dateKey > today));
+        // Bugun biten durak bugunun listesinde (doneElsewhere); baska gunde tekrar yazilmaz.
+        .filter((s) => !carriedKeys?.has(s.logicalStopKey) && !doneToday(s));
     }
     return [...[...habitStops, ...routeStops].map((stop, i) => {
       const done = stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED;

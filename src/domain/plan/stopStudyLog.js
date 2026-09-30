@@ -48,7 +48,8 @@ export function stopLogOperationIds(stop) {
   const base = stopLogOperationId(stop?.id);
   if (!base) return [];
   const topics = Array.isArray(stop?.weeklyTopics) ? stop.weeklyTopics.filter(Boolean) : [];
-  return topics.length < 2 ? [base] : topics.map((_, i) => `${base}_${i}`);
+  // Bolmeden once yazilmis tek kayit da (base) silinir.
+  return topics.length < 2 ? [base] : [base, ...topics.map((_, i) => `${base}_${i}`)];
 }
 
 /**

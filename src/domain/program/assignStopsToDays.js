@@ -17,7 +17,8 @@ import { addDays, mondayOf } from "./dayKeys.js";
 
 const FALLBACK_MINUTES = 30;
 const stopMinutes = (stop) => Number(stop?.cost?.minutes ?? stop?.minutes) || FALLBACK_MINUTES;
-const isWeeklyReview = (stop) => String(stop?.reviewCycle || "").startsWith("weekly");
+// Eski kayitlarda reviewCycle yok: konu adindan da tanir.
+const isWeeklyReview = (stop) => String(stop?.reviewCycle || "").startsWith("weekly") || stop?.topic === "Haftalık tekrar";
 
 function subjectDays(schedule, key) {
   if (!key || !Array.isArray(schedule)) return [];

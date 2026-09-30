@@ -382,7 +382,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const baseWeeks = useMemo(() => {
     const w = computedRoute.weeks || [];
     if (!frozen || !w.length || String(w[0].weekStart || "").slice(0, 10) !== thisMonday) return w;
-    return [{ ...w[0], stops: frozen.stops, planStartDay: frozen.planStartDay || w[0].planStartDay, frozen: true }, ...w.slice(1)];
+    return [{ ...w[0], stops: frozen.stops, planStartDay: frozen.planStartDay, frozen: true }, ...w.slice(1)];
   }, [computedRoute.weeks, frozen, thisMonday]);
   // Kayit effect'i buradan okur ama buna BAGIMLI DEGIL: baseWeeks kayitli
   // satirlardan turuyor; bagimli olsaydi her okuma yeni kayit, her kayit
