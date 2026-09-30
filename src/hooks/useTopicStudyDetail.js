@@ -9,6 +9,7 @@ import {
   shortDate,
   buildChart,
 } from "./topicStudyDetailHelpers";
+import { todayTR } from "../lib/dateUtils";
 
 export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
   const [history, setHistory] = useState([]);
@@ -104,8 +105,10 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
 
   const daysSince = useMemo(() => {
     if (!lastStudyDate) return null;
-    const diff = Date.now() - new Date(lastStudyDate).getTime();
-    return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+    // Iki tarih anahtari da UTC gece yarisi: fark tam gun. Date.now() ile
+    // kiyaslamak TR gece yarisindan sonraki 3 saatte dunu 'bugun' sayiyordu.
+    const diff = Date.parse(todayTR()) - Date.parse(String(lastStudyDate).slice(0, 10));
+    return Math.max(0, Math.round(diff / (1000 * 60 * 60 * 24)));
   }, [lastStudyDate]);
 
   const feel = useMemo(() => {
