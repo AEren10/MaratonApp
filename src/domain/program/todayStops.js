@@ -41,8 +41,17 @@ export function todayPlanStops(week, schedule, todayKey, {
   // KACIRILAN DURAK: pazartesi yapilmayan durak eskiden o gunde kalip
   // gozden kayboluyordu; hafta bitene kadar hicbir listede yoktu. Bitmemis
   // olanlar (en eskiden) bugune tasinir.
+  // Ayni konunun iki parcasi birlikte tasinmaz: listede ayirt edilemeyen iki
+  // "İngilizce · Passives" gorunuyordu. Konu basina bir parca (kok kimlik).
+  const seenRoots = new Set();
   const carried = days.slice(0, todayIdx).flat()
     .filter((s) => !CLOSED.has(s.lifecycleStatus) && !isCompletedToday(s))
+    .filter((s) => {
+      const root = s.rootStopKey || `${s.subject}|${s.topic}`;
+      if (seenRoots.has(root)) return false;
+      seenRoots.add(root);
+      return true;
+    })
     .slice(0, CARRY_LIMIT);
   const carriedSet = new Set(carried);
 

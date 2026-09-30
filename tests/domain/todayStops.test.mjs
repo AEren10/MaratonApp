@@ -55,3 +55,16 @@ test("plan carsamba basladiysa pazartesi-sali bos; tasinacak 'kalan' yok", () =>
   assert.ok(today.every((s) => !s.carried));
   assert.equal(today[0].topic, "A");
 });
+
+test("ayni konunun iki parcasi birlikte tasinmaz", () => {
+  const w = {
+    weekStart: "2026-09-28",
+    stops: [
+      { subject: "e", topic: "Passives", rootStopKey: "r1", lifecycleStatus: "upcoming" },
+      { subject: "e", topic: "Passives", rootStopKey: "r1", lifecycleStatus: "upcoming" },
+      { subject: "t", topic: "Paragraf", rootStopKey: "r2", lifecycleStatus: "upcoming" },
+    ],
+  };
+  const carried = todayPlanStops(w, null, "2026-10-01").filter((s) => s.carried);
+  assert.deepEqual(carried.map((s) => s.topic), ["Passives", "Paragraf"]);
+});
