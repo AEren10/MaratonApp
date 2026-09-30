@@ -3,77 +3,64 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
-import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, SPACING, CONTROL } from "../../../themes/tokens";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 
+// Program > Hafta durak satiri. Kutusuz: saat · zaman cizgisi noktasi · konu.
+// Ay gorunumundeki DayPlannedRow ile ayni dil; saati olmayan durakta "—" yok.
 export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMenu }) {
   const isDone = log.status === "done" || log.completed;
   const dotColor = subjectColorOf(C, log.subjectKey || log.subjectLabel);
-  const isRowDraft = Boolean(log.draft || isDraft);
+  const habit = log.source === "habit";
+  const name = log.topic || log.subjectLabel;
+  const meta = [log.topic ? log.subjectLabel : null, habit ? "Günlük rutin" : null].filter(Boolean).join(" · ");
 
   return (
-    <Pressable onPress={onPress} style={[s.timelineRow, isRowDraft && s.draftRow]}>
-      <View style={s.timeCol}>
-        <Text style={[TYPOGRAPHY.tableName, s.tabular, { color: C.text }]}>{log.time || "—"}</Text>
+    <Pressable onPress={onPress} disabled={!onPress} style={[s.row, (log.draft || isDraft) && s.draft]}>
+      <Text style={[TYPOGRAPHY.metaSemiBold, s.time, { color: C.text3 }]}>{log.time || ""}</Text>
+
+      <View style={s.track}>
+        <View style={[s.dot, { backgroundColor: isDone ? C.text5 : dotColor }]} />
+        {!isLast ? <View style={[s.line, { backgroundColor: C.line }]} /> : null}
       </View>
 
-      <View style={s.lineTrack}>
-        <View style={[s.dot, { backgroundColor: dotColor }]} />
-        {!isLast ? <View style={[s.vertLine, { backgroundColor: C.line }]} /> : null}
+      <View style={s.body}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: isDone ? C.text3 : C.text }]} numberOfLines={1}>{name}</Text>
+        {meta ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>{meta}</Text> : null}
       </View>
 
-      <View style={[s.stopCard, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <View style={s.cardHead}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text, flex: 1 }]} numberOfLines={1}>
-            <Text style={{ color: dotColor }}>{log.subjectLabel}</Text>
-            {log.topic ? ` · ${log.topic}` : ""}
-          </Text>
-          {isDone ? (
-            <View style={s.doneBadge}>
-              <Icon name="check" size={12} color={C.text2} sw={1.5} />
-              <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>Bitti</Text>
-            </View>
-          ) : log.source === "habit" ? (
-            <View style={[s.habitBadge, { backgroundColor: C.void, borderColor: C.line }]}>
-              <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Günlük rutin</Text>
-            </View>
-          ) : (
-            <View style={s.rightActions}>
-              {log.minutes ? (
-                <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{`${log.minutes} dk`}</Text>
-              ) : null}
-              {log.movable ? (
-                <Press
-                  haptic="light"
-                  onPress={() => onOpenMenu?.(log)}
-                  hitSlop={12}
-                  style={s.moreBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel="Durak seçenekleri"
-                >
-                  <Icon name="more" size={14} color={C.text3} />
-                </Press>
-              ) : null}
-            </View>
-          )}
+      {isDone ? (
+        <View style={s.done}>
+          <Icon name="check" size={12} color={C.text3} sw={1.5} />
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Bitti</Text>
         </View>
-      </View>
+      ) : log.minutes ? (
+        <Text style={[TYPOGRAPHY.metaSemiBold, s.tabular, { color: C.text3 }]}>{`${log.minutes} dk`}</Text>
+      ) : null}
+      {!isDone && log.movable ? (
+        <Press
+          haptic="light"
+          onPress={() => onOpenMenu?.(log)}
+          style={s.more}
+          accessibilityRole="button"
+          accessibilityLabel="Durak seçenekleri"
+        >
+          <Icon name="more" size={16} color={C.text3} fill={C.text3} />
+        </Press>
+      ) : null}
     </Pressable>
   );
 }
 
 const s = StyleSheet.create({
-  timelineRow: { flexDirection: "row", alignItems: "stretch", gap: STEP.s1, marginBottom: STEP.s2 },
-  draftRow: { opacity: 0.6 },
-  timeCol: { width: 44, alignItems: "flex-start", paddingTop: SPACING.xs },
-  tabular: { fontVariant: ["tabular-nums"] },
-  lineTrack: { width: 14, alignItems: "center", paddingTop: STEP.s1 },
-  dot: { width: 10, height: 10, borderRadius: SHAPE.chip },
-  vertLine: { width: 1.5, flex: 1, marginTop: SPACING.xs },
-  stopCard: { flex: 1, padding: STEP.s2, borderRadius: SHAPE.cardTight, borderWidth: 1 },
-  cardHead: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  doneBadge: { flexDirection: "row", alignItems: "center", gap: SPACING.xs },
-  habitBadge: { paddingHorizontal: STEP.s1, paddingVertical: SPACING.xs, borderRadius: SHAPE.chip, borderWidth: 1 },
-  rightActions: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  moreBtn: { minWidth: 28, minHeight: 28, alignItems: "center", justifyContent: "center" },
+  row: { flexDirection: "row", alignItems: "stretch", gap: STEP.s2, minHeight: CONTROL.tapMin + STEP.s2 },
+  draft: { opacity: 0.6 },
+  time: { width: 40, paddingTop: STEP.s1, fontVariant: ["tabular-nums"] },
+  track: { width: 10, alignItems: "center", paddingTop: STEP.s1 + 2 },
+  dot: { width: 8, height: 8, borderRadius: SHAPE.chip },
+  line: { width: 1, flex: 1, marginTop: SPACING.xs },
+  body: { flex: 1, paddingVertical: STEP.s1, paddingBottom: STEP.s2 },
+  done: { flexDirection: "row", alignItems: "center", gap: SPACING.xs, alignSelf: "flex-start", paddingTop: STEP.s1 },
+  tabular: { fontVariant: ["tabular-nums"], alignSelf: "flex-start", paddingTop: STEP.s1 },
+  more: { width: CONTROL.tapMin, height: CONTROL.tapMin, marginRight: -STEP.s2, alignItems: "center", justifyContent: "center" },
 });
