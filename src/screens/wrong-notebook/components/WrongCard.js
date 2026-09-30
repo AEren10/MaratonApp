@@ -45,7 +45,9 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   const statusColor = item.is_resolved ? C.text3 : C.warn;
-  const statusText = item.is_resolved ? "Çözüldü" : "Açık";
+  // Sagdaki metin bir DUGME: basinca cozuldu isaretlenir. "Acik" yazmak
+  // ne olacagini soylemiyordu; eylem adi yaziliyor.
+  const statusText = item.is_resolved ? "Çözüldü" : "Çözdüm";
 
   return (
     <Pressable
@@ -93,6 +95,7 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
           hitSlop={10}
           style={s.statusBtn}
         >
+          <Icon name={item.is_resolved ? "check" : "circle"} size={13} color={statusColor} sw={item.is_resolved ? 2.5 : 1.5} />
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: statusColor }]}>{statusText}</Text>
         </Pressable>
       </Animated.View>
@@ -153,6 +156,8 @@ const s = StyleSheet.create({
   statusBtn: {
     minHeight: CONTROL.tapMin,
     paddingHorizontal: STEP.s1,
+    flexDirection: "row",
+    gap: STEP.s1 / 2,
     justifyContent: "center",
     alignItems: "center",
   },
