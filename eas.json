@@ -40,7 +40,9 @@
   },
   "submit": {
     "production": {
-      "ios": {},
+      "ios": {
+        "ascAppId": "6815480891"
+      },
       "android": {
         "serviceAccountKeyPath": "./pc-api-key.json",
         "track": "internal"
