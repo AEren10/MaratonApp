@@ -1,6 +1,7 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
+import { emitRouteUpdated } from "../lib/routeEvents";
 
 const WQ_COLUMNS = "id, user_id, subject, topic, image_path, note, is_resolved, created_at, my_answer, correct_answer, next_review_at, interval_days, ease, last_reviewed_at, topic_source, client_operation_id";
 
@@ -72,12 +73,14 @@ export const addWrongQuestion = async (question) => {
       .single();
     if (error) throw error;
     invalidateInFlightResource("wrong_questions", question.user_id);
+    emitRouteUpdated({ action: "data_changed", resource: "wrong_questions" });
     return data;
   } catch (e) {
     if (isIdempotencyConflict(e)) {
       const existing = await getWrongQuestionByClientOperationId(question.user_id, question.client_operation_id);
       if (existing) {
         invalidateInFlightResource("wrong_questions", question.user_id);
+        emitRouteUpdated({ action: "data_changed", resource: "wrong_questions" });
         return existing;
       }
     }
@@ -120,6 +123,7 @@ export const resolveWrongQuestion = async (id, userId) => {
       .maybeSingle();
     if (error) throw error;
     invalidateInFlightResource("wrong_questions", userId);
+    emitRouteUpdated({ action: "data_changed", resource: "wrong_questions" });
     return data;
   } catch (e) {
     handleSupabaseError(e, "resolveWrongQuestion");
@@ -186,6 +190,7 @@ export const reviewWrongQuestion = async (id, userId, updates) => {
       .maybeSingle();
     if (error) throw error;
     invalidateInFlightResource("wrong_questions", userId);
+    emitRouteUpdated({ action: "data_changed", resource: "wrong_questions" });
     return data;
   } catch (e) {
     handleSupabaseError(e, "reviewWrongQuestion");
@@ -203,6 +208,7 @@ export const deleteWrongQuestion = async (id, userId) => {
       .eq("user_id", userId);
     if (error) throw error;
     invalidateInFlightResource("wrong_questions", userId);
+    emitRouteUpdated({ action: "data_changed", resource: "wrong_questions" });
   } catch (e) {
     handleSupabaseError(e, "deleteWrongQuestion");
     throw e;

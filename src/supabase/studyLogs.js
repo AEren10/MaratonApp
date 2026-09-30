@@ -2,6 +2,7 @@ import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { normalizeStudyLog, toStudyLogRow } from "../domain/study/studyLogModel";
 import { invalidateInFlightResource, makeInFlightKey, shareInFlight } from "../lib/inflightRequest";
+import { emitRouteUpdated } from "../lib/routeEvents";
 
 const SL_COLUMNS = "id, user_id, subject, topic, question_count, correct_count, duration_minutes, note, notes, study_date, created_at, client_operation_id, perceived";
 const PAGE_SIZE = 1000;
@@ -93,6 +94,7 @@ export const addStudyLog = async (log) => {
       .single();
     if (error) throw error;
     invalidateInFlightResource("study_logs", log.user_id);
+    emitRouteUpdated({ action: "data_changed", resource: "study_logs" });
     invalidateInFlightResource("topic_progress", log.user_id);
     return normalizeStudyLog(data);
   } catch (e) {
@@ -100,6 +102,7 @@ export const addStudyLog = async (log) => {
       const existing = await getStudyLogByClientOperationId(log.user_id, log.client_operation_id);
       if (existing) {
         invalidateInFlightResource("study_logs", log.user_id);
+        emitRouteUpdated({ action: "data_changed", resource: "study_logs" });
         invalidateInFlightResource("topic_progress", log.user_id);
         return existing;
       }
@@ -129,6 +132,7 @@ export const updateStudyLog = async (id, updates) => {
     if (error) throw error;
     if (!data) throw new Error("study_log_not_found");
     invalidateInFlightResource("study_logs", userId);
+    emitRouteUpdated({ action: "data_changed", resource: "study_logs" });
     invalidateInFlightResource("topic_progress", userId);
     return normalizeStudyLog(data);
   } catch (e) {
@@ -143,6 +147,7 @@ export const deleteStudyLog = async (id, userId) => {
     const { error } = await supabase.from("study_logs").delete().eq("id", id).eq("user_id", userId);
     if (error) throw error;
     invalidateInFlightResource("study_logs", userId);
+    emitRouteUpdated({ action: "data_changed", resource: "study_logs" });
     invalidateInFlightResource("topic_progress", userId);
   } catch (e) {
     handleSupabaseError(e, "deleteStudyLog");

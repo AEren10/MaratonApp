@@ -52,7 +52,7 @@ test("useStudyRoute: ensures resilient route creation with effectiveUserId and r
   assert.match(useStudyRouteSource, /const resolvedExamType = examType \|\| "tyt_ayt"/);
   assert.match(useStudyRouteSource, /const effectiveUserId = user\?\.id \|\| "local_user"/);
   assert.match(useStudyRouteSource, /emitRouteUpdated\(\{ action: "created"/);
-  assert.match(useStudyRouteSource, /onRouteUpdated\(\(\) => \{/);
+  assert.match(useStudyRouteSource, /onRouteUpdated\(\(payload\) => \{/);
 });
 
 test("firstRouteAction identifies the first active stop in a generated route", () => {

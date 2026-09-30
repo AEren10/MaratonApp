@@ -24,6 +24,7 @@ import { TRIAL_TO_CURRICULUM } from "../domain/trial/trialKeyMap";
 const LOG_WINDOW_DAYS = 45;
 import { weightedWeakAreas, buildRecentStudy, buildTopicWeakness } from "../lib/buildPlanContext";
 import { dateKey } from "../lib/dateUtils";
+import { onRouteUpdated } from "../lib/routeEvents";
 
 // Net-düşüş nudge'larını curriculum key → gerekçe mesajı haritasına çevir.
 function nudgesToPriorityReasons(nudges) {
@@ -64,6 +65,24 @@ export function usePlanContext() {
   const [dataHealth, setDataHealth] = useState(cached
     ? _cache.dataHealth
     : { logs: "loading", topics: "loading", wrongs: "loading" });
+
+  // ANINDA GUNCELLEME: calisma kaydi / yanlis yazilinca (supabase katmani
+  // "data_changed" yayar) onbellek bozulur ve yeniden okunur. Eskiden
+  // onbellek acilista bir kez doluyor, rota (ilerleme, hiz, tempo) uygulama
+  // kapatilip acilana kadar eski veride kaliyordu. Art arda gelen yazmalar
+  // tek okumada toplanir.
+  const [refreshTick, setRefreshTick] = useState(0);
+  useEffect(() => {
+    let timer = null;
+    const off = onRouteUpdated((payload) => {
+      if (payload?.action !== "data_changed") return;
+      if (!["study_logs", "wrong_questions"].includes(payload.resource)) return;
+      _cache = { ..._cache, dataHealth: { ..._cache.dataHealth, logs: "stale" } };
+      clearTimeout(timer);
+      timer = setTimeout(() => setRefreshTick((t) => t + 1), 400);
+    });
+    return () => { clearTimeout(timer); off(); };
+  }, []);
 
   useEffect(() => {
     if (!uid || uid === "dev") return;
@@ -107,7 +126,7 @@ export function usePlanContext() {
       setDataHealth(health);
     });
     return () => { cancelled = true; };
-  }, [uid]);
+  }, [uid, refreshTick]);
 
   return useMemo(() => {
     // Zayif alan ve oneriler yalniz su anki sinavin denemelerinden.

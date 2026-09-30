@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getWrongQuestions } from "../supabase/wrongQuestions";
 import { wrongSignalByTopic } from "../domain/route/wrongSignal";
+import { onRouteUpdated } from "../lib/routeEvents";
 
 // Rotanin yanlis defteri girdisi: cozulmemis yanlislar konu konu.
 // tick degisince (rota guncellendi) yeniden okunur. Okuma basarisizsa rota
@@ -10,6 +11,11 @@ import { wrongSignalByTopic } from "../domain/route/wrongSignal";
 // acilista once yanlissiz sonra yanlisli iki revizyon yazilir.
 export function useRouteWrongSignal(userId, tick = 0) {
   const [state, setState] = useState({ userId: null, rows: [], settled: false });
+  // Yanlis eklenince/cozulunce aninda yeniden oku (rota yeni sinyalle kurulur).
+  const [dataTick, setDataTick] = useState(0);
+  useEffect(() => onRouteUpdated((payload) => {
+    if (payload?.action === "data_changed" && payload.resource === "wrong_questions") setDataTick((t) => t + 1);
+  }), []);
   useEffect(() => {
     if (!userId || userId === "dev" || userId === "local_user") {
       setState({ userId, rows: [], settled: true });
@@ -22,7 +28,7 @@ export function useRouteWrongSignal(userId, tick = 0) {
       .then((data) => { if (!cancelled) setState({ userId, rows: data || [], settled: true }); })
       .catch(() => { if (!cancelled) setState((prev) => ({ ...prev, userId, settled: true })); });
     return () => { cancelled = true; };
-  }, [userId, tick]);
+  }, [userId, tick, dataTick]);
 
   const rows = state.userId === userId ? state.rows : EMPTY_ROWS;
   const byTopic = useMemo(() => wrongSignalByTopic(rows), [rows]);

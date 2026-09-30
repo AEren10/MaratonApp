@@ -202,7 +202,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const routeLoadKeyRef = useRef(null);
 
   useEffect(() => {
-    return onRouteUpdated(() => {
+    return onRouteUpdated((payload) => {
+      // Calisma kaydi/yanlis yazimi rotayi yeniden OKUTMAZ (kayitli duraklar
+      // bosalip liste titrerdi); o degisiklikler usePlanContext ve yanlis
+      // sinyali uzerinden rotaya yansir.
+      if (payload?.action === "data_changed") return;
       setRouteLoadTick((tick) => tick + 1);
     });
   }, []);
