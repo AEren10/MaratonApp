@@ -20,11 +20,11 @@ function dotColor(C, key) {
 export function NotificationBenefitList() {
   const C = useC();
   return (
-    <View style={{ gap: STEP.s1 }}>
-      {ITEMS.map((item) => (
+    <View style={[styles.container, { borderTopColor: C.line, borderBottomColor: C.line }]}>
+      {ITEMS.map((item, index) => (
         <View
           key={item.key}
-          style={[styles.row, { backgroundColor: C.surface, borderColor: C.elev }]}
+          style={[styles.row, index > 0 && { borderTopWidth: 1, borderTopColor: C.line }]}
         >
           <View style={[styles.dot, { backgroundColor: dotColor(C, item.dotKey) }]} />
           <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2, flex: 1 }]}>{item.text}</Text>
@@ -35,14 +35,13 @@ export function NotificationBenefitList() {
 }
 
 const styles = StyleSheet.create({
+  container: { borderTopWidth: 1, borderBottomWidth: 1 },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s2,
-    paddingVertical: STEP.s2,
-    paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
+    paddingVertical: STEP.s2 + 2,
+    minHeight: 44,
   },
   dot: { width: 7, height: 7, borderRadius: 1, flexShrink: 0 },
 });

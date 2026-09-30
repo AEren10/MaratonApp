@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { Button, ErrorState } from "../../components/design";
+import { Button, ErrorState, Press } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { NotificationBenefitList } from "./components/NotificationBenefitList";
 import {
@@ -108,15 +108,20 @@ function NotificationPermissionContent() {
         </Animated.View>
       </ScrollView>
 
-      <Animated.View
-        style={[styles.cta, { borderTopColor: C.line }]}
-      >
+      <Animated.View style={[styles.cta, { borderTopColor: C.line }]}>
         <Button onPress={handleAllow} size="lg" fullWidth loading={busy}>
           Evet, haber ver
         </Button>
-        <Button onPress={handleSkip} variant="ghost" size="md" fullWidth style={{ marginTop: STEP.s1 }}>
-          Şimdi olmasın
-        </Button>
+        <Press
+          haptic="none"
+          onPress={handleSkip}
+          hitSlop={8}
+          style={styles.skipBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Şimdi olmasın"
+        >
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Şimdi olmasın</Text>
+        </Press>
         <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1, textAlign: "center" }]}>
           Şimdi olmasın dersen sistem penceresi hiç açılmaz — bir hafta sonra tekrar sorarız.
         </Text>
@@ -137,4 +142,5 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s4, paddingBottom: STEP.s3 },
   title: { ...TYPOGRAPHY.heading, marginTop: STEP.s2 },
   cta: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  skipBtn: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
 });
