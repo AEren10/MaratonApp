@@ -115,7 +115,13 @@
               "displayName": "Bugün",
               "description": "Bugünün işleri ve sıradaki durağın. Kilit ekranına da eklenir.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryCircular",
+                  "accessoryRectangular",
+                  "accessoryInline"
+                ],
                 "contentMarginsDisabled": true
               }
             },
@@ -124,7 +130,13 @@
               "displayName": "Tekrar",
               "description": "Tekrarı gelen yanlış soruların.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryCircular",
+                  "accessoryRectangular",
+                  "accessoryInline"
+                ],
                 "contentMarginsDisabled": true
               }
             },
@@ -133,7 +145,13 @@
               "displayName": "Rota",
               "description": "Sınava kalan gün ve net çizgin. Kilit ekranına da eklenir.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular", "accessoryInline"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryCircular",
+                  "accessoryRectangular",
+                  "accessoryInline"
+                ],
                 "contentMarginsDisabled": true
               }
             },
@@ -142,7 +160,10 @@
               "displayName": "Bu hafta",
               "description": "Haftanın çözülen soruları ve günlük hedef.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ],
                 "contentMarginsDisabled": true
               }
             },
@@ -151,7 +172,10 @@
               "displayName": "Seri",
               "description": "Serin ve son dört haftanın çalışma ızgarası.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ],
                 "contentMarginsDisabled": true
               }
             },
@@ -160,7 +184,10 @@
               "displayName": "Deneme",
               "description": "Son denemelerinin net çizgisi ve ders ders değişim.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ],
                 "contentMarginsDisabled": true
               }
             }
@@ -179,7 +206,8 @@
           ]
         }
       ],
-      "expo-widgets"
+      "expo-widgets",
+      "expo-build-properties"
     ],
     "extra": {
       "eas": {
