@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View, ScrollView, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -20,6 +20,7 @@ import { ROUTE_STOP_STATUS } from "../../domain/route/stopStatus";
 import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
 import { StatsStrip } from "../../components/design/StatsStrip";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
+import { DepthScrollView } from "../../components/design/DepthScroll";
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
@@ -99,7 +100,7 @@ export default function TopicStudyScreen() {
         ) : error ? (
           <ErrorState preset="server" onPrimary={refetch} style={{ marginTop: STEP.s5 }} />
         ) : (
-          <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+          <DepthScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{heroLabel}</Text>
             <View style={s.hero}>
               <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{heroValue}</Text>
@@ -126,7 +127,7 @@ export default function TopicStudyScreen() {
                 </Press>
               ))}
             </View>
-          </ScrollView>
+          </DepthScrollView>
         )}
       </SafeAreaView>
     </ScreenErrorBoundary>

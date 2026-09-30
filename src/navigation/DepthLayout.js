@@ -1,6 +1,8 @@
 import { View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 
 import { ScreenDepth } from "../components/design/ScreenDepth";
+import { DepthScrollContext } from "../components/design/DepthScroll";
 import { SCREENS } from "../constants/screens";
 import { ROOT_STACK } from "./routes";
 
@@ -15,11 +17,16 @@ const fill = { flex: 1 };
 // Saydam ortu (Pro Onizleme vb.) alttaki ekranin ustune oturur; isik iki kez
 // binip alttakini de aydinlatmasin.
 export function DepthLayout({ children, route, options }) {
+  // Kaydirma konumu (DepthScrollView yazar, ScreenDepth okur). Hook erken
+  // donusten ONCE: her ekranda ayni sirada cagrilsin.
+  const scrollY = useSharedValue(0);
   if (NO_DEPTH.has(route?.name) || options?.presentation === "transparentModal") return children;
   return (
-    <View style={fill}>
-      {children}
-      <ScreenDepth subjectKey={route?.params?.tint || route?.params?.subjectKey || null} home={route?.name === SCREENS.HOME_ROOT} />
-    </View>
+    <DepthScrollContext.Provider value={scrollY}>
+      <View style={fill}>
+        {children}
+        <ScreenDepth subjectKey={route?.params?.tint || route?.params?.subjectKey || null} home={route?.name === SCREENS.HOME_ROOT} scrollY={scrollY} />
+      </View>
+    </DepthScrollContext.Provider>
   );
 }

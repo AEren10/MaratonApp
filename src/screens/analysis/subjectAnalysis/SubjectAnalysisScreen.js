@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -19,6 +19,7 @@ import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tok
 import { HeroMultiTrendChartSvg } from "../components/HeroMultiTrendChartSvg";
 import { StatsStrip } from "../../../components/design/StatsStrip";
 import { CountUpText } from "../../../components/design/CountUpText";
+import { DepthScrollView } from "../../../components/design/DepthScroll";
 
 const signed = (n) => `${n > 0 ? "+" : n < 0 ? "−" : ""}${String(Math.abs(n)).replace(".", ",")}`;
 const fmt = (n) => (n == null ? "—" : String(n).replace(".", ","));
@@ -51,7 +52,7 @@ export default function SubjectAnalysisScreen() {
           <View style={[s.dot, { backgroundColor: color }]} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>{name}</Text>
         </View>
-        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <DepthScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
           {!a.count ? (
             <EmptyState title="Bu ders için deneme yok" body="Deneme girdikçe netlerin burada çizilir." />
           ) : (
@@ -86,7 +87,7 @@ export default function SubjectAnalysisScreen() {
               </Press>
             ))}
           </View>
-        </ScrollView>
+        </DepthScrollView>
       </SafeAreaView>
     </ScreenErrorBoundary>
   );

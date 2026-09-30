@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useC, useTheme } from "../../contexts/ThemeContext";
@@ -30,10 +31,19 @@ const TOP_LIGHT_LIGHT = 0.18;
 const SUBJECT_TINT_LIGHT = 0.10;
 const STATE_TINT_LIGHT = 0.08;
 
-export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null, home = false }) {
+// Kaydirinca isik soner: 0 -> 180 px arasi opaklik 1 -> 0.35 (tamamen
+// kaybolmaz, ust kenar yine derin durur). scrollY yoksa (kaydirma bildirmeyen
+// ekran) isik sabit.
+const FADE_END = 180;
+const FADE_MIN = 0.35;
+
+export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null, home = false, scrollY = null }) {
   const C = useC();
   const { isDark } = useTheme();
   const state = useDepthTone();
+  const fade = useAnimatedStyle(() => ({
+    opacity: scrollY ? interpolate(scrollY.get(), [0, FADE_END], [1, FADE_MIN], Extrapolation.CLAMP) : 1,
+  }));
 
   const stateColor = home ? ({ up: C.up, warn: C.warn }[state] || null) : null;
   const tint = stateColor || (subjectKey ? subjectColorOf(C, subjectKey) : null);
@@ -48,7 +58,7 @@ export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null, home =
   const tintX = stateColor ? "50%" : "92%";
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, fade]}>
       <Svg width="100%" height="100%">
         <Defs>
           <LinearGradient id="sd-top" x1="0" y1="0" x2="0" y2="1">
@@ -65,6 +75,6 @@ export const ScreenDepth = memo(function ScreenDepth({ subjectKey = null, home =
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#sd-top)" />
         {tint ? <Rect x="0" y="0" width="100%" height="100%" fill="url(#sd-tint)" /> : null}
       </Svg>
-    </View>
+    </Animated.View>
   );
 });

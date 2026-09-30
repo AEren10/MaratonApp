@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -17,6 +17,7 @@ import { RouteStatTiles } from "./components/RouteStatTiles";
 import { RouteStopHero } from "./components/RouteStopHero";
 import { RouteStopPlace } from "./components/RouteStopPlace";
 import { RouteStopWhy } from "./components/RouteStopWhy";
+import { DepthScrollView } from "../../components/design/DepthScroll";
 
 
 // Tasarim AKIS 2 · "Durak Detayı": rotadaki tek durak.
@@ -41,7 +42,7 @@ export default function RouteStopDetailScreen() {
         onPaywall={d.access.paywall}
       >
         {stop ? (
-          <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+          <DepthScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
             <Animated.View>
               <RouteStopHero number={d.number} stop={stop} color={color} subjectCompleted={d.subjectCompleted} part={d.part} when={d.when} />
             </Animated.View>
@@ -80,7 +81,7 @@ export default function RouteStopDetailScreen() {
                 </Button>
               ) : null}
             </Animated.View>
-          </ScrollView>
+          </DepthScrollView>
         ) : null}
       </RouteAccessGate>
     </SafeAreaView>
