@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { Card } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { formatRehearsalDate, sessionLabel } from "../../../domain/exam/examRehearsal";
 import { RehearsalRow, RehearsalOptions, RehearsalInput } from "./RehearsalRow";
 
@@ -49,10 +49,10 @@ export function RehearsalSetup({ r }) {
       </Animated.View>
 
       <Animated.View style={s.blockTight}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>PROVA GÜNÜ</Text>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>PROVA GÜNÜ</Text>
         <View style={s.rules}>
           {rules.map((text) => (
-            <View key={text} style={[s.rule, { backgroundColor: C.surface, borderColor: C.elev }]}>
+            <View key={text} style={s.rule}>
               <View style={[s.dot, { backgroundColor: C.accent }]} />
               <Text style={[TYPOGRAPHY.caption, s.ruleText, { color: C.text2 }]}>{text}</Text>
             </View>
@@ -61,11 +61,9 @@ export function RehearsalSetup({ r }) {
       </Animated.View>
 
       <Animated.View style={s.blockTight}>
-        <View style={[s.note, { backgroundColor: C.surface, borderColor: C.elev }]}>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 20 }]}>
-            Prova netleri tahmin bandına girer ama seriyi bozmaz. Yarım bırakırsan kayıt açılmaz.
-          </Text>
-        </View>
+        <Text style={[TYPOGRAPHY.body, s.note, { color: C.text3 }]}>
+          Prova netleri tahmin bandına girer ama seriyi bozmaz. Yarım bırakırsan kayıt açılmaz.
+        </Text>
       </Animated.View>
     </View>
   );
@@ -78,12 +76,12 @@ const s = StyleSheet.create({
   block: { marginTop: STEP.s4 - 4 },
   blockTight: { marginTop: STEP.s3 + 6 },
   form: { paddingHorizontal: STEP.s3, paddingTop: 6, paddingBottom: STEP.s1 },
-  rules: { gap: STEP.s1, marginTop: STEP.s2 + 2 },
+  rules: { gap: STEP.s1, marginTop: STEP.s2 },
   rule: {
-    flexDirection: "row", alignItems: "center", gap: 13,
-    paddingVertical: 15, paddingHorizontal: 16, borderRadius: SHAPE.panel, borderWidth: 1,
+    flexDirection: "row", alignItems: "center", gap: STEP.s2,
+    paddingVertical: STEP.s1,
   },
-  dot: { width: 6, height: 6, borderRadius: 1 },
+  dot: { width: 5, height: 5, borderRadius: 2.5 },
   ruleText: { flex: 1 },
-  note: { paddingVertical: 18, paddingHorizontal: STEP.s3, borderRadius: SHAPE.panel, borderWidth: 1 },
+  note: { marginTop: STEP.s1 },
 });

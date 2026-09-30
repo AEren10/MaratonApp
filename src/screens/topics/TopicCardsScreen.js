@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
@@ -14,7 +14,6 @@ import { CardItem } from "./components/CardItem";
 import { TopicCardsSkeleton } from "./components/TopicCardsSkeleton";
 import { Press } from "../../components/design/Press";
 
-const ItemSeparator = () => <View style={{ height: STEP.s2 }} />;
 
 export default function TopicCardsScreen() {
   const C = useC();
@@ -61,6 +60,8 @@ export default function TopicCardsScreen() {
 
   const keyExtractor = useCallback((item) => String(item.id), []);
 
+  const renderSeparator = useCallback(() => <View style={{ height: 1, backgroundColor: C.line }} />, [C.line]);
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
@@ -98,7 +99,7 @@ export default function TopicCardsScreen() {
           showsVerticalScrollIndicator={false}
           windowSize={5}
           maxToRenderPerBatch={10}
-          ItemSeparatorComponent={ItemSeparator}
+          ItemSeparatorComponent={renderSeparator}
         />
       )}
     </SafeAreaView>
@@ -115,8 +116,7 @@ function makeStyles(C) {
     list: { paddingHorizontal: GUTTER, paddingBottom: 60 },
     card: {
       flexDirection: "row", alignItems: "center", gap: STEP.s2,
-      backgroundColor: C.surface, borderRadius: SHAPE.card,
-      padding: GUTTER,
+      paddingVertical: STEP.s3, minHeight: 48,
     },
     miniBar: {
       width: 50, height: 4, borderRadius: 2, backgroundColor: C.elev, overflow: "hidden",

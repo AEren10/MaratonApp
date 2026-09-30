@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
-import { Icon, Card } from "../../components/design";
+import { Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
@@ -50,11 +50,9 @@ export default function LevelScreen() {
         />
       </Animated.View>
 
-      <Animated.View>
-        <Card tone="surface" radius="panel" style={styles.note}>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 20 }]}>{NOTE}</Text>
-        </Card>
-      </Animated.View>
+      <Animated.Text style={[TYPOGRAPHY.body, styles.note, { color: C.text3 }]}>
+        {NOTE}
+      </Animated.Text>
 
       <Animated.Text
         style={[TYPOGRAPHY.label, styles.sectionLabel, { color: C.text2 }]}
