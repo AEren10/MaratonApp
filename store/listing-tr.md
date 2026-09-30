@@ -12,7 +12,7 @@ Deneme analizi & net takip
 yks,tyt,ayt,deneme,net hesaplama,sıralama,çalışma takip,yanlış defteri,ders programı,sınav hazırlık
 
 ### Promosyon Metni (170 karakter)
-YKS maratonuna hazır mısın? Günlük çalışma planı, deneme analizi ve kişisel rotanla hedefine koş. Tamamen ücretsiz.
+YKS maratonuna hazır mısın? Günlük plan, deneme analizi, yanlış defteri ve kişisel rotayla hedefine düzenli ilerle. Tamamen ücretsiz.
 
 ### Açıklama
 YKS hazırlığını ciddiye alanlar için tasarlandı.
@@ -26,7 +26,7 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 • Sıralama simülatörü ile tahmini sıralamayı gör
 
 📝 GÜNLÜK ÇALIŞMA PLANI
-• Akıllı günlük plan: neyi, ne kadar çalışacağını bildir
+• Kişisel rota: bugün ne çalışacağını biz seçeriz
 • Ders ve konu bazlı çalışma takibi
 • Çalışma zamanlayıcısı ile odaklan
 • Haftalık çalışma raporu ve istatistikler
@@ -34,13 +34,12 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 📓 YANLIŞ DEFTERİ
 • Yanlışlarını fotoğrafla kaydet
 • Tekrar sistemiyle aralıklı tekrar yap
-• Yanlışlarını unutmadan tekrar et
+• Not ekleyerek yanlışlarını daha sonra yeniden çöz
 
 🔥 MOTİVASYON & OYUNLAŞTIRMA
 • Günlük seri takibi — serini koru, dondurmayı kullan
-• XP kazan, rozet aç, ligde yüksel
-• Arkadaşlarınla çalışma mücadelesi başlat
-• Kişisel rota: bugün ne çalışacağını biz seçeriz
+• XP kazan ve ilerlemeni görünür tut
+• Çalışma alışkanlığını düzenli takip et
 
 🗺️ YOL HARİTASI & MÜFREDAT
 • YKS müfredatını konu konu takip et
@@ -73,7 +72,7 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 - Sıralama simülatörü ile tahmini sıralamayı gör
 
 📝 Günlük Çalışma Planı
-- Akıllı günlük plan: neyi, ne kadar çalışacağını bildir
+- Kişisel rota: bugün ne çalışacağını biz seçeriz
 - Ders ve konu bazlı çalışma takibi
 - Çalışma zamanlayıcısı ile odaklan
 - Haftalık çalışma raporu ve istatistikler
@@ -81,13 +80,12 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 📓 Yanlış Defteri
 - Yanlışlarını fotoğrafla kaydet
 - Aralıklı tekrar sistemiyle unutma
-- Yanlışlarını unutmadan tekrar et
+- Not ekleyerek yanlışlarını daha sonra yeniden çöz
 
 🔥 Motivasyon & Oyunlaştırma
 - Günlük seri takibi ve seri dondurma
-- XP kazan, rozet aç, ligde yüksel
-- Arkadaşlarınla çalışma mücadelesi başlat
-- Kişisel rota: bugün ne çalışacağını biz seçeriz
+- XP kazan ve ilerlemeni görünür tut
+- Çalışma alışkanlığını düzenli takip et
 
 🗺️ Yol Haritası & Müfredat Takibi
 - YKS müfredatını konu konu takip et
@@ -112,13 +110,33 @@ Gizlilik: https://maratonapp.com/privacy
 
 ---
 
-## Screenshot Sıralaması (5 adet önerilen)
+## Ekran görüntüleri
 
-1. **Sıralama simülatörü** — "Sıralamanı anında gör" başlıklı overlay
-2. **Günlük plan + seri** — "Günlük planınla hedefe koş" overlay
-3. **Deneme analizi grafiği** — "Netlerin nasıl yükseliyor?" overlay
-4. **Yanlış defteri** — "Yanlışlarını fotoğrafla, tekrarla" overlay
-5. **Lig & sosyal** — "Arkadaşlarınla yarış" overlay
+V1 görsellerinde lig, sosyal, topluluk, premium veya yapay zekâ iddiası gösterilmez.
+
+1. **Rota / günlük plan**
+   - Üst başlık: "Bugünün Rotası"
+   - Demo hesapta görünmesi gereken veri: TYT + AYT Sayısal hedefi, bugünkü çalışma durakları, aktif seri.
+
+2. **Deneme analizi**
+   - Üst başlık: "Netlerin Yükseliyor"
+   - Demo hesapta görünmesi gereken veri: son 6 haftadaki 3 TYT ve 2 AYT denemesi, yükselen net grafiği.
+
+3. **Deneme detayı**
+   - Üst başlık: "Ders Ders Analiz"
+   - Demo hesapta görünmesi gereken veri: TYT veya AYT denemesinin ders kırılımları, doğru/yanlış/boş ve net değerleri.
+
+4. **Yanlış defteri**
+   - Üst başlık: "Yanlışlarını Tekrar Et"
+   - Demo hesapta görünmesi gereken veri: fotoğrafsız ama notlu 5+ yanlış kaydı, tekrar tarihi veya çözülmemiş durum.
+
+5. **Çalışma kaydı**
+   - Üst başlık: "Çalışmanı Kaydet"
+   - Demo hesapta görünmesi gereken veri: son 14 günde 10+ çalışma kaydı, bazı kayıtlarda soru ve doğru sayısı.
+
+6. **Profil / hedefler**
+   - Üst başlık: "Hedefini Takip Et"
+   - Demo hesapta görünmesi gereken veri: TYT + AYT Sayısal ayarı, hedef net, başlangıç neti ve seri özeti.
 
 **Boyutlar:**
 - iPhone 6.7": 1290 × 2796 px
