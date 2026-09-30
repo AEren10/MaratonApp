@@ -4,9 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Icon, Button, Card, StatBlock } from "../../components/design";
+import { Icon, Button, StatBlock, Press } from "../../components/design";
 import LevelTestSubjectRow from "./components/LevelTestSubjectRow";
-import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useLevelTestForm } from "../../hooks/useLevelTestForm";
@@ -15,7 +15,6 @@ import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
-import { Press } from "../../components/design/Press";
 
 export default function LevelTestScreen() {
   const C = useC();
@@ -30,8 +29,6 @@ export default function LevelTestScreen() {
   const gap = targetNet != null ? threshold(totalNet, targetNet) : null;
   const months = gapMonths(daysUntilExam);
 
-  // Bu ekran submit'ten hemen sonra kapaniyor, bu yuzden bekleyen senkron
-  // notu BURADA gosterilemez -- olu UI olur. Not varis ekranina tasiniyor.
   const goNext = useCallback(
     (result) => navigation.navigate(SCREENS.ROUTE_READY, { syncPendingNote: result?.syncPendingNote || undefined }),
     [navigation],
@@ -42,29 +39,34 @@ export default function LevelTestScreen() {
     submit(goNext);
   }, [submit, goNext]);
 
-  // Atlamak da bir sinyal: kullanicinin elinde deneme yok demek, rota
-  // baslangic noktasi olmadan ciziliyor. Huni bunu gormeli.
   const handleSkip = useCallback(() => {
-    if (saving) return; // Devam kaydederken atla ikinci kez ilerletirdi.
+    if (saving) return;
     H.select();
     track(EVENTS.LEVEL_TEST_SKIPPED);
     markLevelTestDone({ skipped: true }).catch(() => {});
     goNext(null);
   }, [goNext, markLevelTestDone, saving]);
 
+  const canGoBack = navigation.canGoBack();
+
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={styles.headerRow}>
-        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri">
-          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
-        </Press>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>3 / 4</Text>
+      <View style={styles.header}>
+        {canGoBack ? (
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" style={styles.backBtn}>
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
+          </Press>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Seviye Belirleme</Text>
+        <View style={styles.backBtn} />
       </View>
+
       <View style={styles.progressRow}>
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
-        <View style={[styles.segment, { backgroundColor: C.track }]} />
+        {[0, 1, 2, 3].map((i) => (
+          <View key={i} style={[styles.segment, { backgroundColor: i <= 2 ? C.accent : C.track }]} />
+        ))}
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -87,28 +89,26 @@ export default function LevelTestScreen() {
         </Animated.View>
 
         {hasAnyEntry && (
-          <Animated.View>
-            <Card style={styles.summaryCard}>
-              <View style={styles.summaryHead}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BAŞLANGIÇ</Text>
-                <StatBlock value={totalNet.toFixed(2).replace(".", ",")} size="value" />
-              </View>
-              {gap && !gap.reached && months != null && (
-                <Text style={[TYPOGRAPHY.caption, styles.gapText, { color: C.text3 }]}>
-                  {`Hedefe ${gap.gap.toFixed(2).replace(".", ",")} net var. Bu mesafe ${months} aylık bir rota demek.`}
-                </Text>
-              )}
-            </Card>
+          <Animated.View style={[styles.summaryGround, { borderTopColor: C.line }]}>
+            <View style={styles.summaryHead}>
+              <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>BAŞLANGIÇ</Text>
+              <StatBlock value={totalNet.toFixed(2).replace(".", ",")} size="value" />
+            </View>
+            {gap && !gap.reached && months != null && (
+              <Text style={[TYPOGRAPHY.caption, styles.gapText, { color: C.text3 }]}>
+                {`Hedefe ${gap.gap.toFixed(2).replace(".", ",")} net var. Bu mesafe ${months} aylık bir rota demek.`}
+              </Text>
+            )}
           </Animated.View>
         )}
       </ScrollView>
 
-      <View style={styles.cta}>
+      <View style={[styles.cta, { borderTopColor: C.line }]}>
         <Button onPress={handleContinue} size="lg" fullWidth loading={saving} disabled={!hasAnyEntry}>
           Devam
         </Button>
-        <Press haptic="none" onPress={handleSkip} hitSlop={8} style={styles.skip}>
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Denemem yok, atla</Text>
+        <Press haptic="none" onPress={handleSkip} hitSlop={8} style={styles.skip} accessibilityRole="button">
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Denemem yok, atla</Text>
         </Press>
       </View>
     </SafeAreaView>
@@ -116,18 +116,16 @@ export default function LevelTestScreen() {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: GUTTER, paddingTop: STEP.s1,
-  },
-  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
+  backBtn: { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
+  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
   segment: { flex: 1, height: 3, borderRadius: 1.5 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 },
   subtitle: { marginTop: STEP.s1, maxWidth: 300 },
   list: { gap: STEP.s1, marginTop: STEP.s3 },
-  summaryCard: { marginTop: STEP.s3 },
+  summaryGround: { marginTop: STEP.s3, paddingTop: STEP.s3, borderTopWidth: 1 },
   summaryHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
   gapText: { marginTop: STEP.s1 },
-  cta: { paddingHorizontal: GUTTER, paddingBottom: STEP.s2 },
-  skip: { alignItems: "center", marginTop: STEP.s3, minHeight: 44, justifyContent: "center" },
+  cta: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  skip: { alignItems: "center", marginTop: STEP.s1, minHeight: CONTROL.tapMin, justifyContent: "center" },
 });
