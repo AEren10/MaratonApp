@@ -109,6 +109,8 @@ Apple incelemecisinin ve her yeni kullanıcının ilk gördüğü yer burası.
 
 ## Riskler
 
+- **Uygulama ikonu YOK (engel):** `assets/icon.png`, `adaptive-icon.png` ve `splash-icon.png` Expo'nun hazır gri çember ızgarası. Mağaza ikonu (1024x1024) ve splash için gerçek bir logo gerekli. Logo vektör (SVG) olarak gelirse onboarding'deki "logo dolar" animasyonu da ondan yapılır.
+
 - **Alan adı ve e-posta** bir günde bitmeyebilir: ücretsiz barındırma adresiyle başla.
 - **İlk production build** widget hedefi için ayrı dağıtım profili ister; EAS Apple girişi soracak, bu adım sende.
 - **İnceleme reddi** en çok boş demo hesap, ölü bağlantı ya da ödeme vaadi yüzünden gelir. Üçü de yukarıda ele alındı.
