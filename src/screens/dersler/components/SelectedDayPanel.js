@@ -47,19 +47,19 @@ export function SelectedDayPanel({ selectedDay, logs }) {
       ) : null}
 
       {displayLogs.length === 0 ? (
-        <View style={s.emptyBox}>
-          <Text style={[TYPOGRAPHY.body, { color: C.text3, marginBottom: STEP.s2 }]}>
+        <View style={[s.emptyBox, { borderColor: C.line, backgroundColor: C.surface + "20" }]}>
+          <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginBottom: STEP.s2 }]}>
             Bu gün için henüz durak planlanmadı.
           </Text>
           <Pressable
             onPress={addTask}
             style={({ pressed }) => [
               s.addButton,
-              { borderColor: C.border, backgroundColor: pressed ? C.elev : C.surface },
+              { borderColor: C.line, backgroundColor: pressed ? C.elev : C.surface },
             ]}
           >
-            <Icon name="plus" size={14} color={C.accent} sw={1.5} />
-            <Text style={[TYPOGRAPHY.bodySemiBold, s.btnText, { color: C.accentBright }]}>
+            <Icon name="plus" size={13} color={C.accentBright} sw={1.5} />
+            <Text style={[TYPOGRAPHY.captionSemiBold, s.btnText, { color: C.text }]}>
               Durak ekle
             </Text>
           </Pressable>
@@ -106,7 +106,7 @@ const s = StyleSheet.create({
   wrap: { marginTop: STEP.s4 },
   summaryRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: STEP.s2 },
   listWrap: { marginTop: STEP.s1 },
-  emptyBox: { paddingVertical: STEP.s2, alignItems: "flex-start" },
+  emptyBox: { paddingVertical: STEP.s3, paddingHorizontal: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1, borderStyle: "dashed", alignItems: "flex-start" },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
