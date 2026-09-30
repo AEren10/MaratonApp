@@ -74,7 +74,7 @@ export default function SettingsScreen() {
             <SettingsRow label="Gizlilik" onPress={vm.go(SCREENS.PRIVACY)} />
             <SettingsRow label="Kullanım koşulları" onPress={vm.go(SCREENS.TERMS)} />
             <SettingsRow label="Hakkında" onPress={vm.go(SCREENS.ABOUT)} />
-            <SettingsRow label="Yardım" hint="destek@maraton.app" onPress={vm.handleHelp} />
+            <SettingsRow label="Yardım" hint="destek@maratonapp.com" onPress={vm.handleHelp} />
           </SettingsGroup>
         </Animated.View>
 
@@ -93,8 +93,7 @@ export default function SettingsScreen() {
 
         <Animated.View>
           <SettingsGroup title="HESAP">
-            {vm.hasSubscription ? <SettingsRow first label="Abonelik ve hesap" onPress={vm.go(SCREENS.SUBSCRIPTION)} /> : null}
-            <SettingsRow first={!vm.hasSubscription} label="E-posta değiştir" onPress={vm.go(SCREENS.EDIT_EMAIL)} />
+            <SettingsRow first label="E-posta değiştir" onPress={vm.go(SCREENS.EDIT_EMAIL)} />
             <SettingsRow label="Şifre değiştir" onPress={vm.go(SCREENS.CHANGE_PASSWORD)} />
           </SettingsGroup>
         </Animated.View>

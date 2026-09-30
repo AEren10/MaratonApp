@@ -17,8 +17,8 @@ export const PREMIUM_FEATURES = {
   },
   ai_suggestions: {
     key: "ai_suggestions",
-    title: "AI Çalışma Önerileri",
-    desc: "Yapay zeka destekli kişisel çalışma planı",
+    title: "Kişisel Çalışma Önerileri",
+    desc: "Kural tabanlı kişisel çalışma planı",
   },
   advanced_reports: {
     key: "advanced_reports",

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const friendsScreen = readFileSync(new URL("../../src/screens/social/FriendsScreen.js", import.meta.url), "utf8");
 const referralScreen = readFileSync(new URL("../../src/screens/social/ReferralScreen.js", import.meta.url), "utf8");
+const leagueScreen = readFileSync(new URL("../../src/screens/league/LeagueScreen.js", import.meta.url), "utf8");
 const useFriends = readFileSync(new URL("../../src/hooks/useFriends.js", import.meta.url), "utf8");
 const useReferrals = readFileSync(new URL("../../src/hooks/useReferrals.js", import.meta.url), "utf8");
 
@@ -21,4 +22,10 @@ test("referral screen delegates Supabase/state work to useReferrals", () => {
   assert.match(useReferrals, /getOrCreateReferralCode\(userId\)/);
   assert.match(useReferrals, /getReferralStats\(userId\)/);
   assert.match(useReferrals, /applyReferralCode\(userId, friendCode\)/);
+});
+
+test("free V1 referral surfaces do not promise premium rewards", () => {
+  for (const source of [referralScreen, leagueScreen, useReferrals]) {
+    assert.doesNotMatch(source, /Premium kaz|premium/i);
+  }
 });

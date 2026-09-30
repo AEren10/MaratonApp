@@ -9,7 +9,6 @@ import { HomeTopBar } from "./components/HomeTopBar";
 import { HomeHero } from "./components/HomeHero";
 import { HomeExamAftermathRow } from "./components/HomeExamAftermathRow";
 import { HomeProBody } from "./components/HomeProBody";
-import { HomeFreeBody } from "./components/HomeFreeBody";
 import { HomeLoading } from "./components/HomeLoading";
 import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
@@ -38,10 +37,10 @@ export default function HomeScreen() {
   useHomeDepthTone(dashboard.solvedToday, h.dailyGoal);
 
   const discoverEligible = (h.longestStreak || h.streak || 0) > 0;
-  const renderBelow = useCallback(({ debtHours, hasRouteAccess }) => (hasRouteAccess
-    ? <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />
-    : <HomeFreeBody recent={h.recent} onSeeRoute={actions.proPreview} onFirstWeek={h.isInGrace ? actions.firstWeek : undefined} />
-  ), [h.stops, h.recent, h.isInGrace, discoverEligible, dueCount, actions]);
+  // v1: Premium kapali; ucretsiz govde uretimden cikti, her zaman tam govde.
+  const renderBelow = useCallback(() => (
+    <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />
+  ), [h.stops, discoverEligible, dueCount, actions]);
 
   let body;
   if (h.loading) {

@@ -18,7 +18,7 @@ Son güncelleme: 2026-06-20
   - Platform: iOS
   - Name: `Maraton: YKS Çalışma Takibi`
   - Primary Language: Turkish
-  - Bundle ID: `com.maraton.app` (Apple Developer portalında kayıtlı olmalı)
+  - Bundle ID: `com.ahmeterensiranli.maraton` (Apple Developer portalında kayıtlı olmalı)
   - SKU: `maraton-app` (benzersiz, bir kez girilir)
 - [ ] Kategori seç: **Education** (Eğitim)
 - [ ] Fiyat: **Free** (Ücretsiz) olarak ayarla
@@ -59,8 +59,8 @@ Son güncelleme: 2026-06-20
 - [ ] Keywords gir: `yks,tyt,ayt,deneme,net hesaplama,sıralama,çalışma takip,yanlış defteri,ders programı,sınav hazırlık`
 - [ ] Promosyon metni gir (170 karakter)
 - [ ] Açıklama gir (store/listing-tr.md'deki Apple App Store açıklaması)
-- [ ] Destek URL'si gir: `https://maraton.app`
-- [ ] Gizlilik Politikası URL'si gir: `https://maraton.app/privacy`
+- [ ] Destek URL'si gir: `https://maratonapp.com`
+- [ ] Gizlilik Politikası URL'si gir: `https://maratonapp.com/privacy`
 
 ### 1.6 Privacy Nutrition Labels
 
@@ -82,7 +82,7 @@ Son güncelleme: 2026-06-20
 ### 1.8 App Review Bilgileri
 
 - [ ] Demo hesap bilgilerini hazırla (Apple review ekibi için):
-  - E-posta: `review@maraton.app` (veya test hesabı)
+  - E-posta: `review@maratonapp.com` (veya test hesabı)
   - Şifre: güçlü bir test şifresi
   - Not: Hesaba örnek deneme sonuçları ve çalışma verileri ekle
 - [ ] Contact Information bölümünü doldur:
@@ -171,9 +171,9 @@ Son güncelleme: 2026-06-20
 - [ ] Kısa açıklama (80 karakter): store/listing-tr.md'den
 - [ ] Tam açıklama (4000 karakter): store/listing-tr.md'den
 - [ ] İletişim bilgileri:
-  - E-posta: `destek@maraton.app`
-  - Website: `https://maraton.app`
-  - Gizlilik Politikası: `https://maraton.app/privacy`
+  - E-posta: `destek@maratonapp.com`
+  - Website: `https://maratonapp.com`
+  - Gizlilik Politikası: `https://maratonapp.com/privacy`
 
 ### 2.5 Data Safety Formu
 
@@ -183,7 +183,7 @@ Son güncelleme: 2026-06-20
   - [ ] Veri türleri: Personal info (e-posta), App activity, App info and performance
   - [ ] Veri güvenliği: Transit encryption (HTTPS), Deletion mechanism (hesap silme)
   - [ ] Üçüncü taraflarla paylaşım: Hayır (reklam ağı ve analitik SDK yok ise)
-- [ ] Gizlilik politikası URL'si: `https://maraton.app/privacy`
+- [ ] Gizlilik politikası URL'si: `https://maratonapp.com/privacy`
 
 ### 2.6 Content Rating (IARC)
 
@@ -191,7 +191,7 @@ Son güncelleme: 2026-06-20
 - [ ] IARC anketini doldur:
   - Kategori: Education / Reference
   - Şiddet, kumar, cinsel içerik, dil: hepsi "Hayır"
-  - User interaction: Evet (topluluk özellikleri varsa)
+  - User interaction: Evet (lig, arkadaş ve grup özellikleri nedeniyle)
   - Location sharing: Hayır
 - [ ] Sonuç: **Everyone** (Herkes) olmalı — onayla ve kaydet
 
@@ -252,7 +252,7 @@ Son güncelleme: 2026-06-20
 
 ### 3.1 Domain & DNS
 
-- [ ] `maraton.app` domainini satın al (Google Domains / Namecheap / Cloudflare)
+- [ ] `maratonapp.com` domaininin DNS ve HTTPS yayınını doğrula
 - [ ] DNS yapılandırmasını yap:
   - A / CNAME kaydı: web hosting'e yönlendir
   - MX kaydı: e-posta servisi için (bkz. 3.3)
@@ -260,30 +260,30 @@ Son güncelleme: 2026-06-20
 
 ### 3.2 Web Sayfalarını Deploy Et
 
-- [ ] `web/` klasöründeki dosyaları `maraton.app` adresine deploy et:
-  - `privacy.html` → `https://maraton.app/privacy`
-  - `terms.html` → `https://maraton.app/terms`
-  - `delete-account.html` → `https://maraton.app/delete-account`
+- [ ] Yasal sayfaları `maratonapp.com` adresine deploy et:
+  - Gizlilik → `https://maratonapp.com/privacy`
+  - Kullanım koşulları → `https://maratonapp.com/terms`
+  - Hesap silme talebi → `https://maratonapp.com/delete-account`
 - [ ] Hosting seçenekleri: Vercel, Netlify, Cloudflare Pages (ücretsiz tier yeterli)
 - [ ] Deploy sonrası tüm URL'lerin çalıştığını doğrula:
-  - [ ] `https://maraton.app/privacy` erişilebilir mi?
-  - [ ] `https://maraton.app/terms` erişilebilir mi?
-  - [ ] `https://maraton.app/delete-account` erişilebilir mi?
+  - [ ] `https://maratonapp.com/privacy` erişilebilir mi?
+  - [ ] `https://maratonapp.com/terms` erişilebilir mi?
+  - [ ] `https://maratonapp.com/delete-account` erişilebilir mi?
 - [ ] Mobil görünümde düzgün göründüğünü kontrol et
 
 ### 3.3 E-posta
 
-- [ ] `destek@maraton.app` e-posta adresini oluştur
+- [ ] `destek@maratonapp.com` e-posta adresini oluştur
   - Seçenekler: Google Workspace, Zoho Mail (ücretsiz 1 kullanıcı), Improvmx (forwarding)
-  - Forwarding: `destek@maraton.app` → `ahmet.hi@hotmail.com` (en basit çözüm)
+  - Forwarding: `destek@maratonapp.com` → `ahmet.hi@hotmail.com` (en basit çözüm)
 - [ ] MX kayıtlarını DNS'e ekle
 - [ ] Test e-postası gönderip alarak çalıştığını doğrula
-- [ ] (Apple Review için) `review@maraton.app` veya alternatif bir demo hesap e-postası oluştur
+- [ ] (Apple Review için) `review@maratonapp.com` veya alternatif bir demo hesap e-postası oluştur
 
 ### 3.4 Deep Link / Universal Link (Opsiyonel ama Önerilen)
 
-- [ ] Apple App Site Association dosyasını `maraton.app/.well-known/apple-app-site-association` yoluna koy
-- [ ] Android Asset Links dosyasını `maraton.app/.well-known/assetlinks.json` yoluna koy
+- [ ] Apple App Site Association dosyasını `maratonapp.com/.well-known/apple-app-site-association` yoluna koy
+- [ ] Android Asset Links dosyasını `maratonapp.com/.well-known/assetlinks.json` yoluna koy
 - [ ] `maraton` URL scheme'inin app.json'da zaten tanımlı olduğunu doğrula
 
 ---
@@ -313,7 +313,7 @@ Son güncelleme: 2026-06-20
 ## 5. Demo & Test Hesabı
 
 - [ ] Apple Review için demo hesap oluştur:
-  - E-posta: `review@maraton.app` (veya `demo@maraton.app`)
+  - E-posta: `review@maratonapp.com` (veya `demo@maratonapp.com`)
   - Şifre: güçlü, hatırlanabilir (Apple ekibi kullanacak)
 - [ ] Demo hesaba örnek veri ekle:
   - [ ] En az 3 deneme sonucu (TYT + AYT)

@@ -5,7 +5,6 @@ import {
   celebrationOptions,
   detailOptions,
   modalOptions,
-  overlayOptions,
   withScreenBoundary,
 } from "./screenOptions";
 
@@ -50,8 +49,7 @@ import SearchScreen from "../screens/search/SearchScreen";
 import DocumentScreen from "../screens/settings/DocumentScreen";
 import HowItWorksScreen from "../screens/settings/HowItWorksScreen";
 import ExamDateScreen from "../screens/settings/ExamDateScreen";
-import SubscriptionScreen from "../screens/premium/SubscriptionScreen";
-import CancelSubscriptionScreen from "../screens/premium/CancelSubscriptionScreen";
+import LegacyHomeRedirectScreen from "../screens/home/LegacyHomeRedirectScreen";
 import LevelScreen from "../screens/profile/LevelScreen";
 import PlanDetailScreen from "../screens/plan/PlanDetailScreen";
 import AddTaskScreen from "../screens/plan/AddTaskScreen";
@@ -91,19 +89,6 @@ const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSi
 const ExamDayPlanScreen = React.lazy(() => import("../screens/exam/ExamDayPlanScreen"));
 const ExamResultScreen = React.lazy(() => import("../screens/exam/ExamResultScreen"));
 const ForecastAccuracyScreen = React.lazy(() => import("../screens/exam/ForecastAccuracyScreen"));
-const PaywallScreen = React.lazy(() => import("../screens/premium/PaywallScreen"));
-const PaymentCardScreen = React.lazy(() => import("../screens/premium/PaymentCardScreen"));
-const PaymentProcessingScreen = React.lazy(() => import("../screens/premium/PaymentProcessingScreen"));
-const PaymentSuccessScreen = React.lazy(() => import("../screens/premium/PaymentSuccessScreen"));
-const PaymentFailedScreen = React.lazy(() => import("../screens/premium/PaymentFailedScreen"));
-const PremiumScreen = React.lazy(() => import("../screens/premium/PremiumScreen"));
-const ProPreviewScreen = React.lazy(() => import("../screens/premium/ProPreviewScreen"));
-const AccessEndedScreen = React.lazy(() => import("../screens/premium/AccessEndedScreen"));
-const FirstWeekScreen = React.lazy(() => import("../screens/premium/FirstWeekScreen"));
-const FirstRouteReadyScreen = React.lazy(() => import("../screens/premium/FirstRouteReadyScreen"));
-const StudyProcessedScreen = React.lazy(() => import("../screens/premium/StudyProcessedScreen"));
-const OneWeekCompletedScreen = React.lazy(() => import("../screens/premium/OneWeekCompletedScreen"));
-const EighthDayLockScreen = React.lazy(() => import("../screens/premium/EighthDayLockScreen"));
 const DataExportScreen = React.lazy(() => import("../screens/settings/DataExportScreen"));
 const AccountDeleteScreen = React.lazy(() => import("../screens/settings/AccountDeleteScreen"));
 const OfflineQueueScreen = React.lazy(() => import("../screens/settings/OfflineQueueScreen"));
@@ -241,22 +226,23 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.EXAM_RESULT, ExamResultScreen),
   screen(SCREENS.FORECAST_ACCURACY, ForecastAccuracyScreen),
   screen(SCREENS.ADD_TASK, AddTaskScreen, modalOptions),
-  // Baglam paywall'i isin ustunde alt sayfa; "Paywall Anı" kendi zeminini boyar.
-  screen(SCREENS.PAYWALL, PaywallScreen, overlayOptions),
-  screen(SCREENS.PAYMENT_CARD, PaymentCardScreen),
-  screen(SCREENS.PAYMENT_PROCESSING, PaymentProcessingScreen, { presentation: 'fullScreenModal', animation: 'fade' }),
-  screen(SCREENS.PAYMENT_SUCCESS, PaymentSuccessScreen, { gestureEnabled: false, animation: 'fade' }),
-  screen(SCREENS.PAYMENT_FAILED, PaymentFailedScreen),
-  screen(SCREENS.SUBSCRIPTION, SubscriptionScreen),
-  screen(SCREENS.SUBSCRIPTION_CANCEL, CancelSubscriptionScreen, modalOptions),
-  screen(SCREENS.PREMIUM, PremiumScreen, modalOptions),
-  screen(SCREENS.PRO_PREVIEW, ProPreviewScreen, overlayOptions),
-  screen(SCREENS.ACCESS_ENDED, AccessEndedScreen, modalOptions),
-  screen(SCREENS.FIRST_WEEK, FirstWeekScreen, modalOptions),
-  screen(SCREENS.FIRST_ROUTE_READY, FirstRouteReadyScreen, modalOptions),
-  screen(SCREENS.STUDY_PROCESSED, StudyProcessedScreen, celebrationOptions),
-  screen(SCREENS.ONE_WEEK_COMPLETED, OneWeekCompletedScreen, celebrationOptions),
-  screen(SCREENS.EIGHTH_DAY_LOCK, EighthDayLockScreen, modalOptions),
+  // V1 tamamen ucretsiz. Eski linkler ve kayitli navigation state'leri bos
+  // ekran veya crash yerine ana akisa yonlendirilir; premium govdesi bundle'a girmez.
+  screen(SCREENS.PAYWALL, LegacyHomeRedirectScreen),
+  screen(SCREENS.PAYMENT_CARD, LegacyHomeRedirectScreen),
+  screen(SCREENS.PAYMENT_PROCESSING, LegacyHomeRedirectScreen),
+  screen(SCREENS.PAYMENT_SUCCESS, LegacyHomeRedirectScreen),
+  screen(SCREENS.PAYMENT_FAILED, LegacyHomeRedirectScreen),
+  screen(SCREENS.SUBSCRIPTION, LegacyHomeRedirectScreen),
+  screen(SCREENS.SUBSCRIPTION_CANCEL, LegacyHomeRedirectScreen),
+  screen(SCREENS.PREMIUM, LegacyHomeRedirectScreen),
+  screen(SCREENS.PRO_PREVIEW, LegacyHomeRedirectScreen),
+  screen(SCREENS.ACCESS_ENDED, LegacyHomeRedirectScreen),
+  screen(SCREENS.FIRST_WEEK, LegacyHomeRedirectScreen),
+  screen(SCREENS.FIRST_ROUTE_READY, LegacyHomeRedirectScreen),
+  screen(SCREENS.STUDY_PROCESSED, LegacyHomeRedirectScreen),
+  screen(SCREENS.ONE_WEEK_COMPLETED, LegacyHomeRedirectScreen),
+  screen(SCREENS.EIGHTH_DAY_LOCK, LegacyHomeRedirectScreen),
   screen(SCREENS.DATA_EXPORT, DataExportScreen),
   screen(SCREENS.ACCOUNT_DELETE, AccountDeleteScreen, modalOptions),
   screen(SCREENS.OFFLINE_QUEUE, OfflineQueueScreen),
@@ -277,6 +263,5 @@ export function screensByName(names) {
     return route;
   });
 }
-
 
 

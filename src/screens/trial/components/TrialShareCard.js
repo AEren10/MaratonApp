@@ -69,7 +69,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
 
       <View style={[styles.divider, { backgroundColor: C.border }]} />
       <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center" }]}>
-        maraton.app · sınav hazırlık asistanın
+        maratonapp.com · sınav hazırlık asistanın
       </Text>
     </View>
   );

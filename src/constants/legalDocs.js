@@ -44,7 +44,7 @@ export const LEGAL_DOCS = {
   },
   {
     title: "İletişim",
-    body: "Gizlilik politikamızla ilgili sorularınız için destek@maraton.app adresine e-posta gönderebilirsiniz.",
+    body: "Gizlilik politikamızla ilgili sorularınız için destek@maratonapp.com adresine e-posta gönderebilirsiniz.",
   },
 ],
   },
@@ -87,7 +87,7 @@ export const LEGAL_DOCS = {
   },
   {
     title: "9. İletişim",
-    body: "Kullanım koşullarıyla ilgili sorularınız için destek@maraton.app adresine e-posta gönderebilirsiniz.",
+    body: "Kullanım koşullarıyla ilgili sorularınız için destek@maratonapp.com adresine e-posta gönderebilirsiniz.",
   },
 ],
   },

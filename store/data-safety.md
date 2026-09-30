@@ -188,7 +188,7 @@ Her "Evet" isaretli veri turu icin asagidaki sorular sorulur:
 |------|-------|
 | Is all of the user data collected by your app encrypted in transit? | **Yes** |
 | Do you provide a way for users to request that their data is deleted? | **Yes** |
-| Deletion request URL (varsa) | `https://maraton.app/delete-account` |
+| Deletion request URL (varsa) | `https://maratonapp.com/delete-account` |
 
 > Uygulama ici hesap silme secenegi de mevcuttur (Settings > Hesabi Sil).
 

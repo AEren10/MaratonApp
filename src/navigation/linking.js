@@ -7,7 +7,7 @@ import { LINKING_SCREENS } from "./routes";
 const prefix = Linking.createURL("/");
 
 export const linkingConfig = {
-  prefixes: [prefix, "maraton://", "https://maraton.app"],
+  prefixes: [prefix, "maraton://", "https://maratonapp.com"],
   config: {
     screens: LINKING_SCREENS,
   },

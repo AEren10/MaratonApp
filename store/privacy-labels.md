@@ -206,7 +206,7 @@ Sentry crash/diagnostic verisi toplar ve kendi sunucularina gonderir. Ancak bu A
 
 ### Hesap Silme
 - Uygulama ici: Ayarlar > Hesabi Sil
-- Web: `https://maraton.app/delete-account`
+- Web: `https://maratonapp.com/delete-account`
 - Apple, iOS 16.4+ icin hesap silme ozelligini zorunlu kilar. Maraton bunu saglar.
 
 ---

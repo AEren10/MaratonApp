@@ -22,7 +22,6 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useReferrals } from "../../hooks/useReferrals";
 import { Press } from "../../components/design/Press";
-import { PREMIUM_ENABLED } from "../../constants/premium";
 
 export default function ReferralScreen() {
   const C = useC();
@@ -40,7 +39,6 @@ export default function ReferralScreen() {
     friendCode,
     setFriendCode,
     applying,
-    rewardDays,
     handleCopy,
     handleShare,
     handleApply,
@@ -81,9 +79,7 @@ export default function ReferralScreen() {
           Birlikte Çalışın
         </Animated.Text>
         <Animated.Text entering={FadeInUp.delay(260)} style={[s.subtitle, { color: C.sec }]}>
-          {PREMIUM_ENABLED
-            ? `Arkadaşlarını davet et, ikiniz de ${rewardDays} gün Premium kazanın`
-            : "Arkadaşını davet et, sınava birlikte hazırlanın"}
+          Arkadaşını davet et, sınava birlikte hazırlanın
         </Animated.Text>
 
         <Animated.View style={[s.codeCard, { backgroundColor: C.surface, borderColor: C.border }]}>
@@ -117,19 +113,12 @@ export default function ReferralScreen() {
               kişiyi davet ettin
             </Text>
           </View>
-          {PREMIUM_ENABLED ? (
-            <Text style={[TYPOGRAPHY.statSmall, { color: C.green }]}>
-              +{stats.referralCount * rewardDays} gün
-            </Text>
-          ) : null}
         </Animated.View>
 
         <Animated.View style={[s.inputCard, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[s.inputLabel, { color: C.text }]}>Davet kodun var mı?</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginBottom: SPACING.md }]}>
-            {PREMIUM_ENABLED
-              ? "Arkadaşının davet kodunu gir, ikiniz de Premium kazanın"
-              : "Seni davet eden arkadaşının kodunu gir"}
+            Seni davet eden arkadaşının kodunu gir
           </Text>
 
           <View style={s.inputRow}>
@@ -165,9 +154,7 @@ export default function ReferralScreen() {
           {[
             "Davet kodunu arkadaşınla paylaş",
             "Arkadaşın uygulamayı indirip kodunu girsin",
-            PREMIUM_ENABLED
-              ? "İkiniz de " + rewardDays + " gün Premium kazanın"
-              : "Davetin kaydedilir, kimin davet ettiği görünür",
+            "Davetin kaydedilir, kimin davet ettiği görünür",
           ].map((step, i) => (
             <View key={i} style={s.stepRow}>
               <View style={[s.stepNum, { backgroundColor: C.accent + "20" }]}>

@@ -15,7 +15,7 @@
       "buildNumber": "1",
       "usesAppleSignIn": true,
       "associatedDomains": [
-        "applinks:maraton.app"
+        "applinks:maratonapp.com"
       ],
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Yanlış soru fotoğrafı eklemek ve story paylaşımına arka plan seçmek için galeri erişimi gerekli.",
@@ -35,17 +35,17 @@
           "data": [
             {
               "scheme": "https",
-              "host": "maraton.app",
+              "host": "maratonapp.com",
               "pathPrefix": "/referral"
             },
             {
               "scheme": "https",
-              "host": "maraton.app",
+              "host": "maratonapp.com",
               "pathPrefix": "/friend"
             },
             {
               "scheme": "https",
-              "host": "maraton.app",
+              "host": "maratonapp.com",
               "pathPrefix": "/group"
             }
           ],
@@ -68,7 +68,12 @@
     },
     "plugins": [
       "expo-font",
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
+        }
+      ],
       "@sentry/react-native/expo",
       "expo-apple-authentication",
       [
@@ -93,7 +98,6 @@
           "isAccessMediaLocationEnabled": false
         }
       ],
-      "@sentry/react-native",
       "expo-image",
       "expo-sharing",
       [
@@ -109,6 +113,8 @@
       [
         "expo-widgets",
         {
+          "bundleIdentifier": "com.ahmeterensiranli.maraton.ExpoWidgetsTarget",
+          "groupIdentifier": "group.com.ahmeterensiranli.maraton",
           "widgets": [
             {
               "name": "MaratonToday",
@@ -206,7 +212,6 @@
           ]
         }
       ],
-      "expo-widgets",
       "expo-build-properties"
     ],
     "extra": {
