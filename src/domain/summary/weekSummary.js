@@ -25,11 +25,16 @@ export function buildWeekSummary({ range, logs = [], routeWeeks = [] }) {
   const stops = countStops(routeWeeks, range.start, range.end);
   const prevStops = countStops(routeWeeks, range.prevStart, range.prevEnd);
 
-  const bars = markTopBars(range.days.map((key, i) => ({
-    key,
-    label: DAYS_SHORT[i],
-    questions: cur.byDay.get(key)?.questions || 0,
-  })));
+  const bars = markTopBars(range.days.map((key, i) => {
+    const mins = cur.byDay.get(key)?.minutes || 0;
+    return {
+      key,
+      label: DAYS_SHORT[i],
+      minutes: mins,
+      value: mins,
+      questions: cur.byDay.get(key)?.questions || 0,
+    };
+  }));
 
   const best = bars.reduce((acc, bar, i) => (bar.questions > (acc?.questions || 0) ? { ...bar, i } : acc), null);
   const routeWeek = routeWeeks.find((w) => toKey(w.weekStart) === range.start);

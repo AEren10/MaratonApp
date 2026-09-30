@@ -10,7 +10,17 @@ const MIN_BAR = 4;
 export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = [], average = null }) {
   const C = useC();
   if (!bars.length) return null;
-  const max = Math.max(1, ...bars.map((b) => b.questions));
+  const getVal = (b) => (b.value != null ? b.value : b.minutes != null ? b.minutes : (b.questions || 0));
+  const getTopText = (b) => {
+    if (b.labelTop) return b.labelTop;
+    if (b.minutes != null && b.value != null) {
+      return b.minutes >= 60
+        ? `${Math.floor(b.minutes / 60)}s${b.minutes % 60 ? `${b.minutes % 60}d` : ""}`
+        : `${b.minutes}d`;
+    }
+    return b.questions > 0 ? String(b.questions) : "";
+  };
+  const max = Math.max(1, ...bars.map(getVal));
   const avgBottom = average ? Math.round((average / max) * PLOT_HEIGHT) : null;
 
   return (
@@ -28,20 +38,22 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
       <View style={styles.plotArea}>
         <View style={styles.barsRow}>
           {bars.map((bar) => {
-            const hasQuestions = bar.questions > 0;
-            const barHeight = hasQuestions
-              ? Math.max(MIN_BAR, Math.round((bar.questions / max) * PLOT_HEIGHT))
+            const val = getVal(bar);
+            const hasVal = val > 0;
+            const topText = getTopText(bar);
+            const barHeight = hasVal
+              ? Math.max(MIN_BAR, Math.round((val / max) * PLOT_HEIGHT))
               : MIN_BAR;
 
             const barColor = bar.highlight
               ? C.accentBright
-              : hasQuestions
+              : hasVal
               ? C.accent
               : C.track;
 
             return (
               <View key={bar.key} style={styles.col}>
-                {hasQuestions ? (
+                {hasVal && topText ? (
                   <Text
                     style={[
                       TYPOGRAPHY.micro,
@@ -49,7 +61,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
                       { color: bar.highlight ? C.accentBright : C.text },
                     ]}
                   >
-                    {bar.questions}
+                    {topText}
                   </Text>
                 ) : (
                   <View style={styles.valPlaceholder} />
@@ -60,7 +72,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
                     styles.bar,
                     {
                       height: barHeight,
-                      width: hasQuestions ? "100%" : "60%",
+                      width: hasVal ? "100%" : "60%",
                       backgroundColor: barColor,
                     },
                   ]}

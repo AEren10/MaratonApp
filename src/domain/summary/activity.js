@@ -59,7 +59,7 @@ export function countStops(routeWeeks = [], startKey, endKey) {
 /** En yuksek iki (sifir olmayan) cubuk vurgulanir -- tasarimda iki kizil cubuk. */
 export function markTopBars(bars, count = 2) {
   const top = bars
-    .map((bar, index) => ({ index, value: bar.questions }))
+    .map((bar, index) => ({ index, value: bar.value != null ? bar.value : (bar.questions || 0) }))
     .filter((b) => b.value > 0)
     .sort((a, b) => b.value - a.value)
     .slice(0, count)
