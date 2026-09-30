@@ -23,8 +23,10 @@ const SUBJECT_TINT_DARK = 0.14;
 const STATE_TINT_DARK = 0.12;
 
 // Açık tema sabitleri (Brief 22)
-// Beyazdan (#FFFFFF) zemine inen yumuşak parlaklık, ekranın üst ~%45'inde söner.
-const TOP_LIGHT_LIGHT = 0.55;
+// Beyazdan zemine inen yumuşak parlaklık, ekranın üst ~%45'inde söner.
+// Katman içeriğin ÜSTÜNDE: 0.55 beyaz başlık metnini griye çevirip kontrastı
+// ~2.8:1'e düşürüyordu (AA altı). 0.18'de metin ~10:1 kalıyor, ışık okunuyor.
+const TOP_LIGHT_LIGHT = 0.18;
 const SUBJECT_TINT_LIGHT = 0.10;
 const STATE_TINT_LIGHT = 0.08;
 
