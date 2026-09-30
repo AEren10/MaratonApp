@@ -35,8 +35,8 @@ export function RouteWeekRow({ C, week, index, isFirst, isLast, rangeLabel }) {
         {!isLast ? <View style={[s.trackLine, { backgroundColor: C.line }]} /> : null}
       </View>
 
-      {/* Kompakt Bilgi Satırı */}
-      <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}>
+      {/* Kutusuz bilgi satırı — haftalar arası 1px çizgi */}
+      <View style={[s.content, !isLast && { borderBottomWidth: 1, borderBottomColor: C.line }]}>
         <View style={s.cardTop}>
           <View style={s.weekMeta}>
             <Text style={[TYPOGRAPHY.label, { color: isFirst ? C.accentBright : C.text2 }]}>
@@ -97,13 +97,9 @@ const s = StyleSheet.create({
     width: 2,
     marginTop: STEP.s1 / 2,
   },
-  card: {
+  content: {
     flex: 1,
-    paddingVertical: STEP.s1 + 2,
-    paddingHorizontal: STEP.s2 + 2,
-    borderRadius: SHAPE.sheet,
-    borderWidth: 1,
-    marginBottom: STEP.s1 / 2,
+    paddingVertical: STEP.s2,
     gap: STEP.s1 / 2,
   },
   cardTop: {
