@@ -14,6 +14,7 @@ import { StatsStrip } from "../../components/design/StatsStrip";
 import { StatsWeeks } from "./components/StatsWeeks";
 import { StatsSubjects } from "./components/StatsSubjects";
 import { statsStory } from "../../domain/insight/storyLines";
+import { CountUpText } from "../../components/design/CountUpText";
 
 // ISTATISTIKLERIM: Ders analizi deseni (tek buyuk sayi, tek cumle, 4'lu serit, kutusuz).
 export default function StatsScreen() {
@@ -55,7 +56,11 @@ export default function StatsScreen() {
             <>
               <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>TÜM ZAMANLAR</Text>
               <View style={s.heroRow}>
-                <Text style={[TYPOGRAPHY.stat, s.num, { color: C.text }]}>{totalHours}</Text>
+                {study?.totalMinutes == null ? (
+                  <Text style={[TYPOGRAPHY.stat, s.num, { color: C.text }]}>{totalHours}</Text>
+                ) : (
+                  <CountUpText value={study.totalMinutes / 60} decimals={study.totalMinutes >= 600 ? 0 : 1} style={[TYPOGRAPHY.stat, s.num, { color: C.text }]} />
+                )}
                 <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>saat</Text>
               </View>
               <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>

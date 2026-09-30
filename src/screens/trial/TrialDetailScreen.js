@@ -26,6 +26,7 @@ import { TrialDetailSubjectTable } from "./components/TrialDetailSubjectTable";
 import { TrialDetailLinks } from "./components/TrialDetailLinks";
 import { TrialDetailStateViews } from "./components/TrialDetailStateViews";
 import { trialStory } from "../../domain/insight/storyLines";
+import { CountUpText } from "../../components/design/CountUpText";
 
 const fmtNet = (n) => String(Math.round(Number(n || 0) * 100) / 100).replace(".", ",");
 
@@ -98,7 +99,7 @@ function TrialDetailScreenInner() {
         <View style={s.heroSection}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${typeLabel} · ${dateStr.toLocaleUpperCase("tr-TR")}`}</Text>
           <View style={s.heroRow}>
-            <Text style={[TYPOGRAPHY.stat, s.num, { color: C.text }]}>{fmtNet(detail.rawNet)}</Text>
+            <CountUpText value={Number(detail.rawNet || 0)} decimals={2} style={[TYPOGRAPHY.stat, { color: C.text }]} />
             {deltaText ? <Text style={[TYPOGRAPHY.bodySemiBold, { color: deltaColor }]}>{deltaText}</Text> : null}
           </View>
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
@@ -145,6 +146,5 @@ const s = StyleSheet.create({
   scroll: { paddingBottom: STEP.s5 * 2 },
   heroSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
   heroRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2, marginTop: STEP.s1 },
-  num: { fontVariant: ["tabular-nums"] },
   offscreen: { position: "absolute", left: -10000, top: 0 },
 });

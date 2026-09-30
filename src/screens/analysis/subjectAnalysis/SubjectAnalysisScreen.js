@@ -18,6 +18,7 @@ import { subjectPaletteKey } from "../../../themes/subjectPalette";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { HeroMultiTrendChartSvg } from "../components/HeroMultiTrendChartSvg";
 import { StatsStrip } from "../../../components/design/StatsStrip";
+import { CountUpText } from "../../../components/design/CountUpText";
 
 const signed = (n) => `${n > 0 ? "+" : n < 0 ? "−" : ""}${String(Math.abs(n)).replace(".", ",")}`;
 const fmt = (n) => (n == null ? "—" : String(n).replace(".", ","));
@@ -57,7 +58,7 @@ export default function SubjectAnalysisScreen() {
             <>
               <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`SON ${a.count} DENEME`}</Text>
               <View style={s.hero}>
-                <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{String(a.last).replace(".", ",")}</Text>
+                <CountUpText value={a.last} decimals={1} style={[TYPOGRAPHY.stat, { color: C.text }]} />
                 {a.delta != null ? (
                   <Text style={[TYPOGRAPHY.bodySemiBold, { color: a.delta > 0 ? C.up : C.down }]}>{`${signed(a.delta)} net`}</Text>
                 ) : null}
