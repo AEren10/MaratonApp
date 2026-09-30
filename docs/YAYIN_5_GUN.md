@@ -39,14 +39,14 @@ Uzun süren dış işler bugün başlamalı; onları beklerken kod işleri akar.
 
 Apple incelemecisinin ve her yeni kullanıcının ilk gördüğü yer burası.
 
-- [ ] **Claude:** Yeni hesapla uçtan uca akış.
+- [x] **Claude:** Yeni hesapla uçtan uca akış. *(1 Ekim: "İlk durağa başla" zamanlayıcıyı açmıyordu, düzeldi; hesap geçişi ve yeni cihaz girişi düzeldi. Cihazda denenecek.)*
   - Kayıt → sınav/hedef → ilk rota → ilk durak → ilk kayıt.
   - Onboarding bitişiyle ilk çalışma arası tasarlanmamıştı; kapat.
   - Gereksiz adımları kısalt.
-- [ ] **Claude:** Çıkış yap / tekrar giriş, şifre sıfırlama, hesap silme uçtan uca.
-- [ ] **Ant:** Onboarding ekranlarının görünümü (brief 20, Claude yazacak).
-- [ ] **Codex:** Migration defterini canlı veritabanıyla eşitle; Supabase security ve performance advisor taraması.
-- [ ] **Codex:** İnceleyici demo hesabı.
+- [x] **Claude:** Çıkış yap / tekrar giriş, şifre sıfırlama, hesap silme uçtan uca. *(Hesap silmeyi engelleyen 6 FK canlıda düzeltildi; çıkışta önceki kullanıcının izi tamamen siliniyor. Cihaz listesi: `docs/BILDIRIM_TEST.md`.)*
+- [x] **Ant:** Onboarding ekranlarının görünümü (brief 20). *(Tüm kurulum ekranları hizalandı, Claude inceledi.)*
+- [x] **Codex:** Migration defterini canlı veritabanıyla eşitle; Supabase security ve performance advisor taraması. *(Defter canlıyla hizalı, advisor'da engel yok: `docs/MIGRATION_LEDGER_2026-10.md`, `docs/SUPABASE_ADVISOR_2026-10.md`.)*
+- [~] **Codex:** İnceleyici demo hesabı. *(Betik hazır: `scripts/seed-review-account.mjs`. Kalan: SEN demo hesabı aç, betiği çalıştır; bkz. `store/appreview.md` > Demo hesap.)*
   - Dolu veri: 3+ deneme (TYT + AYT), birkaç günlük kayıt, yanlış defteri, aktif seri.
   - Boş hesap ret sebebi olabilir.
 - [ ] **Sen:** Sıfırdan yeni bir hesapla uygulamayı baştan sona dene, gördüğünü at.
@@ -56,8 +56,8 @@ Apple incelemecisinin ve her yeni kullanıcının ilk gördüğü yer burası.
 - [ ] **Sen + Ant:** Açık tema için bir tur düzeltme.
   - **Kural:** Akşama kadar iyi görünmezse v1'de açık tema seçeneğini gizle; yarım bırakılmaz.
 - [ ] **Sen + Claude:** Bildirimler cihazda: izin isteme, günlük hatırlatma gerçekten geliyor mu, dokununca doğru ekran açılıyor mu.
-- [ ] **Claude / Ant:** Story Kademe A'yı bitir. Kademe B (Meta App ID) v1.0.1'e kalır.
-- [ ] **Claude:** `app.json` → `runtimeVersion` sabit `"1.0.0"`. Bu hâliyle bir OTA güncellemesi, native kodu farklı bir build'e de iner ve uygulamayı çökertebilir. Production build'den önce `{ "policy": "fingerprint" }` yapılmalı.
+- [~] **Claude / Ant:** Story Kademe A'yı bitir. *(1 Ekim: etiket artık her zaman saydam gidiyor; kartlarda taşma düzeldi. Cihazda denenecek.)* Kademe B (Meta App ID) v1.0.1'e kalır.
+- [x] **Claude:** `app.json` → `runtimeVersion` sabit `"1.0.0"`. Bu hâliyle bir OTA güncellemesi, native kodu farklı bir build'e de iner ve uygulamayı çökertebilir. Production build'den önce `{ "policy": "fingerprint" }` yapılmalı.
 - [ ] **Sen:** Dev build al (`npx expo install --fix` sonrası). Cihazda doğrulanmamış işler:
   - Widget'lar
   - Durak tiki → kayıt
