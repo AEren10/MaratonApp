@@ -1,18 +1,21 @@
 import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Kutusuz 4'lu istatistik seridi: Soru, Aktif Gun, Deneme, En Iyi Hafta.
-export const StatsStrip = memo(function StatsStrip({ C, questions, activeDays, trialCount, bestWeek }) {
-  const cells = [
-    { label: "Soru", value: questions || "0" },
-    { label: "Aktif gün", value: activeDays || "0" },
-    { label: "Deneme", value: trialCount || "0" },
-    { label: "En iyi hafta", value: bestWeek || "—" },
-  ];
+import { STEP, TYPOGRAPHY } from "../../themes/tokens";
 
+/**
+ * Kutusuz istatistik şeridi.
+ * 1px üst + alt kılcal çizgi, dikey 1px bölücülerle 3–4 hücre.
+ * Desen: SubjectAnalysisStats (kullanıcının sevdiği referans).
+ *
+ * @param {object}   props
+ * @param {object}   props.C      - Tema renkleri (useC() çıktısı).
+ * @param {Array<{value: string, label: string}>} props.cells - Gösterilecek metrikler.
+ * @param {object}   [props.style] - Ek stil (marginTop gibi).
+ */
+export const StatsStrip = memo(function StatsStrip({ C, cells, style }) {
   return (
-    <View style={[s.row, { borderColor: C.line }]}>
+    <View style={[s.row, { borderColor: C.line }, style]}>
       {cells.map((c, i) => (
         <View key={c.label} style={[s.cell, i > 0 && { borderLeftWidth: 1, borderLeftColor: C.line }]}>
           <Text style={[TYPOGRAPHY.statSmall, s.num, { color: C.text }]}>{c.value}</Text>
@@ -28,7 +31,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    marginTop: STEP.s4,
+    marginTop: STEP.s3,
   },
   cell: {
     flex: 1,

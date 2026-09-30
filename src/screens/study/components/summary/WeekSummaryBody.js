@@ -7,7 +7,7 @@ import { formatDuration, weekStory } from "../../../../domain/insight/storyLines
 import { getSubjectLabel } from "../../../../themes/subjects";
 import { formatInt } from "../../../../domain/summary/summaryFormat";
 import { PeriodBarChart } from "./PeriodBarChart";
-import { SummaryStatsStrip } from "./SummaryStatsStrip";
+import { StatsStrip } from "../../../../components/design/StatsStrip";
 
 export function WeekSummaryBody({ data }) {
   const C = useC();
@@ -60,13 +60,12 @@ export function WeekSummaryBody({ data }) {
         bars={data.chart?.bars}
       />
 
-      <SummaryStatsStrip
-        C={C}
-        questions={formatInt(data.totals?.questions || 0)}
-        stops={stopsLabel}
-        activeDays={data.totals?.activeDays}
-        streak={data.streak}
-      />
+      <StatsStrip C={C} cells={[
+        { value: formatInt(data.totals?.questions || 0), label: "Soru" },
+        { value: stopsLabel, label: "Durak" },
+        { value: data.totals?.activeDays != null ? `${data.totals.activeDays}/7` : "—", label: "Aktif gün" },
+        { value: data.streak > 0 ? `${data.streak} gün` : "—", label: "Seri" },
+      ]} style={{ marginTop: STEP.s4, marginHorizontal: STEP.s3 }} />
     </View>
   );
 }

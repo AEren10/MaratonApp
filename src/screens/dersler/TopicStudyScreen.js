@@ -18,7 +18,7 @@ import { topicStory } from "../../domain/insight/storyLines";
 import { flattenRouteStops, routeDateTag } from "../../domain/route/routeOverview";
 import { ROUTE_STOP_STATUS } from "../../domain/route/stopStatus";
 import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
-import { TopicStatsStrip } from "./components/TopicStatsStrip";
+import { StatsStrip } from "../../components/design/StatsStrip";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
 
 export default function TopicStudyScreen() {
@@ -108,13 +108,12 @@ export default function TopicStudyScreen() {
 
             {detail.chart ? <TopicAccumulationChart color={color} chart={detail.chart} /> : null}
 
-            <TopicStatsStrip
-              C={C}
-              solved={detail.totalQuestions}
-              duration={detail.totalDurationLabel}
-              wrongCount={notebookCount}
-              lastStudy={detail.lastStudyText}
-            />
+            <StatsStrip C={C} cells={[
+              { value: detail.totalQuestions > 0 ? String(detail.totalQuestions) : "—", label: "Çözülen" },
+              { value: detail.totalDurationLabel || "—", label: "Süre" },
+              { value: notebookCount > 0 ? String(notebookCount) : "—", label: "Defterde" },
+              { value: detail.lastStudyText || "—", label: "Son çalışma" },
+            ]} style={{ marginTop: STEP.s4 }} />
 
             <View style={s.links}>
               {links.map((l) => (

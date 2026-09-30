@@ -17,10 +17,10 @@ import { getSubjectLabel } from "../../../themes/subjects";
 import { subjectPaletteKey } from "../../../themes/subjectPalette";
 import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { HeroMultiTrendChartSvg } from "../components/HeroMultiTrendChartSvg";
-import { SubjectAnalysisStats } from "./SubjectAnalysisStats";
+import { StatsStrip } from "../../../components/design/StatsStrip";
 
 const signed = (n) => `${n > 0 ? "+" : n < 0 ? "−" : ""}${String(Math.abs(n)).replace(".", ",")}`;
-
+const fmt = (n) => (n == null ? "—" : String(n).replace(".", ","));
 // DERS ANALIZI: Analiz'deki ders kartindan acilir. Konu listesi (Mufredat)
 // buradan bir dokunusla; kart eskiden dogrudan oraya gidiyordu.
 export default function SubjectAnalysisScreen() {
@@ -66,7 +66,12 @@ export default function SubjectAnalysisScreen() {
               {a.points.length > 1 ? (
                 <View style={s.chart}><HeroMultiTrendChartSvg C={C} series={[{ key: subjectKey, color, points: a.points }]} /></View>
               ) : null}
-              <SubjectAnalysisStats C={C} a={a} />
+              <StatsStrip C={C} cells={[
+                { value: fmt(a.average), label: "Ortalama" },
+                { value: fmt(a.best), label: "En iyi" },
+                { value: a.accuracy == null ? "—" : `%${a.accuracy}`, label: "Doğruluk" },
+                { value: a.emptyShare == null ? "—" : `%${a.emptyShare}`, label: "Boş" },
+              ]} />
             </>
           )}
           <View style={s.links}>

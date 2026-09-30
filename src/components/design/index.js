@@ -28,3 +28,4 @@ export { StatBlock } from "./StatBlock";
 export { EmptyState } from "./EmptyState";
 export { ErrorState } from "./ErrorState";
 export { Skeleton } from "./Skeleton";
+export { StatsStrip } from "./StatsStrip";

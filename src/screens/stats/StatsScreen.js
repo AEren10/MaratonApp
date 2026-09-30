@@ -10,7 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useStatsOverview } from "../../hooks/useStatsOverview";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { EXAM_NAME, fmtHours, fmtInt, fmtNet, weekLabel } from "./statsFormat";
-import { StatsStrip } from "./components/StatsStrip";
+import { StatsStrip } from "../../components/design/StatsStrip";
 import { StatsWeeks } from "./components/StatsWeeks";
 import { StatsSubjects } from "./components/StatsSubjects";
 import { statsStory } from "../../domain/insight/storyLines";
@@ -60,13 +60,12 @@ export default function StatsScreen() {
               </View>
               <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
 
-              <StatsStrip
-                C={C}
-                questions={fmtInt(study?.totalQuestions)}
-                activeDays={fmtInt(study?.activeDays)}
-                trialCount={trials?.count ? String(trials.count) : "0"}
-                bestWeek={bestWeekStat}
-              />
+              <StatsStrip C={C} cells={[
+                { value: fmtInt(study?.totalQuestions), label: "Soru" },
+                { value: fmtInt(study?.activeDays), label: "Aktif gün" },
+                { value: trials?.count ? String(trials.count) : "0", label: "Deneme" },
+                { value: bestWeekStat, label: "En iyi hafta" },
+              ]} style={{ marginTop: STEP.s4 }} />
 
               {study?.last8Weeks?.length ? (
                 <View style={s.block}>
