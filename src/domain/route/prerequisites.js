@@ -113,6 +113,9 @@ export const PREREQUISITES = {
     "Kimyasal Denge": ["Tepkime Hızları"],
     "Asitler ve Bazlar": ["Kimyasal Denge"],
     "Çözünürlük Dengesi": ["Kimyasal Denge"],
+    // Pil potansiyeli ve denge sabiti iliskisi dengeyi ister (1 Ekim: Elektrokimya
+    // zincirsizdi, AYT Kimya'nin ortasindan tek basina oneriliyordu).
+    "Elektrokimya": ["Kimyasal Denge"],
     "Organik Kimya (Fonksiyonel Gruplar)": ["Organik Kimya (Temel)"],
     "Organik Kimya (Tepkimeler)": ["Organik Kimya (Fonksiyonel Gruplar)"],
   },

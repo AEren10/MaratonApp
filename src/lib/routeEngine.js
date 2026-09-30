@@ -14,6 +14,7 @@ import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
 import { topicShares } from "../domain/route/topicShares.js";
 import { effectiveAccuracy } from "../domain/route/effectiveAccuracy.js";
 import { DROP_BOOST } from "../domain/route/trialWeakness.js";
+import { aytTargetShare, interleaveByTier, orderByPrerequisites, schoolOrderFactor } from "../domain/route/examPhase.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -258,7 +259,10 @@ export function buildRoute({
       });
       // Bekleyen yanlislar oncelige: oturmamis konu one gelir.
       const wb = wrongBoost(wrongs);
-      priority.score = Math.round(priority.score * wb * 100) / 100;
+      const school = schoolOrderFactor({
+        subjectKey: subject.key, topicIndex: (subject.topics || []).indexOf(t), topicCount: subject.topics?.length || 0, q, daysLeft,
+      });
+      priority.score = Math.round(priority.score * wb * school * 100) / 100;
       const reasonCodes = [];
       if (drop > 0) reasonCodes.push("NET_DROP");
       if ((wrongs?.open || 0) >= 3) reasonCodes.push("WRONG_BACKLOG");
@@ -307,6 +311,11 @@ export function buildRoute({
   }
 
   items.sort((a, b) => b.score - a.score);
+
+  // SINAV DONEMI: TYT/AYT payi (eylulde TYT agirlik, ocaktan sonra AYT,
+  // son iki ay neredeyse tamamen AYT). Tur ici puan sirasi korunur.
+  const phaseOrdered = interleaveByTier(orderByPrerequisites(items), aytTargetShare({ examType, daysLeft }));
+  items.splice(0, items.length, ...phaseOrdered);
 
   // Bu hafta yalniz kalan gunler kadar: carsamba baslayana tam hafta yuklenmez.
   const firstWeekFraction = (7 - ((now.getDay() + 6) % 7)) / 7;
