@@ -27,7 +27,8 @@ test("onboarding and level-test flows surface pending net sync", () => {
   assert.match(goalSetupForm, /targetNetPendingNote/);
   assert.match(levelTestForm, /setSyncPending\(true\)/);
   assert.match(levelTestForm, /syncPendingNote/);
-  assert.match(levelTestScreen, /syncPendingNote: syncPendingNote \|\| undefined/);
+  // Not submit sonucundan gelir; render kapanisindaki deger bayatti.
+  assert.match(levelTestScreen, /syncPendingNote: result\?\.syncPendingNote \|\| undefined/);
   assert.match(routeReadyScreen, /useRoute\(\)\.params\?\.syncPendingNote/);
 });
 
