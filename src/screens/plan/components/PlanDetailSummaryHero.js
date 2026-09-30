@@ -16,7 +16,7 @@ export function PlanDetailSummaryHero({
   const pct = totalCount > 0 ? Math.min(100, Math.round((doneCount / totalCount) * 100)) : 0;
 
   return (
-    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}>
+    <View style={s.card}>
       <View style={s.topRow}>
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>GÜNÜN İLERLEMESİ</Text>
         <View style={[s.badge, { backgroundColor: C.void, borderColor: C.elev }]}>
@@ -56,10 +56,9 @@ export function PlanDetailSummaryHero({
 }
 
 const s = StyleSheet.create({
+  // Kutusuz (kullanici, 30 Eylul): ilerleme zeminde durur, kart icinde kart yok.
   card: {
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
-    padding: STEP.s3,
+    paddingVertical: STEP.s2,
     marginBottom: STEP.s2,
   },
   topRow: {
