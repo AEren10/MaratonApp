@@ -48,6 +48,9 @@ test("runtime app copy and links no longer point at the unused maraton.app domai
     "../../src/hooks/useReferrals.js",
     "../../src/screens/trial/components/TrialReportCard.js",
     "../../src/screens/trial/components/TrialShareCard.js",
+    "../../web/privacy.html",
+    "../../web/terms.html",
+    "../../web/delete-account.html",
   ];
 
   for (const file of files) {

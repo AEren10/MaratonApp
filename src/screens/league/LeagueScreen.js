@@ -157,7 +157,7 @@ function SocialActionCard({ C, onInvite, onCompanion }) {
           opacity: pressed ? 0.75 : 1,
         })}
       >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et · +1 hafta premium</Text>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et · birlikte çalışın</Text>
         <Icon name="chevR" size={14} color={C.text3} />
       </Pressable>
       <Pressable

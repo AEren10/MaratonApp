@@ -39,7 +39,6 @@ export default function ReferralScreen() {
     friendCode,
     setFriendCode,
     applying,
-    rewardDays,
     handleCopy,
     handleShare,
     handleApply,
@@ -80,7 +79,7 @@ export default function ReferralScreen() {
           Birlikte Çalışın
         </Animated.Text>
         <Animated.Text entering={FadeInUp.delay(260)} style={[s.subtitle, { color: C.sec }]}>
-          Arkadaşlarını davet et, ikiniz de {rewardDays} gün Premium kazanın
+          Arkadaşlarını davet et, aynı hedefe birlikte koşun
         </Animated.Text>
 
         <Animated.View style={[s.codeCard, { backgroundColor: C.surface, borderColor: C.border }]}>
@@ -115,14 +114,14 @@ export default function ReferralScreen() {
             </Text>
           </View>
           <Text style={[TYPOGRAPHY.statSmall, { color: C.green }]}>
-            +{stats.referralCount * rewardDays} gün
+            {stats.referralCount ? "aktif" : "başla"}
           </Text>
         </Animated.View>
 
         <Animated.View style={[s.inputCard, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[s.inputLabel, { color: C.text }]}>Davet kodun var mı?</Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginBottom: SPACING.md }]}>
-            Arkadaşının davet kodunu gir, ikiniz de Premium kazanın
+            Arkadaşının davet kodunu gir, bağlantınız kaydedilsin
           </Text>
 
           <View style={s.inputRow}>
@@ -158,7 +157,7 @@ export default function ReferralScreen() {
           {[
             "Davet kodunu arkadaşınla paylaş",
             "Arkadaşın uygulamayı indirip kodunu girsin",
-            "İkiniz de " + rewardDays + " gün Premium kazanın",
+            "Birlikte çalışın, haftalık temponuzu koruyun",
           ].map((step, i) => (
             <View key={i} style={s.stepRow}>
               <View style={[s.stepNum, { backgroundColor: C.accent + "20" }]}>

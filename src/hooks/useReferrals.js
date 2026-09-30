@@ -3,7 +3,6 @@ import { Share } from "react-native";
 import * as Clipboard from "expo-clipboard";
 
 import { useAuth } from "../contexts/AuthContext";
-import { usePremium } from "../contexts/PremiumContext";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
 import {
@@ -16,11 +15,8 @@ import { EVENTS } from "../constants/analytics";
 import { captureError } from "../lib/errorReporting";
 import * as H from "../lib/haptics";
 
-const REWARD_DAYS = 7;
-
 export function useReferrals({ routeCode, examType, showAlert } = {}) {
   const { user } = useAuth();
-  const { refreshPremium } = usePremium();
   const [code, setCode] = useState(null);
   const [stats, setStats] = useState({ referralCount: 0 });
   const [loading, setLoading] = useState(true);
@@ -101,8 +97,7 @@ export function useReferrals({ routeCode, examType, showAlert } = {}) {
           entry: routeCode ? "deep_link" : "manual_entry",
         });
         appStorage.remove(STORAGE_KEYS.PENDING_REFERRAL).catch(() => {});
-        await refreshPremium();
-        showAlert?.("Başarılı!", `Davet kodu uygulandı. ${REWARD_DAYS} gün Premium kazandın!`);
+        showAlert?.("Başarılı!", "Davet kodu uygulandı. Arkadaşınla birlikte çalışmaya devam edebilirsin.");
         setFriendCode("");
       } else if (result.reason === "invalid") {
         showAlert?.("Geçersiz Kod", "Bu davet kodu bulunamadı.");
@@ -119,7 +114,7 @@ export function useReferrals({ routeCode, examType, showAlert } = {}) {
     } finally {
       setApplying(false);
     }
-  }, [friendCode, refreshPremium, routeCode, showAlert, userId]);
+  }, [friendCode, routeCode, showAlert, userId]);
 
   return {
     code,
@@ -129,7 +124,6 @@ export function useReferrals({ routeCode, examType, showAlert } = {}) {
     friendCode,
     setFriendCode,
     applying,
-    rewardDays: REWARD_DAYS,
     handleCopy,
     handleShare,
     handleApply,
