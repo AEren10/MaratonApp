@@ -47,6 +47,8 @@ import { useForecastTarget } from "./useForecastTarget";
 import { weekdayRhythm } from "../domain/program/weekdayRhythm";
 import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
 import { dateKey as toDateKey } from "../lib/dateUtils";
+import { useStopMoves } from "./useStopMoves";
+import { applyPulls } from "../domain/program/pullForward";
 
 const MIN_PER_QUESTION = 1.5;
 
@@ -394,6 +396,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   const baseWeeksRef = useRef(baseWeeks);
   baseWeeksRef.current = baseWeeks;
 
+  // Gelecek haftadan one cekilen duraklar (tasima haritasinda bu haftanin
+  // tarihi). Kayit (baseWeeksRef) bunu gormez: yalniz gosterim ve dagitim.
+  const { moves: stopMoves } = useStopMoves();
   const route = useMemo(() => {
     const byKey = new Map((persistedStops || []).map((stop) => [stop.logical_key, stop]));
     // Rota donukken acik duraklar FROZEN: gun listeleri (ana sayfa, plan,
@@ -404,7 +409,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       : stop);
     return {
       ...computedRoute,
-      weeks: ensureSingleActiveRouteStop(baseWeeks.map((week) => ({
+      weeks: ensureSingleActiveRouteStop(applyPulls(baseWeeks.map((week) => ({
         ...week,
         stops: week.stops.map((stop) => {
           const saved = byKey.get(stop.logicalStopKey);
@@ -422,9 +427,9 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             insight: saved.metadata?.insight || stop.insight,
           } : stop;
         }).map(freezeOpen),
-      }))),
+      })), stopMoves)),
     };
-  }, [computedRoute, baseWeeks, persistedStops, isPaused]);
+  }, [computedRoute, baseWeeks, persistedStops, isPaused, stopMoves]);
 
   const forecastProfile = forecastCandidate;
   const forecastTrials = forecastCandidate?.trials || [];

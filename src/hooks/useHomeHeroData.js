@@ -25,6 +25,7 @@ import { syncRouteWidget, syncTodayWidget, syncWeekWidget } from "../lib/widgetS
 import { updateReminderContent } from "../lib/notifications";
 import { todayTR } from "../lib/dateUtils";
 import { useAuth } from "../contexts/AuthContext";
+import { pullCandidate } from "../domain/program/pullForward";
 
 // Hero'nun ihtiyac duydugu her seyi tek yerden turetir: rota erisimi, grafik
 // verisi, ozet seridi ve CTA. Ekran dosyasi sadece render eder.
@@ -205,6 +206,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     return stopsForDate(week, schedule, tomorrow, dayOpts).find((s) => s.lifecycleStatus !== "completed") || null;
   }, [dayDone, weeks, schedule, dayOpts]);
   const hint = ctaHint({ nextTask, dayDone, tomorrowStop });
+  // Haftada acik durak kalmadiysa: gelecek haftanin ilk duragi (one cek).
+  const pullStop = useMemo(() => (dayDone && !tomorrowStop ? pullCandidate(weeks || [], todayTR()) : null), [dayDone, tomorrowStop, weeks]);
 
   const remainingToGoal = Math.max(0, (dailyGoal || 0) - (solvedToday || 0));
 
@@ -213,6 +216,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     dailyGoal,
     remainingToGoal,
     doneCta: dayDone ? dayDoneCta({ remainingToGoal }) : null,
+    pullStop,
     daysUntilExam,
     examType,
     examDate,

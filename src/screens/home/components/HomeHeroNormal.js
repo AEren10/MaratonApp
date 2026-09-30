@@ -17,6 +17,7 @@ import { formatNet } from "../../../lib/format";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { openInTab } from "../../../navigation/tabJump";
 import { HomeExamSeriesChart } from "./HomeExamSeriesChart";
+import { PullForwardRow } from "./PullForwardRow";
 
 // Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
 // grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
@@ -98,6 +99,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         {hero.ctaHint ? (
           <Text style={[TYPOGRAPHY.meta, s.hint, { color: C.text3 }]} numberOfLines={1}>{hero.ctaHint}</Text>
         ) : null}
+        <PullForwardRow stop={hero.pullStop} />
       </Animated.View>
       <RouteFeasibilityNote note={hero.feasibility} style={s.note} />
     </View>
