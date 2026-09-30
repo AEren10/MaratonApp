@@ -17,9 +17,9 @@ export function CurriculumProgressCard({ done, total, left, pct }) {
           <Text style={[TYPOGRAPHY.label, s.headLabel, { color: C.text3 }]}>MÜFREDAT İLERLEMESİ</Text>
           <Text style={[TYPOGRAPHY.tableValue, s.headCount, { color: C.text2 }]}>{`${total} konu hazır`}</Text>
         </View>
-        <View style={[s.emptyPanel, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <View style={s.emptyText}>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>İlk etap hazır.</Text>
-          <Text style={[TYPOGRAPHY.caption, s.emptyText, { color: C.text2 }]}>
+          <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: STEP.s1 }]}>
             İlk konunu tamamladığında kızıl rota burada oluşmaya başlayacak.
           </Text>
         </View>
@@ -88,13 +88,7 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: STEP.s1,
   },
-  emptyPanel: {
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: STEP.s3,
-    marginTop: STEP.s2,
-  },
   emptyText: {
-    marginTop: STEP.s1,
+    marginTop: STEP.s2,
   },
 });

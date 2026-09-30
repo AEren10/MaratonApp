@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import { formatMinutes } from "../../../lib/format";
@@ -47,21 +47,19 @@ export function SelectedDayPanel({ selectedDay, logs }) {
       ) : null}
 
       {displayLogs.length === 0 ? (
-        <View style={[s.emptyBox, { borderColor: C.line, backgroundColor: C.surface + "20" }]}>
-          <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginBottom: STEP.s2 }]}>
+        <View style={s.emptyWrap}>
+          <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>
             Bu gün için henüz durak planlanmadı.
           </Text>
           <Pressable
             onPress={addTask}
             style={({ pressed }) => [
-              s.addButton,
-              { borderColor: C.line, backgroundColor: pressed ? C.elev : C.surface },
+              s.linkRow,
+              { borderBottomColor: C.line, opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Icon name="plus" size={13} color={C.accentBright} sw={1.5} />
-            <Text style={[TYPOGRAPHY.captionSemiBold, s.btnText, { color: C.text }]}>
-              Durak ekle
-            </Text>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright, flex: 1 }]}>Durak ekle</Text>
+            <Icon name="chevR" size={14} color={C.text3} />
           </Pressable>
         </View>
       ) : (
@@ -106,16 +104,14 @@ const s = StyleSheet.create({
   wrap: { marginTop: STEP.s4 },
   summaryRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: STEP.s2 },
   listWrap: { marginTop: STEP.s1 },
-  emptyBox: { paddingVertical: STEP.s3, paddingHorizontal: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1, borderStyle: "dashed", alignItems: "flex-start" },
-  addButton: {
+  emptyWrap: { marginTop: STEP.s1 },
+  linkRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: STEP.s1,
-    height: CONTROL.buttonTertiary,
-    paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
+    gap: STEP.s2,
+    paddingVertical: STEP.s2,
+    borderBottomWidth: 1,
+    minHeight: CONTROL.tapMin,
+    marginTop: STEP.s1,
   },
-  btnText: { letterSpacing: 0.2 },
 });

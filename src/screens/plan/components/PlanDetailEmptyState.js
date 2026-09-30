@@ -1,19 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
+// Kutusuz bos hal: duz metin + oneri (kirmizi cerceve yok).
 export function PlanDetailEmptyState({ C }) {
   return (
     <View style={s.wrap}>
-      <Card tone="void" radius="panel" style={[s.emptyCard, { borderColor: C.line }]}>
-        <Text style={[TYPOGRAPHY.subheading, s.emptyTitle, { color: C.text }]}>Bu gün için henüz durak yok.</Text>
-        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3, textAlign: "center" }]}>
-          İstersen 20 dakikalık bir dönüş durağı ekleyebilirsin.
-        </Text>
-      </Card>
+      <Text style={[TYPOGRAPHY.subheading, { color: C.text, textAlign: "center" }]}>
+        Bu gün için henüz durak yok.
+      </Text>
+      <Text style={[TYPOGRAPHY.body, { color: C.text3, textAlign: "center", marginTop: STEP.s1 }]}>
+        İstersen 20 dakikalık bir dönüş durağı ekleyebilirsin.
+      </Text>
 
-      <Card tone="surface" radius="panel" style={[s.recomCard, { borderColor: C.accent }]}>
+      <View style={[s.recom, { borderTopColor: C.line }]}>
         <View style={s.recomHead}>
           <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ÖNERİLEN</Text>
           <View style={s.timeRow}>
@@ -21,22 +21,25 @@ export function PlanDetailEmptyState({ C }) {
             <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>dk</Text>
           </View>
         </View>
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText, marginBottom: STEP.s1 / 2 }]}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentText }]}>
           20 dakikalık dönüş durağı
         </Text>
-        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: STEP.s1 / 2 }]}>
           10 dakika konu tekrarı · 10 soru
         </Text>
-      </Card>
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { marginTop: STEP.s2 },
-  emptyCard: { marginTop: STEP.s4, padding: STEP.s4, alignItems: "center", borderWidth: 1 },
-  emptyTitle: { marginBottom: STEP.s1 },
-  recomCard: { marginTop: STEP.s3, padding: STEP.s4, borderWidth: 1 },
-  recomHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: STEP.s2 },
+  wrap: { marginTop: STEP.s4 },
+  recom: { borderTopWidth: 1, marginTop: STEP.s4, paddingTop: STEP.s3 },
+  recomHead: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: STEP.s2,
+  },
   timeRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 / 2 },
 });
