@@ -5,40 +5,14 @@ import { useNavigation } from "@react-navigation/native";
 
 import { Icon, Button } from "../../components/design";
 import { ExamOption } from "./components/ExamOption";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useExamSetupPrefill } from "../../hooks/useExamSetupPrefill";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
-
-function buildCategoryOptions() {
-  return [
-    { id: "lgs", label: "LGS", desc: "Liselere Geçiş Sınavı (8. Sınıf)" },
-    { id: "yks", label: "YKS", desc: "Yükseköğretim Kurumları Sınavı" },
-  ];
-}
-
-function buildYKSOptions() {
-  return [
-    { id: "tyt", examType: "tyt", field: null, label: "Sadece TYT", desc: "Temel Yeterlilik Testi" },
-    { id: "ayt_say", examType: "tyt_ayt", field: "sayisal", label: "TYT + AYT Sayısal", desc: "Mühendislik, Tıp, Fen" },
-    { id: "ayt_ea", examType: "tyt_ayt", field: "ea", label: "TYT + AYT Eşit Ağırlık", desc: "Hukuk, İşletme, Psikoloji" },
-    { id: "ayt_soz", examType: "tyt_ayt", field: "sozel", label: "TYT + AYT Sözel", desc: "Edebiyat, Tarih, İlahiyat" },
-    { id: "dil", examType: "dil", field: "dil", label: "YKS Dil", desc: "Yabancı Dil Testi" },
-  ];
-}
-
-function buildExamMonthOptions() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const beforeExamThisYear = now.getMonth() < 5 || (now.getMonth() === 5 && now.getDate() < 20);
-  const startYear = beforeExamThisYear ? currentYear : currentYear + 1;
-  return [`Haziran ${startYear}`, `Haziran ${startYear + 1}`, `Haziran ${startYear + 2}`];
-}
-
-const MONTHS = buildExamMonthOptions();
+import { buildCategoryOptions, buildYKSOptions, MONTHS } from "./constants/examSetupOptions";
 
 export default function ExamSetupScreen() {
   const C = useC();
@@ -74,7 +48,6 @@ export default function ExamSetupScreen() {
       updateExamConfig(opt.examType, opt.field, date).catch(() => {});
     }
     H.success();
-    // replace degil: yanlis sinavi secen geri kaydirip duzeltebilsin.
     navigation.navigate(SCREENS.GOAL_SETUP);
   }, [category, selectedId, examDate, isLGS, updateExamConfig, YKS_OPTIONS, navigation]);
 
@@ -84,24 +57,38 @@ export default function ExamSetupScreen() {
     setSelectedId(null);
   }, []);
 
+  const canGoBack = navigation.canGoBack();
+
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+    <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+      <View style={styles.header}>
+        {canGoBack ? (
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" style={styles.backBtn}>
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
+          </Press>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Sınav Seçimi</Text>
+        <View style={styles.backBtn} />
+      </View>
+
       <View style={styles.progressRow}>
         <View style={[styles.segment, { backgroundColor: C.accent }]} />
         <View style={[styles.segment, { backgroundColor: C.track }]} />
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: C.text }]}>Hangi sınava hazırlanıyorsun?</Text>
+        <Text style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>Hangi sınava hazırlanıyorsun?</Text>
 
-        <View style={{ gap: STEP.s1, marginTop: STEP.s3 }}>
+        <View style={styles.optionsCol}>
           {CATEGORIES.map((opt) => (
             <ExamOption key={opt.id} item={opt} selected={category} onPress={handleCategorySelect} C={C} />
           ))}
         </View>
 
         {category === "yks" && (
-          <View style={{ gap: STEP.s1, marginTop: STEP.s3 }}>
+          <View style={styles.yksCol}>
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>ALAN SEÇİMİ</Text>
             {YKS_OPTIONS.map((opt) => (
               <ExamOption key={opt.id} item={opt} selected={selectedId} onPress={(id) => { H.select(); setSelectedId(id); }} C={C} />
@@ -110,14 +97,15 @@ export default function ExamSetupScreen() {
         )}
 
         {category && (
-          <View style={{ marginTop: STEP.s4 }}>
+          <View style={styles.dateCol}>
             <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>SINAV TARİHİ</Text>
             <View style={styles.dateRow}>
               {MONTHS.map((m) => (
-                <Press haptic="none"
+                <Press
+                  haptic="none"
                   key={m}
                   onPress={() => setExamDate(m)}
-                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.elev }]}
+                  style={[styles.dateChip, { backgroundColor: C.surface, borderColor: examDate === m ? C.accent : C.border }]}
                 >
                   <Icon name="calendar" size={14} color={examDate === m ? C.accent : C.text3} />
                   <Text style={[TYPOGRAPHY.captionMedium, { color: examDate === m ? C.text : C.text2 }]}>{m}</Text>
@@ -128,7 +116,7 @@ export default function ExamSetupScreen() {
         )}
       </ScrollView>
 
-      <View style={{ paddingHorizontal: GUTTER, paddingBottom: STEP.s3 }}>
+      <View style={styles.cta}>
         <Button onPress={finish} iconRight="arrowR" size="lg" fullWidth disabled={!canContinue}>
           Devam
         </Button>
@@ -138,13 +126,27 @@ export default function ExamSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: 30 },
+  safe: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: GUTTER,
+    paddingVertical: STEP.s1,
+    minHeight: CONTROL.tapMin,
+  },
+  backBtn: { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 30 },
   progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
   segment: { flex: 1, height: 3, borderRadius: 1.5 },
-  title: { ...TYPOGRAPHY.heading, fontSize: 28, maxWidth: 280 },
+  title: { fontSize: 24, maxWidth: 300, marginTop: STEP.s2 },
+  optionsCol: { gap: STEP.s1, marginTop: STEP.s3 },
+  yksCol: { gap: STEP.s1, marginTop: STEP.s3 },
+  dateCol: { marginTop: STEP.s4 },
   dateRow: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s2 },
   dateChip: {
     flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
-    borderRadius: SHAPE.card, paddingVertical: STEP.s2, borderWidth: 1, minHeight: 44,
+    borderRadius: SHAPE.card, paddingVertical: STEP.s2, borderWidth: 1, minHeight: CONTROL.tapMin,
   },
+  cta: { paddingHorizontal: GUTTER, paddingBottom: STEP.s3, paddingTop: STEP.s1 },
 });

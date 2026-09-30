@@ -54,7 +54,7 @@ export function OnboardingSlideDaily({ C }) {
       </View>
 
       {/* Görev Satırı */}
-      <View style={[s.taskBox, { backgroundColor: C.bg, borderColor: C.line }]}>
+      <View style={[s.taskBox, { borderTopColor: C.line, borderBottomColor: C.line }]}>
         <View style={[s.subjectBar, { backgroundColor: "#E0A570" }]} />
 
         <View style={s.taskInfo}>
@@ -92,7 +92,7 @@ const s = StyleSheet.create({
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: SHAPE.chip },
   xpTag: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: SHAPE.chip },
-  taskBox: { flexDirection: "row", alignItems: "center", padding: STEP.s2, borderRadius: SHAPE.cardTight, borderWidth: 1, gap: STEP.s2 },
+  taskBox: { flexDirection: "row", alignItems: "center", paddingVertical: STEP.s2, borderTopWidth: 1, borderBottomWidth: 1, gap: STEP.s2 },
   subjectBar: { width: 3.5, height: 38, borderRadius: 2 },
   taskInfo: { flex: 1, gap: 3 },
   metaRow: { flexDirection: "row", alignItems: "center", gap: 6 },

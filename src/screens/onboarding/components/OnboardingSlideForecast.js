@@ -35,7 +35,7 @@ export function OnboardingSlideForecast({ C }) {
     <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }]}>
       {/* Net Rozetleri */}
       <View style={s.topMetrics}>
-        <View style={[s.metricBox, { backgroundColor: C.bg, borderColor: C.line }]}>
+        <View style={s.metricBox}>
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>BAŞLANGIÇ</Text>
           <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>54.0</Text>
         </View>
@@ -44,7 +44,7 @@ export function OnboardingSlideForecast({ C }) {
           <Icon name="arrowR" size={16} color={C.text3} />
         </View>
 
-        <View style={[s.metricBox, { backgroundColor: C.bg, borderColor: C.accent }]}>
+        <View style={[s.metricBox, { alignItems: "flex-end" }]}>
           <Text style={[TYPOGRAPHY.micro, { color: C.accentBright }]}>HEDEF NET</Text>
           <Text style={[TYPOGRAPHY.statMedium, { color: C.accentBright }]}>96.0</Text>
         </View>
@@ -82,7 +82,7 @@ export function OnboardingSlideForecast({ C }) {
       </View>
 
       {/* Akıllı Yeniden Çizim Bildirimi */}
-      <View style={[s.recalcRow, { backgroundColor: C.bg, borderColor: C.line }]}>
+      <View style={[s.recalcRow, { borderTopColor: C.line }]}>
         <Icon name="compass" size={14} color={C.accent} />
         <Text style={[TYPOGRAPHY.micro, { color: C.text2, flex: 1 }]}>
           Her yeni denemeyle kalan yol ve konu ağırlıkları anında yeniden hesaplanır.
@@ -107,14 +107,10 @@ const s = StyleSheet.create({
   },
   metricBox: {
     flex: 1,
-    paddingVertical: STEP.s1,
-    paddingHorizontal: STEP.s2,
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
     gap: 2,
   },
   arrowCol: {
-    paddingHorizontal: STEP.s1,
+    paddingHorizontal: STEP.s2,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -131,8 +127,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s1,
-    padding: STEP.s2,
-    borderRadius: SHAPE.chip,
-    borderWidth: 1,
+    paddingTop: STEP.s2,
+    borderTopWidth: 1,
   },
 });
