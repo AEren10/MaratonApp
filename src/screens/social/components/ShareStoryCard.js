@@ -24,6 +24,8 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
     ? (card.heroValue?.startsWith("+") ? C.up : card.heroValue?.startsWith("-") ? C.down : C.text)
     : C.text;
 
+  const isTopicCard = card.id === "stop" || card.id === "next_stop";
+
   return (
     <Animated.View
       ref={ref}
@@ -44,13 +46,26 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
           {card.title}
         </Text>
 
-        <StatBlock
-          value={card.heroValue}
-          unit={card.heroLabel}
-          size="large"
-          color={heroColor}
-          style={styles.hero}
-        />
+        {isTopicCard ? (
+          <View style={styles.topicHero}>
+            <Text style={[TYPOGRAPHY.subheading, styles.topicText, { color: C.text }]} numberOfLines={3}>
+              {card.heroValue}
+            </Text>
+            {card.heroLabel ? (
+              <Text style={[TYPOGRAPHY.captionMedium, styles.topicLabel, { color: C.accentBright }]}>
+                {card.heroLabel}
+              </Text>
+            ) : null}
+          </View>
+        ) : (
+          <StatBlock
+            value={card.heroValue}
+            unit={card.heroLabel}
+            size="large"
+            color={heroColor}
+            style={styles.hero}
+          />
+        )}
 
         <StoryCardVisual id={card.id} />
 
@@ -63,13 +78,12 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
 
       <View style={styles.footerContainer}>
         {card.stats?.length ? (
-          <View style={[styles.statsRow, { borderTopColor: "rgba(245,242,239,0.1)" }]}>
+          <View style={[styles.statsRow, { borderTopColor: C.line }]}>
             {card.stats.map((stat) => (
               <View key={stat.label} style={styles.statCell}>
                 <Text
                   style={[TYPOGRAPHY.label, styles.statLabel, { color: C.text3 }]}
                   numberOfLines={1}
-                  adjustsFontSizeToFit
                 >
                   {stat.label}
                 </Text>
@@ -79,7 +93,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
           </View>
         ) : null}
 
-        <View style={[styles.footer, { borderTopColor: "rgba(245,242,239,0.1)" }]}>
+        <View style={[styles.footer, { borderTopColor: C.line }]}>
           <View style={styles.footerLeft}>
             <View style={[styles.markSmall, { backgroundColor: C.brandFill }]}>
               <Text style={[styles.markSmallText, { color: C.accentInk }]}>m</Text>
@@ -87,7 +101,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
             <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>maraton</Text>
           </View>
           {footRight ? (
-            <Text style={[TYPOGRAPHY.label, { color: "rgba(245,242,239,0.42)" }]}>{footRight}</Text>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{footRight}</Text>
           ) : null}
         </View>
       </View>
@@ -112,6 +126,9 @@ const styles = StyleSheet.create({
   bare: { borderWidth: 0, backgroundColor: "transparent" },
   kicker: { letterSpacing: 1.6, textTransform: "uppercase" },
   hero: { marginTop: STEP.s2 },
+  topicHero: { marginTop: STEP.s2, minHeight: 70, justifyContent: "center" },
+  topicText: { fontSize: 22, lineHeight: 28 },
+  topicLabel: { marginTop: 4 },
   caption: { marginTop: STEP.s2, maxWidth: 250 },
   footerContainer: { marginTop: STEP.s3 },
   statsRow: { flexDirection: "row", gap: STEP.s2, paddingBottom: STEP.s3, borderTopWidth: 1, paddingTop: STEP.s3 },

@@ -118,5 +118,5 @@ const makeStyles = (C) => StyleSheet.create({
   cardWrap: { width: PREVIEW_CARD_WIDTH },
   actions: { paddingHorizontal: STEP.s3, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
   hint: { textAlign: "center", marginTop: STEP.s2 },
-  offscreen: { position: "absolute", left: -10000, top: 0, width: 360 },
+  offscreen: { position: "absolute", left: -10000, top: 0, width: STORY_WIDTH },
 });

@@ -8,11 +8,12 @@ const eyebrow = { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2.6 };
 // GERİ SAYIM — sinava kalan gun. Ilerleme cubugu gecen sureyi gosterir.
 export function StoryCountdownBody({ data, p }) {
   const pct = data.progressPct != null ? Math.max(0, Math.min(100, data.progressPct)) : null;
+  const isTripleDigit = Number(data.daysToExam) >= 100;
   return (
     <View style={s.countWrap}>
       <Text style={[eyebrow, { color: p.dim }, p.shadow]}>{data.examLabel.toLocaleUpperCase("tr")}</Text>
       <View style={s.countRow}>
-        <Text style={[s.countHero, { color: p.solid }, p.shadow]}>{data.daysToExam}</Text>
+        <Text style={[s.countHero, isTripleDigit && s.countHeroTriple, { color: p.solid }, p.shadow]}>{data.daysToExam}</Text>
         <Text style={[s.countUnit, { color: p.mid }, p.shadow]}>gün</Text>
       </View>
       {pct != null ? (
@@ -35,13 +36,15 @@ export function StoryCountdownBody({ data, p }) {
 // NET — deneme sonrasi. Mutlak net ve bir onceki denemeye gore fark.
 export function StoryNetBody({ data, p }) {
   const up = data.delta != null && data.delta > 0;
+  const netStr = formatNumber(data.net, 2);
+  const isLongNet = netStr.length >= 5;
   return (
     <View style={s.netWrap}>
       {data.label ? (
         <Text style={[eyebrow, { color: p.dim }, p.shadow]}>{data.label.toLocaleUpperCase("tr")}</Text>
       ) : null}
       <View style={s.netRow}>
-        <Text style={[s.netHero, { color: p.solid }, p.shadow]}>{formatNumber(data.net, 2)}</Text>
+        <Text style={[s.netHero, isLongNet && s.netHeroCompact, { color: p.solid }, p.shadow]}>{netStr}</Text>
         <Text style={[s.netUnit, { color: p.mid }, p.shadow]}>net</Text>
       </View>
 
@@ -69,7 +72,7 @@ export function StoryNetBody({ data, p }) {
           <View style={s.netSubjects}>
             {data.subjects.slice(0, 4).map((n) => (
               <View key={n.key} style={s.netSubject}>
-                <Text style={[s.netSubjectKey, { color: p.dim }, p.shadow]}>
+                <Text style={[s.netSubjectKey, { color: p.dim }, p.shadow]} numberOfLines={1}>
                   {String(n.key).toLocaleUpperCase("tr")}
                 </Text>
                 <Text style={[s.netSubjectValue, { color: p.solid }, p.shadow]}>
@@ -103,6 +106,7 @@ const s = StyleSheet.create({
   countWrap: { position: "absolute", left: 36, right: 36, top: 196 },
   countRow: { flexDirection: "row", alignItems: "flex-end", gap: 16, marginTop: 18 },
   countHero: { fontFamily: "Bricolage_400", fontSize: 210, lineHeight: 218, letterSpacing: -14.7 },
+  countHeroTriple: { fontSize: 136, lineHeight: 144, letterSpacing: -8 },
   countUnit: { fontFamily: "Bricolage_400", fontSize: 30, paddingBottom: 26 },
   bar: { height: 6, borderRadius: 2, marginTop: 34, overflow: "hidden" },
   barFill: { height: "100%", borderRadius: 2 },
@@ -112,6 +116,7 @@ const s = StyleSheet.create({
   netWrap: { position: "absolute", left: 36, right: 36, top: 182 },
   netRow: { flexDirection: "row", alignItems: "flex-end", gap: 14, marginTop: 16 },
   netHero: { fontFamily: "Bricolage_400", fontSize: 138, lineHeight: 144, letterSpacing: -8 },
+  netHeroCompact: { fontSize: 92, lineHeight: 98, letterSpacing: -5 },
   netUnit: { fontFamily: "Bricolage_400", fontSize: 26, paddingBottom: 16 },
   chip: {
     alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 7,

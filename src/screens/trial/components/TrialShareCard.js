@@ -12,7 +12,7 @@ function SubjectBar({ name, net, bestNet, color }) {
   return (
     <View style={styles.barRow}>
       <View style={styles.barHead}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>{name}</Text>
+        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]} numberOfLines={1}>{name}</Text>
         <Text style={[TYPOGRAPHY.tableValue, { color }]}>{net.toFixed(1)}</Text>
       </View>
       <View style={[styles.track, { backgroundColor: C.elev }]}>
@@ -46,7 +46,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
       ) : null}
 
       <View style={styles.netSection}>
-        <StatBlock value={net.toFixed(1)} unit="TOPLAM NET" size="hero" color={C.accentBright} align="center" />
+        <StatBlock value={net.toFixed(1)} label="TOPLAM NET" size="hero" color={C.accentBright} align="center" />
         {trend !== 0 && (
           <View style={[styles.trendPill, { backgroundColor: alpha(trendColor, 12) }]}>
             <Text style={[TYPOGRAPHY.captionMedium, { color: trendColor }]}>
