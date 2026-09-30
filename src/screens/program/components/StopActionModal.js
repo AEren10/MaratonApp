@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
-import { View, Text, Modal, StyleSheet, Alert, Pressable } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useMemo, useRef } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER, SPACING } from "../../../themes/tokens";
+import { BottomSheet } from "../../../components/design/BottomSheet";
+import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 import { useStopMoves } from "../../../hooks/useStopMoves";
@@ -15,9 +15,12 @@ import * as H from "../../../lib/haptics";
 
 const DAY_LABELS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
-export function StopActionModal({ visible, stop, dateKey, onClose }) {
+export function StopActionModal({ visible, stop: current, dateKey, onClose }) {
   const C = useC();
-  const insets = useSafeAreaInsets();
+  // Kapanis kaymasi surerken icerik bosalmasin: son durak gosterilir.
+  const last = useRef(current);
+  if (current) last.current = current;
+  const stop = current || last.current;
   const { moveStop, postponeStop, loaded } = useStopMoves();
   const { schedule } = useClassSchedule();
 
@@ -34,7 +37,7 @@ export function StopActionModal({ visible, stop, dateKey, onClose }) {
     });
   }, [monday, dateKey, today]);
 
-  if (!visible || !stop) return null;
+  if (!stop) return null;
 
   const dotColor = subjectColorOf(C, stop.subjectKey || stop.subjectLabel);
 
@@ -55,73 +58,65 @@ export function StopActionModal({ visible, stop, dateKey, onClose }) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={[s.backdrop, { backgroundColor: C.scrim }]} onPress={onClose}>
-        <Pressable
-          style={[s.sheet, { backgroundColor: C.surface, borderColor: C.elev, marginBottom: insets.bottom + STEP.s3 }]}
-          onPress={(e) => e.stopPropagation()}
-        >
-          <View style={s.head}>
-            <View style={s.titleRow}>
-              <View style={[s.dot, { backgroundColor: dotColor }]} />
-              <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]} numberOfLines={1}>
-                {stop.subjectLabel}{stop.topic ? ` · ${stop.topic}` : ""}
+    <BottomSheet visible={Boolean(visible && current)} onClose={onClose} style={s.sheet}>
+      <View style={s.head}>
+        <View style={s.titleRow}>
+          <View style={[s.dot, { backgroundColor: dotColor }]} />
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]} numberOfLines={1}>
+            {stop.subjectLabel}{stop.topic ? ` · ${stop.topic}` : ""}
+          </Text>
+        </View>
+        <Press haptic="none" onPress={onClose} hitSlop={STEP.s2}>
+          <Icon name="x" size={18} color={C.text3} />
+        </Press>
+      </View>
+
+      <Press
+        haptic="light"
+        disabled={!loaded}
+        onPress={handlePostpone}
+        style={[s.postponeBtn, { backgroundColor: C.elev, borderColor: C.line, opacity: loaded ? 1 : 0.5 }]}
+      >
+        <Icon name="arrowR" size={16} color={C.accent} />
+        <View style={s.postponeTextWrap}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Yarına ertele</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Bu haftanın sonraki çalışma gününe kaydır</Text>
+        </View>
+      </Press>
+
+      <Text style={[TYPOGRAPHY.label, s.sectionLabel, { color: C.text3 }]}>BAŞKA GÜNE TAŞI</Text>
+
+      <View style={s.daysRow}>
+        {weekDays.map((d) => {
+          const disabled = !loaded || d.isPast || d.isCurrent;
+          return (
+            <Press
+              key={d.iso}
+              haptic="light"
+              disabled={disabled}
+              onPress={() => handleMove(d.iso)}
+              style={[
+                s.dayChip,
+                {
+                  borderColor: d.isCurrent ? C.accent : d.isPast ? C.line : C.border,
+                  backgroundColor: d.isCurrent ? C.void : d.isPast ? "transparent" : C.elev,
+                  opacity: d.isPast ? 0.35 : 1,
+                },
+              ]}
+            >
+              <Text style={[TYPOGRAPHY.micro, { color: d.isCurrent ? C.accentBright : C.text3 }]}>{d.label}</Text>
+              <Text style={[TYPOGRAPHY.tableName, { color: d.isCurrent ? C.accentBright : d.isPast ? C.text3 : C.text }]}>
+                {d.dayNum}
               </Text>
-            </View>
-            <Press haptic="none" onPress={onClose} hitSlop={STEP.s2}>
-              <Icon name="x" size={18} color={C.text3} />
             </Press>
-          </View>
-
-          <Press
-            haptic="light"
-            disabled={!loaded}
-            onPress={handlePostpone}
-            style={[s.postponeBtn, { backgroundColor: C.elev, borderColor: C.line, opacity: loaded ? 1 : 0.5 }]}
-          >
-            <Icon name="arrowR" size={16} color={C.accent} />
-            <View style={s.postponeTextWrap}>
-              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Yarına ertele</Text>
-              <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Bu haftanın sonraki çalışma gününe kaydır</Text>
-            </View>
-          </Press>
-
-          <Text style={[TYPOGRAPHY.label, s.sectionLabel, { color: C.text3 }]}>BAŞKA GÜNE TAŞI</Text>
-
-          <View style={s.daysRow}>
-            {weekDays.map((d) => {
-              const disabled = !loaded || d.isPast || d.isCurrent;
-              return (
-                <Press
-                  key={d.iso}
-                  haptic="light"
-                  disabled={disabled}
-                  onPress={() => handleMove(d.iso)}
-                  style={[
-                    s.dayChip,
-                    {
-                      borderColor: d.isCurrent ? C.accent : d.isPast ? C.line : C.border,
-                      backgroundColor: d.isCurrent ? C.void : d.isPast ? "transparent" : C.elev,
-                      opacity: d.isPast ? 0.35 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={[TYPOGRAPHY.micro, { color: d.isCurrent ? C.accentBright : C.text3 }]}>{d.label}</Text>
-                  <Text style={[TYPOGRAPHY.tableName, { color: d.isCurrent ? C.accentBright : d.isPast ? C.text3 : C.text }]}>
-                    {d.dayNum}
-                  </Text>
-                </Press>
-              );
-            })}
-          </View>
-        </Pressable>
-      </Pressable>
-    </Modal>
+          );
+        })}
+      </View>
+    </BottomSheet>
   );
 }
 
 const s = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: "flex-end", paddingHorizontal: GUTTER },
   sheet: { borderRadius: SHAPE.cardTight, borderWidth: 1, padding: STEP.s3 },
   head: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: STEP.s3 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, flex: 1, marginRight: STEP.s2 },
