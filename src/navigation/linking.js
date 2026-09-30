@@ -15,8 +15,16 @@ export const linkingConfig = {
   async getInitialURL() {
     const url = await Linking.getInitialURL();
     if (url) return url;
-    const response = await Notifications.getLastNotificationResponseAsync();
+    const response = typeof Notifications.getLastNotificationResponse === "function"
+      ? Notifications.getLastNotificationResponse()
+      : await Notifications.getLastNotificationResponseAsync();
     const data = response?.notification?.request?.content?.data;
+    // Tuketilen yanit temizlenir: yoksa bir sonraki soguk acilis (ikondan)
+    // yine ayni bildirimin ekranina dusebiliyordu.
+    try {
+      if (typeof Notifications.clearLastNotificationResponse === "function") Notifications.clearLastNotificationResponse();
+      else await Notifications.clearLastNotificationResponseAsync?.();
+    } catch (_) {}
     if (data?.url) {
       trackNotificationOpened(data.type || "unknown", { url: data.url, coldStart: true });
     }

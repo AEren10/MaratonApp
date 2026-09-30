@@ -7,6 +7,8 @@ import { getDaily, getStreakRisk, getZeigarnik as getZeigarnikContent, getOptima
 import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from "../supabase/profiles";
 import * as appStorage from "./storage/appStorage";
 import { dailyReminderContent, weeklySummaryContent } from "./reminderContent";
+import { getSession } from "../supabase/auth";
+import { registerSessionReset } from "./session/sessionReset";
 
 const STORAGE_KEY = STORAGE_KEYS.NOTIF_PREFS;
 const CONTEXT_KEY = STORAGE_KEYS.NOTIF_CONTEXT;
@@ -92,10 +94,14 @@ export async function loadNotifPrefsFromServer(userId) {
   return null;
 }
 
+// Cikis iptali de siraya girer: ucustaki bir kurulumun ONUNE gecip sonra
+// onun kurduklarini ortada birakmasin.
 export async function cancelAllScheduled() {
-  try {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-  } catch (_) {}
+  return serial(async () => {
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch (_) {}
+  });
 }
 
 // Sadece verilen tipleri iptal eder. applyNotifPrefs'in her açılışta
@@ -123,6 +129,19 @@ function serial(fn) {
   const run = notifQueue.then(fn, fn);
   notifQueue = run.catch(() => {});
   return run;
+}
+
+// Gec donen bir cagri (A'nin acilis senkronu, ana sayfasi) cikistan SONRA
+// A'nin hatirlatmalarini yeniden kurmasin: userId verildiyse aktif oturumun
+// sahibi olmali. Sira icinde calisir, yani cikis iptalinden once/sonra net.
+async function isActiveOwner(userId) {
+  if (!userId || userId === "dev") return true;
+  try {
+    const session = await getSession();
+    return session?.user?.id === userId;
+  } catch (_) {
+    return false;
+  }
 }
 
 // applyNotifPrefs'in yönettiği tipler. task_reminder BİLEREK yok.
@@ -380,6 +399,7 @@ export function applyNotifPrefs(prefs, context, userId = null) {
 }
 
 async function applyNotifPrefsNow(prefs, context, userId = null) {
+  if (!(await isActiveOwner(userId))) return;
   await cancelScheduledByType(PREF_MANAGED_TYPES);
   if (!prefs) return;
   // Birlestir: acilis senkronu seri bilgisini, ana sayfa gunun planini ve
@@ -422,6 +442,7 @@ export function onStudiedToday(streak = 0, userId = null) {
 
 async function onStudiedTodayNow(streak, userId) {
   try {
+    if (!(await isActiveOwner(userId))) return;
     const prefs = await getNotifPrefs(userId);
     await cancelScheduledByType(["streak_risk"]);
     const context = await readNotifContext(userId);
@@ -437,6 +458,9 @@ async function onStudiedTodayNow(streak, userId) {
  * gonderilebilir (ornegin yalniz reviewDue).
  */
 let lastReminderKey = null;
+// Cikis tum bildirimleri siler; ayni kullanici geri girince "degismedi" deyip
+// gunluk hatirlatmayi yeniden kurmamazlik etmesin.
+registerSessionReset(() => { lastReminderKey = null; });
 export function updateReminderContent(partial = {}, userId = null) {
   if (Platform.OS === "web") return Promise.resolve();
   return serial(() => updateReminderContentNow(partial, userId));
@@ -444,6 +468,7 @@ export function updateReminderContent(partial = {}, userId = null) {
 
 async function updateReminderContentNow(partial, userId) {
   try {
+    if (!(await isActiveOwner(userId))) return;
     const context = await readNotifContext(userId);
     const next = { ...context, ...partial };
     const key = JSON.stringify([userId, next.todayPlan, next.reviewDue, next.weeklyVars]);
@@ -462,6 +487,11 @@ async function updateReminderContentNow(partial, userId) {
 
 export async function scheduleTaskNotifications(taskCount, userId = null) {
   if (Platform.OS === "web") return;
+  return serial(() => scheduleTaskNotificationsNow(taskCount, userId));
+}
+
+async function scheduleTaskNotificationsNow(taskCount, userId) {
+  if (!(await isActiveOwner(userId))) return;
   const prefs = await getNotifPrefs(userId);
   if (prefs.taskReminderEnabled === false) return;
   await cancelTaskReminders();

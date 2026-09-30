@@ -28,7 +28,8 @@ import { ReduxHydrator } from "./src/store/hydrate";
 import { C } from "./src/themes/tokens";
 import { initErrorReporting } from "./src/lib/errorReporting";
 import { useTheme } from "./src/contexts/ThemeContext";
-import { applyNotifPrefs, getNotifPrefs } from "./src/lib/notifications";
+// Yan etki: bildirim isleyicisi ve Android kanali modul yuklenince kurulur.
+import "./src/lib/notifications";
 import OfflineBanner from "./src/components/common/OfflineBanner";
 import { loadHapticPref } from "./src/lib/haptics";
 
@@ -37,13 +38,10 @@ loadHapticPref();
 
 SplashScreen.preventAutoHideAsync();
 
-async function initNotifications() {
-  try {
-    const prefs = await getNotifPrefs();
-    await applyNotifPrefs(prefs);
-  } catch (_) {}
-}
-initNotifications();
+// Acilista kullanicisiz applyNotifPrefs YOK. userId'siz okuma kullanicinin
+// kapattigi tercihleri gormuyor (varsayilan: hepsi acik), cikis yapmis
+// cihaza bile gunluk hatirlatma kuruyor ve useDataSync'in dogru baglamla
+// kurdugu seri uyarisini siliyordu. Kurulum girisli oturumda useDataSync'te.
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
