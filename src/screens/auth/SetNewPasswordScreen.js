@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Linking from "expo-linking";
 
 import { Button, Input, Icon } from "../../components/design";
 import { TYPOGRAPHY, SPACING } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { updatePassword, establishRecoverySession, signOut } from "../../supabase/auth";
-import * as Linking from "expo-linking";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { useAlert } from "../../contexts/AlertContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -37,7 +37,6 @@ export default function SetNewPasswordScreen() {
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState({});
-  // Sıfırlama linkindeki token'la oturum kuruluyor mu.
   const [sessionState, setSessionState] = useState("checking"); // checking | ready | invalid
 
   // OTURUM KURMA ADIMI — bu olmadan updateUser "Auth session missing" verir.
@@ -142,11 +141,9 @@ export default function SetNewPasswordScreen() {
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: C.bg },
-    content: { flex: 1, padding: SPACING.xxl, gap: SPACING.lg, justifyContent: "center" },
-    title: { ...TYPOGRAPHY.heading, color: C.text },
-    desc: { ...TYPOGRAPHY.body, color: C.sec, marginBottom: SPACING.sm },
-  });
-}
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.bg },
+  content: { flex: 1, padding: SPACING.xxl, gap: SPACING.lg, justifyContent: "center" },
+  title: { ...TYPOGRAPHY.heading, color: C.text },
+  desc: { ...TYPOGRAPHY.body, color: C.text2, marginBottom: SPACING.sm },
+});

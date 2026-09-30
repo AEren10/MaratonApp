@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { track } from "../../lib/analytics";
-import { EVENTS } from "../../constants/analytics";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+
+import { track } from "../../lib/analytics";
+import { EVENTS } from "../../constants/analytics";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
@@ -12,26 +13,22 @@ import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { PasswordStrength } from "./components/PasswordStrength";
 import { TermsCheckbox } from "./components/TermsCheckbox";
-import { Icon, Button } from "../../components/design";
+import { Icon, Button, Press } from "../../components/design";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { registerSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { SIGN_UP_OUTCOME, signUpOutcome } from "../../lib/signUpOutcome";
-import { Press } from "../../components/design/Press";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
   const C = useC();
   const insets = useSafeAreaInsets();
   const showAlert = useAlert();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [agreed, setAgreed] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [name, setName] = useState(""); const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); const [agreed, setAgreed] = useState(false);
+  const [busy, setBusy] = useState(false); const [errors, setErrors] = useState({});
 
   const submit = async () => {
     const { ok, errors: fieldErrors } = validate(registerSchema, {
