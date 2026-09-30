@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -9,18 +10,31 @@ import { useC } from "../../contexts/ThemeContext";
 import { useStatsOverview } from "../../hooks/useStatsOverview";
 import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { EXAM_NAME, fmtHours, fmtInt, fmtNet, weekLabel } from "./statsFormat";
-import { StatsTotals } from "./components/StatsTotals";
+import { StatsStrip } from "./components/StatsStrip";
 import { StatsWeeks } from "./components/StatsWeeks";
 import { StatsSubjects } from "./components/StatsSubjects";
+import { statsStory } from "../../domain/insight/storyLines";
 
-// ISTATISTIKLERIM: tum zamanlarin toplami, son 8 hafta, dersler ve denemeler.
-// Veri sunucudan (get_study_totals) ve yalniz aktif sinavin denemeleri.
+// ISTATISTIKLERIM: Ders analizi deseni (tek buyuk sayi, tek cumle, 4'lu serit, kutusuz).
 export default function StatsScreen() {
   const C = useC();
   const navigation = useNavigation();
   const { data, loading, isEmpty } = useStatsOverview();
   const study = data?.study;
   const trials = data?.trials;
+
+  const bestWeekLabel = useMemo(() => {
+    if (!study?.bestWeek) return null;
+    return `${weekLabel(study.bestWeek.weekStart, { long: true })} haftası`;
+  }, [study?.bestWeek]);
+
+  const story = useMemo(() => {
+    const weeks = (study?.last8Weeks || []).map((w) => w.minutes || 0);
+    return statsStory({ weeks, bestWeekLabel });
+  }, [study?.last8Weeks, bestWeekLabel]);
+
+  const totalHours = fmtHours(study?.totalMinutes);
+  const bestWeekStat = study?.bestWeek ? `${fmtHours(study.bestWeek.minutes)} sa` : "—";
 
   return (
     <ScreenErrorBoundary>
@@ -31,6 +45,7 @@ export default function StatsScreen() {
           </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>İstatistiklerim</Text>
         </View>
+
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
           {loading && !data ? (
             <Skeleton width="100%" height={120} radius={SHAPE.card} />
@@ -38,13 +53,20 @@ export default function StatsScreen() {
             <EmptyState title="Henüz istatistik yok" body="Çalışma ve deneme kaydettikçe burası dolar." />
           ) : (
             <>
-              <SectionLabel>TÜM ZAMANLAR</SectionLabel>
-              <StatsTotals C={C} study={study} />
-              {study?.bestWeek ? (
-                <Text style={[TYPOGRAPHY.meta, s.note, { color: C.text2 }]}>
-                  {`En iyi haftan: ${weekLabel(study.bestWeek.weekStart, { long: true })} haftası · ${fmtInt(study.bestWeek.questions)} soru · ${fmtHours(study.bestWeek.minutes)} sa`}
-                </Text>
-              ) : null}
+              <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>TÜM ZAMANLAR</Text>
+              <View style={s.heroRow}>
+                <Text style={[TYPOGRAPHY.stat, s.num, { color: C.text }]}>{totalHours}</Text>
+                <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text3 }]}>saat</Text>
+              </View>
+              <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
+
+              <StatsStrip
+                C={C}
+                questions={fmtInt(study?.totalQuestions)}
+                activeDays={fmtInt(study?.activeDays)}
+                trialCount={trials?.count ? String(trials.count) : "0"}
+                bestWeek={bestWeekStat}
+              />
 
               {study?.last8Weeks?.length ? (
                 <View style={s.block}>
@@ -85,6 +107,8 @@ const s = StyleSheet.create({
   safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingHorizontal: GUTTER, height: CONTROL.tapMin },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  heroRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, marginTop: STEP.s1 },
+  num: { fontVariant: ["tabular-nums"] },
   block: { marginTop: STEP.s4 },
   note: { marginTop: STEP.s2 },
   trialRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1, paddingVertical: STEP.s2, borderBottomWidth: 1 },
