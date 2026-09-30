@@ -12,13 +12,13 @@ Google Sign-In çalışması için OAuth 2.0 istemci kimliği oluşturulmalı.
 2. Yeni proje oluştur veya mevcut projeyi seç
 3. **APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID**
 4. **iOS** tipi seç:
-   - Bundle ID: `com.maraton.app`
+   - Bundle ID: `com.ahmeterensiranli.maraton`
    - Oluşturulan iOS Client ID'yi kopyala
 5. **Web** tipi seç (Supabase için gerekli):
    - Authorized redirect URI: `https://zrycqfehhyjrsujmajpf.supabase.co/auth/v1/callback`
    - Oluşturulan Web Client ID'yi kopyala
 6. **Android** tipi seç:
-   - Package name: `com.maraton.app`
+   - Package name: `com.ahmeterensiranli.maraton`
    - SHA-1: `keytool -keystore android/app/debug.keystore -list -v` ile al (debug keystore şifresi: `android`)
 
 ### Sonra yapılacaklar:
@@ -34,12 +34,12 @@ Google Sign-In çalışması için OAuth 2.0 istemci kimliği oluşturulmalı.
 
 ## 2. Apple Sign-In — App Store Connect
 
-Kod hazır, Supabase Apple provider aktif (Client ID: `com.maraton.app`). Ek yapılacak:
+Kod hazır, Supabase Apple provider aktif olmalı (native bundle ID: `com.ahmeterensiranli.maraton`). Ek yapılacak:
 
 1. **Apple Developer → Certificates, Identifiers & Profiles**
    - App ID'de "Sign in with Apple" capability aktif olmalı
 2. **Services ID** oluştur (web login için, Supabase redirect):
-   - Identifier: `com.maraton.app.web`
+   - Identifier: `com.ahmeterensiranli.maraton.web`
    - Return URL: `https://zrycqfehhyjrsujmajpf.supabase.co/auth/v1/callback`
 3. Supabase Dashboard → Apple provider → Secret Key (p8 dosyası) yükle
 
@@ -81,27 +81,27 @@ Expo access token: https://expo.dev/accounts/ahmeterenn/settings/access-tokens a
 `expo-linking` ve React Navigation linking config hazır. Production'da çalışması için:
 
 ### iOS — Universal Links:
-- `maraton.app/.well-known/apple-app-site-association` dosyası sunucuya koyulmalı:
+- `maratonapp.com/.well-known/apple-app-site-association` dosyası sunucuya koyulmalı:
 ```json
 {
   "applinks": {
     "apps": [],
     "details": [{
-      "appID": "TEAM_ID.com.maraton.app",
-      "paths": ["/referral/*", "/share/*"]
+      "appID": "TEAM_ID.com.ahmeterensiranli.maraton",
+      "paths": ["/referral/*", "/friend/*", "/group/*"]
     }]
   }
 }
 ```
 
 ### Android — App Links:
-- `maraton.app/.well-known/assetlinks.json` dosyası sunucuya koyulmalı:
+- `maratonapp.com/.well-known/assetlinks.json` dosyası sunucuya koyulmalı:
 ```json
 [{
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.maraton.app",
+    "package_name": "com.ahmeterensiranli.maraton",
     "sha256_cert_fingerprints": ["SHA256_HASH"]
   }
 }]
@@ -109,19 +109,15 @@ Expo access token: https://expo.dev/accounts/ahmeterenn/settings/access-tokens a
 
 ---
 
-## 6. RevenueCat API Keys
+## 6. Premium / IAP
 
-Premium/paywall sistemi RevenueCat entegrasyonu hazır, sadece API key'ler placeholder.
+V1 mağaza gönderiminde premium kapalıdır. RevenueCat runtime paketi kaldırıldı ve eski premium rotaları ana ekrana yönlenir.
 
-1. https://app.revenuecat.com → yeni proje oluştur
-2. iOS ve Android app ekle (bundle: `com.maraton.app`)
-3. API key'leri `.env` dosyasına ekle:
-   ```
-   EXPO_PUBLIC_RC_IOS_KEY=appl_xxx
-   EXPO_PUBLIC_RC_ANDROID_KEY=goog_xxx
-   ```
-4. App Store Connect ve Google Play Console'da in-app purchase ürünleri oluştur
-5. RevenueCat'e entitlement ve offering tanımla
+Yapılacaklar:
+
+1. App Store Connect ve Google Play Console'da V1 için IAP ürünü oluşturma.
+2. Store listing metninde yalnızca "tamamen ücretsiz" iddiasını kullan.
+3. Premium yeniden açılacaksa ayrı bir sürümde RevenueCat, mağaza ürünleri, abonelik koşulları, restore akışı ve sandbox testleri baştan doğrulanmalı.
 
 ---
 
@@ -145,5 +141,5 @@ eas build --platform all --profile development
 | 3 | Edge Function deploy | Orta | ⬜ |
 | 4 | pg_cron (Pro plan) | Düşük | ⬜ |
 | 5 | Deep link domain verification | Orta | ⬜ |
-| 6 | RevenueCat API keys | Yüksek | ⬜ |
+| 6 | Premium / IAP V1 kapalı doğrulaması | Yüksek | ⬜ |
 | 7 | Native rebuild (EAS) | Yüksek | ⬜ |

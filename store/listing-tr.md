@@ -12,7 +12,7 @@ Deneme analizi & net takip
 yks,tyt,ayt,deneme,net hesaplama,sıralama,çalışma takip,yanlış defteri,ders programı,sınav hazırlık
 
 ### Promosyon Metni (170 karakter)
-YKS maratonuna hazır mısın? Günlük çalışma planı, deneme analizi ve yapay zeka önerileriyle hedefine koş. Tamamen ücretsiz.
+YKS maratonuna hazır mısın? Günlük çalışma planı, deneme analizi ve kişisel rotanla hedefine koş. Tamamen ücretsiz.
 
 ### Açıklama
 YKS hazırlığını ciddiye alanlar için tasarlandı.
@@ -34,13 +34,13 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 📓 YANLIŞ DEFTERİ
 • Yanlışlarını fotoğrafla kaydet
 • Tekrar sistemiyle aralıklı tekrar yap
-• Toplulukla yanlış paylaş ve çöz
+• Yanlışlarını unutmadan tekrar et
 
 🔥 MOTİVASYON & OYUNLAŞTIRMA
 • Günlük seri takibi — serini koru, dondurmayı kullan
 • XP kazan, rozet aç, ligde yüksel
 • Arkadaşlarınla çalışma mücadelesi başlat
-• Yapay zeka destekli akıllı çalışma önerileri
+• Kişisel rota: bugün ne çalışacağını biz seçeriz
 
 🗺️ YOL HARİTASI & MÜFREDAT
 • YKS müfredatını konu konu takip et
@@ -49,7 +49,7 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 
 Maraton, YKS maratonunda yanında. Şimdi indir, hedefe koşmaya başla.
 
-Destek: destek@maraton.app
+Destek: destek@maratonapp.com
 
 ---
 
@@ -81,13 +81,13 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 📓 Yanlış Defteri
 - Yanlışlarını fotoğrafla kaydet
 - Aralıklı tekrar sistemiyle unutma
-- Toplulukla yanlış paylaş ve çöz
+- Yanlışlarını unutmadan tekrar et
 
 🔥 Motivasyon & Oyunlaştırma
 - Günlük seri takibi ve seri dondurma
 - XP kazan, rozet aç, ligde yüksel
 - Arkadaşlarınla çalışma mücadelesi başlat
-- Yapay zeka destekli akıllı çalışma önerileri
+- Kişisel rota: bugün ne çalışacağını biz seçeriz
 
 🗺️ Yol Haritası & Müfredat Takibi
 - YKS müfredatını konu konu takip et
@@ -96,8 +96,8 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 
 Maraton, YKS maratonunda yanında. Şimdi indir, hedefe koşmaya başla.
 
-Destek: destek@maraton.app
-Gizlilik: https://maraton.app/privacy
+Destek: destek@maratonapp.com
+Gizlilik: https://maratonapp.com/privacy
 
 ---
 

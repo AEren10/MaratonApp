@@ -43,6 +43,7 @@ test("runtime app copy and links no longer point at the unused maraton.app domai
     "../../src/navigation/linking.js",
     "../../src/constants/legalDocs.js",
     "../../src/screens/settings/AboutScreen.js",
+    "../../src/screens/settings/SettingsScreen.js",
     "../../src/screens/settings/useSettingsActions.js",
     "../../src/hooks/useReferrals.js",
     "../../src/screens/trial/components/TrialReportCard.js",
