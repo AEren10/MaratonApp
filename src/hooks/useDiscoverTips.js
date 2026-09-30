@@ -13,7 +13,7 @@ import * as appStorage from "../lib/storage/appStorage";
 // kaydi gorur (rehberde kapatilan ipucu ana sayfadan hemen kalkar). Yazma
 // yuklemeyi bekler; eskiden rehber yukleme bitmeden bos kayitla yazip
 // daha once kapatilan ipuclarini geri getiriyordu.
-export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story", SCHEDULE: "schedule", HABIT: "habit" });
+export const DISCOVER_TIPS = Object.freeze({ WIDGET: "widget", STORY: "story", SCHEDULE: "schedule", HABIT: "habit", KNOWN_TOPICS: "known_topics" });
 // Widget'lar yalniz iOS'ta var.
 const ORDER = Platform.OS === "ios" ? [DISCOVER_TIPS.WIDGET, DISCOVER_TIPS.STORY] : [DISCOVER_TIPS.STORY];
 
@@ -49,7 +49,17 @@ export function useDiscoverTips({ eligible = true } = {}) {
     });
   }, []);
 
+  // Tekrarlayan ipucu (aylik hatirlatma): kapatma anini her seferinde yeniler.
+  const snooze = useCallback((key) => {
+    load().then(() => {
+      state = { ...(state || {}), [key]: Date.now() };
+      emit();
+      appStorage.setJson(STORAGE_KEYS.DISCOVER_TIPS, state).catch(() => {});
+    });
+  }, []);
+
   const isClosed = useCallback((key) => Boolean(closed?.[key]), [closed]);
+  const closedAt = useCallback((key) => Number(closed?.[key]) || 0, [closed]);
   const tip = eligible && closed ? ORDER.find((key) => !closed[key]) || null : null;
-  return { tip, close, isClosed, closed };
+  return { tip, close, snooze, isClosed, closedAt, loaded: Boolean(closed), closed };
 }
