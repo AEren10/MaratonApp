@@ -9,6 +9,7 @@ import { habitStopsForDay } from "../domain/route/habits";
 import { studyWeekdays } from "../domain/program/classSchedule";
 import { weekdayIndex } from "../domain/program/dayKeys";
 import { todayTR } from "../lib/dateUtils";
+import { useDayPlanOptions } from "./useDayPlanOptions";
 
 // Bir gunun rutin duraklari (domain/route/habits). Yalniz calisma gunlerinde;
 // deneme ve bos gun rutin almaz. Bugun icin tamamlanma bugunun kayitlarindan.
@@ -17,10 +18,13 @@ export function useHabitStops(dateKey) {
   const { topicRows } = usePlanContext();
   const { schedule } = useClassSchedule();
   const todayLogs = useSelector(selectTodayLogs);
+  const { blockedDates } = useDayPlanOptions();
 
   return useMemo(() => {
     if (!dateKey || !habits.length) return [];
     if (!studyWeekdays(schedule).includes(weekdayIndex(dateKey))) return [];
+    // Deneme provasi gunu rutin de yok (ana sayfa o gun hic durak gostermiyor).
+    if (blockedDates?.includes(dateKey)) return [];
     const progressByKey = {};
     for (const row of topicRows || []) {
       const subject = row.subject_key || row.subject;
@@ -36,5 +40,5 @@ export function useHabitStops(dateKey) {
       progressByKey,
       dayIndex,
     });
-  }, [dateKey, habits, schedule, topicRows, todayLogs]);
+  }, [dateKey, habits, schedule, topicRows, todayLogs, blockedDates]);
 }

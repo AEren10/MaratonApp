@@ -2,14 +2,14 @@ import { useMemo } from "react";
 
 import { useStudyRoute } from "./useStudyRoute";
 import { useClassSchedule } from "./useClassSchedule";
-import { stopsForDate } from "../domain/program/todayStops";
+import { stopsForDate, todayPlanStops } from "../domain/program/todayStops";
 import { useDayPlanOptions } from "./useDayPlanOptions";
 import { useHabitStops } from "./useHabitStops";
 import { mondayOf } from "../domain/program/dayKeys";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { subjectPaletteKey } from "../themes/subjectPalette";
 import { getSubjectLabel } from "../themes/subjects";
-import { todayTR } from "../lib/dateUtils";
+import { todayTR, dateKey as toDateKey } from "../lib/dateUtils";
 import { useUserTasks } from "./useUserTasks";
 import { useDatedUserTasks } from "./useDatedUserTasks";
 
@@ -47,7 +47,24 @@ export function useDayRouteStops(dateKey) {
       }))
       : [];
     if (!week) return extras;
-    return [...[...habitStops, ...stopsForDate(week, schedule, dateKey, dayOpts)].map((stop, i) => {
+    // Ana sayfayla AYNI kural: bugun = todayPlanStops (tasinan + baska gunde
+    // bugun biten). Gecmis gun: bugune tasinan durak orada tekrar yazilmaz
+    // (eskiden hem gecmis gunde hem bugunde, Ay'da iki kez gorunuyordu).
+    const today = todayTR();
+    const doneToday = (s) => s.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED && s.completedAt
+      && toDateKey(new Date(s.completedAt)) === today;
+    let routeStops;
+    if (dateKey === today) {
+      routeStops = todayPlanStops(week, schedule, today, { isCompletedToday: doneToday, ...dayOpts });
+    } else {
+      const carriedKeys = dateKey < today && mondayOf(dateKey) === mondayOf(today)
+        ? new Set(todayPlanStops(week, schedule, today, { isCompletedToday: doneToday, ...dayOpts })
+          .filter((s) => s.carried).map((s) => s.logicalStopKey))
+        : null;
+      routeStops = stopsForDate(week, schedule, dateKey, dayOpts)
+        .filter((s) => !carriedKeys?.has(s.logicalStopKey) && !(dateKey !== today && doneToday(s) && dateKey > today));
+    }
+    return [...[...habitStops, ...routeStops].map((stop, i) => {
       const done = stop.lifecycleStatus === ROUTE_STOP_STATUS.COMPLETED;
       return {
         id: stop.logicalStopKey || `${stop.subject}-${stop.topic}-${i}`,
