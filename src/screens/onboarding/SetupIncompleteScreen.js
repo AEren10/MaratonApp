@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Button, Skeleton } from "../../components/design";
+import { Button, Skeleton, Press } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { SetupProgressList } from "./components/SetupProgressList";
 import { useSetupProgress } from "../../hooks/useSetupProgress";
@@ -103,9 +103,18 @@ function SetupIncompleteContent() {
         <Button onPress={handleContinue} size="lg" fullWidth>
           Kurulumu tamamla
         </Button>
-        <Button onPress={goHome} variant="ghost" size="md" fullWidth style={{ marginTop: STEP.s1 }}>
-          Şimdi değil, ana sayfaya git
-        </Button>
+        <Press
+          haptic="none"
+          onPress={goHome}
+          hitSlop={8}
+          style={styles.skipBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Şimdi değil, ana sayfaya git"
+        >
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>
+            Şimdi değil, ana sayfaya git
+          </Text>
+        </Press>
       </Animated.View>
     </SafeAreaView>
   );
@@ -126,4 +135,5 @@ const styles = StyleSheet.create({
   segment: { flex: 1, height: 3, borderRadius: 1.5 },
   progressLabelRow: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s1 },
   cta: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: STEP.s2, borderTopWidth: 1 },
+  skipBtn: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
 });
