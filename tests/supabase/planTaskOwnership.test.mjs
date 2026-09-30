@@ -9,7 +9,7 @@ const migration = readFileSync(
 );
 
 test("plan task writes include and check user ownership", () => {
-  assert.match(plans, /user_id: plan\.user_id/);
+  assert.match(plans, /user_id: planRow\.user_id/);
   assert.match(plans, /togglePlanTask = async \(taskId, completed, userId = null\)/);
   assert.match(plans, /\.eq\("user_id", userId\)/);
 });
