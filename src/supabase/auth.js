@@ -169,7 +169,7 @@ export const deleteAccount = async () => {
   // auth.uid()'e bagli; RPC auth.users satirini sildikten sonra oturum
   // artik gecerli bir kullaniciya ait degil ve dosyalar yetim kalir (sonradan
   // kimse silemez). RPC'nin FK yuzunden patlama yolu
-  // 20261001120000_clde_account_delete_fk_cascade ile kapandi; geriye ag/oturum
+  // 20260930125121_clde_account_delete_fk_cascade ile kapandi; geriye ag/oturum
   // hatasi kaliyor -- o durumda dosyalar gider, hesap kalir, kullanici tekrar
   // deneyebilir. Tersini (hesap var, dosya yok) yetim dosyaya tercih ediyoruz.
   const { data } = await supabase.auth.getUser();
