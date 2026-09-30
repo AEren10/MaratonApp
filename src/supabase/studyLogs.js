@@ -161,7 +161,7 @@ export const getStudyLogsByTopic = (userId, subjectKey, topicName, limit = 20) =
   try {
     const { data, error } = await supabase
       .from("study_logs")
-      .select("id, study_date, duration_minutes, question_count, correct_count, note, notes, created_at")
+      .select("id, study_date, duration_minutes, question_count, correct_count, note, notes, created_at, perceived")
       .eq("user_id", userId)
       .eq("subject", subjectKey)
       .eq("topic", topicName)

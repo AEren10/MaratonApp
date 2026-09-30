@@ -102,6 +102,18 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
 
   const lastStudyDate = sortedLogs.length ? sortedLogs[sortedLogs.length - 1].study_date : null;
 
+  const daysSince = useMemo(() => {
+    if (!lastStudyDate) return null;
+    const diff = Date.now() - new Date(lastStudyDate).getTime();
+    return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+  }, [lastStudyDate]);
+
+  const feel = useMemo(() => {
+    const sortedDesc = [...history].sort((a, b) => new Date(b.study_date || b.created_at) - new Date(a.study_date || a.created_at));
+    const withFeel = sortedDesc.find((h) => h.perceived);
+    return withFeel?.perceived || null;
+  }, [history]);
+
   return {
     loading,
     error,
@@ -114,6 +126,8 @@ export function useTopicStudyDetail({ userId, subjectKey, topicName }) {
     correctCount,
     accuracy,
     recentLogs,
+    daysSince,
+    feel,
     lastStudyText: lastStudyLabel(lastStudyDate),
   };
 }

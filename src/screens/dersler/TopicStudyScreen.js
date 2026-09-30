@@ -1,9 +1,12 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { View, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Icon, Button, ErrorState } from "../../components/design";
-import { STEP, GUTTER, TYPOGRAPHY } from "../../themes/tokens";
+
+import { Icon, ErrorState } from "../../components/design";
+import { Press } from "../../components/design/Press";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
@@ -11,106 +14,132 @@ import { SCREENS } from "../../constants/screens";
 import { getSubjectByKey } from "../../themes/subjects";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { useTopicStudyDetail } from "../../hooks/useTopicStudyDetail";
+import { topicStory } from "../../domain/insight/storyLines";
 import { flattenRouteStops, routeDateTag } from "../../domain/route/routeOverview";
 import { ROUTE_STOP_STATUS } from "../../domain/route/stopStatus";
-import { TopicHeroHeader } from "./components/TopicHeroHeader";
-import { TopicStatsRow } from "./components/TopicStatsRow";
-import { TopicAccuracyBar } from "./components/TopicAccuracyBar";
 import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
-import { TopicRecentStudies } from "./components/TopicRecentStudies";
-import { TopicInfoList } from "./components/TopicInfoList";
-import { TopicWrongNotesList } from "./components/TopicWrongNotesList";
+import { TopicStatsStrip } from "./components/TopicStatsStrip";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
-import { Press } from "../../components/design/Press";
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
   const C = useC();
   const route = useRoute();
   const params = route.params ?? {};
-
   const subject = useMemo(() => {
     if (params.subject) return params.subject;
     const key = params.subjectKey;
-    if (!key) return null;
-    const found = getSubjectByKey(key);
-    return found ? { key, name: found.label, icon: found.icon } : { key, name: key, icon: "bookOpen" };
+    const found = key ? getSubjectByKey(key) : null;
+    return found ? { key, name: found.label } : { key: key || "", name: key || "" };
   }, [params.subject, params.subjectKey]);
 
-  const topic = useMemo(() => {
-    if (params.topic) return params.topic;
-    const name = params.topicName;
-    return name ? { name } : null;
-  }, [params.topic, params.topicName]);
-
+  const topicName = params.topic?.name || params.topicName || "Konu Detayı";
   const color = subjectColorOf(C, subject?.key);
   const { user } = useAuth();
-  const detail = useTopicStudyDetail({ userId: user?.id, subjectKey: subject?.key, topicName: topic?.name });
+  const detail = useTopicStudyDetail({ userId: user?.id, subjectKey: subject?.key, topicName });
   const { loading, error, refetch } = detail;
-  const notebookCount = detail.wrongList.length;
+  const notebookCount = detail.wrongList?.length || 0;
 
   const { weeks, isPaused } = useStudyRoute({ persist: false });
   const routePlace = useMemo(() => {
-    if (!topic?.name) return "Rotada planlı değil";
+    if (!topicName) return "Rotada planlı değil";
     const flat = flattenRouteStops(weeks, { routeFrozen: isPaused });
     const match = flat.find(
-      (it) => it.stop?.topic === topic.name && [ROUTE_STOP_STATUS.ACTIVE, ROUTE_STOP_STATUS.UPCOMING].includes(it.status)
+      (it) => it.stop?.topic === topicName && [ROUTE_STOP_STATUS.ACTIVE, ROUTE_STOP_STATUS.UPCOMING].includes(it.status)
     );
     if (!match) return "Rotada planlı değil";
     return match.weekStart ? routeDateTag(match.weekStart) : "Bu hafta";
-  }, [weeks, isPaused, topic?.name]);
+  }, [weeks, isPaused, topicName]);
+
+  const hasAccuracy = detail.correctCount > 0 && detail.accuracy != null;
+  const heroLabel = hasAccuracy ? "DOĞRULUK ORANI" : "ÇÖZÜLEN SORU";
+  const heroValue = hasAccuracy ? `%${detail.accuracy}` : `${detail.totalQuestions}`;
+  const story = topicStory({
+    q: detail.totalQuestions,
+    accuracy: detail.correctCount > 0 ? detail.accuracy : null,
+    wrongsOpen: notebookCount,
+    daysSince: detail.daysSince,
+    feel: detail.feel,
+  });
+
+  const links = [
+    {
+      label: "Bu konuya durak koy",
+      note: "Günün veya haftanın planına çalışma durağı ekle",
+      go: () => navigation.navigate(SCREENS.ADD_TASK, { subjectKey: subject?.key, topicName }),
+    },
+    {
+      label: "Yanlışları",
+      note: notebookCount > 0 ? `Defterde bekleyen ${notebookCount} yanlış soru` : "Defterde kayıtlı yanlış soru yok",
+      go: () => navigation.navigate(SCREENS.WRONG_NOTEBOOK, { subjectKey: subject?.key, topicName }),
+    },
+    {
+      label: "Rotadaki yeri",
+      note: routePlace,
+      go: () => navigation.navigate(SCREENS.ROADMAP),
+    },
+  ];
 
   return (
-    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
-      <View style={s.headerBar}>
-        <Press haptic="none" hitSlop={10} onPress={() => navigation.goBack()} style={s.iconBtn}>
-          <Icon name="chevL" size={16} color={C.text} />
-        </Press>
-        <Text style={[TYPOGRAPHY.metaSemiBold, s.headerMeta, { color: C.text3 }]}>KONU DETAYI</Text>
-        <View style={s.iconBtn} />
-      </View>
+    <ScreenErrorBoundary>
+      <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+        <View style={s.header}>
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
+            <Icon name="arrowL" size={20} color={C.text2} />
+          </Press>
+          <View style={[s.dot, { backgroundColor: color }]} />
+          <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]} numberOfLines={1}>
+            {topicName}
+          </Text>
+          {subject?.name ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{subject.name}</Text> : null}
+        </View>
 
-      {loading ? (
-        <TopicStudySkeleton C={C} />
-      ) : error ? (
-        <ErrorState preset="server" onPrimary={refetch} style={{ marginTop: STEP.s5 }} />
-      ) : (
-        <>
-          <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-            <TopicHeroHeader C={C} subjectName={subject?.name} topicName={topic?.name} color={color} />
-            <TopicStatsRow C={C} solved={detail.totalQuestions} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} />
-            <TopicAccuracyBar C={C} accuracy={detail.accuracy} correctCount={detail.correctCount} totalQuestions={detail.totalQuestions} />
-            <TopicAccumulationChart color={color} chart={detail.chart} />
-            <TopicRecentStudies C={C} items={detail.recentLogs} />
-            <TopicInfoList C={C} durationLabel={detail.totalDurationLabel} notebookCount={notebookCount} lastStudyText={detail.lastStudyText} routePlace={routePlace} />
-            <TopicWrongNotesList
+        {loading ? (
+          <TopicStudySkeleton C={C} />
+        ) : error ? (
+          <ErrorState preset="server" onPrimary={refetch} style={{ marginTop: STEP.s5 }} />
+        ) : (
+          <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+            <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{heroLabel}</Text>
+            <View style={s.hero}>
+              <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{heroValue}</Text>
+            </View>
+            <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
+
+            {detail.chart ? <TopicAccumulationChart color={color} chart={detail.chart} /> : null}
+
+            <TopicStatsStrip
               C={C}
-              items={detail.wrongList}
-              onAllPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK, { subjectKey: subject?.key })}
+              solved={detail.totalQuestions}
+              duration={detail.totalDurationLabel}
+              wrongCount={notebookCount}
+              lastStudy={detail.lastStudyText}
             />
-          </ScrollView>
 
-          <View style={[s.bottom, { backgroundColor: C.bg }]}>
-            <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey: subject?.key, topicName: topic?.name })}>
-              Bu konuya durak koy
-            </Button>
-            {notebookCount > 0 && (
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>
-                {`Defterdeki ${notebookCount} soruyu tekrar et`}
-              </Text>
-            )}
-          </View>
-        </>
-      )}
-    </SafeAreaView>
+            <View style={s.links}>
+              {links.map((l) => (
+                <Press key={l.label} haptic="none" onPress={l.go} accessibilityRole="button" style={[s.link, { borderBottomColor: C.line }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{l.label}</Text>
+                    <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{l.note}</Text>
+                  </View>
+                  <Icon name="chevR" size={14} color={C.text3} />
+                </Press>
+              ))}
+            </View>
+          </ScrollView>
+        )}
+      </SafeAreaView>
+    </ScreenErrorBoundary>
   );
 }
 
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  headerBar: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER - STEP.s1, paddingTop: STEP.s1, paddingBottom: STEP.s2 },
-  iconBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  headerMeta: { flex: 1, textAlign: "center", letterSpacing: 1.5, opacity: 0.5 },
-  content: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 * 2 + STEP.s4 },
-  bottom: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingBottom: STEP.s4, paddingTop: STEP.s3 },
+  header: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingHorizontal: GUTTER, height: CONTROL.tapMin },
+  dot: { width: 10, height: 10, borderRadius: 3 },
+  scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  hero: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2, marginTop: STEP.s1 },
+  links: { marginTop: STEP.s4 },
+  link: { flexDirection: "row", alignItems: "center", gap: STEP.s2, paddingVertical: STEP.s2, borderBottomWidth: 1, minHeight: CONTROL.tapMin },
 });
