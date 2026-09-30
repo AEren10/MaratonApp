@@ -1,6 +1,7 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { dateKey, todayTR } from "../lib/dateUtils";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // KENDİ PROFİLİNİ OKUMA
 //
@@ -31,6 +32,7 @@ async function fetchMyProfile(userId, { force = false } = {}) {
 export function invalidateMyProfileCache() {
   _myProfileCache = { userId: null, data: null, at: 0 };
 }
+registerSessionReset(invalidateMyProfileCache);
 
 
 export const getProfile = async (userId) => {

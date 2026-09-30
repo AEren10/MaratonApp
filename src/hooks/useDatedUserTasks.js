@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { getUserTasksByDate } from "../supabase/userTasks";
 import { saveUserTaskOffline } from "../lib/offlineQueue";
 import { buildOptimisticUserTask, toUserTaskRow } from "../domain/tasks/userTaskModel";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // BUGUN DISI gunlerin ek gorevleri. Bugunun listesi Redux'ta (useUserTasks);
 // Program > Hafta'da ileri bir gun secilip "Durak ekle" denince gorev o gune
@@ -12,6 +13,9 @@ import { buildOptimisticUserTask, toUserTaskRow } from "../domain/tasks/userTask
 const cache = new Map(); // dateKey -> tasks[]
 const listeners = new Set();
 const emit = () => listeners.forEach((fn) => fn());
+// Onbellek gun anahtarli, KULLANICI anahtarli degil: cikista bosalmazsa
+// B, Program'da A'nin ileri gun duraklarini goruyordu (cevrimdisiyken kalici).
+registerSessionReset(() => { cache.clear(); emit(); });
 
 function put(dateKey, tasks) {
   cache.set(dateKey, tasks);

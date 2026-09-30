@@ -34,6 +34,9 @@ export const USER_SCOPED_KEYS = [
   STORAGE_KEYS.ROUTE_WEEKS,
   STORAGE_KEYS.ROUTE_STOPS,
   STORAGE_KEYS.ROUTE_STATE,
+  // Kesif ipuclari (aylik "okulda bitirdiklerin" hatirlatmasi dahil) cihaz
+  // geneli tek anahtarda: A'nin kapattiklari B'de kapali gorunuyordu.
+  STORAGE_KEYS.DISCOVER_TIPS,
 ];
 
 export const USER_SCOPED_PREFIXES = [
@@ -43,13 +46,21 @@ export const USER_SCOPED_PREFIXES = [
   `${STORAGE_KEYS.PLAN_DONE_PREFIX}_`,
 ];
 
-export async function clearUserScopedStorage() {
+// keepUserId: hesap degisiminde yeni kullanicinin `...:<id>` anahtarlari kalir.
+export function selectUserScopedKeys(allKeys = [], { keepUserId = null } = {}) {
+  const keepSuffix = keepUserId ? `:${keepUserId}` : null;
+  const dynamicKeys = allKeys.filter((key) =>
+    (!keepSuffix || !key.endsWith(keepSuffix)) && (
+      USER_SCOPED_PREFIXES.some((prefix) => key.startsWith(prefix)) ||
+      USER_SCOPED_KEYS.some((baseKey) => key.startsWith(`${baseKey}:`))
+    ),
+  );
+  return [...new Set([...USER_SCOPED_KEYS, ...dynamicKeys])];
+}
+
+export async function clearUserScopedStorage({ keepUserId = null } = {}) {
   try {
     const allKeys = await AsyncStorage.getAllKeys();
-    const dynamicKeys = allKeys.filter((key) =>
-      USER_SCOPED_PREFIXES.some((prefix) => key.startsWith(prefix)) ||
-      USER_SCOPED_KEYS.some((baseKey) => key.startsWith(`${baseKey}:`)),
-    );
-    await AsyncStorage.multiRemove([...new Set([...USER_SCOPED_KEYS, ...dynamicKeys])]);
+    await AsyncStorage.multiRemove(selectUserScopedKeys(allKeys, { keepUserId }));
   } catch (_) {}
 }

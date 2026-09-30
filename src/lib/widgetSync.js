@@ -12,3 +12,4 @@ export function syncReviewWidget() { return false; }
 export function syncRouteWidget() { return false; }
 export function syncStreakWidget() { return false; }
 export function syncTrialWidget() { return false; }
+export function clearAllWidgets() {}

@@ -49,6 +49,7 @@ import { setWeekdayRhythm } from "../lib/weekdayRhythmStore";
 import { dateKey as toDateKey } from "../lib/dateUtils";
 import { useStopMoves } from "./useStopMoves";
 import { applyPulls } from "../domain/program/pullForward";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 const MIN_PER_QUESTION = 1.5;
 
@@ -56,6 +57,8 @@ let _lastRouteCache = {
   key: "",
   result: null,
 };
+
+registerSessionReset(() => { _lastRouteCache = { key: "", result: null }; });
 
 function cachedBuildRoute(inputs, key) {
   if (_lastRouteCache.result && _lastRouteCache.key === key) {
@@ -587,7 +590,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
           pausedWeeks: recoveryWeek,
           examType: resolvedExamType,
           studyLogDataState: dataHealth?.logs,
-        }, `fallback_${resolvedExamType}`).weeks;
+        }, `fallback_${routeCacheKey}`).weeks;
 
     if (!targetWeeks || targetWeeks.length === 0) {
       throw new Error("route_preview_unavailable");
@@ -740,7 +743,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   }, [computedRoute.intelligence?.confidence, computedRoute.revision,
     computedRoute.weeks, dataHealth?.logs, daysLeft, effectiveUserId, field,
     goals?.dailyQuestions, hasRouteAccess, pastWeeks, progressByKey,
-    recoveryWeek, resolvedExamType, user?.id, weakSubjectKeys, weekLogs]);
+    recoveryWeek, resolvedExamType, routeCacheKey, user?.id, weakSubjectKeys, weekLogs]);
 
   // Borç: bitmiş haftaların kapanmamış durakları. En son revizyon yalniz
   // bu hafta ve sonrasini tasir; gecmis haftalar eski revizyonlardan okunur.

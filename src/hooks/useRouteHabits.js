@@ -6,6 +6,7 @@ import { getRouteHabits, saveRouteHabits } from "../supabase/routePrefs";
 import { resolveHabits } from "../domain/route/habits";
 import { emitRouteUpdated } from "../lib/routeEvents";
 import { captureError } from "../lib/errorReporting";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // Gunluk rutinler -- tek kopya (ana sayfa, gunun plani, Program ve rota
 // ayni listeyi gorur). Sunucu otoritedir.
@@ -20,6 +21,7 @@ const store = { userId: null, saved: EMPTY, loaded: false, settled: false, infli
 const listeners = new Set();
 let snapshot = { ...store };
 const setStore = (patch) => { Object.assign(store, patch); snapshot = { ...store }; listeners.forEach((l) => l()); };
+registerSessionReset(() => setStore({ userId: null, saved: EMPTY, loaded: false, settled: false, inflightFor: null }));
 
 function load(userId) {
   if (!userId) return;

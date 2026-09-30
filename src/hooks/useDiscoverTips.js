@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // KESIF IPUCLARI — widget ve hikaye paylasimi uygulamanin icinde hic
 // anilmiyordu. Ana sayfada TEK ipucu gorunur; kapatilan ya da acilan bir
@@ -21,12 +22,18 @@ let state = null;
 let loading = null;
 const listeners = new Set();
 const emit = () => listeners.forEach((fn) => fn(state));
+// Anahtar cikista siliniyor (USER_SCOPED_KEYS); bellekteki kopya da gitmeli,
+// yoksa A'nin kapattigi ipuclari B'de kapali kaliyordu.
+// Nesil sayaci: sifirlamadan once baslamis okuma sonradan donerse yazmaz.
+let generation = 0;
+registerSessionReset(() => { generation += 1; state = null; loading = null; emit(); });
 
 function load() {
   if (!loading) {
+    const gen = generation;
     loading = appStorage.getJson(STORAGE_KEYS.DISCOVER_TIPS, {})
-      .then((v) => { state = { ...(v || {}), ...(state || {}) }; emit(); })
-      .catch(() => { state = state || {}; emit(); });
+      .then((v) => { if (gen !== generation) return; state = { ...(v || {}), ...(state || {}) }; emit(); })
+      .catch(() => { if (gen !== generation) return; state = state || {}; emit(); });
   }
   return loading;
 }

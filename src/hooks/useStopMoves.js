@@ -5,6 +5,7 @@ import { getStopMoves, saveStopMoves } from "../supabase/routePrefs";
 import { postponeTarget, withMove } from "../domain/program/stopMoves";
 import { captureError } from "../lib/errorReporting";
 import { todayTR } from "../lib/dateUtils";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // Ogrencinin tasidigi/erteledigi duraklar -- tek kopya. Gun dagitimi
 // (assignWeekStops) bunlara uyar; ana sayfa, gunun plani, Program Hafta/Ay
@@ -15,6 +16,8 @@ const store = { userId: null, moves: EMPTY, loaded: false, inflightFor: null };
 const listeners = new Set();
 let snapshot = { ...store };
 const setStore = (patch) => { Object.assign(store, patch); snapshot = { ...store }; listeners.forEach((l) => l()); };
+// Cikista bosalt: ucustaki yanit userId eslesmedigi icin atilir.
+registerSessionReset(() => setStore({ userId: null, moves: EMPTY, loaded: false, inflightFor: null }));
 
 function load(userId) {
   if (!userId) return;

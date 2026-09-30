@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { registerSessionReset } from "./session/sessionReset.js";
 
 // Ana sayfanin ust isiginin RENGI gunun durumunu tasir (ScreenDepth):
 //  "up"   -- bugunun hedefi tuttu (hafif yesil)
@@ -8,6 +9,7 @@ import { useSyncExternalStore } from "react";
 // ekrana yeni bir oge eklenmez.
 let tone = null;
 const listeners = new Set();
+registerSessionReset(() => setDepthTone(null));
 
 export function setDepthTone(next) {
   const value = next || null;

@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { registerSessionReset } from "./session/sessionReset.js";
 
 // Ogrencinin gun ritmi (domain/program/weekdayRhythm) -- tek kopya.
 // Gun dagitimi bu degere bagli: ana sayfa, gunun plani, Program > Hafta ve
@@ -7,6 +8,8 @@ import { useSyncExternalStore } from "react";
 let rhythm = null;
 let key = "";
 const listeners = new Set();
+// A'nin ritmi B'nin gun dagitimina karismasin (useStudyRoute yeniden yazar).
+registerSessionReset(() => setWeekdayRhythm(null));
 
 export function setWeekdayRhythm(next) {
   const nextKey = Array.isArray(next) ? next.join(",") : "";

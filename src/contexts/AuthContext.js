@@ -1,20 +1,12 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import * as Linking from "expo-linking";
-import {
-  getSession,
-  onAuthStateChange,
-  signOut as supaSignOut,
-  deleteAccount as supaDeleteAccount,
-  isRecoveryUrl,
-} from "../supabase/auth";
-import { cancelAllScheduled } from "../lib/notifications";
-import { unregisterPushToken } from "../supabase/profiles";
-import { store, RESET_STORE } from "../store/store";
+import { getSession, onAuthStateChange, isRecoveryUrl } from "../supabase/auth";
 import { onAuthError } from "../lib/authEvents";
 import { setUserContext } from "../lib/errorReporting";
 import { initAnalytics, setAnalyticsUser, stopAnalytics, flushAnalytics, track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
-import { clearUserScopedStorage } from "../lib/storage/userScopedStorage";
+import { resetLocalSession } from "../lib/session/resetLocalSession";
+import { createUserTracker, signOutUser, deleteUserAccount } from "../lib/session/sessionLifecycle";
 
 const AuthContext = createContext(null);
 
@@ -23,6 +15,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const loggingOut = useRef(false);
+  const tracker = useMemo(() => createUserTracker(() => loggingOut.current), []);
 
   // ŞİFRE SIFIRLAMA MODU
   //
@@ -58,6 +51,7 @@ export function AuthProvider({ children }) {
     const safetyTimer = setTimeout(() => { if (active) setLoading(false); }, 2000);
     getSession()
       .then((s) => {
+        tracker.observe(s?.user?.id);
         setSession(s);
         setUser(s?.user ?? null);
         setUserContext(s?.user ?? null);
@@ -71,6 +65,7 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = onAuthStateChange((event, s) => {
+      tracker.observe(s?.user?.id);
       setSession(s);
       setUser(s?.user ?? null);
       setUserContext(s?.user ?? null);
@@ -92,37 +87,22 @@ export function AuthProvider({ children }) {
       subscription.unsubscribe();
       stopAnalytics();
     };
-  }, []);
+  }, [tracker]);
 
   const logout = useCallback(async () => {
     if (loggingOut.current) return;
     loggingOut.current = true;
     // Bekleyen olayları oturum kapanmadan gönder.
     await flushAnalytics().catch(() => {});
-
-    // BİLDİRİM TEMİZLİĞİ — oturum kapanmadan ÖNCE, token'ı silmek için
-    // hâlâ yetkimiz varken.
-    //
-    // Eskiden çıkışta hiçbir şey temizlenmiyordu. İki sonucu vardı:
-    //   1) Cihaz, çıkmış kullanıcının planlanmış hatırlatmalarını atmaya
-    //      devam ediyordu — üstelik metinlerinde onun serisi ve çalışma
-    //      verisi yazıyordu.
-    //   2) Aynı cihaza ikinci kullanıcı girince push token iki profilde
-    //      birden duruyor, birinciye atılan push ikincinin telefonunda
-    //      çıkıyordu. Paylaşılan cihazda kullanıcılar arası sızıntı.
-    const leavingUserId = user?.id;
-    await cancelAllScheduled().catch(() => {});
-    if (leavingUserId) await unregisterPushToken(leavingUserId).catch(() => {});
-
-    try {
-      await supaSignOut();
-    } catch (_) {}
+    await signOutUser(user?.id);
+    tracker.forget();
     setSession(null);
     setUser(null);
-    store.dispatch({ type: RESET_STORE });
-    await clearUserScopedStorage();
+    // Redux + modul onbellekleri + widget + bildirim (ikinci kez: ucustaki
+    // bir kurulum ilk iptalden sonra yazmis olabilir) + yerel anahtarlar.
+    await resetLocalSession();
     loggingOut.current = false;
-  }, [user?.id]);
+  }, [user?.id, tracker]);
 
   useEffect(() => {
     return onAuthError(() => {
@@ -132,20 +112,20 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const deleteAccount = useCallback(async () => {
-    // Hesap silinirken de planlanmış bildirimler kalmamalı.
-    const leavingUserId = user?.id;
-    await cancelAllScheduled().catch(() => {});
-    if (leavingUserId) await unregisterPushToken(leavingUserId).catch(() => {});
-    const result = await supaDeleteAccount();
-    await supaSignOut().catch(() => {});
-    setSession(null);
-    setUser(null);
-    store.dispatch({ type: RESET_STORE });
-    await clearUserScopedStorage();
-    // Dosya temizliği kısmen başarısız olduysa çağıran bunu kullanıcıya
-    // söyleyebilsin — "tüm veriler silindi" demek doğru olmaz.
-    return result || { storageFailures: [] };
-  }, [user?.id]);
+    if (loggingOut.current) throw new Error("session_ending");
+    loggingOut.current = true;
+    try {
+      // Hata firlatirsa hicbir sey temizlenmez; kullanici girisli kalir.
+      const result = await deleteUserAccount();
+      tracker.forget();
+      setSession(null);
+      setUser(null);
+      await resetLocalSession();
+      return result;
+    } finally {
+      loggingOut.current = false;
+    }
+  }, [tracker]);
 
   const value = useMemo(
     () => ({ session, user, loading, logout, deleteAccount, recoveryMode, recoveryUrl, endRecovery }),

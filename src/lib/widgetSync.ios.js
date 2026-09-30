@@ -263,3 +263,18 @@ export function syncTrialWidget({ trials = [] } = {}) {
   // Baslik "20. TYT DENEME" demeli; cizgi yalniz son 5 noktayi tasir.
   return push("trial", TrialWidget, { points, subjects, exam, total: sameType.length });
 }
+
+/**
+ * Cikista widget'lari bosalt. Ana ekran widget'i uygulamadan bagimsiz
+ * yasiyor: cikis yapan kullanicinin serisi, sinav tarihi ve denemeleri
+ * orada kaliyordu -- paylasilan cihazda bir sonraki kullaniciya gorunuyordu.
+ */
+export function clearAllWidgets() {
+  Object.keys(last).forEach((key) => { delete last[key]; });
+  syncWeekWidget({ week: { days: [], goal: 0 } });
+  syncTodayWidget({});
+  syncRouteWidget({});
+  syncReviewWidget({});
+  syncStreakWidget({});
+  syncTrialWidget({});
+}

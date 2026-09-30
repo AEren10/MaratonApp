@@ -6,6 +6,7 @@ import { makeTopicKey, isTopicDone } from "../domain/curriculum/topicCompletion"
 import { getKnownTopics, saveKnownTopics } from "../supabase/routePrefs";
 import { todayTR } from "./dateUtils";
 import { emitRouteUpdated } from "./routeEvents";
+import { registerSessionReset } from "./session/sessionReset";
 
 export { makeTopicKey, isTopicDone };
 
@@ -26,6 +27,7 @@ const store = { userId: null, map: {}, loaded: false };
 const listeners = new Set();
 let snapshot = { ...store };
 const setStore = (patch) => { Object.assign(store, patch); snapshot = { ...store }; listeners.forEach((l) => l()); };
+registerSessionReset(() => setStore({ userId: null, map: {}, loaded: false }));
 
 async function readLocal(userId) {
   try {
@@ -46,7 +48,9 @@ export async function getCompletedTopicsMap(userId) {
     const merged = { ...local, ...server };
     if (missing.length) saveKnownTopics(userId, merged).catch(() => {});
     appStorage.setJson(keyFor(userId), merged).catch(() => {});
-    if (store.userId === userId || !store.loaded) setStore({ userId, map: merged, loaded: true });
+    // Yalniz ayni kullanicinin kaydi tazelenir; cikistan sonra donen eski
+    // yanit bos store'u baskasinin haritasiyla doldurmasin.
+    if (store.userId === userId) setStore({ userId, map: merged, loaded: true });
     return merged;
   } catch (_) {
     return local; // cevrimdisi: cihaz yedegi
@@ -77,7 +81,13 @@ export function useKnownTopicsMap(userId) {
   );
   useEffect(() => {
     if (!userId || (state.loaded && state.userId === userId)) return;
-    getCompletedTopicsMap(userId).then((map) => setStore({ userId, map, loaded: true })).catch(() => {});
+    // Gec donen eski kullanici yaniti (cikista unmount olmus kanca) yeni
+    // kullanicinin haritasini ezmesin.
+    let alive = true;
+    getCompletedTopicsMap(userId).then((map) => {
+      if (alive) setStore({ userId, map, loaded: true });
+    }).catch(() => {});
+    return () => { alive = false; };
   }, [userId, state.loaded, state.userId]);
   return state.userId === userId ? state.map : EMPTY;
 }

@@ -24,7 +24,14 @@ export const signIn = async ({ email, password }) => {
 
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  if (!error) return;
+  // Ag yoksa (ya da sunucu 5xx) supabase-js oturumu SecureStore'dan SILMIYOR.
+  // Ekran cikis yapmis gibi gorunuyor ama bir sonraki acilista getSession
+  // eski kullaniciyi geri getiriyordu. Yerel oturum her durumda silinir.
+  try {
+    if (typeof supabase.auth._removeSession === "function") await supabase.auth._removeSession();
+  } catch (_) {}
+  throw error;
 };
 
 export const resetPassword = async (email) => {

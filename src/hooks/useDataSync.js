@@ -26,6 +26,7 @@ import { normalizeStudyLog } from "../domain/study/studyLogModel";
 import { normalizeTrial } from "../domain/trial/trialModel";
 import { getJson, remove } from "../lib/storage/appStorage";
 import { captureError } from "../lib/errorReporting";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 const READ_SOURCES = {
   trials: "deneme kayıtları",
@@ -79,6 +80,8 @@ async function retryPendingStreak(activeUserId) {
 // elle basana kadar olu kutuda kaliyordu. Acilista BIR KEZ denenir -- hata
 // hala kaliciysa ayni turda geri duser, maliyeti tek bir istek.
 let deadLetterRetried = false;
+// Yeni giren kullanicinin olu kutusu da bir kez denensin.
+registerSessionReset(() => { deadLetterRetried = false; });
 
 async function loadAll(userId, dispatch) {
   await loadGamificationFromStorage(dispatch, userId);

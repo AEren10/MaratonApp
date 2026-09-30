@@ -25,6 +25,7 @@ const LOG_WINDOW_DAYS = 45;
 import { weightedWeakAreas, buildRecentStudy, buildTopicWeakness } from "../lib/buildPlanContext";
 import { dateKey } from "../lib/dateUtils";
 import { onRouteUpdated } from "../lib/routeEvents";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // Net-düşüş nudge'larını curriculum key → gerekçe mesajı haritasına çevir.
 function nudgesToPriorityReasons(nudges) {
@@ -42,6 +43,14 @@ let _cache = {
   uid: null, weekLogs: [], topicRows: [], srDue: 0,
   dataHealth: { logs: "idle", topics: "idle", wrongs: "idle" },
 };
+
+// Ayni kullanici geri girince de cikis oncesi veri gosterilmesin.
+registerSessionReset(() => {
+  _cache = {
+    uid: null, weekLogs: [], topicRows: [], srDue: 0,
+    dataHealth: { logs: "idle", topics: "idle", wrongs: "idle" },
+  };
+});
 
 function isHealthyCache(health) {
   return health?.logs === "ready" && health?.topics === "ready" && health?.wrongs === "ready";

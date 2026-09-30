@@ -20,6 +20,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { logXP } from "../supabase/xp";
 import { saveGamificationToSupabase, claimStreakMilestoneReward } from "../supabase/profiles";
 import { todayTR } from "../lib/dateUtils";
+import { registerSessionReset } from "../lib/session/sessionReset";
 
 // Module-level guard: prevents concurrent reward/milestone operations
 // across multiple hook instances mounted simultaneously.
@@ -60,6 +61,16 @@ function _setSharedMilestone(next) {
   _milestoneModal = next;
   _milestoneSubs.forEach((fn) => { try { fn(next); } catch (_) {} });
 }
+
+// Cikista A'nin acik toast/modal'i ve bekleyen kayit zamanlayicisi B'ye kalmasin.
+registerSessionReset(() => {
+  clearTimeout(_globalSaveTimer);
+  _globalSaveTimer = null;
+  _opLock = false;
+  _setSharedToast(_toastIdle);
+  _setSharedLevelUp(_levelIdle);
+  _setSharedMilestone(_milestoneIdle);
+});
 
 // Serialized XP log queue: ensures revert operations execute in order
 // and don't corrupt XP totals when multiple logXP calls overlap.
