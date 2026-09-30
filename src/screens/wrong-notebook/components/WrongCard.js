@@ -5,8 +5,7 @@ import { Icon } from "../../../components/design";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
 import SignedImage from "../../../components/common/SignedImage";
-import { getTopicDifficulty } from "../../../lib/topicDifficulty";
-import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { alpha } from "../../../themes/palette";
 
 function relativeDate(iso) {
@@ -37,7 +36,6 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const subj = resolveSubject(item.subject, C);
   const id = useSubjectIdentity(subj.key);
   const subjColor = id?.solid || subj.color;
-  const diff = !item.is_resolved ? getTopicDifficulty(item.topic) : null;
   const imagePath = item.image_path || null;
   const fallbackImage = item.image || null;
   const myA = item.my_answer ?? item.myAnswer;
@@ -46,187 +44,116 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const scale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
+  const statusColor = item.is_resolved ? C.text3 : C.warn;
+  const statusText = item.is_resolved ? "Çözüldü" : "Açık";
+
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${subj.label}${item.topic ? `, ${item.topic}` : ""}${item.is_resolved ? ", çözüldü" : ""}`}
       accessibilityHint="Detayları görmek için dokun"
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
+      onPressIn={() => { scale.value = withSpring(0.98, { damping: 15, stiffness: 300 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
-      style={[
-        s.card,
-        {
-          backgroundColor: C.surface,
-          borderColor: item.is_resolved ? C.line : C.border,
-        },
-      ]}
+      style={[s.row, { borderBottomColor: C.line }]}
     >
-      <Animated.View style={pressStyle}>
-        <View style={s.headRow}>
-          <View style={[s.avatar, { backgroundColor: alpha(subjColor, 10) }]}>
-            <Icon name={subj.icon} size={20} color={subjColor} />
-          </View>
-
-          <View style={s.headContent}>
-            <View style={s.titleRow}>
-              <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{subj.label}</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>·</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>{relativeDate(item.created_at)}</Text>
-            </View>
-            {item.topic ? (
-              <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: 1 }]} numberOfLines={1}>
-                {item.topic}
-              </Text>
-            ) : null}
-          </View>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={item.is_resolved ? "Çözüldü" : "Çözdüm olarak işaretle"}
-            accessibilityHint={item.is_resolved ? "" : "Yanlışı çözülmüş olarak işaretler"}
-            onPress={onResolve}
-            hitSlop={8}
-            style={[
-              s.resolveChip,
-              {
-                backgroundColor: item.is_resolved ? alpha(C.text2, 10) : alpha(C.warn, 10),
-                borderColor: item.is_resolved ? alpha(C.text2, 25) : alpha(C.warn, 25),
-              },
-            ]}
-          >
-            <Icon name={item.is_resolved ? "check" : "circle"} size={14} color={item.is_resolved ? C.text2 : C.warn} sw={item.is_resolved ? 3 : 1.5} />
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: item.is_resolved ? C.text2 : C.warn }]}>
-              {item.is_resolved ? "Çözüldü" : "Çözdüm"}
-            </Text>
-          </Pressable>
-        </View>
-
-        {item.note ? (
-          <Text style={[TYPOGRAPHY.body, s.note, { color: C.text }]} numberOfLines={3}>
-            {item.note}
-          </Text>
-        ) : null}
-
+      <Animated.View style={[s.inner, pressStyle]}>
+        {/* Sol: küçük kare fotoğraf veya ders ikonu */}
         {imagePath || fallbackImage ? (
           imagePath ? (
-            <SignedImage
-              bucket="wrong-questions"
-              path={imagePath}
-              style={[s.img, { backgroundColor: C.elev }]}
-              contentFit="cover"
-              transition={200}
-            />
+            <SignedImage bucket="wrong-questions" path={imagePath} style={[s.thumb, { backgroundColor: C.elev }]} contentFit="cover" transition={200} />
           ) : (
-            <Image
-              source={{ uri: fallbackImage }}
-              style={[s.img, { backgroundColor: C.elev }]}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-              transition={200}
-            />
+            <Image source={{ uri: fallbackImage }} style={[s.thumb, { backgroundColor: C.elev }]} contentFit="cover" cachePolicy="memory-disk" transition={200} />
           )
-        ) : null}
+        ) : (
+          <View style={[s.iconBox, { backgroundColor: alpha(subjColor, 10) }]}>
+            <Icon name={subj.icon} size={18} color={subjColor} />
+          </View>
+        )}
 
-        <View style={s.footerRow}>
-          {myA && corA ? (
-            <View style={[s.answersChip, { backgroundColor: C.elev }]}>
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.red }]}>{myA}</Text>
-              <Icon name="arrowR" size={11} color={C.text3} />
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.up }]}>{corA}</Text>
-            </View>
-          ) : null}
-
-          {diff ? (
-            <View style={[s.diffChip, { backgroundColor: alpha(C[diff.colorKey] || C.text3, 10) }]}>
-              <Icon name="users" size={10} color={C[diff.colorKey]} />
-              <Text style={[TYPOGRAPHY.label, { color: C[diff.colorKey] }]}>
-                ~%{diff.correctRate} doğru · -{diff.netLoss}
-              </Text>
-            </View>
-          ) : null}
-
-          <View style={{ flex: 1 }} />
-
-          {onShare ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={shared ? "Paylaşıldı" : "Paylaş"}
-              accessibilityHint={shared ? "" : "Soruyu toplulukla paylaşır"}
-              onPress={onShare}
-              hitSlop={8}
-              style={({ pressed }) => [
-                s.shareBtn,
-                {
-                  backgroundColor: shared ? alpha(C.text2, 10) : alpha(C.accent, 8),
-                  borderColor: shared ? alpha(C.text2, 20) : alpha(C.accent, 20),
-                  opacity: pressed ? 0.85 : 1,
-                },
-              ]}
-            >
-              <Icon name={shared ? "check" : "share"} size={14} color={shared ? C.text2 : C.accentText} />
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: shared ? C.text2 : C.accentText }]}>
-                {shared ? "Paylaşıldı" : "Paylaş"}
-              </Text>
-            </Pressable>
-          ) : null}
+        {/* Orta: ders · konu ve tarih */}
+        <View style={s.body}>
+          <View style={s.titleRow}>
+            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]} numberOfLines={1}>{subj.label}</Text>
+            {item.topic ? (
+              <>
+                <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}> · </Text>
+                <Text style={[TYPOGRAPHY.caption, { color: C.text2, flex: 1 }]} numberOfLines={1}>{item.topic}</Text>
+              </>
+            ) : null}
+          </View>
+          <WrongCardMeta C={C} item={item} myA={myA} corA={corA} />
         </View>
+
+        {/* Sağ: durum metni + resolve düğmesi */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={item.is_resolved ? "Çözüldü" : "Çözdüm olarak işaretle"}
+          onPress={onResolve}
+          hitSlop={10}
+          style={s.statusBtn}
+        >
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: statusColor }]}>{statusText}</Text>
+        </Pressable>
       </Animated.View>
     </Pressable>
   );
 }
 
+// Alt satır: tarih, cevap bilgisi, paylaş
+function WrongCardMeta({ C, item, myA, corA }) {
+  const dateText = relativeDate(item.created_at);
+  const answerText = myA && corA ? `${myA} → ${corA}` : null;
+
+  return (
+    <View style={s.metaRow}>
+      {dateText ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{dateText}</Text> : null}
+      {answerText ? (
+        <>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}> · </Text>
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>{answerText}</Text>
+        </>
+      ) : null}
+      {item.note ? (
+        <>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}> · </Text>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>Not var</Text>
+        </>
+      ) : null}
+    </View>
+  );
+}
+
 const s = StyleSheet.create({
-  card: {
-    borderRadius: SHAPE.card,
-    borderWidth: 1,
-    padding: STEP.s2,
+  row: {
+    borderBottomWidth: 1,
+    minHeight: CONTROL.tapMin,
   },
-  headRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  avatar: {
-    width: 40,
-    height: 40,
+  inner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s2,
+    paddingVertical: STEP.s2,
+  },
+  thumb: {
+    width: 44,
+    height: 44,
+    borderRadius: SHAPE.iconBox,
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
     borderRadius: SHAPE.iconBox,
     alignItems: "center",
     justifyContent: "center",
   },
-  headContent: { flex: 1 },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  resolveChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: STEP.s2,
-    paddingVertical: 7,
-    borderRadius: SHAPE.pill,
-    borderWidth: 1,
-  },
-  note: { marginTop: STEP.s1, lineHeight: 21 },
-  img: { marginTop: STEP.s2, height: 200, borderRadius: SHAPE.cardTight },
-  footerRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s2, flexWrap: "wrap" },
-  answersChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
+  body: { flex: 1, gap: 2 },
+  titleRow: { flexDirection: "row", alignItems: "center" },
+  metaRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap" },
+  statusBtn: {
+    minHeight: CONTROL.tapMin,
     paddingHorizontal: STEP.s1,
-    paddingVertical: 5,
-    borderRadius: SHAPE.pill,
-  },
-  diffChip: {
-    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: STEP.s1,
-    paddingVertical: 4,
-    borderRadius: SHAPE.pill,
-  },
-  shareBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: STEP.s2,
-    paddingVertical: 8,
-    borderRadius: SHAPE.pill,
-    borderWidth: 1,
   },
 });
