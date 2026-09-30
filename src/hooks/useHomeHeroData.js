@@ -15,7 +15,7 @@ import { baselineTarget } from "../domain/forecast/forecastTarget";
 import { forecastSentence, chartAxisLabels } from "../domain/route/forecastSentence";
 import { buildNetChart } from "../domain/route/netChartData";
 import { feasibilityNote } from "../domain/route/feasibility";
-import { ctaHint } from "../domain/home/ctaHint";
+import { ctaHint, dayDoneCta } from "../domain/home/ctaHint";
 import { stopsForDate } from "../domain/program/todayStops";
 import { addDays, mondayOf } from "../domain/program/dayKeys";
 import { useClassSchedule } from "./useClassSchedule";
@@ -212,6 +212,7 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     solvedToday,
     dailyGoal,
     remainingToGoal,
+    doneCta: dayDone ? dayDoneCta({ remainingToGoal }) : null,
     daysUntilExam,
     examType,
     examDate,

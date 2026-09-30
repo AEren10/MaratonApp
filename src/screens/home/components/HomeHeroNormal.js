@@ -91,8 +91,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 
       <Animated.View style={s.cta}>
         <HomeCTAButton
-          title={nextTask ? "Çalışmaya Başla" : hero.dayDone ? "Günü kapattın" : "Bugüne durak ekle"}
-          subtitle={nextTask ? ctaSubtitle : hero.dayDone ? "Bir durak daha ekle" : null}
+          title={nextTask ? "Çalışmaya Başla" : hero.doneCta ? hero.doneCta.title : "Bugüne durak ekle"}
+          subtitle={nextTask ? ctaSubtitle : hero.doneCta ? hero.doneCta.subtitle : null}
           onPress={() => onStartTask?.(nextTask)}
         />
         {hero.ctaHint ? (

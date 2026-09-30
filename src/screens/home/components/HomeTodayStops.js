@@ -33,7 +33,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
     <View style={s.wrap}>
       <View style={s.head}>
         <Text style={[TYPOGRAPHY.label, { color: isAllDone ? C.up : C.text2 }]}>
-          {isAllDone ? "GÜNÜ KAPATTIN" : "BUGÜNÜN DURAKLARI"}
+          {isAllDone ? "DURAKLAR BİTTİ" : "BUGÜNÜN DURAKLARI"}
         </Text>
         <View style={s.segs}>
           {items.map((_, i) => (

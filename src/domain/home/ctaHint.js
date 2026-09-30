@@ -20,3 +20,11 @@ export function ctaHint({ nextTask = null, dayDone = false, tomorrowStop = null 
   }
   return null;
 }
+
+// Gunun duraklari bitti ama soru hedefi dolmadiysa 'Gunu kapattin' yalan olur:
+// cubuk soruyu hedefe gore sayar, rota gunu ise daha az soru tasiyabilir.
+export function dayDoneCta({ remainingToGoal = 0 } = {}) {
+  const left = Math.max(0, Number(remainingToGoal) || 0);
+  if (left > 0) return { title: "Rotayı bitirdin", subtitle: `Hedefe ${left} soru · bir durak ekle` };
+  return { title: "Günü kapattın", subtitle: "Bir durak daha ekle" };
+}
