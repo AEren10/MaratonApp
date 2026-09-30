@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, Card } from "../../components/design";
+import { Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useTheme, useC } from "../../contexts/ThemeContext";
 import { SettingsGroup } from "./components/SettingsGroup";
@@ -78,12 +78,10 @@ export default function AppearanceScreen() {
           </View>
         </SettingsGroup>
 
-        <Card tone="surface" radius="panel" style={styles.info}>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
-            Vurgu rengini değiştirdiğinde tüm palet yeniden hesaplanır — kartlar,
-            grafikler ve ısı haritası dahil.
-          </Text>
-        </Card>
+        <Text style={[TYPOGRAPHY.body, styles.info, { color: C.text3 }]}>
+          Vurgu rengini değiştirdiğinde tüm palet yeniden hesaplanır — kartlar,
+          grafikler ve ısı haritası dahil.
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

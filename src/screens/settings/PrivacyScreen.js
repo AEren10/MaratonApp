@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, Card } from "../../components/design";
+import { Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -69,12 +69,10 @@ export default function PrivacyScreen() {
           </SettingsGroup>
         ) : null}
 
-        <Card tone="surface" radius="panel" style={styles.note}>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
-            Rota verisi hesabında sunucuda tutulur. Telefon değişse de
-            kayıtların kaybolmaz.
-          </Text>
-        </Card>
+        <Text style={[TYPOGRAPHY.body, styles.note, { color: C.text3 }]}>
+          Rota verisi hesabında sunucuda tutulur. Telefon değişse de
+          kayıtların kaybolmaz.
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Press } from "../../components/design/Press";
 
@@ -37,12 +37,9 @@ export default function AboutScreen() {
         <Text style={s.version}>v1.0.0</Text>
       </View>
 
-      <View style={s.infoCard}>
-        {INFO_ROWS.map((row, i) => (
-          <View
-            key={row.label}
-            style={[s.infoRow, i < INFO_ROWS.length - 1 && s.infoRowBorder]}
-          >
+      <View style={s.infoWrap}>
+        {INFO_ROWS.map((row) => (
+          <View key={row.label} style={[s.infoRow, { borderBottomColor: C.line }]}>
             <Text style={s.infoLabel}>{row.label}</Text>
             <Text style={s.infoValue}>{row.value}</Text>
           </View>
@@ -59,31 +56,30 @@ function makeStyles(C) {
     safe: { flex: 1, backgroundColor: C.bg },
     header: {
       flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+      paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
     },
     headerTitle: { ...TYPOGRAPHY.subheading, color: C.text },
-    center: { alignItems: "center", marginTop: SPACING.xxxl },
+    center: { alignItems: "center", marginTop: STEP.s4 },
     iconWrap: {
-      width: 88, height: 88, borderRadius: RADIUS.xxl,
+      width: 88, height: 88, borderRadius: SHAPE.sheet,
       backgroundColor: C.accent + "18", alignItems: "center",
-      justifyContent: "center", marginBottom: SPACING.lg,
+      justifyContent: "center", marginBottom: STEP.s3,
     },
     appName: { ...TYPOGRAPHY.heading, color: C.text },
-    version: { ...TYPOGRAPHY.caption, color: C.muted, marginTop: SPACING.xs },
-    infoCard: {
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      marginHorizontal: SPACING.lg, marginTop: SPACING.xxxl,
+    version: { ...TYPOGRAPHY.caption, color: C.text3, marginTop: STEP.s1 },
+    infoWrap: {
+      marginHorizontal: GUTTER, marginTop: STEP.s4,
     },
     infoRow: {
       flexDirection: "row", justifyContent: "space-between",
-      alignItems: "center", paddingHorizontal: SPACING.lg, paddingVertical: SPACING.lg,
+      alignItems: "center", paddingVertical: STEP.s3,
+      borderBottomWidth: 1,
     },
-    infoRowBorder: { borderBottomWidth: 1, borderBottomColor: C.border },
-    infoLabel: { ...TYPOGRAPHY.body, color: C.sec },
+    infoLabel: { ...TYPOGRAPHY.body, color: C.text3 },
     infoValue: { ...TYPOGRAPHY.bodySemiBold, color: C.text },
     footer: {
-      ...TYPOGRAPHY.caption, color: C.muted,
-      textAlign: "center", marginTop: SPACING.xxxl,
+      ...TYPOGRAPHY.caption, color: C.text3,
+      textAlign: "center", marginTop: STEP.s5,
     },
   });
 }

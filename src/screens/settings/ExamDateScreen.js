@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Icon, Card, Button, StatBlock } from "../../components/design";
+import { Icon, Button, StatBlock } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExamDatePicker } from "../../hooks/useExamDatePicker";
@@ -90,12 +90,10 @@ export default function ExamDateScreen() {
           </>
         ) : null}
 
-        <Card tone="surface" radius="panel" style={styles.note}>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
-            Tarihi öne alırsan haftalık durak sayısı artar, hedef net aynı kalır.
-            Geçmiş kayıtlar değişmez.
-          </Text>
-        </Card>
+        <Text style={[TYPOGRAPHY.body, styles.note, { color: C.text3 }]}>
+          Tarihi öne alırsan haftalık durak sayısı artar, hedef net aynı kalır.
+          Geçmiş kayıtlar değişmez.
+        </Text>
       </ScrollView>
 
       <View style={[styles.cta, { borderTopColor: C.line }]}>
@@ -112,12 +110,12 @@ export default function ExamDateScreen() {
 
 function Stat({ C, value, unit }) {
   return (
-    <Card tone="surface" radius="panel" style={styles.statCard}>
+    <View style={styles.statCard}>
       <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]} allowFontScaling={false}>
         {value}
       </Text>
       <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 4 }]}>{unit}</Text>
-    </Card>
+    </View>
   );
 }
 

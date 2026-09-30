@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Button, Card } from "../../components/design";
+import { Button } from "../../components/design";
 import { useC } from "../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useAccountDataCounts } from "../../hooks/useAccountDataCounts";
@@ -54,12 +54,12 @@ export default function AccountDeleteScreen() {
 
         <Animated.View entering={FadeIn.duration(520).delay(140)}>
           <DeleteSummaryCard counts={counts} loading={loading} />
-          <Card radius="panel" style={[styles.note, { borderColor: C.elev }]}>
+          <View style={styles.note}>
             <View style={[styles.mark, { backgroundColor: C.down }]} />
-            <Text style={[TYPOGRAPHY.caption, styles.flex, { color: C.text2 }]}>
+            <Text style={[TYPOGRAPHY.body, styles.flex, { color: C.text3 }]}>
               Premium aboneliğin varsa App Store üzerinden ayrıca iptal edilmeli.
             </Text>
-          </Card>
+          </View>
           <DeleteConfirmInput value={typed} onChangeText={setTyped} editable={!deleting} />
         </Animated.View>
 

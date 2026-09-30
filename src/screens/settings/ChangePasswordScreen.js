@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } fr
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, Button, Input, Card } from "../../components/design";
+import { Icon, Button, Input } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { updatePassword } from "../../supabase/auth";
@@ -80,12 +80,10 @@ export default function ChangePasswordScreen() {
             style={styles.second}
           />
 
-          <Card tone="surface" radius="panel" style={styles.note}>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text2, lineHeight: 21 }]}>
-              Şifreni değiştirdikten sonra diğer cihazlarda yeniden giriş yapman
-              gerekebilir.
-            </Text>
-          </Card>
+          <Text style={[TYPOGRAPHY.body, styles.note, { color: C.text3 }]}>
+            Şifreni değiştirdikten sonra diğer cihazlarda yeniden giriş yapman
+            gerekebilir.
+          </Text>
 
           <Button
             variant="primary"
