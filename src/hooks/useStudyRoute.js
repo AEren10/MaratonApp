@@ -10,7 +10,7 @@ import { selectGoals } from "../store/slices/goalsSlice";
 import { startOfWeekTR } from "../lib/dateUtils";
 import { useAuth } from "../contexts/AuthContext";
 import { usePremium } from "../contexts/PremiumContext";
-import { ensureSingleActiveRouteStop } from "../domain/route/stopStatus";
+import { ensureSingleActiveRouteStop, ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
 import { saveRouteWeeks, getRouteWeeks, getRouteState, getLatestRouteStops, getPastWeekStops, pauseRoute, resumeRoute } from "../supabase/routePlan";
 import { saveRouteStopTransitionOffline } from "../lib/offlineQueue";
 import { persistRouteOnce } from "../lib/routePersistOnce";
@@ -392,6 +392,12 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
 
   const route = useMemo(() => {
     const byKey = new Map((persistedStops || []).map((stop) => [stop.logical_key, stop]));
+    // Rota donukken acik duraklar FROZEN: gun listeleri (ana sayfa, plan,
+    // Program) onlari gostermez. Eskiden yalniz ana sayfa kahramani
+    // donuklugu biliyordu; listeler tamamlanamayan duraklar uretiyordu.
+    const freezeOpen = (stop) => (isPaused && ["active", "upcoming"].includes(stop.lifecycleStatus)
+      ? { ...stop, lifecycleStatus: ROUTE_STOP_STATUS.FROZEN }
+      : stop);
     return {
       ...computedRoute,
       weeks: ensureSingleActiveRouteStop(baseWeeks.map((week) => ({
@@ -411,10 +417,10 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
             version: saved.version,
             insight: saved.metadata?.insight || stop.insight,
           } : stop;
-        }),
+        }).map(freezeOpen),
       }))),
     };
-  }, [computedRoute, baseWeeks, persistedStops]);
+  }, [computedRoute, baseWeeks, persistedStops, isPaused]);
 
   const forecastProfile = forecastCandidate;
   const forecastTrials = forecastCandidate?.trials || [];

@@ -53,7 +53,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
   // (route_weeks). Diğer ekranlar persist:false ile sadece okuyor, böylece
   // aynı hafta iki yerden yazılmıyor.
   const {
-    currentWeek: routeCurrentWeek, totals: routeTotals, daysLeft, transitionStop,
+    currentWeek: routeCurrentWeek, totals: routeTotals, daysLeft, transitionStop, isPaused,
   } = useStudyRoute();
   const rehearsalToday = useRehearsalToday(user?.id);
 
@@ -87,7 +87,8 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
         ...planCtx,
         // Gunluk rutin (paragraf, problem...) listenin basinda: isinma.
         routeWeekStops: [...habitStops, ...todayPlanStops(routeCurrentWeek, schedule, todayTR(), { isCompletedToday: completedToday, ...dayOpts })],
-        routeActive: (routeCurrentWeek?.stops || []).length > 0,
+        // Donuk rotada yedek plan uretilmez: ogrenci bilerek ara verdi.
+        routeActive: isPaused || (routeCurrentWeek?.stops || []).length > 0,
       });
     const estHours = generated.estimatedMinutes >= 60
       ? `~${Math.round(generated.estimatedMinutes / 60)} saat`
@@ -102,7 +103,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, dayOpts, habitStops]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, dayOpts, habitStops, isPaused]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),

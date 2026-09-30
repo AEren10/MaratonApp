@@ -21,7 +21,8 @@ export function stopsForDate(week, schedule, dateKey, opts = {}) {
   if (!week || !dateKey) return [];
   const monday = mondayOf(week.weekStart ? String(week.weekStart).slice(0, 10) : dateKey);
   if (mondayOf(dateKey) !== monday) return [];
-  return assignWeekStops(week.stops || [], schedule, { ...opts, monday, firstDate: week.planStartDay })[weekdayIndex(dateKey)] || [];
+  return (assignWeekStops(week.stops || [], schedule, { ...opts, monday, firstDate: week.planStartDay })[weekdayIndex(dateKey)] || [])
+    .filter((s) => s.lifecycleStatus !== "frozen"); // rota donuk
 }
 
 export function todayPlanStops(week, schedule, todayKey, {
@@ -34,7 +35,7 @@ export function todayPlanStops(week, schedule, todayKey, {
     rhythm, moves, monday, blockedDates, examDate, firstDate: week.planStartDay,
   });
   const todayIdx = weekdayIndex(todayKey);
-  const own = days[todayIdx] || [];
+  const own = (days[todayIdx] || []).filter((s) => s.lifecycleStatus !== "frozen"); // rota donuk
   const ownSet = new Set(own);
 
   // KACIRILAN DURAK: pazartesi yapilmayan durak eskiden o gunde kalip

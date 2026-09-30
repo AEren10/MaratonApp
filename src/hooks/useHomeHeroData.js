@@ -81,7 +81,9 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
     for (const week of weeks || []) {
       for (const stop of week.stops || []) {
         index += 1;
-        if (getEffectiveRouteStopStatus(stop.lifecycleStatus) === ROUTE_STOP_STATUS.ACTIVE) {
+        // Donuk rotada acik duraklar FROZEN (useStudyRoute); birakilan nokta ilk o.
+        const st = getEffectiveRouteStopStatus(stop.lifecycleStatus);
+        if (st === ROUTE_STOP_STATUS.ACTIVE || st === ROUTE_STOP_STATUS.FROZEN) {
           return { number: index, subjectLabel: stop.subjectLabel, topic: stop.topic };
         }
       }
