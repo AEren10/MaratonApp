@@ -7,10 +7,15 @@ import { C, GUTTER, SHAPE, STEP } from "../themes/tokens";
 
 const isWeb = Platform.OS === "web";
 
+// iOS'ta "default" = yerel itme. "slide_from_right" ozel animasyon sayiliyor;
+// ozel animasyonda yerel geri kaydirma parmagi izlemiyor, ekran bir anda
+// geri atliyordu (react-native-screens RNSScreenStack animationController).
+const PUSH_ANIMATION = isWeb ? "none" : Platform.OS === "ios" ? "default" : "slide_from_right";
+
 export const screenOptions = {
   headerShown: false,
   contentStyle: { backgroundColor: C.bg },
-  animation: isWeb ? "none" : "slide_from_right",
+  animation: PUSH_ANIMATION,
   gestureEnabled: true,
   fullScreenGestureEnabled: true,
   freezeOnBlur: true,
@@ -40,8 +45,10 @@ export const overlayOptions = {
   freezeOnBlur: true,
 };
 
+// Solma gecisli ekranlarda geri kaydirma, solmayi parmakla birlikte yurutur.
 export const detailOptions = {
   animation: isWeb ? "none" : "fade",
+  animationMatchesGesture: true,
   animationDuration: 280,
   freezeOnBlur: true,
 };
