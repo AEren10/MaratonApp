@@ -25,7 +25,6 @@ const MESSAGE = {
 // Ekranda zaten birincil bir aksiyon varsa "quiet" — iki birincil buton olmaz.
 export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, emphasis = "primary" }) {
   const C = useC();
-  const shotRef = useRef(null);
   const overlayRef = useRef(null);
   const s = useStoryShare(moment);
   const quiet = emphasis === "quiet";
@@ -83,7 +82,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
       ) : null}
 
       <Press haptic="none"
-        onPress={() => { H.tap(); s.share(overlayRef, shotRef); }}
+        onPress={() => { H.tap(); s.share(overlayRef); }}
         disabled={s.busy}
         accessibilityRole="button"
         accessibilityLabel="Paylaş"
@@ -104,13 +103,12 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, empha
       <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text3 }]}>
         {s.result ? MESSAGE[s.result] : photoMode
           ? "Veriler fotoğrafının üstüne biner; Instagram'da taşıyıp büyütebilirsin."
-          : "Kartın Instagram story'ne gönderilir."}
+          : "Etiket saydam gider: Instagram'da fotoğrafını çek ya da seç, basılı tutup yapıştır."}
       </Text>
 
       {/* Yakalanan asil etiketler: tam olcu, EKRAN DISINDA. Eskiden sol ustte
           duruyordu; zIndex RN'de gizlemedigi icin ozetin ustune biniyordu. */}
       <View style={st.offscreen} pointerEvents="none">
-        <StorySticker ref={shotRef} variant={s.selected} photoUri={bgUri} />
         <StorySticker ref={overlayRef} variant={s.selected} overlay />
       </View>
     </View>

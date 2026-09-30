@@ -120,10 +120,11 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     clearResult: () => setResult(null),
     photo,
     pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
-    // Fotografli varyant: fotograf yoksa once sectirilir; etiket seffaf gider,
-    // fotograf Instagram'a arka plan olarak. Marka varyanti oldugu gibi.
-    share: async (overlayRef, fullRef) => {
-      if (selected?.background !== STORY_BG.FOTO) return run(shareStoryToInstagram, fullRef);
+    // Etiket HER zaman seffaf gider (yalniz veriler). Fotografli varyantta
+    // fotograf yoksa once sectirilir ve Instagram'a arka plan olur; digerlerinde
+    // etiket panoya kopyalanir, kullanici Instagram'da kendi fotografini koyar.
+    share: async (overlayRef) => {
+      if (selected?.background !== STORY_BG.FOTO) return run(shareStoryToInstagram, overlayRef);
       const p = photo || await pickStoryPhoto();
       if (!p) return null;
       if (!photo) setPhoto(p);

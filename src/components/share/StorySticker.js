@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import { View, StyleSheet } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
-import { STORY_KIND } from "../../domain/share/storySticker";
+import { STORY_BG, STORY_KIND } from "../../domain/share/storySticker";
 import { BrandBackground, PhotoBackground } from "./StoryBackground";
 import { StoryFoot } from "./StoryFoot";
 import { storyPalette } from "./storyPalette";
@@ -44,10 +44,11 @@ const BODIES = {
 /**
  * Tek bir story etiketi. `ref` view-shot'in yakaladigi dugumdur.
  *
- * `overlay`: fotografli varyantin Instagram'a giden hali -- ZEMIN YOK,
- * arkasi seffaf. Fotograf Instagram'a ayri arka plan olarak gider; etiket
- * onun ustunde tasinip buyutulebilir (Strava gibi). Onizleme ve galeriye
- * kaydetmede zemin cizilir.
+ * `overlay`: Instagram'a giden hal -- HER varyantta ZEMIN YOK, arkasi seffaf,
+ * yalniz veriler (fotograf paleti: beyaz + golge, her fotografta okunur).
+ * Eskiden marka varyantlari zeminiyle birlikte tam ekran goruntu olarak
+ * gidiyordu: hikayede tasinamiyor, arkasina kendi fotografi konamiyordu.
+ * Onizleme ve galeriye kaydetmede zemin cizilir.
  */
 export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false }, ref) {
   const C = useC();
@@ -55,10 +56,10 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
   const Body = BODIES[variant.kind];
   if (!Body) return null;
 
-  const p = storyPalette(C, variant.background);
+  const p = storyPalette(C, overlay ? STORY_BG.FOTO : variant.background);
   return (
-    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay && p.photo ? "transparent" : C.bg }]}>
-      {overlay && p.photo ? null : p.photo ? (
+    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay ? "transparent" : C.bg }]}>
+      {overlay ? null : p.photo ? (
         <PhotoBackground uri={photoUri} label="FOTOĞRAF SEÇ" />
       ) : (
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />

@@ -19,9 +19,6 @@ const STORY_CAMERA_URL = "instagram://story-camera";
 // buna bakiyor; olmadan etigi sessizce reddediyor (Ocak 2023'ten beri).
 const INSTAGRAM_APP_ID = "1219619257045936";
 
-// Etiketin arkasindaki zemin. Tasarimin yuzey merdiveninden: bg -> surface.
-const STORY_BG_TOP = "#26262F";
-const STORY_BG_BOTTOM = "#1C1C23";
 const INSTAGRAM_STORIES_FALLBACK = "instagramstories";
 const INSTAGRAM_STORIES_SOCIAL = Share.Social?.INSTAGRAM_STORIES || INSTAGRAM_STORIES_FALLBACK;
 
@@ -61,6 +58,11 @@ async function capture(ref, result) {
 // backgroundImage: kullanicinin sectigi fotograf (iOS'ta data URI, Android'de
 // dosya yolu). Verilirse Instagram onu arka plan yapar, etiket ustune biner.
 export async function shareStoryToInstagram(ref, { backgroundImage = null } = {}) {
+  // Fotograf secilmediyse etikete bizim zeminimizi GONDERMEYIZ: seffaf etiket
+  // panoya, Instagram story kamerasi acilir; kullanici kendi fotografini
+  // ceker/secer ve yapistirir (Strava). Dogrudan gonderim zemin ister;
+  // yalniz uygulamada fotograf secildiyse kullanilir.
+  if (!backgroundImage) return pasteboardFallback(await capture(ref, "base64"));
   // TEK YAKALAMA. Once dogrudan gonderim kendi yakalamasini yapiyor, sonra
   // basarisiz olursa pano yolu BIR DAHA yakaliyordu: iki tam boy PNG ve iki
   // base64 arka arkaya. Goruntu bir kez uretilip iki yola da veriliyor.
@@ -94,9 +96,7 @@ async function placeStickerInStory(shot, backgroundImage = null) {
       social: INSTAGRAM_STORIES_SOCIAL,
       appId: INSTAGRAM_APP_ID,
       stickerImage: sticker,
-      ...(backgroundImage
-        ? { backgroundImage }
-        : { backgroundTopColor: STORY_BG_TOP, backgroundBottomColor: STORY_BG_BOTTOM }),
+      backgroundImage,
     });
     return true;
   } catch {
