@@ -65,7 +65,7 @@ export default function SubjectAnalysisScreen() {
               </View>
               <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{subjectAnalysisSentence(a)}</Text>
               {a.points.length > 1 ? (
-                <View style={s.chart}><HeroMultiTrendChartSvg C={C} series={[{ key: subjectKey, color, points: a.points }]} /></View>
+                <View style={s.chart}><HeroMultiTrendChartSvg C={C} draw series={[{ key: subjectKey, color, points: a.points }]} /></View>
               ) : null}
               <StatsStrip C={C} cells={[
                 { value: fmt(a.average), label: "Ortalama" },

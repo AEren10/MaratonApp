@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Animated from "react-native-reanimated";
+import { GrowBar } from "./GrowBar";
 
 import { useC } from "../../../../contexts/ThemeContext";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../../themes/tokens";
@@ -37,7 +37,7 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
 
       <View style={styles.plotArea}>
         <View style={styles.barsRow}>
-          {bars.map((bar) => {
+          {bars.map((bar, i) => {
             const val = getVal(bar);
             const hasVal = val > 0;
             const topText = getTopText(bar);
@@ -67,7 +67,9 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
                   <View style={styles.valPlaceholder} />
                 )}
 
-                <Animated.View
+                <GrowBar
+                  index={i}
+                  count={bars.length}
                   style={[
                     styles.bar,
                     {

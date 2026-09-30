@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import Svg, { Line, Path, Circle, Text as SvgText } from "react-native-svg";
+import { DrawnPath } from "../../../components/charts/components/DrawnPath";
 
 const W = 390;
 const H = 170;
@@ -24,9 +25,14 @@ function smoothPath(pts) {
   return d;
 }
 
+// Kirik cizgi uzunlugu; DrawnPath egri icin kendi payini ekler.
+const polyLength = (pts) => pts.slice(1).reduce((n, p, i) => n + Math.hypot(p.x - pts[i].x, p.y - pts[i].y), 0);
+
 // "Tumu" filtresinde TYT ve AYT ayni grafikte: x ekseni tarih, y ekseni net.
 // series: [{ key, color, points: [{ t, v }] }]
-export const HeroMultiTrendChartSvg = React.memo(function HeroMultiTrendChartSvg({ C, series = [] }) {
+// draw: yalniz nadir acilan ekranda (Ders analizi) cizgi acilista kendini cizer.
+// Analiz ana ekrani sik gorulur, orada cizim yok.
+export const HeroMultiTrendChartSvg = React.memo(function HeroMultiTrendChartSvg({ C, series = [], draw = false }) {
   const layout = useMemo(() => {
     const all = series.flatMap((s) => s.points);
     if (all.length < 2) return null;
@@ -77,8 +83,13 @@ export const HeroMultiTrendChartSvg = React.memo(function HeroMultiTrendChartSvg
       {layout.lines.map((line) => (
         <React.Fragment key={line.key}>
           {line.pts.length > 1 ? (
-            <Path d={smoothPath(line.pts)} fill="none" stroke={line.color} strokeWidth={3}
-              strokeLinecap="round" strokeLinejoin="round" />
+            draw ? (
+              <DrawnPath d={smoothPath(line.pts)} length={polyLength(line.pts)} fill="none" stroke={line.color}
+                strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+            ) : (
+              <Path d={smoothPath(line.pts)} fill="none" stroke={line.color} strokeWidth={3}
+                strokeLinecap="round" strokeLinejoin="round" />
+            )
           ) : null}
           {line.pts.map((p, idx) => {
             const isLast = idx === line.pts.length - 1;
