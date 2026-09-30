@@ -26,7 +26,7 @@ export const ScheduleDiscoverCard = React.memo(function ScheduleDiscoverCard({ s
   };
 
   return (
-    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.border }, style]}>
+    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }, style]}>
       <Press
         haptic="tap"
         onPress={handleOpen}
@@ -34,27 +34,28 @@ export const ScheduleDiscoverCard = React.memo(function ScheduleDiscoverCard({ s
         accessibilityLabel="Haftalık programını kur · 2 dakika"
         style={s.body}
       >
-        <View style={[s.iconBox, { backgroundColor: C.accent + "18", borderColor: C.accent + "30" }]}>
-          <Icon name="calendar" size={16} color={C.accent} />
+        <View style={[s.iconBox, { backgroundColor: C.accent + "14", borderColor: C.accent + "28" }]}>
+          <Icon name="calendar" size={13} color={C.accentBright} />
         </View>
         <View style={s.textCol}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>
-            Haftalık programını kur · 2 dakika
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text }]} numberOfLines={1}>
+            Haftalık programını kur · 2 dk
           </Text>
-          <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>
-            Derslerini günlere dağıt, rotan programına göre çizilsin.
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]} numberOfLines={1}>
+            Derslerini günlere dağıt, rotan çizilsin
           </Text>
         </View>
+        <Icon name="chevR" size={13} color={C.text3} />
       </Press>
       <Press
         haptic="none"
         onPress={() => close(DISCOVER_TIPS.SCHEDULE)}
-        hitSlop={12}
+        hitSlop={STEP.s2}
         accessibilityRole="button"
         accessibilityLabel="İpucunu kapat"
         style={s.closeBtn}
       >
-        <Icon name="x" size={15} color={C.text3} />
+        <Icon name="x" size={13} color={C.text3} />
       </Press>
     </View>
   );
@@ -63,33 +64,33 @@ export const ScheduleDiscoverCard = React.memo(function ScheduleDiscoverCard({ s
 const s = StyleSheet.create({
   card: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: STEP.s2,
-    padding: STEP.s3,
-    borderRadius: SHAPE.cardTight,
+    alignItems: "center",
+    gap: STEP.s1,
+    paddingVertical: STEP.s1,
+    paddingHorizontal: STEP.s2,
+    borderRadius: SHAPE.chip,
     borderWidth: 1,
     marginTop: STEP.s2,
   },
   body: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: STEP.s2,
   },
   iconBox: {
-    width: 34,
-    height: 34,
+    width: 26,
+    height: 26,
     borderRadius: SHAPE.chip,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 2,
   },
   textCol: {
     flex: 1,
-    gap: 2,
+    gap: 1,
   },
   closeBtn: {
-    padding: 2,
+    padding: STEP.s1 / 2,
   },
 });

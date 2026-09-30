@@ -56,7 +56,7 @@ export function barrierFor(program) {
  *   reach   → eklenebilir ama sıralaman şu an yetmiyor (hedef olabilir)
  * Bu ikisini karıştırmak öğrenciye yanlış umut ya da yanlış vazgeçme verir.
  */
-export function classifyProgram(program, currentRank) {
+export function classifyProgram(program, currentRank, userNets = null) {
   if (!program) return null;
   const target = Number(program.rank) || null;
   const barrier = barrierFor(program);
@@ -82,6 +82,24 @@ export function classifyProgram(program, currentRank) {
   else if (ratio <= 1.6) status = "reach";   // uzak ama ulaşılabilir
   else status = "far";
 
+  // Alan neti kontrolü: Öğrencinin TYT'si yüksek olsa bile ilgili alanda (AYT/YDT)
+  // bölümün beklediği ortalamadan belirgin açık varsa (~6+ net açık),
+  // bu tercih "Güvenli" olamaz — en fazla "Hedef" seviyesine çekilir.
+  if (userNets && status === "safe") {
+    const { tytNet, aytNet, type } = userNets;
+    if (type !== "tyt") {
+      const aytDeficit = (program.aytNet || 0) - (Number(aytNet) || 0);
+      if (aytDeficit >= 6) {
+        status = "target";
+      }
+    } else {
+      const tytDeficit = (program.tytNet || 0) - (Number(tytNet) || 0);
+      if (tytDeficit >= 8) {
+        status = "target";
+      }
+    }
+  }
+
   return {
     status,
     program,
@@ -95,12 +113,11 @@ export function classifyProgram(program, currentRank) {
  * Tercih listesi önerisi.
  *
  * Klasik tercih stratejisi: listenin başına iddialı, ortasına hedef, sonuna
- * garanti tercihler konur. Hepsini "garanti"den seçmek düşük, hepsini
- * "iddialı"dan seçmek açıkta kalma riski demektir.
+ * güvenli tercihler konur.
  */
-export function buildPreferenceList(programs = [], currentRank, { size = 24 } = {}) {
+export function buildPreferenceList(programs = [], currentRank, { size = 24, userNets = null } = {}) {
   const classified = programs
-    .map((p) => classifyProgram(p, currentRank))
+    .map((p) => classifyProgram(p, currentRank, userNets))
     .filter((c) => c && c.status !== "unknown");
 
   const eligible = classified.filter((c) => c.status !== "blocked" && c.status !== "far");
@@ -111,7 +128,7 @@ export function buildPreferenceList(programs = [], currentRank, { size = 24 } = 
   const target = eligible.filter((c) => c.status === "target").sort(byRank);
   const safe = eligible.filter((c) => c.status === "safe").sort(byRank);
 
-  // Oran: %25 iddialı, %45 hedef, %30 garanti.
+  // Oran: %25 iddialı, %45 hedef, %30 güvenli.
   const nReach = Math.round(size * 0.25);
   const nTarget = Math.round(size * 0.45);
   const nSafe = size - nReach - nTarget;
@@ -143,7 +160,7 @@ export function barrierWarnings(currentRank) {
 }
 
 export const PREFERENCE_STATUS_LABELS = {
-  safe: "Garanti",
+  safe: "Güvenli",
   target: "Hedef",
   reach: "İddialı",
   far: "Şu an uzak",

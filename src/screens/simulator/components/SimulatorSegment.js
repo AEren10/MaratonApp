@@ -2,7 +2,7 @@ import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, SHAPE, SPACING, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 export const SimulatorSegment = memo(function SimulatorSegment({ activeTab, onSelectTab }) {
   const C = useC();
@@ -43,7 +43,7 @@ export const SimulatorSegment = memo(function SimulatorSegment({ activeTab, onSe
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 3,
+    padding: SPACING.xs,
     borderRadius: SHAPE.button,
     borderWidth: 1,
     marginTop: STEP.s2,

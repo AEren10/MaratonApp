@@ -128,7 +128,7 @@ export default function SummaryScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { flex: 1 },
-  content: { flexGrow: 1, paddingTop: STEP.s2, paddingBottom: STEP.s5 },
+  content: { flexGrow: 1, paddingTop: STEP.s2, paddingBottom: STEP.s5 * 2 },
   pad: { paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
   emptyPad: { flex: 1, justifyContent: "center", paddingTop: STEP.s2, paddingBottom: STEP.s5 * 2 },
   gap: { marginTop: STEP.s3 },
