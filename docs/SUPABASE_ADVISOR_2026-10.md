@@ -31,17 +31,15 @@ Dashboard yolu:
 |---|---|---|---|
 | Warning | Leaked password protection kapalı | Bilinen ürün/operasyon kararı olarak geçildi. Yayın öncesi tekrar değerlendirilmeli. | SQL yok; Supabase Auth ayarıdır. Dashboard → Authentication → Security üzerinden açılır. |
 
-## Advisor çıktı tablosu
+## Advisor çıktı tablosu (canlı, Supabase MCP get_advisors, 1 Ekim 2026 — Claude)
 
-Canlı advisor çıktısı alınınca her satır buraya eklenecek. SQL önerileri uygulanmamış taslak olarak kalmalıdır; canlıya uygulanacaksa ayrıca review + backup gerekir.
+**Sonuç: çıkışı engelleyen uyarı yok.** ERROR seviyesinde bulgu yok.
 
-| Ciddiyet | Kaynak | Ne | Etki | Önerilen düzeltme SQL'i | Uygulandı mı? |
-|---|---|---|---|---|---|
-| _Bekliyor_ | Security Advisor | Canlı çıktı gerekli | Bilinmiyor | _Canlı advisor çıktısı olmadan uydurulmadı_ | Hayır |
-| _Bekliyor_ | Performance Advisor | Canlı çıktı gerekli | Bilinmiyor | _Canlı advisor çıktısı olmadan uydurulmadı_ | Hayır |
+| Ciddiyet | Kaynak | Ne | Karar |
+|---|---|---|---|
+| WARN x6 | Security | `authenticated` rolünün çağırabildiği SECURITY DEFINER: `create_trial`, `increment_study_session`, `persist_route_revision`, `sync_challenge_progress`, `transfer_group_admin`, `transition_route_stop` | Bilerek. Altısı da canlıda `auth.uid()` ile çağıranı kontrol ediyor; search_path kilitli (`""` ya da `public, pg_temp`). Uygulamanın kendi RPC'leri. |
+| INFO x2 | Security | `feature_usage_events`, `user_entitlements`: RLS açık, politika yok | Bilerek: istemci doğrudan okumuyor, dar RPC üzerinden. |
+| WARN | Security | Leaked password protection kapalı | Bilinen karar (Pro plan özelliği). |
+| INFO x37 | Performance | Kullanılmayan indeks | Düşük trafik; kullanıcı gelmeden kullanım istatistiği anlamsız. Silinmez, yayından ~1 ay sonra tekrar bakılır. |
 
-## Notlar
-
-- Bu dosya “çıktı yoksa uyarı yoktur” anlamına gelmez.
-- Advisor uyarıları canlı şema, indeks istatistikleri ve extension durumuna bağlıdır; repo dosyalarından güvenilir şekilde uydurulamaz.
-- Özellikle RLS, SECURITY DEFINER search_path, eksik indeks, duplicate index ve unused index uyarıları canlı metriklerle tekrar kontrol edilmelidir.
+Hesap silme FK engelleri 1 Ekim'de düzeltildi (`20260930125121_clde_account_delete_fk_cascade`); sonrasında `auth.users` / `profiles` / `wrong_questions`'a NO ACTION FK kalmadı.
