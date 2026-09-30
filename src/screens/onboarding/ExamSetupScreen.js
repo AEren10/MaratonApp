@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { Icon, Button } from "../../components/design";
+import { Icon, Button, Press } from "../../components/design";
 import { ExamOption } from "./components/ExamOption";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -11,7 +11,6 @@ import { useExam } from "../../contexts/ExamContext";
 import { useExamSetupPrefill } from "../../hooks/useExamSetupPrefill";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
-import { Press } from "../../components/design/Press";
 import { buildCategoryOptions, buildYKSOptions, MONTHS } from "./constants/examSetupOptions";
 
 export default function ExamSetupScreen() {
@@ -127,14 +126,7 @@ export default function ExamSetupScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: GUTTER,
-    paddingVertical: STEP.s1,
-    minHeight: CONTROL.tapMin,
-  },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
   backBtn: { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 30 },
   progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
