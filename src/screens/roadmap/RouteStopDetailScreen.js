@@ -7,6 +7,7 @@ import { Button } from "../../components/design";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteStopDetail } from "../../hooks/useRouteStopDetail";
+import { useDepthTint } from "../../hooks/useDepthTint";
 import { GUTTER, STEP } from "../../themes/tokens";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { RouteAccessGate } from "./components/RouteAccessGate";
@@ -25,6 +26,7 @@ export default function RouteStopDetailScreen() {
   const navigation = useNavigation();
   const d = useRouteStopDetail();
   const { stop } = d;
+  useDepthTint(stop?.subject);
   const color = stop ? subjectColorOf(C, stop.subject) : C.accent;
   const studied = stop && Number(stop.q) > 0;
 

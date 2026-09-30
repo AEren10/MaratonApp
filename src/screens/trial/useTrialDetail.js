@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { getTrialTypes, getAllSubjects } from "../../domain/trial/trialTypes";
 import { forecastNet } from "../../lib/netForecast";
 import { useExam } from "../../contexts/ExamContext";
+import { subjectPaletteKey } from "../../themes/subjectPalette";
 
 const DIFFICULTY_LABEL = {
   easy: "Kolay",
@@ -76,6 +77,12 @@ export function useTrialDetail({ latest, trials, C }) {
     max: s.max,
   })), [subjects, latest]);
 
+  // Ust isigin rengi: en yuksek netli ders (trialStory ile ayni secim).
+  const topSubjectKey = useMemo(() => {
+    const best = bars.filter((b) => b.net > 0 && C?.subjects?.[subjectPaletteKey(b.key)]).sort((x, y) => y.net - x.net)[0];
+    return best ? best.key : null;
+  }, [bars, C]);
+
   const difficultyLabel = DIFFICULTY_LABEL[latest.difficultyLevel] || null;
   const durationMinutes = latest.durationMinutes ?? latest.duration_minutes ?? null;
   // Tasarımın "zor" kartı yalnızca hard/very_hard için birebir kopya taşıyor;
@@ -93,7 +100,7 @@ export function useTrialDetail({ latest, trials, C }) {
   }, [examDate, sameTypeTrials, latest, totalMax]);
 
   return {
-    subjects, bars, prev, totalMax, typeMeta,
+    subjects, bars, prev, totalMax, typeMeta, topSubjectKey,
     rawNet, normalizedNet, hasNormalization, trend,
     difficultyLabel, showDifficultyCard, routeImpact,
     durationMinutes,

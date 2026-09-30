@@ -20,6 +20,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import { useResolvedTrial } from "./useResolvedTrial";
 import { useTrialDetail } from "./useTrialDetail";
 import { useTrialDetailMenu } from "./useTrialDetailMenu";
+import { useDepthTint } from "../../hooks/useDepthTint";
 import { TrialDetailHeader } from "./components/TrialDetailHeader";
 import { TrialDetailSubjectTable } from "./components/TrialDetailSubjectTable";
 import { TrialDetailLinks } from "./components/TrialDetailLinks";
@@ -47,6 +48,7 @@ function TrialDetailScreenInner() {
     trial: route.params?.trial, linkedId: route.params?.id || route.params?.trialId, trials, user,
   });
   const detail = useTrialDetail({ latest: latest || {}, trials, C });
+  useDepthTint(latest ? detail.topSubjectKey : null);
   const { handleMenu } = useTrialDetailMenu({ latest, user, navigation, showAlert, cardRef });
 
   useEffect(() => {
