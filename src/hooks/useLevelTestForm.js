@@ -73,20 +73,23 @@ export function useLevelTestForm() {
     if (!hasAnyEntry) { onDone?.(); return; }
     setSaving(true);
     const netVal = Math.round(totalNet * 100) / 100;
+    // Not onDone'a SONUCLA gecer: cagiranin kapanisindaki syncPendingNote
+    // bu render'in degeri, setSyncPending'i hic gormuyordu.
+    let pendingSync = false;
     try {
       // updateBaselineNet reject etmez, { synced } donduru. Sonuc yok
       // sayilirsa sunucu yazimi basarisiz olsa bile akis basarili gorunur.
       // Deger yerelde ve bekleyen bayrakla duruyor; ExamContext sonraki
       // acilista yeniden deniyor, bu yuzden akis bloklanmiyor.
       const res = await updateBaselineNet(netVal);
-      if (res && res.synced === false) setSyncPending(true);
+      if (res && res.synced === false) { pendingSync = true; setSyncPending(true); }
       track(EVENTS.LEVEL_TEST_SUBMITTED, { net: netVal, trialType: trialTypeCode });
       H.success();
     } catch {
       H.warn();
     } finally {
       setSaving(false);
-      onDone?.();
+      onDone?.({ syncPendingNote: pendingSync ? SYNC_PENDING_COPY.baselineNet : null });
     }
   }, [hasAnyEntry, totalNet, trialTypeCode, updateBaselineNet]);
 
