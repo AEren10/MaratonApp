@@ -103,7 +103,7 @@ export function ProgramWeekView() {
 
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
       <ScheduleDiscoverCard style={{ marginTop: STEP.s3 }} />
-      <HabitDiscoverCard style={{ marginTop: STEP.s2 }} />
+      <HabitDiscoverCard style={{ marginTop: STEP.s3 }} />
 
       {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
 
