@@ -9,7 +9,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
 import { Icon, IconBox, Chip } from "../../../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../../../themes/tokens";
 import { useC } from "../../../../contexts/ThemeContext";
 import SignedImage from "../../../../components/common/SignedImage";
 import { resolveWrongQuestion, getWrongQuestionById } from "../../../../supabase/wrongQuestions";
@@ -81,7 +81,7 @@ export function CommunityQuestionDetail() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s3 }]}>
           Soru Detayı

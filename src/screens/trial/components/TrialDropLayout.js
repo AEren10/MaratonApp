@@ -5,7 +5,7 @@ import Animated from "react-native-reanimated";
 
 import { Button, Icon, Card } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { formatDelta, formatNumber } from "../../../lib/format";
 import { SCREENS } from "../../../constants/screens";
 import { TAB_KEYS } from "../../../navigation/tabAssignment";
@@ -25,7 +25,7 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
       <View style={styles.header}>
         <Press haptic="none" onPress={() => navigation.popToTop()} style={styles.close}
           accessibilityLabel="Kapat" accessibilityRole="button">
-          <Icon name="x" size={14} color={C.text2} sw={1.7} />
+          <Icon name="x" size={NAV_ICON.close} color={C.text2} sw={1.7} />
         </Press>
         <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
           {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}

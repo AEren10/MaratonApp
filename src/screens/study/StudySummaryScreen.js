@@ -9,7 +9,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import * as H from "../../lib/haptics";
 import { Icon } from "../../components/design";
 import { Press } from "../../components/design/Press";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
@@ -76,7 +76,7 @@ export default function StudySummaryScreen() {
           accessibilityLabel="Kapat"
           style={styles.closeBtn}
         >
-          <Icon name="x" size={18} color={C.text2} />
+          <Icon name="x" size={NAV_ICON.close} color={C.text2} />
         </Press>
       </View>
 

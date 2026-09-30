@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Sinav akisi ekranlarinin ust satiri: geri oku + Bricolage baslik.
 // Dokunma alani 44px, gorsel ok tasarimdaki 9x15 boyutunda kalir.
-export function ExamScreenHeader({ title, onBack, icon = "chevL", label = "Geri" }) {
+export function ExamScreenHeader({ title, onBack, icon = "arrowL", label = "Geri" }) {
   const C = useC();
   return (
     <View style={s.row}>
@@ -17,7 +17,7 @@ export function ExamScreenHeader({ title, onBack, icon = "chevL", label = "Geri"
         accessibilityLabel={label}
         style={s.back}
       >
-        <Icon name={icon} size={icon === "x" ? 14 : 16} color={C.text2} />
+        <Icon name={icon} size={icon === "x" ? NAV_ICON.close : NAV_ICON.back} color={C.text2} />
       </Press>
       {title ? <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text }]}>{title}</Text> : null}
     </View>

@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { FlashcardItem } from "./components/FlashcardItem";
 import { FlashcardActions } from "./components/FlashcardActions";
@@ -29,7 +29,7 @@ function CardDetailContent() {
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <View style={styles.header}>
           <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-            <Icon name="arrowL" size={22} color={C.text} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
             Kart Detay
@@ -68,7 +68,7 @@ function CardDetailContent() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           {cardTitle}

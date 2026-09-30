@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Defter akisinin ust satiri: geri oku ya da kapat carpisi, basik baslik
@@ -18,7 +18,7 @@ export function WrongScreenHeader({ icon = "arrowL", title, label, badge, right,
         accessibilityLabel={a11yLabel || (icon === "x" ? "Kapat" : "Geri")}
         style={styles.hit}
       >
-        <Icon name={icon} size={icon === "x" ? 16 : 18} color={C.text2} />
+        <Icon name={icon} size={icon === "x" ? NAV_ICON.close : NAV_ICON.back} color={C.text2} />
       </Press>
       {title ? (
         <View style={styles.titleRow}>

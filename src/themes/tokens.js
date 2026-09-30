@@ -95,6 +95,9 @@ export const SHAPE = {
   phone: 42,
 };
 
+// Ust cubuk ikonlari: geri, kapat ve sag aksiyon her ekranda ayni boyutta.
+export const NAV_ICON = { back: 20, close: 16, action: 18 };
+
 export const CONTROL = {
   buttonPrimary: 52,
   buttonSecondary: 52,

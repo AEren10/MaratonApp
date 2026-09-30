@@ -53,7 +53,7 @@ test("notification inbox is reachable and does not ship fake social/news data", 
 
   assert.doesNotMatch(inbox, /INITIAL_NOTIFS|Mock data|Bugünkü durağın hazır|Sonuç rotayı değiştirdi/);
   assert.match(inbox, /Şimdilik yeni haber yok/);
-  assert.match(inbox, /name="chevL"/);
+  assert.match(inbox, /name="arrowL"/);
 });
 
 test("goal editor keeps exam date reachable from the same settings flow", () => {

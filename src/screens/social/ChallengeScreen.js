@@ -7,7 +7,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-na
 import { Icon, Button } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { listMyChallenges, createChallenge, cancelChallenge, respondToChallenge, checkExpiredChallenges } from "../../supabase/challenges";
@@ -103,7 +103,7 @@ export default function ChallengeScreen() {
     return (
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.header}>
-          <Pressable onPress={() => { setCreating(false); setStep(0); }} hitSlop={12}><Icon name="arrowL" size={20} color={C.text} /></Pressable>
+          <Pressable onPress={() => { setCreating(false); setStep(0); }} hitSlop={12}><Icon name="arrowL" size={NAV_ICON.back} color={C.text2} /></Pressable>
           <Text style={s.title}>Yeni Challenge</Text>
           <View style={{ width: 20 }} />
         </View>
@@ -154,7 +154,7 @@ export default function ChallengeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner"><Icon name="arrowL" size={20} color={C.text} /></Pressable>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner"><Icon name="arrowL" size={NAV_ICON.back} color={C.text2} /></Pressable>
         <Text style={s.title}>Challenges</Text>
         <Pressable onPress={() => setCreating(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Yeni challenge" accessibilityHint="Yeni challenge oluşturmaya başlar"><Icon name="plus" size={20} color={C.accent} /></Pressable>
       </View>

@@ -6,7 +6,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { Icon, Card, Button, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
 import { SCREENS } from "../../constants/screens";
-import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useScenarioView } from "../../hooks/useScenarioView";
 import { ScenarioCard } from "./components/ScenarioCard";
 import { Press } from "../../components/design/Press";
@@ -25,7 +25,7 @@ export default function NetForecastScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s2 }}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner" style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}>
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={{ ...TYPOGRAPHY.label, color: C.text3, marginLeft: STEP.s1 }}>SENARYOLAR</Text>
       </View>

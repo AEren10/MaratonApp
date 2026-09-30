@@ -4,7 +4,7 @@ import Animated from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 
 function greeting(hour = new Date().getHours()) {
@@ -52,7 +52,7 @@ export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }
           accessibilityRole="button"
           accessibilityLabel="Sosyal ve Gruplar"
           style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-          <Icon name="users" size={16} color={C.text2} />
+          <Icon name="users" size={NAV_ICON.action} color={C.text2} />
         </Pressable>
         <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
           accessibilityRole="button"

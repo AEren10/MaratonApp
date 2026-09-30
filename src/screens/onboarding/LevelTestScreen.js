@@ -6,7 +6,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Icon, Button, Card, StatBlock } from "../../components/design";
 import LevelTestSubjectRow from "./components/LevelTestSubjectRow";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useLevelTestForm } from "../../hooks/useLevelTestForm";
@@ -55,7 +55,7 @@ export default function LevelTestScreen() {
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.headerRow}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>3 / 4</Text>
       </View>

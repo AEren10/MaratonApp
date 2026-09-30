@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Rota derinligi ekranlarinin ust satiri: geri oku (ya da kapat X) +
@@ -21,7 +21,7 @@ export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, m
           accessibilityLabel={close ? "Kapat" : "Geri"}
           style={s.tap}
         >
-          <Icon name={close ? "x" : "chevL"} size={close ? 14 : 16} color={C.text2} />
+          <Icon name={close ? "x" : "arrowL"} size={close ? NAV_ICON.close : NAV_ICON.back} color={C.text2} />
         </Press>
       ) : null}
       <Text style={[TYPOGRAPHY.heading, s.title, { color: C.text, paddingLeft: showBack ? 0 : STEP.s1 }]} numberOfLines={1}>
@@ -36,9 +36,9 @@ export function RouteHeader({ title, onBack, close = false, onMore, moreLabel, m
           style={s.tap}
         >
           {moreIcon ? (
-            <Icon name={moreIcon} size={16} color={C.text3} />
+            <Icon name={moreIcon} size={NAV_ICON.action} color={C.text2} />
           ) : (
-            <View style={s.vertical}><Icon name="more" size={18} color={C.text3} fill={C.text3} /></View>
+            <View style={s.vertical}><Icon name="more" size={NAV_ICON.action} color={C.text2} fill={C.text2} /></View>
           )}
         </Press>
       ) : null}

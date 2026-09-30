@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon, Button, Input, Card } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateEmail } from "../../supabase/auth";
@@ -61,7 +61,7 @@ export default function EditEmailScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>E-posta değiştir</Text>
       </View>

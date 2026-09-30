@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon, Card } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useTheme, useC } from "../../contexts/ThemeContext";
 import { SettingsGroup } from "./components/SettingsGroup";
 import { ThemeOptionRow } from "./components/ThemeOptionRow";
@@ -27,7 +27,7 @@ export default function AppearanceScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Görünüm</Text>
       </View>

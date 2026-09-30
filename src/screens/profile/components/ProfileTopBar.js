@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { STEP, GUTTER, SHAPE, CONTROL, TYPOGRAPHY } from "../../../themes/tokens";
+import { STEP, GUTTER, SHAPE, CONTROL, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
@@ -34,7 +34,7 @@ export function ProfileTopBar() {
           alignItems: "center", justifyContent: "center"
         }}
       >
-        <Icon name="settings" size={18} color={C.text2} />
+        <Icon name="settings" size={NAV_ICON.action} color={C.text2} />
       </Press>
     </View>
   );

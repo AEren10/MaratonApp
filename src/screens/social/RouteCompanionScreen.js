@@ -7,7 +7,7 @@ import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteCompanion } from "../../hooks/useRouteCompanion";
-import { RADIUS, SPACING, TYPOGRAPHY } from "../../themes/tokens";
+import { RADIUS, SPACING, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { CompanionEffortCard } from "./components/CompanionEffortCard";
 import { RouteCompanionSkeleton } from "./components/RouteCompanionSkeleton";
 import { Press } from "../../components/design/Press";
@@ -76,7 +76,7 @@ export default function RouteCompanionScreen() {
       <View style={styles.header}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button"
           accessibilityLabel="Geri" style={styles.back}>
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[styles.title, { color: C.text }]}>Yol Arkadaşın</Text>
         <View style={styles.back} />

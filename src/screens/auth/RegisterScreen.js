@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { PasswordStrength } from "./components/PasswordStrength";
 import { TermsCheckbox } from "./components/TermsCheckbox";
@@ -80,7 +80,7 @@ export default function RegisterScreen() {
               accessibilityRole="button"
               style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
             >
-              <Icon name="arrowL" size={18} color={C.text2} />
+              <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
             </Press>
           </View>
 

@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
 import { Icon, Card, Button } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { HOW_IT_WORKS as T } from "../../constants/howItWorks";
@@ -30,7 +30,7 @@ export default function HowItWorksScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>{T.eyebrow}</Text>
       </View>

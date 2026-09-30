@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Skeleton } from "../../components/design";
 import { EmptyState } from "../../components/design/EmptyState";
-import { GUTTER, STEP, TYPOGRAPHY, SHAPE } from "../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useThresholdView } from "../../hooks/useThresholdView";
@@ -99,7 +99,7 @@ function Header({ onBack, C }) {
   return (
     <View style={s.header}>
       <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={s.backBtn}>
-        <Icon name="arrowL" size={22} color={C.text} />
+        <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
       </Press>
       <Text style={[TYPOGRAPHY.label, { color: C.text3, marginLeft: STEP.s1 }]}>NET & SIRALAMA EŞİĞİ</Text>
     </View>

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
-import { GUTTER } from "../../themes/tokens";
+import { GUTTER, NAV_ICON, TYPOGRAPHY } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { Icon, EmptyState, ErrorState } from "../../components/design";
 import { useTrialRecords } from "../../hooks/useTrialRecords";
@@ -51,7 +51,7 @@ export default function TrialRecordsScreen() {
           accessibilityLabel="Geri"
           style={styles.backBtn}
         >
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[styles.title, { color: C.text }]}>Deneme kayıtları</Text>
         <Text style={[styles.count, { color: C.text3 }]}>{totalCount}</Text>
@@ -111,8 +111,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontFamily: "Bricolage_400",
-    fontSize: 22,
+    ...TYPOGRAPHY.subheading,
   },
   count: {
     fontFamily: "Archivo_500",

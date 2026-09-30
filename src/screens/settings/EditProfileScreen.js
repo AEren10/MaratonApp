@@ -9,7 +9,7 @@ import { SettingsRow } from "./components/SettingsRow";
 import { EditProfileAvatar } from "./components/EditProfileAvatar";
 import { EditProfileField } from "./components/EditProfileField";
 import { EditProfileAccountSection } from "./components/EditProfileAccountSection";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
@@ -51,7 +51,7 @@ export default function EditProfileScreen() {
           accessibilityRole="button"
           accessibilityLabel="Geri"
         >
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <View style={{ flex: 1 }} />
         <Press haptic="none"

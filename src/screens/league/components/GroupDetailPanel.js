@@ -5,7 +5,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
 import { GlowBackground, getCrimsonGlow } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { GroupCodeCard } from "./GroupCodeCard";
 import { GroupCompetitionBanner } from "./GroupCompetitionBanner";
@@ -36,7 +36,7 @@ export function GroupDetailPanel({
         <GlowBackground blobs={crimsonBlobs} />
         <View style={[s.topBar, { paddingTop: Math.max(insets.top, SPACING.xl) + SPACING.sm }]}>
           <Press haptic="none" onPress={onClose} accessibilityRole="button" accessibilityLabel="Grup listesini aç" style={s.backHit}>
-            <Icon name="chevL" size={20} color={C.text2} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <View style={s.titleCol}>
             <Text style={[s.title, { color: C.text }]} numberOfLines={1}>{group.name}</Text>

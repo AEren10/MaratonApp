@@ -15,7 +15,7 @@ import { examTrials } from "../../../domain/exam/examScope";
 import { subjectAnalysis, subjectAnalysisSentence } from "../../../domain/analysis/subjectAnalysis";
 import { getSubjectLabel } from "../../../themes/subjects";
 import { subjectPaletteKey } from "../../../themes/subjectPalette";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { HeroMultiTrendChartSvg } from "../components/HeroMultiTrendChartSvg";
 import { SubjectAnalysisStats } from "./SubjectAnalysisStats";
 
@@ -45,7 +45,7 @@ export default function SubjectAnalysisScreen() {
       <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
         <View style={s.header}>
           <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-            <Icon name="arrowL" size={20} color={C.text2} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <View style={[s.dot, { backgroundColor: color }]} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>{name}</Text>

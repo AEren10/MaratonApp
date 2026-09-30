@@ -10,7 +10,7 @@ import { useExam } from "../../contexts/ExamContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useRouteHabits } from "../../hooks/useRouteHabits";
 import { HABIT_QUESTION_RANGE, presetsForExam } from "../../domain/route/habits";
-import { GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { HabitRow } from "./components/HabitRow";
 
 // GUNLUK RUTIN: her gun cozulecek turler. Rota bunlari her calisma gununun
@@ -43,7 +43,7 @@ export default function RouteHabitsScreen() {
     <SafeAreaView edges={["top"]} style={[s.fill, { backgroundColor: C.bg }]}>
       <View style={s.header}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, s.flex, { color: C.text }]}>Günlük rutin</Text>
       </View>

@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, Card, EmptyState, ErrorState, Skeleton } from "../../components/design";
 import { SCREENS } from "../../constants/screens";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTrialCompare } from "../../hooks/useTrialCompare";
 import { TrialPickerModal } from "./components/TrialPickerModal";
@@ -37,7 +37,7 @@ export default function TrialCompareScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>KARŞILAŞTIRMA</Text>
       </View>

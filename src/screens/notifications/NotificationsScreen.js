@@ -7,7 +7,7 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { ErrorState, Icon, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { useNotifications } from "../../hooks/useNotifications";
 
@@ -126,7 +126,7 @@ function NotificationsContent() {
             accessibilityRole="button"
             accessibilityLabel="Geri"
           >
-            <Icon name="chevL" size={18} color={C.text2} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Pressable>
           <Text style={s.headerTitle}>Rota haberleri</Text>
         </View>

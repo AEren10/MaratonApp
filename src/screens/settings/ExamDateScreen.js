@@ -2,7 +2,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Icon, Card, Button, StatBlock } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useExamDatePicker } from "../../hooks/useExamDatePicker";
 import { MonthDayGrid } from "./components/MonthDayGrid";
@@ -22,7 +22,7 @@ export default function ExamDateScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat">
-          <Icon name="x" size={15} color={C.text2} />
+          <Icon name="x" size={NAV_ICON.close} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]}>Sınav tarihi</Text>
       </View>

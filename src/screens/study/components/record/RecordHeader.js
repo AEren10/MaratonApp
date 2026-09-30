@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../../components/design";
 import { useC } from "../../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../../themes/tokens";
 import { Press } from "../../../../components/design/Press";
 
 // Kayit akisinin ust satiri: geri chevron + Bricolage 22 baslik.
@@ -11,7 +11,7 @@ export function RecordHeader({ title, onBack }) {
   return (
     <View style={styles.row}>
       <Press haptic="none" onPress={onBack} accessibilityRole="button" accessibilityLabel="Geri" style={styles.hit}>
-        <Icon name="chevL" size={16} color={C.text2} />
+        <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
       </Press>
       <Text accessibilityRole="header" numberOfLines={1} style={[TYPOGRAPHY.subheading, styles.title, { color: C.text }]}>
         {title}

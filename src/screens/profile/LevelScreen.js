@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
 
 import { Icon, Card } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useLevelProgress } from "../../hooks/useLevelProgress";
@@ -74,7 +74,7 @@ export default function LevelScreen() {
           accessibilityLabel="Geri"
           style={styles.backBtn}
         >
-          <Icon name="chevL" size={16} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Seviye</Text>
       </View>

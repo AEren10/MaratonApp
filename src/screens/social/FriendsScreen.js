@@ -8,7 +8,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { Avatar } from "../../components/design/Avatar";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { FriendCodeCard } from "./components/FriendCodeCard";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
@@ -58,7 +58,7 @@ export default function FriendsScreen() {
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Pressable>
         <Text style={s.title}>Arkadaşlar</Text>
         <View style={{ width: 22 }} />

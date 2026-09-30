@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../design";
 import { useC } from "../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { Press } from "../../components/design/Press";
 
 // Geri oku + bolum etiketi (tasarim: "BORÇ DAĞITIMI", "BOŞLUĞU KAPAT",
@@ -12,7 +12,7 @@ export function EyebrowHeader({ label, onBack }) {
   return (
     <View style={s.row}>
       <Press haptic="none" onPress={onBack} accessibilityRole="button" accessibilityLabel="Geri" style={s.tap}>
-        <Icon name="chevL" size={16} color={C.text2} />
+        <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
       </Press>
       <Text style={[TYPOGRAPHY.label, s.label, { color: C.text3 }]} numberOfLines={1}>{label}</Text>
     </View>

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, NAV_ICON } from "../../../themes/tokens";
 
 export function QuickPracticeTopBar({ questions, results, currentIndex, elapsed, onClose, C }) {
   const s = makeStyles(C);
@@ -14,7 +14,7 @@ export function QuickPracticeTopBar({ questions, results, currentIndex, elapsed,
         accessibilityRole="button"
         style={s.closeBtn}
       >
-        <Icon name="x" size={20} color={C.muted} />
+        <Icon name="x" size={NAV_ICON.close} color={C.text2} />
       </TouchableOpacity>
       <View style={s.dots}>
         {questions.map((_, i) => {

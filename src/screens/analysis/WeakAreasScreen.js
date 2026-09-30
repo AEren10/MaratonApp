@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Icon, EmptyState, ErrorState, SectionLabel, Skeleton } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { useC } from "../../contexts/ThemeContext";
@@ -43,7 +43,7 @@ export default function WeakAreasScreen() {
           accessibilityRole="button"
           accessibilityLabel="Geri"
         >
-          <Icon name="arrowL" size={20} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>ZAYIF DERSLER</Text>
       </View>

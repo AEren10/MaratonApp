@@ -16,7 +16,7 @@ import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import { Icon, AnimatedPressable } from "../../components/design";
 import { ReferralSkeleton } from "./components/ReferralSkeleton";
-import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -51,7 +51,7 @@ export default function ReferralScreen() {
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.header}>
           <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12}>
-            <Icon name="arrowL" size={22} color={C.text} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>Arkadaşını Davet Et</Text>
         </View>
@@ -64,7 +64,7 @@ export default function ReferralScreen() {
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: SPACING.md }]}>
           Arkadaşını Davet Et

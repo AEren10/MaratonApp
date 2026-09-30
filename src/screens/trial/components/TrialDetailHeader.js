@@ -1,14 +1,14 @@
 import { View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
-import { STEP, CONTROL } from "../../../themes/tokens";
+import { STEP, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 export function TrialDetailHeader({ C, onBack, onMenu }) {
   return (
     <View style={styles.row}>
       <Press haptic="none" onPress={onBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-        <Icon name="arrowL" size={20} color={C.text2} />
+        <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
       </Press>
       <View style={{ flex: 1 }} />
       <Press haptic="none"

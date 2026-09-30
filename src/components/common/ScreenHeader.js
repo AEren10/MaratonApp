@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useC } from "../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { Press } from "../design/Press";
 import { Icon } from "../design/Icon";
 
@@ -39,7 +39,7 @@ export const ScreenHeader = memo(function ScreenHeader({
             accessibilityLabel={backLabel || (close ? "Kapat" : "Geri")}
             style={styles.tap}
           >
-            <Icon name={close ? "x" : "chevL"} size={close ? 16 : 18} color={C.text2} />
+            <Icon name={close ? "x" : "arrowL"} size={close ? NAV_ICON.close : NAV_ICON.back} color={C.text2} />
           </Press>
         ) : null}
 

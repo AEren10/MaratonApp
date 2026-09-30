@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
+import { NAV_ICON } from "../../../themes/tokens";
 
 export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
   return (
@@ -14,7 +15,7 @@ export function WrongNotebookHeader({ C, counts, onAdd, onBack, styles }) {
           accessibilityRole="button"
           style={[styles.backBtn, { backgroundColor: C.surface, borderColor: C.border }]}
         >
-          <Icon name="arrowL" size={18} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <View>
           <Text style={{ fontFamily: "Archivo_400", fontSize: 12, color: C.muted }}>

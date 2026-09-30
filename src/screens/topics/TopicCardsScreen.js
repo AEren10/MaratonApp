@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useAuth } from "../../contexts/AuthContext";
@@ -65,7 +65,7 @@ export default function TopicCardsScreen() {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       <View style={styles.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12}>
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1, marginLeft: STEP.s2 }]}>
           Konu Kartları

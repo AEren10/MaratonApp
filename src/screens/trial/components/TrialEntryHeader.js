@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Deneme Gir ust bandi: geri, baslik, adim sayaci ve uc parcali ilerleme cizgisi.
@@ -13,7 +13,7 @@ export function TrialEntryHeader({ step, totalSteps, onBack, showCount = true })
       <View style={styles.row}>
         <Press haptic="none" onPress={onBack} hitSlop={STEP.s1} style={styles.back}
           accessibilityLabel="Geri" accessibilityRole="button">
-          <Icon name="chevL" size={20} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[TYPOGRAPHY.subheading, styles.title, { color: C.text }]}>Deneme Gir</Text>
         {showCount ? (

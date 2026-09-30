@@ -8,7 +8,7 @@ import { Press } from "../../components/design/Press";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { useStatsOverview } from "../../hooks/useStatsOverview";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { EXAM_NAME, fmtHours, fmtInt, fmtNet, weekLabel } from "./statsFormat";
 import { StatsStrip } from "./components/StatsStrip";
 import { StatsWeeks } from "./components/StatsWeeks";
@@ -41,7 +41,7 @@ export default function StatsScreen() {
       <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
         <View style={s.header}>
           <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-            <Icon name="arrowL" size={20} color={C.text2} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>İstatistiklerim</Text>
         </View>

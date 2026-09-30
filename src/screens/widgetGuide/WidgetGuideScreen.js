@@ -7,7 +7,7 @@ import { Icon, SectionLabel } from "../../components/design";
 import { Press } from "../../components/design/Press";
 import { useC } from "../../contexts/ThemeContext";
 import { DISCOVER_TIPS, useDiscoverTips } from "../../hooks/useDiscoverTips";
-import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { GuideSteps } from "./components/GuideSteps";
 import { WidgetMiniPreview } from "./components/WidgetMiniPreview";
 import { HOME_STEPS, LOCK_STEPS, WIDGETS } from "./widgetGuideContent";
@@ -27,7 +27,7 @@ export default function WidgetGuideScreen() {
       <View style={s.header}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12}
           accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
       </View>
 

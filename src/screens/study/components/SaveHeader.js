@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Tasarım: geri + "Atla" — başlık gerçek süreyle kişiselleşir.
@@ -22,7 +22,7 @@ export function SaveHeader({ C, duration, onBack }) {
             justifyContent: "center",
           }}
         >
-          <Icon name="chevL" size={16} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
       </View>
 

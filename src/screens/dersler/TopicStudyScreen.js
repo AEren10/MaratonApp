@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, ErrorState } from "../../components/design";
 import { Press } from "../../components/design/Press";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
@@ -85,7 +85,7 @@ export default function TopicStudyScreen() {
       <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
         <View style={s.header}>
           <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri">
-            <Icon name="arrowL" size={20} color={C.text2} />
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
           <View style={[s.dot, { backgroundColor: color }]} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, flex: 1 }]} numberOfLines={1}>

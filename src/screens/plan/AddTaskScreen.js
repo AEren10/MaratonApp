@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Icon, Button } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { AddTaskSubjectRow } from "./components/AddTaskSubjectRow";
 import { AddTaskExamSegment } from "./components/AddTaskExamSegment";
@@ -45,7 +45,7 @@ function AddTaskInner() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
         <Press haptic="none" onPress={() => state.navigation.goBack()} hitSlop={STEP.s2} style={s.backRow}>
-          <Icon name="chevL" size={18} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Durak ekle</Text>
         </Press>
       </View>

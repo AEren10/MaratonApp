@@ -4,7 +4,7 @@ import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Button } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { resetPassword } from "../../supabase/auth";
 import { AuthInput } from "./components/AuthInput";
@@ -68,7 +68,7 @@ export default function ForgotPasswordScreen() {
               accessibilityRole="button"
               style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
             >
-              <Icon name="arrowL" size={18} color={C.text2} />
+              <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
             </Press>
           </View>
 

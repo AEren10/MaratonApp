@@ -6,7 +6,7 @@ import Animated from "react-native-reanimated";
 import { SCREENS } from "../../constants/screens";
 import { openProgram } from "../../navigation/openProgram";
 import { Icon, Card, Button, EmptyState, Skeleton } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useTopicDebt } from "../../hooks/useTopicDebt";
 import { TopicDebtStopRow } from "./components/TopicDebtStopRow";
@@ -34,7 +34,7 @@ export default function TopicDebtScreen() {
           accessibilityLabel="Geri"
           style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
         >
-          <Icon name="chevL" size={18} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Geride kalan konular</Text>
         </Press>
       </View>

@@ -3,7 +3,7 @@ import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { PREMIUM_ENABLED } from "../../constants/premium";
@@ -320,7 +320,7 @@ export default function LeagueScreen() {
           accessibilityHint="Önceki ekrana döner"
           style={{ padding: SPACING.xs }}
         >
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Pressable>
         <View style={{ flex: 1, marginHorizontal: SPACING.md }}>
           <Text style={[TYPOGRAPHY.subheading, { color: C.text, fontSize: 18 }]}>Sosyal Hub</Text>

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
-import { GUTTER, SHAPE, STEP } from "../../themes/tokens";
+import { GUTTER, SHAPE, STEP, NAV_ICON, TYPOGRAPHY } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { Icon } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -39,7 +39,7 @@ export default function SubjectListScreen() {
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
         <Press haptic="none" onPress={handleBack} hitSlop={12} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Geri">
-          <Icon name="arrowL" size={18} color={C.text2} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={[s.title, { color: C.text }]}>Konu ilerlemesi</Text>
       </View>
@@ -119,7 +119,7 @@ const s = StyleSheet.create({
     paddingBottom: 8,
   },
   backBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  title: { fontFamily: "Bricolage_400", fontSize: 22 },
+  title: { ...TYPOGRAPHY.subheading },
   scroll: { paddingBottom: 50 },
   tabsWrap: { paddingHorizontal: GUTTER, paddingTop: 16 },
   tabsContainer: { flexDirection: "row", gap: 4, padding: 4, borderRadius: SHAPE.chip, borderWidth: 1 },

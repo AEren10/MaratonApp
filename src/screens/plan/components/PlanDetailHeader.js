@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 export function PlanDetailHeader({ dayLabel, onBack, C }) {
@@ -14,7 +14,7 @@ export function PlanDetailHeader({ dayLabel, onBack, C }) {
         onPress={onBack}
         style={s.backBtn}
       >
-        <Icon name="chevL" size={18} color={C.text} />
+        <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>{dayLabel}</Text>
       </Press>
     </View>

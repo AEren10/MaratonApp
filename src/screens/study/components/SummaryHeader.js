@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 export function SummaryHeader({ dateLabel, onClose }) {
@@ -17,7 +17,7 @@ export function SummaryHeader({ dateLabel, onClose }) {
         onPress={onClose}
         style={styles.closeBtn}
       >
-        <Icon name="x" size={14} color={C.text2} />
+        <Icon name="x" size={NAV_ICON.close} color={C.text2} />
       </Press>
       <Text style={[TYPOGRAPHY.label, { color: C.text3, flex: 1 }]}>{dateLabel}</Text>
     </View>

@@ -9,7 +9,7 @@ import { SettingsRow } from "./components/SettingsRow";
 import { GoalNetStepper } from "./components/GoalNetStepper";
 import { GoalMultiNetSection } from "./components/GoalMultiNetSection";
 import { GoalBandNote } from "./components/GoalBandNote";
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
 import { useGoalNetEditor } from "../../hooks/useGoalNetEditor";
@@ -37,7 +37,7 @@ function GoalsContent() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={styles.header}>
         <Press haptic="none" onPress={cancel} hitSlop={12} accessibilityRole="button" accessibilityLabel="Kapat" style={styles.closeBtn}>
-          <Icon name="x" size={14} color={C.text2} />
+          <Icon name="x" size={NAV_ICON.close} color={C.text2} />
         </Press>
       </View>
 

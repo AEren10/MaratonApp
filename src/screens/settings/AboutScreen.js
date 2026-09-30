@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Press } from "../../components/design/Press";
 
@@ -23,7 +23,7 @@ export default function AboutScreen() {
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Press haptic="none" onPress={goBack} hitSlop={12} accessibilityLabel="Geri" accessibilityRole="button">
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={s.headerTitle}>Hakkında</Text>
         <View style={{ width: 22 }} />

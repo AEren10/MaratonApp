@@ -9,7 +9,7 @@ import { Icon, Skeleton } from "../../components/design";
 import { ErrorState } from "../../components/design/ErrorState";
 import { EmptyState } from "../../components/common/EmptyState";
 import { SCREENS } from "../../constants/screens";
-import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useSync } from "../../contexts/DataSyncContext";
 import { comparePeriods, subjectComparison, personalBests, consistencyScore } from "../../lib/comparativeAnalytics";
 import { PeriodSummary } from "./components/PeriodSummary";
@@ -43,7 +43,7 @@ export default function ComparativeScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s3 }}>
         <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner">
-          <Icon name="arrowL" size={22} color={C.text} />
+          <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
         <Text style={{ ...TYPOGRAPHY.subheading, color: C.text, marginLeft: STEP.s3, flex: 1 }}>
           Karşılaştırmalı Analiz

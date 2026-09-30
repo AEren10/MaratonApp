@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button, Icon, Skeleton } from "../../components/design";
-import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
@@ -63,7 +63,7 @@ export default function ExamSimulatorScreen() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={s.header}>
         <Press haptic="none" onPress={navigation.goBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Kapat" style={s.close}>
-          <Icon name="x" size={14} color={C.text2} />
+          <Icon name="x" size={NAV_ICON.close} color={C.text2} />
         </Press>
       </View>
       <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>

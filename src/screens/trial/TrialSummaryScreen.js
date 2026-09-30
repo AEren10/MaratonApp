@@ -11,7 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
-import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { alpha } from "../../themes/palette";
 import * as H from "../../lib/haptics";
 import { trialShortLabel } from "./trialLabels";
@@ -60,7 +60,7 @@ export default function TrialSummaryScreen() {
           <View style={styles.header}>
             <Press haptic="none" onPress={() => navigation.popToTop()} style={styles.close}
               accessibilityLabel="Kapat" accessibilityRole="button">
-              <Icon name="x" size={14} color={C.text2} sw={1.7} />
+              <Icon name="x" size={NAV_ICON.close} color={C.text2} sw={1.7} />
             </Press>
             <Text style={[TYPOGRAPHY.label, styles.headerLabel, { color: C.text3 }]}>
               {[typeLabel, dayMonth].filter(Boolean).join(" · ").toLocaleUpperCase("tr-TR")}
