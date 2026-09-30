@@ -10,14 +10,20 @@ import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { mondayOf } from "../../../domain/program/dayKeys";
 import { todayTR } from "../../../lib/dateUtils";
 import { useDayRouteStops } from "../../../hooks/useDayRouteStops";
-import { SelectedDayStopRow } from "../../dersler/components/SelectedDayStopRow";
+import { DayPlannedRow } from "./DayPlannedRow";
 import { StopActionModal } from "../../program/components/StopActionModal";
 
 export function DayPlannedStops({ day, C }) {
   const [menuStop, setMenuStop] = useState(null);
   const navigation = useNavigation();
-  const { stops } = useDayRouteStops(day);
+  const { stops: all } = useDayRouteStops(day);
+  const isToday = day === todayTR();
   const isDraft = day ? mondayOf(day) > mondayOf(todayTR()) : false;
+  // Bugun biten duraklar ustteki YAPILAN listesinde zaten var; burada ikinci
+  // kez "Bitti" diye yazilmaz. Bugun yalniz kalanlar, ileri gunlerde plan.
+  const stops = isToday ? (all || []).filter((x) => x.status !== "done") : all || [];
+  const doneCount = isToday ? (all || []).length - stops.length : 0;
+  const title = isToday ? "BUGÜN KALAN" : "PLANLANAN";
   // Durak eklemenin TEK yolu: o gunun tarihiyle Durak ekle. Eklenen durak
   // ana sayfada, Program Hafta'da ve burada ayni anda gorunur.
   const addRow = (
@@ -33,12 +39,12 @@ export function DayPlannedStops({ day, C }) {
     </Press>
   );
 
-  if (!stops || stops.length === 0) {
+  if (stops.length === 0) {
     return (
       <View style={s.wrap}>
-        <Text style={[TYPOGRAPHY.label, s.head, { color: C.text3 }]}>PLANLANAN</Text>
+        <Text style={[TYPOGRAPHY.label, s.head, { color: C.text3 }]}>{title}</Text>
         <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>
-          Bu gün için planlanan durak yok.
+          {doneCount > 0 ? "Bugünün durakları bitti." : "Bu gün için planlanan durak yok."}
         </Text>
         {addRow}
       </View>
@@ -48,32 +54,15 @@ export function DayPlannedStops({ day, C }) {
   return (
     <View style={s.wrap}>
       <View style={s.headerRow}>
-        <Text style={[TYPOGRAPHY.label, s.head, { color: C.text3 }]}>
-          PLANLANAN ({stops.length})
-        </Text>
+        <Text style={[TYPOGRAPHY.label, s.head, { color: C.text3 }]}>{`${title} (${stops.length})`}</Text>
         {isDraft ? (
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Taslak</Text>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Taslak · hafta başlayınca kesinleşir</Text>
         ) : null}
       </View>
 
-      {isDraft ? (
-        <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginBottom: STEP.s2 }]}>
-          Taslak · hafta başlayınca kesinleşir
-        </Text>
-      ) : null}
-
-      <View style={s.list}>
-        {stops.map((stop, i) => (
-          <SelectedDayStopRow
-            key={stop.id || i}
-            log={stop}
-            isLast={i === stops.length - 1}
-            isDraft={isDraft}
-            C={C}
-            onOpenMenu={setMenuStop}
-          />
-        ))}
-      </View>
+      {stops.map((stop, i) => (
+        <DayPlannedRow key={stop.id || i} stop={stop} draft={isDraft} C={C} onOpenMenu={setMenuStop} />
+      ))}
       {addRow}
 
       <StopActionModal
@@ -95,6 +84,5 @@ const s = StyleSheet.create({
     marginBottom: STEP.s2,
   },
   head: { letterSpacing: 1.1 },
-  list: { marginTop: STEP.s1 },
   add: { flexDirection: "row", alignItems: "center", gap: STEP.s1, minHeight: 44, marginTop: STEP.s1 },
 });

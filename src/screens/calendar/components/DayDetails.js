@@ -72,7 +72,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
             </View>
             <View>
               <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statStops}</Text>
-              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>durak</Text>
+              <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>kayıt</Text>
             </View>
             <View>
               <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>{statQuestions}</Text>
@@ -80,6 +80,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
             </View>
           </View>
 
+          <Text style={[TYPOGRAPHY.label, styles.head, { color: C.text3 }]}>YAPILAN</Text>
           <View>
             {slots.map((s) => (
               <Press
@@ -120,6 +121,7 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
 
 const styles = StyleSheet.create({
   container: { marginTop: STEP.s4, paddingTop: STEP.s3 },
+  head: { letterSpacing: 1.1, marginBottom: STEP.s1 },
   emptyWrap: {
     paddingVertical: STEP.s2,
     alignItems: "flex-start",
