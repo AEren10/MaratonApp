@@ -78,7 +78,7 @@ export function useReferrals({ routeCode, examType, showAlert } = {}) {
     if (!code) return;
     H.medium();
     try {
-      const link = `https://maraton.app/referral/${code}`;
+      const link = `https://maratonapp.com/referral/${code}`;
       await Share.share({
         message: `Maraton ile birlikte ${examName}'ye hazırlanmak ister misin? ${link}\nDavet kodum: ${code}`,
         url: link,

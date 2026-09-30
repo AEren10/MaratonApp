@@ -13,7 +13,7 @@ export function useSettingsActions() {
   const navigation = useNavigation();
 
   const handleHelp = useCallback(() => {
-    showAlert("Yardım", "Soruların için bize ulaşabilirsin:\n\ndestek@maraton.app");
+    showAlert("Yardım", "Soruların için bize ulaşabilirsin:\n\ndestek@maratonapp.com");
   }, []);
 
   const handleLogout = useCallback(() => {
@@ -41,7 +41,7 @@ export function useSettingsActions() {
         if (result?.storageFailures?.length) {
           showAlert(
             "Hesabın silindi",
-            "Bazı dosyaların sunucudan kaldırılamadı. Destek ekibine yazarsan kalanları biz temizleriz: destek@maraton.app",
+            "Bazı dosyaların sunucudan kaldırılamadı. Destek ekibine yazarsan kalanları biz temizleriz: destek@maratonapp.com",
           );
         }
         return true;

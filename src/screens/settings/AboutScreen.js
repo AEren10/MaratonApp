@@ -9,8 +9,8 @@ import { Press } from "../../components/design/Press";
 
 const INFO_ROWS = [
   { label: "Geliştirici", value: "Maraton Team" },
-  { label: "E-posta", value: "destek@maraton.app" },
-  { label: "Web", value: "maraton.app" },
+  { label: "E-posta", value: "destek@maratonapp.com" },
+  { label: "Web", value: "maratonapp.com" },
 ];
 
 export default function AboutScreen() {
