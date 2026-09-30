@@ -12,6 +12,7 @@ import { HomeStopRow } from "./HomeStopRow";
 import { StopActionModal } from "../../program/components/StopActionModal";
 import { useStopCorrectPrompt } from "../../../hooks/useStopCorrectPrompt";
 import { StopCorrectSheet } from "./StopCorrectSheet";
+import { ProgressSegment } from "./ProgressSegment";
 
 // Satir eklenip cikinca liste zipla­masin diye.
 const REFLOW = LinearTransition.duration(220);
@@ -37,13 +38,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
         </Text>
         <View style={s.segs}>
           {items.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                s.seg,
-                { backgroundColor: i < doneCount ? C.up : C.track },
-              ]}
-            />
+            <ProgressSegment key={i} style={s.seg} filled={i < doneCount} color={C.up} track={C.track} />
           ))}
         </View>
         {items.length ? (
