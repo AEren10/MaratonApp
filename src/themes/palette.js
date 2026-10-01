@@ -22,10 +22,10 @@ export const SEEDS = {
   light: {
     // Acik zeminde parlak kizil "alarm" gibi bagiriyordu: koyu sarap tonu.
     accent: "#C42633",
-    bg: "#F1EDE9",
+    bg: "#F5F2EE",
     canvas: "#E4DFDA",
     text: "#16120F",
-    up: "#147437",
+    up: "#10632E", // kum kart ustunde AA (4.5+)
   },
 };
 
@@ -51,7 +51,7 @@ const FIXED = {
     text4: "#9C9590",
     text5: "#C9C1BA",
     accentInk: "#FFFFFF",
-    accentBright: "#B11F2A",
+    accentBright: "#A81C27",
     down: "#6B7F8D",
     warn: "#92400E",
     danger: "#C4262F",
@@ -59,16 +59,17 @@ const FIXED = {
 };
 
 // Açık temada yüzey basamakları — sıcak açık gri kâğıt merdiveni (Brief 22).
-// Zemin ile kart arasi fark gorunur; "yukseltilmis" (secili segment, cip,
-// avatar kutusu) acik temada zeminden KOYU degil en acik ton -- koyu temadaki
-// gibi isiga yakin. Eski hali kirli gri duruyordu.
+// ACIK ZEMIN + SICAK KUM NESNELER (kullanici karari, 2 Ekim). Beyaz ustu
+// beyaz kart soluk duruyordu; zemin acik kaldi, nesneler (kart, segment yolu,
+// sekme cubugu, panel) kendine guvenen bir kum tonuna gecti. "Yukseltilmis"
+// (secili segment hapi, cip) beyaz: kumun ustunde parlar.
 const LIGHT_SURFACES = {
-  surface: "#F8F5F2",
+  surface: "#E6D6C1",
   elev: "#FFFFFF",
-  border: "#D6CEC6",
-  line: "#E0D9D2",
-  track: "#E4DED8",
-  void: "#E9E4DF",
+  border: "#D3C0A8",
+  line: "#E2DACF",
+  track: "#E3D8CA",
+  void: "#ECE4DA",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise
@@ -167,7 +168,7 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#B8212C"),
     brandFillPress: isDark ? "#A81C26" : "#951A23",
     brandPress: isDark ? "#A81C26" : "#951A23",
-    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#B11F2A"),
+    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#A81C27"),
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
