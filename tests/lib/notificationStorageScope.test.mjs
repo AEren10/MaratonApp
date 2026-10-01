@@ -64,12 +64,9 @@ test("scheduled notifications use fail-closed deep links", () => {
 
 test("notification timing is personalized and foreground banners stay quiet", () => {
   assert.match(notifications, /function notificationJitterMinutes\(userId, type, window = 40\)/);
-  assert.match(notifications, /function withNotificationJitter\(hour, minute, userId, type, window = 40\)/);
-  assert.match(notifications, /withNotificationJitter\(useHour, minute, userId, "daily_reminder"\)/);
-  assert.match(notifications, /withNotificationJitter\(22, 0, userId, "streak_risk", 30\)/);
-  assert.match(notifications, /withNotificationJitter\(20, 0, userId, "weekly_summary"\)/);
-  assert.match(notifications, /withNotificationJitter\(18, 0, userId, "trial_reminder"\)/);
-  assert.match(notifications, /notificationJitterMinutes\(userId, "task_reminder_interval", 1200\)/);
+  // Saat kaydirma ve kisisel saat artik planda (domain/notify/notificationPlan).
+  assert.match(notifications, /jitter: \(type\) => notificationJitterMinutes\(userId, type, 30\)/);
+  assert.match(notifications, /getOptimalHour\(userId\)/);
   assert.match(notifications, /shouldShowBanner: false/);
   assert.match(notifications, /shouldShowList: false/);
 });

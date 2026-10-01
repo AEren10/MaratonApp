@@ -3,10 +3,10 @@ import { Platform } from "react-native";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { SCREENS } from "../constants/screens";
 import { notificationUrl } from "../navigation/routes";
-import { getDaily, getStreakRisk, getZeigarnik as getZeigarnikContent, getOptimalHour } from "./notificationTemplates";
+import { getOptimalHour } from "./notificationTemplates";
 import { getNotificationPrefs, updateNotificationPrefs, registerPushToken } from "../supabase/profiles";
 import * as appStorage from "./storage/appStorage";
-import { dailyReminderContent, weeklySummaryContent } from "./reminderContent";
+import { buildNotificationPlan, PLAN_TYPES } from "../domain/notify/notificationPlan";
 import { getSession } from "../supabase/auth";
 import { registerSessionReset } from "./session/sessionReset";
 
@@ -144,13 +144,9 @@ async function isActiveOwner(userId) {
   }
 }
 
-// applyNotifPrefs'in yönettiği tipler. task_reminder BİLEREK yok.
-const PREF_MANAGED_TYPES = [
-  "daily_reminder",
-  "streak_risk",
-  "weekly_summary",
-  "trial_reminder",
-];
+// applyNotifPrefs'in yönettiği tipler (bkz. domain/notify/notificationPlan).
+// "trial_reminder" eskiden haftalik tekrarlayan tetikti; kurulu kalmis olanlar da temizlensin.
+const PREF_MANAGED_TYPES = PLAN_TYPES;
 
 function hashString(value = "") {
   let hash = 0;
@@ -166,150 +162,42 @@ function notificationJitterMinutes(userId, type, window = 40) {
   return (hashString(`${userId}:${type}`) % (span + 1)) - Math.floor(span / 2);
 }
 
-function withNotificationJitter(hour, minute, userId, type, window = 40) {
-  const minTotal = 8 * 60;
-  const maxTotal = 22 * 60 + 30;
-  const base = Math.max(0, Math.min(23 * 60 + 59, (Number(hour) || 0) * 60 + (Number(minute) || 0)));
-  const shifted = Math.max(minTotal, Math.min(maxTotal, base + notificationJitterMinutes(userId, type, window)));
-  return {
-    hour: Math.floor(shifted / 60),
-    minute: shifted % 60,
-  };
-}
+// Ekran anahtari -> derin baglanti. Plan saf kalsin diye ekran adlari burada.
+const PLAN_SCREENS = {
+  plan: () => notificationUrl(SCREENS.PLAN_DETAIL),
+  review: () => notificationUrl(SCREENS.REVIEW_SESSION),
+  summary: () => notificationUrl(SCREENS.SUMMARY, { period: "week" }),
+  comparative: () => notificationUrl(SCREENS.COMPARATIVE),
+  trial: () => notificationUrl(SCREENS.TRIAL_ENTRY),
+  route: () => notificationUrl(SCREENS.ROADMAP),
+};
 
-// Gunluk hatirlatma: onumuzdeki 7 gun icin TEK SEFERLIK kayitlar. Tekrarlayan
-// (DAILY) tetik her gun ayni metni gonderiyordu; artik gunun plani biliniyorsa
-// o gunun kaydi somut (kac durak, siradaki, kac dakika), gun bittiyse o gun
-// hic gonderilmez (bkz. reminderContent). Ana sayfa her acilista yeniden kurar;
-// hic acmayan kullaniciyi sunucu push'u (3 gun pasif) yakalar.
-export async function scheduleDailyReminder(hour = 19, minute = 0, userId = null) {
-  if (Platform.OS === "web") return null;
-  try {
-    const optHour = await getOptimalHour(userId).catch(() => hour);
-    // Aliskanlik saati secilen saatten en fazla 1 saat sapabilir. 3 saatlik
-    // kayma (19:00 secen kullaniciya 16:00) hata gibi okunuyordu.
-    const useHour = Math.abs(optHour - hour) <= 1 ? optHour : hour;
-    const time = withNotificationJitter(useHour, minute, userId, "daily_reminder");
-    const context = await readNotifContext(userId);
-    const now = new Date();
-    for (let i = 0; i < 7; i += 1) {
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, time.hour, time.minute, 0);
-      if (date.getTime() <= Date.now()) continue;
-      const content = dailyReminderContent(context, localDayKey(date), getDaily());
-      if (!content) continue;
+// Yonetilen tum bildirimleri plandan kurar. Cagiran once iptal eder.
+// Aliskanlik saati secilen saatten en fazla 1 saat sapabilir (19:00 secene
+// 16:00 hata gibi okunuyordu).
+async function schedulePlan(prefs, context, userId) {
+  if (Platform.OS === "web" || !prefs) return;
+  const chosen = Number(prefs.dailyReminderHour ?? 19);
+  const optHour = await getOptimalHour(userId).catch(() => chosen);
+  const habitHour = Math.abs(optHour - chosen) <= 1 ? optHour : chosen;
+  const items = buildNotificationPlan({
+    now: new Date(),
+    prefs,
+    context,
+    habitHour,
+    jitter: (type) => notificationJitterMinutes(userId, type, 30),
+  });
+  for (const item of items) {
+    try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: content.title,
-          body: content.body,
-          data: {
-            type: "daily_reminder",
-            url: notificationUrl(content.kind === "review" ? SCREENS.REVIEW_SESSION : SCREENS.PLAN_DETAIL),
-          },
+          title: item.title,
+          body: item.body,
+          data: { type: item.type, url: (PLAN_SCREENS[item.screen] || PLAN_SCREENS.plan)() },
         },
-        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: item.date },
       });
-    }
-    return true;
-  } catch (_) {
-    return null;
-  }
-}
-
-const localDayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
-// Bir sonraki 22:00'ı döndürür. O gün 22:00 geçtiyse yarını verir.
-// studiedToday ise bugünü atlayıp doğrudan yarını hedefler.
-function nextStreakRiskDate(studiedToday, userId = null) {
-  const target = new Date();
-  const time = withNotificationJitter(22, 0, userId, "streak_risk", 30);
-  target.setSeconds(0, 0);
-  target.setMinutes(time.minute);
-  target.setHours(time.hour);
-  if (studiedToday || target.getTime() <= Date.now()) {
-    target.setDate(target.getDate() + 1);
-  }
-  return target;
-}
-
-/**
- * Seri-riski hatırlatması.
- *
- * Önceden DAILY tetikleyiciydi: her gün 22:00'da, o gün çalışılmış olsa bile
- * "serin tehlikede" diye bildirim gidiyordu. DAILY tetikleyici tek bir günü
- * atlayamadığı için yanlış-pozitif kaçınılmazdı — ve yanlış-pozitif bildirim,
- * kullanıcının bildirimleri tamamen kapatmasının en hızlı yolu.
- *
- * Artık TEK SEFERLİK: her senkronda yeniden kuruluyor, o gün çalışıldıysa
- * yarına atılıyor. Uygulamayı hiç açmayan kullanıcılar için sunucu tarafındaki
- * push (send-push / streak_risk) devrede — o zaten "bugün aktif olmayan"ları
- * hedefliyor, yani ikisi çakışmaz.
- */
-export async function scheduleStreakRiskReminder(streak = 0, studiedToday = false, userId = null) {
-  if (Platform.OS === "web") return null;
-  try {
-    const { title, body } = streak > 0
-      ? getStreakRisk(streak)
-      : { title: "Bugün kayıt yok gibi görünüyor", body: "Kısa bir oturum seriyi canlı tutar." };
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        data: { type: "streak_risk", url: notificationUrl(SCREENS.PLAN_DETAIL) },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: nextStreakRiskDate(studiedToday, userId),
-      },
-    });
-  } catch (_) {
-    return null;
-  }
-}
-
-// Pazar 20:00 karnesi. Sayilar hic doldurulmuyordu (weeklyVars kimse
-// yazmiyordu), hep genel metin gidiyordu. Artik ana sayfa haftanin soru ve
-// dakikasini baglama yaziyor; bu Pazar'in kaydi o sayilarla, sonraki uc
-// Pazar genel metinle kurulur.
-export async function scheduleWeeklySummary(weeklyVars = {}, userId = null) {
-  if (Platform.OS === "web") return null;
-  try {
-    const time = withNotificationJitter(20, 0, userId, "weekly_summary");
-    const now = new Date();
-    const daysToSunday = (7 - now.getDay()) % 7;
-    for (let i = 0; i < 4; i += 1) {
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysToSunday + i * 7, time.hour, time.minute, 0);
-      if (date.getTime() <= Date.now()) continue;
-      const { title, body } = weeklySummaryContent(i === 0 ? weeklyVars || {} : {});
-      await Notifications.scheduleNotificationAsync({
-        content: { title, body, data: { type: "weekly_summary", url: notificationUrl(SCREENS.SUMMARY, { period: "week" }) } },
-        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date },
-      });
-    }
-    return true;
-  } catch (_) {
-    return null;
-  }
-}
-
-export async function scheduleTrialReminder(userId = null) {
-  if (Platform.OS === "web") return null;
-  try {
-    const time = withNotificationJitter(18, 0, userId, "trial_reminder");
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Deneme zamanı",
-        body: "Bu hafta henüz deneme girmedin. Kendini test et!",
-        data: { type: "trial_reminder", url: notificationUrl(SCREENS.TRIAL_ENTRY) },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: 4,
-        hour: time.hour,
-        minute: time.minute,
-      },
-    });
-  } catch {
-    return null;
+    } catch (_) {}
   }
 }
 
@@ -409,21 +297,9 @@ async function applyNotifPrefsNow(prefs, context, userId = null) {
     context = { ...stored, ...context };
     await saveNotifContext(context, userId);
   } else context = stored;
-  if (prefs.dailyReminderEnabled) {
-    await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute, userId);
-  }
-  // Bağlam hiç bilinmiyorsa (ilk açılış, henüz senkron olmadı) streak-risk
-  // bildirimi KURULMAZ. Kurulsaydı studiedToday=false varsayımıyla yanlış
-  // uyarı giderdi; useDataSync birkaç saniye sonra doğru bağlamla çağırıyor.
-  if (prefs.streakRiskEnabled && context.studiedToday !== undefined) {
-    await scheduleStreakRiskReminder(context.streak, context.studiedToday, userId);
-  }
-  if (prefs.weeklySummaryEnabled !== false) {
-    await scheduleWeeklySummary(context.weeklyVars, userId);
-  }
-  if (prefs.trialReminderEnabled) {
-    await scheduleTrialReminder(userId);
-  }
+  // Bağlam hiç bilinmiyorsa (ilk açılış) seri bildirimi plan tarafinda
+  // kurulmaz: studiedToday tanimsizken plan seri dilimini atlar.
+  await schedulePlan(prefs, context, userId);
 }
 
 /**
@@ -444,10 +320,10 @@ async function onStudiedTodayNow(streak, userId) {
   try {
     if (!(await isActiveOwner(userId))) return;
     const prefs = await getNotifPrefs(userId);
-    await cancelScheduledByType(["streak_risk"]);
-    const context = await readNotifContext(userId);
-    await saveNotifContext({ ...(context || {}), streak, studiedToday: true }, userId);
-    if (prefs?.streakRiskEnabled) await scheduleStreakRiskReminder(streak, true, userId);
+    await cancelScheduledByType(PREF_MANAGED_TYPES);
+    const context = { ...(await readNotifContext(userId)), streak, studiedToday: true };
+    await saveNotifContext(context, userId);
+    await schedulePlan(prefs, context, userId);
   } catch (_) {}
 }
 
@@ -471,17 +347,14 @@ async function updateReminderContentNow(partial, userId) {
     if (!(await isActiveOwner(userId))) return;
     const context = await readNotifContext(userId);
     const next = { ...context, ...partial };
-    const key = JSON.stringify([userId, next.todayPlan, next.reviewDue, next.weeklyVars]);
+    const key = JSON.stringify([userId, next]);
     if (key === lastReminderKey) return;
     lastReminderKey = key;
     await saveNotifContext(next, userId);
     const prefs = await getNotifPrefs(userId);
     if (!prefs) return;
-    await cancelScheduledByType(["daily_reminder", "weekly_summary"]);
-    if (prefs.dailyReminderEnabled) {
-      await scheduleDailyReminder(prefs.dailyReminderHour, prefs.dailyReminderMinute, userId);
-    }
-    if (prefs.weeklySummaryEnabled !== false) await scheduleWeeklySummary(next.weeklyVars, userId);
+    await cancelScheduledByType(PREF_MANAGED_TYPES);
+    await schedulePlan(prefs, next, userId);
   } catch (_) {}
 }
 
@@ -492,39 +365,10 @@ export async function scheduleTaskNotifications(taskCount, userId = null) {
 
 async function scheduleTaskNotificationsNow(taskCount, userId) {
   if (!(await isActiveOwner(userId))) return;
-  const prefs = await getNotifPrefs(userId);
-  if (prefs.taskReminderEnabled === false) return;
+  // Eskiden her gun 20:00'de TEKRARLAYAN "hedeflerine ulasmadin" kuruluyordu;
+  // uygulamayi birakana aylarca gidiyordu. Acik duraklar artik planin aksam
+  // dilimiyle ("gun bitmedi") hatirlatiliyor; burada yalniz eskiler temizlenir.
   await cancelTaskReminders();
-  try {
-    const zContent = getZeigarnikContent({ count: taskCount, subject: "", percent: "" });
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: zContent.title || "Yarım kalan görevlerin var",
-        body: zContent.body || `${taskCount} görev tamamlanmamış. Geri dön ve bitir!`,
-        data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 9000 + notificationJitterMinutes(userId, "task_reminder_interval", 1200),
-      },
-    });
-    const now = new Date();
-    if (now.getHours() < 20) {
-      const time = withNotificationJitter(20, 0, userId, "task_reminder_daily");
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Bugünkü hedeflerine ulaşmadın",
-          body: "Açık duran durakların var. Uygunsa birini kapatabilirsin.",
-          data: { type: "task_reminder", url: notificationUrl(SCREENS.PLAN_DETAIL) },
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour: time.hour,
-          minute: time.minute,
-        },
-      });
-    }
-  } catch (_) {}
 }
 
 export async function cancelTaskReminders() {
