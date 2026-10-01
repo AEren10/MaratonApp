@@ -1,74 +1,92 @@
-import { View, Text } from "react-native";
-import Animated from "react-native-reanimated";
-import { BentoCard, Stat, Chip, Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Icon } from "../../../components/design";
+import { StatsStrip } from "../../../components/design/StatsStrip";
+import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
-const RATE_MAP = {
-  improving: { label: "Yükseliş trendi", icon: "trendUp", colorKey: "green" },
-  declining: { label: "Düşüş trendi", icon: "trendDown", colorKey: "red" },
-  stable: { label: "Stabil performans", icon: "minus", colorKey: "sec" },
-};
+const RATE_MAP = (C) => ({
+  improving: { label: "Yükseliş trendi", icon: "trendUp", color: C.up },
+  declining: { label: "Düşüş trendi", icon: "trendDown", color: C.down },
+  stable: { label: "Dengeli performans", icon: "minus", color: C.text3 },
+});
 
-export function PeriodSummary({ current, previous, diff, improvementRate }) {
+export function PeriodSummary({ current, previous, diff, improvementRate, consistency }) {
   const C = useC();
-  const rate = RATE_MAP[improvementRate] ?? RATE_MAP.stable;
-  const accent = C[rate.colorKey];
+  const rateMap = RATE_MAP(C);
+  const rate = rateMap[improvementRate] ?? rateMap.stable;
   const isPositive = diff.avgNet >= 0;
-  const diffColor = isPositive ? C.green : C.red;
   const sign = isPositive ? "+" : "";
 
-  const gradient =
-    improvementRate === "improving"
-      ? [C.green + "12", C.surface, C.surface]
-      : improvementRate === "declining"
-        ? [C.red + "12", C.surface, C.surface]
-        : [C.surface2 + "12", C.surface, C.surface];
-
   return (
-    <Animated.View>
-      <BentoCard gradient={gradient} accent={accent}>
-        <Chip color={accent}>DÖNEM KARŞILAŞTIRMASI</Chip>
+    <View style={s.wrap}>
+      <Text style={[TYPOGRAPHY.tableHead, { color: C.accentBright }]}>DÖNEM KARŞILAŞTIRMASI</Text>
 
-        <Stat size={48} color={C.text} style={{ marginTop: SPACING.md }}>
-          {current.avgNet.toFixed(1)}
-        </Stat>
-        <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
-          Dönem ortalaması
+      <View style={s.heroRow}>
+        <Text style={[TYPOGRAPHY.statLarge, s.num, { color: C.text }]}>
+          {current.avgNet.toFixed(1).replace(".", ",")}
         </Text>
-
-        <View style={{ flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.lg }}>
-          <View style={miniBox(C)}>
-            <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>Önceki dönem</Text>
-            <Text style={[TYPOGRAPHY.subheading, { color: C.muted }]}>
-              {previous.avgNet.toFixed(1)}
-            </Text>
-          </View>
-          <View style={miniBox(C)}>
-            <Text style={[TYPOGRAPHY.caption, { color: C.muted }]}>Değişim</Text>
-            <Text style={[TYPOGRAPHY.subheading, { color: diffColor }]}>
-              {sign}{diff.avgNet.toFixed(1)}
-              {typeof diff.pct === "number" ? ` %${diff.pct.toFixed(0)}` : ""}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.xs, marginTop: SPACING.md }}>
-          <Icon name={rate.icon} size={16} color={accent} />
-          <Text style={[TYPOGRAPHY.caption, { color: accent }]}>{rate.label}</Text>
-        </View>
-
-        <Text style={[TYPOGRAPHY.caption, { color: C.muted, marginTop: SPACING.sm }]}>
-          Bu dönem: {current.count} deneme · Önceki: {previous.count}
+        <Text style={[TYPOGRAPHY.subheading, { color: C.text3, marginLeft: STEP.s1, marginBottom: 6 }]}>
+          net
         </Text>
-      </BentoCard>
-    </Animated.View>
+      </View>
+
+      <View style={s.trendRow}>
+        <Icon name={rate.icon} size={15} color={rate.color} />
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: rate.color }]}>
+          {rate.label}
+        </Text>
+        <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>
+          (önceki döneme göre {sign}{diff.avgNet.toFixed(1).replace(".", ",")} net)
+        </Text>
+      </View>
+
+      <StatsStrip
+        C={C}
+        cells={[
+          { label: "Önceki", value: previous.avgNet.toFixed(1).replace(".", ",") },
+          { label: "Değişim", value: `${sign}${diff.avgNet.toFixed(1).replace(".", ",")}` },
+          { label: "Tutarlılık", value: `${Math.round(consistency?.score ?? 0)}/100` },
+          { label: "Deneme", value: String(current.count) },
+        ]}
+        style={{ marginTop: STEP.s3 }}
+      />
+
+      <View style={s.metaFooter}>
+        <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>
+          Bu dönem {current.count} deneme · Önceki dönem {previous.count} deneme
+        </Text>
+        {consistency?.label ? (
+          <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>
+            Tutarlılık durumu: {consistency.label}
+          </Text>
+        ) : null}
+      </View>
+    </View>
   );
 }
 
-const miniBox = (C) => ({
-  flex: 1,
-  backgroundColor: C.surface2,
-  borderRadius: RADIUS.lg,
-  padding: SPACING.md,
+const s = StyleSheet.create({
+  wrap: {
+    marginTop: STEP.s2,
+  },
+  heroRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginTop: STEP.s1,
+  },
+  num: {
+    fontVariant: ["tabular-nums"],
+  },
+  trendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: STEP.s1,
+    marginTop: STEP.s1 / 2,
+    flexWrap: "wrap",
+  },
+  metaFooter: {
+    marginTop: STEP.s2,
+    gap: 2,
+  },
 });
