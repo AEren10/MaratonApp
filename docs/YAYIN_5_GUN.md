@@ -51,7 +51,7 @@ Apple incelemecisinin ve her yeni kullanıcının ilk gördüğü yer burası.
   - Boş hesap ret sebebi olabilir.
 - [ ] **Sen:** Sıfırdan yeni bir hesapla uygulamayı baştan sona dene, gördüğünü at.
 
-- [ ] **Claude (çalışma sonunda, kullanıcı onayladı):** TestFlight build 7'ye 1 Ekim düzeltmelerini OTA gönder: `eas update --channel production --message "1 Ekim duzeltmeleri"` (plan görevleri, Durak ekle, TYT/AYT dengesi, kaydırınca ışık + çökme düzeltmesi). Önce testler + expo export.
+- [x] **Claude (çalışma sonunda, kullanıcı onayladı):** TestFlight build 7'ye 1 Ekim düzeltmelerini OTA gönder *(1 Ekim 17:xx gönderildi, update group 71d8a460, main fd78cfd. Önemli: production kanalında 1 haftalık eski bir güncelleme vardı ve build 7 onu çalıştırıyordu; bu güncelleme onu geçersiz kıldı.)*: `eas update --channel production --message "1 Ekim duzeltmeleri"` (plan görevleri, Durak ekle, TYT/AYT dengesi, kaydırınca ışık + çökme düzeltmesi). Önce testler + expo export.
 
 ## Gün 3 · Cumartesi 3 Ekim: Açık tema, bildirimler, Story, cihaz build'i
 
