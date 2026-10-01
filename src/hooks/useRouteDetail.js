@@ -100,7 +100,7 @@ export function useRouteDetail() {
     addFirstStop,
     openScenarios,
     // Bagla acildiysa geri gidecek ekran olmayabilir: ana sayfaya don.
-    goBack: () => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate(SCREENS.HOME_ROOT)),
+    goBack: () => (navigation.canGoBack() ? navigation.goBack() : openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME)),
     openThreshold: () => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.RANK_SIMULATOR),
     openHowItWorks: () => navigation.navigate(SCREENS.HOW_IT_WORKS),
     openStop: (key) => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROUTE_STOP_DETAIL, { stopKey: key }),
