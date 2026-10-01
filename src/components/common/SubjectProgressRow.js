@@ -3,8 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "../design";
 import { Press } from "../design/Press";
 import { useC } from "../../contexts/ThemeContext";
-import { alpha } from "../../themes/colorMix";
-import { getSubjectBadge } from "../../themes/subjects";
+import { SubjectIcon } from "./SubjectIcon";
 import { SHAPE, STEP } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
@@ -22,9 +21,6 @@ function SubjectProgressRow({
   style,
 }) {
   const C = useC();
-  const badgeText = badge || getSubjectBadge(name);
-  const badgeBg = alpha(color, 12);
-  const badgeBorder = alpha(color, 24);
   const numericPct = typeof pct === "number" ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
   const fillWidth = numericPct > 0 ? `${Math.max(3, numericPct)}%` : "0%";
 
@@ -36,9 +32,7 @@ function SubjectProgressRow({
 
   const content = (
     <>
-      <View style={[s.badge, { backgroundColor: badgeBg, borderColor: badgeBorder }]}>
-        <Text style={[s.badgeText, { color }]}>{badgeText}</Text>
-      </View>
+      <SubjectIcon subject={badge && badge.length > 3 ? badge : name} color={color} />
       <View style={s.body}>
         <View style={s.topRow}>
           <Text style={[s.name, { color: C.text }]} numberOfLines={1}>
@@ -103,20 +97,7 @@ const s = StyleSheet.create({
     gap: STEP.s2,
     paddingVertical: STEP.s2 + 2,
   },
-  badge: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeText: {
-    fontFamily: "Archivo_700",
-    fontSize: 11,
-    letterSpacing: 0.5,
-  },
-  body: {
+body: {
     flex: 1,
     minWidth: 0,
     gap: STEP.s1,

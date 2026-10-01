@@ -94,3 +94,18 @@ export function getSubjectBadge(nameOrKey = "") {
   if (clean.startsWith("EDE")) return "EDE";
   return clean.slice(0, 3);
 }
+
+// Ders ikonu (kisaltma rozetinin yerine). Rozetle ayni ad eslemesi; bilinmeyen
+// ders null doner, cagiran kisaltmaya duser.
+const GLYPH_BY_BADGE = {
+  TR: "bookOpen", MAT: "sigma", GEO: "sigma", "FİZ": "atom", "KİM": "flask", "BİY": "leaf",
+  TAR: "landmark", "İNK": "landmark", "COĞ": "globe", FEL: "lightbulb", "DİN": "moon",
+  EDE: "feather", "İNG": "languages",
+};
+
+export function getSubjectGlyph(nameOrKey = "") {
+  const text = String(getSubjectLabel(nameOrKey) || nameOrKey).trim().toLocaleUpperCase("tr-TR");
+  if (text.startsWith("FEN")) return "flask";
+  if (text.startsWith("SOSYAL")) return "globe";
+  return GLYPH_BY_BADGE[getSubjectBadge(nameOrKey)] || null;
+}

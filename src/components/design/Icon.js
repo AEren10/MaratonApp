@@ -1,4 +1,5 @@
 import Svg, { Path, Circle, Polyline, Line, Polygon, Rect, G } from "react-native-svg";
+import { SUBJECT_GLYPHS } from "./subjectGlyphs";
 
 const ICONS = {
   zap: <Polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
@@ -415,6 +416,7 @@ const ICONS = {
       <Circle cx="19" cy="12" r="1.7" />
     </>
   ),
+  ...SUBJECT_GLYPHS,
 };
 
 export function Icon({ name, size = 20, color = "#FFFFFF", sw = 1.5, fill = "none" }) {
