@@ -35,6 +35,12 @@ let _globalSaveTimer = null;
 // kopyada set edilir ve kullanıcı XP alır ama hiçbir geri bildirim görmezdi.
 // Ekranların render ettiği kopya ile ödülü veren kopya farklı olabildiği için
 // durum modül seviyesinde tutuluyor ve tüm kopyalar bildirim alıyor.
+// XP ANLIK BILDIRIMLERI KAPALI (1 Ekim, kullanici karari Claude'a birakti).
+// XP ogrenciye "ne calismaliyim" sorusunda bir sey soylemiyor; her eylemden
+// sonra ekrana ek bir oge dusuruyordu. XP hesabi ve sunucu kaydi suruyor,
+// Seviye ekrani duruyor; yalniz "+XP" bildirimi ve seviye atlama penceresi
+// gosterilmiyor. Geri acmak icin true yap.
+export const XP_POPUPS_ENABLED = false;
 const _toastIdle = { visible: false, amount: 0, multiplier: 1 };
 let _xpToast = _toastIdle;
 const _toastSubs = new Set();
@@ -168,10 +174,10 @@ export function useGamification() {
         totalXPRef.current = currentXP + amount;
         weeklyXPRef.current = weeklyXPRef.current + amount;
         if (user?.id) enqueueXPLog(dispatch, user.id, amount, action, xpOperationId(action, data));
-        setXpToast({ visible: true, amount, multiplier });
+        if (XP_POPUPS_ENABLED) setXpToast({ visible: true, amount, multiplier });
 
         const newLevel = getLevelForXP(currentXP + amount);
-        if (newLevel.level > prevLevel.level) {
+        if (XP_POPUPS_ENABLED && newLevel.level > prevLevel.level) {
           clearTimeout(levelUpTimerRef.current);
           levelUpTimerRef.current = setTimeout(() => setLevelUpModal({ visible: true, level: newLevel.level, title: newLevel.title }), 3000);
         }
@@ -247,7 +253,7 @@ export function useGamification() {
           weeklyXPRef.current += totalMilestoneXP;
           const prevLevel = getLevelForXP(currentXP);
           const newLevel = getLevelForXP(totalXPRef.current);
-          if (newLevel.level > prevLevel.level) {
+          if (XP_POPUPS_ENABLED && newLevel.level > prevLevel.level) {
             clearTimeout(levelUpTimerRef.current);
             levelUpTimerRef.current = setTimeout(() => setLevelUpModal({ visible: true, level: newLevel.level, title: newLevel.title }), 4500);
           }

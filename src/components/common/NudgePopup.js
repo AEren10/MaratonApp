@@ -7,7 +7,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "../design";
-import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, GUTTER, CONTROL, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import * as haptic from "../../lib/haptics";
 import { Press } from "../../components/design/Press";
@@ -19,7 +19,7 @@ const POPUP_COLORS = {
 
 const AUTO_DISMISS_MS = 4500;
 const OFF_Y = -160;               // ekranin ustunde, gorunmez
-const ENTER_MS = 320;
+const ENTER = { duration: 420, dampingRatio: 0.85 }; // iner, cok hafif oturur
 const EXIT_MS = 240;
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 const SNAP_BACK = { duration: 400, dampingRatio: 0.8 };
@@ -50,8 +50,8 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
     if (!visible || !nudge) return undefined;
     haptic.tap();
     y.set(reduced ? 0 : OFF_Y);
-    if (!reduced) y.set(withTiming(0, { duration: ENTER_MS, easing: EASE_OUT }));
-    opacity.set(withTiming(1, { duration: reduced ? 200 : ENTER_MS / 2 }));
+    if (!reduced) y.set(withSpring(0, ENTER));
+    opacity.set(withTiming(1, { duration: reduced ? 200 : 180 }));
     timer.current = setTimeout(() => hide(onDismiss), AUTO_DISMISS_MS);
     return () => clearTimeout(timer.current);
   }, [visible, nudge]);
@@ -82,8 +82,9 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
       }
     });
 
+  // Inerken 0.96 -> 1 hafif buyur (yukaridaki konumdan turer, ayri deger yok).
   const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: y.get() }],
+    transform: [{ translateY: y.get() }, { scale: 0.96 + 0.04 * Math.max(0, Math.min(1, 1 - y.get() / OFF_Y)) }],
     opacity: opacity.get(),
   }));
 
@@ -96,20 +97,18 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
         <Press
           haptic="tap"
           onPress={() => hide(onAction ? () => onAction(nudge) : onDismiss)}
-          style={[styles.card, { backgroundColor: C.surface, borderColor: C.line }]}
+          style={[styles.card, { backgroundColor: C.elev, borderColor: C.border }]}
         >
-          <View style={[styles.iconBox, { backgroundColor: tint + "20" }]}>
-            <Icon name={nudge.icon || "bell"} size={20} color={tint} />
-          </View>
+          <Icon name={nudge.icon || "bell"} size={18} color={tint} />
           <View style={styles.body}>
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{nudge.message}</Text>
+            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]} numberOfLines={2}>{nudge.message}</Text>
             {nudge.actionLabel ? (
               <Text style={[TYPOGRAPHY.metaSemiBold, styles.action, { color: tint }]}>{nudge.actionLabel}</Text>
             ) : null}
           </View>
           <Press haptic="none" onPress={() => hide(onDismiss)} hitSlop={12} style={styles.close}
             accessibilityRole="button" accessibilityLabel="Bildirimi kapat">
-            <Icon name="x" size={16} color={C.text3} />
+            <Icon name="x" size={NAV_ICON.close} color={C.text3} />
           </Press>
         </Press>
       </Animated.View>
@@ -119,16 +118,12 @@ export function NudgePopup({ nudge, visible, onDismiss, onAction }) {
 
 const styles = StyleSheet.create({
   container: { position: "absolute", left: GUTTER, right: GUTTER, zIndex: 10000 },
+  // Hap: kutu ve golge yok (derinlik yuzey tonu + 1px kenar, tasarim kurali).
   card: {
-    flexDirection: "row", alignItems: "center", borderRadius: SHAPE.card, borderWidth: 1,
-    overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25, shadowRadius: 16, elevation: 10,
+    flexDirection: "row", alignItems: "center", gap: STEP.s2, borderRadius: SHAPE.sheet, borderWidth: 1,
+    paddingLeft: STEP.s3, minHeight: CONTROL.tapMin + STEP.s1,
   },
-  iconBox: {
-    width: 36, height: 36, borderRadius: SHAPE.badge,
-    alignItems: "center", justifyContent: "center", marginLeft: STEP.s2,
-  },
-  body: { flex: 1, paddingHorizontal: STEP.s2, paddingVertical: STEP.s3 },
-  action: { marginTop: 4 },
-  close: { padding: STEP.s2, marginRight: 4 },
+  body: { flex: 1, paddingVertical: STEP.s2 },
+  action: { marginTop: 2 },
+  close: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
 });
