@@ -304,3 +304,15 @@ export async function groupLeaderboard(groupId, userId) {
     throw e;
   }
 }
+
+// Grup serisi: o gun gruptaki herkes calistiysa gun sayilir (sunucu hesaplar).
+// Donus: { streak, today_done, members }
+export async function getGroupStreak(groupId) {
+  if (!groupId) return null;
+  const { data, error } = await supabase.rpc("get_group_streak", { p_group_id: groupId });
+  if (error) {
+    handleSupabaseError(error, "getGroupStreak");
+    throw error;
+  }
+  return data || null;
+}

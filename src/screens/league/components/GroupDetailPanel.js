@@ -10,6 +10,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { GroupCodeCard } from "./GroupCodeCard";
 import { GroupCompetitionBanner } from "./GroupCompetitionBanner";
 import { GroupMemberRow } from "./GroupMemberRow";
+import { GroupStreakRow } from "./GroupStreakRow";
 
 export function GroupDetailPanel({
   visible,
@@ -56,6 +57,7 @@ export function GroupDetailPanel({
           ListHeaderComponent={(
             <View>
               <GroupCodeCard group={group} onShare={onShare} />
+              <GroupStreakRow groupId={group.id} />
               <GroupCompetitionBanner standing={standing} />
               <View style={s.memberHead}>
                 <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>HAFTALIK SIRALAMA</Text>
