@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useDispatch } from "react-redux";
 
 import { useAuth } from "../contexts/AuthContext";
-import { useAlert } from "../contexts/AlertContext";
 import { useUserTasks } from "./useUserTasks";
 import { usePlanCompletion } from "./usePlanCompletion";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 import { recordStopCompletion, removeStopCompletion } from "../lib/stopCompletionLog";
+import { setStreak } from "../store/slices/studyLogSlice";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
-// Kullanıcı görevleri + rota/plan durakları + AI önerisi tek listede birleşir.
-// Tamamlanan duraklar kaybolmaz; motive edici şekilde yeşil tikle listenin
-// altına iner ve sayaçla (örn. 2/5) tam senkronize kalır.
+// Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
+// durak kaybolmaz, yeşil tikle alta iner ve sayaçla (2/5) senkron kalır.
 export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onAllDone }) {
   const { user } = useAuth();
-  const showAlert = useAlert();
+  const dispatch = useDispatch();
   const { tasks: userTasks, toggleTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlan, syncPlan } = usePlanCompletion(user?.id);
   const rewardedRef = useRef(false);
@@ -128,7 +128,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     else togglePlan(item.id);
     if (user?.id) {
       const sync = wasDone ? removeStopCompletion : recordStopCompletion;
-      sync(user.id, item).catch(() => {});
+      sync(user.id, item).then((res) => { if (typeof res?.current_streak === "number") dispatch(setStreak(res.current_streak)); }).catch(() => {});
     }
 
     if (!wasDone) {
@@ -142,7 +142,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         await onRouteComplete?.(item.routeStop);
       } catch {}
     }
-  }, [onRouteComplete, toggleTask, togglePlan, user?.id]);
+  }, [dispatch, onRouteComplete, toggleTask, togglePlan, user?.id]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;

@@ -2,6 +2,7 @@ import { getStudyLogByClientOperationId, deleteStudyLog, updateStudyLog } from "
 import { saveStudyLogOffline, removeFromQueue } from "./offlineQueue";
 import { buildStopStudyLogs, stopLogOperationIds } from "../domain/plan/stopStudyLog";
 import { todayTR } from "./dateUtils";
+import { touchStreak } from "../supabase/streaks";
 
 // Durak tikinin IO tarafi. Karar ve bicim domain/plan/stopStudyLog.js'te.
 
@@ -14,8 +15,13 @@ export async function recordStopCompletion(userId, stop) {
   const logs = buildStopStudyLogs({ stop, userId, studyDate: todayTR() });
   if (!logs.length) return false;
   try {
-    for (const log of logs) await saveStudyLogOffline(log);
-    return true;
+    let saved = false;
+    for (const log of logs) saved = (await saveStudyLogOffline(log)).saved || saved;
+    // Seriyi sunucu kayitla birlikte gunceller (study_logs tetikleyicisi);
+    // burada yalniz guncel degeri okuyup ekrana yansitmak icin cagrilir.
+    if (!saved) return true;
+    const streak = await touchStreak(userId).catch(() => null);
+    return streak?.ok ? streak : true;
   } catch {
     // Kayit yazilamazsa tik yine de durur: durak durumu ayri bir yazma.
     return false;

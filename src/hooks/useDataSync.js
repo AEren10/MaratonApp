@@ -5,6 +5,7 @@ import { useNetwork } from "../contexts/NetworkContext";
 import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate } from "../store/slices/studyLogSlice";
+import { effectiveStreak } from "../domain/streak/effectiveStreak";
 import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
@@ -117,7 +118,12 @@ async function loadAll(userId, dispatch) {
   }
 
   if (streak.status === "fulfilled" && streak.value) {
-    const streakVal = streak.value.current_streak || 0;
+    // Kirilmis seri bayat sayiyla gosterilmesin (domain/streak/effectiveStreak).
+    const streakVal = effectiveStreak({
+      current: streak.value.current_streak,
+      lastStudyDate: streak.value.last_study_date,
+      freezeCount: streak.value.freeze_count,
+    }, todayTR());
     dispatch(setStreak(streakVal));
     dispatch(setFreezeCount(streak.value.freeze_count ?? 0));
     dispatch(setLongestStreak(streak.value.longest_streak || 0));
@@ -190,7 +196,9 @@ async function loadAll(userId, dispatch) {
   }).catch(() => {});
 
   // studiedToday: seri-riski bildirimi bugün çalışmış kullanıcıya gitmesin.
-  const streakToday = streak.status === "fulfilled" ? (streak.value?.current_streak || 0) : 0;
+  const streakToday = streak.status === "fulfilled" && streak.value
+    ? effectiveStreak({ current: streak.value.current_streak, lastStudyDate: streak.value.last_study_date, freezeCount: streak.value.freeze_count }, todayTR())
+    : 0;
   loadNotifPrefsFromServer(userId).then(async (serverPrefs) => {
     const prefs = serverPrefs || await getNotifPrefs(userId);
     applyNotifPrefs(prefs, { streak: streakToday, studiedToday }, userId);
