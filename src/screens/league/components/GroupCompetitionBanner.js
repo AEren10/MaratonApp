@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
-import { RADIUS, SPACING, TYPOGRAPHY } from "../../../themes/tokens";
+import { SPACING, TYPOGRAPHY } from "../../../themes/tokens";
 
 export function GroupCompetitionBanner({ standing }) {
   const C = useC();
@@ -15,23 +15,22 @@ export function GroupCompetitionBanner({ standing }) {
     text = "Haftalık yarış yeni başladı! İlk soruyu çözen liderliği alır.";
   } else if (standing.isLeader) {
     text = standing.diff > 0
-      ? `Zirvedesin! 2. sırayla aranda ${standing.diff} soru fark var 🏆`
-      : "Zirvedesin! Liderliği elden bırakma ⚡";
+      ? `Zirvedesin. 2. sırayla aranda ${standing.diff} soru fark var.`
+      : "Zirvedesin. Liderliği elden bırakma.";
   } else if (standing.diff === 0) {
-    text = `${standing.leaderName} ile beraberesin! Bir soruyla öne geçebilirsin 🚀`;
+    text = `${standing.leaderName} ile berabersin. Bir soruyla öne geçebilirsin.`;
   } else if (standing.rank) {
-    text = `${standing.leaderName} ${leaderQ} soruyla lider. Fark sadece ${standing.diff} soru 🔥`;
+    text = `${standing.leaderName} ${leaderQ} soruyla lider. Aradaki fark ${standing.diff} soru.`;
   }
 
   const isUp = standing.isLeader && leaderQ > 0;
   const themeColor = isUp ? (C.up || C.green) : C.accent;
 
   return (
-    <View style={[s.banner, { backgroundColor: themeColor + "10", borderColor: themeColor + "35" }]}>
+    // Kutusuz tek satir: kupa + cumle (emoji yok, tasarim kurali).
+    <View style={s.banner}>
       <View style={s.row}>
-        <View style={[s.iconCircle, { backgroundColor: themeColor + "18" }]}>
-          <Icon name="trophy" size={15} color={themeColor} />
-        </View>
+        <Icon name="trophy" size={16} color={themeColor} />
         <Text style={[TYPOGRAPHY.captionMedium, s.text, { color: C.text }]}>{text}</Text>
       </View>
     </View>
@@ -40,23 +39,13 @@ export function GroupCompetitionBanner({ standing }) {
 
 const s = StyleSheet.create({
   banner: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm + 2,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    marginBottom: SPACING.md,
+    paddingVertical: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.sm,
-  },
-  iconCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: RADIUS.full,
-    alignItems: "center",
-    justifyContent: "center",
   },
   text: {
     flex: 1,

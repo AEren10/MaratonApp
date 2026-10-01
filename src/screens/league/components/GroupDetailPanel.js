@@ -117,7 +117,7 @@ const s = StyleSheet.create({
     marginTop: SPACING.lg,
     marginBottom: SPACING.sm,
   },
-  gap: { height: SPACING.xs },
+  gap: { height: 0 }, // satirlar kutusuz, ince alt cizgiyle ayriliyor
   boardError: {
     alignItems: "center",
     gap: SPACING.sm,

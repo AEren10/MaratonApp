@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { Avatar, Icon } from "../../../components/design";
+import { Avatar } from "../../../components/design";
 
 function formatMinutes(value) {
   const minutes = Math.max(0, Number(value) || 0);
@@ -34,21 +34,12 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
 
   return (
     <View
-      style={[
-        s.row,
-        {
-          backgroundColor: isYou ? C.accent + "14" : C.surface,
-          borderColor: isYou ? C.accent + "50" : C.border,
-        },
-      ]}
+      style={[s.row, { borderBottomColor: C.line }]}
     >
-      <View style={[s.rankCol, medalColor && { backgroundColor: medalColor + "18", borderColor: medalColor + "40" }]}>
-        {medalColor ? (
-          <Icon name="trophy" size={15} color={medalColor} />
-        ) : (
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.muted }]}>{rank || "-"}</Text>
-        )}
-      </View>
+      {/* Kutusuz satir (Ders analizi dili): sira duz rakam, ilk uc madalya renginde. */}
+      <Text style={[TYPOGRAPHY.tableValue, s.rank, { color: medalColor && weeklyQuestions > 0 ? medalColor : C.text3 }]}>
+        {rank || "-"}
+      </Text>
 
       <Avatar
         init={(item.name || "?").slice(0, 2).toUpperCase()}
@@ -62,11 +53,6 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
           <Text style={[s.name, TYPOGRAPHY.bodySemiBold, { color: isYou ? C.accent : C.text }]} numberOfLines={1}>
             {isYou ? "Sen" : item.name || "Öğrenci"}
           </Text>
-          {isYou ? (
-            <View style={[s.youTag, { backgroundColor: C.accent, borderColor: C.accent }]}>
-              <Text style={[TYPOGRAPHY.micro, s.youTagText, { color: C.textOnFill }]}>SEN</Text>
-            </View>
-          ) : null}
         </View>
         <Text style={[TYPOGRAPHY.micro, { color: item.is_studying_now ? C.green : C.muted }]} numberOfLines={1}>
           {subtitle}
@@ -92,21 +78,10 @@ const s = StyleSheet.create({
     minHeight: 64,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    paddingHorizontal: SPACING.md,
+    borderBottomWidth: 1,
     paddingVertical: SPACING.sm + 2,
   },
-  rankCol: {
-    width: 28,
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    borderColor: "transparent",
-    marginRight: SPACING.sm,
-  },
+  rank: { width: 24, textAlign: "center", marginRight: SPACING.sm, fontVariant: ["tabular-nums"] },
   nameCol: {
     flex: 1,
     marginLeft: SPACING.sm,
@@ -119,15 +94,6 @@ const s = StyleSheet.create({
   },
   name: {
     marginBottom: 1,
-  },
-  youTag: {
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-  },
-  youTagText: {
-    letterSpacing: 0.5,
   },
   statsCol: {
     flexDirection: "row",
