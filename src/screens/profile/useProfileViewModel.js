@@ -4,9 +4,6 @@ import { useExam } from "../../contexts/ExamContext";
 import { useAppSelector } from "../../store/hooks";
 import { selectLevel, selectStats, selectWeeklyXP } from "../../store/slices/gamificationSlice";
 import { selectStreak, selectLongestStreak } from "../../store/slices/studyLogSlice";
-import { selectTrials } from "../../store/slices/trialSlice";
-import { subjectColorOf } from "../../themes/subjectPalette";
-import { getSubjectLabel } from "../../themes/subjects";
 import { getTier, getNextTier } from "../../constants/league";
 
 export function useProfileViewModel(C) {
@@ -17,7 +14,6 @@ export function useProfileViewModel(C) {
   const streak = useAppSelector(selectStreak);
   const longestStreak = useAppSelector(selectLongestStreak);
   const weeklyXP = useAppSelector(selectWeeklyXP);
-  const trials = useAppSelector(selectTrials);
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Kullanıcı";
 
@@ -41,28 +37,6 @@ export function useProfileViewModel(C) {
   const leagueTier = getTier(weeklyXP);
   const leagueNextTier = getNextTier(weeklyXP);
 
-  const strengths = useMemo(() => {
-    if (!trials || trials.length === 0) return [];
-    const latest = trials.slice(0, 5);
-    const totals = {};
-    latest.forEach((t) => {
-      Object.entries(t.subjects || {}).forEach(([subj, data]) => {
-        if (!totals[subj]) totals[subj] = { correct: 0, total: 0 };
-        totals[subj].correct += data.correct || 0;
-        totals[subj].total += (data.correct || 0) + (data.wrong || 0) + (data.empty || 0);
-      });
-    });
-
-    const entries = [];
-    Object.entries(totals).forEach(([norm, agg]) => {
-      if (agg.total < 5) return;
-      const acc = Math.round((agg.correct / agg.total) * 100);
-      const name = getSubjectLabel(norm);
-      entries.push({ key: norm, name, c: subjectColorOf(C, norm), v: acc });
-    });
-    return entries.sort((a, b) => b.v - a.v).slice(0, 6);
-  }, [trials, C]);
-
   return {
     careerStats,
     displayName,
@@ -72,7 +46,6 @@ export function useProfileViewModel(C) {
     level,
     longestStreak,
     streak,
-    strengths,
     targetDepartment,
     weeklyXP,
     loading: authLoading,

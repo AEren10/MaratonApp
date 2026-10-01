@@ -39,7 +39,6 @@ export default function ProfileScreen() {
     leagueNextTier,
     leagueTier,
     level,
-    strengths,
     targetDepartment,
     weeklyXP,
     loading,
@@ -72,7 +71,7 @@ export default function ProfileScreen() {
               <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
             </Animated.View>
             <Animated.View>
-              <StrengthMap strengths={strengths} />
+              <StrengthMap />
             </Animated.View>
             <ProfileShareTiles />
 

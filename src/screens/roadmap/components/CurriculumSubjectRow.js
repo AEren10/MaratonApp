@@ -13,6 +13,7 @@ function CurriculumSubjectRow({ subject, onPress }) {
   return (
     <SubjectProgressRow
       name={subject.name}
+      subjectKey={subject.key}
       color={color}
       pct={pct}
       value={value}

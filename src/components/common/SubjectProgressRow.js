@@ -9,6 +9,7 @@ import * as H from "../../lib/haptics";
 
 function SubjectProgressRow({
   name,
+  subjectKey,
   badge,
   value,
   pct = 0,
@@ -32,7 +33,7 @@ function SubjectProgressRow({
 
   const content = (
     <>
-      <SubjectIcon subject={badge && badge.length > 3 ? badge : name} color={color} />
+      <SubjectIcon subject={name} subjectKey={subjectKey} color={color} />
       <View style={s.body}>
         <View style={s.topRow}>
           <Text style={[s.name, { color: C.text }]} numberOfLines={1}>
