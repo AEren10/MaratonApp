@@ -101,7 +101,8 @@ export const ANALIZ_STACK = [
   SCREENS.PUBLISHER_COMPARISON_DETAIL, // Yayin karsilastirmasi detay
   SCREENS.TRIAL_DETAIL,     // Deneme Detayi
   SCREENS.WEAK_AREAS,       // Oncelikli Konular
-  SCREENS.NET_FORECAST,     // Net Tahmini
+  SCREENS.NET_FORECAST,     // Senaryolar
+  SCREENS.RANK_SIMULATOR,   // Net & Siralama Tahmini (Bolum Esigi)
   SCREENS.EXAM_SIMULATOR,   // Simulasyon
   SCREENS.SUBJECT_DETAIL,   // (paylasimli)
   SCREENS.SUBJECT_ANALYSIS, // Analiz > ders karti -> Ders analizi
