@@ -16,16 +16,31 @@ const fill = { flex: 1 };
 
 // Saydam ortu (Pro Onizleme vb.) alttaki ekranin ustune oturur; isik iki kez
 // binip alttakini de aydinlatmasin.
+//
+// DIKKAT: React Navigation screenLayout'u BILESEN olarak degil duz fonksiyon
+// olarak cagiriyor. Buraya hook yazilirsa navigator'a ait sayilir; yigindaki
+// ekran sayisi degistikce hook sayisi degisir ve uygulama cokuyordu
+// ("Should have a queue", 1 Ekim). Hook'lar yalniz DepthFrame bileseninde.
 export function DepthLayout({ children, route, options }) {
-  // Kaydirma konumu (DepthScrollView yazar, ScreenDepth okur). Hook erken
-  // donusten ONCE: her ekranda ayni sirada cagrilsin.
-  const scrollY = useSharedValue(0);
   if (NO_DEPTH.has(route?.name) || options?.presentation === "transparentModal") return children;
+  return (
+    <DepthFrame
+      subjectKey={route?.params?.tint || route?.params?.subjectKey || null}
+      home={route?.name === SCREENS.HOME_ROOT}
+    >
+      {children}
+    </DepthFrame>
+  );
+}
+
+// Kaydirma konumu (DepthScrollView yazar, ScreenDepth okur): ekran basina bir deger.
+function DepthFrame({ children, subjectKey, home }) {
+  const scrollY = useSharedValue(0);
   return (
     <DepthScrollContext.Provider value={scrollY}>
       <View style={fill}>
         {children}
-        <ScreenDepth subjectKey={route?.params?.tint || route?.params?.subjectKey || null} home={route?.name === SCREENS.HOME_ROOT} scrollY={scrollY} />
+        <ScreenDepth subjectKey={subjectKey} home={home} scrollY={scrollY} />
       </View>
     </DepthScrollContext.Provider>
   );
