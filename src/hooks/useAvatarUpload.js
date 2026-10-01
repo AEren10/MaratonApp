@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ActionSheetIOS, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useIsFocused } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { uploadAvatar, getAvatarUrl } from "../supabase/storage";
-import { getProfile, updateProfile } from "../supabase/profiles";
+import { updateProfile } from "../supabase/profiles";
+import { setMyAvatar } from "../lib/myAvatarStore";
+import { useMyAvatar } from "./useMyAvatar";
 import { useAlert } from "../contexts/AlertContext";
 import * as H from "../lib/haptics";
 
@@ -13,32 +14,28 @@ import * as H from "../lib/haptics";
 export function useAvatarUpload() {
   const { user } = useAuth();
   const showAlert = useAlert();
-  const isFocused = useIsFocused();
-  const [avatarUri, setAvatarUri] = useState(null);
+  const saved = useMyAvatar();
+  // Yukleme surerken yerel dosya onizlenir; bitince ortak kaynaga yazilir.
+  const [pending, setPending] = useState(null);
   const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    if (!isFocused || !user?.id || user.id === "dev") return;
-    getProfile(user.id)
-      .then((p) => { setAvatarUri(p?.avatar_url || null); })
-      .catch(() => {});
-  }, [user?.id, isFocused]);
+  const avatarUri = pending || saved;
 
   const avatarSource = useMemo(() => (avatarUri ? { uri: avatarUri } : null), [avatarUri]);
 
   const handlePicked = async (localUri) => {
-    setAvatarUri(localUri);
+    setPending(localUri);
     setUploading(true);
     try {
       const path = await uploadAvatar(user.id, localUri);
       const url = getAvatarUrl(path);
       const stampedUrl = url ? `${url}?t=${Date.now()}` : url;
       await updateProfile(user.id, { avatar_url: stampedUrl });
+      setMyAvatar(user.id, stampedUrl);
       H.success();
-      setAvatarUri(stampedUrl);
     } catch (e) {
       showAlert("Hata", "Avatar yüklenirken bir sorun oluştu.\n\n" + (e?.message || ""));
     } finally {
+      setPending(null);
       setUploading(false);
     }
   };
@@ -48,7 +45,7 @@ export function useAvatarUpload() {
     setUploading(true);
     try {
       await updateProfile(user.id, { avatar_url: null });
-      setAvatarUri(null);
+      setMyAvatar(user.id, null);
       H.success();
     } catch (e) {
       showAlert("Hata", "Avatar silinirken bir sorun oluştu.\n\n" + (e?.message || ""));

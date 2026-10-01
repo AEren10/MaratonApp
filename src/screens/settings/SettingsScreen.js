@@ -45,7 +45,6 @@ export default function SettingsScreen() {
             displayName={vm.displayName}
             examLabel={vm.examLabel}
             daysLeft={vm.daysLeft}
-            avatarUrl={vm.user?.user_metadata?.avatar_url}
             onPress={vm.go(SCREENS.EDIT_PROFILE)}
           />
         </Animated.View>

@@ -9,7 +9,7 @@ const photoCaptureSource = readFileSync(new URL("../../src/screens/wrong-noteboo
 test("useAvatarUpload stamps URL with timestamp in updateProfile to bust expo-image disk cache", () => {
   assert.match(avatarHookSource, /stampedUrl = url \? `\${url}\?t=\${Date\.now\(\)}` : url;/);
   assert.match(avatarHookSource, /updateProfile\(user\.id, \{ avatar_url: stampedUrl \}\)/);
-  assert.match(avatarHookSource, /setAvatarUri\(stampedUrl\)/);
+  assert.match(avatarHookSource, /setMyAvatar\(user\.id, stampedUrl\)/);
 });
 
 test("useAvatarUpload supports removeAvatar to clear profile photo", () => {
@@ -18,9 +18,13 @@ test("useAvatarUpload supports removeAvatar to clear profile photo", () => {
   assert.match(avatarHookSource, /Fotoğrafı Kaldır/);
 });
 
-test("useAvatarUpload re-syncs on screen focus", () => {
-  assert.match(avatarHookSource, /useIsFocused/);
-  assert.match(avatarHookSource, /if \(!isFocused \|\| !user\?\.id/);
+test("profil fotografi tek kaynaktan: ayarlar ve ana sayfa ayni degeri okur", () => {
+  const settings = readFileSync(new URL("../../src/screens/settings/components/SettingsIdentityCard.js", import.meta.url), "utf8");
+  const topBar = readFileSync(new URL("../../src/screens/home/components/HomeTopBar.js", import.meta.url), "utf8");
+  assert.match(avatarHookSource, /useMyAvatar\(\)/);
+  assert.match(settings, /useMyAvatar\(\)/);
+  assert.match(topBar, /useMyAvatar\(\)/);
+  assert.doesNotMatch(settings, /user_metadata/);
 });
 
 test("useAddWrong supports both camera and gallery picking", () => {

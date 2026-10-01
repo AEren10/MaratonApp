@@ -1,11 +1,13 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
+import { Image } from "expo-image";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { useMyAvatar } from "../../../hooks/useMyAvatar";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -33,6 +35,7 @@ function heroDateTR() {
 // Ana Sayfa ust bandi: bas harf kutusu, selam + ad, Structured tarzı hero tarih basligi ve aksiyonlar.
 export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }) {
   const C = useC();
+  const avatar = useMyAvatar();
   const days = Math.max(0, Math.round(Number(streak) || 0));
   const dateHeading = useMemo(() => heroDateTR(), []);
 
@@ -42,7 +45,11 @@ export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }
         <Pressable onPress={() => { H.tap(); onProfile?.(); }} hitSlop={STEP.s1 / 4}
           accessibilityRole="button" accessibilityLabel="Profil"
           style={[s.avatar, { backgroundColor: C.elev, borderColor: C.border }]}>
-          <Text style={[TYPOGRAPHY.button, s.initials, { color: C.accentBright }]}>{initialsOf(name)}</Text>
+          {avatar ? (
+            <Image source={{ uri: avatar }} style={s.photo} contentFit="cover" cachePolicy="memory-disk" transition={200} />
+          ) : (
+            <Text style={[TYPOGRAPHY.button, s.initials, { color: C.accentBright }]}>{initialsOf(name)}</Text>
+          )}
         </Pressable>
         <View style={s.flex}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
@@ -79,8 +86,9 @@ const s = StyleSheet.create({
   dateText: { fontSize: 26, lineHeight: 32, letterSpacing: -0.6 },
   avatar: {
     width: CONTROL.tapMin - 2, height: CONTROL.tapMin - 2, borderRadius: SHAPE.iconBox, borderWidth: 1,
-    alignItems: "center", justifyContent: "center",
+    alignItems: "center", justifyContent: "center", overflow: "hidden",
   },
+  photo: { width: "100%", height: "100%" },
   initials: { fontSize: TYPOGRAPHY.button.fontSize + 2, lineHeight: TYPOGRAPHY.button.lineHeight + 2 },
   flex: { flex: 1, minWidth: 0 },
   name: { fontSize: TYPOGRAPHY.topicName.fontSize + 1, marginTop: STEP.s1 / 4 },

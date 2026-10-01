@@ -4,16 +4,17 @@ import { Avatar, Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Press } from "../../../components/design/Press";
+import { useMyAvatar } from "../../../hooks/useMyAvatar";
 
 // Kutusuz kimlik satiri: avatar + ad + meta, altinda ince ayirici.
 export function SettingsIdentityCard({
   displayName,
   examLabel,
   daysLeft,
-  avatarUrl,
   onPress,
 }) {
   const C = useC();
+  const avatarUrl = useMyAvatar();
 
   const daysText = daysLeft != null
     ? (daysLeft > 0 ? `${daysLeft} gün kaldı` : daysLeft === 0 ? "Bugün sınav günü" : "Sınav tamamlandı")
