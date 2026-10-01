@@ -3,7 +3,13 @@ import * as Linking from "expo-linking";
 import { getSession, onAuthStateChange, isRecoveryUrl } from "../supabase/auth";
 import { onAuthError } from "../lib/authEvents";
 import { setUserContext } from "../lib/errorReporting";
-import { initAnalytics, setAnalyticsUser, stopAnalytics, flushAnalytics, track } from "../lib/analytics";
+import {
+  closeAnalytics,
+  initAnalytics,
+  stopAnalytics,
+  flushAnalytics,
+  trackForAnalyticsUser,
+} from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
 import { resetLocalSession } from "../lib/session/resetLocalSession";
 import { createUserTracker, signOutUser, deleteUserAccount } from "../lib/session/sessionLifecycle";
@@ -70,16 +76,20 @@ export function AuthProvider({ children }) {
       setUser(s?.user ?? null);
       setUserContext(s?.user ?? null);
       if (s?.user?.id) {
-        initAnalytics(s.user.id).then(() => {
+        initAnalytics(s.user.id).then((initialized) => {
           // D1/D7 dönüş kohortu bu olay olmadan analytics'ten çıkarılamıyordu;
           // elde yalnızca profiles.last_active vardı. TOKEN_REFRESHED'de
           // tetiklenmemesi için olay tipi kontrol ediliyor.
-          if (event === "SIGNED_IN") {
-            track(EVENTS.AUTH_LOGIN, { provider: s.user.app_metadata?.provider || "unknown" });
+          if (event === "SIGNED_IN" && initialized !== false) {
+            trackForAnalyticsUser(s.user.id, EVENTS.AUTH_LOGIN, {
+              provider: s.user.app_metadata?.provider || "unknown",
+            });
           }
         }).catch(() => {});
       } else {
-        setAnalyticsUser(null);
+        // SIGNED_OUT callback'i her platformda garanti degil. Geldiginde de
+        // onceki kullanicinin timer/kimligini burada kesin olarak kapat.
+        closeAnalytics({ flush: false }).catch(() => {});
       }
     });
 
@@ -92,8 +102,9 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     if (loggingOut.current) return;
     loggingOut.current = true;
-    // Bekleyen olayları oturum kapanmadan gönder.
-    await flushAnalytics().catch(() => {});
+    // Bekleyen olayları oturum kapanmadan gönder ve kimliği callback'e
+    // güvenmeden kapat. Başarısız analytics hiçbir zaman çıkışı engellemez.
+    await closeAnalytics({ flush: true }).catch(() => {});
     await signOutUser(user?.id);
     tracker.forget();
     setSession(null);
@@ -116,7 +127,9 @@ export function AuthProvider({ children }) {
     loggingOut.current = true;
     try {
       // Hata firlatirsa hicbir sey temizlenmez; kullanici girisli kalir.
+      await flushAnalytics().catch(() => {});
       const result = await deleteUserAccount();
+      await closeAnalytics({ flush: false }).catch(() => {});
       tracker.forget();
       setSession(null);
       setUser(null);

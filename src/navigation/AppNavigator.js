@@ -11,7 +11,7 @@ import { useC } from "../contexts/ThemeContext";
 import { useExam } from "../contexts/ExamContext";
 import { DataSyncProvider } from "../contexts/DataSyncContext";
 import { PremiumProvider } from "../contexts/PremiumContext";
-import { flushAnalytics, track } from "../lib/analytics";
+import { flushAnalytics, startAnalyticsSession, track } from "../lib/analytics";
 
 import { TabBar } from "./TabBar";
 import { createNavigationTracker } from "./analytics/navigationTracker";
@@ -209,7 +209,10 @@ function Loading() {
 export default function AppNavigator() {
   const { session, loading, recoveryMode } = useAuth();
   const { onboardingDone, hasSeenSlides, profileSettling, loading: examLoading } = useExam();
-  const navigationTracker = useMemo(() => createNavigationTracker(track), []);
+  const navigationTracker = useMemo(
+    () => createNavigationTracker(track, { startSession: startAnalyticsSession }),
+    [],
+  );
 
   useEffect(() => {
     let appState = AppState.currentState;

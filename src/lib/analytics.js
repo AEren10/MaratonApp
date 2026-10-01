@@ -1,182 +1,254 @@
 import { EVENTS } from "../constants/analytics";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { insertAnalyticsEvents } from "../supabase/analyticsEvents";
+import {
+  acknowledgeAnalyticsPartition,
+  createAnalyticsEnvelope,
+  canReuseAnalyticsInitialization,
+  isActiveAnalyticsIdentity,
+  mergeAnalyticsEvents,
+  mergeAnalyticsPartitions,
+  removeAnalyticsEvents,
+} from "./analyticsState";
 import * as appStorage from "./storage/appStorage";
 
-// Olay gönderici. Sağlayıcı bağımsız: şu an Supabase'deki analytics_events
-// tablosuna yazıyor, ileride PostHog/Amplitude eklenmek istenirse tek yer
-// değişir (flush fonksiyonu).
-//
-// Kural: analytics ASLA uygulamayı bozmaz. Her hata sessizce yutulur ve
-// olaylar en fazla yerel tamponda birikip düşer.
-
+// Sağlayıcı bağımsız ürün analitiği kuyruğu. Hatalar hiçbir kullanıcı akışını
+// bozmaz; olaylar kullanıcı bazında, kimlikleri değişmeden tekrar denenir.
 const BUFFER_KEY = STORAGE_KEYS.ANALYTICS_BUFFER;
 const PENDING_KEY = STORAGE_KEYS.ANALYTICS_PENDING;
 const MAX_BUFFER = 200;
-const FLUSH_SIZE = 10;
+const FLUSH_TRIGGER_SIZE = 10;
+const FLUSH_BATCH_SIZE = 50;
 const FLUSH_INTERVAL_MS = 30_000;
 const MAX_PENDING = 120;
 
-let buffer = [];
+let buffersByUser = {};
+let pendingEvents = [];
 let userId = null;
 let sessionId = null;
 let flushTimer = null;
-let flushing = false;
+let identityGeneration = 0;
+let storageWrites = Promise.resolve();
+const flushesByUser = new Map();
+const initializationsByUser = new Map();
+let storageLoadPromise = null;
 
 function newSessionId() {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function normalizeEvent(item, fallbackUserId = null) {
+  if (!item?.event) return null;
+  return createAnalyticsEnvelope(item.event, item.props, {
+    at: item.at || item.occurred_at,
+    clientEventId: item.clientEventId || item.client_event_id,
+    sessionId: item.sessionId || item.session_id,
+    userId: item.userId || item.user_id || fallbackUserId,
+  });
+}
+
+function normalizeStoredBuffers(value) {
+  const next = {};
+  const add = (owner, items) => {
+    if (!owner) return;
+    const normalized = (Array.isArray(items) ? items : [])
+      .map((item) => normalizeEvent(item, owner))
+      .filter(Boolean);
+    next[owner] = mergeAnalyticsEvents(next[owner], normalized).slice(-MAX_BUFFER);
+  };
+  if (Array.isArray(value)) {
+    for (const item of value) add(item?.userId || item?.user_id, [item]);
+  } else {
+    for (const [owner, items] of Object.entries(value?.byUser || {})) add(owner, items);
+  }
+  return next;
+}
+
+function queueStorageWrite(key, value) {
+  const snapshot = JSON.parse(JSON.stringify(value));
+  storageWrites = storageWrites
+    .catch(() => {})
+    .then(() => appStorage.setJson(key, snapshot))
+    .catch(() => {});
+  return storageWrites;
+}
+
+function persistBuffers() {
+  const byUser = Object.fromEntries(
+    Object.entries(buffersByUser).map(([owner, events]) => [owner, events.slice(-MAX_BUFFER)]),
+  );
+  return queueStorageWrite(BUFFER_KEY, { version: 2, byUser });
+}
+
+function persistPending() {
+  return queueStorageWrite(PENDING_KEY, pendingEvents.slice(-MAX_PENDING));
+}
+
+function appendForUser(owner, event) {
+  buffersByUser[owner] = mergeAnalyticsEvents(buffersByUser[owner], [event]).slice(-MAX_BUFFER);
+}
+
 export function setAnalyticsUser(id) {
-  userId = id || null;
-  // Çıkışta oturumu da kapat: aksi halde sonraki giriş eski sessionId'yi
-  // devralıyor ve iki kullanıcının olayları tek oturumda birleşiyordu.
-  if (!userId) sessionId = null;
+  const next = id || null;
+  if (next === userId) {
+    if (!next) sessionId = null;
+    return;
+  }
+  userId = next;
+  sessionId = null;
+  identityGeneration += 1;
 }
 
 export function startAnalyticsSession() {
   sessionId = newSessionId();
+  return sessionId;
 }
 
-async function loadBuffer() {
+async function deliverBatch(batch) {
+  const rows = batch.map((event) => ({
+    client_event_id: event.clientEventId,
+    user_id: event.userId,
+    session_id: event.sessionId,
+    event: event.event,
+    props: event.props,
+    occurred_at: event.at,
+  }));
   try {
-    const loaded = await appStorage.getJson(BUFFER_KEY, null);
-    if (loaded) {
-      buffer = loaded.filter((e) => e.userId && (!userId || e.userId === userId));
+    await insertAnalyticsEvents(rows);
+    return batch.map((event) => event.clientEventId);
+  } catch (error) {
+    if (error?.code !== "23505") return [];
+  }
+
+  const delivered = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    try {
+      await insertAnalyticsEvents([rows[index]]);
+      delivered.push(batch[index].clientEventId);
+    } catch (error) {
+      if (error?.code === "23505") delivered.push(batch[index].clientEventId);
+      else break;
     }
-  } catch (_) {
-    buffer = [];
   }
+  return delivered;
 }
 
-async function persistBuffer() {
-  try {
-    await appStorage.setJson(BUFFER_KEY, buffer.slice(-MAX_BUFFER));
-  } catch (_) {}
+async function flushUser(owner) {
+  if (!owner || !(buffersByUser[owner]?.length)) return;
+  if (flushesByUser.has(owner)) return flushesByUser.get(owner);
+  const run = (async () => {
+    const batch = buffersByUser[owner].slice(0, FLUSH_BATCH_SIZE);
+    const deliveredIds = await deliverBatch(batch);
+    if (!deliveredIds.length) return;
+    buffersByUser = acknowledgeAnalyticsPartition(buffersByUser, owner, deliveredIds);
+    await persistBuffers();
+  })().catch(() => {}).finally(() => flushesByUser.delete(owner));
+  flushesByUser.set(owner, run);
+  return run;
 }
 
-async function persistPending() {
-  try {
-    if (PENDING_KEY) await appStorage.setJson(PENDING_KEY, pendingEvents.slice(-MAX_PENDING));
-  } catch (_) {}
+export function flushAnalytics() {
+  return flushUser(userId);
 }
-
-export async function flushAnalytics() {
-  if (flushing || buffer.length === 0 || !userId) return;
-  flushing = true;
-  buffer = buffer.filter((e) => e.userId === userId);
-  const batch = buffer.slice(0, FLUSH_SIZE * 5);
-  if (!batch.length) {
-    flushing = false;
-    await persistBuffer();
-    return;
-  }
-  try {
-    await insertAnalyticsEvents(
-      batch.map((e) => ({
-        user_id: e.userId,
-        session_id: e.sessionId,
-        event: e.event,
-        props: e.props,
-        occurred_at: e.at,
-      })),
-    );
-    buffer = buffer.slice(batch.length);
-    await persistBuffer();
-  } catch (_) {
-    // Tablo yoksa veya bağlantı yoksa olaylar tamponda kalır, sonra denenir.
-  } finally {
-    flushing = false;
-  }
-}
-
-// Kullanıcı kimliği daha atanmadan gelen olaylar (Onboarding adımları, soğuk açılış push'u).
-let pendingEvents = [];
 
 export function track(event, props = {}) {
   if (!event) return;
   try {
+    if (!sessionId) startAnalyticsSession();
+    const envelope = createAnalyticsEnvelope(event, props, { userId, sessionId });
     if (!userId) {
-      pendingEvents.push({
-        event,
-        props: props && typeof props === "object" ? props : {},
-        at: new Date().toISOString(),
-      });
-      if (pendingEvents.length > MAX_PENDING) {
-        pendingEvents = pendingEvents.slice(-MAX_PENDING);
-      }
+      pendingEvents = mergeAnalyticsEvents(pendingEvents, [envelope]).slice(-MAX_PENDING);
       persistPending();
       return;
     }
-    if (!sessionId) startAnalyticsSession();
-    buffer.push({
-      event,
-      props: props && typeof props === "object" ? props : {},
-      userId,
-      sessionId,
-      at: new Date().toISOString(),
-    });
-    if (buffer.length > MAX_BUFFER) buffer = buffer.slice(-MAX_BUFFER);
-    persistBuffer();
-    if (buffer.length >= FLUSH_SIZE) flushAnalytics();
+    appendForUser(userId, envelope);
+    persistBuffers();
+    if (buffersByUser[userId].length >= FLUSH_TRIGGER_SIZE) flushUser(userId);
   } catch (_) {}
 }
 
-export function trackButtonTap(id, props = {}) {
-  track(EVENTS.BUTTON_TAP, { id, ...props });
+export function trackForAnalyticsUser(owner, event, props = {}) {
+  if (!owner || owner !== userId) return false;
+  track(event, props);
+  return true;
 }
 
-export function trackFormStarted(form, props = {}) {
-  track(EVENTS.FORM_STARTED, { form, ...props });
-}
-
-export function trackFormCompleted(form, props = {}) {
-  track(EVENTS.FORM_COMPLETED, { form, ...props });
-}
-
-export function trackFormAbandoned(form, props = {}) {
-  track(EVENTS.FORM_ABANDONED, { form, ...props });
-}
-
+export function trackButtonTap(id, props = {}) { track(EVENTS.BUTTON_TAP, { id, ...props }); }
+export function trackFormStarted(form, props = {}) { track(EVENTS.FORM_STARTED, { form, ...props }); }
+export function trackFormCompleted(form, props = {}) { track(EVENTS.FORM_COMPLETED, { form, ...props }); }
+export function trackFormAbandoned(form, props = {}) { track(EVENTS.FORM_ABANDONED, { form, ...props }); }
 export function trackPaywallViewed(source, props = {}) {
   track(EVENTS.PAYWALL_VIEWED, { source, ...props });
   if (source) track(EVENTS.PAYWALL_SOURCE, { source, ...props });
 }
-
 export function trackNotificationOpened(type, props = {}) {
   track(EVENTS.PUSH_OPENED, { type, ...props });
 }
 
-export async function initAnalytics(id) {
-  if (id && id === userId && sessionId) return;
+async function loadStoredAnalyticsOnce() {
+  if (storageLoadPromise) return storageLoadPromise;
+  storageLoadPromise = (async () => {
+    await storageWrites.catch(() => {});
+    let storedBuffers = null;
+    let storedPending = null;
+    try {
+      [storedBuffers, storedPending] = await Promise.all([
+        appStorage.getJson(BUFFER_KEY, null),
+        appStorage.getJson(PENDING_KEY, null),
+      ]);
+    } catch (_) {}
 
-  setAnalyticsUser(id);
-  startAnalyticsSession();
-  await loadBuffer();
+    const loaded = normalizeStoredBuffers(storedBuffers);
+    buffersByUser = mergeAnalyticsPartitions(loaded, buffersByUser, MAX_BUFFER);
+    pendingEvents = mergeAnalyticsEvents(
+      (Array.isArray(storedPending) ? storedPending : []).map((item) => normalizeEvent(item)).filter(Boolean),
+      pendingEvents,
+    ).slice(-MAX_PENDING);
+  })().catch(() => {});
+  return storageLoadPromise;
+}
 
-  // Kimlik yokken tamponlanan olayları (onboarding hünisi ve soğuk açılış) akıt.
-  let queued = [...pendingEvents];
-  try {
-    if (PENDING_KEY) {
-      const saved = await appStorage.getJson(PENDING_KEY, null);
-      if (Array.isArray(saved) && saved.length) {
-        queued = [...saved, ...pendingEvents.filter((p) => !saved.some((s) => s.at === p.at && s.event === p.event))];
-      }
-      await appStorage.setJson(PENDING_KEY, []);
-    }
-  } catch (_) {}
+async function initialize(owner, generation) {
+  await loadStoredAnalyticsOnce();
+  if (!isActiveAnalyticsIdentity(owner, generation, userId, identityGeneration)) return false;
 
-  pendingEvents = [];
-  if (queued.length) {
-    for (const e of queued) track(e.event, e.props);
+  const adoptedIds = new Set(pendingEvents.map((event) => event.clientEventId));
+  for (const event of pendingEvents) {
+    appendForUser(owner, { ...event, userId: owner, sessionId: event.sessionId || sessionId });
   }
+  pendingEvents = removeAnalyticsEvents(pendingEvents, adoptedIds);
+  await Promise.all([persistBuffers(), persistPending()]);
 
   clearInterval(flushTimer);
   flushTimer = setInterval(flushAnalytics, FLUSH_INTERVAL_MS);
-  flushAnalytics();
+  flushUser(owner);
+  return true;
+}
+
+export function initAnalytics(id) {
+  const owner = id || null;
+  if (!owner) return Promise.resolve();
+  const existing = initializationsByUser.get(owner);
+  if (canReuseAnalyticsInitialization(existing, userId, identityGeneration)) return existing.promise;
+  if (owner === userId && sessionId && flushTimer) return Promise.resolve();
+  setAnalyticsUser(owner);
+  startAnalyticsSession();
+  const generation = identityGeneration;
+  const run = initialize(owner, generation).finally(() => {
+    if (initializationsByUser.get(owner)?.promise === run) initializationsByUser.delete(owner);
+  });
+  initializationsByUser.set(owner, { owner, generation, promise: run });
+  return run;
 }
 
 export function stopAnalytics() {
   clearInterval(flushTimer);
   flushTimer = null;
+}
+
+export async function closeAnalytics({ flush = true } = {}) {
+  const closingUser = userId;
+  stopAnalytics();
+  if (flush && closingUser) await flushUser(closingUser);
+  if (userId === closingUser) setAnalyticsUser(null);
 }

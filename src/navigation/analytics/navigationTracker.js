@@ -1,5 +1,6 @@
-import { EVENTS } from "../../constants/analytics";
-import { getRouteAnalyticsMeta } from "../routes";
+import { EVENTS } from "../../constants/analytics.js";
+import { needsNewAnalyticsSession } from "../../lib/analyticsState.js";
+import { getRouteAnalyticsMeta } from "../routes.js";
 
 function categorizeDuration(ms) {
   if (ms < 1500) return "instant";
@@ -10,11 +11,14 @@ function categorizeDuration(ms) {
   return "deep";
 }
 
-export function createNavigationTracker(trackFn) {
+export function createNavigationTracker(trackFn, options = {}) {
+  const now = options.now || Date.now;
+  const startSession = options.startSession || (() => {});
   let currentRouteName = null;
   let currentRouteKey = null;
   let currentRouteMeta = null;
-  let enteredAt = Date.now();
+  let enteredAt = now();
+  let pausedAt = null;
   let active = false;
 
   function view(route, source = "navigation") {
@@ -22,7 +26,7 @@ export function createNavigationTracker(trackFn) {
     currentRouteName = route.name;
     currentRouteKey = route.key || null;
     currentRouteMeta = getRouteAnalyticsMeta(currentRouteName);
-    enteredAt = Date.now();
+    enteredAt = now();
     active = true;
     trackFn(EVENTS.SCREEN_VIEW, {
       screen: currentRouteName,
@@ -34,7 +38,7 @@ export function createNavigationTracker(trackFn) {
 
   function exit(route, reason) {
     if (!currentRouteName || !active) return;
-    const durationMs = Math.max(0, Date.now() - enteredAt);
+    const durationMs = Math.max(0, now() - enteredAt);
     const durationSec = Math.round(durationMs / 1000);
     const isNavigation = reason === "navigation";
     const nextScreen = isNavigation ? (route?.name || null) : null;
@@ -72,9 +76,12 @@ export function createNavigationTracker(trackFn) {
     },
     pause(route, reason = "background") {
       exit(null, reason);
+      pausedAt = now();
     },
     resume(route) {
       if (!route?.name || active) return;
+      if (needsNewAnalyticsSession(pausedAt, now())) startSession();
+      pausedAt = null;
       view(route, "resume");
     },
   };
