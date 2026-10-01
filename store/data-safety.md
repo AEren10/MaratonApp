@@ -96,7 +96,7 @@
 | Other user-generated content | **Evet** | Hayir | App functionality | Zorunlu |
 | Other actions | Hayir | - | - | - |
 
-> **Aciklama - App interactions:** Calisma loglar (study logs), streak verileri, XP/rozet kazanimlari, gorev tamamlama durumlari.
+> **Aciklama - App interactions:** Calisma loglari, streak verileri, gorev tamamlama durumlari, ekran gezinme, ekranda kalma suresi ve ozellik kullanimi. Bu veriler birinci taraf urun analitigiyle uygulamayi anlamak ve iyilestirmek icin kullanilir; reklam amacli kullanilmaz.
 > **Aciklama - Other user-generated content:** Deneme sinavi sonuclari (trial exam results), yanlis soru kayitlari.
 
 ### 2.12 Web Browsing (Web Gezinme)
@@ -132,7 +132,7 @@
 | Purpose of sharing | Analytics (crash tracking) |
 | Is this data shared for advertising? | **No** |
 
-> Diger tum veri turleri icin: **Data is NOT shared with third parties.**
+> Supabase, Expo/EAS, Apple ve Google gibi hizmet saglayicilarin rolu gercek veri akisina gore degerlendirilmelidir. Google Play'in "service provider" istisnasinin uygulanabilirligi icin **[HUKUKI INCELEME GEREKLI]**; reklam amacli veri satisi veya paylasimi yapildigi iddia edilmemektedir.
 
 ---
 
@@ -156,7 +156,15 @@ Her "Evet" isaretli veri turu icin asagidaki sorular sorulur:
 | Is this data required or optional? | **Optional** |
 | Why is this data collected? | **App functionality** |
 
-### App interactions, Other user-generated content
+### App interactions
+| Soru | Cevap |
+|------|-------|
+| Is this data collected, shared, or both? | **Collected** |
+| Is this data processed ephemerally? | **No** |
+| Is this data required or optional? | **Required** |
+| Why is this data collected? | **App functionality, Analytics** |
+
+### Other user-generated content
 | Soru | Cevap |
 |------|-------|
 | Is this data collected, shared, or both? | **Collected** |

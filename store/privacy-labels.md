@@ -103,10 +103,10 @@ Toplanmiyor.
 | Advertising Data | Hayir | - | - | - |
 | Other Usage Data | **Evet** | **Evet** | **Evet** | Hayir |
 
-**Amac (Purpose):** App Functionality
+**Amac (Purpose):** App Functionality, Analytics
 
-> **Product Interaction:** Calisma loglar (study logs), streak verileri, XP kazanimlari, rozet ilerleme, gorev tamamlama, ekran gezinme.
-> **Other Usage Data:** Calisma suresi istatistikleri, haftalik/aylik performans ozeti.
+> **Product Interaction:** Calisma loglari, streak verileri, gorev tamamlama, ekran gezinme, ekranda kalma suresi ve ozellik kullanimi. Birinci taraf urun analitigi; urun deneyimini anlamak ve iyilestirmek icin Supabase'de kullanici hesabiyla iliskili islenir.
+> **Other Usage Data:** Calisma suresi istatistikleri ile haftalik/aylik performans ozeti.
 
 ---
 
@@ -168,13 +168,13 @@ App Store Connect'te her veri turu icin sunlar secilecek:
 - **Collection:** Yes
 - **Linked to User:** Yes
 - **Used for Tracking:** No
-- **Purpose:** App Functionality
+- **Purpose:** App Functionality, Analytics
 
 ### Usage Data - Other Usage Data
 - **Collection:** Yes
 - **Linked to User:** Yes
 - **Used for Tracking:** No
-- **Purpose:** App Functionality
+- **Purpose:** App Functionality, Analytics
 
 ### Diagnostics - Crash Data
 - **Collection:** Yes
@@ -197,6 +197,8 @@ Tum veriler Supabase Auth user ID ile iliskilendirilir, dolayisiyla hepsi **Link
 
 ### "Used for Tracking"
 Apple'in tracking tanimi: kullanicinin verisini ucuncu taraf verileriyle eslestirme veya hedefli reklam amaciyla paylasma. Maraton bunu yapmaz, tum veri turleri icin **No** secilir.
+
+> **[HUKUKI INCELEME GEREKLI]** App Store Connect beyanlari, yayinlanacak binary ve canli veri akisiyla son kez karsilastirilmalidir.
 
 ### Sentry Hakkinda
 Sentry crash/diagnostic verisi toplar ve kendi sunucularina gonderir. Ancak bu Apple'in tanimindaki "tracking" degildir cunku:
