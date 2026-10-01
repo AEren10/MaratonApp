@@ -97,21 +97,23 @@ export const SUBJECT_COLORS = {
     inkilap: "#fda4af",  // LGS İnkılap Tarihi
   },
   light: {
-    turkce: "#2F6FD0",
-    matematik: "#D1631A",
-    fizik: "#0E7490",
-    kimya: "#D1477F",
-    biyoloji: "#147437",
-    tarih: "#92400E",
-    cografya: "#5B5FD0",
-    felsefe: "#8B4FD0",
-    din: "#57850C",
-    edebiyat: "#A83BAF",
-    ingilizce: "#0E7490",
-    ydt_ingilizce: "#0E7490",
-    fen: "#0D9488",
-    sosyal: "#6D3FD0",
-    inkilap: "#BE4B5C",
+    // Kum kart ustunde yazi olarak da okunur (AA 4.6+): ton ayni, koyuluk artti.
+    // Tarih koyu temadaki gibi altin ailesinde; matematikle (yanik turuncu) karismasin.
+    turkce: "#275BAB",
+    matematik: "#944612",
+    fizik: "#0C657D",
+    kimya: "#A92A5E",
+    biyoloji: "#126B33",
+    tarih: "#6E5C0A",
+    cografya: "#474CCA",
+    felsefe: "#7A36C8",
+    din: "#436709",
+    edebiyat: "#923398",
+    ingilizce: "#0C657D",
+    ydt_ingilizce: "#0C657D",
+    fen: "#09675F",
+    sosyal: "#6B3DCF",
+    inkilap: "#9F3948",
   },
 };
 

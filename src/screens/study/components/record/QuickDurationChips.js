@@ -9,7 +9,7 @@ const QUICK_DURATIONS = ["25", "50", "90"];
 
 export function QuickDurationChips({ C, value, onSelect }) {
   return (
-    <View style={s.quickRow}>
+    <View style={[s.quickRow, { borderTopColor: C.line }]}>
       <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>HIZLI SÜRE</Text>
       <View style={s.chipsRow}>
         {QUICK_DURATIONS.map((mins) => {
@@ -55,7 +55,6 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: STEP.s2,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
   },
   chipsRow: {
     flexDirection: "row",
