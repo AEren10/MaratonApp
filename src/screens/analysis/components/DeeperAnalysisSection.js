@@ -5,8 +5,26 @@ import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 
 // Yanlis defteri burada da vardi; grafigin altindaki satir tek giris.
-export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular, onNetTahmini, onYayinKarsilastirmasi, onSimulasyon }) {
+export function DeeperAnalysisSection({
+  C,
+  onKonuIlerlemesi,
+  onOncelikliKonular,
+  onSenaryolar,
+  onNetTahmini,
+  onYayinKarsilastirmasi,
+  onSimulasyon,
+}) {
   const items = [
+    {
+      name: "Senaryolar",
+      note: "Aynı hedef, 3 farklı haftalık tempo yükü",
+      onPress: onSenaryolar,
+    },
+    {
+      name: "Net & Sıralama Tahmini",
+      note: "Hedef açığı, net bandı ve tahmini sıralama simülasyonu",
+      onPress: onNetTahmini,
+    },
     {
       name: "Konu İlerlemesi",
       note: "Konu konu çalışma ve defter durumu",
@@ -16,11 +34,6 @@ export function DeeperAnalysisSection({ C, onKonuIlerlemesi, onOncelikliKonular,
       name: "Zayıf dersler",
       note: "Son denemelerde ortalaması düşük dersler",
       onPress: onOncelikliKonular,
-    },
-    {
-      name: "Net Tahmini",
-      note: "Bu tempoyla sınav gününde nereye varırsın",
-      onPress: onNetTahmini,
     },
     {
       // Bu satir ComparativeScreen'e gider: donem karsilastirmasi (bu donem
