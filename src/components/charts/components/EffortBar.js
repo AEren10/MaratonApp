@@ -13,8 +13,9 @@ const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 // Acilista cubuklar SIRAYLA yukselir: Pazartesi once, Pazar en son. Hafta
 // soldan saga birikiyor; hepsi ayni anda firlarsa birikme okunmaz.
-const GROW_MS = 620;
-const STAGGER_MS = 55;
+// 1 Ekim: 620/55 hizli geliyordu (kullanici: 'biraz daha yavas, tatli').
+const GROW_MS = 820;
+const STAGGER_MS = 85;
 // Sonradan gelen degisiklik daha kisa: bekleyen bir acilis degil, az once
 // yaptigin seyin karsiligi.
 const CHANGE_MS = 420;
@@ -37,10 +38,17 @@ export function EffortBar({ index, x, width, bottom, height, radius, fill, fillO
   const drawn = useSharedValue(reduced ? height : 0);
   const mounted = useRef(false);
 
+  // Acilis buyumesi ancak GERCEK veri gelince: ana sayfa acildiginda veri
+  // henuz yokken (yukseklik 0) ilk animasyon bosa gidiyor, veri gelince
+  // yedi cubuk 'degisiklik' sayilip siralamasiz ve hizli (420ms) uzuyordu.
   useEffect(() => {
     if (reduced) {
       drawn.value = height;
       mounted.current = true;
+      return;
+    }
+    if (!mounted.current && !(height > 0.5)) {
+      drawn.value = height;
       return;
     }
     if (mounted.current) {

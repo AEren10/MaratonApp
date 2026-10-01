@@ -48,12 +48,14 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   const pages = [
     {
       key: "week",
+      hint: "Dokun · geçmişi gör",
       a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Çalışma geçmişini aç` : "Çalışma geçmişini aç",
       render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
       renderFooter: () => <HomeWeeklyMetrics weeklyEffort={weeklyEffort} />,
     },
     {
       key: "route",
+      hint: "Dokun · rota detayı",
       a11y: "Rota detayını gör",
       caption: chartData?.sentence || declared?.summary || null,
       render: () => (
@@ -69,6 +71,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
     // Iki sinavli kullanicida TYT ve AYT ayri cizgi (toplanmaz).
     ...(examSeries ? [{
       key: "exams",
+      hint: "Dokun · Analiz'de aç",
       a11y: "TYT ve AYT netlerini Analiz'de aç",
       caption: examSeries.map((line) => `${line.key} ${formatNet(line.points[line.points.length - 1].v)}`).join(" · ") + " son denemede",
       render: () => <HomeExamSeriesChart series={examSeries} />,

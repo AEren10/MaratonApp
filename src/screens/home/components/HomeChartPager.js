@@ -28,6 +28,11 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   const C = useC();
   const { width } = useWindowDimensions();
   const [index, setIndex] = useState(initialPage);
+  // Sayfa icerigi ILK KEZ gorunurken kurulur: grafikler kendini acilista
+  // ciziyor; ikinci sayfa ekran disinda cizilip bitiyordu, kullanici hic
+  // gormuyordu. Gorulmemis sayfa ilk sayfanin yuksekliginde bos yer tutar.
+  const [seen, setSeen] = useState(() => new Set([initialPage]));
+  const [firstH, setFirstH] = useState(0);
   const indexRef = useRef(initialPage);
   const pageWidth = Math.max(1, width - GUTTER * 2);
 
@@ -46,6 +51,13 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
     setIndex(next);
     onPageChange?.(visible[next]?.key);
   }, [pageWidth, onPageChange, visible]);
+
+  // Siradaki sayfanin %30'u gorununce kur: cizim sayfa ekrana girerken baslar.
+  const onScroll = useCallback((e) => {
+    const pos = e.nativeEvent.contentOffset.x / pageWidth;
+    const cand = Math.min(visible.length - 1, pos % 1 > 0.3 ? Math.ceil(pos) : Math.floor(pos));
+    setSeen((prev) => (prev.has(cand) ? prev : new Set(prev).add(cand)));
+  }, [pageWidth, visible.length]);
 
   const body = (page) => (
     <>
@@ -78,10 +90,12 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={onMomentumEnd}
+        onScroll={onScroll}
+        scrollEventThrottle={32}
         contentOffset={{ x: initialPage * pageWidth, y: 0 }}
         decelerationRate="fast"
       >
-        {visible.map((page) => (
+        {visible.map((page, i) => (
           <Press haptic="none"
             key={page.key}
             style={{ width: pageWidth }}
@@ -89,8 +103,9 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
             disabled={!onPressPage}
             accessibilityRole="button"
             accessibilityLabel={page.a11y}
+            onLayout={i === 0 ? (e) => setFirstH(e.nativeEvent.layout.height) : undefined}
           >
-            {body(page)}
+            {seen.has(i) ? body(page) : <View style={{ height: firstH }} />}
           </Press>
         ))}
       </ScrollView>
@@ -109,6 +124,8 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
           />
         ))}
       </View>
+      {/* Grafige dokununca detay aciliyor ama bunu soyleyen bir sey yoktu. */}
+      {visible[index]?.hint ? <Text style={[TYPOGRAPHY.meta, s.hint, { color: C.text3 }]}>{visible[index].hint}</Text> : null}
     </View>
   );
 }
@@ -126,5 +143,6 @@ const s = StyleSheet.create({
     gap: STEP.s1 - 2, marginTop: STEP.s1,
   },
   dot: { width: 6, height: 6, borderRadius: 3 },
+  hint: { textAlign: "center", marginTop: STEP.s1 },
   dotActive: { width: 18 },
 });

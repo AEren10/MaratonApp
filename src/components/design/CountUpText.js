@@ -27,6 +27,8 @@ export const CountUpText = memo(function CountUpText({ value, decimals = 0, styl
 
   useEffect(() => {
     if (!valid) return;
+    // Veri gelmeden 0 'ilk deger' sayilmaz (yoksa gercek deger saymadan basilir).
+    if (!started.get() && target === 0) { v.set(0); return; }
     if (started.get() || reduced) { v.set(target); started.set(1); return; }
     started.set(1);
     v.set(withTiming(target, COUNT));

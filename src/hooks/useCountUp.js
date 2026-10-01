@@ -3,7 +3,7 @@ import { useReducedMotion } from "react-native-reanimated";
 
 // Sayac 60fps'te DONMEZ: o hizda rakamlar okunmayan bir bulaniga doner.
 // ~13 kademe, sayildigini gosterecek kadar yavas, beklenmeyecek kadar hizli.
-const RISE_MS = 700;
+const RISE_MS = 900;
 const STEP_MS = 55;
 
 // ANIMATION.easing.easeOut ile ayni his: hizli baslar, hedefte yumusar.
@@ -25,7 +25,13 @@ export function useCountUp(value) {
   const risen = useRef(false);
 
   useEffect(() => {
-    if (risen.current || reduced || target === 0) {
+    // Veri gelmeden 0 'ilk deger' sayilmaz: eskiden ana sayfa acilirken
+    // gelen 0 sayaci 'sayildi' isaretliyor, gercek deger saymadan basiliyordu.
+    if (target === 0 && !risen.current) {
+      setShown(0);
+      return undefined;
+    }
+    if (risen.current || reduced) {
       risen.current = true;
       setShown(target);
       return undefined;
@@ -56,7 +62,11 @@ export function useRingFill(value) {
   const filled = useRef(false);
 
   useEffect(() => {
-    if (filled.current || reduced || target === 0) {
+    if (target === 0 && !filled.current) {
+      setShown(0);
+      return undefined;
+    }
+    if (filled.current || reduced) {
       filled.current = true;
       setShown(target);
       return undefined;
