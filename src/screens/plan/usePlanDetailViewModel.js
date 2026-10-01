@@ -79,6 +79,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
 
   const detail = usePlanDetailTasks({
     C,
+    userId: user?.id && user.id !== "dev" ? user.id : null,
     plan: { tasks: generatedTasks },
     adHocTasks: [],
     userTasks,

@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
-import { mapGeneratedTask, mapAdHocTask, mapUserTask } from "./planTaskMappers";
+import { mapGeneratedTask, mapAdHocTask, mapUserTask, taskAsStop } from "./planTaskMappers";
+import { recordStopCompletion, removeStopCompletion } from "../../lib/stopCompletionLog";
 import { mergePlanTasks } from "./mergePlanTasks";
 
 export function usePlanDetailTasks({
   C,
+  userId,
   plan,
   adHocTasks,
   userTasks,
@@ -58,6 +60,9 @@ export function usePlanDetailTasks({
 
     if (task.userTask) toggleUserTask(id);
     else togglePlanDone(id);
+    // Ana sayfadaki tikle ayni kayit: grafik, seri ve konu ilerlemesi buradan
+    // da beslenir (eskiden bu ekranin tiki hicbir calisma kaydi yazmiyordu).
+    if (userId) (nextDone ? recordStopCompletion : removeStopCompletion)(userId, taskAsStop(task)).catch(() => {});
 
     if (task.routeStop && nextDone) {
       try {
@@ -67,10 +72,11 @@ export function usePlanDetailTasks({
         completedHistoryRef.current.delete(id);
         if (task.userTask) toggleUserTask(id);
         else togglePlanDone(id);
+        if (userId) removeStopCompletion(userId, taskAsStop(task)).catch(() => {});
         showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
       }
     }
-  }, [showAlert, toggleUserTask, togglePlanDone, transitionStop]);
+  }, [showAlert, toggleUserTask, togglePlanDone, transitionStop, userId]);
 
   const startTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);
