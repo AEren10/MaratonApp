@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
 import { trackNotificationOpened, track } from "../lib/analytics";
@@ -5,6 +6,24 @@ import { EVENTS } from "../constants/analytics";
 import { LINKING_SCREENS } from "./routes";
 
 const prefix = Linking.createURL("/");
+
+// ACILIS ADRESI BIR KEZ KULLANILIR. Uygulama widget'tan (maraton://rota)
+// acildiktan sonra JS her yeniden yuklendiginde (gelistirmede her Metro
+// yenilemesi, uretimde guncelleme yuklemesi) Linking ayni adresi yeniden
+// veriyordu: ikondan acilsa bile hep Rota aciliyordu. Ayni adres kisa sure
+// once islendiyse yok sayilir.
+const HANDLED_KEY = "@maraton:handled_initial_url";
+const REUSE_WINDOW_MS = 30 * 60 * 1000;
+
+async function freshInitialUrl(url) {
+  try {
+    const raw = await AsyncStorage.getItem(HANDLED_KEY);
+    const prev = raw ? JSON.parse(raw) : null;
+    if (prev?.url === url && Date.now() - prev.at < REUSE_WINDOW_MS) return null;
+    await AsyncStorage.setItem(HANDLED_KEY, JSON.stringify({ url, at: Date.now() }));
+  } catch (_) {}
+  return url;
+}
 
 export const linkingConfig = {
   prefixes: [prefix, "maraton://", "https://maratonapp.com"],
@@ -14,7 +33,7 @@ export const linkingConfig = {
   // Initial deep link from notification or cold start
   async getInitialURL() {
     const url = await Linking.getInitialURL();
-    if (url) return url;
+    if (url) return freshInitialUrl(url);
     const response = typeof Notifications.getLastNotificationResponse === "function"
       ? Notifications.getLastNotificationResponse()
       : await Notifications.getLastNotificationResponseAsync();

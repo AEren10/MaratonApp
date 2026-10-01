@@ -102,11 +102,10 @@ export function useUserTasks() {
     dispatch(setUserTaskCompleted({ id, completed: newCompleted }));
 
     if (typeof id === "string" && id.startsWith("temp_")) {
-      const patched = await patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => false);
-      if (!patched) {
-        dispatch(setUserTaskCompleted({ id, completed: previous }));
-        return false;
-      }
+      // Kuyrukta karsiligi yoksa (gonderildi ama gecici kimlik henuz
+      // degismedi) tik GERI ALINMAZ: eskiden de alinmiyordu; geri almak
+      // yeni eklenen gorevin tikini ziplatiyordu.
+      await patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => false);
       if (newCompleted) trackPlanTaskCompleted({ ...task, userTask: true }, "user_task");
       return true;
     }

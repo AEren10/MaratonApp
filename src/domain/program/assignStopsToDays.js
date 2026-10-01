@@ -60,6 +60,18 @@ function movedDayIndex(stop, moves, monday) {
   return idx >= 0 && idx < 7 ? idx : null;
 }
 
+// Bitmis durak BITTIGI gune sabitlenir (TR takvimi). Yoksa carsamba bitirilen
+// durak ders programina gore cumaya dusuyor, cuma "7/7 bitti" gorunurken o gun
+// hic calisma yoktu ve grafik bos kaliyordu. Hafta disi ya da tarihsizse null.
+function completedDayIndex(stop, monday) {
+  if (stop?.lifecycleStatus !== "completed" || !stop?.completedAt || !monday) return null;
+  const at = new Date(stop.completedAt);
+  if (Number.isNaN(at.getTime())) return null;
+  const key = at.toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" });
+  const idx = Math.round((new Date(`${key}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000);
+  return idx >= 0 && idx < 7 ? idx : null;
+}
+
 export function assignWeekStops(stops = [], schedule = null, {
   rhythm = null, moves = null, monday = null, blockedDates = null, firstDate = null, examDate = null,
 } = {}) {
@@ -90,7 +102,7 @@ export function assignWeekStops(stops = [], schedule = null, {
   // Once ogrencinin tasidiklari: gunlerin yukune onlar sayilir.
   const free = [];
   stops.forEach((stop) => {
-    const idx = movedDayIndex(stop, moves, monday);
+    const idx = completedDayIndex(stop, monday) ?? movedDayIndex(stop, moves, monday);
     if (idx == null) { free.push(stop); return; }
     days[idx].push(stop);
     load[idx] += stopMinutes(stop);
