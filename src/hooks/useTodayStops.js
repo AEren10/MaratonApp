@@ -8,7 +8,7 @@ import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 import { recordStopCompletion, removeStopCompletion } from "../lib/stopCompletionLog";
-import { setStreak } from "../store/slices/studyLogSlice";
+import { applyStreak } from "../lib/applyStreak";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
@@ -128,7 +128,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     else togglePlan(item.id);
     if (user?.id) {
       const sync = wasDone ? removeStopCompletion : recordStopCompletion;
-      sync(user.id, item).then((res) => { if (typeof res?.current_streak === "number") dispatch(setStreak(res.current_streak)); }).catch(() => {});
+      sync(user.id, item).then((res) => applyStreak(dispatch, res)).catch(() => {});
     }
 
     if (!wasDone) {

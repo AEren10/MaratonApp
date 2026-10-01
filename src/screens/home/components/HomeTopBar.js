@@ -8,6 +8,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
+import { HomeStreakStrip } from "./HomeStreakStrip";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -33,10 +34,9 @@ function heroDateTR() {
 }
 
 // Ana Sayfa ust bandi: bas harf kutusu, selam + ad, Structured tarzı hero tarih basligi ve aksiyonlar.
-export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }) {
+export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
   const C = useC();
   const avatar = useMyAvatar();
-  const days = Math.max(0, Math.round(Number(streak) || 0));
   const dateHeading = useMemo(() => heroDateTR(), []);
 
   return (
@@ -63,18 +63,17 @@ export function HomeTopBar({ name, streak = 0, onProfile, onCalendar, onSocial }
         </Pressable>
         <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
           accessibilityRole="button"
-          accessibilityLabel={days > 0 ? `${days} günlük seri, takvimi aç` : "Takvimi aç"}
+          accessibilityLabel="Takvimi aç"
           style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-          <Icon name="calendar" size={14} color={C.accent} />
-          {days > 0 ? (
-            <Text style={[TYPOGRAPHY.metaSemiBold, s.chipText, { color: C.text }]}>{`${days} GÜN`}</Text>
-          ) : null}
+          <Icon name="calendar" size={NAV_ICON.action} color={C.text2} />
         </Pressable>
       </View>
 
       <View style={s.dateRow}>
         <Text style={[TYPOGRAPHY.heading, s.dateText, { color: C.text }]}>{dateHeading}</Text>
       </View>
+      {/* Seri artik takvim cipinde degil, tarihin altinda kendi seridinde. */}
+      <HomeStreakStrip />
     </Animated.View>
   );
 }
@@ -97,8 +96,7 @@ const s = StyleSheet.create({
     alignItems: "center", justifyContent: "center",
   },
   chip: {
-    flexDirection: "row", alignItems: "center", gap: STEP.s1, height: CONTROL.tapMin,
-    paddingHorizontal: STEP.s2 + 3, borderRadius: SHAPE.button, borderWidth: 1,
+    width: CONTROL.tapMin, height: CONTROL.tapMin, borderRadius: SHAPE.button, borderWidth: 1,
+    alignItems: "center", justifyContent: "center",
   },
-  chipText: { fontSize: TYPOGRAPHY.micro.fontSize, letterSpacing: 0.7 },
 });
