@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useDispatch } from "react-redux";
 
 import { useAuth } from "../contexts/AuthContext";
 import { useUserTasks } from "./useUserTasks";
@@ -7,15 +6,14 @@ import { usePlanCompletion } from "./usePlanCompletion";
 import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
-import { recordStopCompletion, removeStopCompletion } from "../lib/stopCompletionLog";
-import { applyStreak } from "../lib/applyStreak";
+import { useStopCompletion } from "./useStopCompletion";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
 // durak kaybolmaz, yeşil tikle alta iner ve sayaçla (2/5) senkron kalır.
 export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onAllDone }) {
   const { user } = useAuth();
-  const dispatch = useDispatch();
+  const stopLog = useStopCompletion();
   const { tasks: userTasks, toggleTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlan, syncPlan } = usePlanCompletion(user?.id);
   const rewardedRef = useRef(false);
@@ -127,8 +125,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     if (item.source === "user") toggleTask(item.id);
     else togglePlan(item.id);
     if (user?.id) {
-      const sync = wasDone ? removeStopCompletion : recordStopCompletion;
-      sync(user.id, item).then((res) => applyStreak(dispatch, res)).catch(() => {});
+      (wasDone ? stopLog.undo : stopLog.complete)(item);
     }
 
     if (!wasDone) {
@@ -142,7 +139,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
         await onRouteComplete?.(item.routeStop);
       } catch {}
     }
-  }, [dispatch, onRouteComplete, toggleTask, togglePlan, user?.id]);
+  }, [stopLog, onRouteComplete, toggleTask, togglePlan, user?.id]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;

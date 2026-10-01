@@ -18,8 +18,10 @@ const studyLogSlice = createSlice({
     },
     addLog: (state, action) => {
       const log = normalizeStudyLog(action.payload);
+      const op = log.client_operation_id;
       const dup = state.todayLogs.some((l) =>
-        l.id === log.id || (
+        (op && l.client_operation_id === op) ||
+        (log.id != null && l.id === log.id) || (
           l.subject === log.subject && l.topic === log.topic &&
           l.questionCount === log.questionCount &&
           l.correctCount === log.correctCount &&
@@ -32,6 +34,11 @@ const studyLogSlice = createSlice({
     // düşsün ki ana ekrandaki sayaçlar tutarlı kalsın.
     removeLog: (state, action) => {
       state.todayLogs = state.todayLogs.filter((l) => l.id !== action.payload);
+    },
+    // Durak tiki geri alininca: o durak icin yazilan kayitlar (islem kimligiyle).
+    removeLogsByOperationIds: (state, action) => {
+      const ids = new Set(action.payload || []);
+      state.todayLogs = state.todayLogs.filter((l) => !ids.has(l.client_operation_id));
     },
     setStreak: (state, action) => {
       state.streak = action.payload;
@@ -54,7 +61,7 @@ const studyLogSlice = createSlice({
   },
 });
 
-export const { setTodayLogs, addLog, removeLog, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate, setLoading } =
+export const { setTodayLogs, addLog, removeLog, removeLogsByOperationIds, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate, setLoading } =
   studyLogSlice.actions;
 
 export default studyLogSlice.reducer;

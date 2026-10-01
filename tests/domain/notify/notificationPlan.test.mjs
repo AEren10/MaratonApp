@@ -19,7 +19,7 @@ test("gunde en fazla iki bildirim, sessiz saat disinda hic yok", () => {
   for (const n of Object.values(byDay(items))) assert.ok(n <= 2);
   for (const i of items) {
     const m = i.date.getHours() * 60 + i.date.getMinutes();
-    assert.ok(m >= 480 && m <= 1320, `${i.type} ${i.date}`);
+    assert.ok(m >= 480 && m < 1320, `${i.type} ${i.date}`);
   }
 });
 

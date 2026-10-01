@@ -131,7 +131,8 @@ export function generateDailyPlan({
       ? differenceInDays(today, new Date(lastStudied))
       : 30;
     const neglectScore = Math.min(daysSince * 3, 40);
-    const urgency = daysLeft < 30 ? 20 : daysLeft < 90 ? 10 : 0;
+    // Sinav gectiyse (daysLeft <= 0) aciliyet yok.
+    const urgency = daysLeft <= 0 ? 0 : daysLeft < 30 ? 20 : daysLeft < 90 ? 10 : 0;
     // smartNudge net-düşüş sinyali olan dersi öne al.
     const priorityBoost = priorityReasons[key] ? 25 : 0;
     const totalScore = weakness * 0.5 + neglectScore + urgency + priorityBoost;

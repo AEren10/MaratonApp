@@ -3,12 +3,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
 import { mapGeneratedTask, mapAdHocTask, mapUserTask, taskAsStop } from "./planTaskMappers";
-import { recordStopCompletion, removeStopCompletion } from "../../lib/stopCompletionLog";
+import { useStopCompletion } from "../../hooks/useStopCompletion";
 import { mergePlanTasks } from "./mergePlanTasks";
 
 export function usePlanDetailTasks({
   C,
-  userId,
   plan,
   adHocTasks,
   userTasks,
@@ -26,6 +25,7 @@ export function usePlanDetailTasks({
     ...plan.tasks.map((t) => mapGeneratedTask(t, C, isPlanDone)),
   ], [C, plan, adHocTasks, userTasks, isPlanDone]);
 
+  const stopLog = useStopCompletion();
   const [tasks, setTasks] = useState(initialTasks);
   const tasksRef = useRef(tasks);
   const completedHistoryRef = useRef(new Map());
@@ -62,7 +62,7 @@ export function usePlanDetailTasks({
     else togglePlanDone(id);
     // Ana sayfadaki tikle ayni kayit: grafik, seri ve konu ilerlemesi buradan
     // da beslenir (eskiden bu ekranin tiki hicbir calisma kaydi yazmiyordu).
-    if (userId) (nextDone ? recordStopCompletion : removeStopCompletion)(userId, taskAsStop(task)).catch(() => {});
+    const logWrite = (nextDone ? stopLog.complete : stopLog.undo)(taskAsStop(task));
 
     if (task.routeStop && nextDone) {
       try {
@@ -72,11 +72,12 @@ export function usePlanDetailTasks({
         completedHistoryRef.current.delete(id);
         if (task.userTask) toggleUserTask(id);
         else togglePlanDone(id);
-        if (userId) removeStopCompletion(userId, taskAsStop(task)).catch(() => {});
+        // Silme, yazma bittikten SONRA: once biterse gec gelen kayit geride kalirdi.
+        Promise.resolve(logWrite).finally(() => stopLog.undo(taskAsStop(task)));
         showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
       }
     }
-  }, [showAlert, toggleUserTask, togglePlanDone, transitionStop, userId]);
+  }, [showAlert, stopLog, toggleUserTask, togglePlanDone, transitionStop]);
 
   const startTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);

@@ -11,6 +11,8 @@ import * as H from "../lib/haptics";
 
 // Profil fotografi secme + yukleme akisi. Is mantigi ProfileHero'dan
 // buraya tasindi (AGENTS: is mantigi src/hooks'ta yasar).
+const PICKER_DELAY_MS = 300;
+
 export function useAvatarUpload() {
   const { user } = useAuth();
   const showAlert = useAlert();
@@ -103,8 +105,10 @@ export function useAvatarUpload() {
           destructiveButtonIndex: avatarUri ? 3 : undefined,
         },
         (buttonIndex) => {
-          if (buttonIndex === 1) pickFromCamera();
-          else if (buttonIndex === 2) pickFromGallery();
+          // Secim menusu kapanirken secici acilirsa iOS iki sunumu cakistirip
+          // dokunmayi kilitleyebiliyor: menu kapandiktan sonra ac.
+          if (buttonIndex === 1) setTimeout(pickFromCamera, PICKER_DELAY_MS);
+          else if (buttonIndex === 2) setTimeout(pickFromGallery, PICKER_DELAY_MS);
           else if (buttonIndex === 3 && avatarUri) removeAvatar();
         }
       );

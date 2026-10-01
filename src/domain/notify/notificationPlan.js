@@ -12,7 +12,7 @@ import {
 // - Gunde en fazla 2 bildirim: gunun ana bildirimi (aliskanlik saati) ve
 //   AKSAM bildirimi (gun bitmediyse; seri >= 3 ise seri dili). Ayni dilime
 //   dusenlerden onceligi yuksek olan kalir. Gun bitince aksamki kurulmaz.
-// - Sessiz saat: 08:00 oncesi ve 22:00 sonrasi hicbir sey kurulmaz.
+// - Sessiz saat: 08:00 oncesi ve 22:00 ve sonrasi hicbir sey kurulmaz.
 // - Gunun isi bittiyse o gunun hatirlatmasi yok (reminderContent).
 // - Merdiven: yarin (gunluk), 3., 7. ve 14. gun. Sonrasi sessiz; yalniz
 //   sinav takvimindeki donum noktalari gider.
@@ -23,7 +23,8 @@ const PRIORITY = { day_unfinished: 1, streak_risk: 2, daily_reminder: 1, monthly
 const MILESTONES = [150, 100, 60, 30, 7];
 const HORIZON_DAYS = 120;
 const QUIET_START = 8 * 60;
-const QUIET_END = 22 * 60;
+// 22:00 ve sonrasi sessiz: en gec 21:45 (kaydirma payi dahil).
+const QUIET_END = 21 * 60 + 45;
 const DAY = 86400000;
 
 export const dayKeyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
