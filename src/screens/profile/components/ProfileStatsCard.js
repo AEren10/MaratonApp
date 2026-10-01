@@ -38,11 +38,17 @@ export const ProfileStatsCard = memo(function ProfileStatsCard() {
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>Tümü</Text>
         <Icon name="chevR" size={14} color={C.text3} />
       </View>
-      <View style={s.row}>
-        {cells.map((c) => (
-          <View key={c.label} style={s.cell}>
-            <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]} numberOfLines={1}>{c.value}</Text>
-            <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{c.label}</Text>
+      <View style={[s.strip, { borderTopColor: C.line, borderBottomColor: C.line }]}>
+        {cells.map((c, i) => (
+          <View
+            key={c.label}
+            style={[
+              s.cell,
+              i > 0 && { borderLeftWidth: 1, borderLeftColor: C.line },
+            ]}
+          >
+            <Text style={[s.num, { color: C.text }]} numberOfLines={1}>{c.value}</Text>
+            <Text style={[s.label, { color: C.text3 }]}>{c.label}</Text>
           </View>
         ))}
       </View>
@@ -54,6 +60,29 @@ const s = StyleSheet.create({
   wrap: { marginHorizontal: GUTTER, marginTop: STEP.s4 },
   head: { flexDirection: "row", alignItems: "center", gap: 2, marginBottom: STEP.s2, minHeight: 24 },
   flex: { flex: 1 },
-  row: { flexDirection: "row", gap: STEP.s2 },
-  cell: { flex: 1 },
+  strip: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    paddingVertical: STEP.s2,
+  },
+  cell: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: STEP.s1 / 2,
+    gap: 2,
+  },
+  num: {
+    fontFamily: "Bricolage_400",
+    fontSize: 28,
+    lineHeight: 34,
+    letterSpacing: -0.6,
+    fontVariant: ["tabular-nums"],
+  },
+  label: {
+    fontFamily: "Archivo_500",
+    fontSize: 13,
+    lineHeight: 18,
+  },
 });
