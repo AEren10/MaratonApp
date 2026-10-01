@@ -113,6 +113,7 @@ Play kişisel hesapta yayından önce 12 test kullanıcısı x 14 gün kapalı t
 - Story Kademe B (Meta App ID)
 - Kaydırınca ışığın sönmesi
 - Deneme durakları (son 1-2 ay) ve düşen derse branş denemesi önerisi
+- "Sadece netleri gir" hızlı deneme girişi (create_trial doğru/yanlış zorunlu; analiz ve rota bunlardan besleniyor, şema + tüketiciler değişmeli)
 
 ## Riskler
 
