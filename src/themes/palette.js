@@ -20,10 +20,11 @@ export const SEEDS = {
     up: "#34D399",
   },
   light: {
-    accent: "#DE2E39",
-    bg: "#EEEAE6",
+    // Acik zeminde parlak kizil "alarm" gibi bagiriyordu: koyu sarap tonu.
+    accent: "#C42633",
+    bg: "#F1EDE9",
     canvas: "#E4DFDA",
-    text: "#171110",
+    text: "#16120F",
     up: "#147437",
   },
 };
@@ -43,12 +44,14 @@ const FIXED = {
     danger: "#F0555F",
   },
   light: {
-    text2: "#5F504B",
-    text3: "#6E635C",
-    text4: "#A69691",
-    text5: "#B4A5A0",
+    // Kahverengimsi tonlar hissi camurlastiriyordu: notr sicak gri.
+    // AA (bg / surface / elev): text2 8.5 / 9.0 / 9.9 · text3 5.7 / 6.1 / 6.7
+    text2: "#47423F",
+    text3: "#615B57",
+    text4: "#9C9590",
+    text5: "#C9C1BA",
     accentInk: "#FFFFFF",
-    accentBright: "#CD202C",
+    accentBright: "#B11F2A",
     down: "#6B7F8D",
     warn: "#92400E",
     danger: "#C4262F",
@@ -56,13 +59,16 @@ const FIXED = {
 };
 
 // Açık temada yüzey basamakları — sıcak açık gri kâğıt merdiveni (Brief 22).
+// Zemin ile kart arasi fark gorunur; "yukseltilmis" (secili segment, cip,
+// avatar kutusu) acik temada zeminden KOYU degil en acik ton -- koyu temadaki
+// gibi isiga yakin. Eski hali kirli gri duruyordu.
 const LIGHT_SURFACES = {
-  surface: "#F7F4F1",
-  elev: "#E7E2DD",
-  border: "#CCC4BD",
-  line: "#DCD5CF",
-  track: "#E0DAD4",
-  void: "#E4DFDA",
+  surface: "#F8F5F2",
+  elev: "#FFFFFF",
+  border: "#D6CEC6",
+  line: "#E0D9D2",
+  track: "#E4DED8",
+  void: "#E9E4DF",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise
@@ -158,10 +164,10 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     ...fixed,
 
     // Marka türevleri
-    brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#C4262F"),
-    brandFillPress: isDark ? "#A81C26" : "#A31C24",
-    brandPress: isDark ? "#A81C26" : "#A31C24",
-    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#CD202C"),
+    brandFill: overrides.brandFill || (isDark ? "#CF2833" : "#B8212C"),
+    brandFillPress: isDark ? "#A81C26" : "#951A23",
+    brandPress: isDark ? "#A81C26" : "#951A23",
+    accentText: overrides.accentText || (isDark ? "#FF6A72" : "#B11F2A"),
     accentDeep: isDark ? "#A81C26" : mix(accent, 70, "#000000"),
     brandTint: mix(accent, isDark ? 13 : 12, bg),
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
