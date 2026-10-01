@@ -30,8 +30,8 @@ export const DayCompleteModal = memo(function DayCompleteModal({
       visible
       onClose={onClose}
       eyebrow={dayLabel ? `${dayLabel} · GÜN KAPANDI` : "GÜN KAPANDI"}
-      title={`Bugünün ${count} durağı da tamam.`}
-      body="Rota bugün planlandığı kadar ilerledi. Yarının durakları sabah açılır."
+      title="Bugünlük bu kadar."
+      body={`Bugünün ${count} durağı da tamam. Şimdi zihnini dinlendir; yarının durakları sabah hazır olacak.`}
       primaryLabel="Günün özetine bak"
       onPrimary={onSummary}
       secondaryLabel={onShare ? "Kartı paylaş" : null}
