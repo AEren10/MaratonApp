@@ -12,21 +12,21 @@ Sahipler: **Sen** · **Claude** (akış, mantık, DB) · **Codex** (veri, mağaz
 
 Uzun süren dış işler bugün başlamalı; onları beklerken kod işleri akar.
 
-- [ ] **Sen:** App Store Connect'te uygulama kaydını aç.
+- [x] **Sen:** App Store Connect'te uygulama kaydını aç. *(Açık: ascAppId `6815480891`; 1 Ekim build 6 ve 7 gönderim kuyruğunda.)*
   - Ad
   - Bundle `com.ahmeterensiranli.maraton`
   - SKU
   - Dil: Türkçe
   - Kategori: Education
-- [ ] **Sen:** Codex'e `appleId`, `ascAppId` ve `appleTeamId` değerlerini ver.
-- [ ] **Sen:** Alan adı kararı. `maraton.app` şu an çözümlenmiyor.
+- [x] **Sen:** Codex'e `appleId`, `ascAppId` ve `appleTeamId` değerlerini ver. *(ascAppId `eas.json`'a yazıldı; appleId/teamId zorunlu değil, EAS gerekince giriş sorar.)*
+- [x] **Sen:** Alan adı kararı. *(`maratonapp.com` canlı.)* `maraton.app` şu an çözümlenmiyor.
   - Hızlı yol: yasal sayfaları GitHub Pages ya da Vercel'in ücretsiz adresinde yayınla, alan adını sonra bağla.
-- [ ] **Sen:** Supabase'de leaked password ayarını geri kapat.
+- [x] **Sen:** Supabase'de leaked password ayarını geri kapat. *(Advisor: kapalı.)*
 - [ ] **Sen (canlı test):** 1 Ekim ay dönümü. Ay görünümü, ay özeti ve seri doğru geçti mi?
-- [ ] **Codex:** Yasal sayfaları yayınla (`web/privacy.html`, `terms.html`, `delete-account.html`) ve destek e-postasını kur.
-- [ ] **Codex:** `eas.json` → `submit.production.ios` alanını doldur.
-- [ ] **Codex:** Belgelerdeki `com.maraton.app` kalıntılarını tekleştir.
-- [ ] **Codex:** Topluluk soru-cevabının v1 grafiğinden tam çıktığını doğrula (Guideline 1.2); premium ve ödeme de öyle.
+- [x] **Codex:** Yasal sayfaları yayınla (`web/privacy.html`, `terms.html`, `delete-account.html`) ve destek e-postasını kur.
+- [x] **Codex:** `eas.json` → `submit.production.ios` alanını doldur. *(Claude, ascAppId.)*
+- [x] **Codex:** Belgelerdeki `com.maraton.app` kalıntılarını tekleştir.
+- [x] **Codex:** Topluluk soru-cevabının v1 grafiğinden tam çıktığını doğrula (Guideline 1.2); premium ve ödeme de öyle.
 - [x] **Claude:** Bekleyen dört kararı uygula (1 Ekim, main):
   1. **Doğru sayısı:** Kayıt formlarında ve durak tikinde doğru sayısı sorulsun. Boş bırakılabilir; "bilinmiyor" 0 sayılmaz.
   2. **"Rotayı bitirdin · hedefe N soru":** Günün durakları bitti ama soru hedefi dolmadıysa gösterilecek metin.
