@@ -30,7 +30,7 @@ export function TargetDepartmentCard({ targetDepartment }) {
     <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Hedef bölüm"
-      onPress={() => { H.tap(); nav.navigate(SCREENS.GOALS); }}
+      onPress={() => { H.tap(); nav.navigate(SCREENS.RANK_SIMULATOR); }}
       style={{
         flexDirection: "row", alignItems: "center", gap: STEP.s2,
         marginHorizontal: GUTTER, marginTop: STEP.s3,
