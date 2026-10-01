@@ -50,6 +50,8 @@ export function StrengthMap({ strengths = [] }) {
           pct={s.v}
           value={`%${s.v}`}
           variant="row"
+          showChevron
+          onPress={() => nav.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: s.key || s.name, subjectName: s.name })}
           last={i === sorted.length - 1}
         />
       ))}

@@ -148,6 +148,8 @@ export const PROFIL_STACK = [
   SCREENS.EXAM_DAY_PLAN,    // (paylasimli) Profil satiri
   SCREENS.EXAM_RESULT,      // (paylasimli)
   SCREENS.FORECAST_ACCURACY, // (paylasimli)
+  SCREENS.SUBJECT_DETAIL,   // Profil > Guc haritasi -> Ders mufredat ilerlemesi
+  SCREENS.TOPIC_STUDY,      // Mufredat konusu detayi
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
   // Sosyal/Lig — Defter topluluk soru-cevap v1 disi; Lig ve arkadas
