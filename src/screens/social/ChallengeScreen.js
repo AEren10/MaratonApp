@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "../../components/design/usePressScale";
 
 import { Icon, Button } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -197,8 +198,8 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
   const pct = item.target > 0 ? Math.min(1, (myProgress || 0) / item.target) : 0;
   const oppPct = item.target > 0 ? Math.min(1, (theirProgress || 0) / item.target) : 0;
   const metric = METRICS.find((m) => m.key === item.metric);
-  const scale = useSharedValue(1);
-  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const press = usePressScale();
+  const pressStyle = press.style;
   const [expanded, setExpanded] = useState(false);
   const daysLeft = item.ends_on ? Math.max(0, Math.ceil((new Date(item.ends_on) - Date.now()) / 86400000)) : null;
   const isPendingForMe = item.status === "pending" && item.opponent_id === user.id;
@@ -211,8 +212,8 @@ const ChallengeCard = React.memo(function ChallengeCard({ item, user, handleCanc
   return (
     <Pressable
       onPress={() => { H.select(); setExpanded((v) => !v); }}
-      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+      onPressIn={press.onIn}
+      onPressOut={press.onOut}
     >
       <Animated.View style={[s.card, pressStyle]}>
         <View style={s.cardTop}>

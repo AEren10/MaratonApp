@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ReportableAvatar } from "../../components/common/ReportableAvatar";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "../../components/design/usePressScale";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
@@ -53,13 +54,13 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
   const medalColor = item.rank === 1 ? (C.warn || C.amber) : item.rank === 2 ? C.text2 : item.rank === 3 ? C.text3 : null;
   const zone = getZone(item.rank, totalUsers);
   const zoneColor = zone === ZONE.PROMOTION ? C.green : zone === ZONE.DEMOTION ? C.danger : null;
-  const scale = useSharedValue(1);
-  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const press = usePressScale(0.985);
+  const pressStyle = press.style;
 
   return (
     <AnimPressable
-      onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 320 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 320 }); }}
+      onPressIn={press.onIn}
+      onPressOut={press.onOut}
       style={[
         {
           flexDirection: "row",

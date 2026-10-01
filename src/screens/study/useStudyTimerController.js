@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as Haptics from "expo-haptics";
+import * as H from "../../lib/haptics";
 import { AppState } from "react-native";
 
 import {
@@ -183,7 +183,7 @@ export function useStudyTimerController(C) {
   }, []);
 
   const advancePhase = useCallback(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    H.success();
     if (!isPomodoro) {
       setRunning(false);
       return;
@@ -339,7 +339,7 @@ export function useStudyTimerController(C) {
       }
       return next;
     });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    H.tap();
   }, []);
 
   const handleModeChange = useCallback((key) => {
@@ -355,7 +355,7 @@ export function useStudyTimerController(C) {
 
   const addQuestion = useCallback(() => {
     setQuestions((previous) => previous + 1);
-    Haptics.selectionAsync().catch(() => {});
+    H.select();
   }, []);
 
   const removeQuestion = useCallback(() => {
@@ -368,7 +368,7 @@ export function useStudyTimerController(C) {
 
   const addCorrect = useCallback(() => {
     setCorrectCount((count) => Math.min(count + 1, questions));
-    Haptics.selectionAsync().catch(() => {});
+    H.select();
   }, [questions]);
 
   const removeCorrect = useCallback(() => {

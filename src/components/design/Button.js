@@ -1,8 +1,9 @@
 import { Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "./usePressScale";
 import { Icon } from "./Icon";
 import { useC } from "../../contexts/ThemeContext";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL, ANIMATION } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
 const ReanimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -48,8 +49,7 @@ export function Button({
   const C = useC();
   const v = (VARIANTS[variant] || VARIANTS.primary)(C);
   const s = SIZES[size] || SIZES.md;
-  const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const press = usePressScale();
 
   const isDisabled = disabled || loading;
   const label = children ?? title;
@@ -57,8 +57,8 @@ export function Button({
   return (
     <ReanimatedPressable
       onPress={(e) => { if (!isDisabled) { H.tap(); onPress?.(e); } }}
-      onPressIn={() => { scale.value = withSpring(0.97, ANIMATION.spring.default); }}
-      onPressOut={() => { scale.value = withSpring(1, ANIMATION.spring.default); }}
+      onPressIn={press.onIn}
+      onPressOut={press.onOut}
       disabled={isDisabled}
       hitSlop={hitSlop}
       pressRetentionOffset={RETENTION}
@@ -67,7 +67,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
       style={[
-        animStyle,
+        press.style,
         styles.base,
         {
           backgroundColor: v.bg,

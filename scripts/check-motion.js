@@ -37,6 +37,15 @@ const RULES = [
     msg: "runOnJS Reanimated 4'te birakildi. react-native-worklets'ten scheduleOnRN kullan.",
   },
   { re: /\bPanResponder\b/, msg: "PanResponder koprudan gecer. Gesture.Pan() kullan." },
+  {
+    re: /onPressIn=\{[^}]*withSpring\(/,
+    msg: "Basma geri bildirimi yayla yapilmaz (ziplak okunur). components/design/usePressScale ya da Press kullan.",
+  },
+  {
+    re: /from "expo-haptics"/,
+    skip: "lib/haptics.js",
+    msg: "expo-haptics dogrudan cagrilmaz: Ayarlar > Titresim kapaliyken de titretir. lib/haptics kullan.",
+  },
 ];
 
 // Imza anlari: cizgi cizilir, hat gecis yapar, dugum parlar. Bunlar uzun surer.
@@ -64,6 +73,7 @@ for (const file of files) {
   lines.forEach((line, i) => {
     if (/^\s*(\/\/|\*)/.test(line)) return;
     for (const r of RULES) {
+      if (r.skip && rel.endsWith(r.skip)) continue;
       if (r.re.test(line)) hits.push({ rel, line: i + 1, msg: r.msg });
     }
     // Sure tavani: imza ani degilse 900ms'i gecen hareket yok (AGENTS.md: 0.5-0.9 sn)

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "../../../components/design/usePressScale";
 
 import { Icon } from "../../../components/design/Icon";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL, SHAPE } from "../../../themes/tokens";
@@ -20,18 +21,10 @@ export function StudyTimerControls({
   onSkip,
   onToggle,
 }) {
-  const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.96, { damping: 18, stiffness: 320 });
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, { damping: 18, stiffness: 320 });
-  }, [scale]);
+  const press = usePressScale(0.96);
+  const animStyle = press.style;
+  const handlePressIn = press.onIn;
+  const handlePressOut = press.onOut;
 
   const handleToggle = useCallback(() => {
     H.tap();

@@ -3,7 +3,7 @@ import { View, Text, Modal, StyleSheet } from "react-native";
 import Animated, {
   Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming,
 } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
+import * as H from "../../lib/haptics";
 import { IconBox, Button } from "../design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -32,7 +32,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
     glow.set(0);
     shown.set(withTiming(1, { duration: reduced ? 200 : ENTER_MS, easing: EASE_OUT }));
     if (!reduced) glow.set(withDelay(ENTER_MS - 120, withTiming(1, { duration: GLOW_MS, easing: EASE_OUT })));
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    H.success();
   }, [visible, reduced, shown, glow]);
 
   const scrimStyle = useAnimatedStyle(() => ({ opacity: shown.get() }));

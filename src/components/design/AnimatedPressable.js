@@ -1,14 +1,9 @@
 import { Pressable } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "./usePressScale";
 import * as H from "../../lib/haptics";
 
 const ReanimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const SPRING = { damping: 18, stiffness: 320 };
 
 const HAPTIC_FN = {
   tap: H.tap,
@@ -30,10 +25,7 @@ export function AnimatedPressable({
   exiting,
   ...rest
 }) {
-  const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const press = usePressScale(scaleValue);
 
   const pressable = (
     <ReanimatedPressable
@@ -42,15 +34,15 @@ export function AnimatedPressable({
         onPress?.(e);
       }}
       onPressIn={(e) => {
-        scale.value = withSpring(scaleValue, SPRING);
+        press.onIn();
         onPressIn?.(e);
       }}
       onPressOut={(e) => {
-        scale.value = withSpring(1, SPRING);
+        press.onOut();
         onPressOut?.(e);
       }}
       disabled={disabled}
-      style={[animStyle, style]}
+      style={[press.style, style]}
       {...rest}
     >
       {children}

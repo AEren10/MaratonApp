@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "../../../components/design/usePressScale";
 import { Icon } from "../../../components/design";
 import { useC, useSubjectIdentity } from "../../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../../themes/subjects";
@@ -41,8 +42,8 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
   const myA = item.my_answer ?? item.myAnswer;
   const corA = item.correct_answer ?? item.correctAnswer;
 
-  const scale = useSharedValue(1);
-  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const press = usePressScale(0.985);
+  const pressStyle = press.style;
 
   const statusColor = item.is_resolved ? C.text3 : C.warn;
   // Sagdaki metin bir DUGME: basinca cozuldu isaretlenir. "Acik" yazmak
@@ -55,8 +56,8 @@ export function WrongCard({ item, onPress, onResolve, onShare, shared }) {
       accessibilityLabel={`${subj.label}${item.topic ? `, ${item.topic}` : ""}${item.is_resolved ? ", çözüldü" : ""}`}
       accessibilityHint="Detayları görmek için dokun"
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.98, { damping: 15, stiffness: 300 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+      onPressIn={press.onIn}
+      onPressOut={press.onOut}
       style={[s.row, { borderBottomColor: C.line }]}
     >
       <Animated.View style={[s.inner, pressStyle]}>
