@@ -53,7 +53,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
   // (route_weeks). Diğer ekranlar persist:false ile sadece okuyor, böylece
   // aynı hafta iki yerden yazılmıyor.
   const {
-    currentWeek: routeCurrentWeek, totals: routeTotals, daysLeft, transitionStop, isPaused,
+    currentWeek: routeCurrentWeek, totals: routeTotals, daysLeft, transitionStop, isPaused, routeStopsLoaded,
   } = useStudyRoute();
   const rehearsalToday = useRehearsalToday(user?.id);
 
@@ -81,7 +81,10 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
     // Deneme provasi gunu: "O gün başka durak açılmaz" (AKIS 14).
     // Ders programi okunmadan plan kurulmaz: varsayilan dagilimla kurulan
     // plan gunun gorev setine yanlis duraklarla yazilabiliyordu.
-    const generated = rehearsalToday || !scheduleReady
+    // Rota duraklari gelmeden de kurulmaz: o an hafta bos gorunur, motor
+    // rota yok sanip kendi eski planini (haftanin her dersi) uretir; ekranda
+    // bir saniye 11 durak gorunup 2'ye iniyordu.
+    const generated = rehearsalToday || !scheduleReady || !routeStopsLoaded
       ? { tasks: [], totalQuestions: 0, estimatedMinutes: 0 }
       : generateDailyPlan({
         ...planCtx,
@@ -103,7 +106,7 @@ export function useHomeDashboard({ C, planCtx, todayLogs, trials, user }) {
       },
       generatedTasks: generated.tasks,
     };
-  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, dayOpts, habitStops, isPaused]);
+  }, [planCtx, solvedToday, routeCurrentWeek, rehearsalToday, schedule, scheduleReady, todayKey, dayOpts, habitStops, isPaused, routeStopsLoaded]);
 
   const subjectMomentum = useMemo(
     () => buildSubjectMomentum(trials, C),

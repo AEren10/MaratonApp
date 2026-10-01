@@ -41,7 +41,9 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
 
   // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar (en fazla 3-4 durak)
   const generatedTasks = useMemo(() => {
-    if (rehearsalToday || !scheduleReady) return [];
+    // Rota duraklari gelmeden kurulmaz: hafta bos gorunur ve motor rota yok
+    // sanip eski tip tam gun plani uretiyordu (bir saniye 11 durak, sonra 2).
+    if (rehearsalToday || !scheduleReady || !studyRoute.routeStopsLoaded) return [];
     const today = todayTR();
     const doneToday = (stop) => {
       // Plan gorevinin anahtariyla AYNI: rota duraginda plan_<logicalStopKey>.
@@ -73,7 +75,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
       routeActive: (studyRoute.currentWeek?.stops || []).length > 0,
     });
     return generated.tasks || [];
-  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady, dayOpts, habitStops]);
+  }, [planCtx, studyRoute.currentWeek, schedule, isDone, rehearsalToday, scheduleReady, dayOpts, habitStops, studyRoute.routeStopsLoaded]);
 
   const detail = usePlanDetailTasks({
     C,
