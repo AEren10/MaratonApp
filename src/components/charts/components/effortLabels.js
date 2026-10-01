@@ -11,7 +11,7 @@ export function compactDuration(minutes) {
 // Acik kutulu gun (bugun ve sonrasi): sure etiketi kutunun USTUNE cikar.
 // Kutunun icinde kalinca kesikli kenarlara ve taban izine biniyordu.
 // Bugunun etiketi sagdaki hedef yazisiyla cakisirsa hedef yazisi cizginin altina iner.
-export function effortLabelLayout({ week, todayIndex, goalY, top, slot }) {
+export function effortLabelLayout({ week, todayIndex, goalY, top, slot, width = CHART_W }) {
   const labelYOf = (i, barTop) => {
     const open = todayIndex == null || i >= todayIndex;
     const ceiling = open && goalY != null ? Math.min(barTop, goalY) : barTop;
@@ -19,6 +19,6 @@ export function effortLabelLayout({ week, todayIndex, goalY, top, slot }) {
   };
   const todayCx = todayIndex != null ? EFFORT_PAD_LEFT + slot * todayIndex + slot / 2 : null;
   const todayLabelled = todayIndex != null && (week.days[todayIndex]?.minutes || 0) > 0;
-  const goalLabelBelow = todayLabelled && todayCx > CHART_W - PAD_RIGHT - 110;
+  const goalLabelBelow = todayLabelled && todayCx > width - PAD_RIGHT - 110;
   return { labelYOf, goalLabelBelow };
 }

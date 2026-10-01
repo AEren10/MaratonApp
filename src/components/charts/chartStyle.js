@@ -92,9 +92,9 @@ export function plotBottom({ hasAxis }) {
   return CHART_H - PAD_BOTTOM - (hasAxis ? AXIS_BAND : 0);
 }
 
-export function scaleOptions({ hasAxis }) {
+export function scaleOptions({ hasAxis, width = CHART_W }) {
   return {
-    width: CHART_W,
+    width,
     height: CHART_H,
     padTop: PAD_TOP,
     padBottom: PAD_BOTTOM + (hasAxis ? AXIS_BAND : 0),
@@ -106,8 +106,8 @@ export function scaleOptions({ hasAxis }) {
 // Net cizgi grafiginin olcek ayari: RouteLineChart ve etiketlerini ayri
 // cizen RouteDetailChart AYNI fonksiyonu kullanir, yoksa etiketler kayar.
 // flagged: hedef bayragi cizilecek; bayrak diregi icin ust pay acilir.
-export function lineScaleOptions({ hasAxis = false, tickLabels = false, flagged = false, xs = null } = {}) {
-  const base = scaleOptions({ hasAxis });
+export function lineScaleOptions({ hasAxis = false, tickLabels = false, flagged = false, xs = null, width = CHART_W } = {}) {
+  const base = scaleOptions({ hasAxis, width });
   return {
     ...base,
     xs,
@@ -118,8 +118,19 @@ export function lineScaleOptions({ hasAxis = false, tickLabels = false, flagged 
 
 // Eksenin uc etiketinin x konumu ve hizalamasi.
 // midShare: orta etiketin (bugun) 0..1 konumu; bolunmus eksende gecmisin sonu.
-export function axisAnchor(index, count, midShare = 0.5) {
+export function axisAnchor(index, count, midShare = 0.5, width = CHART_W) {
   if (index === 0) return { x: PAD_LEFT, anchor: "start" };
-  if (index === count - 1) return { x: CHART_W - PAD_RIGHT, anchor: "end" };
-  return { x: PAD_LEFT + (CHART_W - PAD_LEFT - PAD_RIGHT) * midShare, anchor: "middle" };
+  if (index === count - 1) return { x: width - PAD_RIGHT, anchor: "end" };
+  return { x: PAD_LEFT + (width - PAD_LEFT - PAD_RIGHT) * midShare, anchor: "middle" };
+}
+
+// GENIS EKRAN (tablet): tuval 390 genislikte sabitti; genis kutuya oranla
+// sigdirilinca grafik ortada kucucuk kaliyor, yazilar 11px altina iniyordu.
+// Genis kutuda yukseklik en az CHART_H olur (yazi 1:1) ve tuval YATAYDA
+// uzar: cizgi ve cubuklar genislige yayilir, yazi ve dugum olcusu sabit.
+// Telefonda (w <= CHART_W) hicbir sey degismez.
+export function chartFrame(w, height) {
+  if (!w || w <= CHART_W) return null;
+  const h = height ? Math.max(height, CHART_H) : CHART_H;
+  return { h, vbW: Math.max(CHART_W, Math.round((CHART_H * w) / h)) };
 }

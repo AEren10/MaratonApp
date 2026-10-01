@@ -2,6 +2,7 @@ import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Stop, Text as SvgText } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
+import { useChartFrame } from "./useChartFrame";
 import {
   CHART_W, CHART_H, PAD_LEFT, PAD_RIGHT, PAD_TOP,
   NODE, STROKE, LABEL, VALUE, plotBottom, axisAnchor,
@@ -17,6 +18,7 @@ import {
 // gibi duruyordu. Izgara cizgileri de kaldirildi — olculmus grafikte yok.
 export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emptyLabel = "HENÜZ TAHMİN YOK" }) {
   const C = useC();
+  const { onLayout, vbW, wide } = useChartFrame(height);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
   const bottom = plotBottom({ hasAxis });
 
@@ -24,7 +26,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emp
   // bunlar yalnizca CIZIM konumu, uzerlerine sayi yazilmaz.
   const x0 = PAD_LEFT;
   const y0 = bottom - 16;
-  const x1 = CHART_W - PAD_RIGHT;
+  const x1 = vbW - PAD_RIGHT;
   // Tasarimda hattin ucu tuvalin EN USTUNE kadar cikiyor. Etiket artik
   // dugumun ustunde degil solunda durdugu icin yukarida yer kaldi.
   const y1 = PAD_TOP - 8;
@@ -40,13 +42,14 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emp
 
   return (
     <View
-      style={[s.wrap, height ? { aspectRatio: undefined, height } : null]}
+      style={[s.wrap, height ? { aspectRatio: undefined, height } : null, wide]}
+      onLayout={onLayout}
       accessible
       accessibilityLabel={declared?.summary
         ? `Rota: ${declared.startLabel || "başlangıç bilinmiyor"} → ${declared.goalLabel || "hedef yok"}. ${declared.summary}`
         : "Net grafiği: henüz veri yok."}
     >
-      <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
+      <Svg width="100%" height="100%" viewBox={`0 0 ${vbW} ${CHART_H}`}>
         <Defs>
           <LinearGradient id="declaredGlow" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={C.accent} stopOpacity={0.3} />
@@ -109,7 +112,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emp
 
         {hasAxis ? axisLabels.map((label, i) => {
           if (!label) return null;
-          const { x, anchor } = axisAnchor(i, axisLabels.length);
+          const { x, anchor } = axisAnchor(i, axisLabels.length, 0.5, vbW);
           return (
             <SvgText
               key={`axis-${i}`}
@@ -123,7 +126,7 @@ export function RouteEmptyChart({ examDateTag, declared, axisLabels, height, emp
 
         {!hasAxis && examDateTag ? (
           <SvgText
-            x={CHART_W - PAD_RIGHT} y={PAD_TOP - 8}
+            x={vbW - PAD_RIGHT} y={PAD_TOP - 8}
             fill={C.text2} fontSize={LABEL.size} fontWeight={LABEL.weight}
             letterSpacing={LABEL.tracking} textAnchor="end"
           >

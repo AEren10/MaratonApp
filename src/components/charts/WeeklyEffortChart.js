@@ -6,27 +6,27 @@ import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
 import { compactDuration, effortLabelLayout } from "./components/effortLabels";
 import { useC } from "../../contexts/ThemeContext";
+import { useChartFrame } from "./useChartFrame";
 import {
-  CHART_W, CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
+  CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
 } from "./chartStyle";
 
 const BAR_RADIUS = 3;
 
-
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
+  const { onLayout, vbW, wide } = useChartFrame(height);
 
   if (!week) return null;
 
   // Bos hafta da 7 bos kutuyla gorunur (kullanici karari, 28 Eylul): cubuklar
   // her zaman yerinde, gun calisildikca dolar. Bos kart cubuklarin yerini
   // aliyor ve ustteki sayilarin uzerine biniyordu.
-
   const bottom = plotBottom({ hasAxis: true });
   const top = PAD_TOP;
   const usableH = bottom - top;
-  const usableW = CHART_W - EFFORT_PAD_LEFT - PAD_RIGHT;
+  const usableW = vbW - EFFORT_PAD_LEFT - PAD_RIGHT;
   const slot = usableW / week.days.length;
   // Ince cubuk (kullanici istegi, 29 Eylul): 34/0.68 -> 24/0.5.
   const barW = Math.min(24, slot * 0.5);
@@ -37,15 +37,16 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
-  const { labelYOf, goalLabelBelow } = effortLabelLayout({ week, todayIndex, goalY, top, slot });
+  const { labelYOf, goalLabelBelow } = effortLabelLayout({ week, todayIndex, goalY, top, slot, width: vbW });
 
   return (
     <View
-      style={[s.wrap, { height }]}
+      style={[s.wrap, { height }, wide]}
+      onLayout={onLayout}
       accessible
       accessibilityLabel={week.summary || "Bu hafta henüz çalışma kaydın yok."}
     >
-      <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
+      <Svg width="100%" height="100%" viewBox={`0 0 ${vbW} ${CHART_H}`}>
         <EffortSlotDefs color={C.line} />
 
         {/* Sol eksen: olcek. Izgara cizgileri cubuklarin ARKASINDA kalir,
@@ -57,7 +58,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
           return (
             <Fragment key={`grid-${v}`}>
               <Line
-                x1={EFFORT_PAD_LEFT} y1={gy} x2={CHART_W - PAD_RIGHT} y2={gy}
+                x1={EFFORT_PAD_LEFT} y1={gy} x2={vbW - PAD_RIGHT} y2={gy}
                 stroke={C.line} strokeWidth={1} strokeOpacity={0.55}
               />
               <SvgText
@@ -71,7 +72,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
         })}
 
         <Line
-          x1={EFFORT_PAD_LEFT} y1={bottom} x2={CHART_W - PAD_RIGHT} y2={bottom}
+          x1={EFFORT_PAD_LEFT} y1={bottom} x2={vbW - PAD_RIGHT} y2={bottom}
           stroke={C.line} strokeWidth={1}
         />
 
@@ -108,11 +109,11 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
         {goalY != null ? (
           <>
             <Line
-              x1={EFFORT_PAD_LEFT} y1={goalY} x2={CHART_W - PAD_RIGHT} y2={goalY}
+              x1={EFFORT_PAD_LEFT} y1={goalY} x2={vbW - PAD_RIGHT} y2={goalY}
               stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
             />
             <SvgText
-              x={CHART_W - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
+              x={vbW - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
               fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor="end"
             >
               {`GÜNLÜK HEDEF ${week.goal}`}

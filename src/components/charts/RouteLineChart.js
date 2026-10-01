@@ -7,6 +7,7 @@ import { RouteChartNodes } from "./components/RouteChartNodes";
 import { RouteTargetFlag } from "./components/RouteTargetFlag";
 import { RouteTickLabels } from "./components/RouteTickLabels";
 import { useC } from "../../contexts/ThemeContext";
+import { useChartFrame } from "./useChartFrame";
 import {
   makeScale,
   buildChartSummary,
@@ -23,7 +24,6 @@ import {
   STROKE, LABEL, lineScaleOptions, axisAnchor,
 } from "./chartStyle";
 
-const W = CHART_W;
 const H = CHART_H;
 
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
@@ -32,17 +32,18 @@ export const RouteLineChart = memo(function RouteLineChart({
   todayLabel, endLabel, axisLabels, xs = null, mode = null, tickLabels = false,
 }) {
   const C = useC();
+  const { onLayout, vbW: W, wide } = useChartFrame(height);
   const safeStops = Array.isArray(stops) ? stops : [];
   const safeProj = Array.isArray(projection) ? projection : [];
   const values = useMemo(() => safeStops.map((s) => (typeof s === "number" ? s : s?.y ?? 0)), [safeStops]);
   const hasAxis = Array.isArray(axisLabels) && axisLabels.some(Boolean);
   // tickLabels: sol eksende net etiketleri (ana sayfa); yer acmak icin genis sol pay.
   const flagged = typeof target === "number" && safeProj.length > 0; // bayrak diregine ust pay
-  const scaleOpts = lineScaleOptions({ hasAxis, tickLabels, flagged, xs });
+  const scaleOpts = lineScaleOptions({ hasAxis, tickLabels, flagged, xs, width: W });
   const totalCount = values.length + safeProj.length;
   const sc = useMemo(
     () => makeScale([...values, ...safeProj, ...(typeof target === "number" ? [target] : [])], scaleOpts),
-    [values, safeProj, target, xs, tickLabels, hasAxis],
+    [values, safeProj, target, xs, tickLabels, hasAxis, W],
   );
 
   const points = useMemo(() => sc.toPoints(values, { count: totalCount }), [sc, values, totalCount]);
@@ -88,7 +89,7 @@ export const RouteLineChart = memo(function RouteLineChart({
   );
 
   return (
-    <View style={{ width: "100%", aspectRatio: W / H, height, display: "flex" }} accessible accessibilityLabel={summary}>
+    <View style={[{ width: "100%", aspectRatio: CHART_W / H, height, display: "flex" }, wide]} onLayout={onLayout} accessible accessibilityLabel={summary}>
       <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
         <Defs>
           <LinearGradient id="hglow" x1="0" y1="0" x2="0" y2="1">
@@ -128,17 +129,10 @@ export const RouteLineChart = memo(function RouteLineChart({
 
         {hasAxis ? axisLabels.map((label, i) => {
           if (!label) return null;
-          const { x, anchor } = axisAnchor(i, axisLabels.length, xs?.[todayIndex] ?? 0.5);
+          const { x, anchor } = axisAnchor(i, axisLabels.length, xs?.[todayIndex] ?? 0.5, W);
           return (
-            <SvgText
-              key={`axis-${i}`}
-              x={x}
-              y={H - 6}
-              fill={C.text4}
-              fontSize={LABEL.size}
-              fontWeight="500"
-              textAnchor={anchor}
-            >
+            <SvgText key={`axis-${i}`} x={x} y={H - 6} fill={C.text4}
+              fontSize={LABEL.size} fontWeight="500" textAnchor={anchor}>
               {label}
             </SvgText>
           );
