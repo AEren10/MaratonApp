@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { ReportableAvatar } from "../../components/common/ReportableAvatar";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,7 +7,7 @@ import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/nativ
 import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { Icon, Avatar, AnimatedCard, GlowBackground, getCrimsonGlow } from "../../components/design";
+import { Icon, AnimatedCard, GlowBackground, getCrimsonGlow } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
 import { getTier, getNextTier } from "../../constants/league";
@@ -81,7 +82,7 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
         )}
       </View>
 
-      <Avatar init={(item.name || "?").slice(0, 2).toUpperCase()} size={34} color={isYou ? C.accent : undefined} />
+      <ReportableAvatar userId={item.user_id} name={item.name} image={item.avatar_url} size={34} color={isYou ? C.accent : undefined} you={isYou} />
 
       <View style={{ flex: 1, marginLeft: SPACING.sm }}>
         <Text

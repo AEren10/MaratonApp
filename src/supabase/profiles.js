@@ -278,3 +278,15 @@ export const updateExamConfig = async (userId, config) => {
     target_department: config.targetDepartment || null,
   });
 };
+
+// Baskasinin profil fotografini bildirir. Donus: "reported" | "removed" |
+// "no_avatar". Iki farkli kisi ayni fotografi bildirince sunucu fotografi
+// kaldirir (bkz. migration clde_avatar_reports).
+export async function reportAvatar(targetId) {
+  const { data, error } = await supabase.rpc("report_avatar", { p_target: targetId });
+  if (error) {
+    handleSupabaseError(error, "reportAvatar");
+    throw error;
+  }
+  return data;
+}

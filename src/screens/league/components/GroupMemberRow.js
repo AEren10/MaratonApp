@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
-import { Avatar } from "../../../components/design";
+import { ReportableAvatar } from "../../../components/common/ReportableAvatar";
 
 function formatMinutes(value) {
   const minutes = Math.max(0, Number(value) || 0);
@@ -41,12 +41,8 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
         {rank || "-"}
       </Text>
 
-      <Avatar
-        init={(item.name || "?").slice(0, 2).toUpperCase()}
-        image={item.avatar_url}
-        size={36}
-        color={isYou ? C.accent : undefined}
-      />
+      <ReportableAvatar userId={item.user_id} name={item.name} image={item.avatar_url}
+        size={36} color={isYou ? C.accent : undefined} you={isYou} />
 
       <View style={s.nameCol}>
         <View style={s.nameRow}>

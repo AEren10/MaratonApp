@@ -33,7 +33,10 @@ export function useAvatarUpload() {
       setMyAvatar(user.id, stampedUrl);
       H.success();
     } catch (e) {
-      showAlert("Hata", "Avatar yüklenirken bir sorun oluştu.\n\n" + (e?.message || ""));
+      // Fotografi birden cok kez bildirilip kaldirilan hesapta yukleme kapali.
+      if (String(e?.message || "").includes("avatar_locked")) {
+        showAlert("Fotoğraf eklenemiyor", "Bu hesapta profil fotoğrafı bildirimler nedeniyle kapatıldı.");
+      } else showAlert("Hata", "Avatar yüklenirken bir sorun oluştu.\n\n" + (e?.message || ""));
     } finally {
       setPending(null);
       setUploading(false);
