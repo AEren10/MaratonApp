@@ -37,6 +37,7 @@ export const STORY_CAPTURE_SCALE = 2;
 export const STORY_MOMENT = Object.freeze({
   SESSION: "session",
   TRIAL: "trial",
+  STREAK: "streak",
   GENERIC: "generic",
 });
 
@@ -137,7 +138,9 @@ function rankFor(moment, ctx) {
   const soon = pos(ctx.daysToExam) != null && ctx.daysToExam <= COUNTDOWN_SOON_DAYS;
   const head = moment === STORY_MOMENT.TRIAL
     ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.ROTA, STORY_KIND.ISTATISTIK]
-    : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.ISTATISTIK, STORY_KIND.ROTA];
+    : moment === STORY_MOMENT.STREAK
+      ? [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.IZ]
+      : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.ISTATISTIK, STORY_KIND.ROTA];
   const tail = [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.DURUST, STORY_KIND.GERISAYIM];
   const order = [...head, ...tail.filter((k) => !head.includes(k))];
   if (soon) {

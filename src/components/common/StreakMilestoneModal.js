@@ -1,111 +1,49 @@
-import { useMemo } from "react";
-import { View, Text, Modal, StyleSheet } from "react-native";
-import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
-import { Icon, SparkBurst, AnimatedPressable, Button } from "../design";
+import { StyleSheet, Text, View } from "react-native";
+
+import { BottomSheet } from "../design/BottomSheet";
+import { Press } from "../design/Press";
+import { StoryShareBlock } from "../share/StoryShareBlock";
 import { useC } from "../../contexts/ThemeContext";
-import { PREMIUM_ENABLED } from "../../constants/premium";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
+import { STORY_MOMENT } from "../../domain/share/storySticker";
+import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+
+// SERI DONUM NOKTASI (7/14/30/60/100/365). Eskiden XP rozeti, kivilcim
+// patlamasi ve "Harika!" vardi; tasarim kurali: konfeti ve rozet yok.
+// Artik buyuk sayi + tek cumle + paylasim (seri Story karti one gelir).
+const LINES = {
+  7: "Bir hafta, her gün. Ritim oturdu.",
+  14: "İki hafta aralıksız. Bu artık bir alışkanlık.",
+  30: "Bir ay. Çoğu kişi buraya gelmeden bırakır.",
+  60: "İki ay, her gün. Sınav günü bu ritmi hatırlayacak.",
+  100: "Yüz gün. Bunu sen yaptın.",
+  365: "Bir yıl, her gün.",
+};
 
 export default function StreakMilestoneModal({ visible, milestone, onDismiss }) {
   const C = useC();
-  const s = useMemo(() => makeStyles(C), [C]);
-
   if (!milestone) return null;
-  const color = milestone.color || C.accent;
-
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={s.backdrop}>
-        {milestone.day >= 30 && (
-          <View style={s.burstWrap} pointerEvents="none">
-            <SparkBurst trigger={visible} />
-          </View>
-        )}
-        <Animated.View entering={ZoomIn.springify().damping(milestone.day >= 60 ? 10 : 14)} style={s.card}>
-          {/* Icon */}
-          <Animated.View entering={ZoomIn.delay(100).springify().damping(11)} style={s.iconWrap}>
-            <View style={[s.iconGlow, { backgroundColor: color }]} />
-            <View style={[s.iconCircle, { backgroundColor: color + "22" }]}>
-              <Icon name={milestone.icon || "flame"} size={44} color={color} sw={1.5} />
-            </View>
-          </Animated.View>
-
-          {/* Title */}
-          <Animated.Text entering={FadeIn.delay(160)} style={s.title}>
-            {milestone.title}
-          </Animated.Text>
-
-          {/* Day count */}
-          <Animated.Text entering={FadeIn.delay(220)} style={[s.days, { color }]}>
-            {milestone.day} Gün Serisi!
-          </Animated.Text>
-
-          {/* XP reward */}
-          <Animated.View entering={FadeIn.delay(300)} style={[s.xpBadge, { backgroundColor: color + "18" }]}>
-            <Text style={[s.xpText, { color }]}>+{milestone.xp} XP</Text>
-          </Animated.View>
-
-          {/* Premium gift */}
-          {PREMIUM_ENABLED && milestone.premiumDays > 0 && (
-            <Animated.Text entering={FadeIn.delay(380)} style={s.premium}>
-              {milestone.premiumDays} gün Premium hediye!
-            </Animated.Text>
-          )}
-
-          {/* Dismiss */}
-          <Animated.View entering={FadeIn.delay(440)} style={{ width: "100%", alignItems: "center", marginTop: SPACING.md }}>
-            <Button onPress={onDismiss} fullWidth>Harika!</Button>
-          </Animated.View>
-        </Animated.View>
+    <BottomSheet visible={visible} onClose={onDismiss} style={s.sheet}>
+      <View style={s.pad}>
+        <Text style={[TYPOGRAPHY.label, { color: C.accentText }]}>SERİ</Text>
+        <View style={s.hero}>
+          <Text style={[TYPOGRAPHY.statHero, { color: C.text }]}>{milestone.day}</Text>
+          <Text style={[TYPOGRAPHY.statSideUnit, s.unit, { color: C.text2 }]}>gün üst üste</Text>
+        </View>
+        <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>{LINES[milestone.day] || "Her gün, aralıksız."}</Text>
       </View>
-    </Modal>
+      <StoryShareBlock moment={STORY_MOMENT.STREAK} />
+      <Press haptic="none" onPress={onDismiss} accessibilityRole="button" style={s.close}>
+        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>Kapat</Text>
+      </Press>
+    </BottomSheet>
   );
 }
 
-function makeStyles(C) {
-  return StyleSheet.create({
-    backdrop: {
-      flex: 1, backgroundColor: "rgba(0,0,0,0.70)",
-      alignItems: "center", justifyContent: "center",
-    },
-    burstWrap: {
-      ...StyleSheet.absoluteFillObject,
-      alignItems: "center", justifyContent: "center",
-    },
-    card: {
-      backgroundColor: C.surface, borderRadius: RADIUS.xxl,
-      borderWidth: 1, borderColor: C.border,
-      padding: SPACING.xxxl, alignItems: "center",
-      marginHorizontal: SPACING.xxxl, width: "85%", maxWidth: 340,
-    },
-    iconWrap: {
-      width: 96, height: 96, alignItems: "center",
-      justifyContent: "center", marginBottom: SPACING.xl,
-    },
-    iconGlow: {
-      position: "absolute", width: 96, height: 96,
-      borderRadius: 48, opacity: 0.15,
-    },
-    iconCircle: {
-      width: 80, height: 80, borderRadius: 40,
-      alignItems: "center", justifyContent: "center",
-    },
-    title: {
-      ...TYPOGRAPHY.heading, color: C.text,
-      textAlign: "center", marginBottom: SPACING.sm,
-    },
-    days: {
-      ...TYPOGRAPHY.subheading, textAlign: "center",
-      marginBottom: SPACING.lg,
-    },
-    xpBadge: {
-      borderRadius: RADIUS.lg, paddingHorizontal: SPACING.xl,
-      paddingVertical: SPACING.sm, marginBottom: SPACING.lg,
-    },
-    xpText: { ...TYPOGRAPHY.heading, fontSize: 22 },
-    premium: {
-      ...TYPOGRAPHY.bodyMedium, color: C.sec,
-      textAlign: "center", marginBottom: SPACING.sm,
-    },
-  });
-}
+const s = StyleSheet.create({
+  sheet: { borderRadius: SHAPE.sheet, overflow: "hidden" },
+  pad: { padding: STEP.s3, paddingBottom: STEP.s2, gap: STEP.s1 },
+  hero: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s1 },
+  unit: { paddingBottom: STEP.s2 },
+  close: { minHeight: 48, alignItems: "center", justifyContent: "center" },
+});
