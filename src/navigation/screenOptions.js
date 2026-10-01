@@ -45,10 +45,12 @@ export const overlayOptions = {
   freezeOnBlur: true,
 };
 
-// Solma gecisli ekranlarda geri kaydirma, solmayi parmakla birlikte yurutur.
+// Detay ekranlari. iOS'ta sistemin kendi itme gecisi: geri kaydirinca ekran
+// parmakla birlikte kayar. Solma gecisinde (1 Ekim'e kadar) geri kaydirma
+// ekrani kaydirmiyor, yerinde solduruyordu -- kullanici "iyi calismiyor" dedi.
+// Android'de solma kaliyor (geri hareketi sistemin, ekran kaydirmaz).
 export const detailOptions = {
-  animation: isWeb ? "none" : "fade",
-  animationMatchesGesture: true,
+  animation: isWeb ? "none" : Platform.OS === "ios" ? "default" : "fade",
   animationDuration: 280,
   freezeOnBlur: true,
 };
