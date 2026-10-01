@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 
-import { Card, Button, Skeleton } from "../../components/design";
+import { Button, Skeleton } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
@@ -74,13 +74,6 @@ function PlanDetailInner({ route }) {
                 );
               })}
             </View>
-
-            <Card tone="surface" radius="panel" style={s.summaryCard}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text3, marginBottom: STEP.s1 }]}>GÜNÜN ÖZETİ</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text2 }]}>
-                {detail.doneCount} durak kapandı. Kalanları başlattığında rota ve günlük plan aynı kaynaktan güncellenir.
-              </Text>
-            </Card>
           </Animated.View>
         ) : loading ? (
           <View style={s.loading}>
@@ -146,6 +139,5 @@ const s = StyleSheet.create({
   listHeader: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s3, paddingBottom: STEP.s1 },
   rule: { flex: 1, height: 1 },
   stopsList: { marginTop: STEP.s1 },
-  summaryCard: { marginTop: STEP.s3, padding: STEP.s3 },
   actionsWrap: { marginTop: STEP.s3, paddingBottom: STEP.s3, gap: STEP.s2 },
 });

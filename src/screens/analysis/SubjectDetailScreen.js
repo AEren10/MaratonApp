@@ -113,9 +113,8 @@ export default function SubjectDetailScreen() {
               ListFooterComponent={
                 <View style={styles.footerAction}>
                   <Button variant="primary" size="lg" fullWidth onPress={() => navigation.navigate(SCREENS.ADD_TASK, { subjectKey })}>
-                    Seçili 3 konuya durak koy
+                    Bu dersten durak ekle
                   </Button>
-                  <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: STEP.s2 }]}>Tamamlananları gizle</Text>
                 </View>
               }
             />
