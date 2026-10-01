@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { ActionSheetIOS, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useIsFocused } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
@@ -57,26 +58,59 @@ export function useAvatarUpload() {
   }, [user?.id, showAlert]);
 
   const pickFromGallery = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { showAlert("İzin gerekli", "Galeri erişimi için izin ver."); return; }
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
-    });
-    if (!res.canceled && res.assets?.length) handlePicked(res.assets[0].uri);
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) { showAlert("İzin gerekli", "Galeri erişimi için izin ver."); return; }
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
+      });
+      if (!res.canceled && res.assets?.length) handlePicked(res.assets[0].uri);
+    } catch (e) {
+      showAlert("Hata", "Galeri açılırken bir sorun oluştu.");
+    }
   };
 
   const pickFromCamera = async () => {
-    const perm = await ImagePicker.requestCameraPermissionsAsync();
-    if (!perm.granted) { showAlert("İzin gerekli", "Kamera erişimi için izin ver."); return; }
-    const res = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
-    });
-    if (!res.canceled && res.assets?.length) handlePicked(res.assets[0].uri);
+    try {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) { showAlert("İzin gerekli", "Kamera erişimi için izin ver."); return; }
+      const res = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
+      });
+      if (!res.canceled && res.assets?.length) handlePicked(res.assets[0].uri);
+    } catch (e) {
+      showAlert("Hata", "Kamera açılırken bir sorun oluştu.");
+    }
   };
 
   const pickAvatar = () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      showAlert("Giriş Gerekli", "Profil fotoğrafını değiştirmek için oturum açmalısın.");
+      return;
+    }
     H.medium();
+
+    if (Platform.OS === "ios") {
+      const options = ["İptal", "Kamera", "Galeri"];
+      if (avatarUri) options.push("Fotoğrafı Kaldır");
+
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: "Profil Fotoğrafı",
+          message: "Nereden eklemek istersin?",
+          options,
+          cancelButtonIndex: 0,
+          destructiveButtonIndex: avatarUri ? 3 : undefined,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) pickFromCamera();
+          else if (buttonIndex === 2) pickFromGallery();
+          else if (buttonIndex === 3 && avatarUri) removeAvatar();
+        }
+      );
+      return;
+    }
+
     const actions = [
       { text: "Kamera", onPress: pickFromCamera },
       { text: "Galeri", onPress: pickFromGallery },

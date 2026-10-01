@@ -50,6 +50,7 @@ export default function EditProfileScreen() {
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Geri"
+          style={{ minWidth: 44, minHeight: 44, justifyContent: "center" }}
         >
           <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
         </Press>
