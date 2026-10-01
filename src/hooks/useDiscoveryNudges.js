@@ -13,21 +13,26 @@ export function useDiscoveryNudges(trials, base = []) {
   const { user } = useAuth();
   const { examType, targetNetTYT, targetNetAYT, targetNet, daysUntilExam } = useExam();
   const key = useMemo(() => userScopedKey(STORAGE_KEYS.DISCOVERY_SEEN, user?.id), [user?.id]);
+  // { ids: Set, lastAt: ISO|null } -- eski kayit duz dizi olabilir.
   const [seen, setSeen] = useState(null);
 
   useEffect(() => {
     let alive = true;
     setSeen(null);
-    getJson(key, []).then((ids) => { if (alive) setSeen(new Set(Array.isArray(ids) ? ids : [])); })
-      .catch(() => { if (alive) setSeen(new Set()); });
+    getJson(key, null).then((raw) => {
+      if (!alive) return;
+      const ids = Array.isArray(raw) ? raw : raw?.ids || [];
+      setSeen({ ids: new Set(ids), lastAt: Array.isArray(raw) ? null : raw?.lastAt || null });
+    }).catch(() => { if (alive) setSeen({ ids: new Set(), lastAt: null }); });
     return () => { alive = false; };
   }, [key]);
 
   const markSeen = useCallback((id) => {
     setSeen((prev) => {
-      const next = new Set(prev || []);
-      next.add(id);
-      setJson(key, [...next]).catch(() => {});
+      const ids = new Set(prev?.ids || []);
+      ids.add(id);
+      const next = { ids, lastAt: new Date().toISOString() };
+      setJson(key, { ids: [...ids], lastAt: next.lastAt }).catch(() => {});
       return next;
     });
   }, [key]);
@@ -40,7 +45,8 @@ export function useDiscoveryNudges(trials, base = []) {
       targets: { tyt: targetNetTYT ?? (aytExam ? null : targetNet), ayt: targetNetAYT },
       aytExam,
       daysLeft: daysUntilExam,
-      seen,
+      seen: seen.ids,
+      lastShownAt: seen.lastAt,
     }).map((n) => ({ ...n, priority: "high", onShown: () => markSeen(n.id) })).concat(base || []);
   }, [base, seen, trials, examType, targetNetTYT, targetNetAYT, targetNet, daysUntilExam, markSeen]);
 }

@@ -1,17 +1,24 @@
 // KESIF POPUP'LARI -- bir seyden sonra bir sey. Saf.
 //
 // "Daha derine" ozellikleri (donem karsilastirmasi, tahmin, hedef, rota
-// evresi) Analiz'in en altinda kaliyordu. Ilgili an gelince ana sayfada bir
-// kez davet edilir. Her kimlik OMURDE bir kez gosterilir (seen kumesi).
+// evresi) Analiz'in en altinda kaliyordu. Ilgili an gelince ana sayfada
+// davet edilir. Her KIMLIK bir kez gosterilir ama kimlikler olaya bagli
+// (her 3 denemede tahmin, her buyuk net degisiminde karsilastirma, her ay,
+// her yeni hedef) -- yil boyunca ara sira tekrar eder. Iki davet arasi en
+// az 3 gun.
 // screen: SCREENS anahtari degil, cagiranin cevirdigi kisa ad (saf kalsin).
 
 const MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+const COOLDOWN_DAYS = 3;
+const BIG_SWING = 3;
 const fmt = (n) => (Math.round(n * 10) / 10).toString().replace(".", ",");
 const family = (t) => (String(t?.trialType || "").startsWith("AYT") ? "AYT" : String(t?.trialType || ""));
 const netOf = (t) => Number(t?.totalNet ?? t?.total_net);
 const dayOf = (t) => String(t?.date || "").slice(0, 10);
 
-export function discoveryNudges({ trials = [], targets = {}, aytExam = false, daysLeft = null, now = new Date(), seen = new Set() } = {}) {
+export function discoveryNudges({ trials = [], targets = {}, aytExam = false, daysLeft = null, now = new Date(), seen = new Set(), lastShownAt = null } = {}) {
+  // Ara sira kalsin: iki kesif davetinin arasinda en az COOLDOWN_DAYS gun.
+  if (lastShownAt && now.getTime() - new Date(lastShownAt).getTime() < COOLDOWN_DAYS * 86400000) return [];
   const out = [];
   const add = (n) => { if (!seen.has(n.id)) out.push({ type: "discovery", icon: "trendUp", color: "coral", ...n }); };
   const list = (Array.isArray(trials) ? trials : []).filter((t) => ["TYT", "AYT"].includes(family(t)));
@@ -29,17 +36,33 @@ export function discoveryNudges({ trials = [], targets = {}, aytExam = false, da
         actionLabel: "Hedefi güncelle", screen: "goals",
       });
     }
-    if (same.length >= 3) {
+    // Tahmin her 3 denemede bir tazelenir: 3, 6, 9... (kimlik kademeye bagli).
+    const tier = Math.floor(same.length / 3);
+    if (tier >= 1) {
       add({
-        id: `disc_forecast_${fam}`,
-        message: `${same.length} ${fam} denemesi tamam: sınav günü tahminin açıldı.`,
+        id: `disc_forecast_${fam}_${tier}`,
+        message: tier === 1
+          ? `${same.length} ${fam} denemesi tamam: sınav günü tahminin açıldı.`
+          : `${same.length}. ${fam} denemesiyle tahminin güncellendi. Sınav gününe nereden bakıyorsun?`,
         actionLabel: "Tahminini gör", screen: "forecast",
       });
     }
-    if (same.length >= 2) {
+    // Karsilastirma: ikinci denemede bir kez, sonra her denemede net onceki
+    // ayni tur denemeye gore 3+ degistiyse (kimlik denemenin gunune bagli).
+    const sorted = [...same].sort((a, b) => dayOf(b).localeCompare(dayOf(a)));
+    const delta = netOf(sorted[0]) - netOf(sorted[1]);
+    if (same.length === 2) {
       add({
         id: `disc_compare_${fam}`,
         message: `İki ${fam} denemen oldu. Netin nereden değişti, yan yana gör.`,
+        actionLabel: "Karşılaştır", screen: "comparative",
+      });
+    } else if (same.length > 2 && Number.isFinite(delta) && Math.abs(delta) >= BIG_SWING) {
+      add({
+        id: `disc_compare_${fam}_${dayOf(sorted[0])}`,
+        message: delta > 0
+          ? `${fam} netin ${fmt(delta)} arttı. Nereden geldiğini gör, orayı koru.`
+          : `${fam} netin ${fmt(-delta)} düştü. Hangi dersten kaybettiğine bir bak.`,
         actionLabel: "Karşılaştır", screen: "comparative",
       });
     }
