@@ -105,7 +105,10 @@ export default function AnalysisScreen() {
                 }
               />
 
-              <PublisherComparisonCard C={C} comparison={publisherComparison} />
+              <PublisherComparisonCard
+                C={C} comparison={publisherComparison}
+                onPress={() => go(screens.PUBLISHER_COMPARISON_DETAIL, undefined, "analysis_publisher_detail")}
+              />
 
               <DeeperAnalysisSection
                 C={C}

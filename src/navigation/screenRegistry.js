@@ -83,6 +83,7 @@ const RouteCompanionScreen = React.lazy(() => import("../screens/social/RouteCom
 const RankSimulatorScreen = React.lazy(() => import("../screens/simulator/RankSimulatorScreen"));
 const NetForecastScreen = React.lazy(() => import("../screens/forecast/NetForecastScreen"));
 const ComparativeScreen = React.lazy(() => import("../screens/analytics/ComparativeScreen"));
+const PublisherDetailScreen = React.lazy(() => import("../screens/analysis/PublisherDetailScreen"));
 const RoutePauseScreen = React.lazy(() => import("../screens/roadmap/RoutePauseScreen"));
 const RouteRedrawScreen = React.lazy(() => import("../screens/roadmap/RouteRedrawScreen"));
 const ExamSimulatorScreen = React.lazy(() => import("../screens/simulator/ExamSimulatorScreen"));
@@ -192,6 +193,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.RANK_SIMULATOR, RankSimulatorScreen),
   screen(SCREENS.NET_FORECAST, NetForecastScreen),
   screen(SCREENS.COMPARATIVE, ComparativeScreen),
+  screen(SCREENS.PUBLISHER_COMPARISON_DETAIL, PublisherDetailScreen, detailOptions),
   screen(SCREENS.REVIEW_SESSION, ReviewSessionScreen),
   screen(SCREENS.REVIEW_DONE, ReviewDoneScreen, celebrationOptions),
   screen(SCREENS.ROUTE_PAUSE, RoutePauseScreen, modalOptions),

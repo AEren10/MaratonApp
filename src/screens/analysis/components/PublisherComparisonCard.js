@@ -2,8 +2,10 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, SHAPE } from "../../../themes/tokens";
 import { PendingSection } from "../../../components/common/PendingSection";
+import { Icon } from "../../../components/design";
+import { Press } from "../../../components/design/Press";
 
-export function PublisherComparisonCard({ C, comparison }) {
+export function PublisherComparisonCard({ C, comparison, onPress }) {
   // Bu kart eskiden hic veri almiyordu: herkese ayni uc yayini gosteriyordu.
   // Karsilastirma en az iki farkli yayindan deneme ister.
   if (!comparison?.ready) {
@@ -20,27 +22,48 @@ export function PublisherComparisonCard({ C, comparison }) {
 
   const publishers = comparison.publishers;
 
+  const cardContent = (
+    <>
+      <View style={s.cardHeader}>
+        <Text style={[s.cardTitle, { color: C.accentBright }]}>YAYIN KARŞILAŞTIRMASI</Text>
+        {onPress && <Icon name="chevR" size={14} color={C.text3} />}
+      </View>
+
+      <View style={s.list}>
+        {publishers.map((p) => (
+          <View key={p.name} style={s.row}>
+            <Text style={[s.pubName, { color: C.text2 }]}>{p.name}</Text>
+            <View style={[s.track, { backgroundColor: C.track }]}>
+              <View style={[s.bar, { width: p.percent, backgroundColor: C.accent }]} />
+            </View>
+            <Text style={[s.netNum, { color: C.text }]}>{String(p.net).replace(".", ",")}</Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={[s.footnote, { color: C.text2 }]}>
+        Zor yayınlarda net düşüşün normal — panik yapma. Rota normalize net üzerinden çizilir.
+      </Text>
+    </>
+  );
+
   return (
     <View style={s.wrap}>
-      <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
-        <Text style={[s.cardTitle, { color: C.accentBright }]}>YAYIN KARŞILAŞTIRMASI</Text>
-
-        <View style={s.list}>
-          {publishers.map((p) => (
-            <View key={p.name} style={s.row}>
-              <Text style={[s.pubName, { color: C.text2 }]}>{p.name}</Text>
-              <View style={[s.track, { backgroundColor: C.track }]}>
-                <View style={[s.bar, { width: p.percent, backgroundColor: C.accent }]} />
-              </View>
-              <Text style={[s.netNum, { color: C.text }]}>{String(p.net).replace(".", ",")}</Text>
-            </View>
-          ))}
+      {onPress ? (
+        <Press
+          haptic="none"
+          accessibilityRole="button"
+          accessibilityLabel="Yayın Karşılaştırması Ayrıntıları"
+          onPress={onPress}
+          style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}
+        >
+          {cardContent}
+        </Press>
+      ) : (
+        <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
+          {cardContent}
         </View>
-
-        <Text style={[s.footnote, { color: C.text2 }]}>
-          Zor yayınlarda net düşüşün normal — panik yapma. Rota normalize net üzerinden çizilir.
-        </Text>
-      </View>
+      )}
     </View>
   );
 }
@@ -54,6 +77,11 @@ const s = StyleSheet.create({
     padding: 20,
     borderRadius: 24,
     borderWidth: 1,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   cardTitle: {
     fontFamily: "Archivo_600",

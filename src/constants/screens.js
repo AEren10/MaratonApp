@@ -125,6 +125,7 @@ export const SCREENS = {
   // Forecast & Analytics
   NET_FORECAST: "NetForecast",
   COMPARATIVE: "Comparative",
+  PUBLISHER_COMPARISON_DETAIL: "PublisherComparisonDetail",
 
   // Premium
   PAYWALL: "Paywall",

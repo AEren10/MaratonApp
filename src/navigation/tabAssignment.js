@@ -98,6 +98,7 @@ export const ANALIZ_STACK = [
   SCREENS.SUBJECT_LIST,     // Konu Ilerlemesi
   SCREENS.TRIAL_COMPARE,    // Deneme Karsilastirma
   SCREENS.COMPARATIVE,      // Yayin / donem karsilastirmasi
+  SCREENS.PUBLISHER_COMPARISON_DETAIL, // Yayin karsilastirmasi detay
   SCREENS.TRIAL_DETAIL,     // Deneme Detayi
   SCREENS.WEAK_AREAS,       // Oncelikli Konular
   SCREENS.NET_FORECAST,     // Net Tahmini
