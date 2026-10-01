@@ -34,8 +34,8 @@ export function DayPlannedStops({ day, C }) {
       onPress={() => navigation.navigate(SCREENS.ADD_TASK, { date: day })}
       style={s.add}
     >
-      <Icon name="plus" size={14} color={C.accent} />
-      <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Bu güne durak ekle</Text>
+      <Icon name="plus" size={16} color={C.accent} />
+      <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>Bu güne durak ekle</Text>
     </Press>
   );
 

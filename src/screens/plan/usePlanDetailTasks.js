@@ -3,18 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SCREENS } from "../../constants/screens";
 import * as haptic from "../../lib/haptics";
 import { mapGeneratedTask, mapAdHocTask, mapUserTask } from "./planTaskMappers";
-
-function mergeTasks(initialTasks, prev, history, isPlanDone) {
-  const doneById = {};
-  prev.forEach((t) => { if (t.done) doneById[t.id] = true; });
-  history.forEach((_t, id) => { doneById[id] = true; });
-
-  return initialTasks.map((t) => {
-    const isDoneNow = doneById[t.id] ?? (isPlanDone ? isPlanDone(t.id) : t.done);
-    if (isDoneNow) history.set(t.id, { ...t, done: true });
-    return { ...t, done: isDoneNow };
-  });
-}
+import { mergePlanTasks } from "./mergePlanTasks";
 
 export function usePlanDetailTasks({
   C,
@@ -43,7 +32,7 @@ export function usePlanDetailTasks({
 
   const taskSig = initialTasks.map((t) => t.id).join("|");
   useEffect(() => {
-    setTasks((prev) => mergeTasks(initialTasks, prev, completedHistoryRef.current, isPlanDone));
+    setTasks((prev) => mergePlanTasks(initialTasks, prev, completedHistoryRef.current, isPlanDone));
   }, [taskSig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTask = useCallback(async (id) => {

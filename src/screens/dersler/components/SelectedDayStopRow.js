@@ -20,7 +20,7 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMen
       <Text style={[TYPOGRAPHY.metaSemiBold, s.time, { color: C.text3 }]}>{log.time || ""}</Text>
 
       <View style={s.track}>
-        <View style={[s.dot, { backgroundColor: isDone ? C.text5 : dotColor }]} />
+        <View style={[s.dot, { backgroundColor: isDone ? C.up : dotColor }]} />
         {!isLast ? <View style={[s.line, { backgroundColor: C.line }]} /> : null}
       </View>
 
@@ -31,8 +31,8 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMen
 
       {isDone ? (
         <View style={s.done}>
-          <Icon name="check" size={12} color={C.text3} sw={1.5} />
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>Bitti</Text>
+          <Icon name="check" size={12} color={C.up} sw={1.8} />
+          <Text style={[TYPOGRAPHY.meta, { color: C.up }]}>Bitti</Text>
         </View>
       ) : log.minutes ? (
         <Text style={[TYPOGRAPHY.metaSemiBold, s.tabular, { color: C.text3 }]}>{`${log.minutes} dk`}</Text>

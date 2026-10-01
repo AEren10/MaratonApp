@@ -80,8 +80,8 @@ export function SelectedDayPanel({ selectedDay, logs }) {
               Eski addButton/btnText stilleri kutu temizliginde silinmis ama
               kullanim kalmisti: arti ve metin alt alta, gri zeminde. */}
           <Press haptic="tap" onPress={addTask} accessibilityRole="button" style={s.addRow}>
-            <Icon name="plus" size={14} color={C.accent} />
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Bu güne durak ekle</Text>
+            <Icon name="plus" size={16} color={C.accent} />
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>Bu güne durak ekle</Text>
           </Press>
         </View>
       )}
