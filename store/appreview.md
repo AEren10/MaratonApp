@@ -2,16 +2,22 @@
 
 Son güncelleme: 1 Ekim 2026
 
-Amaç: App Store / Google Play gönderimi öncesinde neyi bitirdiğimizi, neyin kaldığını ve hangi riskleri bilinçli takip ettiğimizi tek yerde görmek.
+Bu dosyanın düzeni:
 
-V1 yayın kararı:
+1. Önce yapılanlar
+2. Sonra kalanlar
+3. En altta reviewer notes ve komut referansları
+
+## V1 yayın kararı
 
 - [x] İlk sürüm tamamen ücretsiz olacak.
 - [x] Premium, kart ödeme ve anonim topluluk soru-cevap V1 inceleme kapsamından çıkarıldı.
 - [x] Store listing ve ekran görüntülerinde V1 dışı özellik gösterilmeyecek: lig, sosyal, topluluk, premium.
 - [x] “Yapay zekâ” iddiası kullanılmayacak; sistem kural/algoritma tabanlı anlatılacak.
 
-## 0. Genel durum
+# Yapılanlar
+
+## 1. Genel durum
 
 - [x] iOS bundle ID: `com.ahmeterensiranli.maraton`
 - [x] Android package: `com.ahmeterensiranli.maraton`
@@ -22,11 +28,8 @@ V1 yayın kararı:
 - [x] Test durumu güncel: `npm test` 853/853 başarılı.
 - [x] Repo genel kontrolü: `npm run check` başarılı.
 - [x] Çözülmemiş merge conflict marker yok.
-- [ ] Final `.ipa` ve `.aab` üretildikten sonra native manifest kontrolü yapılacak.
 
-## 1. Alan adı, yasal sayfalar ve destek kanalı
-
-### Yapılanlar
+## 2. Alan adı, yasal sayfalar ve destek kanalı
 
 - [x] `maratonapp.com` nihai domain olarak belirlendi.
 - [x] `/privacy` sayfası hazırlandı.
@@ -37,38 +40,14 @@ V1 yayın kararı:
 - [x] Hesap silme sayfası, uygulama içi silme yolunu ve destek e-postasına talep göndermeyi anlatacak şekilde planlandı.
 - [x] Destek adresi metinlerde `destek@maratonapp.com` olarak güncellendi.
 
-### Kalan kontroller
-
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/privacy`
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/terms`
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/delete-account`
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/support`
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/apple-app-site-association`
-- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/assetlinks.json`
-- [ ] `destek@maratonapp.com` gelen/giden mail testi yapılacak.
-- [ ] Footer veya sitedeki görünür linklerden legal sayfalara ulaşım tekrar kontrol edilecek.
-
-## 2. Kimlikler ve platform eşleşmeleri
-
-### Yapılanlar
+## 3. Kimlikler ve platform eşleşmeleri
 
 - [x] Nihai bundle/package kimliği belirlendi: `com.ahmeterensiranli.maraton`
 - [x] Eski `com.maraton.app` kimliğinin doküman kalıntısı olduğu netleştirildi.
 - [x] Associated Domains ve Android App Links tarafında `maratonapp.com` hedeflendi.
 - [x] App Group hedefi `group.com.ahmeterensiranli.maraton` olarak belirlendi.
 
-### Kalan kontroller
-
-- [ ] Apple Developer’da App Group gerçekten kayıtlı mı kontrol edilecek.
-- [ ] Apple Associated Domains final build capability içinde var mı kontrol edilecek.
-- [ ] Google Play / Android App Links SHA ve package eşleşmesi kontrol edilecek.
-- [ ] Supabase Apple OAuth client ayarları final bundle ID ile uyumlu mu kontrol edilecek.
-- [ ] Supabase Google OAuth client ayarları final Android package/SHA ile uyumlu mu kontrol edilecek.
-- [ ] App Store Connect ve Google Play Console’da bundle/package değerleri son kez kontrol edilecek.
-
-## 3. Topluluk / UGC / sosyal yüzeyler
-
-### Yapılanlar
+## 4. Topluluk / UGC / sosyal yüzeyler
 
 - [x] Anonim soru-cevap topluluğu V1 dışı bırakıldı.
 - [x] Yanlış defteri detay ekranı community detail gövdesini import etmeyecek şekilde ayrıldı.
@@ -77,16 +56,7 @@ V1 yayın kararı:
 - [x] Store listing ve screenshot planından “toplulukla çöz” iddiası çıkarıldı.
 - [x] V1 ekran görüntülerinde lig, sosyal, topluluk gösterilmeyecek kararı yazıldı.
 
-### Bilinçli risk / kalan kontroller
-
-- [ ] Lig, grup, arkadaş ve profil alanlarında kullanıcı adı / profil fotoğrafı / grup adı gibi kullanıcı kaynaklı içerikler hâlâ risk yüzeyi olabilir.
-- [ ] Kullanıcı adı ve grup adı için uygunsuz içerik filtresi ayrıca doğrulanmalı.
-- [ ] Lig/grup/arkadaş alanlarında kullanıcı şikâyet/engelleme akışı App Review öncesi tekrar değerlendirilmeli.
-- [ ] V1 binary’de anonim soru-cevap topluluğuna route/import/deep link kalmadığı final build üzerinde doğrulanmalı.
-
-## 4. Ödeme, premium, kart ödeme
-
-### Yapılanlar
+## 5. Ödeme, premium, kart ödeme
 
 - [x] V1 ücretsiz yayın kararı verildi.
 - [x] Store listing’de yalnız “tamamen ücretsiz” anlatımı kullanılacak.
@@ -96,51 +66,20 @@ V1 yayın kararı:
 - [x] `react-native-purchases` runtime bağımlılığı kaldırıldığı raporlandı.
 - [x] Kart numarası/CVC isteyen `PaymentCardScreen` production akışından çıkarıldı.
 
-### Kalan kontroller
-
-- [ ] Final binary içinde kart ödeme ekranına ulaşılmadığı gerçek cihazda doğrulanacak.
-- [ ] Store listing’de premium, abonelik, fiyat, restore purchase metni kalmadığı son kez kontrol edilecek.
-- [ ] App Store Connect’te IAP / subscription ürünü açık değil mi kontrol edilecek.
-- [ ] Google Play Console’da in-app product / subscription açık değil mi kontrol edilecek.
-
-## 5. İzinler ve production manifest
-
-### Yapılanlar
+## 6. İzinler ve production manifest hazırlığı
 
 - [x] `app.json` içinde Sentry ve `expo-widgets` plugin tekrarları temizlendiği raporlandı.
 - [x] `expo-secure-store` Face ID izin açıklaması üretmeyecek şekilde yapılandırıldığı raporlandı.
 - [x] Kamera/fotoğraf izinlerinin yanlış soru fotoğrafı, avatar ve paylaşım kartı gibi kullanıcı aksiyonlarına bağlı anlatılması planlandı.
 
-### Kalan kontroller
-
-- [ ] Final `.ipa` içinden `Info.plist` kontrol edilecek.
-- [ ] Final `.aab` içinden `AndroidManifest.xml` kontrol edilecek.
-- [ ] `NSMicrophoneUsageDescription` final iOS build’de kalıyor mu kontrol edilecek.
-- [ ] `android.permission.RECORD_AUDIO` final Android build’de kalıyor mu kontrol edilecek.
-- [ ] Expo Dev Client / local network açıklamaları production archive içinde yok mu kontrol edilecek.
-- [ ] Android storage/media izinleri Google Play Data Safety beyanıyla uyumlu mu kontrol edilecek.
-- [ ] Kamera ve galeri izin promptları yalnız ilgili kullanıcı aksiyonlarında tetikleniyor mu gerçek cihazda kontrol edilecek.
-
-## 6. Privacy labels ve Google Play Data Safety
-
-### Yapılanlar
+## 7. Privacy labels ve Google Play Data Safety hazırlığı
 
 - [x] Privacy copy içinde “hiçbir veri üçüncü taraflarla paylaşılmaz” gibi doğrulanmamış mutlak iddialardan kaçınılması gerektiği belirlendi.
 - [x] Kullanılan servis sağlayıcılar not edildi: Supabase, Sentry, Expo/EAS/Updates/Notifications, Apple ve Google platform servisleri.
 - [x] RevenueCat yalnız production’da gerçekten aktif edilirse beyana eklenecek kararı verildi.
 - [x] Sentry ve Expo’nun reklam/tracking amacıyla değil, uygulama işlevi ve hata giderme için veri işlediği anlatım çizgisi belirlendi.
 
-### Kalan kontroller
-
-- [ ] App Store Privacy Labels final binary ve canlı backend davranışıyla eşleştirilecek.
-- [ ] Google Play Data Safety final binary ve canlı backend davranışıyla eşleştirilecek.
-- [ ] Bildirim tokenları ve bildirim tercihleri beyanlarda doğru yer alacak.
-- [ ] Sentry hata verileri / cihaz bilgileri beyanlarda doğru yer alacak.
-- [ ] Hesap silme sonrası saklanan/verilen veri kategorileri legal metinle uyumlu mu kontrol edilecek.
-
-## 7. Store listing iddiaları ve ASO metinleri
-
-### Yapılanlar
+## 8. Store listing iddiaları ve ASO metinleri
 
 - [x] “Yapay zekâ destekli öneriler” çıkarıldı / kullanılmaması kararlaştırıldı.
 - [x] “Toplulukla yanlış paylaş ve çöz” V1 listing’den çıkarıldı.
@@ -151,16 +90,7 @@ V1 yayın kararı:
 - [x] `store/listing-tr.md` altına 6 karelik “Ekran görüntüleri” bölümü eklendi.
 - [x] Screenshot planında V1 dışı özellikler yasaklandı: lig, sosyal, topluluk, premium.
 
-### Kalan kontroller
-
-- [ ] App Store listing final metni panoya girmeden önce son kez okunacak.
-- [ ] Google Play listing final metni panoya girmeden önce son kez okunacak.
-- [ ] Ekran görüntülerinde V1 dışı feature görünmediği görsel bazda kontrol edilecek.
-- [ ] Görsellerde kullanılan üst başlıkların 5 kelimeyi aşmadığı kontrol edilecek.
-
-## 8. App Review demo hesabı
-
-### Yapılanlar
+## 9. App Review demo hesabı hazırlığı
 
 - [x] `scripts/seed-review-account.mjs` yazıldı.
 - [x] Betik kullanıcı hesabı veya şifre oluşturmuyor.
@@ -168,7 +98,7 @@ V1 yayın kararı:
 - [x] Betik verilen e-postalı mevcut hesabı buluyor.
 - [x] Betik iki kez çalıştırılırsa kendi demo verisini temizleyip yeniden yazacak şekilde idempotent tasarlandı.
 - [x] Betik yalnız çalışma verisi üretir; uydurma ad, okul, telefon, kimlik veya fotoğraf üretmez.
-- [x] Demo veri kapsamı:
+- [x] Demo veri kapsamı hazırlandı:
   - 3 TYT + 2 AYT Sayısal deneme
   - Son 14 günde 12 çalışma kaydı
   - Fotoğrafsız, notlu 6 yanlış defteri kaydı
@@ -177,35 +107,7 @@ V1 yayın kararı:
   - 10 günlük aktif seri
 - [x] `node --check scripts/seed-review-account.mjs` başarılı.
 
-### Kalan kontroller
-
-- [ ] Demo hesap uygulamadan manuel oluşturulacak.
-- [ ] Demo hesap e-postası ve şifresi App Store / Play review notlarına manuel yazılacak.
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` geçici env olarak ayarlanıp seed script canlı demo hesap için çalıştırılacak.
-- [ ] Seed sonrası uygulamada demo hesabıyla giriş yapılıp Rota / Analiz / Yanlış Defteri / Profil ekranları kontrol edilecek.
-- [ ] Demo hesapta kişisel veri veya gerçek öğrenci bilgisi bulunmadığı kontrol edilecek.
-
-### Seed komutu
-
-```bash
-SUPABASE_URL="https://PROJECT_REF.supabase.co" \
-SUPABASE_SERVICE_ROLE_KEY="SERVICE_ROLE_KEY" \
-node scripts/seed-review-account.mjs reviewer@example.com
-```
-
-Windows PowerShell:
-
-```powershell
-$env:SUPABASE_URL="https://PROJECT_REF.supabase.co"
-$env:SUPABASE_SERVICE_ROLE_KEY="SERVICE_ROLE_KEY"
-node scripts/seed-review-account.mjs reviewer@example.com
-Remove-Item Env:\SUPABASE_SERVICE_ROLE_KEY
-Remove-Item Env:\SUPABASE_URL
-```
-
-## 9. Supabase migration defteri ve advisor
-
-### Yapılanlar
+## 10. Supabase migration defteri ve advisor
 
 - [x] Canlı migration defteri Claude tarafından `list_migrations` ile okundu.
 - [x] `docs/MIGRATION_LEDGER_2026-10.md` güncellendi.
@@ -216,14 +118,92 @@ Remove-Item Env:\SUPABASE_URL
 - [x] Leaked password protection kapalı uyarısı bilinen karar olarak not edildi.
 - [x] Performance `unused_index` uyarıları düşük trafik nedeniyle silme önerisi yapılmadan takip listesine alındı.
 
-### Kalan kontroller
+# Kalanlar
+
+## 1. Final build ve manifest kontrolleri
+
+- [ ] Final build üret.
+- [ ] Final `.ipa` içinden `Info.plist` kontrol et.
+- [ ] Final `.aab` içinden `AndroidManifest.xml` kontrol et.
+- [ ] `NSMicrophoneUsageDescription` final iOS build’de kalıyor mu kontrol et.
+- [ ] `android.permission.RECORD_AUDIO` final Android build’de kalıyor mu kontrol et.
+- [ ] Expo Dev Client / local network açıklamaları production archive içinde yok mu kontrol et.
+- [ ] Android storage/media izinleri Google Play Data Safety beyanıyla uyumlu mu kontrol et.
+- [ ] Kamera ve galeri izin promptları yalnız ilgili kullanıcı aksiyonlarında tetikleniyor mu gerçek cihazda kontrol et.
+
+## 2. Canlı site ve destek kontrolleri
+
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/privacy`
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/terms`
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/delete-account`
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/support`
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/apple-app-site-association`
+- [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/assetlinks.json`
+- [ ] `destek@maratonapp.com` gelen/giden mail testi yap.
+- [ ] Footer veya sitedeki görünür linklerden legal sayfalara ulaşım tekrar kontrol et.
+
+## 3. Apple / Google / Supabase kimlik kontrolleri
+
+- [ ] Apple Developer’da App Group gerçekten kayıtlı mı kontrol et.
+- [ ] Apple Associated Domains final build capability içinde var mı kontrol et.
+- [ ] Google Play / Android App Links SHA ve package eşleşmesini kontrol et.
+- [ ] Supabase Apple OAuth client ayarları final bundle ID ile uyumlu mu kontrol et.
+- [ ] Supabase Google OAuth client ayarları final Android package/SHA ile uyumlu mu kontrol et.
+- [ ] App Store Connect ve Google Play Console’da bundle/package değerlerini son kez kontrol et.
+
+## 4. UGC / sosyal risk kontrolleri
+
+- [ ] Lig, grup, arkadaş ve profil alanlarında kullanıcı adı / profil fotoğrafı / grup adı gibi kullanıcı kaynaklı içerikler hâlâ risk yüzeyi olabilir.
+- [ ] Kullanıcı adı ve grup adı için uygunsuz içerik filtresi ayrıca doğrulanmalı.
+- [ ] Lig/grup/arkadaş alanlarında kullanıcı şikâyet/engelleme akışı App Review öncesi tekrar değerlendirilmeli.
+- [ ] V1 binary’de anonim soru-cevap topluluğuna route/import/deep link kalmadığı final build üzerinde doğrulanmalı.
+
+## 5. Ödeme / premium kontrolleri
+
+- [ ] Final binary içinde kart ödeme ekranına ulaşılmadığı gerçek cihazda doğrulanacak.
+- [ ] Store listing’de premium, abonelik, fiyat, restore purchase metni kalmadığı son kez kontrol edilecek.
+- [ ] App Store Connect’te IAP / subscription ürünü açık değil mi kontrol edilecek.
+- [ ] Google Play Console’da in-app product / subscription açık değil mi kontrol edilecek.
+
+## 6. Privacy labels ve Data Safety doldurma
+
+- [ ] App Store Privacy Labels final binary ve canlı backend davranışıyla eşleştirilecek.
+- [ ] Google Play Data Safety final binary ve canlı backend davranışıyla eşleştirilecek.
+- [ ] Bildirim tokenları ve bildirim tercihleri beyanlarda doğru yer alacak.
+- [ ] Sentry hata verileri / cihaz bilgileri beyanlarda doğru yer alacak.
+- [ ] Hesap silme sonrası saklanan/verilen veri kategorileri legal metinle uyumlu mu kontrol edilecek.
+
+## 7. Store listing ve görsel son kontrol
+
+- [ ] App Store listing final metni panoya girmeden önce son kez okunacak.
+- [ ] Google Play listing final metni panoya girmeden önce son kez okunacak.
+- [ ] Ekran görüntülerinde V1 dışı feature görünmediği görsel bazda kontrol edilecek.
+- [ ] Görsellerde kullanılan üst başlıkların 5 kelimeyi aşmadığı kontrol edilecek.
+
+## 8. Demo hesap hazırlama
+
+- [ ] Demo hesap uygulamadan manuel oluşturulacak.
+- [ ] Demo hesap e-postası ve şifresi App Store / Play review notlarına manuel yazılacak.
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` geçici env olarak ayarlanıp seed script canlı demo hesap için çalıştırılacak.
+- [ ] Seed sonrası uygulamada demo hesabıyla giriş yapılıp Rota / Analiz / Yanlış Defteri / Profil ekranları kontrol edilecek.
+- [ ] Demo hesapta kişisel veri veya gerçek öğrenci bilgisi bulunmadığı kontrol edilecek.
+
+## 9. Supabase takip işleri
 
 - [ ] `supabase db lint` canlı Postgres bağlantısı için `SUPABASE_DB_PASSWORD` istedi; DB password olan ortamda tekrar çalıştırılabilir.
 - [ ] Advisor’daki `SECURITY DEFINER` RPC’ler yayın sonrası tekrar audit edilecek.
 - [ ] Unused index uyarılarına gerçek kullanıcı trafiğinden yaklaşık 1 ay sonra tekrar bakılacak.
 - [ ] Bu sohbette paylaşılan Supabase personal access token rotate/silinmeli.
 
-## 10. Reviewer Notes taslağı
+## 10. Mağaza panellerine girilecekler
+
+- [ ] App Store review notes içine demo hesabı ve aşağıdaki açıklamayı gir.
+- [ ] Play Console test credentials / review notes alanına demo hesabı gir.
+- [ ] Privacy Labels doldur.
+- [ ] Play Data Safety doldur.
+- [ ] V1 dışı özelliklerin listing/görsellerde görünmediğini son kez kontrol et.
+
+# Reviewer Notes taslağı
 
 ```text
 Maraton, YKS öğrencileri için günlük çalışma planı, deneme takibi ve yanlış tekrar uygulamasıdır.
@@ -252,27 +232,29 @@ Anonim topluluk soru-cevap, lig/sosyal ve premium akışları V1 inceleme kapsam
 Hesap silme: Profil → Ayarlar → Hesabı Sil.
 ```
 
-## 11. Son gönderim öncesi kısa liste
+# Demo seed komutu
 
-- [ ] Final build üret.
-- [ ] Final `.ipa` manifest kontrolü yap.
-- [ ] Final `.aab` manifest kontrolü yap.
-- [ ] Demo hesabı oluştur.
-- [ ] Demo seed script’i canlı demo hesap için çalıştır.
-- [ ] Demo hesapla gerçek cihazda giriş yap.
-- [ ] Yasal sayfaları ve `.well-known` dosyalarını canlıdan aç.
-- [ ] `destek@maratonapp.com` mail testini yap.
-- [ ] Privacy Labels doldur.
-- [ ] Play Data Safety doldur.
-- [ ] App Store review notes içine demo hesabı ve yukarıdaki açıklamayı gir.
-- [ ] Play Console test credentials / review notes alanına demo hesabı gir.
-- [ ] V1 dışı özelliklerin listing/görsellerde görünmediğini son kez kontrol et.
+```bash
+SUPABASE_URL="https://PROJECT_REF.supabase.co" \
+SUPABASE_SERVICE_ROLE_KEY="SERVICE_ROLE_KEY" \
+node scripts/seed-review-account.mjs reviewer@example.com
+```
 
-## Resmî kaynaklar
+Windows PowerShell:
+
+```powershell
+$env:SUPABASE_URL="https://PROJECT_REF.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY="SERVICE_ROLE_KEY"
+node scripts/seed-review-account.mjs reviewer@example.com
+Remove-Item Env:\SUPABASE_SERVICE_ROLE_KEY
+Remove-Item Env:\SUPABASE_URL
+```
+
+# Resmî kaynaklar
 
 - Apple App Review Guidelines: https://developer.apple.com/app-store/review/guidelines/
 - Apple screenshot gereksinimleri: https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots
 - Apple privacy manifests: https://developer.apple.com/documentation/BundleResources/privacy-manifest-files
 - Expo SDK 57 ImagePicker: https://docs.expo.dev/versions/v57.0.0/sdk/imagepicker/
 - Expo SDK 57 Widgets: https://docs.expo.dev/versions/v57.0.0/sdk/widgets/
-- Google Play yayın rehberi: https://support.google.com/googleplay/android-developer/answer/15191715?hl=en
+- Google Play yayın rehberi: https://support.google.com/googleplay/android-developer/answer/15191715
