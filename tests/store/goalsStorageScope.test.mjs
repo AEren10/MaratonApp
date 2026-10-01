@@ -20,7 +20,7 @@ test("goals local cache is scoped to the active user", () => {
 
 test("all goal writers and fallback readers use the current user id", () => {
   assert.match(dataSync, /import \{ STORAGE_KEYS, userScopedKey \} from "\.\.\/constants\/storageKeys"/);
-  assert.match(dataSync, /saveGoalsToStorage\(g, userId\)/);
+  assert.match(dataSync, /saveGoalsToStorage\(merged, userId\)/);
   assert.match(dataSync, /getJson\(userScopedKey\(STORAGE_KEYS\.GOALS, userId\)\)/);
   assert.match(goalSetup, /saveGoalsToStorage\(goals, user\?\.id\)/);
   assert.match(goalEditor, /const \{ user \} = useAuth\(\);/);
