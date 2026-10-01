@@ -161,8 +161,11 @@ async function loadAll(userId, dispatch) {
     const g = { dailyQuestions: profile.value.daily_question_goal };
     if (profile.value.weekly_trials_goal != null) g.weeklyTrials = profile.value.weekly_trials_goal;
     if (profile.value.weekly_minutes_goal != null) g.weeklyMinutes = profile.value.weekly_minutes_goal;
-    dispatch(setGoals(g));
-    saveGoalsToStorage(g, userId);
+    // Sunucuda bos olan haftalik hedef yereldekini silmesin: birlestir.
+    const stored = await getJson(userScopedKey(STORAGE_KEYS.GOALS, userId)).catch(() => null);
+    const merged = { ...(stored || {}), ...g };
+    dispatch(setGoals(merged));
+    saveGoalsToStorage(merged, userId);
   } else {
     const localGoals = await getJson(userScopedKey(STORAGE_KEYS.GOALS, userId));
     if (localGoals) dispatch(setGoals(localGoals));

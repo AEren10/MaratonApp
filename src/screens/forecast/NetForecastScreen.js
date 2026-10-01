@@ -41,7 +41,7 @@ export default function NetForecastScreen() {
           <EmptyState
             eyebrow="SENARYOLAR"
             title="Senaryolar için veriye ihtiyacın var"
-            body="En az 3 aynı tip deneme ve bir rota gerekiyor. Önce deneme gir, rota oluşsun."
+            body="En az 3 aynı tip deneme, en az 2 haftaya yayılmış, ve bir rota gerekiyor."
             primary="Deneme Gir"
             onPrimary={() => navigation.navigate(SCREENS.TRIAL_ENTRY)}
             style={{ paddingHorizontal: GUTTER }}

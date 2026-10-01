@@ -11,6 +11,7 @@
 const MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 const COOLDOWN_DAYS = 3;
 const BIG_SWING = 3;
+const FORECAST_SPAN_DAYS = 14;
 const fmt = (n) => (Math.round(n * 10) / 10).toString().replace(".", ",");
 const family = (t) => (String(t?.trialType || "").startsWith("AYT") ? "AYT" : String(t?.trialType || ""));
 const netOf = (t) => Number(t?.totalNet ?? t?.total_net);
@@ -37,7 +38,11 @@ export function discoveryNudges({ trials = [], targets = {}, aytExam = false, da
       });
     }
     // Tahmin her 3 denemede bir tazelenir: 3, 6, 9... (kimlik kademeye bagli).
-    const tier = Math.floor(same.length / 3);
+    // Tahmin ancak denemeler 2 haftaya yayilinca acilir (lib/netForecast);
+    // acilmamis tahmine davet etmeyiz.
+    const days = same.map((x) => dayOf(x)).filter(Boolean).sort();
+    const span = days.length > 1 ? (Date.parse(days[days.length - 1]) - Date.parse(days[0])) / 86400000 : 0;
+    const tier = span >= FORECAST_SPAN_DAYS ? Math.floor(same.length / 3) : 0;
     if (tier >= 1) {
       add({
         id: `disc_forecast_${fam}_${tier}`,

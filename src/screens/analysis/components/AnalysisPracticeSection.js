@@ -25,8 +25,8 @@ export function AnalysisPracticeSection({ C, go, onSimulator, screens }) {
           />
           <DeepRow
             C={C}
-            title="Net Tahmini"
-            sub="Bu tempoyla sınav günü tahmini"
+            title="Senaryolar"
+            sub="Bu tempoyla sınav günü: üç tempo yan yana"
             onPress={() => go(screens.NET_FORECAST, undefined, "analysis_net_forecast")}
           />
           <DeepRow

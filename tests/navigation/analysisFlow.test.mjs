@@ -33,7 +33,8 @@ test("analysis home uses canonical labels and a sticky trial entry action", () =
   assert.match(screen, /DENEME KAYITLARI/);
   assert.match(shortcuts, /YAYIN KARŞILAŞTIRMASI/);
   assert.match(practice, /DAHA DERİNE/);
-  assert.match(practice, /Net Tahmini/);
+  // "Net Tahmini" satiri Senaryolar ekranini aciyordu; adi ekranla ayni oldu.
+  assert.match(practice, /Senaryolar/);
   assert.match(practice, /Simülasyon/);
   assert.match(subjectList, /Konu ilerlemesi/);
 });

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { PREMIUM_ENABLED } from "../../constants/premium";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -54,12 +55,15 @@ export default function AccountDeleteScreen() {
 
         <Animated.View entering={FadeIn.duration(520).delay(140)}>
           <DeleteSummaryCard counts={counts} loading={loading} />
-          <View style={styles.note}>
-            <View style={[styles.mark, { backgroundColor: C.down }]} />
-            <Text style={[TYPOGRAPHY.body, styles.flex, { color: C.text3 }]}>
-              Premium aboneliğin varsa App Store üzerinden ayrıca iptal edilmeli.
-            </Text>
-          </View>
+          {/* v1'de satin alma yok: abonelik notu yalniz premium aciksa. */}
+          {PREMIUM_ENABLED ? (
+            <View style={styles.note}>
+              <View style={[styles.mark, { backgroundColor: C.down }]} />
+              <Text style={[TYPOGRAPHY.body, styles.flex, { color: C.text3 }]}>
+                Premium aboneliğin varsa App Store üzerinden ayrıca iptal edilmeli.
+              </Text>
+            </View>
+          ) : null}
           <DeleteConfirmInput value={typed} onChangeText={setTyped} editable={!deleting} />
         </Animated.View>
 

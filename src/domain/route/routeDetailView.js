@@ -10,7 +10,10 @@ export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [], 
   const target = Number.isFinite(targetNet) ? targetNet : null;
   const points = forecast?.dataPoints || [];
 
-  let note = "3. denemeden sonra açılır";
+  // Tahmin 3 deneme VE 2 haftalik olcum araligi ister (lib/netForecast).
+  // 3 deneme girmis ama araligi kisa olana "3. denemeden sonra" demek yalan.
+  const measured = Array.isArray(netChart?.stops) ? netChart.stops.length : 0;
+  let note = measured >= 3 ? "denemeler 2 haftaya yayılınca açılır" : "3. denemeden sonra açılır";
   if (projected != null) {
     if (target == null) note = null;
     else if (projected >= target) note = `hedefin ${round(projected - target)} net üstünde`;
