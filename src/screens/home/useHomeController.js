@@ -17,6 +17,8 @@ import { usePlanContext } from "../../hooks/usePlanContext";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useAISuggestions } from "../../hooks/useAISuggestions";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
+import { useNotifContextSync } from "../../hooks/useNotifContextSync";
+import { useDiscoveryNudges } from "../../hooks/useDiscoveryNudges";
 import { useRetention } from "../../hooks/useRetention";
 import { useFirstDayDismiss } from "../../hooks/useFirstDayDismiss";
 import { useGamification } from "../../hooks/useGamification";
@@ -35,7 +37,6 @@ import { useHomeActions } from "./useHomeActions";
 // Odakta sessiz tazeleme araligi. Sekme degistirmede ag trafigi olmasin,
 // ama uzun bir oturumdan donen kullanici bayat sayi gormesin.
 const FOCUS_REFRESH_MS = 30000;
-
 const subjectLabel = (key) => getSubjectByKey(key)?.label;
 
 // Ana Sayfa'nin tum durumu tek yerde; ekran dosyasi yalniz hal secer ve cizer.
@@ -60,10 +61,11 @@ export function useHomeController() {
   const trials = useSelector(selectTrials);
 
   useHomeGamificationBridge({ checkMilestone, streak, syncStat });
+  useNotifContextSync(trials);
 
   const planCtx = usePlanContext();
   const nudges = useRecommendations(planCtx.weekLogs);
-  const nudge = useNudgePopup(nudges);
+  const nudge = useNudgePopup(useDiscoveryNudges(trials, nudges));
   const { suggestions } = useAISuggestions();
   const { refresh, syncedOnce, error: syncError } = useSync();
   const { onRefresh, refreshing } = useHomeRefresh(refresh);

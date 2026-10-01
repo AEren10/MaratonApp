@@ -13,6 +13,7 @@ export const NUDGE_TYPES = {
   IMPROVEMENT: "improvement",
   WEAK_AREA: "weak_area",
   SUGGEST: "suggest",
+  DISCOVERY: "discovery",
 };
 
 function subjectLabel(key) {

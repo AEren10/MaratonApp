@@ -9,6 +9,7 @@ import { NudgePopup } from "../../../components/common/NudgePopup";
 import { StreakDetailSheet } from "../../../components/common/StreakDetailSheet";
 import StreakMilestoneModal from "../../../components/common/StreakMilestoneModal";
 import { NudgeModal } from "../../../components/common/NudgeModal";
+import { nudgeTarget, openNudge } from "../nudgeNavigation";
 
 export function HomeOverlays({
   comeback,
@@ -97,12 +98,8 @@ export function HomeOverlays({
         onDismiss={dismissNudgePopup}
         onAction={(nudge) => {
           dismissNudgePopup();
-          const target = nudge.subject ? SCREENS.ANALYSIS : SCREENS.PLAN_DETAIL;
-          trackButtonTap("home_nudge_popup_action", {
-            targetScreen: target,
-            subject: nudge.subject || null,
-          });
-          navigation.navigate(target);
+          trackButtonTap("home_nudge_popup_action", { targetScreen: nudgeTarget(nudge), subject: nudge.subject || null });
+          openNudge(navigation, nudge);
         }}
       />
 

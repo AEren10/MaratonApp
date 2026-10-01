@@ -17,6 +17,7 @@ export const STORAGE_KEYS = {
   HAPTICS_ENABLED: "@maraton:haptics_enabled",
   GOALS: "@maraton:goals",
   NUDGE_POPUP_SHOWN: "@nudge_popup_shown",
+  DISCOVERY_SEEN: "@maraton:discovery_seen",
   LAST_ACTIVE: "@maraton:last_active",
   LOGIN_REWARDED: "@maraton:login_rewarded",
   COMEBACK_SHOWN: "@maraton:comeback_shown",

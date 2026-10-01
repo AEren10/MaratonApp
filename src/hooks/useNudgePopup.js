@@ -12,6 +12,7 @@ const POPUP_TYPES = new Set([
   NUDGE_TYPES.IMPROVEMENT,
   NUDGE_TYPES.PERSONAL_RECORD,
   NUDGE_TYPES.STREAK_RISK,
+  NUDGE_TYPES.DISCOVERY,
 ]);
 
 const SHOWN_KEY = STORAGE_KEYS.NUDGE_POPUP_SHOWN;
@@ -61,6 +62,7 @@ export function useNudgePopup(nudges) {
       if (pendingIdRef.current !== id) return;
       pendingIdRef.current = null;
       setPopup(candidate);
+      candidate.onShown?.();
       shownRef.current.add(id);
       setJson(shownKey, { day: todayKey(), ids: [...shownRef.current] }).catch(() => {});
       if (user?.id) {
