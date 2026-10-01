@@ -195,6 +195,16 @@ for (const [screen, path] of Object.entries(DEEP_LINK_ROUTE_PATHS)) {
   else ROOT_LEVEL[screen] = withParse(screen, path);
 }
 
+// Bagla acilan ic ekranin ALTINA sekmenin koku konur. Yoksa maraton://rota
+// (widget, bildirim) Rota'yi yigindaki tek ekran yapiyor, geri tusu gidecek
+// yer bulamiyordu ("GO_BACK was not handled").
+const TAB_ROOT = {
+  [TAB_KEYS.ROTA]: SCREENS.HOME_ROOT,
+  [TAB_KEYS.PROGRAM]: SCREENS.CURRICULUM_MAP_ROOT,
+  [TAB_KEYS.ANALIZ]: SCREENS.ANALYSIS_ROOT,
+  [TAB_KEYS.PROFIL]: SCREENS.PROFILE_ROOT,
+};
+
 export const LINKING_SCREENS = {
   [ROOT_STACK.MAIN_TABS]: {
     screens: Object.fromEntries(
@@ -204,6 +214,7 @@ export const LINKING_SCREENS = {
           screen,
           {
             path: DEEP_LINK_ROUTE_PATHS[screen],
+            ...(TAB_ROOT[screen] ? { initialRouteName: TAB_ROOT[screen] } : {}),
             screens: NESTED_BY_TAB.get(screen) || {},
           },
         ]),
