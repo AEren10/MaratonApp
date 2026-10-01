@@ -5,6 +5,7 @@ import * as haptic from "../../lib/haptics";
 import { mapGeneratedTask, mapAdHocTask, mapUserTask, taskAsStop } from "./planTaskMappers";
 import { useStopCompletion } from "../../hooks/useStopCompletion";
 import { mergePlanTasks } from "./mergePlanTasks";
+import { trackPlanAllCompletedOnce, trackPlanTaskCompleted } from "../../lib/planAnalytics";
 
 export function usePlanDetailTasks({
   C,
@@ -18,6 +19,7 @@ export function usePlanDetailTasks({
   toggleUserTask,
   removeUserTask,
   transitionStop,
+  userId,
 }) {
   const initialTasks = useMemo(() => [
     ...userTasks.filter((t) => t.subject !== "__calendar").map((t) => mapUserTask(t, C)),
@@ -46,6 +48,7 @@ export function usePlanDetailTasks({
     }
 
     const nextDone = !task.done;
+    const completesPlan = nextDone && tasksRef.current.every((item) => item.id === id || item.done);
 
     // Optimistik anında güncelleme: durak ekrandan kaybolmaz, dakikası hemen artar
     setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, done: nextDone } : item)));
@@ -58,7 +61,8 @@ export function usePlanDetailTasks({
       haptic.select();
     }
 
-    if (task.userTask) toggleUserTask(id);
+    let taskSaved = true;
+    if (task.userTask) taskSaved = await toggleUserTask(id);
     else togglePlanDone(id);
     // Ana sayfadaki tikle ayni kayit: grafik, seri ve konu ilerlemesi buradan
     // da beslenir (eskiden bu ekranin tiki hicbir calisma kaydi yazmiyordu).
@@ -67,6 +71,7 @@ export function usePlanDetailTasks({
     if (task.routeStop && nextDone) {
       try {
         await transitionStop(task.routeStop, "completed", { source: "daily_plan" });
+        trackPlanTaskCompleted(task, "plan_detail");
       } catch {
         setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, done: false } : item)));
         completedHistoryRef.current.delete(id);
@@ -75,9 +80,23 @@ export function usePlanDetailTasks({
         // Silme, yazma bittikten SONRA: once biterse gec gelen kayit geride kalirdi.
         Promise.resolve(logWrite).finally(() => stopLog.undo(taskAsStop(task)));
         showAlert("Durak tamamlanamadı", "Rota güncellenemedi. Bağlantını kontrol edip yeniden dene.");
+        taskSaved = false;
       }
+    } else if (nextDone && !task.userTask) {
+      taskSaved = Boolean(await logWrite);
+      if (taskSaved) trackPlanTaskCompleted(task, "plan_detail");
     }
-  }, [showAlert, stopLog, toggleUserTask, togglePlanDone, transitionStop]);
+
+    if (!taskSaved) {
+      setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, done: false } : item)));
+      completedHistoryRef.current.delete(id);
+      if (task.userTask && nextDone) await Promise.resolve(logWrite).finally(() => stopLog.undo(taskAsStop(task)));
+    } else if (completesPlan) {
+      await trackPlanAllCompletedOnce(userId, tasksRef.current.map((item) => (
+        item.id === id ? { ...item, done: true } : item
+      )), "plan_detail");
+    }
+  }, [showAlert, stopLog, toggleUserTask, togglePlanDone, transitionStop, userId]);
 
   const startTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);

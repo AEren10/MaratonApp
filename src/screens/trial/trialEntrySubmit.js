@@ -166,8 +166,8 @@ export async function submitTrialEntry({
     }).catch(() => {});
   }
 
-  completeForm({ net: netVal, trialType, durationMinutes: durationValue });
-  track(EVENTS.TRIAL_ENTERED, { net: netVal, trialType });
+  completeForm({ hasNet: true, trialType, durationMinutes: durationValue });
+  track(EVENTS.TRIAL_ENTERED, { hasNet: true, trialType });
   track(EVENTS.TRIAL_NORMALIZED, {
     difficultyLevel,
     hasPublisher: !!publisherId,

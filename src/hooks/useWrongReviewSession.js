@@ -7,7 +7,8 @@ import { useGamification } from "./useGamification";
 import { getDueWrongQuestions } from "../supabase/wrongQuestions";
 import { saveReviewOffline } from "../lib/offlineQueue";
 import { gradeWrongReview } from "../lib/wrongReviewLadder";
-import { trackButtonTap } from "../lib/analytics";
+import { track, trackButtonTap } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
 import * as H from "../lib/haptics";
 
 // Sonuc goruldukten sonra siradaki soruya gecis. Kullanici ipucu satirini
@@ -81,7 +82,16 @@ export function useWrongReviewSession({ limit, shuffle, source } = {}) {
     const result = gradeWrongReview(current, knew);
     if (knew) H.success(); else H.tap();
     saveReviewOffline(current.id, user.id, result.updates)
-      .then((r) => { if (r.queued) setStats((p) => ({ ...p, queued: p.queued + 1 })); })
+      .then((r) => {
+        if (!r.saved && !r.queued) return;
+        if (r.queued) setStats((p) => ({ ...p, queued: p.queued + 1 }));
+        track(EVENTS.WRONG_REVIEWED, {
+          remembered: Boolean(knew),
+          closed: Boolean(result.closes),
+          queued: Boolean(r.queued),
+          source: source || "direct",
+        });
+      })
       .catch(() => {});
     if (result.closes) {
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
@@ -103,7 +113,7 @@ export function useWrongReviewSession({ limit, shuffle, source } = {}) {
       setAnswer(null);
       setIdx((i) => i + 1);
     }, ADVANCE_MS);
-  }, [current, answer, user?.id, reward, idx, queue.length, finish]);
+  }, [current, answer, user?.id, reward, idx, queue.length, finish, source]);
 
   return {
     answer,

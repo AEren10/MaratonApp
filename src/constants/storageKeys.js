@@ -53,6 +53,7 @@ export const STORAGE_KEYS = {
   DAILY_GOAL_DONE_PREFIX: "@daily_goal_done",
   PLAN_DONE_PREFIX: "@plan_done",
   PLAN_REWARDED_PREFIX: "@plan_rewarded",
+  PLAN_ANALYTICS_ALL_COMPLETED_PREFIX: "@maraton:analytics:plan_all_completed",
   USER_TASK_REWARDED_PREFIX: "@user_task_rewarded",
   // Ilk Gun hero'su Home govdesinin TAMAMINI gizliyor. Kullanici "ana sayfayi
   // goster" dediginde bu bayrak yaziliyor ve bir daha gizlenmiyor.

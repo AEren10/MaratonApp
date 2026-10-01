@@ -26,7 +26,7 @@ export const linkingConfig = {
       else await Notifications.clearLastNotificationResponseAsync?.();
     } catch (_) {}
     if (data?.url) {
-      trackNotificationOpened(data.type || "unknown", { url: data.url, coldStart: true });
+      trackNotificationOpened(data.type || "unknown", { coldStart: true });
     }
     return data?.url ?? null;
   },
@@ -45,7 +45,7 @@ export const linkingConfig = {
     const notifSub = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response?.notification?.request?.content?.data;
       if (data?.url) {
-        trackNotificationOpened(data.type || "unknown", { url: data.url, coldStart: false });
+        trackNotificationOpened(data.type || "unknown", { coldStart: false });
         listener(data.url);
       }
     });

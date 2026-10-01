@@ -7,6 +7,7 @@ import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 import { useStopCompletion } from "./useStopCompletion";
+import { trackPlanAllCompletedOnce, trackPlanTaskCompleted } from "../lib/planAnalytics";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
@@ -122,13 +123,12 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     }
     H.select();
     const wasDone = !!item.completed;
-    if (item.source === "user") toggleTask(item.id);
+    let taskSaved = true;
+    if (item.source === "user") taskSaved = await toggleTask(item.id);
     else togglePlan(item.id);
-    if (user?.id) {
-      (wasDone ? stopLog.undo : stopLog.complete)(item);
-    }
+    const logWrite = user?.id ? (wasDone ? stopLog.undo : stopLog.complete)(item) : null;
 
-    if (!wasDone) {
+    if (!wasDone && item.source !== "user") {
       completedHistoryRef.current.set(item.id, { ...item, completed: true });
     } else {
       completedHistoryRef.current.delete(item.id);
@@ -137,9 +137,22 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     if (item.routeStop && !wasDone) {
       try {
         await onRouteComplete?.(item.routeStop);
-      } catch {}
+      } catch {
+        taskSaved = false;
+      }
+    } else if (!wasDone && item.source !== "user") {
+      taskSaved = Boolean(await logWrite);
     }
-  }, [stopLog, onRouteComplete, toggleTask, togglePlan, user?.id]);
+
+    if (!wasDone && taskSaved) {
+      completedHistoryRef.current.set(item.id, { ...item, completed: true });
+      if (item.source !== "user") trackPlanTaskCompleted(item, "home");
+      const completedItems = items.map((candidate) => (
+        candidate.id === item.id ? { ...candidate, completed: true } : candidate
+      ));
+      await trackPlanAllCompletedOnce(user?.id, completedItems, "home");
+    }
+  }, [items, stopLog, onRouteComplete, toggleTask, togglePlan, user?.id]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;

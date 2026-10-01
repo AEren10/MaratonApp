@@ -13,7 +13,6 @@ export function showRouteCreatedAlert({ action, navigation, routeCreated, revisi
   track(EVENTS.ROUTE_FIRST_ACTION_OFFERED, {
     routeCreated,
     subject: action.subjectKey,
-    stopId: action.stopId || null,
   });
   showAlert(copy.title, copy.message, [
     { text: "Sonra", style: "cancel" },
@@ -23,7 +22,6 @@ export function showRouteCreatedAlert({ action, navigation, routeCreated, revisi
       onPress: () => {
         track(EVENTS.ROUTE_FIRST_ACTION_STARTED, {
           subject: action.subjectKey,
-          stopId: action.stopId || null,
         });
         navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams(action));
       },

@@ -16,7 +16,6 @@ export function useRoadmapNextAction({ navigation, routeCreated, weeks }) {
     track(EVENTS.ROUTE_FIRST_ACTION_STARTED, {
       source: "roadmap_next_action",
       subject: nextRouteAction.subjectKey,
-      stopId: nextRouteAction.stopId || null,
     });
     if (typeof navigation.replace === "function") {
       navigation.replace(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));

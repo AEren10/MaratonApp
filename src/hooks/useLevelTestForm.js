@@ -83,7 +83,7 @@ export function useLevelTestForm() {
       // acilista yeniden deniyor, bu yuzden akis bloklanmiyor.
       const res = await updateBaselineNet(netVal);
       if (res && res.synced === false) { pendingSync = true; setSyncPending(true); }
-      track(EVENTS.LEVEL_TEST_SUBMITTED, { net: netVal, trialType: trialTypeCode });
+      track(EVENTS.LEVEL_TEST_SUBMITTED, { hasNet: true, trialType: trialTypeCode });
       H.success();
     } catch {
       H.warn();

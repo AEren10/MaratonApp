@@ -90,7 +90,7 @@ export function useWrongNotebookController() {
       showAlert("Bu soru gönderilmeyi bekliyor.", "Bağlantı gelince açabilirsin.");
       return;
     }
-    trackButtonTap("wrong_card_open", { wrongQuestionId: item.id });
+    trackButtonTap("wrong_card_open", { source: item.pending ? "offline_queue" : "saved" });
     navigation.navigate(SCREENS.WRONG_DETAIL, { id: item.id, item });
   }, [navigation, showAlert]);
 

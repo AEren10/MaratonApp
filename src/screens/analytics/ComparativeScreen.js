@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -19,6 +19,8 @@ import { PeriodSummary } from "./components/PeriodSummary";
 import { SubjectProgress } from "./components/SubjectProgress";
 import { PersonalBests } from "./components/PersonalBests";
 import { Press } from "../../components/design/Press";
+import { EVENTS } from "../../constants/analytics";
+import { track } from "../../lib/analytics";
 
 const PERIOD_OPTIONS = [
   { key: 7, label: "Hafta" },
@@ -33,6 +35,7 @@ function ComparativeContent() {
   const { syncedOnce, error: syncError, refresh } = useSync();
   const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const [periodDays, setPeriodDays] = useState(30);
+  const trackedPeriodsRef = useRef(new Set());
 
   const period = useMemo(() => comparePeriods(trials, periodDays), [trials, periodDays]);
   const subjects = useMemo(() => subjectComparison(trials, periodDays), [trials, periodDays]);
@@ -40,6 +43,16 @@ function ComparativeContent() {
   const consistency = useMemo(() => consistencyScore(trials, periodDays), [trials, periodDays]);
 
   const handlePeriod = useCallback((days) => setPeriodDays(days), []);
+
+  useEffect(() => {
+    if (!period || trackedPeriodsRef.current.has(periodDays)) return;
+    trackedPeriodsRef.current.add(periodDays);
+    track(EVENTS.TRIAL_COMPARED, {
+      period: `${periodDays}d`,
+      trialCount: trials.length,
+      hasSubjectBreakdown: subjects.length > 0,
+    });
+  }, [period, periodDays, subjects.length, trials.length]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>

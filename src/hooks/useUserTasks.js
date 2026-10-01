@@ -21,9 +21,8 @@ import {
 } from "../lib/offlineQueue";
 import { userTaskSchema } from "../validations/auth";
 import { scheduleTaskNotifications, cancelTaskReminders } from "../lib/notifications";
-import { track } from "../lib/analytics";
+import { trackPlanTaskCompleted } from "../lib/planAnalytics";
 import { useGamification } from "./useGamification";
-import { EVENTS } from "../constants/analytics";
 import { todayTR } from "../lib/dateUtils";
 import { toUserTaskRow, buildOptimisticUserTask } from "../domain/tasks/userTaskModel";
 import { STORAGE_KEYS, datedUserKey } from "../constants/storageKeys";
@@ -103,17 +102,23 @@ export function useUserTasks() {
     dispatch(setUserTaskCompleted({ id, completed: newCompleted }));
 
     if (typeof id === "string" && id.startsWith("temp_")) {
-      patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => {});
-      return;
+      const patched = await patchQueuedPayload(`usertask_${id}`, { completed: newCompleted }).catch(() => false);
+      if (!patched) {
+        dispatch(setUserTaskCompleted({ id, completed: previous }));
+        return false;
+      }
+      if (newCompleted) trackPlanTaskCompleted({ ...task, userTask: true }, "user_task");
+      return true;
     }
 
-    saveUserTaskUpdateOffline(id, { completed: newCompleted }, user?.id).then((result) => {
-      if (result.queued || result.saved) return;
+    const result = await saveUserTaskUpdateOffline(id, { completed: newCompleted }, user?.id);
+    if (!result.queued && !result.saved) {
       dispatch(setUserTaskCompleted({ id, completed: previous }));
-    });
+      return false;
+    }
 
     if (newCompleted) {
-      track(EVENTS.PLAN_TASK_COMPLETED, { subject: task.subject || null, source: task.source || null });
+      trackPlanTaskCompleted({ ...task, userTask: true }, "user_task");
       if (!rewardedTaskIdsRef.current.has(id)) {
         rewardedTaskIdsRef.current.add(id);
         if (user?.id) setJson(getUserTaskRewardedKey(user.id), [...rewardedTaskIdsRef.current]).catch(() => {});
@@ -123,6 +128,7 @@ export function useUserTasks() {
 
     const doneAfter = tasks.filter((t) => (t.id === id ? newCompleted : t.completed)).length;
     if (doneAfter >= tasks.length) cancelTaskReminders().catch(() => {});
+    return true;
   }, [dispatch, tasks, user?.id]);
 
   const removeTask = useCallback(async (id) => {

@@ -26,6 +26,8 @@ import {
 import { getSubjectByKey } from "../../themes/subjects";
 import { getJson, setJson } from "../../lib/storage/appStorage";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
+import { EVENTS } from "../../constants/analytics";
+import { track } from "../../lib/analytics";
 
 const DEFAULT_CUSTOM_CONFIG = { focus: 30, break: 5, cycles: 4 };
 
@@ -71,6 +73,7 @@ export function useStudyTimerController(C) {
   const [correctCount, setCorrectCount] = useState(0);
   const interval = useRef(null);
   const phaseTimeout = useRef(null);
+  const studyStartedTrackedRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -140,6 +143,7 @@ export function useStudyTimerController(C) {
       setRunning(false);
       setTotalFocusSeconds(0);
       sessionStartedAtRef.current = null;
+      studyStartedTrackedRef.current = false;
       setCustomModalVisible(false);
     };
 
@@ -180,6 +184,7 @@ export function useStudyTimerController(C) {
     setRunning(false);
     setTotalFocusSeconds(0);
     sessionStartedAtRef.current = null;
+    studyStartedTrackedRef.current = false;
   }, []);
 
   const advancePhase = useCallback(() => {
@@ -295,6 +300,7 @@ export function useStudyTimerController(C) {
     setTotalFocusSeconds(r.totalFocusSeconds || 0);
     if (r.taskContext) setTaskContext(r.taskContext);
     sessionStartedAtRef.current = r.sessionStartedAt || null;
+    studyStartedTrackedRef.current = true;
     setRunning(false);
     setRecovery(null);
   }, [recovery]);
@@ -331,6 +337,14 @@ export function useStudyTimerController(C) {
         // Başlat: şu andan itibaren say.
         startedAtRef.current = Date.now();
         if (!sessionStartedAtRef.current) sessionStartedAtRef.current = startedAtRef.current;
+        if (!studyStartedTrackedRef.current) {
+          studyStartedTrackedRef.current = true;
+          track(EVENTS.STUDY_STARTED, {
+            mode: modeKey === "FREE" ? "free" : modeKey === "CUSTOM" ? "custom" : "pomodoro",
+            source: taskContext.routeStopId ? "route" : taskContext.planTaskKey ? "plan" : "direct",
+            hasSubject: Boolean(selectedSubjectKey),
+          });
+        }
       } else {
         // Duraklat: o ana kadarki süreyi biriktir, çapayı bırak.
         accumulatedRef.current = elapsedFrom(accumulatedRef.current, startedAtRef.current);
@@ -340,7 +354,7 @@ export function useStudyTimerController(C) {
       return next;
     });
     H.tap();
-  }, []);
+  }, [modeKey, selectedSubjectKey, taskContext.planTaskKey, taskContext.routeStopId]);
 
   const handleModeChange = useCallback((key) => {
     if (elapsed > 30) {

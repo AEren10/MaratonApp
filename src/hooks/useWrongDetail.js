@@ -56,7 +56,7 @@ export function useWrongDetail(params = {}) {
     try {
       await resolveWrongQuestion(item.id, user.id);
       H.success();
-      trackButtonTap("wrong_resolve", { wrongQuestionId: item.id });
+      trackButtonTap("wrong_resolve");
       reward("wrong_resolved", { statUpdates: [{ type: "increment", key: "wrongsResolved" }] });
       navigation.goBack();
     } catch (e) {
@@ -77,7 +77,7 @@ export function useWrongDetail(params = {}) {
           try {
             await deleteWrongQuestion(item.id, user.id);
             H.success();
-            trackButtonTap("wrong_delete", { wrongQuestionId: item.id });
+            trackButtonTap("wrong_delete");
             navigation.goBack();
           } catch (e) {
             showAlert("Hata", e?.message || "Kaydedilemedi.");
@@ -93,7 +93,7 @@ export function useWrongDetail(params = {}) {
     try {
       await reviewWrongQuestion(item.id, user.id, { note });
       setItem((prev) => ({ ...prev, note }));
-      trackButtonTap("wrong_note_edit", { wrongQuestionId: item.id });
+      trackButtonTap("wrong_note_edit", { hasNote: Boolean(note) });
       return true;
     } catch (e) {
       showAlert("Hata", e?.message || "Kaydedilemedi.");

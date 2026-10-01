@@ -10,7 +10,8 @@ import { useGamification } from "./useGamification";
 import { uploadWrongQuestionImage } from "../supabase/storage";
 import { saveWrongQuestionOffline } from "../lib/offlineQueue";
 import { initialReview } from "../lib/spacedRepetition";
-import { trackButtonTap } from "../lib/analytics";
+import { track, trackButtonTap } from "../lib/analytics";
+import { EVENTS } from "../constants/analytics";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 
@@ -128,6 +129,12 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
       });
       bumpUsage?.("wrong");
       trackButtonTap("wrong_add_save", { subject: subject.key, hasImage: !!image, guessed: !topic && !!guess, keepOpen });
+      track(EVENTS.WRONG_ADDED, {
+        subject: subject.key,
+        hasImage: Boolean(image),
+        queued: Boolean(result.queued || imageLocalUri),
+        topicSource: topicNames(subject).includes(name) ? "curriculum" : "custom",
+      });
       if (result.queued || imageLocalUri) {
         H.tap();
         showAlert(imageLocalUri ? "Fotoğraf beklemede" : "Çevrimdışı", "Bağlantı geldiğinde otomatik kaydedilecek.");

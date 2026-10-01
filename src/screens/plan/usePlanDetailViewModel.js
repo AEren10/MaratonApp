@@ -16,6 +16,8 @@ import { generateDailyPlan } from "../../lib/planEngine";
 import { dateKey, todayTR } from "../../lib/dateUtils";
 import { buildPlanTaskKey } from "../../domain/plan/planTaskIdentity";
 import { usePlanDetailTasks } from "./usePlanDetailTasks";
+import { EVENTS } from "../../constants/analytics";
+import { track } from "../../lib/analytics";
 
 export function formatMinutes(minutes) {
   if (!minutes) return "0 dk";
@@ -38,6 +40,10 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
   const habitStops = useHabitStops(todayTR());
   // Deneme provasi gunu baska durak acilmaz (Ana sayfa ile ayni kural).
   const rehearsalToday = useRehearsalToday(user?.id);
+
+  useEffect(() => {
+    track(EVENTS.PLAN_VIEWED, { surface: "plan_detail" });
+  }, []);
 
   // Günlük planın durakları: tüm haftanın değil, o güne ait duraklar (en fazla 3-4 durak)
   const generatedTasks = useMemo(() => {
@@ -89,6 +95,7 @@ export function usePlanDetailViewModel({ C, forceEmpty }) {
     toggleUserTask,
     removeUserTask,
     transitionStop: studyRoute.transitionStop,
+    userId: user?.id,
   });
 
   const plannedMinutes = useMemo(
