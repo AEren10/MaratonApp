@@ -6,16 +6,16 @@ import { TYPOGRAPHY } from "../../themes/tokens";
 // Etiketin altindaki marka satiri. Bu, paylasimin bize donen tek getirisi —
 // her varyantta ayni yerde, ayni boyda durur ("kart" haric, onun kendi
 // ayagi var).
-export function StoryFoot({ p, daysToExam, inline = false }) {
+export function StoryFoot({ p, inline = true, centered = true }) {
   return (
-    <View style={[s.wrap, inline && s.inline]}>
+    <View style={[s.wrap, inline && s.inline, centered && s.centered]}>
       <View style={s.brand}>
         <View style={[s.mark, { backgroundColor: p.accent }]}>
-          <Svg width={17} height={17} viewBox="0 0 18 18">
+          <Svg width={16} height={16} viewBox="0 0 18 18">
             <Path
               d="M2 14C6 14 7 4 9 4s3 10 7 10"
               stroke={p.markInk}
-              strokeWidth={2.2}
+              strokeWidth={2.4}
               strokeLinecap="round"
               fill="none"
             />
@@ -23,17 +23,13 @@ export function StoryFoot({ p, daysToExam, inline = false }) {
         </View>
         <Text style={[s.word, { color: p.solid }, p.shadow]}>maraton</Text>
       </View>
-      {daysToExam != null ? (
-        <Text style={[TYPOGRAPHY.tableHead, s.days, { color: p.dim }, p.shadow]}>
-          {`SINAVA ${daysToExam} GÜN`}
-        </Text>
-      ) : null}
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  inline: { position: "relative", left: 0, right: 0, bottom: 0 },
+  inline: { position: "relative", left: "auto", right: "auto", bottom: "auto" },
+  centered: { alignSelf: "center", justifyContent: "center" },
   wrap: {
     position: "absolute",
     left: 34,
@@ -41,10 +37,9 @@ const s = StyleSheet.create({
     bottom: 52,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
-  brand: { flexDirection: "row", alignItems: "center", gap: 10 },
-  mark: { width: 28, height: 28, borderRadius: 9, alignItems: "center", justifyContent: "center" },
-  word: { fontFamily: "Bricolage_400", fontSize: 19, letterSpacing: -0.19 },
-  days: { letterSpacing: 1.6 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 9 },
+  mark: { width: 26, height: 26, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  word: { fontFamily: "Bricolage_400", fontSize: 18, letterSpacing: -0.2 },
 });

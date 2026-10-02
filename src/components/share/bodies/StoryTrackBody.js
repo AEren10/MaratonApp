@@ -61,16 +61,19 @@ export function StoryTrackBody({ data, p, visibility = {} }) {
         </Svg>
       ) : null}
 
-      <StoryFoot p={p} daysToExam={showCountdown ? data.daysToExam : null} />
+      <View style={s.brandRow}>
+        <StoryFoot p={p} inline centered />
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject },
-  grid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 34, paddingTop: 64, rowGap: 22 },
+  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  grid: { width: W, flexDirection: "row", flexWrap: "wrap", rowGap: 16 },
   cell: { width: "50%" },
-  label: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 0.2 },
-  value: { fontFamily: "Bricolage_400", fontSize: 34, lineHeight: 40, letterSpacing: -0.8, marginTop: 2 },
-  track: { marginTop: 56, alignSelf: "center" },
+  label: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 0.2 },
+  value: { fontFamily: "Bricolage_400", fontSize: 30, lineHeight: 36, letterSpacing: -0.8, marginTop: 2 },
+  track: { marginTop: 24, alignSelf: "center" },
+  brandRow: { marginTop: 24, alignSelf: "center" },
 });

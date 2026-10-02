@@ -1,37 +1,62 @@
+import { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Svg, { Path, Circle, Line, Text as SvgText } from "react-native-svg";
+import Svg, { Path, Circle, Line, Text as SvgText, G } from "react-native-svg";
 import { StoryFoot } from "../StoryFoot";
 
-const W = 345;
-const H = 240;
+const W = 330;
+const H = 190;
+const PAD_X = 28;
+const PAD_Y = 28;
 
-export function StoryMapBody({ data, p, C, visibility = {} }) {
-  const {
-    showChart = true,
-    showNet = true,
-    showStops = true,
-    showCountdown = true,
-  } = visibility;
+export function StoryMapBody({ data, p, visibility = {} }) {
+  const { showChart = true, showNet = true, showStops = true } = visibility;
 
-  const currentNet = data.currentNet ?? 74;
-  const targetNet = data.targetNet ?? 95;
-  const stopsCount = data.stopsCount ?? 14;
-  const completed = data.completedStops ?? 6;
+  const currentNet = Number(data.currentNet ?? 44.0);
+  const targetNet = Number(data.targetNet ?? 95.0);
+  const stopsCount = data.stopsCount ?? 16;
+  const completed = data.completedStops ?? 8;
   const pct = Math.round((completed / stopsCount) * 100);
 
-  const pts = [
-    { x: 32, y: 190, lbl: "Başlangıç" },
-    { x: 100, y: 165, lbl: "D4" },
-    { x: 170, y: 120, lbl: `${currentNet.toFixed(1)} Net` },
-    { x: 235, y: 80, lbl: "D12" },
-    { x: 300, y: 45, lbl: `${targetNet} Net` },
-  ];
-  const flagX = pts[4].x;
-  const flagY = pts[4].y;
+  const rawHistory = Array.isArray(data.history) && data.history.length
+    ? data.history
+    : [
+        { label: "1. Deneme", net: Math.max(15, currentNet - 14) },
+        { label: "2. Deneme", net: Math.max(20, currentNet - 7) },
+        { label: "Son Deneme", net: currentNet },
+      ];
+
+  const chartData = useMemo(() => {
+    const allNets = [...rawHistory.map((h) => Number(h.net)), targetNet];
+    const minN = Math.min(...allNets, 20);
+    const maxN = Math.max(...allNets, 90);
+    const range = Math.max(10, maxN - minN);
+
+    const pastW = W * 0.62;
+    const pts = rawHistory.map((h, i) => {
+      const x = PAD_X + (i / Math.max(1, rawHistory.length - 1)) * (pastW - PAD_X);
+      const y = H - PAD_Y - ((Number(h.net) - minN) / range) * (H - PAD_Y * 2);
+      return { x, y, net: Number(h.net), label: h.label || "" };
+    });
+
+    const curr = pts[pts.length - 1] || { x: pastW, y: H / 2, net: currentNet };
+    const flagX = W - PAD_X;
+    const flagY = H - PAD_Y - ((targetNet - minN) / range) * (H - PAD_Y * 2);
+
+    let pastPath = pts.length > 0 ? `M${pts[0].x},${pts[0].y}` : "";
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const midX = (prev.x + pts[i].x) / 2;
+      pastPath += ` C${midX},${prev.y} ${midX},${pts[i].y} ${pts[i].x},${pts[i].y}`;
+    }
+
+    const midFutureX = (curr.x + flagX) / 2;
+    const futPath = `M${curr.x},${curr.y} C${midFutureX},${curr.y} ${midFutureX},${flagY} ${flagX},${flagY}`;
+
+    return { pts, curr, flagX, flagY, pastPath, futPath };
+  }, [rawHistory, currentNet, targetNet]);
 
   return (
     <View style={s.wrap}>
-      {/* Baslik & Net Hedefi */}
       <View style={s.head}>
         <Text style={[s.eyebrow, { color: p.accent }, p.shadow]}>✦ HEDEF ROTASI & YOLCULUK ✦</Text>
         {showNet ? (
@@ -48,78 +73,58 @@ export function StoryMapBody({ data, p, C, visibility = {} }) {
               <Text style={[s.pctText, { color: p.up }]}>{`%${pct} TAMAMLANDI`}</Text>
             </View>
             <Text style={[s.stopsLine, { color: p.mid }, p.shadow]}>
-              {`${stopsCount} duraktan ${completed}'sı geçildi`}
+              {`${stopsCount} duraktan ${completed}'i geçildi`}
             </Text>
           </View>
         ) : null}
       </View>
 
-      {/* Noktali & Bayrakli Rota Cizgisi */}
       {showChart ? (
         <View style={s.chartBox}>
           <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-            {/* Gecmis rota çizgisi */}
-            <Path
-              d={`M${pts[0].x},${pts[0].y} Q${pts[1].x},${pts[1].y + 10} ${pts[2].x},${pts[2].y}`}
-              stroke={p.accent}
-              strokeWidth={5}
-              strokeLinecap="round"
-              fill="none"
-            />
-            {/* Gelecek kesikli rota çizgisi */}
-            <Path
-              d={`M${pts[2].x},${pts[2].y} Q${pts[3].x},${pts[3].y - 5} ${flagX},${flagY}`}
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth={3.5}
-              strokeDasharray="6 6"
-              strokeLinecap="round"
-              fill="none"
-            />
-
-            {/* Gecilmis durak noktalari */}
-            <Circle cx={pts[0].x} cy={pts[0].y} r={6.5} fill={p.solid} />
-            <Circle cx={pts[1].x} cy={pts[1].y} r={6.5} fill={p.solid} />
-
-            {/* Simdiki durak: parlayan cift halka */}
-            <Circle cx={pts[2].x} cy={pts[2].y} r={18} fill={p.accent} fillOpacity={0.25} />
-            <Circle cx={pts[2].x} cy={pts[2].y} r={8.5} fill={p.accent} stroke="#FFFFFF" strokeWidth={2.5} />
-            <SvgText x={pts[2].x} y={pts[2].y - 24} fill={p.accent} fontSize={11} fontWeight="700" textAnchor="middle">
+            {chartData.pastPath ? (
+              <Path d={chartData.pastPath} stroke={p.accent} strokeWidth={4.5} strokeLinecap="round" fill="none" />
+            ) : null}
+            <Path d={chartData.futPath} stroke="rgba(255,255,255,0.4)" strokeWidth={3} strokeDasharray="5 5" strokeLinecap="round" fill="none" />
+            {chartData.pts.map((pt, i) => (
+              <Circle key={`pt-${i}`} cx={pt.x} cy={pt.y} r={5} fill={p.solid} />
+            ))}
+            <Circle cx={chartData.curr.x} cy={chartData.curr.y} r={16} fill={p.accent} fillOpacity={0.25} />
+            <Circle cx={chartData.curr.x} cy={chartData.curr.y} r={7.5} fill={p.accent} stroke="#FFFFFF" strokeWidth={2} />
+            <SvgText x={chartData.curr.x} y={chartData.curr.y - 20} fill={p.accent} fontSize={10} fontWeight="700" textAnchor="middle">
               ŞU AN BURADASIN
             </SvgText>
-
-            {/* Gelecek durak noktasi */}
-            <Circle cx={pts[3].x} cy={pts[3].y} r={6} fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth={2} />
-
-            {/* Hedef Kirmizi Bayrak 🚩 */}
-            <Circle cx={flagX} cy={flagY} r={11} fill={p.accent} fillOpacity={0.2} />
-            <Line x1={flagX} y1={flagY} x2={flagX} y2={flagY - 28} stroke={p.accent} strokeWidth={2.5} strokeLinecap="round" />
-            <Path
-              d={`M${flagX},${flagY - 28} L${flagX + 20},${flagY - 20} L${flagX},${flagY - 12} Z`}
-              fill={p.accent}
-            />
-            <SvgText x={flagX - 10} y={flagY + 20} fill={p.solid} fontSize={11} fontWeight="700" textAnchor="middle">
-              {`${targetNet} NET 🚩`}
-            </SvgText>
+            <G>
+              <Circle cx={chartData.flagX} cy={chartData.flagY} r={10} fill={p.accent} fillOpacity={0.2} />
+              <Line x1={chartData.flagX} y1={chartData.flagY} x2={chartData.flagX} y2={chartData.flagY - 24} stroke={p.accent} strokeWidth={2.2} strokeLinecap="round" />
+              <Path d={`M${chartData.flagX},${chartData.flagY - 24} L${chartData.flagX + 18},${chartData.flagY - 17} L${chartData.flagX},${chartData.flagY - 10} Z`} fill={p.accent} />
+              <SvgText x={chartData.flagX - 10} y={chartData.flagY + 18} fill={p.solid} fontSize={10} fontWeight="700" textAnchor="middle">
+                {`${targetNet} NET 🚩`}
+              </SvgText>
+            </G>
           </Svg>
         </View>
       ) : null}
 
-      <StoryFoot p={p} daysToExam={showCountdown ? data.daysToExam : null} />
+      <View style={s.brandRow}>
+        <StoryFoot p={p} inline centered />
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "space-between", paddingHorizontal: 30, paddingTop: 64 },
-  head: { gap: 6 },
-  eyebrow: { fontFamily: "Archivo_700", fontSize: 12, letterSpacing: 1.6 },
-  netRow: { flexDirection: "row", alignItems: "baseline", gap: 10, marginTop: 4 },
-  netVal: { fontFamily: "Bricolage_400", fontSize: 44, lineHeight: 48, letterSpacing: -1 },
-  arrow: { fontFamily: "Bricolage_400", fontSize: 32 },
-  netUnit: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 1 },
+  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  head: { width: W, gap: 4, marginBottom: 8 },
+  eyebrow: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.6 },
+  netRow: { flexDirection: "row", alignItems: "baseline", gap: 8, marginTop: 2 },
+  netVal: { fontFamily: "Bricolage_400", fontSize: 38, lineHeight: 42, letterSpacing: -1 },
+  arrow: { fontFamily: "Bricolage_400", fontSize: 26 },
+  netUnit: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 1 },
   badgeRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 },
   pctPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  pctText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 0.8 },
-  stopsLine: { fontFamily: "Archivo_500", fontSize: 13 },
-  chartBox: { marginTop: 16, alignSelf: "center", width: W },
+  pctText: { fontFamily: "Archivo_700", fontSize: 10, letterSpacing: 0.8 },
+  stopsLine: { fontFamily: "Archivo_500", fontSize: 12.5 },
+  chartBox: { alignSelf: "center", width: W },
+  brandRow: { marginTop: 22, alignSelf: "center" },
 });

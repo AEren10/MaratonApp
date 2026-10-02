@@ -12,6 +12,7 @@ import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
 const KIND_NAMES = {
   cubuk: "HAFTALIK RAPOR",
   harita: "HEDEF ROTASI",
+  ders: "DERS TRENDİ",
   kart: "GÜNÜN RAPORU",
   net: "DENEME NETİ",
   iz: "GÜNÜN İZİ",

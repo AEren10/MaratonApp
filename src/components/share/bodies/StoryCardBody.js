@@ -93,38 +93,38 @@ export function StoryCardBody({ data, p, C, visibility = {} }) {
       <View style={s.footBox}>
         <Text style={[s.dotsDivider, { color: p.rule }]}>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</Text>
         <View style={s.barcodeRow}>
-          <Svg width={180} height={22} viewBox="0 0 180 22">
+          <Svg width={180} height={20} viewBox="0 0 180 20">
             {[4, 12, 16, 26, 32, 36, 48, 54, 60, 72, 80, 88, 98, 106, 114, 126, 134, 142, 154, 164, 172].map((x, i) => (
-              <Line key={i} x1={x} y1={2} x2={x} y2={20} stroke="rgba(255,255,255,0.4)" strokeWidth={i % 3 === 0 ? 3 : 1.5} />
+              <Line key={i} x1={x} y1={2} x2={x} y2={18} stroke="rgba(255,255,255,0.4)" strokeWidth={i % 3 === 0 ? 3 : 1.5} />
             ))}
           </Svg>
           <Text style={[s.receiptNo, { color: p.dim }]}>#M-2026-STUDY</Text>
         </View>
-        <StoryFoot p={p} daysToExam={showCountdown ? data.daysToExam : null} inline />
+        <StoryFoot p={p} inline centered />
       </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, paddingTop: 70, paddingHorizontal: 30, paddingBottom: 64, justifyContent: "space-between" },
-  head: { gap: 6 },
+  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  head: { width: 330, gap: 4 },
   topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  badge: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.5 },
-  chip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, borderWidth: 1 },
-  chipText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 1 },
-  date: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.4, marginTop: 2 },
-  dotsDivider: { letterSpacing: 2, fontSize: 11, opacity: 0.5, marginVertical: 4 },
-  body: { gap: 14 },
+  badge: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.5 },
+  chip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
+  chipText: { fontFamily: "Archivo_700", fontSize: 10, letterSpacing: 1 },
+  date: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.2, marginTop: 2 },
+  dotsDivider: { letterSpacing: 2, fontSize: 10.5, opacity: 0.5, marginVertical: 3 },
+  body: { width: 330, gap: 10 },
   heroGroup: { gap: 2 },
-  heroNum: { fontFamily: "Bricolage_400", fontSize: 104, lineHeight: 108, letterSpacing: -5 },
-  heroLabel: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 2 },
-  dataRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
-  dataItem: { gap: 3 },
-  dataLabel: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.5 },
-  dataVal: { fontFamily: "Bricolage_400", fontSize: 22 },
-  chartBox: { marginTop: 8 },
-  footBox: { gap: 6 },
-  barcodeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  heroNum: { fontFamily: "Bricolage_400", fontSize: 80, lineHeight: 84, letterSpacing: -4 },
+  heroLabel: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2 },
+  dataRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
+  dataItem: { gap: 2 },
+  dataLabel: { fontFamily: "Archivo_600", fontSize: 10.5, letterSpacing: 1.4 },
+  dataVal: { fontFamily: "Bricolage_400", fontSize: 20 },
+  chartBox: { marginTop: 4 },
+  footBox: { width: 330, gap: 6, marginTop: 4 },
+  barcodeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 6 },
   receiptNo: { fontFamily: "Archivo_500", fontSize: 10.5, letterSpacing: 1.2 },
 });

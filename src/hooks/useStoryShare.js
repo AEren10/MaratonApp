@@ -55,21 +55,22 @@ function lastTrialOf(trials) {
 }
 
 /**
- * Story paylasim blogunun tek veri kaynagi. Ham veriyi toplar, saf katmana
- * verir, geri donen varyantlari ve paylasim eylemlerini sunar.
+ * Story paylasim blogunun tek veri kaynagi.
  */
+import { extractTrialNetHistory, extractSubjectData } from "../domain/share/storySubjectHistory";
+
 export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
   const report = useWeeklyReport();
   const streak = useSelector(selectStreak);
   const todayLogs = useSelector(selectTodayLogs);
   const trials = useSelector(selectTrials);
-  const { examType, examDate, daysUntilExam } = useExam();
+  const { examType, examDate, daysUntilExam, targetNet: examTarget } = useExam();
 
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
-  // Fotografli varyantin arka plani: { uri, share } ya da null.
   const [photo, setPhoto] = useState(null);
+  const [subjectKey, setSubjectKey] = useState("mat");
 
   const ctx = useMemo(() => {
     const logs = todayLogs || [];
@@ -97,11 +98,13 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
       lastTrial: lastTrialOf(trials),
       todayIndex: new Date().getDay() === 0 ? 6 : new Date().getDay() - 1,
       routeStopsTotal: 16,
-      routeStopsCompleted: 6,
-      currentNet: trials?.[0]?.totalNet || 74.0,
-      targetNet: 95.0,
+      routeStopsCompleted: 8,
+      currentNet: Number(trials?.[0]?.totalNet ?? trials?.[0]?.total_net) || 44.0,
+      targetNet: Number(examTarget) || 95.0,
+      trialNetHistory: extractTrialNetHistory(trials),
+      selectedSubjectData: extractSubjectData(trials, subjectKey),
     };
-  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, report.totalMinutes, streak, daysUntilExam, examType, examDate, trials]);
+  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, report.totalMinutes, streak, daysUntilExam, examType, examDate, trials, examTarget, subjectKey]);
 
   const variants = useMemo(() => buildStoryVariants(ctx, moment), [ctx, moment]);
   const selected = variants[Math.min(index, Math.max(0, variants.length - 1))] || null;
@@ -127,16 +130,11 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     photo,
     pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
     clearPhoto: () => setPhoto(null),
-    // STRAVA MODELI: etiket HER ZAMAN seffaf (overlay) olarak yakalanir.
-    // Fotograf secildiyse: sticker + arka plan dogrudan Instagram'a gider
-    // (kullanici yerlesmis halde gorur, tasiyip buyutebilir).
-    // Fotograf secilmediyse: seffaf etiket panoya kopyalanir, Instagram story
-    // kamerasi acilir — kullanici kendi karesini cekerken yapistirir.
+    subjectKey,
+    setSubjectKey,
     share: async (overlayRef) => {
       const bg = photo;
-      if (bg) {
-        return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
-      }
+      if (bg) return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
       return run(shareStoryToInstagram, overlayRef);
     },
     save: (ref) => run(saveStoryToGallery, ref),

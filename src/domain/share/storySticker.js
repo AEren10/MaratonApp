@@ -17,6 +17,7 @@ export const STORY_KIND = Object.freeze({
   IZ: "iz",
   CUBUK: "cubuk",
   HARITA: "harita",
+  DERS: "ders",
 });
 
 export const STORY_BG = Object.freeze({ MARKA: "marka", FOTO: "foto" });
@@ -67,7 +68,6 @@ function variantData(kind, ctx) {
         accuracy: num(today.accuracy),
         stops: pos(today.stops),
         series,
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.IZ:
@@ -78,12 +78,11 @@ function variantData(kind, ctx) {
         streak: pos(ctx.streak),
         weekQuestions: pos(week.questions),
         series: series.length >= 2 ? series : [],
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.SADE:
       if (!pos(today.questions)) return null;
-      return { questions: today.questions, streak: pos(ctx.streak), daysToExam: pos(ctx.daysToExam) };
+      return { questions: today.questions, streak: pos(ctx.streak) };
 
     case STORY_KIND.ROTA:
       // Egri son 7 gunden uretilir; iki noktadan az veriyle cizgi yalan olur.
@@ -92,12 +91,11 @@ function variantData(kind, ctx) {
         series,
         dayLabels: Array.isArray(week.dayLabels) ? week.dayLabels : [],
         weekQuestions: week.questions,
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.SERI:
       if (!pos(ctx.streak)) return null;
-      return { streak: ctx.streak, daysToExam: pos(ctx.daysToExam) };
+      return { streak: ctx.streak };
 
     case STORY_KIND.GERISAYIM: {
       const days = pos(ctx.daysToExam);
@@ -117,7 +115,6 @@ function variantData(kind, ctx) {
         delta: num(trial.delta),
         label: trial.label || null,
         subjects: Array.isArray(trial.subjects) ? trial.subjects : [],
-        daysToExam: pos(ctx.daysToExam),
       };
     }
 
@@ -125,7 +122,7 @@ function variantData(kind, ctx) {
       const q = num(today.questions);
       if (q == null || q <= 0 || q > HONEST_MAX_QUESTIONS) return null;
       if (!pos(ctx.streak)) return null;
-      return { questions: q, streak: ctx.streak, daysToExam: pos(ctx.daysToExam) };
+      return { questions: q, streak: ctx.streak };
     }
 
     case STORY_KIND.CUBUK: {
@@ -141,22 +138,41 @@ function variantData(kind, ctx) {
         weekMinutes: pos(week.minutes) || (today.minutes ? today.minutes * 2 : 180),
         todayQuestions: pos(today.questions),
         todayIndex: ctx.todayIndex ?? (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1),
-        daysToExam: pos(ctx.daysToExam),
       };
     }
 
     case STORY_KIND.HARITA: {
       if (!pos(ctx.routeStopsTotal) && !trial && num(ctx.currentNet) == null) return null;
-      const currentNet = num(ctx.currentNet) || (trial ? num(trial.net) : null) || 72.5;
-      const targetNet = num(ctx.targetNet) || 95;
+      const currentNet = num(ctx.currentNet) || (trial ? num(trial.net) : null) || 44.0;
+      const targetNet = num(ctx.targetNet) || 95.0;
+      const history = Array.isArray(ctx.trialNetHistory) && ctx.trialNetHistory.length >= 2
+        ? ctx.trialNetHistory
+        : [
+            { label: "1. Deneme", net: Math.max(15, currentNet - 14) },
+            { label: "2. Deneme", net: Math.max(20, currentNet - 7) },
+            { label: "Son Deneme", net: currentNet },
+          ];
       return {
         currentNet,
         targetNet,
-        series: series.length >= 2 ? series : [currentNet - 8, currentNet - 4, currentNet, currentNet + 2],
+        history,
         stopsCount: pos(ctx.routeStopsTotal) || 16,
-        completedStops: pos(ctx.routeStopsCompleted) || 6,
-        daysToExam: pos(ctx.daysToExam),
+        completedStops: pos(ctx.routeStopsCompleted) || 8,
       };
+    }
+
+    case STORY_KIND.DERS: {
+      if (!ctx.selectedSubjectData && !trial && !ctx.trialNetHistory?.length) return null;
+      const subj = ctx.selectedSubjectData || {
+        key: "mat",
+        label: "Matematik",
+        history: [14.0, 17.5, 20.0, 24.5],
+        currentNet: 24.5,
+        delta: 4.5,
+        pct: 22,
+        average: 19.0,
+      };
+      return subj;
     }
 
     default:
@@ -170,12 +186,12 @@ function rankFor(moment, ctx) {
   const isHonest = ctx.today?.questions != null && ctx.today.questions > 0 && ctx.today.questions <= HONEST_MAX_QUESTIONS && pos(ctx.streak);
 
   const head = moment === STORY_MOMENT.SESSION
-    ? [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA]
+    ? [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
     : moment === STORY_MOMENT.TRIAL
-      ? [STORY_KIND.NET, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.IZ]
+      ? [STORY_KIND.NET, STORY_KIND.DERS, STORY_KIND.HARITA, STORY_KIND.CUBUK, STORY_KIND.IZ]
       : moment === STORY_MOMENT.STREAK
-        ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.KART, STORY_KIND.IZ]
-        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.KART, STORY_KIND.NET, STORY_KIND.IZ];
+        ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
+        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.IZ];
 
   const tail = [
     STORY_KIND.GERISAYIM,

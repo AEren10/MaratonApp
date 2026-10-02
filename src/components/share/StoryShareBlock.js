@@ -18,7 +18,7 @@ const CARD_H = Math.round(CARD_W * (16 / 9));
 const STATUS_TEXTS = {
   placed: "Instagram'a aktarıldı ✓",
   opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
-  tiktok_opened: "TikTok açıldı — Hikayende 'Çıkartma' olarak yapıştırabilirsin ✓",
+  tiktok_opened: "Paylaşım açıldı — TikTok veya dilediğin uygulamayı seçebilirsin ✓",
   copied: "Şeffaf etiket panoya kopyalandı ✓",
   saved: "Galeriye kaydedildi ✓",
   permission_denied: "İzin verilmedi.",
@@ -78,12 +78,14 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
         ))}
       </View>
 
-      {/* İcindeki Verileri Kapatip Acma Secenekleri */}
+      {/* İcindeki Verileri Kapatip Acma ve Ders Secme */}
       <StoryFilterChips
         kind={s.selected.kind}
         data={s.selected.data}
         visibility={visibility}
         onToggle={handleToggle}
+        selectedSubject={s.subjectKey}
+        onSelectSubject={s.setSubjectKey}
       />
 
       {/* Strava Tarzi Dairesel Butonlar */}

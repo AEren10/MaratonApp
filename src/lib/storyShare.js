@@ -160,14 +160,30 @@ export async function copyStoryToClipboard(ref) {
 
 const TIKTOK_SCHEMES = ["snssdk1233://", "snssdk1180://", "tiktok://"];
 
-/** TikTok paylasimi: etiketi panoya kopyalar ve TikTok uygulamasini acar. */
+/** TikTok paylasimi: etiketi panoya kopyalar ve sistem paylasim menusuyle TikTok'a aktarir. */
 export async function shareStoryToTikTok(ref) {
   const base64 = await capture(ref, "base64");
-  if (!base64) return STORY_SHARE.FAILED;
-  try {
-    await Clipboard.setImageAsync(base64);
-  } catch {
-    return STORY_SHARE.FAILED;
+  const tmpfile = await capture(ref, "tmpfile");
+  if (!base64 && !tmpfile) return STORY_SHARE.FAILED;
+
+  if (base64) {
+    try {
+      await Clipboard.setImageAsync(base64);
+    } catch {}
+  }
+
+  if (tmpfile) {
+    try {
+      await Share.open({
+        url: tmpfile,
+        title: "Maraton Aktivite Paylaşımı",
+      });
+      return STORY_SHARE.TIKTOK_OPENED;
+    } catch (e) {
+      if (e?.message?.includes("User did not share") || e?.message?.includes("dismissed")) {
+        return STORY_SHARE.COPIED;
+      }
+    }
   }
 
   let opened = false;
@@ -179,18 +195,7 @@ export async function shareStoryToTikTok(ref) {
         opened = true;
         break;
       }
-    } catch {
-      // devam et
-    }
+    } catch {}
   }
-  if (!opened) {
-    try {
-      await Linking.openURL("tiktok://");
-      opened = true;
-    } catch {
-      opened = false;
-    }
-  }
-
   return opened ? STORY_SHARE.TIKTOK_OPENED : STORY_SHARE.COPIED;
 }

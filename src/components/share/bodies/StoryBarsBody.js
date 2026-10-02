@@ -123,21 +123,30 @@ export function StoryBarsBody({ data, p, C, visibility = {} }) {
         ) : null}
       </View>
 
-      <StoryFoot p={p} daysToExam={showCountdown ? data.daysToExam : null} />
+      {/* Ortalanmis Maraton Logosu */}
+      <View style={s.brandRow}>
+        <StoryFoot p={p} inline centered />
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "space-between", paddingHorizontal: 30, paddingTop: 64 },
-  head: { gap: 6 },
-  eyebrow: { fontFamily: "Archivo_700", fontSize: 12, letterSpacing: 1.6 },
-  metricRow: { flexDirection: "row", gap: 24, marginTop: 4 },
+  wrap: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  head: { width: W, gap: 4, marginBottom: 8 },
+  eyebrow: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.6 },
+  metricRow: { flexDirection: "row", gap: 20, marginTop: 2 },
   statBox: { gap: 2 },
-  heroNum: { fontFamily: "Bricolage_400", fontSize: 44, lineHeight: 48, letterSpacing: -1 },
-  heroUnit: { fontFamily: "Archivo_500", fontSize: 13 },
-  chartBox: { marginTop: 20, alignSelf: "center", width: W },
+  heroNum: { fontFamily: "Bricolage_400", fontSize: 40, lineHeight: 44, letterSpacing: -1 },
+  heroUnit: { fontFamily: "Archivo_500", fontSize: 12.5 },
+  chartBox: { alignSelf: "center", width: W },
   daysRow: { flexDirection: "row", marginTop: 8 },
   dayLbl: { fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 0.5 },
   todayDot: { width: 4, height: 4, borderRadius: 2, marginTop: 3 },
+  brandRow: { marginTop: 26, alignSelf: "center" },
 });

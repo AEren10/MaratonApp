@@ -6,6 +6,16 @@ import { STEP, GUTTER, TYPOGRAPHY } from "../../themes/tokens";
 import { Press } from "../../components/design/Press";
 import * as H from "../../lib/haptics";
 
+const SUBJECT_LIST = [
+  { key: "mat", label: "Matematik" },
+  { key: "tur", label: "Türkçe" },
+  { key: "fiz", label: "Fizik" },
+  { key: "kim", label: "Kimya" },
+  { key: "bio", label: "Biyoloji" },
+  { key: "tar", label: "Tarih" },
+  { key: "cog", label: "Coğrafya" },
+];
+
 function getAvailableFields(kind, data) {
   const f = [];
   if (kind === "cubuk") {
@@ -13,14 +23,16 @@ function getAvailableFields(kind, data) {
     if (data?.weekMinutes != null) f.push({ key: "showMinutes", label: "Toplam Süre" });
     f.push({ key: "showDays", label: "Günler" });
     f.push({ key: "showGoalLine", label: "Hedef Çizgisi 🚩" });
-    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
     return f;
   }
   if (kind === "harita") {
     if (data?.currentNet != null) f.push({ key: "showNet", label: `Net (${data.currentNet.toFixed(1)}→${data.targetNet})` });
     if (data?.stopsCount != null) f.push({ key: "showStops", label: `Duraklar (${data.completedStops}/${data.stopsCount})` });
     f.push({ key: "showChart", label: "Noktalı Yol & Bayrak 🚩" });
-    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
+    return f;
+  }
+  if (kind === "ders") {
+    f.push({ key: "showChart", label: "Net Eğrisi" });
     return f;
   }
   if (data?.questions != null) f.push({ key: "showQuestions", label: `Soru (${data.questions})` });
@@ -31,14 +43,13 @@ function getAvailableFields(kind, data) {
   if (data?.accuracy != null) f.push({ key: "showAccuracy", label: `İsabet (%${Math.round(data.accuracy)})` });
   if (data?.weekQuestions != null && kind === "iz") f.push({ key: "showWeek", label: "Haftalık" });
   if (data?.dayLabels?.length && kind === "rota") f.push({ key: "showDays", label: "Günler" });
-  if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
+  if (kind === "gerisayim" && data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
   return f;
 }
 
-export function StoryFilterChips({ kind, data, visibility, onToggle }) {
+export function StoryFilterChips({ kind, data, visibility, onToggle, selectedSubject = "mat", onSelectSubject }) {
   const C = useC();
   const fields = getAvailableFields(kind, data);
-  if (!fields.length) return null;
 
   return (
     <View style={[s.wrap, { backgroundColor: C.void, borderColor: C.line }]}>
@@ -49,11 +60,29 @@ export function StoryFilterChips({ kind, data, visibility, onToggle }) {
           </Svg>
           <Text style={[s.title, { color: C.text }]}>HİKÂYEYİ ÖZELLEŞTİR</Text>
         </View>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Aç / Kapat</Text>
+        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{kind === "ders" ? "Ders Seç" : "Aç / Kapat"}</Text>
       </View>
 
-      <View style={s.chipsGrid}>
-        {fields.map((f) => {
+      {kind === "ders" ? (
+        <View style={s.chipsGrid}>
+          {SUBJECT_LIST.map((subj) => {
+            const isSel = selectedSubject === subj.key;
+            return (
+              <Press
+                key={subj.key}
+                haptic="none"
+                onPress={() => { H.tap(); onSelectSubject?.(subj.key); }}
+                style={[s.chip, { backgroundColor: isSel ? C.surface : "transparent", borderColor: isSel ? C.accent : C.line }]}
+              >
+                <View style={[s.dot, { backgroundColor: isSel ? C.accentBright : C.line }]} />
+                <Text style={[s.chipText, { color: isSel ? C.text : C.text3 }]}>{subj.label}</Text>
+              </Press>
+            );
+          })}
+        </View>
+      ) : (
+        <View style={s.chipsGrid}>
+          {fields.map((f) => {
           const isVisible = visibility[f.key] !== false;
           return (
             <Press
