@@ -33,6 +33,7 @@ import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
 import { overdueStops, plannedTopicKeys, DEBT_WINDOW_DAYS } from "../domain/route/overdueStops";
 import { addDays } from "../domain/program/dayKeys";
+import { targetReachedFrom } from "../domain/route/targetReached";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { useTodayKey } from "./useTodayKey";
 import { topicFeelFromLogs } from "../domain/route/topicFeel";
@@ -283,11 +284,11 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
   // Hedefi koruma modu: tahminin sinavindaki SON net hedefe ulastiysa rota
   // yeni konu kovalamak yerine tekrari ve yanlislari one alir.
   const { target: forecastTargetNet } = useForecastTarget(forecastCandidate?.types || []);
-  const targetReached = useMemo(() => {
-    const latest = latestNetOf(forecastCandidate?.trials || []);
-    return Number.isFinite(latest) && Number.isFinite(forecastTargetNet) && forecastTargetNet > 0
-      && latest >= forecastTargetNet;
-  }, [forecastCandidate, forecastTargetNet]);
+  // Tek denemeyle degil: son 3 denemenin agirlikli ortalamasi (bkz. targetReached.js).
+  const targetReached = useMemo(
+    () => targetReachedFrom(forecastCandidate?.trials || [], forecastTargetNet),
+    [forecastCandidate, forecastTargetNet],
+  );
 
   // Gunluk rutinlerin haftalik yuku: rota butcesinden dusulur.
   const { habits, settled: habitsSettled } = useRouteHabits();
