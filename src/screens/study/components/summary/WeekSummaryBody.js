@@ -8,6 +8,7 @@ import { getSubjectLabel } from "../../../../themes/subjects";
 import { formatInt } from "../../../../domain/summary/summaryFormat";
 import { PeriodBarChart } from "./PeriodBarChart";
 import { StatsStrip } from "../../../../components/design/StatsStrip";
+import { WeekProgressProof } from "./WeekProgressProof";
 
 export function WeekSummaryBody({ data }) {
   const C = useC();
@@ -53,6 +54,8 @@ export function WeekSummaryBody({ data }) {
         </View>
         <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s1 }]}>{story}</Text>
       </View>
+
+      <WeekProgressProof data={data} />
 
       <PeriodBarChart
         label="GÜNLÜK ÇALIŞMA"

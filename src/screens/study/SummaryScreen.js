@@ -98,6 +98,8 @@ function SummaryScreenInner() {
           onPrimary={handlePrimary}
           onShare={handleShare}
           onGoHome={handleGoHome}
+          onStart={handleStart}
+          startLabel={nextRouteAction ? `Sıradaki durak: ${nextRouteAction.title || "başla"}` : "Ana sayfadan devam et"}
         />
       </>
     );

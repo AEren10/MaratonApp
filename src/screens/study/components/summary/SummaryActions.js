@@ -3,16 +3,15 @@ import { View, StyleSheet } from "react-native";
 import { Button } from "../../../../components/design";
 import { GUTTER, STEP } from "../../../../themes/tokens";
 
-// Gun/Ay: birincil + "Kartı paylaş" + "Ana sayfaya dön". Hafta: "Kartı gör" + Paylaş · İndir.
-export function SummaryActions({ period, ctaLabel, onPrimary, onShare, onGoHome }) {
+// Gun/Ay: birincil + "Kartı paylaş" + "Ana sayfaya dön". Hafta: siradaki
+// durak (rapordan dogrudan calismaya) + "Haftanı paylaş". Eskiden uc buton
+// (Kartı gör / Paylaş / İndir) ayni isi yapiyordu.
+export function SummaryActions({ period, ctaLabel, onPrimary, onShare, onGoHome, onStart, startLabel }) {
   if (period === "week") {
     return (
       <View style={styles.wrap}>
-        <Button variant="primary" size="lg" fullWidth onPress={onShare}>Kartı gör</Button>
-        <View style={styles.pair}>
-          <Button variant="outline" size="lg" icon="share" onPress={onShare} style={styles.flex}>Paylaş</Button>
-          <Button variant="outline" size="lg" icon="arrowDown" onPress={onShare} style={styles.flex}>İndir</Button>
-        </View>
+        {onStart ? <Button variant="primary" size="lg" fullWidth onPress={onStart}>{startLabel || "Sıradaki durağa başla"}</Button> : null}
+        <Button variant="outline" size="lg" fullWidth icon="share" onPress={onShare} style={onStart ? styles.gap : null}>Haftanı paylaş</Button>
         {onGoHome ? (
           <Button variant="ghost" size="md" fullWidth onPress={onGoHome} style={styles.gap}>Ana sayfaya dön</Button>
         ) : null}

@@ -2,6 +2,7 @@ import { addDays, dayOfMonth, toKey } from "./dateKeys.js";
 import { aggregateLogs, countStops, markTopBars, percentChange } from "./activity.js";
 import { DAYS_FULL, DAYS_SHORT, formatInt, formatShortHours, spanLabel } from "./summaryFormat.js";
 import { rangeHeaderLabel } from "./periodRange.js";
+import { accuracyGains } from "./accuracyGains.js";
 
 /**
  * "Bu hafta rotanin en verimli haftasi oldu." yalniz dogruysa soylenir:
@@ -59,6 +60,8 @@ export function buildWeekSummary({ range, logs = [], routeWeeks = [] }) {
     promise: stops.planned > 0
       ? { title: `Plana göre ${stops.planned} durak, gerçekte ${stops.done}.`, body: "Farkın nereden geldiğini gör" }
       : null,
+    // Ilerleme kaniti: dogrulugu girilmis konularda gecen haftaya gore artis.
+    gains: accuracyGains(logs, range),
     totals: { ...pick(cur), stopsDone: stops.done, stopsPlanned: stops.planned },
     previous: { ...pick(prev), stopsDone: prevStops.done },
     questionsDeltaPct: percentChange(cur.questions, prev.questions),
