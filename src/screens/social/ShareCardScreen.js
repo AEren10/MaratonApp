@@ -5,12 +5,12 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../../components/design";
 import { Press } from "../../components/design/Press";
-import ScreenErrorBoundary from "../../components/common/ScreenErrorBoundary";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { StoryShareBlock } from "../../components/share/StoryShareBlock";
 import { STORY_MOMENT } from "../../domain/share/storySticker";
 import { STEP, CONTROL, TYPOGRAPHY } from "../../themes/tokens";
 
-function ShareCardScreen() {
+function ShareCardContent() {
   const C = useC();
   const nav = useNavigation();
   const { params } = useRoute();
@@ -30,6 +30,14 @@ function ShareCardScreen() {
         <StoryShareBlock moment={params?.moment || STORY_MOMENT.GENERIC} />
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+export default function ShareCardScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <ShareCardContent />
+    </ScreenErrorBoundary>
   );
 }
 
@@ -54,5 +62,3 @@ const s = StyleSheet.create({
   spacer: { width: CONTROL.tapMin },
   content: { flexGrow: 1, paddingBottom: STEP.s4 },
 });
-
-export default ScreenErrorBoundary(ShareCardScreen, "ShareCardScreen");
