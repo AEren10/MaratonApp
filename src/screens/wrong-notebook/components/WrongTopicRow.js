@@ -27,6 +27,7 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
   const done = group.state === GROUP_STATE.DONE;
   const lead = group.lead || {};
   const imagePath = lead.image_path || lead.image_uri || lead.image_local_uri || null;
+  const subjectColor = subjectColorOf(C, group.subjectKey);
 
   return (
     <Pressable
@@ -35,13 +36,13 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
       accessibilityLabel={`${group.topic}, ${subjectLabel}, ${group.count} soru, ${pill.text}`}
       style={({ pressed }) => [styles.row, { borderTopColor: C.line }, pressed && { backgroundColor: C.surfacePressed }]}
     >
-      <WrongThumb color={subjectColorOf(C, group.subjectKey)} imagePath={imagePath} />
+      <WrongThumb color={subjectColor} imagePath={imagePath} />
       <View style={styles.body}>
         <Text style={[TYPOGRAPHY.topicName, { color: done ? C.text3 : C.text }]} numberOfLines={2}>
           {group.topic}
         </Text>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3, marginTop: 4 }]}>
-          {subjectLabel} · {group.count} soru
+          <Text style={{ color: done ? C.text3 : subjectColor }}>{subjectLabel}</Text> · {group.count} soru
         </Text>
         {lead.note ? (
           <Text style={[TYPOGRAPHY.micro, styles.note, { color: C.text2 }]} numberOfLines={2}>
@@ -54,7 +55,7 @@ export const WrongTopicRow = memo(function WrongTopicRow({ group, onPress }) {
           </View>
           <View style={styles.dashes}>
             {REVIEW_LADDER.map((_, i) => (
-              <View key={i} style={[styles.dash, { backgroundColor: i < group.stage ? pill.color : C.track }]} />
+              <View key={i} style={[styles.dash, { backgroundColor: i < group.stage ? subjectColor : C.track }]} />
             ))}
           </View>
         </View>

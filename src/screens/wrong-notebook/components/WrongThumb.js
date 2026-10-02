@@ -3,13 +3,14 @@ import { View, StyleSheet } from "react-native";
 import SignedImage from "../../../components/common/SignedImage";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP } from "../../../themes/tokens";
+import { alpha } from "../../../themes/colorMix";
 
 // Soru kagidi kucuk resmi. Fotograf varsa gercek soruyu gosterir; yoksa
 // tasarimin soyut kagit placeholder'i kalir.
 export function WrongThumb({ color, imagePath }) {
   const C = useC();
   return (
-    <View style={[styles.box, { backgroundColor: C.surface, borderColor: C.elev }]}>
+    <View style={[styles.box, { backgroundColor: alpha(color, 10), borderColor: alpha(color, 55) }]}>
       {imagePath ? (
         <SignedImage
           bucket="wrong-questions"
@@ -33,7 +34,8 @@ export function WrongThumb({ color, imagePath }) {
 
 const styles = StyleSheet.create({
   box: {
-    width: 82,
+    // Soru fotografi genelde yatay: biraz genis, satir yuksekligi ayni.
+    width: 104,
     height: 82,
     borderRadius: SHAPE.cardTight,
     borderWidth: 1,
