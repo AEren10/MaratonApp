@@ -182,8 +182,11 @@ export function PremiumProvider({ children }) {
   }, [accessState, examDate, isPremium, navigation, user?.created_at, user?.id]);
 
   const value = useMemo(() => ({
-    accessError: accessState === "error",
-    accessLoading: accessState === "loading",
+    // Premium kapaliyken uyelik durumu hicbir akisi BEKLETMEZ: erisim bilgisi
+    // gelmedi diye (kotu ag, sunucu hatasi) deneme kaydi ve ozellik girisi
+    // "Baglanti dogrulanamadi" deyip kilitleniyordu -- her sey zaten acik.
+    accessError: PREMIUM_ENABLED && accessState === "error",
+    accessLoading: PREMIUM_ENABLED && accessState === "loading",
     accessMode: snapshot?.accessMode || null,
     accessSnapshot: snapshot,
     isPremium,
