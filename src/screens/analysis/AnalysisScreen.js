@@ -16,6 +16,7 @@ import { PublisherComparisonCard } from "./components/PublisherComparisonCard";
 import { buildPublisherComparison } from "../../domain/analysis/publisherComparison";
 import { DeeperAnalysisSection } from "./components/DeeperAnalysisSection";
 import { AnalysisSkeleton } from "./components/AnalysisSkeleton";
+import { AnalysisCoachLine } from "./components/AnalysisCoachLine";
 import { useAnalysisController } from "./useAnalysisController";
 
 export default function AnalysisScreen() {
@@ -63,6 +64,7 @@ export default function AnalysisScreen() {
             <AnalysisSkeleton />
           ) : (
             <>
+              <AnalysisCoachLine C={C} />
               <AnalysisFilterPills
                 C={C}
                 value={filter}
