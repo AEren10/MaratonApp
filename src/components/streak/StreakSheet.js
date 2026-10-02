@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 
-import { BottomSheet } from "../design/BottomSheet";
+import { CenterCard } from "../design/CenterCard";
 import { CountUpText } from "../design/CountUpText";
 import { Icon } from "../design/Icon";
 import { useC } from "../../contexts/ThemeContext";
@@ -29,7 +29,7 @@ export function StreakSheet({ visible, onClose, week }) {
   if (!week) return null;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} style={s.sheet}>
+    <CenterCard visible={visible} onClose={onClose} style={s.sheet}>
       <View style={s.hero}>
         <View style={[s.halo, { backgroundColor: alpha(C.flame, 10) }]}>
           <View style={[s.ring, { backgroundColor: alpha(C.flame, 18), borderColor: alpha(C.flame, 45) }]}>
@@ -74,7 +74,7 @@ export function StreakSheet({ visible, onClose, week }) {
       <Text style={[TYPOGRAPHY.caption, s.note, { color: C.text3 }]}>
         {`${week.jokerLine} Bir durak ya da bir çalışma kaydı o günü sayar.`}
       </Text>
-    </BottomSheet>
+    </CenterCard>
   );
 }
 

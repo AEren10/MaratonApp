@@ -8,7 +8,7 @@ import { GUTTER, STEP } from "../../themes/tokens";
 import { HomeTopBar } from "./components/HomeTopBar";
 import { HomeHero } from "./components/HomeHero";
 import { HomeExamAftermathRow } from "./components/HomeExamAftermathRow";
-import { HomeProBody, HomeDiscoverRow } from "./components/HomeProBody";
+import { HomeProBody } from "./components/HomeProBody";
 import { HomeLoading } from "./components/HomeLoading";
 import { HomeOffline } from "./components/HomeOffline";
 import { HomeOverlays } from "./components/HomeOverlays";
@@ -20,8 +20,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { discoverTipEligible } from "../../domain/home/discoverTiming";
 import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
 
-// Ana Sayfa. Sira (D7): ust bant -> Calismaya Basla -> bugunun duraklari ->
-// seri -> bugunun sayisi + grafik -> kesif kartlari. Eski kart hedefleri git gecmisinde.
+// Ana Sayfa (Ana Sayfa · İlk Gün · Yükleniyor · Bağlantı Yok). Sira: ust bant
+// (seri satiri) -> bugunun sayisi + grafik -> Calismaya Basla -> duraklar.
 export default function HomeScreen() {
   const h = useHomeController();
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
@@ -37,9 +37,8 @@ export default function HomeScreen() {
   const discoverEligible = discoverTipEligible({ streak: h.streak, longestStreak: h.longestStreak, createdAt: user?.created_at });
   // v1: Premium kapali; ucretsiz govde uretimden cikti, her zaman tam govde.
   const renderBelow = useCallback(() => (
-    <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} />
-  ), [h.stops, dueCount, actions]);
-  const renderAfter = useCallback(() => <HomeDiscoverRow eligible={discoverEligible} />, [discoverEligible]);
+    <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />
+  ), [h.stops, discoverEligible, dueCount, actions]);
 
   let body;
   if (h.loading) {
@@ -95,7 +94,6 @@ export default function HomeScreen() {
           minutesToday={dashboard.minutesToday}
           onRecord={actions.record}
           renderBelow={renderBelow}
-          renderAfter={renderAfter}
         />
       </ScrollView>
     );

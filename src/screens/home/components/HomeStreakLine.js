@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { CountUpText } from "../../../components/design/CountUpText";
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
+import { FlameBadge } from "../../../components/streak/FlameBadge";
 import { StreakSheet } from "../../../components/streak/StreakSheet";
 import { useC } from "../../../contexts/ThemeContext";
 import { useStreakWeek } from "../../../hooks/useStreakWeek";
 import { useWeekRhythm } from "../../../hooks/useWeekRhythm";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
-// Ana sayfa SERI SATIRI: alev + seri + haftalik ritim, tek satir. Buyuk
-// seri seridi ana sayfayi sikistiriyordu (kullanici, 2 Ekim); hafta
-// noktalari ve esik dokununca acilan panelde.
+// Ana sayfa SERI SATIRI: animasyonlu turuncu alev + sayarak gelen seri +
+// haftalik ritim. Tek satir yuksekliginde (buyuk serit ana sayfayi
+// sikistiriyordu, kullanici 2 Ekim); dokununca ortada seri karti acilir.
 export function HomeStreakLine() {
   const C = useC();
   const week = useStreakWeek();
@@ -28,12 +30,20 @@ export function HomeStreakLine() {
         accessibilityLabel={`${week.value} günlük seri. ${rhythm.text}. Ayrıntı için dokun.`}
         style={s.row}
       >
-        <Icon name="flame" size={18} color={lit ? C.flame : C.text3} fill={lit ? C.flame : "none"} />
-        <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>
-          {lit ? `${week.value} günlük seri` : "Bugün seri başlar"}
-        </Text>
-        <View style={[s.dot, { backgroundColor: C.text3 }]} />
-        <Text style={[TYPOGRAPHY.meta, s.flex, { color: C.text2 }]} numberOfLines={1}>{rhythm.text}</Text>
+        <FlameBadge value={week.value} size={38} />
+        <View style={s.text}>
+          <View style={s.count}>
+            {lit ? (
+              <>
+                <CountUpText value={week.value} style={[TYPOGRAPHY.statMedium, { color: C.flame }]} />
+                <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>günlük seri</Text>
+              </>
+            ) : (
+              <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Bugün seri başlar</Text>
+            )}
+          </View>
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>{rhythm.text}</Text>
+        </View>
         <Icon name="chevR" size={14} color={C.text3} />
       </Press>
       <StreakSheet visible={open} onClose={() => setOpen(false)} week={week} />
@@ -42,7 +52,7 @@ export function HomeStreakLine() {
 }
 
 const s = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: STEP.s1, minHeight: CONTROL.tapMin },
-  dot: { width: 3, height: 3, borderRadius: 2 },
-  flex: { flex: 1 },
+  row: { flexDirection: "row", alignItems: "center", gap: STEP.s2, minHeight: CONTROL.tapMin, marginTop: STEP.s2 },
+  text: { flex: 1, minWidth: 0 },
+  count: { flexDirection: "row", alignItems: "baseline", gap: 6 },
 });

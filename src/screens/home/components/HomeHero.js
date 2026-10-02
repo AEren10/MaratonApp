@@ -38,7 +38,6 @@ export function HomeHero({
   minutesToday = 0,
   onRecord,
   renderBelow,
-  renderAfter,
 }) {
   const { examDate } = useExam();
   const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops: stops, weekLogs, previousQuestions, streak });
@@ -112,7 +111,6 @@ export function HomeHero({
   } else {
     content = (
       <HomeHeroNormal
-        renderMiddle={() => renderBelow?.({ debtHours, hasRouteAccess })}
         solvedToday={solvedToday}
         dailyGoal={dailyGoal}
         hero={hero}
@@ -124,16 +122,11 @@ export function HomeHero({
     );
   }
 
-  // Normal (Pro) modda duraklar CTA'nin hemen altinda, hero'nun icinde
-  // (renderMiddle); grafik onlardan sonra. Diger hallerde duraklar hero'dan
-  // sonra. Seri her halde ust bantta tek satir (HomeStreakLine).
-  const isNormalPro = mode === HOME_HERO_MODE.NORMAL && !firstDay && hasRouteAccess;
-  const isFirstDay = mode === HOME_HERO_MODE.NORMAL && firstDay;
+  const showBelow = !(mode === HOME_HERO_MODE.NORMAL && firstDay);
   return (
     <Fragment>
       <View style={s.wrap}>{content}</View>
-      {!isNormalPro && !isFirstDay ? renderBelow?.({ debtHours, hasRouteAccess }) : null}
-      {!isFirstDay ? renderAfter?.() : null}
+      {showBelow ? renderBelow?.({ debtHours, hasRouteAccess }) : null}
     </Fragment>
   );
 }
