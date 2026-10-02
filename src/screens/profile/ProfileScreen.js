@@ -6,6 +6,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { SCREENS } from "../../constants/screens";
 import { PREMIUM_ENABLED } from "../../constants/premium";
+import { SOCIAL_ENABLED } from "../../constants/social";
 import { STEP, GUTTER } from "../../themes/tokens";
 
 import { ProfileTopBar } from "./components/ProfileTopBar";
@@ -67,9 +68,11 @@ export default function ProfileScreen() {
             <Animated.View>
               <ProfileStatsCard />
             </Animated.View>
-            <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
-              <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
-            </Animated.View>
+            {SOCIAL_ENABLED ? (
+              <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s4 }}>
+                <LeagueMiniCard tier={leagueTier} nextTier={leagueNextTier} weeklyXP={weeklyXP} />
+              </Animated.View>
+            ) : null}
             <Animated.View>
               <StrengthMap />
             </Animated.View>
@@ -86,16 +89,19 @@ export default function ProfileScreen() {
                 onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
                 first
               />
-              <ProfileLinkRow
-                label="Gruplarım"
-                onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
-              />
-              {/* Meydan okuma yalniz Arkadaslar ekraninin en altindaydi. */}
-              <ProfileLinkRow
-                label="Meydan okumalar"
-                meta="Arkadaşınla yarış"
-                onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
-              />
+              {SOCIAL_ENABLED ? (
+                <>
+                  <ProfileLinkRow
+                    label="Gruplarım"
+                    onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
+                  />
+                  <ProfileLinkRow
+                    label="Meydan okumalar"
+                    meta="Arkadaşınla yarış"
+                    onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
+                  />
+                </>
+              ) : null}
               <ProfileLinkRow
                 label="Arkadaşını davet et"
                 onPress={() => navigation.navigate(SCREENS.REFERRAL)}

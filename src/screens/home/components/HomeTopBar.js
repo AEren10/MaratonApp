@@ -9,6 +9,7 @@ import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/toke
 import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
 import { HomeStreakStrip } from "./HomeStreakStrip";
+import { SOCIAL_ENABLED } from "../../../constants/social";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -55,12 +56,14 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
           <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{greeting()}</Text>
           <Text numberOfLines={1} style={[TYPOGRAPHY.topicName, s.name, { color: C.text }]}>{name}</Text>
         </View>
-        <Pressable onPress={() => { H.tap(); onSocial?.(); }}
-          accessibilityRole="button"
-          accessibilityLabel="Sosyal ve Gruplar"
-          style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
-          <Icon name="users" size={NAV_ICON.action} color={C.text2} />
-        </Pressable>
+        {SOCIAL_ENABLED ? (
+          <Pressable onPress={() => { H.tap(); onSocial?.(); }}
+            accessibilityRole="button"
+            accessibilityLabel="Sosyal ve Gruplar"
+            style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+            <Icon name="users" size={NAV_ICON.action} color={C.text2} />
+          </Pressable>
+        ) : null}
         <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
           accessibilityRole="button"
           accessibilityLabel="Takvimi aç"

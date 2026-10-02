@@ -8,6 +8,7 @@ import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getString, remove, setString } from "../lib/storage/appStorage";
 import { track } from "../lib/analytics";
 import { EVENTS } from "../constants/analytics";
+import { SOCIAL_ENABLED } from "../constants/social";
 
 const PENDING_KEY = STORAGE_KEYS.PENDING_REFERRAL;
 const PENDING_FRIEND_KEY = STORAGE_KEYS.PENDING_FRIEND_CODE;
@@ -101,8 +102,8 @@ export function useDeepLink() {
         consumePendingGroupCode(),
         getString(PENDING_KEY).catch(() => null),
       ]);
-      if (friendCode) navigation.navigate(SCREENS.FRIENDS, { friendCode });
-      else if (groupCode) navigation.navigate(SCREENS.LEAGUE, { groupCode });
+      if (SOCIAL_ENABLED && friendCode) navigation.navigate(SCREENS.FRIENDS, { friendCode });
+      else if (SOCIAL_ENABLED && groupCode) navigation.navigate(SCREENS.LEAGUE, { groupCode });
       else if (referralCode) {
         // remove() ETMİYORUZ: ReferralScreen kodu depodan okuyup alana
         // dolduruyor ve uygulama başarılı olunca temizleniyor. Burada silersek

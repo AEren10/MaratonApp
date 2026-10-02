@@ -1,5 +1,6 @@
 import { SCREENS } from "../constants/screens.js";
 import { PRODUCT_FLOW_IDS } from "../constants/productFlows.js";
+import { SOCIAL_ENABLED } from "../constants/social.js";
 import { TAB_KEYS, TAB_STACKS } from "./tabAssignment.js";
 
 export const ROOT_STACK = {
@@ -87,11 +88,11 @@ export const ROUTE_CONFIGS = {
   [SCREENS.TOPIC_CARDS]: { path: "kartlar", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.CARD_DETAIL]: { path: "kartlar/:id", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: false },
 
-  [SCREENS.LEAGUE]: { path: "group/:groupCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "groupCode" },
-  [SCREENS.FRIENDS]: { path: "friend/:friendCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "friendCode" },
+  [SCREENS.LEAGUE]: { path: "group/:groupCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: SOCIAL_ENABLED, parse: "groupCode" },
+  [SCREENS.FRIENDS]: { path: "friend/:friendCode?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: SOCIAL_ENABLED, parse: "friendCode" },
   [SCREENS.CHALLENGE]: { path: "sosyal/meydan-okuma", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: false },
   [SCREENS.REFERRAL]: { path: "referral/:code?", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true, parse: "code" },
-  [SCREENS.ROUTE_COMPANION]: { path: "yol-arkadasi", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: true },
+  [SCREENS.ROUTE_COMPANION]: { path: "yol-arkadasi", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: SOCIAL_ENABLED },
 
   [SCREENS.WEEKLY_REVIEW]: { path: "weekly-review", flow: PRODUCT_FLOW_IDS.TIME_BASED, deepLink: true },
   [SCREENS.SHARE_CARD]: { path: "paylasim", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },

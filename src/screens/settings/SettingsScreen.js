@@ -17,6 +17,7 @@ import { SettingsRow } from "./components/SettingsRow";
 import { SettingsDangerGroup } from "./components/SettingsDangerGroup";
 import { SyncStatusGroup } from "./components/SyncStatusGroup";
 import { useSettingsViewModel } from "./useSettingsViewModel";
+import { SOCIAL_ENABLED } from "../../constants/social";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -89,12 +90,18 @@ export default function SettingsScreen() {
         </Animated.View>
 
         <Animated.View>
-          <SettingsGroup title="ARKADAŞLAR">
-            <SettingsRow first label="Arkadaşlar" onPress={vm.go(SCREENS.FRIENDS)} />
-            <SettingsRow label="Yol arkadaşın" onPress={vm.go(SCREENS.ROUTE_COMPANION)} />
-            <SettingsRow label="Challenge" onPress={vm.go(SCREENS.CHALLENGE)} />
-            <SettingsRow label="Davet et" onPress={vm.go(SCREENS.REFERRAL)} />
-          </SettingsGroup>
+          {SOCIAL_ENABLED ? (
+            <SettingsGroup title="ARKADAŞLAR">
+              <SettingsRow first label="Arkadaşlar" onPress={vm.go(SCREENS.FRIENDS)} />
+              <SettingsRow label="Yol arkadaşın" onPress={vm.go(SCREENS.ROUTE_COMPANION)} />
+              <SettingsRow label="Meydan okuma" onPress={vm.go(SCREENS.CHALLENGE)} />
+              <SettingsRow label="Davet et" onPress={vm.go(SCREENS.REFERRAL)} />
+            </SettingsGroup>
+          ) : (
+            <SettingsGroup title="DAVET">
+              <SettingsRow first label="Arkadaşını davet et" onPress={vm.go(SCREENS.REFERRAL)} />
+            </SettingsGroup>
+          )}
         </Animated.View>
 
         <Animated.View>
