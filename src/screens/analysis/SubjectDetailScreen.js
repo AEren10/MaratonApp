@@ -70,6 +70,7 @@ export default function SubjectDetailScreen() {
       <SubjectProgressHeader
         C={C}
         subjectName={subjectName}
+        subjectKey={subjectKey}
         subjectColor={subjectColor}
         doneCount={doneCount}
         totalCount={totalCount}
@@ -78,7 +79,7 @@ export default function SubjectDetailScreen() {
       />
       <SubjectTopicSegment C={C} active={segment} onChange={setSegment} />
     </>
-  ), [C, subjectName, subjectColor, doneCount, totalCount, totalQuestionsSum, progressPct, segment]);
+  ), [C, subjectName, subjectKey, subjectColor, doneCount, totalCount, totalQuestionsSum, progressPct, segment]);
 
   return (
     <ScreenErrorBoundary>

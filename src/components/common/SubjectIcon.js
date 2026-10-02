@@ -14,13 +14,14 @@ function SubjectIcon({ subject, subjectKey, color, size = 36 }) {
   const advanced = /^(ayt|ydt)_/.test(String(subjectKey || ""));
   const tint = {
     width: size, height: size, borderRadius: size / 2,
-    backgroundColor: alpha(color, advanced ? 20 : 14),
+    // Canli pastel (kullanici istegi): eski %14/%20 soluk kaliyordu.
+    backgroundColor: alpha(color, advanced ? 30 : 22),
     ...(advanced ? { borderWidth: 1.5, borderColor: color } : null),
   };
   return (
     <View style={[s.circle, tint]} accessibilityElementsHidden importantForAccessibility="no">
       {glyph
-        ? <Icon name={glyph} size={Math.round(size * 0.5)} color={color} sw={1.8} />
+        ? <Icon name={glyph} size={Math.round(size * 0.5)} color={color} sw={2} />
         : <Text style={[s.badge, { color }]}>{getSubjectBadge(subjectKey || subject)}</Text>}
     </View>
   );

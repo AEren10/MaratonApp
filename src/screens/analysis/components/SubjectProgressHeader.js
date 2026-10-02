@@ -1,11 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { StatBlock } from "../../../components/design";
+import { SubjectIcon } from "../../../components/common/SubjectIcon";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
 
 export const SubjectProgressHeader = React.memo(function SubjectProgressHeader({
   C,
   subjectName,
+  subjectKey,
   subjectColor,
   doneCount,
   totalCount,
@@ -17,7 +19,7 @@ export const SubjectProgressHeader = React.memo(function SubjectProgressHeader({
   return (
     <View style={styles.wrap}>
       <View style={styles.nameRow}>
-        <View style={[styles.dot, { backgroundColor: subjectColor }]} />
+        <SubjectIcon subject={subjectName} subjectKey={subjectKey} color={subjectColor} size={40} />
         <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]}>{subjectName}</Text>
       </View>
 
@@ -41,7 +43,6 @@ export const SubjectProgressHeader = React.memo(function SubjectProgressHeader({
 const styles = StyleSheet.create({
   wrap: { paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
   nameRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 2 },
-  dot: { width: 9, height: 9, borderRadius: 1 },
   stat: { marginTop: STEP.s2 },
   barRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 + 2, marginTop: STEP.s2 },
   track: { flex: 1, height: 5, borderRadius: 2, overflow: "hidden" },
