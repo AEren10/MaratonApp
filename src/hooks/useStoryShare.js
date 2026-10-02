@@ -15,6 +15,7 @@ import {
   STORY_SHARE,
 } from "../lib/storyShare";
 import { pickStoryPhoto } from "../lib/storyPhoto";
+import { extractTrialNetHistory, extractSubjectData } from "../domain/share/storySubjectHistory";
 
 const EXAM_NAME = { tyt: "YKS", ayt: "YKS", lgs: "LGS" };
 
@@ -53,11 +54,6 @@ function lastTrialOf(trials) {
     subjects,
   };
 }
-
-/**
- * Story paylasim blogunun tek veri kaynagi.
- */
-import { extractTrialNetHistory, extractSubjectData } from "../domain/share/storySubjectHistory";
 
 export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
   const report = useWeeklyReport();
@@ -119,6 +115,11 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     return outcome;
   }, [busy]);
 
+  const cycleSubject = useCallback(() => {
+    const keys = ["mat", "tur", "fiz", "kim", "bio", "tar", "cog"];
+    setSubjectKey((prev) => keys[(keys.indexOf(prev) + 1) % keys.length]);
+  }, []);
+
   return {
     variants,
     selected,
@@ -128,14 +129,15 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     result,
     clearResult: () => setResult(null),
     photo,
-    pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
+    pickPhoto: async (src) => { const p = await pickStoryPhoto(src); if (p) setPhoto(p); return p; },
     clearPhoto: () => setPhoto(null),
     subjectKey,
     setSubjectKey,
-    share: async (overlayRef) => {
+    cycleSubject,
+    share: async (ref) => {
       const bg = photo;
-      if (bg) return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
-      return run(shareStoryToInstagram, overlayRef);
+      if (bg) return run((r) => shareStoryToInstagram(r, { backgroundImage: bg.share }), ref);
+      return run(shareStoryToInstagram, ref);
     },
     save: (ref) => run(saveStoryToGallery, ref),
     copy: (ref) => run(copyStoryToClipboard, ref),

@@ -13,17 +13,17 @@ export function storyPalette(C, background) {
     // Ikisi celisiyor; bkz. briefs/99-EREN-icin-sorular.md.
     markInk: "#22090B",
     solid: photo ? "#FFFFFF" : C.text,
-    mid: photo ? "rgba(255,255,255,0.82)" : C.text2,
-    dim: photo ? "rgba(255,255,255,0.72)" : C.text4,
-    rule: photo ? "rgba(255,255,255,0.42)" : C.border,
-    track: photo ? "rgba(255,255,255,0.28)" : C.track,
-    up: photo ? "#7CF0A6" : C.up,
-    upBg: photo ? "rgba(124,240,166,0.14)" : C.brandTint,
-    upBorder: photo ? "rgba(124,240,166,0.42)" : C.bandEdge,
-    areaOpacity: photo ? 0.22 : 0.34,
-    // RN'de CSS drop-shadow yok; fotograf uzerinde metin golgesi ile okunur.
+    mid: photo ? "#FFFFFF" : C.text2,
+    dim: photo ? "#ECE8E4" : C.text3,
+    rule: photo ? "rgba(255,255,255,0.55)" : C.border,
+    track: photo ? "rgba(255,255,255,0.35)" : C.track,
+    up: photo ? "#34D399" : C.up,
+    upBg: photo ? "rgba(52,211,153,0.22)" : C.brandTint,
+    upBorder: photo ? "#34D399" : C.bandEdge,
+    areaOpacity: 0.38,
+    // RN'de CSS drop-shadow yok; fotograf uzerinde keskin metin golgesi ile net okunur.
     shadow: photo
-      ? { textShadowColor: "rgba(0,0,0,0.55)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 16 }
+      ? { textShadowColor: "rgba(0,0,0,0.88)", textShadowOffset: { width: 0, height: 1.5 }, textShadowRadius: 6 }
       : null,
   };
 }

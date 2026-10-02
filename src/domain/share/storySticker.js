@@ -85,7 +85,6 @@ function variantData(kind, ctx) {
       return { questions: today.questions, streak: pos(ctx.streak) };
 
     case STORY_KIND.ROTA:
-      // Egri son 7 gunden uretilir; iki noktadan az veriyle cizgi yalan olur.
       if (series.length < 2 || !pos(week.questions)) return null;
       return {
         series,
@@ -134,8 +133,8 @@ function variantData(kind, ctx) {
           questions: q,
           minutes: q ? Math.round(q * 1.5) : 0,
         })) : []),
-        weekQuestions: pos(week.questions) || today.questions || 120,
-        weekMinutes: pos(week.minutes) || (today.minutes ? today.minutes * 2 : 180),
+        weekQuestions: pos(week.questions) || today.questions,
+        weekMinutes: pos(week.minutes) || (today.minutes ? today.minutes * 2 : null),
         todayQuestions: pos(today.questions),
         todayIndex: ctx.todayIndex ?? (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1),
       };
@@ -163,7 +162,7 @@ function variantData(kind, ctx) {
 
     case STORY_KIND.DERS: {
       if (!ctx.selectedSubjectData && !trial && !ctx.trialNetHistory?.length) return null;
-      const subj = ctx.selectedSubjectData || {
+      return ctx.selectedSubjectData || {
         key: "mat",
         label: "Matematik",
         history: [14.0, 17.5, 20.0, 24.5],
@@ -172,7 +171,6 @@ function variantData(kind, ctx) {
         pct: 22,
         average: 19.0,
       };
-      return subj;
     }
 
     default:
@@ -191,7 +189,7 @@ function rankFor(moment, ctx) {
       ? [STORY_KIND.NET, STORY_KIND.DERS, STORY_KIND.HARITA, STORY_KIND.CUBUK, STORY_KIND.IZ]
       : moment === STORY_MOMENT.STREAK
         ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
-        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.IZ];
+        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.SERI, STORY_KIND.GERISAYIM, STORY_KIND.DURUST];
 
   const tail = [
     STORY_KIND.GERISAYIM,

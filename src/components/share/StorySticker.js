@@ -60,12 +60,13 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
   const Body = BODIES[variant.kind];
   if (!Body) return null;
 
-  const p = storyPalette(C, overlay ? STORY_BG.FOTO : variant.background);
+  const hasPhoto = Boolean(photoUri);
+  const p = storyPalette(C, (overlay || hasPhoto) ? STORY_BG.FOTO : STORY_BG.MARKA);
 
   return (
-    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay ? "transparent" : C.bg }]}>
-      {overlay ? null : p.photo ? (
-        <PhotoBackground uri={photoUri} label="FOTOĞRAF SEÇ" />
+    <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay ? "transparent" : (hasPhoto ? "#000000" : C.bg) }]}>
+      {overlay ? null : hasPhoto ? (
+        <PhotoBackground uri={photoUri} />
       ) : (
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}

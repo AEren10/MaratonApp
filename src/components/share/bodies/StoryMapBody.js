@@ -58,7 +58,6 @@ export function StoryMapBody({ data, p, visibility = {} }) {
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Text style={[s.eyebrow, { color: p.accent }, p.shadow]}>✦ HEDEF ROTASI & YOLCULUK ✦</Text>
         {showNet ? (
           <View style={s.netRow}>
             <Text style={[s.netVal, { color: p.solid }, p.shadow]}>{currentNet.toFixed(1)}</Text>
@@ -69,9 +68,8 @@ export function StoryMapBody({ data, p, visibility = {} }) {
         ) : null}
         {showStops ? (
           <View style={s.badgeRow}>
-            <View style={[s.pctPill, { backgroundColor: p.upBg, borderColor: p.upBorder }]}>
-              <Text style={[s.pctText, { color: p.up }]}>{`%${pct} TAMAMLANDI`}</Text>
-            </View>
+            <Text style={[s.pctText, { color: p.up }]}>{`%${pct} tamamlandı`}</Text>
+            <Text style={[s.dotSep, { color: p.dim }]}>·</Text>
             <Text style={[s.stopsLine, { color: p.mid }, p.shadow]}>
               {`${stopsCount} duraktan ${completed}'i geçildi`}
             </Text>
@@ -83,9 +81,9 @@ export function StoryMapBody({ data, p, visibility = {} }) {
         <View style={s.chartBox}>
           <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
             {chartData.pastPath ? (
-              <Path d={chartData.pastPath} stroke={p.accent} strokeWidth={4.5} strokeLinecap="round" fill="none" />
+              <Path d={chartData.pastPath} stroke={p.accent} strokeWidth={5.2} strokeLinecap="round" fill="none" />
             ) : null}
-            <Path d={chartData.futPath} stroke="rgba(255,255,255,0.4)" strokeWidth={3} strokeDasharray="5 5" strokeLinecap="round" fill="none" />
+            <Path d={chartData.futPath} stroke="rgba(255,255,255,0.45)" strokeWidth={3} strokeDasharray="5 5" strokeLinecap="round" fill="none" />
             {chartData.pts.map((pt, i) => (
               <Circle key={`pt-${i}`} cx={pt.x} cy={pt.y} r={5} fill={p.solid} />
             ))}
@@ -96,9 +94,9 @@ export function StoryMapBody({ data, p, visibility = {} }) {
             </SvgText>
             <G>
               <Circle cx={chartData.flagX} cy={chartData.flagY} r={10} fill={p.accent} fillOpacity={0.2} />
-              <Line x1={chartData.flagX} y1={chartData.flagY} x2={chartData.flagX} y2={chartData.flagY - 24} stroke={p.accent} strokeWidth={2.2} strokeLinecap="round" />
+              <Line x1={chartData.flagX} y1={chartData.flagY} x2={chartData.flagX} y2={chartData.flagY - 24} stroke={p.accent} strokeWidth={2.4} strokeLinecap="round" />
               <Path d={`M${chartData.flagX},${chartData.flagY - 24} L${chartData.flagX + 18},${chartData.flagY - 17} L${chartData.flagX},${chartData.flagY - 10} Z`} fill={p.accent} />
-              <SvgText x={chartData.flagX - 10} y={chartData.flagY + 18} fill={p.solid} fontSize={10} fontWeight="700" textAnchor="middle">
+              <SvgText x={chartData.flagX - 10} y={chartData.flagY + 18} fill={p.solid} fontSize={10.5} fontWeight="700" textAnchor="middle">
                 {`${targetNet} NET 🚩`}
               </SvgText>
             </G>
@@ -115,16 +113,15 @@ export function StoryMapBody({ data, p, visibility = {} }) {
 
 const s = StyleSheet.create({
   wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
-  head: { width: W, gap: 4, marginBottom: 8 },
-  eyebrow: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.6 },
-  netRow: { flexDirection: "row", alignItems: "baseline", gap: 8, marginTop: 2 },
-  netVal: { fontFamily: "Bricolage_400", fontSize: 38, lineHeight: 42, letterSpacing: -1 },
-  arrow: { fontFamily: "Bricolage_400", fontSize: 26 },
-  netUnit: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 1 },
-  badgeRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 },
-  pctPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  pctText: { fontFamily: "Archivo_700", fontSize: 10, letterSpacing: 0.8 },
+  head: { width: W, gap: 4, marginBottom: 12 },
+  netRow: { flexDirection: "row", alignItems: "baseline", gap: 8 },
+  netVal: { fontFamily: "Bricolage_400", fontSize: 44, lineHeight: 48, letterSpacing: -1 },
+  arrow: { fontFamily: "Bricolage_400", fontSize: 28 },
+  netUnit: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 1 },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
+  pctText: { fontFamily: "Archivo_700", fontSize: 12 },
+  dotSep: { fontSize: 12 },
   stopsLine: { fontFamily: "Archivo_500", fontSize: 12.5 },
   chartBox: { alignSelf: "center", width: W },
-  brandRow: { marginTop: 22, alignSelf: "center" },
+  brandRow: { marginTop: 26, alignSelf: "center" },
 });

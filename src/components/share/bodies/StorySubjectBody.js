@@ -47,22 +47,21 @@ export function StorySubjectBody({ data, p }) {
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <View style={[s.badge, { backgroundColor: p.upBg, borderColor: p.upBorder }]}>
-          <Text style={[s.badgeText, { color: p.accent }]}>{`✦ ${label.toLocaleUpperCase("tr")} TRENDİ ✦`}</Text>
-        </View>
+        <Text style={[s.subjTitle, { color: p.accent }, p.shadow]}>
+          {label.toLocaleUpperCase("tr")}
+        </Text>
 
         <View style={s.heroRow}>
           <Text style={[s.heroNum, { color: p.solid }, p.shadow]}>{formatNumber(currentNet, 1)}</Text>
           <Text style={[s.heroUnit, { color: p.mid }, p.shadow]}>net</Text>
         </View>
 
+        {/* Kutu chipler kaldirildi, saf tipografik veri */}
         <View style={s.metaRow}>
-          <View style={[s.pill, { backgroundColor: p.upBg, borderColor: p.upBorder }]}>
-            <Text style={[s.pillText, { color: p.up }]}>{`▲ +${formatNumber(Math.abs(delta), 1)} net`}</Text>
-          </View>
-          <View style={[s.pill, { backgroundColor: p.upBg, borderColor: p.upBorder }]}>
-            <Text style={[s.pillText, { color: p.up }]}>{`%${Math.round(pct)} artış`}</Text>
-          </View>
+          <Text style={[s.metaGreen, { color: p.up }, p.shadow]}>{`▲ +${formatNumber(Math.abs(delta), 1)} net`}</Text>
+          <Text style={[s.metaDot, { color: p.dim }]}>·</Text>
+          <Text style={[s.metaGreen, { color: p.up }, p.shadow]}>{`%${Math.round(pct)} artış`}</Text>
+          <Text style={[s.metaDot, { color: p.dim }]}>·</Text>
           <Text style={[s.avgText, { color: p.dim }, p.shadow]}>{`Ort: ${formatNumber(avg, 1)}`}</Text>
         </View>
       </View>
@@ -71,20 +70,20 @@ export function StorySubjectBody({ data, p }) {
         <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
           <Defs>
             <LinearGradient id="subjGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={p.accent} stopOpacity={0.35} />
+              <Stop offset="0" stopColor={p.accent} stopOpacity={0.4} />
               <Stop offset="1" stopColor={p.accent} stopOpacity={0} />
             </LinearGradient>
           </Defs>
           {chart.areaPath ? <Path d={chart.areaPath} fill="url(#subjGrad)" /> : null}
           {chart.linePath ? (
-            <Path d={chart.linePath} stroke={p.accent} strokeWidth={3.8} strokeLinecap="round" fill="none" />
+            <Path d={chart.linePath} stroke={p.accent} strokeWidth={4.8} strokeLinecap="round" fill="none" />
           ) : null}
           {chart.pts.map((pt, i) => (
             <Circle key={`p-${i}`} cx={pt.x} cy={pt.y} r={4.5} fill={p.solid} />
           ))}
           <Circle cx={chart.last.x} cy={chart.last.y} r={14} fill={p.accent} fillOpacity={0.25} />
           <Circle cx={chart.last.x} cy={chart.last.y} r={6.5} fill={p.accent} stroke="#FFFFFF" strokeWidth={2} />
-          <SvgText x={chart.last.x} y={chart.last.y - 18} fill={p.accent} fontSize={10} fontWeight="700" textAnchor="middle">
+          <SvgText x={chart.last.x} y={chart.last.y - 18} fill={p.accent} fontSize={10.5} fontWeight="700" textAnchor="middle">
             {`${formatNumber(currentNet, 1)} NET`}
           </SvgText>
         </Svg>
@@ -99,16 +98,15 @@ export function StorySubjectBody({ data, p }) {
 
 const s = StyleSheet.create({
   wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
-  head: { width: W, gap: 6, marginBottom: 10 },
-  badge: { alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, borderWidth: 1 },
-  badgeText: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.2 },
+  head: { width: W, gap: 4, marginBottom: 12 },
+  subjTitle: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
   heroRow: { flexDirection: "row", alignItems: "baseline", gap: 8 },
-  heroNum: { fontFamily: "Bricolage_400", fontSize: 44, lineHeight: 48, letterSpacing: -1 },
-  heroUnit: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 0.8 },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 2 },
-  pill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
-  pillText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 0.6 },
+  heroNum: { fontFamily: "Bricolage_400", fontSize: 52, lineHeight: 56, letterSpacing: -1.5 },
+  heroUnit: { fontFamily: "Archivo_600", fontSize: 14, letterSpacing: 0.8 },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
+  metaGreen: { fontFamily: "Archivo_700", fontSize: 12 },
+  metaDot: { fontSize: 12 },
   avgText: { fontFamily: "Archivo_500", fontSize: 12 },
   chartBox: { alignSelf: "center", width: W },
-  brandRow: { marginTop: 24, alignSelf: "center" },
+  brandRow: { marginTop: 28, alignSelf: "center" },
 });

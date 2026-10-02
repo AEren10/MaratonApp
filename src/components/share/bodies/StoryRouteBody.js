@@ -20,7 +20,6 @@ export function StoryRouteBody({ data, p, visibility = {} }) {
   return (
     <View style={s.centerWrap}>
       <View style={s.box}>
-        <Text style={[s.eyebrow, { color: p.accent }, p.shadow]}>✦ SON 7 GÜNÜN İVMESİ ✦</Text>
         {showChart ? (
           <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={s.chart}>
             <Defs>

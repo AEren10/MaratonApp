@@ -32,18 +32,28 @@ export function StoryGridCard({
   height,
   visibility,
   onPress,
+  onCycleSubject,
 }) {
   const C = useC();
   const scale = width / STORY_WIDTH;
-  const label = KIND_NAMES[variant.kind] || variant.kind.toLocaleUpperCase("tr");
+  const isDers = variant.kind === "ders";
+  const label = isDers
+    ? `${(variant.data?.label || "Matematik").toLocaleUpperCase("tr")}${active ? " ↺" : ""}`
+    : (KIND_NAMES[variant.kind] || variant.kind.toLocaleUpperCase("tr"));
+
+  const handlePress = () => {
+    H.tap();
+    if (active && isDers) {
+      onCycleSubject?.();
+    } else {
+      onPress();
+    }
+  };
 
   return (
     <Press
       haptic="none"
-      onPress={() => {
-        H.tap();
-        onPress();
-      }}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       style={[

@@ -18,7 +18,7 @@ const CARD_H = Math.round(CARD_W * (16 / 9));
 const STATUS_TEXTS = {
   placed: "Instagram'a aktarıldı",
   opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
-  tiktok_opened: "Paylaşım açıldı — TikTok veya dilediğin uygulamayı seçebilirsin",
+  tiktok_opened: "TikTok için hazırlandı — dilediğince paylaşabilirsin",
   copied: "Şeffaf etiket panoya kopyalandı",
   saved: "Galeriye kaydedildi",
   permission_denied: "İzin verilmedi.",
@@ -28,6 +28,7 @@ const STATUS_TEXTS = {
 export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
   const C = useC();
   const overlayRef = useRef(null);
+  const fullCardRef = useRef(null);
   const s = useStoryShare(moment);
 
   const [visibility, setVisibility] = useState({
@@ -54,7 +55,6 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
 
   return (
     <View style={[st.wrap, { backgroundColor: C.surface, borderTopColor: C.line }]}>
-      {/* Baslik */}
       <View style={st.headerRow}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>HİKAYEDE PAYLAŞ</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
@@ -62,7 +62,6 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
         </Text>
       </View>
 
-      {/* Strava Tarzı 2x2 Grid */}
       <View style={st.grid}>
         {s.variants.map((v, i) => (
           <StoryGridCard
@@ -74,11 +73,11 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
             height={CARD_H}
             visibility={visibility}
             onPress={() => s.select(i)}
+            onCycleSubject={s.cycleSubject}
           />
         ))}
       </View>
 
-      {/* İcindeki Verileri Kapatip Acma ve Ders Secme */}
       <StoryFilterChips
         kind={s.selected.kind}
         data={s.selected.data}
@@ -88,31 +87,35 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
         onSelectSubject={s.setSubjectKey}
       />
 
-      {/* Strava Tarzi Dairesel Butonlar */}
       <StoryActionRow
         onShareInstagram={() => s.share(overlayRef)}
-        onShareTikTok={() => s.shareTikTok(overlayRef)}
+        onShareTikTok={() => s.shareTikTok(fullCardRef)}
         onCopyToClipboard={() => s.copy(overlayRef)}
-        onSaveToGallery={() => s.save(overlayRef)}
+        onSaveToGallery={() => s.save(fullCardRef)}
         onPickPhoto={handlePickPhoto}
         onClearPhoto={s.clearPhoto}
         hasPhoto={!!s.photo}
         busy={s.busy}
       />
 
-      {/* Geri Bildirim Mesaji */}
       <Text style={[TYPOGRAPHY.micro, st.statusNote, { color: s.result ? C.up : C.text3 }]}>
         {s.result ? STATUS_TEXTS[s.result] || "" : s.photo
-          ? "Fotoğrafın arka planda, sticker önde açılır. Instagram'da taşıyabilirsin."
-          : "Şeffaf etiket Instagram'a biner; arka planı Instagram'da dilediğince seçebilirsin."}
+          ? "Fotoğrafın arka planda hazır, sticker önde açılır."
+          : "Fotoğrafsız paylaşımda koyu marka zemini otomatik giydirilir."}
       </Text>
 
-      {/* Ekran Disinda Tam Olculu Yakalama */}
       <View style={st.offscreen} pointerEvents="none">
         <StorySticker
           ref={overlayRef}
           variant={s.selected}
           overlay
+          visibility={visibility}
+        />
+        <StorySticker
+          ref={fullCardRef}
+          variant={s.selected}
+          photoUri={s.photo?.uri}
+          overlay={false}
           visibility={visibility}
         />
       </View>
