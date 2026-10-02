@@ -1,43 +1,5 @@
-export const XP_REWARDS = {
-  study_15min: 10,
-  question_solved: 2,
-  trial_entry: 50,
-  wrong_resolved: 15,
-  daily_login: 20,
-  streak_bonus_per_day: 5,
-  plan_task_done: 5,
-  perfect_plan: 100,
-  daily_goal_complete: 40,
-  comeback_bonus: 50,
-  referral_applied: 50,
-  streak_milestone: 0,
-};
-
-export const LEVELS = [
-  { level: 1, xp: 0, title: "Başlangıç" },
-  { level: 2, xp: 100, title: "Çaylak" },
-  { level: 3, xp: 300, title: "Öğrenci" },
-  { level: 4, xp: 600, title: "Azimli" },
-  { level: 5, xp: 1000, title: "Çalışkan" },
-  { level: 6, xp: 1500, title: "Kararlı" },
-  { level: 7, xp: 2200, title: "Odaklı" },
-  { level: 8, xp: 3000, title: "Hırslı" },
-  { level: 9, xp: 4000, title: "Disiplinli" },
-  { level: 10, xp: 5200, title: "Savaşçı" },
-  { level: 11, xp: 6500, title: "Uzman" },
-  { level: 12, xp: 8000, title: "Usta" },
-  { level: 13, xp: 10000, title: "Elit" },
-  { level: 14, xp: 12500, title: "Efsane" },
-  { level: 15, xp: 15500, title: "Maratoncu" },
-  { level: 16, xp: 19000, title: "Titan" },
-  { level: 17, xp: 23000, title: "Şampiyon" },
-  { level: 18, xp: 28000, title: "Dahi" },
-  { level: 19, xp: 34000, title: "Efsanevi" },
-  { level: 20, xp: 42000, title: "Maraton Efsanesi" },
-];
-
-// LEAGUE_TIERS burada DEĞİL: src/constants/league.js içinde.
-// Burada minRank tabanlı ikinci bir tanım vardı (0/100/500/2000/5000, shield
-// ikonu, farklı renkler) ve hiçbir yerden kullanılmıyordu. Gerçek lig modeli
-// haftalık XP tabanlı — iki farklı model yan yana durunca hangisinin geçerli
-// olduğu belirsizleşiyordu. Tek kaynak: league.js.
+// XP / SEVIYE GORUNURLUGU (2026-10-02). XP bildirimleri kapali; kullanici
+// XP'yi neyle kazandigini gormuyor, profildeki "Seviye 9 · 704/1200 XP"
+// baglamsiz kaliyordu. Profil artik gercek emegi anlatir (soru, saat, aktif
+// gun, en uzun seri). Kod SILINMEDI; bu bayragi true yapmak yeterli.
+export const XP_VISIBLE = false;

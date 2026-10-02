@@ -21,6 +21,7 @@ import { logXP } from "../supabase/xp";
 import { saveGamificationToSupabase, claimStreakMilestoneReward } from "../supabase/profiles";
 import { todayTR } from "../lib/dateUtils";
 import { registerSessionReset } from "../lib/session/sessionReset";
+import { XP_VISIBLE } from "../constants/gamification";
 
 // Module-level guard: prevents concurrent reward/milestone operations
 // across multiple hook instances mounted simultaneously.
@@ -60,6 +61,8 @@ const _levelSubs = new Set();
 const _milestoneSubs = new Set();
 
 function _setSharedLevelUp(next) {
+  // XP gorunmuyorken "Seviye atladin" penceresi de acilmaz (bkz. XP_VISIBLE).
+  if (next?.visible && !XP_VISIBLE) return;
   _levelUpModal = next;
   _levelSubs.forEach((fn) => { try { fn(next); } catch (_) {} });
 }

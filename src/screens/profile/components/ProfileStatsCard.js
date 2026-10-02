@@ -14,7 +14,7 @@ import * as H from "../../../lib/haptics";
 // Profilde temel istatistik: uc sayi. Ayrinti Istatistiklerim ekraninda.
 // Kutusuz (kullanici, 29 Eylul): her seyi kaba almak sayfayi agirlastiriyordu;
 // sayilar zeminde durur, bolum basligindaki "Tümü" ayrintiya goturur.
-export const ProfileStatsCard = memo(function ProfileStatsCard() {
+export const ProfileStatsCard = memo(function ProfileStatsCard({ longestStreak = 0 }) {
   const C = useC();
   const navigation = useNavigation();
   const { data } = useStatsOverview();
@@ -34,7 +34,7 @@ export const ProfileStatsCard = memo(function ProfileStatsCard() {
       style={s.wrap}
     >
       <View style={s.head}>
-        <Text style={[TYPOGRAPHY.tableHead, s.flex, { color: C.text2 }]}>İSTATİSTİKLER</Text>
+        <Text style={[TYPOGRAPHY.tableHead, s.flex, { color: C.text2 }]}>YOLCULUĞUN</Text>
         <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>Tümü</Text>
         <Icon name="chevR" size={14} color={C.text3} />
       </View>
@@ -52,6 +52,11 @@ export const ProfileStatsCard = memo(function ProfileStatsCard() {
           </View>
         ))}
       </View>
+      {longestStreak > 1 ? (
+        <Text style={[TYPOGRAPHY.caption, s.line, { color: C.text2 }]}>
+          {`En uzun serin ${longestStreak} gün. Her durak bu sayılara eklenir.`}
+        </Text>
+      ) : null}
     </Press>
   );
 });
@@ -60,6 +65,7 @@ const s = StyleSheet.create({
   wrap: { marginHorizontal: GUTTER, marginTop: STEP.s4 },
   head: { flexDirection: "row", alignItems: "center", gap: 2, marginBottom: STEP.s2, minHeight: 24 },
   flex: { flex: 1 },
+  line: { marginTop: STEP.s2 },
   strip: {
     flexDirection: "row",
     borderTopWidth: 1,
