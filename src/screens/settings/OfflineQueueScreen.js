@@ -44,7 +44,7 @@ export default function OfflineQueueScreen() {
           seritten geliyor ve aradigi sey bu. Bekleyenler normal durum. */}
       {failedRows.length ? (
         <View style={styles.section}>
-          <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>GÖNDERİLEMEYEN</Text>
+          <Text style={[TYPOGRAPHY.label, styles.label, { color: C.text2 }]}>YÜKLENEMEYEN</Text>
           <Text style={[TYPOGRAPHY.meta, styles.failedNote, { color: C.text3 }]}>
             Bu kayıtlar cihazında duruyor ama sunucuya yazılamadı. Aşağıdaki
             düğme hepsini yeniden dener; vazgeçtiklerini tek tek silebilirsin.
@@ -60,7 +60,7 @@ export default function OfflineQueueScreen() {
         </View>
       ) : null}
       {loading ? <Skeleton height={48} style={styles.section} /> : null}
-      {rows.length ? <Text style={[TYPOGRAPHY.label, styles.section, styles.label, { color: C.text2 }]}>KUYRUKTA</Text> : null}
+      {rows.length ? <Text style={[TYPOGRAPHY.label, styles.section, styles.label, { color: C.text2 }]}>BAĞLANTIYI BEKLEYEN</Text> : null}
     </Animated.View>
   );
 

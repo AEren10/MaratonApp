@@ -72,12 +72,12 @@ export function SyncStatusGroup() {
   if (!pending && !failed) return null;
 
   return (
-    <SettingsGroup title="SENKRON">
+    <SettingsGroup title="YÜKLENMEYİ BEKLEYENLER">
       {pending > 0 && (
         <SettingsRow
           icon="clock"
           iconColor={C.amber}
-          label={`${pending} kayıt gönderilmeyi bekliyor`}
+          label={`${pending} kayıt bağlantı gelince yüklenecek`}
           onPress={openQueue}
         />
       )}
@@ -86,13 +86,13 @@ export function SyncStatusGroup() {
           <SettingsRow
             icon="alert"
             iconColor={C.red}
-            label={`${failed} kayıt gönderilemedi — tekrar dene`}
+            label={`${failed} kayıt yüklenemedi — tekrar dene`}
             onPress={retry}
           />
           <SettingsRow
             icon="x"
             iconColor={C.muted}
-            label="Başarısız kayıtları sil"
+            label="Yüklenemeyen kayıtları sil"
             onPress={discard}
           />
         </>
