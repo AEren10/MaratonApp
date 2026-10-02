@@ -9,7 +9,6 @@ import { useWeeklyReport } from "./useWeeklyReport";
 import { buildStoryVariants, STORY_MOMENT } from "../domain/share/storySticker";
 import { shareStoryToInstagram, saveStoryToGallery, STORY_SHARE } from "../lib/storyShare";
 import { pickStoryPhoto } from "../lib/storyPhoto";
-import { STORY_BG } from "../domain/share/storySticker";
 
 const EXAM_NAME = { tyt: "YKS", ayt: "YKS", lgs: "LGS" };
 
