@@ -81,13 +81,15 @@ function NotificationPermissionContent() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeIn.delay(80)}>
-          <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>ROTA YENİDEN ÇİZİLDİ</Text>
+          {/* Soz = gercek: notificationPlan gunu iki dilime boler (gunduz +
+              aksam), dilim basina tek bildirim. Metin degisirse plan da. */}
+          <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>BİLDİRİMLER</Text>
           <Text style={[styles.title, { color: C.text }]}>
-            Tahminin değiştiğinde haber vereyim mi?
+            Rotanı sana hatırlatayım mı?
           </Text>
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>
-            İlk denemen rotaya işlendi. Bundan sonra tahmin her değiştiğinde tek bir bildirim
-            gelir — daha fazlası değil.
+            Günde en fazla iki bildirim: gündüz günün durağı, akşam günün bitmediyse bir
+            hatırlatma. Daha fazlası değil.
           </Text>
         </Animated.View>
 
@@ -99,8 +101,8 @@ function NotificationPermissionContent() {
             <NotificationBenefitList />
           </View>
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s3 }]}>
-            Hiçbir bildirim sana sadece çalış demez. Sadece rotanda önemli bir şey değişirse
-            haber verir.
+            Hiçbir bildirim seni suçlamaz. Ara verirsen 3., 7. ve 14. günde birer kez yoklarız,
+            sonra susarız.
           </Text>
           <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>
             Sıklığı ve saatini Ayarlar'dan değiştirebilirsin.

@@ -3,10 +3,11 @@ import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 
 const ITEMS = [
-  { key: "predict", dotKey: "accent", text: "Tahminin 71'den 73'e çıktı." },
-  { key: "repeat", dotKey: "matematik", text: "Bugün 6 soru tekrar zamanı." },
-  { key: "stop", dotKey: "warn", text: "Bekleyen iki durağın hazır." },
-  { key: "report", dotKey: "up", text: "Haftalık raporun hazır." },
+  // Yalniz gercekten gonderilen turler (domain/notify/notificationPlan).
+  { key: "daily", dotKey: "matematik", text: "Sıradaki durak seni bekliyor, 15 dakika yeter." },
+  { key: "evening", dotKey: "warn", text: "12 günlük serin bu akşam bitmesin." },
+  { key: "trial", dotKey: "accent", text: "Son denemen 8 gün önceydi; yenisi rotanı ve tahminini günceller." },
+  { key: "report", dotKey: "up", text: "Haftan bitti: kaç saat, kaç soru; pazar akşamı." },
 ];
 
 function dotColor(C, key) {
