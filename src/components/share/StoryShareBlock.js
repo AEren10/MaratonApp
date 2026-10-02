@@ -30,15 +30,8 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
   const s = useStoryShare(moment);
 
   const [visibility, setVisibility] = useState({
-    showQuestions: true,
-    showMinutes: true,
-    showStreak: true,
-    showChart: true,
-    showStops: true,
-    showAccuracy: true,
-    showWeek: true,
-    showDays: true,
-    showCountdown: true,
+    showQuestions: true, showMinutes: true, showStreak: true, showChart: true,
+    showStops: true, showAccuracy: true, showWeek: true, showDays: true, showCountdown: true,
   });
 
   const handleToggle = useCallback((key) => {
@@ -48,14 +41,8 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
   const handlePickPhoto = useCallback(() => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ["İptal", "Kamerayla Çek", "Galeriden Seç"],
-          cancelButtonIndex: 0,
-        },
-        (btnIndex) => {
-          if (btnIndex === 1) s.pickPhoto("camera");
-          if (btnIndex === 2) s.pickPhoto("library");
-        }
+        { options: ["İptal", "Kamerayla Çek", "Galeriden Seç"], cancelButtonIndex: 0 },
+        (i) => { if (i === 1) s.pickPhoto("camera"); if (i === 2) s.pickPhoto("library"); }
       );
     } else {
       s.pickPhoto("library");

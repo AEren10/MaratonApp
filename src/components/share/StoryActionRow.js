@@ -21,14 +21,11 @@ export function StoryActionRow({
   return (
     <View style={s.wrap}>
       <View style={s.row}>
-        {/* 1. Instagram Stories Butonu (Strava tarzı birincil gradient buton) */}
+        {/* 1. Instagram Stories Butonu */}
         <Press
           haptic="none"
           disabled={busy}
-          onPress={() => {
-            H.tap();
-            onShareInstagram();
-          }}
+          onPress={() => { H.tap(); onShareInstagram(); }}
           accessibilityRole="button"
           accessibilityLabel="Instagram Hikayesi"
           style={[s.item, { opacity: busy ? 0.5 : 1 }]}
@@ -46,141 +43,96 @@ export function StoryActionRow({
             </Svg>
           </LinearGradient>
           <Text style={[TYPOGRAPHY.micro, s.label, { color: C.text }]}>
-            {busy ? "Hazırlanıyor…" : "Instagram"}
+            {busy ? "…" : "Instagram"}
           </Text>
         </Press>
 
         {/* 2. Panoya Kopyala */}
-        <Press
-          haptic="none"
-          disabled={busy}
-          onPress={() => {
-            H.tap();
-            onCopyToClipboard();
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Panoya Kopyala"
-          style={[s.item, { opacity: busy ? 0.5 : 1 }]}
-        >
-          <View style={[s.actionCircle, { backgroundColor: C.elev, borderColor: C.border }]}>
+        <ActionBtn
+          C={C}
+          busy={busy}
+          label="Kopyala"
+          onPress={onCopyToClipboard}
+          icon={
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Rect x="8" y="8" width="12" height="12" rx="2.5" stroke={C.text} strokeWidth="1.8" />
-              <Path
-                d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"
-                stroke={C.text2}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
+              <Path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2" stroke={C.text2} strokeWidth="1.8" strokeLinecap="round" />
             </Svg>
-          </View>
-          <Text style={[TYPOGRAPHY.micro, s.label, { color: C.text2 }]}>Kopyala</Text>
-        </Press>
+          }
+        />
 
         {/* 3. Galeriye Kaydet */}
-        <Press
-          haptic="none"
-          disabled={busy}
-          onPress={() => {
-            H.tap();
-            onSaveToGallery();
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Galeriye Kaydet"
-          style={[s.item, { opacity: busy ? 0.5 : 1 }]}
-        >
-          <View style={[s.actionCircle, { backgroundColor: C.elev, borderColor: C.border }]}>
+        <ActionBtn
+          C={C}
+          busy={busy}
+          label="Kaydet"
+          onPress={onSaveToGallery}
+          icon={
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M12 4v12m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"
-                stroke={C.text}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <Path d="M12 4v12m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke={C.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </Svg>
-          </View>
-          <Text style={[TYPOGRAPHY.micro, s.label, { color: C.text2 }]}>Kaydet</Text>
-        </Press>
+          }
+        />
 
-        {/* 4. Masa Fotoğrafı Ekle / Değiştir */}
-        <Press
-          haptic="none"
-          disabled={busy}
-          onPress={() => {
-            H.tap();
-            onPickPhoto();
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={hasPhoto ? "Fotoğrafı Değiştir" : "Masa Fotoğrafı Ekle"}
-          style={[s.item, { opacity: busy ? 0.5 : 1 }]}
-        >
-          <View
-            style={[
-              s.actionCircle,
-              {
-                backgroundColor: hasPhoto ? C.brandTint : C.elev,
-                borderColor: hasPhoto ? C.accent : C.border,
-              },
-            ]}
-          >
+        {/* 4. Masa Fotoğrafı */}
+        <ActionBtn
+          C={C}
+          busy={busy}
+          label={hasPhoto ? "Fotoğraf" : "Masa Çek"}
+          highlighted={hasPhoto}
+          onPress={onPickPhoto}
+          icon={
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M3 8a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"
-                stroke={hasPhoto ? C.accentBright : C.text}
-                strokeWidth="1.8"
-              />
+              <Path d="M3 8a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
               <Circle cx="12" cy="13" r="3.5" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
             </Svg>
-          </View>
-          <Text style={[TYPOGRAPHY.micro, s.label, { color: hasPhoto ? C.accentBright : C.text2 }]}>
-            {hasPhoto ? "Fotoğraf" : "Masa Çek"}
-          </Text>
-        </Press>
+          }
+        />
       </View>
 
-      {/* Fotoğraf seçilmişse kaldırma butonu */}
       {hasPhoto ? (
-        <Press
-          haptic="none"
-          onPress={() => {
-            H.tap();
-            onClearPhoto();
-          }}
-          accessibilityRole="button"
-          style={s.clearPhotoBtn}
-        >
-          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>✕ Fotoğrafı Kaldır (Yalnızca Şeffaf Çıkartma)</Text>
+        <Press haptic="none" onPress={() => { H.tap(); onClearPhoto(); }} accessibilityRole="button" style={s.clearPhotoBtn}>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>✕ Fotoğrafı Kaldır (Saf Şeffaf Çıkartma)</Text>
         </Press>
       ) : null}
     </View>
   );
 }
 
+function ActionBtn({ C, busy, label, onPress, icon, highlighted }) {
+  return (
+    <Press
+      haptic="none"
+      disabled={busy}
+      onPress={() => { H.tap(); onPress(); }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={[s.item, { opacity: busy ? 0.5 : 1 }]}
+    >
+      <View
+        style={[
+          s.actionCircle,
+          {
+            backgroundColor: highlighted ? C.brandTint : C.elev,
+            borderColor: highlighted ? C.accent : C.border,
+          },
+        ]}
+      >
+        {icon}
+      </View>
+      <Text style={[TYPOGRAPHY.micro, s.label, { color: highlighted ? C.accentBright : C.text2 }]}>
+        {label}
+      </Text>
+    </Press>
+  );
+}
+
 const s = StyleSheet.create({
   wrap: { marginTop: STEP.s3, alignItems: "center" },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    width: "100%",
-    paddingHorizontal: STEP.s2,
-  },
+  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-around", width: "100%", paddingHorizontal: STEP.s2 },
   item: { alignItems: "center", minWidth: 64 },
-  instaCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  actionCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  instaCircle: { width: 54, height: 54, borderRadius: 27, alignItems: "center", justifyContent: "center" },
+  actionCircle: { width: 50, height: 50, borderRadius: 25, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   label: { marginTop: 6, fontFamily: "Archivo_600", fontSize: 11.5 },
   clearPhotoBtn: { marginTop: STEP.s2, paddingVertical: 4 },
 });
