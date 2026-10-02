@@ -15,7 +15,8 @@ export function RouteThisWeekStrip({ C, currentWeek, promiseText, onPress }) {
   const totalStops = stops.length;
 
   const statusText = totalStops > 0
-    ? `Bu hafta ${completedStops}/${totalStops} durak tamamlandı`
+    // Sayi HAFTANIN tum duraklari (gunluk degil); metin bunu acikca soyler.
+    ? `Bu hafta ${totalStops} durak · ${completedStops} bitti`
     : promiseText || "Bu haftanın programı";
 
   return (

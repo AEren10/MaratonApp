@@ -14,6 +14,9 @@ import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 // ayri pad/yukseklik yazilinca BUGUN ve HEDEF dugumden birkac px kayiyordu.
 const W = CHART_W;
 const TAG_W = 96;
+const DATE_W = 40;
+// Rota sayfasi en onemli ekran: cizgi acilista fark edilecek hizda cizilir.
+const DRAW_MS = 1600;
 
 // Rota Detay grafigi: paylasilan RouteLineChart + tasarimin etiketleri
 // (NET, HEDEF, BUGUN, SINAV GUNU · N, sinav tarihi). Etiket konumu grafigin
@@ -30,7 +33,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
 
   const pos = useMemo(() => {
     if (!stops.length) {
-      return { today: { x: W / 2, y: H / 2 }, end: null, targetY: null, ticks: [] };
+      return { today: { x: W / 2, y: H / 2 }, end: null, targetY: null, ticks: [], points: [] };
     }
     const values = stops.map((p) => (typeof p === "number" ? p : p?.y ?? 0));
     const allValues = [...values, ...projection, ...(hasTarget ? [target] : [])];
@@ -39,6 +42,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
     const sc = makeScale(allValues, lineScaleOptions({ flagged: hasTarget && projection.length > 0, xs: chart?.xs || null }));
     const last = Math.max(0, values.length - 1);
     const [todayPoint] = sc.toPoints([values[last]], { count: total, offset: last });
+    const points = sc.toPoints(values, { count: total });
     const endValue = projection.length ? projection[projection.length - 1] : null;
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
@@ -50,6 +54,7 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
       end: endValue != null ? { y: sc.toY(endValue) } : null,
       targetY: hasTarget ? sc.toY(target) : null,
       ticks,
+      points,
     };
   }, [stops, projection, hasTarget, target, H, chart?.xs]);
 
@@ -71,17 +76,19 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
           target={hasTarget ? target : undefined}
           ticks={pos.ticks}
           height={H * k}
+          drawMs={DRAW_MS}
         />
       ) : <View style={{ aspectRatio: W / H }} />}
       {width > 0 ? (
         <>
-          <Text style={[...tag, s.net, { color: C.text3 }]}>NET</Text>
-          {pos.ticks.map((t) => (
+          {/* Sol eksen sayilari kalkti (cizginin ustune biniyordu); her
+              denemenin tarihi kendi noktasinin TAM altinda. */}
+          {pos.points.map((p, i) => (
             <Text
-              key={`ax-${t.val}`}
-              style={[s.axisLabel, { top: t.y * k - 7, color: C.text4 }]}
+              key={`d-${i}`}
+              style={[TYPOGRAPHY.micro, s.date, { left: Math.min(width - DATE_W, Math.max(0, p.x * k - DATE_W / 2)), top: H * k + 2, color: C.text3 }]}
             >
-              {t.val}
+              {stops[i]?.label || ""}
             </Text>
           ))}
           {pos.targetY != null ? (
@@ -114,18 +121,9 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { position: "relative", paddingBottom: STEP.s3 },
+  wrap: { position: "relative", paddingBottom: STEP.s3 + STEP.s2 },
+  date: { position: "absolute", width: DATE_W, textAlign: "center", fontVariant: ["tabular-nums"] },
   tag: { position: "absolute" },
-  net: { left: STEP.s1, top: 0 },
-  axisLabel: {
-    position: "absolute",
-    left: 4,
-    width: 22,
-    textAlign: "right",
-    fontFamily: "Archivo_500",
-    fontSize: 11,
-    fontVariant: ["tabular-nums"],
-  },
   right: { right: STEP.s1 },
   // Sagda hedef bayragi duruyor; etiket cizginin sol basinda (tasarim).
   targetTag: { left: 30 },

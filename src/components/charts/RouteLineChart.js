@@ -29,7 +29,7 @@ const H = CHART_H;
 // Bileşen SAF: veri prop olarak gelir, çekmez. stops[i] = { y, status, label }.
 export const RouteLineChart = memo(function RouteLineChart({
   stops = [], todayIndex, projection = [], band, target, ticks, height = H,
-  todayLabel, endLabel, axisLabels, xs = null, mode = null, tickLabels = false,
+  todayLabel, endLabel, axisLabels, xs = null, mode = null, tickLabels = false, drawMs,
 }) {
   const C = useC();
   const { onLayout, vbW: W, wide } = useChartFrame(height);
@@ -107,6 +107,7 @@ export const RouteLineChart = memo(function RouteLineChart({
           <DrawnPath
             d={pastD}
             length={estimatePathLength(pastPoints)}
+            duration={drawMs}
             fill="none"
             stroke={C.accent}
             strokeWidth={STROKE.past}

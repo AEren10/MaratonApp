@@ -87,7 +87,7 @@ test("detail forecast states distance to target and tempo rows", () => {
   });
   assert.equal(view.note, "hedefin 2 net altında");
   assert.equal(view.rangeText, "66–75 net");
-  assert.equal(view.caption, "3 deneme · bugün · sınav günü tahmini");
+  assert.equal(view.caption, "3 deneme");
   assert.deepEqual(view.tempoRows.map((r) => r.value), ["73 net", "68 net"]);
   assert.equal(routeDetailForecast({ forecast, targetNet: null }).note, null);
 });

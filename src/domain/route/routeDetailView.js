@@ -48,9 +48,8 @@ export function routeDetailForecast({ forecast, targetNet, tempoScenarios = [], 
   ].filter(Boolean);
 
   return {
-    caption: netChart
-      ? `${netChart.stops.length} deneme · bugün · ${netChart.mode === "forecast" ? "sınav günü tahmini" : "hedef"}`
-      : points.length ? `${points.length} deneme · bugün · sınav günü tahmini` : null,
+    // Yalniz deneme sayisi; "bugun · hedef" grafigin kendi etiketlerinde zaten var.
+    caption: netChart ? `${netChart.stops.length} deneme` : points.length ? `${points.length} deneme` : null,
     chart,
     projectedNet: projected,
     note,

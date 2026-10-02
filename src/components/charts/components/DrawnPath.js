@@ -25,7 +25,7 @@ const SLACK = 1.06;
  * yeniden cizilmez -- o zaman yol zaten yerinde, tekrar cizmek
  * "az once ne yaptin" degil "sayfa yeniden yuklendi" gibi okunur.
  */
-export function DrawnPath({ d, length, delay = 0, ...rest }) {
+export function DrawnPath({ d, length, delay = 0, duration = DRAW_MS, ...rest }) {
   const reduced = useReducedMotion();
   const total = Math.max(1, length * SLACK);
   const offset = useSharedValue(reduced ? 0 : total);
@@ -38,8 +38,8 @@ export function DrawnPath({ d, length, delay = 0, ...rest }) {
       offset.set(0);
       return;
     }
-    offset.set(withDelay(delay, withTiming(0, { duration: DRAW_MS, easing: EASE_OUT })));
-  }, [delay, reduced, offset, total]);
+    offset.set(withDelay(delay, withTiming(0, { duration, easing: EASE_OUT })));
+  }, [delay, duration, reduced, offset, total]);
 
   const animatedProps = useAnimatedProps(() => ({ strokeDashoffset: offset.get() }));
 

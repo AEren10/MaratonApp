@@ -9,7 +9,6 @@ import { useRouteDetail } from "../../hooks/useRouteDetail";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useRoadmapNextAction } from "./useRoadmapNextAction";
 import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
-import { flattenRouteStops, routeDateTag, upcomingRouteStops } from "../../domain/route/routeOverview";
 import { SCREENS } from "../../constants/screens";
 import { GUTTER, STEP } from "../../themes/tokens";
 import { RouteAccessGate } from "./components/RouteAccessGate";
@@ -21,7 +20,6 @@ import { RouteProjectionCard } from "./components/RouteProjectionCard";
 import { RouteFeasibilityNote } from "../../components/route/RouteFeasibilityNote";
 import { feasibilityNote } from "../../domain/route/feasibility";
 import { RouteTempoSection } from "./components/RouteTempoSection";
-import { RouteUpcomingStops } from "./components/RouteUpcomingStops";
 import { RouteThisWeekStrip } from "./components/RouteThisWeekStrip";
 import { RouteNextActionCard } from "./components/RouteNextActionCard";
 import { RouteWeeksTimeline } from "./components/RouteWeeksTimeline";
@@ -43,20 +41,6 @@ export default function RoadmapScreen() {
     routeCreated,
     weeks,
   });
-
-  const enrichedUpcoming = useMemo(() => {
-    const flat = flattenRouteStops(weeks, { routeFrozen: isPaused });
-    return upcomingRouteStops(flat, 3).map((item) => {
-      const seg = item.stop?.segmentIndex;
-      return {
-        key: item.key,
-        name: item.stop.topic,
-        part: seg != null && seg > 0 ? `${seg + 1}. bölüm` : null,
-        note: item.stop.subjectLabel || null,
-        date: routeDateTag(item.weekStart),
-      };
-    });
-  }, [weeks, isPaused]);
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
@@ -125,13 +109,9 @@ export default function RoadmapScreen() {
                 </View>
               </Animated.View>
 
+              {/* "Gelecek duraklar" kalkti: ayni bilgi haftalik yolda ve
+                  Program > Hafta'da zaten var; sayfa gurultusunu azaltir. */}
               <RouteWeeksTimeline C={C} weeks={weeks} />
-
-              <Animated.View style={s.section}>
-                {enrichedUpcoming.length > 0 ? (
-                  <RouteUpcomingStops items={enrichedUpcoming} onStop={d.openStop} />
-                ) : null}
-              </Animated.View>
             </>
           )}
         </ScrollView>
