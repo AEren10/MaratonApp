@@ -27,7 +27,7 @@ export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C, streak = 0 }
         {streak > 0 ? (
           <View style={s.streak} accessibilityLabel={`${streak} günlük seri`}>
             <Icon name="flame" size={13} color={C.flame} fill={C.flame} />
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.flame }]}>{`${streak} günlük seri`}</Text>
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentText }]}>{`${streak} günlük seri`}</Text>
           </View>
         ) : null}
       </View>

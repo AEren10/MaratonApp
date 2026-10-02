@@ -5,6 +5,7 @@ import { useExam } from "../contexts/ExamContext";
 import { aytTargetShare } from "../domain/route/examPhase";
 import { dateKey } from "../lib/dateUtils";
 import { updateReminderContent } from "../lib/notifications";
+import { widgetTipAt } from "../lib/widgetTipSchedule";
 
 // Bildirim planinin sinav ve deneme girdileri: sinav donum noktalari
 // (150/100/60/30/7 gun), ay donumu karsilastirmasi ve deneme hatirlatmasi
@@ -21,11 +22,18 @@ export function useNotifContextSync(trials) {
   const examKey = examDate ? dateKey(new Date(examDate)) : null;
   const ayt = aytTargetShare({ examType, daysLeft: 200 }) != null;
 
+  const createdAt = user?.created_at || null;
   useEffect(() => {
-    if (!uid) return;
-    updateReminderContent({
-      exam: examKey ? { date: examKey, ayt } : null,
-      trials: { count: list.length, lastDay: lastDay || null },
-    }, uid);
-  }, [uid, examKey, ayt, list.length, lastDay]);
+    if (!uid) return undefined;
+    let alive = true;
+    widgetTipAt(uid, createdAt).catch(() => null).then((tipAt) => {
+      if (!alive) return;
+      updateReminderContent({
+        exam: examKey ? { date: examKey, ayt } : null,
+        trials: { count: list.length, lastDay: lastDay || null },
+        widgetTipAt: tipAt,
+      }, uid);
+    });
+    return () => { alive = false; };
+  }, [uid, createdAt, examKey, ayt, list.length, lastDay]);
 }

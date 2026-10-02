@@ -1,6 +1,7 @@
 import { dailyReminderContent } from "../../lib/reminderContent.js";
 import {
   comebackCopy, dailyGeneric, milestoneCopy, monthlyCopy, streakCopy, trialCopy, unfinishedCopy, weeklyCopy,
+  weeklyShareCopy, widgetTipCopy,
 } from "./notificationCopy.js";
 
 // BILDIRIM PLANI -- saf. Uygulama her acilista ve gunun plani degistiginde
@@ -17,9 +18,11 @@ import {
 // - Merdiven: yarin (gunluk), 3., 7. ve 14. gun. Sonrasi sessiz; yalniz
 //   sinav takvimindeki donum noktalari gider.
 
-export const PLAN_TYPES = ["daily_reminder", "day_unfinished", "comeback", "streak_risk", "weekly_summary", "monthly_summary", "trial_reminder", "exam_milestone"];
+export const PLAN_TYPES = ["daily_reminder", "day_unfinished", "comeback", "streak_risk", "weekly_summary", "weekly_share", "monthly_summary", "trial_reminder", "exam_milestone", "widget_tip"];
 const EVENING = new Set(["streak_risk", "day_unfinished"]);
-const PRIORITY = { day_unfinished: 1, streak_risk: 2, daily_reminder: 1, monthly_summary: 2, trial_reminder: 2, weekly_summary: 3, comeback: 4, exam_milestone: 5 };
+const PRIORITY = { widget_tip: 0, day_unfinished: 1, streak_risk: 2, daily_reminder: 1, monthly_summary: 2, trial_reminder: 2, weekly_summary: 3, weekly_share: 3, comeback: 4, exam_milestone: 5 };
+// Iyi hafta esigi: haftalik bildirim ozet yerine paylasima davet olur.
+const SHARE_MINUTES = 120;
 const MILESTONES = [150, 100, 60, 30, 7];
 const HORIZON_DAYS = 120;
 const QUIET_START = 8 * 60;
@@ -76,7 +79,16 @@ export function buildNotificationPlan({ now = new Date(), prefs = {}, context = 
     let d = at(toSunday, 20, 0, "weekly_summary");
     const thisWeek = future(d);
     if (!thisWeek) d = at(toSunday + 7, 20, 0, "weekly_summary");
-    push("weekly_summary", d, weeklyCopy(thisWeek ? context.weeklyVars : {}), "summary");
+    const vars = thisWeek ? context.weeklyVars || {} : {};
+    // Iyi gecen hafta: "Bu hafta 9 sa, 340 soru -- paylas" ve hikaye kartina gider.
+    if (Number(vars.minutes) >= SHARE_MINUTES) push("weekly_share", d, weeklyShareCopy(vars), "share");
+    else push("weekly_summary", d, weeklyCopy(vars), "summary");
+  }
+
+  // Widget ipucu: tarihi cagiran BIR KEZ sabitler (her acilista ileri
+  // kaymasin); ayni gun baska bildirim varsa o kazanir (oncelik 0).
+  if (context.widgetTipAt) {
+    push("widget_tip", new Date(context.widgetTipAt), widgetTipCopy(), "widget");
   }
 
   if (Number(context.trials?.count) >= 2) {
@@ -106,12 +118,18 @@ export function buildNotificationPlan({ now = new Date(), prefs = {}, context = 
 }
 
 // Her gun iki dilim: ana ve aksam. Dilim basina en oncelikli bildirim kalir.
+// Widget ipucu kendi (ogle) diliminde, ama o gun zaten iki bildirim varsa
+// gonderilmez: gunde en fazla iki sozu bozulmaz.
 function capPerDay(items) {
   const best = new Map();
   for (const item of items) {
-    const key = `${dayKeyOf(item.date)}:${EVENING.has(item.type) ? "evening" : "main"}`;
+    const slot = item.type === "widget_tip" ? "tip" : EVENING.has(item.type) ? "evening" : "main";
+    const key = `${dayKeyOf(item.date)}:${slot}`;
     const cur = best.get(key);
     if (!cur || PRIORITY[item.type] > PRIORITY[cur.type]) best.set(key, item);
   }
-  return [...best.values()];
+  const kept = [...best.values()];
+  const perDay = {};
+  for (const i of kept) if (i.type !== "widget_tip") perDay[dayKeyOf(i.date)] = (perDay[dayKeyOf(i.date)] || 0) + 1;
+  return kept.filter((i) => i.type !== "widget_tip" || (perDay[dayKeyOf(i.date)] || 0) < 2);
 }

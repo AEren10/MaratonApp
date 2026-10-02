@@ -16,10 +16,8 @@ import {
 const BAR_RADIUS = 3;
 
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gunun CALISMA SURESI
-// (soru girilmemis calisma da dolar). Soru sayisi cubukta DEGIL: gun
-// adlarinin altinda kendi satirinda (kullanici, 2 Ekim) -- kisa cubukta
-// kayboluyor, renkli zeminde daginik duruyordu; artik her gun ayni hizada.
-const Q_ROW = 16;
+// (soru girilmemis calisma da dolar). Soru sayisi su an grafikte YOK
+// (kullanici, 2 Ekim: yeri bulunana kadar kaldirildi).
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
   const { onLayout, vbW, wide } = useChartFrame(height);
@@ -29,7 +27,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
   // Bos hafta da 7 bos kutuyla gorunur (kullanici karari, 28 Eylul): cubuklar
   // her zaman yerinde, gun calisildikca dolar. Bos kart cubuklarin yerini
   // aliyor ve ustteki sayilarin uzerine biniyordu.
-  const bottom = plotBottom({ hasAxis: true }) - Q_ROW;
+  const bottom = plotBottom({ hasAxis: true });
   const top = PAD_TOP;
   const usableH = bottom - top;
   const usableW = vbW - EFFORT_PAD_LEFT - PAD_RIGHT;
@@ -103,30 +101,20 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
           </>
         ) : null}
 
-        {/* Soru satirinin basligi: sol eksen hizasinda. */}
-        <SvgText x={EFFORT_PAD_LEFT - 6} y={CHART_H - 6} fill={C.text4} fontSize={11} textAnchor="end">soru</SvgText>
-
         {week.days.map((day, i) => {
           const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
           const isToday = i === todayIndex;
-          const future = todayIndex != null && i > todayIndex;
           return (
-            <Fragment key={`lbl-${day.label}`}>
-              <SvgText
-                x={cx} y={CHART_H - 6 - Q_ROW}
-                fill={isToday ? C.text : C.text4}
-                fontSize={LABEL.size}
-                fontWeight={isToday ? LABEL.weight : "500"}
-                textAnchor="middle"
-              >
-                {day.label}
-              </SvgText>
-              {!future ? (
-                <SvgText x={cx} y={CHART_H - 6} fill={day.questions > 0 ? C.text2 : C.text4} fontSize={11} fontWeight="600" textAnchor="middle">
-                  {day.questions > 0 ? day.questions : "–"}
-                </SvgText>
-              ) : null}
-            </Fragment>
+            <SvgText
+              key={`lbl-${day.label}`}
+              x={cx} y={CHART_H - 6}
+              fill={isToday ? C.accentBright : C.text4}
+              fontSize={LABEL.size}
+              fontWeight={isToday ? LABEL.weight : "500"}
+              textAnchor="middle"
+            >
+              {day.label}
+            </SvgText>
           );
         })}
       </Svg>

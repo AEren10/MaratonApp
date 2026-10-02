@@ -7,9 +7,9 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 export function StreakLegend() {
   const C = useC();
   const items = [
-    { label: "Hedef tuttu", box: { backgroundColor: C.flame, borderColor: C.flame } },
-    { label: "Seri sürdü", box: { backgroundColor: alpha(C.flame, 20), borderColor: alpha(C.flame, 45) } },
-    { label: "Bugün", box: { borderColor: C.selBorder, borderWidth: 1.5 } },
+    { label: "Hedef tuttu", box: { backgroundColor: C.accent, borderColor: C.accent } },
+    { label: "Seri sürdü", box: { backgroundColor: alpha(C.accent, 24), borderColor: alpha(C.accent, 45) } },
+    { label: "Bugün", box: { borderColor: C.accent, borderWidth: 1.5 } },
     { label: "Gelecek", box: { borderColor: C.line } },
     { label: "Planlı", isDot: true },
   ];
@@ -19,7 +19,7 @@ export function StreakLegend() {
         <View key={it.label} style={s.item}>
           {it.isDot ? (
             <View style={s.dotBox}>
-              <View style={[s.planDot, { backgroundColor: C.text3 }]} />
+              <View style={[s.planDot, { backgroundColor: C.accent }]} />
             </View>
           ) : (
             <View style={[s.box, it.box]} />

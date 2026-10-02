@@ -96,3 +96,16 @@ export function milestoneCopy(days, ayt) {
       return { title: "Son hafta", body: "Yeni konu yok; sakin tekrar ve iyi uyku. Hazırsın." };
   }
 }
+
+// Iyi gecen hafta: haftalik bildirim paylasima davet eder (hikaye karti).
+export function weeklyShareCopy({ questions = 0, minutes = 0 } = {}) {
+  const q = Number(questions) || 0;
+  const m = Number(minutes) || 0;
+  const parts = [m ? duration(m) : null, q ? `${q} soru` : null].filter(Boolean).join(", ");
+  return { title: `Bu hafta ${parts}`, body: "Emeğin görünsün: haftanı hikâyende paylaş, kartın hazır." };
+}
+
+// Bir kerelik: widget ile bugunun isi ana ekranda.
+export function widgetTipCopy() {
+  return { title: "Maraton'u ana ekranına al", body: "Bugünün durağı ve serin, uygulamayı açmadan görünsün. Eklemek 20 saniye." };
+}

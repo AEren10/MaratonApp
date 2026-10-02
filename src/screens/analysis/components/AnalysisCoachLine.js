@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Press } from "../../../components/design/Press";
 import { useAnalysisCoach } from "../../../hooks/useAnalysisCoach";
-import { TYPOGRAPHY, STEP, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, CONTROL, GUTTER } from "../../../themes/tokens";
 
 // Analiz'in en ustunde tek yorum, tek aksiyon. Kutusuz: etiket + cumle +
 // yazi butonu. Veri yetmiyorsa hic gorunmez.
@@ -30,7 +30,8 @@ export function AnalysisCoachLine({ C }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { paddingVertical: STEP.s3, borderBottomWidth: 1, gap: STEP.s1 },
+  // Diger Analiz bolumleri gibi kenar boslugu (yoksa yazi ekran kenarina yapisiyordu).
+  wrap: { marginHorizontal: GUTTER, paddingVertical: STEP.s3, borderBottomWidth: 1, gap: STEP.s1 },
   text: { lineHeight: 22 },
   btn: { minHeight: CONTROL.tapMin, justifyContent: "center", alignSelf: "flex-start" },
   done: { minHeight: CONTROL.tapMin, textAlignVertical: "center", paddingTop: STEP.s2 },

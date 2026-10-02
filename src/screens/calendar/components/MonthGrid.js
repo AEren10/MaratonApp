@@ -25,15 +25,15 @@ function getCalendarDays(monthDate) {
 }
 
 // Takvim ve Seri ısı haritası:
-// Hedef tuttu = dolu alev turuncusu, Seri sürdü = alev tonu, Bugün = notr
-// halka. Kizil burada yok: takvim serinin yeri, seri turuncu (flame).
+// Hedef tuttu = dolu accent, Seri sürdü = accent tonu, Bugün = halka.
+// Takvim kizil kalir (kullanici, 2 Ekim); yalniz kosedeki alev turuncu.
 function cellLook(data, dailyGoal, isFuture, C) {
   const hasWorked = Boolean(data?.logs?.length || data?.trials?.length || (data?.totalQuestions && data.totalQuestions > 0));
   if (hasWorked && data.totalQuestions >= dailyGoal) {
-    return { backgroundColor: C.flame, borderColor: C.flame, color: C.flameInk };
+    return { backgroundColor: C.accent, borderColor: C.accent, color: C.accentInk };
   }
   if (hasWorked) {
-    return { backgroundColor: alpha(C.flame, 20), borderColor: alpha(C.flame, 45), color: C.text };
+    return { backgroundColor: alpha(C.accent, 24), borderColor: alpha(C.accent, 45), color: C.accentBright || C.text };
   }
   if (isFuture) return { backgroundColor: "transparent", borderColor: C.line, color: C.text3 };
   return { backgroundColor: "transparent", borderColor: "transparent", color: C.text3 };
@@ -41,7 +41,7 @@ function cellLook(data, dailyGoal, isFuture, C) {
 
 function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
   const look = cellLook(data, dailyGoal, isFuture, C);
-  const isFilled = look.backgroundColor === C.flame;
+  const isFilled = look.backgroundColor === C.accent;
   const worked = Boolean(data?.logs?.length || data?.trials?.length || data?.totalQuestions > 0);
   const dotCount = planData?.count ? Math.min(planData.count, 3) : 0;
   const isDraft = Boolean(planData?.draft);
@@ -56,8 +56,8 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
       style={[
         styles.dayCell,
         { backgroundColor: look.backgroundColor, borderColor: look.borderColor },
-        isToday && { borderColor: C.selBorder, borderWidth: 1.5 },
-        isSelected && { borderColor: C.text, borderWidth: 2 },
+        isToday && { borderColor: C.accent, borderWidth: 1.5 },
+        isSelected && { borderColor: isFilled ? C.text : C.accent, borderWidth: 2 },
       ]}
     >
       {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
@@ -66,7 +66,7 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
           <Icon name="flame" size={17} color={C.flame} fill={C.flame} />
         </View>
       ) : null}
-      <Text style={[styles.dayText, { color: isToday && !isFilled ? C.text : look.color }]}>{date.getDate()}</Text>
+      <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
       {dotCount > 0 ? (
         <View style={[styles.dotsRow, isDraft && styles.draftDots]}>
           {Array.from({ length: dotCount }).map((_, idx) => (
@@ -74,7 +74,7 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
               key={idx}
               style={[
                 styles.planDot,
-                { backgroundColor: isFilled ? C.flameInk : C.text3 },
+                { backgroundColor: isFilled ? C.accentInk : C.accent },
               ]}
             />
           ))}

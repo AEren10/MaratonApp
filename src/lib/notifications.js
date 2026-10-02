@@ -170,6 +170,8 @@ const PLAN_SCREENS = {
   comparative: () => notificationUrl(SCREENS.COMPARATIVE),
   trial: () => notificationUrl(SCREENS.TRIAL_ENTRY),
   route: () => notificationUrl(SCREENS.ROADMAP),
+  share: () => notificationUrl(SCREENS.SHARE_CARD),
+  widget: () => notificationUrl(SCREENS.WIDGET_GUIDE),
 };
 
 // Yonetilen tum bildirimleri plandan kurar. Cagiran once iptal eder.
