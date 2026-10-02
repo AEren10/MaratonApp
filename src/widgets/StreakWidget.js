@@ -16,9 +16,9 @@ import { createWidget } from "expo-widgets";
 const StreakWidget = (props, environment) => {
   "widget";
 
-  const accent = "#E5343F";
-  const accentBright = "#FF6A72";
-  const accentDeep = "#A81C26";
+  // Seri turuncu (palet: flame); kizil ana buton ve rotaya ait.
+  const flame = "#FF8A3D";
+  const flameDeep = "#6B3416";
   const bg = "#1C1C23";
   const text = "#ECE8E4";
   const text2 = "#B0ADB5";
@@ -72,14 +72,14 @@ const StreakWidget = (props, environment) => {
         const future = ago < 0;
         const v = !future && ago <= 27 ? raw[27 - ago] : 0;
         const isToday = ago === 0;
-        const fill = future ? bg : isToday && !todayDone ? bg : v === 2 ? accent : v === 1 ? accentDeep : track;
+        const fill = future ? bg : isToday && !todayDone ? bg : v === 2 ? flame : v === 1 ? flameDeep : track;
         const ring = future
           ? [strokeBorder({ content: text4, style: { lineWidth: 1, dash: [2, 2] }, shape: "roundedRectangle", cornerRadius: 4 })]
           : isToday
-            ? [strokeBorder({ content: todayDone ? text : accent, style: { lineWidth: 1.5 }, shape: "roundedRectangle", cornerRadius: 4 })]
+            ? [strokeBorder({ content: todayDone ? text : flame, style: { lineWidth: 1.5 }, shape: "roundedRectangle", cornerRadius: 4 })]
             : [];
         return (
-          <VStack key={`c${c}`} modifiers={[frame({ width: cell, height: cell }), background(isToday && todayDone ? accentBright : fill),
+          <VStack key={`c${c}`} modifiers={[frame({ width: cell, height: cell }), background(isToday && todayDone ? flame : fill),
             cornerRadius(4), ...ring]}>
             <Spacer />
           </VStack>
@@ -95,7 +95,7 @@ const StreakWidget = (props, environment) => {
     return (
       <VStack alignment="leading" spacing={4} modifiers={[containerBackground(bg, "widget"), padding({ all: 13 }), url]}>
         <HStack alignment="lastTextBaseline" spacing={3}>
-          <Text modifiers={[font({ size: 34 }), foregroundStyle(accentBright)]}>{String(streak)}</Text>
+          <Text modifiers={[font({ size: 34 }), foregroundStyle(flame)]}>{String(streak)}</Text>
           <Text modifiers={[font({ size: 14 }), foregroundStyle(text3)]}>gün</Text>
         </HStack>
         <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(text)]}>{sentence}</Text>
@@ -119,7 +119,7 @@ const StreakWidget = (props, environment) => {
   return (
     <HStack spacing={10} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), url]}>
       <VStack alignment="leading" spacing={2}>
-        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>SERİ</Text>
+        <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(flame)]}>SERİ</Text>
         <HStack alignment="lastTextBaseline" spacing={3}>
           <Text modifiers={[font({ size: 44 }), foregroundStyle(text)]}>{String(streak)}</Text>
           <Text modifiers={[font({ size: 15 }), foregroundStyle(text3)]}>gün</Text>

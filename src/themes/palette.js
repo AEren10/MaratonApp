@@ -188,6 +188,7 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     // Acik temada koyulastirildi: zemin ustunde AA (>= 4.5).
     flame: isDark ? "#FF8A3D" : "#9E3206",
     flameInk: isDark ? "#241307" : "#FFFFFF",
+    flameDeep: isDark ? "#6B3416" : "#EBC2A6",
 
     // Rota / grafik türevleri
     proj: mix(accent, isDark ? 52 : 62, bg),

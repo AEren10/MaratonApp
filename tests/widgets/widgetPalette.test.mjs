@@ -20,6 +20,8 @@ const PALETTE = {
   accentBright: "#FF6A72",
   accentDeep: "#A81C26",
   accentInk: "#F7F2F0",
+  flame: "#FF8A3D",
+  flameDeep: "#6B3416",
   bg: "#1C1C23",
   surface: "#28282E",
   line: "#3A3A42",
