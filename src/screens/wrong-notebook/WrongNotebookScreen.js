@@ -13,6 +13,7 @@ import { Segmented } from "./components/Segmented";
 import { WrongScreenHeader } from "./components/WrongScreenHeader";
 import { WrongTopicRow } from "./components/WrongTopicRow";
 import { useWrongNotebookController } from "./useWrongNotebookController";
+import { NotebookSubjectFilter } from "./components/NotebookSubjectFilter";
 
 export default function WrongNotebookScreen() {
   const C = useC();
@@ -37,6 +38,7 @@ export default function WrongNotebookScreen() {
       <View style={[styles.gutter, styles.segment]}>
         <Segmented options={filterOptions} value={nb.filter} onChange={nb.changeFilter} />
       </View>
+      <NotebookSubjectFilter chips={nb.subjectChips} total={nb.itemCount} value={nb.subjectKey} onChange={nb.pickSubject} />
       {view.dueCount > 0 ? (
         <View style={[styles.gutter, styles.due]}>
           <ReviewDueCard count={view.dueCount} onStart={nb.goReview} />
@@ -46,7 +48,8 @@ export default function WrongNotebookScreen() {
         <SectionLabel style={[styles.gutter, styles.section, { color: C.text2 }]}>KONUYA GÖRE</SectionLabel>
       ) : null}
     </View>
-  ), [C, nb.lostPhotoCount, nb.dismissLostPhotos, filterOptions, nb.filter, nb.changeFilter, view.dueCount, nb.goReview, view.groups.length]);
+  ), [C, nb.lostPhotoCount, nb.dismissLostPhotos, filterOptions, nb.filter, nb.changeFilter, view.dueCount, nb.goReview, view.groups.length,
+    nb.subjectChips, nb.itemCount, nb.subjectKey, nb.pickSubject]);
 
   const footer = useMemo(() => (
     <View style={[styles.gutter, styles.footer]}>

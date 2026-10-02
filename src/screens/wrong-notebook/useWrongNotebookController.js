@@ -7,6 +7,8 @@ import { useAlert } from "../../contexts/AlertContext";
 import { trackButtonTap } from "../../lib/analytics";
 import { SCREENS } from "../../constants/screens";
 import { buildNotebookView, NOTEBOOK_FILTER } from "../../domain/wrongNotebook/wrongTopicGroups";
+import { notebookSubjectChips } from "../../domain/wrongNotebook/subjectChips";
+import { getSubjectByKey } from "../../themes/subjects";
 import { getWrongQuestions } from "../../supabase/wrongQuestions";
 import {
   getPendingWrongQuestions,
@@ -35,6 +37,11 @@ export function useWrongNotebookController() {
   const { subjectKey, subjectName } = useRoute().params || {};
   const scoped = useMemo(() => (subjectKey ? items.filter((it) => wrongMatchesSubject(it, subjectKey)) : items), [items, subjectKey]);
   const view = useMemo(() => buildNotebookView(scoped, filter), [scoped, filter]);
+  // Ders filtresi tum defterden kurulur (secili dersin disindakiler de gorunsun).
+  const subjectChips = useMemo(() => notebookSubjectChips(items, (k) => getSubjectByKey(k)?.label), [items]);
+  const pickSubject = useCallback((chip) => {
+    navigation.setParams({ subjectKey: chip?.key || undefined, subjectName: chip?.key ? chip.label : undefined });
+  }, [navigation]);
 
   const loadItems = useCallback(async () => {
     if (!user?.id) {
@@ -114,6 +121,9 @@ export function useWrongNotebookController() {
   return {
     subjectKey,
     subjectName,
+    subjectChips,
+    itemCount: items.length,
+    pickSubject,
     clearSubject: () => navigation.setParams({ subjectKey: undefined, subjectName: undefined }),
     changeFilter,
     dismissLostPhotos,
