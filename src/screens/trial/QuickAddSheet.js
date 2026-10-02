@@ -94,21 +94,23 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           </GestureDetector>
 
           <View style={styles.headerRow}>
-            <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Ne kaydediyorsun?</Text>
+            <Text style={[TYPOGRAPHY.subheading, { color: C.text }]}>Ne yapmak istiyorsun?</Text>
             <Press haptic="none" onPress={close} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat">
               <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Kapat</Text>
             </Press>
           </View>
 
           <View style={styles.section}>
-            <SectionLabel>ŞİMDİ</SectionLabel>
+            <SectionLabel>ŞİMDİ ÇALIŞ</SectionLabel>
             <QuickAddNowCard C={C} nextAction={nextAction} onStart={() => go(startScreen, startParams)} />
           </View>
 
           <View style={styles.section}>
-            <SectionLabel>KAYDET</SectionLabel>
+            {/* Calismaya baslamak (ust) ile yapilmis olani kaydetmek (alt) ayri:
+                ikisi "kaydet" altinda karisiyordu. */}
+            <SectionLabel>YAPTIĞINI KAYDET</SectionLabel>
             <View style={{ gap: STEP.s1 }}>
-              <QuickAddRow C={C} title="Çalışma kaydet" subtitle="Yaptığın çalışmayı gir · sayaç açmadan"
+              <QuickAddRow C={C} title="Geçmiş çalışma" subtitle="Sayaçsız yaptığın çalışmayı gir"
                 icon="bookOpen"
                 onPress={() => go(SCREENS.ADD_STUDY)} />
               <QuickAddRow C={C} title="Deneme gir" subtitle="Fotoğraftan veya elle"

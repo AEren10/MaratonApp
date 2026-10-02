@@ -5,8 +5,13 @@ import { TYPOGRAPHY, STEP, GUTTER } from "../../../themes/tokens";
 // kapali" tercihini tutuyor, dogrudan cagri o tercihi atliyor.
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
+import { useSelector } from "react-redux";
+import { selectLongestStreak, selectStreak } from "../../../store/slices/studyLogSlice";
 
 export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPress }) {
+  // Ilk calismasini yapacak kullaniciya tek yol: varsayilan sure + Basla.
+  // Pomodoro/ozel sure secenekleri ilk calisilan gunden sonra gorunur.
+  const firstTimer = !useSelector(selectStreak) && !useSelector(selectLongestStreak);
   const handleSelect = (key) => {
     if (key !== modeKey) {
       H.select();
@@ -20,6 +25,8 @@ export function StudyTimerModeSelector({ C, modeKey, modes, onChange, onCustomPr
     H.select();
     if (onCustomPress) onCustomPress();
   };
+
+  if (firstTimer && modeKey !== "CUSTOM") return null;
 
   return (
     <View style={s.container}>
