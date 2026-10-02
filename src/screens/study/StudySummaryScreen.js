@@ -1,17 +1,16 @@
 import { useEffect, useMemo } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SCREENS } from "../../constants/screens";
 import { useSelector } from "react-redux";
-import Animated, { FadeInUp } from "react-native-reanimated";
 
 import * as H from "../../lib/haptics";
-import { Icon } from "../../components/design";
-import { Press } from "../../components/design/Press";
-import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
+import { STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
+import { selectStreak, selectLongestStreak } from "../../store/slices/studyLogSlice";
+import { shareReady } from "../../domain/home/discoverTiming";
 import { usePaywallTrigger } from "../../hooks/usePaywallTrigger";
 import { useInAppReview } from "../../hooks/useInAppReview";
 import { openInTab } from "../../navigation/tabJump";
@@ -23,6 +22,9 @@ import { StudySummaryHero } from "./components/StudySummaryHero";
 import { StudySummaryActions } from "./components/StudySummaryActions";
 import { StoryShareBlock } from "../../components/share/StoryShareBlock";
 import { STORY_MOMENT } from "../../domain/share/storySticker";
+import { studyOutcomeLine } from "../../domain/study/studyOutcome";
+import { StudySummaryOutcome } from "./components/StudySummaryOutcome";
+import { StudySummaryHeader } from "./components/StudySummaryHeader";
 
 export default function StudySummaryScreen() {
   const C = useC();
@@ -31,12 +33,14 @@ export default function StudySummaryScreen() {
 
   const {
     subjectLabel = "Çalışma", subjectColor = C.accent, topic = "",
-    duration = 0, questions = 0, correctCount = 0,
+    duration = 0, questions = 0, correctCount = 0, routeStopId = null, routeOutcome = null,
   } = route.params ?? {};
   const wrongCount = Math.max(0, questions - correctCount);
 
   const todayLogs = useSelector((state) => state.studyLog.todayLogs);
   const dailyGoal = useSelector(selectDailyQuestionsGoal);
+  // Hikaye karti gosterecek ilerleme (3 gun) olusmadan sunulmaz.
+  const canShare = shareReady({ streak: useSelector(selectStreak), longestStreak: useSelector(selectLongestStreak) });
 
   const todaySolved = useMemo(() => todayLogs.reduce((sum, l) => sum + (l.questionCount || 0), 0), [todayLogs]);
   const todayMinutes = useMemo(() => todayLogs.reduce((sum, l) => sum + (l.duration || 0), 0), [todayLogs]);
@@ -45,6 +49,10 @@ export default function StudySummaryScreen() {
   const { maybeRequestReview } = useInAppReview();
   const { routeCreated, weeks } = useStudyRoute();
   const { nextRouteAction, startNextRouteAction } = useRoadmapNextAction({ navigation, routeCreated, weeks });
+  const outcome = useMemo(
+    () => studyOutcomeLine({ outcome: routeOutcome, week: weeks?.[0], stopId: routeStopId, subjectLabel }),
+    [routeOutcome, weeks, routeStopId, subjectLabel],
+  );
 
   useEffect(() => {
     H.success();
@@ -58,27 +66,11 @@ export default function StudySummaryScreen() {
   const safeGoal = dailyGoal > 0 ? dailyGoal : 100;
   const goalReached = todaySolved >= safeGoal;
 
-  const dismiss = () => {
-    openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
-  };
+  const dismiss = () => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <View style={styles.headerRow}>
-        <Animated.Text entering={FadeInUp.duration(500)} style={[TYPOGRAPHY.label, { color: C.accentBright ?? C.accent }]}>
-          DURAK TAMAMLANDI
-        </Animated.Text>
-        <Press
-          haptic="tap"
-          onPress={dismiss}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Kapat"
-          style={styles.closeBtn}
-        >
-          <Icon name="x" size={NAV_ICON.close} color={C.text2} />
-        </Press>
-      </View>
+      <StudySummaryHeader stopDone={Boolean(routeOutcome?.routeCompleted)} onClose={dismiss} C={C} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -95,20 +87,9 @@ export default function StudySummaryScreen() {
           wrongCount={wrongCount}
         />
 
-        <Animated.View style={{ marginTop: STEP.s4 }}>
-          <StudySummaryStats
-            C={C}
-            todaySolved={todaySolved}
-            safeGoal={safeGoal}
-            goalReached={goalReached}
-            todayMinutes={todayMinutes}
-          />
-        </Animated.View>
+        <StudySummaryOutcome line={outcome} C={C} />
 
-        <View style={{ marginTop: STEP.s4 }}>
-          <StoryShareBlock moment={STORY_MOMENT.SESSION} emphasis="quiet" />
-        </View>
-
+        {/* Sira: ne oldu -> siradaki durak -> bugun -> paylasim (en altta). */}
         <StudySummaryActions
           C={C}
           wrongCount={wrongCount}
@@ -117,26 +98,26 @@ export default function StudySummaryScreen() {
           startNextRouteAction={startNextRouteAction}
           onDismiss={dismiss}
         />
+
+        <StudySummaryStats
+          C={C}
+          todaySolved={todaySolved}
+          safeGoal={safeGoal}
+          goalReached={goalReached}
+          todayMinutes={todayMinutes}
+        />
+
+        {canShare ? (
+          <View style={{ marginTop: STEP.s4, paddingBottom: STEP.s4 }}>
+            <StoryShareBlock moment={STORY_MOMENT.SESSION} emphasis="quiet" />
+          </View>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: GUTTER,
-    paddingTop: STEP.s2,
-    paddingBottom: STEP.s1,
-  },
-  closeBtn: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   scroll: {
     paddingHorizontal: GUTTER,
     paddingTop: STEP.s2,

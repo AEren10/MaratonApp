@@ -3,7 +3,8 @@ import Animated from "react-native-reanimated";
 
 import { Button } from "../../../../components/design/Button";
 import { useC } from "../../../../contexts/ThemeContext";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { CONTROL, STEP, TYPOGRAPHY } from "../../../../themes/tokens";
+import { Press } from "../../../../components/design/Press";
 import { FirstDayRouteLine } from "./FirstDayRouteLine";
 import { FirstDayStop } from "./FirstDayStop";
 
@@ -41,28 +42,23 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
         <FirstDayStop task={nextTask} />
       </Animated.View>
 
+      {/* Tek baskin cikis: ilk durak. Aktivasyon ani rota hazir ekrani degil,
+          ilk calismanin bitip rotanin ilerledigini gormek. Digerleri yazi
+          baglantisi; deneme aciklamasi ilk calismadan sonra (Analiz bos hali). */}
       <Animated.View style={s.actions}>
         <Button variant="primary" size="lg" fullWidth onPress={() => onStartTask?.(nextTask)}>
           İlk durağa başla
         </Button>
-        <Button variant="outline" size="md" fullWidth onPress={onViewRoute}>
-          Rotanı gör
-        </Button>
-        {/* Ilk Gun hero'su Home govdesinin tamamini gizliyor ve eski tek
-            cikisi veri girmekti. Bu buton kapiyi aciyor: ilk duragi yapmadan
-            da Ana Sayfa'nin geri kalani gorulebilir. */}
-        {onShowHome ? (
-          <Button variant="ghost" size="md" fullWidth onPress={onShowHome}>
-            Ana sayfayı göster
-          </Button>
-        ) : null}
-      </Animated.View>
-
-      <Animated.View style={[s.hint, { borderColor: C.elev }]}>
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>Deneme girdikçe burada ne görünür?</Text>
-        <Text style={[TYPOGRAPHY.caption, s.hintBody, { color: C.text3 }]}>
-          Net ortalaman, tahmini sınav netin ve zayıf derslerin. Üç denemeden sonra rota geleceği de çizer.
-        </Text>
+        <View style={s.links}>
+          <Press haptic="tap" onPress={onViewRoute} accessibilityRole="button" style={s.link}>
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Rotanı gör</Text>
+          </Press>
+          {onShowHome ? (
+            <Press haptic="tap" onPress={onShowHome} accessibilityRole="button" style={s.link}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text3 }]}>Ana sayfaya geç</Text>
+            </Press>
+          ) : null}
+        </View>
       </Animated.View>
     </View>
   );
@@ -71,10 +67,7 @@ export function HomeFirstDay({ dailyGoal, hero, onStartTask, onViewRoute, onShow
 const s = StyleSheet.create({
   top: { paddingTop: STEP.s4 },
   summary: { marginTop: STEP.s2 + 2 },
-  actions: { marginTop: STEP.s4 - 4, gap: STEP.s2 },
-  hint: {
-    marginTop: STEP.s4 + 2, marginBottom: STEP.s4, paddingVertical: STEP.s3 - 2, paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.sheet - 2, borderWidth: 1, borderStyle: "dashed",
-  },
-  hintBody: { marginTop: STEP.s1 },
+  actions: { marginTop: STEP.s4 - 4, marginBottom: STEP.s4, gap: STEP.s1 },
+  links: { flexDirection: "row", justifyContent: "center", gap: STEP.s4 },
+  link: { minHeight: CONTROL.tapMin, justifyContent: "center", paddingHorizontal: STEP.s1 },
 });

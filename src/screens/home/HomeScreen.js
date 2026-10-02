@@ -17,6 +17,7 @@ import { useDueReviews } from "../../hooks/useDueReviews";
 import { syncReviewWidget, syncStreakWidget, syncTrialWidget } from "../../lib/widgetSync";
 import { updateReminderContent } from "../../lib/notifications";
 import { useAuth } from "../../contexts/AuthContext";
+import { discoverTipEligible } from "../../domain/home/discoverTiming";
 import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
@@ -36,7 +37,8 @@ export default function HomeScreen() {
   useEffect(() => { syncTrialWidget({ trials: h.trials }); }, [h.trials]);
   useHomeDepthTone(dashboard.solvedToday, h.dailyGoal);
 
-  const discoverEligible = (h.longestStreak || h.streak || 0) > 0;
+  // Widget/hikaye ipucu: 7. gunden ve 3 calisilmis gunden once dikkat dagitir.
+  const discoverEligible = discoverTipEligible({ streak: h.streak, longestStreak: h.longestStreak, createdAt: user?.created_at });
   // v1: Premium kapali; ucretsiz govde uretimden cikti, her zaman tam govde.
   const renderBelow = useCallback(() => (
     <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />

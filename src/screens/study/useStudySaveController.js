@@ -275,6 +275,14 @@ export function useStudySaveController() {
       duration,
       questions: qc,
       correctCount: cc,
+      // Ozetin "ne yaptik" cumlesi icin: durak gercekten kapandi mi?
+      routeStopId: routeStopId || null,
+      routeOutcome: {
+        routeCompleted: Boolean(planCompletion.routeCompleted),
+        partial: planCompletion.skipped === "partial"
+          ? { solved: planCompletion.solved, planned: planCompletion.planned }
+          : null,
+      },
     };
     // Sunucuya yazilamadi, kuyrukta: "Oturum Kaydedilemedi" hali.
     if (result.queued) {
