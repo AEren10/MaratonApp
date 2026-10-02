@@ -54,7 +54,7 @@ export function useAddStudyController() {
     const isToday = studyDate === todayTR();
     const current = [...tytSubjects, ...aytSubjects].find((s) => s.key === subjectKey);
 
-    const parsed = studyLogSchema.safeParse({ subject: subjectKey, topic: topicVal, questionCount: qc, correctCount: cc, duration });
+    const parsed = studyLogSchema.safeParse({ subject: subjectKey, topic: topicVal, questionCount: qc, correctCount: cc ?? undefined, duration });
     if (!parsed.success) {
       H.warn();
       showAlert("Hata", parsed.error.issues[0]?.message || "Geçersiz değer");
@@ -65,7 +65,7 @@ export function useAddStudyController() {
     if (isToday) {
       dispatch(addLog({
         id: Date.now().toString(), subject: subjectKey, topic: topicVal,
-        questionCount: qc, correctCount: cc, duration, examTier: tier, study_date: studyDate,
+        questionCount: qc, correctCount: cc ?? 0, duration, examTier: tier, study_date: studyDate,
       }));
     }
 

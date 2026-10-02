@@ -21,6 +21,8 @@ function has(input, ...keys) {
 export function normalizeStudyLog(row = {}) {
   const questionCount = toNumber(row.questionCount ?? row.question_count);
   const correctCount = toNumber(row.correctCount ?? row.correct_count);
+  // Dogru sayisi GIRILDI mi? null = girilmedi (0 = olculmus sifir).
+  const correctKnown = (row.correct_count ?? row.correctCount) != null;
   const duration = toNumber(row.duration ?? row.duration_minutes);
   const notes = row.notes ?? row.note ?? null;
 
@@ -28,6 +30,7 @@ export function normalizeStudyLog(row = {}) {
     ...row,
     questionCount,
     correctCount,
+    correctKnown,
     duration,
     question_count: questionCount,
     correct_count: correctCount,
@@ -46,8 +49,9 @@ export function toStudyLogRow(input = {}) {
     question_count: has(input, "question_count", "questionCount")
       ? toNumber(input.question_count ?? input.questionCount)
       : undefined,
+    // null korunur: "dogru sayisi girilmedi" (0 = olculmus sifir).
     correct_count: has(input, "correct_count", "correctCount")
-      ? toNumber(input.correct_count ?? input.correctCount)
+      ? ((input.correct_count ?? input.correctCount) == null ? null : toNumber(input.correct_count ?? input.correctCount))
       : undefined,
     duration_minutes: has(input, "duration_minutes", "duration")
       ? toNumber(input.duration_minutes ?? input.duration)

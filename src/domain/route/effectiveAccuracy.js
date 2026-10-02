@@ -19,13 +19,20 @@ const VOLUME_MASTERY_Q = 40;
 // Bilinen ve bilinmeyen kayitlar ayni konuda karisinca correct / toplam soru
 // dogrulugu yanlis dusurur (100 sorunun 20'sinde 15 dogru -> %15, oysa %75).
 // graded yoksa (eski satir) toplam soruya duser.
+//
+// 2026-10-03: graded > 0 ise dogruluk OLCULMUSTUR -- 0 dogru da (%0). Eskiden
+// dogru 0 ise "bilinmiyor" donuyordu: 50 soruda olculmus 0 dogru hacimden
+// ustalik (%82) alabiliyordu. graded'a artik yalniz dogru sayisi GIRILMIS
+// kayitlar giriyor (correct_count NULL = girilmedi).
 export function knownAccuracy({ q = 0, correct = 0, graded = 0 } = {}) {
   const questions = Number(q) || 0;
   const right = Number(correct) || 0;
-  if (questions <= 0 || right <= 0) return null;
+  if (questions <= 0) return null;
   const g = Number(graded) || 0;
-  const denom = g > 0 ? Math.min(g, questions) : questions;
-  return Math.min(100, Math.round((right / Math.max(denom, right)) * 100));
+  if (g > 0) return Math.min(100, Math.round((right / Math.max(Math.min(g, questions), right)) * 100));
+  // Eski satir (graded yok): yalniz dogru girilmisse.
+  if (right <= 0) return null;
+  return Math.min(100, Math.round((right / Math.max(questions, right)) * 100));
 }
 
 /** topic_progress satirindan bilinen dogruluk (%), bilinmiyorsa null. */

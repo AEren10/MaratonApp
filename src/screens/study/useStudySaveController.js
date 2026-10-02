@@ -148,7 +148,8 @@ export function useStudySaveController() {
 
     const todayStr = todayTR();
     const qc = parseInt(questionCount, 10) || 0;
-    const cc = parseInt(correctCount, 10) || 0;
+    // Bos = girilmedi (null); motor bilinmeyeni olculmus sifirdan ayirir.
+    const cc = String(correctCount).trim() === "" ? null : parseInt(correctCount, 10) || 0;
     const topicVal = topic.trim() || (currentSubject?.label || subjectKey);
 
     const notesVal = notes.trim() || undefined;
@@ -156,7 +157,7 @@ export function useStudySaveController() {
       subject: subjectKey,
       topic: topicVal,
       questionCount: qc,
-      correctCount: cc,
+      correctCount: cc ?? undefined,
       duration,
       notes: notesVal,
     });
@@ -171,7 +172,7 @@ export function useStudySaveController() {
       subject: subjectKey,
       topic: topicVal,
       questionCount: qc,
-      correctCount: cc,
+      correctCount: cc ?? 0,
       duration,
       notes: notesVal,
       study_date: todayStr,
@@ -274,7 +275,7 @@ export function useStudySaveController() {
       topic: topicVal,
       duration,
       questions: qc,
-      correctCount: cc,
+      correctCount: cc ?? 0,
       // Ozetin "ne yaptik" cumlesi icin: durak gercekten kapandi mi?
       routeStopId: routeStopId || null,
       routeOutcome: {

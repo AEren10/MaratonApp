@@ -11,7 +11,7 @@ export function useStudyRecordForm(initial = {}, onDirty) {
   const [questions, setQ] = useState(initial.questions ? String(initial.questions) : "");
   const [minutes, setM] = useState(initial.minutes ? String(initial.minutes) : "");
   // Dogru sayisi istege bagli: bos = bilinmiyor (0 yazilir, rota 0'i "bilinmiyor" okur).
-  const [correct, setC] = useState(initial.correct ? String(initial.correct) : "");
+  const [correct, setC] = useState(initial.correct != null ? String(initial.correct) : "");
 
   const dirty = useCallback((field, extra) => onDirty?.({ field, ...extra }), [onDirty]);
 
@@ -27,7 +27,9 @@ export function useStudyRecordForm(initial = {}, onDirty) {
   const values = useMemo(() => {
     const qc = parseInt(questions, 10) || 0;
     const dur = parseInt(minutes, 10) || 0;
-    const cc = Math.min(parseInt(correct, 10) || 0, qc);
+    // Bos birakilan dogru = "girilmedi" (null), 0 degil: motor bilinmeyeni
+    // olculmus sifirdan ayirir.
+    const cc = String(correct).trim() === "" ? null : Math.min(parseInt(correct, 10) || 0, qc);
     return { qc, dur, cc, topicVal: topic.trim() };
   }, [questions, minutes, correct, topic]);
 

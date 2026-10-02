@@ -27,7 +27,7 @@ export function useRehearsalTimer({ userId, session }) {
         subject: session.key,
         topic: "Sınav Simülasyonu",
         question_count: 0,
-        correct_count: 0,
+        correct_count: null,
         duration_minutes: session.minutes,
         study_date: todayTR(),
       }).catch(() => {});
