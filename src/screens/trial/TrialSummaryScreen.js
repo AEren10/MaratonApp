@@ -19,6 +19,7 @@ import { useTrialSummary } from "./useTrialSummary";
 import { useTrialSummaryShare } from "./useTrialSummaryShare";
 import { TrialShareCard } from "./components/TrialShareCard";
 import { TrialSummaryReportCard } from "./components/TrialSummaryReportCard";
+import { TrialRouteChanges } from "./components/TrialRouteChanges";
 import { TrialSummaryTarget } from "./components/TrialSummaryTarget";
 import { TrialDropLayout } from "./components/TrialDropLayout";
 import { Press } from "../../components/design/Press";
@@ -80,6 +81,7 @@ export default function TrialSummaryScreen() {
             />
 
             <TrialSummaryTarget onDepartments={() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.RANK_SIMULATOR, { tab: "preference" })} />
+            <TrialRouteChanges style={styles.changes} onOpenRoute={() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)} />
 
             {/* Kayit bitti: bir sonraki dogal adimlar */}
             <Animated.View style={styles.actions}>
@@ -124,6 +126,7 @@ export default function TrialSummaryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, position: "relative" },
+  changes: { paddingHorizontal: GUTTER, marginTop: STEP.s4 },
   ambientGlow: { position: "absolute", top: 0, left: 0, right: 0, height: 380 },
   header: { flexDirection: "row", alignItems: "center", gap: STEP.s1, paddingHorizontal: GUTTER - STEP.s2, paddingTop: 4 },
   close: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },

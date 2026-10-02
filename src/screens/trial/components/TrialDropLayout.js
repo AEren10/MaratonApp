@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { TrialRouteChanges } from "./TrialRouteChanges";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -90,6 +91,8 @@ export function TrialDropLayout({ trial, summary, typeLabel, dayMonth, onShare }
             </Text>
           </View>
         </Animated.View>
+
+        <TrialRouteChanges style={styles.section} />
 
         <Animated.View style={styles.actions}>
           <Button size="lg" fullWidth onPress={() => openInTab(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP)}>
