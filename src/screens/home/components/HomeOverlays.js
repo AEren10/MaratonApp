@@ -75,8 +75,7 @@ export function HomeOverlays({
       <GoalCompleteModal
         visible={goalCompleteVisible}
         solved={solvedToday}
-        goal={dailyGoal}
-        xpEarned={40}
+        minutes={minutesToday}
         onDismiss={dismissGoalComplete}
         onShare={() => {
           trackButtonTap("home_goal_complete_share", { targetScreen: SCREENS.SHARE_CARD });

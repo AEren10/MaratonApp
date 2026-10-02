@@ -12,7 +12,7 @@ import {
   selectStreak, selectTodayLogs, selectFreezeCount, selectLongestStreak, selectFreezeResetAt, selectLastStudyDate,
 } from "../../store/slices/studyLogSlice";
 import { selectTrials } from "../../store/slices/trialSlice";
-import { selectDailyQuestionsGoal } from "../../store/slices/goalsSlice";
+import { selectDailyQuestionsGoal, selectWeeklyMinutesGoal } from "../../store/slices/goalsSlice";
 import { usePlanContext } from "../../hooks/usePlanContext";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { useAISuggestions } from "../../hooks/useAISuggestions";
@@ -23,6 +23,7 @@ import { useRetention } from "../../hooks/useRetention";
 import { useFirstDayDismiss } from "../../hooks/useFirstDayDismiss";
 import { useGamification } from "../../hooks/useGamification";
 import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
+import { dailyMinutesGoalOf } from "../../domain/home/weeklyEffort";
 import { useCompletionMoments } from "../../hooks/useCompletionMoments";
 import { useHomeDashboard } from "../../hooks/useHomeDashboard";
 import { useTodayStops } from "../../hooks/useTodayStops";
@@ -79,7 +80,10 @@ export function useHomeController() {
     solvedToday,
     minutesToday: dashboard.minutesToday,
   });
-  const goalReward = useDailyGoalReward({ solvedToday, dailyGoal, userId: user?.id, reward });
+  const minutesGoal = dailyMinutesGoalOf(useSelector(selectWeeklyMinutesGoal));
+  const goalReward = useDailyGoalReward({
+    solvedToday, dailyGoal, minutesToday: dashboard.minutesToday, minutesGoal, userId: user?.id, reward,
+  });
   const completion = useCompletionMoments({ currentWeek: routeCurrentWeek, totals: routeTotals, userId: user?.id });
   const { markDayDone } = completion;
 
