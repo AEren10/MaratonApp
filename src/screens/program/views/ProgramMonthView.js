@@ -21,7 +21,7 @@ import { CalendarSkeleton } from "../../calendar/components/CalendarSkeleton";
 // kalkti (sifir kahraman olmaz); denemeye basinca detay bu sekmede acilir,
 // eskiden kullaniciyi Analiz sekmesine atiyordu.
 export function ProgramMonthView() {
-  const { value: streak } = useStreakWeek();
+  const { value: streak, longest } = useStreakWeek();
   const C = useC();
   const navigation = useNavigation();
   const [selectedDay, setSelectedDay] = useState(() => todayTR());
@@ -44,7 +44,7 @@ export function ProgramMonthView() {
       automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
     >
-      <CalendarStreakHero streak={streak} C={C} />
+      <CalendarStreakHero streak={streak} longest={longest} C={C} />
       <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} />
       <MonthGrid
         monthDate={monthDate}

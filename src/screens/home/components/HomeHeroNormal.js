@@ -18,7 +18,6 @@ import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { openInTab } from "../../../navigation/tabJump";
 import { HomeExamSeriesChart } from "./HomeExamSeriesChart";
 import { PullForwardRow } from "./PullForwardRow";
-import { HomeStreakStrip } from "./HomeStreakStrip";
 
 // Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
 // grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
@@ -97,8 +96,6 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       </Animated.View>
 
       {renderMiddle?.()}
-
-      <HomeStreakStrip />
 
       <View style={s.stat}>
         <HomeHeroStat

@@ -31,7 +31,7 @@ export function FlameBadge({ value = 0, size = 44 }) {
 
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
   const lit = value > 0;
-  const color = lit ? C.accent : C.text3;
+  const color = lit ? C.flame : C.text3;
   return (
     <View style={[s.halo, { width: size, height: size, borderRadius: size / 2, backgroundColor: alpha(color, lit ? 14 : 8) }]}>
       <Animated.View style={style}>

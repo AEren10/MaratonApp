@@ -183,6 +183,12 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     selFill: surfaces.elev,
     selText: text,
 
+    // Seri alevi: turuncu. Kizil ana buton + rota cizgisine ait; seri
+    // (alev, takvimde calisilan gun, seri noktalari) kendi sicak tonunda.
+    // Acik temada koyulastirildi: zemin ustunde AA (>= 4.5).
+    flame: isDark ? "#FF8A3D" : "#9E3206",
+    flameInk: isDark ? "#241307" : "#FFFFFF",
+
     // Rota / grafik türevleri
     proj: mix(accent, isDark ? 52 : 62, bg),
     projNode: mix(accent, isDark ? 44 : 60, fixed.text2),

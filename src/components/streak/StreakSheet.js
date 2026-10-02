@@ -31,9 +31,9 @@ export function StreakSheet({ visible, onClose, week }) {
   return (
     <BottomSheet visible={visible} onClose={onClose} style={s.sheet}>
       <View style={s.hero}>
-        <View style={[s.halo, { backgroundColor: alpha(C.accent, 10) }]}>
-          <View style={[s.ring, { backgroundColor: alpha(C.accent, 18), borderColor: alpha(C.accent, 45) }]}>
-            <Icon name="flame" size={30} color={C.accent} fill={C.accent} />
+        <View style={[s.halo, { backgroundColor: alpha(C.flame, 10) }]}>
+          <View style={[s.ring, { backgroundColor: alpha(C.flame, 18), borderColor: alpha(C.flame, 45) }]}>
+            <Icon name="flame" size={30} color={C.flame} fill={C.flame} />
           </View>
         </View>
         <View style={s.numberRow}>
@@ -49,10 +49,10 @@ export function StreakSheet({ visible, onClose, week }) {
         <View style={s.block}>
           <View style={s.between}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`SIRADAKİ EŞİK · ${next.day} GÜN`}</Text>
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentText }]}>{`${next.daysLeft} gün kaldı`}</Text>
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.flame }]}>{`${next.daysLeft} gün kaldı`}</Text>
           </View>
           <View style={[s.track, { backgroundColor: C.track }]}>
-            <Animated.View style={[s.fill, { backgroundColor: C.accent }, fillStyle]} />
+            <Animated.View style={[s.fill, { backgroundColor: C.flame }, fillStyle]} />
           </View>
         </View>
       ) : null}

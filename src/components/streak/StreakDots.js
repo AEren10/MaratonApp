@@ -24,15 +24,15 @@ function Dot({ state, size, settle, flame }) {
   }, [state, settle, reduced, scale]);
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
   const look = state === "done"
-    ? { backgroundColor: C.accent }
+    ? { backgroundColor: C.flame }
     : state === "today"
-      ? { borderWidth: 1.5, borderColor: C.accent }
+      ? { borderWidth: 1.5, borderColor: C.flame }
       : state === "missed"
         ? { backgroundColor: C.track }
         : { borderWidth: 1, borderColor: C.text5 };
   return (
     <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center" }, look, style]}>
-      {flame && state === "done" ? <Icon name="flame" size={Math.round(size * 0.58)} color={C.accentInk} fill={C.accentInk} /> : null}
+      {flame && state === "done" ? <Icon name="flame" size={Math.round(size * 0.58)} color={C.flameInk} fill={C.flameInk} /> : null}
     </Animated.View>
   );
 }
@@ -45,7 +45,7 @@ export function StreakDots({ days = [], size = 10, settle = false, labels = true
       {days.map((d) => (
         <View key={d.key} style={s.col}>
           {labels ? (
-            <Text style={[TYPOGRAPHY.micro, { color: d.state === "today" ? C.accentText : C.text3 }]}>{d.label}</Text>
+            <Text style={[TYPOGRAPHY.micro, { color: d.state === "today" ? C.flame : C.text3 }]}>{d.label}</Text>
           ) : null}
           <Dot state={d.state} size={size} settle={settle} flame={flame} />
         </View>

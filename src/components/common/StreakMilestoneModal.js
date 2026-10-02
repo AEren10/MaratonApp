@@ -25,7 +25,7 @@ export default function StreakMilestoneModal({ visible, milestone, onDismiss }) 
   return (
     <BottomSheet visible={visible} onClose={onDismiss} style={s.sheet}>
       <View style={s.pad}>
-        <Text style={[TYPOGRAPHY.label, { color: C.accentText }]}>SERİ</Text>
+        <Text style={[TYPOGRAPHY.label, { color: C.flame }]}>SERİ</Text>
         <View style={s.hero}>
           <Text style={[TYPOGRAPHY.statHero, { color: C.text }]}>{milestone.day}</Text>
           <Text style={[TYPOGRAPHY.statSideUnit, s.unit, { color: C.text2 }]}>gün üst üste</Text>

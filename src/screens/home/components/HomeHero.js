@@ -14,7 +14,6 @@ import { HomeHeroComeback } from "./heroVariants/HomeHeroComeback";
 import { HomeHeroExamDay } from "./heroVariants/HomeHeroExamDay";
 import { HomeHeroFrozen } from "./heroVariants/HomeHeroFrozen";
 import { getExamPhase } from "../../../domain/exam/examPhase";
-import { HomeStreakStrip } from "./HomeStreakStrip";
 
 // Yeni tasarim hero'su. Zamana bagli varyantlari (AKIŞ 14) useHomeHeroMode
 // secer. Normal modda erisime ve ilk gune gore uc hal: Pro (HomeHeroNormal),
@@ -126,15 +125,14 @@ export function HomeHero({
   }
 
   // Normal (Pro) modda duraklar CTA'nin hemen altinda, hero'nun icinde
-  // (renderMiddle); seri ve grafik onlardan sonra gelir. Diger hallerde
-  // duraklar hero'dan sonra, seri en altta. Ilk gunde seri yok.
+  // (renderMiddle); grafik onlardan sonra. Diger hallerde duraklar hero'dan
+  // sonra. Seri her halde ust bantta tek satir (HomeStreakLine).
   const isNormalPro = mode === HOME_HERO_MODE.NORMAL && !firstDay && hasRouteAccess;
   const isFirstDay = mode === HOME_HERO_MODE.NORMAL && firstDay;
   return (
     <Fragment>
       <View style={s.wrap}>{content}</View>
       {!isNormalPro && !isFirstDay ? renderBelow?.({ debtHours, hasRouteAccess }) : null}
-      {!isNormalPro && !isFirstDay ? <HomeStreakStrip /> : null}
       {!isFirstDay ? renderAfter?.() : null}
     </Fragment>
   );

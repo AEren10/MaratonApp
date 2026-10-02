@@ -9,6 +9,7 @@ import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/toke
 import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
 import { SOCIAL_ENABLED } from "../../../constants/social";
+import { HomeStreakLine } from "./HomeStreakLine";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -74,6 +75,8 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
       <View style={s.dateRow}>
         <Text style={[TYPOGRAPHY.heading, s.dateText, { color: C.text }]}>{dateHeading}</Text>
       </View>
+      {/* Seri tek satir, tarihin altinda: her acilista gorunur ama yer kaplamaz. */}
+      <HomeStreakLine />
     </Animated.View>
   );
 }
@@ -81,7 +84,7 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
 const s = StyleSheet.create({
   wrap: { paddingTop: STEP.s1 - 2 },
   row: { flexDirection: "row", alignItems: "center", gap: STEP.s2 + 1 },
-  dateRow: { marginTop: STEP.s3, marginBottom: STEP.s1 },
+  dateRow: { marginTop: STEP.s3 },
   dateText: { fontSize: 26, lineHeight: 32, letterSpacing: -0.6 },
   avatar: {
     width: CONTROL.tapMin - 2, height: CONTROL.tapMin - 2, borderRadius: SHAPE.iconBox, borderWidth: 1,

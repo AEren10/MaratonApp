@@ -19,7 +19,7 @@ const MONTH_LOCATIVES = [
 function Bar({ ratio, C }) {
   return (
     <View style={[s.track, { backgroundColor: C.track }]}>
-      <View style={[s.fill, { width: `${Math.round(Math.min(1, ratio) * 100)}%`, backgroundColor: C.accent }]} />
+      <View style={[s.fill, { width: `${Math.round(Math.min(1, ratio) * 100)}%`, backgroundColor: C.flame }]} />
     </View>
   );
 }
@@ -88,7 +88,7 @@ function StreakMonthCard({ monthDate, stats, onPress }) {
         <View style={[s.milestone, { borderTopWidth: 1, borderTopColor: C.line }]}>
           <View style={s.mHead}>
             <Text style={[TYPOGRAPHY.tableName, s.flex, { color: C.text }]}>{`${next.day} gün kilometre taşı`}</Text>
-            <Text style={[TYPOGRAPHY.metaSemiBold, s.num, { color: C.accentBright }]}>{`${next.daysLeft} gün`}</Text>
+            <Text style={[TYPOGRAPHY.metaSemiBold, s.num, { color: C.flame }]}>{`${next.daysLeft} gün`}</Text>
           </View>
           <View style={s.mBar}><Bar ratio={streak / next.day} C={C} /></View>
         </View>
