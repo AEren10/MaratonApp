@@ -158,11 +158,10 @@ export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
   for (const kind of rankFor(moment, ctx)) {
     const data = variantData(kind, ctx);
     if (!data) continue;
-    // "kart" yalniz marka zemininde, "iz" yalniz fotograf ustunde yasar;
-    // digerleri iki zeminde de.
-    const backgrounds = kind === STORY_KIND.KART
-      ? [STORY_BG.MARKA]
-      : kind === STORY_KIND.IZ ? [STORY_BG.FOTO] : [STORY_BG.FOTO, STORY_BG.MARKA];
+    // Strava modeli: her varyant hem fotografin ustune (seffaf sticker)
+    // hem de marka zemininde yasar. Fotograf oncelikli — insanlar kendi
+    // masalarini fotograflayip uzerine etiket koymak istiyor.
+    const backgrounds = [STORY_BG.FOTO, STORY_BG.MARKA];
     for (const background of backgrounds) {
       out.push({ key: `${kind}_${background}`, kind, background, data });
     }
