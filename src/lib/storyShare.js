@@ -58,20 +58,16 @@ async function capture(ref, result) {
 // backgroundImage: kullanicinin sectigi fotograf (iOS'ta data URI, Android'de
 // dosya yolu). Verilirse Instagram onu arka plan yapar, etiket ustune biner.
 export async function shareStoryToInstagram(ref, { backgroundImage = null } = {}) {
-  // Fotograf secilmediyse etikete bizim zeminimizi GONDERMEYIZ: seffaf etiket
-  // panoya, Instagram story kamerasi acilir; kullanici kendi fotografini
-  // ceker/secer ve yapistirir (Strava). Dogrudan gonderim zemin ister;
-  // yalniz uygulamada fotograf secildiyse kullanilir.
-  if (!backgroundImage) return pasteboardFallback(await capture(ref, "base64"));
-  // TEK YAKALAMA. Once dogrudan gonderim kendi yakalamasini yapiyor, sonra
-  // basarisiz olursa pano yolu BIR DAHA yakaliyordu: iki tam boy PNG ve iki
-  // base64 arka arkaya. Goruntu bir kez uretilip iki yola da veriliyor.
+  // TEK YAKALAMA: Etiketi olculu olarak yakalar.
   const shot = await capture(ref, Platform.OS === "ios" ? "base64" : "tmpfile");
   if (!shot) return STORY_SHARE.FAILED;
 
+  // Instagram Stories API'si dogrudan cagirilir. Fotograf secildiyse arka plan
+  // olarak gonderilir; secilmediyse koyu marka zemin rengiyle sadece sticker biner.
   if (await placeStickerInStory(shot, backgroundImage)) return STORY_SHARE.PLACED;
-  // Pano yolu base64 ister; Android'de dosya yakalandigi icin orada bir kez
-  // daha uretmek gerekiyor. Nadir yol: yalnizca dogrudan gonderim reddedilirse.
+
+  // Yedek yol: Yalnizca dogrudan gonderim basarisiz olursa (Instagram kurulu degilse vb.)
+  // etiket panoya kopyalanir ve kamera acilir.
   const base64 = Platform.OS === "ios" ? shot : await capture(ref, "base64");
   return pasteboardFallback(base64);
 }
@@ -79,25 +75,28 @@ export async function shareStoryToInstagram(ref, { backgroundImage = null } = {}
 /**
  * Etiketi Instagram'a DOGRUDAN gonderir — kullanici hicbir sey yapistirmaz.
  *
- * iOS'ta base64, Android'de dosya yolu isteniyor. Android'de base64
- * gondermek `enableBase64ShareAndroid` gerektiriyor, o da uygulamaya
- * WRITE_EXTERNAL_STORAGE izni ekliyor; bir paylasim ozelligi icin magaza
- * listesine hassas izin koymaya degmez.
- *
- * Instagram kurulu degilse ya da cagri reddedilirse firlatir; cagiran
- * pano yoluna duser.
+ * iOS'ta base64, Android'de dosya yolu istenir.
+ * backgroundImage varsa kullanicinin fotografi arka plana yerlesir, sticker ustune biner.
+ * backgroundImage yoksa Instagram story editoru koyu zemin ve sticker ile dogrudan acilir.
  */
 async function placeStickerInStory(shot, backgroundImage = null) {
   try {
     if (!shot) return false;
     const sticker = Platform.OS === "ios" ? `data:image/png;base64,${shot}` : shot;
 
-    await Share.shareSingle({
+    const shareOptions = {
       social: INSTAGRAM_STORIES_SOCIAL,
       appId: INSTAGRAM_APP_ID,
       stickerImage: sticker,
-      backgroundImage,
-    });
+      backgroundTopColor: "#1C1C23",
+      backgroundBottomColor: "#1C1C23",
+    };
+
+    if (backgroundImage) {
+      shareOptions.backgroundImage = backgroundImage;
+    }
+
+    await Share.shareSingle(shareOptions);
     return true;
   } catch {
     return false;
