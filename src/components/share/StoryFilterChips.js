@@ -22,13 +22,13 @@ function getAvailableFields(kind, data) {
     if (data?.weekQuestions != null) f.push({ key: "showQuestions", label: `Soru (${data.weekQuestions})` });
     if (data?.weekMinutes != null) f.push({ key: "showMinutes", label: "Toplam Süre" });
     f.push({ key: "showDays", label: "Günler" });
-    f.push({ key: "showGoalLine", label: "Hedef Çizgisi 🚩" });
+    f.push({ key: "showGoalLine", label: "Hedef Çizgisi" });
     return f;
   }
   if (kind === "harita") {
     if (data?.currentNet != null) f.push({ key: "showNet", label: `Net (${data.currentNet.toFixed(1)}→${data.targetNet})` });
     if (data?.stopsCount != null) f.push({ key: "showStops", label: `Duraklar (${data.completedStops}/${data.stopsCount})` });
-    f.push({ key: "showChart", label: "Noktalı Yol & Bayrak 🚩" });
+    f.push({ key: "showChart", label: "Noktalı Yol & Bayrak" });
     return f;
   }
   if (kind === "ders") {

@@ -23,7 +23,7 @@ export function StoryActionRow({
   const showPhotoInfo = () => {
     H.tap();
     Alert.alert(
-      "📸 Masa Fotoğrafı & Şablon",
+      "Masa Fotoğrafı & Şablon",
       "1. Fotoğrafını Ekle:\nÇalışma masanın veya kitabının fotoğrafını çek/seç.\n\n2. Otomatik Giydir:\nSeçtiğin şablon fotoğrafının tam üzerine 9:16 oranında oturur.\n\n3. Hızlıca Paylaş:\nInstagram veya TikTok'a hazır hikaye olarak tek tıkla gönder!",
       [{ text: "Harika, Anladım", style: "default" }]
     );
@@ -61,11 +61,13 @@ export function StoryActionRow({
               <Path d="M3 8a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth={1.8} />
               <Circle cx="12" cy="13" r="3.5" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth={1.8} />
             </Svg>
-            <Press haptic="none" onPress={showPhotoInfo} style={s.infoBadge}>
-              <Text style={s.infoText}>i</Text>
-            </Press>
           </Press>
-          <Text style={[TYPOGRAPHY.micro, s.label, { color: hasPhoto ? C.accentBright : C.text2 }]}>{hasPhoto ? "Değiştir" : "Fotoğraf"}</Text>
+          <View style={s.labelRow}>
+            <Text style={[TYPOGRAPHY.micro, s.label, { color: hasPhoto ? C.accentBright : C.text2 }]}>{hasPhoto ? "Değiştir" : "Fotoğraf"}</Text>
+            <Press haptic="none" onPress={showPhotoInfo} hitSlop={10} style={s.infoBtn}>
+              <Text style={[s.infoText, { color: C.text3 }]}>ⓘ</Text>
+            </Press>
+          </View>
         </View>
 
         {/* 4. Kopyala */}
@@ -76,8 +78,8 @@ export function StoryActionRow({
       </View>
 
       {hasPhoto ? (
-        <Press haptic="none" onPress={() => { H.tap(); onClearPhoto(); }} accessibilityRole="button" style={[s.clearPhotoBtn, { backgroundColor: C.void, borderColor: C.line }]}>
-          <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
+        <Press haptic="none" onPress={() => { H.tap(); onClearPhoto(); }} accessibilityRole="button" style={[s.clearPhotoBtn, { backgroundColor: C.void, borderColor: C.border }]}>
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
             <Path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke={C.danger || "#F0555F"} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
           <Text style={[s.clearPhotoText, { color: C.text }]}>Fotoğrafı Kaldır</Text>
@@ -92,11 +94,12 @@ const s = StyleSheet.create({
   wrap: { marginTop: STEP.s3, alignItems: "center" },
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%", paddingHorizontal: STEP.s2 },
   item: { alignItems: "center", width: 62 },
-  circle: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center", position: "relative" },
-  infoBadge: { position: "absolute", top: -2, right: -2, width: 16, height: 16, borderRadius: 8, backgroundColor: "rgba(100,100,110,0.85)", alignItems: "center", justifyContent: "center" },
-  infoText: { color: "#FFFFFF", fontSize: 10, fontWeight: "700" },
-  label: { marginTop: 6, fontFamily: "Archivo_600", fontSize: 11 },
-  clearPhotoBtn: { marginTop: STEP.s2, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1 },
-  clearPhotoText: { fontFamily: "Archivo_600", fontSize: 11.5 },
+  circle: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
+  labelRow: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 6 },
+  label: { fontFamily: "Archivo_600", fontSize: 11 },
+  infoBtn: { padding: 1 },
+  infoText: { fontSize: 11, fontFamily: "Archivo_600" },
+  clearPhotoBtn: { marginTop: STEP.s2, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 16, height: 38, borderRadius: 19, borderWidth: 1 },
+  clearPhotoText: { fontFamily: "Archivo_600", fontSize: 12 },
   clearPhotoSub: { fontFamily: "Archivo_500", fontSize: 11 },
 });

@@ -128,7 +128,7 @@ const s = StyleSheet.create({
   },
   tagText: {
     fontFamily: "Archivo_700",
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 1.1,
   },
   checkCircle: {

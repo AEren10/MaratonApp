@@ -89,15 +89,15 @@ export function StoryMapBody({ data, p, visibility = {} }) {
             ))}
             <Circle cx={chartData.curr.x} cy={chartData.curr.y} r={16} fill={p.accent} fillOpacity={0.25} />
             <Circle cx={chartData.curr.x} cy={chartData.curr.y} r={7.5} fill={p.accent} stroke="#FFFFFF" strokeWidth={2} />
-            <SvgText x={chartData.curr.x} y={chartData.curr.y - 20} fill={p.accent} fontSize={10} fontWeight="700" textAnchor="middle">
+            <SvgText x={chartData.curr.x} y={chartData.curr.y - 20} fill={p.accent} fontSize={11} fontWeight="700" textAnchor="middle">
               ŞU AN BURADASIN
             </SvgText>
             <G>
               <Circle cx={chartData.flagX} cy={chartData.flagY} r={10} fill={p.accent} fillOpacity={0.2} />
               <Line x1={chartData.flagX} y1={chartData.flagY} x2={chartData.flagX} y2={chartData.flagY - 24} stroke={p.accent} strokeWidth={2.4} strokeLinecap="round" />
               <Path d={`M${chartData.flagX},${chartData.flagY - 24} L${chartData.flagX + 18},${chartData.flagY - 17} L${chartData.flagX},${chartData.flagY - 10} Z`} fill={p.accent} />
-              <SvgText x={chartData.flagX - 10} y={chartData.flagY + 18} fill={p.solid} fontSize={10.5} fontWeight="700" textAnchor="middle">
-                {`${targetNet} NET 🚩`}
+              <SvgText x={chartData.flagX - 10} y={chartData.flagY + 18} fill={p.solid} fontSize={11} fontWeight="700" textAnchor="middle">
+                {`${targetNet} NET`}
               </SvgText>
             </G>
           </Svg>

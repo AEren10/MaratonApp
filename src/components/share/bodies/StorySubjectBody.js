@@ -83,7 +83,7 @@ export function StorySubjectBody({ data, p }) {
           ))}
           <Circle cx={chart.last.x} cy={chart.last.y} r={14} fill={p.accent} fillOpacity={0.25} />
           <Circle cx={chart.last.x} cy={chart.last.y} r={6.5} fill={p.accent} stroke="#FFFFFF" strokeWidth={2} />
-          <SvgText x={chart.last.x} y={chart.last.y - 18} fill={p.accent} fontSize={10.5} fontWeight="700" textAnchor="middle">
+          <SvgText x={chart.last.x} y={chart.last.y - 18} fill={p.accent} fontSize={11} fontWeight="700" textAnchor="middle">
             {`${formatNumber(currentNet, 1)} NET`}
           </SvgText>
         </Svg>

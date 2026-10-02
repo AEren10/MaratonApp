@@ -23,7 +23,7 @@ export function StoryCountdownBody({ data, p }) {
             </View>
             <View style={s.barMeta}>
               <Text style={[s.metaText, { color: p.dim }, p.shadow]}>{`%${Math.round(pct)} Geride Kaldı`}</Text>
-              <Text style={[s.metaText, { color: p.up }, p.shadow]}>Hedefe Odaklan 🎯</Text>
+              <Text style={[s.metaText, { color: p.up }, p.shadow]}>Hedefe Odaklan</Text>
             </View>
           </View>
         ) : null}

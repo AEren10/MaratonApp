@@ -78,7 +78,7 @@ export function StoryBarsBody({ data, p, visibility = {} }) {
             return (
               <G key={`b-${i}`}>
                 {val > 0 && d.minutes ? (
-                  <SvgText x={x + barW / 2} y={y - 6} fill={isToday ? p.accent : p.solid} fontSize={10.5} fontWeight="700" textAnchor="middle">
+                  <SvgText x={x + barW / 2} y={y - 6} fill={isToday ? p.accent : p.solid} fontSize={11} fontWeight="700" textAnchor="middle">
                     {fmtMinutes(d.minutes)}
                   </SvgText>
                 ) : null}
@@ -92,7 +92,7 @@ export function StoryBarsBody({ data, p, visibility = {} }) {
                   fillOpacity={val > 0 ? 1 : 0.25}
                 />
                 {d.questions > 0 && h >= 28 ? (
-                  <SvgText x={x + barW / 2} y={barAreaH - 6} fill="#FFFFFF" fontSize={10} fontWeight="700" textAnchor="middle">
+                  <SvgText x={x + barW / 2} y={barAreaH - 6} fill="#FFFFFF" fontSize={11} fontWeight="700" textAnchor="middle">
                     {d.questions}
                   </SvgText>
                 ) : null}
