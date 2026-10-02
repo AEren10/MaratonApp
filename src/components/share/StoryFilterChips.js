@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
@@ -11,27 +11,27 @@ function getAvailableFields(kind, data) {
   if (kind === "cubuk") {
     if (data?.weekQuestions != null) f.push({ key: "showQuestions", label: `Soru (${data.weekQuestions})` });
     if (data?.weekMinutes != null) f.push({ key: "showMinutes", label: "Toplam Süre" });
-    f.push({ key: "showDays", label: "Gün İsimleri" });
+    f.push({ key: "showDays", label: "Günler" });
     f.push({ key: "showGoalLine", label: "Hedef Çizgisi 🚩" });
-    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Sınava ${data.daysToExam} Gün` });
+    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
     return f;
   }
   if (kind === "harita") {
     if (data?.currentNet != null) f.push({ key: "showNet", label: `Net (${data.currentNet.toFixed(1)}→${data.targetNet})` });
     if (data?.stopsCount != null) f.push({ key: "showStops", label: `Duraklar (${data.completedStops}/${data.stopsCount})` });
-    f.push({ key: "showChart", label: "Rota & Bayrak 🚩" });
-    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Sınava ${data.daysToExam} Gün` });
+    f.push({ key: "showChart", label: "Noktalı Yol & Bayrak 🚩" });
+    if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
     return f;
   }
   if (data?.questions != null) f.push({ key: "showQuestions", label: `Soru (${data.questions})` });
   if (data?.minutes != null) f.push({ key: "showMinutes", label: "Süre" });
   if (data?.streak != null) f.push({ key: "showStreak", label: `Seri (${data.streak} g)` });
-  if (data?.series?.length > 1) f.push({ key: "showChart", label: "Grafik / İz" });
+  if (data?.series?.length > 1) f.push({ key: "showChart", label: "Grafik" });
   if (data?.stops != null) f.push({ key: "showStops", label: `Duraklar (${data.stops})` });
   if (data?.accuracy != null) f.push({ key: "showAccuracy", label: `İsabet (%${Math.round(data.accuracy)})` });
   if (data?.weekQuestions != null && kind === "iz") f.push({ key: "showWeek", label: "Haftalık" });
-  if (data?.dayLabels?.length && kind === "rota") f.push({ key: "showDays", label: "Gün İsimleri" });
-  if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Sınava ${data.daysToExam} Gün` });
+  if (data?.dayLabels?.length && kind === "rota") f.push({ key: "showDays", label: "Günler" });
+  if (data?.daysToExam != null) f.push({ key: "showCountdown", label: `Kalan Gün (${data.daysToExam})` });
   return f;
 }
 
@@ -41,13 +41,18 @@ export function StoryFilterChips({ kind, data, visibility, onToggle }) {
   if (!fields.length) return null;
 
   return (
-    <View style={s.wrap}>
+    <View style={[s.wrap, { backgroundColor: C.void, borderColor: C.line }]}>
       <View style={s.headRow}>
-        <Text style={[TYPOGRAPHY.label, s.title, { color: C.text2 }]}>HİKAYEYİ ÖZELLEŞTİR</Text>
-        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Dokun & Kapat / Aç</Text>
+        <View style={s.titleGroup}>
+          <Svg width={13} height={13} viewBox="0 0 24 24" fill="none">
+            <Path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" stroke={C.accentBright} strokeWidth={2.2} strokeLinecap="round" />
+          </Svg>
+          <Text style={[s.title, { color: C.text }]}>HİKÂYEYİ ÖZELLEŞTİR</Text>
+        </View>
+        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Aç / Kapat</Text>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
+      <View style={s.chipsGrid}>
         {fields.map((f) => {
           const isVisible = visibility[f.key] !== false;
           return (
@@ -60,46 +65,38 @@ export function StoryFilterChips({ kind, data, visibility, onToggle }) {
               style={[
                 s.chip,
                 {
-                  backgroundColor: isVisible ? C.elev : C.void,
-                  borderColor: isVisible ? C.accent : C.border,
+                  backgroundColor: isVisible ? C.surface : "transparent",
+                  borderColor: isVisible ? C.accent : C.line,
                 },
               ]}
             >
-              <View style={[s.iconBox, { backgroundColor: isVisible ? C.accent : "transparent" }]}>
-                {isVisible ? (
-                  <Svg width={9} height={9} viewBox="0 0 10 10">
-                    <Path d="M2 5L4 7L8 3" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                  </Svg>
-                ) : (
-                  <View style={[s.offDot, { backgroundColor: C.text4 }]} />
-                )}
-              </View>
-              <Text style={[TYPOGRAPHY.micro, s.chipText, { color: isVisible ? C.text : C.text4 }]}>
+              <View style={[s.dot, { backgroundColor: isVisible ? C.accentBright : C.line }]} />
+              <Text style={[s.chipText, { color: isVisible ? C.text : C.text3 }]}>
                 {f.label}
               </Text>
             </Press>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { marginTop: STEP.s3 },
-  headRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: GUTTER, marginBottom: STEP.s1 },
-  title: { letterSpacing: 0.9, fontFamily: "Archivo_600", fontSize: 11.5 },
-  rail: { paddingHorizontal: GUTTER, gap: STEP.s1, alignItems: "center", paddingVertical: 2 },
+  wrap: { marginHorizontal: GUTTER, marginTop: STEP.s3, borderRadius: 16, borderWidth: 1, padding: 12 },
+  headRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  titleGroup: { flexDirection: "row", alignItems: "center", gap: 7 },
+  title: { letterSpacing: 1.1, fontFamily: "Archivo_700", fontSize: 11 },
+  chipsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    gap: 7,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
     borderRadius: 20,
-    borderWidth: 1.5,
+    borderWidth: 1.2,
   },
-  iconBox: { width: 16, height: 16, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-  offDot: { width: 4, height: 4, borderRadius: 2 },
-  chipText: { fontFamily: "Archivo_600", fontSize: 12 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  chipText: { fontFamily: "Archivo_600", fontSize: 11.5 },
 });

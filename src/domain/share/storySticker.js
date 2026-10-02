@@ -169,19 +169,20 @@ function rankFor(moment, ctx) {
   const soon = pos(ctx.daysToExam) != null && ctx.daysToExam <= COUNTDOWN_SOON_DAYS;
   const isHonest = ctx.today?.questions != null && ctx.today.questions > 0 && ctx.today.questions <= HONEST_MAX_QUESTIONS && pos(ctx.streak);
 
-  const head = moment === STORY_MOMENT.TRIAL
-    ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.CUBUK, STORY_KIND.HARITA]
-    : moment === STORY_MOMENT.STREAK
-      ? [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.IZ, STORY_KIND.CUBUK]
-      : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA];
+  const head = moment === STORY_MOMENT.SESSION
+    ? [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA]
+    : moment === STORY_MOMENT.TRIAL
+      ? [STORY_KIND.NET, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.IZ]
+      : moment === STORY_MOMENT.STREAK
+        ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.KART, STORY_KIND.IZ]
+        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.KART, STORY_KIND.NET, STORY_KIND.IZ];
 
   const tail = [
-    STORY_KIND.ISTATISTIK,
-    STORY_KIND.ROTA,
-    STORY_KIND.SERI,
-    STORY_KIND.SADE,
     STORY_KIND.GERISAYIM,
-    STORY_KIND.NET,
+    STORY_KIND.SERI,
+    STORY_KIND.ROTA,
+    STORY_KIND.ISTATISTIK,
+    STORY_KIND.SADE,
     STORY_KIND.DURUST,
   ];
 
@@ -189,7 +190,7 @@ function rankFor(moment, ctx) {
     ? [STORY_KIND.DURUST, ...head, ...tail.filter((k) => k !== STORY_KIND.DURUST && !head.includes(k))]
     : [...head, ...tail.filter((k) => !head.includes(k))];
 
-  if (soon) {
+  if (soon && moment !== STORY_MOMENT.TRIAL) {
     order = [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
   }
   return order;

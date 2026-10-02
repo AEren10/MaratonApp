@@ -157,3 +157,40 @@ export async function copyStoryToClipboard(ref) {
     return STORY_SHARE.FAILED;
   }
 }
+
+const TIKTOK_SCHEMES = ["snssdk1233://", "snssdk1180://", "tiktok://"];
+
+/** TikTok paylasimi: etiketi panoya kopyalar ve TikTok uygulamasini acar. */
+export async function shareStoryToTikTok(ref) {
+  const base64 = await capture(ref, "base64");
+  if (!base64) return STORY_SHARE.FAILED;
+  try {
+    await Clipboard.setImageAsync(base64);
+  } catch {
+    return STORY_SHARE.FAILED;
+  }
+
+  let opened = false;
+  for (const scheme of TIKTOK_SCHEMES) {
+    try {
+      const can = await Linking.canOpenURL(scheme);
+      if (can) {
+        await Linking.openURL(scheme);
+        opened = true;
+        break;
+      }
+    } catch {
+      // devam et
+    }
+  }
+  if (!opened) {
+    try {
+      await Linking.openURL("tiktok://");
+      opened = true;
+    } catch {
+      opened = false;
+    }
+  }
+
+  return opened ? STORY_SHARE.TIKTOK_OPENED : STORY_SHARE.COPIED;
+}

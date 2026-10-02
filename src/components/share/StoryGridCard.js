@@ -10,17 +10,17 @@ import { CheckerboardBackground } from "./CheckerboardBackground";
 import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
 
 const KIND_NAMES = {
-  iz: "İZ & VERİ",
-  cubuk: "ÇUBUKLAR",
+  cubuk: "HAFTALIK RAPOR",
   harita: "HEDEF ROTASI",
-  kart: "FİŞ",
-  rota: "GRAFİK",
-  sade: "MİNİMAL",
-  seri: "SERİ",
-  net: "NET",
+  kart: "GÜNÜN RAPORU",
+  net: "DENEME NETİ",
+  iz: "GÜNÜN İZİ",
+  gerisayim: "GERİ SAYIM",
+  seri: "SERİ ATEŞİ",
+  rota: "TREND EĞRİSİ",
   istatistik: "İSTATİSTİK",
-  gerisayim: "SAYAC",
-  durust: "DÜRÜST",
+  sade: "MİNİMAL",
+  durust: "DÜRÜST KART",
 };
 
 export function StoryGridCard({

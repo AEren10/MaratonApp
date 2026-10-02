@@ -18,6 +18,7 @@ const CARD_H = Math.round(CARD_W * (16 / 9));
 const STATUS_TEXTS = {
   placed: "Instagram'a aktarıldı ✓",
   opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
+  tiktok_opened: "TikTok açıldı — Hikayende 'Çıkartma' olarak yapıştırabilirsin ✓",
   copied: "Şeffaf etiket panoya kopyalandı ✓",
   saved: "Galeriye kaydedildi ✓",
   permission_denied: "İzin verilmedi.",
@@ -88,6 +89,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
       {/* Strava Tarzi Dairesel Butonlar */}
       <StoryActionRow
         onShareInstagram={() => s.share(overlayRef)}
+        onShareTikTok={() => s.shareTikTok(overlayRef)}
         onCopyToClipboard={() => s.copy(overlayRef)}
         onSaveToGallery={() => s.save(overlayRef)}
         onPickPhoto={handlePickPhoto}

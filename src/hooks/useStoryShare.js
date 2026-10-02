@@ -9,6 +9,7 @@ import { useWeeklyReport } from "./useWeeklyReport";
 import { buildStoryVariants, STORY_MOMENT } from "../domain/share/storySticker";
 import {
   shareStoryToInstagram,
+  shareStoryToTikTok,
   saveStoryToGallery,
   copyStoryToClipboard,
   STORY_SHARE,
@@ -140,6 +141,7 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     },
     save: (ref) => run(saveStoryToGallery, ref),
     copy: (ref) => run(copyStoryToClipboard, ref),
+    shareTikTok: (ref) => run(shareStoryToTikTok, ref),
     loading: report.loading,
     STORY_SHARE,
   };

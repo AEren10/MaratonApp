@@ -78,6 +78,9 @@ export function StoryNetBody({ data, p }) {
                 <Text style={[s.netSubjectValue, { color: p.solid }, p.shadow]}>
                   {formatNumber(n.net, 2)}
                 </Text>
+                <View style={[s.subjTrack, { backgroundColor: p.rule }]}>
+                  <View style={[s.subjFill, { width: `${Math.min(100, Math.max(12, ((Number(n.net) || 0) / 40) * 100))}%`, backgroundColor: p.accent }]} />
+                </View>
               </View>
             ))}
           </View>
@@ -128,6 +131,8 @@ const s = StyleSheet.create({
   netSubject: { gap: 6 },
   netSubjectKey: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.4 },
   netSubjectValue: { fontFamily: "Bricolage_400", fontSize: 24, lineHeight: 24 },
+  subjTrack: { height: 3, width: "100%", borderRadius: 1.5, marginTop: 4, overflow: "hidden" },
+  subjFill: { height: "100%", borderRadius: 1.5 },
 
   honestWrap: { position: "absolute", left: 40, right: 40, top: 236 },
   honestBar: { width: 52, height: 4, borderRadius: 2 },
