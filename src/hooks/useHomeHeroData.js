@@ -133,8 +133,8 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
   // Haftalik emek: deneme GEREKTIRMEZ, her calisilan gun degisir. Grafik
   // alanindaki ilk sayfa bu; rota ikinci sayfada.
   const weeklyEffort = useMemo(
-    () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal, previousQuestions }),
-    [weekLogs, dailyGoal, previousQuestions],
+    () => buildWeeklyEffort({ logs: weekLogs || [], dailyGoal, previousQuestions, weeklyMinutesGoal }),
+    [weekLogs, dailyGoal, previousQuestions, weeklyMinutesGoal],
   );
   // Gun degisince (gece yarisi / uygulama one gelince) yeniden hesaplanir.
   const todayKey = useTodayKey();

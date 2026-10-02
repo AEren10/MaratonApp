@@ -165,3 +165,13 @@ test("gecen hafta verisi yoksa cumle eskisi gibi kalir", () => {
   assert.equal(w.summary, "Bu hafta 60 soru · 45 dk");
   assert.equal(w.tempo, null);
 });
+
+test("cubuk sure: gunluk dakika hedefi ve en yuksek gun dakikasi", async () => {
+  const { buildWeeklyEffort: build, dailyMinutesGoalOf } = await import("../../src/domain/home/weeklyEffort.js");
+  assert.equal(dailyMinutesGoalOf(1200), 170);
+  assert.equal(dailyMinutesGoalOf(0), 0);
+  const w = build({ logs: [{ study_date: PZT, duration_minutes: 50 }, { study_date: PZT, duration_minutes: 70, question_count: 29 }], weeklyMinutesGoal: 1200 });
+  assert.equal(w.minutesGoal, 170);
+  assert.equal(w.peakMinutes, 120);
+  assert.equal(w.days[0].questions, 29);
+});

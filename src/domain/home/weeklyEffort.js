@@ -66,7 +66,16 @@ export function buildTempo(total, previous) {
   return { direction, percent, label: `geçen haftadan %${Math.abs(percent)} ${word}` };
 }
 
-export function buildWeeklyEffort({ logs = [], dailyGoal = 0, previousQuestions = null } = {}) {
+// Haftalik dakika hedefinin gunluk karsiligi, 5 dakikaya yuvarli (1200 -> 170).
+export function dailyMinutesGoalOf(weeklyMinutes) {
+  const w = num(weeklyMinutes);
+  return w > 0 ? Math.round(w / 7 / 5) * 5 : 0;
+}
+
+// CUBUKLAR SURE (2 Ekim, kullanici karari): soru girilmemis calisma da
+// cubugu doldurur; soru sayisi cubugun icinde kucuk sayi olarak kalir.
+// Ana sayfanin buyuk sayisi ("bugun cozulen") soru olarak kalir.
+export function buildWeeklyEffort({ logs = [], dailyGoal = 0, previousQuestions = null, weeklyMinutesGoal = 0 } = {}) {
   const days = WEEK_DAYS.map((label) => ({
     label, questions: 0, minutes: 0, worked: false, minutesOnly: false,
   }));
@@ -104,6 +113,8 @@ export function buildWeeklyEffort({ logs = [], dailyGoal = 0, previousQuestions 
     tempo,
     days,
     goal,
+    minutesGoal: dailyMinutesGoalOf(weeklyMinutesGoal),
+    peakMinutes: days.reduce((max, d) => Math.max(max, d.minutes), 0),
     maxValue,
     totalQuestions,
     totalMinutes,

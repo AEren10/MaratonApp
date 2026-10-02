@@ -4,16 +4,18 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
+import { EffortGrid } from "./components/EffortGrid";
 import { compactDuration, effortLabelLayout } from "./components/effortLabels";
 import { useC } from "../../contexts/ThemeContext";
 import { useChartFrame } from "./useChartFrame";
 import {
-  CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom, gridSteps,
+  CHART_H, EFFORT_PAD_LEFT, PAD_RIGHT, PAD_TOP, LABEL, plotBottom,
 } from "./chartStyle";
 
 const BAR_RADIUS = 3;
 
-// Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gun cozulen soru.
+// Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gunun CALISMA SURESI
+// (soru girilmemis calisma da dolar). Soru sayisi cubugun icinde kucuk sayi.
 export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
   const C = useC();
   const { onLayout, vbW, wide } = useChartFrame(height);
@@ -31,9 +33,9 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
   // Ince cubuk (kullanici istegi, 29 Eylul): 34/0.68 -> 24/0.5.
   const barW = Math.min(24, slot * 0.5);
 
-  const peak = (week.days || []).reduce((max, d) => Math.max(max, d.questions), 0);
-  const goal = week.goal || 0;
-  const chartMax = Math.max(Math.round(peak * 1.15), Math.round(goal * 1.22), 10);
+  const peak = week.peakMinutes || 0;
+  const goal = week.minutesGoal || 0;
+  const chartMax = Math.max(Math.round(peak * 1.15), Math.round(goal * 1.22), 60);
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
@@ -49,27 +51,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
       <Svg width="100%" height="100%" viewBox={`0 0 ${vbW} ${CHART_H}`}>
         <EffortSlotDefs color={C.line} />
 
-        {/* Sol eksen: olcek. Izgara cizgileri cubuklarin ARKASINDA kalir,
-            hayalet kutularin kenarligiyla yarismasin diye opaklik dusuk.
-            Etiket rengi text4 -- tokens.js'e gore yalniz eksen/izgara
-            etiketinde kullanilan ton. */}
-        {gridSteps(chartMax).map((v) => {
-          const gy = yOf(v);
-          return (
-            <Fragment key={`grid-${v}`}>
-              <Line
-                x1={EFFORT_PAD_LEFT} y1={gy} x2={vbW - PAD_RIGHT} y2={gy}
-                stroke={C.line} strokeWidth={1} strokeOpacity={0.55}
-              />
-              <SvgText
-                x={EFFORT_PAD_LEFT - 6} y={gy + 3.5}
-                fill={C.text4} fontSize={11} textAnchor="end"
-              >
-                {v}
-              </SvgText>
-            </Fragment>
-          );
-        })}
+        <EffortGrid chartMax={chartMax} yOf={yOf} width={vbW} C={C} />
 
         <Line
           x1={EFFORT_PAD_LEFT} y1={bottom} x2={vbW - PAD_RIGHT} y2={bottom}
@@ -78,7 +60,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
         {week.days.map((day, i) => {
           const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
-          const barTop = day.questions > 0 ? yOf(day.questions) : bottom - 6;
+          const barTop = day.minutes > 0 ? yOf(day.minutes) : bottom - 6;
+          const showQ = day.questions > 0 && bottom - barTop >= 24;
           return (
             <Fragment key={day.label}>
             {day.minutes > 0 ? (
@@ -93,7 +76,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               day={day}
               index={i}
               todayIndex={todayIndex}
-              goal={week.goal}
+              goal={goal}
               x={cx - barW / 2}
               width={barW}
               bottom={bottom}
@@ -102,6 +85,11 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               radius={BAR_RADIUS}
               C={C}
             />
+            {showQ ? (
+              <SvgText x={cx} y={barTop + 14} fill={C.accentInk} fillOpacity={0.92} fontSize={11} fontWeight="600" textAnchor="middle">
+                {day.questions}
+              </SvgText>
+            ) : null}
             </Fragment>
           );
         })}
@@ -116,7 +104,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               x={vbW - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
               fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor="end"
             >
-              {`GÜNLÜK HEDEF ${week.goal}`}
+              {`GÜNLÜK HEDEF ${compactDuration(goal)}`}
             </SvgText>
           </>
         ) : null}

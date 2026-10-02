@@ -4,9 +4,6 @@ import { Rect } from "react-native-svg";
 import { EffortBar } from "./EffortBar";
 import { EffortSlot } from "./EffortSlot";
 
-// Soru girilmemis ama calisilmis gun: sifir degil, kisa bir iz.
-const MINUTES_ONLY_H = 6;
-
 // Haftanin TEK gunu: doldurulabilecek kutu + icini dolduran cubuk.
 export function EffortDay({
   day, index, todayIndex, goal, x, width, bottom, goalY, yOf, radius, C,
@@ -32,16 +29,14 @@ export function EffortDay({
     />
   ) : null;
 
+  // Cubuk SURE (dakika): soru girilmemis calisma da dolar.
   let barH = 0;
   let fill = C.track;
-  if (day.questions > 0) {
-    barH = Math.max(4, bottom - yOf(day.questions));
+  if (day.minutes > 0) {
+    barH = Math.max(4, bottom - yOf(day.minutes));
     // Hedefi tutturan gun vurgulanir; tutturamayan gun de gorunur kalir,
     // cezalandirilmaz.
-    fill = goal > 0 && day.questions >= goal ? C.up : C.accent;
-  } else if (day.minutesOnly) {
-    barH = MINUTES_ONLY_H;
-    fill = C.text5;
+    fill = goal > 0 && day.minutes >= goal ? C.up : C.accent;
   }
 
   // Calisilmamis gun: yukselecek bir sey yok. Kutu zaten o gunun bos
