@@ -107,6 +107,7 @@ export function StoryFilterChips({ kind, data, visibility, onToggle, selectedSub
           );
         })}
       </View>
+      )}
     </View>
   );
 }
