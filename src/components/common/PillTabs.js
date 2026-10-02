@@ -24,7 +24,7 @@ function PillTabs({ options, value, onChange, height = 40 }) {
             accessibilityState={{ selected: on }}
             style={[
               s.pill,
-              { height, borderColor: on ? C.accent : C.border, backgroundColor: on ? C.brandTint : "transparent" },
+              { height, borderColor: on ? C.selBorder : C.border, backgroundColor: on ? C.selFill : "transparent" },
             ]}
           >
             <Text style={[on ? TYPOGRAPHY.metaSemiBold : TYPOGRAPHY.meta, { color: on ? C.text : C.text2 }]}>

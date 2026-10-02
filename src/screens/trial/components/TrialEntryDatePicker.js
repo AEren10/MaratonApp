@@ -19,10 +19,10 @@ export function TrialEntryDatePicker({ recentDays, trialDate, onChangeDate }) {
             accessibilityRole="radio" accessibilityLabel={`${day.dayName} ${day.day}`}
             accessibilityState={{ selected: active }}
             style={[styles.chip, {
-              backgroundColor: active ? C.brandTint : C.void,
-              borderColor: active ? C.accent : C.border,
+              backgroundColor: active ? C.selFill : C.void,
+              borderColor: active ? C.selBorder : C.border,
             }]}>
-            <Text style={[TYPOGRAPHY.tableHead, { color: active ? C.accentBright : C.text3, letterSpacing: 0 }]}>
+            <Text style={[TYPOGRAPHY.tableHead, { color: active ? C.selText : C.text3, letterSpacing: 0 }]}>
               {day.dayName}
             </Text>
             <Text style={[TYPOGRAPHY.topicName, { color: C.text, fontVariant: ["tabular-nums"] }]}>{day.day}</Text>

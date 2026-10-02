@@ -25,8 +25,8 @@ export function TrialTypeSelector({ value, onChange }) {
               accessibilityState={{ selected: active }}
               onPress={() => { H.select(); onChange(type.code); }}
               style={[styles.item, {
-                backgroundColor: active ? C.brandTint : "transparent",
-                borderColor: active ? C.accent : C.border,
+                backgroundColor: active ? C.selFill : "transparent",
+                borderColor: active ? C.selBorder : C.border,
               }]}>
               <Text style={[TYPOGRAPHY.captionMedium, {
                 fontFamily: active ? "Archivo_600" : "Archivo_500",

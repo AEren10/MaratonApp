@@ -30,11 +30,10 @@ export function HomeHeroStat({ solved, goal, remainingToGoal, daysUntilExam, exa
             an gunun basi -- kalan, hedefin kendisi. Ilerleme basladiginda
             satir geri geliyor, cunku 63/110'da "47 kaldı" goz karari
             hesaplanmiyor ve ise yariyor. */}
-        {solved > 0 ? (
-          <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
-            {remainingToGoal > 0 ? `${remainingToGoal} kaldı` : "hedef tamamlandı"}
-          </Text>
-        ) : null}
+        {/* Sifirda basarisizlik degil baslangic dili (2026-10 denetimi). */}
+        <Text style={[TYPOGRAPHY.body, { color: C.text3, marginTop: STEP.s1 }]}>
+          {solved === 0 ? "Gün yeni başlıyor; ilk durakla dolar." : remainingToGoal > 0 ? `${remainingToGoal} kaldı` : "hedef tamamlandı"}
+        </Text>
       </StatBlock>
 
       {daysUntilExam != null ? (

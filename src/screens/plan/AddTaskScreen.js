@@ -28,7 +28,7 @@ function Pill({ label, selected, onPress, C }) {
   return (
     <Press haptic="none"
       onPress={onPress}
-      style={[s.pill, { borderColor: selected ? C.accent : C.elev, backgroundColor: selected ? C.brandTint : C.surface }]}
+      style={[s.pill, { borderColor: selected ? C.selBorder : C.elev, backgroundColor: selected ? C.selFill : C.surface }]}
     >
       <Text style={[TYPOGRAPHY.metaSemiBold, { color: selected ? C.text : C.text3 }]}>{label}</Text>
     </Press>

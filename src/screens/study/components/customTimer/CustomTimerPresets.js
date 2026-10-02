@@ -27,8 +27,8 @@ export function CustomTimerPresets({ presets, value, unit, onChange, C }) {
             style={[
               s.chip,
               {
-                backgroundColor: active ? C.accent + "22" : C.surface,
-                borderColor: active ? C.accent : C.border,
+                backgroundColor: active ? C.selFill : C.surface,
+                borderColor: active ? C.selBorder : C.border,
               },
             ]}
           >

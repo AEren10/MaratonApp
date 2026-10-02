@@ -26,7 +26,7 @@ export const ThemeOptionRow = React.memo(function ThemeOptionRow({
           <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: 3 }]}>{hint}</Text>
         ) : null}
       </View>
-      <View style={[styles.radio, { borderColor: active ? C.accent : C.border }]}>
+      <View style={[styles.radio, { borderColor: active ? C.selBorder : C.border }]}>
         {active ? <View style={[styles.dot, { backgroundColor: C.accent }]} /> : null}
       </View>
     </Press>

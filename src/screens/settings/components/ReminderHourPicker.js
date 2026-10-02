@@ -35,12 +35,12 @@ export function ReminderHourPicker({ hour, onSelect }) {
               style={[
                 styles.chip,
                 {
-                  borderColor: active ? C.accent : C.border,
-                  backgroundColor: active ? C.accent : "transparent",
+                  borderColor: active ? C.selBorder : C.border,
+                  backgroundColor: active ? C.selFill : "transparent",
                 },
               ]}
             >
-              <Text style={[TYPOGRAPHY.captionMedium, { color: active ? C.accentInk : C.text2 }]}>
+              <Text style={[TYPOGRAPHY.captionMedium, { color: active ? C.selText : C.text2 }]}>
                 {o.label}
               </Text>
             </Press>

@@ -15,13 +15,13 @@ function Level({ level, active, onPress }) {
     <Press haptic="none" onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected: active }}
       accessibilityLabel={`${level.label} ${level.factor}`}
       style={[styles.level, {
-        backgroundColor: active ? C.brandTint : "transparent",
-        borderColor: active ? C.accent : C.border,
+        backgroundColor: active ? C.selFill : "transparent",
+        borderColor: active ? C.selBorder : C.border,
       }]}>
       <Text numberOfLines={1} style={[TYPOGRAPHY.meta, {
         fontFamily: active ? "Archivo_600" : "Archivo_500", color: active ? C.text : C.text2,
       }]}>{level.label}</Text>
-      <Text style={[TYPOGRAPHY.micro, styles.factor, { color: active ? C.accentBright : C.text3 }]}>
+      <Text style={[TYPOGRAPHY.micro, styles.factor, { color: active ? C.selText : C.text3 }]}>
         {level.factor}
       </Text>
     </Press>

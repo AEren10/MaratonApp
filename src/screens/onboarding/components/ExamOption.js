@@ -38,9 +38,9 @@ export function ExamOption({ item, selected, onPress, C }) {
           borderRadius: SHAPE.card,
           paddingVertical: STEP.s2 + 2,
           paddingHorizontal: STEP.s3 - 2,
-          backgroundColor: active ? C.brandTint : C.surface,
+          backgroundColor: active ? C.selFill : C.surface,
           borderWidth: 1,
-          borderColor: active ? C.accent : C.elev,
+          borderColor: active ? C.selBorder : C.elev,
           minHeight: CONTROL.tapMin,
         },
       ]}
@@ -56,15 +56,15 @@ export function ExamOption({ item, selected, onPress, C }) {
           borderRadius: 4,
           flexShrink: 0,
           borderWidth: 1.8,
-          borderColor: active ? C.accent : C.text4,
+          borderColor: active ? C.selBorder : C.text4,
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: active ? C.accent : "transparent",
+          backgroundColor: active ? C.selText : "transparent",
         }}
       >
         {active && (
           <Animated.View entering={ZoomIn.springify().damping(14)}>
-            <Icon name="check" size={12} color={C.accentInk} sw={2.6} />
+            <Icon name="check" size={12} color={C.bg} sw={2.6} />
           </Animated.View>
         )}
       </View>

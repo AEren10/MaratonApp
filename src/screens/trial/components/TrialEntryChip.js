@@ -14,8 +14,8 @@ export function TrialEntryChip({ label, active, onPress, accessibilityLabel }) {
     <Press haptic="none" onPress={onPress} hitSlop={HIT} accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel || label} accessibilityState={{ selected: active }}
       style={[styles.chip, {
-        backgroundColor: active ? C.brandTint : "transparent",
-        borderColor: active ? C.accent : C.border,
+        backgroundColor: active ? C.selFill : "transparent",
+        borderColor: active ? C.selBorder : C.border,
       }]}>
       {active ? <Icon name="check" size={11} color={C.accent} sw={2.6} /> : null}
       <Text style={[TYPOGRAPHY.captionMedium, {

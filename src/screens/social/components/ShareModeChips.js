@@ -29,8 +29,8 @@ export function ShareModeChips({ cards, selectedId, onSelect }) {
             style={[
               styles.chip,
               {
-                backgroundColor: selected ? C.brandTint : "transparent",
-                borderColor: selected ? C.accent : C.border,
+                backgroundColor: selected ? C.selFill : "transparent",
+                borderColor: selected ? C.selBorder : C.border,
               },
             ]}
           >

@@ -25,9 +25,9 @@ export function ScenarioCard({ item, selected, locked, onPress }) {
         minHeight: CONTROL.tapMin,
         padding: STEP.s2,
         borderRadius: SHAPE.panel,
-        backgroundColor: selected ? C.brandTint : C.surface,
+        backgroundColor: selected ? C.selFill : C.surface,
         borderWidth: 1,
-        borderColor: selected ? C.accent : C.elev,
+        borderColor: selected ? C.selBorder : C.elev,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "baseline", gap: STEP.s1 }}>

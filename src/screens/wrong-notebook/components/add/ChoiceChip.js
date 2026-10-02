@@ -23,8 +23,8 @@ export const ChoiceChip = memo(function ChoiceChip({
       style={[
         styles.chip,
         {
-          backgroundColor: active ? C.brandTint : "transparent",
-          borderColor: active ? C.accent : C.border,
+          backgroundColor: active ? C.selFill : "transparent",
+          borderColor: active ? C.selBorder : C.border,
           borderStyle: dashed ? "dashed" : "solid",
         },
         style,

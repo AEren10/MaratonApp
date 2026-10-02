@@ -13,8 +13,8 @@ export const TrialComparePill = React.memo(function TrialComparePill({ C, label,
       style={[
         styles.pill,
         {
-          backgroundColor: active ? C.brandTint : "transparent",
-          borderColor: active ? C.accent : C.border
+          backgroundColor: active ? C.selFill : "transparent",
+          borderColor: active ? C.selBorder : C.border
         }
       ]}
     >

@@ -39,7 +39,7 @@ export function SheetOption({ title, meta, color, selected, onPress }) {
       {color ? <View style={[styles.dot, { backgroundColor: color }]} /> : null}
       <Text numberOfLines={1} style={[TYPOGRAPHY.bodyMedium, styles.flex, { color: selected ? C.text : C.text2 }]}>{title}</Text>
       {meta ? <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{meta}</Text> : null}
-      <View style={[styles.radio, { borderColor: selected ? C.accent : C.border, backgroundColor: selected ? C.accent : "transparent" }]} />
+      <View style={[styles.radio, { borderColor: selected ? C.selBorder : C.border, backgroundColor: selected ? C.selText : "transparent" }]} />
     </Press>
   );
 }

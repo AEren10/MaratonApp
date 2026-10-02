@@ -58,15 +58,15 @@ export function TrialFilter({ value, onChange }) {
             style={[
               styles.tab,
               {
-                backgroundColor: active ? C.accent + "20" : "transparent",
-                borderColor: active ? C.accent : C.border,
+                backgroundColor: active ? C.selFill : "transparent",
+                borderColor: active ? C.selBorder : C.border,
               },
             ]}
           >
             <Text
               style={[
                 styles.label,
-                { color: active ? C.accent : C.sec },
+                { color: active ? C.selText : C.sec },
               ]}
             >
               {f.label}

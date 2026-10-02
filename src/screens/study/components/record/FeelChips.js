@@ -29,9 +29,9 @@ export const FeelChips = memo(function FeelChips({ value, onChange }) {
               accessibilityState={{ selected: on }}
               accessibilityLabel={o.label}
               onPress={() => onChange?.(on ? null : o.key)}
-              style={[s.chip, { borderColor: on ? C.accent : C.border, backgroundColor: on ? C.brandTint : "transparent" }]}
+              style={[s.chip, { borderColor: on ? C.selBorder : C.border, backgroundColor: on ? C.selFill : "transparent" }]}
             >
-              <Text style={[TYPOGRAPHY.metaSemiBold, { color: on ? C.accentBright : C.text2 }]} numberOfLines={1}>{o.label}</Text>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: on ? C.selText : C.text2 }]} numberOfLines={1}>{o.label}</Text>
             </Press>
           );
         })}

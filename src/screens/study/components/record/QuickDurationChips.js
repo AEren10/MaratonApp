@@ -28,7 +28,7 @@ export function QuickDurationChips({ C, value, onSelect }) {
                 s.chip,
                 {
                   backgroundColor: active ? C.elev : C.void,
-                  borderColor: active ? C.accentBright : C.line,
+                  borderColor: active ? C.selBorder : C.line,
                 },
               ]}
             >
@@ -36,7 +36,7 @@ export function QuickDurationChips({ C, value, onSelect }) {
                 style={[
                   TYPOGRAPHY.tableHead,
                   s.chipText,
-                  { color: active ? C.accentBright : C.text2 },
+                  { color: active ? C.selText : C.text2 },
                 ]}
               >
                 {`${mins} dk`}

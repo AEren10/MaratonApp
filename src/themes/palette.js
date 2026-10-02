@@ -176,6 +176,13 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     accentPress: isDark ? "#C22730" : mix(accent, 86, "#000000"),
     accentGlow: alpha(accent, isDark ? 30 : 26),
 
+    // Secili durum (cip, sekme, secenek, radyo). Kizil yalniz birincil
+    // butonda ve rota cizgisinde: secim yuzey tonu + metin rengiyle anlatilir
+    // (2026-10 denetimi: kizil her yerde kullaniliyor, vurgu kayboluyordu).
+    selBorder: fixed.text2,
+    selFill: surfaces.elev,
+    selText: text,
+
     // Rota / grafik türevleri
     proj: mix(accent, isDark ? 52 : 62, bg),
     projNode: mix(accent, isDark ? 44 : 60, fixed.text2),

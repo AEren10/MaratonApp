@@ -17,12 +17,12 @@ export function AddTaskPillRow({ presets, value, onChange, formatLabel, C, suffi
             style={[
               st.pill,
               {
-                backgroundColor: active ? C.brandTint : C.surface,
-                borderColor: active ? C.accent : C.border,
+                backgroundColor: active ? C.selFill : C.surface,
+                borderColor: active ? C.selBorder : C.border,
               },
             ]}
           >
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: active ? C.accent : C.text }]}>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { color: active ? C.selText : C.text }]}>
               {formatLabel(p)}
             </Text>
           </Press>

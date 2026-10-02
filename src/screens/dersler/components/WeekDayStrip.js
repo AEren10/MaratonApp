@@ -9,8 +9,8 @@ function DayChip({ day, selected, onPress, C }) {
   const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
 
   const bg = isSelected ? C.elev : isPastDone ? C.surface : day.isFuture ? "transparent" : C.surface;
-  const border = isSelected ? C.accent : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
-  const letterColor = isSelected ? C.accentBright : isPastDone ? C.text2 : C.text3;
+  const border = isSelected ? C.selBorder : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
+  const letterColor = isSelected ? C.selText : isPastDone ? C.text2 : C.text3;
   const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
   const dotColor = isSelected
     ? (day.active ? C.up : C.accent)
