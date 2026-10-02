@@ -85,13 +85,21 @@ test("stop explanation prefers the dominant route reason", () => {
     dataConfidence: "medium",
     q: 10,
     acc: 30,
+    accKnown: true,
     scoreComponents: { expectedNetGain: 1.234, effortQuestions: 18 },
   });
 
   assert.equal(insight.reasonCode, "LOW_ACCURACY");
   assert.equal(insight.confidence, "medium");
   assert.equal(insight.expectedNetGain, 1.23);
-  assert.match(insight.reasonText, /10 soruda doğruluk %30/);
+  assert.match(insight.reasonText, /10 soruda doğruluğun %30/);
+});
+
+test("estimated accuracy is never shown as a number; no precise net claims", () => {
+  const low = explainRouteStop({ reasonCodes: ["LOW_ACCURACY"], q: 10, acc: 70, accKnown: false });
+  assert.doesNotMatch(low.reasonText, /%/);
+  const weight = explainRouteStop({ reasonCodes: ["HIGH_EXAM_WEIGHT"], scoreComponents: { expectedNetGain: 8.69 } });
+  assert.doesNotMatch(weight.reasonText, /\d/);
 });
 
 test("route treats topic-level low accuracy as a weak signal without subject flag", () => {

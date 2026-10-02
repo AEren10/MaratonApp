@@ -1,6 +1,7 @@
 import { ROUTE_STOP_STATUS } from "./stopStatus.js";
 
-export const ROUTE_ALGORITHM_VERSION = "route-v2";
+// v3 (2026-10-03): olculmus 0 dogru, hedef modu 3 deneme, ilk hafta kalibrasyonu, yumusak gerekceler.
+export const ROUTE_ALGORITHM_VERSION = "route-v3";
 
 function stableHash(value) {
   let hash = 2166136261;

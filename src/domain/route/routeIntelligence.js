@@ -94,20 +94,23 @@ function reasonTextFor(stop = {}) {
   if (reasonCode === "REVIEW_DUE") {
     const retention = percent(Number(stop.retention ?? components.retention) * 100);
     const days = Number(components.reviewDaysSince);
-    const dayText = Number.isFinite(days) && days > 0 ? `${Math.round(days)} gün önce çalışılmış; ` : "";
-    return `${dayText}${retention || "hatırlama"} seviyesine düşmüş görünüyor. Kısa tekrar neti korur.`;
+    // Hatirlama yuzdesi gosterilmez: unutma modeli kalibre bir olcum degil.
+    void retention;
+    const dayText = Number.isFinite(days) && days > 0 ? `${Math.round(days)} gün önce çalışmıştın; ` : "";
+    return `${dayText}tekrar zamanı geldi. Kısa bir tekrar öğrendiğini kalıcı yapar.`;
   }
   if (reasonCode === "LOW_ACCURACY") {
-    if (questions > 0 && accuracy) return `${questions} soruda doğruluk ${accuracy}; zayıf sinyal verdiği için öne alındı.`;
-    return "Son deneme/konu verilerinde zayıf sinyal verdiği için öne alındı.";
+    // Yuzde yalniz OLCULMUS dogrulukta (tahmini dogruluk rakam gibi sunulmaz).
+    if (questions > 0 && accuracy && stop.accKnown) return `${questions} soruda doğruluğun ${accuracy}; bu konu öne alındı.`;
+    return "Son denemelerinde bu alanda zorlandın; o yüzden öne alındı.";
   }
   if (reasonCode === "NEGLECTED") {
     return `${Math.round(neglectedDays)} gündür temas yok; unutma riski büyümeden kısa durak iyi olur.`;
   }
   if (reasonCode === "HIGH_EXAM_WEIGHT") {
-    return netGain > 0
-      ? `Bu konu sınavda yaklaşık ${Math.round(netGain * 10) / 10} netlik paya temas ediyor; getirisi yüksek.`
-      : "Sınavdaki soru payı yüksek olduğu için getirisi iyi.";
+    // Konu sikligi resmi OSYM verisi degil: kesin net rakami verilmez.
+    void netGain;
+    return "Geçmiş sınavlarda bu konudan sık soru geldi; çalışmanın getirisi yüksek.";
   }
   if (reasonCode === "PREREQUISITE") {
     const names = (components.missingPrerequisites || []).map((ref) => String(ref).split(":").pop());

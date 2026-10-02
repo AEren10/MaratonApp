@@ -136,6 +136,7 @@ export function buildRoute({
         topic: name,
         q,
         acc,
+        accKnown: accuracyKnown,
         neglectedDays,
       };
 
