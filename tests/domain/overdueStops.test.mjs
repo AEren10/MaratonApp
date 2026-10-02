@@ -31,3 +31,14 @@ test("older than 21 days after the week drops; segments merge; total capped by a
   assert.equal(r.totalMinutes, 40);
   assert.equal(r.capped, true);
 });
+
+test("atlanan durak ve rotanin yeniden planladigi konu borc sayilmaz", async () => {
+  const { overdueStops: od, plannedTopicKeys } = await import("../../src/domain/route/overdueStops.js");
+  const now = new Date("2026-10-02T10:00:00+03:00");
+  const thisMonday = "2026-09-28";
+  const past = (topic, status) => ({ week_start: "2026-09-21", lifecycle_status: status, subject: "matematik", topic, metadata: { minutes: 60 } });
+  const stops = [past("Fonksiyonlar", "active"), past("Polinomlar", "skipped"), past("Problemler", "upcoming")];
+  const weeks = [{ weekStart: "2026-09-28", stops: [{ subject: "matematik", topic: "Problemler", lifecycleStatus: "upcoming" }] }];
+  const r = od({ now, thisMonday, stops, planned: plannedTopicKeys(weeks, thisMonday) });
+  assert.deepEqual(r.items.map((i) => i.topic), ["Fonksiyonlar"]);
+});

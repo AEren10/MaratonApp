@@ -14,13 +14,30 @@ import { subjectPaletteKey } from "../../themes/subjectPalette.js";
 //   azalir (eski borc yeni borctan once kovalanmaz).
 // - Ayni konunun parcalari tek satirda birlesir.
 // - Toplam bir haftalik kapasiteyi gecmez; ustu "Sirada"ya duser (capped).
+// - Ogrencinin bilerek ATLADIGI durak borc degildir ("atla" = istemiyorum).
+// - Rota konuyu bu haftaya ya da ileriye ZATEN yeniden koyduysa borc
+//   sayilmaz: ayni konu hem rotada hem borc listesinde cift sayiliyordu.
 export const DEBT_WINDOW_DAYS = 21;
-const OPEN = new Set(["active", "upcoming", "skipped"]);
+const OPEN = new Set(["active", "upcoming"]);
+const DONE = new Set(["completed", "skipped", "rescheduled", "frozen"]);
 const DAY = 86400000;
 
 const topicKey = (subject, topic) => `${subjectPaletteKey(subject)}|${String(topic || "").trim().toLocaleLowerCase("tr-TR")}`;
 
-export function overdueStops({ stops = [], logs = [], thisMonday, now = new Date(), minutesPerWeek = 0 } = {}) {
+/** Bu hafta ve sonrasinda rotada ACIK duran konular (ders|konu anahtari). */
+export function plannedTopicKeys(weeks = [], thisMonday) {
+  const keys = new Set();
+  for (const week of weeks || []) {
+    const ws = String(week?.weekStart || "").slice(0, 10);
+    if (ws && thisMonday && ws < thisMonday) continue;
+    for (const s of week?.stops || []) {
+      if (!DONE.has(s?.lifecycleStatus) && s?.topic) keys.add(topicKey(s.subject, s.topic));
+    }
+  }
+  return keys;
+}
+
+export function overdueStops({ stops = [], logs = [], thisMonday, now = new Date(), minutesPerWeek = 0, planned = null } = {}) {
   const studiedAfter = new Map(); // topicKey -> son calisma tarihi (YYYY-MM-DD)
   for (const log of logs || []) {
     const day = String(log.study_date || log.studyDate || "").slice(0, 10);
@@ -40,6 +57,7 @@ export function overdueStops({ stops = [], logs = [], thisMonday, now = new Date
     const k = topicKey(stop.subject, stop.topic);
     const last = studiedAfter.get(k);
     if (last && last >= weekStart) continue; // sonradan calisilmis: kapandi
+    if (planned?.has(k)) continue; // rota zaten yeniden planladi
     const minutes = Number(stop.metadata?.minutes ?? stop.cost?.minutes) || 0;
     const weight = 1 - ageDays / (DEBT_WINDOW_DAYS + 1);
     const root = stop.root_key || stop.rootStopKey || k;

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useStudyRoute } from "./useStudyRoute";
 import { ROUTE_STOP_STATUS } from "../domain/route/stopStatus";
-import { overdueStops } from "../domain/route/overdueStops";
+import { overdueStops, plannedTopicKeys } from "../domain/route/overdueStops";
 import { distributeDebt } from "../lib/routeEngine";
 import { buildDebtDistributionView } from "../domain/route/debtDistributionView";
 import { startOfWeekTR, dateKey } from "../lib/dateUtils";
@@ -37,7 +37,8 @@ export function useTopicDebt() {
   // revizyonlardan okuyor (pastStops).
   const overdue = useMemo(() => overdueStops({
     stops: pastStops, logs: recentLogs, thisMonday, minutesPerWeek,
-  }), [pastStops, recentLogs, thisMonday, minutesPerWeek]);
+    planned: plannedTopicKeys(route?.weeks, thisMonday),
+  }), [pastStops, recentLogs, thisMonday, minutesPerWeek, route?.weeks]);
 
   const stops = useMemo(() => overdue.items.map((it) => ({
     key: it.key,

@@ -31,7 +31,7 @@ import * as appStorage from "../lib/storage/appStorage";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { onRouteUpdated, emitRouteUpdated } from "../lib/routeEvents";
 import { makeRouteStopRootKey } from "../domain/route/routeIdentity";
-import { overdueStops, DEBT_WINDOW_DAYS } from "../domain/route/overdueStops";
+import { overdueStops, plannedTopicKeys, DEBT_WINDOW_DAYS } from "../domain/route/overdueStops";
 import { addDays } from "../domain/program/dayKeys";
 import { useRouteWrongSignal } from "./useRouteWrongSignal";
 import { useTodayKey } from "./useTodayKey";
@@ -764,6 +764,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       logs: weekLogs,
       thisMonday,
       minutesPerWeek: route.capacity?.minutesPerWeek || 0,
+      planned: plannedTopicKeys(route.weeks, thisMonday),
     });
     const totalQuestions = Math.round((overdue.totalMinutes || 0) / MIN_PER_QUESTION);
     return {
@@ -771,7 +772,7 @@ export function useStudyRoute({ pausedWeeks = null, persist = true } = {}) {
       totalQuestions,
       hasDebt: (overdue.totalMinutes || 0) > 0,
     };
-  }, [route.capacity?.minutesPerWeek, weekLogs, pastStops, thisMonday]);
+  }, [route.capacity?.minutesPerWeek, route.weeks, weekLogs, pastStops, thisMonday]);
 
   const pause = useCallback(async () => {
     if (!user?.id) return;
