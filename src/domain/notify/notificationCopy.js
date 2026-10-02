@@ -102,6 +102,7 @@ export function weeklyShareCopy({ questions = 0, minutes = 0 } = {}) {
   const q = Number(questions) || 0;
   const m = Number(minutes) || 0;
   const parts = [m ? duration(m) : null, q ? `${q} soru` : null].filter(Boolean).join(", ");
+  if (!parts) return { title: "Bu hafta iyi çalıştın", body: "Emeğin görünsün: haftanı hikâyende paylaş, kartın hazır." };
   return { title: `Bu hafta ${parts}`, body: "Emeğin görünsün: haftanı hikâyende paylaş, kartın hazır." };
 }
 

@@ -180,7 +180,9 @@ export function useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayS
         open: openStops.length,
         next: nextTask ? { label: [nextTask.subjectLabel, nextTask.topicLabel].filter(Boolean).join(" · "), minutes: nextTask.estimatedMinutes || 0 } : null,
       },
-      weeklyVars: { questions: weeklyEffort?.totalQuestions || 0, minutes: weeklyEffort?.totalMinutes || 0 },
+      // day: sayilarin olculdugu gun. Pazar bildirimi yalniz o gun olculmus
+      // sayiyi yazar; eski sayi haftayi eksik soylerdi.
+      weeklyVars: { questions: weeklyEffort?.totalQuestions || 0, minutes: weeklyEffort?.totalMinutes || 0, day: todayTR() },
     }, user?.id && user.id !== "dev" ? user.id : null);
   }, [weeklyEffort, solvedToday, dailyGoal, streak, nextTask, todayStops, weeklyMinutesGoal, examDate, chartData, examTarget.target, user?.id]);
   const comebackRecommendation = buildComebackRecommendation(nextTask);

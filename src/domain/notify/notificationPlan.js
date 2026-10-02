@@ -80,9 +80,12 @@ export function buildNotificationPlan({ now = new Date(), prefs = {}, context = 
     const thisWeek = future(d);
     if (!thisWeek) d = at(toSunday + 7, 20, 0, "weekly_summary");
     const vars = thisWeek ? context.weeklyVars || {} : {};
-    // Iyi gecen hafta: "Bu hafta 9 sa, 340 soru -- paylas" ve hikaye kartina gider.
-    if (Number(vars.minutes) >= SHARE_MINUTES) push("weekly_share", d, weeklyShareCopy(vars), "share");
-    else push("weekly_summary", d, weeklyCopy(vars), "summary");
+    // Sayilar yalniz o pazar olculduyse yazilir; daha eskiyse hafta eksik
+    // gorunurdu (dakika yalniz artar: "iyi hafta" karari icin alt sinir yeter).
+    const fresh = vars.day === dayKeyOf(d);
+    const shown = fresh ? vars : {};
+    if (Number(vars.minutes) >= SHARE_MINUTES) push("weekly_share", d, weeklyShareCopy(shown), "share");
+    else push("weekly_summary", d, weeklyCopy(shown), "summary");
   }
 
   // Widget ipucu: tarihi cagiran BIR KEZ sabitler (her acilista ileri

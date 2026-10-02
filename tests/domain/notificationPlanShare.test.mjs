@@ -6,7 +6,7 @@ const now = new Date(2026, 9, 2, 10, 0); // Cuma
 const prefs = { dailyReminderEnabled: true, weeklySummaryEnabled: true };
 
 test("good week: Sunday notification invites to share and opens the story card", () => {
-  const items = buildNotificationPlan({ now, prefs, context: { weeklyVars: { minutes: 600, questions: 340 } } });
+  const items = buildNotificationPlan({ now, prefs, context: { weeklyVars: { minutes: 600, questions: 340, day: "2026-10-04" } } });
   const w = items.find((i) => i.type === "weekly_share");
   assert.ok(w);
   assert.equal(w.screen, "share");
@@ -28,4 +28,10 @@ test("widget tip goes out on its fixed day and never breaks the two-per-day cap"
   const perDay = {};
   for (const i of items) { const k = i.date.toDateString(); perDay[k] = (perDay[k] || 0) + 1; }
   assert.ok(Object.values(perDay).every((n) => n <= 2));
+});
+
+test("numbers measured before Sunday are not printed (would undercount the week)", () => {
+  const items = buildNotificationPlan({ now, prefs, context: { weeklyVars: { minutes: 600, questions: 340, day: "2026-10-01" } } });
+  const w = items.find((i) => i.type === "weekly_share");
+  assert.equal(w.title, "Bu hafta iyi çalıştın");
 });
