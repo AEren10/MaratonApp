@@ -120,15 +120,20 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     clearResult: () => setResult(null),
     photo,
     pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
-    // Etiket HER zaman seffaf gider (yalniz veriler). Fotografli varyantta
-    // fotograf yoksa once sectirilir ve Instagram'a arka plan olur; digerlerinde
-    // etiket panoya kopyalanir, kullanici Instagram'da kendi fotografini koyar.
+    clearPhoto: () => setPhoto(null),
+    // STRAVA MODELI: etiket HER ZAMAN seffaf (overlay) olarak yakalanir.
+    // Fotograf secildiyse: sticker + arka plan dogrudan Instagram'a gider
+    // (kullanici yerlesmis halde gorur, tasiyip buyutebilir).
+    // Fotograf secilmediyse: seffaf etiket panoya kopyalanir, Instagram story
+    // kamerasi acilir — kullanici kendi karesini cekerken yapistirir.
     share: async (overlayRef) => {
-      if (selected?.background !== STORY_BG.FOTO) return run(shareStoryToInstagram, overlayRef);
-      const p = photo || await pickStoryPhoto();
-      if (!p) return null;
-      if (!photo) setPhoto(p);
-      return run((ref) => shareStoryToInstagram(ref, { backgroundImage: p.share }), overlayRef);
+      // Fotograf varsa dogrudan gonder (Strava'nin birincil yolu)
+      const bg = photo;
+      if (bg) {
+        return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
+      }
+      // Fotograf yoksa: panoya kopyala + Instagram kamera ac (Strava fallback)
+      return run(shareStoryToInstagram, overlayRef);
     },
     save: (ref) => run(saveStoryToGallery, ref),
     loading: report.loading,
