@@ -21,7 +21,7 @@ import { RouteProjectionCard } from "./components/RouteProjectionCard";
 import { RouteFeasibilityNote } from "../../components/route/RouteFeasibilityNote";
 import { feasibilityNote } from "../../domain/route/feasibility";
 import { RouteTempoSection } from "./components/RouteTempoSection";
-import { RouteThisWeekStrip } from "./components/RouteThisWeekStrip";
+import { RouteWhyThisWeek } from "./components/RouteWhyThisWeek";
 import { RouteNextActionCard } from "./components/RouteNextActionCard";
 import { RouteWeeksTimeline } from "./components/RouteWeeksTimeline";
 import { RouteTopicDebtRow } from "./components/RouteTopicDebtRow";
@@ -74,11 +74,13 @@ export default function RoadmapScreen() {
                 declared={d.declared}
               />
 
-              <RouteThisWeekStrip
+              {/* Haftalik "N durak · M bitti" kutusu kalkti (kullanici, 3 Ekim):
+                  yerine rotanin bu haftaki kararlari ve gerekceleri. */}
+              <RouteWhyThisWeek
                 C={C}
-                currentWeek={weeks?.[0]}
-                promiseText={d.promiseText}
-                onPress={() => openProgram(navigation, PROGRAM_VIEWS.WEEK)}
+                week={weeks?.[0]}
+                onOpenStop={d.openStop}
+                onOpenWeek={() => openProgram(navigation, PROGRAM_VIEWS.WEEK)}
               />
 
               {nextRouteAction ? (
