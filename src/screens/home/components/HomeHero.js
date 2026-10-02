@@ -14,6 +14,7 @@ import { HomeHeroComeback } from "./heroVariants/HomeHeroComeback";
 import { HomeHeroExamDay } from "./heroVariants/HomeHeroExamDay";
 import { HomeHeroFrozen } from "./heroVariants/HomeHeroFrozen";
 import { getExamPhase } from "../../../domain/exam/examPhase";
+import { HomeStreakStrip } from "./HomeStreakStrip";
 
 // Yeni tasarim hero'su. Zamana bagli varyantlari (AKIŞ 14) useHomeHeroMode
 // secer. Normal modda erisime ve ilk gune gore uc hal: Pro (HomeHeroNormal),
@@ -38,6 +39,7 @@ export function HomeHero({
   minutesToday = 0,
   onRecord,
   renderBelow,
+  renderAfter,
 }) {
   const { examDate } = useExam();
   const hero = useHomeHeroData({ solvedToday, dailyGoal, generatedTasks, todayStops: stops, weekLogs, previousQuestions, streak });
@@ -111,6 +113,7 @@ export function HomeHero({
   } else {
     content = (
       <HomeHeroNormal
+        renderMiddle={() => renderBelow?.({ debtHours, hasRouteAccess })}
         solvedToday={solvedToday}
         dailyGoal={dailyGoal}
         hero={hero}
@@ -122,11 +125,17 @@ export function HomeHero({
     );
   }
 
-  const showBelow = !(mode === HOME_HERO_MODE.NORMAL && firstDay);
+  // Normal (Pro) modda duraklar CTA'nin hemen altinda, hero'nun icinde
+  // (renderMiddle); seri ve grafik onlardan sonra gelir. Diger hallerde
+  // duraklar hero'dan sonra, seri en altta. Ilk gunde seri yok.
+  const isNormalPro = mode === HOME_HERO_MODE.NORMAL && !firstDay && hasRouteAccess;
+  const isFirstDay = mode === HOME_HERO_MODE.NORMAL && firstDay;
   return (
     <Fragment>
       <View style={s.wrap}>{content}</View>
-      {showBelow ? renderBelow?.({ debtHours, hasRouteAccess }) : null}
+      {!isNormalPro && !isFirstDay ? renderBelow?.({ debtHours, hasRouteAccess }) : null}
+      {!isNormalPro && !isFirstDay ? <HomeStreakStrip /> : null}
+      {!isFirstDay ? renderAfter?.() : null}
     </Fragment>
   );
 }

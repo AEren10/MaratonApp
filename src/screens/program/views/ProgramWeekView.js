@@ -103,11 +103,14 @@ export function ProgramWeekView() {
       ) : null}
 
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
+
+      {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
+
+      {/* Kurulum/kesif kartlari gunun gorevlerinden SONRA ve ayni anda en
+          fazla biri (ders programi > aliskanlik > bildigin konular). */}
       <ScheduleDiscoverCard style={{ marginTop: STEP.s3 }} />
       <HabitDiscoverCard style={{ marginTop: STEP.s3 }} />
       <KnownTopicsReminder style={{ marginTop: STEP.s3 }} />
-
-      {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
 
       <ProgramRulesSection onOpen={() => navigation.navigate(SCREENS.CLASS_SCHEDULE)} />
       <Press haptic="none"

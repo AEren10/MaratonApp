@@ -8,6 +8,7 @@ import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { useRouteHabits } from "../../../hooks/useRouteHabits";
 import { DISCOVER_TIPS, useDiscoverTips } from "../../../hooks/useDiscoverTips";
+import { useScheduleTipVisible } from "../../../hooks/useScheduleTipVisible";
 import { CONTROL, STEP, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 
 export const HabitDiscoverCard = React.memo(function HabitDiscoverCard({ style }) {
@@ -15,8 +16,9 @@ export const HabitDiscoverCard = React.memo(function HabitDiscoverCard({ style }
   const navigation = useNavigation();
   const { habits } = useRouteHabits();
   const { isClosed, close } = useDiscoverTips();
+  const scheduleTip = useScheduleTipVisible();
 
-  if (habits.length > 0 || isClosed(DISCOVER_TIPS.HABIT)) return null;
+  if (scheduleTip || habits.length > 0 || isClosed(DISCOVER_TIPS.HABIT)) return null;
 
   const handleOpen = () => {
     navigation.navigate(SCREENS.ROUTE_HABITS);

@@ -8,7 +8,6 @@ import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY, NAV_ICON } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
-import { HomeStreakStrip } from "./HomeStreakStrip";
 import { SOCIAL_ENABLED } from "../../../constants/social";
 
 function greeting(hour = new Date().getHours()) {
@@ -75,8 +74,6 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
       <View style={s.dateRow}>
         <Text style={[TYPOGRAPHY.heading, s.dateText, { color: C.text }]}>{dateHeading}</Text>
       </View>
-      {/* Seri artik takvim cipinde degil, tarihin altinda kendi seridinde. */}
-      <HomeStreakStrip />
     </Animated.View>
   );
 }

@@ -8,6 +8,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useC } from "../../../contexts/ThemeContext";
 import { useRouteHabits } from "../../../hooks/useRouteHabits";
 import { DISCOVER_TIPS, useDiscoverTips } from "../../../hooks/useDiscoverTips";
+import { useScheduleTipVisible } from "../../../hooks/useScheduleTipVisible";
 import { knownTopicsReminderDue } from "../../../domain/program/knownTopicsReminder";
 import { openProgram, PROGRAM_VIEWS } from "../../../navigation/openProgram";
 import { CONTROL, SPACING, STEP, TYPOGRAPHY } from "../../../themes/tokens";
@@ -27,7 +28,8 @@ export const KnownTopicsReminder = React.memo(function KnownTopicsReminder({ sty
     accountCreatedAt: user?.created_at,
     lastAt: closedAt(DISCOVER_TIPS.KNOWN_TOPICS),
   });
-  if (!due || habitTipVisible) return null;
+  const scheduleTip = useScheduleTipVisible();
+  if (!due || habitTipVisible || scheduleTip) return null;
 
   const open = () => {
     snooze(DISCOVER_TIPS.KNOWN_TOPICS);

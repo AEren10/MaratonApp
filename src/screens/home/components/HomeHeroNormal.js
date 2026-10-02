@@ -18,11 +18,12 @@ import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { openInTab } from "../../../navigation/tabJump";
 import { HomeExamSeriesChart } from "./HomeExamSeriesChart";
 import { PullForwardRow } from "./PullForwardRow";
+import { HomeStreakStrip } from "./HomeStreakStrip";
 
 // Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
 // grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
 // bilgiyi tekrar ediyordu, kaldirildi.
-export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewWeek }) {
+export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onViewRoute, onViewWeek, renderMiddle }) {
   const {
     remainingToGoal, daysUntilExam, examType, examDate, chartTarget, hasRouteAccess,
     chartData, declared, declaredAxis, weeklyEffort, todayIndex, examSeries,
@@ -78,22 +79,12 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
     }] : []),
   ];
 
+  // SIRA (D7): uygulamayi acan ilk 10 saniyede calismaya baslayabilmeli.
+  // Once "Calismaya Basla" + bugunun duraklari, sonra seri, en son bugunun
+  // sayisi ve grafikler. Metrikler eylemle yarismaz.
   return (
     <View style={s.top}>
-      <HomeHeroStat
-        solved={solvedToday}
-        goal={dailyGoal}
-        remainingToGoal={remainingToGoal}
-        daysUntilExam={daysUntilExam}
-        examType={examType}
-        examDate={examDate}
-      />
-
-      <View style={s.chart}>
-        <HomeChartPager pages={pages} onPressPage={onPressPage} />
-      </View>
-
-      <Animated.View style={s.cta}>
+      <Animated.View>
         <HomeCTAButton
           title={nextTask ? "Çalışmaya Başla" : hero.doneCta ? hero.doneCta.title : "Bugüne durak ekle"}
           subtitle={nextTask ? ctaSubtitle : hero.doneCta ? hero.doneCta.subtitle : null}
@@ -104,6 +95,25 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
         ) : null}
         <PullForwardRow stop={hero.pullStop} />
       </Animated.View>
+
+      {renderMiddle?.()}
+
+      <HomeStreakStrip />
+
+      <View style={s.stat}>
+        <HomeHeroStat
+          solved={solvedToday}
+          goal={dailyGoal}
+          remainingToGoal={remainingToGoal}
+          daysUntilExam={daysUntilExam}
+          examType={examType}
+          examDate={examDate}
+        />
+      </View>
+
+      <View style={s.chart}>
+        <HomeChartPager pages={pages} onPressPage={onPressPage} />
+      </View>
       <RouteFeasibilityNote note={hero.feasibility} style={s.note} />
     </View>
   );
@@ -111,8 +121,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
 
 const s = StyleSheet.create({
   top: { paddingTop: STEP.s3 + 2 },
+  stat: { marginTop: STEP.s4 },
   chart: { marginTop: -STEP.s2, marginBottom: STEP.s2 },
-  cta: { marginTop: STEP.s4 },
   note: { marginTop: STEP.s3 },
   hint: { marginTop: STEP.s1, textAlign: "center" },
 });

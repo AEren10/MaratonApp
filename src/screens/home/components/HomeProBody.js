@@ -11,7 +11,7 @@ import { ScheduleDiscoverCard } from "../../program/components/ScheduleDiscoverC
 // varsa -- Defter. Ana sayfa "simdi ne yapayim" sorusuna cevap verir;
 // "dikkat ceken iki ders" Analiz'deki ders trendinin tekrariydi, grup karti
 // Profil'deki Gruplarim'in tekrariydi, ikisi de kaldirildi.
-export const HomeProBody = React.memo(function HomeProBody({ stops, dueCount = 0, go, discoverEligible = false }) {
+export const HomeProBody = React.memo(function HomeProBody({ stops, dueCount = 0, go }) {
   return (
     <View style={s.wrap}>
       <HomeTodayStops stops={stops} onStartTask={go.startTask} onViewPlan={go.plan} />
@@ -20,13 +20,23 @@ export const HomeProBody = React.memo(function HomeProBody({ stops, dueCount = 0
           <HomeNotebookCard dueCount={dueCount} onPress={go.notebook} onReview={go.review} />
         </View>
       ) : null}
+    </View>
+  );
+});
+
+// Kesif kartlari en altta, grafiklerden sonra: "simdi ne yapayim"in
+// onune gecmezler.
+export const HomeDiscoverRow = React.memo(function HomeDiscoverRow({ eligible = false }) {
+  return (
+    <View style={s.tips}>
       <ScheduleDiscoverCard style={{ marginTop: STEP.s3 }} />
-      <HomeDiscoverTip eligible={discoverEligible} />
+      <HomeDiscoverTip eligible={eligible} />
     </View>
   );
 });
 
 const s = StyleSheet.create({
-  wrap: { paddingBottom: STEP.s4 + 2 },
+  wrap: { paddingBottom: STEP.s3 },
+  tips: { paddingBottom: STEP.s4 + 2 },
   due: { paddingTop: STEP.s3 },
 });
