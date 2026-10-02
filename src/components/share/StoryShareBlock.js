@@ -16,11 +16,11 @@ const CARD_W = Math.floor((SCREEN_W - GUTTER * 2 - GRID_GAP) / 2);
 const CARD_H = Math.round(CARD_W * (16 / 9));
 
 const STATUS_TEXTS = {
-  placed: "Instagram'a aktarıldı ✓",
+  placed: "Instagram'a aktarıldı",
   opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
-  tiktok_opened: "Paylaşım açıldı — TikTok veya dilediğin uygulamayı seçebilirsin ✓",
-  copied: "Şeffaf etiket panoya kopyalandı ✓",
-  saved: "Galeriye kaydedildi ✓",
+  tiktok_opened: "Paylaşım açıldı — TikTok veya dilediğin uygulamayı seçebilirsin",
+  copied: "Şeffaf etiket panoya kopyalandı",
+  saved: "Galeriye kaydedildi",
   permission_denied: "İzin verilmedi.",
   failed: "İşlem tamamlanamadı, tekrar dener misin?",
 };

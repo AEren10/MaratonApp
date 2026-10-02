@@ -38,7 +38,7 @@ export function StoryCardBody({ data, p, C, visibility = {} }) {
           <Text style={[s.badge, { color: p.accent }, p.shadow]}>✦ GÜNLÜK ÇALIŞMA RAPORU ✦</Text>
           {showStreak && data.streak != null ? (
             <View style={[s.chip, { backgroundColor: alpha(p.accent, 20), borderColor: p.accent }]}>
-              <Text style={[s.chipText, { color: p.accent }]}>{`SERİ ${data.streak} GÜN 🔥`}</Text>
+              <Text style={[s.chipText, { color: p.accent }]}>{`SERİ ${data.streak} GÜN`}</Text>
             </View>
           ) : null}
         </View>
