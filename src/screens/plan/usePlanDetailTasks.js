@@ -5,6 +5,7 @@ import * as haptic from "../../lib/haptics";
 import { mapGeneratedTask, mapAdHocTask, mapUserTask, taskAsStop } from "./planTaskMappers";
 import { useStopCompletion } from "../../hooks/useStopCompletion";
 import { mergePlanTasks } from "./mergePlanTasks";
+import { usePlanTaskUndo } from "./usePlanTaskUndo";
 import { trackPlanAllCompletedOnce, trackPlanTaskCompleted } from "../../lib/planAnalytics";
 
 export function usePlanDetailTasks({
@@ -34,6 +35,10 @@ export function usePlanDetailTasks({
   const [reasonTask, setReasonTask] = useState(null);
   tasksRef.current = tasks;
 
+  const undo = usePlanTaskUndo({
+    tasksRef, setTasks, completedHistoryRef, isPlanDone, togglePlanDone, toggleUserTask, transitionStop, stopLog,
+  });
+
   const taskSig = initialTasks.map((t) => t.id).join("|");
   useEffect(() => {
     setTasks((prev) => mergePlanTasks(initialTasks, prev, completedHistoryRef.current, isPlanDone));
@@ -44,6 +49,7 @@ export function usePlanDetailTasks({
     if (!task) return;
     if (task.routeStop && task.done) {
       haptic.select();
+      undo.confirmReopen(task);
       return;
     }
 
@@ -96,7 +102,7 @@ export function usePlanDetailTasks({
         item.id === id ? { ...item, done: true } : item
       )), "plan_detail");
     }
-  }, [showAlert, stopLog, toggleUserTask, togglePlanDone, transitionStop, userId]);
+  }, [showAlert, stopLog, toggleUserTask, togglePlanDone, transitionStop, userId, undo]);
 
   const startTask = useCallback((id) => {
     const task = tasksRef.current.find((t) => t.id === id);
@@ -156,6 +162,6 @@ export function usePlanDetailTasks({
   return {
     clearRemaining, doneCount: tasks.filter((t) => t.done).length,
     moveTask, reasonTask, removeTask, setReasonTask,
-    showReason, startTask, tasks, toggleTask,
+    showReason, startTask, tasks, toggleTask, editTask: undo.editTask,
   };
 }

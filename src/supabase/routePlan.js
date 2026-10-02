@@ -241,8 +241,9 @@ export async function transitionRouteStop({
         }
 
         const canTransition =
-          (serverStop.lifecycle_status === "upcoming" || serverStop.lifecycle_status === "active") &&
-          ["completed", "skipped", "rescheduled"].includes(transition);
+          ((serverStop.lifecycle_status === "upcoming" || serverStop.lifecycle_status === "active") &&
+            ["completed", "skipped", "rescheduled"].includes(transition)) ||
+          (serverStop.lifecycle_status === "completed" && transition === "upcoming");
 
         if (canTransition) {
           const { data: retriedData, error: retryErr } = await supabase.rpc("transition_route_stop", {

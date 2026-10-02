@@ -91,6 +91,10 @@ export function useHomeController() {
     (stop) => transitionStop(stop, "completed", { source: "home_plan" }),
     [transitionStop],
   );
+  const onRouteReopen = useCallback(
+    (stop) => transitionStop(stop, "upcoming", { source: "home_undo" }),
+    [transitionStop],
+  );
   const stops = useTodayStops({
     generatedTasks: dashboard.generatedTasks,
     // Rota gununde gunun listesi YALNIZ ders programinin duraklari + ek
@@ -98,6 +102,7 @@ export function useHomeController() {
     // (ana sayfa 4/4, plan 3).
     aiSuggestion: !(dashboard.routeCurrentWeek?.stops?.length) && suggestions?.length ? suggestions[0] : null,
     onRouteComplete,
+    onRouteReopen,
     onAllDone,
   });
 

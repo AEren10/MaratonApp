@@ -6,7 +6,7 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { SHAPE, STEP, TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { HomeStopCheckRing } from "./HomeStopCheckRing";
 import { Press, PRESS_ROW } from "../../../components/design/Press";
-import { Icon } from "../../../components/design/Icon";
+import { HomeStopRowTrail } from "./HomeStopRowTrail";
 
 function durationOf(item) {
   const mins = item.minutes || (item.count > 0 ? Math.round(item.count * 1.5) : null);
@@ -15,7 +15,7 @@ function durationOf(item) {
 
 // Bugünün durakları satırı:
 // [Dikey ders renk çubuğu] -> [Onay halkası] -> [Ders / Konu] -> [Sağda Süre + Durum]
-export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onOpenMenu }) {
+export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onOpenMenu, onEdit }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
   const subjectLabel = getSubjectByKey(item.subject)?.label || item.subject || "";
@@ -26,10 +26,12 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
     onToggle(item);
   }, [onToggle, item]);
 
+  // Bitmis duraga dokunmak kaydi acar (sure/soru duzeltilir); acik durak baslar.
   const handlePress = useCallback(() => {
-    if (onStart) onStart(item);
+    if (item.completed && onEdit) onEdit(item);
+    else if (onStart) onStart(item);
     else onToggle(item);
-  }, [onStart, onToggle, item]);
+  }, [onStart, onToggle, onEdit, item]);
 
   const durationStr = durationOf(item);
   const rawTopic = item.topic || item.planTopicName || item.label;
@@ -57,7 +59,7 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
         done={isDone}
         isNext={isNext}
         onToggle={handleToggle}
-        accessibilityLabel={`${subjectLabel} tamamlandı olarak işaretle`}
+        accessibilityLabel={isDone ? `${subjectLabel} tikini geri al` : `${subjectLabel} tamamlandı olarak işaretle`}
       />
 
       <Press
@@ -93,27 +95,14 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           </Text>
         </View>
 
-        <View style={s.rightCol}>
-          <Text style={[TYPOGRAPHY.tableValue, { color: isDone ? C.text3 : C.text2 }]}>
-            {durationStr}
-          </Text>
-          {isNext && !isDone ? <View style={[s.dot, { backgroundColor: C.accent }]} /> : null}
-          {canPostpone ? (
-            <Press
-              haptic="light"
-              onPress={(e) => {
-                e?.stopPropagation?.();
-                onOpenMenu?.(item);
-              }}
-              hitSlop={STEP.s2}
-              style={s.moreBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Durak seçenekleri"
-            >
-              <Icon name="more" size={14} color={C.text3} />
-            </Press>
-          ) : null}
-        </View>
+        <HomeStopRowTrail
+          duration={durationStr}
+          isDone={isDone}
+          isNext={isNext}
+          canPostpone={canPostpone}
+          onMenu={() => onOpenMenu?.(item)}
+          onEdit={onEdit ? () => onEdit(item) : null}
+        />
       </Press>
     </View>
   );
@@ -143,7 +132,4 @@ const s = StyleSheet.create({
   },
   sub: { letterSpacing: 0.6 },
   topic: { marginTop: STEP.s1 / 4 },
-  rightCol: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
-  dot: { width: 6, height: 6, borderRadius: SHAPE.chip },
-  moreBtn: { minWidth: 28, minHeight: 28, alignItems: "center", justifyContent: "center" },
 });

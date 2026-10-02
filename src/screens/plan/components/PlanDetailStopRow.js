@@ -8,7 +8,7 @@ import { Press } from "../../../components/design/Press";
 
 export function PlanDetailStopRow({
   done, C, subject, title, meta, hasStart, isLast, onStart, onToggle,
-  isCarried, canPostpone, onOpenMenu,
+  isCarried, canPostpone, onOpenMenu, onEdit,
 }) {
   return (
     <View
@@ -23,7 +23,7 @@ export function PlanDetailStopRow({
         hitSlop={STEP.s2}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
-        accessibilityLabel={`${subject} tamamlandı olarak işaretle`}
+        accessibilityLabel={done ? `${subject} tikini geri al` : `${subject} tamamlandı olarak işaretle`}
         style={[s.checkTouch]}
       >
         <View
@@ -77,6 +77,19 @@ export function PlanDetailStopRow({
           accessibilityLabel="Durak seçenekleri"
         >
           <Icon name="more" size={14} color={C.text3} />
+        </Press>
+      ) : null}
+
+      {done && onEdit ? (
+        <Press
+          haptic="light"
+          onPress={onEdit}
+          hitSlop={STEP.s1}
+          style={[s.startBtn, { backgroundColor: C.void }]}
+          accessibilityRole="button"
+          accessibilityLabel={`${subject} kaydını düzenle`}
+        >
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Düzenle</Text>
         </Press>
       ) : null}
 

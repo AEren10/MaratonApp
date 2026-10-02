@@ -44,7 +44,8 @@ const TRANSITIONS = Object.freeze({
     ROUTE_STOP_STATUS.RESCHEDULED,
   ]),
   [ROUTE_STOP_STATUS.SKIPPED]: new Set([ROUTE_STOP_STATUS.RESCHEDULED]),
-  [ROUTE_STOP_STATUS.COMPLETED]: new Set(),
+  // Yalniz bitirildigi gun geri acilir (sunucu TR gunune bakar).
+  [ROUTE_STOP_STATUS.COMPLETED]: new Set([ROUTE_STOP_STATUS.UPCOMING]),
   [ROUTE_STOP_STATUS.RESCHEDULED]: new Set(),
 });
 

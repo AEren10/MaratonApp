@@ -7,14 +7,16 @@ import { buildPlanTaskKey } from "../domain/plan/planTaskIdentity";
 import { getSubjectByKey } from "../themes/subjects";
 import * as H from "../lib/haptics";
 import { useStopCompletion } from "./useStopCompletion";
+import { useStopRecordActions } from "./useStopRecordActions";
 import { trackPlanAllCompletedOnce, trackPlanTaskCompleted } from "../lib/planAnalytics";
 
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
 // durak kaybolmaz, yeşil tikle alta iner ve sayaçla (2/5) senkron kalır.
-export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onAllDone }) {
+export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onRouteReopen, onAllDone }) {
   const { user } = useAuth();
   const stopLog = useStopCompletion();
+  const record = useStopRecordActions();
   const { tasks: userTasks, toggleTask } = useUserTasks();
   const { isDone: isPlanDone, toggle: togglePlan, syncPlan } = usePlanCompletion(user?.id);
   const rewardedRef = useRef(false);
@@ -115,10 +117,26 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
     }
   }, [items]);
 
+  // Geri alma: once rota (sunucu yalniz bugun bitenleri acar), basarirsa
+  // kayit silinir. Tersi sirada sunucu reddederse kayit bosuna silinirdi.
+  const reopen = useCallback(async (item) => {
+    completedHistoryRef.current.delete(item.id);
+    if (item.routeStop) {
+      const res = await Promise.resolve(onRouteReopen?.(item.routeStop)).catch(() => null);
+      if (res?.lifecycle_status !== "upcoming") {
+        completedHistoryRef.current.set(item.id, true);
+        record.undoFailed();
+        return;
+      }
+    }
+    if (isPlanDone(item.id)) togglePlan(item.id);
+    if (user?.id) stopLog.undo(item);
+  }, [isPlanDone, onRouteReopen, record, stopLog, togglePlan, user?.id]);
+
   const toggle = useCallback(async (item) => {
-    // Tamamlanmış rota veya plan durakları geri alınamaz (müfredat ve gün tutarlılığı)
-    if (item.completed && (item.routeStop || item.source === "plan" || item.source === "ai")) {
-      H.select();
+    // Bitmis rota/plan duragi onayla geri alinir (yanlislikla tik).
+    if (item.completed && item.source !== "user") {
+      record.confirmUndo(item, () => reopen(item));
       return;
     }
     H.select();
@@ -152,10 +170,10 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       ));
       await trackPlanAllCompletedOnce(user?.id, completedItems, "home");
     }
-  }, [items, stopLog, onRouteComplete, toggleTask, togglePlan, user?.id]);
+  }, [items, stopLog, onRouteComplete, toggleTask, togglePlan, user?.id, record, reopen]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;
 
-  return { items, doneCount, nextId, toggle };
+  return { items, doneCount, nextId, toggle, editRecord: record.openEdit };
 }

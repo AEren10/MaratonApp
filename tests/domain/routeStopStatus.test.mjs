@@ -85,6 +85,7 @@ test("transition table rejects terminal and overlay transitions", () => {
   assert.equal(canTransitionRouteStop("active", "completed"), true);
   assert.equal(canTransitionRouteStop("skipped", "rescheduled"), true);
   assert.equal(canTransitionRouteStop("completed", "active"), false);
+  assert.equal(canTransitionRouteStop("completed", "upcoming"), true);
   assert.equal(canTransitionRouteStop("active", "locked"), false);
 });
 

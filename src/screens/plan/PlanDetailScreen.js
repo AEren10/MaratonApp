@@ -70,6 +70,7 @@ function PlanDetailInner({ route }) {
                     onOpenMenu={() => setMenuStop({ ...task, subjectLabel: task.s?.label || task.s?.key || "Durak" })}
                     onStart={() => detail.startTask(task.id)}
                     onToggle={() => detail.toggleTask(task.id)}
+                    onEdit={() => detail.editTask(task.id)}
                   />
                 );
               })}

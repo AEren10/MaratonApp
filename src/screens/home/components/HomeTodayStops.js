@@ -59,6 +59,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
                   onToggle={correct.toggleWithPrompt}
                   onStart={onStartTask}
                   onOpenMenu={setMenuStop}
+                  onEdit={stops.editRecord}
                 />
               </Animated.View>
             </Animated.View>
