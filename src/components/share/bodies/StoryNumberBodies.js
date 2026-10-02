@@ -8,22 +8,31 @@ const hero = (size) => ({ fontFamily: "Bricolage_400", fontSize: size, lineHeigh
 const label = { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.9 };
 
 // SAYILAR — gunun rakami one cikar, altinda sure/seri ve kucuk bir egri.
-export function StoryStatsBody({ data, p }) {
-  const pts = data.series?.length > 1
+export function StoryStatsBody({ data, p, visibility = {} }) {
+  const {
+    showQuestions = true,
+    showMinutes = true,
+    showStreak = true,
+    showChart = true,
+  } = visibility;
+
+  const pts = showChart && data.series?.length > 1
     ? scalePoints(data.series, { width: 360, height: 96, padTop: 12, padBottom: 12 })
     : null;
   return (
     <View style={s.statsWrap}>
-      <View style={s.heroRow}>
-        <Text style={[hero(116), { color: p.solid }, p.shadow]}>{data.questions}</Text>
-        <Text style={[label, s.heroUnit, { color: p.dim }, p.shadow]}>SORU</Text>
-      </View>
+      {showQuestions ? (
+        <View style={s.heroRow}>
+          <Text style={[hero(116), { color: p.solid }, p.shadow]}>{data.questions}</Text>
+          <Text style={[label, s.heroUnit, { color: p.dim }, p.shadow]}>SORU</Text>
+        </View>
+      ) : null}
       <View style={[s.rule, { backgroundColor: p.rule }]} />
       <View style={s.statsRow}>
-        {data.minutes != null ? (
+        {showMinutes && data.minutes != null ? (
           <Stat p={p} name="SÜRE" value={formatMinutes(data.minutes)} />
         ) : null}
-        {data.streak != null ? (
+        {showStreak && data.streak != null ? (
           <Stat p={p} name="SERİ" value={`${data.streak} gün`} />
         ) : null}
         {pts ? (
@@ -49,37 +58,53 @@ function Stat({ p, name, value }) {
 }
 
 // SADE — tek rakam, tek cizgi. En az sey soyleyen varyant.
-export function StorySimpleBody({ data, p }) {
+export function StorySimpleBody({ data, p, visibility = {} }) {
+  const {
+    showStreak = true,
+    showQuestions = true,
+  } = visibility;
+
   return (
     <View style={s.simpleWrap}>
-      {data.streak != null ? (
+      {showStreak && data.streak != null ? (
         <Text style={[label, s.simpleTop, { color: p.dim }, p.shadow]}>{`GÜN ${data.streak}`}</Text>
       ) : null}
-      <Text style={[hero(176), s.simpleHero, { color: p.solid }, p.shadow]}>{data.questions}</Text>
-      <Text style={[s.simpleUnit, { color: p.mid }, p.shadow]}>soru</Text>
+      {showQuestions ? (
+        <>
+          <Text style={[hero(176), s.simpleHero, { color: p.solid }, p.shadow]}>{data.questions}</Text>
+          <Text style={[s.simpleUnit, { color: p.mid }, p.shadow]}>soru</Text>
+        </>
+      ) : null}
       <View style={[s.simpleBar, { backgroundColor: p.accent }]} />
     </View>
   );
 }
 
 // SERİ — her gun bir kare. Son yedi gun vurgulu.
-export function StoryStreakBody({ data, p }) {
+export function StoryStreakBody({ data, p, visibility = {} }) {
+  const {
+    showStreak = true,
+    showChart = true,
+  } = visibility;
   const total = Math.min(data.streak, 180);
   const dots = Array.from({ length: total }, (_, i) => i >= total - 7);
   return (
     <View style={s.streakWrap}>
-      <View style={s.dots}>
-        {dots.map((recent, i) => (
-          <View
-            key={i}
-            style={[s.dot, { backgroundColor: recent ? p.accent : p.track }]}
-          />
-        ))}
-      </View>
-      <View style={s.heroRow}>
-        <Text style={[hero(150), { color: p.solid }, p.shadow]}>{data.streak}</Text>
-        <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>gün</Text>
-      </View>
+      {showChart ? (
+        <View style={s.dots}>
+          {dots.map((recent, i) => (
+            <View
+              key={i}
+              style={[s.dot, { backgroundColor: recent ? p.accent : p.track }]}
+            />
+          ))}
+        </View>
+      ) : null}
+      {showStreak ? (
+        <View style={s.heroRow}>
+          <Text style={[hero(150), { color: p.solid }, p.shadow]}>{data.streak}</Text>
+          <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>gün</Text>
+      ) : null}
       <Text style={[s.streakLine, { color: p.mid }, p.shadow]}>Bir gün bile ara vermedim.</Text>
     </View>
   );

@@ -7,7 +7,12 @@ import { selectTrials } from "../store/slices/trialSlice";
 import { getSubjectByKey } from "../themes/subjects";
 import { useWeeklyReport } from "./useWeeklyReport";
 import { buildStoryVariants, STORY_MOMENT } from "../domain/share/storySticker";
-import { shareStoryToInstagram, saveStoryToGallery, STORY_SHARE } from "../lib/storyShare";
+import {
+  shareStoryToInstagram,
+  saveStoryToGallery,
+  copyStoryToClipboard,
+  STORY_SHARE,
+} from "../lib/storyShare";
 import { pickStoryPhoto } from "../lib/storyPhoto";
 
 const EXAM_NAME = { tyt: "YKS", ayt: "YKS", lgs: "LGS" };
@@ -126,15 +131,14 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     // Fotograf secilmediyse: seffaf etiket panoya kopyalanir, Instagram story
     // kamerasi acilir — kullanici kendi karesini cekerken yapistirir.
     share: async (overlayRef) => {
-      // Fotograf varsa dogrudan gonder (Strava'nin birincil yolu)
       const bg = photo;
       if (bg) {
         return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
       }
-      // Fotograf yoksa: panoya kopyala + Instagram kamera ac (Strava fallback)
       return run(shareStoryToInstagram, overlayRef);
     },
     save: (ref) => run(saveStoryToGallery, ref),
+    copy: (ref) => run(copyStoryToClipboard, ref),
     loading: report.loading,
     STORY_SHARE,
   };

@@ -8,10 +8,16 @@ const H = 200;
 
 // ROTA — son yedi gunun egrisi. Ayni tasarim herkeste baska bir yukselis:
 // egri elle cizilmiyor, kullanicinin kendi gununden uretiliyor.
-export function StoryRouteBody({ data, p }) {
+export function StoryRouteBody({ data, p, visibility = {} }) {
+  const {
+    showChart = true,
+    showDays = true,
+    showQuestions = true,
+  } = visibility;
+
   const pts = scalePoints(data.series, { width: W, height: H, padTop: 22, padBottom: 22 });
   const last = pts[pts.length - 1];
-  const labels = data.dayLabels?.length === data.series.length ? data.dayLabels : null;
+  const labels = showDays && data.dayLabels?.length === data.series.length ? data.dayLabels : null;
 
   return (
     <View style={s.wrap}>
@@ -19,25 +25,27 @@ export function StoryRouteBody({ data, p }) {
         <Text style={[s.eyebrow, { color: p.accent }, p.shadow]}>SON 7 GÜN</Text>
       </View>
 
-      <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={s.chart}>
-        <Defs>
-          <LinearGradient id="storyRouteArea" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={p.accent} stopOpacity={p.areaOpacity} />
-            <Stop offset="1" stopColor={p.accent} stopOpacity={0} />
-          </LinearGradient>
-        </Defs>
-        <Path d={buildAreaPath(pts, H)} fill="url(#storyRouteArea)" />
-        <Path
-          d={buildSmoothPath(pts)}
-          stroke={p.accent}
-          strokeWidth={7}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <Circle cx={last.x} cy={last.y} r={24} fill={p.accent} fillOpacity={0.18} />
-        <Circle cx={last.x} cy={last.y} r={11} fill={p.accent} />
-      </Svg>
+      {showChart ? (
+        <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={s.chart}>
+          <Defs>
+            <LinearGradient id="storyRouteArea" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={p.accent} stopOpacity={p.areaOpacity} />
+              <Stop offset="1" stopColor={p.accent} stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <Path d={buildAreaPath(pts, H)} fill="url(#storyRouteArea)" />
+          <Path
+            d={buildSmoothPath(pts)}
+            stroke={p.accent}
+            strokeWidth={7}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          <Circle cx={last.x} cy={last.y} r={24} fill={p.accent} fillOpacity={0.18} />
+          <Circle cx={last.x} cy={last.y} r={11} fill={p.accent} />
+        </Svg>
+      ) : null}
 
       {labels ? (
         <View style={[s.pad, s.days]}>
@@ -52,10 +60,12 @@ export function StoryRouteBody({ data, p }) {
         </View>
       ) : null}
 
-      <View style={[s.pad, s.total]}>
-        <Text style={[s.hero, { color: p.solid }, p.shadow]}>{data.weekQuestions}</Text>
-        <Text style={[s.unit, { color: p.mid }, p.shadow]}>soru / hafta</Text>
-      </View>
+      {showQuestions ? (
+        <View style={[s.pad, s.total]}>
+          <Text style={[s.hero, { color: p.solid }, p.shadow]}>{data.weekQuestions}</Text>
+          <Text style={[s.unit, { color: p.mid }, p.shadow]}>soru / hafta</Text>
+        </View>
+      ) : null}
     </View>
   );
 }

@@ -50,13 +50,15 @@ const BODIES = {
  * gidiyordu: hikayede tasinamiyor, arkasina kendi fotografi konamiyordu.
  * Onizleme ve galeriye kaydetmede zemin cizilir.
  */
-export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false }, ref) {
+export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false, visibility }, ref) {
   const C = useC();
   if (!variant) return null;
   const Body = BODIES[variant.kind];
   if (!Body) return null;
 
   const p = storyPalette(C, overlay ? STORY_BG.FOTO : variant.background);
+  const showCountdown = visibility?.showCountdown !== false;
+
   return (
     <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay ? "transparent" : C.bg }]}>
       {overlay ? null : p.photo ? (
@@ -65,10 +67,10 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}
 
-      <Body data={variant.data} p={p} C={C} />
+      <Body data={variant.data} p={p} C={C} visibility={visibility} />
 
       {variant.kind !== STORY_KIND.KART && variant.kind !== STORY_KIND.IZ ? (
-        <StoryFoot p={p} daysToExam={variant.data.daysToExam} />
+        <StoryFoot p={p} daysToExam={showCountdown ? variant.data.daysToExam : null} />
       ) : null}
     </View>
   );

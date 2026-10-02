@@ -16,8 +16,18 @@ function todayLabel() {
 
 // KART — tam anlatim. Tek varyant ki kendi ayagini tasir, bu yuzden
 // StoryFoot'u kendi icinde cizer ve yalniz marka zemininde yasar.
-export function StoryCardBody({ data, p, C }) {
-  const pts = data.series?.length > 1
+export function StoryCardBody({ data, p, C, visibility = {} }) {
+  const {
+    showQuestions = true,
+    showMinutes = true,
+    showStreak = true,
+    showChart = true,
+    showStops = true,
+    showAccuracy = true,
+    showCountdown = true,
+  } = visibility;
+
+  const pts = showChart && data.series?.length > 1
     ? scalePoints(data.series, { width: 360, height: 96, padTop: 12, padBottom: 12 })
     : null;
   const last = pts ? pts[pts.length - 1] : null;
@@ -25,7 +35,7 @@ export function StoryCardBody({ data, p, C }) {
   return (
     <View style={s.wrap}>
       <View style={s.top}>
-        {data.streak != null ? (
+        {showStreak && data.streak != null ? (
           <View style={[s.chip, { backgroundColor: alpha(p.accent, 15), borderColor: alpha(p.accent, 45) }]}>
             <View style={[s.chipDot, { backgroundColor: p.accent }]} />
             <Text style={[s.chipText, { color: p.accent }]}>{`GÜN ${data.streak}`}</Text>
@@ -36,9 +46,13 @@ export function StoryCardBody({ data, p, C }) {
 
       <View style={s.spacer} />
 
-      <Text style={[s.hero, { color: p.solid }]}>{data.questions}</Text>
-      <Text style={[s.heroUnit, { color: p.mid }]}>soru çözüldü</Text>
-      {data.streak != null ? (
+      {showQuestions ? (
+        <>
+          <Text style={[s.hero, { color: p.solid }]}>{data.questions}</Text>
+          <Text style={[s.heroUnit, { color: p.mid }]}>soru çözüldü</Text>
+        </>
+      ) : null}
+      {showStreak && data.streak != null ? (
         <Text style={[s.line, { color: p.dim }]}>{`${data.streak} gündür ara vermedin.`}</Text>
       ) : null}
 
@@ -60,13 +74,13 @@ export function StoryCardBody({ data, p, C }) {
       ) : null}
 
       <View style={[s.stats, { borderTopColor: C.border }]}>
-        {data.stops != null ? <Stat p={p} name="DURAK" value={String(data.stops)} /> : null}
-        {data.minutes != null ? <Stat p={p} name="SÜRE" value={formatMinutes(data.minutes)} /> : null}
-        {data.accuracy != null ? <Stat p={p} name="İSABET" value={`%${Math.round(data.accuracy)}`} /> : null}
+        {showStops && data.stops != null ? <Stat p={p} name="DURAK" value={String(data.stops)} /> : null}
+        {showMinutes && data.minutes != null ? <Stat p={p} name="SÜRE" value={formatMinutes(data.minutes)} /> : null}
+        {showAccuracy && data.accuracy != null ? <Stat p={p} name="İSABET" value={`%${Math.round(data.accuracy)}`} /> : null}
       </View>
 
       <View style={[s.footRail, { borderTopColor: C.border }]}>
-        <StoryFoot p={p} daysToExam={data.daysToExam} inline />
+        <StoryFoot p={p} daysToExam={showCountdown ? data.daysToExam : null} inline />
       </View>
     </View>
   );

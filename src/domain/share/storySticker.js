@@ -150,21 +150,16 @@ function rankFor(moment, ctx) {
 }
 
 /**
- * Paylasilabilir varyantlar, ana gore sirali. Verisi olmayan varyant listeye
- * HIC girmez — kullaniciya bos etiket sunulmaz.
+ * Paylasilabilir 4 ana sablon. Strava stili 2x2 secim gridi icin en yuksek
+ * baglamsal degeri olan 4 farkli sablon dondurur.
  */
 export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
   const out = [];
   for (const kind of rankFor(moment, ctx)) {
     const data = variantData(kind, ctx);
     if (!data) continue;
-    // Strava modeli: her varyant hem fotografin ustune (seffaf sticker)
-    // hem de marka zemininde yasar. Fotograf oncelikli — insanlar kendi
-    // masalarini fotograflayip uzerine etiket koymak istiyor.
-    const backgrounds = [STORY_BG.FOTO, STORY_BG.MARKA];
-    for (const background of backgrounds) {
-      out.push({ key: `${kind}_${background}`, kind, background, data });
-    }
+    out.push({ key: kind, kind, background: STORY_BG.FOTO, data });
+    if (out.length >= 4) break;
   }
   return out;
 }

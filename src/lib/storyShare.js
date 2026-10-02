@@ -145,3 +145,15 @@ export async function saveStoryToGallery(ref) {
     return STORY_SHARE.FAILED;
   }
 }
+
+/** Etiketi seffaf PNG olarak panoya kopyalar. */
+export async function copyStoryToClipboard(ref) {
+  const base64 = await capture(ref, "base64");
+  if (!base64) return STORY_SHARE.FAILED;
+  try {
+    await Clipboard.setImageAsync(base64);
+    return STORY_SHARE.COPIED;
+  } catch {
+    return STORY_SHARE.FAILED;
+  }
+}
