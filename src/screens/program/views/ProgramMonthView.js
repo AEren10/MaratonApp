@@ -9,6 +9,7 @@ import { useCalendarTasks } from "../../../hooks/useCalendarTasks";
 import { todayTR } from "../../../lib/dateUtils";
 import { GUTTER } from "../../../themes/tokens";
 import { MonthSwitcher } from "../../calendar/components/MonthSwitcher";
+import { useStreakWeek } from "../../../hooks/useStreakWeek";
 import { MonthGrid } from "../../calendar/components/MonthGrid";
 import { StreakLegend } from "../../calendar/components/StreakLegend";
 import StreakMonthCard from "../../calendar/components/StreakMonthCard";
@@ -19,6 +20,7 @@ import { CalendarSkeleton } from "../../calendar/components/CalendarSkeleton";
 // kalkti (sifir kahraman olmaz); denemeye basinca detay bu sekmede acilir,
 // eskiden kullaniciyi Analiz sekmesine atiyordu.
 export function ProgramMonthView() {
+  const { value: streak } = useStreakWeek();
   const C = useC();
   const navigation = useNavigation();
   const [selectedDay, setSelectedDay] = useState(() => todayTR());
@@ -41,7 +43,7 @@ export function ProgramMonthView() {
       automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
     >
-      <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} />
+      <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} streak={streak} />
       <MonthGrid
         monthDate={monthDate}
         dayMap={dayMap}

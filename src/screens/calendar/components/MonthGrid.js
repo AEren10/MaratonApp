@@ -6,6 +6,7 @@ import { alpha } from "../../../themes/palette";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
 import { useMonthRoutePlan } from "../../../hooks/useMonthRoutePlan";
 import { Press } from "../../../components/design/Press";
+import { Icon } from "../../../components/design/Icon";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
@@ -40,6 +41,7 @@ function cellLook(data, dailyGoal, isFuture, C) {
 function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, isFuture, onSelect, C }) {
   const look = cellLook(data, dailyGoal, isFuture, C);
   const isFilled = look.backgroundColor === C.accent;
+  const worked = Boolean(data?.logs?.length || data?.trials?.length || data?.totalQuestions > 0);
   const dotCount = planData?.count ? Math.min(planData.count, 3) : 0;
   const isDraft = Boolean(planData?.draft);
 
@@ -57,6 +59,12 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
         isSelected && { borderColor: isFilled ? C.text : C.accent, borderWidth: 2 },
       ]}
     >
+      {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
+      {worked ? (
+        <View style={styles.flame} pointerEvents="none">
+          <Icon name="flame" size={10} color={isFilled ? C.accentInk : C.accent} fill={isFilled ? C.accentInk : C.accent} />
+        </View>
+      ) : null}
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
       {dotCount > 0 ? (
         <View style={[styles.dotsRow, isDraft && styles.draftDots]}>
@@ -137,6 +145,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  flame: { position: "absolute", top: 3, right: 4 },
   draftDots: {
     opacity: 0.45,
   },

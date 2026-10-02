@@ -4,7 +4,8 @@ import { MONTHS_TR } from "../../../lib/trWords";
 import { CONTROL, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
-export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
+// streak > 0 ise ay adinin altinda ortada alevli seri sayisi.
+export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C, streak = 0 }) {
   const monthName = MONTHS_TR[monthDate.getMonth()];
   const year = monthDate.getFullYear();
 
@@ -19,9 +20,17 @@ export function MonthSwitcher({ monthDate, prevMonth, nextMonth, C }) {
       >
         <Icon name="chevL" size={16} color={C.text3} />
       </Press>
-      <Text style={[TYPOGRAPHY.topicName, s.title, { color: C.text, fontVariant: ["tabular-nums"] }]}>
-        {`${monthName} ${year}`}
-      </Text>
+      <View style={s.center}>
+        <Text style={[TYPOGRAPHY.topicName, s.title, { color: C.text, fontVariant: ["tabular-nums"] }]}>
+          {`${monthName} ${year}`}
+        </Text>
+        {streak > 0 ? (
+          <View style={s.streak} accessibilityLabel={`${streak} günlük seri`}>
+            <Icon name="flame" size={13} color={C.accent} fill={C.accent} />
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentText }]}>{`${streak} günlük seri`}</Text>
+          </View>
+        ) : null}
+      </View>
       <Press haptic="none"
         hitSlop={12}
         accessibilityRole="button"
@@ -52,4 +61,6 @@ const s = StyleSheet.create({
   title: {
     letterSpacing: 0.2,
   },
+  center: { alignItems: "center", gap: 2 },
+  streak: { flexDirection: "row", alignItems: "center", gap: 4 },
 });
