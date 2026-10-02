@@ -35,7 +35,13 @@ export function todayPlanStops(week, schedule, todayKey, {
     rhythm, moves, monday, blockedDates, examDate, firstDate: week.planStartDay,
   });
   const todayIdx = weekdayIndex(todayKey);
-  const own = (days[todayIdx] || []).filter((s) => s.lifecycleStatus !== "frozen"); // rota donuk
+  // Bugunun KENDI duraklari: acik olanlar + BUGUN bitirilenler. Baska bir gun
+  // bitmis durak bugune dusmus olabilir (revizyonlar bitis zamanini
+  // tasimiyordu, durak ders programina gore bugune yerlesiyordu): ogrenci
+  // dokunmadigi gorevleri "tikli" goruyordu, grafik bos kaliyordu.
+  const own = (days[todayIdx] || [])
+    .filter((s) => s.lifecycleStatus !== "frozen") // rota donuk
+    .filter((s) => s.lifecycleStatus !== "completed" || isCompletedToday(s));
   const ownSet = new Set(own);
 
   // KACIRILAN DURAK: pazartesi yapilmayan durak eskiden o gunde kalip

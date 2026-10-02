@@ -29,3 +29,12 @@ test("cuma listesi baska gun bitmis duragi 'bitti' diye gostermez", () => {
   assert.ok(!friday.includes(done));
   assert.ok(friday.some((s) => s.id === "s2"));
 });
+
+test("bitis zamani bilinmeyen bitmis durak bugun 'tikli' gorunmez", () => {
+  const unknownDone = { id: "s3", subject: "tyt_turkce", topic: "Noktalama", cost: { minutes: 30 }, lifecycleStatus: "completed", completedAt: null };
+  const w = { weekStart: "2026-09-28", stops: [unknownDone, open] };
+  const friday = todayPlanStops(w, schedule, "2026-10-02");
+  assert.ok(!friday.includes(unknownDone));
+  const doneToday = todayPlanStops(w, schedule, "2026-10-02", { isCompletedToday: (s) => s.id === "s3" });
+  assert.ok(doneToday.includes(unknownDone), "bugun bitirildiyse listede kalir");
+});
