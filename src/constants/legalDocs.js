@@ -63,7 +63,7 @@ export const LEGAL_DOCS = {
   },
   {
     title: "3. Kullanım Kuralları",
-    body: "Uygulamayı yalnızca kişisel eğitim amaçlı kullanabilirsiniz. İçerikleri kopyalamak, dağıtmak, ters mühendislik yapmak veya ticari amaçla kullanmak yasaktır. Diğer kullanıcılara zarar verecek, yanıltıcı veya uygunsuz davranışlarda bulunmak yasaktır.",
+    body: "Uygulamayı yalnızca kişisel eğitim amaçlı kullanabilirsiniz. İçerikleri kopyalamak, dağıtmak, ters mühendislik yapmak veya ticari amaçla kullanmak yasaktır. Diğer kullanıcılara zarar verecek, yanıltıcı veya uygunsuz davranışlarda bulunmak yasaktır. Uygunsuz, hakaret, nefret söylemi veya taciz içeren içeriğe (ad, fotoğraf, grup adı) ve bu davranışta bulunan kullanıcılara hiçbir tolerans gösterilmez: bildirilen içerik 24 saat içinde incelenir, kaldırılır ve hesap kapatılabilir. Rahatsız eden kullanıcıyı engelleyebilir ya da bildirebilirsiniz.",
   },
   {
     title: "4. İçerik ve Fikri Mülkiyet",
