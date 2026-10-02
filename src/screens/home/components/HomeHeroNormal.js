@@ -18,6 +18,7 @@ import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { openInTab } from "../../../navigation/tabJump";
 import { HomeExamSeriesChart } from "./HomeExamSeriesChart";
 import { PullForwardRow } from "./PullForwardRow";
+import { useReplayOnFocus } from "../../../hooks/useReplayOnFocus";
 
 // Ana Sayfa hero'sunun normal (Pro) hali: bugunun sayilari + rota / hafta
 // grafigi (kahraman) + "Çalışmaya Başla". Rota ozet seridi grafikle ayni
@@ -30,6 +31,8 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
   } = hero;
   const navigation = useNavigation();
   const C = useC();
+  // Ana sayfaya donunce grafikler yeniden cizilir.
+  const replay = useReplayOnFocus();
 
   // Varsayilan sayfa HAFTALIK: ana sayfa her gun aciliyor ve her gun sorulan
   // soru "bugun ilerledim mi". Rota haftada bir bakilan bir sey, ikinci
@@ -90,7 +93,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       />
 
       <View style={s.chart}>
-        <HomeChartPager pages={pages} onPressPage={onPressPage} />
+        <HomeChartPager key={`pager-${replay}`} pages={pages} onPressPage={onPressPage} />
       </View>
 
       <Animated.View style={s.cta}>

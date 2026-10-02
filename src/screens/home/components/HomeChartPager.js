@@ -5,25 +5,10 @@ import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
-// Grafik alani iki sayfa: "Bu hafta" (varsayilan) ve "Rota".
-//
-// NEDEN SAYFA, NEDEN UST USTE DEGIL
-// Iki grafik iki ayri soruya cevap veriyor ve farkli siklikta bakiliyor:
-// haftalik "bugun ilerledim mi" (her gun), rota "nereye gidiyorum" (haftada
-// bir). Tek tuvale sikistirmak ikisini de kucultur.
-//
-// NEDEN CUMLE DE SAYFANIN ICINDE
-// Grafigin altindaki cumle sayfaya ait. Disarida dururken haftalik sayfada
-// cumle yok, rota sayfasinda var oluyordu; kaydirirken altindaki her sey
-// (rota seridi, "Çalışmaya Başla") bir satir boyu asagi kayiyordu. Icerde
-// duruyor ve sayfalar esit yukseklikte -- kaydirirken hicbir sey oynamiyor.
-//
-// DOKUNMA AYRIMI
-// Sayfa yatay kayiyor, sayfanin KENDISI de dokununca Rota detayina gidiyor.
-// Pressable'i ScrollView'in ICINE koyuyoruz: RN'de kaydirma basladiginda
-// icteki Pressable'in onPress'i iptal edilir, yani kaydirirken yanlislikla
-// navigasyon tetiklenmez. Tersi (ScrollView'i Pressable icine koymak)
-// kaydirmayi yutardi.
+// Grafik alani sayfalari ("Bu hafta" varsayilan, "Rota", "Denemeler").
+// Iki grafik iki ayri soruya cevap verir; cumle sayfanin icinde durur ki
+// sayfalar esit yukseklikte kalsin. Pressable ScrollView'in ICINDE:
+// kaydirma baslayinca onPress iptal olur, yanlislikla navigasyon olmaz.
 export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialPage = 0 }) {
   const C = useC();
   const { width } = useWindowDimensions();
@@ -32,6 +17,10 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   // ciziyor; ikinci sayfa ekran disinda cizilip bitiyordu, kullanici hic
   // gormuyordu. Gorulmemis sayfa ilk sayfanin yuksekliginde bos yer tutar.
   const [seen, setSeen] = useState(() => new Set([initialPage]));
+  // Her GIRISTE animasyon bastan (kullanici, 3 Ekim): sayfaya yeniden
+  // gelindiginde icerik yeni anahtarla kurulur, cubuklar/cizgi tekrar cizilir.
+  const [visits, setVisits] = useState(() => ({ [initialPage]: 1 }));
+  const candRef = useRef(initialPage);
   const [firstH, setFirstH] = useState(0);
   const indexRef = useRef(initialPage);
   const pageWidth = Math.max(1, width - GUTTER * 2);
@@ -57,6 +46,10 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
     const pos = e.nativeEvent.contentOffset.x / pageWidth;
     const cand = Math.min(visible.length - 1, pos % 1 > 0.3 ? Math.ceil(pos) : Math.floor(pos));
     setSeen((prev) => (prev.has(cand) ? prev : new Set(prev).add(cand)));
+    if (cand !== candRef.current) {
+      candRef.current = cand;
+      setVisits((prev) => ({ ...prev, [cand]: (prev[cand] || 0) + 1 }));
+    }
   }, [pageWidth, visible.length]);
 
   const body = (page) => (
@@ -105,7 +98,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
             accessibilityLabel={page.a11y}
             onLayout={i === 0 ? (e) => setFirstH(e.nativeEvent.layout.height) : undefined}
           >
-            {seen.has(i) ? body(page) : <View style={{ height: firstH }} />}
+            {seen.has(i) ? <View key={`${page.key}-${visits[i] || 0}`}>{body(page)}</View> : <View style={{ height: firstH }} />}
           </Press>
         ))}
       </ScrollView>
