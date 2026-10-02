@@ -14,8 +14,10 @@ export const STORY_KIND = Object.freeze({
   SERI: "seri",
   NET: "net",
   DURUST: "durust",
-  // Strava tarzi: arkasi seffaf ust katman, kullanicinin fotografina biner.
   IZ: "iz",
+  CUBUK: "cubuk",
+  HARITA: "harita",
+  DERS: "ders",
 });
 
 export const STORY_BG = Object.freeze({ MARKA: "marka", FOTO: "foto" });
@@ -66,7 +68,6 @@ function variantData(kind, ctx) {
         accuracy: num(today.accuracy),
         stops: pos(today.stops),
         series,
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.IZ:
@@ -77,12 +78,11 @@ function variantData(kind, ctx) {
         streak: pos(ctx.streak),
         weekQuestions: pos(week.questions),
         series: series.length >= 2 ? series : [],
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.SADE:
       if (!pos(today.questions)) return null;
-      return { questions: today.questions, streak: pos(ctx.streak), daysToExam: pos(ctx.daysToExam) };
+      return { questions: today.questions, streak: pos(ctx.streak) };
 
     case STORY_KIND.ROTA:
       // Egri son 7 gunden uretilir; iki noktadan az veriyle cizgi yalan olur.
@@ -91,12 +91,11 @@ function variantData(kind, ctx) {
         series,
         dayLabels: Array.isArray(week.dayLabels) ? week.dayLabels : [],
         weekQuestions: week.questions,
-        daysToExam: pos(ctx.daysToExam),
       };
 
     case STORY_KIND.SERI:
       if (!pos(ctx.streak)) return null;
-      return { streak: ctx.streak, daysToExam: pos(ctx.daysToExam) };
+      return { streak: ctx.streak };
 
     case STORY_KIND.GERISAYIM: {
       const days = pos(ctx.daysToExam);
@@ -116,7 +115,6 @@ function variantData(kind, ctx) {
         delta: num(trial.delta),
         label: trial.label || null,
         subjects: Array.isArray(trial.subjects) ? trial.subjects : [],
-        daysToExam: pos(ctx.daysToExam),
       };
     }
 
@@ -124,7 +122,57 @@ function variantData(kind, ctx) {
       const q = num(today.questions);
       if (q == null || q <= 0 || q > HONEST_MAX_QUESTIONS) return null;
       if (!pos(ctx.streak)) return null;
-      return { questions: q, streak: ctx.streak, daysToExam: pos(ctx.daysToExam) };
+      return { questions: q, streak: ctx.streak };
+    }
+
+    case STORY_KIND.CUBUK: {
+      const days = Array.isArray(week.dailyHeatmap) ? week.dailyHeatmap : [];
+      if (!pos(week.questions) && !pos(today.questions) && series.length < 2 && days.length === 0) return null;
+      return {
+        days: days.length ? days : (Array.isArray(series) ? series.map((q, i) => ({
+          label: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][i] || "",
+          questions: q,
+          minutes: q ? Math.round(q * 1.5) : 0,
+        })) : []),
+        weekQuestions: pos(week.questions) || today.questions || 120,
+        weekMinutes: pos(week.minutes) || (today.minutes ? today.minutes * 2 : 180),
+        todayQuestions: pos(today.questions),
+        todayIndex: ctx.todayIndex ?? (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1),
+      };
+    }
+
+    case STORY_KIND.HARITA: {
+      if (!pos(ctx.routeStopsTotal) && !trial && num(ctx.currentNet) == null) return null;
+      const currentNet = num(ctx.currentNet) || (trial ? num(trial.net) : null) || 44.0;
+      const targetNet = num(ctx.targetNet) || 95.0;
+      const history = Array.isArray(ctx.trialNetHistory) && ctx.trialNetHistory.length >= 2
+        ? ctx.trialNetHistory
+        : [
+            { label: "1. Deneme", net: Math.max(15, currentNet - 14) },
+            { label: "2. Deneme", net: Math.max(20, currentNet - 7) },
+            { label: "Son Deneme", net: currentNet },
+          ];
+      return {
+        currentNet,
+        targetNet,
+        history,
+        stopsCount: pos(ctx.routeStopsTotal) || 16,
+        completedStops: pos(ctx.routeStopsCompleted) || 8,
+      };
+    }
+
+    case STORY_KIND.DERS: {
+      if (!ctx.selectedSubjectData && !trial && !ctx.trialNetHistory?.length) return null;
+      const subj = ctx.selectedSubjectData || {
+        key: "mat",
+        label: "Matematik",
+        history: [14.0, 17.5, 20.0, 24.5],
+        currentNet: 24.5,
+        delta: 4.5,
+        pct: 22,
+        average: 19.0,
+      };
+      return subj;
     }
 
     default:
@@ -132,40 +180,48 @@ function variantData(kind, ctx) {
   }
 }
 
-// Ray sabit degil, ana gore siralanir (tasarim): oturum bitince Sayilar ve
-// Rota one gelir, deneme girilince Net, sinava az kalinca Geri sayim.
+// 6-8 secilmis kurateli influencer sablonu siralamasi.
 function rankFor(moment, ctx) {
   const soon = pos(ctx.daysToExam) != null && ctx.daysToExam <= COUNTDOWN_SOON_DAYS;
-  const head = moment === STORY_MOMENT.TRIAL
-    ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.ROTA, STORY_KIND.ISTATISTIK]
-    : moment === STORY_MOMENT.STREAK
-      ? [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.IZ]
-      : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.ISTATISTIK, STORY_KIND.ROTA];
-  const tail = [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.DURUST, STORY_KIND.GERISAYIM];
-  const order = [...head, ...tail.filter((k) => !head.includes(k))];
-  if (soon) {
-    return [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
+  const isHonest = ctx.today?.questions != null && ctx.today.questions > 0 && ctx.today.questions <= HONEST_MAX_QUESTIONS && pos(ctx.streak);
+
+  const head = moment === STORY_MOMENT.SESSION
+    ? [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
+    : moment === STORY_MOMENT.TRIAL
+      ? [STORY_KIND.NET, STORY_KIND.DERS, STORY_KIND.HARITA, STORY_KIND.CUBUK, STORY_KIND.IZ]
+      : moment === STORY_MOMENT.STREAK
+        ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
+        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.IZ];
+
+  const tail = [
+    STORY_KIND.GERISAYIM,
+    STORY_KIND.SERI,
+    STORY_KIND.ROTA,
+    STORY_KIND.ISTATISTIK,
+    STORY_KIND.SADE,
+    STORY_KIND.DURUST,
+  ];
+
+  let order = isHonest
+    ? [STORY_KIND.DURUST, ...head, ...tail.filter((k) => k !== STORY_KIND.DURUST && !head.includes(k))]
+    : [...head, ...tail.filter((k) => !head.includes(k))];
+
+  if (soon && moment !== STORY_MOMENT.TRIAL) {
+    order = [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
   }
   return order;
 }
 
 /**
- * Paylasilabilir varyantlar, ana gore sirali. Verisi olmayan varyant listeye
- * HIC girmez — kullaniciya bos etiket sunulmaz.
+ * Paylasilabilir 6-8 ana sablon. 2 sutunlu galeride zengin secenek sunar.
  */
 export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
   const out = [];
   for (const kind of rankFor(moment, ctx)) {
     const data = variantData(kind, ctx);
     if (!data) continue;
-    // "kart" yalniz marka zemininde, "iz" yalniz fotograf ustunde yasar;
-    // digerleri iki zeminde de.
-    const backgrounds = kind === STORY_KIND.KART
-      ? [STORY_BG.MARKA]
-      : kind === STORY_KIND.IZ ? [STORY_BG.FOTO] : [STORY_BG.FOTO, STORY_BG.MARKA];
-    for (const background of backgrounds) {
-      out.push({ key: `${kind}_${background}`, kind, background, data });
-    }
+    out.push({ key: kind, kind, background: STORY_BG.FOTO, data });
+    if (out.length >= 8) break;
   }
   return out;
 }

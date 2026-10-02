@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import Svg, { Circle, Path, Line } from "react-native-svg";
 
 import { scalePoints, buildSmoothPath } from "../../../lib/routeChartPath";
 import { formatMinutes } from "../../../lib/format";
@@ -14,91 +14,117 @@ function todayLabel() {
     .toLocaleUpperCase("tr");
 }
 
-// KART — tam anlatim. Tek varyant ki kendi ayagini tasir, bu yuzden
-// StoryFoot'u kendi icinde cizer ve yalniz marka zemininde yasar.
-export function StoryCardBody({ data, p, C }) {
-  const pts = data.series?.length > 1
-    ? scalePoints(data.series, { width: 360, height: 96, padTop: 12, padBottom: 12 })
+export function StoryCardBody({ data, p, C, visibility = {} }) {
+  const {
+    showQuestions = true,
+    showMinutes = true,
+    showStreak = true,
+    showChart = true,
+    showStops = true,
+    showAccuracy = true,
+    showCountdown = true,
+  } = visibility;
+
+  const pts = showChart && data.series?.length > 1
+    ? scalePoints(data.series, { width: 340, height: 80, padTop: 10, padBottom: 10 })
     : null;
   const last = pts ? pts[pts.length - 1] : null;
 
   return (
     <View style={s.wrap}>
-      <View style={s.top}>
-        {data.streak != null ? (
-          <View style={[s.chip, { backgroundColor: alpha(p.accent, 15), borderColor: alpha(p.accent, 45) }]}>
-            <View style={[s.chipDot, { backgroundColor: p.accent }]} />
-            <Text style={[s.chipText, { color: p.accent }]}>{`GÜN ${data.streak}`}</Text>
-          </View>
-        ) : <View />}
-        <Text style={[s.date, { color: p.dim }]}>{todayLabel()}</Text>
-      </View>
-
-      <View style={s.spacer} />
-
-      <Text style={[s.hero, { color: p.solid }]}>{data.questions}</Text>
-      <Text style={[s.heroUnit, { color: p.mid }]}>soru çözüldü</Text>
-      {data.streak != null ? (
-        <Text style={[s.line, { color: p.dim }]}>{`${data.streak} gündür ara vermedin.`}</Text>
-      ) : null}
-
-      {pts ? (
-        <View style={s.chart}>
-          <Svg width="100%" height={96} viewBox="0 0 360 96">
-            <Path
-              d={buildSmoothPath(pts)}
-              stroke={p.accent}
-              strokeWidth={5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-            <Circle cx={last.x} cy={last.y} r={17} fill={p.accent} fillOpacity={0.2} />
-            <Circle cx={last.x} cy={last.y} r={8} fill={p.accent} />
-          </Svg>
+      {/* Fiş / Rapor Başlığı */}
+      <View style={s.head}>
+        <View style={s.topRow}>
+          <Text style={[s.badge, { color: p.accent }, p.shadow]}>✦ GÜNLÜK ÇALIŞMA RAPORU ✦</Text>
+          {showStreak && data.streak != null ? (
+            <View style={[s.chip, { backgroundColor: alpha(p.accent, 20), borderColor: p.accent }]}>
+              <Text style={[s.chipText, { color: p.accent }]}>{`SERİ ${data.streak} GÜN 🔥`}</Text>
+            </View>
+          ) : null}
         </View>
-      ) : null}
-
-      <View style={[s.stats, { borderTopColor: C.border }]}>
-        {data.stops != null ? <Stat p={p} name="DURAK" value={String(data.stops)} /> : null}
-        {data.minutes != null ? <Stat p={p} name="SÜRE" value={formatMinutes(data.minutes)} /> : null}
-        {data.accuracy != null ? <Stat p={p} name="İSABET" value={`%${Math.round(data.accuracy)}`} /> : null}
+        <Text style={[s.date, { color: p.dim }, p.shadow]}>{todayLabel()}</Text>
+        <Text style={[s.dotsDivider, { color: p.rule }]}>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</Text>
       </View>
 
-      <View style={[s.footRail, { borderTopColor: C.border }]}>
-        <StoryFoot p={p} daysToExam={data.daysToExam} inline />
-      </View>
-    </View>
-  );
-}
+      {/* Ana Kahraman Sayılar */}
+      <View style={s.body}>
+        {showQuestions ? (
+          <View style={s.heroGroup}>
+            <Text style={[s.heroNum, { color: p.solid }, p.shadow]}>{data.questions}</Text>
+            <Text style={[s.heroLabel, { color: p.mid }, p.shadow]}>SORU ÇÖZÜLDÜ</Text>
+          </View>
+        ) : null}
 
-function Stat({ p, name, value }) {
-  return (
-    <View style={s.stat}>
-      <Text style={[s.statName, { color: p.dim }]}>{name}</Text>
-      <Text style={[s.statValue, { color: p.solid }]}>{value}</Text>
+        {/* 3'lü İnce Veri Satırı */}
+        <View style={s.dataRow}>
+          {showMinutes && data.minutes != null ? (
+            <View style={s.dataItem}>
+              <Text style={[s.dataLabel, { color: p.dim }, p.shadow]}>SÜRE</Text>
+              <Text style={[s.dataVal, { color: p.solid }, p.shadow]}>{formatMinutes(data.minutes)}</Text>
+            </View>
+          ) : null}
+          {showAccuracy && data.accuracy != null ? (
+            <View style={s.dataItem}>
+              <Text style={[s.dataLabel, { color: p.dim }, p.shadow]}>İSABET</Text>
+              <Text style={[s.dataVal, { color: p.up || "#34D399" }, p.shadow]}>{`%${Math.round(data.accuracy)}`}</Text>
+            </View>
+          ) : null}
+          {showStops && data.stops != null ? (
+            <View style={s.dataItem}>
+              <Text style={[s.dataLabel, { color: p.dim }, p.shadow]}>DURAK</Text>
+              <Text style={[s.dataVal, { color: p.solid }, p.shadow]}>{`${data.stops} Durak`}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Mini Günlük Trend Eğrisi */}
+        {pts ? (
+          <View style={s.chartBox}>
+            <Svg width="100%" height={80} viewBox="0 0 340 80">
+              <Path d={buildSmoothPath(pts)} stroke={p.accent} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <Circle cx={last.x} cy={last.y} r={14} fill={p.accent} fillOpacity={0.25} />
+              <Circle cx={last.x} cy={last.y} r={7} fill={p.accent} stroke="#FFFFFF" strokeWidth={2} />
+            </Svg>
+          </View>
+        ) : null}
+      </View>
+
+      {/* Alt Fiş İmzası ve Barkod */}
+      <View style={s.footBox}>
+        <Text style={[s.dotsDivider, { color: p.rule }]}>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</Text>
+        <View style={s.barcodeRow}>
+          <Svg width={180} height={20} viewBox="0 0 180 20">
+            {[4, 12, 16, 26, 32, 36, 48, 54, 60, 72, 80, 88, 98, 106, 114, 126, 134, 142, 154, 164, 172].map((x, i) => (
+              <Line key={i} x1={x} y1={2} x2={x} y2={18} stroke="rgba(255,255,255,0.4)" strokeWidth={i % 3 === 0 ? 3 : 1.5} />
+            ))}
+          </Svg>
+          <Text style={[s.receiptNo, { color: p.dim }]}>#M-2026-STUDY</Text>
+        </View>
+        <StoryFoot p={p} inline centered />
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, paddingTop: 94, paddingHorizontal: 34, paddingBottom: 110 },
-  top: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
-  chip: {
-    flexDirection: "row", alignItems: "center", gap: 7, height: 26,
-    paddingHorizontal: 12, borderRadius: 6, borderWidth: 1,
-  },
-  chipDot: { width: 5, height: 5, borderRadius: 1 },
-  chipText: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 2.2 },
-  date: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.76 },
-  spacer: { flex: 1, minHeight: 0 },
-  hero: { fontFamily: "Bricolage_400", fontSize: 132, lineHeight: 138, letterSpacing: -6.9 },
-  heroUnit: { fontFamily: "Bricolage_400", fontSize: 22, marginTop: 12 },
-  line: { fontFamily: "Archivo_400", fontSize: 15, lineHeight: 23, marginTop: 12, maxWidth: 290 },
-  chart: { marginHorizontal: -34, marginTop: 20 },
-  stats: { flexDirection: "row", borderTopWidth: 1, marginTop: 16, paddingTop: 16 },
-  stat: { flex: 1 },
-  statName: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.8 },
-  statValue: { fontFamily: "Bricolage_400", fontSize: 20, marginTop: 6 },
-  footRail: { borderTopWidth: 1, marginTop: 18, paddingTop: 16, height: 44 },
+  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  head: { width: 330, gap: 4 },
+  topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  badge: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1.5 },
+  chip: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
+  chipText: { fontFamily: "Archivo_700", fontSize: 10, letterSpacing: 1 },
+  date: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.2, marginTop: 2 },
+  dotsDivider: { letterSpacing: 2, fontSize: 10.5, opacity: 0.5, marginVertical: 3 },
+  body: { width: 330, gap: 10 },
+  heroGroup: { gap: 2 },
+  heroNum: { fontFamily: "Bricolage_400", fontSize: 80, lineHeight: 84, letterSpacing: -4 },
+  heroLabel: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2 },
+  dataRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
+  dataItem: { gap: 2 },
+  dataLabel: { fontFamily: "Archivo_600", fontSize: 10.5, letterSpacing: 1.4 },
+  dataVal: { fontFamily: "Bricolage_400", fontSize: 20 },
+  chartBox: { marginTop: 4 },
+  footBox: { width: 330, gap: 6, marginTop: 4 },
+  barcodeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 6 },
+  receiptNo: { fontFamily: "Archivo_500", fontSize: 10.5, letterSpacing: 1.2 },
 });

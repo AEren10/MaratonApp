@@ -1,132 +1,141 @@
-import { useRef } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { useState, useRef, useCallback } from "react";
+import { View, Text, StyleSheet, Dimensions, ActionSheetIOS, Platform } from "react-native";
 
 import { useC } from "../../contexts/ThemeContext";
 import { useStoryShare } from "../../hooks/useStoryShare";
-import { STORY_BG, STORY_MOMENT } from "../../domain/share/storySticker";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
-import * as H from "../../lib/haptics";
-import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
-import { Press } from "../../components/design/Press";
+import { STORY_MOMENT } from "../../domain/share/storySticker";
+import { STEP, GUTTER, TYPOGRAPHY } from "../../themes/tokens";
+import { StorySticker } from "./StorySticker";
+import { StoryGridCard } from "./StoryGridCard";
+import { StoryFilterChips } from "./StoryFilterChips";
+import { StoryActionRow } from "./StoryActionRow";
 
-const THUMB_W = 124;
-const SELECTED_W = 148;
+const { width: SCREEN_W } = Dimensions.get("window");
+const GRID_GAP = 12;
+const CARD_W = Math.floor((SCREEN_W - GUTTER * 2 - GRID_GAP) / 2);
+const CARD_H = Math.round(CARD_W * (16 / 9));
 
-const MESSAGE = {
-  placed: "Instagram'a gönderildi.",
-  opened: "Etiket panoda. Instagram'da basılı tut, Yapıştır'a dokun.",
-  copied: "Etiket panoya kopyalandı. Instagram'ı açıp yapıştırabilirsin.",
-  failed: "Etiket hazırlanamadı. Tekrar dener misin?",
+const STATUS_TEXTS = {
+  placed: "Instagram'a aktarıldı ✓",
+  opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
+  tiktok_opened: "Paylaşım açıldı — TikTok veya dilediğin uygulamayı seçebilirsin ✓",
+  copied: "Şeffaf etiket panoya kopyalandı ✓",
+  saved: "Galeriye kaydedildi ✓",
+  permission_denied: "İzin verilmedi.",
+  failed: "İşlem tamamlanamadı, tekrar dener misin?",
 };
 
-// PAYLAŞ BLOĞU — tasarim: ayri ekran yok, ozetin icinde yasar. Hazir
-// varyantlar yatay kayar, tek buton paylasir.
-// emphasis: tek basina duran yuzeyde "primary" (tasarimin dolgulu butonu).
-// Ekranda zaten birincil bir aksiyon varsa "quiet" — iki birincil buton olmaz.
-export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, photoUri, emphasis = "primary" }) {
+export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
   const C = useC();
   const overlayRef = useRef(null);
   const s = useStoryShare(moment);
-  const quiet = emphasis === "quiet";
-  const photoMode = s.selected?.background === STORY_BG.FOTO;
-  const bgUri = s.photo?.uri || photoUri;
+
+  const [visibility, setVisibility] = useState({
+    showQuestions: true, showMinutes: true, showStreak: true, showChart: true,
+    showStops: true, showAccuracy: true, showWeek: true, showDays: true, showCountdown: true,
+  });
+
+  const handleToggle = useCallback((key) => {
+    setVisibility((prev) => ({ ...prev, [key]: prev[key] === false }));
+  }, []);
+
+  const handlePickPhoto = useCallback(() => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: ["İptal", "Kamerayla Çek", "Galeriden Seç"], cancelButtonIndex: 0 },
+        (i) => { if (i === 1) s.pickPhoto("camera"); if (i === 2) s.pickPhoto("library"); }
+      );
+    } else {
+      s.pickPhoto("library");
+    }
+  }, [s]);
 
   if (s.loading || !s.selected) return null;
 
   return (
-    <View style={[st.wrap, { borderTopColor: C.line, backgroundColor: C.surface }]}>
-      <Text style={[TYPOGRAPHY.label, st.head, { color: C.text2 }]}>PAYLAŞ</Text>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.rail}>
-        {s.variants.map((v, i) => {
-          const active = i === s.selectedIndex;
-          const w = active ? SELECTED_W : THUMB_W;
-          return (
-            <Press haptic="none"
-              key={v.key}
-              onPress={() => { H.tap(); s.select(i); }}
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              style={[
-                st.thumb,
-                {
-                  width: w,
-                  height: Math.round((w * STORY_HEIGHT) / STORY_WIDTH),
-                  borderColor: active ? C.accent : C.border,
-                  opacity: active ? 1 : 0.62,
-                },
-              ]}
-            >
-              <View style={[st.scaled, { transform: [{ scale: w / STORY_WIDTH }] }]} pointerEvents="none">
-                <StorySticker variant={v} photoUri={bgUri} />
-              </View>
-            </Press>
-          );
-        })}
-      </ScrollView>
-
-      {/* Strava modeli: fotograf burada secilir ya da o an cekilir, Instagram'a
-          zemin olarak gider; veriler ustune seffaf etiket olarak biner. */}
-      {photoMode ? (
-        <View style={st.photoRow}>
-          <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto("library"); }} accessibilityRole="button" style={st.secondary}>
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>
-              {bgUri ? "Fotoğrafı değiştir" : "Galeriden seç"}
-            </Text>
-          </Press>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>·</Text>
-          <Press haptic="none" onPress={() => { H.tap(); s.pickPhoto("camera"); }} accessibilityRole="button" style={st.secondary}>
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>Kamerayla çek</Text>
-          </Press>
-        </View>
-      ) : null}
-
-      <Press haptic="none"
-        onPress={() => { H.tap(); s.share(overlayRef); }}
-        disabled={s.busy}
-        accessibilityRole="button"
-        accessibilityLabel="Paylaş"
-        style={[
-          st.cta,
-          quiet
-            ? { borderWidth: 1, borderColor: C.border, backgroundColor: "transparent" }
-            : { backgroundColor: C.accent },
-          { opacity: s.busy ? 0.6 : 1}
-        ]}
-      >
-        <Text style={[TYPOGRAPHY.button, { color: quiet ? C.text : C.accentInk }]}>
-          {s.busy ? "Hazırlanıyor…" : "Paylaş"}
+    <View style={[st.wrap, { backgroundColor: C.surface, borderTopColor: C.line }]}>
+      {/* Baslik */}
+      <View style={st.headerRow}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>HİKAYEDE PAYLAŞ</Text>
+        <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
+          {s.selectedIndex + 1} / {s.variants.length} Şablon
         </Text>
-      </Press>
+      </View>
 
+      {/* Strava Tarzı 2x2 Grid */}
+      <View style={st.grid}>
+        {s.variants.map((v, i) => (
+          <StoryGridCard
+            key={v.key}
+            variant={v}
+            photoUri={s.photo?.uri}
+            active={i === s.selectedIndex}
+            width={CARD_W}
+            height={CARD_H}
+            visibility={visibility}
+            onPress={() => s.select(i)}
+          />
+        ))}
+      </View>
 
-      <Text style={[TYPOGRAPHY.micro, st.note, { color: C.text3 }]}>
-        {s.result ? MESSAGE[s.result] : photoMode
-          ? "Veriler fotoğrafının üstüne biner; Instagram'da taşıyıp büyütebilirsin."
-          : "Etiket saydam gider: Instagram'da fotoğrafını çek ya da seç, basılı tutup yapıştır."}
+      {/* İcindeki Verileri Kapatip Acma ve Ders Secme */}
+      <StoryFilterChips
+        kind={s.selected.kind}
+        data={s.selected.data}
+        visibility={visibility}
+        onToggle={handleToggle}
+        selectedSubject={s.subjectKey}
+        onSelectSubject={s.setSubjectKey}
+      />
+
+      {/* Strava Tarzi Dairesel Butonlar */}
+      <StoryActionRow
+        onShareInstagram={() => s.share(overlayRef)}
+        onShareTikTok={() => s.shareTikTok(overlayRef)}
+        onCopyToClipboard={() => s.copy(overlayRef)}
+        onSaveToGallery={() => s.save(overlayRef)}
+        onPickPhoto={handlePickPhoto}
+        onClearPhoto={s.clearPhoto}
+        hasPhoto={!!s.photo}
+        busy={s.busy}
+      />
+
+      {/* Geri Bildirim Mesaji */}
+      <Text style={[TYPOGRAPHY.micro, st.statusNote, { color: s.result ? C.up : C.text3 }]}>
+        {s.result ? STATUS_TEXTS[s.result] || "" : s.photo
+          ? "Fotoğrafın arka planda, sticker önde açılır. Instagram'da taşıyabilirsin."
+          : "Şeffaf etiket Instagram'a biner; arka planı Instagram'da dilediğince seçebilirsin."}
       </Text>
 
-      {/* Yakalanan asil etiketler: tam olcu, EKRAN DISINDA. Eskiden sol ustte
-          duruyordu; zIndex RN'de gizlemedigi icin ozetin ustune biniyordu. */}
+      {/* Ekran Disinda Tam Olculu Yakalama */}
       <View style={st.offscreen} pointerEvents="none">
-        <StorySticker ref={overlayRef} variant={s.selected} overlay />
+        <StorySticker
+          ref={overlayRef}
+          variant={s.selected}
+          overlay
+          visibility={visibility}
+        />
       </View>
     </View>
   );
 }
 
 const st = StyleSheet.create({
-  wrap: { borderTopWidth: 1, paddingTop: STEP.s3, paddingBottom: STEP.s4 },
-  head: { paddingHorizontal: STEP.s3 },
-  rail: { gap: STEP.s2, paddingHorizontal: STEP.s3, paddingTop: STEP.s2, alignItems: "flex-start" },
-  thumb: { borderRadius: SHAPE.card, borderWidth: 1, overflow: "hidden" },
-  scaled: { position: "absolute", left: 0, top: 0, transformOrigin: "top left" },
-  cta: {
-    height: 52, marginHorizontal: STEP.s3, marginTop: STEP.s3,
-    borderRadius: SHAPE.button, alignItems: "center", justifyContent: "center",
+  wrap: { borderTopWidth: 1, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: GUTTER,
+    marginBottom: STEP.s2,
   },
-  secondary: { minHeight: 44, alignItems: "center", justifyContent: "center", marginTop: STEP.s1 },
-  photoRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: STEP.s2 },
-  note: { textAlign: "center", paddingHorizontal: STEP.s4, marginTop: STEP.s1 },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: GUTTER,
+    gap: GRID_GAP,
+    justifyContent: "space-between",
+  },
+  statusNote: { textAlign: "center", paddingHorizontal: GUTTER, marginTop: STEP.s2 },
   offscreen: { position: "absolute", top: 0, left: -10000 },
 });

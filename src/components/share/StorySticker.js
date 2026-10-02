@@ -19,6 +19,9 @@ import {
   StoryHonestBody,
   StoryNetBody,
 } from "./bodies/StoryMomentBodies";
+import { StoryBarsBody } from "./bodies/StoryBarsBody";
+import { StoryMapBody } from "./bodies/StoryMapBody";
+import { StorySubjectBody } from "./bodies/StorySubjectBody";
 
 // Tasarimin tuvali: 9:16, sabit olcu. Kucuk gosterilecekse SARAN view
 // olceklenir, tuval degil — yakalama tam cozunurlukte olsun diye.
@@ -39,6 +42,9 @@ const BODIES = {
   [STORY_KIND.NET]: StoryNetBody,
   [STORY_KIND.DURUST]: StoryHonestBody,
   [STORY_KIND.IZ]: StoryTrackBody,
+  [STORY_KIND.CUBUK]: StoryBarsBody,
+  [STORY_KIND.HARITA]: StoryMapBody,
+  [STORY_KIND.DERS]: StorySubjectBody,
 };
 
 /**
@@ -46,17 +52,16 @@ const BODIES = {
  *
  * `overlay`: Instagram'a giden hal -- HER varyantta ZEMIN YOK, arkasi seffaf,
  * yalniz veriler (fotograf paleti: beyaz + golge, her fotografta okunur).
- * Eskiden marka varyantlari zeminiyle birlikte tam ekran goruntu olarak
- * gidiyordu: hikayede tasinamiyor, arkasina kendi fotografi konamiyordu.
  * Onizleme ve galeriye kaydetmede zemin cizilir.
  */
-export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false }, ref) {
+export const StorySticker = forwardRef(function StorySticker({ variant, photoUri, overlay = false, visibility }, ref) {
   const C = useC();
   if (!variant) return null;
   const Body = BODIES[variant.kind];
   if (!Body) return null;
 
   const p = storyPalette(C, overlay ? STORY_BG.FOTO : variant.background);
+
   return (
     <View ref={ref} collapsable={false} style={[s.canvas, { backgroundColor: overlay ? "transparent" : C.bg }]}>
       {overlay ? null : p.photo ? (
@@ -65,11 +70,7 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}
 
-      <Body data={variant.data} p={p} C={C} />
-
-      {variant.kind !== STORY_KIND.KART && variant.kind !== STORY_KIND.IZ ? (
-        <StoryFoot p={p} daysToExam={variant.data.daysToExam} />
-      ) : null}
+      <Body data={variant.data} p={p} C={C} visibility={visibility} />
     </View>
   );
 });

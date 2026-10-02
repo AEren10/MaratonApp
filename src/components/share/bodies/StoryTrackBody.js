@@ -18,14 +18,26 @@ const fmtMinutes = (m) => {
 // ustune biner. Ustte 2x2 veri, ortada haftanin izi (beyaz hat, sonunda
 // kirmizi dugum), altta marka. Fotograf her renkte olabilir: metin beyaz ve
 // golgeli, hat beyaz ve ince golgeli.
-export function StoryTrackBody({ data, p }) {
+export function StoryTrackBody({ data, p, visibility = {} }) {
+  const {
+    showQuestions = true,
+    showMinutes = true,
+    showStreak = true,
+    showWeek = true,
+    showChart = true,
+    showCountdown = true,
+  } = visibility;
+
   const cells = [
-    { label: "Soru", value: data.questions ? String(data.questions) : null },
-    { label: "Süre", value: fmtMinutes(data.minutes) },
-    { label: "Seri", value: data.streak ? `${data.streak} gün` : null },
-    { label: "Bu hafta", value: data.weekQuestions ? `${data.weekQuestions} soru` : null },
-  ].filter((c) => c.value);
-  const pts = data.series?.length >= 2 ? scalePoints(data.series, { width: W, height: H, padTop: 20, padBottom: 20 }) : [];
+    showQuestions ? { label: "Soru", value: data.questions ? String(data.questions) : null } : null,
+    showMinutes ? { label: "Süre", value: fmtMinutes(data.minutes) } : null,
+    showStreak ? { label: "Seri", value: data.streak ? `${data.streak} gün` : null } : null,
+    showWeek ? { label: "Bu hafta", value: data.weekQuestions ? `${data.weekQuestions} soru` : null } : null,
+  ].filter((c) => c && c.value);
+
+  const pts = showChart && data.series?.length >= 2
+    ? scalePoints(data.series, { width: W, height: H, padTop: 20, padBottom: 20 })
+    : [];
   const last = pts[pts.length - 1];
 
   return (
@@ -49,16 +61,19 @@ export function StoryTrackBody({ data, p }) {
         </Svg>
       ) : null}
 
-      <StoryFoot p={p} daysToExam={data.daysToExam} />
+      <View style={s.brandRow}>
+        <StoryFoot p={p} inline centered />
+      </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject },
-  grid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 34, paddingTop: 64, rowGap: 22 },
+  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  grid: { width: W, flexDirection: "row", flexWrap: "wrap", rowGap: 16 },
   cell: { width: "50%" },
-  label: { fontFamily: "Archivo_600", fontSize: 13, letterSpacing: 0.2 },
-  value: { fontFamily: "Bricolage_400", fontSize: 34, lineHeight: 40, letterSpacing: -0.8, marginTop: 2 },
-  track: { marginTop: 56, alignSelf: "center" },
+  label: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 0.2 },
+  value: { fontFamily: "Bricolage_400", fontSize: 30, lineHeight: 36, letterSpacing: -0.8, marginTop: 2 },
+  track: { marginTop: 24, alignSelf: "center" },
+  brandRow: { marginTop: 24, alignSelf: "center" },
 });

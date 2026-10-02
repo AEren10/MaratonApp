@@ -7,9 +7,14 @@ import { selectTrials } from "../store/slices/trialSlice";
 import { getSubjectByKey } from "../themes/subjects";
 import { useWeeklyReport } from "./useWeeklyReport";
 import { buildStoryVariants, STORY_MOMENT } from "../domain/share/storySticker";
-import { shareStoryToInstagram, saveStoryToGallery, STORY_SHARE } from "../lib/storyShare";
+import {
+  shareStoryToInstagram,
+  shareStoryToTikTok,
+  saveStoryToGallery,
+  copyStoryToClipboard,
+  STORY_SHARE,
+} from "../lib/storyShare";
 import { pickStoryPhoto } from "../lib/storyPhoto";
-import { STORY_BG } from "../domain/share/storySticker";
 
 const EXAM_NAME = { tyt: "YKS", ayt: "YKS", lgs: "LGS" };
 
@@ -24,17 +29,11 @@ function examLabel(examType, examDate) {
 
 function lastTrialOf(trials) {
   if (!trials?.length) return null;
-  const sorted = (trials || [])
-    .map((t, index) => ({ trial: t, orderIndex: index }))
-    .sort((a, b) => {
-      const diff = new Date(b.trial.date) - new Date(a.trial.date);
-      if (diff !== 0) return diff;
-      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
-      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
-      if (timeA !== timeB) return timeB - timeA;
-      return a.orderIndex - b.orderIndex;
-    })
-    .map(({ trial }) => trial);
+  const sorted = [...(trials || [])].sort((a, b) => {
+    const diff = new Date(b.date) - new Date(a.date);
+    if (diff !== 0) return diff;
+    return (new Date(b.created_at || 0).getTime()) - (new Date(a.created_at || 0).getTime());
+  });
   const latest = sorted[0];
   const net = Number(latest?.totalNet ?? latest?.total_net);
   if (!Number.isFinite(net)) return null;
@@ -56,21 +55,22 @@ function lastTrialOf(trials) {
 }
 
 /**
- * Story paylasim blogunun tek veri kaynagi. Ham veriyi toplar, saf katmana
- * verir, geri donen varyantlari ve paylasim eylemlerini sunar.
+ * Story paylasim blogunun tek veri kaynagi.
  */
+import { extractTrialNetHistory, extractSubjectData } from "../domain/share/storySubjectHistory";
+
 export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
   const report = useWeeklyReport();
   const streak = useSelector(selectStreak);
   const todayLogs = useSelector(selectTodayLogs);
   const trials = useSelector(selectTrials);
-  const { examType, examDate, daysUntilExam } = useExam();
+  const { examType, examDate, daysUntilExam, targetNet: examTarget } = useExam();
 
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
-  // Fotografli varyantin arka plani: { uri, share } ya da null.
   const [photo, setPhoto] = useState(null);
+  const [subjectKey, setSubjectKey] = useState("mat");
 
   const ctx = useMemo(() => {
     const logs = todayLogs || [];
@@ -87,15 +87,24 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
       },
       week: {
         questions: report.totalQuestions || 0,
+        minutes: report.totalMinutes || 0,
         series: heat.map((d) => d.questions),
+        dailyHeatmap: heat,
         dayLabels: heat.map((d) => String(d.label || "").slice(0, 1).toLocaleUpperCase("tr")),
       },
       streak: streak || 0,
       daysToExam: daysUntilExam ?? null,
       examLabel: examLabel(examType, examDate),
       lastTrial: lastTrialOf(trials),
+      todayIndex: new Date().getDay() === 0 ? 6 : new Date().getDay() - 1,
+      routeStopsTotal: 16,
+      routeStopsCompleted: 8,
+      currentNet: Number(trials?.[0]?.totalNet ?? trials?.[0]?.total_net) || 44.0,
+      targetNet: Number(examTarget) || 95.0,
+      trialNetHistory: extractTrialNetHistory(trials),
+      selectedSubjectData: extractSubjectData(trials, subjectKey),
     };
-  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, streak, daysUntilExam, examType, examDate, trials]);
+  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, report.totalMinutes, streak, daysUntilExam, examType, examDate, trials, examTarget, subjectKey]);
 
   const variants = useMemo(() => buildStoryVariants(ctx, moment), [ctx, moment]);
   const selected = variants[Math.min(index, Math.max(0, variants.length - 1))] || null;
@@ -120,17 +129,17 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
     clearResult: () => setResult(null),
     photo,
     pickPhoto: async (source) => { const p = await pickStoryPhoto(source); if (p) setPhoto(p); return p; },
-    // Etiket HER zaman seffaf gider (yalniz veriler). Fotografli varyantta
-    // fotograf yoksa once sectirilir ve Instagram'a arka plan olur; digerlerinde
-    // etiket panoya kopyalanir, kullanici Instagram'da kendi fotografini koyar.
+    clearPhoto: () => setPhoto(null),
+    subjectKey,
+    setSubjectKey,
     share: async (overlayRef) => {
-      if (selected?.background !== STORY_BG.FOTO) return run(shareStoryToInstagram, overlayRef);
-      const p = photo || await pickStoryPhoto();
-      if (!p) return null;
-      if (!photo) setPhoto(p);
-      return run((ref) => shareStoryToInstagram(ref, { backgroundImage: p.share }), overlayRef);
+      const bg = photo;
+      if (bg) return run((ref) => shareStoryToInstagram(ref, { backgroundImage: bg.share }), overlayRef);
+      return run(shareStoryToInstagram, overlayRef);
     },
     save: (ref) => run(saveStoryToGallery, ref),
+    copy: (ref) => run(copyStoryToClipboard, ref),
+    shareTikTok: (ref) => run(shareStoryToTikTok, ref),
     loading: report.loading,
     STORY_SHARE,
   };

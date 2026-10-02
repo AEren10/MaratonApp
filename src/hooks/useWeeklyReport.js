@@ -118,9 +118,10 @@ export function useWeeklyReport() {
       d.setDate(d.getDate() + i);
       const dateStr = toIso(d);
       const active = days.has(dateStr);
-      const q = logs.filter((l) => l.study_date === dateStr)
-        .reduce((s, l) => s + (l.questionCount ?? l.question_count ?? 0), 0);
-      return { label, date: dateStr, active, questions: q };
+      const dayLogs = logs.filter((l) => l.study_date === dateStr);
+      const q = dayLogs.reduce((s, l) => s + (l.questionCount ?? l.question_count ?? 0), 0);
+      const m = dayLogs.reduce((s, l) => s + (l.duration ?? l.duration_minutes ?? 0), 0);
+      return { label, date: dateStr, active, questions: q, minutes: m };
     });
 
     return {

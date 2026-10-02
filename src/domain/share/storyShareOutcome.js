@@ -3,6 +3,7 @@
 export const STORY_SHARE = Object.freeze({
   PLACED: "placed",     // etiket dogrudan Instagram story'ye yerlesti
   OPENED: "opened",     // pano hazir + Instagram acildi
+  TIKTOK_OPENED: "tiktok_opened", // pano hazir + TikTok acildi
   COPIED: "copied",     // pano hazir, Instagram acilamadi
   SAVED: "saved",       // galeriye kaydedildi
   PERMISSION_DENIED: "permission_denied",
