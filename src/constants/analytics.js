@@ -17,6 +17,9 @@ export const EVENTS = {
 
   // Onboarding
   ONBOARDING_COMPLETE: "onboarding.complete",
+  // Kayit oncesi rota onizlemesi: rota cizildi / "Rotami kaydet"e basildi.
+  ROUTE_PREVIEW_SHOWN: "onboarding.route_preview_shown",
+  ROUTE_PREVIEW_SAVE: "onboarding.route_preview_save",
   // Seviye Testi (kurulum 3/4) — rotanin baslangic neti girildi ya da atlandi.
   LEVEL_TEST_SUBMITTED: "onboarding.level_test_submitted",
   LEVEL_TEST_SKIPPED: "onboarding.level_test_skipped",

@@ -14,6 +14,7 @@ import ProfileScreen from "../screens/profile/ProfileScreen";
 import LeagueScreen from "../screens/league/LeagueScreen";
 import LoginScreen from "../screens/auth/LoginScreen";
 import RegisterScreen from "../screens/auth/RegisterScreen";
+import RoutePreviewScreen from "../screens/onboarding/RoutePreviewScreen";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import SetNewPasswordScreen from "../screens/auth/SetNewPasswordScreen";
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
@@ -108,6 +109,7 @@ export const TAB_SCREENS = [
 
 export const AUTH_STACK_SCREENS = [
   screen(SCREENS.LOGIN, LoginScreen),
+  screen(SCREENS.ROUTE_PREVIEW, RoutePreviewScreen),
   screen(SCREENS.REGISTER, RegisterScreen),
   screen(SCREENS.FORGOT_PASSWORD, ForgotPasswordScreen),
   screen(SCREENS.SET_NEW_PASSWORD, SetNewPasswordScreen),

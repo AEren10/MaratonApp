@@ -30,6 +30,7 @@ import {
 } from "./screenRegistry";
 import { useDeepLink } from "../hooks/useDeepLink";
 import { usePostSetupLanding } from "../hooks/usePostSetupLanding";
+import { usePendingPreviewSetup } from "../hooks/usePendingPreviewSetup";
 import { consumeAuthIntent } from "../lib/authIntent";
 import { ROOT_GATE, resolveRootGate } from "./rootGate";
 
@@ -123,14 +124,14 @@ function MainTabs() {
 }
 
 function AuthStack() {
-  // Karsilama'daki "Rotami kur" -> Kayit, "Hesabim var" -> Giris.
-  // Niyet yoksa varsayilan Giris (donen kullanici).
+  // Karsilama'daki "Rotami kur" -> once hesapsiz rota onizlemesi, sonra
+  // Kayit; "Hesabim var" -> Giris. Niyet yoksa varsayilan Giris (donen kullanici).
   const intent = consumeAuthIntent();
   return (
     <Stack.Navigator
       screenOptions={screenOptions}
       screenLayout={DepthLayout}
-      initialRouteName={intent === "register" ? SCREENS.REGISTER : SCREENS.LOGIN}
+      initialRouteName={intent === "register" ? SCREENS.ROUTE_PREVIEW : SCREENS.LOGIN}
     >
       {AUTH_STACK_SCREENS.map(renderStackScreen)}
     </Stack.Navigator>
@@ -163,13 +164,17 @@ function SetupStack() {
   // Yeni kaydolan kullanicinin ilk gordugu ekran Hedef Sec olmali; tasarimin
   // Kurulum Yarim metni ("Sinavini secmissin ama hedefini belirlememissin")
   // zaten ilerleme oldugunu varsayiyor.
+  // Kayit oncesi rota onizlemesinden gelen yeni kullanici sinavi zaten secti:
+  // kurulum dogrudan Hedef'ten baslar (usePendingPreviewSetup sinavi yazar).
   const { examType } = useExam();
+  const fromPreview = usePendingPreviewSetup();
   const resuming = !!examType;
+  const initial = fromPreview ? SCREENS.GOAL_SETUP : resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP;
   return (
     <Stack.Navigator
       screenOptions={screenOptions}
       screenLayout={DepthLayout}
-      initialRouteName={resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP}
+      initialRouteName={initial}
     >
       {SETUP_STACK_SCREENS.map(renderStackScreen)}
       <Stack.Screen name={ROOT_STACK.MAIN_TABS} component={MainTabs} />

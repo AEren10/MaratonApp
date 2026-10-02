@@ -8,6 +8,7 @@ import { setGoals, saveGoalsToStorage } from "../../store/slices/goalsSlice";
 import * as H from "../../lib/haptics";
 import { SCREENS } from "../../constants/screens";
 import { SYNC_PENDING_COPY } from "../../constants/stateCopy";
+import { peekPendingPreview } from "../../lib/routePreviewStore";
 
 export const TYT_NET_MIN = 20, TYT_NET_MAX = 120, TYT_NET_DEFAULT = 75;
 export const AYT_NET_MIN = 10, AYT_NET_MAX = 80, AYT_NET_DEFAULT = 45;
@@ -49,7 +50,8 @@ export function useGoalSetupForm() {
   const [tytNet, setTytNet] = useState(targetNetTYT || TYT_NET_DEFAULT);
   const [aytNet, setAytNet] = useState(targetNetAYT || (isDil ? YDT_NET_DEFAULT : AYT_NET_DEFAULT));
   const [singleNet, setSingleNet] = useState(targetNet || (isLgs ? LGS_NET_DEFAULT : TYT_NET_DEFAULT));
-  const [dailyQuestions, setDailyQuestions] = useState(80);
+  // Onizlemede secilen gunluk sure buraya tasinir (ayni soru iki kez sorulmaz).
+  const [dailyQuestions, setDailyQuestions] = useState(() => peekPendingPreview()?.dailyQuestions || 80);
   const [targetNetPending, setTargetNetPending] = useState(false);
   const seeded = useRef(false);
 

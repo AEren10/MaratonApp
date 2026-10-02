@@ -11,6 +11,7 @@ export const SCREENS = {
   EXAM_SETUP: "ExamSetup",
   GOAL_SETUP: "GoalSetup",
   LEVEL_TEST: "LevelTest",
+  ROUTE_PREVIEW: "RoutePreview",
   ROUTE_READY: "RouteReady",
   NOTIFICATION_PERMISSION: "NotificationPermission",
   SETUP_INCOMPLETE: "SetupIncomplete",

@@ -10,6 +10,7 @@ import { TAB_KEYS } from "../navigation/tabAssignment";
 import { EVENTS } from "../constants/analytics";
 import { track } from "../lib/analytics";
 import { landingDeferredToNewStack, setPostSetupLanding } from "../lib/postSetupLanding";
+import { clearPendingPreview } from "../lib/routePreviewStore";
 
 async function permissionNotAsked() {
   if (Platform.OS === "web") return false;
@@ -31,6 +32,7 @@ export function useFinishOnboarding() {
 
   const complete = useCallback(async (summary = {}, options = {}) => {
     track(EVENTS.ONBOARDING_COMPLETE, summary);
+    clearPendingPreview();
     // Kurulumdan cikan kullanici ANA SAYFA'ya iner, Rota Detay'a degil.
     // Rota Detay ilk gun bos gorunuyor (hicbir deneme, hicbir tamamlanmis
     // durak yok); ana sayfada ise selamlama, bugunun duragi ve rota cizgisi

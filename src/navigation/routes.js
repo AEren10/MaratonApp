@@ -10,6 +10,7 @@ export const ROOT_STACK = {
 
 export const ROUTE_CONFIGS = {
   [SCREENS.LOGIN]: { path: "giris", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: true },
+  [SCREENS.ROUTE_PREVIEW]: { path: "rota-onizleme", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: false },
   [SCREENS.REGISTER]: { path: "kayit", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: true },
   [SCREENS.FORGOT_PASSWORD]: { path: "sifre-sifirla", flow: PRODUCT_FLOW_IDS.ONBOARDING, deepLink: true },
   // Şifre sıfırlama e-postasındaki linkin düştüğü yer. Supabase Auth

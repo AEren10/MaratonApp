@@ -20,6 +20,7 @@ import * as H from "../../lib/haptics";
 import { registerSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { SIGN_UP_OUTCOME, signUpOutcome } from "../../lib/signUpOutcome";
+import { registerLeadCopy } from "../../lib/routePreviewStore";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
@@ -91,7 +92,7 @@ export default function RegisterScreen() {
               Hesap oluştur.
             </Text>
             <Text style={[TYPOGRAPHY.body, { fontSize: 13.5, color: C.text3, marginTop: STEP.s2, maxWidth: 302 }]}>
-              Rotan hazır. Hesap yalnızca onu buluta almak için — hangi telefondan girersen aynı yerden devam eder.
+              {registerLeadCopy()}
             </Text>
           </Animated.View>
 
