@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback } from "react";
-import { View, Text, FlatList, TextInput, StyleSheet } from "react-native";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { View, Text, FlatList, TextInput, StyleSheet, Keyboard, useWindowDimensions } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Icon } from "../design";
@@ -7,8 +7,14 @@ import { getSubjectByKey } from "../../themes/subjects";
 import { Press } from "../../components/design/Press";
 import { BottomSheet } from "../design/BottomSheet";
 
+// Dersin BUTUN konulari burada (onceki ekranda yalniz ornekler). Panel
+// altta ve sabit boyda: eskiden klavye kacirma katmani paneli ekranin
+// ustune itiyor, liste 320px kutuda 7 konu gosterip kaydirilabildigini
+// belli etmiyordu.
 export function TopicPicker({ visible, subject, onClose, onSelect }) {
   const C = useC();
+  const { height } = useWindowDimensions();
+  useEffect(() => { if (visible) Keyboard.dismiss(); }, [visible]);
   const s = useMemo(() => makeStyles(C), [C]);
   const [query, setQuery] = useState("");
   const [customMode, setCustomMode] = useState(false);
@@ -45,10 +51,11 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
   ), [pick, s, C.muted]);
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} edge keyboard style={s.sheet} header={(
+    <BottomSheet visible={visible} onClose={onClose} edge style={[s.sheet, { height: Math.round(height * 0.72) }]} header={(
       <View>
         <View style={s.handle} />
         <Text style={s.title}>{subject?.label || "Ders"} · Konu Seç</Text>
+        <Text style={s.count}>{`${topics.length} konu`}</Text>
       </View>
     )}>
       {customMode ? (
@@ -84,7 +91,7 @@ export function TopicPicker({ visible, subject, onClose, onSelect }) {
           <FlatList
             data={filtered}
             keyExtractor={(item, i) => `${item}-${i}`}
-            style={{ maxHeight: 320 }}
+            style={s.list}
             keyboardShouldPersistTaps="handled"
             windowSize={5}
             maxToRenderPerBatch={10}
@@ -119,7 +126,9 @@ const makeStyles = (C) => StyleSheet.create({
     alignSelf: "center",
     marginBottom: SPACING.md,
   },
-  title: { ...TYPOGRAPHY.subheading, color: C.text, marginBottom: SPACING.md },
+  title: { ...TYPOGRAPHY.subheading, color: C.text },
+  count: { ...TYPOGRAPHY.meta, color: C.muted, marginTop: 2, marginBottom: SPACING.md },
+  list: { flex: 1 },
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
