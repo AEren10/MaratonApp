@@ -111,13 +111,13 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
             <SectionLabel>YAPTIĞINI KAYDET</SectionLabel>
             <View style={{ gap: STEP.s1 }}>
               <QuickAddRow C={C} title="Geçmiş çalışma" subtitle="Sayaçsız yaptığın çalışmayı gir"
-                icon="bookOpen"
+                icon="bookOpen" iconColor={C.up}
                 onPress={() => go(SCREENS.ADD_STUDY)} />
               <QuickAddRow C={C} title="Deneme gir" subtitle="Fotoğraftan veya elle"
-                icon="target"
+                icon="target" iconColor={C.accent}
                 onPress={() => go(SCREENS.TRIAL_ENTRY)} />
               <QuickAddRow C={C} title="Yanlış ekle" subtitle="Deftere soru kaydet"
-                icon="notebook"
+                icon="notebook" iconColor={C.warn}
                 onPress={() => go(SCREENS.ADD_WRONG)} />
             </View>
           </View>
@@ -125,7 +125,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           <View style={styles.section}>
             <SectionLabel>PLANA EKLE</SectionLabel>
             <QuickAddRow C={C} title="Durak ekle" subtitle="Programa · gün ve süre seçerek"
-              icon="calendar"
+              icon="calendar" iconColor={C.blue}
               onPress={() => go(SCREENS.ADD_TASK)} />
           </View>
         </Animated.View>

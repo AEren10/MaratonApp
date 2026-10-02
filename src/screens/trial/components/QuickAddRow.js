@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
+import { alpha } from "../../../themes/colorMix";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
@@ -14,7 +15,8 @@ export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, i
       accessibilityLabel={accessibilityLabel || title}
       style={[styles.row, { backgroundColor: C.surface, borderColor: C.elev }]}
     >
-      <View style={[styles.iconBox, { backgroundColor: C.elev }]}>
+      {/* Renkli ikon kutusu: satirlar bir bakista ayrisir (kullanici, 3 Ekim). */}
+      <View style={[styles.iconBox, { backgroundColor: iconColor ? alpha(iconColor, 18) : C.elev }]}>
         <Icon name={icon} size={16} color={icColor} sw={1.5} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
