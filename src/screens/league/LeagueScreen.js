@@ -11,6 +11,7 @@ import { SCREENS } from "../../constants/screens";
 import { Icon, AnimatedCard, GlowBackground, getCrimsonGlow } from "../../components/design";
 import { EmptyState } from "../../components/common/EmptyState";
 import { useAuth } from "../../contexts/AuthContext";
+import { useBlockedIds } from "../../lib/blockedUsers";
 import { getTier, getNextTier } from "../../constants/league";
 import { getZone, ZONE } from "../../lib/leagueZones";
 import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
@@ -190,6 +191,7 @@ export default function LeagueScreen() {
   const route = useRoute();
   const C = useC();
   const { user } = useAuth();
+  const blocked = useBlockedIds(user?.id);
   const [tab, setTab] = useState(route.params?.tab || "groups");
 
   useEffect(() => {
@@ -261,6 +263,7 @@ export default function LeagueScreen() {
     let addedDemotionLabel = false;
     let addedMidDivider = false;
     data.list.forEach((item) => {
+      if (blocked.has(item.user_id)) return;
       const zone = showZones ? getZone(item.rank, totalUsers) : ZONE.SAFE;
       if (showZones && !addedMidDivider && zone !== ZONE.PROMOTION) {
         items.push({ _type: "divider", _id: "div-mid" });
@@ -273,7 +276,7 @@ export default function LeagueScreen() {
       items.push(item);
     });
     return items;
-  }, [data.list, totalUsers]);
+  }, [data.list, totalUsers, blocked]);
 
   const renderItem = useCallback(({ item }) => {
     if (item._type === "divider") {

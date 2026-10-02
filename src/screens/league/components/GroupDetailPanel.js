@@ -11,6 +11,9 @@ import { GroupCodeCard } from "./GroupCodeCard";
 import { GroupCompetitionBanner } from "./GroupCompetitionBanner";
 import { GroupMemberRow } from "./GroupMemberRow";
 import { GroupStreakRow } from "./GroupStreakRow";
+import { GroupReportButton } from "./GroupReportButton";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useBlockedIds } from "../../../lib/blockedUsers";
 
 export function GroupDetailPanel({
   visible,
@@ -24,7 +27,10 @@ export function GroupDetailPanel({
 }) {
   const C = useC();
   const insets = useSafeAreaInsets();
-  const members = board?.list || [];
+  const { user } = useAuth();
+  const blocked = useBlockedIds(user?.id);
+  // Engellenen uye listede gorunmez (Apple 1.2).
+  const members = useMemo(() => (board?.list || []).filter((m) => !blocked.has(m.user_id)), [board, blocked]);
   const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
   const renderMember = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
   const keyExtractor = useCallback((item) => String(item.user_id), []);
@@ -45,6 +51,7 @@ export function GroupDetailPanel({
               {Number(group.member_count ?? group.memberCount ?? members.length) || members.length} üye · haftalık yarış
             </Text>
           </View>
+          <GroupReportButton group={group} />
         </View>
 
         <FlatList
