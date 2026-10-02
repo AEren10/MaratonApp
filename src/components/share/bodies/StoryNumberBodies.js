@@ -104,6 +104,7 @@ export function StoryStreakBody({ data, p, visibility = {} }) {
         <View style={s.heroRow}>
           <Text style={[hero(150), { color: p.solid }, p.shadow]}>{data.streak}</Text>
           <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>gün</Text>
+        </View>
       ) : null}
       <Text style={[s.streakLine, { color: p.mid }, p.shadow]}>Bir gün bile ara vermedim.</Text>
     </View>
