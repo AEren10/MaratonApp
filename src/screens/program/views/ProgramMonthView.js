@@ -9,6 +9,7 @@ import { useCalendarTasks } from "../../../hooks/useCalendarTasks";
 import { todayTR } from "../../../lib/dateUtils";
 import { GUTTER } from "../../../themes/tokens";
 import { MonthSwitcher } from "../../calendar/components/MonthSwitcher";
+import { CalendarStreakHero } from "../../calendar/components/CalendarStreakHero";
 import { useStreakWeek } from "../../../hooks/useStreakWeek";
 import { MonthGrid } from "../../calendar/components/MonthGrid";
 import { StreakLegend } from "../../calendar/components/StreakLegend";
@@ -43,7 +44,8 @@ export function ProgramMonthView() {
       automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
     >
-      <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} streak={streak} />
+      <CalendarStreakHero streak={streak} C={C} />
+      <MonthSwitcher monthDate={monthDate} prevMonth={prevMonth} nextMonth={nextMonth} C={C} />
       <MonthGrid
         monthDate={monthDate}
         dayMap={dayMap}

@@ -5,6 +5,7 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
 import { EffortGrid } from "./components/EffortGrid";
+import { RouteTargetFlag } from "./components/RouteTargetFlag";
 import { compactDuration, effortLabelLayout } from "./components/effortLabels";
 import { useC } from "../../contexts/ThemeContext";
 import { useChartFrame } from "./useChartFrame";
@@ -39,7 +40,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
-  const { labelYOf, goalLabelBelow } = effortLabelLayout({ week, todayIndex, goalY, top, slot, width: vbW });
+  const { labelYOf } = effortLabelLayout({ week, todayIndex, goalY, top, slot, width: vbW });
 
   return (
     <View
@@ -61,7 +62,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
         {week.days.map((day, i) => {
           const cx = EFFORT_PAD_LEFT + slot * i + slot / 2;
           const barTop = day.minutes > 0 ? yOf(day.minutes) : bottom - 6;
-          const showQ = day.questions > 0 && bottom - barTop >= 24;
+          // Soru sayisi cubugun DIBINDE: ustteki sure etiketiyle cakismaz.
+          const showQ = day.questions > 0 && bottom - barTop >= 20;
           return (
             <Fragment key={day.label}>
             {day.minutes > 0 ? (
@@ -86,7 +88,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               C={C}
             />
             {showQ ? (
-              <SvgText x={cx} y={barTop + 14} fill={C.accentInk} fillOpacity={0.92} fontSize={11} fontWeight="600" textAnchor="middle">
+              <SvgText x={cx} y={bottom - 6} fill={C.accentInk} fillOpacity={0.92} fontSize={11} fontWeight="600" textAnchor="middle">
                 {day.questions}
               </SvgText>
             ) : null}
@@ -100,12 +102,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               x1={EFFORT_PAD_LEFT} y1={goalY} x2={vbW - PAD_RIGHT} y2={goalY}
               stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
             />
-            <SvgText
-              x={vbW - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
-              fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor="end"
-            >
-              {`GÜNLÜK HEDEF ${compactDuration(goal)}`}
-            </SvgText>
+            {/* Hedef yazisi yerine rota grafigindeki bayrak: cizginin sag ucunda. */}
+            <RouteTargetFlag x={vbW - PAD_RIGHT} y={goalY} C={C} />
           </>
         ) : null}
 

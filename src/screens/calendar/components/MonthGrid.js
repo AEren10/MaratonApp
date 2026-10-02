@@ -61,8 +61,8 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
     >
       {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
       {worked ? (
-        <View style={styles.flame} pointerEvents="none">
-          <Icon name="flame" size={10} color={isFilled ? C.accentInk : C.accent} fill={isFilled ? C.accentInk : C.accent} />
+        <View style={[styles.flame, { backgroundColor: C.bg }]} pointerEvents="none">
+          <Icon name="flame" size={13} color={C.accent} fill={C.accent} />
         </View>
       ) : null}
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
@@ -145,7 +145,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  flame: { position: "absolute", top: 3, right: 4 },
+  // Alev kutunun sag ust KOSESINE oturur (kenar cizgisinin kesisimi);
+  // zemin renginde kucuk daire cizgiyi keser, alev one cikar.
+  flame: { position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", zIndex: 2 },
   draftDots: {
     opacity: 0.45,
   },
