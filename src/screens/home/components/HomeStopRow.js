@@ -45,13 +45,9 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
 
   return (
     <View
-      style={[
-        s.row,
-        {
-          backgroundColor: C.surface,
-          borderColor: (isNext && !isDone) ? C.border : (isDone ? C.line : C.elev),
-        },
-      ]}
+      // Kutusuz (Ders analizi deseni): zemin ve cerceve yok, satirlar ince
+      // ayracla ayrilir; siradaki durak ders rengi cubugu ve kizil noktayla.
+      style={[s.row, { borderBottomColor: C.line }]}
     >
       <View style={[s.bar, { backgroundColor: isDone ? C.line : tone }]} />
 
@@ -112,10 +108,7 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: SHAPE.cardTight,
-    borderWidth: 1,
-    paddingLeft: STEP.s2,
-    paddingRight: STEP.s3,
+    borderBottomWidth: 1,
     paddingVertical: STEP.s2,
     gap: STEP.s2,
     minHeight: 64,

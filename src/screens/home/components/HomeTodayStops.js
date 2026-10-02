@@ -47,7 +47,7 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
       </View>
 
       {preview.length ? (
-        <View style={s.list}>
+        <View style={[s.list, { borderTopColor: C.line }]}>
           {preview.map((item) => (
             <Animated.View key={item.id} layout={REFLOW}>
               <Animated.View
@@ -100,9 +100,9 @@ const s = StyleSheet.create({
   segs: { flex: 1, flexDirection: "row", gap: STEP.s1 / 2 },
   seg: { flex: 1, height: 4, borderRadius: SHAPE.chip },
   count: { letterSpacing: 0, fontVariant: ["tabular-nums"] },
-  list: { gap: STEP.s1 },
+  list: { borderTopWidth: 1 },
   all: {
-    flexDirection: "row", alignItems: "center", gap: STEP.s2, height: STEP.s5 - 2, marginTop: STEP.s1,
+    flexDirection: "row", alignItems: "center", gap: STEP.s2, height: STEP.s5 - 2, marginTop: STEP.s3,
     paddingHorizontal: STEP.s3, borderRadius: SHAPE.cardTight, borderWidth: 1,
   },
   flex: { flex: 1 },
