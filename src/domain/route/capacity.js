@@ -23,9 +23,14 @@ const GOAL_FLOOR_SHARE = 0.6;
 const consistencyFactor = (observed, total) => 0.25 + 0.75 * (observed / Math.max(1, total));
 const MS_WEEK = 7 * 86400000;
 
-/** Beyan edilen günlük hedeften haftalık taban kapasite. */
-function fallbackCapacity(dailyQuestionGoal) {
-  const daily = Number(dailyQuestionGoal) || 20;
+// Hic kayit yokken (ilk hafta) beyanin tamami degil bu payi: "gunde 80
+// cozerim" diyen ama aliskanligi henuz olmayan ogrenciye ilk haftada 560
+// soruluk taban kurulmasin. Ilk kayitlardan sonra gercek tempo devralir.
+const CALIBRATION_SHARE = 0.75;
+
+/** Beyan edilen günlük hedeften haftalık taban kapasite (ilk hafta kalibrasyonu). */
+function fallbackCapacity(dailyQuestionGoal, share = 1) {
+  const daily = (Number(dailyQuestionGoal) || 20) * share;
   return {
     questionsPerWeek: Math.max(20, Math.round(daily * 7)),
     minutesPerWeek: Math.max(60, Math.round(daily * 7 * 1.5)), // ~1.5 dk/soru
@@ -57,7 +62,8 @@ export function estimateWeeklyCapacity(
     return capMinutes({ ...fallbackCapacity(dailyQuestionGoal), missingData: true });
   }
   if (!Array.isArray(logs) || logs.length === 0) {
-    return capMinutes(fallbackCapacity(dailyQuestionGoal));
+    // Gercekten hic kayit yok (yukleme hatasi degil): ilk hafta kalibrasyonu.
+    return capMinutes({ ...fallbackCapacity(dailyQuestionGoal, CALIBRATION_SHARE), calibrating: true });
   }
 
   const currentWeek = new Date(startOfWeekTR(now));

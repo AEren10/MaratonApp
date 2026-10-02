@@ -16,3 +16,9 @@ test("steady results at target switch to keep mode", () => {
 test("latest below target never keeps", () => {
   assert.equal(targetReachedFrom([tr("2026-09-27", 99), tr("2026-10-01", 85)], 90), false);
 });
+
+test("first week (no logs) is calibrated to 75% of the declared goal; load failure keeps full goal", async () => {
+  const { estimateWeeklyCapacity } = await import("../../src/domain/route/capacity.js");
+  assert.equal(estimateWeeklyCapacity([], 80).questionsPerWeek, 420);
+  assert.equal(estimateWeeklyCapacity([], 80, new Date(), { dataState: "error" }).questionsPerWeek, 560);
+});

@@ -38,7 +38,8 @@ test("rutin dusumu butcenin yarisini gecmez; yetisme notu rutinleri de sayar", a
   const { feasibilityNote } = await import("../../../src/domain/route/feasibility.js");
   const pool = [{ key: "matematik", label: "Matematik", questionCount: 40, topics: ["Kümeler"] }];
   const r = buildRoute({ pool, daysLeft: 100, dailyQuestionGoal: 20, habitLoad: { questionsPerWeek: 210, minutesPerWeek: 300 } });
-  assert.equal(r.capacity.questionsPerWeek, 70);
+  // Kayitsiz ogrenci: ilk hafta kalibrasyonu (hedefin %75'i) -> 105, rutin en fazla yarisi.
+  assert.equal(r.capacity.questionsPerWeek, 53);
   const note = feasibilityNote({ shortfall: { topics: 3, questions: 650 }, capacity: r.capacity, weeksLeft: 10 });
-  assert.equal(note.targetPerDay, Math.round(70 / 7 + 30) + note.extraPerDay);
+  assert.equal(note.targetPerDay, Math.round(53 / 7 + 30) + note.extraPerDay);
 });
