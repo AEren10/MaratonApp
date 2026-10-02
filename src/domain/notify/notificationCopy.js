@@ -16,6 +16,7 @@ export function dailyGeneric(dayIndex, daysLeft) {
       ? { title: `Sınava ${daysLeft} gün`, body: "Her gün bir durak, yolu sessizce kısaltır." }
       : { title: "Bir durak, bir adım", body: "Bugünün ilk durağı kısa. Gerisi kendiliğinden gelir." },
     { title: "Kaldığın yer duruyor", body: "Sıradaki durak seni bekliyor, 15 dakika yeter." },
+    { title: "Kısa gün mü?", body: "15 dakikalık bir durak da rotada sayılır. Gerisini başlayınca düşünürsün." },
   ];
   return lines[Math.abs(dayIndex) % lines.length];
 }
@@ -42,9 +43,12 @@ export function comebackCopy(step, { daysLeft = 0, next = null } = {}) {
 }
 
 export function streakCopy(streak, next) {
+  const s = Number(streak) || 0;
   return {
-    title: `${streak} günlük serin bu akşam bitmesin`,
-    body: next ? `Tek durak yeter: ${next}.` : "Kısa bir durak seriyi yaşatır.",
+    title: s >= 7 ? `${s} gündür masadasın` : `${s} günlük serin bu akşam bitmesin`,
+    body: next
+      ? `Bu akşam tek durak seriyi ${s + 1} güne taşır: ${next}.`
+      : `Bu akşam kısa bir durak seriyi ${s + 1} güne taşır.`,
   };
 }
 
@@ -53,7 +57,9 @@ export function unfinishedCopy(open, next, studiedToday) {
   const left = open === 1 ? "1 durak" : `${open} durak`;
   return studiedToday
     ? { title: `Güzel gidiyordun, ${left} kaldı`, body: next ? `Gün bitmeden: ${next}.` : "Gün bitmeden bir tane daha kapatabilirsin." }
-    : { title: `Bugün ${left} seni bekliyor`, body: next ? `Gün bitmeden gel: ${next}. Kısa bir başlangıç yeter.` : "Gün bitmeden kısa bir başlangıç yeter." };
+    : open >= 2
+      ? { title: `Bugünkü ${left} yarına geçebilir`, body: next ? `Yetişmeyecekse sorun değil, rota yarını ona göre kurar. Yetişecekse ilki: ${next}.` : "Yetişmeyecekse sorun değil, rota yarını ona göre kurar." }
+      : { title: `Bugün ${left} seni bekliyor`, body: next ? `Gün bitmeden gel: ${next}. Kısa bir başlangıç yeter.` : "Gün bitmeden kısa bir başlangıç yeter." };
 }
 
 export function weeklyCopy({ questions = 0, minutes = 0 } = {}) {
