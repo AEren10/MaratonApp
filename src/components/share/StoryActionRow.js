@@ -47,7 +47,22 @@ export function StoryActionRow({
           </Text>
         </Press>
 
-        {/* 2. Panoya Kopyala */}
+        {/* 2. Fotoğraf Ekle / Çek (Kullanıcı İsteği: 2. Buton) */}
+        <ActionBtn
+          C={C}
+          busy={busy}
+          label={hasPhoto ? "Değiştir" : "Fotoğraf Ekle"}
+          highlighted={hasPhoto}
+          onPress={onPickPhoto}
+          icon={
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <Path d="M3 8a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
+              <Circle cx="12" cy="13" r="3.5" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
+            </Svg>
+          }
+        />
+
+        {/* 3. Panoya Kopyala */}
         <ActionBtn
           C={C}
           busy={busy}
@@ -61,7 +76,7 @@ export function StoryActionRow({
           }
         />
 
-        {/* 3. Galeriye Kaydet */}
+        {/* 4. Galeriye Kaydet */}
         <ActionBtn
           C={C}
           busy={busy}
@@ -70,21 +85,6 @@ export function StoryActionRow({
           icon={
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Path d="M12 4v12m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke={C.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </Svg>
-          }
-        />
-
-        {/* 4. Masa Fotoğrafı */}
-        <ActionBtn
-          C={C}
-          busy={busy}
-          label={hasPhoto ? "Fotoğraf" : "Masa Çek"}
-          highlighted={hasPhoto}
-          onPress={onPickPhoto}
-          icon={
-            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-              <Path d="M3 8a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
-              <Circle cx="12" cy="13" r="3.5" stroke={hasPhoto ? C.accentBright : C.text} strokeWidth="1.8" />
             </Svg>
           }
         />

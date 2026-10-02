@@ -12,9 +12,8 @@ export async function pickStoryPhoto(source = "library") {
   try {
     const options = {
       mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [9, 16],
-      quality: 0.7,
+      allowsEditing: false,
+      quality: 0.85,
       base64: Platform.OS === "ios",
     };
     if (source === "camera") {

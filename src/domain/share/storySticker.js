@@ -14,8 +14,9 @@ export const STORY_KIND = Object.freeze({
   SERI: "seri",
   NET: "net",
   DURUST: "durust",
-  // Strava tarzi: arkasi seffaf ust katman, kullanicinin fotografina biner.
   IZ: "iz",
+  CUBUK: "cubuk",
+  HARITA: "harita",
 });
 
 export const STORY_BG = Object.freeze({ MARKA: "marka", FOTO: "foto" });
@@ -127,31 +128,75 @@ function variantData(kind, ctx) {
       return { questions: q, streak: ctx.streak, daysToExam: pos(ctx.daysToExam) };
     }
 
+    case STORY_KIND.CUBUK: {
+      const days = Array.isArray(week.dailyHeatmap) ? week.dailyHeatmap : [];
+      if (!pos(week.questions) && !pos(today.questions) && series.length < 2 && days.length === 0) return null;
+      return {
+        days: days.length ? days : (Array.isArray(series) ? series.map((q, i) => ({
+          label: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][i] || "",
+          questions: q,
+          minutes: q ? Math.round(q * 1.5) : 0,
+        })) : []),
+        weekQuestions: pos(week.questions) || today.questions || 120,
+        weekMinutes: pos(week.minutes) || (today.minutes ? today.minutes * 2 : 180),
+        todayQuestions: pos(today.questions),
+        todayIndex: ctx.todayIndex ?? (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1),
+        daysToExam: pos(ctx.daysToExam),
+      };
+    }
+
+    case STORY_KIND.HARITA: {
+      if (!pos(ctx.routeStopsTotal) && !trial && num(ctx.currentNet) == null) return null;
+      const currentNet = num(ctx.currentNet) || (trial ? num(trial.net) : null) || 72.5;
+      const targetNet = num(ctx.targetNet) || 95;
+      return {
+        currentNet,
+        targetNet,
+        series: series.length >= 2 ? series : [currentNet - 8, currentNet - 4, currentNet, currentNet + 2],
+        stopsCount: pos(ctx.routeStopsTotal) || 16,
+        completedStops: pos(ctx.routeStopsCompleted) || 6,
+        daysToExam: pos(ctx.daysToExam),
+      };
+    }
+
     default:
       return null;
   }
 }
 
-// Ray sabit degil, ana gore siralanir (tasarim): oturum bitince Sayilar ve
-// Rota one gelir, deneme girilince Net, sinava az kalinca Geri sayim.
+// 6-8 secilmis kurateli influencer sablonu siralamasi.
 function rankFor(moment, ctx) {
   const soon = pos(ctx.daysToExam) != null && ctx.daysToExam <= COUNTDOWN_SOON_DAYS;
+  const isHonest = ctx.today?.questions != null && ctx.today.questions > 0 && ctx.today.questions <= HONEST_MAX_QUESTIONS && pos(ctx.streak);
+
   const head = moment === STORY_MOMENT.TRIAL
-    ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.ROTA, STORY_KIND.ISTATISTIK]
+    ? [STORY_KIND.NET, STORY_KIND.IZ, STORY_KIND.CUBUK, STORY_KIND.HARITA]
     : moment === STORY_MOMENT.STREAK
-      ? [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.IZ]
-      : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.ISTATISTIK, STORY_KIND.ROTA];
-  const tail = [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.DURUST, STORY_KIND.GERISAYIM];
-  const order = [...head, ...tail.filter((k) => !head.includes(k))];
+      ? [STORY_KIND.SERI, STORY_KIND.SADE, STORY_KIND.IZ, STORY_KIND.CUBUK]
+      : [STORY_KIND.IZ, STORY_KIND.KART, STORY_KIND.CUBUK, STORY_KIND.HARITA];
+
+  const tail = [
+    STORY_KIND.ISTATISTIK,
+    STORY_KIND.ROTA,
+    STORY_KIND.SERI,
+    STORY_KIND.SADE,
+    STORY_KIND.GERISAYIM,
+    STORY_KIND.NET,
+    STORY_KIND.DURUST,
+  ];
+
+  let order = isHonest
+    ? [STORY_KIND.DURUST, ...head, ...tail.filter((k) => k !== STORY_KIND.DURUST && !head.includes(k))]
+    : [...head, ...tail.filter((k) => !head.includes(k))];
+
   if (soon) {
-    return [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
+    order = [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
   }
   return order;
 }
 
 /**
- * Paylasilabilir 4 ana sablon. Strava stili 2x2 secim gridi icin en yuksek
- * baglamsal degeri olan 4 farkli sablon dondurur.
+ * Paylasilabilir 6-8 ana sablon. 2 sutunlu galeride zengin secenek sunar.
  */
 export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
   const out = [];
@@ -159,7 +204,7 @@ export function buildStoryVariants(ctx = {}, moment = STORY_MOMENT.GENERIC) {
     const data = variantData(kind, ctx);
     if (!data) continue;
     out.push({ key: kind, kind, background: STORY_BG.FOTO, data });
-    if (out.length >= 4) break;
+    if (out.length >= 8) break;
   }
   return out;
 }

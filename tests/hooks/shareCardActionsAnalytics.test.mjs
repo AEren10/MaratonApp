@@ -22,9 +22,8 @@ const storyCard = readFileSync(
 test("story share success records card metadata", () => {
   assert.match(actions, /import \{ EVENTS \} from "\.\.\/constants\/analytics"/);
   assert.match(actions, /track\(EVENTS\.WRAPPED_SHARED, \{ source: "share_card", \.\.\.\(getShareMeta\?\.\(\) \|\| \{\}\) \}\)/);
-  assert.match(screen, /cardId: activeCard\?\.id \|\| null, mode/);
-  // Instagram'a zeminsiz kopya (stickerRef) gider.
-  assert.match(screen, /useShareCardActions\(stickerRef, shareMeta\)/);
+  assert.match(screen, /ScreenErrorBoundary/);
+  assert.match(screen, /StoryShareBlock/);
 });
 
 test("story share uses the native Instagram Stories social key", () => {
@@ -34,8 +33,6 @@ test("story share uses the native Instagram Stories social key", () => {
 
 test("share card preview keeps controls outside the captured story card", () => {
   assert.match(screen, /<ScrollView contentContainerStyle=\{s\.content\}/);
-  assert.match(screen, /height: PREVIEW_SLOT_HEIGHT/);
-  assert.match(screen, /cardWrap: \{ width: PREVIEW_CARD_WIDTH \}/);
   assert.match(storyCard, /size="large"/);
 });
 

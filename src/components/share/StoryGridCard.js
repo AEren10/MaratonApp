@@ -11,6 +11,8 @@ import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
 
 const KIND_NAMES = {
   iz: "İZ & VERİ",
+  cubuk: "ÇUBUKLAR",
+  harita: "HEDEF ROTASI",
   kart: "FİŞ",
   rota: "GRAFİK",
   sade: "MİNİMAL",

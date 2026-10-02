@@ -19,6 +19,8 @@ import {
   StoryHonestBody,
   StoryNetBody,
 } from "./bodies/StoryMomentBodies";
+import { StoryBarsBody } from "./bodies/StoryBarsBody";
+import { StoryMapBody } from "./bodies/StoryMapBody";
 
 // Tasarimin tuvali: 9:16, sabit olcu. Kucuk gosterilecekse SARAN view
 // olceklenir, tuval degil — yakalama tam cozunurlukte olsun diye.
@@ -39,6 +41,8 @@ const BODIES = {
   [STORY_KIND.NET]: StoryNetBody,
   [STORY_KIND.DURUST]: StoryHonestBody,
   [STORY_KIND.IZ]: StoryTrackBody,
+  [STORY_KIND.CUBUK]: StoryBarsBody,
+  [STORY_KIND.HARITA]: StoryMapBody,
 };
 
 /**

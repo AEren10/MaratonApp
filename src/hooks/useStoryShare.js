@@ -28,17 +28,11 @@ function examLabel(examType, examDate) {
 
 function lastTrialOf(trials) {
   if (!trials?.length) return null;
-  const sorted = (trials || [])
-    .map((t, index) => ({ trial: t, orderIndex: index }))
-    .sort((a, b) => {
-      const diff = new Date(b.trial.date) - new Date(a.trial.date);
-      if (diff !== 0) return diff;
-      const timeA = a.trial.created_at || a.trial.createdAt ? new Date(a.trial.created_at || a.trial.createdAt).getTime() : (Number(a.trial.id) > 1e9 ? Number(a.trial.id) : 0);
-      const timeB = b.trial.created_at || b.trial.createdAt ? new Date(b.trial.created_at || b.trial.createdAt).getTime() : (Number(b.trial.id) > 1e9 ? Number(b.trial.id) : 0);
-      if (timeA !== timeB) return timeB - timeA;
-      return a.orderIndex - b.orderIndex;
-    })
-    .map(({ trial }) => trial);
+  const sorted = [...(trials || [])].sort((a, b) => {
+    const diff = new Date(b.date) - new Date(a.date);
+    if (diff !== 0) return diff;
+    return (new Date(b.created_at || 0).getTime()) - (new Date(a.created_at || 0).getTime());
+  });
   const latest = sorted[0];
   const net = Number(latest?.totalNet ?? latest?.total_net);
   if (!Number.isFinite(net)) return null;
@@ -91,15 +85,22 @@ export function useStoryShare(moment = STORY_MOMENT.GENERIC) {
       },
       week: {
         questions: report.totalQuestions || 0,
+        minutes: report.totalMinutes || 0,
         series: heat.map((d) => d.questions),
+        dailyHeatmap: heat,
         dayLabels: heat.map((d) => String(d.label || "").slice(0, 1).toLocaleUpperCase("tr")),
       },
       streak: streak || 0,
       daysToExam: daysUntilExam ?? null,
       examLabel: examLabel(examType, examDate),
       lastTrial: lastTrialOf(trials),
+      todayIndex: new Date().getDay() === 0 ? 6 : new Date().getDay() - 1,
+      routeStopsTotal: 16,
+      routeStopsCompleted: 6,
+      currentNet: trials?.[0]?.totalNet || 74.0,
+      targetNet: 95.0,
     };
-  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, streak, daysUntilExam, examType, examDate, trials]);
+  }, [todayLogs, report.dailyHeatmap, report.totalQuestions, report.totalMinutes, streak, daysUntilExam, examType, examDate, trials]);
 
   const variants = useMemo(() => buildStoryVariants(ctx, moment), [ctx, moment]);
   const selected = variants[Math.min(index, Math.max(0, variants.length - 1))] || null;

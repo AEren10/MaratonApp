@@ -81,13 +81,10 @@ test("durust karti yalniz az calisilmis gunde ve seri varken cikar", () => {
   assert.ok(!kindsOf(seriyok).includes(STORY_KIND.DURUST));
 });
 
-test("kart yalniz marka zemininde, digerleri iki zeminde", () => {
+test("sablonlar foto zeminli etiket olarak hazirlanir", () => {
   const list = buildStoryVariants(full);
-  const kart = list.filter((v) => v.kind === STORY_KIND.KART);
-  assert.deepEqual(kart.map((v) => v.background), [STORY_BG.MARKA]);
-
-  const seri = list.filter((v) => v.kind === STORY_KIND.SERI);
-  assert.deepEqual(seri.map((v) => v.background), [STORY_BG.FOTO, STORY_BG.MARKA]);
+  assert.ok(list.length >= 6 && list.length <= 8);
+  assert.ok(list.every((v) => v.background === STORY_BG.FOTO));
 });
 
 test("anahtarlar benzersiz", () => {
