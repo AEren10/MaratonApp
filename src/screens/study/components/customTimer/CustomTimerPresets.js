@@ -14,6 +14,7 @@ export function CustomTimerPresets({ presets, value, unit, onChange, C }) {
         return (
           <Press
             key={p}
+            hitSlop={{ top: 6, bottom: 6 }}
             haptic="none"
             scaleTo={0.94}
             onPress={() => {
@@ -57,7 +58,7 @@ const s = StyleSheet.create({
   },
   chip: {
     minWidth: 40,
-    height: 32,
+    minHeight: 32,
     paddingHorizontal: STEP.s1,
     borderRadius: SHAPE.chip + 2,
     borderWidth: 1,

@@ -46,6 +46,7 @@ export function AnalysisFilterPills({ C, value, onChange, examType }) {
               key={tab.key}
               accessibilityRole="tab"
               accessibilityState={{ selected: active }}
+              hitSlop={{ top: 4, bottom: 4 }}
               onPress={() => onChange(tab.key)}
               style={[
                 s.tab,
@@ -82,7 +83,7 @@ const s = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    height: 36,
+    minHeight: 36,
     borderRadius: SHAPE.chip, // 6px
     alignItems: "center",
     justifyContent: "center",

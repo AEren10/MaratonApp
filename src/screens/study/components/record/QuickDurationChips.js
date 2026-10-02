@@ -17,6 +17,7 @@ export function QuickDurationChips({ C, value, onSelect }) {
           return (
             <Press
               key={mins}
+              hitSlop={{ top: 6, bottom: 6 }}
               onPress={() => {
                 H.select();
                 onSelect(active ? "" : mins);
@@ -62,7 +63,7 @@ const s = StyleSheet.create({
     gap: STEP.s1,
   },
   chip: {
-    height: 32,
+    minHeight: 32,
     paddingHorizontal: STEP.s2,
     borderRadius: SHAPE.chip,
     borderWidth: 1,

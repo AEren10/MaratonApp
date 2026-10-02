@@ -123,7 +123,7 @@ const s = StyleSheet.create({
   scroll: { paddingBottom: 50 },
   tabsWrap: { paddingHorizontal: GUTTER, paddingTop: 16 },
   tabsContainer: { flexDirection: "row", gap: 4, padding: 4, borderRadius: SHAPE.chip, borderWidth: 1 },
-  tabItem: { flex: 1, height: 36, borderRadius: SHAPE.chip, alignItems: "center", justifyContent: "center" },
+  tabItem: { flex: 1, minHeight: 36, borderRadius: SHAPE.chip, alignItems: "center", justifyContent: "center" },
   tabText: { fontFamily: "Archivo_700", fontSize: 12.5 },
   listWrap: { paddingHorizontal: GUTTER, paddingTop: 30 },
   sectionLabel: { fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 1.84 },
