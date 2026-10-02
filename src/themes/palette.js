@@ -1,4 +1,4 @@
-import { mix, alpha } from "./colorMix.js";
+import { mix, alpha, contrastRatio } from "./colorMix.js";
 export { mix, alpha };
 
 // Yeni tasarımın palet sistemi. Sabit renk listesi DEĞİL — üç tohumdan
@@ -216,10 +216,41 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     subjects: SUBJECT_COLORS[isDark ? "dark" : "light"],
   };
 
+  // KULLANICI ANA RENGI: varsayilan kizil disinda bir renk secildiyse
+  // butun marka tonlari (buton dolgusu, basili ton, kizil yazi/vurgu) o
+  // renkten turetilir. Eskiden bunlar sabit kizildi: mor secince grafik
+  // mor, "Deneme gir" ve "Tekrara basla" kizil kaliyordu (kullanici, 3 Ekim).
+  const custom = overrides.accent && overrides.accent.toUpperCase() !== base.accent.toUpperCase();
+  if (custom) Object.assign(p, accentFamily(accent, isDark));
+
   Object.assign(p, legacyAliases(p));
+  if (custom) {
+    p.textOnFill = p.accentInk;
+    p.textOnBrand = p.accentInk;
+    p.textOnAccent = p.accentInk;
+    p.textInverse = p.accentInk;
+  }
 
   _cache.set(key, p);
   return p;
+}
+
+// Secilen ana renkten marka ailesi. Dolgu ustundeki yazi rengi kontrasta
+// gore secilir (amber/yesil gibi acik renklerde koyu yazi).
+function accentFamily(accent, isDark) {
+  const fill = mix(accent, isDark ? 90 : 92, "#000000");
+  const press = mix(accent, isDark ? 72 : 76, "#000000");
+  const textTone = isDark ? mix(accent, 72, "#FFFFFF") : mix(accent, 78, "#000000");
+  const ink = contrastRatio("#FFFFFF", fill) >= contrastRatio("#1C1C23", fill) ? "#FFFFFF" : "#1C1C23";
+  return {
+    brandFill: fill,
+    brandFillPress: press,
+    brandPress: press,
+    accentDeep: mix(accent, 70, "#000000"),
+    accentText: textTone,
+    accentBright: textTone,
+    accentInk: ink,
+  };
 }
 
 /**
