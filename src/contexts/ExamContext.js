@@ -4,6 +4,7 @@ import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
+import { serverSetupDone } from "../domain/onboarding/serverSetupDone";
 import * as appStorage from "../lib/storage/appStorage";
 import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
 import { useProfileSettleGate } from "../hooks/useProfileSettleGate";
@@ -252,7 +253,7 @@ export function ExamProvider({ children }) {
         baselineNet: baselineNetValue,
         dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
-        setupCompleted: !!local.setupCompleted || !!p.gamification_stats?.setup_completed || (p.study_session_count != null && p.study_session_count > 0),
+        setupCompleted: !!local.setupCompleted || serverSetupDone(p),
       };
       setExamType(config.examType);
       setField(config.field);
