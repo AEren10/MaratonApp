@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 /**
  * Geri donus akisinin asamasi (AKIS 14).
  *
- * comeback useRetention'dan gelir (daysAway >= 2, oturum basina bir kez).
+ * comeback useRetention'dan gelir (daysAway >= COMEBACK_MIN_DAYS_AWAY, oturum basina bir kez).
  * "Donus duragi" icin ayri bir kayit yok; bu yuzden "done" asamasi yalniz
  * GERCEK veriye dayanir: kullanici donusu baslattiktan sonra bugunun
  * soru ya da dakika toplami baslangic anindakinin ustune cikti.

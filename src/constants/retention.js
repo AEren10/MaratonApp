@@ -17,3 +17,6 @@ export const RETENTION_SOURCES = {
   STUDY_SUMMARY: "study_summary",
   PAYWALL: "paywall",
 };
+
+// Son acilistan bu kadar gun sonra "geri donus modu" (3 gun ara).
+export const COMEBACK_MIN_DAYS_AWAY = 4;

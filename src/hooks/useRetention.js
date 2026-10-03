@@ -4,7 +4,7 @@ import { selectRetentionData } from "../store/slices/gamificationSlice";
 import { useAuth } from "../contexts/AuthContext";
 import { markLoginRewarded } from "../supabase/profiles";
 import { recordRetentionEvent } from "../supabase/retention";
-import { RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
+import { COMEBACK_MIN_DAYS_AWAY, RETENTION_EVENTS, RETENTION_SOURCES } from "../constants/retention";
 import { todayTR } from "../lib/dateUtils";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
 import { getString, setString } from "../lib/storage/appStorage";
@@ -72,7 +72,9 @@ export function useRetention(reward) {
     if (lastActive && alive) {
       const lastDate = lastActive.split("T")[0];
       const daysAway = daysBetween(lastDate, today);
-      if (daysAway >= 2) {
+      // Geri donus modu 3+ gun aradan sonra. Eskiden >= 2: tek gun atlayan
+      // (seri hala 6) "yeniden baslamak icin rotayi hafifletelim" goruyordu.
+      if (daysAway >= COMEBACK_MIN_DAYS_AWAY) {
         const comebackKey = [activeUserId, today, lastDate].join("|");
         if (comebackShownFor.current !== comebackKey) {
           comebackShownFor.current = comebackKey;
