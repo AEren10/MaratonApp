@@ -58,11 +58,18 @@ function SetNewPasswordContent() {
     }
   }, [password, confirm, showAlert, endRecovery]);
 
+  // Vazgecmek: kurtarma linkinin actigi oturum da kapanir. Yalniz endRecovery
+  // kullaniciyi sifresini degistirmeden uygulamaya sokuyordu (oturum acik kalir).
+  const leave = useCallback(async () => {
+    await signOut().catch(() => {});
+    endRecovery();
+  }, [endRecovery]);
+
   const header = (
     <View style={styles.topBar}>
       <Press
         haptic="none"
-        onPress={endRecovery}
+        onPress={leave}
         hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel="Geri"
@@ -83,7 +90,7 @@ function SetNewPasswordContent() {
           <Text style={[TYPOGRAPHY.body, { color: C.text2 }]}>
             Şifre sıfırlama bağlantısının süresi dolmuş ya da daha önce kullanılmış olabilir.
           </Text>
-          <Button onPress={endRecovery} size="lg" fullWidth>
+          <Button onPress={leave} size="lg" fullWidth>
             Yeni bağlantı iste
           </Button>
         </View>
