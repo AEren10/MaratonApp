@@ -133,6 +133,20 @@ function getOperationFingerprint(op) {
   }
 }
 
+// Icerikten olusan YENI kayitlar (calisma, deneme, yanlis, gorev) icin ayni
+// parmak izi "ayni kayit" demek degil: ogrenci ayni gun iki kez 25 dk
+// matematik calisabilir. Cevrimdisi girilen ikincisi sessizce atiliyor ama
+// kullaniciya "kuyruga alindi" deniyordu. Bu turlerde parmak izi yalniz
+// cift dokunusu/yeniden denemeyi yakalar (kisa pencere); durum turlerinde
+// (plan, tekrar, durak gecisi) son durum tek kayit oldugu icin aynen kalir.
+const CREATE_OPS = new Set([OP_STUDY_LOG, OP_TRIAL, OP_WRONG_QUESTION, OP_USER_TASK]);
+const DOUBLE_SUBMIT_MS = 15000;
+
+function isSameIntent(type, item, now) {
+  if (!CREATE_OPS.has(type)) return true;
+  return now - (item.queuedAt || 0) < DOUBLE_SUBMIT_MS;
+}
+
 export async function enqueue(op) {
   return withQueueLock(() => enqueueLocked(op));
 }
@@ -141,10 +155,11 @@ async function enqueueLocked(op) {
   let list = await readQueue();
   const clientOperationId = op.clientOperationId || createClientOperationId(op.type);
   const fingerprint = op.fingerprint || getOperationFingerprint(op);
+  const now = Date.now();
   if (list.some((item) =>
     item.clientOperationId === clientOperationId ||
     item.id === clientOperationId ||
-    (fingerprint && item.fingerprint === fingerprint)
+    (fingerprint && item.fingerprint === fingerprint && isSameIntent(op.type, item, now))
   )) {
     return clientOperationId;
   }
@@ -154,7 +169,7 @@ async function enqueueLocked(op) {
   list.push({
     ...op,
     payload,
-    queuedAt: Date.now(),
+    queuedAt: now,
     id: clientOperationId,
     clientOperationId,
     fingerprint,

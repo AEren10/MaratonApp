@@ -16,7 +16,7 @@ export function GroupAvatarStack({ initial, memberCount, members = [] }) {
       {fallback.map((member, index) => (
         <Avatar
           key={member.user_id || `${member.name}-${index}`}
-          init={(member.name || initial || "?").slice(0, 2).toUpperCase()}
+          init={(member.name || initial || "?").slice(0, 1).toLocaleUpperCase("tr-TR")}
           image={member.avatar_url}
           size={24}
           ring={1}
@@ -24,8 +24,8 @@ export function GroupAvatarStack({ initial, memberCount, members = [] }) {
         />
       ))}
       {rest > 0 ? (
-        <View style={[s.more, { backgroundColor: C.accent + "20", borderColor: C.bg }]}>
-          <Text style={[TYPOGRAPHY.micro, { color: C.accentText }]}>+{rest}</Text>
+        <View style={[s.more, { backgroundColor: C.elev, borderColor: C.surface }]}>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text2 }]}>+{rest}</Text>
         </View>
       ) : null}
       <Text style={[TYPOGRAPHY.micro, s.text, { color: C.text3 }]}>{memberCount} üye</Text>

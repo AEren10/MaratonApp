@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { GUTTER, STEP } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
+import { useExam } from "../../../contexts/ExamContext";
 
 // Yanlis defteri burada da vardi; grafigin altindaki satir tek giris.
 export function DeeperAnalysisSection({
@@ -14,6 +15,9 @@ export function DeeperAnalysisSection({
   onYayinKarsilastirmasi,
   onSimulasyon,
 }) {
+  // Simulasyon YKS (TYT) provasi; LGS ogrencisine gosterilmez.
+  const { examType } = useExam();
+  const isLGS = String(examType || "").toLowerCase() === "lgs";
   const items = [
     {
       name: "Senaryolar",
@@ -43,12 +47,12 @@ export function DeeperAnalysisSection({
       note: "Bu dönem öncekine göre nasıl, en iyi netlerin, tutarlılık",
       onPress: onYayinKarsilastirmasi,
     },
-    {
+    isLGS ? null : {
       name: "Simülasyon",
       note: "Tam süreli TYT provası",
       onPress: onSimulasyon,
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <View style={s.wrap}>

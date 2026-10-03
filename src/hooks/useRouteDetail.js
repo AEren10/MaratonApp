@@ -78,6 +78,7 @@ export function useRouteDetail() {
   );
 
   return {
+    isLGS: String(examType || "").toLowerCase() === "lgs",
     access: {
       loading: route.routeAccessLoading || !route.routeStopsLoaded,
       error: route.routeAccessError,

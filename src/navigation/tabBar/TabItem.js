@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
@@ -7,27 +6,16 @@ import { ANIMATION, TYPOGRAPHY } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
 // Sekme dugmesi. Gunde onlarca kez basilir: geri bildirim kisa ve sakin
-// (yay yok, sallanma yok). Secim noktasi HEP yerinde durur, yalniz belirir;
-// eskiden secili sekmede nokta yer kapliyordu ve etiket 3px zipliyordu.
-const EASE_OUT = Easing.bezier(...ANIMATION.easing.easeOut);
-const PRESS = { duration: 120, easing: EASE_OUT };
-const DOT = { duration: 180, easing: EASE_OUT };
+// (yay yok, sallanma yok). Secim artik arkadaki kayan hapta (TabIndicator);
+// eski alt nokta kalkti.
+const PRESS = { duration: 120, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
 
-export function TabItem({ tab, active, onPress, C }) {
+export function TabItem({ tab, active, onPress, onLongPress, C }) {
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
-  const dot = useSharedValue(active ? 1 : 0);
-
-  useEffect(() => {
-    dot.set(reduced ? (active ? 1 : 0) : withTiming(active ? 1 : 0, DOT));
-  }, [active, reduced, dot]);
-
   const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
-  const dotStyle = useAnimatedStyle(() => ({
-    opacity: dot.get(),
-    transform: [{ scale: 0.4 + dot.get() * 0.6 }],
-  }));
   const press = (v) => { if (!reduced) scale.set(withTiming(v, PRESS)); };
+  const tone = active ? C.text : C.text3;
 
   return (
     <Pressable
@@ -35,17 +23,17 @@ export function TabItem({ tab, active, onPress, C }) {
       accessibilityLabel={tab.label}
       accessibilityHint={tab.hint}
       accessibilityState={{ selected: active }}
-      onPressIn={() => press(0.92)}
+      onPressIn={() => press(0.9)}
       onPressOut={() => press(1)}
       onPress={() => { H.select(); onPress(); }}
+      onLongPress={onLongPress}
       pressRetentionOffset={12}
       style={s.item}
     >
-      <Animated.View style={[s.icon, iconStyle]}>
-        <Icon name={tab.icon} size={22} color={active ? C.text : C.muted} sw={active ? 2.2 : 1.8} />
+      <Animated.View style={iconStyle}>
+        <Icon name={tab.icon} size={21} color={tone} sw={active ? 2.1 : 1.7} />
       </Animated.View>
-      <Animated.View style={[s.dot, { backgroundColor: C.accent }, dotStyle]} />
-      <Text style={[TYPOGRAPHY.micro, { fontFamily: active ? "Archivo_600" : "Archivo_500", color: active ? C.text : C.muted }]}>
+      <Text numberOfLines={1} style={[TYPOGRAPHY.micro, s.label, { fontFamily: active ? "Archivo_600" : "Archivo_500", color: tone }]}>
         {tab.label}
       </Text>
     </Pressable>
@@ -53,7 +41,6 @@ export function TabItem({ tab, active, onPress, C }) {
 }
 
 const s = StyleSheet.create({
-  item: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6, minHeight: 48 },
-  icon: { alignItems: "center" },
-  dot: { width: 4, height: 4, borderRadius: 2, marginTop: 3, marginBottom: 1 },
+  item: { flex: 1, alignItems: "center", justifyContent: "center", gap: 3, minHeight: 56 },
+  label: { fontSize: 11 },
 });

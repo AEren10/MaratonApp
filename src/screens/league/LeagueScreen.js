@@ -1,424 +1,98 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { ReportableAvatar } from "../../components/common/ReportableAvatar";
-import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import Animated from "react-native-reanimated";
-import { usePressScale } from "../../components/design/usePressScale";
+import { useEffect, useMemo, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
-import { TYPOGRAPHY, SPACING, RADIUS, NAV_ICON } from "../../themes/tokens";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { Icon } from "../../components/design/Icon";
+import { Press } from "../../components/design/Press";
+import { useAuth } from "../../contexts/AuthContext";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
-import { Icon, AnimatedCard, GlowBackground, getCrimsonGlow } from "../../components/design";
-import { EmptyState } from "../../components/common/EmptyState";
-import { useAuth } from "../../contexts/AuthContext";
-import { useBlockedIds } from "../../lib/blockedUsers";
-import { getTier, getNextTier } from "../../constants/league";
-import { getZone, ZONE } from "../../lib/leagueZones";
-import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
+import { FEATURES } from "../../constants/features";
+import { CONTROL, GUTTER, NAV_ICON, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { GroupsTab } from "./GroupsTab";
-import { SkeletonCard } from "../../components/common/SkeletonCard";
-import * as H from "../../lib/haptics";
+import { LeagueBoard } from "./LeagueBoard";
+import { LeagueSegment } from "./components/LeagueSegment";
 
-const POLL_MS = 30000;
+// Gruplar · Arkadaslar (· Genel Lig, bayrakla). Eski adi "Sosyal" merkezdi;
+// ekran kalin bir kabuk: baslik + segment + secili sekmenin govdesi.
+const TABS = [
+  { key: "groups", label: "Gruplar" },
+  { key: "friends", label: "Arkadaşlar" },
+  ...(FEATURES.globalLeague ? [{ key: "global", label: "Genel Lig" }] : []),
+];
 
-function TierHeader({ tier, nextTier, myScore, totalUsers, C }) {
-  const xpToNext = nextTier ? nextTier.minXP - (myScore ?? 0) : null;
+const SUBTITLE = {
+  groups: "Haftayı grubunla kapat; kıyas emek üzerinden.",
+  friends: "Arkadaşlarınla haftalık soru sıralaması.",
+  global: "Bu hafta en çok soru çözenler.",
+};
 
-  return (
-    <AnimatedCard delay={0}>
-      <View style={{
-        padding: SPACING.lg,
-        marginBottom: SPACING.sm,
-        borderRadius: RADIUS.xxl,
-        backgroundColor: tier.color + "14",
-        borderWidth: 1,
-        borderColor: tier.color + "30",
-        flexDirection: "row",
-        alignItems: "center",
-      }}>
-        <Icon name={tier.icon} size={36} color={tier.color} />
-        <View style={{ marginLeft: SPACING.md, flex: 1 }}>
-          <Text style={[TYPOGRAPHY.heading, { color: tier.color }]}>{tier.name} Lig</Text>
-          <Text style={[TYPOGRAPHY.caption, { color: C.sec, marginTop: SPACING.xs }]}>
-            {totalUsers} yarışmacı{xpToNext != null ? ` · ${nextTier.name} Lig'e ${xpToNext} puan` : ""}
-          </Text>
-        </View>
-      </View>
-    </AnimatedCard>
-  );
-}
-
-const AnimPressable = Animated.createAnimatedComponent(Pressable);
-
-const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C }) {
-  const isYou = item.you;
-  const medalColor = item.rank === 1 ? (C.warn || C.amber) : item.rank === 2 ? C.text2 : item.rank === 3 ? C.text3 : null;
-  const zone = getZone(item.rank, totalUsers);
-  const zoneColor = zone === ZONE.PROMOTION ? C.green : zone === ZONE.DEMOTION ? C.danger : null;
-  const press = usePressScale(0.985);
-  const pressStyle = press.style;
-
-  return (
-    <AnimPressable
-      onPressIn={press.onIn}
-      onPressOut={press.onOut}
-      style={[
-        {
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: isYou ? C.accent + "14" : "transparent",
-          borderRadius: RADIUS.xl,
-          paddingHorizontal: SPACING.md,
-          paddingVertical: SPACING.md,
-          borderWidth: isYou ? 1 : 0,
-          borderColor: isYou ? C.accent + "40" : "transparent",
-        },
-        pressStyle,
-      ]}
-    >
-      <View style={{ width: 28, alignItems: "center", marginRight: SPACING.sm }}>
-        {medalColor ? (
-          <Icon name="trophy" size={18} color={medalColor} />
-        ) : (
-          <Text style={[TYPOGRAPHY.captionMedium, { color: zoneColor || C.muted }]}>{item.rank}</Text>
-        )}
-      </View>
-
-      <ReportableAvatar userId={item.user_id} name={item.name} image={item.avatar_url} size={34} color={isYou ? C.accent : undefined} you={isYou} />
-
-      <View style={{ flex: 1, marginLeft: SPACING.sm }}>
-        <Text
-          style={{
-            fontFamily: isYou ? "Archivo_600" : "Archivo_500",
-            fontSize: 14,
-            color: isYou ? C.accent : C.text,
-          }}
-          numberOfLines={1}
-        >
-          {isYou ? "Sen" : item.name || "Öğrenci"}
-        </Text>
-        <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginTop: 1 }]}>
-          {item.streak ? `${item.streak} günlük seri` : `${item.questions || 0} soru · ${item.trials || 0} deneme`}
-        </Text>
-      </View>
-
-      {zoneColor && !isYou && (
-        <Icon name={zone === ZONE.PROMOTION ? "trendUp" : "trendDown"} size={12} color={zoneColor} style={{ marginRight: SPACING.xs }} />
-      )}
-
-      <Text style={{ fontFamily: "Bricolage_400", fontSize: 16, color: C.text }}>
-        {item.questions ?? item.weekly_xp}
-      </Text>
-      <Text style={[TYPOGRAPHY.micro, { color: C.muted, marginLeft: SPACING.xs }]}>soru</Text>
-    </AnimPressable>
-  );
-});
-
-function LeagueBrief({ C, data }) {
-  const my = data.list.find((item) => item.you);
-  const previous = data.list.find((item) => item.rank === (my?.rank ?? 0) + 1);
-  const delta = previous ? Math.max(0, (my?.questions || 0) - (previous.questions || 0)) : 0;
-  const rankText = data.myRank ? `${data.myRank}. sıra` : "sıralama";
-  return (
-    <AnimatedCard delay={0}>
-      <View style={{
-        padding: SPACING.lg,
-        marginBottom: SPACING.md,
-        borderRadius: RADIUS.xxl,
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-      }}>
-        <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>BU HAFTA · {rankText.toUpperCase()}</Text>
-        <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: SPACING.sm }]}>
-          Bu hafta {my?.questions || 0} soru çözdün{delta ? `, alt sıradan ${delta} fazla.` : "."}
-        </Text>
-        <Text style={[TYPOGRAPHY.caption, { color: C.text2, marginTop: SPACING.sm, lineHeight: 19 }]}>
-          Sıralama haftalık çözülen soru ve çalışma süresine göre okunur. Netlerin burada görünmez — burada kıyas emek üzerinden.
-        </Text>
-      </View>
-    </AnimatedCard>
-  );
-}
-
-function SocialActionCard({ C, onInvite, onCompanion }) {
-  return (
-    <View style={{ gap: SPACING.sm, marginTop: SPACING.md }}>
-      <Pressable
-        onPress={onInvite}
-        accessibilityRole="button"
-        accessibilityLabel="Arkadaşını davet et"
-        style={({ pressed }) => ({
-          minHeight: 52,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: SPACING.md,
-          borderRadius: RADIUS.xl,
-          backgroundColor: C.surface,
-          borderWidth: 1,
-          borderColor: C.border,
-          opacity: pressed ? 0.75 : 1,
-        })}
-      >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et</Text>
-        <Icon name="chevR" size={14} color={C.text3} />
-      </Pressable>
-      <Pressable
-        onPress={onCompanion}
-        accessibilityRole="button"
-        accessibilityLabel="Yol arkadaşını aç"
-        style={({ pressed }) => ({
-          minHeight: 52,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: SPACING.md,
-          borderRadius: RADIUS.xl,
-          backgroundColor: C.surface,
-          borderWidth: 1,
-          borderColor: C.border,
-          opacity: pressed ? 0.75 : 1,
-        })}
-      >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Yol arkadaşın · iki rota yan yana</Text>
-        <Icon name="chevR" size={14} color={C.text3} />
-      </Pressable>
-    </View>
-  );
-}
-
-export default function LeagueScreen() {
+function LeagueScreenInner() {
   const navigation = useNavigation();
   const route = useRoute();
   const C = useC();
   const { user } = useAuth();
-  const blocked = useBlockedIds(user?.id);
-  const [tab, setTab] = useState(route.params?.tab || "groups");
+  const allowed = useMemo(() => new Set(TABS.map((t) => t.key)), []);
+  const pick = (key) => (allowed.has(key) ? key : "groups");
+  const [tab, setTab] = useState(pick(route.params?.tab));
 
   useEffect(() => {
-    if (route.params?.tab) {
-      setTab(route.params.tab);
-    } else if (route.params?.groupCode) {
-      setTab("groups");
-    }
-  }, [route.params?.tab, route.params?.groupCode]);
-  const [data, setData] = useState({ list: [], total: null, myRank: null, myScore: 0 });
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState(false);
-  const pollRef = useRef(null);
+    if (route.params?.tab) setTab(pick(route.params.tab));
+    else if (route.params?.groupCode) setTab("groups");
+  }, [route.params?.tab, route.params?.groupCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const load = useCallback(async (silent) => {
-    if (!user?.id || tab === "groups") return;
-    if (!silent) setLoading(true);
-    try {
-      const res = tab === "friends"
-        ? await fetchFriendsLeague(user.id)
-        : await fetchGlobalTop(user.id, 50);
-      setData(res);
-      setError(false);
-    } catch (e) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id, tab]);
-
-  useFocusEffect(
-    useCallback(() => {
-      load(false);
-      pollRef.current = setInterval(() => load(true), POLL_MS);
-      return () => {
-        if (pollRef.current) clearInterval(pollRef.current);
-      };
-    }, [load])
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await load(true);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [load]);
-
-  const tier = useMemo(() => getTier(data.myScore), [data.myScore]);
-  const nextTier = useMemo(() => getNextTier(data.myScore), [data.myScore]);
-
-  const goAddFriend = () => navigation.navigate(SCREENS.FRIENDS);
   const goInvite = () => navigation.navigate(SCREENS.REFERRAL);
-  const goCompanion = () => navigation.navigate(SCREENS.ROUTE_COMPANION);
-
-  // Gerçek kohort büyüklüğü sunucudan gelir. list.length kullanılırsa global
-  // sıralamada liste 50 satırla sınırlı olduğu için 46-50. sıradakiler
-  // "düşme bölgesi" görünüyordu — oysa onlar global ilk 50.
-  const totalUsers = data.total ?? data.list.length;
-  // Toplam bilinmiyorsa bölge gösterme; yanlış bölge göstermektense hiç
-  // göstermemek doğru.
-  const showZones = data.total != null;
-
-  const listData = useMemo(() => {
-    if (!data.list.length) return [];
-    const items = [];
-    let addedDemotionLabel = false;
-    let addedMidDivider = false;
-    data.list.forEach((item) => {
-      if (blocked.has(item.user_id)) return;
-      const zone = showZones ? getZone(item.rank, totalUsers) : ZONE.SAFE;
-      if (showZones && !addedMidDivider && zone !== ZONE.PROMOTION) {
-        items.push({ _type: "divider", _id: "div-mid" });
-        addedMidDivider = true;
-      }
-      if (showZones && !addedDemotionLabel && zone === ZONE.DEMOTION) {
-        items.push({ _type: "demotionLabel", _id: "demotion-label" });
-        addedDemotionLabel = true;
-      }
-      items.push(item);
-    });
-    return items;
-  }, [data.list, totalUsers, blocked]);
-
-  const renderItem = useCallback(({ item }) => {
-    if (item._type === "divider") {
-      return <View style={{ height: 1, backgroundColor: C.border, marginVertical: SPACING.md }} />;
-    }
-    if (item._type === "demotionLabel") {
-      return (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginBottom: SPACING.xs }}>
-          <Icon name="trendDown" size={13} color={C.danger} />
-          <Text style={[TYPOGRAPHY.label, { color: C.danger, letterSpacing: 0.8 }]}>DÜŞME BÖLGESİ</Text>
-        </View>
-      );
-    }
-    return <LeaderboardRow item={item} totalUsers={totalUsers} C={C} />;
-  }, [C, totalUsers]);
-
-  const emptyComponent = useMemo(() => {
-    if (error) {
-      return <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="accent" />;
-    }
-    if (tab === "friends") {
-      return <EmptyState icon="users" title="Rakibini bul, motivasyonunu katla" message="Arkadaşlarını ekle, haftalık XP sıralaması başlasın" actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="accent" />;
-    }
-    return <EmptyState icon="award" title="Henüz kimse yok" message="Bu haftanın sıralaması henüz oluşmadı" color="accent" />;
-  }, [error, tab, goAddFriend]);
-
-  const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
-      <GlowBackground blobs={crimsonBlobs} />
-      {/* Header */}
-      <View style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: SPACING.lg,
-        paddingVertical: SPACING.md,
-      }}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={14}
-          accessibilityRole="button"
-          accessibilityLabel="Geri"
-          accessibilityHint="Önceki ekrana döner"
-          style={{ padding: SPACING.xs }}
-        >
+    <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <View style={s.header}>
+        <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={8} accessibilityLabel="Geri" style={s.iconBtn}>
           <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
-        </Pressable>
-        <View style={{ flex: 1, marginHorizontal: SPACING.md }}>
-          <Text style={[TYPOGRAPHY.subheading, { color: C.text, fontSize: 18 }]}>Sosyal Hub</Text>
-          <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2, marginTop: 2 }]}>
-            {tab === "groups" ? "GRUPLARIM" : tab === "global" ? "LİG" : "ARKADAŞLAR"}
-          </Text>
-        </View>
-        <Pressable
-          onPress={goInvite}
-          hitSlop={14}
-          accessibilityRole="button"
-          accessibilityLabel="Arkadaş davet et"
-          style={{ padding: SPACING.xs }}
-        >
-          <Icon name="users" size={20} color={C.text2} />
-        </Pressable>
+        </Press>
+        <Press haptic="none" onPress={goInvite} hitSlop={8} accessibilityLabel="Arkadaşını davet et" style={s.iconBtn}>
+          <Icon name="users" size={NAV_ICON.action} color={C.text2} />
+        </Press>
+      </View>
+      <View style={s.titleBlock}>
+        <Text style={[TYPOGRAPHY.display, { color: C.text }]}>Birlikte</Text>
+        <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>{SUBTITLE[tab]}</Text>
       </View>
 
-      {/* Tabs */}
-      <View style={{
-        flexDirection: "row",
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-        borderRadius: RADIUS.lg,
-        padding: SPACING.xs,
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.md,
-      }}>
-        {[
-          { key: "groups", label: "Gruplarım" },
-          { key: "global", label: "Genel Lig" },
-          { key: "friends", label: "Arkadaşlar" },
-        ].map((t) => (
-          <Pressable
-            key={t.key}
-            onPress={() => { H.tap(); setTab(t.key); }}
-            style={{
-              flex: 1,
-              alignItems: "center",
-              paddingVertical: SPACING.sm,
-              borderRadius: RADIUS.md,
-              backgroundColor: tab === t.key ? C.accent : "transparent",
-            }}
-          >
-            <Text style={[TYPOGRAPHY.captionMedium, { color: tab === t.key ? C.textOnFill : C.sec }]}>
-              {t.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      <LeagueSegment tabs={TABS} value={tab} onChange={setTab} />
 
       {tab === "groups" ? (
         <GroupsTab user={user} initialGroupCode={route.params?.groupCode} />
-      ) : loading ? (
-        <View style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, gap: SPACING.md }}>
-          <SkeletonCard height={120} />
-          {[1, 2, 3, 4, 5].map((i) => (
-            <SkeletonCard key={i} height={52} />
-          ))}
-        </View>
       ) : (
-        <FlatList
-          data={listData}
-          keyExtractor={(item) => item._id ?? String(item.user_id)}
-          ListHeaderComponent={
-            <>
-              <LeagueBrief C={C} data={data} />
-              <TierHeader tier={tier} nextTier={nextTier} myScore={data.myScore} totalUsers={totalUsers} C={C} />
-              <Text style={[
-                TYPOGRAPHY.label,
-                {
-                  color: C.green,
-                  letterSpacing: 1,
-                  marginTop: SPACING.md,
-                  marginBottom: SPACING.sm,
-                  marginLeft: SPACING.xs,
-                },
-              ]}>SIRALAMA · SORU SAYISI</Text>
-            </>
-          }
-          renderItem={renderItem}
-          windowSize={5}
-          maxToRenderPerBatch={10}
-          ListEmptyComponent={emptyComponent}
-          contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 100, gap: SPACING.sm }}
-          removeClippedSubviews={true}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />
-          }
-          ListFooterComponent={<SocialActionCard C={C} onInvite={goInvite} onCompanion={goCompanion} />}
+        <LeagueBoard
+          key={tab}
+          user={user}
+          kind={tab}
+          onAddFriend={() => navigation.navigate(SCREENS.FRIENDS)}
+          onInvite={goInvite}
+          onCompanion={() => navigation.navigate(SCREENS.ROUTE_COMPANION)}
         />
       )}
     </SafeAreaView>
   );
 }
+
+export default function LeagueScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <LeagueScreenInner />
+    </ScreenErrorBoundary>
+  );
+}
+
+const s = StyleSheet.create({
+  safe: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: GUTTER - 10,
+    minHeight: CONTROL.tapMin,
+  },
+  iconBtn: { minWidth: CONTROL.tapMin, minHeight: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
+  titleBlock: { paddingHorizontal: GUTTER, paddingTop: STEP.s1, paddingBottom: STEP.s3, gap: 4 },
+});

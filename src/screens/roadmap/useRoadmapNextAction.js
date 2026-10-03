@@ -17,11 +17,10 @@ export function useRoadmapNextAction({ navigation, routeCreated, weeks }) {
       source: "roadmap_next_action",
       subject: nextRouteAction.subjectKey,
     });
-    if (typeof navigation.replace === "function") {
-      navigation.replace(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
-    } else {
-      navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
-    }
+    // replace() DEGIL: sayac kok yiginda; sekme icinden replace kok
+    // yigina cikip MainTabs'in yerini aliyordu -> butun sekme durumu
+    // siliniyor, sayactan geri donulecek yer kalmiyordu.
+    navigation.navigate(SCREENS.STUDY_TIMER, routeActionTimerParams(nextRouteAction));
   }, [navigation, nextRouteAction]);
 
   return { nextRouteAction, startNextRouteAction };

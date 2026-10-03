@@ -9,6 +9,7 @@ import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens
 import { useRoutePreviewForm } from "./useRoutePreviewForm";
 import { PreviewChoices } from "./components/PreviewChoices";
 import { PreviewResult } from "./components/PreviewResult";
+import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
 
 // KAYIT ONCESI ROTA ONIZLEMESI. Kullanici taahhut (hesap) vermeden once
 // kendi rotasinin ilk duraklarini gorur; "Rotami kaydet" hesabi acar.
@@ -36,6 +37,7 @@ function RoutePreviewInner() {
           <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>Hesabım var</Text>
         </Press>
       </View>
+      <SetupRouteSteps current={0} preview />
 
       <ScrollView style={s.fill} contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {done ? <PreviewResult preview={f.preview} C={C} /> : <PreviewChoices f={f} C={C} />}

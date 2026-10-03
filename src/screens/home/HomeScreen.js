@@ -19,10 +19,12 @@ import { updateReminderContent } from "../../lib/notifications";
 import { useAuth } from "../../contexts/AuthContext";
 import { discoverTipEligible } from "../../domain/home/discoverTiming";
 import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
+import { useTabScrollTop } from "../../hooks/useTabScrollTop";
 
 // Ana Sayfa (Ana Sayfa · İlk Gün · Yükleniyor · Bağlantı Yok). Sira: ust bant
 // (seri satiri) -> bugunun sayisi + grafik -> Calismaya Basla -> duraklar.
 export default function HomeScreen() {
+  const scrollRef = useTabScrollTop();
   const h = useHomeController();
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
   const { user } = useAuth();
@@ -64,6 +66,7 @@ export default function HomeScreen() {
   } else {
     body = (
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}

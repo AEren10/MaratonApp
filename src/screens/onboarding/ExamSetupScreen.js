@@ -10,6 +10,7 @@ import { useC } from "../../contexts/ThemeContext";
 import { useExam } from "../../contexts/ExamContext";
 import { useExamSetupPrefill } from "../../hooks/useExamSetupPrefill";
 import { SCREENS } from "../../constants/screens";
+import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
 import * as H from "../../lib/haptics";
 import { buildCategoryOptions, buildYKSOptions, MONTHS } from "./constants/examSetupOptions";
 
@@ -72,10 +73,7 @@ export default function ExamSetupScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <View style={styles.progressRow}>
-        <View style={[styles.segment, { backgroundColor: C.accent }]} />
-        <View style={[styles.segment, { backgroundColor: C.track }]} />
-      </View>
+      <SetupRouteSteps current={1} />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>Hangi sınava hazırlanıyorsun?</Text>
@@ -129,8 +127,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
   backBtn: { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s2, paddingBottom: 30 },
-  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
-  segment: { flex: 1, height: 3, borderRadius: 1.5 },
   title: { fontSize: 24, maxWidth: 300, marginTop: STEP.s2 },
   optionsCol: { gap: STEP.s1, marginTop: STEP.s3 },
   yksCol: { gap: STEP.s1, marginTop: STEP.s3 },

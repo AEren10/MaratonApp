@@ -4,6 +4,7 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, SPACING, RADIUS, SHADOW } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
+import { FEATURES } from "../../../constants/features";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
@@ -18,7 +19,8 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
     <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Haftalık Lig"
-      onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE, { tab: "global" }); }}
+      // Genel Lig kapaliysa (FEATURES.globalLeague) kademe arkadaslar tablosunda.
+      onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE, { tab: FEATURES.globalLeague ? "global" : "friends" }); }}
       style={[
         {
           flexDirection: "row",

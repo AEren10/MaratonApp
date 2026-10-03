@@ -15,6 +15,7 @@ import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
+import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
 
 export default function LevelTestScreen() {
   const C = useC();
@@ -63,11 +64,7 @@ export default function LevelTestScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <View style={styles.progressRow}>
-        {[0, 1, 2, 3].map((i) => (
-          <View key={i} style={[styles.segment, { backgroundColor: i <= 2 ? C.accent : C.track }]} />
-        ))}
-      </View>
+      <SetupRouteSteps current={3} />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.delay(80)}>
@@ -118,8 +115,6 @@ export default function LevelTestScreen() {
 const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
   backBtn: { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
-  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
-  segment: { flex: 1, height: 3, borderRadius: 1.5 },
   scroll: { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s3 },
   subtitle: { marginTop: STEP.s1, maxWidth: 300 },
   list: { gap: STEP.s1, marginTop: STEP.s3 },

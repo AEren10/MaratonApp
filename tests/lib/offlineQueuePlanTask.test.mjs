@@ -37,3 +37,19 @@ test("route stop version conflict is not advertised as retryable", () => {
   assert.match(sql, /route stop version conflict' USING ERRCODE = 'PT409'/);
   assert.doesNotMatch(sql, /ERRCODE = '40001'/);
 });
+
+test("identical offline creates are kept unless they are a double submit", () => {
+  // Ayni gun iki ozdes 25 dk calisma iki ayri kayittir; eskiden ikincisi
+  // parmak iziyle sessizce atiliyordu. Parmak izi yalniz kisa pencerede
+  // (cift dokunus) yeni kayitlari birlestirir.
+  assert.match(source, /const CREATE_OPS = new Set\(\[OP_STUDY_LOG, OP_TRIAL, OP_WRONG_QUESTION, OP_USER_TASK\]\)/);
+  assert.match(source, /item\.fingerprint === fingerprint && isSameIntent\(op\.type, item, now\)/);
+  assert.match(source, /return now - \(item\.queuedAt \|\| 0\) < DOUBLE_SUBMIT_MS/);
+});
+
+test("suspended premium never reports access as loading or failed", () => {
+  // Erisim anlik goruntusu alinamayinca deneme girisi/rota kilitleniyordu.
+  const ctx = readFileSync(new URL("../../src/contexts/PremiumContext.js", import.meta.url), "utf8");
+  assert.match(ctx, /accessError: (gated|PREMIUM_ENABLED) && accessState === "error"/);
+  assert.match(ctx, /accessLoading: (gated|PREMIUM_ENABLED) && accessState === "loading"/);
+});

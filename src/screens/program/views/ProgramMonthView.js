@@ -16,11 +16,13 @@ import { StreakLegend } from "../../calendar/components/StreakLegend";
 import StreakMonthCard from "../../calendar/components/StreakMonthCard";
 import { DayDetails } from "../../calendar/components/DayDetails";
 import { CalendarSkeleton } from "../../calendar/components/CalendarSkeleton";
+import { useTabScrollTop } from "../../../hooks/useTabScrollTop";
 
 // Ay: eski Takvim ve Aylik plan tek gorunumde. Buyuk "0 AKTIF SERI" basligi
 // kalkti (sifir kahraman olmaz); denemeye basinca detay bu sekmede acilir,
 // eskiden kullaniciyi Analiz sekmesine atiyordu.
 export function ProgramMonthView() {
+  const scrollRef = useTabScrollTop();
   const { value: streak, longest } = useStreakWeek();
   const C = useC();
   const navigation = useNavigation();
@@ -39,6 +41,7 @@ export function ProgramMonthView() {
   return (
     // Gorev ekle girisi sayfanin dibinde: klavye acilinca iOS kaydirip gorunur tutsun.
     <ScrollView
+      ref={scrollRef}
       contentContainerStyle={s.scroll}
       showsVerticalScrollIndicator={false}
       automaticallyAdjustKeyboardInsets

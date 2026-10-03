@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -9,24 +8,29 @@ import { EVENTS } from "../../constants/analytics";
 import { signUp } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { PasswordStrength } from "./components/PasswordStrength";
 import { TermsCheckbox } from "./components/TermsCheckbox";
 import { Icon, Button, Press } from "../../components/design";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
+import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { registerSchema, validate } from "../../validations/auth";
 import { authErrorMessage } from "../../supabase/authErrors";
 import { SIGN_UP_OUTCOME, signUpOutcome } from "../../lib/signUpOutcome";
-import { registerLeadCopy } from "../../lib/routePreviewStore";
+import { peekPendingPreview, registerLeadCopy } from "../../lib/routePreviewStore";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
+  const { reopenSlides } = useExam();
+  const goBack = () => (navigation.canGoBack() ? navigation.goBack() : reopenSlides());
   const C = useC();
   const insets = useSafeAreaInsets();
   const showAlert = useAlert();
+  const fromPreview = Boolean(peekPendingPreview());
   const [name, setName] = useState(""); const [email, setEmail] = useState("");
   const [password, setPassword] = useState(""); const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false); const [errors, setErrors] = useState({});
@@ -77,7 +81,7 @@ export default function RegisterScreen() {
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Press haptic="none"
-              onPress={() => navigation.goBack()}
+              onPress={goBack}
               hitSlop={12}
               accessibilityLabel="Geri"
               accessibilityRole="button"
@@ -87,60 +91,59 @@ export default function RegisterScreen() {
             </Press>
           </View>
 
-          <Animated.View style={{ marginTop: STEP.s2 }}>
-            <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 280 }]}>
-              Hesap oluştur.
-            </Text>
-            <Text style={[TYPOGRAPHY.body, { fontSize: 13.5, color: C.text3, marginTop: STEP.s2, maxWidth: 302 }]}>
-              {registerLeadCopy()}
-            </Text>
-          </Animated.View>
-
-          <View style={{ marginTop: STEP.s4 }}>
-            <Animated.View>
-              <AuthInput label="AD SOYAD" value={name} onChangeText={setName} placeholder="Arda Karaca" autoCapitalize="words" error={errors.name} />
-            </Animated.View>
-
-            <Animated.View>
-              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
-            </Animated.View>
-
-            <Animated.View>
-              <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••••" secureTextEntry error={errors.password} />
-              <PasswordStrength password={password} />
-            </Animated.View>
+          <View style={{ marginHorizontal: -GUTTER, marginTop: STEP.s1 }}>
+            <SetupRouteSteps current={fromPreview ? 1 : 0} />
           </View>
 
-          <Animated.View style={{ marginTop: STEP.s2 }}>
+          <View style={{ marginTop: STEP.s4 }}>
+            <Text style={[TYPOGRAPHY.heading, { fontSize: 28, color: C.text, maxWidth: 300 }]}>
+              {fromPreview ? "Rotanı kaydet." : "Rotanın ilk durağı: hesabın."}
+            </Text>
+            <Text style={[TYPOGRAPHY.body, { fontSize: 13.5, color: C.text3, marginTop: STEP.s2, maxWidth: 312 }]}>
+              {registerLeadCopy()}
+            </Text>
+          </View>
+
+          {/* Apple formun ustunde; Android'de sosyal giris yok -> ayrac da yok. */}
+          {Platform.OS === "ios" ? (
+            <>
+              <View style={{ marginTop: STEP.s4 }}>
+                <SocialAuthButtons />
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center", marginTop: STEP.s3, gap: STEP.s2 }}>
+                <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+                <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA E-POSTA İLE</Text>
+                <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+              </View>
+            </>
+          ) : null}
+
+          <View style={{ marginTop: Platform.OS === "ios" ? STEP.s3 : STEP.s4 }}>
+              <AuthInput label="AD SOYAD" value={name} onChangeText={setName} placeholder="Arda Karaca" autoCapitalize="words" error={errors.name} />
+
+              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
+
+              <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••••" secureTextEntry error={errors.password} />
+              <PasswordStrength password={password} />
+          </View>
+
+          <View style={{ marginTop: STEP.s2 }}>
             <TermsCheckbox
               checked={agreed}
               onToggle={() => setAgreed((v) => !v)}
               onOpenTerms={() => navigation.navigate(SCREENS.TERMS)}
               onOpenPrivacy={() => navigation.navigate(SCREENS.PRIVACY)}
             />
-          </Animated.View>
+          </View>
 
-          <Animated.View>
-            <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s3 }}>
-              {busy ? "Hesap açılıyor..." : "Hesabı oluştur"}
-            </Button>
-          </Animated.View>
+          <Button onPress={submit} loading={busy} size="lg" fullWidth style={{ marginTop: STEP.s3 }}>
+            {busy ? "Hesap açılıyor..." : "Hesabı oluştur"}
+          </Button>
 
-          <Animated.View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-              <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-            </View>
-            <SocialAuthButtons />
-          </Animated.View>
-
-          <Animated.View>
-            <Press haptic="none" onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
-              <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın var mı?</Text>
-              <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Giriş yap</Text>
-            </Press>
-          </Animated.View>
+          <Press haptic="none" onPress={() => navigation.navigate(SCREENS.LOGIN)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
+            <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın var mı?</Text>
+            <Text style={[TYPOGRAPHY.bodySemiBold, { fontSize: 13, color: C.accentBright }]}>Giriş yap</Text>
+          </Press>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

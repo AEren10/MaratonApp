@@ -14,8 +14,6 @@ import { WrongScreenHeader } from "../WrongScreenHeader";
 import { DetailPhoto } from "./DetailPhoto";
 import { ReviewLadder } from "./ReviewLadder";
 import { WhyWrongCard } from "./WhyWrongCard";
-import { useAlert } from "../../../../contexts/AlertContext";
-import { Press } from "../../../../components/design/Press";
 
 export function OwnWrongDetail() {
   const C = useC();
@@ -24,7 +22,6 @@ export function OwnWrongDetail() {
   const d = useWrongDetail(params);
   const item = d.item;
   const goBack = () => navigation.goBack();
-  const showAlert = useAlert();
 
   if (d.loading && !item) {
     return (
@@ -86,24 +83,11 @@ export function OwnWrongDetail() {
               Bu soruyu kapat
             </Button>
           ) : null}
-          <View style={styles.actionRow}>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              style={{ flex: 1 }} 
-              onPress={() => showAlert("Yakında", "Topluluğa sor özelliği henüz aktif değil.")}
-            >
-              Topluluğa sor
-            </Button>
-            <Press haptic="none"
-              onPress={d.remove}
-              accessibilityRole="button"
-              accessibilityLabel="Soruyu sil"
-              style={[styles.trash, { borderColor: C.border }]}
-            >
-              <Icon name="trash" size={16} color={C.text3} />
-            </Press>
-          </View>
+          {/* "Topluluğa sor" kaldirildi: "Yakında" uyarisi acan buton App
+              Store incelemesinde (2.1) bitmemis ozellik sayilir. */}
+          <Button size="lg" variant="outline" fullWidth icon="trash" onPress={d.remove}>
+            Soruyu sil
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -118,13 +102,4 @@ const styles = StyleSheet.create({
   titleBlock: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 4 },
   topic: { marginTop: STEP.s1 + 2, maxWidth: 300 },
   actions: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 + 6 },
-  actionRow: { flexDirection: "row", gap: STEP.s2 },
-  trash: {
-    width: 48,
-    height: 48,
-    borderRadius: SHAPE.button,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
 });

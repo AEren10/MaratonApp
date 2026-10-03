@@ -11,7 +11,6 @@ import { SCREENS } from "../../constants/screens";
 import { useLevelProgress } from "../../hooks/useLevelProgress";
 import { LevelHero } from "./components/LevelHero";
 import { LevelPathRow } from "./components/LevelPathRow";
-import { WeeklyGains } from "./components/WeeklyGains";
 import { Press } from "../../components/design/Press";
 
 const NOTE =
@@ -84,7 +83,6 @@ export default function LevelScreen() {
         ListHeaderComponent={header}
         ListFooterComponent={
           <View>
-            <WeeklyGains />
             <Press haptic="none"
               onPress={() => navigation.navigate(SCREENS.MILESTONE)}
               accessibilityRole="button"

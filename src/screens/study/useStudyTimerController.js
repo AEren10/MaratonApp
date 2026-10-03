@@ -136,6 +136,8 @@ export function useStudyTimerController(C) {
     setJson(STORAGE_KEYS.CUSTOM_TIMER_CONFIG, nextConfig).catch(() => {});
 
     const doApply = () => {
+      accumulatedRef.current = 0;
+      startedAtRef.current = null;
       setModeKey("CUSTOM");
       setPhase(STUDY_TIMER_PHASE.FOCUS);
       setElapsed(0);
@@ -176,7 +178,16 @@ export function useStudyTimerController(C) {
     [cycleIndex, mode, phase],
   );
 
+  // Duvar saati: ekrandaki `elapsed` sifirlanip saat referanslari
+  // sifirlanmazsa bir sonraki tick eski sureyi geri getiriyordu (mod
+  // degisince eski sure kayda giriyor, pomodoro fazi her saniye donuyordu).
+  const restartClock = useCallback((keepRunning) => {
+    accumulatedRef.current = 0;
+    startedAtRef.current = keepRunning ? Date.now() : null;
+  }, []);
+
   const resetTimer = useCallback((nextModeKey) => {
+    restartClock(false);
     setModeKey(nextModeKey);
     setPhase(STUDY_TIMER_PHASE.FOCUS);
     setElapsed(0);
@@ -185,7 +196,7 @@ export function useStudyTimerController(C) {
     setTotalFocusSeconds(0);
     sessionStartedAtRef.current = null;
     studyStartedTrackedRef.current = false;
-  }, []);
+  }, [restartClock]);
 
   const advancePhase = useCallback(() => {
     H.success();
@@ -206,8 +217,9 @@ export function useStudyTimerController(C) {
     } else {
       setPhase(STUDY_TIMER_PHASE.FOCUS);
     }
+    restartClock(true);
     setElapsed(0);
-  }, [cycleIndex, isPomodoro, mode, phase, phaseTargetSec]);
+  }, [cycleIndex, isPomodoro, mode, phase, phaseTargetSec, restartClock]);
 
   useEffect(() => {
     if (running) {
@@ -446,9 +458,19 @@ export function useStudyTimerController(C) {
     }
   }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
+  // Gecmis Profil sekmesinde; oraya gitmek kok yigindaki sayaci kapatir.
+  // Eskiden calisan sayac uyarisiz kapaniyordu.
   const openHistory = useCallback(() => {
-    openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.STUDY_HISTORY);
-  }, [navigation]);
+    const go = () => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.STUDY_HISTORY);
+    if (elapsed >= 30 || totalFocusSeconds >= 30) {
+      showAlert("Sayaç kapanacak", "Geçmişi açarsan bu çalışma kaydedilmeden sayaç kapanır.", [
+        { text: "Vazgeç", style: "cancel" },
+        { text: "Yine de aç", style: "destructive", onPress: go },
+      ]);
+    } else {
+      go();
+    }
+  }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
   return {
     // Yarım kalan oturum kurtarma — ekran bunu bir soru olarak gösterir.

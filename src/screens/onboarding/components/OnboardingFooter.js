@@ -3,21 +3,16 @@ import { Button } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 import { TYPOGRAPHY, STEP, GUTTER, CONTROL } from "../../../themes/tokens";
 
-export function OnboardingFooter({ isLastSlide = false, onNext, onStart, onLogin, C }) {
+// Tek birincil aksiyon, filmin her aninda. "Devam et"e uc kez basma duvari yok.
+export function OnboardingFooter({ onStart, onLogin, C }) {
   return (
     <View style={s.footer}>
-      {isLastSlide ? (
-        <Button variant="primary" size="lg" fullWidth onPress={onStart}>
-          Rotamı kur
-        </Button>
-      ) : (
-        <Button variant="primary" size="lg" fullWidth onPress={onNext}>
-          Devam et
-        </Button>
-      )}
+      <Button variant="primary" size="lg" fullWidth iconRight="arrowR" onPress={onStart}>
+        Rotamı kur
+      </Button>
 
       <Text style={[TYPOGRAPHY.micro, s.reassurance, { color: C.text3 }]}>
-        Hesap sonra. Önce rotanı görüyorsun.
+        Hesabını aç, üç kısa soruyla rotan çizilsin.
       </Text>
 
       <Press
@@ -29,7 +24,7 @@ export function OnboardingFooter({ isLastSlide = false, onNext, onStart, onLogin
         style={s.loginLink}
       >
         <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2 }]}>
-          Hesabım var, giriş yap
+          Hesabım var, <Text style={{ color: C.accentText }}>giriş yap</Text>
         </Text>
       </Press>
     </View>
@@ -39,13 +34,12 @@ export function OnboardingFooter({ isLastSlide = false, onNext, onStart, onLogin
 const s = StyleSheet.create({
   footer: {
     paddingHorizontal: GUTTER,
-    paddingBottom: STEP.s3,
+    paddingBottom: STEP.s2,
     paddingTop: STEP.s2,
   },
   reassurance: {
     textAlign: "center",
     marginTop: STEP.s2,
-    marginBottom: STEP.s1,
   },
   loginLink: {
     alignItems: "center",

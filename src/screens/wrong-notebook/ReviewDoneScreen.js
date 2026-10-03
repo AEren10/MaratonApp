@@ -19,13 +19,16 @@ function ReviewDoneContent() {
   const navigation = useNavigation();
   const { params } = useRoute();
   
-  // Params'dan gelen veriler
-  const reviewedCount = params?.reviewedCount ?? 6;
-  const closedCount = params?.closedCount ?? 2;
-  const rememberedCount = params?.rememberedCount ?? 4;
-  const forgotCount = params?.forgotCount ?? 2;
-  const pendingBefore = params?.pendingBefore ?? 14;
-  const pendingAfter = params?.pendingAfter ?? 12;
+  // Yalniz oturumun gercek sayilari (useWrongReviewSession). Eskiden
+  // parametre gelmezse 6/2/4/2/14/12 uyduruluyor, metinde sabit "Yarın 4
+  // soru" ve "9 gün sonra" yaziyordu.
+  const reviewedCount = params?.reviewedCount ?? 0;
+  const closedCount = params?.closedCount ?? 0;
+  const rememberedCount = params?.rememberedCount ?? 0;
+  const forgotCount = params?.forgotCount ?? 0;
+  const pendingBefore = params?.pendingBefore ?? 0;
+  const pendingAfter = params?.pendingAfter ?? 0;
+  const resolvedShare = pendingBefore > 0 ? (pendingBefore - pendingAfter) / pendingBefore : 0;
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
@@ -46,13 +49,13 @@ function ReviewDoneContent() {
           <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.5 }]}>TEKRAR BİTTİ</Text>
           
           <View style={styles.heroTitleRow}>
-            <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 64, lineHeight: 64 }]}>{reviewedCount}</Text>
+            <Text style={[TYPOGRAPHY.statLarge, { color: C.text, fontSize: 64, lineHeight: 64 }]}>{reviewedCount}</Text>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: 12 }]}>soru tekrar edildi</Text>
           </View>
           
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s3 }]}>
-            {rememberedCount}'ünü bildin, {forgotCount}'si tekrar takvimine geri döndü.
-            Yarın 4 soru, üç gün sonra 7 soru bekliyor.
+            Bildiğin {rememberedCount} sorunun aralığı uzadı.{" "}
+            {forgotCount > 0 ? `Bilemediğin ${forgotCount} soru yarın yeniden karşına çıkacak.` : "Bilemediğin soru yok."}
           </Text>
         </Animated.View>
 
@@ -78,6 +81,7 @@ function ReviewDoneContent() {
           forgotCount={forgotCount}
           pendingBefore={pendingBefore}
           pendingAfter={pendingAfter}
+          resolvedShare={resolvedShare}
         />
 
         <Animated.View entering={FadeIn.delay(300).duration(400)} style={styles.actions}>

@@ -18,8 +18,10 @@ import { DeeperAnalysisSection } from "./components/DeeperAnalysisSection";
 import { AnalysisSkeleton } from "./components/AnalysisSkeleton";
 import { AnalysisCoachLine } from "./components/AnalysisCoachLine";
 import { useAnalysisController } from "./useAnalysisController";
+import { useTabScrollTop } from "../../hooks/useTabScrollTop";
 
 export default function AnalysisScreen() {
+  const scrollRef = useTabScrollTop();
   const C = useC();
   const {
     analysis,
@@ -47,6 +49,7 @@ export default function AnalysisScreen() {
     <SwipeToHome>
       <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
         <ScrollView
+        ref={scrollRef}
           contentContainerStyle={s.scroll}
           showsVerticalScrollIndicator={false}
           refreshControl={

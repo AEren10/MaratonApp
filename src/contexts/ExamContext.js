@@ -311,6 +311,13 @@ export function ExamProvider({ children }) {
     appStorage.setString(SLIDES_KEY, "true").catch(() => {});
   }, []);
 
+  // Giris/Kayit yiginin ilk ekranindaki geri oku karsilama filmine doner.
+  // Eskiden goBack() gidecek yer olmadigi icin hicbir sey yapmiyordu.
+  const reopenSlides = useCallback(() => {
+    setHasSeenSlides(false);
+    appStorage.remove(SLIDES_KEY).catch(() => {});
+  }, []);
+
   const updateExamConfig = useCallback(async (type, selectedField, date) => {
     const changedExam = !!examType && !!type && examType !== type;
     setExamType(type);
@@ -556,13 +563,14 @@ export function ExamProvider({ children }) {
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
     markSlidesAsSeen,
+    reopenSlides,
   }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
-    markSlidesAsSeen]);
+    markSlidesAsSeen, reopenSlides]);
 
   return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;
 }

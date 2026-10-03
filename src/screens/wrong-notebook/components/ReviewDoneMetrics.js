@@ -5,7 +5,9 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Card } from "../../../components/design";
 import { TYPOGRAPHY, STEP } from "../../../themes/tokens";
 
-export function ReviewDoneMetrics({ C, rememberedCount, forgotCount, pendingBefore, pendingAfter }) {
+// Yalniz oturumun gercek sayilari. Eskiden sabit dort renkli cubuk ve
+// "Bu konu 9 gun sonra tekrar onerilecek" yaziyordu.
+export function ReviewDoneMetrics({ C, rememberedCount, forgotCount, pendingBefore, pendingAfter, resolvedShare = 0 }) {
   return (
     <Animated.View entering={FadeIn.delay(200).duration(400)} style={styles.metrics}>
       <View style={styles.row}>
@@ -28,14 +30,11 @@ export function ReviewDoneMetrics({ C, rememberedCount, forgotCount, pendingBefo
             {`${pendingBefore} → `}<Text style={{ color: C.text }}>{pendingAfter}</Text> bekliyor
           </Text>
         </View>
-        <View style={styles.progressRow}>
-          <View style={[styles.bar, { flex: 3, backgroundColor: C.warn }]} />
-          <View style={[styles.bar, { flex: 2, backgroundColor: C.text2 }]} />
-          <View style={[styles.bar, { flex: 2, backgroundColor: C.text3 }]} />
-          <View style={[styles.bar, { flex: 1, backgroundColor: C.line }]} />
+        <View style={[styles.track, { backgroundColor: C.track }]}>
+          <View style={[styles.bar, { width: `${Math.round(resolvedShare * 100)}%`, backgroundColor: C.up }]} />
         </View>
         <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s2 }]}>
-          Tekrar kayda geçti. Bu konu 9 gün sonra tekrar önerilecek.
+          Tekrar kayda geçti. Sıradaki tekrar günü her soru için ayrı hesaplandı.
         </Text>
       </Card>
     </Animated.View>
@@ -48,6 +47,6 @@ const styles = StyleSheet.create({
   halfCard: { flex: 1 },
   fullCard: { marginTop: STEP.s2 },
   cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  progressRow: { flexDirection: "row", gap: 4, marginTop: STEP.s2 },
+  track: { height: 6, borderRadius: 3, marginTop: STEP.s2, overflow: "hidden" },
   bar: { height: 6, borderRadius: 3 },
 });

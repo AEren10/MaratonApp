@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { View } from "react-native";
+import { useEffect, useState } from "react";
+import { Keyboard, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../contexts/ThemeContext";
+import { SHADOW } from "../themes/tokens";
 import { TabItem } from "./tabBar/TabItem";
 import { CenterFab } from "./tabBar/CenterFab";
+import { TabIndicator } from "./tabBar/TabIndicator";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
@@ -17,13 +19,37 @@ const TABS = [
   { key: SCREENS.PROFILE, label: "Profil", icon: "user", hint: "Profil sayfanı açar" },
 ];
 
+// Yuzen kapsul tabbar: kenarlardan iceride, yuzey tonu + 1px kenarlik
+// (derinlik golgeyle degil). Aktif sekmenin arkasinda kayan hap.
 export function TabBar({ state, navigation }) {
   const insets = useSafeAreaInsets();
   const C = useC();
   const isDark = C.scheme !== "light";
   const currentKey = state.routes[state.index].name;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const tabBg = isDark ? C.surface : C.elev;
+  const [width, setWidth] = useState(0);
+  const keyboard = useAndroidKeyboard();
+  const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === currentKey));
+
+  // Klavye acikken Android tabbar'i klavyenin ustune tasiyordu (form
+  // alaninin ustunu kapatarak). iOS'ta klavye zaten ustunu ortuyor.
+  if (keyboard) return null;
+
+  const press = (tab) => {
+    const route = state.routes.find((r) => r.name === tab.key);
+    const active = currentKey === tab.key;
+    // Standart tabPress: ic yigin odaktaysa koke doner, kokteyse ekran
+    // useScrollToTop ile en uste kayar. Eskiden olay yayilmiyordu.
+    const event = route
+      ? navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true })
+      : { defaultPrevented: false };
+    if (event.defaultPrevented) return;
+    if (active) {
+      navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
+      return;
+    }
+    navigation.navigate(tab.key);
+  };
 
   return (
     <>
@@ -33,52 +59,50 @@ export function TabBar({ state, navigation }) {
         onClose={() => setSheetOpen(false)}
         onAction={(screen, params) => navigation.navigate(screen, params)}
       />
-      {/* Icerik tabbar'a sert cizgiyle degil yumusak kararmayla girer: 20 -> 52px. */}
-      <LinearGradient
-        colors={["transparent", C.alpha(tabBg, 35), C.alpha(tabBg, 85), tabBg]}
-        locations={[0, 0.45, 0.85, 1]}
-        style={{ position: "absolute", top: -52, left: 0, right: 0, height: 52 }}
-        pointerEvents="none"
-      />
-      <View style={{
-        flexDirection: "row",
-        backgroundColor: tabBg,
-        borderTopWidth: 1,
-        borderTopColor: C.line,
-        paddingTop: 8,
-        paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
-        paddingHorizontal: 8,
-      }}>
-        {TABS.map((tab) => {
-          if (tab.center) {
-            return <CenterFab key={tab.key} open={sheetOpen} onPress={() => setSheetOpen((v) => !v)} C={C} />;
-          }
-          const active = currentKey === tab.key;
-          return (
-            <TabItem
-              key={tab.key}
-              tab={tab}
-              active={active}
-              onPress={() => {
-                // ZATEN BU SEKMEDEYSEK yigini kokune don.
-                //
-                // Duz navigate(tab.key) odaklanmis sekmede HICBIR SEY yapmiyor:
-                // ic yigin oldugu yerde kaliyor. Home'a bagli bir ekrandayken
-                // Home'a basan kullanici ekranda sikisip kaliyordu -- ozellikle
-                // geri tusu olmayan ekranlarda tek cikis yolu buydu.
-                //
-                // Kok ekranin adina navigate etmek yigini oraya kadar acar.
-                if (active) {
-                  navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
-                  return;
-                }
-                navigation.navigate(tab.key);
-              }}
-              C={C}
-            />
-          );
-        })}
+      <View style={[s.dock, { backgroundColor: C.bg, paddingBottom: insets.bottom > 0 ? insets.bottom - 4 : 12 }]}>
+        {/* Icerik kapsule sert cizgiyle degil yumusak kararmayla girer. */}
+        <LinearGradient
+          colors={["transparent", C.alpha(C.bg, 70), C.bg]}
+          locations={[0, 0.6, 1]}
+          style={s.fade}
+          pointerEvents="none"
+        />
+        <View
+          onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+          style={[s.capsule, { backgroundColor: C.surface, borderColor: C.edgeStrong }, !isDark && SHADOW.cardLight]}
+        >
+          {currentKey !== "Add" ? <TabIndicator index={activeIndex} slotWidth={width / TABS.length} C={C} /> : null}
+          {TABS.map((tab) => (tab.center ? (
+            <CenterFab key={tab.key} open={sheetOpen} onPress={() => setSheetOpen((v) => !v)} C={C} />
+          ) : (
+            <TabItem key={tab.key} tab={tab} active={currentKey === tab.key} onPress={() => press(tab)} C={C} />
+          )))}
+        </View>
       </View>
     </>
   );
 }
+
+function useAndroidKeyboard() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (Platform.OS !== "android") return undefined;
+    const show = Keyboard.addListener("keyboardDidShow", () => setOpen(true));
+    const hide = Keyboard.addListener("keyboardDidHide", () => setOpen(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
+  return open;
+}
+
+const s = StyleSheet.create({
+  dock: { paddingHorizontal: 14, paddingTop: 6 },
+  fade: { position: "absolute", top: -36, left: 0, right: 0, height: 36 },
+  capsule: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 64,
+    borderRadius: 30,
+    borderWidth: 1,
+    paddingHorizontal: 0,
+  },
+});

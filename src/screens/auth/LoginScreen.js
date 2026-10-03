@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { signIn } from "../../supabase/auth";
 import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
+import { useExam } from "../../contexts/ExamContext";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
@@ -18,6 +19,8 @@ import { Press } from "../../components/design/Press";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const { reopenSlides } = useExam();
+  const goBack = () => (navigation.canGoBack() ? navigation.goBack() : reopenSlides());
   const C = useC();
   const insets = useSafeAreaInsets();
   const showAlert = useAlert();
@@ -58,7 +61,7 @@ export default function LoginScreen() {
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Press haptic="none"
-              onPress={() => navigation.goBack()}
+              onPress={goBack}
               hitSlop={12}
               accessibilityLabel="Geri"
               accessibilityRole="button"
@@ -97,13 +100,17 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-              <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-            </View>
-
-            <SocialAuthButtons />
+            {/* Android'de sosyal giris yok (Google askida) -> bos "VEYA" ayraci da yok. */}
+            {Platform.OS === "ios" ? (
+              <>
+                <View style={{ flexDirection: "row", alignItems: "center", marginVertical: STEP.s3, gap: STEP.s2 }}>
+                  <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+                  <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
+                  <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+                </View>
+                <SocialAuthButtons />
+              </>
+            ) : null}
 
             <Press haptic="none" onPress={() => navigation.navigate(SCREENS.REGISTER)} style={{ marginTop: STEP.s4, alignItems: "center", minHeight: 44, justifyContent: "center", flexDirection: "row", gap: STEP.s1 / 2 }} hitSlop={6}>
               <Text style={[TYPOGRAPHY.body, { fontSize: 13, color: C.text3 }]}>Hesabın yok mu?</Text>

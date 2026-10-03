@@ -1,4 +1,5 @@
 import { ScrollView } from "react-native";
+import { useTabScrollTop } from "../../hooks/useTabScrollTop";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
@@ -33,6 +34,7 @@ function studyMeta({ totalQuestions = 0, totalHours = 0 } = {}) {
 
 export default function ProfileScreen() {
   const C = useC();
+  const scrollRef = useTabScrollTop();
   const navigation = useNavigation();
   const {
     careerStats,
@@ -54,7 +56,7 @@ export default function ProfileScreen() {
         {loading ? (
           <ProfileSkeleton />
         ) : (
-          <ScrollView contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
+          <ScrollView ref={scrollRef} contentContainerStyle={{ paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
             {/* Kimlik: kim, hangi sinav, hedef, seviye ve lig. Seviye ve lig
                 eskiden sayfanin en altinda, baglanti listesinin arkasindaydi. */}
             <Animated.View>

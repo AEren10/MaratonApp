@@ -95,7 +95,7 @@ function NotificationPermissionContent() {
 
         <Animated.View style={{ marginTop: STEP.s4 }}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.6 }]}>
-            SANA NE GÖNDERİRİZ
+            ÖRNEK BİLDİRİMLER
           </Text>
           <View style={{ marginTop: STEP.s2 }}>
             <NotificationBenefitList />

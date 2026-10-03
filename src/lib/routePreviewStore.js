@@ -32,5 +32,5 @@ export function clearPendingPreview() {
 export function registerLeadCopy() {
   return memory
     ? "Rotan hazır. Hesap onu buluta alır — hangi telefondan girersen aynı yerden devam eder."
-    : "Hesabını aç, ardından iki dakikada rotanı çizelim. Hangi telefondan girersen aynı yerden devam eder.";
+    : "Sonra üç kısa soru ve rotan çizilir. Hesabın onu buluta bağlar; hangi telefondan girersen aynı duraktan devam edersin.";
 }
