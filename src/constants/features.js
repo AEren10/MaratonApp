@@ -5,6 +5,9 @@
 // her satirda avatara dokununca Bildir / Engelle (ReportableAvatar),
 // engellenen siralamadan ayiklanir, kosullarda sifir tolerans maddesi.
 // Eksik kalan: ad filtresi (kufur listesi).
+// homeBackdrop: ana sayfanin arka plani (deneme, 4 Ekim). "lines" isik
+// huzmeleri | "dots" nokta izgarasi | null kapali. Tek satirla degisir.
 export const FEATURES = Object.freeze({
   globalLeague: true,
+  homeBackdrop: "lines",
 });

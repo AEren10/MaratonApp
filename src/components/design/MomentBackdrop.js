@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
-import Svg, { Defs, G, LinearGradient, Mask, Path, RadialGradient, Rect, Stop } from "react-native-svg";
+import Svg, { Circle, Defs, G, LinearGradient, Mask, Path, Pattern, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
 
@@ -32,12 +32,14 @@ function linePaths(w, h, flip) {
   return out;
 }
 
-export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style }) {
+// variant: "lines" isik huzmeleri | "dots" ince nokta izgarasi (koseden isiltiyla).
+// strength: 0-1 yogunluk (ana sayfada daha silik).
+export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1 }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
   const h = height || Math.round(screenH * 0.62);
   const light = C.scheme === "light";
-  const k = light ? 0.55 : 1;
+  const k = (light ? 0.55 : 1) * strength;
   const paths = useMemo(() => linePaths(width, h, flip), [width, h, flip]);
 
   return (
@@ -62,10 +64,24 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
           <Mask id="mbMask" x={0} y={0} width={width} height={h} maskUnits="userSpaceOnUse">
             <Rect x={0} y={0} width={width} height={h} fill="url(#mbFade)" />
           </Mask>
+          <Pattern id="mbDots" patternUnits="userSpaceOnUse" width={7} height={7}>
+            <Circle cx={3.5} cy={3.5} r={0.75} fill={C.accentBright} />
+          </Pattern>
+          <RadialGradient id="mbDotFall" cx={flip ? width : 0} cy={0} r={width * 1.3} gradientUnits="userSpaceOnUse">
+            <Stop offset="0" stopColor="#fff" stopOpacity={1} />
+            <Stop offset="1" stopColor="#fff" stopOpacity={0.15} />
+          </RadialGradient>
+          <Mask id="mbDotMask" x={0} y={0} width={width} height={h} maskUnits="userSpaceOnUse">
+            <Rect x={0} y={0} width={width} height={h} fill="url(#mbDotFall)" />
+          </Mask>
         </Defs>
         <G mask="url(#mbMask)">
           <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" />
-          {paths.map((p) => (
+          {variant === "dots" ? (
+            <G mask="url(#mbDotMask)">
+              <Rect x={0} y={0} width={width} height={h} fill="url(#mbDots)" opacity={0.5 * k} />
+            </G>
+          ) : paths.map((p) => (
             <Path key={p.d} d={p.d} fill="none" stroke="url(#mbLine)" strokeWidth={p.sw} strokeOpacity={p.o * k} />
           ))}
         </G>

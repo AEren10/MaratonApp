@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { SyncProblemBanner } from "../../components/common/SyncProblemBanner";
 import { ErrorState } from "../../components/design/ErrorState";
 import { GUTTER, STEP } from "../../themes/tokens";
@@ -20,7 +19,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { discoverTipEligible } from "../../domain/home/discoverTiming";
 import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
 import { useTabScrollTop } from "../../hooks/useTabScrollTop";
-
+import { HomeBackdrop } from "./components/HomeBackdrop";
 // Ana Sayfa (Ana Sayfa · İlk Gün · Yükleniyor · Bağlantı Yok). Sira: ust bant
 // (seri satiri) -> bugunun sayisi + grafik -> Calismaya Basla -> duraklar.
 export default function HomeScreen() {
@@ -104,6 +103,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[s.fill, { backgroundColor: C.bg }]}>
+      <HomeBackdrop />
       {body}
       <HomeOverlays
         comeback={h.comeback}
