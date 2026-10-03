@@ -15,6 +15,8 @@ import { useRecommendations } from "../../hooks/useRecommendations";
 import { useNudgePopup } from "../../hooks/useNudgePopup";
 import { useTrialCompareEntry } from "../../hooks/useTrialCompareEntry";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { useAlert } from "../../contexts/AlertContext";
 import { useResolvedTrial } from "./useResolvedTrial";
 import { useTrialDetail } from "./useTrialDetail";
@@ -69,17 +71,13 @@ function TrialDetailScreenInner() {
   );
 
   const deltaText = detail.prev && detail.trend !== 0
-    ? `${detail.trend > 0 ? "+" : "−"}${fmtNet(Math.abs(detail.trend))} net`
-    : null;
+    ? `${detail.trend > 0 ? "+" : "−"}${fmtNet(Math.abs(detail.trend))} net` : null;
   const deltaColor = detail.trend > 0 ? C.up : C.down;
 
-  const links = useMemo(
-    () => [
-      { label: "Deneme karşılaştır", note: "İki denemeyi ders ders yan yana koy", go: () => openCompare() },
-      { label: "Yanlışları deftere ekle", note: "Bu denemedeki soruları kaydet", go: () => navigation.navigate(SCREENS.ADD_WRONG, { trialId: latest?.id }) },
-    ],
-    [openCompare, navigation, latest?.id]
-  );
+  const links = useMemo(() => [
+    { label: "Deneme karşılaştır", note: "İki denemeyi ders ders yan yana koy", go: () => openCompare() },
+    { label: "Yanlışları deftere ekle", note: "Bu denemedeki soruları kaydet", go: () => navigation.navigate(SCREENS.ADD_WRONG, { trialId: latest?.id }) },
+  ], [openCompare, navigation, latest?.id]);
 
   if (!latest) {
     return (
@@ -115,7 +113,7 @@ function TrialDetailScreenInner() {
         onDismiss={dismissNudgePopup}
         onAction={(n) => {
           dismissNudgePopup();
-          if (n.subject) navigation.navigate(SCREENS.ANALYSIS);
+          if (n.subject) openInTab(navigation, TAB_KEYS.ANALIZ, SCREENS.ANALYSIS);
         }}
       />
 

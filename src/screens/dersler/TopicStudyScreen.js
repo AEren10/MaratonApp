@@ -11,6 +11,8 @@ import { useC } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openHere } from "../../navigation/tabJump";
 import { getSubjectByKey } from "../../themes/subjects";
 import { subjectColorOf } from "../../themes/subjectPalette";
 import { useTopicStudyDetail } from "../../hooks/useTopicStudyDetail";
@@ -77,7 +79,7 @@ export default function TopicStudyScreen() {
     {
       label: "Rotadaki yeri",
       note: routePlace,
-      go: () => navigation.navigate(SCREENS.ROADMAP),
+      go: () => openHere(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP),
     },
   ];
 

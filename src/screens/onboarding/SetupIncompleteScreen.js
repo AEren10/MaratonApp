@@ -4,9 +4,9 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
+import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON, CONTROL } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
-import { Button, Skeleton, Press } from "../../components/design";
+import { Button, Skeleton, Press, Icon } from "../../components/design";
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { SetupProgressList } from "./components/SetupProgressList";
 import { useSetupProgress } from "../../hooks/useSetupProgress";
@@ -16,18 +16,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
 import { firstNameOf } from "../../lib/displayName";
 
-function getSubtitle(nextStepKey) {
-  if (nextStepKey === "goal") {
-    return "Sınavını seçmişsin ama hedefini belirlememişsin. Rotan hedef olmadan çizilemiyor.";
-  }
-  if (nextStepKey === "levelTest") {
-    return "Hedefini belirlemişsin ama seviyeni ölçmemişsin. Başlangıç noktan olmadan rota çizilemiyor.";
-  }
-  if (nextStepKey === "route") {
-    return "Neredeyse bitti! Rotanı çizmek için son bir adım kaldı.";
-  }
-  return "Maraton'a başlamak için kurulumu tamamlaman gerekiyor.";
-}
+const SUBTITLES = {
+  goal: "Sınavını seçmişsin ama hedefini belirlememişsin. Rotan hedef olmadan çizilemiyor.",
+  levelTest: "Hedefini belirlemişsin ama seviyeni ölçmemişsin. Başlangıç noktan olmadan rota çizilemiyor.",
+  route: "Neredeyse bitti! Rotanı çizmek için son bir adım kaldı.",
+};
+const getSubtitle = (k) => SUBTITLES[k] || "Maraton'a başlamak için kurulumu tamamlaman gerekiyor.";
 
 function SetupIncompleteContent() {
   const C = useC();
@@ -66,6 +60,20 @@ function SetupIncompleteContent() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      {navigation.canGoBack() ? (
+        <View style={styles.topBar}>
+          <Press
+            haptic="none"
+            onPress={() => navigation.goBack()}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Geri"
+            style={styles.backBtn}
+          >
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
+          </Press>
+        </View>
+      ) : null}
       <View style={styles.content}>
         <Animated.View entering={FadeIn.delay(80)}>
           <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>
@@ -129,7 +137,9 @@ export default function SetupIncompleteScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { flex: 1, paddingHorizontal: GUTTER, paddingTop: STEP.s4 },
+  topBar: { paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
+  backBtn: { width: CONTROL.tapMin, height: CONTROL.tapMin, justifyContent: "center" },
+  content: { flex: 1, paddingHorizontal: GUTTER, paddingTop: STEP.s2 },
   title: { ...TYPOGRAPHY.heading, marginTop: STEP.s2 },
   progressRow: { flexDirection: "row", gap: STEP.s1 },
   segment: { flex: 1, height: 3, borderRadius: 1.5 },

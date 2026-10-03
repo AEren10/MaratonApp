@@ -7,6 +7,8 @@ import { Icon, Button, EmptyState, ErrorState, Skeleton } from "../../components
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { SCREENS } from "../../constants/screens";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
+import { openInTab } from "../../navigation/tabJump";
 import { useMilestone } from "../../hooks/useMilestone";
 import { MilestoneHero } from "./components/MilestoneHero";
 import { MilestoneStats } from "./components/MilestoneStats";
@@ -24,7 +26,7 @@ export default function MilestoneScreen() {
   };
   const goRoute = () => {
     H.select();
-    navigation.navigate(SCREENS.HOME);
+    openInTab(navigation, TAB_KEYS.ROTA, SCREENS.HOME);
   };
 
   return (

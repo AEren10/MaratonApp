@@ -64,9 +64,12 @@ export const ROTA_STACK = [
   SCREENS.GOALS,            // Bolum Esigi -> Hedef Duzenle
   SCREENS.TOPIC_STUDY,      // Konu Detayi
   SCREENS.SUBJECT_DETAIL,   // Ders Konulari
+  SCREENS.WEAK_AREAS,       // Oncelikli Konular (paylasimli)
+  SCREENS.TRIAL_COMPARE,    // Deneme Karsilastir (paylasimli)
 ];
 
 export const PROGRAM_STACK = [
+  SCREENS.ROADMAP,          // Rota: Konu Detayi -> Rotadaki yeri
   SCREENS.EXAM_DATE,        // Hedefler -> Sinav tarihi (sekme degismez)
   SCREENS.DATA_EXPORT,      // Nasil calisir -> Verilerimi indir
   SCREENS.TRIAL_DETAIL,     // Ay gorunumunde denemeye basinca (sekme degismez)
@@ -91,9 +94,18 @@ export const PROGRAM_STACK = [
   SCREENS.RANK_SIMULATOR,   // Bolum Esigi (paylasimli)
   SCREENS.NET_FORECAST,     // Senaryolar (paylasimli)
   SCREENS.GOALS,            // Hedef Duzenle (paylasimli)
+  SCREENS.WEAK_AREAS,       // Oncelikli Konular (paylasimli)
+  SCREENS.EXAM_RESULT,      // Sinav Sonucu (paylasimli)
+  SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu (paylasimli)
+  SCREENS.LEAGUE,           // Sosyal bildirim / derin baglanti (paylasimli)
+  SCREENS.FRIENDS,
+  SCREENS.REFERRAL,
+  SCREENS.ROUTE_COMPANION,
+  SCREENS.CHALLENGE,
 ];
 
 export const ANALIZ_STACK = [
+  SCREENS.ROADMAP,          // Konu Detayi -> Rotadaki yeri
   SCREENS.TRIAL_RECORDS,    // Deneme Kayitlari (tasarim: filtreli, aya gruplu liste)
   SCREENS.SUBJECT_LIST,     // Konu Ilerlemesi
   SCREENS.TRIAL_COMPARE,    // Deneme Karsilastirma
@@ -117,9 +129,24 @@ export const ANALIZ_STACK = [
   SCREENS.CARD_DETAIL,
   SCREENS.SHARE_CARD,
   SCREENS.SEARCH,
+  SCREENS.HOW_IT_WORKS,     // Konu kartlari bilgi ikonu
+  SCREENS.PLAN_DETAIL,      // Gunun Plani (paylasimli)
+  SCREENS.CLASS_SCHEDULE,   // Haftalik ders programi (paylasimli)
+  SCREENS.TOPIC_DEBT,       // Konu Borcu (paylasimli)
+  SCREENS.GOALS,            // Hedefler (paylasimli)
+  SCREENS.EXAM_DATE,        // Tarih secici (paylasimli)
+  SCREENS.DATA_EXPORT,      // Veri indir (paylasimli)
+  SCREENS.EXAM_RESULT,      // Sinav Sonucu (paylasimli)
+  SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu (paylasimli)
+  SCREENS.LEAGUE,           // Sosyal bildirim / derin baglanti (paylasimli)
+  SCREENS.FRIENDS,
+  SCREENS.REFERRAL,
+  SCREENS.ROUTE_COMPANION,
+  SCREENS.CHALLENGE,
 ];
 
 export const PROFIL_STACK = [
+  SCREENS.ROADMAP,          // Konu Detayi -> Rotadaki yeri
   SCREENS.RANK_SIMULATOR,   // Ayarlar > Net esigi (eskiden NAVIGATE hatasi veriyordu)
   SCREENS.WRONG_NOTEBOOK,   // Profil > Yanlis defteri (sekme degismez)
   SCREENS.WRONG_DETAIL,
@@ -154,6 +181,10 @@ export const PROFIL_STACK = [
   SCREENS.TOPIC_STUDY,      // Mufredat konusu detayi
   SCREENS.STUDY_HISTORY,    // Calisma Gecmisi
   SCREENS.STUDY_LOG,        // (ayni birlesik Calisma Gecmisi ekrani)
+  SCREENS.WEAK_AREAS,       // Oncelikli Konular (paylasimli)
+  SCREENS.PLAN_DETAIL,      // Gunun Plani (paylasimli)
+  SCREENS.TOPIC_DEBT,       // Konu Borcu (paylasimli)
+  SCREENS.TRIAL_COMPARE,    // Deneme Karsilastir (paylasimli)
   // Sosyal/Lig — Defter topluluk soru-cevap v1 disi; Lig ve arkadas
   // akislari canli urun alani olarak PROFIL stack'inde kalir.
   SCREENS.LEAGUE,

@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { openProgram } from "../../../navigation/openProgram";
+import { openInTab } from "../../../navigation/tabJump";
+import { TAB_KEYS } from "../../../navigation/tabAssignment";
 import { useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 import { SCREENS } from "../../../constants/screens";
@@ -49,7 +51,11 @@ export function HomeCompletionOverlays({
         onExamDayPlan={daysLeft != null && daysLeft >= 0
           ? go("home_route_complete_exam_day_plan", SCREENS.EXAM_DAY_PLAN)
           : undefined}
-        onYearRoute={go("home_route_complete_profile", SCREENS.PROFILE)}
+        onYearRoute={() => {
+          trackButtonTap("home_route_complete_profile", { targetScreen: "Profile" });
+          dismiss();
+          openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.PROFILE);
+        }}
       />
     );
   }

@@ -7,6 +7,8 @@ import { Icon, EmptyState, ErrorState, SectionLabel, Skeleton } from "../../comp
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { SCREENS } from "../../constants/screens";
 import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
+import { openHere } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { useC } from "../../contexts/ThemeContext";
 import { useWeakAreas } from "../../hooks/useWeakAreas";
 import { WeakAreaRow } from "./components/WeakAreaRow";
@@ -61,7 +63,7 @@ export default function WeakAreasScreen() {
           preset="priorityTopics"
           style={styles.empty}
           onPrimary={() => openProgram(navigation, PROGRAM_VIEWS.CURRICULUM)}
-          onSecondary={() => navigation.navigate(SCREENS.SUBJECT_LIST)}
+          onSecondary={() => openHere(navigation, TAB_KEYS.ANALIZ, SCREENS.SUBJECT_LIST)}
         />
       ) : (
         <FlatList

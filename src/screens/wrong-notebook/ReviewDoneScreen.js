@@ -3,16 +3,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { Button, Card, Icon } from "../../components/design";
+import { Button, Card, Icon, Press } from "../../components/design";
+import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
+import { ReviewDoneMetrics } from "./components/ReviewDoneMetrics";
 import { useC } from "../../contexts/ThemeContext";
-import { STEP, SHAPE, TYPOGRAPHY, GUTTER } from "../../themes/tokens";
+import { STEP, SHAPE, TYPOGRAPHY, GUTTER, CONTROL } from "../../themes/tokens";
 import { alpha } from "../../themes/palette";
 import { SCREENS } from "../../constants/screens";
 import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { openInTab } from "../../navigation/tabJump";
 import * as haptic from "../../lib/haptics";
 
-export default function ReviewDoneScreen() {
+function ReviewDoneContent() {
   const C = useC();
   const navigation = useNavigation();
   const { params } = useRoute();
@@ -27,6 +29,18 @@ export default function ReviewDoneScreen() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+      <View style={styles.topBar}>
+        <Press
+          haptic="none"
+          hitSlop={12}
+          onPress={() => navigation.navigate(SCREENS.WRONG_NOTEBOOK)}
+          accessibilityRole="button"
+          accessibilityLabel="Kapat"
+          style={styles.closeBtn}
+        >
+          <Icon name="x" size={18} color={C.text2} />
+        </Press>
+      </View>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Animated.View entering={FadeIn.duration(400)} style={styles.hero}>
           <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.5 }]}>TEKRAR BİTTİ</Text>
@@ -58,38 +72,13 @@ export default function ReviewDoneScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeIn.delay(200).duration(400)} style={styles.metrics}>
-          <View style={styles.row}>
-            <Card style={styles.halfCard}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text }]}>BİLDİM</Text>
-              <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 32, marginTop: STEP.s1 }]}>{rememberedCount}</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>aralık uzadı</Text>
-            </Card>
-            <Card style={styles.halfCard}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>BİLEMEDİM</Text>
-              <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 32, marginTop: STEP.s1 }]}>{forgotCount}</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>yarın tekrar</Text>
-            </Card>
-          </View>
-
-          <Card style={styles.fullCard}>
-            <View style={styles.cardHeader}>
-              <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>DEFTER DURUMU</Text>
-              <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>
-                {pendingBefore} \u2192 <Text style={{ color: C.text }}>{pendingAfter}</Text> bekliyor
-              </Text>
-            </View>
-            <View style={styles.progressRow}>
-              <View style={[styles.bar, { flex: 3, backgroundColor: C.warn }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.text2 }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.text3 }]} />
-              <View style={[styles.bar, { flex: 1, backgroundColor: C.line }]} />
-            </View>
-            <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s2 }]}>
-              Tekrar kayda geçti. Bu konu 9 gün sonra tekrar önerilecek.
-            </Text>
-          </Card>
-        </Animated.View>
+        <ReviewDoneMetrics
+          C={C}
+          rememberedCount={rememberedCount}
+          forgotCount={forgotCount}
+          pendingBefore={pendingBefore}
+          pendingAfter={pendingAfter}
+        />
 
         <Animated.View entering={FadeIn.delay(300).duration(400)} style={styles.actions}>
           <Button
@@ -119,22 +108,25 @@ export default function ReviewDoneScreen() {
   );
 }
 
+export default function ReviewDoneScreen() {
+  return (
+    <ScreenErrorBoundary>
+      <ReviewDoneContent />
+    </ScreenErrorBoundary>
+  );
+}
+
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { padding: GUTTER, paddingTop: STEP.s4 },
+  topBar: { paddingHorizontal: GUTTER, paddingTop: STEP.s1, alignItems: "flex-end" },
+  closeBtn: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
+  scroll: { padding: GUTTER, paddingTop: STEP.s1 },
   hero: { marginBottom: STEP.s3 },
   heroTitleRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s2, marginTop: STEP.s2 },
   closedRow: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1, marginTop: STEP.s2,
   },
-  metrics: { marginTop: STEP.s4, gap: STEP.s2 },
-  row: { flexDirection: "row", gap: STEP.s2 },
-  halfCard: { flex: 1 },
-  fullCard: { marginTop: STEP.s2 },
-  cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  progressRow: { flexDirection: "row", gap: 4, marginTop: STEP.s2 },
-  bar: { height: 6, borderRadius: 3 },
   actions: { marginTop: STEP.s4, gap: STEP.s2, paddingBottom: STEP.s4 },
   actionBtn: { width: "100%" },
 });

@@ -1,12 +1,13 @@
 import { useCallback, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button, AnimatedNumber } from "../../components/design";
 import RouteReadyStopRow from "./components/RouteReadyStopRow";
 import RouteReadyFirstTask from "./components/RouteReadyFirstTask";
+import { RouteReadyHeader } from "./components/RouteReadyHeader";
 import { TYPOGRAPHY, STEP, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { useRouteReadySummary } from "../../hooks/useRouteReadySummary";
@@ -20,6 +21,7 @@ import { Press } from "../../components/design/Press";
 export default function RouteReadyScreen() {
   const syncPendingNote = useRoute().params?.syncPendingNote || null;
   const C = useC();
+  const navigation = useNavigation();
   const [starting, setStarting] = useState(false);
   const { finish } = useFinishOnboarding();
   const showAlert = useAlert();
@@ -54,6 +56,7 @@ export default function RouteReadyScreen() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <RouteReadyHeader C={C} onBack={navigation.canGoBack() ? () => navigation.goBack() : null} />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.delay(60)}>
           <Text style={[TYPOGRAPHY.micro, styles.eyebrow, { color: C.accentText }]}>ROTAN HAZIR</Text>

@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
 import { Icon, Button, Press } from "../../components/design";
@@ -14,14 +15,20 @@ import { PreviewResult } from "./components/PreviewResult";
 // Kayit ekranindaki "Rotan hazir" cumlesi bu ekran sayesinde dogru.
 function RoutePreviewInner() {
   const C = useC();
+  const navigation = useNavigation();
   const f = useRoutePreviewForm();
   const done = Boolean(f.preview);
+  const canGoBack = navigation.canGoBack();
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
       <View style={s.header}>
         {done ? (
           <Press haptic="none" onPress={f.back} hitSlop={12} accessibilityLabel="Seçimlere dön" style={s.side}>
+            <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
+          </Press>
+        ) : canGoBack ? (
+          <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" style={s.side}>
             <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
         ) : <View style={s.side} />}
