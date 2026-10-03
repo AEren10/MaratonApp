@@ -32,6 +32,7 @@ export const ROUTE_CONFIGS = {
   [SCREENS.STUDY_LOG]: { path: "calisma/gecmis", flow: PRODUCT_FLOW_IDS.STUDY_SESSION, deepLink: true },
   [SCREENS.ANALYSIS]: { path: "analiz", flow: PRODUCT_FLOW_IDS.ANALYSIS_NOTEBOOK, deepLink: true, tab: true },
   [SCREENS.PROFILE]: { path: "profil", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true, tab: true },
+  [SCREENS.PUBLIC_PROFILE]: { path: "kullanici/:userId", flow: PRODUCT_FLOW_IDS.SOCIAL, deepLink: false },
 
   [SCREENS.PLAN_DETAIL]: { path: "plan", flow: PRODUCT_FLOW_IDS.PLAN_STOPS, deepLink: true },
   [SCREENS.WIDGET_GUIDE]: { path: "widget", flow: PRODUCT_FLOW_IDS.PROFILE, deepLink: true },

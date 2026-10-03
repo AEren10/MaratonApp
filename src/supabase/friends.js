@@ -7,6 +7,16 @@ function assertUUID(val, label = "id") {
   if (!val || !UUID_RE.test(val)) throw new Error(`Invalid ${label}`);
 }
 
+async function invokeFriendAction(body) {
+  const { data, error } = await supabase.functions.invoke("friend-actions", { body });
+  if (error) {
+    let detail = null;
+    try { detail = await error.context?.json?.(); } catch (_) {}
+    throw new Error(detail?.error || error.message || "İşlem tamamlanamadı.");
+  }
+  return data;
+}
+
 export async function searchUsers(query) {
   try {
     if (!query || query.length < 3) return [];
@@ -26,24 +36,8 @@ export async function searchUsers(query) {
 export async function sendFriendRequest(addresseeId) {
   try {
     assertUUID(addresseeId, "addresseeId");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Oturum yok");
-    if (addresseeId === user.id) throw new Error("Kendinize istek gönderemezsiniz");
-    const { data: existing } = await supabase
-      .from("friendships")
-      .select("id, status")
-      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${addresseeId}),and(requester_id.eq.${addresseeId},addressee_id.eq.${user.id})`)
-      .maybeSingle();
-    if (existing?.status === "blocked") throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
-    if (existing?.status === "accepted") throw new Error("Zaten arkadaşsınız");
-    if (existing?.status === "pending") throw new Error("Zaten bekleyen istek var");
-    const { data, error } = await supabase
-      .from("friendships")
-      .insert({ requester_id: user.id, addressee_id: addresseeId })
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    return data;
+    const data = await invokeFriendAction({ action: "send", addresseeId });
+    return data?.friendship || null;
   } catch (e) {
     handleSupabaseError(e, "sendFriendRequest");
     throw e;
@@ -52,19 +46,10 @@ export async function sendFriendRequest(addresseeId) {
 
 export async function respondToRequest(friendshipId, accept, userId) {
   try {
+    assertUUID(friendshipId, "friendshipId");
     if (!userId || !UUID_RE.test(userId)) throw new Error("Invalid userId");
-    const { data, error } = await supabase
-      .from("friendships")
-      .update({
-        status: accept ? "accepted" : "declined",
-        responded_at: new Date().toISOString(),
-      })
-      .eq("id", friendshipId)
-      .eq("addressee_id", userId)
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    return data;
+    const data = await invokeFriendAction({ action: "respond", friendshipId, accept: !!accept });
+    return data?.friendship || null;
   } catch (e) {
     handleSupabaseError(e, "respondToRequest");
     throw e;
@@ -106,12 +91,8 @@ export async function listOutgoingRequests(userId) {
 export async function cancelRequest(friendshipId, userId) {
   if (!userId) throw new Error("userId is required");
   try {
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("id", friendshipId)
-      .eq("requester_id", userId)
-      .eq("status", "pending");
+    assertUUID(friendshipId, "friendshipId");
+    const { error } = await supabase.rpc("cancel_friend_request", { p_friendship_id: friendshipId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "cancelRequest");
@@ -142,11 +123,8 @@ export async function listFriends(userId) {
 export async function unfriend(friendshipId, userId) {
   if (!userId) throw new Error("userId is required");
   try {
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("id", friendshipId)
-      .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+    assertUUID(friendshipId, "friendshipId");
+    const { error } = await supabase.rpc("remove_friend", { p_friendship_id: friendshipId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "unfriend");
@@ -168,23 +146,8 @@ export async function blockUser(targetId) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
     if (targetId === user.id) throw new Error("Kendinizi engelleyemezsiniz");
-    const { data: existing } = await supabase
-      .from("friendships")
-      .select("id")
-      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${targetId}),and(requester_id.eq.${targetId},addressee_id.eq.${user.id})`)
-      .maybeSingle();
-    if (existing) {
-      const { error } = await supabase
-        .from("friendships")
-        .update({ status: "blocked" })
-        .eq("id", existing.id);
-      if (error) throw error;
-    } else {
-      const { error } = await supabase
-        .from("friendships")
-        .insert({ requester_id: user.id, addressee_id: targetId, status: "blocked" });
-      if (error) throw error;
-    }
+    const { error } = await supabase.rpc("block_user", { p_target: targetId });
+    if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "blockUser");
     throw e;
@@ -196,12 +159,7 @@ export async function unblockUser(targetId) {
     assertUUID(targetId, "targetId");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("requester_id", user.id)
-      .eq("addressee_id", targetId)
-      .eq("status", "blocked");
+    const { error } = await supabase.rpc("unblock_user", { p_target: targetId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "unblockUser");
@@ -254,19 +212,6 @@ export async function sendFriendRequestByCode(code) {
     throw new Error("Bu koda ait kullanıcı bulunamadı");
   }
   const target = { id: lookup.id, name: lookup.name };
-  const { data: existing } = await supabase
-    .from("friendships")
-    .select("id, status")
-    .or(`and(requester_id.eq.${user.id},addressee_id.eq.${target.id}),and(requester_id.eq.${target.id},addressee_id.eq.${user.id})`)
-    .maybeSingle();
-  if (existing?.status === "blocked") throw new Error("Bu kullanıcıyla etkileşim kurulamaz");
-  if (existing?.status === "accepted") throw new Error("Zaten arkadaşsınız");
-  if (existing?.status === "pending") throw new Error("Zaten bekleyen istek var");
-  const { data, error } = await supabase
-    .from("friendships")
-    .insert({ requester_id: user.id, addressee_id: target.id })
-    .select()
-    .maybeSingle();
-  if (error) throw error;
-  return { friendship: data, targetName: target.name };
+  const friendship = await sendFriendRequest(target.id);
+  return { friendship, targetName: target.name };
 }

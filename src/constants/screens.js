@@ -24,6 +24,7 @@ export const SCREENS = {
   ANALYSIS_ROOT: "AnalysisRoot",
   PROFILE: "Profile",
   PROFILE_ROOT: "ProfileRoot",
+  PUBLIC_PROFILE: "PublicProfile",
 
   // Daily Plan Stack
   PLAN_DETAIL: "PlanDetail",
@@ -160,5 +161,4 @@ export const SCREENS = {
   ACCOUNT_DELETE: "AccountDelete",
   OFFLINE_QUEUE: "OfflineQueue",
 };
-
 

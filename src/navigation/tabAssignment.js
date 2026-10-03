@@ -32,6 +32,7 @@ export const ROTA_STACK = [
   // Ana sayfaya doner (eskiden Profil'e atiyordu). Alt ekranlari da burada.
   SCREENS.LEAGUE,
   SCREENS.FRIENDS,
+  SCREENS.PUBLIC_PROFILE,
   SCREENS.REFERRAL,
   SCREENS.ROUTE_COMPANION,
   SCREENS.CHALLENGE,
@@ -99,6 +100,7 @@ export const PROGRAM_STACK = [
   SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu (paylasimli)
   SCREENS.LEAGUE,           // Sosyal bildirim / derin baglanti (paylasimli)
   SCREENS.FRIENDS,
+  SCREENS.PUBLIC_PROFILE,
   SCREENS.REFERRAL,
   SCREENS.ROUTE_COMPANION,
   SCREENS.CHALLENGE,
@@ -140,6 +142,7 @@ export const ANALIZ_STACK = [
   SCREENS.FORECAST_ACCURACY, // Tahmin Dogrulugu (paylasimli)
   SCREENS.LEAGUE,           // Sosyal bildirim / derin baglanti (paylasimli)
   SCREENS.FRIENDS,
+  SCREENS.PUBLIC_PROFILE,
   SCREENS.REFERRAL,
   SCREENS.ROUTE_COMPANION,
   SCREENS.CHALLENGE,
@@ -189,6 +192,7 @@ export const PROFIL_STACK = [
   // akislari canli urun alani olarak PROFIL stack'inde kalir.
   SCREENS.LEAGUE,
   SCREENS.FRIENDS,
+  SCREENS.PUBLIC_PROFILE,
   SCREENS.REFERRAL,
   SCREENS.ROUTE_COMPANION,
   SCREENS.CHALLENGE,
