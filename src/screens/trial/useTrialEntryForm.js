@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRoute } from "@react-navigation/native";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useExam } from "../../contexts/ExamContext";
@@ -24,8 +25,10 @@ export function useTrialEntryForm({ C, navigation }) {
   const showAlert = useAlert();
   const { checkFeature, showPaywall, bumpUsage, accessLoading, accessError } = usePremium();
   const accessReady = !accessLoading && !accessError;
-  const [trialType, setTrialType] = useState(userExamType === "lgs" ? "LGS" : "TYT");
-  const [branchSubject, setBranchSubject] = useState(null);
+  // Rotanin deneme onerisinden gelindiyse tur ve brans hazir gelir.
+  const params = useRoute().params || {};
+  const [trialType, setTrialType] = useState(params.trialType || (userExamType === "lgs" ? "LGS" : "TYT"));
+  const [branchSubject, setBranchSubject] = useState(params.branchSubject || null);
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState({});
   const [mood, setMood] = useState(null);

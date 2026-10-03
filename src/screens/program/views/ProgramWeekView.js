@@ -17,6 +17,7 @@ import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
 import { SelectedDayPanel } from "../../dersler/components/SelectedDayPanel";
+import { ProgramWeekTrials } from "../components/ProgramWeekTrials";
 import { ProgramRulesSection } from "../../dersler/components/ProgramRulesSection";
 import { ScheduleDiscoverCard } from "../components/ScheduleDiscoverCard";
 import { HabitDiscoverCard } from "../components/HabitDiscoverCard";
@@ -105,6 +106,8 @@ export function ProgramWeekView() {
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
 
       {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
+
+      <ProgramWeekTrials style={{ marginTop: STEP.s4 }} />
 
       {/* Kurulum/kesif kartlari gunun gorevlerinden SONRA ve ayni anda en
           fazla biri (ders programi > aliskanlik > bildigin konular). */}

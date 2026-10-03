@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import { SCREENS } from "../../constants/screens";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useC } from "../../contexts/ThemeContext";
@@ -23,6 +24,7 @@ import { useRetention } from "../../hooks/useRetention";
 import { useFirstDayDismiss } from "../../hooks/useFirstDayDismiss";
 import { useGamification } from "../../hooks/useGamification";
 import { useDailyGoalReward } from "../../hooks/useDailyGoalReward";
+import { useWeekTrialPlan } from "../../hooks/useWeekTrialPlan";
 import { dailyMinutesGoalOf } from "../../domain/home/weeklyEffort";
 import { useCompletionMoments } from "../../hooks/useCompletionMoments";
 import { useHomeDashboard } from "../../hooks/useHomeDashboard";
@@ -99,7 +101,14 @@ export function useHomeController() {
     (stop) => transitionStop(stop, "upcoming", { source: "home_undo" }),
     [transitionStop],
   );
+  const trialPlan = useWeekTrialPlan();
+  const openTrial = useCallback(
+    (item) => navigation.navigate(SCREENS.TRIAL_ENTRY, { trialType: item.trialType, branchSubject: item.branchSubject || undefined }),
+    [navigation],
+  );
   const stops = useTodayStops({
+    trialItems: trialPlan.todayItems,
+    onOpenTrial: openTrial,
     generatedTasks: dashboard.generatedTasks,
     // Rota gununde gunun listesi YALNIZ ders programinin duraklari + ek
     // gorevler: oneri kalemi 'Programin tamami' ile sayilari ayristiriyordu

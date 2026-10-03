@@ -18,7 +18,10 @@ function durationOf(item) {
 export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onToggle, onStart, onOpenMenu, onEdit }) {
   const C = useC();
   const sid = useSubjectIdentity(item.subject);
-  const subjectLabel = getSubjectByKey(item.subject)?.label || item.subject || "";
+  const isTrial = item.source === "trial";
+  // Tam deneme bir derse ait degil: etiket "Deneme"; brans denemesinde ders.
+  const subjectLabel = isTrial && !item.subject ? "Deneme" : getSubjectByKey(item.subject)?.label || item.subject || "";
+  const editable = isTrial ? null : onEdit;
   const isDone = Boolean(item.completed);
   const tone = isDone ? C.text3 : (sid?.solid || C.text2);
 
@@ -28,10 +31,10 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
 
   // Bitmis duraga dokunmak kaydi acar (sure/soru duzeltilir); acik durak baslar.
   const handlePress = useCallback(() => {
-    if (item.completed && onEdit) onEdit(item);
+    if (item.completed && editable) editable(item);
     else if (onStart) onStart(item);
     else onToggle(item);
-  }, [onStart, onToggle, onEdit, item]);
+  }, [onStart, onToggle, editable, item]);
 
   const durationStr = durationOf(item);
   const rawTopic = item.topic || item.planTopicName || item.label;
@@ -97,7 +100,7 @@ export const HomeStopRow = React.memo(function HomeStopRow({ item, isNext, onTog
           isNext={isNext}
           canPostpone={canPostpone}
           onMenu={() => onOpenMenu?.(item)}
-          onEdit={onEdit ? () => onEdit(item) : null}
+          onEdit={editable ? () => editable(item) : null}
         />
       </Press>
     </View>

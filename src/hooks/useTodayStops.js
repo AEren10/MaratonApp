@@ -13,7 +13,7 @@ import { trackPlanAllCompletedOnce, trackPlanTaskCompleted } from "../lib/planAn
 // Ana Sayfa "BUGÜNÜN DURAKLARI".
 // Kullanıcı görevleri + rota/plan durakları + öneri tek listede; tamamlanan
 // durak kaybolmaz, yeşil tikle alta iner ve sayaçla (2/5) senkron kalır.
-export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComplete, onRouteReopen, onAllDone }) {
+export function useTodayStops({ generatedTasks = [], aiSuggestion, trialItems = [], onOpenTrial, onRouteComplete, onRouteReopen, onAllDone }) {
   const { user } = useAuth();
   const stopLog = useStopCompletion();
   const record = useStopRecordActions();
@@ -93,6 +93,10 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       });
     }
 
+    // Bugunun deneme onerisi (rota ritmi): durak gibi gorunur, dokununca
+    // deneme girisi acilir; o hafta o turden deneme girildiyse bitti.
+    trialItems.forEach((t) => out.push(t));
+
     // Tamamlananları senkronize et; yeni duraklar ekleyerek listeyi sonsuz uzatma
     out.forEach((item) => {
       if (item.completed) {
@@ -107,11 +111,13 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       if (a.completed === b.completed) return 0;
       return a.completed ? 1 : -1;
     });
-  }, [generatedTasks, userTasks, aiSuggestion, isPlanDone]);
+  }, [generatedTasks, userTasks, aiSuggestion, isPlanDone, trialItems]);
 
   useEffect(() => {
     if (items.length === 0 || rewardedRef.current) return;
-    if (items.every((t) => t.completed)) {
+    // Deneme onerisi gunun kapanmasini bekletmez (istege bagli).
+    const core = items.filter((t) => t.source !== "trial");
+    if (core.length > 0 && core.every((t) => t.completed)) {
       rewardedRef.current = true;
       onAllDoneRef.current?.(items);
     }
@@ -134,6 +140,8 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
   }, [isPlanDone, onRouteReopen, record, stopLog, togglePlan, user?.id]);
 
   const toggle = useCallback(async (item) => {
+    // Deneme tiklenmez, girilir: deneme girisi acilir.
+    if (item.source === "trial") { if (!item.completed) onOpenTrial?.(item); return; }
     // Bitmis rota/plan duragi onayla geri alinir (yanlislikla tik).
     if (item.completed && item.source !== "user") {
       record.confirmUndo(item, () => reopen(item));
@@ -170,7 +178,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, onRouteComple
       ));
       await trackPlanAllCompletedOnce(user?.id, completedItems, "home");
     }
-  }, [items, stopLog, onRouteComplete, toggleTask, togglePlan, user?.id, record, reopen]);
+  }, [items, stopLog, onRouteComplete, toggleTask, togglePlan, user?.id, record, reopen, onOpenTrial]);
 
   const doneCount = items.filter((t) => t.completed).length;
   const nextId = items.find((t) => !t.completed)?.id ?? null;
