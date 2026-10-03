@@ -4,71 +4,80 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
-import { CONTROL, GUTTER, NAV_ICON, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { GlowBackground, getCrimsonGlow } from "../../../components/design";
+import { TYPOGRAPHY, SPACING, RADIUS, CONTROL, NAV_ICON } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { GroupCodeCard } from "./GroupCodeCard";
 import { GroupCompetitionBanner } from "./GroupCompetitionBanner";
 import { GroupMemberRow } from "./GroupMemberRow";
 import { GroupStreakRow } from "./GroupStreakRow";
-import { GroupWeekHero } from "./GroupWeekHero";
 import { GroupReportButton } from "./GroupReportButton";
+import { GroupWeekHero } from "./GroupWeekHero";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useBlockedIds } from "../../../lib/blockedUsers";
 
-// Grup odasi. Sira: haftanin durumu -> seri -> siralama -> davet -> ayril.
-// Davet kodu eskiden en ustteydi; odaya her giriste ilk gorulen sey
-// "paylas" butonu oluyordu. Ayrilma yalniz listede basili tutunca vardi.
-export function GroupDetailPanel({ visible, group, board, boardError, standing, onClose, onRetry, onShare, onLeave }) {
+export function GroupDetailPanel({
+  visible,
+  group,
+  board,
+  boardError,
+  standing,
+  onClose,
+  onRetry,
+  onShare,
+}) {
   const C = useC();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const blocked = useBlockedIds(user?.id);
   // Engellenen uye listede gorunmez (Apple 1.2).
   const members = useMemo(() => (board?.list || []).filter((m) => !blocked.has(m.user_id)), [board, blocked]);
+  const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
   const renderMember = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
   const keyExtractor = useCallback((item) => String(item.user_id), []);
 
   if (!group) return null;
-  const memberCount = Number(group.member_count ?? group.memberCount ?? members.length) || members.length;
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView edges={["bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
-        <View style={[s.topBar, { paddingTop: Math.max(insets.top, STEP.s3) }]}>
-          <Press haptic="none" onPress={onClose} accessibilityLabel="Gruplara dön" style={s.iconBtn}>
+        <GlowBackground blobs={crimsonBlobs} />
+        <View style={[s.topBar, { paddingTop: Math.max(insets.top, SPACING.xl) + SPACING.sm }]}>
+          <Press haptic="none" onPress={onClose} accessibilityRole="button" accessibilityLabel="Grup listesini aç" style={s.backHit}>
             <Icon name="arrowL" size={NAV_ICON.back} color={C.text2} />
           </Press>
-          <View style={s.actions}>
-            <Press haptic="none" onPress={() => onShare?.(group)} accessibilityLabel="Davet et" style={s.iconBtn}>
-              <Icon name="share" size={NAV_ICON.action} color={C.text2} />
-            </Press>
-            <GroupReportButton group={group} />
+          <View style={s.titleCol}>
+            <Text style={[s.title, { color: C.text }]} numberOfLines={1}>{group.name}</Text>
+            <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]} numberOfLines={1}>
+              {Number(group.member_count ?? group.memberCount ?? members.length) || members.length} üye · haftalık yarış
+            </Text>
           </View>
+          <GroupReportButton group={group} />
         </View>
 
         <FlatList
           data={boardError ? [] : members}
           renderItem={renderMember}
           keyExtractor={keyExtractor}
-          contentContainerStyle={s.list}
+          contentContainerStyle={s.listContent}
+          ItemSeparatorComponent={MemberGap}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={(
             <View>
-              <Text style={[TYPOGRAPHY.display, { color: C.text }]} numberOfLines={2}>{group.name}</Text>
-              <Text style={[TYPOGRAPHY.caption, s.sub, { color: C.text3 }]}>{memberCount} üye · haftalık soru yarışı</Text>
               <GroupWeekHero group={group} members={members} />
-              <GroupCompetitionBanner standing={standing} />
+              <GroupCodeCard group={group} onShare={onShare} />
               <GroupStreakRow groupId={group.id} />
+              <GroupCompetitionBanner standing={standing} />
               <View style={s.memberHead}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>HAFTALIK SIRALAMA</Text>
-                <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>soru · süre</Text>
+                <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>HAFTALIK SIRALAMA</Text>
+                <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Soru & Süre</Text>
               </View>
               {boardError ? (
-                <View style={[s.error, { borderColor: C.line, backgroundColor: C.surface }]}>
-                  <Text style={[TYPOGRAPHY.caption, s.center, { color: C.text3 }]}>
+                <View style={[s.boardError, { borderColor: C.border, backgroundColor: C.surface }]}>
+                  <Text style={[TYPOGRAPHY.caption, s.errorText, { color: C.text3 }]}>
                     Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.
                   </Text>
-                  <Press haptic="none" onPress={onRetry} style={[s.retry, { borderColor: C.border }]}>
+                  <Press haptic="none" onPress={onRetry} style={[s.retryBtn, { borderColor: C.border }]}>
                     <Text style={[TYPOGRAPHY.captionMedium, { color: C.text }]}>Tekrar dene</Text>
                   </Press>
                 </View>
@@ -76,34 +85,58 @@ export function GroupDetailPanel({ visible, group, board, boardError, standing, 
             </View>
           )}
           ListEmptyComponent={!boardError ? (
-            <Text style={[TYPOGRAPHY.caption, s.empty, { color: C.text3 }]}>Bu hafta henüz kimse soru çözmedi. İlk soru seninki olsun.</Text>
+            <Text style={[TYPOGRAPHY.caption, s.emptySub, { color: C.text3 }]}>
+              Bu hafta henüz kimse soru çözmedi.
+            </Text>
           ) : null}
-          ListFooterComponent={(
-            <View style={s.footer}>
-              <GroupCodeCard group={group} onShare={onShare} />
-              <Press haptic="none" onPress={onLeave} accessibilityLabel="Gruptan ayrıl" style={s.leave}>
-                <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Gruptan ayrıl</Text>
-              </Press>
-            </View>
-          )}
         />
       </SafeAreaView>
     </Modal>
   );
 }
 
+function MemberGap() {
+  return <View style={s.gap} />;
+}
+
 const s = StyleSheet.create({
   safe: { flex: 1 },
-  topBar: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: GUTTER - 10, paddingBottom: STEP.s1 },
-  actions: { flexDirection: "row", alignItems: "center" },
-  iconBtn: { minWidth: CONTROL.tapMin, minHeight: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
-  list: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 },
-  sub: { marginTop: 4, marginBottom: STEP.s3 },
-  memberHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: STEP.s3, marginBottom: STEP.s1 },
-  error: { alignItems: "center", gap: STEP.s1, padding: STEP.s3, borderRadius: SHAPE.card, borderWidth: 1 },
-  center: { textAlign: "center" },
-  retry: { minHeight: CONTROL.tapMin, justifyContent: "center", paddingHorizontal: STEP.s3, borderRadius: SHAPE.button, borderWidth: 1 },
-  empty: { textAlign: "center", paddingVertical: STEP.s3 },
-  footer: { marginTop: STEP.s4, gap: STEP.s2 },
-  leave: { minHeight: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
+  topBar: {
+    minHeight: 82,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.md,
+  },
+  backHit: {
+    width: CONTROL.tapMin,
+    height: CONTROL.tapMin,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: SPACING.sm,
+  },
+  titleCol: { flex: 1 },
+  title: { ...TYPOGRAPHY.heading },
+  listContent: {
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.huge,
+  },
+  memberHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+  gap: { height: 0 }, // satirlar kutusuz, ince alt cizgiyle ayriliyor
+  boardError: {
+    alignItems: "center",
+    gap: SPACING.sm,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+  },
+  errorText: { textAlign: "center" },
+  retryBtn: { minHeight: 44, justifyContent: "center", paddingHorizontal: SPACING.lg, borderRadius: RADIUS.md, borderWidth: 1 },
+  emptySub: { textAlign: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg },
 });
