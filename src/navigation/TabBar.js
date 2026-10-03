@@ -20,8 +20,10 @@ const TABS = [
 export function TabBar({ state, navigation }) {
   const insets = useSafeAreaInsets();
   const C = useC();
+  const isDark = C.scheme !== "light";
   const currentKey = state.routes[state.index].name;
   const [sheetOpen, setSheetOpen] = useState(false);
+  const tabBg = isDark ? C.surface : C.elev;
 
   return (
     <>
@@ -33,14 +35,16 @@ export function TabBar({ state, navigation }) {
       />
       {/* Icerik tabbar'a sert cizgiyle degil yumusak kararmayla girer: 20 -> 52px. */}
       <LinearGradient
-        colors={["transparent", C.surface + "59", C.surface + "D9", C.surface]}
+        colors={["transparent", C.alpha(tabBg, 35), C.alpha(tabBg, 85), tabBg]}
         locations={[0, 0.45, 0.85, 1]}
         style={{ position: "absolute", top: -52, left: 0, right: 0, height: 52 }}
         pointerEvents="none"
       />
       <View style={{
         flexDirection: "row",
-        backgroundColor: C.surface,
+        backgroundColor: tabBg,
+        borderTopWidth: 1,
+        borderTopColor: C.line,
         paddingTop: 8,
         paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
         paddingHorizontal: 8,

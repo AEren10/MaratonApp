@@ -142,10 +142,6 @@ export default function AnalysisScreen() {
 }
 
 const s = StyleSheet.create({
-  safe: {
-    flex: 1,
-  },
-  scroll: {
-    paddingBottom: 140,
-  },
+  safe: { flex: 1 },
+  scroll: { paddingBottom: 140 },
 });

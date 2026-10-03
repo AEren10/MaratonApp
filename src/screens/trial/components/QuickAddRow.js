@@ -2,18 +2,23 @@ import { Text, View, StyleSheet } from "react-native";
 
 import { Icon } from "../../../components/design";
 import { alpha } from "../../../themes/colorMix";
-import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
+import { TYPOGRAPHY, STEP, SHAPE, CONTROL, SHADOW } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 
 export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, icon = "plus", iconColor }) {
   const icColor = iconColor || C.text2;
+  const isDark = C.scheme !== "light";
   return (
     <Press haptic="none"
       onPress={() => { H.tap(); onPress(); }}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
-      style={[styles.row, { backgroundColor: C.surface, borderColor: C.elev }]}
+      style={[
+        styles.row,
+        { backgroundColor: C.surface, borderColor: C.line },
+        !isDark && SHADOW.cardLight,
+      ]}
     >
       {/* Renkli ikon kutusu: satirlar bir bakista ayrisir (kullanici, 3 Ekim). */}
       <View style={[styles.iconBox, { backgroundColor: iconColor ? alpha(iconColor, 18) : C.elev }]}>

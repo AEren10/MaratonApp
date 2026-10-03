@@ -4,7 +4,7 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 
 import { useC } from "../../contexts/ThemeContext";
 import * as H from "../../lib/haptics";
-import { ANIMATION, CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { ANIMATION, CONTROL, SHAPE, STEP, TYPOGRAPHY, SHADOW } from "../../themes/tokens";
 import { Press } from "../../components/design/Press";
 
 // Segment kontrolu (tasarim: Programım "Haftalık / Aylık"): surface kutu,
@@ -38,14 +38,31 @@ function SegmentTabs({ options, value, onChange, style }) {
 
   const pill = useAnimatedStyle(() => ({ opacity: ready.get(), transform: [{ translateX: x.get() }] }));
 
+  const isDark = C.scheme !== "light";
+
   return (
     <View
-      style={[s.box, { backgroundColor: C.surface, borderColor: C.elev }, style]}
+      style={[
+        s.box,
+        {
+          backgroundColor: isDark ? C.surface : C.void,
+          borderColor: isDark ? C.elev : C.line,
+        },
+        style,
+      ]}
       accessibilityRole="tablist"
       onLayout={(e) => setWidth(e.nativeEvent.layout.width - 2)}
     >
       {segW ? (
-        <Animated.View pointerEvents="none" style={[s.pill, { width: segW, backgroundColor: C.elev }, pill]} />
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            s.pill,
+            { width: segW, backgroundColor: C.elev },
+            !isDark && SHADOW.cardLight,
+            pill,
+          ]}
+        />
       ) : null}
       {options.map((o) => {
         const on = o.key === value;

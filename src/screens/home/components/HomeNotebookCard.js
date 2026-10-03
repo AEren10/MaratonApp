@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { alpha } from "../../../themes/colorMix";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY, SHADOW } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // "Defter" karti.
@@ -22,6 +22,8 @@ export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
   const due = dueCount > 0;
   const action = due ? onReview || onPress : onPress;
 
+  const isDark = C.scheme !== "light";
+
   return (
     <Press
       onPress={() => action?.()}
@@ -30,8 +32,9 @@ export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
         s.card,
         {
           backgroundColor: C.surface,
-          borderColor: due ? alpha(C.accent, 38) : C.border,
+          borderColor: due ? alpha(C.accent, 38) : C.line,
         },
+        !isDark && SHADOW.cardLight,
       ]}
     >
       <Icon name="notebook" size={20} color={due ? C.accent : alpha(C.accent, 55)} />

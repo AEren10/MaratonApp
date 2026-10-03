@@ -22,10 +22,10 @@ export const SEEDS = {
   light: {
     // Acik zeminde parlak kizil "alarm" gibi bagiriyordu: koyu sarap tonu.
     accent: "#C42633",
-    bg: "#F5F2EE",
-    canvas: "#E4DFDA",
+    bg: "#EDE7DF",      // Sicak editorial kagit zemini (Brief 22 / Kullanici karari)
+    canvas: "#E4DDD5",
     text: "#16120F",
-    up: "#10632E", // kum kart ustunde AA (4.5+)
+    up: "#10632E",      // AA: bg 6.01 / elev 7.38
   },
 };
 
@@ -45,31 +45,31 @@ const FIXED = {
   },
   light: {
     // Kahverengimsi tonlar hissi camurlastiriyordu: notr sicak gri.
-    // AA (bg / surface / elev): text2 8.5 / 9.0 / 9.9 · text3 5.7 / 6.1 / 6.7
+    // AA (bg / surface / elev): text2 8.07 / 9.91 · text3 5.44 / 6.68
     text2: "#47423F",
     text3: "#615B57",
     text4: "#9C9590",
     text5: "#C9C1BA",
     accentInk: "#FFFFFF",
-    accentBright: "#A81C27",
-    down: "#6B7F8D",
-    warn: "#92400E",
-    danger: "#C4262F",
+    accentBright: "#A81C27", // AA: bg 5.98 / elev 7.34
+    down: "#566B79",         // AA: bg 4.53 / elev 5.56 (kotu haber bagirmaz)
+    warn: "#92400E",         // AA: bg 5.77 / elev 7.09
+    danger: "#C4262F",       // AA: bg 4.66 / elev 5.73
   },
 };
 
-// Açık temada yüzey basamakları — sıcak açık gri kâğıt merdiveni (Brief 22).
-// ACIK ZEMIN + SICAK KUM NESNELER (kullanici karari, 2 Ekim). Beyaz ustu
-// beyaz kart soluk duruyordu; zemin acik kaldi, nesneler (kart, segment yolu,
-// sekme cubugu, panel) kendine guvenen bir kum tonuna gecti. "Yukseltilmis"
-// (secili segment hapi, cip) beyaz: kumun ustunde parlar.
+// Acik temada yuzey basamaklari: sicak kagit zemini (#EDE7DF) uzerinde beyaz
+// kartlar (#FFFFFF), ince sicak kenarlik (#DCD2C5) ve cok hafif sicak kahve golgesi.
+// Camurlu kum yuzeyi (#E6D6C1) kalkti; kartlar temiz beyaz, girintiler (void/track)
+// zeminden bir kademe koyu kuyu.
 const LIGHT_SURFACES = {
-  surface: "#E6D6C1",
+  surface: "#FFFFFF",
   elev: "#FFFFFF",
-  border: "#D3C0A8",
-  line: "#E2DACF",
-  track: "#E3D8CA",
-  void: "#ECE4DA",
+  border: "#D0C5B5",
+  line: "#DCD2C5",
+  track: "#DDD5CA",
+  void: "#E4DDD5",
+  sand: "#EADDCB",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise

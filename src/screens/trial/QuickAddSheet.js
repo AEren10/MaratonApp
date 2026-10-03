@@ -60,10 +60,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
       if (finished) scheduleOnRN(finish, screen, params);
     }));
   };
-  const close = () => {
-    "worklet";
-    closeThen(null, undefined);
-  };
+  const close = () => { "worklet"; closeThen(null, undefined); };
 
   const pan = Gesture.Pan()
     .onUpdate((e) => {
@@ -85,11 +82,11 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Sayfa dışına dokun, kapat" />
         </Animated.View>
         <Animated.View
-          style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.border }, sheetAnimStyle]}
+          style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.line }, sheetAnimStyle]}
         >
           <GestureDetector gesture={pan}>
             <View style={styles.handleZone}>
-              <View style={[styles.handle, { backgroundColor: C.border }]} />
+              <View style={[styles.handle, { backgroundColor: C.line }]} />
             </View>
           </GestureDetector>
 

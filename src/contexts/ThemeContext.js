@@ -4,7 +4,7 @@ import { useColorScheme } from "react-native";
 import { buildPalette, ACCENT_PRESETS } from "../themes/palette";
 import { alpha } from "../themes/colorMix";
 import { TYPE, FONTS, TRACKING } from "../themes/typography";
-import { SPACING, RADIUS, ELEVATION, ANIMATION } from "../themes/tokens";
+import { SPACING, RADIUS, ELEVATION, ANIMATION, SHADOW } from "../themes/tokens";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
 
@@ -89,6 +89,7 @@ export function ThemeProvider({ children }) {
       spacing: SPACING,
       radius: RADIUS,
       elevation: scheme === "dark" ? ELEVATION.dark : ELEVATION.light,
+      cardShadow: scheme === "light" ? SHADOW.cardLight : null,
       animation: ANIMATION,
     };
   }, [pref, scheme, hydrated, accentKey, setPref, setAccent]);
@@ -105,6 +106,7 @@ export const useTheme = () => {
 export const useC = () => useTheme().palette;
 export const useType = () => useTheme().type;
 export const useElevation = () => useTheme().elevation;
+export const useCardShadow = () => useTheme().cardShadow;
 export const useSubjectColor = (key) => {
   const { subjects, palette } = useTheme();
   return subjects[key] || palette.accent;

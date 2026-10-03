@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { GUTTER, SHAPE } from "../../../themes/tokens";
+import { GUTTER, SHAPE, SHADOW } from "../../../themes/tokens";
 import { PendingSection } from "../../../components/common/PendingSection";
 import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
@@ -47,6 +47,8 @@ export function PublisherComparisonCard({ C, comparison, onPress }) {
     </>
   );
 
+  const isDark = C.scheme !== "light";
+
   return (
     <View style={s.wrap}>
       {onPress ? (
@@ -55,12 +57,22 @@ export function PublisherComparisonCard({ C, comparison, onPress }) {
           accessibilityRole="button"
           accessibilityLabel="Yayın Karşılaştırması Ayrıntıları"
           onPress={onPress}
-          style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}
+          style={[
+            s.card,
+            { backgroundColor: C.surface, borderColor: C.line },
+            !isDark && SHADOW.cardLight,
+          ]}
         >
           {cardContent}
         </Press>
       ) : (
-        <View style={[s.card, { backgroundColor: C.surface, borderColor: C.elev }]}>
+        <View
+          style={[
+            s.card,
+            { backgroundColor: C.surface, borderColor: C.line },
+            !isDark && SHADOW.cardLight,
+          ]}
+        >
           {cardContent}
         </View>
       )}

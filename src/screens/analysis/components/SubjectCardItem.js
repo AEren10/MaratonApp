@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "../../../components/design";
+import { SHADOW } from "../../../themes/tokens";
 import { SubjectSparklineSvg } from "./SubjectSparklineSvg";
 
 function formatNum(n) {
@@ -21,6 +22,7 @@ export function SubjectCardItem({ C, card, onPress }) {
   const hasTrend = card.delta != null && Array.isArray(card.series) && card.series.length >= 2;
   const isUp = (card.delta ?? 0) >= 0;
   const dc = isUp ? C.up : C.down;
+  const isDark = C.scheme !== "light";
 
   return (
     <Pressable
@@ -29,7 +31,8 @@ export function SubjectCardItem({ C, card, onPress }) {
       onPress={onPress}
       style={({ pressed }) => [
         s.card,
-        { backgroundColor: C.surface, borderColor: pressed ? C.border : C.elev },
+        { backgroundColor: C.surface, borderColor: pressed ? C.border : C.line },
+        !isDark && SHADOW.cardLight,
       ]}
     >
       <View style={s.cardTop}>

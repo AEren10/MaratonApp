@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "../../../components/design";
-import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
+import { TYPOGRAPHY, SPACING, RADIUS, SHADOW } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
 import * as H from "../../../lib/haptics";
@@ -12,22 +12,26 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
   const nav = useNavigation();
   const tierColor = tier?.color || C.accent;
   const xpToNext = nextTier ? nextTier.minXP - weeklyXP : 0;
+  const isDark = C.scheme !== "light";
 
   return (
     <Press haptic="none"
       accessibilityRole="button"
       accessibilityLabel="Haftalık Lig"
       onPress={() => { H.tap(); nav.navigate(SCREENS.LEAGUE, { tab: "global" }); }}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: C.surface,
-        borderWidth: 1,
-        borderColor: C.border,
-        borderRadius: RADIUS.xxl,
-        padding: SPACING.lg,
-        marginBottom: SPACING.lg
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: C.surface,
+          borderWidth: 1,
+          borderColor: C.line,
+          borderRadius: RADIUS.xxl,
+          padding: SPACING.lg,
+          marginBottom: SPACING.lg
+        },
+        !isDark && SHADOW.cardLight,
+      ]}
     >
       {/* Trophy icon */}
       <View style={{

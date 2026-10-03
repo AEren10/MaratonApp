@@ -17,13 +17,26 @@ export { alpha };
 // uzerinden palette.subjects'i okuyor. Iki harita zamanla ayrisabilecegi
 // icin olu kopya silindi (yedek rengi de olu mor #9B7BFF idi).
 
-// Surface elevation (gölge) — light için belirgin, dark için minimal
+// Derinlik belirteçleri.
+// Koyu temada gölge YOKTUR (derinlik yüzey tonu + 1px kenarlıkla kurulur).
+// Açık temada yalnız kart/panel seviyesinde çok hafif sıcak kahve gölgesi kullanılır.
+export const SHADOW = {
+  cardLight: {
+    shadowColor: "#3A3026",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+};
+
+// Surface elevation (gölge) — light için sıcak kahve tonlu, dark için minimal
 export const ELEVATION = {
   light: {
-    sm: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6,  elevation: 2 },
-    md: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.07, shadowRadius: 14, elevation: 4 },
-    lg: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.09, shadowRadius: 24, elevation: 8 },
-    xl: { shadowColor: "#15161A", shadowOffset: { width: 0, height: 14}, shadowOpacity: 0.11, shadowRadius: 40, elevation: 12 },
+    sm: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4,  elevation: 1 },
+    md: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8,  elevation: 2 },
+    lg: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 4 },
+    xl: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 12}, shadowOpacity: 0.10, shadowRadius: 28, elevation: 8 },
   },
   dark: {
     sm: { shadowColor: "#000",    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.20, shadowRadius: 6,  elevation: 2 },
