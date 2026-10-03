@@ -36,7 +36,13 @@ export const HomeDiscoverTip = React.memo(function HomeDiscoverTip({ eligible })
   const open = () => { close(tip); navigation.navigate(copy.screen); };
 
   return (
-    <View style={[s.card, { backgroundColor: C.surface, borderColor: C.line }]}>
+    <View
+      style={[
+        s.card,
+        { backgroundColor: C.surface, borderColor: C.edgeStrong },
+        C.scheme === "light" && SHADOW.cardLight,
+      ]}
+    >
       <View style={s.body}>
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{copy.title}</Text>
         <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{copy.line}</Text>
