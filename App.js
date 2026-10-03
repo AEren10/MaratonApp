@@ -31,6 +31,7 @@ import { useTheme } from "./src/contexts/ThemeContext";
 // Yan etki: bildirim isleyicisi ve Android kanali modul yuklenince kurulur.
 import "./src/lib/notifications";
 import OfflineBanner from "./src/components/common/OfflineBanner";
+import { WidgetSync } from "./src/components/common/WidgetSync";
 import { loadHapticPref } from "./src/lib/haptics";
 
 initErrorReporting();
@@ -91,6 +92,7 @@ function ThemedRoot() {
     <AlertProvider>
       <View style={{ flex: 1, backgroundColor: palette.bg }}>
         <OfflineBanner />
+        <WidgetSync />
         <StatusBar style={scheme === "light" ? "dark" : "light"} />
         <ScreenErrorBoundary>
           <AppNavigator />
