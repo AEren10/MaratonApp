@@ -13,6 +13,8 @@ import { Press } from "../../components/design/Press";
 import { SimulatorSegment } from "./components/SimulatorSegment";
 import { ThresholdViewSection } from "./components/ThresholdViewSection";
 import { PreferenceListSection } from "./components/PreferenceListSection";
+import { openHere } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 
 function emptyCopy({ targetNet, examLabel, multi }) {
   const exam = examLabel || "deneme";
@@ -69,7 +71,10 @@ export default function RankSimulatorScreen() {
           <EmptyState
             eyebrow="NET EŞİĞİ"
             {...emptyCopy({ targetNet, examLabel, multi: examType === "tyt_ayt" || examType === "dil" })}
-            onPrimary={() => navigation.navigate(targetNet == null ? SCREENS.GOALS : SCREENS.TRIAL_ENTRY)}
+            onPrimary={() => (targetNet == null
+              // Hedef Duzenle Analiz sekmesinde kayitli degil; sahibi olan sekmeye atlar.
+              ? openHere(navigation, TAB_KEYS.PROFIL, SCREENS.GOALS)
+              : navigation.navigate(SCREENS.TRIAL_ENTRY))}
             style={s.emptyState}
           />
         ) : activeTab === "threshold" ? (

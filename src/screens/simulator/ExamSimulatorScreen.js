@@ -52,7 +52,7 @@ export default function ExamSimulatorScreen() {
         <RehearsalDone
           full={t.full}
           elapsed={t.elapsed}
-          onEnterResults={() => { H.select(); navigation.replace(SCREENS.TRIAL_ENTRY); }}
+          onEnterResults={() => { H.select(); navigation.navigate(SCREENS.TRIAL_ENTRY); }}
           onClose={navigation.goBack}
         />
       </SafeAreaView>

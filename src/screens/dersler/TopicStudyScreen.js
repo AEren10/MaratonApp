@@ -21,6 +21,8 @@ import { TopicAccumulationChart } from "./components/TopicAccumulationChart";
 import { StatsStrip } from "../../components/design/StatsStrip";
 import { TopicStudySkeleton } from "./components/TopicStudySkeleton";
 import { DepthScrollView } from "../../components/design/DepthScroll";
+import { openHere } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 
 export default function TopicStudyScreen() {
   const navigation = useNavigation();
@@ -77,7 +79,8 @@ export default function TopicStudyScreen() {
     {
       label: "Rotadaki yeri",
       note: routePlace,
-      go: () => navigation.navigate(SCREENS.ROADMAP),
+      // Yol Haritasi yalniz Rota sekmesinde; baska sekmeden duz navigate sessizce hicbir sey yapmiyordu.
+      go: () => openHere(navigation, TAB_KEYS.ROTA, SCREENS.ROADMAP),
     },
   ];
 

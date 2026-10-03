@@ -458,9 +458,19 @@ export function useStudyTimerController(C) {
     }
   }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
+  // Gecmis Profil sekmesinde; oraya gitmek kok yigindaki sayaci kapatir.
+  // Eskiden calisan sayac uyarisiz kapaniyordu.
   const openHistory = useCallback(() => {
-    openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.STUDY_HISTORY);
-  }, [navigation]);
+    const go = () => openInTab(navigation, TAB_KEYS.PROFIL, SCREENS.STUDY_HISTORY);
+    if (elapsed >= 30 || totalFocusSeconds >= 30) {
+      showAlert("Sayaç kapanacak", "Geçmişi açarsan bu çalışma kaydedilmeden sayaç kapanır.", [
+        { text: "Vazgeç", style: "cancel" },
+        { text: "Yine de aç", style: "destructive", onPress: go },
+      ]);
+    } else {
+      go();
+    }
+  }, [elapsed, navigation, showAlert, totalFocusSeconds]);
 
   return {
     // Yarım kalan oturum kurtarma — ekran bunu bir soru olarak gösterir.

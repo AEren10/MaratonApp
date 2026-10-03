@@ -28,6 +28,10 @@ async function freshInitialUrl(url) {
 export const linkingConfig = {
   prefixes: [prefix, "maraton://", "https://maratonapp.com"],
   config: {
+    // Kok seviyedeki derin bag (maraton://deneme/yeni -> TrialEntry) soguk
+    // acilista ALTINDA hicbir sey olmadan aciliyordu: "Vazgec"/geri gidecek
+    // yer yoktu. MainTabs altta kurulur, geri ana sayfaya doner.
+    initialRouteName: "MainTabs",
     screens: LINKING_SCREENS,
   },
   // Initial deep link from notification or cold start
