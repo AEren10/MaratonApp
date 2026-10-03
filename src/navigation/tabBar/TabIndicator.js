@@ -1,17 +1,23 @@
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming,
+} from "react-native-reanimated";
 import { ANIMATION } from "../../themes/tokens";
 
-const SLIDE = { duration: 280, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
 const INSET = 4;
+// Kayis yayli (sivi his): hap hedefe akar, hafif tasip oturur. Yol uzunsa
+// kayarken yatayda biraz uzar, varinca toplanir.
+const SLIDE = ANIMATION.spring.default;
+const STRETCH_OUT = { duration: 120, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
 
-// Aktif sekmenin arkasindaki hap. Sekmeler arasinda KAYAR (iOS 26 yuzen
-// tabbar dili): nerede oldugun ve nereye gittigin tek harekette okunur.
-// Ilk yerlesimde animasyonsuz oturur; genislik bilinene kadar gorunmez.
+// Aktif sekmenin arkasindaki hap. Sekme degisimini navigasyon bitmeden,
+// BASILDIGI AN gosterir (TabBar iyimser index verir): agir ekran acilirken
+// hap beklemez.
 export function TabIndicator({ index, slotWidth, C }) {
   const reduced = useReducedMotion();
   const x = useSharedValue(index * slotWidth);
+  const stretch = useSharedValue(1);
   const placed = useSharedValue(0);
 
   useEffect(() => {
@@ -20,14 +26,16 @@ export function TabIndicator({ index, slotWidth, C }) {
     if (!placed.get() || reduced) {
       x.set(to);
       placed.set(1);
-    } else {
-      x.set(withTiming(to, SLIDE));
+      return;
     }
-  }, [index, slotWidth, reduced, x, placed]);
+    const hops = Math.abs(to - x.get()) / slotWidth;
+    x.set(withSpring(to, SLIDE));
+    if (hops > 0.5) stretch.set(withSequence(withTiming(1 + Math.min(0.28, hops * 0.12), STRETCH_OUT), withSpring(1, SLIDE)));
+  }, [index, slotWidth, reduced, x, stretch, placed]);
 
   const style = useAnimatedStyle(() => ({
     opacity: placed.get(),
-    transform: [{ translateX: x.get() + INSET }],
+    transform: [{ translateX: x.get() + INSET }, { scaleX: stretch.get() }],
   }));
 
   return (

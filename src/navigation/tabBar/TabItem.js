@@ -5,16 +5,18 @@ import { Icon } from "../../components/design";
 import { ANIMATION, TYPOGRAPHY } from "../../themes/tokens";
 import * as H from "../../lib/haptics";
 
-// Sekme dugmesi. Gunde onlarca kez basilir: geri bildirim kisa ve sakin
-// (yay yok, sallanma yok). Secim artik arkadaki kayan hapta (TabIndicator);
-// eski alt nokta kalkti.
+// Sekme dugmesi. Parmak degince (birakmadan) sekmenin arkasinda hafif bir
+// zemin belirir ve ikon biraz kuculur: "basiyorum" hissi. Secim arkadaki
+// kayan hapta (TabIndicator).
 const PRESS = { duration: 120, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
+const RELEASE = { duration: 220, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
 
-export function TabItem({ tab, active, onPress, onLongPress, C }) {
+export function TabItem({ tab, active, onPress, onPressIn, onLongPress, C }) {
   const reduced = useReducedMotion();
-  const scale = useSharedValue(1);
-  const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
-  const press = (v) => { if (!reduced) scale.set(withTiming(v, PRESS)); };
+  const p = useSharedValue(0);
+  const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 - p.get() * 0.1 }] }));
+  const glowStyle = useAnimatedStyle(() => ({ opacity: p.get() }));
+  const press = (v) => { if (!reduced) p.set(withTiming(v, v ? PRESS : RELEASE)); };
   const tone = active ? C.text : C.text3;
 
   return (
@@ -23,13 +25,14 @@ export function TabItem({ tab, active, onPress, onLongPress, C }) {
       accessibilityLabel={tab.label}
       accessibilityHint={tab.hint}
       accessibilityState={{ selected: active }}
-      onPressIn={() => press(0.9)}
-      onPressOut={() => press(1)}
+      onPressIn={() => { press(1); onPressIn?.(); }}
+      onPressOut={() => press(0)}
       onPress={() => { H.select(); onPress(); }}
       onLongPress={onLongPress}
       pressRetentionOffset={12}
       style={s.item}
     >
+      {!active ? <Animated.View pointerEvents="none" style={[s.glow, { backgroundColor: C.void }, glowStyle]} /> : null}
       <Animated.View style={iconStyle}>
         <Icon name={tab.icon} size={21} color={tone} sw={active ? 2.1 : 1.7} />
       </Animated.View>
@@ -42,5 +45,6 @@ export function TabItem({ tab, active, onPress, onLongPress, C }) {
 
 const s = StyleSheet.create({
   item: { flex: 1, alignItems: "center", justifyContent: "center", gap: 3, minHeight: 56 },
+  glow: { position: "absolute", top: 4, bottom: 4, left: 4, right: 4, borderRadius: 22 },
   label: { fontSize: 11 },
 });

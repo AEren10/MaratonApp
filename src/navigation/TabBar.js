@@ -29,7 +29,12 @@ export function TabBar({ state, navigation }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [width, setWidth] = useState(0);
   const keyboard = useAndroidKeyboard();
-  const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === currentKey));
+  // Iyimser secim: hap basildigi an hedefe kayar; yeni ekranin acilmasini
+  // (agir ekranda yuzlerce ms) beklemez. Gercek sekme gelince sifirlanir.
+  const [pendingKey, setPendingKey] = useState(null);
+  useEffect(() => { setPendingKey(null); }, [currentKey]);
+  const shownKey = pendingKey || currentKey;
+  const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === shownKey));
 
   // Klavye acikken Android tabbar'i klavyenin ustune tasiyordu (form
   // alaninin ustunu kapatarak). iOS'ta klavye zaten ustunu ortuyor.
@@ -44,6 +49,7 @@ export function TabBar({ state, navigation }) {
       ? navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true })
       : { defaultPrevented: false };
     if (event.defaultPrevented) return;
+    if (!active) setPendingKey(tab.key);
     if (active) {
       navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
       return;
@@ -75,7 +81,7 @@ export function TabBar({ state, navigation }) {
           {TABS.map((tab) => (tab.center ? (
             <CenterFab key={tab.key} open={sheetOpen} onPress={() => setSheetOpen((v) => !v)} C={C} />
           ) : (
-            <TabItem key={tab.key} tab={tab} active={currentKey === tab.key} onPress={() => press(tab)} C={C} />
+            <TabItem key={tab.key} tab={tab} active={shownKey === tab.key} onPress={() => press(tab)} C={C} />
           )))}
         </View>
       </View>
