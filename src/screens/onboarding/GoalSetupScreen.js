@@ -10,8 +10,8 @@ import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary
 import { TargetNetField } from "./components/TargetNetField";
 import { MultiNetSection } from "./components/MultiNetSection";
 import { DailyPaceField } from "./components/DailyPaceField";
-import {
 import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
+import {
   useGoalSetupForm, TYT_NET_MIN, TYT_NET_MAX, LGS_NET_MIN, LGS_NET_MAX,
   DAILY_Q_MIN, DAILY_Q_MAX, DAILY_Q_STEP,
 } from "./useGoalSetupForm";
