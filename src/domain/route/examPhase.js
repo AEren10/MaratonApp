@@ -11,7 +11,10 @@
 // digeri kalan her yeri doldurur (bos gun uretilmez).
 //
 // YKS haziranda: ~150 gun kala ocak ortasi, ~60 gun kala nisan sonu.
+// 2026-10 arastirmasi: sinava 8+ ay kala neredeyse tamamen TYT (koclar
+// "TYT'nin %60-70'i bitince AYT'ye gec" diyor).
 export const EXAM_PHASES = Object.freeze([
+  { minDays: 240, aytShare: 0.2 },    // erken: TYT temeli ~%80
   { minDays: 151, aytShare: 0.33 },   // temel: TYT ~%67
   { minDays: 61, aytShare: 0.70 },    // ocak sonrasi: AYT agirlik
   { minDays: 0, aytShare: 0.90 },     // son iki ay: neredeyse tamamen AYT
@@ -116,4 +119,17 @@ export function orderByPrerequisites(items = []) {
     if (!moved) break;
   }
   return out;
+}
+
+/**
+ * TYT hazirligi: TYT'nin cogu bitmeden AYT payi sinirli (ocaga kadar).
+ * %30'un altinda en fazla %10, %60'in altinda en fazla %25. Son 150 gunde
+ * donem payi gecerli (artik bekleme lusku yok).
+ */
+export function aytShareForReadiness(share, { tytProgress = 1, daysLeft = null } = {}) {
+  if (share == null || daysLeft == null || daysLeft <= 150) return share;
+  const p = Number(tytProgress) || 0;
+  if (p < 0.3) return Math.min(share, 0.1);
+  if (p < 0.6) return Math.min(share, 0.25);
+  return share;
 }

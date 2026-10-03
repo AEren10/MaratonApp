@@ -14,7 +14,8 @@ import { addWeeklyReviews } from "../domain/route/weeklyReview.js";
 import { topicShares } from "../domain/route/topicShares.js";
 import { effectiveAccuracy } from "../domain/route/effectiveAccuracy.js";
 import { DROP_BOOST } from "../domain/route/trialWeakness.js";
-import { aytTargetShare, interleaveByTier, orderByPrerequisites, schoolOrderFactor } from "../domain/route/examPhase.js";
+import { aytTargetShare, interleaveByTier, orderByPrerequisites, schoolOrderFactor, subjectTier, aytShareForReadiness } from "../domain/route/examPhase.js";
+import { orderWithinCurriculum, niceStop, topicConfidence } from "../domain/route/routeSanity.js";
 
 // KİŞİYE ÖZEL ROTA MOTORU
 //
@@ -92,6 +93,8 @@ export function buildRoute({
   let masteredCount = 0;
   let totalCount = 0;
   let reviewCount = 0;
+  // TYT hazirligi: AYT payi TYT'nin ne kadar bittigine de bagli (aytShareForReadiness).
+  const tyt = { total: 0, mastered: 0 };
 
   for (const subject of pool) {
     const prog = progressByKey[subject.key] || {};
@@ -112,6 +115,8 @@ export function buildRoute({
       const name = typeof t === "string" ? t : t.name;
       if (!name) continue;
       totalCount += 1;
+      const isTyt = subjectTier(subject.key) === "TYT";
+      if (isTyt) tyt.total += 1;
 
       const rawTp = prog[name] || {};
       const q = rawTp.total_questions || 0;
@@ -138,6 +143,10 @@ export function buildRoute({
         acc,
         accKnown: accuracyKnown,
         neglectedDays,
+        // Mufredattaki sirasi: ders ici sira (orderWithinCurriculum).
+        topicIndex: (subject.topics || []).indexOf(t),
+        // Dersin sinavdaki soru sayisi: haftalik ders payi buna orantili.
+        subjectWeight,
       };
 
       const topicShare = shares[name] ?? equalShare;
@@ -173,6 +182,7 @@ export function buildRoute({
 
       if (cost.done || declaredKnown) {
         masteredCount += 1;
+        if (isTyt) tyt.mastered += 1;
 
         // Ustalasilmis konuda zamani gelmis yanlislar: kisa yanlis tekrari.
         if ((wrongs?.due || 0) >= WRONG_REVIEW_MIN_DUE) {
@@ -288,7 +298,12 @@ export function buildRoute({
         // Durak aciklamasi "once Limit" diyebilsin diye eksik on kosullar.
         scoreComponents: { ...priority.components, missingPrerequisites: missingPrereqs },
         reasonCodes,
-        dataConfidence: q >= 20 ? "high" : q >= 5 ? "medium" : "low",
+        dataConfidence: topicConfidence({
+          q,
+          accKnown: accuracyKnown,
+          neglectedDays: tp.last_studied_at ? neglectedDays : null,
+          hasTrialSignal: subjectWeakness[subject.key] != null || drop > 0,
+        }),
       });
     }
   }
@@ -315,7 +330,11 @@ export function buildRoute({
 
   // SINAV DONEMI: TYT/AYT payi (eylulde TYT agirlik, ocaktan sonra AYT,
   // son iki ay neredeyse tamamen AYT). Tur ici puan sirasi korunur.
-  const phaseOrdered = interleaveByTier(orderByPrerequisites(items), aytTargetShare({ examType, daysLeft }));
+  // Ders ici mufredat sirasi (temelden ileriye) + TYT hazirligina gore AYT payi.
+  const aytShare = aytShareForReadiness(aytTargetShare({ examType, daysLeft }), {
+    tytProgress: tyt.total > 0 ? tyt.mastered / tyt.total : 1, daysLeft,
+  });
+  const phaseOrdered = interleaveByTier(orderWithinCurriculum(orderByPrerequisites(items)), aytShare);
   items.splice(0, items.length, ...phaseOrdered);
 
   // Bu hafta yalniz kalan gunler kadar: carsamba baslayana tam hafta yuklenmez.
@@ -327,9 +346,10 @@ export function buildRoute({
   // Bu haftanin plani bugun basliyor: gecmis gunlere durak dagitilmaz
   // (planStart; frozenWeek sabitlenince korunur).
   const planStart = dateKey(now);
+  // Duraklarin soru/dakikasi yuvarlak (10/15/20.. soru, 15/20/25.. dk).
   const scheduled = attachStopInsights(decorateScheduledRoute(stamped, { examType })).map((week, i) => (i === 0
-    ? { ...week, planStartDay: planStart, stops: week.stops.map((s) => ({ ...s, planStart })) }
-    : week));
+    ? { ...week, planStartDay: planStart, stops: week.stops.map((s) => ({ ...niceStop(s), planStart })) }
+    : { ...week, stops: (week.stops || []).map(niceStop) }));
   const revision = createRouteRevision({
     weeks: scheduled,
     examType,

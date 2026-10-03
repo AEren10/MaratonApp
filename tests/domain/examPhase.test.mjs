@@ -17,7 +17,8 @@ test("tur: ayt_/ydt_ onekli dersler AYT, digerleri TYT", () => {
 });
 
 test("donem payi: eylul TYT agirlik, ocak sonrasi AYT, son iki ay neredeyse tamamen AYT", () => {
-  assert.equal(aytTargetShare({ examType: "tyt_ayt", daysLeft: 250 }), 0.33);
+  assert.equal(aytTargetShare({ examType: "tyt_ayt", daysLeft: 250 }), 0.2);
+  assert.equal(aytTargetShare({ examType: "tyt_ayt", daysLeft: 200 }), 0.33);
   assert.equal(aytTargetShare({ examType: "tyt_ayt", daysLeft: 120 }), 0.7);
   assert.equal(aytTargetShare({ examType: "tyt_ayt", daysLeft: 30 }), 0.9);
 });

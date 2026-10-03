@@ -10,6 +10,38 @@ import { spreadSubjects } from "./subjectSpread.js";
 // yanlış defteri için pay ayrılır. Aksi halde plan "sadece yeni konu"ya
 // dönüşür ve öğrenci öğrendiğini unutur.
 const NEW_TOPIC_SHARE = 0.65;
+// DERS PAYI: bir dersin haftalik payi sinavdaki agirligiyla orantili
+// (koclarin programlarinda sure soru sayisini izler: TYT'de Matematik 40,
+// Felsefe 5 soru). Pay = agirlik orani x 1.5, en az %12, en fazla %35.
+// Baska ders kalmadiysa sinir gevser.
+const SUBJECT_SHARE = { min: 0.12, max: 0.35, stretch: 1.5 };
+// Cekirdek dersler her hafta en az bu kadar durakla (her gun calisilan dersler).
+const CORE_SUBJECTS = new Set(["turkce", "matematik", "lgs_turkce", "lgs_matematik"]);
+const CORE_MIN_STOPS = 2;
+
+function subjectShares(queue) {
+  const weights = new Map();
+  for (const it of queue) if (!it.isReview && it.subject) weights.set(it.subject, Number(it.subjectWeight) || 10);
+  const total = [...weights.values()].reduce((a, b) => a + b, 0) || 1;
+  const out = new Map();
+  for (const [k, w] of weights) out.set(k, Math.min(SUBJECT_SHARE.max, Math.max(SUBJECT_SHARE.min, (w / total) * SUBJECT_SHARE.stretch)));
+  return out;
+}
+
+// Cekirdek derslerin ilk duraklari sira basina (oncelik sirasini koruyarak).
+function pullCoreForward(queue) {
+  const picked = [];
+  for (const key of CORE_SUBJECTS) {
+    let n = 0;
+    for (let i = 0; i < queue.length && n < CORE_MIN_STOPS; i += 1) {
+      if (queue[i].subject === key && !queue[i].isReview) { picked.push(i); n += 1; }
+    }
+  }
+  picked.sort((a, b) => a - b);
+  const front = picked.map((i) => queue[i]);
+  for (let i = picked.length - 1; i >= 0; i -= 1) queue.splice(picked[i], 1);
+  queue.unshift(...front);
+}
 // Oncelikli konu haftaya sigmiyorsa bolunur -- ama kalan butce bu kadardan
 // azsa bolmek anlamsiz kucuk bir parca uretir; o zaman kucuk konularla doldurulur.
 const MIN_CHUNK_QUESTIONS = 10;
@@ -103,6 +135,13 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null, fir
     let questionsLeft = questionBudget;
     let minutesLeft = minuteBudget;
     const stops = [];
+    const subjectQ = new Map();
+    const shares = subjectShares(queue);
+    pullCoreForward(queue);
+    const capOf = (subject) => Math.max(Math.round(questionBudget * (shares.get(subject) || SUBJECT_SHARE.max)), 25);
+    const overCap = (item) => !item.isReview
+      && (subjectQ.get(item.subject) || 0) + (Number(item.cost.questions) || 0) > capOf(item.subject)
+      && queue.some((x) => x.subject !== item.subject && !x.isReview);
 
     // Öncelik sırasını koruyarak bütçeye SIĞAN ilk konuyu al.
     //
@@ -115,8 +154,10 @@ export function scheduleWeeks(items, capacity, weeksLeft, { daysLeft = null, fir
     while (idx < queue.length && questionsLeft > 0 && minutesLeft > 0) {
       const questionCost = Math.max(1, Number(queue[idx].cost.questions) || 1);
       const minuteCost = Math.max(1, Number(queue[idx].cost.minutes) || 1);
+      if (overCap(queue[idx])) { idx += 1; continue; }
       if (questionCost <= questionsLeft && minuteCost <= minutesLeft) {
         const [picked] = queue.splice(idx, 1);
+        subjectQ.set(picked.subject, (subjectQ.get(picked.subject) || 0) + questionCost);
         stops.push({ ...picked, position: stops.length });
         questionsLeft -= questionCost;
         minutesLeft -= minuteCost;
