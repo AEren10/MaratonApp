@@ -12,7 +12,7 @@ export function OnboardingFooter({ onStart, onLogin, C }) {
       </Button>
 
       <Text style={[TYPOGRAPHY.micro, s.reassurance, { color: C.text3 }]}>
-        2 dakika sürer. Hesap sonra, önce rotanı görürsün.
+        Hesabını aç, üç kısa soruyla rotan çizilsin.
       </Text>
 
       <Press

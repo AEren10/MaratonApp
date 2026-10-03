@@ -11,6 +11,7 @@ import { TargetNetField } from "./components/TargetNetField";
 import { MultiNetSection } from "./components/MultiNetSection";
 import { DailyPaceField } from "./components/DailyPaceField";
 import {
+import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
   useGoalSetupForm, TYT_NET_MIN, TYT_NET_MAX, LGS_NET_MIN, LGS_NET_MAX,
   DAILY_Q_MIN, DAILY_Q_MAX, DAILY_Q_STEP,
 } from "./useGoalSetupForm";
@@ -39,14 +40,7 @@ function GoalSetupContent() {
         <View style={styles.backBtn} />
       </View>
 
-      <View style={styles.progressRow}>
-        {[0, 1, 2, 3].map((i) => (
-          <View
-            key={i}
-            style={[styles.segment, { backgroundColor: i <= 1 ? C.accent : C.track }]}
-          />
-        ))}
-      </View>
+      <SetupRouteSteps current={2} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -130,8 +124,6 @@ export default function GoalSetupScreen() {
 const styles = StyleSheet.create({
   header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: GUTTER, paddingVertical: STEP.s1, minHeight: CONTROL.tapMin },
   backBtn:     { width: CONTROL.tapMin, minHeight: CONTROL.tapMin, justifyContent: "center" },
-  progressRow: { flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingTop: STEP.s1 },
-  segment:     { flex: 1, height: 3, borderRadius: 1.5 },
   scroll:      { paddingHorizontal: GUTTER, paddingTop: STEP.s3, paddingBottom: STEP.s4 },
   cta:         { paddingTop: STEP.s2, paddingHorizontal: GUTTER, paddingBottom: STEP.s2, borderTopWidth: 1 },
   skipBtn:     { marginTop: STEP.s1, minHeight: CONTROL.tapMin, justifyContent: "center", alignItems: "center" },
