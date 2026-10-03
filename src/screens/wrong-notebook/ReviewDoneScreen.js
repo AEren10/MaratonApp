@@ -17,13 +17,16 @@ export default function ReviewDoneScreen() {
   const navigation = useNavigation();
   const { params } = useRoute();
   
-  // Params'dan gelen veriler
-  const reviewedCount = params?.reviewedCount ?? 6;
-  const closedCount = params?.closedCount ?? 2;
-  const rememberedCount = params?.rememberedCount ?? 4;
-  const forgotCount = params?.forgotCount ?? 2;
-  const pendingBefore = params?.pendingBefore ?? 14;
-  const pendingAfter = params?.pendingAfter ?? 12;
+  // Yalniz oturumun gercek sayilari (useWrongReviewSession). Eskiden
+  // parametre gelmezse 6/2/4/2/14/12 uyduruluyor, metinde sabit "Yarın 4
+  // soru" ve "9 gün sonra" yaziyordu.
+  const reviewedCount = params?.reviewedCount ?? 0;
+  const closedCount = params?.closedCount ?? 0;
+  const rememberedCount = params?.rememberedCount ?? 0;
+  const forgotCount = params?.forgotCount ?? 0;
+  const pendingBefore = params?.pendingBefore ?? 0;
+  const pendingAfter = params?.pendingAfter ?? 0;
+  const resolvedShare = pendingBefore > 0 ? (pendingBefore - pendingAfter) / pendingBefore : 0;
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: C.bg }]}>
@@ -32,13 +35,13 @@ export default function ReviewDoneScreen() {
           <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.5 }]}>TEKRAR BİTTİ</Text>
           
           <View style={styles.heroTitleRow}>
-            <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 64, lineHeight: 64 }]}>{reviewedCount}</Text>
+            <Text style={[TYPOGRAPHY.statLarge, { color: C.text, fontSize: 64, lineHeight: 64 }]}>{reviewedCount}</Text>
             <Text style={[TYPOGRAPHY.subheading, { color: C.text, marginTop: 12 }]}>soru tekrar edildi</Text>
           </View>
           
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s3 }]}>
-            {rememberedCount}'ünü bildin, {forgotCount}'si tekrar takvimine geri döndü.
-            Yarın 4 soru, üç gün sonra 7 soru bekliyor.
+            Bildiğin {rememberedCount} sorunun aralığı uzadı.{" "}
+            {forgotCount > 0 ? `Bilemediğin ${forgotCount} soru yarın yeniden karşına çıkacak.` : "Bilemediğin soru yok."}
           </Text>
         </Animated.View>
 
@@ -62,12 +65,12 @@ export default function ReviewDoneScreen() {
           <View style={styles.row}>
             <Card style={styles.halfCard}>
               <Text style={[TYPOGRAPHY.label, { color: C.text }]}>BİLDİM</Text>
-              <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 32, marginTop: STEP.s1 }]}>{rememberedCount}</Text>
+              <Text style={[TYPOGRAPHY.statLarge, { color: C.text, fontSize: 32, lineHeight: 36, marginTop: STEP.s1 }]}>{rememberedCount}</Text>
               <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>aralık uzadı</Text>
             </Card>
             <Card style={styles.halfCard}>
               <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>BİLEMEDİM</Text>
-              <Text style={[TYPOGRAPHY.hero, { color: C.text, fontSize: 32, marginTop: STEP.s1 }]}>{forgotCount}</Text>
+              <Text style={[TYPOGRAPHY.statLarge, { color: C.text, fontSize: 32, lineHeight: 36, marginTop: STEP.s1 }]}>{forgotCount}</Text>
               <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s1 }]}>yarın tekrar</Text>
             </Card>
           </View>
@@ -76,17 +79,14 @@ export default function ReviewDoneScreen() {
             <View style={styles.cardHeader}>
               <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>DEFTER DURUMU</Text>
               <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>
-                {pendingBefore} \u2192 <Text style={{ color: C.text }}>{pendingAfter}</Text> bekliyor
+                {pendingBefore} → <Text style={{ color: C.text }}>{pendingAfter}</Text> bekliyor
               </Text>
             </View>
-            <View style={styles.progressRow}>
-              <View style={[styles.bar, { flex: 3, backgroundColor: C.warn }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.text2 }]} />
-              <View style={[styles.bar, { flex: 2, backgroundColor: C.text3 }]} />
-              <View style={[styles.bar, { flex: 1, backgroundColor: C.line }]} />
+            <View style={[styles.track, { backgroundColor: C.track }]}>
+              <View style={[styles.bar, { width: `${Math.round(resolvedShare * 100)}%`, backgroundColor: C.up }]} />
             </View>
             <Text style={[TYPOGRAPHY.caption, { color: C.text3, marginTop: STEP.s2 }]}>
-              Tekrar kayda geçti. Bu konu 9 gün sonra tekrar önerilecek.
+              Tekrar kayda geçti. Sıradaki tekrar günü her soru için ayrı hesaplandı.
             </Text>
           </Card>
         </Animated.View>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   halfCard: { flex: 1 },
   fullCard: { marginTop: STEP.s2 },
   cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  progressRow: { flexDirection: "row", gap: 4, marginTop: STEP.s2 },
+  track: { height: 6, borderRadius: 3, marginTop: STEP.s2, overflow: "hidden" },
   bar: { height: 6, borderRadius: 3 },
   actions: { marginTop: STEP.s4, gap: STEP.s2, paddingBottom: STEP.s4 },
   actionBtn: { width: "100%" },

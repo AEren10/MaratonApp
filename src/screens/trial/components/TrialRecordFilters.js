@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, STEP, SHAPE, CONTROL } from "../../../themes/tokens";
 import { Icon } from "../../../components/design";
 import * as H from "../../../lib/haptics";
@@ -51,17 +51,8 @@ export const TrialRecordFilters = React.memo(function TrialRecordFilters({ tabs,
         ) : null}
       </View>
 
-      <View style={styles.dropdownRow}>
-        <Pressable style={[styles.dropdownPill, { borderColor: C.border }]}>
-          <Text style={[styles.dropdownText, { color: C.text3 }]}>Yayın · hepsi</Text>
-          <Icon name="chevDown" size={10} color={C.text5 || C.text4} />
-        </Pressable>
-
-        <Pressable style={[styles.dropdownPill, { borderColor: C.border }]}>
-          <Text style={[styles.dropdownText, { color: C.text3 }]}>Son 3 ay</Text>
-          <Icon name="chevDown" size={10} color={C.text5 || C.text4} />
-        </Pressable>
-      </View>
+      {/* "Yayın · hepsi / Son 3 ay" kaldirildi: dokununca hicbir sey
+          yapmayan sahte acilir menulerdi. Filtre ustteki dugmede. */}
     </View>
   );
 });
@@ -101,23 +92,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  dropdownRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 10,
-  },
-  dropdownPill: {
-    height: 34,
-    paddingHorizontal: 13,
-    borderRadius: SHAPE.chip, // 6px
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-  },
-  dropdownText: {
-    fontFamily: "Archivo_500",
-    fontSize: 12,
   },
 });

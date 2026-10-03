@@ -99,10 +99,11 @@ export default function RoadmapScreen() {
                   <RouteTempoSection rows={view.tempoRows} locked={d.scenariosLocked} onOpen={d.openScenarios} />
                 ) : null}
                 <View style={s.links}>
-                  {d.targetNet != null ? (
+                  {/* Universite/bolum esigi YKS icin; LGS ogrencisine anlamsiz. */}
+                  {d.targetNet != null && !d.isLGS ? (
                     <RouteLinkRow
                       title={`${d.examLabel ? `${d.examLabel} ` : ""}${d.targetNet} net ≈ hangi bölümler?`}
-                      subtitle="Hedef netinin karşılığı · 24 devlet üniversitesi"
+                      subtitle="Hedef netinin karşılığı · üniversite ve bölümler"
                       onPress={d.openThreshold}
                     />
                   ) : null}
