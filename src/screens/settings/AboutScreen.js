@@ -46,7 +46,7 @@ export default function AboutScreen() {
         ))}
       </View>
 
-      <Text style={s.footer}>React Native ile yapıldı</Text>
+      <Text style={s.footer}>Sınava hazırlananlar için yapıldı</Text>
     </SafeAreaView>
   );
 }

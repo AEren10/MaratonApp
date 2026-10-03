@@ -111,7 +111,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
               <QuickAddRow C={C} title="Çalışma kaydet" subtitle="Yaptığın çalışmayı gir · sayaç açmadan"
                 icon="bookOpen"
                 onPress={() => go(SCREENS.ADD_STUDY)} />
-              <QuickAddRow C={C} title="Deneme gir" subtitle="Fotoğraftan veya elle"
+              <QuickAddRow C={C} title="Deneme gir" subtitle="Ders ders net, iki dakikada"
                 icon="target"
                 onPress={() => go(SCREENS.TRIAL_ENTRY)} />
               <QuickAddRow C={C} title="Yanlış ekle" subtitle="Deftere soru kaydet"

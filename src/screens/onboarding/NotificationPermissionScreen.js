@@ -81,19 +81,19 @@ function NotificationPermissionContent() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeIn.delay(80)}>
-          <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>ROTA YENİDEN ÇİZİLDİ</Text>
+          <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>ROTAN HAZIR</Text>
           <Text style={[styles.title, { color: C.text }]}>
-            Tahminin değiştiğinde haber vereyim mi?
+            Durağın geldiğinde haber vereyim mi?
           </Text>
           <Text style={[TYPOGRAPHY.body, { color: C.text2, marginTop: STEP.s2 }]}>
-            İlk denemen rotaya işlendi. Bundan sonra tahmin her değiştiğinde tek bir bildirim
-            gelir — daha fazlası değil.
+            Günün durakları, tekrar zamanı ve tahminin değiştiğinde kısa bir not. İstemediğini
+            Ayarlar'dan tek tek kapatabilirsin.
           </Text>
         </Animated.View>
 
         <Animated.View style={{ marginTop: STEP.s4 }}>
           <Text style={[TYPOGRAPHY.captionMedium, { color: C.text2, letterSpacing: 1.6 }]}>
-            SANA NE GÖNDERİRİZ
+            ÖRNEK BİLDİRİMLER
           </Text>
           <View style={{ marginTop: STEP.s2 }}>
             <NotificationBenefitList />

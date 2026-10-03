@@ -24,6 +24,14 @@ function hasFreeChallengeSlot(usage) {
   return Number.isFinite(count) && count < FREE_LIMITS.active_challenges;
 }
 
+// Askida premium: butun ozellikler acik, deneme kotasi sinirsiz.
+const OPEN_ACCESS_SNAPSHOT = {
+  ...DEV_ACCESS_SNAPSHOT,
+  accessMode: "free",
+  isPremium: false,
+  isFirstWeek: false,
+};
+
 export function PremiumProvider({ children }) {
   const { user } = useAuth();
   const { examDate } = useExam();
@@ -181,11 +189,16 @@ export function PremiumProvider({ children }) {
     return true;
   }, [accessState, examDate, isPremium, navigation, user?.created_at, user?.id]);
 
+  // Premium askidayken erisim sorusu yok: her sey acik. Eskiden sunucudaki
+  // erisim anlik goruntusu alinamayinca (cevrimdisi, zayif ag) deneme girisi,
+  // rota ve ucretsiz ozellikler "uyelik dogrulanamadi" diye kilitleniyordu.
+  // Anlik goruntu yine cekiliyor (bayrak acilinca hazir), ama karar vermiyor.
+  const gated = PREMIUM_ENABLED;
   const value = useMemo(() => ({
-    accessError: accessState === "error",
-    accessLoading: accessState === "loading",
+    accessError: gated && accessState === "error",
+    accessLoading: gated && accessState === "loading",
     accessMode: snapshot?.accessMode || null,
-    accessSnapshot: snapshot,
+    accessSnapshot: gated ? snapshot : { ...OPEN_ACCESS_SNAPSHOT, ...snapshot, features: OPEN_ACCESS_SNAPSHOT.features, quotas: OPEN_ACCESS_SNAPSHOT.quotas },
     isPremium,
     isInGrace,
     isInTrial: snapshot?.accessMode === "premium" && snapshot?.trialDaysLeft > 0,
@@ -197,7 +210,7 @@ export function PremiumProvider({ children }) {
     refreshUsage,
     bumpUsage,
     refreshPremium: refreshAccess,
-  }), [accessState, bumpUsage, checkFeature, isInGrace, isPremium, refreshAccess,
+  }), [accessState, bumpUsage, gated, checkFeature, isInGrace, isPremium, refreshAccess,
     refreshUsage, remainingTrials, showPaywall, snapshot]);
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;
