@@ -227,7 +227,7 @@ Kamera ve fotoğraf izinleri yalnızca yanlış soru fotoğrafı, avatar ve payl
 
 Version 1.0'da ücretli özellik, uygulama içi satın alma, abonelik veya kart ödeme bulunmamaktadır.
 
-Anonim topluluk soru-cevap, lig/sosyal ve premium akışları V1 inceleme kapsamına dahil değildir.
+Sosyal yüzey yalnızca davet koduyla tanışılan kişilerle sınırlıdır: Profil → Birlikte ekranında çalışma grupları (6 haneli davet koduyla katılım, haftalık soru sıralaması) ve arkadaşlar. Herkese açık lig, mesajlaşma ve anonim topluluk soru-cevap bu sürümde YOKTUR. Netler/deneme sonuçları diğer kullanıcılara gösterilmez. Uygunsuz profil fotoğrafı avatara dokunup "Bildir" ile bildirilebilir; kullanıcılar Arkadaşlar ekranından engellenebilir; kullanım koşullarında sıfır tolerans maddesi ve destek@maratonapp.com iletişim adresi bulunur. Premium akışları bu sürümde kapalıdır.
 
 Hesap silme: Profil → Ayarlar → Hesabı Sil.
 ```
