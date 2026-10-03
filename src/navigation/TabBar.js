@@ -68,7 +68,7 @@ export function TabBar({ state, navigation }) {
       <View style={[s.dock, { backgroundColor: C.bg, paddingBottom: insets.bottom > 0 ? insets.bottom - 4 : 12 }]}>
         {/* Icerik kapsule sert cizgiyle degil yumusak kararmayla girer. */}
         <LinearGradient
-          colors={["transparent", C.alpha(C.bg, 70), C.bg]}
+          colors={[C.alpha(C.bg, 0), C.alpha(C.bg, 70), C.bg]}
           locations={[0, 0.6, 1]}
           style={s.fade}
           pointerEvents="none"
