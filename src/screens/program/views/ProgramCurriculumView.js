@@ -9,10 +9,12 @@ import { useCurriculumMap } from "../../../hooks/useCurriculumMap";
 import { GUTTER, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { CurriculumProgressCard } from "../../roadmap/components/CurriculumProgressCard";
 import CurriculumSubjectRow from "../../roadmap/components/CurriculumSubjectRow";
+import { useTabScrollTop } from "../../../hooks/useTabScrollTop";
 
 // Mufredat: dersler ve konu ilerlemesi (eski "Yol haritasi"). Tasarimi
 // korundu; kalkan tek sey ust segment ve altta tekrar eden aksiyon kartlari.
 export function ProgramCurriculumView() {
+  const scrollRef = useTabScrollTop();
   const C = useC();
   const navigation = useNavigation();
   const map = useCurriculumMap();
@@ -34,7 +36,8 @@ export function ProgramCurriculumView() {
   if (map.total === 0) return <ErrorState preset="server" onPrimary={map.refresh} style={s.pad} />;
 
   return (
-    <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      ref={scrollRef} contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
       <View style={s.pad}>
         <CurriculumProgressCard done={map.done} total={map.total} left={map.left} pct={map.pct} />
       </View>

@@ -18,6 +18,7 @@ import { syncReviewWidget, syncStreakWidget, syncTrialWidget } from "../../lib/w
 import { updateReminderContent } from "../../lib/notifications";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
+import { useTabScrollTop } from "../../hooks/useTabScrollTop";
 
 // Ana Sayfa (tasarim: Ana Sayfa · Ücretsiz Ana Sayfa · İlk Gün · Yükleniyor ·
 // Bağlantı Yok). Kaldirilan eski kartlarin hedefleri:
@@ -26,6 +27,7 @@ import { useHomeDepthTone } from "../../hooks/useHomeDepthTone";
 //   Haftalik rapor kartlari -> "Bu haftanın raporu"; tekrar karti -> Defter
 //   Hizli eylemler -> + sheet (kayit/deneme/yanlis/gorev) ve ilgili sekmeler
 export default function HomeScreen() {
+  const scrollRef = useTabScrollTop();
   const h = useHomeController();
   const { C, dashboard, actions, gamification, goalReward, nudge } = h;
   const { user } = useAuth();
@@ -66,6 +68,7 @@ export default function HomeScreen() {
   } else {
     body = (
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}

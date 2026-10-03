@@ -38,7 +38,7 @@ export function CenterFab({ open, onPress, C }) {
         pressRetentionOffset={12}
       >
         {/* Kirmizi isilti (kullanici karari, 28 Eylul): eski + dugmesinin en sevilen yani. */}
-        <Animated.View style={[s.fab, { backgroundColor: C.accent, shadowColor: C.accent }, fabStyle]}>
+        <Animated.View style={[s.fab, { backgroundColor: C.brandFill || C.accent, shadowColor: C.accent }, fabStyle]}>
           <Icon name="plus" size={24} color={C.textOnFill} sw={3} />
         </Animated.View>
       </Pressable>
@@ -47,9 +47,9 @@ export function CenterFab({ open, onPress, C }) {
 }
 
 const s = StyleSheet.create({
-  slot: { flex: 1, alignItems: "center" },
+  slot: { flex: 1, alignItems: "center", justifyContent: "center" },
   fab: {
-    width: 54, height: 54, borderRadius: 27, alignItems: "center", justifyContent: "center", marginTop: -18,
+    width: 50, height: 50, borderRadius: 25, alignItems: "center", justifyContent: "center",
     shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.32, shadowRadius: 14, elevation: 8,
   },
 });

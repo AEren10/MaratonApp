@@ -21,6 +21,7 @@ import { ProgramRulesSection } from "../../dersler/components/ProgramRulesSectio
 import { ScheduleDiscoverCard } from "../components/ScheduleDiscoverCard";
 import { HabitDiscoverCard } from "../components/HabitDiscoverCard";
 import { KnownTopicsReminder } from "../components/KnownTopicsReminder";
+import { useTabScrollTop } from "../../../hooks/useTabScrollTop";
 
 function weekSummary({ weekRangeLabel, activeDaysCount, totalMinutes, totalQuestions }) {
   const parts = [weekRangeLabel, `${activeDaysCount || 0}/7 aktif gün`];
@@ -30,6 +31,7 @@ function weekSummary({ weekRangeLabel, activeDaysCount, totalMinutes, totalQuest
 }
 
 export function ProgramWeekView() {
+  const scrollRef = useTabScrollTop();
   const C = useC();
   const navigation = useNavigation();
   const w = useWeekProgram();
@@ -77,6 +79,7 @@ export function ProgramWeekView() {
 
   return (
     <ScrollView
+      ref={scrollRef}
       contentContainerStyle={s.scroll}
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={w.loading} onRefresh={w.refresh} tintColor={C.accent} colors={[C.accent]} />}
