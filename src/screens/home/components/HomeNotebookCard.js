@@ -32,7 +32,7 @@ export function HomeNotebookCard({ dueCount = 0, onPress, onReview }) {
         s.card,
         {
           backgroundColor: C.surface,
-          borderColor: due ? alpha(C.accent, 38) : C.line,
+          borderColor: due ? alpha(C.accent, 38) : C.edgeStrong,
         },
         !isDark && SHADOW.cardLight,
       ]}

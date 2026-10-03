@@ -31,7 +31,7 @@ export function SubjectCardItem({ C, card, onPress }) {
       onPress={onPress}
       style={({ pressed }) => [
         s.card,
-        { backgroundColor: C.surface, borderColor: pressed ? C.border : C.line },
+        { backgroundColor: C.surface, borderColor: pressed ? C.border : C.edgeSoft },
         !isDark && SHADOW.cardLight,
       ]}
     >

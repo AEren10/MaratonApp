@@ -183,6 +183,12 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     selFill: surfaces.elev,
     selText: text,
 
+    // Kart kenarligi: koyu temada eski tonlar korunur (kartta border, ic
+    // yuzeyde elev); acik temada ince sicak cizgi (line). Ant'in acik tema
+    // isi bunlari her iki temada line yapmisti -- koyu kartlar solmustu.
+    edgeStrong: isDark ? surfaces.border : surfaces.line,
+    edgeSoft: isDark ? surfaces.elev : surfaces.line,
+
     // Seri alevi: turuncu. Kizil ana buton + rota cizgisine ait; seri
     // (alev, takvimde calisilan gun, seri noktalari) kendi sicak tonunda.
     // Acik temada koyulastirildi: zemin ustunde AA (>= 4.5).

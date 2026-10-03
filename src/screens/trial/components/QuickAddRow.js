@@ -16,7 +16,7 @@ export function QuickAddRow({ C, title, subtitle, onPress, accessibilityLabel, i
       accessibilityLabel={accessibilityLabel || title}
       style={[
         styles.row,
-        { backgroundColor: C.surface, borderColor: C.line },
+        { backgroundColor: C.surface, borderColor: C.edgeSoft },
         !isDark && SHADOW.cardLight,
       ]}
     >

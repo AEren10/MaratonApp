@@ -82,11 +82,11 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Sayfa dışına dokun, kapat" />
         </Animated.View>
         <Animated.View
-          style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.line }, sheetAnimStyle]}
+          style={[styles.sheet, { backgroundColor: C.bg, borderColor: C.edgeStrong }, sheetAnimStyle]}
         >
           <GestureDetector gesture={pan}>
             <View style={styles.handleZone}>
-              <View style={[styles.handle, { backgroundColor: C.line }]} />
+              <View style={[styles.handle, { backgroundColor: C.edgeStrong }]} />
             </View>
           </GestureDetector>
 

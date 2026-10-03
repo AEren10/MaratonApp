@@ -59,7 +59,7 @@ export function PublisherComparisonCard({ C, comparison, onPress }) {
           onPress={onPress}
           style={[
             s.card,
-            { backgroundColor: C.surface, borderColor: C.line },
+            { backgroundColor: C.surface, borderColor: C.edgeSoft },
             !isDark && SHADOW.cardLight,
           ]}
         >
@@ -69,7 +69,7 @@ export function PublisherComparisonCard({ C, comparison, onPress }) {
         <View
           style={[
             s.card,
-            { backgroundColor: C.surface, borderColor: C.line },
+            { backgroundColor: C.surface, borderColor: C.edgeSoft },
             !isDark && SHADOW.cardLight,
           ]}
         >

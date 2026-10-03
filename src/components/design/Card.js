@@ -7,8 +7,8 @@ import { SHAPE, STEP, SHADOW } from "../../themes/tokens";
 // Acik temada ise beyaz kartlar zeminden ince sicak kenarlik ve hafif sicak kahve golgesiyle ayrilir.
 // tone: surface (kart) | elev (acilan panel, ikon kutusu) | void (girinti/kuyu)
 const TONES = {
-  surface: (C) => ({ bg: C.surface, border: C.line }),
-  elev:    (C) => ({ bg: C.elev,    border: C.line }),
+  surface: (C) => ({ bg: C.surface, border: C.edgeStrong }),
+  elev:    (C) => ({ bg: C.elev,    border: C.edgeStrong }),
   void:    (C) => ({ bg: C.void,    border: C.line }),
   tint:    (C) => ({ bg: C.brandTint, border: "transparent" }),
 };

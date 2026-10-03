@@ -25,7 +25,7 @@ export function LeagueMiniCard({ tier, nextTier, weeklyXP }) {
           alignItems: "center",
           backgroundColor: C.surface,
           borderWidth: 1,
-          borderColor: C.line,
+          borderColor: C.edgeStrong,
           borderRadius: RADIUS.xxl,
           padding: SPACING.lg,
           marginBottom: SPACING.lg

@@ -9,7 +9,7 @@ import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 export function ReviewDueCard({ count, onStart }) {
   const C = useC();
   return (
-    <Card radius="sheet" style={styles.card}>
+    <Card radius="sheet" style={[styles.card, { borderColor: C.edgeSoft }]}>
       <View style={styles.head}>
         <Text style={[TYPOGRAPHY.label, styles.flex, { color: C.text2 }]}>TEKRAR ZAMANI</Text>
         <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>{count}</Text>
