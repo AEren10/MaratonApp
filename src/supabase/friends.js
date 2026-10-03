@@ -91,12 +91,8 @@ export async function listOutgoingRequests(userId) {
 export async function cancelRequest(friendshipId, userId) {
   if (!userId) throw new Error("userId is required");
   try {
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("id", friendshipId)
-      .eq("requester_id", userId)
-      .eq("status", "pending");
+    assertUUID(friendshipId, "friendshipId");
+    const { error } = await supabase.rpc("cancel_friend_request", { p_friendship_id: friendshipId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "cancelRequest");
@@ -127,11 +123,8 @@ export async function listFriends(userId) {
 export async function unfriend(friendshipId, userId) {
   if (!userId) throw new Error("userId is required");
   try {
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("id", friendshipId)
-      .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+    assertUUID(friendshipId, "friendshipId");
+    const { error } = await supabase.rpc("remove_friend", { p_friendship_id: friendshipId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "unfriend");
@@ -166,12 +159,7 @@ export async function unblockUser(targetId) {
     assertUUID(targetId, "targetId");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("requester_id", user.id)
-      .eq("addressee_id", targetId)
-      .eq("status", "blocked");
+    const { error } = await supabase.rpc("unblock_user", { p_target: targetId });
     if (error) throw error;
   } catch (e) {
     handleSupabaseError(e, "unblockUser");

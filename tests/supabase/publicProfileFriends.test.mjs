@@ -24,12 +24,15 @@ test("public profile RPC is fixed-field, access checked, and net-free", () => {
 });
 
 test("friend mutations are server authoritative and direct client writes are revoked", () => {
-  assert.match(migration, /REVOKE INSERT, UPDATE ON public\.friendships FROM authenticated/);
+  assert.match(migration, /REVOKE INSERT, UPDATE, DELETE ON public\.friendships FROM authenticated/);
   assert.match(migration, /GRANT EXECUTE ON FUNCTION public\.send_friend_request_server\(uuid, uuid\) TO service_role/);
   assert.match(migration, /GRANT EXECUTE ON FUNCTION public\.respond_friend_request_server\(uuid, uuid, boolean\) TO service_role/);
   assert.match(friendsApi, /functions\.invoke\("friend-actions"/);
-  assert.doesNotMatch(friendsApi, /\.from\("friendships"\)[\s\S]{0,160}\.(insert|update)\(/);
+  assert.doesNotMatch(friendsApi, /\.from\("friendships"\)[\s\S]{0,160}\.(insert|update|delete)\(/);
   assert.match(friendsApi, /rpc\("block_user"/);
+  assert.match(friendsApi, /rpc\("cancel_friend_request"/);
+  assert.match(friendsApi, /rpc\("remove_friend"/);
+  assert.match(friendsApi, /rpc\("unblock_user"/);
 });
 
 test("friend notification templates and recipients cannot be supplied by clients", () => {

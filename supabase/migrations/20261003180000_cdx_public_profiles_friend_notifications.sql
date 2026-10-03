@@ -327,5 +327,49 @@ $$;
 REVOKE ALL ON FUNCTION public.block_user(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.block_user(uuid) TO authenticated;
 
--- All INSERT/UPDATE friendship mutations now pass through the server functions.
-REVOKE INSERT, UPDATE ON public.friendships FROM authenticated;
+CREATE OR REPLACE FUNCTION public.cancel_friend_request(p_friendship_id uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  DELETE FROM public.friendships f
+   WHERE f.id = p_friendship_id
+     AND f.requester_id = auth.uid()
+     AND f.status = 'pending';
+$$;
+
+CREATE OR REPLACE FUNCTION public.remove_friend(p_friendship_id uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  DELETE FROM public.friendships f
+   WHERE f.id = p_friendship_id
+     AND f.status = 'accepted'
+     AND auth.uid() IN (f.requester_id, f.addressee_id);
+$$;
+
+CREATE OR REPLACE FUNCTION public.unblock_user(p_target uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  DELETE FROM public.friendships f
+   WHERE f.requester_id = auth.uid()
+     AND f.addressee_id = p_target
+     AND f.status = 'blocked';
+$$;
+
+REVOKE ALL ON FUNCTION public.cancel_friend_request(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.remove_friend(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.unblock_user(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.cancel_friend_request(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.remove_friend(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.unblock_user(uuid) TO authenticated;
+
+-- All friendship mutations now pass through purpose-limited server functions.
+-- In particular, a blocked user cannot DELETE the block row to unblock themself.
+REVOKE INSERT, UPDATE, DELETE ON public.friendships FROM authenticated;
