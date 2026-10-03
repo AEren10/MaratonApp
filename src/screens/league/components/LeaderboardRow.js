@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { ReportableAvatar } from "../../../components/common/ReportableAvatar";
+import { UserActionRow } from "../../../components/common/UserActionRow";
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
 import { getZone, ZONE } from "../../../lib/leagueZones";
@@ -17,7 +18,8 @@ export const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUs
   const podium = item.rank <= 3;
 
   return (
-    <View style={[s.row, { borderBottomColor: C.line }, isYou && { backgroundColor: C.void }]}>
+    <UserActionRow userId={item.user_id} name={item.name} image={item.avatar_url} you={isYou}
+      style={[s.row, { borderBottomColor: C.line }, isYou && { backgroundColor: C.void }]}>
       <Text style={[TYPOGRAPHY.tableValue, s.rank, { color: podium ? C.text : C.text3 }]}>{item.rank}</Text>
       <ReportableAvatar userId={item.user_id} name={item.name} image={item.avatar_url} size={34}
         color={isYou ? C.accent : undefined} you={isYou} />
@@ -34,7 +36,7 @@ export const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUs
         <Text style={[TYPOGRAPHY.signalValue, { color: C.text }]}>{item.questions ?? item.weekly_xp ?? 0}</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>soru</Text>
       </View>
-    </View>
+    </UserActionRow>
   );
 });
 

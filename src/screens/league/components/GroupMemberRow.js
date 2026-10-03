@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { ReportableAvatar } from "../../../components/common/ReportableAvatar";
+import { UserActionRow } from "../../../components/common/UserActionRow";
 
 function formatMinutes(value) {
   const minutes = Math.max(0, Number(value) || 0);
@@ -33,9 +34,8 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
     : "Haftalık yarış";
 
   return (
-    <View
-      style={[s.row, { borderBottomColor: C.line }]}
-    >
+    <UserActionRow userId={item.user_id} name={item.name} image={item.avatar_url} you={isYou}
+      style={[s.row, { borderBottomColor: C.line }]}>
       {/* Kutusuz satir (Ders analizi dili): sira duz rakam, ilk uc madalya renginde. */}
       <Text style={[TYPOGRAPHY.tableValue, s.rank, { color: medalColor && weeklyQuestions > 0 ? medalColor : C.text3 }]}>
         {rank || "-"}
@@ -65,7 +65,7 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>süre</Text>
         </View>
       </View>
-    </View>
+    </UserActionRow>
   );
 });
 
