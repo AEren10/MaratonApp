@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maraton Marka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600&family=Unbounded:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #E5343F; --fill: #CF2833; --press: #A81C26; --bg: #1C1C23; --surface: #28282F;
+    --elev: #35353B; --line: #3A3A42; --text: #ECE8E4; --text2: #B0ADB5; --text3: #A3A0AB; --flame: #FF8A3D;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #121217; color: var(--text); font-family: Archivo, sans-serif; padding: 40px; }
+  .sheet { width: 1240px; margin: 0 auto; display: grid; gap: 20px; }
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: 22px; padding: 28px; position: relative; overflow: hidden; }
+  .label { font: 600 11.5px Archivo; letter-spacing: .16em; text-transform: uppercase; color: var(--text3); margin-bottom: 18px; }
+  .row { display: flex; gap: 20px; }
+  .grow { flex: 1; }
+  .icon { border-radius: 22.37%; display: block; }
+  .glow { position: absolute; inset: 0; background: radial-gradient(60% 80% at 0% 0%, rgba(229,52,63,.35), transparent 70%); pointer-events: none; }
+  .word { font-family: Unbounded; font-weight: 600; letter-spacing: .02em; line-height: 1; }
+  .tag { font: 500 13px Archivo; letter-spacing: .34em; text-transform: uppercase; color: var(--text2); }
+  .lockup { display: flex; align-items: center; gap: 22px; }
+  .divider { width: 1px; align-self: stretch; background: var(--line); }
+  .hero { display: flex; align-items: center; gap: 48px; padding: 44px; }
+  .sw { display: flex; flex-direction: column; gap: 8px; }
+  .chip { width: 96px; height: 72px; border-radius: 14px; border: 1px solid var(--line); }
+  .sw b { font: 600 12.5px Archivo; } .sw span { font: 500 11.5px Archivo; color: var(--text3); }
+  .phone { width: 250px; height: 520px; border-radius: 40px; border: 8px solid #0b0b0e; background: #000; position: relative; overflow: hidden; box-shadow: 0 0 0 1px #2a2a30; }
+  .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 24px; border-radius: 14px; background: #000; z-index: 3; }
+  .status { position: absolute; top: 14px; left: 26px; right: 22px; display: flex; justify-content: space-between; font: 600 12px Archivo; z-index: 2; }
+  .wall { position: absolute; inset: 0; background: radial-gradient(90% 60% at 80% 10%, #5b1a22, transparent 60%), radial-gradient(80% 60% at 10% 100%, #3a1520, transparent 60%), #141218; }
+  .apps { position: absolute; top: 70px; left: 18px; right: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 10px; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 5px; font: 500 10.5px Archivo; color: #fff; }
+  .ghost { width: 46px; height: 46px; border-radius: 22.37%; background: rgba(255,255,255,.12); }
+  .splash { position: absolute; inset: 0; background: radial-gradient(70% 45% at 30% 0%, rgba(229,52,63,.45), transparent 70%), var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+  .notif { background: rgba(40,40,47,.92); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  .notif h4 { font: 600 13.5px Archivo; display: flex; justify-content: space-between; }
+  .notif h4 small { font: 500 11.5px Archivo; color: var(--text3); }
+  .notif p { font: 400 13px Archivo; color: var(--text2); margin-top: 2px; }
+  .type { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .type div { border-top: 1px solid var(--line); padding-top: 14px; }
+  .type small { display: block; font: 500 11.5px Archivo; color: var(--text3); margin-top: 8px; line-height: 1.55; }
+  .light { background: #EDE7DF; border-color: #DCD2C5; color: #1C1C23; }
+  .light .tag { color: #4E4E56; }
+  .sizes { display: flex; align-items: flex-end; gap: 26px; }
+  .sizes figure { display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 11.5px Archivo; color: var(--text3); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- M isareti: iki yuvarlak kemer + varis duragi. Sag bacak kirmizinin
+         ustunden gecerken saydamlasir (cam kesisim). -->
+    <linearGradient id="fade" gradientUnits="userSpaceOnUse" x1="56" y1="0" x2="70" y2="0">
+      <stop offset="0" stop-color="#F3EEE9" stop-opacity="1"/>
+      <stop offset=".35" stop-color="#F3EEE9" stop-opacity="1"/>
+      <stop offset="1" stop-color="#F3EEE9" stop-opacity=".42"/>
+    </linearGradient>
+    <linearGradient id="fadeDark" gradientUnits="userSpaceOnUse" x1="56" y1="0" x2="70" y2="0">
+      <stop offset="0" stop-color="#1C1C23" stop-opacity="1"/>
+      <stop offset=".35" stop-color="#1C1C23" stop-opacity="1"/>
+      <stop offset="1" stop-color="#1C1C23" stop-opacity=".45"/>
+    </linearGradient>
+    <symbol id="mark" viewBox="0 0 124 56">
+      <polyline points="56,42 75,9 86,9 103,42" fill="none" stroke="#E5343F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="10,42 44,9 55,9 69,42" fill="none" stroke="url(#fade)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="114" cy="45" r="10.5" fill="var(--ring, #1C1C23)"/>
+      <circle cx="114" cy="45" r="7.5" fill="#E5343F"/>
+    </symbol>
+    <symbol id="markLight" viewBox="0 0 124 56">
+      <polyline points="56,42 75,9 86,9 103,42" fill="none" stroke="#E5343F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="10,42 44,9 55,9 69,42" fill="none" stroke="url(#fadeDark)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="114" cy="45" r="10.5" fill="#EDE7DF"/>
+      <circle cx="114" cy="45" r="7.5" fill="#E5343F"/>
+    </symbol>
+    <symbol id="markMono" viewBox="0 0 124 56">
+      <polyline points="56,42 75,9 86,9 103,42" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="10,42 44,9 55,9 69,42" fill="none" stroke="#000" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/><polyline points="10,42 44,9 55,9 69,42" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="114" cy="45" r="10.5" fill="#000"/>
+      <circle cx="114" cy="45" r="7.5" fill="#fff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="sheet">
+  <!-- 1. Ana kimlik -->
+  <div class="card hero">
+    <div class="glow"></div>
+    <img class="icon" src="icon-a-1024.png" width="200" height="200" alt="Uygulama ikonu">
+    <div class="lockup">
+      <svg width="150" height="68"><use href="#mark"/></svg>
+      <div class="divider"></div>
+      <div>
+        <div class="word" style="font-size:62px">MARATON</div>
+        <div class="tag" style="margin-top:14px">Her gün bir adım daha</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Varyasyonlar -->
+  <div class="row">
+    <div class="card grow">
+      <div class="label">Dikey</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 0">
+        <svg width="130" height="59"><use href="#mark"/></svg>
+        <div class="word" style="font-size:30px">MARATON</div>
+        <div class="tag" style="font-size:10.5px">Her gün bir adım daha</div>
+      </div>
+    </div>
+    <div class="card grow light">
+      <div class="label" style="color:#6E6E77">Açık zemin</div>
+      <div class="lockup" style="padding:22px 0">
+        <svg width="100" height="45"><use href="#markLight"/></svg>
+        <div class="word" style="font-size:34px;color:#1C1C23">MARATON</div>
+      </div>
+    </div>
+    <div class="card grow">
+      <div class="label">Tek renk · bildirim ikonu</div>
+      <div style="display:flex;align-items:center;gap:26px;padding:16px 0">
+        <svg width="110" height="50" style="background:#000;border-radius:12px;padding:6px"><use href="#markMono"/></svg>
+        <svg width="40" height="18"><use href="#markMono"/></svg>
+        <svg width="24" height="11"><use href="#markMono"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Mockuplar -->
+  <div class="row">
+    <div class="card" style="flex:0 0 auto">
+      <div class="label">Ana ekran</div>
+      <div class="phone">
+        <div class="island"></div><div class="status"><span>9:41</span><span>●●● 100</span></div>
+        <div class="wall"></div>
+        <div class="apps">
+          <div class="app"><div class="ghost"></div>Takvim</div>
+          <div class="app"><div class="ghost"></div>Notlar</div>
+          <div class="app"><img class="icon" src="icon-a-1024.png" width="46" height="46" alt="">Maraton</div>
+          <div class="app"><div class="ghost"></div>Kamera</div>
+          <div class="app"><div class="ghost"></div>Müzik</div>
+          <div class="app"><div class="ghost"></div>Harita</div>
+          <div class="app"><div class="ghost"></div>Saat</div>
+          <div class="app"><div class="ghost"></div>Ayarlar</div>
+        </div>
+        <div style="position:absolute;left:12px;right:12px;bottom:110px" class="notif">
+          <img class="icon" src="icon-a-1024.png" width="34" height="34" alt="">
+          <div class="grow"><h4>Maraton <small>şimdi</small></h4><p>Günün durağı hazır: Paragraf, 25 dk.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex:0 0 auto">
+      <div class="label">Splash</div>
+      <div class="phone">
+        <div class="island"></div>
+        <div class="splash">
+          <svg width="132" height="60" style="--ring:#1C1C23"><use href="#mark"/></svg>
+          <div class="word" style="font-size:24px">MARATON</div>
+          <div class="tag" style="font-size:9.5px">Her gün bir adım daha</div>
+        </div>
+      </div>
+    </div>
+    <div class="card grow">
+      <div class="label">İkon boyutları</div>
+      <div class="sizes">
+        <figure><img class="icon" src="icon-a-1024.png" width="120" height="120" alt="">180</figure>
+        <figure><img class="icon" src="icon-a-1024.png" width="60" height="60" alt="">60</figure>
+        <figure><img class="icon" src="icon-a-1024.png" width="40" height="40" alt="">40</figure>
+        <figure><img class="icon" src="icon-a-1024.png" width="29" height="29" alt="">29</figure>
+      </div>
+      <div class="label" style="margin-top:32px">Renk</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div class="sw"><div class="chip" style="background:var(--accent)"></div><b>#E5343F</b><span>Kızıl · vurgu</span></div>
+        <div class="sw"><div class="chip" style="background:var(--press)"></div><b>#A81C26</b><span>Koyu kızıl</span></div>
+        <div class="sw"><div class="chip" style="background:var(--bg)"></div><b>#1C1C23</b><span>Zemin</span></div>
+        <div class="sw"><div class="chip" style="background:var(--surface)"></div><b>#28282F</b><span>Yüzey</span></div>
+        <div class="sw"><div class="chip" style="background:var(--text)"></div><b>#ECE8E4</b><span>Metin</span></div>
+        <div class="sw"><div class="chip" style="background:var(--flame)"></div><b>#FF8A3D</b><span>Seri alevi</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Tipografi -->
+  <div class="card">
+    <div class="label">Tipografi</div>
+    <div class="type">
+      <div>
+        <div class="word" style="font-size:40px">MARATON</div>
+        <small>Unbounded SemiBold · yalnız logo yazısı ve splash. Büyük harf.<br>İ Ş Ğ Ü Ö Ç — Türkçe harfler</small>
+        <div class="word" style="font-size:22px;margin-top:8px">İŞĞÜÖÇ</div>
+      </div>
+      <div>
+        <div style="font:400 56px/1 'Bricolage Grotesque';letter-spacing:-.04em">254 <span style="font-size:22px;color:var(--text2)">gün</span></div>
+        <small>Bricolage Grotesque · uygulamada başlık ve kahraman sayılar</small>
+      </div>
+      <div>
+        <div style="font:500 15px/1.6 Archivo">Rotan bugün iki durak: Paragraf ve Temel Kavramlar. Bitirince hat bir durak uzar.</div>
+        <small>Archivo · arayüz metni, butonlar, etiketler</small>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
