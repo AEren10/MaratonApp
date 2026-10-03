@@ -22,12 +22,12 @@ function setupStackScreenKeys() {
 
 const TAB_ORDER = [TAB_KEYS.ROTA, TAB_KEYS.PROGRAM, TAB_KEYS.ANALIZ, TAB_KEYS.PROFIL];
 
-test("tabbar tasarim etiketleri Rota Program Analiz Profil olarak kalir", () => {
+test("tabbar etiketleri Ana Sayfa Program Analiz Profil (4 Ekim: Rota sayfasiyla karismasin)", () => {
   const src = readFileSync("src/navigation/TabBar.js", "utf8");
-  for (const label of ["Rota", "Program", "Analiz", "Profil"]) {
+  for (const label of ["Ana Sayfa", "Program", "Analiz", "Profil"]) {
     assert.match(src, new RegExp(`label: "${label}"`));
   }
-  assert.doesNotMatch(src, /label: "Ana Sayfa"|label: "Dersler"/);
+  assert.doesNotMatch(src, /label: "Rota"|label: "Dersler"/);
   assert.doesNotMatch(src, /C\.orange/);
 });
 

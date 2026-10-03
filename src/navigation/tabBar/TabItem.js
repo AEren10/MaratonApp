@@ -17,7 +17,8 @@ export function TabItem({ tab, active, onPress, onPressIn, onLongPress, C }) {
   const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 - p.get() * 0.1 }] }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: p.get() }));
   const press = (v) => { if (!reduced) p.set(withTiming(v, v ? PRESS : RELEASE)); };
-  const tone = active ? C.text : C.text3;
+  // Secili sekme kirmizi: hangi sayfadaysan onun ikonu ve adi.
+  const tone = active ? C.accentBright : C.text3;
 
   return (
     <Pressable

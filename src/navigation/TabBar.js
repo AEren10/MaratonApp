@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Keyboard, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../contexts/ThemeContext";
 import { SHADOW } from "../themes/tokens";
 import { TabItem } from "./tabBar/TabItem";
@@ -12,7 +11,7 @@ import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
 
 const TABS = [
-  { key: SCREENS.HOME, label: "Rota", icon: "home", hint: "Rota ana sayfasına gider" },
+  { key: SCREENS.HOME, label: "Ana Sayfa", icon: "home", hint: "Ana sayfaya gider" },
   { key: SCREENS.CURRICULUM_MAP, label: "Program", icon: "book", hint: "Program ekranını gösterir" },
   { key: "Add", label: "Kaydet", icon: "plus", center: true },
   { key: SCREENS.ANALYSIS, label: "Analiz", icon: "chart", hint: "Analiz ekranına gider" },
@@ -66,13 +65,6 @@ export function TabBar({ state, navigation }) {
         onAction={(screen, params) => navigation.navigate(screen, params)}
       />
       <View style={[s.dock, { backgroundColor: C.bg, paddingBottom: insets.bottom > 0 ? insets.bottom - 4 : 12 }]}>
-        {/* Icerik kapsule sert cizgiyle degil yumusak kararmayla girer. */}
-        <LinearGradient
-          colors={[C.alpha(C.bg, 0), C.alpha(C.bg, 70), C.bg]}
-          locations={[0, 0.6, 1]}
-          style={s.fade}
-          pointerEvents="none"
-        />
         <View
           onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
           style={[s.capsule, { backgroundColor: C.surface, borderColor: C.edgeStrong }, !isDark && SHADOW.cardLight]}
@@ -102,7 +94,6 @@ function useAndroidKeyboard() {
 
 const s = StyleSheet.create({
   dock: { paddingHorizontal: 14, paddingTop: 6 },
-  fade: { position: "absolute", top: -36, left: 0, right: 0, height: 36 },
   capsule: {
     flexDirection: "row",
     alignItems: "center",
