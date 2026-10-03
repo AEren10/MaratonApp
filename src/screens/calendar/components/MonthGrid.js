@@ -6,7 +6,7 @@ import { alpha } from "../../../themes/palette";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
 import { useMonthRoutePlan } from "../../../hooks/useMonthRoutePlan";
 import { Press } from "../../../components/design/Press";
-import { Icon } from "../../../components/design/Icon";
+import { LiveFlame } from "../../../components/streak/LiveFlame";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
@@ -63,7 +63,7 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
       {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
       {worked ? (
         <View style={[styles.flame, { backgroundColor: C.bg }]} pointerEvents="none">
-          <Icon name="flame" size={17} color={C.flame} fill={C.flame} />
+          <LiveFlame size={26} phase={(date.getDate() * 137) % 600} />
         </View>
       ) : null}
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   // Alev kutunun sag ust KOSESINE oturur (kenar cizgisinin kesisimi);
   // zemin renginde kucuk daire cizgiyi keser, alev one cikar.
-  flame: { position: "absolute", top: -7, right: -7, width: 23, height: 23, borderRadius: 12, alignItems: "center", justifyContent: "center", zIndex: 2 },
+  flame: { position: "absolute", top: -10, right: -10, width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", zIndex: 2 },
   draftDots: {
     opacity: 0.45,
   },

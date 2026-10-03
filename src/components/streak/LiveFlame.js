@@ -21,7 +21,7 @@ const loop = (to, ms, delay = 0) => withDelay(delay, withRepeat(withTiming(to, {
  * hafif salinir, ic cekirdek ayri ritimde atar. Hareketi azalt acikken durgun.
  * lit=false: seri yok -> gri, hareketsiz.
  */
-export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true }) {
+export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true }) {
   const C = useC();
   const reduced = useReducedMotion();
   const still = reduced || !lit;
@@ -32,24 +32,25 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true }) {
 
   useEffect(() => {
     if (still) return;
-    rise.set(loop(1, 620));
-    sway.set(loop(1, 1180, 120));
-    core.set(loop(1, 440, 60));
-    glow.set(loop(1, 1500));
-  }, [still, rise, sway, core, glow]);
+    // phase: yan yana alevler (takvim) ayni anda nefes almasin.
+    rise.set(loop(1, 560, phase));
+    sway.set(loop(1, 980, phase + 120));
+    core.set(loop(1, 340, phase + 60));
+    glow.set(loop(1, 1300, phase));
+  }, [still, rise, sway, core, glow, phase]);
 
   const outerStyle = useAnimatedStyle(() => ({
     transform: [
-      { scaleY: 1 + rise.get() * 0.07 },
-      { scaleX: 1 - rise.get() * 0.025 },
-      { rotate: `${(sway.get() - 0.5) * 6}deg` },
+      { scaleY: 1 + rise.get() * 0.11 },
+      { scaleX: 1 - rise.get() * 0.04 },
+      { rotate: `${(sway.get() - 0.5) * 9}deg` },
     ],
   }));
   const coreStyle = useAnimatedStyle(() => ({
-    opacity: 0.75 + core.get() * 0.25,
-    transform: [{ scaleY: 0.9 + core.get() * 0.18 }, { translateY: -core.get() * size * 0.02 }],
+    opacity: 0.7 + core.get() * 0.3,
+    transform: [{ scaleY: 0.86 + core.get() * 0.26 }, { scaleX: 1.04 - core.get() * 0.08 }, { translateY: -core.get() * size * 0.03 }],
   }));
-  const glowStyle = useAnimatedStyle(() => ({ opacity: 0.35 + glow.get() * 0.4, transform: [{ scale: 0.92 + glow.get() * 0.12 }] }));
+  const glowStyle = useAnimatedStyle(() => ({ opacity: 0.4 + glow.get() * 0.5, transform: [{ scale: 0.9 + glow.get() * 0.18 }] }));
 
   const base = lit ? C.flame : C.text3;
   const tip = lit ? C.warn : C.text3;
@@ -57,7 +58,7 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true }) {
 
   return (
     <View style={box} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {lit ? (
+      {lit && withGlow ? (
         <Animated.View style={[StyleSheet.absoluteFill, glowStyle]}>
           <Svg width={size} height={size} viewBox="0 0 24 24">
             <Defs>

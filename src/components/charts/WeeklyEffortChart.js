@@ -68,7 +68,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
             {day.minutes > 0 ? (
               <SvgText
                 x={cx} y={labelYOf(i, barTop)}
-                fill={C.text2} fontSize={11} fontWeight="600" textAnchor="middle"
+                // Cizgiyi gecen gunun etiketi yesil: odul hissi, cubuk tek ton kalir.
+                fill={goal > 0 && day.minutes >= goal ? C.up : C.text2} fontSize={11} fontWeight="600" textAnchor="middle"
               >
                 {compactDuration(day.minutes)}
               </SvgText>
