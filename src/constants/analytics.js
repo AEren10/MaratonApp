@@ -95,6 +95,10 @@ export const EVENTS = {
   DEEP_LINK_OPENED: "deep_link.opened",
   REFERRAL_LINK_SHARED: "referral.link_shared",
   REFERRAL_LINK_APPLIED: "referral.link_applied",
+  PUBLIC_PROFILE_VIEWED: "social.public_profile_viewed",
+  FRIEND_REQUEST_SENT: "social.friend_request_sent",
+  FRIEND_REQUEST_RESPONDED: "social.friend_request_responded",
+  PROFILE_VISIBILITY_CHANGED: "profile.visibility_changed",
 
   // Push Notifications
   PUSH_TOKEN_REGISTERED: "push.token_registered",

@@ -15,6 +15,8 @@ import {
 } from "../supabase/friends";
 import { captureError } from "../lib/errorReporting";
 import * as H from "../lib/haptics";
+import { EVENTS } from "../constants/analytics";
+import { track } from "../lib/analytics";
 
 export function useFriends({ showAlert } = {}) {
   const { user } = useAuth();
@@ -91,6 +93,7 @@ export function useFriends({ showAlert } = {}) {
     setSending(targetId);
     try {
       await sendFriendRequest(targetId);
+      track(EVENTS.FRIEND_REQUEST_SENT, { source: "friends" });
       H.success();
       showAlert?.("İstek gönderildi", "Arkadaşlık isteğin iletildi.");
       load();
@@ -114,6 +117,7 @@ export function useFriends({ showAlert } = {}) {
   const respond = useCallback(async (id, accept) => {
     try {
       await respondToRequest(id, accept, userId);
+      track(EVENTS.FRIEND_REQUEST_RESPONDED, { accepted: !!accept });
       load();
     } catch (e) {
       showAlert?.("Hata", e.message || "İşlem başarısız.");
