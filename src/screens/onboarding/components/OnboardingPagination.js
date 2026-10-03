@@ -43,9 +43,9 @@ function SegmentBar({ isActive, isPast, duration = 6000, C, reduced }) {
 export function OnboardingPagination({
   total = 3,
   current = 0,
+  cycle = 0,
   duration = 6000,
   onSelect,
-  onSkip,
   C,
 }) {
   const reduced = useReducedMotion();
@@ -59,31 +59,17 @@ export function OnboardingPagination({
             MARATON
           </Text>
         </View>
-
-        {current < total - 1 ? (
-          <Press
-            haptic="none"
-            onPress={onSkip}
-            hitSlop={14}
-            accessibilityRole="button"
-            accessibilityLabel="Tanıtımı atla"
-            style={s.skipBtn}
-          >
-            <Text style={[TYPOGRAPHY.captionMedium, { color: C.text3 }]}>Atla</Text>
-          </Press>
-        ) : (
-          <View style={s.skipPlaceholder} />
-        )}
       </View>
 
       <View style={s.segments}>
         {Array.from({ length: total }).map((_, i) => (
           <Press
-            key={i}
-            haptic="selection"
+            // Tur degisince cubuklar sifirdan dolar (film basa sardi).
+            key={`${cycle}-${i}`}
+            haptic="none"
             onPress={() => onSelect(i)}
             accessibilityRole="button"
-            accessibilityLabel={`Sayfa ${i + 1}`}
+            accessibilityLabel={`Sahne ${i + 1}`}
             style={s.segmentTouch}
           >
             <SegmentBar
@@ -110,19 +96,12 @@ const s = StyleSheet.create({
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   brandDot: { width: 7, height: 7, borderRadius: 3.5 },
-  skipBtn: {
-    minHeight: CONTROL.tapMin,
-    minWidth: CONTROL.tapMin,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  skipPlaceholder: { minHeight: CONTROL.tapMin, minWidth: CONTROL.tapMin },
   segments: {
     flexDirection: "row",
     gap: STEP.s1,
     marginTop: STEP.s1,
   },
-  segmentTouch: { flex: 1, paddingVertical: 6 },
+  segmentTouch: { flex: 1, paddingVertical: 10 },
   segmentTrack: { height: 3, borderRadius: 1.5, overflow: "hidden" },
   segmentFill: { height: "100%", borderRadius: 1.5 },
 });
