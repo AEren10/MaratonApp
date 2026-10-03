@@ -66,12 +66,12 @@ export function SceneStop({ C, compact }) {
           <Circle cx={CX} cy={cyOf(0)} r={R} fill={C.up} />
           <Path d={checkD(cyOf(0))} stroke={C.bg} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
 
-          <Circle cx={CX} cy={cyOf(1)} r={R - 0.75} fill={C.surface} stroke={C.accent} strokeWidth={1.5} />
+          <Circle cx={CX} cy={cyOf(1)} r={R - 0.75} fill={C.bg} stroke={C.accent} strokeWidth={1.5} />
           <AnimatedCircle cx={CX} cy={cyOf(1)} r={R} fill={C.up} animatedProps={fillProps} />
           <AnimatedPath d={checkD(cyOf(1))} stroke={C.bg} strokeWidth={2} fill="none" strokeLinecap="round"
             strokeLinejoin="round" strokeDasharray={CHECK_LEN} animatedProps={checkProps} />
 
-          <Circle cx={CX} cy={cyOf(2)} r={R - 0.75} fill={C.surface} stroke={C.border} strokeWidth={1.5} />
+          <Circle cx={CX} cy={cyOf(2)} r={R - 0.75} fill={C.bg} stroke={C.border} strokeWidth={1.5} />
           <AnimatedCircle cx={CX} cy={cyOf(2)} r={R - 1} fill="none" stroke={C.accent} strokeWidth={2} animatedProps={nextProps} />
         </Svg>
 

@@ -49,7 +49,7 @@ function Node({ index, progress, rowH, C }) {
     <>
       <AnimatedCircle
         cx={CX} cy={cy} r={finish ? 8 : 6}
-        fill={index === 0 ? C.accent : C.surface}
+        fill={index === 0 ? C.accent : C.bg}
         stroke={finish || index === 0 ? C.accentBright : C.border}
         strokeWidth={2}
         animatedProps={props}

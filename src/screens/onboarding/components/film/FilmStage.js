@@ -1,6 +1,6 @@
 import { View, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { SHAPE, STEP } from "../../../../themes/tokens";
+import { STEP } from "../../../../themes/tokens";
 import { REVEAL_MS } from "./filmMotion";
 import { SceneRoute } from "./SceneRoute";
 import { SceneStop } from "./SceneStop";
@@ -8,14 +8,15 @@ import { SceneWeek } from "./SceneWeek";
 
 const SCENES = { route: SceneRoute, stop: SceneStop, week: SceneWeek };
 
-// Filmin perdesi: uygulamanin kendi yuzeyiyle ayni kart. Yalniz aktif sahne
+// Filmin perdesi: kartsiz, dogrudan zemin uzerinde (kullanici: arkadaki kart
+// kalksin). Yalniz aktif sahne
 // bagli; anahtar (tur + sahne) degisince sahne bastan oynar. Sol yarisina
 // dokunmak geri, sag yarisi ileri -- hikaye kalibi.
 export function FilmStage({ sceneKey, cycle, height, compact, onPrev, onNext, C }) {
   const Scene = SCENES[sceneKey];
   return (
     <View
-      style={[s.card, { height, backgroundColor: C.surface, borderColor: C.line }]}
+      style={[s.card, { height }]}
       accessible
       accessibilityRole="image"
       accessibilityLabel="Maraton uygulamasından canlı önizleme"
@@ -39,16 +40,14 @@ export function FilmStage({ sceneKey, cycle, height, compact, onPrev, onNext, C 
 const s = StyleSheet.create({
   card: {
     width: "100%",
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
     overflow: "hidden",
   },
   scene: {
     ...StyleSheet.absoluteFillObject,
-    padding: STEP.s3,
+    paddingVertical: STEP.s3,
     justifyContent: "center",
   },
-  sceneCompact: { padding: STEP.s2 + 4 },
+  sceneCompact: { paddingVertical: STEP.s2 + 4 },
   taps: { ...StyleSheet.absoluteFillObject, flexDirection: "row" },
   half: { flex: 1 },
 });

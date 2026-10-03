@@ -7,7 +7,8 @@ import { Icon } from "../../../../components/design/Icon";
 import { TYPOGRAPHY, STEP } from "../../../../themes/tokens";
 import { draw } from "./filmMotion";
 
-// Sahne 3: haftanin emek cubuklari sirayla dolar (bugun kirmizi),
+// Sahne 3: haftanin emek cubuklari sirayla dolar (gecmis gunler kirmizi,
+// bugun parlak kirmizi),
 // sonra deneme sonucu belirir -- "deneme kaydedildi" imza aninin ozeti.
 const DAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 const VALUES = [52, 74, 38, 88, 60, 0, 0];
@@ -26,7 +27,7 @@ function Bar({ value, index, grow, barsH, C }) {
     <View style={s.col}>
       <View style={[s.slot, { height: barsH }, empty && { borderColor: C.line, borderWidth: 1, borderStyle: "dashed" }]}>
         {!empty ? (
-          <Animated.View style={[s.bar, { backgroundColor: isToday ? C.accent : C.border }, style]} />
+          <Animated.View style={[s.bar, { backgroundColor: isToday ? C.accentBright : C.accent }, style]} />
         ) : null}
       </View>
       <Text style={[TYPOGRAPHY.micro, { color: isToday ? C.accentBright : C.text3 }]}>{DAYS[index]}</Text>
