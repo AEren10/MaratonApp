@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
@@ -23,6 +24,7 @@ function RoutePreviewInner() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <MomentBackdrop />
       <View style={s.header}>
         {done ? (
           <Press haptic="none" onPress={f.back} hitSlop={12} accessibilityLabel="Seçimlere dön" style={s.side}>

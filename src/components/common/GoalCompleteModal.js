@@ -1,4 +1,5 @@
 import { memo, useEffect } from "react";
+import { MomentBackdrop } from "../design/MomentBackdrop";
 import { View, Text, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
 import Animated, {
@@ -45,6 +46,7 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
   return (
     <CenterCard visible={visible} onClose={onDismiss} style={s.card}>
+      <MomentBackdrop height={260} flip style={s.backdrop} />
       <Animated.View style={[s.badge, { backgroundColor: alpha(C.up, 16), borderColor: alpha(C.up, 35) }, badgeStyle]}>
         <Animated.View style={flagStyle}>
           <Icon name="flag" size={30} color={C.up} />
@@ -69,7 +71,8 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 });
 
 const s = StyleSheet.create({
-  card: { padding: STEP.s4, alignItems: "center", gap: STEP.s1 },
+  card: { padding: STEP.s4, alignItems: "center", gap: STEP.s1, overflow: "hidden" },
+  backdrop: { left: -40, right: undefined },
   badge: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, alignItems: "center", justifyContent: "center", marginBottom: STEP.s1 },
   center: { textAlign: "center" },
   lines: { alignSelf: "stretch", borderTopWidth: 1, marginTop: STEP.s2, paddingTop: STEP.s2, gap: 4 },

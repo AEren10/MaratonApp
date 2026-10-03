@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -68,6 +69,7 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <MomentBackdrop />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}

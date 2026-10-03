@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import { Icon, Button } from "../../components/design";
@@ -48,6 +49,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <MomentBackdrop />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}

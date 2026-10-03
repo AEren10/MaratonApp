@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -49,6 +50,7 @@ export default function TrialSummaryScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe, { backgroundColor: C.bg }]}>
+      <MomentBackdrop />
       <LinearGradient
         colors={[alpha(C.accent, 16), alpha(C.accent, 2), "transparent"]}
         style={styles.ambientGlow}

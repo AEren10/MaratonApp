@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -56,6 +57,7 @@ export default function RouteReadyScreen() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <MomentBackdrop />
       <RouteReadyHeader C={C} onBack={navigation.canGoBack() ? () => navigation.goBack() : null} />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.delay(60)}>

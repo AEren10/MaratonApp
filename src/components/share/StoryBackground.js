@@ -4,6 +4,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { alpha } from "../../themes/colorMix";
+import { MomentBackdrop } from "../design/MomentBackdrop";
 import { TYPOGRAPHY } from "../../themes/tokens";
 
 // Marka zemini: kizil gecis (kullanici karari, 29 Eylul) -- ustte marka
@@ -27,6 +28,7 @@ export function BrandBackground({ C, width, height }) {
         </Defs>
         <Rect x={-140} y={-180} width={520} height={520} fill="url(#storyGlowA)" />
       </Svg>
+      <MomentBackdrop height={height} />
       <View style={[s.topLine, { backgroundColor: alpha(C.text, 22) }]} />
     </View>
   );

@@ -8,7 +8,7 @@ import { useExam } from "../../contexts/ExamContext";
 import { setAuthIntent } from "../../lib/authIntent";
 import * as H from "../../lib/haptics";
 import { GUTTER, STEP } from "../../themes/tokens";
-import { OnboardingAmbientGlow } from "./components/OnboardingAmbientGlow";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 import { OnboardingPagination } from "./components/OnboardingPagination";
 import { OnboardingCaption } from "./components/OnboardingCaption";
 import { OnboardingFooter } from "./components/OnboardingFooter";
@@ -52,7 +52,7 @@ function OnboardingScreenInner() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
-      <OnboardingAmbientGlow C={C} />
+      <MomentBackdrop />
       <OnboardingPagination
         total={FILM_SCENES.length}
         current={film.index}
