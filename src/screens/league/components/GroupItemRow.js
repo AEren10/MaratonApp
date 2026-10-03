@@ -5,6 +5,7 @@ import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { GroupAvatarStack } from "./GroupAvatarStack";
+import { GrowBar } from "../../../components/design/GrowBar";
 
 // Grup karti: ad, uyeler (yuz yigini), haftanin ortak hedefine ilerleme ve
 // senin siran. Eskiden yalniz bir harf rozeti + "N uye · N soru" satiriydi;
@@ -53,9 +54,7 @@ export const GroupItemRow = React.memo(function GroupItemRow({ group, onSelect, 
           </Text>
         </View>
         {target > 0 ? (
-          <View style={[s.track, { backgroundColor: C.track }]}>
-            <View style={[s.fill, { width: `${Math.round(share * 100)}%`, backgroundColor: share >= 1 ? C.up : C.accent }]} />
-          </View>
+          <GrowBar value={share} color={share >= 1 ? C.up : C.accent} track={C.track} />
         ) : null}
       </View>
     </Press>
@@ -70,6 +69,4 @@ const s = StyleSheet.create({
   rank: { alignItems: "center", borderWidth: 1, borderRadius: SHAPE.chip + 4, paddingHorizontal: STEP.s1 + 2, paddingVertical: 4 },
   week: { gap: 6 },
   weekText: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
-  track: { height: 4, borderRadius: 2, overflow: "hidden" },
-  fill: { height: "100%", borderRadius: 2 },
 });

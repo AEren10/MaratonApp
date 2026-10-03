@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useC } from "../../../contexts/ThemeContext";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { GrowBar } from "../../../components/design/GrowBar";
 
 const qOf = (m) => Number(m.weekly_questions ?? m.questions ?? 0) || 0;
 
@@ -23,9 +24,7 @@ export function GroupWeekHero({ group, members }) {
         <Text style={[TYPOGRAPHY.meta, { color: C.text2 }]}>{target > 0 ? `/ ${target} soru` : "soru"}</Text>
       </View>
       {target > 0 ? (
-        <View style={[s.track, { backgroundColor: C.track }]}>
-          <View style={[s.fill, { width: `${Math.round(share * 100)}%`, backgroundColor: share >= 1 ? C.up : C.accent }]} />
-        </View>
+        <GrowBar value={share} color={share >= 1 ? C.up : C.accent} track={C.track} height={5} delay={250} style={s.bar} />
       ) : null}
       <Text style={[TYPOGRAPHY.caption, { color: C.text2 }]}>
         {me ? `Senin payın ${mine} soru${me.rank ? ` · ${me.rank}. sıradasın` : ""}.` : "Sıralama yüklenince payın burada görünür."}
@@ -37,6 +36,5 @@ export function GroupWeekHero({ group, members }) {
 const s = StyleSheet.create({
   card: { borderRadius: SHAPE.card, borderWidth: 1, padding: STEP.s3, gap: STEP.s1, marginBottom: STEP.s2 },
   hero: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
-  track: { height: 5, borderRadius: 3, overflow: "hidden", marginVertical: 4 },
-  fill: { height: "100%", borderRadius: 3 },
+  bar: { marginVertical: 4 },
 });

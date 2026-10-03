@@ -23,7 +23,7 @@ const TABS = [
 ];
 
 const SUBTITLE = {
-  groups: "Birlikte çalış, haftayı birlikte kapat.",
+  groups: "Haftayı grubunla kapat; kıyas emek üzerinden.",
   friends: "Arkadaşlarınla haftalık soru sıralaması.",
   global: "Bu hafta en çok soru çözenler.",
 };
