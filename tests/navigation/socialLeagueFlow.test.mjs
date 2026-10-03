@@ -26,15 +26,18 @@ test("social league is not hidden in the orphan allow-list", () => {
 
 test("league screen uses social league copy and visible relationship actions", () => {
   const league = readFileSync("src/screens/league/LeagueScreen.js", "utf8");
+  const board = readFileSync("src/screens/league/LeagueBoard.js", "utf8");
+  const links = readFileSync("src/screens/league/components/SocialLinks.js", "utf8");
 
-  assert.match(league, /Sosyal/);
-  assert.match(league, /LİG/);
+  assert.match(league, /Gruplar/);
   assert.match(league, /Arkadaşlar/);
-  assert.match(league, /Genel/);
-  assert.match(league, /SIRALAMA · SORU SAYISI/);
-  assert.match(league, /Arkadaşını davet et/);
-  assert.match(league, /Yol arkadaşın/);
+  // Genel Lig v1'de bayrakla kapali (App Store 1.2); kod duruyor.
+  assert.match(league, /FEATURES\.globalLeague \? \[\{ key: "global", label: "Genel Lig" \}\]/);
+  assert.match(board, /GENEL LİG/);
+  assert.match(links, /Arkadaşını davet et/);
+  assert.match(links, /Yol arkadaşın/);
   assert.match(league, /SCREENS\.REFERRAL/);
   assert.match(league, /SCREENS\.ROUTE_COMPANION/);
   assert.doesNotMatch(league, />Topluluk</);
+  assert.doesNotMatch(league, /Sosyal Hub/);
 });

@@ -16,7 +16,7 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
   const C = useC();
   const isYou = item.you;
   const rank = Number(item.rank) || 0;
-  const medalColor = rank === 1 ? C.amber : rank === 2 ? C.text2 : rank === 3 ? C.text3 : null;
+  const medalColor = rank >= 1 && rank <= 3 ? C.text : null;
   const weeklyQuestions = Number(item.weekly_questions ?? item.questions ?? item.weekly_xp ?? 0) || 0;
   const weeklyMinutes = Number(item.weekly_minutes ?? item.weeklyMinutes ?? item.minutes ?? 0) || 0;
 
@@ -46,23 +46,23 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
 
       <View style={s.nameCol}>
         <View style={s.nameRow}>
-          <Text style={[s.name, TYPOGRAPHY.bodySemiBold, { color: isYou ? C.accent : C.text }]} numberOfLines={1}>
+          <Text style={[s.name, TYPOGRAPHY.bodySemiBold, { color: isYou ? C.accentText : C.text }]} numberOfLines={1}>
             {isYou ? "Sen" : item.name || "Öğrenci"}
           </Text>
         </View>
-        <Text style={[TYPOGRAPHY.micro, { color: item.is_studying_now ? C.green : C.muted }]} numberOfLines={1}>
+        <Text style={[TYPOGRAPHY.micro, { color: subtitle === "Şu an çalışıyor" ? C.up : C.text3 }]} numberOfLines={1}>
           {subtitle}
         </Text>
       </View>
 
       <View style={s.statsCol}>
         <View style={s.statBlock}>
-          <Text style={[TYPOGRAPHY.signalValue, { color: isYou ? C.accent : C.text }]}>{weeklyQuestions}</Text>
-          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>soru</Text>
+          <Text style={[TYPOGRAPHY.signalValue, { color: C.text }]}>{weeklyQuestions}</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>soru</Text>
         </View>
         <View style={s.statBlock}>
           <Text style={[TYPOGRAPHY.tableValue, { color: C.text2 }]}>{formatMinutes(weeklyMinutes)}</Text>
-          <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>süre</Text>
+          <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>süre</Text>
         </View>
       </View>
     </View>
