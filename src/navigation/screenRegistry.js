@@ -76,6 +76,7 @@ const PrivacyScreen = React.lazy(() => import("../screens/settings/PrivacyScreen
 const TermsScreen = React.lazy(() => import("../screens/settings/TermsScreen"));
 const AboutScreen = React.lazy(() => import("../screens/settings/AboutScreen"));
 const FriendsScreen = React.lazy(() => import("../screens/social/FriendsScreen"));
+const PublicProfileScreen = React.lazy(() => import("../screens/profile/PublicProfileScreen"));
 const ChallengeScreen = React.lazy(() => import("../screens/social/ChallengeScreen"));
 const ShareCardScreen = React.lazy(() => import("../screens/social/ShareCardScreen"));
 const MilestoneScreen = React.lazy(() => import("../screens/profile/MilestoneScreen"));
@@ -192,6 +193,7 @@ export const APP_STACK_SCREENS = [
   screen(SCREENS.LEAGUE, LeagueScreen),
   screen(SCREENS.GOALS, GoalsScreen),
   screen(SCREENS.FRIENDS, FriendsScreen),
+  screen(SCREENS.PUBLIC_PROFILE, PublicProfileScreen),
   screen(SCREENS.RANK_SIMULATOR, RankSimulatorScreen),
   screen(SCREENS.NET_FORECAST, NetForecastScreen),
   screen(SCREENS.COMPARATIVE, ComparativeScreen),
@@ -267,5 +269,4 @@ export function screensByName(names) {
     return route;
   });
 }
-
 

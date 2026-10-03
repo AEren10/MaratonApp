@@ -1,5 +1,7 @@
 import { useCallback } from "react";
+import { useNavigation } from "@react-navigation/native";
 
+import { SCREENS } from "../constants/screens";
 import { useAlert } from "../contexts/AlertContext";
 import { blockUser, sendFriendRequest } from "../supabase/friends";
 import { reportAvatar } from "../supabase/profiles";
@@ -10,6 +12,11 @@ import { markBlocked } from "../lib/blockedUsers";
 // engelle (Apple 1.2: kullanici icerigi bildirilebilir ve engellenebilir).
 export function useUserActions() {
   const showAlert = useAlert();
+  const navigation = useNavigation();
+
+  const viewProfile = useCallback((user) => {
+    navigation.navigate(SCREENS.PUBLIC_PROFILE, { userId: user.id });
+  }, [navigation]);
 
   const report = useCallback(async (user) => {
     try {
@@ -50,12 +57,13 @@ export function useUserActions() {
   const open = useCallback((user) => {
     if (!user?.id) return;
     showAlert(user.name || "Öğrenci", null, [
+      { text: "Profili gör", onPress: () => viewProfile(user) },
       { text: "Arkadaş ekle", onPress: () => addFriend(user) },
       { text: "Bildir", onPress: () => report(user) },
       { text: "Engelle", style: "destructive", onPress: () => block(user) },
       { text: "Vazgeç", style: "cancel" },
     ]);
-  }, [addFriend, block, report, showAlert]);
+  }, [addFriend, block, report, showAlert, viewProfile]);
 
   return { open };
 }

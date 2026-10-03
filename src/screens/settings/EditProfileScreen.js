@@ -98,8 +98,8 @@ export default function EditProfileScreen() {
 
           <Animated.View style={{ marginTop: STEP.s4 }}>
             <SettingsRow
-              label="Profilim herkese açık"
-              hint="Ligdeki diğer öğrenciler görebilir"
+              label="Sıralamada görün"
+              hint="Kapalıyken lig ve grup listelerinde görünmezsin"
               toggle
               value={showInLeaderboard}
               onToggle={toggleLeaderboard}

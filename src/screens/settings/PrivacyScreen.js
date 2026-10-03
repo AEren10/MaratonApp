@@ -13,6 +13,7 @@ import { SettingsGroup } from "./components/SettingsGroup";
 import { SettingsRow } from "./components/SettingsRow";
 import { useSettingsActions } from "./useSettingsActions";
 import { Press } from "../../components/design/Press";
+import { useProfileVisibility } from "../../hooks/useProfileVisibility";
 
 // Tasarimin "Gizlilik" ekrani bir HUB: belge satirlari + VERILERIN grubu.
 // Politika METNI artik burada degil, "Belge" ekraninda (DocumentScreen);
@@ -24,6 +25,7 @@ export default function PrivacyScreen() {
   // Kayit ekranindan (giristen once) da aciliyor: veri indirme ve hesap
   // silme oturum ister, o yigina kayitli da degil.
   const { user } = useAuth();
+  const { groupVisible, loading: visibilityLoading, update: updateVisibility } = useProfileVisibility();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const openExport = useCallback(() => navigation.navigate(SCREENS.DATA_EXPORT), [navigation]);
@@ -63,10 +65,23 @@ export default function PrivacyScreen() {
         </SettingsGroup>
 
         {user ? (
-          <SettingsGroup title="VERİLERİN">
-            <SettingsRow first label="Verilerimi indir" onPress={openExport} />
-            <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
-          </SettingsGroup>
+          <>
+            <SettingsGroup title="PROFİL">
+              <SettingsRow
+                first
+                label="Profilimi kimler görebilir"
+                hint={groupVisible ? "Grup üyeleri ve arkadaşlar" : "Yalnız arkadaşlar"}
+                toggle
+                value={groupVisible}
+                disabled={visibilityLoading}
+                onToggle={updateVisibility}
+              />
+            </SettingsGroup>
+            <SettingsGroup title="VERİLERİN">
+              <SettingsRow first label="Verilerimi indir" onPress={openExport} />
+              <SettingsRow label="Hesabımı sil" danger onPress={handleDeleteAccount} />
+            </SettingsGroup>
+          </>
         ) : null}
 
         <Text style={[TYPOGRAPHY.body, styles.note, { color: C.text3 }]}>
