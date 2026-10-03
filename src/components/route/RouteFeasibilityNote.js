@@ -23,11 +23,11 @@ export const RouteFeasibilityNote = memo(function RouteFeasibilityNote({ note, s
       onPress={() => { H.tap(); navigation.navigate(SCREENS.GOALS); }}
       style={[s.row, { borderColor: C.line }, style]}
     >
-      <View style={[s.dot, { backgroundColor: C.warn }]} />
+      <View style={[s.dot, { backgroundColor: C.text3 }]} />
       <View style={s.body}>
         <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>{note.title}</Text>
         <Text style={[TYPOGRAPHY.meta, s.detail, { color: C.text2 }]}>{note.detail}</Text>
-        <Text style={[TYPOGRAPHY.metaSemiBold, s.action, { color: C.warn }]}>Günlük hedefi güncelle</Text>
+        <Text style={[TYPOGRAPHY.metaSemiBold, s.action, { color: C.text }]}>Günlük hedefi güncelle</Text>
       </View>
       <Icon name="chevR" size={16} color={C.text3} />
     </Press>

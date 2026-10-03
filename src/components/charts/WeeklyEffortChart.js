@@ -94,7 +94,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
           <>
             <Line
               x1={EFFORT_PAD_LEFT} y1={goalY} x2={vbW - PAD_RIGHT} y2={goalY}
-              stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
+              stroke={C.text4} strokeWidth={1.5} strokeDasharray="4 6"
             />
             {/* Hedef yazisi yerine rota grafigindeki bayrak: cizginin sag ucunda. */}
             <RouteTargetFlag x={vbW - PAD_RIGHT} y={goalY} C={C} />
