@@ -4,7 +4,7 @@ import Animated, { LinearTransition, FadeOutUp } from "react-native-reanimated";
 
 import { Icon } from "../../../components/design/Icon";
 import { useC } from "../../../contexts/ThemeContext";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY, SHADOW } from "../../../themes/tokens";
 import { EMPTY_COPY } from "../../../constants/stateCopy";
 import { todayTR } from "../../../lib/dateUtils";
 import * as H from "../../../lib/haptics";
@@ -73,7 +73,14 @@ export function HomeTodayStops({ stops, onStartTask, onViewPlan }) {
         onPress={() => { H.tap(); onViewPlan?.(); }}
         accessibilityRole="button"
         accessibilityLabel="Programın tamamı"
-        style={({ pressed }) => [s.all, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}
+        style={({ pressed }) => [
+          s.all,
+          {
+            backgroundColor: pressed ? C.elev : C.surface,
+            borderColor: C.edgeStrong,
+          },
+          C.scheme === "light" && SHADOW.cardLight,
+        ]}
       >
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>Programın tamamı</Text>
         <View style={s.flex} />

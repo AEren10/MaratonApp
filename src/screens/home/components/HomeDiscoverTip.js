@@ -7,7 +7,7 @@ import { Press } from "../../../components/design/Press";
 import { SCREENS } from "../../../constants/screens";
 import { useC } from "../../../contexts/ThemeContext";
 import { DISCOVER_TIPS, useDiscoverTips } from "../../../hooks/useDiscoverTips";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { SHAPE, STEP, TYPOGRAPHY, SHADOW } from "../../../themes/tokens";
 
 const COPY = {
   [DISCOVER_TIPS.WIDGET]: {

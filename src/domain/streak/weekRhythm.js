@@ -13,5 +13,12 @@ export function weekRhythm({ logs = [], studyDays = 7, mondayKey, todayKey } = {
   }
   const planned = Math.max(1, Math.min(7, Number(studyDays) || 7));
   const worked = days.size;
-  return { worked, planned, text: `Bu hafta ${worked}/${planned} gün` };
+  // Pzt..Paz: o gun calisildi mi + bugunun sirasi (takvim serisi seridi).
+  const week = [];
+  const base = new Date(`${mondayKey}T12:00:00Z`);
+  for (let i = 0; i < 7; i += 1) {
+    const key = new Date(base.getTime() + i * 86400000).toISOString().slice(0, 10);
+    week.push({ key, done: days.has(key), today: key === todayKey, future: key > todayKey });
+  }
+  return { worked, planned, week, text: `Bu hafta ${worked}/${planned} gün` };
 }

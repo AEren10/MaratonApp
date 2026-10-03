@@ -19,24 +19,24 @@ export { alpha };
 
 // Derinlik belirteçleri.
 // Koyu temada gölge YOKTUR (derinlik yüzey tonu + 1px kenarlıkla kurulur).
-// Açık temada yalnız kart/panel seviyesinde çok hafif sıcak kahve gölgesi kullanılır.
+// Açık temada yalnız kart/panel seviyesinde çok hafif nötr mikro gölge kullanılır.
 export const SHADOW = {
   cardLight: {
-    shadowColor: "#3A3026",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
   },
 };
 
-// Surface elevation (gölge) — light için sıcak kahve tonlu, dark için minimal
+// Surface elevation (gölge) — light için nötr zarif mikro gölge, dark için minimal
 export const ELEVATION = {
   light: {
-    sm: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4,  elevation: 1 },
-    md: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8,  elevation: 2 },
-    lg: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 4 },
-    xl: { shadowColor: "#3A3026", shadowOffset: { width: 0, height: 12}, shadowOpacity: 0.10, shadowRadius: 28, elevation: 8 },
+    sm: { shadowColor: "#000000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 3,  elevation: 1 },
+    md: { shadowColor: "#000000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 6,  elevation: 2 },
+    lg: { shadowColor: "#000000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 4 },
+    xl: { shadowColor: "#000000", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 20, elevation: 6 },
   },
   dark: {
     sm: { shadowColor: "#000",    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.20, shadowRadius: 6,  elevation: 2 },

@@ -2,14 +2,14 @@ import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
-import { Icon } from "../design/Icon";
+import { LiveFlame } from "./LiveFlame";
 import { useC } from "../../contexts/ThemeContext";
 import { alpha } from "../../themes/colorMix";
 import { ANIMATION } from "../../themes/tokens";
 
 const SETTLE = { duration: 520, dampingRatio: 0.55 };
 
-// Seri alevi: parlayan halkada dolu alev. Acilista hafifce yerine oturur;
+// Seri alevi: parlayan halkada CANLI alev (LiveFlame: titrer, salinir). Acilista hafifce yerine oturur;
 // seri ARTINCA bir kez "pit" yapar (kuculur, yaylanip oturur). Konfeti yok.
 export function FlameBadge({ value = 0, size = 44 }) {
   const C = useC();
@@ -35,7 +35,7 @@ export function FlameBadge({ value = 0, size = 44 }) {
   return (
     <View style={[s.halo, { width: size, height: size, borderRadius: size / 2, backgroundColor: alpha(color, lit ? 14 : 8) }]}>
       <Animated.View style={style}>
-        <Icon name="flame" size={Math.round(size * 0.52)} color={color} fill={lit ? color : "none"} />
+        <LiveFlame size={Math.round(size * 0.72)} lit={lit} />
       </Animated.View>
     </View>
   );

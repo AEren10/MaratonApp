@@ -22,10 +22,10 @@ export const SEEDS = {
   light: {
     // Acik zeminde parlak kizil "alarm" gibi bagiriyordu: koyu sarap tonu.
     accent: "#C42633",
-    bg: "#EDE7DF",      // Sicak editorial kagit zemini (Brief 22 / Kullanici karari)
-    canvas: "#E4DDD5",
+    bg: "#F6F6F8",      // Ferah, temiz neutral-light zemin (Apple/Linear standardi)
+    canvas: "#F6F6F8",
     text: "#16120F",
-    up: "#10632E",      // AA: bg 6.01 / elev 7.38
+    up: "#10632E",      // AA: bg 6.84 / elev 7.38
   },
 };
 
@@ -44,32 +44,31 @@ const FIXED = {
     danger: "#F0555F",
   },
   light: {
-    // Kahverengimsi tonlar hissi camurlastiriyordu: notr sicak gri.
-    // AA (bg / surface / elev): text2 8.07 / 9.91 · text3 5.44 / 6.68
-    text2: "#47423F",
-    text3: "#615B57",
-    text4: "#9C9590",
-    text5: "#C9C1BA",
+    // Notr modern gri basamaklar.
+    // AA (bg / surface / elev): text2 7.64 / 8.24 · text3 4.68 / 5.05
+    text2: "#4E4E56",
+    text3: "#6E6E77",
+    text4: "#9C9CA4",
+    text5: "#D1D1D8",
     accentInk: "#FFFFFF",
-    accentBright: "#A81C27", // AA: bg 5.98 / elev 7.34
-    down: "#566B79",         // AA: bg 4.53 / elev 5.56 (kotu haber bagirmaz)
-    warn: "#92400E",         // AA: bg 5.77 / elev 7.09
-    danger: "#C4262F",       // AA: bg 4.66 / elev 5.73
+    accentBright: "#A81C27", // AA: bg 6.80 / elev 7.34
+    down: "#566B79",         // AA: bg 5.15 / elev 5.56 (kotu haber bagirmaz)
+    warn: "#92400E",         // AA: bg 6.57 / elev 7.09
+    danger: "#C4262F",       // AA: bg 5.31 / elev 5.73
   },
 };
 
-// Acik temada yuzey basamaklari: sicak kagit zemini (#EDE7DF) uzerinde beyaz
-// kartlar (#FFFFFF), ince sicak kenarlik (#DCD2C5) ve cok hafif sicak kahve golgesi.
-// Camurlu kum yuzeyi (#E6D6C1) kalkti; kartlar temiz beyaz, girintiler (void/track)
-// zeminden bir kademe koyu kuyu.
+// Acik temada yuzey basamaklari: ferah notr zemin (#F6F6F8) uzerinde saf beyaz
+// kartlar (#FFFFFF), cok ince zarif kenarlik (#EAEAEF) ve mikro golge.
+// Camurlu sari/kahve tonlar kalkti; kartlar ve girintiler temiz iOS standartlarinda.
 const LIGHT_SURFACES = {
   surface: "#FFFFFF",
   elev: "#FFFFFF",
-  border: "#D0C5B5",
-  line: "#DCD2C5",
-  track: "#DDD5CA",
-  void: "#E4DDD5",
-  sand: "#EADDCB",
+  border: "#E2E2EA",
+  line: "#EAEAEF",
+  track: "#E5E5EB",
+  void: "#EEEEF4",
+  sand: "#F2F0EB",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise

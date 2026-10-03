@@ -16,3 +16,13 @@ test("counts distinct study days of this week only", () => {
 test("undefined schedule means a seven day week", () => {
   assert.equal(weekRhythm({ logs: [], mondayKey: "2026-09-28", todayKey: "2026-10-02" }).text, "Bu hafta 0/7 gün");
 });
+
+test("hafta seridi: hangi gun calisildi, bugun hangisi, gelecek hangileri", () => {
+  const r = weekRhythm({
+    logs: [{ study_date: "2026-09-28" }, { study_date: "2026-09-30" }],
+    mondayKey: "2026-09-28", todayKey: "2026-09-30",
+  });
+  assert.deepEqual(r.week.map((d) => d.done), [true, false, true, false, false, false, false]);
+  assert.equal(r.week.findIndex((d) => d.today), 2);
+  assert.deepEqual(r.week.map((d) => d.future), [false, false, false, true, true, true, true]);
+});
