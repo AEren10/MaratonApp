@@ -33,6 +33,8 @@ test("friend mutations are server authoritative and direct client writes are rev
   assert.match(friendsApi, /rpc\("cancel_friend_request"/);
   assert.match(friendsApi, /rpc\("remove_friend"/);
   assert.match(friendsApi, /rpc\("unblock_user"/);
+  assert.match(migration, /f\.status <> 'blocked'/);
+  assert.match(migration, /ON CONFLICT \(requester_id, addressee_id\) DO UPDATE/);
 });
 
 test("friend notification templates and recipients cannot be supplied by clients", () => {

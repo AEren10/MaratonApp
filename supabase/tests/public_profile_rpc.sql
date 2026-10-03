@@ -63,6 +63,19 @@ BEGIN
 
   UPDATE public.friendships SET status = 'blocked'
    WHERE requester_id = viewer AND addressee_id = target;
+
+  -- A reverse block/unblock must not erase the original user's block.
+  PERFORM set_config('request.jwt.claim.sub', target::text, true);
+  PERFORM public.block_user(viewer);
+  PERFORM public.unblock_user(viewer);
+  IF NOT EXISTS (
+    SELECT 1 FROM public.friendships
+     WHERE requester_id = viewer AND addressee_id = target AND status = 'blocked'
+  ) THEN
+    RAISE EXCEPTION 'reverse block cycle removed the original block';
+  END IF;
+  PERFORM set_config('request.jwt.claim.sub', viewer::text, true);
+
   BEGIN
     PERFORM public.get_public_profile(target);
     RAISE EXCEPTION 'blocked profile was visible';

@@ -358,12 +358,17 @@ BEGIN
     least(v_caller::text, p_target::text) || greatest(v_caller::text, p_target::text), 2
   ));
 
+  -- Remove the social relationship, but never delete a block owned by the
+  -- other person. Blocks are directional so each user controls only their own.
   DELETE FROM public.friendships f
-   WHERE (f.requester_id = v_caller AND f.addressee_id = p_target)
-      OR (f.requester_id = p_target AND f.addressee_id = v_caller);
+   WHERE f.status <> 'blocked'
+     AND ((f.requester_id = v_caller AND f.addressee_id = p_target)
+       OR (f.requester_id = p_target AND f.addressee_id = v_caller));
 
   INSERT INTO public.friendships (requester_id, addressee_id, status, created_at, responded_at)
-  VALUES (v_caller, p_target, 'blocked', now(), now());
+  VALUES (v_caller, p_target, 'blocked', now(), now())
+  ON CONFLICT (requester_id, addressee_id) DO UPDATE
+    SET status = 'blocked', responded_at = now();
 END;
 $$;
 
