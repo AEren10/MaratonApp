@@ -13,7 +13,7 @@ function LevelTestSubjectRow({ subject, value, onChangeText }) {
       accessibilityLabel={`${subject.name} net girişi`}
     >
       <View style={[styles.dot, { backgroundColor: subject.color }]} />
-      <Text style={[TYPOGRAPHY.bodyMedium, styles.name, { color: C.text }]}>
+      <Text numberOfLines={1} style={[TYPOGRAPHY.bodyMedium, styles.name, { color: C.text }]}>
         {subject.name}
       </Text>
       <TextInput
@@ -45,5 +45,7 @@ const styles = StyleSheet.create({
   },
   dot: { width: 8, height: 8, borderRadius: 1 },
   name: { flex: 1 },
-  input: { minWidth: 44, textAlign: "right", padding: 0 },
+  // Sabit genislik: web ve bazi Android surumlerinde TextInput icerigi kadar
+  // daralmiyor, ders adini iki satira itiyordu ("Fen / Bilimleri").
+  input: { width: 64, textAlign: "right", padding: 0 },
 });
