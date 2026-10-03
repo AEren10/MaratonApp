@@ -8,6 +8,7 @@ import { selectTYTTrials, selectLGSTrials } from "../store/slices/trialSlice";
 import { getAllSubjectsFlat } from "../data/curriculum";
 import { firstRouteAction } from "../domain/route/routeStartAction";
 import { resolveRouteReadyCurrentNet } from "../domain/route/routeReadySummary";
+import { upcomingRouteStops } from "../domain/route/upcomingStops";
 
 const SUBJECT_LABELS = Object.fromEntries(
   getAllSubjectsFlat().map((s) => [s.key, s.label]),
@@ -33,13 +34,7 @@ export function useRouteReadySummary() {
     [route.weeks],
   );
 
-  const upcomingStops = useMemo(() => allStops.slice(0, 4).map((stop, index) => ({
-    key: stop.stopId || `${stop.subject}-${stop.topic}-${index}`,
-    position: index + 1,
-    subject: stop.subject,
-    name: stop.topic,
-    when: index === 0 ? "Bugün" : `${index + 1}. durak`,
-  })), [allStops]);
+  const upcomingStops = useMemo(() => upcomingRouteStops(allStops), [allStops]);
 
   const firstStopAction = useMemo(() => firstRouteAction(allStops), [allStops]);
 
