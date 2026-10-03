@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Avatar, Button } from "../../../components/design";
 import { useC } from "../../../contexts/ThemeContext";
-import { GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, GUTTER, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 const EXAM_LABELS = { tyt: "TYT", tyt_ayt: "TYT + AYT", ayt: "AYT", dil: "TYT + YDT", lgs: "LGS" };
 
@@ -20,7 +20,7 @@ export function PublicProfileHeader({ profile, sending, onAdd, onRequests }) {
   const exam = EXAM_LABELS[String(profile.examType || "").toLowerCase()] || profile.examType || "Sınav bilgisi yok";
   return (
     <View style={styles.wrap}>
-      <Avatar init={initials} image={profile.avatarUrl} size={76} ring={2} />
+      <Avatar init={initials} image={profile.avatarUrl} size={CONTROL.buttonPrimary + STEP.s3} />
       <Text style={[TYPOGRAPHY.heading, styles.name, { color: C.text }]}>{profile.name}</Text>
       <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>{exam}</Text>
       <Button

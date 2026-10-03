@@ -47,8 +47,17 @@ function friendlyError(message = ""): { message: string; status: number } {
 async function sendPush(
   supabase: ReturnType<typeof createClient>,
   result: MutationResult,
+  actorId: string,
 ): Promise<boolean> {
   if (!result.recipient_id || !result.notification_kind) return false;
+  const { data: allowed, error: allowedError } = await supabase.rpc("friend_notification_allowed", {
+    p_actor: actorId,
+    p_recipient: result.recipient_id,
+    p_friendship_id: result.friendship_id,
+    p_kind: result.notification_kind,
+  });
+  // Avoid dispatch if the authorization re-check cannot be completed.
+  if (allowedError || allowed !== true) return false;
   const { data: recipient } = await supabase
     .from("profiles")
     .select("expo_push_token")
@@ -121,7 +130,7 @@ Deno.serve(async (req) => {
   }
 
   const result = data as MutationResult;
-  const pushed = await sendPush(supabase, result).catch(() => false);
+  const pushed = await sendPush(supabase, result, authData.user.id).catch(() => false);
   return json({
     friendship: { id: result.friendship_id },
     accepted: payload.action === "respond" ? payload.accept : undefined,

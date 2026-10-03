@@ -18,7 +18,10 @@ CREATE TABLE IF NOT EXISTS public.friend_request_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   recipient_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  friendship_id uuid NOT NULL REFERENCES public.friendships(id) ON DELETE CASCADE,
+  -- Rate-limit history must survive request cancellation/removal; otherwise a
+  -- sender could cancel and resend forever. The relationship reference is only
+  -- diagnostic and becomes null when the friendship row is removed.
+  friendship_id uuid REFERENCES public.friendships(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -297,6 +300,46 @@ REVOKE ALL ON FUNCTION public.send_friend_request_server(uuid, uuid) FROM PUBLIC
 REVOKE ALL ON FUNCTION public.respond_friend_request_server(uuid, uuid, boolean) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.send_friend_request_server(uuid, uuid) TO service_role;
 GRANT EXECUTE ON FUNCTION public.respond_friend_request_server(uuid, uuid, boolean) TO service_role;
+
+-- The Edge Function re-checks this immediately before contacting Expo. The
+-- request/accept mutation commits before the network call, so a block created
+-- in that gap must prevent delivery as well.
+CREATE OR REPLACE FUNCTION public.friend_notification_allowed(
+  p_actor uuid,
+  p_recipient uuid,
+  p_friendship_id uuid,
+  p_kind text
+)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT NOT EXISTS (
+           SELECT 1 FROM public.friendships blocked
+            WHERE blocked.status = 'blocked'
+              AND ((blocked.requester_id = p_actor AND blocked.addressee_id = p_recipient)
+                OR (blocked.requester_id = p_recipient AND blocked.addressee_id = p_actor))
+         )
+     AND EXISTS (
+           SELECT 1 FROM public.friendships current_relation
+            WHERE current_relation.id = p_friendship_id
+              AND current_relation.requester_id IN (p_actor, p_recipient)
+              AND current_relation.addressee_id IN (p_actor, p_recipient)
+              AND current_relation.requester_id <> current_relation.addressee_id
+              AND current_relation.status = CASE
+                    WHEN p_kind = 'friend_request' THEN 'pending'
+                    WHEN p_kind = 'friend_accepted' THEN 'accepted'
+                    ELSE '__invalid__'
+                  END
+         );
+$$;
+
+REVOKE ALL ON FUNCTION public.friend_notification_allowed(uuid, uuid, uuid, text)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.friend_notification_allowed(uuid, uuid, uuid, text)
+  TO service_role;
 
 CREATE OR REPLACE FUNCTION public.block_user(p_target uuid)
 RETURNS void

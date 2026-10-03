@@ -38,11 +38,13 @@ test("friend mutations are server authoritative and direct client writes are rev
 test("friend notification templates and recipients cannot be supplied by clients", () => {
   assert.match(edge, /auth\.getUser\(token\)/);
   assert.match(edge, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(edge, /rpc\("friend_notification_allowed"/);
   assert.match(edge, /maraton:\/\/friend/);
   assert.match(edge, /seni arkadaş olarak eklemek istiyor/);
   assert.match(edge, /isteğini kabul etti/);
   assert.doesNotMatch(edge, /payload\.(title|body|recipient|recipient_id|actor_name)/);
   assert.match(migration, />= 20/);
+  assert.match(migration, /friendship_id uuid REFERENCES public\.friendships\(id\) ON DELETE SET NULL/);
 });
 
 test("rollback SQL test covers profile privacy boundaries", () => {

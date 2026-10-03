@@ -25,7 +25,9 @@ export default function PrivacyScreen() {
   // Kayit ekranindan (giristen once) da aciliyor: veri indirme ve hesap
   // silme oturum ister, o yigina kayitli da degil.
   const { user } = useAuth();
-  const { groupVisible, loading: visibilityLoading, update: updateVisibility } = useProfileVisibility();
+  const {
+    groupVisible, loading: visibilityLoading, saving: visibilitySaving, update: updateVisibility,
+  } = useProfileVisibility();
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const openExport = useCallback(() => navigation.navigate(SCREENS.DATA_EXPORT), [navigation]);
@@ -70,10 +72,12 @@ export default function PrivacyScreen() {
               <SettingsRow
                 first
                 label="Profilimi kimler görebilir"
-                hint={groupVisible ? "Grup üyeleri ve arkadaşlar" : "Yalnız arkadaşlar"}
+                hint={groupVisible == null
+                  ? "Tercih yüklenemedi"
+                  : groupVisible ? "Grup üyeleri ve arkadaşlar" : "Yalnız arkadaşlar"}
                 toggle
-                value={groupVisible}
-                disabled={visibilityLoading}
+                value={groupVisible === true}
+                disabled={visibilityLoading || visibilitySaving || groupVisible == null}
                 onToggle={updateVisibility}
               />
             </SettingsGroup>

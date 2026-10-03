@@ -9,7 +9,7 @@ import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
 import { useC } from "../../contexts/ThemeContext";
 import { usePublicProfile } from "../../hooks/usePublicProfile";
-import { GUTTER, NAV_ICON, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { CONTROL, GUTTER, NAV_ICON, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { PublicProfileHeader } from "./components/PublicProfileHeader";
 import { PublicProfileStats } from "./components/PublicProfileStats";
 import { PublicStrengthMap } from "./components/PublicStrengthMap";
@@ -57,7 +57,7 @@ export default function PublicProfileScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: GUTTER, paddingVertical: STEP.s1 },
-  back: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  back: { width: CONTROL.tapMin, height: CONTROL.tapMin, alignItems: "center", justifyContent: "center" },
   title: { flex: 1, textAlign: "center" },
   scroll: { paddingBottom: STEP.s5 },
   state: { marginHorizontal: GUTTER },
