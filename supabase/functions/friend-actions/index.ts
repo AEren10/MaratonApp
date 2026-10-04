@@ -3,7 +3,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// UUID 8-4-4-4-12. Eskiden bir 4'luk grup eksikti: HICBIR gercek kimlik gecmiyordu
+// ("Profili gor" -> "Gecersiz profil", arkadas istegi reddediliyordu; 4 Ekim).
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type ActionPayload =
   | { action: "send"; addresseeId: string }

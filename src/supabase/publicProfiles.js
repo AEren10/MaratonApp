@@ -2,7 +2,9 @@ import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
 import { invalidateMyProfileCache } from "./profiles";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// UUID 8-4-4-4-12. Eskiden bir 4'luk grup eksikti: HICBIR gercek kimlik gecmiyordu
+// ("Profili gor" -> "Gecersiz profil", arkadas istegi reddediliyordu; 4 Ekim).
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function getPublicProfile(userId) {
   if (!UUID_RE.test(userId || "")) throw new Error("Geçersiz profil");
