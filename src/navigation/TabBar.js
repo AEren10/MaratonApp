@@ -9,7 +9,6 @@ import { TabIndicator } from "./tabBar/TabIndicator";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
-import { perfMark } from "../lib/perfProbe";
 
 // "+" paneli buyuk bir Modal; her sekme basisinda yeniden cizilmesin.
 const QuickAdd = memo(QuickAddSheet);
@@ -46,7 +45,6 @@ export function TabBar({ state, navigation }) {
   if (keyboard) return null;
 
   const press = (tab) => {
-    perfMark(`sekme bas: ${tab.key}`);
     const route = state.routes.find((r) => r.name === tab.key);
     const active = currentKey === tab.key;
     // Standart tabPress: ic yigin odaktaysa koke doner, kokteyse ekran
@@ -59,11 +57,10 @@ export function TabBar({ state, navigation }) {
       navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
       return;
     }
-    // AKICILIK: once hap kaymaya baslasin, agir sekme (Analiz, Program) iki
-    // kare SONRA kurulsun. Ayni karede yapilinca JS meshgul kaliyor, hap ve
-    // basma geri bildirimi takiliyordu ("tabbar kasiyor", 4 Ekim).
+    // Hap basildigi an kayar (iyimser secim); gecis HEMEN. 32ms gecikme
+    // hizli basista siraya giriyordu ve iptal edilmiyordu (4 Ekim raporu).
     setPendingKey(tab.key);
-    setTimeout(() => navigation.navigate(tab.key), 32);
+    navigation.navigate(tab.key);
   };
 
   return (
