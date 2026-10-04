@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import { SCREENS } from "../constants/screens";
 import { useAlert } from "../contexts/AlertContext";
+import { anchorOf, useAnchoredMenu } from "../contexts/AnchoredMenuContext";
 import { blockUser, sendFriendRequest } from "../supabase/friends";
 import { reportAvatar } from "../supabase/profiles";
 import { reportContent } from "../supabase/moderation";
@@ -12,6 +13,7 @@ import { markBlocked } from "../lib/blockedUsers";
 // engelle (Apple 1.2: kullanici icerigi bildirilebilir ve engellenebilir).
 export function useUserActions() {
   const showAlert = useAlert();
+  const openMenu = useAnchoredMenu();
   const navigation = useNavigation();
 
   const viewProfile = useCallback((user) => {
@@ -54,16 +56,20 @@ export function useUserActions() {
     }
   }, [showAlert]);
 
-  const open = useCallback((user) => {
+  // Dokunulan yerin yaninda kucuk menu (event verilirse oradan acilir).
+  const open = useCallback((user, event) => {
     if (!user?.id) return;
-    showAlert(user.name || "Öğrenci", null, [
-      { text: "Profili gör", onPress: () => viewProfile(user) },
-      { text: "Arkadaş ekle", onPress: () => addFriend(user) },
-      { text: "Bildir", onPress: () => report(user) },
-      { text: "Engelle", style: "destructive", onPress: () => block(user) },
-      { text: "Vazgeç", style: "cancel" },
-    ]);
-  }, [addFriend, block, report, showAlert, viewProfile]);
+    openMenu({
+      anchor: anchorOf(event),
+      title: user.name || "Öğrenci",
+      items: [
+        { label: "Profili gör", icon: "user", onPress: () => viewProfile(user) },
+        { label: "Arkadaş ekle", icon: "plus", onPress: () => addFriend(user) },
+        { label: "Bildir", icon: "flag", onPress: () => report(user) },
+        { label: "Engelle", icon: "x", destructive: true, onPress: () => block(user) },
+      ],
+    });
+  }, [addFriend, block, openMenu, report, viewProfile]);
 
   return { open };
 }

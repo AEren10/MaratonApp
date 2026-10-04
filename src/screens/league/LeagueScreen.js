@@ -60,7 +60,7 @@ const LeaderboardRow = React.memo(function LeaderboardRow({ item, totalUsers, C 
   const pressStyle = press.style;
   // Satirin tamami: profili gor / arkadas ekle / bildir / engelle (yalniz avatar degil).
   const actions = useUserActions();
-  const openActions = isYou ? undefined : () => actions.open({ id: item.user_id, name: item.name, image: item.avatar_url });
+  const openActions = isYou ? undefined : (e) => actions.open({ id: item.user_id, name: item.name, image: item.avatar_url }, e);
 
   return (
     <AnimPressable

@@ -23,6 +23,7 @@ import { ExamProvider } from "./src/contexts/ExamContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ScreenErrorBoundary } from "./src/components/common/ScreenErrorBoundary";
 import { AlertProvider } from "./src/contexts/AlertContext";
+import { AnchoredMenuProvider } from "./src/contexts/AnchoredMenuContext";
 import { NetworkProvider } from "./src/contexts/NetworkContext";
 import { ReduxHydrator } from "./src/store/hydrate";
 import { C } from "./src/themes/tokens";
@@ -90,6 +91,7 @@ function ThemedRoot() {
   const { scheme, palette } = useTheme();
   return (
     <AlertProvider>
+    <AnchoredMenuProvider>
       <View style={{ flex: 1, backgroundColor: palette.bg }}>
         <OfflineBanner />
         <WidgetSync />
@@ -98,6 +100,7 @@ function ThemedRoot() {
           <AppNavigator />
         </ScreenErrorBoundary>
       </View>
+    </AnchoredMenuProvider>
     </AlertProvider>
   );
 }

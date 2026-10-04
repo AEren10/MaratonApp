@@ -15,7 +15,7 @@ export function ReportableAvatar({ userId, name, image, size, color, you }) {
       hitSlop={6}
       accessibilityRole="button"
       accessibilityLabel={`${name || "Kullanıcı"}: profili gör veya kullanıcı işlemlerini aç`}
-      onPress={() => actions.open({ id: userId, name, image })}
+      onPress={(e) => actions.open({ id: userId, name, image }, e)}
     >
       {avatar}
     </Press>
