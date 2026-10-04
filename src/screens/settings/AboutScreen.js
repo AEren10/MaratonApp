@@ -6,6 +6,13 @@ import { Icon } from "../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, NAV_ICON } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { Press } from "../../components/design/Press";
+import Constants from "expo-constants";
+import * as Updates from "expo-updates";
+
+// Surum sabit "v1.0.0" yaziyordu. Uygulamadan okunur; OTA ile gelen paketin
+// kisa kimligi de yaninda (destek: "hangi surumdesin").
+const VERSION = Constants.expoConfig?.version || "1.0.0";
+const OTA = Updates.updateId && !Updates.isEmbeddedLaunch ? ` · ${String(Updates.updateId).slice(0, 7)}` : "";
 
 const INFO_ROWS = [
   { label: "Geliştirici", value: "Maraton Team" },
@@ -34,7 +41,7 @@ export default function AboutScreen() {
           <Icon name="zap" size={56} color={C.accent} />
         </View>
         <Text style={s.appName}>Maraton</Text>
-        <Text style={s.version}>v1.0.0</Text>
+        <Text style={s.version}>{`v${VERSION}${OTA}`}</Text>
       </View>
 
       <View style={s.infoWrap}>

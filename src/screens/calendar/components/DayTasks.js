@@ -67,10 +67,10 @@ export function DayTasks({ date, tasks = [], onAdd, onToggle, onRemove, autoOpen
           onPress={() => setShowInput(true)}
           style={s.singleLineAdd}
           accessibilityRole="button"
-          accessibilityLabel="Görev ekle"
+          accessibilityLabel="Durak ekle"
         >
           <Icon name="plus" size={14} color={C.accent} sw={1.5} />
-          <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Görev ekle</Text>
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Durak ekle</Text>
         </Press>
       ) : null}
     </View>

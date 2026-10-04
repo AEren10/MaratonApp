@@ -1,6 +1,7 @@
 import { ScrollView } from "react-native";
 import { useTabScrollTop } from "../../hooks/useTabScrollTop";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TabBackdrop } from "../../components/design/TabBackdrop";
 import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
@@ -52,6 +53,7 @@ export default function ProfileScreen() {
   return (
     <SwipeToHome>
       <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
+        <TabBackdrop />
         <ProfileTopBar />
         {loading ? (
           <ProfileSkeleton />

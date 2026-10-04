@@ -86,8 +86,8 @@ function NotificationsSettingsContent() {
             ) : null}
 
             <SettingsRow
-              label="Streak Uyarısı"
-              hint="Streak'in tehlikedeyse gece bildirilir"
+              label="Seri uyarısı"
+              hint="Serin tehlikedeyse akşam haber verir"
               toggle
               value={prefs.streakRiskEnabled}
               onToggle={(v) => update({ streakRiskEnabled: v })}
@@ -100,8 +100,8 @@ function NotificationsSettingsContent() {
               onToggle={(v) => update({ trialReminderEnabled: v })}
             />
             <SettingsRow
-              label="Görev Hatırlatıcı"
-              hint="Çalışma listen yarım kalırsa bildirir"
+              label="Durak hatırlatıcı"
+              hint="Günün durakları yarım kalırsa akşam hatırlatır"
               toggle
               value={prefs.taskReminderEnabled !== false}
               onToggle={(v) => update({ taskReminderEnabled: v })}

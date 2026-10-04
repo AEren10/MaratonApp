@@ -94,6 +94,7 @@ export function buildAnalysisViewModel({ C, examType, filter, trials }) {
       trend: prevTrial ? Number(((trial.totalNet || 0) - (prevTrial.totalNet || 0)).toFixed(2)) : null,
       trialType: trial.trialType,
       name: trial.name,
+      difficultyLevel: trial.difficultyLevel ?? trial.difficulty_level ?? null,
     };
   });
   const subjects = subjectsForFilter(C, filter, latest, examType);

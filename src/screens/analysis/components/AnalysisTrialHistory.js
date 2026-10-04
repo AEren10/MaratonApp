@@ -5,6 +5,9 @@ import { Icon } from "../../../components/design";
 import { TrialHistoryItem } from "./TrialHistoryItem";
 import { PendingSection } from "../../../components/common/PendingSection";
 
+const MOOD = { very_hard: "ÇOK ZOR", hard: "ZOR", easy: "KOLAY", very_easy: "ÇOK KOLAY" };
+const moodOf = (level) => MOOD[level] || null;
+
 export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelectTrial, onSeeAll }) {
   // Deneme yoksa UYDURMA: burada bir zamanlar "TYT 23 Haziran 58,25" ve
   // "24 kayit" sabit yaziyordu, yeni acilan hesap bunlari kendi verisi
@@ -21,12 +24,14 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
 
   const items = history.slice(0, 2).map((t, i) => ({
     id: t.id,
-    type: t.trialType || "TYT",
+    type: t.trialType || t.exam_type || "TYT",
     date: t.date || "",
     net: t.net || 0,
     trend: t.trend,
     latest: i === 0,
-    mood: t.trend == null ? null : (t.trend >= 0 ? "İYİ" : "ZOR"),
+    // Etiket ogrencinin SECTIGI zorluktan (eskiden net dususunden "ZOR"
+    // uyduruluyordu; zor demedigi deneme ZOR yaziyordu).
+    mood: moodOf(t.difficultyLevel ?? t.difficulty_level ?? t.trial?.difficultyLevel ?? t.trial?.difficulty_level),
     trial: t,
   }));
 
