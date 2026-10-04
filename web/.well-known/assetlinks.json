@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ahmeterensiranli.maraton",
+      "sha256_cert_fingerprints": [
+        "PLAY_UYGULAMA_IMZA_ANAHTARI_SHA256_BURAYA",
+        "EAS_YUKLEME_ANAHTARI_SHA256_BURAYA"
+      ]
+    }
+  }
+]

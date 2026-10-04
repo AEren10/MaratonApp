@@ -111,15 +111,15 @@
 | Diagnostics | **Evet** | **Evet** | App functionality, Analytics | Zorunlu |
 | Other app performance data | Hayir | - | - | - |
 
-> **Aciklama:** Sentry SDK kullanilir. Crash log ve diagnostik verileri Sentry sunucularina gonderilir. Bu "paylasim" sayilir cunku Sentry ucuncu taraf servis saglayicisidir.
-> **Sentry paylasim amaci:** "Service provider" olarak sec. Reklam amacli degildir.
+> **Aciklama:** Sentry SDK kullanilir. Crash log ve diagnostik verileri Sentry sunucularina gonderilir. Google Play tanimina gore servis saglayiciya (Sentry, bizim adimiza isler) aktarim "paylasim" SAYILMAZ; "Toplanir" isaretlenir, "Paylasilir" isaretlenmez.
+> **Not:** Sentry servis saglayici oldugu icin paylasim bolumune eklenmez.
 
 ### 2.14 Device or Other IDs (Cihaz Kimlikleri)
 | Veri Turu | Toplanir mi? | Paylasilir mi? | Amac | Zorunlu/Istege Bagli |
 |-----------|-------------|----------------|------|---------------------|
 | Device or other IDs | **Evet** | **Evet** | App functionality, Analytics | Zorunlu |
 
-> **Aciklama:** Expo push notification token ve Sentry device ID toplanir. Sentry'ye gonderildigi icin "paylasilir" olarak isaretlenir.
+> **Aciklama:** Expo push notification token ve Sentry device ID toplanir. Servis saglayicilara (Sentry, Expo push) aktarim paylasim sayilmaz; yalniz "Toplanir".
 
 ---
 
@@ -128,7 +128,7 @@
 ### Crash logs & Diagnostics & Device IDs
 | Soru | Cevap |
 |------|-------|
-| Is this data shared to a third party? | **Yes** (Sentry) |
+| Is this data shared to a third party? | **No** (Sentry servis saglayici; Play tanimina gore paylasim degil) |
 | Purpose of sharing | Analytics (crash tracking) |
 | Is this data shared for advertising? | **No** |
 
@@ -217,8 +217,8 @@ Her "Evet" isaretli veri turu icin asagidaki sorular sorulur:
 - [x] Email, isim, user ID toplanir olarak isaretlendi
 - [x] Foto istege bagli olarak isaretlendi
 - [x] Study log, deneme sonuclari App Activity altinda isaretlendi
-- [x] Crash log + diagnostik hem toplanir hem paylasilir (Sentry)
-- [x] Device ID hem toplanir hem paylasilir (Sentry + push token)
+- [x] Crash log + diagnostik toplanir; paylasilmaz (Sentry servis saglayici)
+- [x] Device ID toplanir; paylasilmaz (Sentry + push token servis saglayici)
 - [x] Hicbir veri reklam amaciyla paylasilmiyor
 - [x] Transit sifreleme (HTTPS/TLS) aktif
 - [x] Hesap silme yolu mevcut (in-app + web)

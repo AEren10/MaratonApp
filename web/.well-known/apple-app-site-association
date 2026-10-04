@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID_BURAYA.com.ahmeterensiranli.maraton"],
+        "components": [
+          { "/": "/referral*" },
+          { "/": "/friend*" },
+          { "/": "/group*" }
+        ]
+      }
+    ]
+  }
+}

@@ -57,3 +57,8 @@ tmp/
 
 # Ajan gorev brief'leri (yerel calisma notu)
 briefs/
+
+# Magaza / servis anahtarlari (asla repoya girmez)
+pc-api-key.json
+google-services.json
+GoogleService-Info.plist
