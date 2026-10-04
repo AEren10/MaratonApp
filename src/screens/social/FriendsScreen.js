@@ -202,15 +202,15 @@ export default function FriendsScreen() {
                 <Pressable
                   onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
                   accessibilityRole="button"
-                  accessibilityLabel="Challenge Başlat"
-                  accessibilityHint="Challenge ekranını açar"
+                  accessibilityLabel="Meydan oku"
+                  accessibilityHint="Meydan okuma ekranını açar"
                   style={({ pressed }) => [s.challengeBanner, pressed && { opacity: 0.8 }]}
                 >
                   <View style={s.challengeIcon}>
                     <Icon name="zap" size={20} color={C.accent} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Challenge Başlat</Text>
+                    <Text style={{ ...TYPOGRAPHY.bodySemiBold, color: C.text }}>Meydan oku</Text>
                     <Text style={{ ...TYPOGRAPHY.caption, color: C.sec, marginTop: 2 }}>Arkadaşınla yarış, motivasyonunu katla</Text>
                   </View>
                   <Icon name="arrowR" size={16} color={C.muted} />

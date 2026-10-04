@@ -86,8 +86,8 @@ function NotificationsSettingsContent() {
             ) : null}
 
             <SettingsRow
-              label="Streak Uyarısı"
-              hint="Streak'in tehlikedeyse gece bildirilir"
+              label="Seri uyarısı"
+              hint="Serin tehlikedeyse gece haber veririz"
               toggle
               value={prefs.streakRiskEnabled}
               onToggle={(v) => update({ streakRiskEnabled: v })}

@@ -60,6 +60,7 @@ export default function HomeScreen() {
           preset="server"
           onPrimary={h.onRefresh}
           code={h.syncError.code || "sync_read_failed"}
+          onSecondary={h.continueOffline}
         />
       </ScrollView>
     );

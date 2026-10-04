@@ -142,13 +142,25 @@ export class StorageCleanupFailedError extends Error {
   }
 }
 
-export const signInWithAppleToken = async ({ idToken, nonce }) => {
+export const signInWithAppleToken = async ({ idToken, nonce, fullName }) => {
   const { data, error } = await supabase.auth.signInWithIdToken({
     provider: "apple",
     token: idToken,
     nonce,
   });
   if (error) throw error;
+  // Apple adi YALNIZ ilk giriste verir ve token'a koymaz. Eskiden hic
+  // kaydedilmiyordu: e-postasini gizleyen kullanici Apple'in rastgele relay
+  // adresinin onekiyle selamlaniyor, siralamada adi bos gorunuyordu.
+  const name = [fullName?.givenName, fullName?.familyName].filter(Boolean).join(" ").trim();
+  if (name && !data?.user?.user_metadata?.name) {
+    try {
+      await supabase.auth.updateUser({ data: { name } });
+      if (data?.user?.id) await supabase.from("profiles").update({ name }).eq("id", data.user.id);
+    } catch (_) {
+      // Ad kaydi girisi bozmasin; kullanici Profil'den duzenleyebilir.
+    }
+  }
   return data;
 };
 

@@ -24,7 +24,7 @@ export function DeeperAnalysisSection({
       note: "Aynı hedef, 3 farklı haftalık tempo yükü",
       onPress: onSenaryolar,
     },
-    {
+    isLGS ? null : {
       name: "Net & Sıralama Tahmini",
       note: "Hedef açığı, net bandı ve tahmini sıralama simülasyonu",
       onPress: onNetTahmini,

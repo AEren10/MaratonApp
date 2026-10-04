@@ -12,19 +12,19 @@ export const LEGAL_DOCS = {
   privacy: {
     key: "privacy",
     title: "Gizlilik Politikası",
-    lastUpdated: "18 Haziran 2026",
+    lastUpdated: "4 Ekim 2026",
     sections: [
   {
     title: "Veri Toplama",
-    body: "Maraton, hizmetlerini sunabilmek için ad, e-posta adresi ve çalışma verilerinizi toplar. Bu veriler yalnızca uygulamanın işlevselliğini sağlamak amacıyla kullanılır.",
+    body: "Maraton, hizmetlerini sunabilmek için ad, e-posta adresi, çalışma ve deneme verilerinizi, yanlış defterine eklediğiniz soru fotoğraflarını ve isteğe bağlı profil fotoğrafınızı toplar. Uygulamayı geliştirmek için hangi ekranların kullanıldığına dair kullanım verisi, bildirim gönderebilmek için cihazınızın bildirim anahtarı ve hata ayıklama için çökme kayıtları da işlenir.",
   },
   {
     title: "Veri Kullanımı",
-    body: "Toplanan veriler, kişiselleştirilmiş çalışma planları oluşturmak, ilerlemenizi takip etmek ve istatistiklerinizi göstermek için kullanılır. Verileriniz üçüncü taraflarla paylaşılmaz.",
+    body: "Toplanan veriler, kişiselleştirilmiş çalışma planları oluşturmak, ilerlemenizi takip etmek ve istatistiklerinizi göstermek için kullanılır. Verileriniz satılmaz ve reklam amacıyla kimseyle paylaşılmaz. Bir çalışma grubuna katıldığınızda veya arkadaş eklediğinizde adınız, profil fotoğrafınız ve haftalık soru sayınız o kişilere görünür; deneme netleriniz görünmez.",
   },
   {
     title: "Üçüncü Taraf Hizmetleri",
-    body: "Uygulama altyapısı Supabase (veritabanı ve kimlik doğrulama), Sentry (hata takibi) ve Expo (uygulama güncellemeleri) hizmetlerini kullanmaktadır. Bu hizmetler yalnızca teknik altyapı amacıyla veri işler.",
+    body: "Uygulama altyapısı Supabase (veritabanı, dosya depolama ve kimlik doğrulama), Sentry (hata takibi), Expo (uygulama güncellemeleri ve bildirim iletimi) ve Apple ile giriş hizmetlerini kullanmaktadır. Bu hizmet sağlayıcılar verileri yalnızca bizim adımıza, teknik altyapı amacıyla işler; sunucuları yurt dışında bulunabilir.",
   },
   {
     title: "Veri Güvenliği",

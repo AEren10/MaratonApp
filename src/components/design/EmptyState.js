@@ -48,14 +48,14 @@ export function EmptyState({
         </Text>
       ) : null}
 
-      {_primary || _secondary ? (
+      {(_primary && onPrimary) || (_secondary && onSecondary) ? (
         <View style={styles.actions}>
-          {_primary ? (
+          {_primary && onPrimary ? (
             <Button variant="primary" size="lg" fullWidth onPress={onPrimary}>
               {_primary}
             </Button>
           ) : null}
-          {_secondary ? (
+          {_secondary && onSecondary ? (
             <Button variant="ghost" size="md" fullWidth onPress={onSecondary}>
               {_secondary}
             </Button>

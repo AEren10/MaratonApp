@@ -212,7 +212,7 @@ export function useStudySaveController() {
         dispatch(setStreak(newStreak));
         dispatch(setFreezeCount(freezeCount));
         if (usedFreeze) {
-          showAlert("Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
+          showAlert("Joker kullanıldı", "Bir gün atlamıştın ama joker serini korudu!");
         }
       } catch (e) { captureError(e, { context: "streak_update_studySave" }); }
       syncChallengeProgress(user.id, {

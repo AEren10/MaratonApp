@@ -66,12 +66,12 @@ export default function ChallengeScreen() {
       H.success();
       setCreating(false); setStep(0); setPick({ friend: null, metric: null, target: null });
       load();
-    } catch { H.error(); showAlert("Hata", "Challenge oluşturulamadı"); }
+    } catch { H.error(); showAlert("Hata", "Meydan okuma oluşturulamadı."); }
   }, [pick, checkFeature, showPaywall, bumpUsage, load]);
 
   const handleCancel = useCallback(async (id) => {
     if (!user?.id) return;
-    try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Challenge iptal edilemedi."); }
+    try { await cancelChallenge(id, user.id); load(); } catch { showAlert("Hata", "Meydan okuma iptal edilemedi."); }
   }, [load, showAlert, user?.id]);
 
   const handleRespond = useCallback(async (id, accept) => {
@@ -79,7 +79,7 @@ export default function ChallengeScreen() {
     try {
       await respondToChallenge(id, accept, user.id);
       H.success();
-      showAlert(accept ? "Kabul edildi!" : "Reddedildi", accept ? "Challenge başladı, bol şans!" : "Challenge reddedildi.");
+      showAlert(accept ? "Kabul edildi!" : "Reddedildi", accept ? "Meydan okuma başladı, bol şans!" : "Meydan okuma reddedildi.");
       load();
     } catch (e) { showAlert("Hata", e.message || "İşlem başarısız."); }
   }, [load, showAlert, user?.id]);
@@ -105,14 +105,14 @@ export default function ChallengeScreen() {
       <SafeAreaView edges={["top"]} style={s.safe}>
         <View style={s.header}>
           <Pressable onPress={() => { setCreating(false); setStep(0); }} hitSlop={12}><Icon name="arrowL" size={NAV_ICON.back} color={C.text2} /></Pressable>
-          <Text style={s.title}>Yeni Challenge</Text>
+          <Text style={s.title}>Yeni meydan okuma</Text>
           <View style={{ width: 20 }} />
         </View>
         <View style={{ padding: SPACING.lg, gap: SPACING.lg }}>
           {step === 0 && (
             <Animated.View style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Arkadaş Seç</Text>
-              {friends.length === 0 ? <EmptyState icon="users" title="Rakibini bul" message="Challenge başlatmak için arkadaş ekle" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
+              {friends.length === 0 ? <EmptyState icon="users" title="Rakibini bul" message="Meydan okumak için önce arkadaş ekle" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
                 <Pressable key={f.id} onPress={() => { H.select(); setPick((p) => ({ ...p, friend: f })); setStep(1); }}
                   style={[s.optionRow, pick.friend?.id === f.id && { borderColor: C.accent }]}>
                   <Icon name="user" size={16} color={C.sec} />
@@ -156,13 +156,13 @@ export default function ChallengeScreen() {
     <SafeAreaView edges={["top"]} style={s.safe}>
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" accessibilityHint="Önceki ekrana döner"><Icon name="arrowL" size={NAV_ICON.back} color={C.text2} /></Pressable>
-        <Text style={s.title}>Challenges</Text>
-        <Pressable onPress={() => setCreating(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Yeni challenge" accessibilityHint="Yeni challenge oluşturmaya başlar"><Icon name="plus" size={20} color={C.accent} /></Pressable>
+        <Text style={s.title}>Meydan okumalar</Text>
+        <Pressable onPress={() => setCreating(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Yeni meydan okuma" accessibilityHint="Yeni meydan okuma oluşturur"><Icon name="plus" size={20} color={C.accent} /></Pressable>
       </View>
 
       <Animated.View style={s.tabs}>
         {["active", "past"].map((t) => (
-          <Pressable key={t} onPress={() => { H.tap(); setTab(t); }} accessibilityRole="tab" accessibilityLabel={t === "active" ? "Aktif" : "Geçmiş"} accessibilityHint="Challenge listesini filtreler" style={[s.tab, tab === t && { backgroundColor: C.accent + "18" }]}>
+          <Pressable key={t} onPress={() => { H.tap(); setTab(t); }} accessibilityRole="tab" accessibilityLabel={t === "active" ? "Aktif" : "Geçmiş"} accessibilityHint="Meydan okuma listesini filtreler" style={[s.tab, tab === t && { backgroundColor: C.accent + "18" }]}>
             <Text style={[s.tabText, tab === t && { color: C.accentText }]}>{t === "active" ? "Aktif" : "Geçmiş"}</Text>
           </Pressable>
         ))}
@@ -174,7 +174,7 @@ export default function ChallengeScreen() {
         contentContainerStyle={{ padding: SPACING.lg, gap: SPACING.md }}
         windowSize={5}
         maxToRenderPerBatch={10}
-        ListEmptyComponent={<EmptyState icon="zap" title="Arkadaşlarınla yarışarak motive ol" message="Bir challenge oluştur, kimin daha çok çözdüğünü görün" actionLabel="Challenge Oluştur" onAction={() => setCreating(true)} color="accent" />}
+        ListEmptyComponent={<EmptyState icon="zap" title="Arkadaşlarınla yarışarak motive ol" message="Bir meydan okuma başlat, kimin daha çok çözdüğünü görün" actionLabel="Meydan oku" onAction={() => setCreating(true)} color="accent" />}
         renderItem={renderItem}
       />
     </SafeAreaView>

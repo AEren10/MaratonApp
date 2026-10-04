@@ -44,12 +44,14 @@ export function ErrorState({
       {children}
 
       <View style={styles.actions}>
-        {_primary ? (
+        {/* Elle baglanmamis preset dugmesi cizilmez: 17 ekranda hicbir sey
+            yapmayan "Çevrimdışı devam et" gorunuyordu. */}
+        {_primary && onPrimary ? (
           <Button variant="primary" size="lg" fullWidth onPress={onPrimary}>
             {_primary}
           </Button>
         ) : null}
-        {_secondary ? (
+        {_secondary && onSecondary ? (
           <Button variant="outline" size="lg" fullWidth onPress={onSecondary}>
             {_secondary}
           </Button>

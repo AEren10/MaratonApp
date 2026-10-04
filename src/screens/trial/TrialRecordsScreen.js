@@ -62,7 +62,7 @@ export default function TrialRecordsScreen() {
       ) : error ? (
         <ErrorState preset="server" onPrimary={retry} code={error.code} style={{ paddingHorizontal: GUTTER }} />
       ) : isEmpty ? (
-        <EmptyState preset="trialRecords" style={{ paddingHorizontal: GUTTER }} />
+        <EmptyState preset="trialRecords" onPrimary={() => navigation.navigate(SCREENS.TRIAL_ENTRY)} style={{ paddingHorizontal: GUTTER }} />
       ) : (
         <SectionList
           sections={sections}

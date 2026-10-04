@@ -143,7 +143,8 @@ export default function ReferralScreen() {
               {applying ? (
                 <ActivityIndicator size="small" color={C.textOnFill} />
               ) : (
-                <Text style={s.applyBtnText}>Uygula</Text>
+                // Pasifken zemin (surface2) ve yazi (textOnFill) acik temada ikisi de beyazdi.
+                <Text style={[s.applyBtnText, friendCode.trim().length < 4 && { color: C.text3 }]}>Uygula</Text>
               )}
             </AnimatedPressable>
           </View>

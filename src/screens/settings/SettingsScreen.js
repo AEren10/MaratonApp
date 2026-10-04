@@ -17,11 +17,13 @@ import { SettingsRow } from "./components/SettingsRow";
 import { SettingsDangerGroup } from "./components/SettingsDangerGroup";
 import { SyncStatusGroup } from "./components/SyncStatusGroup";
 import { useSettingsViewModel } from "./useSettingsViewModel";
+import { useExam } from "../../contexts/ExamContext";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const C = useC();
   const vm = useSettingsViewModel(navigation);
+  const { examType } = useExam();
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -56,7 +58,10 @@ export default function SettingsScreen() {
             <SettingsRow label="Günlük soru hedefi" value={vm.dailyGoalLabel} onPress={vm.go(SCREENS.GOALS)} />
             <SettingsRow label="Haftalık ders programı" onPress={vm.go(SCREENS.CLASS_SCHEDULE)} />
             <SettingsRow label="Günlük rutin" hint="Her gün paragraf, problem…" onPress={vm.go(SCREENS.ROUTE_HABITS)} />
-            <SettingsRow label="Net eşiği" hint="Hedef bölüm karşılaştırması" onPress={vm.gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
+            {/* Universite bolum esigi YKS'ye ozel; LGS'de gizli. */}
+            {String(examType || "").toLowerCase() !== "lgs" ? (
+              <SettingsRow label="Net eşiği" hint="Hedef bölüm karşılaştırması" onPress={vm.gatedGo("rank_simulator", SCREENS.RANK_SIMULATOR)} />
+            ) : null}
           </SettingsGroup>
         </Animated.View>
 
@@ -92,7 +97,7 @@ export default function SettingsScreen() {
           <SettingsGroup title="ARKADAŞLAR">
             <SettingsRow first label="Arkadaşlar" onPress={vm.go(SCREENS.FRIENDS)} />
             <SettingsRow label="Yol arkadaşın" onPress={vm.go(SCREENS.ROUTE_COMPANION)} />
-            <SettingsRow label="Challenge" onPress={vm.go(SCREENS.CHALLENGE)} />
+            <SettingsRow label="Meydan okuma" onPress={vm.go(SCREENS.CHALLENGE)} />
             <SettingsRow label="Davet et" onPress={vm.go(SCREENS.REFERRAL)} />
           </SettingsGroup>
         </Animated.View>

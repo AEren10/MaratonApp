@@ -28,7 +28,8 @@ export function useSocialAuth() {
   const signInWithApple = useCallback(async () => {
     setBusy(true);
     try {
-      const rawNonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      // Kriptografik rastgele nonce (Math.random tahmin edilebilir).
+      const rawNonce = Crypto.randomUUID();
       const hashedNonce = await Crypto.digestStringAsync(
         Crypto.CryptoDigestAlgorithm.SHA256,
         rawNonce,
@@ -41,7 +42,11 @@ export function useSocialAuth() {
         nonce: hashedNonce,
       });
       if (!credential.identityToken) throw new Error("Apple identity token missing");
-      return await signInWithAppleToken({ idToken: credential.identityToken, nonce: rawNonce });
+      return await signInWithAppleToken({
+        idToken: credential.identityToken,
+        nonce: rawNonce,
+        fullName: credential.fullName,
+      });
     } finally {
       setBusy(false);
     }

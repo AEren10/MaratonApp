@@ -94,7 +94,7 @@ export function useAddStudyController() {
           trackStreakTransition(streakResult.local);
           dispatch(setStreak(newStreak));
           dispatch(setFreezeCount(freezeCount));
-          if (usedFreeze) showAlert("Joker kullanıldı", "Bir gün atlamıştın ama jokerin streak'ini korudu!");
+          if (usedFreeze) showAlert("Joker kullanıldı", "Bir gün atlamıştın ama joker serini korudu!");
         } catch (e) { captureError(e, { context: "streak_update_addStudy" }); }
       }
       syncChallengeProgress(user.id, {

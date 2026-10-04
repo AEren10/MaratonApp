@@ -99,7 +99,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
             </View>
             <Text style={[TYPOGRAPHY.stat, { color: C.text }]}>{streak}</Text>
             <Text style={[TYPOGRAPHY.bodyMedium, { color: C.sec }]}>
-              {streak === 0 ? "Henüz streak yok" : streak === 1 ? "günlük seri" : "günlük seri"}
+              {streak === 0 ? "Henüz serin yok" : "günlük seri"}
             </Text>
           </Animated.View>
 

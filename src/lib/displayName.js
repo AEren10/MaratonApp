@@ -4,7 +4,10 @@
 // Ad auth user_metadata'sinda tutuluyor (profiles.name kolonu da var ama
 // mevcut kod yolu metadata'yi kullaniyor; ikisi ayrismasin diye buradan okunur).
 export function displayNameOf(user) {
-  return user?.user_metadata?.name || user?.email?.split("@")[0] || "Öğrenci";
+  const email = user?.email || "";
+  // Apple "e-postami gizle" adresi (x7k2...@privaterelay.appleid.com) ad degil.
+  const local = email.endsWith("privaterelay.appleid.com") ? null : email.split("@")[0];
+  return user?.user_metadata?.name || local || "Öğrenci";
 }
 
 // Yalnizca ilk ad — tasarimda selamlama tek kelime kullaniyor ("HOS GELDIN ARDA").
