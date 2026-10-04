@@ -19,6 +19,7 @@ const STAGGER_MS = 85;
 // Sonradan gelen degisiklik daha kisa: bekleyen bir acilis degil, az once
 // yaptigin seyin karsiligi.
 const CHANGE_MS = 420;
+const REPLAY_DELAY_MS = 40;
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 
 // HER CUBUK KENDI YUKSEKLIGINI TASIR.
@@ -33,7 +34,7 @@ const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 //
 // Yukseklik SVG icinde degisiyor (layout degil): Yoga yeniden calismaz,
 // deger UI thread'inde hesaplanir.
-export function EffortBar({ index, x, width, bottom, height, radius, fill, fillOpacity }) {
+export function EffortBar({ index, x, width, bottom, height, radius, fill, fillOpacity, replay = 0 }) {
   const reduced = useReducedMotion();
   const drawn = useSharedValue(reduced ? height : 0);
   const mounted = useRef(false);
@@ -61,6 +62,19 @@ export function EffortBar({ index, x, width, bottom, height, radius, fill, fillO
       );
     }
   }, [height, index, reduced, drawn]);
+
+  // Ekrana donuste YENIDEN YUKSELIS -- grafigi sokmeden (4 Ekim, kasma): eskiden
+  // butun grafik anahtarla bastan kuruluyordu, tam sekme gecisinde JS'i
+  // kilitliyordu. Simdi yalniz deger sifirlanip UI thread'inde yeniden buyur;
+  // sekme gecisi otursun diye kisa gecikmeyle.
+  const lastReplay = useRef(replay);
+  useEffect(() => {
+    if (replay === lastReplay.current) return;
+    lastReplay.current = replay;
+    if (reduced || !(height > 0.5)) return;
+    drawn.value = 0;
+    drawn.value = withDelay(REPLAY_DELAY_MS + index * STAGGER_MS, withTiming(height, { duration: GROW_MS, easing: EASE_OUT }));
+  }, [replay, height, index, reduced, drawn]);
 
   const animatedProps = useAnimatedProps(() => {
     const h = Math.max(0.01, drawn.value);

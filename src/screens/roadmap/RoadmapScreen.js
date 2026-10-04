@@ -8,7 +8,6 @@ import { useC } from "../../contexts/ThemeContext";
 import { useRouteDetail } from "../../hooks/useRouteDetail";
 import { useStudyRoute } from "../../hooks/useStudyRoute";
 import { useRoadmapNextAction } from "./useRoadmapNextAction";
-import { useReplayOnFocus } from "../../hooks/useReplayOnFocus";
 import { openProgram, PROGRAM_VIEWS } from "../../navigation/openProgram";
 import { SCREENS } from "../../constants/screens";
 import { GUTTER, STEP } from "../../themes/tokens";
@@ -30,7 +29,6 @@ export default function RoadmapScreen() {
   const navigation = useNavigation();
   const d = useRouteDetail();
   const { view } = d;
-  const replay = useReplayOnFocus();
   const route = useStudyRoute({ persist: false });
   const { weeks, isPaused, routeCreated } = route;
   const feasibility = useMemo(() => feasibilityNote({
@@ -64,7 +62,6 @@ export default function RoadmapScreen() {
           ) : (
             <>
               <RouteNetIntro
-                key={`net-${replay}`}
                 C={C}
                 view={view}
                 chartReady={d.chartReady}

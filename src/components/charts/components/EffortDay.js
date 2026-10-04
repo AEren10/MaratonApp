@@ -6,7 +6,7 @@ import { EffortSlot } from "./EffortSlot";
 
 // Haftanin TEK gunu: doldurulabilecek kutu + icini dolduran cubuk.
 export function EffortDay({
-  day, index, todayIndex, goal, x, width, bottom, goalY, yOf, radius, C,
+  day, index, todayIndex, goal, x, width, bottom, goalY, yOf, radius, C, replay,
 }) {
   const isToday = index === todayIndex;
   // Kutu HEDEF yuksekliginde: o gun doldurulabilecek alan bu kadar.
@@ -71,6 +71,7 @@ export function EffortDay({
         />
       ) : null}
       <EffortBar
+        replay={replay}
         index={index}
         x={x}
         width={width}

@@ -19,7 +19,11 @@ export function ProgramCurriculumView() {
   const navigation = useNavigation();
   const map = useCurriculumMap();
 
-  useFocusEffect(useCallback(() => { map.refresh?.(); }, [map.refresh]));
+  // Yenileme sekme gecisi oturduktan sonra (ayni karede gecisi kasiyordu).
+  useFocusEffect(useCallback(() => {
+    const timer = setTimeout(() => map.refresh?.(), 450);
+    return () => clearTimeout(timer);
+  }, [map.refresh]));
 
   const openSubject = useCallback((subject) => {
     navigation.navigate(SCREENS.SUBJECT_DETAIL, { subjectKey: subject.key, subjectName: subject.name });

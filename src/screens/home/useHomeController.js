@@ -130,11 +130,13 @@ export function useHomeController() {
   // baglıyordu. Sessiz tazeleme: iskelet yok, titresim yok, spinner yok.
   const lastFocusSyncRef = useRef(Date.now());
   useEffect(() => {
-    if (!focused || !isConnected) return;
+    if (!focused || !isConnected) return undefined;
     const now = Date.now();
-    if (now - lastFocusSyncRef.current < FOCUS_REFRESH_MS) return;
+    if (now - lastFocusSyncRef.current < FOCUS_REFRESH_MS) return undefined;
     lastFocusSyncRef.current = now;
-    refresh();
+    // Sekme gecisi oturduktan SONRA (ayni karede veri + yeniden cizim gecisi kasiyordu).
+    const timer = setTimeout(refresh, 450);
+    return () => clearTimeout(timer);
   }, [focused, isConnected, refresh]);
 
   const { dismissed: firstDayDismissed, dismiss: dismissFirstDay } = useFirstDayDismiss();

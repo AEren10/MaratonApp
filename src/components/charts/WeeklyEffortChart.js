@@ -18,7 +18,7 @@ const BAR_RADIUS = 3;
 // Haftanin emek grafigi: 7 gun, 7 cubuk, yuksekligi o gunun CALISMA SURESI
 // (soru girilmemis calisma da dolar). Soru sayisi su an grafikte YOK
 // (kullanici, 2 Ekim: yeri bulunana kadar kaldirildi).
-export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H }) {
+export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIndex, height = CHART_H, replay = 0 }) {
   const C = useC();
   const { onLayout, vbW, wide } = useChartFrame(height);
 
@@ -78,6 +78,7 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               day={day}
               index={i}
               todayIndex={todayIndex}
+              replay={replay}
               goal={goal}
               x={cx - barW / 2}
               width={barW}
