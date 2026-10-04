@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Keyboard, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useC } from "../contexts/ThemeContext";
@@ -9,6 +9,9 @@ import { TabIndicator } from "./tabBar/TabIndicator";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
+
+// "+" paneli buyuk bir Modal; her sekme basisinda yeniden cizilmesin.
+const QuickAdd = memo(QuickAddSheet);
 
 const TABS = [
   { key: SCREENS.HOME, label: "Ana Sayfa", icon: "home", hint: "Ana sayfaya gider" },
@@ -34,6 +37,8 @@ export function TabBar({ state, navigation }) {
   useEffect(() => { setPendingKey(null); }, [currentKey]);
   const shownKey = pendingKey || currentKey;
   const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === shownKey));
+  const closeSheet = useCallback(() => setSheetOpen(false), []);
+  const sheetAction = useCallback((screen, params) => navigation.navigate(screen, params), [navigation]);
 
   // Klavye acikken Android tabbar'i klavyenin ustune tasiyordu (form
   // alaninin ustunu kapatarak). iOS'ta klavye zaten ustunu ortuyor.
@@ -48,22 +53,21 @@ export function TabBar({ state, navigation }) {
       ? navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true })
       : { defaultPrevented: false };
     if (event.defaultPrevented) return;
-    if (!active) setPendingKey(tab.key);
     if (active) {
       navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
       return;
     }
-    navigation.navigate(tab.key);
+    // AKICILIK: once hap kaymaya baslasin, agir sekme (Analiz, Program) iki
+    // kare SONRA kurulsun. Ayni karede yapilinca JS meshgul kaliyor, hap ve
+    // basma geri bildirimi takiliyordu ("tabbar kasiyor", 4 Ekim).
+    setPendingKey(tab.key);
+    setTimeout(() => navigation.navigate(tab.key), 32);
   };
 
   return (
     <>
       {/* Tasarim: "Tabbar'in ortasindaki + her kok ekrandan acilir." */}
-      <QuickAddSheet
-        visible={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        onAction={(screen, params) => navigation.navigate(screen, params)}
-      />
+      <QuickAdd visible={sheetOpen} onClose={closeSheet} onAction={sheetAction} />
       <View style={[s.dock, { backgroundColor: C.bg, paddingBottom: insets.bottom > 0 ? insets.bottom - 4 : 12 }]}>
         <View
           onLayout={(e) => setWidth(e.nativeEvent.layout.width)}

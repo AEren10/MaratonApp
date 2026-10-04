@@ -46,7 +46,7 @@ export const GoalCompleteModal = memo(function GoalCompleteModal({ visible, solv
 
   return (
     <CenterCard visible={visible} onClose={onDismiss} style={s.card}>
-      <MomentBackdrop height={260} flip style={s.backdrop} />
+      <MomentBackdrop height={260} flip fadeColor={C.surface} style={s.backdrop} />
       <Animated.View style={[s.badge, { backgroundColor: alpha(C.up, 16), borderColor: alpha(C.up, 35) }, badgeStyle]}>
         <Animated.View style={flagStyle}>
           <Icon name="flag" size={30} color={C.up} />

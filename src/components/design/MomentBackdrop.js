@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
-import Svg, { Circle, Defs, G, LinearGradient, Mask, Path, Pattern, RadialGradient, Rect, Stop } from "react-native-svg";
+import Svg, { Circle, Defs, G, LinearGradient, Path, Pattern, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
 
@@ -53,12 +53,14 @@ function routeStops(w, h, flip) {
   });
 }
 
-export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1, fadeTop = false }) {
+export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1, fadeTop = false, fadeColor, fade = true }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
   const h = height || Math.round(screenH * 0.62);
   const light = C.scheme === "light";
   const k = (light ? 0.55 : 1) * strength;
+  // Sonme ortusu, dokunun ALTINDAKI zeminle ayni renkte olmali (kart: surface).
+  const fc = fadeColor || C.bg;
   const paths = useMemo(() => linePaths(width, h, flip), [width, h, flip]);
 
   return (
@@ -75,26 +77,19 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
             <Stop offset="0.35" stopColor={C.accentBright} stopOpacity={0.9} />
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
           </LinearGradient>
+          {/* PERFORMANS: SVG Mask iPhone'da her cizimde ekran disi bir katman
+              aciyor (kaydirmada kasma). Yerine zemin renginde ustten ortu:
+              ayni sonme, tek dikdortgen. */}
           <LinearGradient id="mbFade" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#fff" stopOpacity={fadeTop ? 0 : 1} />
-            <Stop offset={fadeTop ? "0.3" : "0.6"} stopColor="#fff" stopOpacity={fadeTop ? 1 : 0.7} />
-            <Stop offset="1" stopColor="#fff" stopOpacity={0} />
+            <Stop offset="0" stopColor={fc} stopOpacity={fadeTop ? 1 : 0} />
+            <Stop offset={fadeTop ? "0.3" : "0.6"} stopColor={fc} stopOpacity={fadeTop ? 0 : 0.3} />
+            <Stop offset="1" stopColor={fc} stopOpacity={1} />
           </LinearGradient>
-          <Mask id="mbMask" x={0} y={0} width={width} height={h} maskUnits="userSpaceOnUse">
-            <Rect x={0} y={0} width={width} height={h} fill="url(#mbFade)" />
-          </Mask>
           <Pattern id="mbDots" patternUnits="userSpaceOnUse" width={7} height={7}>
             <Circle cx={3.5} cy={3.5} r={0.85} fill={C.accentBright} />
           </Pattern>
-          <RadialGradient id="mbDotFall" cx={flip ? width : 0} cy={0} r={width * 1.3} gradientUnits="userSpaceOnUse">
-            <Stop offset="0" stopColor="#fff" stopOpacity={1} />
-            <Stop offset="1" stopColor="#fff" stopOpacity={0.15} />
-          </RadialGradient>
-          <Mask id="mbDotMask" x={0} y={0} width={width} height={h} maskUnits="userSpaceOnUse">
-            <Rect x={0} y={0} width={width} height={h} fill="url(#mbDotFall)" />
-          </Mask>
         </Defs>
-        <G mask="url(#mbMask)">
+        <G>
           {glow > 0 ? <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" /> : null}
           {variant === "glow" ? null : variant === "route" ? (
             <G>
@@ -108,13 +103,12 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
               ))}
             </G>
           ) : variant === "dots" ? (
-            <G mask="url(#mbDotMask)">
-              <Rect x={0} y={0} width={width} height={h} fill="url(#mbDots)" opacity={0.85 * k} />
-            </G>
+            <Rect x={0} y={0} width={width} height={h} fill="url(#mbDots)" opacity={0.6 * k} />
           ) : paths.map((p) => (
             <Path key={p.d} d={p.d} fill="none" stroke="url(#mbLine)" strokeWidth={p.sw} strokeOpacity={p.o * k} />
           ))}
         </G>
+        {fade ? <Rect x={0} y={0} width={width} height={h} fill="url(#mbFade)" /> : null}
       </Svg>
     </View>
   );
