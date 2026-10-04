@@ -35,7 +35,7 @@ export function useAddTaskState() {
   const currentTopics = useMemo(() => getTopicsForSubject(subjectKey), [subjectKey]);
 
   const [topicName, setTopicName] = useState(route.params?.topicName || currentTopics[0] || "Genel çalışma");
-  const [durVal, setDurVal] = useState("50 dk");
+  const [durVal, setDurVal] = useState(route.params?.duration || "50 dk");
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const selectedSubjectObj = groups.flatMap((g) => g.subjects).find((s) => s.key === subjectKey) || subjects[0];
