@@ -53,7 +53,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       key: "week",
       hint: "Dokun · geçmişi gör",
       a11y: weeklyEffort?.summary ? `${weeklyEffort.summary}. Çalışma geçmişini aç` : "Çalışma geçmişini aç",
-      render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} />,
+      render: () => <WeeklyEffortChart week={weeklyEffort} todayIndex={todayIndex} replay={replay} />,
       renderFooter: () => <HomeWeeklyMetrics weeklyEffort={weeklyEffort} />,
     },
     {
@@ -93,7 +93,7 @@ export function HomeHeroNormal({ solvedToday, dailyGoal, hero, onStartTask, onVi
       />
 
       <View style={s.chart}>
-        <HomeChartPager key={`pager-${replay}`} pages={pages} onPressPage={onPressPage} />
+        <HomeChartPager pages={pages} onPressPage={onPressPage} />
       </View>
 
       <Animated.View style={s.cta}>
