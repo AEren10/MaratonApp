@@ -17,15 +17,9 @@ export function RouteTopicDebtRow({ C, onPress }) {
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${totalHours} saat geride, ${stopCount} konu, borç dağıtımını aç`}
-        style={({ pressed }) => [
-          s.row,
-          {
-            backgroundColor: pressed ? C.elev : C.surface,
-            borderColor: C.elev,
-          },
-        ]}
+        style={({ pressed }) => [s.row, { borderColor: C.line, opacity: pressed ? 0.7 : 1 }]}
       >
-        <View style={[s.dot, { backgroundColor: C.warn }]} />
+        <View style={[s.dot, { backgroundColor: C.text3 }]} />
         <View style={s.copy}>
           <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text }]}>
             {`${totalHours} sa geride · ${stopCount} konu`}
@@ -46,10 +40,10 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: STEP.s2,
+    // Kutusuz satir: ust/alt ince cizgi (Rota sayfasi kutu kalabaligi, 4 Ekim).
     paddingVertical: STEP.s2 + STEP.s1 / 2,
-    paddingHorizontal: STEP.s3,
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   dot: {
     width: 8,
