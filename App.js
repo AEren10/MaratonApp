@@ -52,6 +52,8 @@ export default function App() {
     Archivo_600: require("./assets/fonts/Archivo_600.ttf"),
     Archivo_700: require("./assets/fonts/Archivo_700.ttf"),
     Bricolage_400: require("./assets/fonts/Bricolage_400.ttf"),
+    // Yalniz marka yazisi (logo yanindaki MARATON); arayuz Archivo/Bricolage.
+    Unbounded_600: require("./assets/fonts/Unbounded_600.ttf"),
   });
 
   const onLayoutRootView = useCallback(async () => {

@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 import { SCREENS } from "../../constants/screens";
+import { openHere } from "../../navigation/tabJump";
+import { TAB_KEYS } from "../../navigation/tabAssignment";
 import { PREMIUM_ENABLED } from "../../constants/premium";
 import { SOCIAL_ENABLED } from "../../constants/social";
 import { XP_VISIBLE } from "../../constants/gamification";
@@ -91,11 +93,17 @@ export default function ProfileScreen() {
             <Animated.View style={{ marginHorizontal: GUTTER, marginTop: STEP.s3 }}>
               {/* Yanlis defteri ana sayfada ve Analiz'de; hikaye ve widget
                   listeden cikip ustte kutucuk oldu. Liste hafifledi. */}
+              {/* Yanlis defteri yakinda olsun (kullanici, 4 Ekim): Analiz'in en
+                  dibinde kaliyordu. Ilk satir. */}
+              <ProfileLinkRow
+                label="Yanlış defteri"
+                onPress={() => openHere(navigation, TAB_KEYS.ANALIZ, SCREENS.WRONG_NOTEBOOK)}
+                first
+              />
               <ProfileLinkRow
                 label="Çalışma geçmişi"
                 meta={studyMeta(careerStats)}
                 onPress={() => navigation.navigate(SCREENS.STUDY_LOG)}
-                first
               />
               {SOCIAL_ENABLED ? (
                 <>

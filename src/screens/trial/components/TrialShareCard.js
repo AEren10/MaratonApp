@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { BrandMark } from "../../../components/design/BrandMark";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatBlock } from "../../../components/design/StatBlock";
@@ -35,7 +36,7 @@ export const TrialShareCard = forwardRef(function TrialShareCard(
       <LinearGradient colors={[alpha(C.accent, 10), "transparent"]} style={styles.glow} />
 
       <View style={styles.header}>
-        <Text style={[TYPOGRAPHY.label, { color: C.accentBright, letterSpacing: 2 }]}>MARATON</Text>
+        <BrandMark width={30} word wordSize={12} color={C.text} />
         <View style={[styles.typeBadge, { backgroundColor: C.brandTint, borderColor: C.accent }]}>
           <Text style={[TYPOGRAPHY.meta, { color: C.accentBright }]}>{typeName}</Text>
         </View>

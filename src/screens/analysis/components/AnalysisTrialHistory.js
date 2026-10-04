@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { GUTTER } from "../../../themes/tokens";
-import { Icon } from "../../../components/design";
 import { TrialHistoryItem } from "./TrialHistoryItem";
 import { PendingSection } from "../../../components/common/PendingSection";
 
@@ -37,7 +36,6 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
 
   const count = totalCount || history.length;
   const countText = `${count} kayıt`;
-  const btnSubtitle = `${count} deneme · yayın ve tarihe göre süz`;
 
   return (
     <View style={s.wrap}>
@@ -60,21 +58,6 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
         ))}
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Tüm deneme kayıtları"
-        onPress={onSeeAll}
-        style={({ pressed }) => [
-          s.seeAllBtn,
-          { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.accent },
-        ]}
-      >
-        <View style={s.btnTextWrap}>
-          <Text style={[s.btnTitle, { color: C.text }]}>Tüm deneme kayıtları</Text>
-          <Text style={[s.btnSub, { color: C.text3 }]}>{btnSubtitle}</Text>
-        </View>
-        <Icon name="chevR" size={14} color={C.accent} sw={1.5} />
-      </Pressable>
     </View>
   );
 }
