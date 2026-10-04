@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { useIsFocused } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { useExam } from "../contexts/ExamContext";
 import { dateKey } from "../lib/dateUtils";
@@ -11,25 +11,25 @@ import { loadExamResult } from "../lib/examResultRepository";
 export function useExamResultEntry() {
   const { user } = useAuth();
   const { examType, examDate } = useExam();
-  const focused = useIsFocused();
   const userId = user?.id;
   const examKey = examDate ? dateKey(examDate) : null;
 
   const [state, setState] = useState({ status: "loading", entry: null });
   const [reload, setReload] = useState(0);
 
-  useEffect(() => {
-    if (!focused) return undefined;
+  // useFocusEffect, useIsFocused degil: odak kaybinda ekrani yeniden
+  // cizdirmesin. Ayni sonuc tekrar okununca durum degismez (yeniden cizim yok).
+  useFocusEffect(useCallback(() => {
     if (!userId || !examType || !examKey) {
-      setState({ status: "ready", entry: null });
+      setState((s) => settle(s, "ready", null));
       return undefined;
     }
     let alive = true;
     loadExamResult(userId, examType, examKey)
-      .then((entry) => { if (alive) setState({ status: "ready", entry: entry || null }); })
-      .catch(() => { if (alive) setState({ status: "error", entry: null }); });
+      .then((entry) => { if (alive) setState((s) => settle(s, "ready", entry || null)); })
+      .catch(() => { if (alive) setState((s) => settle(s, "error", null)); });
     return () => { alive = false; };
-  }, [focused, userId, examType, examKey, reload]);
+  }, [userId, examType, examKey, reload]));
 
   const retry = useCallback(() => {
     setState((s) => ({ ...s, status: "loading" }));
@@ -37,4 +37,9 @@ export function useExamResultEntry() {
   }, []);
 
   return { ...state, examKey, retry };
+}
+
+function settle(prev, status, entry) {
+  if (prev.status === status && JSON.stringify(prev.entry) === JSON.stringify(entry)) return prev;
+  return { status, entry };
 }

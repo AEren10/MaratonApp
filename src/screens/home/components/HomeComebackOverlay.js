@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { useIsFocused } from "@react-navigation/native";
 import { SCREENS } from "../../../constants/screens";
 import { trackButtonTap } from "../../../lib/analytics";
 import { ComebackModal } from "../../../components/common/ComebackModal";
@@ -16,6 +17,9 @@ export function HomeComebackOverlay({
   routeTotals,
   solvedToday,
 }) {
+  // Modal ekrandan bagimsiz cizilir; baska sekmedeyken acilmasin. Odak burada
+  // dinleniyor ki sekme degisince yalniz bu kucuk bilesen yeniden cizilsin.
+  const focused = useIsFocused();
   const { pendingStops, stopsClosedToday } = useMemo(
     () => summarizeComebackStops(routeCurrentWeek),
     [routeCurrentWeek],
@@ -35,7 +39,7 @@ export function HomeComebackOverlay({
 
   return (
     <ComebackModal
-      stage={stage}
+      stage={focused ? stage : null}
       disablePrompt
       pendingStops={pendingStops}
       solvedToday={solvedToday}
