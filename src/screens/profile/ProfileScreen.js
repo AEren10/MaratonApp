@@ -98,10 +98,6 @@ export default function ProfileScreen() {
               {SOCIAL_ENABLED ? (
                 <>
                   <ProfileLinkRow
-                    label="Gruplarım"
-                    onPress={() => navigation.navigate(SCREENS.LEAGUE, { tab: "groups" })}
-                  />
-                  <ProfileLinkRow
                     label="Meydan okumalar"
                     meta="Arkadaşınla yarış"
                     onPress={() => navigation.navigate(SCREENS.CHALLENGE)}
