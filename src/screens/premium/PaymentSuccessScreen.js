@@ -74,8 +74,8 @@ export default function PaymentSuccessScreen() {
           <Circle cx={224} cy={62} r={7} fill={C.accent} />
           <Circle cx={352} cy={32} r={7.5} fill={C.bg} stroke={C.text3} strokeWidth={2.6} />
           
-          <SvgText x={40} y={120} fontFamily="Archivo_700Bold" fontSize={11} letterSpacing={1.6} fill={C.text3}>23 HAZ</SvgText>
-          <SvgText x={366} y={120} textAnchor="end" fontFamily="Archivo_600SemiBold" fontSize={11} letterSpacing={1.2} fill={C.text3}>20 HAZ 2027</SvgText>
+          <SvgText x={40} y={120} fontFamily="Archivo_700" fontSize={11} letterSpacing={1.6} fill={C.text3}>23 HAZ</SvgText>
+          <SvgText x={366} y={120} textAnchor="end" fontFamily="Archivo_600" fontSize={11} letterSpacing={1.2} fill={C.text3}>20 HAZ 2027</SvgText>
         </Svg>
       </View>
 
@@ -162,13 +162,13 @@ function makeStyles(C) {
       zIndex: 1,
     },
     badge: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11.5,
       letterSpacing: 1.84,
       color: C.accentBright,
     },
     heroTitle: {
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 52,
       lineHeight: 55,
       letterSpacing: -1.82,
@@ -177,7 +177,7 @@ function makeStyles(C) {
       maxWidth: 300,
     },
     heroSub: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 14,
       lineHeight: 21.7, // 1.55
       color: C.text2,
@@ -195,7 +195,7 @@ function makeStyles(C) {
       flex: 1,
     },
     featuresTitle: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11.5,
       letterSpacing: 1.84,
       color: C.text2,
@@ -224,12 +224,12 @@ function makeStyles(C) {
       flex: 1,
     },
     featureTitle: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 13.5,
       color: C.text,
     },
     featureSub: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 11.5,
       lineHeight: 17.25,
       color: C.text3,
@@ -241,7 +241,7 @@ function makeStyles(C) {
       paddingTop: 14,
     },
     footerNote: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 11.5,
       color: C.text3,
       marginBottom: 12,

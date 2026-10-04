@@ -104,7 +104,7 @@ function makeStyles(C) {
       marginLeft: -6,
     },
     headerTitle: { 
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 22,
       color: C.text 
     },
@@ -114,14 +114,14 @@ function makeStyles(C) {
       paddingTop: 56,
     },
     title: {
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 22,
       lineHeight: 28.6, // 1.3
       color: C.text,
       marginTop: 26,
     },
     subtitle: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 13.5,
       lineHeight: 21.6, // 1.6
       color: C.text3,
@@ -142,13 +142,13 @@ function makeStyles(C) {
       borderColor: C.elev,
     },
     responseLabel: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11.5,
       letterSpacing: 1.84, // .16em
       color: C.text3,
     },
     responseText: {
-      fontFamily: "Archivo_500Medium",
+      fontFamily: "Archivo_500",
       fontSize: 13,
       lineHeight: 20.8, // 1.6
       color: C.text2,
@@ -174,7 +174,7 @@ function makeStyles(C) {
     },
     tipText: {
       flex: 1,
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 13,
       lineHeight: 19.5, // 1.5
       color: C.text2,
@@ -214,7 +214,7 @@ function makeStyles(C) {
       justifyContent: "center",
     },
     secondaryBtnText: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 13.5,
       color: C.text2,
     }

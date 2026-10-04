@@ -113,7 +113,7 @@ const s = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   pillRest: {
-    fontFamily: "Archivo_500Medium",
+    fontFamily: "Archivo_500",
     fontSize: 12,
     letterSpacing: 0.8,
     marginTop: 1,

@@ -15,12 +15,12 @@
 
 export const FONTS = {
   // Arayüz
-  regular: "Archivo_400Regular",
-  medium: "Archivo_500Medium",
-  semibold: "Archivo_600SemiBold",
-  bold: "Archivo_700Bold",
+  regular: "Archivo_400",
+  medium: "Archivo_500",
+  semibold: "Archivo_600",
+  bold: "Archivo_700",
   // Editöryal
-  display: "BricolageGrotesque_400Regular",
+  display: "Bricolage_400",
 };
 
 // Tasarımda 73× .2em, 71× .16em, 45× .14em, 38× .18em kullanılmış.
@@ -98,9 +98,9 @@ export const TYPE = {
 // App.js'te useFonts'a verilecek eşleme. Font dosyaları assets/fonts/ altına
 // eklenmeli — Archivo ve Bricolage Grotesque henüz projede YOK.
 export const FONT_ASSETS = {
-  Archivo_400Regular: "Archivo_400Regular.ttf",
-  Archivo_500Medium: "Archivo_500Medium.ttf",
-  Archivo_600SemiBold: "Archivo_600SemiBold.ttf",
-  Archivo_700Bold: "Archivo_700Bold.ttf",
-  BricolageGrotesque_400Regular: "BricolageGrotesque_400Regular.ttf",
+  Archivo_400: "Archivo_400.ttf",
+  Archivo_500: "Archivo_500.ttf",
+  Archivo_600: "Archivo_600.ttf",
+  Archivo_700: "Archivo_700.ttf",
+  Bricolage_400: "Bricolage_400.ttf",
 };

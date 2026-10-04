@@ -78,7 +78,7 @@ const s = StyleSheet.create({
     minWidth: 0,
   },
   subjectLabel: {
-    fontFamily: "Archivo_700Bold",
+    fontFamily: "Archivo_700",
     fontSize: 11,
     letterSpacing: 1.4,
   },
@@ -96,7 +96,7 @@ const s = StyleSheet.create({
     flexShrink: 0,
   },
   stopText: {
-    fontFamily: "Archivo_600SemiBold",
+    fontFamily: "Archivo_600",
     fontSize: 11.5,
   },
 });

@@ -95,7 +95,7 @@ function makeStyles(C) {
       paddingHorizontal: 46,
     },
     title: {
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 24,
       lineHeight: 31.2, // 1.3
       color: C.text,
@@ -103,7 +103,7 @@ function makeStyles(C) {
       textAlign: "center"
     },
     subtitle: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 13.5,
       lineHeight: 21.6, // 1.6
       color: C.text3,
@@ -119,7 +119,7 @@ function makeStyles(C) {
       alignItems: "center"
     },
     bottomText: {
-      fontFamily: "Archivo_500Medium",
+      fontFamily: "Archivo_500",
       fontSize: 12,
       color: C.text3,
     }

@@ -37,7 +37,7 @@ const s = StyleSheet.create({
   },
   text: {
     flex: 1,
-    fontFamily: "Archivo_500Medium",
+    fontFamily: "Archivo_500",
     fontSize: 12.5,
     lineHeight: 18,
   },

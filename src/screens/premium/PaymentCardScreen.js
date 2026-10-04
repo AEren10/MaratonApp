@@ -138,7 +138,7 @@ function makeStyles(C) {
       marginLeft: -6,
     },
     headerTitle: { 
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 22,
       color: C.text 
     },
@@ -163,29 +163,29 @@ function makeStyles(C) {
       justifyContent: "space-between",
     },
     planTitle: {
-      fontFamily: "Archivo_700Bold",
+      fontFamily: "Archivo_700",
       fontSize: 13.5,
       color: C.text,
     },
     planPrice: {
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 26,
       color: C.text,
       fontVariant: ["tabular-nums"],
     },
     planPriceSpan: {
-      fontFamily: "Archivo_500Medium",
+      fontFamily: "Archivo_500",
       fontSize: 13,
       color: C.text3,
     },
     planDesc: {
-      fontFamily: "Archivo_500Medium",
+      fontFamily: "Archivo_500",
       fontSize: 11.5,
       color: C.text3,
       marginTop: 6,
     },
     trialText: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 12,
       lineHeight: 19.2, // 1.6
       color: C.text3,
@@ -205,14 +205,14 @@ function makeStyles(C) {
       gap: STEP.s2,
     },
     fieldLabel: {
-      fontFamily: "Archivo_600SemiBold",
+      fontFamily: "Archivo_600",
       fontSize: 11.5,
       letterSpacing: 1.84, // .16em
       color: C.text3,
       textTransform: "uppercase"
     },
     fieldHelper: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 12,
       lineHeight: 18,
       color: C.text3,
@@ -229,7 +229,7 @@ function makeStyles(C) {
       paddingHorizontal: 16,
     },
     input: {
-      fontFamily: "BricolageGrotesque_400Regular",
+      fontFamily: "Bricolage_400",
       fontSize: 16,
       color: C.text,
       fontVariant: ["tabular-nums"],
@@ -259,7 +259,7 @@ function makeStyles(C) {
       marginBottom: STEP.s2,
     },
     trustText: {
-      fontFamily: "Archivo_400Regular",
+      fontFamily: "Archivo_400",
       fontSize: 11.5,
       color: C.text3,
     },
