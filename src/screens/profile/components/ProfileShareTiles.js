@@ -92,12 +92,7 @@ export const ProfileShareTiles = memo(function ProfileShareTiles() {
 });
 
 const s = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    gap: STEP.s2,
-    marginHorizontal: GUTTER,
-    marginTop: STEP.s4,
-  },
+  row: { flexDirection: "row", gap: STEP.s2, marginHorizontal: GUTTER, marginTop: STEP.s4 },
   tile: {
     flex: 1,
     borderWidth: 1,
@@ -106,44 +101,12 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     minHeight: 112,
   },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  iconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 11,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badge: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  badgeText: {
-    fontFamily: "Archivo_600",
-    fontSize: 9.5,
-    letterSpacing: 0.8,
-  },
-  content: {
-    marginTop: STEP.s2 + 2,
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 4,
-  },
-  title: {
-    fontSize: 14.5,
-    flex: 1,
-  },
-  meta: {
-    fontSize: 11.5,
-    marginTop: 2,
-    lineHeight: 15,
-  },
+  topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  iconBox: { width: 38, height: 38, borderRadius: 11, alignItems: "center", justifyContent: "center" },
+  badge: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6 },
+  badgeText: { fontFamily: "Archivo_600", fontSize: 9.5, letterSpacing: 0.8 },
+  content: { marginTop: STEP.s2 + 2 },
+  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 4 },
+  title: { fontSize: 14.5, flex: 1 },
+  meta: { fontSize: 11.5, marginTop: 2, lineHeight: 15 },
 });

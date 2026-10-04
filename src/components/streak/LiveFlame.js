@@ -15,14 +15,15 @@ const CORE = "M12 10.5c.2 1.6 1.2 2.4 1.9 3.4.6.8.9 1.6.9 2.5a2.8 2.8 0 0 1-5.6 
 const SOFT = Easing.bezier(0.45, 0, 0.55, 1);
 // Surekli durum gostergesi (seri yaniyor): her katman kendi ritminde, birbirini
 // tekrar etmeyen surelerle -- mekanik degil, canli okunur.
-const loop = (to, ms, delay = 0) => withDelay(delay, withRepeat(withTiming(to, { duration: ms, easing: SOFT }), -1, true));
+// reps: -1 sonsuz; sayi verilirse o kadar gidip gelip durur (cift sayi = sona dinlenir).
+const loop = (to, ms, delay = 0, reps = -1) => withDelay(delay, withRepeat(withTiming(to, { duration: ms, easing: SOFT }), reps, true));
 
 /**
  * Canli seri alevi: arkada nefes alan isik, dis alev boyuna uzayip kisalir ve
  * hafif salinir, ic cekirdek ayri ritimde atar. Hareketi azalt acikken durgun.
  * lit=false: seri yok -> gri, hareketsiz.
  */
-export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true, animate = true }) {
+export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true, animate = true, cycles = null }) {
   const C = useC();
   const reduced = useReducedMotion();
   // PERFORMANS: sonsuz donguler UI thread'inde; ekran gorunmezken (baska
@@ -41,12 +42,16 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase 
       return undefined;
     }
     // phase: yan yana alevler (takvim) ayni anda nefes almasin.
-    rise.set(loop(1, 560, phase));
-    sway.set(loop(1, 980, phase + 120));
-    core.set(loop(1, 340, phase + 60));
-    glow.set(loop(1, 1300, phase));
+    // cycles: yalniz acilista N kez yanip durur (takvim kareleri, ana sayfa).
+    // Sure en uzun katmana (isilti, 1300ms) gore; digerleri ayni surede biter.
+    const span = cycles ? cycles * 2 * 1300 : 0;
+    const reps = (ms) => (cycles ? Math.max(2, Math.round(span / ms / 2) * 2) : -1);
+    rise.set(loop(1, 560, phase, reps(560)));
+    sway.set(loop(1, 980, phase + 120, reps(980)));
+    core.set(loop(1, 340, phase + 60, reps(340)));
+    glow.set(loop(1, 1300, phase, reps(1300)));
     return () => [rise, sway, core, glow].forEach((v) => cancelAnimation(v));
-  }, [still, rise, sway, core, glow, phase]);
+  }, [still, rise, sway, core, glow, phase, cycles]);
 
   const outerStyle = useAnimatedStyle(() => ({
     transform: [

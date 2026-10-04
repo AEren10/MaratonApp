@@ -63,9 +63,8 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
       {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
       {worked ? (
         <View style={[styles.flame, { backgroundColor: C.bg }]} pointerEvents="none">
-          {/* Yalniz son 7 gunun alevi canli (performans); eskiler sabit ama ayni boyda. */}
-          <LiveFlame size={26} phase={(date.getDate() * 137) % 600}
-            animate={!isFuture && Date.now() - date.getTime() < 7 * 86400000} />
+          {/* Acilista iki kez yanip durur (kullanici); her kare farkli fazda. */}
+          <LiveFlame size={26} phase={(date.getDate() * 137) % 600} cycles={2} />
         </View>
       ) : null}
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>
