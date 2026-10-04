@@ -74,7 +74,7 @@ export default function PrivacyScreen() {
                 label="Profilimi kimler görebilir"
                 hint={groupVisible == null
                   ? "Tercih yüklenemedi"
-                  : groupVisible ? "Grup üyeleri ve arkadaşlar" : "Yalnız arkadaşlar"}
+                  : groupVisible ? "Ligdeki herkes (net ve deneme gizli)" : "Yalnız arkadaşlar"}
                 toggle
                 value={groupVisible === true}
                 disabled={visibilityLoading || visibilitySaving || groupVisible == null}
