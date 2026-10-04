@@ -27,6 +27,7 @@
     },
     "android": {
       "package": "com.ahmeterensiranli.maraton",
+      "googleServicesFile": "./google-services.json",
       "versionCode": 1,
       "intentFilters": [
         {
