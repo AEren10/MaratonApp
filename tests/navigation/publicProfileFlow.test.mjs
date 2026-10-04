@@ -33,7 +33,8 @@ test("profile visibility uses a dedicated setting, not leaderboard visibility", 
   const privacy = readFileSync("src/screens/settings/PrivacyScreen.js", "utf8");
   const api = readFileSync("src/supabase/publicProfiles.js", "utf8");
   assert.match(privacy, /Profilimi kimler görebilir/);
-  assert.match(privacy, /Grup üyeleri ve arkadaşlar/);
+  // 4 Ekim: acik profil ligdeki herkese (net ve deneme yine gizli).
+  assert.match(privacy, /Ligdeki herkes/);
   assert.match(privacy, /Yalnız arkadaşlar/);
   assert.match(api, /public_profile_visibility/);
 });
