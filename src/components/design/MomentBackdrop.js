@@ -9,7 +9,7 @@ import { useC } from "../../contexts/ThemeContext";
 // silik bir isilti; asagi dogru zemine soner. Marka sayfasindaki "gorsel dil"
 // dokusunun seyrek hali. GUNLUK ekranlarda YOK -- metin kontrasti ve tek
 // vurgu rengi kurali (liste/grafik arkasinda doku olmaz). Duragan.
-const LINES = 14;
+const LINES = 9;
 
 // Cizgiler ust koseden yelpaze gibi acilir; her besinciden biri daha parlak
 // ve kalin (isik huzmesi). flip: sag kose.
@@ -22,7 +22,7 @@ function linePaths(w, h, flip) {
     const y1 = h * 0.02 + Math.pow(t, 1.3) * h * 1.05;
     const c1 = y0 - h * 0.18 + t * h * 0.1;
     const c2 = y1 + h * 0.12;
-    const hot = i % 5 === 2;
+    const hot = i === 3;
     out.push({
       d: `M ${X(-w * 0.15)} ${y0} C ${X(w * 0.35)} ${c1}, ${X(w * 0.65)} ${c2}, ${X(w * 1.15)} ${y1}`,
       o: (hot ? 0.95 : 0.42) * (1 - t * 0.55),

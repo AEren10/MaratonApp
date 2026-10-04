@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { ScrollView, RefreshControl, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SyncProblemBanner } from "../../components/common/SyncProblemBanner";
 import { ErrorState } from "../../components/design/ErrorState";
 import { GUTTER, STEP } from "../../themes/tokens";
@@ -41,6 +41,7 @@ export default function HomeScreen() {
     <HomeProBody stops={h.stops} dueCount={dueCount} go={actions} discoverEligible={discoverEligible} />
   ), [h.stops, discoverEligible, dueCount, actions]);
 
+  const insets = useSafeAreaInsets();
   let body;
   if (h.loading) {
     body = <HomeLoading />;
@@ -66,9 +67,10 @@ export default function HomeScreen() {
     body = (
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={s.content}
+        style={{ marginTop: -insets.top }}
+        contentContainerStyle={[s.content, { paddingTop: insets.top }]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
+        refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} progressViewOffset={insets.top} tintColor={C.accent} colors={[C.accent]} />}
       >
         <HomeBackdrop />
         <HomeTopBar name={dashboard.displayName} streak={h.streak}
@@ -141,9 +143,7 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
 function noop() {}
-
 const s = StyleSheet.create({
   fill: { flex: 1 },
   content: { paddingHorizontal: GUTTER, paddingBottom: STEP.s5 + STEP.s4 + 4 },

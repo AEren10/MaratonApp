@@ -7,6 +7,8 @@ import { FEATURES } from "../../../constants/features";
 // isik cizgileri; asagi inildikce (sayfa yeterince uzunsa) ikinci demet bu
 // kez sagdan sola akar, birincinin devami gibi. Gunluk ekran: cok silik,
 // fark edilmeyecek kadar (kullanici: efekt bariz olmasin). FEATURES.homeBackdrop.
+// HomeScreen kaydirma alani durum cubugunun altina uzanir (marginTop -insets.top):
+// doku en ustten baslar, guvenli alanda duz koyu bant kalmaz.
 export function HomeBackdrop() {
   const { height } = useWindowDimensions();
   if (!FEATURES.homeBackdrop) return null;
