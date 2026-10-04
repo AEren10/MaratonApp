@@ -11,7 +11,8 @@ export function useReplayOnFocus() {
   const first = useRef(true);
   useFocusEffect(useCallback(() => {
     if (first.current) { first.current = false; return undefined; }
-    const timer = setTimeout(() => setTick((t) => t + 1), 180);
+    // 360ms: tabbar hapinin kayisi (320ms) bitsin; cubuklar onunla yarismasin.
+    const timer = setTimeout(() => setTick((t) => t + 1), 360);
     return () => clearTimeout(timer);
   }, []));
   return tick;

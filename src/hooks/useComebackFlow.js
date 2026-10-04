@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
  * soru ya da dakika toplami baslangic anindakinin ustune cikti.
  * Baslatip calismadan donen kullaniciya istem tekrar gosterilmez.
  */
-export function useComebackFlow({ comeback, focused, solvedToday = 0, minutesToday = 0 }) {
+export function useComebackFlow({ comeback, solvedToday = 0, minutesToday = 0 }) {
   const [baseline, setBaseline] = useState(null);
 
   useEffect(() => {
@@ -25,7 +25,9 @@ export function useComebackFlow({ comeback, focused, solvedToday = 0, minutesTod
   );
 
   let stage = null;
-  if (comeback && focused) {
+  // Odak kosulu burada degil: "prompt" hero'nun icinde (ekran gizliyken
+  // gorunmez), "done" modali HomeComebackOverlay odakta degilken cizmez.
+  if (comeback) {
     if (!baseline) stage = "prompt";
     else if (progressed) stage = "done";
   }

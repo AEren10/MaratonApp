@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { SCREENS } from "../../constants/screens";
 
@@ -45,7 +45,9 @@ const subjectLabel = (key) => getSubjectByKey(key)?.label;
 // Ana Sayfa'nin tum durumu tek yerde; ekran dosyasi yalniz hal secer ve cizer.
 export function useHomeController() {
   const navigation = useNavigation();
-  const focused = useIsFocused();
+  // useIsFocused YOK (4 Ekim, kasma): odak her degistiginde butun Ana Sayfa
+  // agaci yeniden ciziliyordu -- tam sekme gecisinin karesinde. Odak gereken
+  // yerler useFocusEffect ya da kucuk alt bilesende (HomeComebackOverlay).
   const C = useC();
   const { user } = useAuth();
   const { daysUntilExam } = useExam();
@@ -78,7 +80,6 @@ export function useHomeController() {
   const { solvedToday, routeCurrentWeek, routeTotals, transitionStop, weekLogs, weekLoaded } = dashboard;
   const comebackFlow = useComebackFlow({
     comeback,
-    focused,
     solvedToday,
     minutesToday: dashboard.minutesToday,
   });
@@ -129,15 +130,15 @@ export function useHomeController() {
   // bir kez cekilen veri bayat kaliyordu; yalniz Ozet'in reset yolu yeniden
   // baglıyordu. Sessiz tazeleme: iskelet yok, titresim yok, spinner yok.
   const lastFocusSyncRef = useRef(Date.now());
-  useEffect(() => {
-    if (!focused || !isConnected) return undefined;
+  useFocusEffect(useCallback(() => {
+    if (!isConnected) return undefined;
     const now = Date.now();
     if (now - lastFocusSyncRef.current < FOCUS_REFRESH_MS) return undefined;
     lastFocusSyncRef.current = now;
     // Sekme gecisi oturduktan SONRA (ayni karede veri + yeniden cizim gecisi kasiyordu).
     const timer = setTimeout(refresh, 450);
     return () => clearTimeout(timer);
-  }, [focused, isConnected, refresh]);
+  }, [isConnected, refresh]));
 
   const { dismissed: firstDayDismissed, dismiss: dismissFirstDay } = useFirstDayDismiss();
 
