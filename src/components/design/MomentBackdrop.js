@@ -33,7 +33,7 @@ function linePaths(w, h, flip) {
 }
 
 // variant: "lines" (v1) isik huzmeleri | "dots" (v2) ince nokta izgarasi |
-// "route" (v3) ustten gecen silik rota cizgisi ve duraklari.
+// "route" (v3) ustten gecen silik rota cizgisi ve duraklari | "glow" yalniz isilti.
 // strength: 0-1 yogunluk (ana sayfada daha silik). glow: koseden isiltinin
 // carpani (0 = yok). fadeTop: ust kenar da yumusak acilir (sayfanin ortasinda
 // baslayan ikinci demet kesik cizgiyle baslamasin).
@@ -65,7 +65,7 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
     <View pointerEvents="none" style={[s.wrap, { height: h }, style]}>
       <Svg width={width} height={h}>
         <Defs>
-          <RadialGradient id="mbGlow" cx={flip ? width : 0} cy={0} r={width * 1.1} gradientUnits="userSpaceOnUse">
+          <RadialGradient id="mbGlow" cx={flip ? width : 0} cy={fadeTop ? h * 0.5 : 0} r={width * 1.1} gradientUnits="userSpaceOnUse">
             <Stop offset="0" stopColor={C.accent} stopOpacity={0.42 * k * glow} />
             <Stop offset="0.55" stopColor={C.accent} stopOpacity={0.12 * k * glow} />
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
@@ -96,7 +96,7 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
         </Defs>
         <G mask="url(#mbMask)">
           {glow > 0 ? <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" /> : null}
-          {variant === "route" ? (
+          {variant === "glow" ? null : variant === "route" ? (
             <G>
               <Path d={routePath(width, h, flip)} fill="none" stroke={C.accent} strokeWidth={1.4} strokeOpacity={0.45 * k} strokeDasharray="1 6" strokeLinecap="round" />
               <Path d={routePath(width, h, flip)} fill="none" stroke={C.accent} strokeWidth={1.2} strokeOpacity={0.3 * k} />

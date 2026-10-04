@@ -7,8 +7,8 @@
 // Eksik kalan: ad filtresi (kufur listesi).
 // homeBackdrop: ana sayfanin arka plani (deneme, 4 Ekim). Tek satirla degisir:
 // "lines" v1 isik huzmeleri | "dots" v2 nokta izgarasi | "route" v3 rota
-// cizgisi ve duraklar | null kapali.
+// cizgisi ve duraklar | "glow" yalniz isilti (ust sol + asagida sag) | null kapali.
 export const FEATURES = Object.freeze({
   globalLeague: true,
-  homeBackdrop: "lines",
+  homeBackdrop: "glow",
 });
