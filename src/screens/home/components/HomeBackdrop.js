@@ -14,10 +14,10 @@ export function HomeBackdrop() {
   if (!FEATURES.homeBackdrop) return null;
   return (
     <>
-      <MomentBackdrop variant={FEATURES.homeBackdrop} strength={0.5} glow={0.35} />
+      <MomentBackdrop variant={FEATURES.homeBackdrop} strength={0.5} glow={0.55} />
       {FEATURES.homeBackdrop === "lines" || FEATURES.homeBackdrop === "glow" ? (
         <MomentBackdrop variant={FEATURES.homeBackdrop} flip fadeTop strength={0.42}
-          glow={FEATURES.homeBackdrop === "glow" ? 0.35 : 0} style={{ top: Math.round(height * 0.8) }} />
+          glow={FEATURES.homeBackdrop === "glow" ? 0.55 : 0} style={{ top: Math.round(height * 0.8) }} />
       ) : null}
     </>
   );
