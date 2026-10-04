@@ -13,6 +13,7 @@ import { CONTROL, GUTTER, NAV_ICON, STEP, TYPOGRAPHY } from "../../themes/tokens
 import { PublicProfileHeader } from "./components/PublicProfileHeader";
 import { PublicProfileStats } from "./components/PublicProfileStats";
 import { PublicStrengthMap } from "./components/PublicStrengthMap";
+import { PublicLeagueRow } from "./components/PublicLeagueRow";
 
 export default function PublicProfileScreen() {
   const C = useC();
@@ -46,6 +47,7 @@ export default function PublicProfileScreen() {
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <PublicProfileHeader profile={profile} sending={sending} onAdd={addFriend} onRequests={openRequests} />
           <PublicProfileStats profile={profile} />
+          <PublicLeagueRow weeklyXP={profile.weeklyXP} />
           <PublicStrengthMap subjects={profile.subjectProgress} />
           <Text style={[TYPOGRAPHY.caption, styles.privacy, { color: C.text3 }]}>Deneme ve net bilgileri gizlidir.</Text>
         </ScrollView>

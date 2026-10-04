@@ -17,8 +17,9 @@ test("public profile is registered in every social entry stack", () => {
 
 test("profile action is first and public screen never reads trial or net data", () => {
   const actions = readFileSync("src/hooks/useUserActions.js", "utf8");
-  const start = actions.indexOf("showAlert(user.name");
-  const menu = actions.slice(start, actions.indexOf("]);", start));
+  // Menu artik dokunulan yerde acilan AnchoredMenu (4 Ekim).
+  const start = actions.indexOf("openMenu({");
+  const menu = actions.slice(start, actions.indexOf("],", start));
   assert.ok(menu.indexOf("Profili gör") < menu.indexOf("Arkadaş ekle"));
   assert.match(actions, /SCREENS\.PUBLIC_PROFILE/);
 

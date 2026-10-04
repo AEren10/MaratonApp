@@ -21,6 +21,7 @@ export async function getPublicProfile(userId) {
     currentStreak: Number(data.current_streak) || 0,
     weeklyQuestions: Number(data.weekly_questions) || 0,
     weeklyMinutes: Number(data.weekly_minutes) || 0,
+    weeklyXP: Number(data.weekly_xp) || 0,
     relationshipStatus: data.relationship_status || "none",
     subjectProgress: (data.subject_progress || []).map((item) => ({
       key: item.subject_key,
