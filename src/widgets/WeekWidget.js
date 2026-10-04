@@ -48,6 +48,20 @@ const WeekWidget = (props, environment) => {
   const solved = q[todayIdx];
   const compact = environment?.widgetFamily === "systemSmall";
 
+  // Canli zemin: kosede koyu kizil isilti zemine iner. Ton paletten karisim
+  // (widget kendi calisma zamaninda; token import edilemez).
+  const mixHex = (a, b, t) => {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [x, y] = [p(a), p(b)];
+    return `#${x.map((v, i) => Math.round(v * (1 - t) + y[i] * t).toString(16).padStart(2, "0")).join("")}`;
+  };
+  const glowBg = {
+    type: "linearGradient",
+    colors: [mixHex(accentDeep, bg, 0.55), bg, bg],
+    startPoint: { x: 0, y: 0 },
+    endPoint: { x: 1, y: 1 },
+  };
+
   const plotH = compact ? 36 : 68;
   // Her gunun sutunu cubuktan genis: gun adi ve 3 haneli deger sigsin,
   // cubuk sutunun ortasinda durur.
@@ -138,7 +152,7 @@ const WeekWidget = (props, environment) => {
   if (compact) {
     return (
       <VStack alignment="leading" spacing={4}
-        modifiers={[containerBackground(bg, "widget"), padding({ all: 12 }), widgetURL("maraton://home")]}>
+        modifiers={[containerBackground(glowBg, "widget"), padding({ all: 12 }), widgetURL("maraton://home")]}>
         {hero(34)}
         <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(solved === 0 && best < 0 ? accentBright : text)]}>
           {sentence}
@@ -150,7 +164,7 @@ const WeekWidget = (props, environment) => {
   }
 
   return (
-    <HStack spacing={12} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), widgetURL("maraton://home")]}>
+    <HStack spacing={12} modifiers={[containerBackground(glowBg, "widget"), padding({ all: 14 }), widgetURL("maraton://home")]}>
       <VStack alignment="leading" spacing={2}>
         <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>BUGÜN</Text>
         {hero(46)}

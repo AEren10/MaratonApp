@@ -133,21 +133,6 @@
               }
             },
             {
-              "name": "MaratonReview",
-              "displayName": "Tekrar",
-              "description": "Tekrarı gelen yanlış soruların.",
-              "ios": {
-                "supportedFamilies": [
-                  "systemSmall",
-                  "systemMedium",
-                  "accessoryCircular",
-                  "accessoryRectangular",
-                  "accessoryInline"
-                ],
-                "contentMarginsDisabled": true
-              }
-            },
-            {
               "name": "MaratonRoute",
               "displayName": "Rota",
               "description": "Sınava kalan gün ve net çizgin. Kilit ekranına da eklenir.",
@@ -192,7 +177,6 @@
               "description": "Son denemelerinin net çizgisi ve ders ders değişim.",
               "ios": {
                 "supportedFamilies": [
-                  "systemSmall",
                   "systemMedium"
                 ],
                 "contentMarginsDisabled": true

@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 // gercek degerleriyle karsilastiriliyor: palet degisir de widget'lar
 // guncellenmezse burasi kirilir ve kimse iki yerde farkli renk gormez.
 // check-design-drift.js bu klasoru ayni gerekce ile muaf tutuyor.
-const WIDGETS = ["WeekWidget", "TodayWidget", "ReviewWidget", "RouteWidget", "StreakWidget", "TrialWidget"];
+const WIDGETS = ["WeekWidget", "TodayWidget", "RouteWidget", "StreakWidget", "TrialWidget"];
 
 // buildPalette("dark") ciktisi (28 Eylul 2026'da yeniden olculdu); test
 // asagida paletin kendisiyle de karsilastiriyor.

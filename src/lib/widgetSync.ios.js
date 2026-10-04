@@ -1,6 +1,5 @@
 import WeekWidget from "../widgets/WeekWidget";
 import TodayWidget from "../widgets/TodayWidget";
-import ReviewWidget from "../widgets/ReviewWidget";
 import RouteWidget from "../widgets/RouteWidget";
 import StreakWidget from "../widgets/StreakWidget";
 import TrialWidget from "../widgets/TrialWidget";
@@ -169,12 +168,9 @@ export function syncRouteWidget({ examDate = null, chart = null, target = 0 } = 
   }, { timeline: true });
 }
 
-/** Tekrari gelen yanlislar. */
-export function syncReviewWidget({ due = 0, subjects = 0 } = {}) {
-  return push("review", ReviewWidget, {
-    due: Number(due) || 0,
-    subjects: Number(subjects) || 0,
-  });
+/** Tekrar widget'i kaldirildi (4 Ekim, kullanici: fazla widget). Cagri yerleri bozulmasin diye bos. */
+export function syncReviewWidget() {
+  return false;
 }
 
 /**
@@ -274,7 +270,6 @@ export function clearAllWidgets() {
   syncWeekWidget({ week: { days: [], goal: 0 } });
   syncTodayWidget({});
   syncRouteWidget({});
-  syncReviewWidget({});
   syncStreakWidget({});
   syncTrialWidget({});
 }
