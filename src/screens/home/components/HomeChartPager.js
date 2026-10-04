@@ -17,9 +17,8 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   // ciziyor; ikinci sayfa ekran disinda cizilip bitiyordu, kullanici hic
   // gormuyordu. Gorulmemis sayfa ilk sayfanin yuksekliginde bos yer tutar.
   const [seen, setSeen] = useState(() => new Set([initialPage]));
-  // Her GIRISTE animasyon bastan (kullanici, 3 Ekim): sayfaya yeniden
-  // gelindiginde icerik yeni anahtarla kurulur, cubuklar/cizgi tekrar cizilir.
-  const [visits, setVisits] = useState(() => ({ [initialPage]: 1 }));
+  // Sayfa ilk gorundugunde kurulur ve KURULU KALIR. Eskiden her geliste yeni
+  // anahtarla sokulup yeniden kuruluyordu (kaydirmada takilma, 4 Ekim).
   const candRef = useRef(initialPage);
   const [firstH, setFirstH] = useState(0);
   const indexRef = useRef(initialPage);
@@ -45,10 +44,9 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
   const onScroll = useCallback((e) => {
     const pos = e.nativeEvent.contentOffset.x / pageWidth;
     const cand = Math.min(visible.length - 1, pos % 1 > 0.3 ? Math.ceil(pos) : Math.floor(pos));
-    setSeen((prev) => (prev.has(cand) ? prev : new Set(prev).add(cand)));
     if (cand !== candRef.current) {
       candRef.current = cand;
-      setVisits((prev) => ({ ...prev, [cand]: (prev[cand] || 0) + 1 }));
+      setSeen((prev) => (prev.has(cand) ? prev : new Set(prev).add(cand)));
     }
   }, [pageWidth, visible.length]);
 
@@ -98,7 +96,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
             accessibilityLabel={page.a11y}
             onLayout={i === 0 ? (e) => setFirstH(e.nativeEvent.layout.height) : undefined}
           >
-            {seen.has(i) ? <View key={`${page.key}-${visits[i] || 0}`}>{body(page)}</View> : <View style={{ height: firstH }} />}
+            {seen.has(i) ? <View>{body(page)}</View> : <View style={{ height: firstH }} />}
           </Press>
         ))}
       </ScrollView>

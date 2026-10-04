@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { StyleSheet, View, useWindowDimensions } from "react-native";
+import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
 import Svg, { Circle, Defs, G, LinearGradient, Path, Pattern, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useC } from "../../contexts/ThemeContext";
@@ -53,6 +53,11 @@ function routeStops(w, h, flip) {
   });
 }
 
+// "glow" turu SVG DEGIL, onceden uretilmis tek PNG (assets/brand/glow-corner.png:
+// sag ust kose, ayni egri). SVG gradyanlari sekme gecislerinde kare
+// dusuruyordu (4 Ekim); resim GPU'da sadece kopyalanir. flip: sol, fadeTop: alt.
+const GLOW = require("../../../assets/brand/glow-corner.png");
+
 export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1, fadeTop = false, fadeColor, fade = true }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
@@ -62,6 +67,18 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
   // Sonme ortusu, dokunun ALTINDAKI zeminle ayni renkte olmali (kart: surface).
   const fc = fadeColor || C.bg;
   const paths = useMemo(() => linePaths(width, h, flip), [width, h, flip]);
+
+  if (variant === "glow") {
+    const flipX = flip ? -1 : 1;
+    // fadeTop (asagidaki ikinci isilti): kose asagida; dikeyde de aynalanir.
+    const flipY = fadeTop ? -1 : 1;
+    return (
+      <View pointerEvents="none" style={[s.wrap, { height: h }, style]}>
+        <Image source={GLOW} resizeMode="stretch"
+          style={{ width, height: h, opacity: Math.min(1, k * glow), transform: [{ scaleX: -flipX }, { scaleY: flipY }] }} />
+      </View>
+    );
+  }
 
   return (
     <View pointerEvents="none" style={[s.wrap, { height: h }, style]}>
