@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { BrandMark } from "../../components/design/BrandMark";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -37,10 +38,7 @@ export default function AboutScreen() {
       </View>
 
       <View style={s.center}>
-        <View style={s.iconWrap}>
-          <Icon name="zap" size={56} color={C.accent} />
-        </View>
-        <Text style={s.appName}>Maraton</Text>
+        <BrandMark width={150} word wordSize={22} color={C.text} direction="column" />
         <Text style={s.version}>{`v${VERSION}${OTA}`}</Text>
       </View>
 

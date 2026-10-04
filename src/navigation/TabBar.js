@@ -9,6 +9,7 @@ import { TabIndicator } from "./tabBar/TabIndicator";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
+import { perfMark } from "../lib/perfProbe";
 
 // "+" paneli buyuk bir Modal; her sekme basisinda yeniden cizilmesin.
 const QuickAdd = memo(QuickAddSheet);
@@ -45,6 +46,7 @@ export function TabBar({ state, navigation }) {
   if (keyboard) return null;
 
   const press = (tab) => {
+    perfMark(`sekme bas: ${tab.key}`);
     const route = state.routes.find((r) => r.name === tab.key);
     const active = currentKey === tab.key;
     // Standart tabPress: ic yigin odaktaysa koke doner, kokteyse ekran

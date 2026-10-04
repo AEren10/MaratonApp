@@ -1,4 +1,5 @@
 import { forwardRef, useMemo } from "react";
+import { BrandMark } from "../../../components/design/BrandMark";
 import { View, Text, StyleSheet } from "react-native";
 import { TYPOGRAPHY, SPACING, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
@@ -66,7 +67,7 @@ export const TrialReportCard = forwardRef(function TrialReportCard(
       <View style={s.accent} />
 
       <View style={s.headerRow}>
-        <Text style={s.brand}>MARATON</Text>
+        <BrandMark width={30} word wordSize={12} color={C.text} />
         <Text style={s.type}>{typeLabel}</Text>
       </View>
 

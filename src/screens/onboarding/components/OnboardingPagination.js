@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { BrandMark } from "../../../components/design/BrandMark";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
@@ -53,12 +54,7 @@ export function OnboardingPagination({
   return (
     <View style={s.wrap}>
       <View style={s.topBar}>
-        <View style={s.brandRow}>
-          <View style={[s.brandDot, { backgroundColor: C.accent }]} />
-          <Text style={[TYPOGRAPHY.label, { color: C.accentBright, letterSpacing: 2.2 }]}>
-            MARATON
-          </Text>
-        </View>
+        <BrandMark width={34} word wordSize={13} color={C.text} />
       </View>
 
       <View style={s.segments}>
