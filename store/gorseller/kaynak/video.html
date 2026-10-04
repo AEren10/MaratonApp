@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Maraton Önizleme Videosu</title>
+<link rel="stylesheet" href="screens.css">
+<style>
+  html, body { width: 443px; height: 960px; overflow: hidden; }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .scene .slide { width: 443px; height: 960px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand span { font-family: Unbounded; font-weight: 600; letter-spacing: .06em; }
+  .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .tag { margin-top: 18px; font-size: 13px; font-weight: 600; letter-spacing: .3em; color: var(--text3); }
+  .slide .home-ind, .slide .tabs { display: none; }
+</style></head>
+<body>
+<script src="screens.js"></script>
+<script>
+// Zaman çizelgesi (sn). Her sahne kendi penceresinde görünür, 0.5 sn çapraz geçiş.
+const SCENES = [
+  { id: "intro", a: 0, b: 2.8 },
+  { k: "rota", a: 2.6, b: 7.6, kick: "Günlük rota", h: "Bugün ne çalışacağın <em>hazır.</em>" },
+  { k: "net", a: 7.4, b: 11.8, kick: "Net takibi", h: "Netlerin nereye gidiyor, <em>gör.</em>" },
+  { k: "deneme", a: 11.6, b: 15.8, kick: "Deneme analizi", h: "Ders ders, <em>net net.</em>" },
+  { k: "defter", a: 15.6, b: 19.8, kick: "Yanlış defteri", h: "Aynı soruda <em>iki kez</em> yanılma." },
+  { k: "program", a: 19.6, b: 23.4, kick: "Haftalık program", h: "Haftanı tek bakışta <em>kur.</em>" },
+  { k: "hedef", a: 23.2, b: 27.2, kick: "Hedef ve seri", h: "Hedefine kaç net <em>kaldığını</em> bil." },
+  { id: "outro", a: 27.0, b: 30 },
+];
+const DURATION = 29.5;
+const anims = [];
+const ms = (s) => Math.round(s * 1000);
+const E = "cubic-bezier(.2,.7,.2,1)";
+function add(el, frames, start, dur, easing = E, fill = "both") {
+  const a = el.animate(frames, { delay: ms(start), duration: ms(dur), fill, easing });
+  a.pause(); anims.push(a);
+}
+
+SCENES.forEach((s) => {
+  const el = document.createElement("div");
+  el.className = "scene";
+  if (s.id === "intro" || s.id === "outro") {
+    const out = s.id === "outro";
+    el.innerHTML = `<div class="slide"><div class="glow"></div><div class="grain"></div>
+      <div class="center"><img class="m" src="mark.png" style="height:${out ? 64 : 84}px">
+      <div class="brand w" style="margin-top:22px"><span style="font-size:${out ? 26 : 32}px">MARATON</span></div>
+      <div class="tag t">${out ? "YKS'YE KADAR YANINDA" : "HER GÜN BİR ADIM DAHA"}</div>
+      ${out ? `<div class="t2 bri" style="font-size:34px;line-height:1.1;letter-spacing:-.03em;margin-top:44px;padding:0 30px">Rotanı <em style="font-style:normal;color:var(--accent-text)">bugün</em> başlat.</div>` : ""}
+      </div></div>`;
+  } else {
+    el.innerHTML = `<div class="slide"><div class="glow"></div><div class="grain"></div>
+      <div class="copy" style="padding-top:70px"><div class="kicker"><i></i>${s.kick}</div><h1>${s.h}</h1></div>
+      <div class="stage">${SCREENS[s.k]()}</div></div>`;
+  }
+  document.body.appendChild(el);
+  s.el = el;
+});
+
+function build() {
+  SCENES.forEach((s, i) => {
+    const el = s.el;
+    // Sahne görünürlüğü
+    const first = i === 0, last = i === SCENES.length - 1;
+    add(el, [{ opacity: first ? 1 : 0 }, { opacity: 1 }], s.a, first ? 0.01 : 0.5, "linear");
+    // Çıkış yalnız ileri dolar; geri dolsaydı tüm sahneler t=0'da görünür olup üst üste binerdi
+    if (!last) add(el, [{ opacity: 1 }, { opacity: 0 }], s.b - 0.2, 0.5, "linear", "forwards");
+    const t0 = s.a + (first ? 0.2 : 0.3);
+
+    if (s.id) {
+      add(el.querySelector(".m"), [{ opacity: 0, transform: "translateY(18px) scale(.94)" }, { opacity: 1, transform: "none" }], t0, 0.8);
+      add(el.querySelector(".w"), [{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }], t0 + 0.25, 0.7);
+      add(el.querySelector(".t"), [{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }], t0 + 0.45, 0.7);
+      const t2 = el.querySelector(".t2");
+      if (t2) add(t2, [{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }], t0 + 0.8, 0.7);
+      return;
+    }
+    // Yerleşim
+    const copy = el.querySelector(".copy"), st = el.querySelector(".stage");
+    const top = copy.offsetTop + copy.offsetHeight + 30;
+    const scale = 0.86;
+    st.style.top = top + "px";
+    // Tür 1: yukarı süzülme (metin + telefon + kartlar)
+    [copy.querySelector(".kicker"), copy.querySelector("h1")].forEach((n, j) =>
+      add(n, [{ opacity: 0, transform: "translateY(16px)" }, { opacity: 1, transform: "none" }], t0 + j * 0.12, 0.7));
+    add(st, [{ opacity: 0, transform: `translateX(-50%) translateY(60px) scale(${scale})` },
+             { opacity: 1, transform: `translateX(-50%) translateY(0) scale(${scale})` }], t0 + 0.15, 0.9);
+    // Telefonun sahne boyunca hafif yukarı kayması (kaydırma hissi)
+    add(st.querySelector(".scr"), [{ transform: "translateY(0)" }, { transform: "translateY(-60px)" }], t0 + 1.4, s.b - t0 - 1.4, "ease-in-out");
+    el.querySelectorAll(".stop, .item").forEach((n, j) =>
+      add(n, [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }], t0 + 0.6 + j * 0.12, 0.6));
+    // Tür 2: hat çizilir / çubuk dolar
+    el.querySelectorAll("path.draw, line.draw").forEach((p) => {
+      const L = p.getTotalLength ? p.getTotalLength() : 300;
+      p.style.strokeDasharray = L;
+      add(p, [{ strokeDashoffset: L }, { strokeDashoffset: 0 }], t0 + 0.7, 0.9, "ease-out");
+    });
+    el.querySelectorAll("path.draw2").forEach((p) =>
+      add(p, [{ opacity: 0 }, { opacity: 1 }], t0 + 1.5, 0.6, "linear"));
+    el.querySelectorAll(".grow").forEach((n, j) => {
+      n.style.transformOrigin = "left center";
+      add(n, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], t0 + 0.7 + j * 0.05, 0.8);
+    });
+    el.querySelectorAll(".cell").forEach((n, j) =>
+      add(n, [{ opacity: 0 }, { opacity: 1 }], t0 + 0.6 + (j / 105) * 0.9, 0.3, "linear"));
+  });
+}
+window.seek = (t) => { const v = ms(t); anims.forEach((a) => { a.currentTime = v; }); };
+window.DURATION = DURATION;
+document.fonts.ready.then(() => { build(); seek(0); document.body.dataset.ready = "1"; });
+</script>
+</body></html>

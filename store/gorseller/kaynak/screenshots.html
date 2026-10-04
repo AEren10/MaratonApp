@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Maraton Mağaza Görselleri</title>
+<link rel="stylesheet" href="screens.css">
+<style>
+  body { display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; background: #111115; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+  .slide .tabs, .slide .home-ind { display: none; }
+  .brand img { height: 22px; }
+  .brand span { font-family: Unbounded; font-weight: 600; font-size: 15px; letter-spacing: .06em; }
+</style></head>
+<body>
+<script src="screens.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const W = +(q.get("w") || 440), H = +(q.get("h") || 956);
+const SLIDES = [
+  { k: "rota", kick: "Günlük rota", h: "Bugün ne çalışacağın <em>hazır.</em>", p: "Rotan her sabah duraklara bölünür. Sen yalnızca başla.", brand: true },
+  { k: "net", kick: "Net takibi", h: "Netlerin nereye gidiyor, <em>gör.</em>", p: "Her denemeyi gir; grafiğin ders ders nerede ilerlediğini gösterir." },
+  { k: "deneme", kick: "Deneme analizi", h: "Ders ders, <em>net net.</em>", p: "Doğru, yanlış, boş — ve en çok nerede net kaybettiğin." },
+  { k: "defter", kick: "Yanlış defteri", h: "Aynı soruda <em>iki kez</em> yanılma.", p: "Yanlışını fotoğrafla, notunu düş. Tekrar gününü Maraton hatırlatır." },
+  { k: "program", kick: "Haftalık program", h: "Haftanı tek bakışta <em>kur.</em>", p: "Hangi gün, hangi ders, kaç dakika — hepsi tek ekranda." },
+  { k: "hedef", kick: "Hedef ve seri", h: "Hedefine kaç net <em>kaldığını</em> bil.", p: "Başlangıcın, bugünün ve hedefin aynı hatta. Seri seni masada tutar." },
+];
+SLIDES.forEach((s, i) => {
+  const el = document.createElement("div");
+  el.className = "slide"; el.id = "s" + (i + 1);
+  el.style.width = W + "px"; el.style.height = H + "px";
+  el.innerHTML = `<div class="glow"></div><div class="grain"></div>
+    <div class="copy">${s.brand ? `<div class="brand"><img src="mark.png"><span>MARATON</span></div>` : ""}
+      <div class="kicker"><i></i>${s.kick}</div><h1>${s.h}</h1><p>${s.p}</p></div>
+    <div class="stage">${SCREENS[s.k]()}</div>`;
+  document.body.appendChild(el);
+});
+function layout() {
+  document.querySelectorAll(".slide").forEach(sl => {
+    const copy = sl.querySelector(".copy"), st = sl.querySelector(".stage");
+    const top = copy.offsetTop + copy.offsetHeight + 34;
+    const scale = Math.min(0.86, (W - 64) / 410);
+    st.style.top = top + "px";
+    st.style.transform = `translateX(-50%) scale(${scale})`;
+  });
+  document.body.dataset.ready = "1";
+}
+document.fonts.ready.then(layout);
+</script>
+</body></html>
