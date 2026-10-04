@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Icon, Button, Press } from "../../components/design";
 import { ExamOption } from "./components/ExamOption";
@@ -17,6 +17,8 @@ import { buildCategoryOptions, buildYKSOptions, MONTHS } from "./constants/examS
 export default function ExamSetupScreen() {
   const C = useC();
   const navigation = useNavigation();
+  // Ayarlar > Sinav turu: duzenleme modu (kurulum cizgisi yok, kaydedince geri doner).
+  const editing = Boolean(useRoute().params?.edit);
   const CATEGORIES = useMemo(() => buildCategoryOptions(), []);
   const YKS_OPTIONS = useMemo(() => buildYKSOptions(), []);
   const { updateExamConfig } = useExam();
@@ -48,8 +50,9 @@ export default function ExamSetupScreen() {
       updateExamConfig(opt.examType, opt.field, date).catch(() => {});
     }
     H.success();
-    navigation.navigate(SCREENS.GOAL_SETUP);
-  }, [category, selectedId, examDate, isLGS, updateExamConfig, YKS_OPTIONS, navigation]);
+    if (editing) navigation.goBack();
+    else navigation.navigate(SCREENS.GOAL_SETUP);
+  }, [category, selectedId, examDate, isLGS, updateExamConfig, YKS_OPTIONS, navigation, editing]);
 
   const handleCategorySelect = useCallback((id) => {
     H.select();
@@ -73,7 +76,7 @@ export default function ExamSetupScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <SetupRouteSteps current={1} />
+      {editing ? null : <SetupRouteSteps current={1} />}
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[TYPOGRAPHY.heading, styles.title, { color: C.text }]}>Hangi sınava hazırlanıyorsun?</Text>

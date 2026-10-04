@@ -83,7 +83,7 @@ function PlanDetailInner({ route }) {
             <Skeleton width="100%" height={72} radius={SHAPE.card} style={{ marginTop: STEP.s2 }} />
           </View>
         ) : (
-          <PlanDetailEmptyState C={C} />
+          <PlanDetailEmptyState C={C} onAddRecommended={() => navigation.navigate(SCREENS.ADD_TASK, { duration: "25 dk" })} />
         )}
 
         {!loading ? (

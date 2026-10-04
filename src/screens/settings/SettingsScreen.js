@@ -54,6 +54,8 @@ export default function SettingsScreen() {
           <SettingsGroup title="ROTA">
             <SettingsRow first label="Hedef net" value={vm.targetNetLabel} onPress={vm.go(SCREENS.GOALS)} />
             <SettingsRow label="Sınav tarihi" value={vm.examDateLabel} onPress={vm.go(SCREENS.EXAM_DATE)} />
+            {/* Kurulumu atlayan / yanlis sinav secen icin donus yolu yoktu. */}
+            <SettingsRow label="Sınav türü" value={vm.examLabel} onPress={() => navigation.navigate(SCREENS.EXAM_SETUP, { edit: true })} />
             <SettingsRow label="Günlük soru hedefi" value={vm.dailyGoalLabel} onPress={vm.go(SCREENS.GOALS)} />
             <SettingsRow label="Haftalık ders programı" onPress={vm.go(SCREENS.CLASS_SCHEDULE)} />
             <SettingsRow label="Günlük rutin" hint="Her gün paragraf, problem…" onPress={vm.go(SCREENS.ROUTE_HABITS)} />
