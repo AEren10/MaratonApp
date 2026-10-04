@@ -1,0 +1,90 @@
+{
+  "appStore": {
+    "name": "Maraton: YKS Deneme Takibi",
+    "subtitle": "Net hesaplama, çalışma planı",
+    "keywords": "tyt,ayt,lgs,ydt,takip,sayaç,pomodoro,yanlış,defteri,soru,ders,programı,sıralama,konu,tekrar",
+    "promotionalText": "Sınava giden yol bir rotaya dönüşsün: her sabah günün durakları hazır, denemeni gir, netinin nereye gittiğini gör. Lansman döneminde tüm özellikler açık.",
+    "description": "Sınava giden yol bir rotaya dönüşür.\n\nMaraton, YKS'ye (TYT, AYT, YDT) ve LGS'ye hazırlanan öğrenciler için kişisel çalışma planı ve deneme takibi uygulaması. Sınav gününe kadar kalan konuları gün gün duraklara böler; sabah açtığında hangi dersten, hangi konudan, kaç soru çözeceğini bilirsin. Ders anlatmaz, içerik satmaz: kendi ilerlemeni net görmeni sağlar.\n\nBUGÜNÜN DURAKLARI\n- Rotan sınav tarihine, hedef netine ve bitirdiğin konulara göre çizilir.\n- Her gün birkaç durak: ders, konu, soru sayısı.\n- Durağı bitirince işaretle, hat ilerlesin.\n- Gün aksarsa durağı ertele ya da haftayı yeniden düzenle. Rota seni cezalandırmaz, yeniden hesaplar.\n\nDENEME TAKİBİ VE NET HESAPLAMA\n- TYT, AYT, YDT ve LGS denemelerini ders ders gir: doğru, yanlış, boş.\n- Net kendiliğinden hesaplanır.\n- Net grafiğin ve net tahminin her yeni denemeyle güncellenir.\n- Hangi derste yükseldiğini, hangisinde durduğunu görürsün.\n- Hedef netinle aranda kaç net kaldığını ve son netine yakın bölümleri gör.\n\nYANLIŞ DEFTERİ\n- Yanlış yaptığın soruyu fotoğrafla ya da not al.\n- Tekrar günü gelince önüne gelir.\n- Çözdüğünü kapatırsın, çözemediğin yeniden sıraya girer.\n\nÇALIŞMA SAYACI VE POMODORO\n- Kronometre ya da pomodoro ile odaklan.\n- Bitince ders, konu, süre ve soru sayısını tek ekranda kaydet.\n- Çalışma geçmişin takvimde ve haftalık programında birikir.\n\nSERİ VE HAFTALIK ÖZET\n- Her gün kayıt girdikçe serin uzar.\n- Haftanın sonunda ne kadar çalıştığını, kaç soru çözdüğünü ve rotada nerede olduğunu tek sayfada gör.\n\nÇALIŞMA GRUBU\n- Arkadaşlarınla davet koduyla grup kur.\n- Haftalık soru hedefinizi ve grup içi soru sıralamasını birlikte takip edin.\n\nANA EKRAN VE KİLİT EKRANI WIDGET'LARI\n- Sınava kalan gün, sıradaki durak, serin, net çizgin ve tekrarı gelen yanlışların bir bakışta.\n\nİNTERNETSİZ DE ÇALIŞIR\n- Bağlantın yokken girdiğin kayıtlar cihazda bekler, bağlantı gelince eşitlenir.\n\nVERİN SENİN\n- Reklam yok, verin reklam için kullanılmaz.\n- Verilerini istediğin an indirebilir, hesabını uygulama içinden silebilirsin.\n\nNot: Net tahmini ve bölüm eşleşmeleri, girdiğin deneme sonuçlarına ve geçmiş yılların açık taban verilerine dayanan yaklaşık hesaplardır; resmî sonuç yerine geçmez. Maraton, ÖSYM ya da MEB ile bağlantılı değildir.\n\nGizlilik: https://maratonapp.com/privacy\nKullanım koşulları: https://maratonapp.com/terms\nDestek: destek@maratonapp.com",
+    "whatsNew": "Maraton'un ilk sürümü. Kişisel çalışma rotası, deneme net takibi ve net tahmini, yanlış defteri, pomodoro sayacı, seri, çalışma grupları ve ana ekran widget'ları. Görüşlerini destek@maratonapp.com adresine yaz."
+  },
+  "googlePlay": {
+    "title": "Maraton: YKS Deneme Takibi",
+    "shortDescription": "TYT, AYT ve LGS deneme net takibi, ders çalışma programı, sayaç, yanlış defteri",
+    "fullDescription": "Maraton, YKS (TYT, AYT, YDT) ve LGS'ye hazırlanan öğrenciler için ders çalışma programı ve deneme takibi uygulaması. Sınav gününe kadar kalan konuları gün gün duraklara böler; sabah açtığında hangi dersten, hangi konudan kaç soru çözeceğini bilirsin.\n\nSınava giden yol bir rotaya dönüşür. Maraton ders anlatmaz, içerik satmaz; kendi ilerlemeni net görmeni sağlar.\n\nHer sabah hazır çalışma programı\nÇalışma programın sınav tarihine, hedef netine ve okulda bitirdiğin konulara göre çizilir. Her gün birkaç durak: ders, konu, soru sayısı. Durağı bitirince işaretle, hat ilerlesin. Gün aksarsa durağı ertele ya da haftalık programı yeniden düzenle; rota seni cezalandırmaz, yeniden hesaplar.\n\nDeneme takibi ve net hesaplama\nTYT, AYT ve LGS denemelerini ders ders gir: doğru, yanlış, boş. Net hesaplama kendiliğinden yapılır. Net grafiğin ve net tahminin her yeni denemeyle güncellenir; hangi derste yükseldiğini, hangisinde durduğunu görürsün. Hedef netinle aranda kaç net kaldığını ve son netine yakın bölümleri takip et.\n\nYanlış defteri ve soru takibi\nYanlış yaptığın soruyu fotoğrafla ya da not al; yanlış defteri her soruyu ders ve konusuyla saklar. Tekrar günü gelince önüne gelir; çözdüğünü kapat, çözemediğin yeniden sıraya girsin. Günlük çözdüğün soru sayısı hedefinle birlikte görünür, böylece soru takibi tek yerde kalır.\n\nÇalışma sayacı ve pomodoro\nKronometre ya da pomodoro sayacı ile odaklan. Bitince ders, konu, süre ve soru sayısını tek ekranda kaydet. Ders çalışma geçmişin takvimde birikir; haftanın hangi günü ne kadar çalıştığını görürsün.\n\nSeri ve haftalık özet\nHer gün kayıt girdikçe serin uzar; YKS ya da LGS gününe kaç gün kaldığını her an görürsün. Hafta sonunda ne kadar çalıştığını, kaç soru çözdüğünü ve rotada nerede olduğunu tek sayfada gör.\n\nArkadaşlarınla çalışma grubu\nDavet koduyla YKS ya da LGS çalışma grubu kur. Haftalık soru hedefinizi ve grup içindeki soru sıralamasını birlikte takip edin.\n\nİnternetsiz de çalışır\nBağlantın yokken girdiğin kayıtlar cihazda bekler, bağlantı gelince eşitlenir.\n\nVerin senin\nReklam yok. Verilerini istediğin an indirebilir, hesabını uygulama içinden silebilirsin.\n\nNet tahmini ve bölüm eşleşmeleri, girdiğin deneme sonuçlarına ve geçmiş yılların açık taban verilerine dayanan yaklaşık hesaplardır; resmî sonuç yerine geçmez. Maraton, ÖSYM ya da MEB ile bağlantılı değildir.\n\nGizlilik: https://maratonapp.com/privacy\nDestek: destek@maratonapp.com",
+    "releaseNotes": "Maraton'un ilk sürümü: kişisel çalışma rotası, deneme net takibi ve net tahmini, yanlış defteri, pomodoro sayacı, seri ve çalışma grupları. Görüşlerin için: destek@maratonapp.com"
+  },
+  "screenshots": [
+    {
+      "id": 1,
+      "screen": "Ana sayfa: kahraman sayı + rota hattı + BUGÜNÜN DURAKLARI (HomeHeroNormal, HomeTodayStops)",
+      "headline": "Günlük ders planın hazır",
+      "subline": "Sınav gününe kadar durak durak rota"
+    },
+    {
+      "id": 2,
+      "screen": "Net tahmini grafiği (NetForecastScreen)",
+      "headline": "Net takibi ve net tahmini",
+      "subline": "Her denemeyle grafiğin güncellenir"
+    },
+    {
+      "id": 3,
+      "screen": "Deneme detayı, ders ders net (TrialDetailScreen)",
+      "headline": "Deneme net hesaplama",
+      "subline": "Doğru, yanlış, boş gir; netin hazır"
+    },
+    {
+      "id": 4,
+      "screen": "Yanlış defteri listesi + tekrar oturumu (WrongNotebookScreen, ReviewSessionScreen)",
+      "headline": "Yanlış defteri ve tekrar",
+      "subline": "Fotoğrafla, tekrar günü önüne gelsin"
+    },
+    {
+      "id": 5,
+      "screen": "Çalışma sayacı, pomodoro modu (StudyTimerScreen)",
+      "headline": "Pomodoro çalışma sayacı",
+      "subline": "Süre, ders ve konu tek dokunuşla kayıtta"
+    },
+    {
+      "id": 6,
+      "screen": "Program > hafta/ay takvimi + seri (Program sekmesi, SummaryScreen)",
+      "headline": "Haftalık program ve seri",
+      "subline": "Her günün ve serin bir bakışta"
+    },
+    {
+      "id": 7,
+      "screen": "iOS ana ekran + kilit ekranı widget'ları (Rota, Bugün, Seri). Play setinde: çalışma grubu (GroupsTab)",
+      "headline": "YKS sayacı kilit ekranında",
+      "subline": "Sınava kalan gün ve sıradaki durak"
+    },
+    {
+      "id": 8,
+      "screen": "Sınav ve hedef kurulumu (ExamSetupScreen, GoalSetupScreen)",
+      "headline": "TYT, AYT, YDT ya da LGS",
+      "subline": "Sınavını ve hedef netini seç"
+    }
+  ],
+  "extras": {
+    "appStoreEnGBLocalization": {
+      "name": "Maraton: Ders Çalışma Takibi",
+      "subtitle": "Sınav sayacı, öğrenci ajandası",
+      "keywords": "yks,lgs,calisma,kronometre,odaklanma,lise,mezun,universite,hazirlik,haftalik,taban,bolum,yanlis"
+    },
+    "appStoreAlternatives": [
+      {
+        "name": "Maraton: TYT AYT LGS Net Takip",
+        "subtitle": "Deneme analizi, çalışma planı",
+        "keywords": "yks,ydt,tekrar,takibi,sayaç,pomodoro,yanlış,defteri,soru,ders,programı,hesaplama,sıralama,konu"
+      },
+      {
+        "name": "Maraton: Ders Çalışma Planı",
+        "subtitle": "YKS ve LGS deneme, net, sayaç",
+        "keywords": "tyt,ayt,ydt,takip,pomodoro,yanlış,defteri,soru,programı,hesaplama,sıralama,konu,tekrar,odak"
+      }
+    ],
+    "playScreenshot7": {
+      "screen": "Çalışma grubu, haftalık soru sıralaması (GroupsTab / LeagueBoard grup görünümü)",
+      "headline": "Arkadaşlarınla grup kur",
+      "subline": "Davet kodu, haftalık soru sıralaması"
+    }
+  }
+}

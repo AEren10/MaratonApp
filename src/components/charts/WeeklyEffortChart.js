@@ -4,7 +4,7 @@ import Svg, { Line, Text as SvgText } from "react-native-svg";
 
 import { EffortDay } from "./components/EffortDay";
 import { EffortSlotDefs } from "./components/EffortSlot";
-import { compactDuration, effortLabelLayout } from "./components/effortLabels";
+import { compactDuration, effortLabelLayout, goalLabelPlacement } from "./components/effortLabels";
 import { useC } from "../../contexts/ThemeContext";
 import { useChartFrame } from "./useChartFrame";
 import {
@@ -37,7 +37,8 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
 
   const yOf = (value) => bottom - (value / chartMax) * usableH;
   const goalY = goal > 0 ? yOf(goal) : null;
-  const { labelYOf, goalLabelBelow } = effortLabelLayout({ week, todayIndex, goalY, top, slot, width: vbW });
+  const { labelYOf } = effortLabelLayout({ week, todayIndex, goalY, top, slot, width: vbW });
+  const goalLabel = goalLabelPlacement({ week, goalY, yOf, labelYOf, slot, bottom, width: vbW });
 
   return (
     <View
@@ -112,12 +113,14 @@ export const WeeklyEffortChart = memo(function WeeklyEffortChart({ week, todayIn
               x1={EFFORT_PAD_LEFT} y1={goalY} x2={vbW - PAD_RIGHT} y2={goalY}
               stroke={C.targetLine} strokeWidth={1.5} strokeDasharray="4 6"
             />
-            <SvgText
-              x={vbW - PAD_RIGHT} y={goalLabelBelow ? goalY + 14 : goalY - 7}
-              fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor="end"
-            >
-              {`GÜNLÜK HEDEF ${week.goal}`}
-            </SvgText>
+            {goalLabel ? (
+              <SvgText
+                x={goalLabel.x} y={goalLabel.y}
+                fill={C.text4} fontSize={LABEL.size} fontWeight="500" textAnchor={goalLabel.anchor}
+              >
+                {`GÜNLÜK HEDEF ${week.goal}`}
+              </SvgText>
+            ) : null}
           </>
         ) : null}
 
