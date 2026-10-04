@@ -57,6 +57,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundImage": "./assets/adaptive-icon-bg.png",
         "backgroundColor": "#1C1C23"
       },
       "permissions": [
@@ -105,7 +106,7 @@
         {
           "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
-          "imageWidth": 160,
+          "imageWidth": 220,
           "backgroundColor": "#1C1C23"
         }
       ],

@@ -1,66 +1,51 @@
 import { useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Svg, { Circle, ClipPath, Defs, G, Path } from "react-native-svg";
+import { View, Image, StyleSheet } from "react-native";
 import Animated, {
-  Easing, useAnimatedProps, useReducedMotion, useSharedValue, withRepeat, withTiming,
+  Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming,
 } from "react-native-reanimated";
 import { useC } from "../../contexts/ThemeContext";
-import { ANIMATION, STEP, TYPOGRAPHY } from "../../themes/tokens";
+import { ANIMATION } from "../../themes/tokens";
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+const MARK = require("../../../assets/brand/mark.png");
+const W = 176;
+const H = Math.round(W * 398 / 859); // isaretin en-boy orani (assets/brand/mark.png)
+// Noktanin isaret icindeki yeri (generate-brand-assets ile olculdu).
+const DOT = { x: 0.926 * W, y: 0.835 * H, r: 0.069 * W };
+const EASE = Easing.bezier(...ANIMATION.easing.easeOut);
 
-const SIZE = 96;
-const R = 46;
-const AMP = 3.2;
-const M_PATH = "M 31 63 L 31 34 L 48 51 L 65 34 L 65 63";
-
-// Su yuzeyi: seviye (0 bos - 1 dolu) ve faz ile dalgali kapali sekil.
-function wavePath(level, phase) {
-  "worklet";
-  const y = SIZE - level * SIZE;
-  let d = `M 0 ${y}`;
-  for (let x = 0; x <= SIZE; x += 6) {
-    d += ` L ${x} ${y + Math.sin((x / SIZE) * Math.PI * 2 + phase) * AMP}`;
-  }
-  return `${d} L ${SIZE} ${SIZE} L 0 ${SIZE} Z`;
-}
-
-// Acilis: logo rozetinin ici alttan yukari kirmizi suyla dolar (dalga
-// yuzeyi akar), M harfi suyun ustunde okunur. Yukleme uzarsa dolu kalir,
-// dalga akmaya devam eder. Hareketi azalt acikken dolu ve durgun.
+// Acilis: onayli logo (secenek 1) once soluk durur, alttan yukari asil
+// rengiyle dolar; dolum bitince varis noktasi bir kez parlar. Yazi yok.
+// Hareketi azalt acikken dolu ve durgun.
 export function AppLaunchLoading() {
   const C = useC();
   const reduced = useReducedMotion();
-  const level = useSharedValue(reduced ? 0.78 : 0.06);
-  const phase = useSharedValue(0);
+  const fill = useSharedValue(reduced ? 1 : 0);
+  const flash = useSharedValue(0);
 
   useEffect(() => {
     if (reduced) return;
-    level.set(withTiming(0.78, { duration: 1800, easing: Easing.bezier(...ANIMATION.easing.easeOut) }));
-    phase.set(withRepeat(withTiming(Math.PI * 2, { duration: 1400, easing: Easing.linear }), -1, false));
-  }, [level, phase, reduced]);
+    fill.set(withTiming(1, { duration: 1300, easing: EASE }));
+    flash.set(withDelay(1200, withTiming(1, { duration: 700, easing: EASE })));
+  }, [fill, flash, reduced]);
 
-  const back = useAnimatedProps(() => ({ d: wavePath(level.get() - 0.03, phase.get() + 1.6) }));
-  const front = useAnimatedProps(() => ({ d: wavePath(level.get(), phase.get()) }));
+  const fillStyle = useAnimatedStyle(() => ({ height: H * fill.get() }));
+  const flashStyle = useAnimatedStyle(() => ({
+    opacity: flash.get() > 0 ? 0.55 * (1 - flash.get()) : 0,
+    transform: [{ scale: 1 + flash.get() * 1.6 }],
+  }));
 
   return (
-    <View style={[s.fill, { backgroundColor: C.bg }]}>
-      <View style={s.center} accessible accessibilityLabel="Maraton açılıyor">
-        <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-          <Defs>
-            <ClipPath id="launchBadge">
-              <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} />
-            </ClipPath>
-          </Defs>
-          <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill={C.surface} />
-          <G clipPath="url(#launchBadge)">
-            <AnimatedPath animatedProps={back} fill={C.accent} opacity={0.35} />
-            <AnimatedPath animatedProps={front} fill={C.accent} />
-          </G>
-          <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke={C.border} strokeWidth={1.5} />
-          <Path d={M_PATH} stroke={C.text} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        </Svg>
-        <Text style={[TYPOGRAPHY.label, s.word, { color: C.text }]}>MARATON</Text>
+    <View style={[s.fill, { backgroundColor: C.bg }]} accessible accessibilityLabel="Maraton açılıyor">
+      <View style={{ width: W, height: H }}>
+        <Image source={MARK} style={[s.mark, { opacity: 0.14 }]} resizeMode="contain" />
+        <Animated.View style={[s.reveal, fillStyle]}>
+          <Image source={MARK} style={s.markBottom} resizeMode="contain" />
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[s.dot, { left: DOT.x - DOT.r, top: DOT.y - DOT.r, width: DOT.r * 2, height: DOT.r * 2,
+            borderRadius: DOT.r, backgroundColor: C.accent }, flashStyle]}
+        />
       </View>
     </View>
   );
@@ -68,6 +53,10 @@ export function AppLaunchLoading() {
 
 const s = StyleSheet.create({
   fill: { flex: 1, alignItems: "center", justifyContent: "center" },
-  center: { alignItems: "center", justifyContent: "center", gap: STEP.s3 },
-  word: { letterSpacing: 3 },
+  mark: { width: W, height: H },
+  // Alttan yukari acilan pencere; icindeki isaret alta sabit, boylece dolum
+  // asagidan baslar.
+  reveal: { position: "absolute", left: 0, right: 0, bottom: 0, overflow: "hidden" },
+  markBottom: { position: "absolute", bottom: 0, width: W, height: H },
+  dot: { position: "absolute" },
 });

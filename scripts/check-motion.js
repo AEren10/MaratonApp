@@ -51,6 +51,8 @@ const RULES = [
 // Imza anlari: cizgi cizilir, hat gecis yapar, dugum parlar. Bunlar uzun surer.
 const SLOW_OK = [
   "components/charts",
+  // Acilis: logonun alttan dolmasi (marka imza ani, gunde bir kez).
+  "components/common/AppLaunchLoading",
   "FirstDayRouteLine",
   "CurriculumCurve",
   "EmptyState",
