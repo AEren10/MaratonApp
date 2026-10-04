@@ -1,4 +1,5 @@
 import { supabase } from "./client";
+import { containsProfanity, PROFANITY_MESSAGE } from "../domain/moderation/profanity";
 import { handleSupabaseError } from "./handleError";
 import { normalizeGroupCode, rankGroupMembers, groupWeeklyGoalSummary } from "../domain/groups";
 
@@ -133,12 +134,18 @@ async function rpc(name, params = {}, context = name) {
   return data;
 }
 
+// Uygunsuz ad/aciklama sunucuya hic gitmez (sunucu tetikleyicisi yedek).
+function assertClean(...texts) {
+  if (texts.some((t) => t && containsProfanity(t))) throw new Error(PROFANITY_MESSAGE);
+}
+
 export async function createGroup(input = {}) {
   const payload = typeof input === "string" ? { name: input } : input;
   const { name, description = "", weeklyTarget, weekly_target } = payload;
   const target = weeklyTarget ?? weekly_target ?? 1000;
   try {
     if (!name?.trim()) throw new Error("Grup adı gerekli");
+    assertClean(name, description);
     const result = ensureOk(await rpc("create_group", {
       p_name: name.trim(),
       p_description: description,
@@ -275,6 +282,7 @@ export async function deleteGroup(groupId) {
 export async function updateGroupSettings(groupId, { name, description, weeklyTarget, weekly_target } = {}) {
   try {
     if (!groupId) throw new Error("groupId is required");
+    assertClean(name, description);
     const target = weeklyTarget ?? weekly_target;
     const result = ensureOk(await rpc("update_group_settings", {
       p_group_id: groupId,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { containsProfanity, PROFANITY_MESSAGE } from "../domain/moderation/profanity";
 
 // Tek e-posta kuralı — tüm ekranlar bunu kullansın.
 // ForgotPassword ve EditEmail elle `includes("@")` yapıyordu ve "a@" gibi
@@ -14,7 +15,8 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2, "Adın en az 2 karakter olmalı"),
+  name: z.string().min(2, "Adın en az 2 karakter olmalı")
+    .refine((v) => !containsProfanity(v), PROFANITY_MESSAGE),
   email: z.string().email("Geçerli bir e-posta gir"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
 });
