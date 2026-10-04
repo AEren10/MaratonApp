@@ -70,6 +70,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={h.refreshing} onRefresh={h.onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
+        <HomeBackdrop />
         <HomeTopBar name={dashboard.displayName} streak={h.streak}
           onProfile={actions.profile} onCalendar={actions.calendar} onSocial={actions.social} />
         <SyncProblemBanner />
@@ -103,7 +104,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={[s.fill, { backgroundColor: C.bg }]}>
-      <HomeBackdrop />
       {body}
       <HomeOverlays
         comeback={h.comeback}

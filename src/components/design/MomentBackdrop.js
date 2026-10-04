@@ -34,7 +34,9 @@ function linePaths(w, h, flip) {
 
 // variant: "lines" (v1) isik huzmeleri | "dots" (v2) ince nokta izgarasi |
 // "route" (v3) ustten gecen silik rota cizgisi ve duraklari.
-// strength: 0-1 yogunluk (ana sayfada daha silik). glow: koseden isiltinin carpani.
+// strength: 0-1 yogunluk (ana sayfada daha silik). glow: koseden isiltinin
+// carpani (0 = yok). fadeTop: ust kenar da yumusak acilir (sayfanin ortasinda
+// baslayan ikinci demet kesik cizgiyle baslamasin).
 // v3: ekranin ustunden gecen tek rota (S egrisi) ve uzerindeki uc durak.
 function routePath(w, h, flip) {
   const X = (x) => (flip ? w - x : x);
@@ -51,7 +53,7 @@ function routeStops(w, h, flip) {
   });
 }
 
-export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1 }) {
+export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1, fadeTop = false }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
   const h = height || Math.round(screenH * 0.62);
@@ -74,8 +76,8 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
           </LinearGradient>
           <LinearGradient id="mbFade" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#fff" stopOpacity={1} />
-            <Stop offset="0.6" stopColor="#fff" stopOpacity={0.7} />
+            <Stop offset="0" stopColor="#fff" stopOpacity={fadeTop ? 0 : 1} />
+            <Stop offset={fadeTop ? "0.3" : "0.6"} stopColor="#fff" stopOpacity={fadeTop ? 1 : 0.7} />
             <Stop offset="1" stopColor="#fff" stopOpacity={0} />
           </LinearGradient>
           <Mask id="mbMask" x={0} y={0} width={width} height={h} maskUnits="userSpaceOnUse">
@@ -93,7 +95,7 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
           </Mask>
         </Defs>
         <G mask="url(#mbMask)">
-          <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" />
+          {glow > 0 ? <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" /> : null}
           {variant === "route" ? (
             <G>
               <Path d={routePath(width, h, flip)} fill="none" stroke={C.accent} strokeWidth={1.4} strokeOpacity={0.45 * k} strokeDasharray="1 6" strokeLinecap="round" />
