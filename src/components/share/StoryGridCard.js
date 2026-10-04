@@ -64,20 +64,16 @@ export function StoryGridCard({
         },
       ]}
     >
-      {/* Gerçek Kart Önizlemesi (Fotoğraf veya Koyu Marka Zemini) */}
+      {/* Gerçek Kart Önizlemesi (Ortalanmış ve tam oturan ölçek) */}
       <View
-        style={[
-          s.scaled,
-          {
-            width: STORY_WIDTH,
-            height: STORY_HEIGHT,
-            transform: [
-              { translateX: -((STORY_WIDTH * (1 - scale)) / 2) },
-              { translateY: -((STORY_HEIGHT * (1 - scale)) / 2) },
-              { scale },
-            ],
-          },
-        ]}
+        style={{
+          position: "absolute",
+          left: (width - STORY_WIDTH) / 2,
+          top: (height - STORY_HEIGHT) / 2,
+          width: STORY_WIDTH,
+          height: STORY_HEIGHT,
+          transform: [{ scale }],
+        }}
         pointerEvents="none"
       >
         <StorySticker variant={variant} photoUri={photoUri} overlay={false} visibility={visibility} />
@@ -120,7 +116,6 @@ export function StoryGridCard({
 
 const s = StyleSheet.create({
   card: { borderRadius: SHAPE.cardTight, overflow: "hidden", position: "relative", backgroundColor: "#16161D" },
-  scaled: { position: "absolute", left: 0, top: 0 },
   tagBadge: { position: "absolute", top: 10, left: 10, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
   tagText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 1 },
   cyclePill: { position: "absolute", bottom: 8, left: 8, right: 8, paddingVertical: 4, borderRadius: 6, alignItems: "center", justifyContent: "center" },

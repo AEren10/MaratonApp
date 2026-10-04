@@ -7,13 +7,14 @@ import { alpha } from "../../themes/colorMix";
 import { MomentBackdrop } from "../design/MomentBackdrop";
 import { TYPOGRAPHY } from "../../themes/tokens";
 
-// Marka zemini: kizil gecis (kullanici karari, 29 Eylul) -- ustte marka
-// kirmizisi, asagi dogru koyulasip zemine iner; ustte yumusak bir hale.
+// Marka zemini: koyu grafit gecis -- ustte yuzey tonu, asagi dogru
+// zemin tonuna iner; ust kosede cok silik kizil bir isilti.
 export function BrandBackground({ C, width, height }) {
+  const isLight = C.scheme === "light";
   return (
     <View style={StyleSheet.absoluteFill}>
       <LinearGradient
-        colors={[C.brandFill, C.accentDeep, C.bg]}
+        colors={isLight ? [C.surface, C.bg, "#E6E2DC"] : [C.surface, C.bg, "#121217"]}
         locations={[0, 0.48, 1]}
         start={{ x: 0.15, y: 0 }}
         end={{ x: 0.85, y: 1 }}
@@ -22,14 +23,14 @@ export function BrandBackground({ C, width, height }) {
       <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
         <Defs>
           <RadialGradient id="storyGlowA" cx="50%" cy="50%" r="50%">
-            <Stop offset="0" stopColor={C.accentBright} stopOpacity={0.35} />
-            <Stop offset="0.7" stopColor={C.accentBright} stopOpacity={0} />
+            <Stop offset="0" stopColor={C.accent} stopOpacity={isLight ? 0.05 : 0.12} />
+            <Stop offset="0.7" stopColor={C.accent} stopOpacity={0} />
           </RadialGradient>
         </Defs>
         <Rect x={-140} y={-180} width={520} height={520} fill="url(#storyGlowA)" />
       </Svg>
-      <MomentBackdrop height={height} fade={false} />
-      <View style={[s.topLine, { backgroundColor: alpha(C.text, 22) }]} />
+      <MomentBackdrop height={height} fade={false} strength={0.3} glow={0.2} />
+      <View style={[s.topLine, { backgroundColor: alpha(C.text, isLight ? 12 : 20) }]} />
     </View>
   );
 }
