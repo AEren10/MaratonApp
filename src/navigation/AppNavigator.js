@@ -3,7 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { ActivityIndicator, AppState, View } from "react-native";
+import { ActivityIndicator, AppState, Easing, View } from "react-native";
+import { ANIMATION } from "../themes/tokens";
 import { DepthLayout } from "./DepthLayout";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -105,7 +106,10 @@ const AFTER_FAB_SCREENS = TAB_SCREENS.filter((route) => !TABS_BEFORE_FAB.include
 const TAB_NAV_OPTIONS = {
   headerShown: false,
   lazy: true,
-  animation: "none",
+  // Sekme gecisi tek karede degil, kisa bir solmayla (kullanici, 4 Ekim:
+  // "+ harika aciliyor, sekmeler smooth degil"). Yerel surucude, JS beklemez.
+  animation: "fade",
+  transitionSpec: { animation: "timing", config: { duration: ANIMATION.duration.fast, easing: Easing.bezier(...ANIMATION.easing.easeOut) } },
   freezeOnBlur: true,
   detachInactiveScreens: true,
 };
