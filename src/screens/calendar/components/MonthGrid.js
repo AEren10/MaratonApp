@@ -6,7 +6,7 @@ import { alpha } from "../../../themes/palette";
 import { dateKey, todayTR } from "../../../lib/dateUtils";
 import { useMonthRoutePlan } from "../../../hooks/useMonthRoutePlan";
 import { Press } from "../../../components/design/Press";
-import { LiveFlame } from "../../../components/streak/LiveFlame";
+import { Icon } from "../../../components/design/Icon";
 
 const WEEKDAYS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 
@@ -63,9 +63,9 @@ function DayCell({ date, iso, data, planData, dailyGoal, isSelected, isToday, is
       {/* Calisilan gun: kosede alev -- seri takvimde zincir gibi okunur. */}
       {worked ? (
         <View style={[styles.flame, { backgroundColor: C.bg }]} pointerEvents="none">
-          {/* Kareler SABIT (performans, 4 Ekim): 20-30 alevin ayni anda
-              oynamasi takvimi aciliste kasiyordu. Canli olan tek alev ustteki. */}
-          <LiveFlame size={26} animate={false} />
+          {/* Tek parca ikon (performans): karede uc katmanli SVG alev 30 kez
+              ciziliyordu. Boyut buyuk kaldi, renk turuncu. */}
+          <Icon name="flame" size={21} color={C.flame} fill={C.flame} />
         </View>
       ) : null}
       <Text style={[styles.dayText, { color: isToday && !isFilled ? C.accentText : look.color }]}>{date.getDate()}</Text>

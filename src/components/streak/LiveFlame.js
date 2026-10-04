@@ -4,7 +4,6 @@ import Svg, { Defs, LinearGradient, Path, RadialGradient, Stop, Circle } from "r
 import Animated, {
   cancelAnimation, Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming, withDelay,
 } from "react-native-reanimated";
-import { useIsFocused } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
 
@@ -23,14 +22,14 @@ const loop = (to, ms, delay = 0, reps = -1) => withDelay(delay, withRepeat(withT
  * hafif salinir, ic cekirdek ayri ritimde atar. Hareketi azalt acikken durgun.
  * lit=false: seri yok -> gri, hareketsiz.
  */
-export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true, animate = true, cycles = null }) {
+export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true, animate = false, cycles = null }) {
   const C = useC();
   const reduced = useReducedMotion();
-  // PERFORMANS: sonsuz donguler UI thread'inde; ekran gorunmezken (baska
-  // sekme, donmus ekran) de suruyordu -> takvimdeki 20-30 alev butun
-  // uygulamayi kasiyordu (4 Ekim). Yalniz odaktaki ekranda ve animate iken.
-  const focused = useIsFocused();
-  const still = reduced || !lit || !animate || !focused;
+  // PERFORMANS (4 Ekim): alev artik VARSAYILAN DURGUN. Her alev useIsFocused
+  // ile sekme degisimini dinliyordu; takvimdeki 30 alev her gecis aninda
+  // yeniden ciziliyor, donguler de UI thread'ini dolduruyordu -> sekme
+  // gecisleri kasiyordu. animate yalniz acikca istenirse.
+  const still = reduced || !lit || !animate;
   const rise = useSharedValue(0);
   const sway = useSharedValue(0);
   const core = useSharedValue(0);

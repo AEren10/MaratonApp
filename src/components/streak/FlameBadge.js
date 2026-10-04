@@ -35,7 +35,7 @@ export function FlameBadge({ value = 0, size = 44 }) {
   return (
     <View style={[s.halo, { width: size, height: size, borderRadius: size / 2, backgroundColor: alpha(color, lit ? 14 : 8) }]}>
       <Animated.View style={style}>
-        <LiveFlame size={Math.round(size * 0.72)} lit={lit} cycles={2} />
+        <LiveFlame size={Math.round(size * 0.72)} lit={lit} />
       </Animated.View>
     </View>
   );
