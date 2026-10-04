@@ -117,8 +117,8 @@ export function StoryGridCard({
 const s = StyleSheet.create({
   card: { borderRadius: SHAPE.cardTight, overflow: "hidden", position: "relative", backgroundColor: "#16161D" },
   tagBadge: { position: "absolute", top: 10, left: 10, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
-  tagText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 1 },
+  tagText: { fontFamily: "Archivo_700", fontSize: 11, letterSpacing: 1 },
   cyclePill: { position: "absolute", bottom: 8, left: 8, right: 8, paddingVertical: 4, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  cycleText: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 0.4 },
+  cycleText: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 0.4 },
   checkCircle: { position: "absolute", top: 10, right: 10, width: 22, height: 22, borderRadius: 11, backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
 });
