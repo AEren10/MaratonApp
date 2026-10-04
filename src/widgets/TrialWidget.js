@@ -19,6 +19,7 @@ const TrialWidget = (props, environment) => {
 
   const accent = "#E5343F";
   const bg = "#1C1C23";
+  const accentDeep = "#A81C26";
   const up = "#34D399";
   const down = "#9A97A0";
   const text = "#ECE8E4";
@@ -30,6 +31,20 @@ const TrialWidget = (props, environment) => {
   const points = (Array.isArray(props?.points) ? props.points : []).map((p) => Number(p?.net) || 0);
   const subjects = Array.isArray(props?.subjects) ? props.subjects : [];
   const compact = environment?.widgetFamily === "systemSmall";
+
+  // Canli zemin: kosede koyu kizil isilti zemine iner. Ton paletten karisim
+  // (widget kendi calisma zamaninda; token import edilemez).
+  const mixHex = (a, b, t) => {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [x, y] = [p(a), p(b)];
+    return `#${x.map((v, i) => Math.round(v * (1 - t) + y[i] * t).toString(16).padStart(2, "0")).join("")}`;
+  };
+  const glowBg = {
+    type: "linearGradient",
+    colors: [mixHex(accentDeep, bg, 0.55), bg, bg],
+    startPoint: { x: 0, y: 0 },
+    endPoint: { x: 1, y: 1 },
+  };
   const fmt = (n) => String(Math.round(Number(n) * 10) / 10).replace(".", ",");
   const signed = (n) => `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
   const tone = (n) => (n > 0 ? up : n < 0 ? down : text3);
@@ -37,7 +52,7 @@ const TrialWidget = (props, environment) => {
   if (!points.length) {
     return (
       <VStack alignment="leading" spacing={4}
-        modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), widgetURL("maraton://analiz")]}>
+        modifiers={[containerBackground(glowBg, "widget"), padding({ all: 14 }), widgetURL("maraton://analiz")]}>
         <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>DENEME</Text>
         <Spacer />
         <Text modifiers={[font({ size: 15, weight: "semibold" }), foregroundStyle(text)]}>İlk denemeni gir.</Text>
@@ -108,7 +123,7 @@ const TrialWidget = (props, environment) => {
   if (compact) {
     return (
       <VStack alignment="leading" spacing={6}
-        modifiers={[containerBackground(bg, "widget"), padding({ all: 13 }), widgetURL("maraton://analiz")]}>
+        modifiers={[containerBackground(glowBg, "widget"), padding({ all: 13 }), widgetURL("maraton://analiz")]}>
         <HStack alignment="firstTextBaseline">
           <Text modifiers={[font({ size: 36 }), foregroundStyle(text)]}>{fmt(last)}</Text>
           <Spacer />
@@ -125,7 +140,7 @@ const TrialWidget = (props, environment) => {
     );
   }
 
-  const rows = subjects.slice(-5).map((s, i, arr) => {
+  const rows = subjects.slice(-4).map((s, i, arr) => {
     const d = Number(s.delta) || 0;
     const isWorst = worstDown && i === arr.length - 1;
     return (
@@ -140,16 +155,16 @@ const TrialWidget = (props, environment) => {
   });
 
   return (
-    <HStack spacing={12} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), widgetURL("maraton://analiz")]}>
+    <HStack spacing={12} modifiers={[containerBackground(glowBg, "widget"), padding({ all: 14 }), widgetURL("maraton://analiz")]}>
       <VStack alignment="leading" spacing={2}>
         <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>{`${Number(props?.total) || points.length}. ${props?.exam ? `${props.exam} ` : ""}DENEME`}</Text>
-        <HStack alignment="firstTextBaseline" spacing={6}>
-          <Text modifiers={[font({ size: 38 }), foregroundStyle(text)]}>{fmt(last)}</Text>
-          {deltaFirst != null ? (
-            <Text modifiers={[font({ size: 13, weight: "semibold" }), foregroundStyle(tone(deltaFirst))]}>{signed(deltaFirst)}</Text>
-          ) : null}
-          {deltaFirst != null ? <Text modifiers={[font({ size: 11 }), foregroundStyle(text3)]}>ilkinden</Text> : null}
+        <HStack alignment="lastTextBaseline" spacing={3}>
+          <Text modifiers={[font({ size: 32, weight: "semibold" }), foregroundStyle(text)]}>{fmt(last)}</Text>
+          <Text modifiers={[font({ size: 12 }), foregroundStyle(text3)]}>net</Text>
         </HStack>
+        {deltaFirst != null ? (
+          <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(tone(deltaFirst))]}>{`${signed(deltaFirst)} ilk denemeden`}</Text>
+        ) : null}
         <Spacer />
         {chart}
       </VStack>

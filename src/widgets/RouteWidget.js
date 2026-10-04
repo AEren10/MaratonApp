@@ -21,6 +21,7 @@ const RouteWidget = (props, environment) => {
 
   const accent = "#E5343F";
   const bg = "#1C1C23";
+  const accentDeep = "#A81C26";
   const up = "#34D399";
   const text = "#ECE8E4";
   const text3 = "#A3A0AB";
@@ -70,8 +71,22 @@ const RouteWidget = (props, environment) => {
 
   // ---- ANA EKRAN ----
   const compact = family === "systemSmall";
+
+  // Canli zemin: kosede koyu kizil isilti zemine iner. Ton paletten karisim
+  // (widget kendi calisma zamaninda; token import edilemez).
+  const mixHex = (a, b, t) => {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [x, y] = [p(a), p(b)];
+    return `#${x.map((v, i) => Math.round(v * (1 - t) + y[i] * t).toString(16).padStart(2, "0")).join("")}`;
+  };
+  const glowBg = {
+    type: "linearGradient",
+    colors: [mixHex(accentDeep, bg, 0.55), bg, bg],
+    startPoint: { x: 0, y: 0 },
+    endPoint: { x: 1, y: 1 },
+  };
   const W = compact ? 130 : 306;
-  const H = compact ? 34 : 44;
+  const H = compact ? 46 : 64;
   const R = 5;
   const lo = Math.min(...points);
   const hi = Math.max(...points);
@@ -82,13 +97,27 @@ const RouteWidget = (props, environment) => {
   const pts = points.map((v, i) => ({ x: xOf(i), y: yOf(v) }));
   const showTarget = target > 0 && target >= base && target <= base + span;
 
-  const segments = pts.slice(1).map((b, i) => {
-    const a = pts[i];
+  const seg = (a, b) => {
     const len = Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
     const deg = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    return { len, deg, cx: (a.x + b.x) / 2 - len / 2, cy: (a.y + b.y) / 2 };
+  };
+  // Isilti: cizginin altinda kalin, zemine karisan serit (neon hissi).
+  const glowTone = mixHex(accent, bg, 0.62);
+  const glows = pts.slice(1).map((b, i) => {
+    const g = seg(pts[i], b);
     return (
-      <VStack key={`s${i}`} modifiers={[frame({ width: len, height: 2.5 }), background(accent), cornerRadius(1.25),
-        rotationEffect(deg), offset({ x: (a.x + b.x) / 2 - len / 2, y: (a.y + b.y) / 2 - 1.25 })]}>
+      <VStack key={`g${i}`} modifiers={[frame({ width: g.len, height: 8 }), background(glowTone), cornerRadius(4),
+        rotationEffect(g.deg), offset({ x: g.cx, y: g.cy - 4 })]}>
+        <Spacer />
+      </VStack>
+    );
+  });
+  const segments = pts.slice(1).map((b, i) => {
+    const g = seg(pts[i], b);
+    return (
+      <VStack key={`s${i}`} modifiers={[frame({ width: g.len, height: 3 }), background(accent), cornerRadius(1.5),
+        rotationEffect(g.deg), offset({ x: g.cx, y: g.cy - 1.5 })]}>
         <Spacer />
       </VStack>
     );
@@ -113,6 +142,7 @@ const RouteWidget = (props, environment) => {
   const line = pts.length >= 2 ? (
     <ZStack alignment="topLeading" modifiers={[frame({ width: W, height: H, alignment: "topLeading" })]}>
       {dashes}
+      {glows}
       {segments}
       {dots}
     </ZStack>
@@ -122,19 +152,19 @@ const RouteWidget = (props, environment) => {
 
   return (
     <VStack alignment="leading" spacing={compact ? 4 : 6}
-      modifiers={[containerBackground(bg, "widget"), padding({ all: compact ? 13 : 15 }), url]}>
+      modifiers={[containerBackground(glowBg, "widget"), padding({ all: compact ? 13 : 15 }), url]}>
       <HStack alignment="top">
         <VStack alignment="leading" spacing={0}>
           <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(accent)]}>SINAVA</Text>
-          <HStack alignment="lastTextBaseline" spacing={4}>
-            <Text modifiers={[font({ size: compact ? 40 : 44 }), foregroundStyle(text)]}>{dayText}</Text>
-            <Text modifiers={[font({ size: 14, weight: "semibold" }), foregroundStyle(text3)]}>gün</Text>
+          <HStack alignment="lastTextBaseline" spacing={3}>
+            <Text modifiers={[font({ size: compact ? 30 : 28, weight: "semibold" }), foregroundStyle(text)]}>{dayText}</Text>
+            <Text modifiers={[font({ size: 13, weight: "semibold" }), foregroundStyle(text3)]}>gün</Text>
           </HStack>
         </VStack>
         <Spacer />
         {!compact && deltaText ? (
           <VStack alignment="trailing" spacing={1}>
-            <Text modifiers={[font({ size: 24 }), foregroundStyle(delta > 0 ? up : text3)]}>{deltaText}</Text>
+            <Text modifiers={[font({ size: 20, weight: "semibold" }), foregroundStyle(delta > 0 ? up : text3)]}>{deltaText}</Text>
             <Text modifiers={[font({ size: 12, weight: "medium" }), foregroundStyle(text3)]}>{`son ${points.length} denemede`}</Text>
           </VStack>
         ) : null}

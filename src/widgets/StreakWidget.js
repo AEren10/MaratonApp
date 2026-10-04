@@ -1,4 +1,4 @@
-import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
+import { HStack, Image, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import {
   background, containerBackground, cornerRadius, font, foregroundStyle, frame, padding, strokeBorder, widgetURL,
 } from "@expo/ui/swift-ui/modifiers";
@@ -49,6 +49,20 @@ const StreakWidget = (props, environment) => {
   const todayDone = raw[27] > 0;
   const compact = environment?.widgetFamily === "systemSmall";
 
+  // Canli zemin: kosede koyu turuncu isilti zemine iner. Ton paletten karisim
+  // (widget kendi calisma zamaninda; token import edilemez).
+  const mixHex = (a, b, t) => {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [x, y] = [p(a), p(b)];
+    return `#${x.map((v, i) => Math.round(v * (1 - t) + y[i] * t).toString(16).padStart(2, "0")).join("")}`;
+  };
+  const glowBg = {
+    type: "linearGradient",
+    colors: [mixHex(flameDeep, bg, 0.35), bg, bg],
+    startPoint: { x: 0, y: 0 },
+    endPoint: { x: 0.9, y: 1 },
+  };
+
   // Rekoru gecme gunu: seri bugun surerse kac gun sonra rekor asilir.
   const gapToRecord = longest - streak;
   let sentence;
@@ -93,9 +107,10 @@ const StreakWidget = (props, environment) => {
 
   if (compact) {
     return (
-      <VStack alignment="leading" spacing={4} modifiers={[containerBackground(bg, "widget"), padding({ all: 13 }), url]}>
-        <HStack alignment="lastTextBaseline" spacing={3}>
-          <Text modifiers={[font({ size: 34 }), foregroundStyle(flame)]}>{String(streak)}</Text>
+      <VStack alignment="leading" spacing={4} modifiers={[containerBackground(glowBg, "widget"), padding({ all: 13 }), url]}>
+        <HStack alignment="center" spacing={4}>
+          <Image systemName="flame.fill" size={26} color={streak > 0 ? flame : text4} />
+          <Text modifiers={[font({ size: 34, weight: "semibold" }), foregroundStyle(streak > 0 ? flame : text3)]}>{String(streak)}</Text>
           <Text modifiers={[font({ size: 14 }), foregroundStyle(text3)]}>gün</Text>
         </HStack>
         <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle(text)]}>{sentence}</Text>
@@ -117,11 +132,12 @@ const StreakWidget = (props, environment) => {
   );
 
   return (
-    <HStack spacing={10} modifiers={[containerBackground(bg, "widget"), padding({ all: 14 }), url]}>
+    <HStack spacing={10} modifiers={[containerBackground(glowBg, "widget"), padding({ all: 14 }), url]}>
       <VStack alignment="leading" spacing={2}>
         <Text modifiers={[font({ size: 11, weight: "bold" }), foregroundStyle(flame)]}>SERİ</Text>
-        <HStack alignment="lastTextBaseline" spacing={3}>
-          <Text modifiers={[font({ size: 44 }), foregroundStyle(text)]}>{String(streak)}</Text>
+        <HStack alignment="center" spacing={5}>
+          <Image systemName="flame.fill" size={34} color={streak > 0 ? flame : text4} />
+          <Text modifiers={[font({ size: 44, weight: "semibold" }), foregroundStyle(streak > 0 ? flame : text)]}>{String(streak)}</Text>
           <Text modifiers={[font({ size: 15 }), foregroundStyle(text3)]}>gün</Text>
         </HStack>
         {longest > 0 ? (

@@ -28,7 +28,7 @@ export function BrandBackground({ C, width, height }) {
         </Defs>
         <Rect x={-140} y={-180} width={520} height={520} fill="url(#storyGlowA)" />
       </Svg>
-      <MomentBackdrop height={height} />
+      <MomentBackdrop height={height} fade={false} />
       <View style={[s.topLine, { backgroundColor: alpha(C.text, 22) }]} />
     </View>
   );

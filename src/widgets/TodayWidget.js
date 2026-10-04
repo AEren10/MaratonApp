@@ -37,6 +37,20 @@ const TodayWidget = (props, environment) => {
   const weekMinutes = Number(props?.weekMinutes) || 0;
   const weekGoal = Number(props?.weeklyMinutesGoal) || 0;
   const compact = environment?.widgetFamily === "systemSmall";
+
+  // Canli zemin: kosede koyu kizil isilti zemine iner. Ton paletten karisim
+  // (widget kendi calisma zamaninda; token import edilemez).
+  const mixHex = (a, b, t) => {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [x, y] = [p(a), p(b)];
+    return `#${x.map((v, i) => Math.round(v * (1 - t) + y[i] * t).toString(16).padStart(2, "0")).join("")}`;
+  };
+  const glowBg = {
+    type: "linearGradient",
+    colors: [mixHex(accentDeep, bg, 0.6), bg, bg],
+    startPoint: { x: 0, y: 0 },
+    endPoint: { x: 1, y: 1 },
+  };
   const next = tasks.find((t) => !t?.done) || null;
   const url = widgetURL("maraton://plan");
 
@@ -85,7 +99,7 @@ const TodayWidget = (props, environment) => {
     ));
     return (
       <VStack alignment="leading" spacing={3}
-        modifiers={[containerBackground(onRed ? accentDeep : bg, "widget"), padding({ all: 14 }), url]}>
+        modifiers={[containerBackground(onRed ? accentDeep : glowBg, "widget"), padding({ all: 14 }), url]}>
         <HStack alignment="top">
           <HStack alignment="lastTextBaseline" spacing={1}>
             <Text modifiers={[font({ size: 40 }), foregroundStyle(ink)]}>{String(doneCount)}</Text>
@@ -143,7 +157,7 @@ const TodayWidget = (props, environment) => {
   ));
 
   return (
-    <VStack alignment="leading" spacing={6} modifiers={[containerBackground(bg, "widget"), padding({ all: 12 }), url]}>
+    <VStack alignment="leading" spacing={6} modifiers={[containerBackground(glowBg, "widget"), padding({ all: 12 }), url]}>
       {rows.length ? (
         <VStack alignment="leading" spacing={4}>{rows}</VStack>
       ) : (
