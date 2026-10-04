@@ -3,12 +3,10 @@ import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
-import { NudgePopup } from "../../components/common/NudgePopup";
 
 import { AnalysisHeader } from "./components/AnalysisHeader";
 import { AnalysisFilterPills } from "./components/AnalysisFilterPills";
 import { AnalysisAddTrialButton } from "./components/AnalysisAddTrialButton";
-import { AnalysisNotebookLink } from "./components/AnalysisNotebookLink";
 import { AnalysisHeroScore } from "./components/AnalysisHeroScore";
 import { SubjectTrendCards } from "./components/SubjectTrendCards";
 import { AnalysisTrialHistory } from "./components/AnalysisTrialHistory";
@@ -67,7 +65,6 @@ export default function AnalysisScreen() {
             <AnalysisSkeleton />
           ) : (
             <>
-              <AnalysisCoachLine C={C} />
               <AnalysisFilterPills
                 C={C}
                 value={filter}
@@ -83,10 +80,8 @@ export default function AnalysisScreen() {
                 heroSeries={analysis.heroSeries}
               />
 
-              <AnalysisNotebookLink
-                C={C}
-                onPress={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_notebook_link")}
-              />
+              {/* Koc satiri grafigin ALTINDA: net grafigi ekranin ustunde kalsin. */}
+              <AnalysisCoachLine C={C} />
 
               {/* DERS BAZLI TREND */}
               <SubjectTrendCards
@@ -117,9 +112,8 @@ export default function AnalysisScreen() {
 
               <DeeperAnalysisSection
                 C={C}
-                onSenaryolar={() => go(screens.NET_FORECAST, undefined, "analysis_forecast")}
+                onNotebook={() => go(screens.WRONG_NOTEBOOK, undefined, "analysis_notebook_link")}
                 onNetTahmini={() => go(screens.RANK_SIMULATOR, undefined, "analysis_rank_simulator")}
-                onKonuIlerlemesi={() => go(screens.SUBJECT_LIST, undefined, "analysis_subject_list")}
                 onOncelikliKonular={() => go(screens.WEAK_AREAS, undefined, "analysis_weak_areas")}
                 onYayinKarsilastirmasi={() => go(screens.COMPARATIVE, undefined, "analysis_comparative")}
                 onSimulasyon={openSimulator}
@@ -131,13 +125,6 @@ export default function AnalysisScreen() {
         <AnalysisAddTrialButton
           C={C}
           onPress={() => go(screens.TRIAL_ENTRY, undefined, "analysis_sticky_trial_entry")}
-        />
-
-        <NudgePopup
-          nudge={nudgePopup}
-          visible={!!nudgePopup}
-          onDismiss={dismissNudgePopup}
-          onAction={handleNudgeAction}
         />
       </SafeAreaView>
     </SwipeToHome>

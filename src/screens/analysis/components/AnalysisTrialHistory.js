@@ -37,8 +37,11 @@ export function AnalysisTrialHistory({ C, history = [], totalCount = 0, onSelect
   return (
     <View style={s.wrap}>
       <View style={s.headerRow}>
-        <Text style={[s.sectionLabel, { color: C.accentBright }]}>DENEME KAYITLARI</Text>
-        <Text style={[s.countLabel, { color: C.text3 }]}>{countText}</Text>
+        <Text style={[s.sectionLabel, { color: C.text2 }]}>DENEME KAYITLARI</Text>
+        {/* Alttaki "Tum deneme kayitlari" butonu yerine baslik yaninda Tumu. */}
+        <Pressable onPress={onSeeAll} hitSlop={14} accessibilityRole="button" accessibilityLabel={`Tüm deneme kayıtları, ${countText}`}>
+          <Text style={[s.countLabel, { color: C.accentText }]}>Tümü ›</Text>
+        </Pressable>
       </View>
 
       <View style={s.list}>

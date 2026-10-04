@@ -5,12 +5,13 @@ import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 import { useExam } from "../../../contexts/ExamContext";
 
-// Yanlis defteri burada da vardi; grafigin altindaki satir tek giris.
+// Yanlis defterinin Analiz'deki tek girisi (grafigin altindaki satir kalkti).
+// Senaryolar ve Konu Ilerlemesi kalkti (4 Ekim): Konu Ilerlemesi Program >
+// Mufredat ile karisiyordu; Senaryolar Rota'dan acilir.
 export function DeeperAnalysisSection({
   C,
-  onKonuIlerlemesi,
+  onNotebook,
   onOncelikliKonular,
-  onSenaryolar,
   onNetTahmini,
   onYayinKarsilastirmasi,
   onSimulasyon,
@@ -20,19 +21,14 @@ export function DeeperAnalysisSection({
   const isLGS = String(examType || "").toLowerCase() === "lgs";
   const items = [
     {
-      name: "Senaryolar",
-      note: "Aynı hedef, 3 farklı haftalık tempo yükü",
-      onPress: onSenaryolar,
+      name: "Yanlış defteri",
+      note: "Yanlış soruların ve tekrar zamanı gelenler",
+      onPress: onNotebook,
     },
     {
       name: "Net & Sıralama Tahmini",
       note: "Hedef açığı, net bandı ve tahmini sıralama simülasyonu",
       onPress: onNetTahmini,
-    },
-    {
-      name: "Konu İlerlemesi",
-      note: "Konu konu çalışma ve defter durumu",
-      onPress: onKonuIlerlemesi,
     },
     {
       name: "Zayıf dersler",

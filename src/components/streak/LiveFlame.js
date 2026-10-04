@@ -2,8 +2,9 @@ import { memo, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, Path, RadialGradient, Stop, Circle } from "react-native-svg";
 import Animated, {
-  Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming, withDelay,
+  cancelAnimation, Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming, withDelay,
 } from "react-native-reanimated";
+import { useIsFocused } from "@react-navigation/native";
 
 import { useC } from "../../contexts/ThemeContext";
 
@@ -21,22 +22,30 @@ const loop = (to, ms, delay = 0) => withDelay(delay, withRepeat(withTiming(to, {
  * hafif salinir, ic cekirdek ayri ritimde atar. Hareketi azalt acikken durgun.
  * lit=false: seri yok -> gri, hareketsiz.
  */
-export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true }) {
+export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase = 0, glow: withGlow = true, animate = true }) {
   const C = useC();
   const reduced = useReducedMotion();
-  const still = reduced || !lit;
+  // PERFORMANS: sonsuz donguler UI thread'inde; ekran gorunmezken (baska
+  // sekme, donmus ekran) de suruyordu -> takvimdeki 20-30 alev butun
+  // uygulamayi kasiyordu (4 Ekim). Yalniz odaktaki ekranda ve animate iken.
+  const focused = useIsFocused();
+  const still = reduced || !lit || !animate || !focused;
   const rise = useSharedValue(0);
   const sway = useSharedValue(0);
   const core = useSharedValue(0);
   const glow = useSharedValue(0);
 
   useEffect(() => {
-    if (still) return;
+    if (still) {
+      [rise, sway, core, glow].forEach((v) => { cancelAnimation(v); v.set(0); });
+      return undefined;
+    }
     // phase: yan yana alevler (takvim) ayni anda nefes almasin.
     rise.set(loop(1, 560, phase));
     sway.set(loop(1, 980, phase + 120));
     core.set(loop(1, 340, phase + 60));
     glow.set(loop(1, 1300, phase));
+    return () => [rise, sway, core, glow].forEach((v) => cancelAnimation(v));
   }, [still, rise, sway, core, glow, phase]);
 
   const outerStyle = useAnimatedStyle(() => ({

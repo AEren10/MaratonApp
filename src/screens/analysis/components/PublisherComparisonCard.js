@@ -25,7 +25,7 @@ export function PublisherComparisonCard({ C, comparison, onPress }) {
   const cardContent = (
     <>
       <View style={s.cardHeader}>
-        <Text style={[s.cardTitle, { color: C.accentBright }]}>YAYIN KARŞILAŞTIRMASI</Text>
+        <Text style={[s.cardTitle, { color: C.text2 }]}>YAYIN KARŞILAŞTIRMASI</Text>
         {onPress && <Icon name="chevR" size={14} color={C.text3} />}
       </View>
 
