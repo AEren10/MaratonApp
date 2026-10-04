@@ -6,41 +6,49 @@ import { Icon } from "../../../components/design";
 import { Press } from "../../../components/design/Press";
 import { useC, useTheme } from "../../../contexts/ThemeContext";
 import { SCREENS } from "../../../constants/screens";
-import { GUTTER, SHAPE, STEP, TYPOGRAPHY, SHADOW } from "../../../themes/tokens";
+import { GUTTER, STEP, TYPOGRAPHY, SHADOW } from "../../../themes/tokens";
 import { alpha } from "../../../themes/colorMix";
 
-// Hikaye ve widget: uygulamanin disina tasinan iki guclu ozellik.
-// Biri sosyal paylasim (Instagram/TikTok story), digeri iOS ana/kilit ekran entegrasyonu.
+// Hikaye ve widget: profilin disariya acilan iki vitrini.
+// Tasarim: Apple widget & editorial card estetikleri, ozel ambiyans tonlari.
 export const ProfileShareTiles = memo(function ProfileShareTiles() {
   const C = useC();
   const { isDark } = useTheme();
   const navigation = useNavigation();
 
+  const widgetColor = C.subjects?.turkce || C.accent;
+
   const tiles = [
     {
       key: "story",
       icon: "share",
-      badge: "STORY",
-      title: "Hikâyende Paylaş",
-      meta: "Haftalık kartını hazırla",
+      badge: "HİKÂYE",
+      title: "Haftalık Kart",
+      meta: "Netlerini ve serini story at",
       screen: SCREENS.SHARE_CARD,
+      cardBg: C.surface,
+      cardBorder: isDark ? alpha(C.accent, 24) : C.edgeStrong,
       iconBg: alpha(C.accent, isDark ? 22 : 14),
+      iconBorder: alpha(C.accent, isDark ? 36 : 20),
       iconColor: isDark ? C.accentText : C.accent,
-      badgeColor: isDark ? alpha(C.accentText, 18) : alpha(C.accent, 12),
+      badgeBg: alpha(C.accent, isDark ? 16 : 10),
       badgeText: isDark ? C.accentText : C.accent,
     },
     Platform.OS === "ios"
       ? {
           key: "widget",
           icon: "grid",
-          badge: "WIDGET",
-          title: "Widget Ekle",
-          meta: "Kilit ve ana ekrana koy",
+          badge: "KİLİT EKRANI",
+          title: "Canlı Widget",
+          meta: "Açmadan serini anlık gör",
           screen: SCREENS.WIDGET_GUIDE,
-          iconBg: alpha(C.subjects?.turkce || "#74A9E8", isDark ? 22 : 14),
-          iconColor: C.subjects?.turkce || "#74A9E8",
-          badgeColor: alpha(C.subjects?.turkce || "#74A9E8", isDark ? 18 : 12),
-          badgeText: C.subjects?.turkce || "#74A9E8",
+          cardBg: C.surface,
+          cardBorder: isDark ? alpha(widgetColor, 24) : C.edgeStrong,
+          iconBg: alpha(widgetColor, isDark ? 22 : 14),
+          iconBorder: alpha(widgetColor, isDark ? 36 : 20),
+          iconColor: widgetColor,
+          badgeBg: alpha(widgetColor, isDark ? 16 : 10),
+          badgeText: widgetColor,
         }
       : null,
   ].filter(Boolean);
@@ -52,34 +60,36 @@ export const ProfileShareTiles = memo(function ProfileShareTiles() {
           key={t.key}
           haptic="tap"
           accessibilityRole="button"
-          accessibilityLabel={t.title}
+          accessibilityLabel={`${t.title}, ${t.meta}`}
           onPress={() => navigation.navigate(t.screen)}
           style={[
             s.tile,
             {
-              backgroundColor: C.surface,
-              borderColor: C.edgeStrong,
+              backgroundColor: t.cardBg,
+              borderColor: t.cardBorder,
             },
             !isDark && SHADOW.cardLight,
           ]}
         >
-          {/* Üst Kısım: İkon + Rozet */}
+          {/* Üst Kısım: Işıltılı İkon Kutusu + Rozet */}
           <View style={s.topRow}>
-            <View style={[s.iconBox, { backgroundColor: t.iconBg }]}>
-              <Icon name={t.icon} size={18} color={t.iconColor} sw={1.8} />
+            <View style={[s.iconBox, { backgroundColor: t.iconBg, borderColor: t.iconBorder }]}>
+              <Icon name={t.icon} size={18} color={t.iconColor} sw={1.9} />
             </View>
-            <View style={[s.badge, { backgroundColor: t.badgeColor }]}>
+            <View style={[s.badge, { backgroundColor: t.badgeBg }]}>
               <Text style={[s.badgeText, { color: t.badgeText }]}>{t.badge}</Text>
             </View>
           </View>
 
-          {/* Alt Kısım: Başlık + Açıklama + Ok */}
-          <View style={s.content}>
+          {/* Alt Kısım: Başlık + Açıklama + Mini Aksiyon Oku */}
+          <View style={s.bottomContent}>
             <View style={s.titleRow}>
               <Text style={[TYPOGRAPHY.bodySemiBold, s.title, { color: C.text }]} numberOfLines={1}>
                 {t.title}
               </Text>
-              <Icon name="arrowR" size={11} color={C.text3} sw={2} />
+              <View style={[s.arrowCircle, { backgroundColor: alpha(C.text, isDark ? 8 : 6) }]}>
+                <Icon name="arrowR" size={10} color={C.text2} sw={2.2} />
+              </View>
             </View>
             <Text style={[TYPOGRAPHY.meta, s.meta, { color: C.text3 }]} numberOfLines={1}>
               {t.meta}
@@ -96,17 +106,31 @@ const s = StyleSheet.create({
   tile: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: SHAPE.cardTight + 2,
-    padding: STEP.s3 - 4,
+    borderRadius: 18,
+    padding: 13,
     justifyContent: "space-between",
-    minHeight: 112,
+    minHeight: 114,
   },
   topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconBox: { width: 38, height: 38, borderRadius: 11, alignItems: "center", justifyContent: "center" },
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   badge: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6 },
   badgeText: { fontFamily: "Archivo_600", fontSize: 9.5, letterSpacing: 0.8 },
-  content: { marginTop: STEP.s2 + 2 },
+  bottomContent: { marginTop: STEP.s2 + 2 },
   titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 4 },
   title: { fontSize: 14.5, flex: 1 },
+  arrowCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   meta: { fontSize: 11.5, marginTop: 2, lineHeight: 15 },
 });

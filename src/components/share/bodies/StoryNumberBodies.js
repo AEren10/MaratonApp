@@ -3,8 +3,10 @@ import Svg, { Path } from "react-native-svg";
 import { scalePoints, buildSmoothPath } from "../../../lib/routeChartPath";
 import { formatMinutes } from "../../../lib/format";
 import { StoryFoot } from "../StoryFoot";
+import { Icon } from "../../design";
 
 const DAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const FLAME_COLOR = "#FF8A3D";
 
 // SERİ — Canli alev, devasa gun sayisi ve 7 gunluk ritim seridi
 export function StoryStreakBody({ data, p, visibility = {} }) {
@@ -15,14 +17,25 @@ export function StoryStreakBody({ data, p, visibility = {} }) {
   return (
     <View style={s.centerWrap}>
       <View style={s.box}>
-        <View style={s.flameBadge}>
-          <Text style={[s.badgeLabel, { color: p.accent }, p.shadow]}>ZİNCİRİ KIRMADIM</Text>
+        <View style={s.flameHeaderRow}>
+          <View style={s.flameHalo}>
+            <Icon name="flame" size={32} color={FLAME_COLOR} fill={FLAME_COLOR} />
+          </View>
+          <View style={s.flameBadge}>
+            <Text style={[s.badgeLabel, { color: FLAME_COLOR }, p.shadow]}>ZİNCİRİ KIRMADIM</Text>
+          </View>
         </View>
 
         {showStreak ? (
           <View style={s.streakRow}>
             <Text style={[s.streakHero, { color: p.solid }, p.shadow]}>{streakCount}</Text>
-            <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>GÜN SERİ</Text>
+            <View style={s.streakMetaCol}>
+              <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>GÜN SERİ</Text>
+              <View style={s.streakFlameMini}>
+                <Icon name="flame" size={13} color={FLAME_COLOR} fill={FLAME_COLOR} />
+                <Text style={s.streakLitText}>Seri yanıyor</Text>
+              </View>
+            </View>
           </View>
         ) : null}
 
@@ -37,12 +50,14 @@ export function StoryStreakBody({ data, p, visibility = {} }) {
                     style={[
                       s.dayDot,
                       {
-                        backgroundColor: isPastOrToday ? p.accent : "transparent",
-                        borderColor: isPastOrToday ? p.accent : p.track,
+                        backgroundColor: isPastOrToday ? FLAME_COLOR : "transparent",
+                        borderColor: isPastOrToday ? FLAME_COLOR : p.track,
                       },
                     ]}
                   >
-                    {isPastOrToday ? <View style={s.innerDot} /> : null}
+                    {isPastOrToday ? (
+                      <Icon name="flame" size={13} color="#FFFFFF" fill="#FFFFFF" />
+                    ) : null}
                   </View>
                   <Text style={[s.dayText, { color: isPastOrToday ? p.solid : p.dim }, p.shadow]}>{d}</Text>
                 </View>
@@ -97,14 +112,12 @@ export function StorySimpleBody({ data, p, visibility = {} }) {
   return (
     <View style={s.centerWrap}>
       <View style={s.box}>
-        {showStreak && data.streak != null ? (
-          <Text style={[s.statName, { color: p.dim }, p.shadow]}>{`GÜN ${data.streak}`}</Text>
-        ) : null}
+        {showStreak && data.streak != null ? <Text style={[s.statName, { color: p.dim }, p.shadow]}>{`GÜN ${data.streak}`}</Text> : null}
         {showQuestions ? (
-          <>
+          <View style={s.heroRow}>
             <Text style={[s.statsHero, { color: p.solid }, p.shadow]}>{data.questions}</Text>
             <Text style={[s.streakUnit, { color: p.mid }, p.shadow]}>soru</Text>
-          </>
+          </View>
         ) : null}
         <View style={[s.simpleBar, { backgroundColor: p.accent }]} />
       </View>
@@ -116,25 +129,20 @@ export function StorySimpleBody({ data, p, visibility = {} }) {
 const s = StyleSheet.create({
   centerWrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   box: { width: 330, gap: 8 },
-  flameBadge: { flexDirection: "row", alignItems: "center", gap: 8 },
-  badgeLabel: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
-  streakRow: { flexDirection: "row", alignItems: "baseline", gap: 12, marginTop: 4 },
-  streakHero: { fontFamily: "Bricolage_400", fontSize: 100, lineHeight: 104, letterSpacing: -5 },
-  streakUnit: { fontFamily: "Archivo_700", fontSize: 16, letterSpacing: 1.2 },
+  flameHeaderRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 4 },
+  flameHalo: { width: 46, height: 46, borderRadius: 23, backgroundColor: "rgba(255, 138, 61, 0.16)", borderWidth: 1.5, borderColor: "rgba(255, 138, 61, 0.35)", alignItems: "center", justifyContent: "center" },
+  flameBadge: { flexDirection: "row", alignItems: "center" }, badgeLabel: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
+  streakRow: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 4 },
+  streakHero: { fontFamily: "Bricolage_400", fontSize: 94, lineHeight: 98, letterSpacing: -4 },
+  streakMetaCol: { gap: 4 }, streakUnit: { fontFamily: "Archivo_700", fontSize: 16, letterSpacing: 1.2 },
+  streakFlameMini: { flexDirection: "row", alignItems: "center", gap: 4 },
+  streakLitText: { fontFamily: "Archivo_600", fontSize: 11.5, color: FLAME_COLOR },
   rhythmRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 14 },
-  dayItem: { alignItems: "center", gap: 6 },
-  dayDot: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, alignItems: "center", justifyContent: "center" },
-  innerDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#FFFFFF" },
-  dayText: { fontFamily: "Archivo_600", fontSize: 11 },
-  streakMotto: { fontFamily: "Archivo_500", fontSize: 13, marginTop: 12, fontStyle: "italic" },
-  heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 12 },
-  statsHero: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 96, letterSpacing: -4 },
-  statsUnit: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2, paddingBottom: 10 },
-  statsRow: { flexDirection: "row", alignItems: "flex-end", gap: 24, marginTop: 14 },
-  stat: { gap: 4 },
-  statName: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.8 },
-  statValue: { fontFamily: "Bricolage_400", fontSize: 24, lineHeight: 28 },
-  spark: { flex: 1, alignItems: "flex-end", justifyContent: "flex-end", paddingBottom: 2 },
-  simpleBar: { width: 56, height: 4, borderRadius: 2, marginTop: 24 },
-  brandRow: { marginTop: 28, alignSelf: "center" },
+  dayItem: { alignItems: "center", gap: 6 }, dayDot: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  dayText: { fontFamily: "Archivo_600", fontSize: 11 }, streakMotto: { fontFamily: "Archivo_500", fontSize: 13, marginTop: 12, fontStyle: "italic" },
+  heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 12 }, statsHero: { fontFamily: "Bricolage_400", fontSize: 92, lineHeight: 96, letterSpacing: -4 },
+  statsUnit: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 2, paddingBottom: 10 }, statsRow: { flexDirection: "row", alignItems: "flex-end", gap: 24, marginTop: 14 },
+  stat: { gap: 4 }, statName: { fontFamily: "Archivo_600", fontSize: 11, letterSpacing: 1.8 },
+  statValue: { fontFamily: "Bricolage_400", fontSize: 24, lineHeight: 28 }, spark: { flex: 1, alignItems: "flex-end", justifyContent: "flex-end", paddingBottom: 2 },
+  simpleBar: { width: 56, height: 4, borderRadius: 2, marginTop: 24 }, brandRow: { marginTop: 28, alignSelf: "center" },
 });
