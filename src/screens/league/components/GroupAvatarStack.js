@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Avatar } from "../../../components/design/Avatar";
 import { useC } from "../../../contexts/ThemeContext";
+import { alpha } from "../../../themes/colorMix";
 import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 
 export function GroupAvatarStack({ initial, memberCount, members = [] }) {
@@ -24,7 +25,7 @@ export function GroupAvatarStack({ initial, memberCount, members = [] }) {
         />
       ))}
       {rest > 0 ? (
-        <View style={[s.more, { backgroundColor: C.accent + "20", borderColor: C.bg }]}>
+        <View style={[s.more, { backgroundColor: alpha(C.accent, 13), borderColor: C.bg }]}>
           <Text style={[TYPOGRAPHY.micro, { color: C.accentText }]}>+{rest}</Text>
         </View>
       ) : null}
@@ -37,7 +38,7 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: SPACING.sm,
+    marginTop: 6,
   },
   avatar: { borderWidth: 1 },
   overlap: { marginLeft: -7 },
