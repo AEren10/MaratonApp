@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { useIsFocused } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { bagItems, venueLine } from "../domain/exam/examDayPlan";
 import { loadExamDayPlan, writeExamDayPlan } from "../lib/examDayPlanStore";
@@ -10,18 +10,17 @@ import * as H from "../lib/haptics";
 // isaretli gelmez, sinav yeri karti cizilmez.
 export function useExamDayBag() {
   const { user } = useAuth();
-  const focused = useIsFocused();
   const userId = user?.id;
   const [plan, setPlan] = useState(null);
 
-  useEffect(() => {
-    if (!focused) return undefined;
+  // Odaga her geliste okunur (useIsFocused odak kaybinda da yeniden cizdirir).
+  useFocusEffect(useCallback(() => {
     let alive = true;
     loadExamDayPlan(userId)
       .then(({ plan: p }) => { if (alive) setPlan(p); })
       .catch(() => {});
     return () => { alive = false; };
-  }, [focused, userId]);
+  }, [userId]));
 
   const toggle = useCallback((key) => {
     if (!plan) return;

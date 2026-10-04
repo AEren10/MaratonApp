@@ -64,12 +64,38 @@ function normalizeStoredBuffers(value) {
   return next;
 }
 
+// Anlik goruntu yazim aninda yeni dizilerden kurulur (olaylar degismez);
+// derin kopya gerekmez -- setJson zaten serilestiriyor.
 function queueStorageWrite(key, value) {
-  const snapshot = JSON.parse(JSON.stringify(value));
   storageWrites = storageWrites
     .catch(() => {})
-    .then(() => appStorage.setJson(key, snapshot))
+    .then(() => appStorage.setJson(key, value))
     .catch(() => {});
+  return storageWrites;
+}
+
+// track() diske HER olayda degil, kisa bir sureden sonra TEK SEFERDE yazar.
+// Eskiden her sekme gecisi 3 olay = 3 kez 200 olayliga kadar tamponun JSON
+// kopyasi + 3 AsyncStorage yazimi, tam yeni ekranin cizildigi karede (kasma).
+const PERSIST_DELAY_MS = 2000;
+const dirtyKeys = new Set();
+let persistTimer = null;
+
+function schedulePersist(key) {
+  dirtyKeys.add(key);
+  if (persistTimer) return;
+  persistTimer = setTimeout(persistDirty, PERSIST_DELAY_MS);
+}
+
+function persistDirty() {
+  clearTimeout(persistTimer);
+  persistTimer = null;
+  const keys = [...dirtyKeys];
+  dirtyKeys.clear();
+  for (const key of keys) {
+    if (key === BUFFER_KEY) persistBuffers();
+    else if (key === PENDING_KEY) persistPending();
+  }
   return storageWrites;
 }
 
@@ -148,6 +174,8 @@ async function flushUser(owner) {
 }
 
 export function flushAnalytics() {
+  // Arka plana geciste bekleyen yazim beklemesin: uygulama orada oldurulebilir.
+  persistDirty();
   return flushUser(userId);
 }
 
@@ -158,11 +186,11 @@ export function track(event, props = {}) {
     const envelope = createAnalyticsEnvelope(event, props, { userId, sessionId });
     if (!userId) {
       pendingEvents = mergeAnalyticsEvents(pendingEvents, [envelope]).slice(-MAX_PENDING);
-      persistPending();
+      schedulePersist(PENDING_KEY);
       return;
     }
     appendForUser(userId, envelope);
-    persistBuffers();
+    schedulePersist(BUFFER_KEY);
     if (buffersByUser[userId].length >= FLUSH_TRIGGER_SIZE) flushUser(userId);
   } catch (_) {}
 }
@@ -248,6 +276,7 @@ export function stopAnalytics() {
 
 export async function closeAnalytics({ flush = true } = {}) {
   const closingUser = userId;
+  persistDirty();
   stopAnalytics();
   if (flush && closingUser) await flushUser(closingUser);
   if (userId === closingUser) setAnalyticsUser(null);
