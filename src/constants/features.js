@@ -4,7 +4,8 @@
 // gosterir. Kullanici karariyla ACIK (2026-10-04). App Store 1.2 karsiligi:
 // her satirda avatara dokununca Bildir / Engelle (ReportableAvatar),
 // engellenen siralamadan ayiklanir, kosullarda sifir tolerans maddesi.
-// Eksik kalan: ad filtresi (kufur listesi).
+// Ad/grup adi/aciklama: src/domain/moderation (istemci) + sunucu tetikleyicisi
+// (private.guard_*, migration 20261005100000).
 // homeBackdrop: ana sayfanin arka plani (deneme, 4 Ekim). Tek satirla degisir:
 // "lines" v1 isik huzmeleri | "dots" v2 nokta izgarasi | "route" v3 rota
 // cizgisi ve duraklar | "glow" yalniz isilti (ust sol + asagida sag) | null kapali.
