@@ -32,8 +32,25 @@ function linePaths(w, h, flip) {
   return out;
 }
 
-// variant: "lines" isik huzmeleri | "dots" ince nokta izgarasi (koseden isiltiyla).
+// variant: "lines" (v1) isik huzmeleri | "dots" (v2) ince nokta izgarasi |
+// "route" (v3) ustten gecen silik rota cizgisi ve duraklari.
 // strength: 0-1 yogunluk (ana sayfada daha silik).
+// v3: ekranin ustunden gecen tek rota (S egrisi) ve uzerindeki uc durak.
+function routePath(w, h, flip) {
+  const X = (x) => (flip ? w - x : x);
+  return `M ${X(-w * 0.1)} ${h * 0.16} C ${X(w * 0.3)} ${h * 0.0}, ${X(w * 0.62)} ${h * 0.24}, ${X(w * 1.1)} ${h * 0.06}`;
+}
+function routeStops(w, h, flip) {
+  // Bezier uzerinde t = .22 / .5 / .78 noktalari.
+  const P = [[-w * 0.1, h * 0.16], [w * 0.3, h * 0.0], [w * 0.62, h * 0.24], [w * 1.1, h * 0.06]];
+  return [0.22, 0.5, 0.78].map((t) => {
+    const u = 1 - t;
+    const a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
+    const x = a * P[0][0] + b * P[1][0] + c * P[2][0] + d * P[3][0];
+    return { x: flip ? w - x : x, y: a * P[0][1] + b * P[1][1] + c * P[2][1] + d * P[3][1] };
+  });
+}
+
 export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1 }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
@@ -65,7 +82,7 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
             <Rect x={0} y={0} width={width} height={h} fill="url(#mbFade)" />
           </Mask>
           <Pattern id="mbDots" patternUnits="userSpaceOnUse" width={7} height={7}>
-            <Circle cx={3.5} cy={3.5} r={0.75} fill={C.accentBright} />
+            <Circle cx={3.5} cy={3.5} r={0.85} fill={C.accentBright} />
           </Pattern>
           <RadialGradient id="mbDotFall" cx={flip ? width : 0} cy={0} r={width * 1.3} gradientUnits="userSpaceOnUse">
             <Stop offset="0" stopColor="#fff" stopOpacity={1} />
@@ -77,9 +94,20 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
         </Defs>
         <G mask="url(#mbMask)">
           <Rect x={0} y={0} width={width} height={h} fill="url(#mbGlow)" />
-          {variant === "dots" ? (
+          {variant === "route" ? (
+            <G>
+              <Path d={routePath(width, h, flip)} fill="none" stroke={C.accent} strokeWidth={1.4} strokeOpacity={0.45 * k} strokeDasharray="1 6" strokeLinecap="round" />
+              <Path d={routePath(width, h, flip)} fill="none" stroke={C.accent} strokeWidth={1.2} strokeOpacity={0.3 * k} />
+              {routeStops(width, h, flip).map((p, i) => (
+                <G key={i}>
+                  <Circle cx={p.x} cy={p.y} r={7} fill={C.accent} opacity={0.12 * k} />
+                  <Circle cx={p.x} cy={p.y} r={3} fill={i === 2 ? C.accent : C.bg} stroke={C.accent} strokeWidth={1.3} opacity={0.7 * k} />
+                </G>
+              ))}
+            </G>
+          ) : variant === "dots" ? (
             <G mask="url(#mbDotMask)">
-              <Rect x={0} y={0} width={width} height={h} fill="url(#mbDots)" opacity={0.5 * k} />
+              <Rect x={0} y={0} width={width} height={h} fill="url(#mbDots)" opacity={0.85 * k} />
             </G>
           ) : paths.map((p) => (
             <Path key={p.d} d={p.d} fill="none" stroke="url(#mbLine)" strokeWidth={p.sw} strokeOpacity={p.o * k} />
