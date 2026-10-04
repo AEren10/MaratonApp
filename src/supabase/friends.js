@@ -162,12 +162,21 @@ export async function getMyFriendCode(userId) {
   return data;
 }
 
+// Engel sunucuda block_user() ile kurulur (20261004120000 migration'i):
+// istegi gonderen taraf engellediginde dogrudan guncelleme RLS yuzunden
+// 0 satir degistiriyordu. RPC henuz yoksa (migration uygulanmamis) eski yola
+// duser.
+const isMissingRpc = (e) => e?.code === "PGRST202" || /could not find the function/i.test(e?.message || "");
+
 export async function blockUser(targetId) {
   try {
     assertUUID(targetId, "targetId");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
     if (targetId === user.id) throw new Error("Kendinizi engelleyemezsiniz");
+    const { error: rpcError } = await supabase.rpc("block_user", { p_target: targetId });
+    if (!rpcError) return;
+    if (!isMissingRpc(rpcError)) throw rpcError;
     const { data: existing } = await supabase
       .from("friendships")
       .select("id")
@@ -196,6 +205,9 @@ export async function unblockUser(targetId) {
     assertUUID(targetId, "targetId");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Oturum yok");
+    const { error: rpcError } = await supabase.rpc("unblock_user", { p_target: targetId });
+    if (!rpcError) return;
+    if (!isMissingRpc(rpcError)) throw rpcError;
     const { error } = await supabase
       .from("friendships")
       .delete()
