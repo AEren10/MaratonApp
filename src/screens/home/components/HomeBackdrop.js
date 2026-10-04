@@ -5,5 +5,5 @@ import { FEATURES } from "../../../constants/features";
 // ekranda oldugu icin an ekranlarindan daha silik. FEATURES.homeBackdrop.
 export function HomeBackdrop() {
   if (!FEATURES.homeBackdrop) return null;
-  return <MomentBackdrop variant={FEATURES.homeBackdrop} strength={0.7} />;
+  return <MomentBackdrop variant={FEATURES.homeBackdrop} strength={0.7} glow={0.5} />;
 }

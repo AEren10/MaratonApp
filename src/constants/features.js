@@ -10,5 +10,5 @@
 // cizgisi ve duraklar | null kapali.
 export const FEATURES = Object.freeze({
   globalLeague: true,
-  homeBackdrop: "dots",
+  homeBackdrop: "route",
 });

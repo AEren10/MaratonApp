@@ -34,7 +34,7 @@ function linePaths(w, h, flip) {
 
 // variant: "lines" (v1) isik huzmeleri | "dots" (v2) ince nokta izgarasi |
 // "route" (v3) ustten gecen silik rota cizgisi ve duraklari.
-// strength: 0-1 yogunluk (ana sayfada daha silik).
+// strength: 0-1 yogunluk (ana sayfada daha silik). glow: koseden isiltinin carpani.
 // v3: ekranin ustunden gecen tek rota (S egrisi) ve uzerindeki uc durak.
 function routePath(w, h, flip) {
   const X = (x) => (flip ? w - x : x);
@@ -51,7 +51,7 @@ function routeStops(w, h, flip) {
   });
 }
 
-export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1 }) {
+export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = false, style, variant = "lines", strength = 1, glow = 1 }) {
   const C = useC();
   const { width, height: screenH } = useWindowDimensions();
   const h = height || Math.round(screenH * 0.62);
@@ -64,8 +64,8 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
       <Svg width={width} height={h}>
         <Defs>
           <RadialGradient id="mbGlow" cx={flip ? width : 0} cy={0} r={width * 1.1} gradientUnits="userSpaceOnUse">
-            <Stop offset="0" stopColor={C.accent} stopOpacity={0.42 * k} />
-            <Stop offset="0.55" stopColor={C.accent} stopOpacity={0.12 * k} />
+            <Stop offset="0" stopColor={C.accent} stopOpacity={0.42 * k * glow} />
+            <Stop offset="0.55" stopColor={C.accent} stopOpacity={0.12 * k * glow} />
             <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
           </RadialGradient>
           <LinearGradient id="mbLine" x1={flip ? "1" : "0"} y1="0" x2={flip ? "0" : "1"} y2="0">
