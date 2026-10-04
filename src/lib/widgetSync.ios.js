@@ -1,9 +1,18 @@
-import WeekWidget from "../widgets/WeekWidget";
-import TodayWidget from "../widgets/TodayWidget";
-import RouteWidget from "../widgets/RouteWidget";
-import StreakWidget from "../widgets/StreakWidget";
-import TrialWidget from "../widgets/TrialWidget";
+import { requireOptionalNativeModule } from "expo";
 import { getSubjectLabel } from "../themes/subjects";
+
+// expo-widgets native modulu YOKSA (Expo Go, ya da expo-widgets eklenmeden
+// once alinmis eski dev build) paket daha import aninda
+// "Cannot find native module 'ExpoWidgets'" atip uygulamayi acilista
+// dusuruyordu. Once modul var mi bakilir; yoksa widget dosyalari hic
+// yuklenmez ve her sync sessizce false doner. require() Metro'nun modul
+// grafiginde kalir, gercek build'de davranis degismez.
+const HAS_WIDGETS = requireOptionalNativeModule("ExpoWidgets") != null;
+const WeekWidget = HAS_WIDGETS ? require("../widgets/WeekWidget").default : null;
+const TodayWidget = HAS_WIDGETS ? require("../widgets/TodayWidget").default : null;
+const RouteWidget = HAS_WIDGETS ? require("../widgets/RouteWidget").default : null;
+const StreakWidget = HAS_WIDGETS ? require("../widgets/StreakWidget").default : null;
+const TrialWidget = HAS_WIDGETS ? require("../widgets/TrialWidget").default : null;
 
 // WIDGET'LARA VERI YAZMA — tek gecis noktasi (iOS).
 //
@@ -12,7 +21,7 @@ import { getSubjectLabel } from "../themes/subjects";
 // `updateSnapshot` ile yazilir.
 //
 // NEDEN .ios.js
-// Widget dosyalari STATIK import edilmeli: derleyici `'widget'` direktifli
+// Widget dosyalari modul grafiginde olmali: derleyici `'widget'` direktifli
 // fonksiyonu modul grafiginde gorup ayri pakete cikariyor. Ama ayni dosya
 // Android'de `@expo/ui/swift-ui` yuklemeye calisirdi. Metro'nun platform
 // uzantisi ikisini birden cozuyor: iOS burayi, digerleri yanindaki
@@ -53,6 +62,7 @@ function plistSafe(value) {
 }
 
 function push(key, widget, rawSnapshot, { timeline = false } = {}) {
+  if (!widget) return false;
   const snapshot = plistSafe(rawSnapshot);
   // Timeline'li widget'ta ayni veri bile ertesi gun yeniden yazilmali.
   const serialized = JSON.stringify(snapshot) + (timeline ? mondayKey() + new Date().getDate() : "");
