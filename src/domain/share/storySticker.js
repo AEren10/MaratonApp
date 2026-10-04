@@ -96,16 +96,8 @@ function variantData(kind, ctx) {
       if (!pos(ctx.streak)) return null;
       return { streak: ctx.streak };
 
-    case STORY_KIND.GERISAYIM: {
-      const days = pos(ctx.daysToExam);
-      if (days == null || !ctx.examLabel) return null;
-      return {
-        daysToExam: days,
-        examLabel: ctx.examLabel,
-        elapsedDays: pos(ctx.examElapsedDays),
-        progressPct: num(ctx.examProgressPct),
-      };
-    }
+    case STORY_KIND.GERISAYIM:
+      return null;
 
     case STORY_KIND.NET: {
       if (!trial || num(trial.net) == null) return null;
@@ -189,10 +181,9 @@ function rankFor(moment, ctx) {
       ? [STORY_KIND.NET, STORY_KIND.DERS, STORY_KIND.HARITA, STORY_KIND.CUBUK, STORY_KIND.IZ]
       : moment === STORY_MOMENT.STREAK
         ? [STORY_KIND.SERI, STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS]
-        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.SERI, STORY_KIND.GERISAYIM, STORY_KIND.DURUST];
+        : [STORY_KIND.CUBUK, STORY_KIND.HARITA, STORY_KIND.DERS, STORY_KIND.NET, STORY_KIND.KART, STORY_KIND.SERI, STORY_KIND.DURUST];
 
   const tail = [
-    STORY_KIND.GERISAYIM,
     STORY_KIND.SERI,
     STORY_KIND.ROTA,
     STORY_KIND.ISTATISTIK,
@@ -200,13 +191,10 @@ function rankFor(moment, ctx) {
     STORY_KIND.DURUST,
   ];
 
-  let order = isHonest
+  const order = isHonest
     ? [STORY_KIND.DURUST, ...head, ...tail.filter((k) => k !== STORY_KIND.DURUST && !head.includes(k))]
     : [...head, ...tail.filter((k) => !head.includes(k))];
 
-  if (soon && moment !== STORY_MOMENT.TRIAL) {
-    order = [STORY_KIND.GERISAYIM, ...order.filter((k) => k !== STORY_KIND.GERISAYIM)];
-  }
   return order;
 }
 

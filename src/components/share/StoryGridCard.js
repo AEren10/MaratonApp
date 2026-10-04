@@ -1,12 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Image } from "expo-image";
 import Svg, { Path } from "react-native-svg";
-
 import { useC } from "../../contexts/ThemeContext";
 import { SHAPE, TYPOGRAPHY } from "../../themes/tokens";
 import { Press } from "../../components/design/Press";
 import * as H from "../../lib/haptics";
-import { CheckerboardBackground } from "./CheckerboardBackground";
 import { StorySticker, STORY_WIDTH, STORY_HEIGHT } from "./StorySticker";
 
 const KIND_NAMES = {
@@ -61,32 +58,48 @@ export function StoryGridCard({
         {
           width,
           height,
-          borderColor: active ? "#FFFFFF" : C.border,
+          borderColor: active ? C.accentBright || "#FFFFFF" : C.border,
           borderWidth: active ? 2.5 : 1,
-          opacity: active ? 1 : 0.65,
+          opacity: active ? 1 : 0.72,
         },
       ]}
     >
-      {/* Zemin: Fotograf varsa fotograf, yoksa dama tahtasi seffaf deseni */}
-      {photoUri ? (
-        <Image source={{ uri: photoUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
-      ) : (
-        <CheckerboardBackground />
-      )}
-
-      {/* Olcekli Sticker */}
-      <View style={[s.scaled, { transform: [{ scale }] }]} pointerEvents="none">
-        <StorySticker variant={variant} overlay visibility={visibility} />
+      {/* Gerçek Kart Önizlemesi (Fotoğraf veya Koyu Marka Zemini) */}
+      <View
+        style={[
+          s.scaled,
+          {
+            width: STORY_WIDTH,
+            height: STORY_HEIGHT,
+            transform: [
+              { translateX: -((STORY_WIDTH * (1 - scale)) / 2) },
+              { translateY: -((STORY_HEIGHT * (1 - scale)) / 2) },
+              { scale },
+            ],
+          },
+        ]}
+        pointerEvents="none"
+      >
+        <StorySticker variant={variant} photoUri={photoUri} overlay={false} visibility={visibility} />
       </View>
 
-      {/* Sol ust etiket rozeti */}
-      <View style={[s.tagBadge, { backgroundColor: active ? C.accent : "rgba(30,30,36,0.85)" }]}>
+      {/* Sol üst etiket rozeti */}
+      <View style={[s.tagBadge, { backgroundColor: active ? C.accent : "rgba(30,30,36,0.88)" }]}>
         <Text style={[TYPOGRAPHY.micro, s.tagText, { color: active ? C.accentInk : C.text2 }]}>
           {label}
         </Text>
       </View>
 
-      {/* Sag ust secim tiki */}
+      {/* Ders kartı için dokunma ipucu */}
+      {isDers ? (
+        <View style={[s.cyclePill, { backgroundColor: active ? C.accent : "rgba(22,22,29,0.92)" }]}>
+          <Text style={[s.cycleText, { color: active ? C.accentInk : C.text }]}>
+            {active ? "Ders değiştir ↺" : "Dokun · Dersler arası gez"}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Sağ üst seçim tiki */}
       {active ? (
         <View style={s.checkCircle}>
           <Svg width={12} height={12} viewBox="0 0 14 14">
@@ -106,40 +119,11 @@ export function StoryGridCard({
 }
 
 const s = StyleSheet.create({
-  card: {
-    borderRadius: SHAPE.cardTight,
-    overflow: "hidden",
-    position: "relative",
-    backgroundColor: "#16161D",
-  },
-  scaled: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    transformOrigin: "top left",
-  },
-  tagBadge: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  tagText: {
-    fontFamily: "Archivo_700",
-    fontSize: 11,
-    letterSpacing: 1.1,
-  },
-  checkCircle: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  card: { borderRadius: SHAPE.cardTight, overflow: "hidden", position: "relative", backgroundColor: "#16161D" },
+  scaled: { position: "absolute", left: 0, top: 0 },
+  tagBadge: { position: "absolute", top: 10, left: 10, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
+  tagText: { fontFamily: "Archivo_700", fontSize: 10.5, letterSpacing: 1 },
+  cyclePill: { position: "absolute", bottom: 8, left: 8, right: 8, paddingVertical: 4, borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  cycleText: { fontFamily: "Archivo_600", fontSize: 10, letterSpacing: 0.4 },
+  checkCircle: { position: "absolute", top: 10, right: 10, width: 22, height: 22, borderRadius: 11, backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
 });

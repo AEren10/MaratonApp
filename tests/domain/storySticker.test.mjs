@@ -41,9 +41,8 @@ test("rota egrisi tek noktayla cizilmez", () => {
   assert.ok(!kindsOf(list).includes(STORY_KIND.ROTA));
 });
 
-test("sinav etiketi yoksa geri sayim sunulmaz", () => {
-  const { examLabel, ...noLabel } = full;
-  assert.ok(!kindsOf(buildStoryVariants(noLabel)).includes(STORY_KIND.GERISAYIM));
+test("geri sayim sablonlarda sunulmaz (kullanici karari: kalkti)", () => {
+  assert.ok(!kindsOf(buildStoryVariants(full)).includes(STORY_KIND.GERISAYIM));
 });
 
 // Oturum aninda once Strava tarzi "iz" (fotograf ustune seffaf katman),
@@ -65,9 +64,9 @@ test("deneme aninda once net gelir", () => {
   assert.equal(list[0].kind, STORY_KIND.NET);
 });
 
-test("sinava az kalinca geri sayim basa gecer", () => {
+test("sinava az kalsa bile geri sayim cikmaz, oturumda iz basa gecer", () => {
   const list = buildStoryVariants(full, STORY_MOMENT.SESSION);
-  assert.equal(list[0].kind, STORY_KIND.GERISAYIM);
+  assert.equal(list[0].kind, STORY_KIND.IZ);
 });
 
 test("durust karti yalniz az calisilmis gunde ve seri varken cikar", () => {
