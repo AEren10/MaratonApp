@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TabBackdrop } from "../../components/design/TabBackdrop";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { ScreenErrorBoundary } from "../../components/common/ScreenErrorBoundary";
@@ -40,6 +41,7 @@ function ProgramInner() {
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+      <TabBackdrop />
       <RouteHeader
         title="Program"
         onMore={() => navigation.navigate(SCREENS.SEARCH)}

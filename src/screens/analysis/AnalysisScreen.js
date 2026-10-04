@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TabBackdrop } from "../../components/design/TabBackdrop";
 import { useC } from "../../contexts/ThemeContext";
 import { SwipeToHome } from "../../components/common/SwipeToHome";
 
@@ -46,6 +47,7 @@ export default function AnalysisScreen() {
   return (
     <SwipeToHome>
       <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
+        <TabBackdrop />
         <ScrollView
         ref={scrollRef}
           contentContainerStyle={s.scroll}
