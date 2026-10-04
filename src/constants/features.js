@@ -10,5 +10,5 @@
 // cizgisi ve duraklar | "glow" yalniz isilti (ust sol + asagida sag) | null kapali.
 export const FEATURES = Object.freeze({
   globalLeague: true,
-  homeBackdrop: "glow",
+  homeBackdrop: null,
 });
