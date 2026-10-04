@@ -7,7 +7,7 @@ import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 
 // Tasarimin gezinme satiri: surface zemin + elev kenar, baslik, alt satir,
 // sagda istege bagli deger (ya da borc cipi) ve sonuk ok.
-function RouteLinkRow({ title, subtitle, value, chip, onPress }) {
+function RouteLinkRow({ title, subtitle, value, chip, onPress, plain = false }) {
   const C = useC();
   return (
     <Pressable
@@ -16,7 +16,9 @@ function RouteLinkRow({ title, subtitle, value, chip, onPress }) {
       accessibilityLabel={[title, subtitle, value || chip].filter(Boolean).join(", ")}
       style={({ pressed }) => [
         s.row,
-        { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.elev },
+        plain
+          ? [s.plain, { borderColor: C.line, opacity: pressed ? 0.7 : 1 }]
+          : { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.elev },
       ]}
     >
       <View style={s.copy}>
@@ -47,6 +49,8 @@ const s = StyleSheet.create({
     borderRadius: SHAPE.panel,
     borderWidth: 1,
   },
+  // plain: kutusuz satir (ust/alt ince cizgi), Rota sayfasinda.
+  plain: { borderRadius: 0, borderWidth: 0, borderTopWidth: 1, borderBottomWidth: 1, paddingHorizontal: 0 },
   copy: { flex: 1, minWidth: 0 },
   sub: { marginTop: STEP.s1 / 2 },
   chip: {

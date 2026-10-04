@@ -22,7 +22,6 @@ import { RouteFeasibilityNote } from "../../components/route/RouteFeasibilityNot
 import { feasibilityNote } from "../../domain/route/feasibility";
 import { RouteTempoSection } from "./components/RouteTempoSection";
 import { RouteWhyThisWeek } from "./components/RouteWhyThisWeek";
-import { RouteNextActionCard } from "./components/RouteNextActionCard";
 import { RouteWeeksTimeline } from "./components/RouteWeeksTimeline";
 import { RouteTopicDebtRow } from "./components/RouteTopicDebtRow";
 
@@ -83,21 +82,18 @@ export default function RoadmapScreen() {
                 onOpenWeek={() => openProgram(navigation, PROGRAM_VIEWS.WEEK)}
               />
 
-              {nextRouteAction ? (
-                <RouteNextActionCard
-                  C={C}
-                  action={nextRouteAction}
-                  onStart={startNextRouteAction}
-                  onOpenStop={() => d.openStop(nextRouteAction.stopId || nextRouteAction.topicName)}
-                />
-              ) : null}
+              {/* Dev "Calismaya basla" karti kalkti (kullanici, 4 Ekim): bu sayfa
+                  rotayi okumak icin; calismaya ana sayfadan gidilir. */}
 
               <RouteTopicDebtRow C={C} onPress={() => navigation.navigate(SCREENS.TOPIC_DEBT)} />
 
               <RouteFeasibilityNote note={feasibility} style={s.feasible} />
-              <Animated.View style={s.cardSection}>
-                <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
-              </Animated.View>
+              {/* Tahmin yoksa ("—") kart hic gorunmez; bos kutu kafa karistiriyordu. */}
+              {view.projectedNet != null ? (
+                <Animated.View style={s.cardSection}>
+                  <RouteProjectionCard projectedNet={view.projectedNet} note={view.note} rangeText={view.rangeText} />
+                </Animated.View>
+              ) : null}
 
               <Animated.View style={s.section}>
                 {view.tempoRows?.length ? (
@@ -107,6 +103,7 @@ export default function RoadmapScreen() {
                   {/* Universite/bolum esigi YKS icin; LGS ogrencisine anlamsiz. */}
                   {d.targetNet != null && !d.isLGS ? (
                     <RouteLinkRow
+                      plain
                       title={`${d.examLabel ? `${d.examLabel} ` : ""}${d.targetNet} net ≈ hangi bölümler?`}
                       subtitle="Hedef netinin karşılığı · üniversite ve bölümler"
                       onPress={d.openThreshold}
