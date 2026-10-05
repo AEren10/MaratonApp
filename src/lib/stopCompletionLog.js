@@ -3,6 +3,7 @@ import { saveStudyLogOffline, removeFromQueue } from "./offlineQueue";
 import { buildStopStudyLogs, stopLogOperationIds } from "../domain/plan/stopStudyLog";
 import { todayTR } from "./dateUtils";
 import { touchStreak } from "../supabase/streaks";
+import { normalizeStopCorrect } from "../domain/study/stopCorrect";
 
 // Durak tikinin IO tarafi. Karar ve bicim domain/plan/stopStudyLog.js'te.
 
@@ -66,8 +67,8 @@ export function canAskStopCorrect(stop) {
  */
 export async function recordStopCorrect(userId, stop, correct) {
   const operationId = stopLogOperationIds(stop)[0];
-  const value = Math.max(0, Math.min(Number(correct) || 0, Number(stop?.count) || 0));
-  if (!userId || !operationId || value <= 0) return false;
+  const value = normalizeStopCorrect(correct, stop?.count);
+  if (!userId || !operationId || value == null) return false;
   for (let i = 0; i < 4; i += 1) {
     try {
       const log = await getStudyLogByClientOperationId(userId, operationId);

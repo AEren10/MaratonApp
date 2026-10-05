@@ -48,7 +48,17 @@ export function AuthInput({
           autoCorrect={false}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={[TYPOGRAPHY.inputMedium, { flex: 1, color: C.text, paddingVertical: 0 }]}
+          style={[
+            TYPOGRAPHY.inputMedium,
+            {
+              flex: 1,
+              alignSelf: "stretch",
+              minHeight: CONTROL.buttonPrimary,
+              color: C.text,
+              paddingVertical: 0,
+              textAlignVertical: "center",
+            },
+          ]}
         />
         {isPassword ? (
           <Press haptic="none" onPress={() => setShow((v) => !v)} hitSlop={10} style={{ padding: STEP.s1 }} accessibilityRole="button" accessibilityLabel={show ? "Şifreyi gizle" : "Şifreyi göster"}>

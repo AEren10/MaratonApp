@@ -71,12 +71,12 @@ export const SetupRouteSteps = memo(function SetupRouteSteps({ current = 0, prev
         })}
         {current > 0 ? (
           <AnimatedLine x1={xOf(current - 1) + R} y1={H / 2} x2={xOf(current) - R} y2={H / 2}
-            stroke={C.accent} strokeWidth={2} strokeLinecap="round"
+            stroke={C.accent} strokeWidth={2.5} strokeLinecap="round"
             strokeDasharray={segLen} animatedProps={liveProps} />
         ) : null}
         {steps.map((step, i) => (
           <Circle key={step} cx={xOf(i)} cy={H / 2} r={i === current ? R : R - 1}
-            fill={i < current ? C.accent : C.bg}
+            fill={i <= current ? C.accent : C.bg}
             stroke={i <= current ? C.accent : C.border} strokeWidth={i === current ? 2 : 1.5} />
         ))}
       </Svg>
@@ -88,7 +88,7 @@ export const SetupRouteSteps = memo(function SetupRouteSteps({ current = 0, prev
               TYPOGRAPHY.micro,
               s.label,
               edgeStyle(i, n, xOf(i)),
-              { color: i === current ? C.text : i < current ? C.text2 : C.text3 },
+              { color: i === current ? C.accentBright : i < current ? C.text2 : C.text3 },
             ]}
           >
             {step}

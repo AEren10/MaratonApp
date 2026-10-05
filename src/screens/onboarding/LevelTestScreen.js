@@ -16,6 +16,7 @@ import * as H from "../../lib/haptics";
 import { track } from "../../lib/analytics";
 import { EVENTS } from "../../constants/analytics";
 import { SetupRouteSteps } from "../../components/route/SetupRouteSteps";
+import { MomentBackdrop } from "../../components/design/MomentBackdrop";
 
 export default function LevelTestScreen() {
   const C = useC();
@@ -52,6 +53,7 @@ export default function LevelTestScreen() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      <MomentBackdrop />
       <View style={styles.header}>
         {canGoBack ? (
           <Press haptic="none" onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Geri" style={styles.backBtn}>
@@ -70,7 +72,7 @@ export default function LevelTestScreen() {
         <Animated.View entering={FadeIn.delay(80)}>
           <Text style={[TYPOGRAPHY.heading, { color: C.text }]}>Şu an neredesin?</Text>
           <Text style={[TYPOGRAPHY.body, styles.subtitle, { color: C.text3 }]}>
-            Son denemeni gir, rotanın başlangıç noktasını oradan çizelim. Denemen yoksa atlayabilirsin.
+            Son denemeni gir, rotanın başlangıç noktasını buradan çizelim. Denemen yoksa yaklaşık netlerini yaz; ilk rotan daha isabetli başlar.
           </Text>
         </Animated.View>
 

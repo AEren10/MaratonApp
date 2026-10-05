@@ -6,6 +6,7 @@ import { BottomSheet } from "../../../components/design/BottomSheet";
 import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { normalizeStopCorrect } from "../../../domain/study/stopCorrect";
 
 // Durak tikinden sonra "Kac dogru?". Istege bagli: Gec'e basmak ya da bos
 // birakmak dogrulugu bilinmiyor birakir, 0 saymaz.
@@ -19,11 +20,11 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   useEffect(() => { setValue(""); }, [current?.id]);
 
   const total = Number(stop?.count) || 0;
-  const n = Math.min(parseInt(value, 10) || 0, total);
+  const n = normalizeStopCorrect(value, total);
   const title = stop?.topic || stop?.label || "";
 
   return (
-    <BottomSheet visible={Boolean(current)} onClose={onSkip} keyboard style={s.sheet}>
+    <BottomSheet visible={Boolean(current)} onClose={onSkip} style={s.sheet}>
       <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${total} SORU · ${title}`.toLocaleUpperCase("tr-TR")}</Text>
       <Text accessibilityRole="header" style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>Kaç doğru?</Text>
       <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>
@@ -50,7 +51,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>Geç</Text>
         </Press>
         <View style={s.fill}>
-          <Button size="lg" fullWidth disabled={n <= 0} onPress={() => onAnswer(n)}>Kaydet</Button>
+          <Button size="lg" fullWidth disabled={n == null} onPress={() => onAnswer(n)}>Kaydet</Button>
         </View>
       </View>
     </BottomSheet>

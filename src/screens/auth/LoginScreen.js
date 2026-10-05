@@ -84,7 +84,7 @@ export default function LoginScreen() {
 
           <View style={{ marginTop: STEP.s4 }}>
             <Animated.View>
-              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
+              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@eposta.com" keyboardType="email-address" error={errors.email} />
             </Animated.View>
 
             <Animated.View>

@@ -123,7 +123,7 @@ export default function RegisterScreen() {
           <View style={{ marginTop: Platform.OS === "ios" ? STEP.s3 : STEP.s4 }}>
               <AuthInput label="AD SOYAD" value={name} onChangeText={setName} placeholder="Arda Karaca" autoCapitalize="words" error={errors.name} />
 
-              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@mail.com" keyboardType="email-address" error={errors.email} />
+              <AuthInput label="E-POSTA" value={email} onChangeText={setEmail} placeholder="ornek@eposta.com" keyboardType="email-address" error={errors.email} />
 
               <AuthInput label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="••••••••••" secureTextEntry error={errors.password} />
               <PasswordStrength password={password} />

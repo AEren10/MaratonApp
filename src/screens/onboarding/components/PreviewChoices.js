@@ -19,9 +19,9 @@ function Chips({ items, value, onPick, C, label }) {
             accessibilityRole="radio"
             accessibilityState={{ selected: on }}
             accessibilityLabel={`${label}: ${it.label}`}
-            style={[s.chip, { backgroundColor: on ? C.elev : C.surface, borderColor: on ? C.text2 : C.border }]}
+            style={[s.chip, { backgroundColor: on ? C.brandTint : C.surface, borderColor: on ? C.accent : C.border }]}
           >
-            <Text style={[TYPOGRAPHY.captionMedium, { color: on ? C.text : C.text2 }]}>{it.label}</Text>
+            <Text style={[TYPOGRAPHY.captionMedium, { color: on ? C.accentText : C.text2 }]}>{it.label}</Text>
           </Press>
         );
       })}
