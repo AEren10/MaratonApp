@@ -17,6 +17,8 @@ export const EVENTS = {
 
   // Onboarding
   ONBOARDING_COMPLETE: "onboarding.complete",
+  SETUP_PROFILE_EMPTY: "setup.profile_empty",
+  SETUP_PROFILE_ERROR: "setup.profile_error",
   // Kayit oncesi rota onizlemesi: rota cizildi / "Rotami kaydet"e basildi.
   ROUTE_PREVIEW_SHOWN: "onboarding.route_preview_shown",
   ROUTE_PREVIEW_SAVE: "onboarding.route_preview_save",

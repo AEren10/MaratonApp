@@ -209,8 +209,8 @@ Bu dosyanın düzeni:
 Maraton, YKS öğrencileri için günlük çalışma planı, deneme takibi ve yanlış tekrar uygulamasıdır.
 
 Demo hesap:
-E-posta: [DEMO_EMAIL]
-Şifre: [DEMO_PASSWORD]
+E-posta: demo@gmail.com
+Şifre: demo12345
 
 Bu hesap gerçek kullanıcı değildir; App Review için örnek çalışma verisiyle hazırlanmıştır.
 

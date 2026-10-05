@@ -1,13 +1,16 @@
-import { View, StyleSheet } from "react-native";
+import { View, Image, StyleSheet } from "react-native";
 
 import { Skeleton } from "../../../components/design/Skeleton";
-import { useC } from "../../../contexts/ThemeContext";
 import { GUTTER, SHAPE, STEP } from "../../../themes/tokens";
 
+const MARK = require("../../../../assets/brand/mark.png");
+const MARK_W = 64;
+const MARK_H = Math.round(MARK_W * 398 / 859);
+
 // "Yükleniyor" artboardi: kahraman sayi, grafik bloku, uc satir, kizil
-// uc nokta. Iskelet kendi nefesini tasir (Skeleton), ek hareket yok.
+// marka isareti (eskiden uc nokta). Iskelet kendi nefesini tasir (Skeleton),
+// ek hareket yok.
 export function HomeLoading() {
-  const C = useC();
   return (
     <View style={s.wrap} accessibilityLabel="Yükleniyor" accessibilityRole="progressbar">
       <View style={s.block}>
@@ -25,10 +28,8 @@ export function HomeLoading() {
           {[0, 1, 2].map((i) => <Skeleton key={i} width="100%" height={62} radius={SHAPE.button} />)}
         </View>
       </View>
-      <View style={[s.block, s.dots]}>
-        {[0.9, 0.55, 0.25].map((o) => (
-          <View key={o} style={[s.dot, { backgroundColor: C.accent, opacity: o }]} />
-        ))}
+      <View style={[s.block, s.mark]}>
+        <Image source={MARK} style={{ width: MARK_W, height: MARK_H, opacity: 0.55 }} resizeMode="contain" />
       </View>
     </View>
   );
@@ -39,6 +40,5 @@ const s = StyleSheet.create({
   block: { paddingTop: STEP.s4 },
   gap: { marginTop: STEP.s3 - 2 },
   list: { gap: STEP.s2 + 2 },
-  dots: { flexDirection: "row", justifyContent: "center", gap: STEP.s1 + 2 },
-  dot: { width: 7, height: 7, borderRadius: SHAPE.chip / 6 },
+  mark: { alignItems: "center" },
 });
