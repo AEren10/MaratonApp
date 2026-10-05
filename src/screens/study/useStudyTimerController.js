@@ -28,6 +28,7 @@ import { getJson, setJson } from "../../lib/storage/appStorage";
 import { STORAGE_KEYS } from "../../constants/storageKeys";
 import { EVENTS } from "../../constants/analytics";
 import { track } from "../../lib/analytics";
+import { usePhaseEndReminder } from "../../hooks/usePhaseEndReminder";
 
 const DEFAULT_CUSTOM_CONFIG = { focus: 30, break: 5, cycles: 4 };
 
@@ -285,6 +286,10 @@ export function useStudyTimerController(C) {
     });
     return () => sub?.remove?.();
   }, []);
+
+  // Ekran kapaliyken faz bitince bildirim (pomodoro).
+  const getElapsedSec = useCallback(() => elapsedFrom(accumulatedRef.current, startedAtRef.current), []);
+  usePhaseEndReminder({ enabled: running && isPomodoro, phase, targetSec: phaseTargetSec, getElapsedSec });
 
   // Açılışta yarım kalan oturumu sor.
   useEffect(() => {
