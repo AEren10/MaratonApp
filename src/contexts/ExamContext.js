@@ -8,6 +8,9 @@ import { serverSetupDone } from "../domain/onboarding/serverSetupDone";
 import * as appStorage from "../lib/storage/appStorage";
 import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
 import { useProfileSettleGate } from "../hooks/useProfileSettleGate";
+import { getProfileWithRetry } from "../lib/getProfileRetry";
+import { EVENTS } from "../constants/analytics";
+import { track } from "../lib/analytics";
 
 const ExamContext = createContext(null);
 
@@ -194,10 +197,11 @@ export function ExamProvider({ children }) {
     let cancelled = false;
     let finished = false;
 
-    getProfile(userId).then(async (p) => {
+    getProfileWithRetry(userId).then(async (p) => {
       if (cancelled) return;
       const local = await appStorage.getJson(storageKey, {});
       if (!p?.exam_type) {
+        track(EVENTS.SETUP_PROFILE_EMPTY, { hasProfile: !!p, hasLocalExam: !!local?.examType, localSetupDone: !!local?.setupCompleted });
         if (local && !cancelled) {
           setExamType(local.examType);
           setField(local.field || null);
@@ -294,7 +298,9 @@ export function ExamProvider({ children }) {
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
       await retryPendingNetSync(userId, local, () => cancelled);
       await retryPendingProfileSettingsSync(userId, local, () => cancelled);
-    }).catch(() => {}).finally(() => {
+    }).catch((e) => {
+      track(EVENTS.SETUP_PROFILE_ERROR, { message: String(e?.message || e).slice(0, 120) });
+    }).finally(() => {
       finished = true;
       if (!cancelled) { setDbLoading(false); setProfileReadyFor(userId); }
     });
