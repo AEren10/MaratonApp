@@ -162,7 +162,7 @@ export function useTodayStops({ generatedTasks = [], aiSuggestion, trialItems = 
 
     if (item.routeStop && !wasDone) {
       try {
-        await onRouteComplete?.(item.routeStop);
+        await Promise.all([onRouteComplete?.(item.routeStop), logWrite]);
       } catch {
         taskSaved = false;
       }
