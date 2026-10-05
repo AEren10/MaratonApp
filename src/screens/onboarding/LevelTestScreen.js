@@ -107,7 +107,7 @@ export default function LevelTestScreen() {
           Devam
         </Button>
         <Press haptic="none" onPress={handleSkip} hitSlop={8} style={styles.skip} accessibilityRole="button">
-          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Denemem yok, atla</Text>
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Şimdilik atla</Text>
         </Press>
       </View>
     </SafeAreaView>

@@ -3,7 +3,7 @@ import { patchQueuedPayload, saveStudyLogOffline, removeFromQueue } from "./offl
 import { buildStopStudyLogs, stopLogOperationIds } from "../domain/plan/stopStudyLog";
 import { todayTR } from "./dateUtils";
 import { touchStreak } from "../supabase/streaks";
-import { normalizeStopCorrect } from "../domain/study/stopCorrect";
+import { normalizeStopCorrect } from "./stopCorrect";
 
 // Durak tikinin IO tarafi. Karar ve bicim domain/plan/stopStudyLog.js'te.
 

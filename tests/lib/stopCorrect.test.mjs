@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { normalizeStopCorrect } from "../../src/domain/study/stopCorrect.js";
+import { normalizeStopCorrect } from "../../src/lib/stopCorrect.js";
 
 test("bos dogru sayisini bilinmiyor birakir", () => {
   assert.equal(normalizeStopCorrect("", 10), null);

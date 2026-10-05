@@ -6,7 +6,7 @@ import { BottomSheet } from "../../../components/design/BottomSheet";
 import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
 import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { normalizeStopCorrect } from "../../../domain/study/stopCorrect";
+import { normalizeStopCorrect } from "../../../lib/stopCorrect";
 
 // Durak tikinden sonra "Kac dogru?". Istege bagli: Gec'e basmak ya da bos
 // birakmak dogrulugu bilinmiyor birakir, 0 saymaz.
@@ -20,7 +20,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   useEffect(() => { setValue(""); }, [current?.id]);
 
   const total = Number(stop?.count) || 0;
-  const n = normalizeStopCorrect(value, total);
+  const correctCount = normalizeStopCorrect(value, total);
   const title = stop?.topic || stop?.label || "";
 
   return (
@@ -51,7 +51,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text2 }]}>Geç</Text>
         </Press>
         <View style={s.fill}>
-          <Button size="lg" fullWidth disabled={n == null} onPress={() => onAnswer(n)}>Kaydet</Button>
+          <Button size="lg" fullWidth disabled={correctCount == null} onPress={() => onAnswer(correctCount)}>Kaydet</Button>
         </View>
       </View>
     </BottomSheet>
