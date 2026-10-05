@@ -24,7 +24,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   const title = stop?.topic || stop?.label || "";
 
   return (
-    <BottomSheet visible={Boolean(current)} onClose={onSkip} style={s.sheet}>
+    <BottomSheet visible={Boolean(current)} onClose={onSkip} keyboard keyboardBehavior="height" style={s.sheet}>
       <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${total} SORU · ${title}`.toLocaleUpperCase("tr-TR")}</Text>
       <Text accessibilityRole="header" style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>Kaç doğru?</Text>
       <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>

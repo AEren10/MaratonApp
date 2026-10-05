@@ -1,5 +1,5 @@
 import { getStudyLogByClientOperationId, deleteStudyLog, updateStudyLog } from "../supabase/studyLogs";
-import { saveStudyLogOffline, removeFromQueue } from "./offlineQueue";
+import { patchQueuedPayload, saveStudyLogOffline, removeFromQueue } from "./offlineQueue";
 import { buildStopStudyLogs, stopLogOperationIds } from "../domain/plan/stopStudyLog";
 import { todayTR } from "./dateUtils";
 import { touchStreak } from "../supabase/streaks";
@@ -61,14 +61,14 @@ export function canAskStopCorrect(stop) {
 }
 
 /**
- * Tikle yazilan kayda dogru sayisini ekler. Kayit tikle ayni anda yaziliyor;
- * henuz sunucuda gorunmuyorsa kisa araliklarla birkac kez bakar. Cevrimdisi
- * kuyrukta kalan kayitta dogru yazilmaz (bilinmiyor kalir) -- kayip degil.
+ * Tikle yazilan kayda dogru sayisini ekler. Kayit henuz cevrimdisi kuyruktaysa
+ * INSERT yuku yerinde guncellenir; sunucuya gidiyorsa kisa araliklarla aranir.
  */
 export async function recordStopCorrect(userId, stop, correct) {
   const operationId = stopLogOperationIds(stop)[0];
   const value = normalizeStopCorrect(correct, stop?.count);
   if (!userId || !operationId || value == null) return false;
+  if (await patchQueuedPayload(operationId, { correct_count: value })) return true;
   for (let i = 0; i < 4; i += 1) {
     try {
       const log = await getStudyLogByClientOperationId(userId, operationId);

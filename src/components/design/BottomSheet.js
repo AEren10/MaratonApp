@@ -29,7 +29,9 @@ function project(velocity, rate = 0.998) {
 // edge: ekran kenarina yapisik (tam genislik, alt bosluk yok; guvenli alan cagirana ait).
 // header: verilirse surukleme YALNIZ bu bolgeden -- icerik kaydirilabilir listeyse
 // tum panele baglanan surukleme listeyi kaydirmak yerine paneli kapatmaya calisir.
-export function BottomSheet({ visible, onClose, children, style, keyboard = false, edge = false, header = null }) {
+export function BottomSheet({
+  visible, onClose, children, style, keyboard = false, keyboardBehavior = "padding", edge = false, header = null,
+}) {
   const C = useC();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
@@ -92,7 +94,11 @@ export function BottomSheet({ visible, onClose, children, style, keyboard = fals
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, backdropStyle]}>
           <Pressable style={s.fill} onPress={onClose} accessibilityLabel="Kapat" />
         </Animated.View>
-        <Wrap style={[s.bottom, edge && s.edge]} behavior={keyboard && Platform.OS === "ios" ? "padding" : undefined} pointerEvents="box-none">
+        <Wrap
+          style={[s.bottom, edge && s.edge]}
+          behavior={keyboard && Platform.OS === "ios" ? keyboardBehavior : undefined}
+          pointerEvents="box-none"
+        >
           {header ? (
             <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
               <GestureDetector gesture={pan}><Animated.View>{header}</Animated.View></GestureDetector>

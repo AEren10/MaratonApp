@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { canAskStopCorrect, recordStopCorrect } from "../lib/stopCompletionLog";
 
 // Durak tiklenince "Kac dogru?" (istege bagli). Tik aninda yazilan kayda
-// sonradan eklenir; gecilirse dogruluk bilinmiyor kalir (0 = bilinmiyor).
+// sonradan eklenir; gecilirse dogruluk null/bilinmiyor kalir (0 = olculmus sifir).
 // Gunun son duragi sorulmaz: orada "gunu kapattin" ani acilir, iki pencere
 // ust uste binmesin.
 export function useStopCorrectPrompt(stops) {
