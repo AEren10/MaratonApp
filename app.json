@@ -80,7 +80,13 @@
           "faceIDPermission": false
         }
       ],
-      "@sentry/react-native/expo",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "maraton-ew",
+          "project": "react-native"
+        }
+      ],
       "expo-apple-authentication",
       [
         "expo-notifications",
