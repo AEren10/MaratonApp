@@ -42,7 +42,12 @@ export const getProfile = async (userId) => {
 
 export const saveGamificationToSupabase = async (userId, stats, claimedMilestones) => {
   if (!userId || userId === "dev") return;
-  const payload = { ...(stats || {}), claimedMilestones: claimedMilestones || [] };
+  // Bu yazim gamification_stats'i BASTAN yazar; Redux'ta olmayan setup_completed
+  // bayragi her kayitta siliniyordu (kurulumu bitiren kullanici yeniden girişte
+  // kurulumu bastan goruyordu). Sunucudaki bayrak korunur.
+  const current = await fetchMyProfile(userId).catch(() => null);
+  const keep = current?.gamification_stats?.setup_completed ? { setup_completed: true } : {};
+  const payload = { ...(stats || {}), ...keep, claimedMilestones: claimedMilestones || [] };
   const { error } = await supabase
     .from("profiles")
     .update({ gamification_stats: payload })
