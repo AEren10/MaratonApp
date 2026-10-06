@@ -8,7 +8,7 @@ UPDATE public.profiles AS p
    SET onboarding_completed_at = COALESCE(p.onboarding_completed_at, now())
  WHERE p.onboarding_completed_at IS NULL
    AND (
-     COALESCE((p.gamification_stats ->> 'setup_completed')::boolean, false)
+     COALESCE(p.gamification_stats ->> 'setup_completed', 'false') = 'true'
      OR p.target_net IS NOT NULL
      OR p.target_net_tyt IS NOT NULL
      OR COALESCE(p.study_session_count, 0) > 0

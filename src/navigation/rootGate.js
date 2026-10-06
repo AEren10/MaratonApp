@@ -24,8 +24,8 @@ export function resolveRootGate({
   if (recoveryMode) return ROOT_GATE.RECOVERY;
   if (!hasSeenSlides) return ROOT_GATE.SLIDES;
   if (!hasSession) return ROOT_GATE.AUTH;
-  if (profileLoadFailed) return ROOT_GATE.PROFILE_ERROR;
-  if (onboardingDone) return ROOT_GATE.APP;
   if (profileSettling) return ROOT_GATE.PROFILE_LOADING;
+  if (profileLoadFailed) return onboardingDone ? ROOT_GATE.APP : ROOT_GATE.PROFILE_ERROR;
+  if (onboardingDone) return ROOT_GATE.APP;
   return ROOT_GATE.SETUP;
 }

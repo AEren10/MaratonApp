@@ -28,6 +28,12 @@ test("pending onboarding completion is retried without gamification JSON", () =>
   assert.doesNotMatch(source, /gamification_stats:\s*\{[^}]*setup_completed/s);
 });
 
+test("stale local completion cannot override a successful server read", () => {
+  assert.match(source, /const completionPending = !!local\.onboardingCompletionSyncPending && !!local\.setupCompleted/);
+  assert.match(source, /setupCompleted: completionPending \|\| serverSetupDone\(p\)/);
+  assert.doesNotMatch(source, /setupCompleted: !!local\.setupCompleted \|\| serverSetupDone\(p\)/);
+});
+
 test("onboarding and level-test flows surface pending net sync", () => {
   assert.match(stateCopy, /SYNC_PENDING_COPY/);
   assert.match(goalSetupForm, /setTargetNetPending\(true\)/);

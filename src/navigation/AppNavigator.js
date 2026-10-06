@@ -34,6 +34,7 @@ import { usePostSetupLanding } from "../hooks/usePostSetupLanding";
 import { usePendingPreviewSetup } from "../hooks/usePendingPreviewSetup";
 import { consumeAuthIntent } from "../lib/authIntent";
 import { ROOT_GATE, resolveRootGate } from "./rootGate";
+import { setupStartScreen } from "../domain/onboarding/setupStartScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -170,10 +171,9 @@ function SetupStack() {
   // zaten ilerleme oldugunu varsayiyor.
   // Kayit oncesi rota onizlemesinden gelen yeni kullanici sinavi zaten secti:
   // kurulum dogrudan Hedef'ten baslar (usePendingPreviewSetup sinavi yazar).
-  const { examType } = useExam();
+  const { examType, dailyGoalSet, levelTestDone, setupCompleted } = useExam();
   const fromPreview = usePendingPreviewSetup();
-  const resuming = !!examType;
-  const initial = fromPreview ? SCREENS.GOAL_SETUP : resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP;
+  const initial = setupStartScreen({ fromPreview, examType, dailyGoalSet, levelTestDone, setupCompleted });
   return (
     <Stack.Navigator
       screenOptions={screenOptions}

@@ -24,13 +24,14 @@ test("kurulumu biten (ya da sinavi secip atlayan) uygulamaya girer", () => {
 
 test("profil okunurken kurulum yigini acilmaz", () => {
   assert.equal(resolveRootGate({ ...signedIn, profileSettling: true }), ROOT_GATE.PROFILE_LOADING);
-  // Yerel ayardan kurulum zaten bitmis gorunuyorsa beklenmez.
-  assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileSettling: true }), ROOT_GATE.APP);
+  // Yerel ayar dolu olsa bile sunucu istegi bitmeden kok yigin secilmez.
+  assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileSettling: true }), ROOT_GATE.PROFILE_LOADING);
 });
 
 test("profil okuma hatasi yerel onboarding durumundan once ele alinir", () => {
   assert.equal(resolveRootGate({ ...signedIn, profileLoadFailed: true }), ROOT_GATE.PROFILE_ERROR);
-  assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileLoadFailed: true }), ROOT_GATE.PROFILE_ERROR);
+  // Sunucuya ulasilamiyorsa tamamlanmis yerel kopya cevrimdisi erisim saglar.
+  assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileLoadFailed: true }), ROOT_GATE.APP);
 });
 
 test("profil kapisi: basarili okuma ya da acik hata durumuna kadar bekler", () => {

@@ -230,7 +230,7 @@ export function ExamProvider({ children }) {
           setTargetNetAYT(local.targetNetAYT ?? null);
           setBaselineNet(local.baselineNet ?? null);
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
-          setSetupCompleted(!!local.setupCompleted);
+          setSetupCompleted(!!local.setupCompleted && !!local.onboardingCompletionSyncPending);
           setSetupSkipped(!!local.setupSkipped);
         }
         await retryPendingNetSync(userId, local, () => cancelled);
@@ -262,6 +262,7 @@ export function ExamProvider({ children }) {
       const examConfigPending = !!local.examConfigSyncPending && !!local.examType;
       const rankingPending = !!local.rankingSyncPending;
       const dailyGoalPending = !!local.dailyGoalSyncPending;
+      const completionPending = !!local.onboardingCompletionSyncPending && !!local.setupCompleted;
       const config = {
         examType: examConfigPending ? local.examType : p.exam_type,
         field: examConfigPending ? (local.field || null) : (p.field || null),
@@ -276,7 +277,7 @@ export function ExamProvider({ children }) {
         baselineNet: baselineNetValue,
         dailyGoalSet: dailyGoalPending || serverGoalDone(p),
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
-        setupCompleted: !!local.setupCompleted || serverSetupDone(p),
+        setupCompleted: completionPending || serverSetupDone(p),
       };
       setExamType(config.examType);
       setField(config.field);
@@ -347,6 +348,12 @@ export function ExamProvider({ children }) {
     setProfileLoadErrorFor(null);
     setProfileRetryNonce((value) => value + 1);
   }, [userId]);
+
+  useEffect(() => {
+    if (!userId || profileLoadErrorFor !== userId) return undefined;
+    const timer = setTimeout(retryProfileLoad, 30_000);
+    return () => clearTimeout(timer);
+  }, [profileLoadErrorFor, retryProfileLoad, userId]);
 
   const markSlidesAsSeen = useCallback(() => {
     setHasSeenSlides(true);
