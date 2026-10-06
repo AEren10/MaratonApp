@@ -21,6 +21,13 @@ test("pending local net values win over stale server values", () => {
   assert.match(source, /local\.baselineNetSyncPending && local\.baselineNet != null/);
 });
 
+test("pending onboarding completion is retried without gamification JSON", () => {
+  assert.match(source, /async function retryPendingOnboardingCompletion/);
+  assert.match(source, /onboardingCompletionSyncPending/);
+  assert.match(source, /await completeOnboardingOnServer\(\)/);
+  assert.doesNotMatch(source, /gamification_stats:\s*\{[^}]*setup_completed/s);
+});
+
 test("onboarding and level-test flows surface pending net sync", () => {
   assert.match(stateCopy, /SYNC_PENDING_COPY/);
   assert.match(goalSetupForm, /setTargetNetPending\(true\)/);

@@ -42,12 +42,9 @@ export const getProfile = async (userId) => {
 
 export const saveGamificationToSupabase = async (userId, stats, claimedMilestones) => {
   if (!userId || userId === "dev") return;
-  // Bu yazim gamification_stats'i BASTAN yazar; Redux'ta olmayan setup_completed
-  // bayragi her kayitta siliniyordu (kurulumu bitiren kullanici yeniden girişte
-  // kurulumu bastan goruyordu). Sunucudaki bayrak korunur.
-  const current = await fetchMyProfile(userId).catch(() => null);
-  const keep = current?.gamification_stats?.setup_completed ? { setup_completed: true } : {};
-  const payload = { ...(stats || {}), ...keep, claimedMilestones: claimedMilestones || [] };
+  // Onboarding durumu profiles.onboarding_completed_at alaninin otoritesidir.
+  // Oyunlastirma kaydi yalniz kendi JSON alanini yazar.
+  const payload = { ...(stats || {}), claimedMilestones: claimedMilestones || [] };
   const { error } = await supabase
     .from("profiles")
     .update({ gamification_stats: payload })
@@ -56,6 +53,13 @@ export const saveGamificationToSupabase = async (userId, stats, claimedMilestone
     handleSupabaseError(error, "saveGamificationToSupabase");
     throw error;
   }
+};
+
+export const completeOnboardingOnServer = async () => {
+  const { data, error } = await supabase.rpc("complete_onboarding");
+  if (error) throw error;
+  invalidateMyProfileCache();
+  return data;
 };
 
 // Streak ödülü: gün sayısını ve hak edilip edilmediğini sunucu doğrular.

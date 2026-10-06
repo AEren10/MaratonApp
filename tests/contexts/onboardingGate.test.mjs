@@ -18,7 +18,9 @@ test("examType hala sart: onsuz uygulama calisamaz", () => {
 
 test("completeOnboarding bayragi kaliciya yazar", () => {
   // Yalniz bellege yazsaydi uygulama kapaninca kilit geri gelirdi.
-  assert.match(src, /setSetupCompleted\(true\)[\s\S]{0,320}setupCompleted: true/);
+  assert.match(src, /setSetupCompleted\(true\)[\s\S]{0,420}setupCompleted: true/);
+  assert.match(src, /onboardingCompletionSyncPending: true/);
+  assert.match(src, /completeOnboardingOnServer\(\)/);
 });
 
 test("setupCompleted hedef net veya soru sayisindan tetiklenmez (premature stack unmount engeli)", () => {
@@ -43,4 +45,3 @@ test("tum kurulum ekranlari APP_STACK_SCREENS ve ROOT_ONLY icinde tanimlidir", (
   assert.match(tabSrc, /SCREENS\.NOTIFICATION_PERMISSION/);
   assert.match(tabSrc, /SCREENS\.SETUP_INCOMPLETE/);
 });
-

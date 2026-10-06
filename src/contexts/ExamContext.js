@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "./AuthContext";
-import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
+import { completeOnboardingOnServer, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
@@ -97,6 +97,17 @@ async function retryPendingProfileSettingsSync(userId, local, isCancelled) {
     }
   } catch {
     // Hala başarısız: pending bayrakları yerelde kalır, sonraki açılışta yeniden denenir.
+  }
+}
+
+async function retryPendingOnboardingCompletion(userId, local, isCancelled) {
+  if (!userId || !local?.onboardingCompletionSyncPending) return;
+  try {
+    await completeOnboardingOnServer();
+    if (isCancelled()) return;
+    await persistExamConfigPatch({ onboardingCompletionSyncPending: false }, userId);
+  } catch {
+    // Sunucuya ulasilamadi: yerel tamamlanma korunur, sonraki acilista yeniden denenir.
   }
 }
 
@@ -218,6 +229,7 @@ export function ExamProvider({ children }) {
         }
         await retryPendingNetSync(userId, local, () => cancelled);
         await retryPendingProfileSettingsSync(userId, local, () => cancelled);
+        await retryPendingOnboardingCompletion(userId, local, () => cancelled);
         return;
       }
       // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
@@ -298,6 +310,7 @@ export function ExamProvider({ children }) {
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
       await retryPendingNetSync(userId, local, () => cancelled);
       await retryPendingProfileSettingsSync(userId, local, () => cancelled);
+      await retryPendingOnboardingCompletion(userId, local, () => cancelled);
     }).catch((e) => {
       track(EVENTS.SETUP_PROFILE_ERROR, { message: String(e?.message || e).slice(0, 120) });
     }).finally(() => {
@@ -486,17 +499,22 @@ export function ExamProvider({ children }) {
     setSetupCompleted(true);
     try {
       const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(storageKey, { ...existing, setupCompleted: true });
+      await appStorage.setJson(storageKey, {
+        ...existing,
+        setupCompleted: true,
+        onboardingCompletionSyncPending: true,
+      });
     } catch {}
     if (session?.user?.id) {
       try {
-        const p = await getProfile(session.user.id).catch(() => null);
-        const currentStats = p?.gamification_stats || {};
-        await updateProf(session.user.id, {
-          gamification_stats: { ...currentStats, setup_completed: true },
-        });
-      } catch {}
+        await completeOnboardingOnServer();
+        await persistExamConfigPatch({ onboardingCompletionSyncPending: false }, session.user.id);
+        return { synced: true };
+      } catch (error) {
+        return { synced: false, error };
+      }
     }
+    return { synced: false, offline: true };
   }, [session?.user?.id, storageKey]);
 
   const skipSetup = useCallback(async () => {
