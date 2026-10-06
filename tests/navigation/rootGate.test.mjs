@@ -28,14 +28,18 @@ test("profil okunurken kurulum yigini acilmaz", () => {
   assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileSettling: true }), ROOT_GATE.APP);
 });
 
-test("profil kapisi: yalniz yerel sinav ayari yokken ve sure dolmadan bekler", () => {
-  const base = { userId: "u1", profileReadyFor: null, examType: null, expiredFor: null };
+test("profil okuma hatasi yerel onboarding durumundan once ele alinir", () => {
+  assert.equal(resolveRootGate({ ...signedIn, profileLoadFailed: true }), ROOT_GATE.PROFILE_ERROR);
+  assert.equal(resolveRootGate({ ...signedIn, onboardingDone: true, profileLoadFailed: true }), ROOT_GATE.PROFILE_ERROR);
+});
+
+test("profil kapisi: basarili okuma ya da acik hata durumuna kadar bekler", () => {
+  const base = { userId: "u1", profileReadyFor: null, profileLoadErrorFor: null };
   assert.equal(isProfileSettling(base), true);
-  assert.equal(isProfileSettling({ ...base, examType: "tyt" }), false);
   assert.equal(isProfileSettling({ ...base, profileReadyFor: "u1" }), false);
-  assert.equal(isProfileSettling({ ...base, expiredFor: "u1" }), false);
-  // Onceki kullanicinin okumasi/suresi yeni kullaniciyi gecirmez.
-  assert.equal(isProfileSettling({ ...base, profileReadyFor: "u0", expiredFor: "u0" }), true);
+  assert.equal(isProfileSettling({ ...base, profileLoadErrorFor: "u1" }), false);
+  // Onceki kullanicinin okumasi/hatasi yeni kullaniciyi gecirmez.
+  assert.equal(isProfileSettling({ ...base, profileReadyFor: "u0", profileLoadErrorFor: "u0" }), true);
   assert.equal(isProfileSettling({ ...base, userId: null }), false);
 });
 

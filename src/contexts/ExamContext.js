@@ -144,6 +144,8 @@ export function ExamProvider({ children }) {
   // Profil okumasi hangi kullanici icin BITTI. Bitmeden kurulum yigini
   // acilirsa ikinci cihazdaki donen kullanici once Sinav Sec'i goruyordu.
   const [profileReadyFor, setProfileReadyFor] = useState(null);
+  const [profileLoadErrorFor, setProfileLoadErrorFor] = useState(null);
+  const [profileRetryNonce, setProfileRetryNonce] = useState(0);
   const dbLoadedFor = useRef(null);
 
   useEffect(() => {
@@ -180,6 +182,8 @@ export function ExamProvider({ children }) {
     if (!userId) {
       if (!session && !loading) {
         dbLoadedFor.current = null;
+        setProfileReadyFor(null);
+        setProfileLoadErrorFor(null);
         setExamType(null);
         setField(null);
         setExamDate(null);
@@ -201,12 +205,14 @@ export function ExamProvider({ children }) {
     if (dbLoadedFor.current === userId) return;
     dbLoadedFor.current = userId;
     setDbLoading(true);
+    setProfileLoadErrorFor(null);
 
     // Çıkış→giriş yarışı: A'nın profili logout'tan sonra resolve olursa
     // B'nin sınav tipi/hedef sıralaması A'nınkiyle eziliyor ve diske yazılıyor.
     // Effect session değişince yeniden çalıştığı için cleanup bunu keser.
     let cancelled = false;
     let finished = false;
+    let succeeded = false;
 
     getProfileWithRetry(userId).then(async (p) => {
       if (cancelled) return;
@@ -230,6 +236,7 @@ export function ExamProvider({ children }) {
         await retryPendingNetSync(userId, local, () => cancelled);
         await retryPendingProfileSettingsSync(userId, local, () => cancelled);
         await retryPendingOnboardingCompletion(userId, local, () => cancelled);
+        succeeded = true;
         return;
       }
       // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
@@ -311,11 +318,19 @@ export function ExamProvider({ children }) {
       await retryPendingNetSync(userId, local, () => cancelled);
       await retryPendingProfileSettingsSync(userId, local, () => cancelled);
       await retryPendingOnboardingCompletion(userId, local, () => cancelled);
+      succeeded = true;
     }).catch((e) => {
       track(EVENTS.SETUP_PROFILE_ERROR, { message: String(e?.message || e).slice(0, 120) });
+      if (!cancelled) {
+        dbLoadedFor.current = null;
+        setProfileLoadErrorFor(userId);
+      }
     }).finally(() => {
       finished = true;
-      if (!cancelled) { setDbLoading(false); setProfileReadyFor(userId); }
+      if (!cancelled) {
+        setDbLoading(false);
+        if (succeeded) setProfileReadyFor(userId);
+      }
     });
 
     return () => {
@@ -324,7 +339,14 @@ export function ExamProvider({ children }) {
       // calisma yeniden okusun; yoksa profil hic uygulanmiyordu.
       if (!finished && dbLoadedFor.current === userId) dbLoadedFor.current = null;
     };
-  }, [loading, session, storageKey, userId]);
+  }, [loading, profileRetryNonce, session, storageKey, userId]);
+
+  const retryProfileLoad = useCallback(() => {
+    if (!userId) return;
+    dbLoadedFor.current = null;
+    setProfileLoadErrorFor(null);
+    setProfileRetryNonce((value) => value + 1);
+  }, [userId]);
 
   const markSlidesAsSeen = useCallback(() => {
     setHasSeenSlides(true);
@@ -578,12 +600,14 @@ export function ExamProvider({ children }) {
   }, [examDate]);
 
   const combinedLoading = loading;
-  const profileSettling = useProfileSettleGate({ userId, profileReadyFor, examType });
+  const profileSettling = useProfileSettleGate({ userId, profileReadyFor, profileLoadErrorFor });
+  const profileLoadFailed = !!userId && profileLoadErrorFor === userId;
 
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
+    profileLoadFailed, retryProfileLoad,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
@@ -592,6 +616,7 @@ export function ExamProvider({ children }) {
   }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
+    profileLoadFailed, retryProfileLoad,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
