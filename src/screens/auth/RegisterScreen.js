@@ -110,7 +110,10 @@ export default function RegisterScreen() {
           {Platform.OS === "ios" ? (
             <>
               <View style={{ marginTop: STEP.s4 }}>
-                <SocialAuthButtons />
+                <SocialAuthButtons
+                  termsAccepted={agreed}
+                  onTermsRequired={() => showAlert("Onay gerekli", "Apple ile devam etmek için Kullanım Şartları ve Gizlilik Politikası'nı onaylamalısın.")}
+                />
               </View>
               <View style={{ flexDirection: "row", alignItems: "center", marginTop: STEP.s3, gap: STEP.s2 }}>
                 <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
