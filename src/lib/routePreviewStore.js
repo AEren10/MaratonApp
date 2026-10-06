@@ -1,4 +1,5 @@
 import * as appStorage from "./storage/appStorage";
+import { registerSessionReset } from "./session/sessionReset";
 
 // Kayit oncesi rota onizlemesinin cevaplari (sinav, alan, yil, gunluk soru).
 // Kayittan sonra kurulum bunlarla baslar: sinav ekrani atlanir, hedef ekrani
@@ -23,9 +24,17 @@ export async function loadPendingPreview() {
   return memory;
 }
 
-export function clearPendingPreview() {
-  setPendingPreview(null);
+export async function clearPendingPreview() {
+  memory = null;
+  await appStorage.remove(KEY).catch(() => {});
 }
+
+// SIGNED_OUT ve hesap degisimi logout butonu disindan da olabilir. Modul
+// bellegi aninda sifirlanir; kalici taslak arka planda temizlenir.
+registerSessionReset(() => {
+  memory = null;
+  appStorage.remove(KEY).catch(() => {});
+});
 
 // Kayit ekraninin alt cumlesi. "Rotan hazir" yalniz onizlemeden gelindiyse
 // dogru; Giris'ten gelen kullanicinin rotasi henuz cizilmedi.
