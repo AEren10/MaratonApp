@@ -4,7 +4,7 @@ import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
-import { serverSetupDone } from "../domain/onboarding/serverSetupDone";
+import { serverExamChosen, serverGoalDone, serverSetupDone } from "../domain/onboarding/serverSetupDone";
 import * as appStorage from "../lib/storage/appStorage";
 import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
 import { useProfileSettleGate } from "../hooks/useProfileSettleGate";
@@ -200,7 +200,7 @@ export function ExamProvider({ children }) {
     getProfileWithRetry(userId).then(async (p) => {
       if (cancelled) return;
       const local = await appStorage.getJson(storageKey, {});
-      if (!p?.exam_type) {
+      if (!serverExamChosen(p)) {
         track(EVENTS.SETUP_PROFILE_EMPTY, { hasProfile: !!p, hasLocalExam: !!local?.examType, localSetupDone: !!local?.setupCompleted });
         if (local && !cancelled) {
           setExamType(local.examType);
@@ -255,7 +255,7 @@ export function ExamProvider({ children }) {
         targetNetTYT: targetNetTYTValue,
         targetNetAYT: targetNetSecondValue,
         baselineNet: baselineNetValue,
-        dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
+        dailyGoalSet: dailyGoalPending || serverGoalDone(p),
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
         setupCompleted: !!local.setupCompleted || serverSetupDone(p),
       };
