@@ -17,7 +17,7 @@ const OTA = Updates.updateId && !Updates.isEmbeddedLaunch ? ` · ${String(Update
 
 const INFO_ROWS = [
   { label: "Geliştirici", value: "Maraton Team" },
-  { label: "E-posta", value: "destek@maratonapp.com" },
+  { label: "E-posta", value: "destekmaraton@gmail.com" },
   { label: "Web", value: "maratonapp.com" },
 ];
 

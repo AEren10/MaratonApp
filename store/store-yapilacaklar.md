@@ -171,7 +171,7 @@ Son güncelleme: 2026-06-20
 - [ ] Kısa açıklama (80 karakter): store/listing-tr.md'den
 - [ ] Tam açıklama (4000 karakter): store/listing-tr.md'den
 - [ ] İletişim bilgileri:
-  - E-posta: `destek@maratonapp.com`
+  - E-posta: `destekmaraton@gmail.com`
   - Website: `https://maratonapp.com`
   - Gizlilik Politikası: `https://maratonapp.com/privacy`
 
@@ -273,9 +273,9 @@ Son güncelleme: 2026-06-20
 
 ### 3.3 E-posta
 
-- [ ] `destek@maratonapp.com` e-posta adresini oluştur
+- [ ] `destekmaraton@gmail.com` e-posta adresini oluştur
   - Seçenekler: Google Workspace, Zoho Mail (ücretsiz 1 kullanıcı), Improvmx (forwarding)
-  - Forwarding: `destek@maratonapp.com` → `ahmet.hi@hotmail.com` (en basit çözüm)
+  - Forwarding: `destekmaraton@gmail.com` → `ahmet.hi@hotmail.com` (en basit çözüm)
 - [ ] MX kayıtlarını DNS'e ekle
 - [ ] Test e-postası gönderip alarak çalıştığını doğrula
 - [ ] (Apple Review için) `review@maratonapp.com` veya alternatif bir demo hesap e-postası oluştur

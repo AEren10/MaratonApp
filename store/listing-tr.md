@@ -48,7 +48,7 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 
 Maraton, YKS maratonunda yanında. Şimdi indir, hedefe koşmaya başla.
 
-Destek: destek@maratonapp.com
+Destek: destekmaraton@gmail.com
 
 ---
 
@@ -94,7 +94,7 @@ Maraton, günlük çalışma planından deneme analizine, yanlış defterinden s
 
 Maraton, YKS maratonunda yanında. Şimdi indir, hedefe koşmaya başla.
 
-Destek: destek@maratonapp.com
+Destek: destekmaraton@gmail.com
 Gizlilik: https://maratonapp.com/privacy
 
 ---
