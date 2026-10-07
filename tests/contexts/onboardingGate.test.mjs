@@ -20,7 +20,7 @@ test("completeOnboarding bayragi kaliciya yazar", () => {
   // Yalniz bellege yazsaydi uygulama kapaninca kilit geri gelirdi.
   assert.match(src, /setSetupCompleted\(true\)[\s\S]{0,420}setupCompleted: true/);
   assert.match(src, /onboardingCompletionSyncPending: true/);
-  assert.match(src, /completeOnboardingOnServer\(\)/);
+  assert.match(src, /completeOnboardingOnServer\(session\.user\.id\)/);
 });
 
 test("setupCompleted hedef net veya soru sayisindan tetiklenmez (premature stack unmount engeli)", () => {

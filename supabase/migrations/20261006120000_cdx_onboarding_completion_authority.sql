@@ -19,7 +19,11 @@ UPDATE public.profiles AS p
      )
    );
 
-CREATE OR REPLACE FUNCTION public.complete_onboarding()
+-- Remove the earlier parameterless draft if this migration is replayed in a
+-- disposable environment; leaving both overloads would preserve the unsafe API.
+DROP FUNCTION IF EXISTS public.complete_onboarding();
+
+CREATE OR REPLACE FUNCTION public.complete_onboarding(p_user uuid)
 RETURNS timestamptz
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -32,10 +36,13 @@ BEGIN
   IF uid IS NULL THEN
     RAISE EXCEPTION 'unauthenticated' USING errcode = '28000';
   END IF;
+  IF uid IS DISTINCT FROM p_user THEN
+    RAISE EXCEPTION 'user_mismatch' USING errcode = '42501';
+  END IF;
 
   UPDATE public.profiles
      SET onboarding_completed_at = COALESCE(onboarding_completed_at, now())
-   WHERE id = uid
+   WHERE id = p_user
    RETURNING onboarding_completed_at INTO completed_at;
 
   IF completed_at IS NULL THEN
@@ -46,10 +53,10 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.complete_onboarding() FROM public, anon;
-GRANT EXECUTE ON FUNCTION public.complete_onboarding() TO authenticated;
+REVOKE ALL ON FUNCTION public.complete_onboarding(uuid) FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.complete_onboarding(uuid) TO authenticated;
 
 COMMENT ON COLUMN public.profiles.onboarding_completed_at IS
   'Server authority for completed onboarding; null means setup is incomplete.';
-COMMENT ON FUNCTION public.complete_onboarding() IS
-  'Idempotently marks the authenticated user onboarding as complete.';
+COMMENT ON FUNCTION public.complete_onboarding(uuid) IS
+  'Idempotently marks the expected authenticated user onboarding as complete.';

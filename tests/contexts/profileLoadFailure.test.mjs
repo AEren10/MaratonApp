@@ -7,7 +7,7 @@ const navigator = readFileSync("src/navigation/AppNavigator.js", "utf8");
 
 test("failed profile reads do not mark the profile ready", () => {
   assert.match(context, /let succeeded = false/);
-  assert.match(context, /if \(succeeded\) setProfileReadyFor\(userId\)/);
+  assert.match(context, /if \(succeeded\) \{[\s\S]{0,160}setProfileReadyFor\(userId\)/);
   assert.match(context, /setProfileLoadErrorFor\(userId\)/);
 });
 
@@ -16,4 +16,12 @@ test("profile error offers an explicit retry instead of opening setup", () => {
   assert.match(context, /setProfileRetryNonce\(\(value\) => value \+ 1\)/);
   assert.match(navigator, /ROOT_GATE\.PROFILE_ERROR/);
   assert.match(navigator, /ProfileLoadFailure onRetry=\{retryProfileLoad\}/);
+});
+
+test("automatic retry keeps the explicit error state until the server succeeds", () => {
+  assert.match(context, /const backgroundProfileRetry = useRef\(false\)/);
+  assert.match(context, /if \(!isBackgroundRetry\) setProfileLoadErrorFor\(null\)/);
+  assert.match(context, /setTimeout\(retryProfileLoadInBackground, 30_000\)/);
+  assert.match(context, /\[profileLoadErrorFor, profileRetryNonce, retryProfileLoadInBackground, userId\]/);
+  assert.match(context, /if \(succeeded\) \{[\s\S]{0,120}setProfileLoadErrorFor\(null\)/);
 });

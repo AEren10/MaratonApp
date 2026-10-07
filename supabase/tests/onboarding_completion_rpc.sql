@@ -24,8 +24,8 @@ BEGIN
   PERFORM set_config('request.jwt.claim.sub', pending_user::text, true);
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
 
-  first_value := public.complete_onboarding();
-  second_value := public.complete_onboarding();
+  first_value := public.complete_onboarding(pending_user);
+  second_value := public.complete_onboarding(pending_user);
 
   IF first_value IS NULL OR second_value IS DISTINCT FROM first_value THEN
     RAISE EXCEPTION 'complete_onboarding is not idempotent: %, %', first_value, second_value;
@@ -35,9 +35,15 @@ BEGIN
     RAISE EXCEPTION 'existing completed user lost onboarding state';
   END IF;
 
+  BEGIN
+    PERFORM public.complete_onboarding(completed_user);
+    RAISE EXCEPTION 'cross-user onboarding completion succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+
   PERFORM set_config('request.jwt.claim.sub', '', true);
   BEGIN
-    PERFORM public.complete_onboarding();
+    PERFORM public.complete_onboarding(pending_user);
     RAISE EXCEPTION 'anonymous onboarding completion succeeded';
   EXCEPTION WHEN invalid_authorization_specification THEN NULL;
   END;

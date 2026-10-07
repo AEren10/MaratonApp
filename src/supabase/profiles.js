@@ -55,8 +55,9 @@ export const saveGamificationToSupabase = async (userId, stats, claimedMilestone
   }
 };
 
-export const completeOnboardingOnServer = async () => {
-  const { data, error } = await supabase.rpc("complete_onboarding");
+export const completeOnboardingOnServer = async (userId) => {
+  if (!userId) throw new Error("userId is required");
+  const { data, error } = await supabase.rpc("complete_onboarding", { p_user: userId });
   if (error) throw error;
   invalidateMyProfileCache();
   return data;
