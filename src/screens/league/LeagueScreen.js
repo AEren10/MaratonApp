@@ -147,47 +147,37 @@ function LeagueBrief({ C, data }) {
   );
 }
 
-function SocialActionCard({ C, onInvite, onCompanion }) {
+function SocialRow({ C, label, a11yLabel, onPress }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={a11yLabel || label}
+      style={({ pressed }) => ({
+        minHeight: 52,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: SPACING.md,
+        borderRadius: RADIUS.xl,
+        backgroundColor: C.surface,
+        borderWidth: 1,
+        borderColor: C.border,
+        opacity: pressed ? 0.75 : 1,
+      })}
+    >
+      <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>{label}</Text>
+      <Icon name="chevR" size={14} color={C.text3} />
+    </Pressable>
+  );
+}
+
+// Sag ustteki davet ikonu yerinde duruyor; burada ayrica kodla ekleme yolu var.
+function SocialActionCard({ C, onInvite, onCompanion, onAddFriend }) {
   return (
     <View style={{ gap: SPACING.sm, marginTop: SPACING.md }}>
-      <Pressable
-        onPress={onInvite}
-        accessibilityRole="button"
-        accessibilityLabel="Arkadaşını davet et"
-        style={({ pressed }) => ({
-          minHeight: 52,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: SPACING.md,
-          borderRadius: RADIUS.xl,
-          backgroundColor: C.surface,
-          borderWidth: 1,
-          borderColor: C.border,
-          opacity: pressed ? 0.75 : 1,
-        })}
-      >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Arkadaşını davet et</Text>
-        <Icon name="chevR" size={14} color={C.text3} />
-      </Pressable>
-      <Pressable
-        onPress={onCompanion}
-        accessibilityRole="button"
-        accessibilityLabel="Yol arkadaşını aç"
-        style={({ pressed }) => ({
-          minHeight: 52,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: SPACING.md,
-          borderRadius: RADIUS.xl,
-          backgroundColor: C.surface,
-          borderWidth: 1,
-          borderColor: C.border,
-          opacity: pressed ? 0.75 : 1,
-        })}
-      >
-        <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>Yol arkadaşın · iki rota yan yana</Text>
-        <Icon name="chevR" size={14} color={C.text3} />
-      </Pressable>
+      <SocialRow C={C} label="Arkadaşını davet et" onPress={onInvite} />
+      <SocialRow C={C} label="Yol arkadaşın · iki rota yan yana" a11yLabel="Yol arkadaşını aç" onPress={onCompanion} />
+      <SocialRow C={C} label="Arkadaş ekle · kod gir" a11yLabel="Arkadaş kodu girerek ekle" onPress={onAddFriend} />
     </View>
   );
 }
@@ -422,7 +412,7 @@ export default function LeagueScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />
           }
-          ListFooterComponent={<SocialActionCard C={C} onInvite={goInvite} onCompanion={goCompanion} />}
+          ListFooterComponent={<SocialActionCard C={C} onInvite={goInvite} onCompanion={goCompanion} onAddFriend={goAddFriend} />}
         />
       )}
     </SafeAreaView>
