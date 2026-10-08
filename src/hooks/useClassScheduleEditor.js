@@ -56,11 +56,19 @@ export function useClassScheduleEditor() {
     (key) => {
       const match = options.find((o) => o.key === key);
       if (match) {
-        if (key.startsWith("ayt_")) return `AYT ${match.label}`;
+        if (key.startsWith("ayt_") && !match.label.startsWith("AYT ")) {
+          return `AYT ${match.label}`;
+        }
         return match.label;
       }
       const pMatch = options.find((o) => o.paletteKey === key);
-      return pMatch?.label || key;
+      if (pMatch) {
+        if (key.startsWith("ayt_") && !pMatch.label.startsWith("AYT ")) {
+          return `AYT ${pMatch.label}`;
+        }
+        return pMatch.label;
+      }
+      return key;
     },
     [options],
   );

@@ -33,7 +33,7 @@ function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
         };
 
   const content = (
-    <Text style={[s.text, { color: look.color }]}>{label}</Text>
+    <Text numberOfLines={1} style={[s.text, { color: look.color }]}>{label}</Text>
   );
   const box = [
     s.chip,
@@ -69,6 +69,7 @@ const s = StyleSheet.create({
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
+    flexShrink: 0,
   },
   text: {
     fontFamily: TYPOGRAPHY.captionMedium.fontFamily,
