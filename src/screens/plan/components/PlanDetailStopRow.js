@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE, SPACING } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
@@ -94,23 +93,23 @@ export function PlanDetailStopRow({
       ) : null}
 
       {hasStart ? (
-        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
-          <Press haptic="none" scaleTo={0.92}
-            accessibilityRole="button"
-            accessibilityLabel={`${subject} çalışmaya başla`}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-            onPress={(e) => {
-              H.tap();
-              onStart?.(e);
-            }}
-            style={[
-              s.startBtn,
-              { backgroundColor: C.accent + "18" },
-            ]}
-          >
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>Başla</Text>
-          </Press>
-        </Animated.View>
+        <Press
+          haptic="none"
+          scaleTo={0.92}
+          accessibilityRole="button"
+          accessibilityLabel={`${subject} çalışmaya başla`}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          onPress={(e) => {
+            H.tap();
+            onStart?.(e);
+          }}
+          style={[
+            s.startBtn,
+            { backgroundColor: C.accent + "18" },
+          ]}
+        >
+          <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>Başla</Text>
+        </Press>
       ) : null}
     </View>
   );
