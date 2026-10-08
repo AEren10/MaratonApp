@@ -58,7 +58,7 @@ export function StoryRouteBody({ data, p, visibility = {} }) {
 }
 
 const s = StyleSheet.create({
-  centerWrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  centerWrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   box: { width: W, gap: 6 },
   eyebrow: { fontFamily: "Archivo_700", fontSize: 11.5, letterSpacing: 1.8 },
   chart: { marginTop: 12 },

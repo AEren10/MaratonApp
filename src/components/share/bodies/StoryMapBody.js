@@ -112,7 +112,7 @@ export function StoryMapBody({ data, p, visibility = {} }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   head: { width: W, gap: 4, marginBottom: 12 },
   netRow: { flexDirection: "row", alignItems: "baseline", gap: 8 },
   netVal: { fontFamily: "Bricolage_400", fontSize: 44, lineHeight: 48, letterSpacing: -1 },

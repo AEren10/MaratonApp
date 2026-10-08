@@ -69,7 +69,7 @@ export function StoryTrackBody({ data, p, visibility = {} }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   grid: { width: W, flexDirection: "row", flexWrap: "wrap", rowGap: 16 },
   cell: { width: "50%" },
   label: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 0.2 },

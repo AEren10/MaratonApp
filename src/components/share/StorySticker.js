@@ -71,11 +71,21 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
         <BrandBackground C={C} width={STORY_WIDTH} height={STORY_HEIGHT} />
       )}
 
-      <Body data={variant.data} p={p} C={C} visibility={visibility} />
+      <View style={s.bodyWrap}>
+        <Body data={variant.data} p={p} C={C} visibility={visibility} />
+      </View>
     </View>
   );
 });
 
 const s = StyleSheet.create({
   canvas: { width: STORY_WIDTH, height: STORY_HEIGHT, overflow: "hidden" },
+  bodyWrap: {
+    ...StyleSheet.absoluteFillObject,
+    width: STORY_WIDTH,
+    height: STORY_HEIGHT,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
+

@@ -127,7 +127,7 @@ export function StorySimpleBody({ data, p, visibility = {} }) {
 }
 
 const s = StyleSheet.create({
-  centerWrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  centerWrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   box: { width: 330, gap: 8 },
   flameHeaderRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 4 },
   flameHalo: { width: 46, height: 46, borderRadius: 23, backgroundColor: "rgba(255, 138, 61, 0.16)", borderWidth: 1.5, borderColor: "rgba(255, 138, 61, 0.35)", alignItems: "center", justifyContent: "center" },

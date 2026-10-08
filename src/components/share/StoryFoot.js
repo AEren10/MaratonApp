@@ -1,24 +1,18 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { BrandMark } from "../design/BrandMark";
-import Svg, { Path } from "react-native-svg";
 
-import { TYPOGRAPHY } from "../../themes/tokens";
-
-// Etiketin altindaki marka satiri. Bu, paylasimin bize donen tek getirisi —
-// her varyantta ayni yerde, ayni boyda durur ("kart" haric, onun kendi
-// ayagi var).
+// Etiketin altindaki marka satiri. Icon ve isim kibar olcekli, isim ana kirmizi tonunda.
 export function StoryFoot({ p, inline = true, centered = true }) {
   return (
-    <View style={[s.wrap, inline && s.inline, centered && s.centered]}>
-      {/* Onayli marka: isaret + Unbounded MARATON (4 Ekim). */}
-      <BrandMark width={38} word wordSize={15} color={p.solid} />
+    <View style={[inline ? s.inline : s.wrap, centered && s.centered]}>
+      {/* Onayli marka: isaret + Unbounded MARATON */}
+      <BrandMark width={26} word wordSize={11} color={p.accent || "#E5343F"} />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  inline: { position: "relative", left: "auto", right: "auto", bottom: "auto" },
-  centered: { alignSelf: "center", justifyContent: "center" },
+  inline: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
   wrap: {
     position: "absolute",
     left: 34,
@@ -28,7 +22,6 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  brand: { flexDirection: "row", alignItems: "center", gap: 9 },
-  mark: { width: 26, height: 26, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-  word: { fontFamily: "Bricolage_400", fontSize: 18, letterSpacing: -0.2 },
+  centered: { alignSelf: "center", justifyContent: "center" },
 });
+

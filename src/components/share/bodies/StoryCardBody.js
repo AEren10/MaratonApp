@@ -90,7 +90,7 @@ export function StoryCardBody({ data, p, visibility = {} }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   head: { width: 330, gap: 4 },
   date: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 1.2 },
   dotsDivider: { letterSpacing: 2, fontSize: 11, opacity: 0.5, marginVertical: 4 },

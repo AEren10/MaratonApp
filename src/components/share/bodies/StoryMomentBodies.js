@@ -100,7 +100,7 @@ export function StoryHonestBody({ data, p }) {
 }
 
 const s = StyleSheet.create({
-  centerWrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  centerWrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   cardBox: { width: 330, gap: 6 },
   countLabel: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
   countRow: { flexDirection: "row", alignItems: "baseline", gap: 10, marginTop: 4 },

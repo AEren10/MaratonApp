@@ -127,7 +127,8 @@ export function StoryBarsBody({ data, p, visibility = {} }) {
 
 const s = StyleSheet.create({
   wrap: {
-    ...StyleSheet.absoluteFillObject,
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 30,

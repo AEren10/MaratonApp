@@ -102,7 +102,7 @@ export function StorySubjectBody({ data, p }) {
 }
 
 const s = StyleSheet.create({
-  wrap: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
+  wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   head: { width: W, gap: 4, marginBottom: 12 },
   titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   subjTitle: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
