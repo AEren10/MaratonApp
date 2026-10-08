@@ -34,6 +34,11 @@ test("stale local completion cannot override a successful server read", () => {
   assert.doesNotMatch(source, /setupCompleted: !!local\.setupCompleted \|\| serverSetupDone\(p\)/);
 });
 
+test("profile reconciliation waits until the active user's local hydration finishes", () => {
+  assert.match(source, /setLocalReadyFor\(userId\)/);
+  assert.match(source, /if \(localReadyFor !== userId\) return;[\s\S]*getProfileWithRetry\(userId\)/);
+});
+
 test("offline completion fallback requires a server confirmation or a pending write", () => {
   assert.match(source, /!!d\.onboardingServerConfirmed \|\| completionPending/);
   assert.match(source, /onboardingServerConfirmed: serverCompletionConfirmed/);

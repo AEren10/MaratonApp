@@ -4,6 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-na
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as H from "../../../lib/haptics";
+import { CONTROL, SHAPE, STEP } from "../../../themes/tokens";
 
 const THUMB_R = 14;
 const TRACK_H = 6;
@@ -20,7 +21,7 @@ function snap(val, step) {
 export function GoalSlider({
   value, onChange, C, trackWidth, min, max, step, accessibilityLabel,
   fillColor = C.accent, trackColor = C.track, thumbColor = C.text,
-  thumbHalfSize = THUMB_R, thumbCornerRadius = 6,
+  thumbHalfSize = THUMB_R, thumbCornerRadius = SHAPE.chip,
 }) {
   const pct = max > min ? Math.max(0, Math.min(1, (value - min) / (max - min))) : 0;
   const thumbX = useSharedValue(pct * trackWidth);
@@ -78,7 +79,7 @@ export function GoalSlider({
   const fillStyle = useAnimatedStyle(() => ({
     transform: [{ scaleX: trackWidth > 0 ? Math.max(0, Math.min(1, thumbX.value / trackWidth)) : 0 }],
   }));
-  const hitArea = Math.max(44, thumbHalfSize * 2 + 20);
+  const hitArea = Math.max(CONTROL.tapMin, thumbHalfSize * 2 + STEP.s3);
 
   return (
     <GestureDetector gesture={gesture}>

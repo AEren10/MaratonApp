@@ -4,6 +4,7 @@ import test from "node:test";
 
 const context = readFileSync("src/contexts/ExamContext.js", "utf8");
 const navigator = readFileSync("src/navigation/AppNavigator.js", "utf8");
+const failureScreen = readFileSync("src/components/common/ProfileLoadFailure.js", "utf8");
 
 test("failed profile reads do not mark the profile ready", () => {
   assert.match(context, /let succeeded = false/);
@@ -16,6 +17,7 @@ test("profile error offers an explicit retry instead of opening setup", () => {
   assert.match(context, /setProfileRetryNonce\(\(value\) => value \+ 1\)/);
   assert.match(navigator, /ROOT_GATE\.PROFILE_ERROR/);
   assert.match(navigator, /ProfileLoadFailure onRetry=\{retryProfileLoad\}/);
+  assert.match(failureScreen, /<ScreenErrorBoundary>/);
 });
 
 test("automatic retry keeps the explicit error state until the server succeeds", () => {

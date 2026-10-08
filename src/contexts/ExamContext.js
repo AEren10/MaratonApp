@@ -160,6 +160,7 @@ export function ExamProvider({ children }) {
   const [profileReadyFor, setProfileReadyFor] = useState(null);
   const [profileLoadErrorFor, setProfileLoadErrorFor] = useState(null);
   const [profileRetryNonce, setProfileRetryNonce] = useState(0);
+  const [localReadyFor, setLocalReadyFor] = useState(null);
   const dbLoadedFor = useRef(null);
   const backgroundProfileRetry = useRef(false);
 
@@ -190,7 +191,13 @@ export function ExamProvider({ children }) {
       setHasSeenSlides(seenRaw === "true");
     })
     .catch(() => {})
-    .finally(() => { clearTimeout(safety); if (!cancelled) setLoading(false); });
+    .finally(() => {
+      clearTimeout(safety);
+      if (!cancelled) {
+        setLocalReadyFor(userId);
+        setLoading(false);
+      }
+    });
     return () => { cancelled = true; };
   }, [storageKey, userId]);
 
@@ -219,6 +226,9 @@ export function ExamProvider({ children }) {
       }
       return;
     }
+    // Yerel yedek once uygulanir; aksi halde gec tamamlanan hydration,
+    // sunucunun onboarding_completed_at kararini sonradan ezebilir.
+    if (localReadyFor !== userId) return;
     if (dbLoadedFor.current === userId) return;
     dbLoadedFor.current = userId;
     setDbLoading(true);
@@ -387,7 +397,7 @@ export function ExamProvider({ children }) {
       // calisma yeniden okusun; yoksa profil hic uygulanmiyordu.
       if (!finished && dbLoadedFor.current === userId) dbLoadedFor.current = null;
     };
-  }, [loading, profileRetryNonce, session, storageKey, userId]);
+  }, [loading, localReadyFor, profileRetryNonce, session, storageKey, userId]);
 
   const retryProfileLoad = useCallback(() => {
     if (!userId) return;

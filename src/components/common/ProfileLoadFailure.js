@@ -2,10 +2,11 @@ import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button, Icon } from "../design";
+import { ScreenErrorBoundary } from "./ScreenErrorBoundary";
 import { useC } from "../../contexts/ThemeContext";
 import { GUTTER, STEP, TYPOGRAPHY } from "../../themes/tokens";
 
-export function ProfileLoadFailure({ onRetry }) {
+function ProfileLoadFailureContent({ onRetry }) {
   const C = useC();
 
   return (
@@ -17,6 +18,14 @@ export function ProfileLoadFailure({ onRetry }) {
         <Button onPress={onRetry} size="lg" fullWidth style={styles.button}>Tekrar dene</Button>
       </View>
     </SafeAreaView>
+  );
+}
+
+export function ProfileLoadFailure(props) {
+  return (
+    <ScreenErrorBoundary>
+      <ProfileLoadFailureContent {...props} />
+    </ScreenErrorBoundary>
   );
 }
 

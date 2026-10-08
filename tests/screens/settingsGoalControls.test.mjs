@@ -21,7 +21,8 @@ test("toplam net satiri label yerine daha okunur govde tipografisi kullanir", ()
 test("dikey kaydirma suruklemeden once kazanir ve onboarding gorunumu korunur", () => {
   assert.match(slider, /activeOffsetX\(\[-10, 10\]\)/);
   assert.match(slider, /failOffsetY\(\[-6, 6\]\)/);
-  assert.match(slider, /thumbHalfSize = THUMB_R, thumbCornerRadius = 6/);
+  assert.match(slider, /thumbHalfSize = THUMB_R, thumbCornerRadius = SHAPE\.chip/);
+  assert.match(slider, /Math\.max\(CONTROL\.tapMin, thumbHalfSize \* 2 \+ STEP\.s3\)/);
 });
 
 test("sayi girisi ust durumu aninda gunceller ve acik bitirme kontrolu sunar", () => {
