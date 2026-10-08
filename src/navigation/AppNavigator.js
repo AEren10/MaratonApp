@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -243,7 +243,11 @@ export default function AppNavigator() {
     return () => subscription.remove();
   }, [navigationRef, navigationTracker]);
 
-  if (loading || examLoading) return <Loading />;
+  // Acilis animasyonu bitmeden sayfa atlamasin: veri hazir olsa bile
+  // animasyon sonuna kadar oynar (introDone), sonra gecilir.
+  const [introDone, setIntroDone] = useState(false);
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+  if (loading || examLoading || !introDone) return <AppLaunchLoading onDone={finishIntro} />;
 
   let content;
   // Kurtarma modu HER ŞEYDEN ÖNCE gelir: oturum kurulmuş olsa bile kullanıcı
