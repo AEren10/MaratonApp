@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Modal, Pressable, Text, View, StyleSheet, useWindowDimensions } from "react-native";
-import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import { GestureDetector, Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming,
 } from "react-native-reanimated";
@@ -15,13 +15,7 @@ import { QuickAddNowCard } from "./components/QuickAddNowCard";
 import { QuickAddRow } from "./components/QuickAddRow";
 import { Press } from "../../components/design/Press";
 
-const DISMISS_DISTANCE = 90;
-
-// Acilis ve kapanis TEK ilerleme degerinden: zemin kararmasi ile panelin
-// kaymasi ayni egride, ayni surede. Eskiden Modal kendi "fade"ini yapiyor,
-// panel ayri bir yayla sabit 500px'ten kalkiyordu -- panel 500'den uzun
-// oldugu icin ilk karede yarisi gorunuyor, sonra zipliyordu. Egri iOS sheet
-// egrisi; azaltilmis harekette yalniz kisa bir gecis.
+const DISMISS_DISTANCE = 70;
 const OPEN_EASE = Easing.bezier(0.32, 0.72, 0, 1);
 const CLOSE_EASE = Easing.bezier(0.4, 0, 1, 1);
 
@@ -47,9 +41,6 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
     opacity: progress.get() * Math.max(0, 1 - drag.get() / height),
   }));
 
-  // Kapanis animasyonu BITINCE panel kapanir ve (varsa) secilen sayfa acilir.
-  // iOS'ta RN Modal kapanirken yeni modal ekran sunulamayabiliyor: panel
-  // kapandiktan sonra kisa bir nefes.
   const finish = (screen, params) => {
     onClose();
     if (screen) setTimeout(() => onAction(screen, params), 80);
@@ -62,22 +53,23 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
   };
   const close = () => { "worklet"; closeThen(null, undefined); };
 
-  const pan = Gesture.Pan()
+  const pan = useMemo(() => Gesture.Pan()
+    .activeOffsetY([0, 5])
     .onUpdate((e) => {
       "worklet";
       drag.set(Math.max(0, e.translationY));
     })
     .onEnd((e) => {
       "worklet";
-      if (e.translationY > DISMISS_DISTANCE || e.velocityY > 700) close();
+      if (e.translationY > DISMISS_DISTANCE || e.velocityY > 500) close();
       else drag.set(withTiming(0, { duration: 220, easing: OPEN_EASE }));
-    });
+    }), [reduced]);
 
   const go = (screen, params) => closeThen(screen, params);
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={close}>
-      <View style={styles.root}>
+      <GestureHandlerRootView style={styles.root}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, scrimStyle]}>
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Sayfa dışına dokun, kapat" />
         </Animated.View>
@@ -103,8 +95,6 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
           </View>
 
           <View style={styles.section}>
-            {/* Calismaya baslamak (ust) ile yapilmis olani kaydetmek (alt) ayri:
-                ikisi "kaydet" altinda karisiyordu. */}
             <SectionLabel>YAPTIĞINI KAYDET</SectionLabel>
             <View style={{ gap: STEP.s1 }}>
               <QuickAddRow C={C} title="Geçmiş çalışma" subtitle="Sayaçsız yaptığın çalışmayı gir"
@@ -126,7 +116,7 @@ export default function QuickAddSheet({ visible, onClose, onAction }) {
               onPress={() => go(SCREENS.ADD_TASK)} />
           </View>
         </Animated.View>
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
@@ -138,8 +128,11 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderBottomWidth: 0,
     paddingHorizontal: STEP.s3, paddingBottom: STEP.s4,
   },
-  handleZone: { alignItems: "center", paddingVertical: STEP.s1 },
-  handle: { width: 40, height: 4, borderRadius: 2 },
+  handleZone: {
+    width: "100%", alignItems: "center", justifyContent: "center",
+    minHeight: CONTROL.tapMin, paddingVertical: STEP.s1,
+  },
+  handle: { width: 44, height: 4.5, borderRadius: 2.5 },
   headerRow: {
     flexDirection: "row", alignItems: "baseline", justifyContent: "space-between",
     paddingBottom: STEP.s1, minHeight: CONTROL.tapMin / 2,
