@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Maraton mağaza karesi</title>
+<style>
+  @font-face { font-family: Bricolage; src: url(../../../assets/fonts/Bricolage_400.ttf); font-weight: 400; }
+  @font-face { font-family: Unbounded; src: url(../../../assets/fonts/Unbounded_600.ttf); font-weight: 600; }
+  @font-face { font-family: Archivo; src: url(../../../assets/fonts/Archivo_500.ttf); font-weight: 500; }
+  @font-face { font-family: Archivo; src: url(../../../assets/fonts/Archivo_600.ttf); font-weight: 600; }
+  :root {
+    --bg: #1C1C23; --surface: #28282F; --line: #3A3A42; --border: #5A5961;
+    --text: #ECE8E4; --text2: #B0ADB5; --text3: #A3A0AB;
+    --accent: #E5343F; --accentText: #FF6A72;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--bg); overflow: hidden; }
+  #c { position: relative; overflow: hidden; background: var(--bg); }
+  .brand { position: absolute; display: flex; align-items: center; }
+  .brand img { display: block; }
+  .brand span { font: 600 1em Archivo; letter-spacing: .16em; color: var(--text2); }
+  h1 { position: absolute; font-family: Bricolage; font-weight: 400; color: var(--text);
+       letter-spacing: -.04em; line-height: .98; font-variant-numeric: tabular-nums; }
+  h1 em { font-style: normal; color: var(--accentText); display: block; }
+  p.sub { position: absolute; font: 500 1em/1.4 Archivo; color: var(--text2); }
+  svg.route { position: absolute; left: 0; overflow: visible; }
+  .phone { position: absolute; background: #0E0E12; border: 1px solid var(--border); overflow: hidden; }
+  .screen { position: absolute; overflow: hidden; background: var(--surface); }
+  .screen img { width: 100%; display: block; }
+  .island { position: absolute; left: 50%; transform: translateX(-50%); background: #000; z-index: 2; }
+  .missing { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+             font: 600 1em Archivo; color: var(--text3); border: 2px dashed var(--line); text-align: center; }
+</style>
+</head>
+<body>
+<div id="c"></div>
+<script src="slides.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>

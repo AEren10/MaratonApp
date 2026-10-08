@@ -203,6 +203,26 @@ Bu dosyanın düzeni:
 - [ ] Play Data Safety doldur.
 - [ ] V1 dışı özelliklerin listing/görsellerde görünmediğini son kez kontrol et.
 
+## 11. Önerilen yayın iş sırası — 5 Ekim 2026
+
+Uygulama içindeki son küçük işler tamamlandıktan sonra aşağıdaki sıra izlenecek.
+Final `.ipa` ve `.aab`, ilk sekiz madde bitmeden alınmayacak.
+
+1. [ ] Native izinleri temizle: kullanılmayan mikrofon, ses/video medya ve legacy storage izinlerini kaldır.
+2. [ ] Kullanıcı/grup adı filtresini ve gerçek moderasyon operasyonunu tamamla; 24 saat müdahale sözünü karşılayacak sorumlu ve kontrol yöntemi belirle.
+3. [ ] App Review sosyal/lig açıklamasını gerçek V1 davranışıyla eşleştir; açık genel ligi yokmuş gibi anlatma.
+4. [ ] AASA ve `assetlinks.json` dosyalarını yayınla; Apple Team ID, Android package ve production SHA-256 eşleşmesini cihazda doğrula.
+5. [ ] 1–4 Ekim tarihli son Supabase migration'larını canlı migration defteriyle yeniden karşılaştır; eksik migration varsa ayrı onayla uygula.
+6. [ ] Apple keywords alanını 100 UTF-8 byte altına indir; başlık/alt başlık tekrarlarını temizle.
+7. [ ] Demo hesabı oluştur, seed et ve Rota / Analiz / Yanlış Defteri / Profil akışlarını bu hesapla kontrol et.
+8. [ ] App Store ve Google Play screenshot'larını, Play Feature Graphic'i ve 512 × 512 Play listing icon'unu hazırla.
+9. [ ] App Store Connect ve Play Console beyanlarını doldur: yaş/UGC/sosyal özellikler, Privacy Labels, Data Safety, ücretsiz ve IAP/abonelik yok.
+10. [ ] Çalışma ağacını temizle; tüm release değişikliklerini pushlanmış ve SHA'sı kayıtlı tek bir committe sabitle.
+11. [ ] Güncel committen production `.ipa` ve `.aab` al.
+12. [ ] Final `.ipa` içindeki `Info.plist`, entitlement ve privacy manifestlerini; `.aab` içindeki `AndroidManifest.xml`, target SDK ve App Links yapılandırmasını incele.
+13. [ ] TestFlight ve Play Internal/Closed Test üzerinde gerçek cihaz kritik senaryo turunu tamamla.
+14. [ ] Demo bilgileri, mağaza metinleri, ekran görüntüleri ve inceleme notlarını son kez karşılaştırıp gönder.
+
 # Reviewer Notes taslağı
 
 ```text

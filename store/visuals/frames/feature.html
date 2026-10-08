@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Maraton feature graphic</title>
+<style>
+  @font-face { font-family: Bricolage; src: url(../../../assets/fonts/Bricolage_400.ttf); }
+  @font-face { font-family: Unbounded; src: url(../../../assets/fonts/Unbounded_600.ttf); font-weight: 600; }
+  @font-face { font-family: Archivo; src: url(../../../assets/fonts/Archivo_500.ttf); font-weight: 500; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1024px; height: 500px; overflow: hidden; background: #1C1C23; position: relative; color: #ECE8E4; }
+  .brand { position: absolute; left: 72px; top: 92px; display: flex; align-items: center; gap: 16px; }
+  .brand img { height: 30px; }
+  .brand span { font: 600 24px Unbounded; letter-spacing: .04em; }
+  h1 { position: absolute; left: 72px; top: 160px; font: 400 66px/1 Bricolage; letter-spacing: -.04em; }
+  h1 em { font-style: normal; color: #FF6A72; display: block; }
+  p { position: absolute; left: 74px; top: 316px; font: 500 21px Archivo; color: #B0ADB5; }
+  svg { position: absolute; left: 0; top: 0; }
+</style></head>
+<body>
+  <div class="brand"><img src="../../../assets/brand/mark.png" alt=""><span>MARATON</span></div>
+  <h1>Her gün<em>bir adım daha.</em></h1>
+  <p>YKS için günlük rota, deneme takibi ve net analizi.</p>
+  <svg width="1024" height="500" fill="none" stroke="#E5343F" stroke-width="4" stroke-linecap="round">
+    <path d="M660,410 C720,410 700,300 770,300 S820,220 880,200 S930,120 1040,110"/>
+    <circle cx="660" cy="410" r="9" fill="#1C1C23"/>
+    <circle cx="770" cy="300" r="9" fill="#1C1C23"/>
+    <circle cx="880" cy="200" r="12" fill="#FF6A72" stroke="#FF6A72"/>
+  </svg>
+</body></html>
