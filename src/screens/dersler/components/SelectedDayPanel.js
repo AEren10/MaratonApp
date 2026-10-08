@@ -30,6 +30,8 @@ export function SelectedDayPanel({ selectedDay, logs }) {
     selectedDay?.key && selectedDay.key >= todayTR() ? { date: selectedDay.key } : undefined,
   );
 
+  const hasAnyTime = displayLogs.some((l) => Boolean(l.time));
+
   return (
     <View style={s.wrap}>
       {isDraft ? (
@@ -72,6 +74,7 @@ export function SelectedDayPanel({ selectedDay, logs }) {
               isLast={i === displayLogs.length - 1}
               isDraft={isDraft}
               C={C}
+              showTime={hasAnyTime}
               onPress={openDetail}
               onOpenMenu={setMenuStop}
             />
@@ -79,8 +82,15 @@ export function SelectedDayPanel({ selectedDay, logs }) {
           {/* Ay gorunumundeki satirla ayni: kutusuz, arti + metin tek satir.
               Eski addButton/btnText stilleri kutu temizliginde silinmis ama
               kullanim kalmisti: arti ve metin alt alta, gri zeminde. */}
-          <Press haptic="tap" onPress={addTask} accessibilityRole="button" style={s.addRow}>
-            <Icon name="plus" size={16} color={C.accent} />
+          <Press
+            haptic="tap"
+            onPress={addTask}
+            accessibilityRole="button"
+            style={[s.addRow, hasAnyTime && { paddingLeft: 40 + STEP.s2 }]}
+          >
+            <View style={s.addIconBox}>
+              <Icon name="plus" size={16} color={C.accent} />
+            </View>
             <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.accentBright }]}>Bu güne durak ekle</Text>
           </Press>
         </View>
@@ -101,7 +111,8 @@ const s = StyleSheet.create({
   summaryRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: STEP.s2 },
   listWrap: { marginTop: STEP.s1 },
   emptyWrap: { marginTop: STEP.s1 },
-  addRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, minHeight: CONTROL.tapMin, marginTop: STEP.s1 },
+  addRow: { flexDirection: "row", alignItems: "center", gap: STEP.s2, minHeight: CONTROL.tapMin, marginTop: STEP.s1 },
+  addIconBox: { width: 16, alignItems: "center", justifyContent: "center" },
   linkRow: {
     flexDirection: "row",
     alignItems: "center",
