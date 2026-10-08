@@ -32,7 +32,7 @@ export function netChartSeries(trials, types = [], limit = NET_CHART_LIMIT) {
       && (!allowed.size || allowed.has(String(t.trialType || t.exam_type || "").toUpperCase())))
     .sort((a, b) => (a.date - b.date) || (createdTime(a.t) - createdTime(b.t)))
     .slice(-limit)
-    .map(({ date, net }) => ({ net, date, dateStr: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}` }));
+    .map(({ t, date, net }) => ({ trial: t, net, date, dateStr: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}` }));
 }
 
 /**
@@ -76,7 +76,7 @@ export function buildNetChart({ trials, types, forecast, target, minPoints = 2, 
   const proj = netChartProjection({ series, forecast, target });
   return {
     series,
-    stops: series.map((p) => ({ y: p.net, label: p.dateStr })),
+    stops: series.map((p) => ({ y: p.net, label: p.dateStr, trial: p.trial })),
     todayIndex: series.length - 1,
     xs: routeXs(series.length, proj.projection.length),
     ...proj,
