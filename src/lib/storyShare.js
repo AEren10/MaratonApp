@@ -6,6 +6,7 @@ import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
 
 import { STORY_SHARE, storyShareOutcome } from "../domain/share/storyShareOutcome";
+import { saveCapturedStoryToGallery } from "../domain/share/gallerySave";
 import {
   STORY_CAPTURE_SCALE, STORY_HEIGHT, STORY_WIDTH,
 } from "../domain/share/storySticker";
@@ -136,14 +137,15 @@ async function pasteboardFallback(base64) {
 export async function saveStoryToGallery(ref) {
   const uri = await capture(ref, "tmpfile");
   if (!uri) return STORY_SHARE.FAILED;
-  try {
-    const { granted } = await MediaLibrary.requestPermissionsAsync(true);
-    if (!granted) return STORY_SHARE.PERMISSION_DENIED;
-    await MediaLibrary.saveToLibraryAsync(uri);
-    return STORY_SHARE.SAVED;
-  } catch {
-    return STORY_SHARE.FAILED;
-  }
+  return saveCapturedStoryToGallery({
+    uri,
+    platform: Platform.OS,
+    platformVersion: Platform.Version,
+    requestWritePermission: () => MediaLibrary.requestPermissionsAsync(true),
+    // Expo 57'nin yeni API'si Android 11+'da scoped storage'a genis
+    // galeri okuma izni olmadan yazar. Android 10 ve altinda yazma izni gerekir.
+    createAsset: (localUri) => MediaLibrary.Asset.create(localUri),
+  });
 }
 
 /** Etiketi seffaf PNG olarak panoya kopyalar. */

@@ -29,10 +29,17 @@ test("profil fotografi tek kaynaktan: ayarlar ve ana sayfa ayni degeri okur", ()
 
 test("useAddWrong supports both camera and gallery picking", () => {
   assert.match(addWrongHookSource, /requestCameraPermissionsAsync/);
-  assert.match(addWrongHookSource, /requestMediaLibraryPermissionsAsync/);
+  assert.match(addWrongHookSource, /Platform\.OS === "ios"[\s\S]*requestMediaLibraryPermissionsAsync/);
   assert.match(addWrongHookSource, /launchCameraAsync/);
   assert.match(addWrongHookSource, /launchImageLibraryAsync/);
   assert.match(addWrongHookSource, /clearImage/);
+});
+
+test("Android gallery pickers rely on the system photo picker without read permission", () => {
+  assert.match(avatarHookSource, /Platform\.OS === "ios"[\s\S]*requestMediaLibraryPermissionsAsync/);
+  assert.match(avatarHookSource, /launchImageLibraryAsync/);
+  assert.match(addWrongHookSource, /Platform\.OS === "ios"[\s\S]*requestMediaLibraryPermissionsAsync/);
+  assert.match(addWrongHookSource, /launchImageLibraryAsync/);
 });
 
 test("PhotoCapture provides camera, gallery, and remove buttons", () => {

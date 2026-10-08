@@ -61,8 +61,10 @@ export function useAvatarUpload() {
 
   const pickFromGallery = async () => {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted) { showAlert("İzin gerekli", "Galeri erişimi için izin ver."); return; }
+      if (Platform.OS === "ios") {
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) { showAlert("İzin gerekli", "Galeri erişimi için izin ver."); return; }
+      }
       const res = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"], quality: 0.7, allowsEditing: true, aspect: [1, 1],
       });
