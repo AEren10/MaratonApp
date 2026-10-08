@@ -1,27 +1,20 @@
-import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { RouteLineChart } from "../../../components/charts/RouteLineChart";
 import { useC } from "../../../contexts/ThemeContext";
-import { makeScale, netTicks } from "../../../lib/routeChartPath";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { CHART_H, CHART_W, lineScaleOptions } from "../../../components/charts/chartStyle";
-
+import { CHART_H, CHART_W } from "../../../components/charts/chartStyle";
+import { useRouteChartPos } from "./useRouteChartPos";
 import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
-// RouteLineChart'in tuval olcusu ve olcek kurali (tek ortak olcek).
-// Etiketler RouteLineChart'in KENDI olcegiyle (scaleOptions) konumlanir;
-// ayri pad/yukseklik yazilinca BUGUN ve HEDEF dugumden birkac px kayiyordu.
+// Rota Detay grafigi: RouteLineChart + etiketler (NET, HEDEF, BUGUN, SINAV GUNU).
 const W = CHART_W;
 const TAG_W = 96;
 const DATE_W = 40;
-// Rota sayfasi en onemli ekran: cizgi acilista fark edilecek hizda cizilir.
 const DRAW_MS = 1600;
 
-// Rota Detay grafigi: paylasilan RouteLineChart + tasarimin etiketleri
-// (NET, HEDEF, BUGUN, SINAV GUNU · N, sinav tarihi). Etiket konumu grafigin
-// kendi olceginden hesaplanir; tuval genislige oturtulur ki ikisi ortussun.
-export function RouteDetailChart({ chart, target, examDateTag }) {
+export function RouteDetailChart({ chart, target, examDateTag, onSelectStop, selectedIndex }) {
   const C = useC();
   const [width, setWidth] = useState(0);
   const H = CHART_H;
@@ -31,32 +24,13 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
   const stops = chart?.stops || [];
   const projection = chart?.projection || [];
 
-  const pos = useMemo(() => {
-    if (!stops.length) {
-      return { today: { x: W / 2, y: H / 2 }, end: null, targetY: null, ticks: [], points: [] };
-    }
-    const values = stops.map((p) => (typeof p === "number" ? p : p?.y ?? 0));
-    const allValues = [...values, ...projection, ...(hasTarget ? [target] : [])];
-    const total = values.length + projection.length;
-    // Bolunmus eksen (netChartData.routeXs) grafikle ayni olcekten.
-    const sc = makeScale(allValues, lineScaleOptions({ flagged: hasTarget && projection.length > 0, xs: chart?.xs || null }));
-    const last = Math.max(0, values.length - 1);
-    const [todayPoint] = sc.toPoints([values[last]], { count: total, offset: last });
-    const points = sc.toPoints(values, { count: total });
-    const endValue = projection.length ? projection[projection.length - 1] : null;
-    const minVal = Math.min(...allValues);
-    const maxVal = Math.max(...allValues);
-    const tickVals = netTicks(minVal, maxVal);
-    const ticks = tickVals.map((v) => ({ val: v, y: sc.toY(v) }));
-
-    return {
-      today: { x: todayPoint?.x ?? W / 2, y: todayPoint?.y ?? H / 2 },
-      end: endValue != null ? { y: sc.toY(endValue) } : null,
-      targetY: hasTarget ? sc.toY(target) : null,
-      ticks,
-      points,
-    };
-  }, [stops, projection, hasTarget, target, H, chart?.xs]);
+  const pos = useRouteChartPos({
+    stops,
+    projection,
+    hasTarget,
+    target,
+    xs: chart?.xs,
+  });
 
   if (!stops.length) {
     return <RouteEmptyChart examDateTag={examDateTag} target={target} />;
@@ -81,15 +55,52 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
       ) : <View style={{ aspectRatio: W / H }} />}
       {width > 0 ? (
         <>
-          {/* Sol eksen sayilari kalkti (cizginin ustune biniyordu); her
-              denemenin tarihi kendi noktasinin TAM altinda. */}
+          {selectedIndex != null && pos.points[selectedIndex] ? (
+            <View
+              pointerEvents="none"
+              style={[
+                s.selectRing,
+                {
+                  left: pos.points[selectedIndex].x * k - 14,
+                  top: pos.points[selectedIndex].y * k - 14,
+                  borderColor: C.accentBright,
+                  backgroundColor: C.brandTint,
+                },
+              ]}
+            />
+          ) : null}
+
           {pos.points.map((p, i) => (
-            <Text
+            <Pressable
+              key={`pt-touch-${i}`}
+              onPress={() => onSelectStop?.(stops[i], i)}
+              hitSlop={8}
+              style={[s.touchNode, { left: p.x * k - 22, top: p.y * k - 22 }]}
+              accessibilityRole="button"
+              accessibilityLabel={`${stops[i]?.trial?.name || stops[i]?.label || "Deneme"}, net ${stops[i]?.y}`}
+            />
+          ))}
+
+          {pos.points.map((p, i) => (
+            <Pressable
               key={`d-${i}`}
-              style={[TYPOGRAPHY.micro, s.date, { left: Math.min(width - DATE_W, Math.max(0, p.x * k - DATE_W / 2)), top: H * k + 2, color: C.text3 }]}
+              onPress={() => onSelectStop?.(stops[i], i)}
+              hitSlop={4}
+              style={[
+                s.datePress,
+                { left: Math.min(width - DATE_W, Math.max(0, p.x * k - DATE_W / 2)), top: H * k + 2 },
+              ]}
             >
-              {stops[i]?.label || ""}
-            </Text>
+              <Text
+                style={[
+                  TYPOGRAPHY.micro,
+                  s.date,
+                  { color: selectedIndex === i ? C.accentBright : C.text3 },
+                ]}
+              >
+                {stops[i]?.label || ""}
+              </Text>
+            </Pressable>
           ))}
           {pos.targetY != null ? (
             <Text style={[...tag, s.targetTag, { top: pos.targetY * k - STEP.s3, color: C.targetLabel }]}>
@@ -122,10 +133,12 @@ export function RouteDetailChart({ chart, target, examDateTag }) {
 
 const s = StyleSheet.create({
   wrap: { position: "relative", paddingBottom: STEP.s3 + STEP.s2 },
-  date: { position: "absolute", width: DATE_W, textAlign: "center", fontVariant: ["tabular-nums"] },
+  datePress: { position: "absolute", width: DATE_W, alignItems: "center" },
+  date: { textAlign: "center", fontVariant: ["tabular-nums"] },
+  touchNode: { position: "absolute", width: 44, height: 44, borderRadius: 22, zIndex: 10 },
+  selectRing: { position: "absolute", width: 28, height: 28, borderRadius: 14, borderWidth: 2, zIndex: 5 },
   tag: { position: "absolute" },
   right: { right: STEP.s1 },
-  // Sagda hedef bayragi duruyor; etiket cizginin sol basinda (tasarim).
   targetTag: { left: 30 },
   center: { width: TAG_W, textAlign: "center" },
   bottom: { bottom: 0 },

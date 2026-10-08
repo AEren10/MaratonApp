@@ -68,6 +68,7 @@ export default function RoadmapScreen() {
                 targetNet={d.targetNet}
                 examDateTag={d.examDateTag}
                 declared={d.declared}
+                onOpenTrialDetail={(trial) => navigation.navigate(SCREENS.TRIAL_DETAIL, { trial, trialId: trial?.id, id: trial?.id })}
               />
 
               {/* Haftalik "N durak · M bitti" kutusu kalkti (kullanici, 3 Ekim):

@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials, selectTrialsLoading } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";
@@ -8,6 +8,7 @@ import { canAccessProductFeature } from "../domain/premium/paywallGate";
 import { PRODUCT_FEATURES } from "../constants/premium";
 import { useFeatureEntry } from "./useFeatureEntry";
 import { getSubjectLabel } from "../themes/subjects";
+import { getTrialPublishers } from "../supabase/productAccess";
 
 export const FREE_WINDOW_DAYS = 56; // "Son 8 hafta acik" (tasarim, AKIS 17)
 // Sekmeler kullanicinin sinavina gore: LGS'ciye AYT, YKS'liye LGS sekmesi
@@ -36,14 +37,64 @@ function branchExamPrefix(subjectKey) {
   return "";
 }
 
-function trialTitle(item, badge) {
-  const custom = item.title?.trim();
+export function getTrialPublisher(item, publisherMap) {
+  const p = item.publisherNameSnapshot || item.publisher_name_snapshot || item.publisher;
+  if (typeof p === "string" && p.trim()) return p.trim();
+  const pubId = item.publisherId || item.publisher_id;
+  if (pubId && publisherMap?.has(pubId)) {
+    return publisherMap.get(pubId);
+  }
+  return "";
+}
+
+export function getCustomTitle(item, badge, publisher) {
+  const raw = (item.title || item.name || "").trim();
+  if (!raw) return "";
+
+  const lower = raw.toLowerCase();
+  const pubLower = (publisher || "").toLowerCase();
+
+  if (pubLower && (lower === pubLower || lower === `${pubLower} denemesi`)) {
+    return "";
+  }
+
+  const genericExamNames = [
+    "tyt", "ayt", "lgs", "ydt",
+    "ayt say", "ayt ea", "ayt soz", "ayt söz",
+    "ayt_say", "ayt_ea", "ayt_soz",
+    "branch", "brans", "branş",
+    "deneme",
+    `${badge?.toLowerCase?.() || ""} denemesi`,
+    "branş denemesi", "brans denemesi",
+  ];
+  if (genericExamNames.includes(lower)) return "";
+
+  if (lower.endsWith(" branş") || lower.endsWith(" brans")) return "";
+  if (lower.endsWith(" denemesi")) {
+    const base = lower.replace(" denemesi", "").trim();
+    if (genericExamNames.includes(base)) return "";
+  }
+
+  return raw;
+}
+
+export function trialTitle(item, badge, publisherMap) {
+  const publisher = getTrialPublisher(item, publisherMap);
+  const custom = getCustomTitle(item, badge, publisher);
+
+  if (publisher) {
+    if (custom) return `${publisher} · ${custom}`;
+    return publisher;
+  }
+
   if (custom) return custom;
+
   if (item.trialType === "BRANCH") {
     const subject = item.branchSubjectName || getSubjectLabel(item.branchSubject);
     const prefix = branchExamPrefix(item.branchSubject);
     return subject ? `${[prefix, subject].filter(Boolean).join(" ")} Denemesi` : "Branş Denemesi";
   }
+
   return `${badge} Denemesi`;
 }
 
@@ -83,9 +134,26 @@ export function useTrialRecords() {
     [examType, trials],
   );
   const [filter, setFilter] = useState("ALL");
+  const [publishers, setPublishers] = useState([]);
   const { accessLoading, accessError, accessSnapshot } = usePremium();
   const { syncedOnce, error: syncError, refresh } = useSync();
   const { open: openHistoryGate } = useFeatureEntry(PRODUCT_FEATURES.trial_compare, "trial_history");
+
+  useEffect(() => {
+    let cancelled = false;
+    getTrialPublishers()
+      .then((rows) => { if (!cancelled) setPublishers(rows || []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const publisherMap = useMemo(() => {
+    const map = new Map();
+    (publishers || []).forEach((p) => {
+      if (p?.id && p?.name) map.set(p.id, p.name);
+    });
+    return map;
+  }, [publishers]);
 
   const readError = syncError?.sourceKeys?.includes("trials") ? syncError : null;
   const loading = Boolean(trialsLoading || accessLoading || (!syncedOnce && !readError));
@@ -150,7 +218,8 @@ export function useTrialRecords() {
         id: String(item.id ?? `${item.date}-${item.badge}`),
         trial: item,
         badge: item.badge,
-        title: trialTitle(item, item.badge),
+        title: trialTitle(item, item.badge, publisherMap),
+        publisher: getTrialPublisher(item, publisherMap) || null,
         dateLabel: formatDate(item.date),
         netLabel: formatNet(item.net),
         deltaLabel: formatDelta(item.delta),
@@ -163,7 +232,7 @@ export function useTrialRecords() {
       lockedCount: filtered.length - visible.length,
       totalCount: trials.length,
     };
-  }, [trials, filter, canAccessHistory]);
+  }, [trials, filter, canAccessHistory, publisherMap]);
 
   return {
     filter,

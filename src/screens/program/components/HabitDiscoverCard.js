@@ -37,7 +37,7 @@ export const HabitDiscoverCard = React.memo(function HabitDiscoverCard({ style }
         <Icon name="flame" size={16} color={C.accentBright} />
         <View style={s.textCol}>
           <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]} numberOfLines={1}>
-            Her gün paragraf & problem çöz
+            Her gün paragraf ve problem çöz
           </Text>
           <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>
             Günlük rutin · her sabah otomatik eklenir

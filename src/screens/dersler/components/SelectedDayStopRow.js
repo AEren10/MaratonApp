@@ -6,9 +6,9 @@ import { Press } from "../../../components/design/Press";
 import { TYPOGRAPHY, STEP, SHAPE, SPACING, CONTROL } from "../../../themes/tokens";
 import { subjectColorOf } from "../../../themes/subjectPalette";
 
-// Program > Hafta durak satiri. Kutusuz: saat · zaman cizgisi noktasi · konu.
-// Ay gorunumundeki DayPlannedRow ile ayni dil; saati olmayan durakta "—" yok.
-export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMenu }) {
+// Program > Hafta durak satiri. Kutusuz: zaman cizgisi noktasi · konu.
+// Listede saatli calisma kaydi varsa time sutunu aktiflesir, yoksa nokta en solda durur.
+export function SelectedDayStopRow({ log, isLast, isDraft, C, showTime, onPress, onOpenMenu }) {
   const isDone = log.status === "done" || log.completed;
   const dotColor = subjectColorOf(C, log.subjectKey || log.subjectLabel);
   const habit = log.source === "habit";
@@ -17,7 +17,9 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMen
 
   return (
     <Pressable onPress={onPress} disabled={!onPress} style={[s.row, (log.draft || isDraft) && s.draft]}>
-      <Text style={[TYPOGRAPHY.metaSemiBold, s.time, { color: C.text3 }]}>{log.time || ""}</Text>
+      {showTime ? (
+        <Text style={[TYPOGRAPHY.metaSemiBold, s.time, { color: C.text3 }]}>{log.time || ""}</Text>
+      ) : null}
 
       <View style={s.track}>
         <View style={[s.dot, { backgroundColor: isDone ? C.up : dotColor }]} />
@@ -55,12 +57,12 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, onPress, onOpenMen
 const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "stretch", gap: STEP.s2, minHeight: CONTROL.tapMin + STEP.s2 },
   draft: { opacity: 0.6 },
-  time: { width: 40, paddingTop: STEP.s1, fontVariant: ["tabular-nums"] },
-  track: { width: 10, alignItems: "center", paddingTop: STEP.s1 + 2 },
-  dot: { width: 8, height: 8, borderRadius: SHAPE.chip },
+  time: { width: 40, paddingTop: 10, fontVariant: ["tabular-nums"] },
+  track: { width: 16, alignItems: "center", paddingTop: 15 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
   line: { width: 1, flex: 1, marginTop: SPACING.xs },
   body: { flex: 1, paddingVertical: STEP.s1, paddingBottom: STEP.s2 },
-  done: { flexDirection: "row", alignItems: "center", gap: SPACING.xs, alignSelf: "flex-start", paddingTop: STEP.s1 },
-  tabular: { fontVariant: ["tabular-nums"], alignSelf: "flex-start", paddingTop: STEP.s1 },
+  done: { flexDirection: "row", alignItems: "center", gap: SPACING.xs, alignSelf: "flex-start", paddingTop: 10 },
+  tabular: { fontVariant: ["tabular-nums"], alignSelf: "flex-start", paddingTop: 10 },
   more: { width: CONTROL.tapMin, height: CONTROL.tapMin, marginRight: -STEP.s2, alignItems: "center", justifyContent: "center" },
 });

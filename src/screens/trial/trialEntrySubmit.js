@@ -86,8 +86,8 @@ export async function submitTrialEntry({
   });
   const trialDateISO = formatDateISO(trialDate);
   const field = getFieldFromType(trialType);
-  const durationValue = durationMinutes === "" || durationMinutes == null
-    ? null : Number(durationMinutes);
+  const durationValue =
+    durationMinutes === "" || durationMinutes == null ? null : Number(durationMinutes);
   const publisherSelection = normalizePublisherSelection({ publisherId, publisherName });
   const effectivePublisherId = publisherSelection.publisherId;
   const cleanedPublisherName = publisherSelection.publisherName;
@@ -110,6 +110,7 @@ export async function submitTrialEntry({
     id: Date.now().toString(),
     date: trialDateISO,
     name: trialName,
+    title,
     totalNet: netVal,
     subjects: subjectsMap,
     trialType,
@@ -117,6 +118,7 @@ export async function submitTrialEntry({
     branchSubject,
     publisherId: effectivePublisherId,
     publisherNameSnapshot: cleanedPublisherName || null,
+    publisher_name_snapshot: cleanedPublisherName || null,
     difficultyLevel,
     difficultyMultiplier: trialDifficultyMultiplier(difficultyLevel),
     durationMinutes: durationValue,
@@ -151,7 +153,10 @@ export async function submitTrialEntry({
       await bumpUsage?.("trial");
       showPaywall("trial_entry_limit");
     } else {
-      showAlert("Kaydedilemedi", "Deneme sonucu güvenle saklanamadı. Bağlantını kontrol edip yeniden dene.");
+      showAlert(
+        "Kaydedilemedi",
+        "Deneme sonucu güvenle saklanamadı. Bağlantını kontrol edip yeniden dene.",
+      );
     }
     return;
   }
