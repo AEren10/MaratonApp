@@ -33,10 +33,13 @@ export function rankGroupMembers(members = []) {
     .map((member) => ({
       ...member,
       weekly_questions: Number(member.weekly_questions ?? member.questions ?? 0) || 0,
+      weekly_minutes: Number(member.weekly_minutes ?? member.weeklyMinutes ?? member.minutes ?? 0) || 0,
+      trials: Number(member.trials ?? 0) || 0,
     }))
     .sort((a, b) => (
       b.weekly_questions - a.weekly_questions ||
-      String(a.joined_at || "").localeCompare(String(b.joined_at || "")) ||
+      b.weekly_minutes - a.weekly_minutes ||
+      b.trials - a.trials ||
       String(a.user_id || a.id || "").localeCompare(String(b.user_id || b.id || ""))
     ))
     .map((member, index) => ({ ...member, rank: index + 1 }));

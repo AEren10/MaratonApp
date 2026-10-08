@@ -19,13 +19,28 @@ test("weekStartIstanbul returns Monday date in Turkey week", () => {
   assert.equal(weekStartIstanbul("2026-09-14T01:00:00+03:00"), "2026-09-14");
 });
 
-test("rankGroupMembers sorts by weekly questions, not xp or net", () => {
+test("rankGroupMembers uses questions, minutes, trials and stable id — never xp", () => {
   const ranked = rankGroupMembers([
-    { user_id: "b", weekly_questions: 20, weekly_xp: 999, joined_at: "2026-09-12" },
-    { user_id: "a", weekly_questions: 40, weekly_xp: 1, joined_at: "2026-09-13" },
-    { user_id: "c", weekly_questions: 20, weekly_xp: 0, joined_at: "2026-09-10" },
+    { user_id: "zero-with-xp", weekly_questions: 0, weekly_minutes: 500, weekly_xp: 999 },
+    { user_id: "twenty-nine", weekly_questions: 29, weekly_minutes: 10, weekly_xp: 1 },
+    { user_id: "a-minute-low", weekly_questions: 20, weekly_minutes: 30, trials: 8 },
+    { user_id: "z-minute-high", weekly_questions: 20, weekly_minutes: 45, trials: 0 },
+    { user_id: "a-trial-low", weekly_questions: 10, weekly_minutes: 20, trials: 1 },
+    { user_id: "z-trial-high", weekly_questions: 10, weekly_minutes: 20, trials: 2 },
+    { user_id: "stable-b", weekly_questions: 5, weekly_minutes: 5, trials: 0 },
+    { user_id: "stable-a", weekly_questions: 5, weekly_minutes: 5, trials: 0 },
   ]);
-  assert.deepEqual(ranked.map((m) => [m.user_id, m.rank]), [["a", 1], ["c", 2], ["b", 3]]);
+  assert.deepEqual(ranked.map((m) => m.user_id), [
+    "twenty-nine",
+    "z-minute-high",
+    "a-minute-low",
+    "z-trial-high",
+    "a-trial-low",
+    "stable-a",
+    "stable-b",
+    "zero-with-xp",
+  ]);
+  assert.deepEqual(ranked.map((m) => m.rank), [1, 2, 3, 4, 5, 6, 7, 8]);
 });
 
 test("groupWeeklyGoalSummary computes shared question target progress", () => {
