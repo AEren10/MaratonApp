@@ -28,3 +28,13 @@ test("trial record badges use accent for exams and subject color for branch tria
   assert.match(row, /getSubjectBadge\(item\.trial\.branchSubjectName \|\| item\.trial\.branchSubject\)/);
   assert.match(row, /color: C\.accentBright/);
 });
+
+test("trial records prioritize publisher over generic exam title", () => {
+  assert.match(recordsHook, /getTrialPublisher/);
+  assert.match(recordsHook, /getCustomTitle/);
+  assert.match(recordsHook, /if \(publisher\) \{/);
+  assert.match(recordsHook, /\$\{publisher\} · \$\{custom\}/);
+  assert.match(recordsHook, /return publisher;/);
+  assert.match(recordsHook, /publisher: getTrialPublisher\(item, publisherMap\) \|\| null/);
+});
+

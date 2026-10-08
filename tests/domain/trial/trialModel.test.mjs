@@ -33,3 +33,14 @@ test("stored normalized net wins and all snapshot fields serialize", () => {
   assert.equal(row.normalization_confidence, "verified");
   assert.equal(TRIAL_DIFFICULTY.EASY.multiplier, 0.94);
 });
+
+test("normalizes name and title consistently for display", () => {
+  const trialFromName = normalizeTrial({ name: "3D TG 1", exam_type: "tyt" });
+  assert.equal(trialFromName.name, "3D TG 1");
+  assert.equal(trialFromName.title, "3D TG 1");
+
+  const trialFromTitle = normalizeTrial({ title: "Özdebir", exam_type: "ayt" });
+  assert.equal(trialFromTitle.name, "Özdebir");
+  assert.equal(trialFromTitle.title, "Özdebir");
+});
+

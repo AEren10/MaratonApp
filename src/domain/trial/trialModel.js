@@ -79,9 +79,12 @@ export function normalizeTrial(row = {}) {
   const confidence = row.normalizationConfidence
     ?? row.normalization_confidence ?? "self_reported";
   const durationMinutes = optionalNumber(row.durationMinutes ?? row.duration_minutes);
+  const name = row.name ?? row.title ?? null;
+  const title = row.title ?? row.name ?? null;
   return {
     ...row, date: row.date || row.trial_date,
     trial_date: row.trial_date || row.date,
+    name, title,
     totalNet: rawTotalNet, total_net: rawTotalNet,
     rawTotalNet, raw_total_net: rawTotalNet,
     normalizedTotalNet, normalized_total_net: normalizedTotalNet,

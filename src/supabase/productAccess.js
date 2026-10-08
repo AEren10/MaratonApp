@@ -13,7 +13,10 @@ export async function getProductAccessSnapshot() {
   }
 }
 
+let _cachedPublishers = null;
+
 export async function getTrialPublishers() {
+  if (_cachedPublishers) return _cachedPublishers;
   try {
     const { data, error } = await supabase
       .from("trial_publishers")
@@ -21,9 +24,11 @@ export async function getTrialPublishers() {
       .eq("active", true)
       .order("name");
     if (error) throw error;
-    return data || [];
+    _cachedPublishers = data || [];
+    return _cachedPublishers;
   } catch (error) {
     handleSupabaseError(error, "getTrialPublishers");
     throw error;
   }
 }
+

@@ -26,6 +26,7 @@ export async function submitTrialEntry({
   onSaved,
   reward,
   publisherId,
+  publishers,
   setSaving,
   showAlert,
   showPaywall,
@@ -101,16 +102,21 @@ export async function submitTrialEntry({
     return;
   }
 
+  const publisherName = publishers?.find((p) => p.id === publisherId)?.name || null;
+
   const localTrial = {
     id: Date.now().toString(),
     date: trialDateISO,
     name: trialName,
+    title,
     totalNet: netVal,
     subjects: subjectsMap,
     trialType,
     field,
     branchSubject,
     publisherId,
+    publisherNameSnapshot: publisherName,
+    publisher_name_snapshot: publisherName,
     difficultyLevel,
     difficultyMultiplier: trialDifficultyMultiplier(difficultyLevel),
     durationMinutes: durationValue,
@@ -131,6 +137,7 @@ export async function submitTrialEntry({
         total_net: netVal,
         mood,
         publisher_id: publisherId,
+        publisher_name_snapshot: publisherName,
         difficulty_level: difficultyLevel,
         duration_minutes: durationValue,
       },
