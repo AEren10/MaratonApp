@@ -8,7 +8,10 @@ import { handleSupabaseError } from "./handleError";
 function withRanks(rows, userId) {
   return rows.map((r, i) => ({
     ...r,
-    weekly_xp: r.weekly_xp || 0,
+    questions: Number(r.questions) || 0,
+    weekly_minutes: Number(r.weekly_minutes) || 0,
+    trials: Number(r.trials) || 0,
+    weekly_xp: Number(r.weekly_xp) || 0,
     rank: i + 1,
     you: r.user_id === userId,
   }));
@@ -25,7 +28,10 @@ export async function fetchGlobalTop(userId, limit = 50) {
 
   const list = (data || []).map((r) => ({
     ...r,
-    weekly_xp: r.weekly_xp || 0,
+    questions: Number(r.questions) || 0,
+    weekly_minutes: Number(r.weekly_minutes) || 0,
+    trials: Number(r.trials) || 0,
+    weekly_xp: Number(r.weekly_xp) || 0,
     rank: Number(r.rank) || 0,
     you: r.you ?? r.user_id === userId,
   }));
@@ -45,7 +51,7 @@ export async function fetchGlobalTop(userId, limit = 50) {
   return { list, total, myRank: mine?.rank ?? null, myScore: mine?.weekly_xp ?? 0 };
 }
 
-// Sadece arkadaşlar + kullanıcı, haftalık XP'ye göre sıralı.
+// Sadece arkadaşlar + kullanıcı; soru, dakika ve deneme eşitlik kuralıyla sıralı.
 export async function fetchFriendsLeague(userId) {
   try {
     if (!userId || typeof userId !== "string") throw new Error("Invalid userId");

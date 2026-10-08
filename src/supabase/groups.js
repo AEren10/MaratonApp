@@ -101,6 +101,7 @@ function normalizeGroup(row = {}) {
 function normalizeMember(row = {}) {
   const weeklyQuestions = Number(row.weekly_questions ?? row.questions ?? 0) || 0;
   const weeklyMinutes = Number(row.weekly_minutes ?? row.minutes ?? row.duration_minutes ?? 0) || 0;
+  const trials = Number(row.trials ?? 0) || 0;
   const name = row.display_name || row.name || "Öğrenci";
   return {
     user_id: row.user_id,
@@ -116,6 +117,7 @@ function normalizeMember(row = {}) {
     weekly_minutes: weeklyMinutes,
     weeklyMinutes,
     minutes: weeklyMinutes,
+    trials,
     weekly_xp: Number(row.weekly_xp ?? weeklyQuestions) || 0,
     rank: Number(row.rank) || 0,
     you: !!row.you,
