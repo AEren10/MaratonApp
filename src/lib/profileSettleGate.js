@@ -6,12 +6,10 @@
 // kullanici Kurulum Yarim yerine bastan Sinav Sec'te kaliyordu, cunku yiginin
 // ilk ekrani yalniz mount aninda okunuyor.
 //
-// Yerelde sinav ayari varsa beklenmez (cevrimdisi acilis aninda calisir).
-// Ag asiri yavassa kapi sure dolunca acilir: kimse yukleme ekraninda kalmaz.
-export const PROFILE_SETTLE_MAX_MS = 4000;
-
-export function isProfileSettling({ userId, profileReadyFor, examType, expiredFor }) {
-  if (!userId || examType) return false;
+// Yerel sinav ayari sunucu okumasinin yerine gecmez: eski cihaz verisiyle
+// yanlis yigina girmektense okuma hatasi acikca gosterilir ve tekrar denenir.
+export function isProfileSettling({ userId, profileReadyFor, profileLoadErrorFor }) {
+  if (!userId) return false;
   if (profileReadyFor === userId) return false;
-  return expiredFor !== userId;
+  return profileLoadErrorFor !== userId;
 }

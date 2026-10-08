@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectTrials, selectTrialsLoading } from "../store/slices/trialSlice";
 import { usePremium } from "../contexts/PremiumContext";

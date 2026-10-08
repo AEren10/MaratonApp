@@ -1,18 +1,7 @@
-import { useEffect, useState } from "react";
+import { isProfileSettling } from "../lib/profileSettleGate";
 
-import { isProfileSettling, PROFILE_SETTLE_MAX_MS } from "../lib/profileSettleGate";
-
-// Profil okumasi surerken true (bkz. lib/profileSettleGate). Sure dolunca
-// o kullanici icin kapi acilir.
-export function useProfileSettleGate({ userId, profileReadyFor, examType }) {
-  const [expiredFor, setExpiredFor] = useState(null);
-  const waiting = isProfileSettling({ userId, profileReadyFor, examType, expiredFor });
-
-  useEffect(() => {
-    if (!waiting) return undefined;
-    const timer = setTimeout(() => setExpiredFor(userId), PROFILE_SETTLE_MAX_MS);
-    return () => clearTimeout(timer);
-  }, [waiting, userId]);
-
-  return waiting;
+// Profil okumasi bitmeden ya da acik bir hata durumuna gecmeden kok yigin
+// secilmez. Bu sayede yavas ag yeni kullanici kurulumunu yanlislikla acmaz.
+export function useProfileSettleGate({ userId, profileReadyFor, profileLoadErrorFor }) {
+  return isProfileSettling({ userId, profileReadyFor, profileLoadErrorFor });
 }

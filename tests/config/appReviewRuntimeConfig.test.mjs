@@ -37,6 +37,11 @@ test("Expo plugins avoid duplicate native review surfaces", () => {
   assert.equal(pluginOptions(widgets).groupIdentifier, "group.com.ahmeterensiranli.maraton");
 });
 
+test("Android manifest blocks broad photo-library read permissions", () => {
+  assert.ok(expo.android.blockedPermissions.includes("android.permission.READ_MEDIA_IMAGES"));
+  assert.ok(expo.android.blockedPermissions.includes("android.permission.READ_MEDIA_VISUAL_USER_SELECTED"));
+});
+
 test("runtime app copy and links no longer point at the unused maraton.app domain", () => {
   const files = [
     "../../.env.example",

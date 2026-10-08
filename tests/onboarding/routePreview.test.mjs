@@ -32,6 +32,7 @@ test("register says 'rotan hazir' only after a real preview; setup skips exam ch
   assert.doesNotMatch(read("src/screens/auth/RegisterScreen.js"), /Rotan hazır/);
   assert.match(read("src/lib/routePreviewStore.js"), /return memory\s*\? "Rotan hazır/);
   assert.match(read("src/navigation/AppNavigator.js"), /intent === "register" \? SCREENS\.ROUTE_PREVIEW/);
-  assert.match(read("src/navigation/AppNavigator.js"), /fromPreview \? SCREENS\.GOAL_SETUP/);
+  assert.match(read("src/navigation/AppNavigator.js"), /setupStartScreen\(\{ fromPreview,/);
+  assert.match(read("src/domain/onboarding/setupStartScreen.js"), /fromPreview \? SCREENS\.GOAL_SETUP/);
   assert.match(read("src/hooks/useFinishOnboarding.js"), /clearPendingPreview\(\)/);
 });

@@ -23,10 +23,11 @@ function GoalsContent() {
   const navigation = useNavigation();
   const { examDate } = useExam();
   const {
-    isMulti, secondLabel, tytValue, decTyt, incTyt, aytValue, decAyt, incAyt,
-    aytMin, aytMax, value, dec, inc, save, cancel, saving, pendingNote,
+    isMulti, secondLabel, tytValue, decTyt, incTyt, changeTyt,
+    aytValue, decAyt, incAyt, changeAyt,
+    aytMin, aytMax, value, dec, inc, changeNet, save, cancel, saving, pendingNote,
     netLabel, currentNet, gapResult, examLabel, targetDepartment, min, max,
-    daily, decDaily, incDaily, dailyMin, dailyMax,
+    daily, decDaily, incDaily, changeDaily, dailyMin, dailyMax,
   } = useGoalNetEditor();
 
   const examDateLabel = examDate
@@ -55,15 +56,17 @@ function GoalsContent() {
             aytValue={aytValue}
             decTyt={decTyt}
             incTyt={incTyt}
+            onTytChange={changeTyt}
             decAyt={decAyt}
             incAyt={incAyt}
+            onAytChange={changeAyt}
             aytMin={aytMin}
             aytMax={aytMax}
           />
         ) : (
           <GoalNetStepper
             value={value} min={min} max={max} netLabel={netLabel}
-            currentNet={currentNet} onDec={dec} onInc={inc}
+            currentNet={currentNet} onChange={changeNet} onDec={dec} onInc={inc}
           />
         )}
 
@@ -82,8 +85,10 @@ function GoalsContent() {
           unit="soru · günde"
           label="günlük soru hedefini"
           currentNet={null}
+          onChange={changeDaily}
           onDec={decDaily}
           onInc={incDaily}
+          step={10}
         />
 
         <SettingsGroup title="Aynı ekrandan">

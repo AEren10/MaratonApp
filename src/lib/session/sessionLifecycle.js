@@ -3,6 +3,7 @@ import { unregisterPushToken } from "../../supabase/profiles";
 import { cancelAllScheduled } from "../notifications";
 import { resetLocalSession } from "./resetLocalSession";
 import { isUserSwitch } from "./sessionReset";
+import { clearPendingPreview } from "../routePreviewStore";
 
 // OTURUMUN SONU -- AuthContext'in cagirdigi uc yol burada toplanir ki
 // context yalniz durum tutsun.
@@ -32,6 +33,7 @@ export function createUserTracker(isBusy = () => false) {
 // girince token iki profilde birden duruyordu.
 export async function signOutUser(userId) {
   await cancelAllScheduled().catch(() => {});
+  await clearPendingPreview();
   if (userId) await unregisterPushToken(userId).catch(() => {});
   try { await supaSignOut(); } catch (_) {}
 }

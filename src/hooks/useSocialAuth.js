@@ -25,7 +25,12 @@ const GoogleSignin = null;
 export function useSocialAuth() {
   const [busy, setBusy] = useState(false);
 
-  const signInWithApple = useCallback(async () => {
+  const signInWithApple = useCallback(async ({ termsAccepted = false } = {}) => {
+    if (!termsAccepted) {
+      const error = new Error("Apple ile devam etmek için Kullanım Şartları ve Gizlilik Politikası onayı gerekli.");
+      error.code = "TERMS_REQUIRED";
+      throw error;
+    }
     setBusy(true);
     try {
       const rawNonce = Math.random().toString(36).slice(2) + Date.now().toString(36);

@@ -42,6 +42,8 @@ export const getProfile = async (userId) => {
 
 export const saveGamificationToSupabase = async (userId, stats, claimedMilestones) => {
   if (!userId || userId === "dev") return;
+  // Onboarding durumu profiles.onboarding_completed_at alaninin otoritesidir.
+  // Oyunlastirma kaydi yalniz kendi JSON alanini yazar.
   const payload = { ...(stats || {}), claimedMilestones: claimedMilestones || [] };
   const { error } = await supabase
     .from("profiles")
@@ -51,6 +53,14 @@ export const saveGamificationToSupabase = async (userId, stats, claimedMilestone
     handleSupabaseError(error, "saveGamificationToSupabase");
     throw error;
   }
+};
+
+export const completeOnboardingOnServer = async (userId) => {
+  if (!userId) throw new Error("userId is required");
+  const { data, error } = await supabase.rpc("complete_onboarding", { p_user: userId });
+  if (error) throw error;
+  invalidateMyProfileCache();
+  return data;
 };
 
 // Streak ödülü: gün sayısını ve hak edilip edilmediğini sunucu doğrular.

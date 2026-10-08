@@ -10,7 +10,7 @@ import { TrialTypeSelector } from "./TrialTypeSelector";
 
 // Deneme Gir 1/3: deneme turu, yayin ve zorluk.
 export function TrialEntryStep1({ form, styles, onNext }) {
-  const publisherName = form.publishers.find((p) => p.id === form.publisherId)?.name || null;
+  const publisherName = form.publisherLabel;
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll}
@@ -24,13 +24,15 @@ export function TrialEntryStep1({ form, styles, onNext }) {
         <Animated.View style={styles.section}>
           <Text style={styles.title}>Hangi denemeyi girdin?</Text>
           <Text style={styles.body}>
-            Yayını seç, zorluğunu sen işaretle. Netini o çarpanla normalize edip rotaya işleriz.
+            Yayını seç veya yaz, zorluğunu sen işaretle. Netini o çarpanla normalize edip rotaya işleriz.
           </Text>
         </Animated.View>
         <TrialNormalizationFields difficultyLevel={form.difficultyLevel}
           onDifficultyChange={form.handleDifficultyChange}
           onPublisherChange={form.handlePublisherChange}
-          publisherId={form.publisherId} publishers={form.publishers} />
+          onPublisherNameChange={form.handlePublisherNameChange}
+          publisherId={form.publisherId} publisherName={form.publisherName}
+          publishers={form.publishers} />
         <TrialDifficultyNote difficultyLevel={form.difficultyLevel} publisherName={publisherName} styles={styles} />
       </ScrollView>
         <TrialEntryFooter>

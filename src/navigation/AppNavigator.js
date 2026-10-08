@@ -34,6 +34,7 @@ import { usePostSetupLanding } from "../hooks/usePostSetupLanding";
 import { usePendingPreviewSetup } from "../hooks/usePendingPreviewSetup";
 import { consumeAuthIntent } from "../lib/authIntent";
 import { ROOT_GATE, resolveRootGate } from "./rootGate";
+import { setupStartScreen } from "../domain/onboarding/setupStartScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -170,10 +171,9 @@ function SetupStack() {
   // zaten ilerleme oldugunu varsayiyor.
   // Kayit oncesi rota onizlemesinden gelen yeni kullanici sinavi zaten secti:
   // kurulum dogrudan Hedef'ten baslar (usePendingPreviewSetup sinavi yazar).
-  const { examType } = useExam();
+  const { examType, dailyGoalSet, levelTestDone, setupCompleted } = useExam();
   const fromPreview = usePendingPreviewSetup();
-  const resuming = !!examType;
-  const initial = fromPreview ? SCREENS.GOAL_SETUP : resuming ? SCREENS.SETUP_INCOMPLETE : SCREENS.EXAM_SETUP;
+  const initial = setupStartScreen({ fromPreview, examType, dailyGoalSet, levelTestDone, setupCompleted });
   return (
     <Stack.Navigator
       screenOptions={screenOptions}
@@ -210,6 +210,7 @@ function SessionProviders({ children }) {
 }
 
 import { AppLaunchLoading } from "../components/common/AppLaunchLoading";
+import { ProfileLoadFailure } from "../components/common/ProfileLoadFailure";
 
 function Loading() {
   return <AppLaunchLoading />;
@@ -217,7 +218,10 @@ function Loading() {
 
 export default function AppNavigator() {
   const { session, loading, recoveryMode } = useAuth();
-  const { onboardingDone, hasSeenSlides, profileSettling, loading: examLoading } = useExam();
+  const {
+    onboardingDone, hasSeenSlides, profileSettling, profileLoadFailed,
+    retryProfileLoad, loading: examLoading,
+  } = useExam();
   const navigationTracker = useMemo(
     () => createNavigationTracker(track, { startSession: startAnalyticsSession }),
     [],
@@ -253,7 +257,8 @@ export default function AppNavigator() {
   // Kurtarma modu HER ŞEYDEN ÖNCE gelir: oturum kurulmuş olsa bile kullanıcı
   // önce yeni şifresini belirlemeli. Sira: navigation/rootGate.
   const gate = resolveRootGate({
-    recoveryMode, hasSeenSlides, hasSession: !!session, onboardingDone, profileSettling,
+    recoveryMode, hasSeenSlides, hasSession: !!session, onboardingDone,
+    profileSettling, profileLoadFailed,
   });
   if (gate === ROOT_GATE.RECOVERY) {
     content = <RecoveryStack />;
@@ -263,6 +268,8 @@ export default function AppNavigator() {
     content = <AuthStack />;
   } else if (gate === ROOT_GATE.PROFILE_LOADING) {
     content = <Loading />;
+  } else if (gate === ROOT_GATE.PROFILE_ERROR) {
+    content = <ProfileLoadFailure onRetry={retryProfileLoad} />;
   } else if (gate === ROOT_GATE.SETUP) {
     content = (
       <SessionProviders>

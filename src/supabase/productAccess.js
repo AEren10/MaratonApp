@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { handleSupabaseError } from "./handleError";
+import { visiblePublisherOptions } from "../domain/trial/publisherSelection";
 
 export async function getProductAccessSnapshot() {
   try {
@@ -24,11 +25,10 @@ export async function getTrialPublishers() {
       .eq("active", true)
       .order("name");
     if (error) throw error;
-    _cachedPublishers = data || [];
+    _cachedPublishers = visiblePublisherOptions(data || []);
     return _cachedPublishers;
   } catch (error) {
     handleSupabaseError(error, "getTrialPublishers");
     throw error;
   }
 }
-

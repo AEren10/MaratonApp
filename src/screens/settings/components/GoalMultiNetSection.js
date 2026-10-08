@@ -10,8 +10,10 @@ export function GoalMultiNetSection({
   aytValue,
   decTyt,
   incTyt,
+  onTytChange,
   decAyt,
   incAyt,
+  onAytChange,
   aytMin,
   aytMax,
 }) {
@@ -20,7 +22,7 @@ export function GoalMultiNetSection({
   return (
     <>
       <View style={styles.totalBadge}>
-        <Text style={[TYPOGRAPHY.label, { color: C.accentBright }]}>
+        <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.accentBright }]}>
           {`TOPLAM: ${value} NET (TYT: ${tytValue} + ${secondLabel}: ${aytValue})`}
         </Text>
       </View>
@@ -36,6 +38,7 @@ export function GoalMultiNetSection({
         label="TYT hedef netini"
         onDec={decTyt}
         onInc={incTyt}
+        onChange={onTytChange}
       />
 
       <Text style={[TYPOGRAPHY.label, styles.section, { color: C.text2 }]}>
@@ -49,6 +52,7 @@ export function GoalMultiNetSection({
         label={`${secondLabel} hedef netini`}
         onDec={decAyt}
         onInc={incAyt}
+        onChange={onAytChange}
       />
     </>
   );

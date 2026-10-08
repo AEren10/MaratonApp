@@ -10,12 +10,21 @@ import { useGamification } from "../../hooks/useGamification";
 import { buildTrialSubjectScores } from "../../domain/trial/trialEntryModel";
 import { getSubjectsForType, officialDurationForTrialType } from "../../domain/trial/trialTypes";
 import { wrongPenaltyForTrialType } from "../../domain/trial/trialModel";
+import {
+  MAX_PUBLISHER_NAME_LENGTH,
+  normalizePublisherSelection,
+  publisherLabel as resolvePublisherLabel,
+} from "../../domain/trial/publisherSelection";
 import { useAppDispatch } from "../../store/hooks";
 import { getRecentDays } from "./trialEntryDates";
 import { submitTrialEntry } from "./trialEntrySubmit";
 import * as H from "../../lib/haptics";
 import { getTrialPublishers } from "../../supabase/productAccess";
-import { loadTrialEntryDraft, saveTrialEntryDraft, clearTrialEntryDraft } from "../../lib/trialEntryDraft";
+import {
+  loadTrialEntryDraft,
+  saveTrialEntryDraft,
+  clearTrialEntryDraft,
+} from "../../lib/trialEntryDraft";
 
 export function useTrialEntryForm({ C, navigation }) {
   const dispatch = useAppDispatch();
@@ -27,7 +36,9 @@ export function useTrialEntryForm({ C, navigation }) {
   const accessReady = !accessLoading && !accessError;
   // Rotanin deneme onerisinden gelindiyse tur ve brans hazir gelir.
   const params = useRoute().params || {};
-  const [trialType, setTrialType] = useState(params.trialType || (userExamType === "lgs" ? "LGS" : "TYT"));
+  const [trialType, setTrialType] = useState(
+    params.trialType || (userExamType === "lgs" ? "LGS" : "TYT"),
+  );
   const [branchSubject, setBranchSubject] = useState(params.branchSubject || null);
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState({});
@@ -35,8 +46,11 @@ export function useTrialEntryForm({ C, navigation }) {
   const [title, setTitle] = useState("");
   const [publishers, setPublishers] = useState([]);
   const [publisherId, setPublisherId] = useState(null);
+  const [publisherName, setPublisherName] = useState("");
   const [difficultyLevel, setDifficultyLevel] = useState("standard");
-  const [durationMinutes, setDurationMinutes] = useState(() => String(officialDurationForTrialType(trialType) || ""));
+  const [durationMinutes, setDurationMinutes] = useState(() =>
+    String(officialDurationForTrialType(trialType) || ""),
+  );
   const [trialDate, setTrialDate] = useState(() => new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const recentDays = useMemo(() => getRecentDays(14), []);
@@ -56,47 +70,84 @@ export function useTrialEntryForm({ C, navigation }) {
   useEffect(() => {
     let cancelled = false;
     getTrialPublishers()
-      .then((rows) => { if (!cancelled) setPublishers(rows); })
+      .then((rows) => {
+        if (!cancelled) setPublishers(rows);
+      })
       .catch(() => {});
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    loadTrialEntryDraft(user?.id).then((draft) => {
-      if (cancelled || !draft) { setDraftReady(true); return; }
-      if (draft.trialType) setTrialType(draft.trialType);
-      if (draft.branchSubject !== undefined) setBranchSubject(draft.branchSubject);
-      if (draft.values) setValues(draft.values);
-      if (draft.mood !== undefined) setMood(draft.mood);
-      if (draft.title) setTitle(draft.title);
-      if (draft.publisherId !== undefined) setPublisherId(draft.publisherId);
-      if (draft.difficultyLevel) setDifficultyLevel(draft.difficultyLevel);
-      if (draft.durationMinutes !== undefined) setDurationMinutes(String(draft.durationMinutes || ""));
-      if (draft.trialDate) setTrialDate(new Date(draft.trialDate));
-      setDraftReady(true);
-    }).catch(() => setDraftReady(true));
-    return () => { cancelled = true; };
+    loadTrialEntryDraft(user?.id)
+      .then((draft) => {
+        if (cancelled || !draft) {
+          setDraftReady(true);
+          return;
+        }
+        if (draft.trialType) setTrialType(draft.trialType);
+        if (draft.branchSubject !== undefined) setBranchSubject(draft.branchSubject);
+        if (draft.values) setValues(draft.values);
+        if (draft.mood !== undefined) setMood(draft.mood);
+        if (draft.title) setTitle(draft.title);
+        if (draft.publisherId !== undefined || draft.publisherName !== undefined) {
+          const restoredPublisher = normalizePublisherSelection(draft);
+          setPublisherId(restoredPublisher.publisherId);
+          setPublisherName(restoredPublisher.publisherName);
+        }
+        if (draft.difficultyLevel) setDifficultyLevel(draft.difficultyLevel);
+        if (draft.durationMinutes !== undefined)
+          setDurationMinutes(String(draft.durationMinutes || ""));
+        if (draft.trialDate) setTrialDate(new Date(draft.trialDate));
+        setDraftReady(true);
+      })
+      .catch(() => setDraftReady(true));
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isDirty = useMemo(() => {
     const { hasAny } = buildTrialSubjectScores(subjects, values, wrongPenalty);
-    return hasAny || !!title.trim() || !!mood || !!publisherId;
-  }, [subjects, values, wrongPenalty, title, mood, publisherId]);
+    return hasAny || !!title.trim() || !!mood || !!publisherId || !!publisherName.trim();
+  }, [subjects, values, wrongPenalty, title, mood, publisherId, publisherName]);
 
   useEffect(() => {
     if (!draftReady) return;
     if (!isDirty) return;
     const timeout = setTimeout(() => {
       saveTrialEntryDraft(user?.id, {
-        trialType, branchSubject, values, mood, title, publisherId, difficultyLevel,
+        trialType,
+        branchSubject,
+        values,
+        mood,
+        title,
+        publisherId,
+        publisherName,
+        difficultyLevel,
         durationMinutes,
         trialDate: trialDate.toISOString(),
       });
     }, 500);
     return () => clearTimeout(timeout);
-  }, [draftReady, isDirty, user?.id, trialType, branchSubject, values, mood, title, publisherId, difficultyLevel, durationMinutes, trialDate]);
+  }, [
+    draftReady,
+    isDirty,
+    user?.id,
+    trialType,
+    branchSubject,
+    values,
+    mood,
+    title,
+    publisherId,
+    publisherName,
+    difficultyLevel,
+    durationMinutes,
+    trialDate,
+  ]);
 
   const clearDraft = useCallback(() => clearTrialEntryDraft(user?.id), [user?.id]);
 
@@ -107,48 +158,98 @@ export function useTrialEntryForm({ C, navigation }) {
       .toFixed(2);
   }, [subjects, values, wrongPenalty]);
 
-  const handleTypeChange = useCallback((newType) => {
-    H.select();
-    markFormDirty({ field: "trial_type", trialType: newType });
-    setTrialType(newType);
-    setValues({});
-    setDurationMinutes(String(officialDurationForTrialType(newType) || ""));
-    if (newType !== "BRANCH") setBranchSubject(null);
-  }, [markFormDirty]);
+  const handleTypeChange = useCallback(
+    (newType) => {
+      H.select();
+      markFormDirty({ field: "trial_type", trialType: newType });
+      setTrialType(newType);
+      setValues({});
+      setDurationMinutes(String(officialDurationForTrialType(newType) || ""));
+      if (newType !== "BRANCH") setBranchSubject(null);
+    },
+    [markFormDirty],
+  );
 
-  const handleBranchChange = useCallback((key) => {
-    H.select();
-    markFormDirty({ branchSubject: key, field: "branch_subject" });
-    setBranchSubject(key);
-    setValues({});
-  }, [markFormDirty]);
+  const handleBranchChange = useCallback(
+    (key) => {
+      H.select();
+      markFormDirty({ branchSubject: key, field: "branch_subject" });
+      setBranchSubject(key);
+      setValues({});
+    },
+    [markFormDirty],
+  );
 
-  const handleScoreChange = useCallback((key) => (value) => {
-    markFormDirty({ field: "subject_score", subject: key });
-    setValues((prev) => ({ ...prev, [key]: value }));
-  }, [markFormDirty]);
+  const handleScoreChange = useCallback(
+    (key) => (value) => {
+      markFormDirty({ field: "subject_score", subject: key });
+      setValues((prev) => ({ ...prev, [key]: value }));
+    },
+    [markFormDirty],
+  );
 
-  const handleDateChange = useCallback((date) => {
-    H.tap();
-    markFormDirty({ field: "trial_date" });
-    setTrialDate(date);
-    setShowDatePicker(false);
-  }, [markFormDirty]);
+  const handleDateChange = useCallback(
+    (date) => {
+      H.tap();
+      markFormDirty({ field: "trial_date" });
+      setTrialDate(date);
+      setShowDatePicker(false);
+    },
+    [markFormDirty],
+  );
 
-  const handleTitleChange = useCallback((value) => {
-    markFormDirty({ field: "title" });
-    setTitle(value);
-  }, [markFormDirty]);
+  const handleTitleChange = useCallback(
+    (value) => {
+      markFormDirty({ field: "title" });
+      setTitle(value);
+    },
+    [markFormDirty],
+  );
 
-  const handleDurationChange = useCallback((value) => {
-    markFormDirty({ field: "duration_minutes" });
-    setDurationMinutes(value.replace(/\D/g, "").slice(0, 3));
-  }, [markFormDirty]);
+  const handleDurationChange = useCallback(
+    (value) => {
+      markFormDirty({ field: "duration_minutes" });
+      setDurationMinutes(value.replace(/\D/g, "").slice(0, 3));
+    },
+    [markFormDirty],
+  );
 
-  const handleMoodChange = useCallback((value) => {
-    markFormDirty({ field: "mood" });
-    setMood(value);
-  }, [markFormDirty]);
+  const handleMoodChange = useCallback(
+    (value) => {
+      markFormDirty({ field: "mood" });
+      setMood(value);
+    },
+    [markFormDirty],
+  );
+
+  const handlePublisherChange = useCallback(
+    (value) => {
+      markFormDirty({ field: "publisher" });
+      setPublisherId(value);
+      setPublisherName("");
+    },
+    [markFormDirty],
+  );
+
+  const handlePublisherNameChange = useCallback(
+    (value) => {
+      markFormDirty({ field: "publisher_name" });
+      const next = value.slice(0, MAX_PUBLISHER_NAME_LENGTH);
+      setPublisherName(next);
+      if (next.trim()) setPublisherId(null);
+    },
+    [markFormDirty],
+  );
+
+  const publisherLabel = useMemo(
+    () =>
+      resolvePublisherLabel({
+        publisherId,
+        publisherName,
+        publishers,
+      }),
+    [publisherId, publisherName, publishers],
+  );
 
   const handleSave = useCallback(async () => {
     if (saving) return;
@@ -167,7 +268,7 @@ export function useTrialEntryForm({ C, navigation }) {
       onSaved: clearDraft,
       reward,
       publisherId,
-      publishers,
+      publisherName,
       setSaving,
       showAlert,
       showPaywall,
@@ -193,7 +294,7 @@ export function useTrialEntryForm({ C, navigation }) {
     mood,
     navigation,
     publisherId,
-    publishers,
+    publisherName,
     reward,
     saving,
     showAlert,
@@ -226,8 +327,11 @@ export function useTrialEntryForm({ C, navigation }) {
     difficultyLevel,
     handleDifficultyChange: setDifficultyLevel,
     handleDurationChange,
-    handlePublisherChange: setPublisherId,
+    handlePublisherChange,
+    handlePublisherNameChange,
     publisherId,
+    publisherLabel,
+    publisherName,
     publishers,
     recentDays,
     saving,

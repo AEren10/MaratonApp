@@ -24,6 +24,7 @@ export default function RouteReadyScreen() {
   const C = useC();
   const navigation = useNavigation();
   const [starting, setStarting] = useState(false);
+  const [going, setGoing] = useState(false);
   const { finish } = useFinishOnboarding();
   const showAlert = useAlert();
   const { daysUntilExam, targetNet, currentNet, stopCount, upcomingStops, firstStop, firstStopAction, createRoute } =
@@ -53,7 +54,13 @@ export default function RouteReadyScreen() {
     finishOnboarding(params ? { then: { screen: SCREENS.STUDY_TIMER, params } } : {}).catch(() => {});
   }, [createRoute, finishOnboarding, firstStopAction, showAlert]);
 
-  const handleGoHome = useCallback(() => finishOnboarding({}), [finishOnboarding]);
+  // Kurulumun bitisi sunucuya yazmayi bekliyor (1-2 sn); bu surede dugme sessiz
+  // kalinca kullanici ikinci kez basiyordu. Ilk basista kilitlenir, yazi degisir.
+  const handleGoHome = useCallback(() => {
+    if (going || starting) return;
+    setGoing(true);
+    finishOnboarding({}).catch(() => setGoing(false));
+  }, [finishOnboarding, going, starting]);
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
@@ -106,7 +113,7 @@ export default function RouteReadyScreen() {
       </ScrollView>
 
       <View style={[styles.cta, { borderTopColor: C.line }]}>
-        <Button onPress={handleStart} size="lg" fullWidth loading={starting} disabled={!firstStop}>
+        <Button onPress={handleStart} size="lg" fullWidth loading={starting} disabled={!firstStop || going}>
           İlk durağa başla
         </Button>
         {syncPendingNote ? (
@@ -120,7 +127,7 @@ export default function RouteReadyScreen() {
           accessibilityRole="button"
           accessibilityLabel="Ana sayfaya git"
         >
-          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>Ana sayfaya git</Text>
+          <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text2 }]}>{going ? "Ana sayfa açılıyor…" : "Ana sayfaya git"}</Text>
         </Press>
         <Text style={[TYPOGRAPHY.caption, styles.footnote, { color: C.text3 }]}>
           Rotanı her zaman değiştirebilirsin. Deneme girdikçe kendini de günceller.

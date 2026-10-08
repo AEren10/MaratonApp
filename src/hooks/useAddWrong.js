@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { Platform } from "react-native";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 
@@ -69,10 +70,12 @@ export function useAddWrong({ initialSubjectKey, onSaved } = {}) {
 
   const pick = useCallback(async (source) => {
     const camera = source === "camera";
-    const perm = camera
+    const permission = camera
       ? await ImagePicker.requestCameraPermissionsAsync()
-      : await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
+      : Platform.OS === "ios"
+        ? await ImagePicker.requestMediaLibraryPermissionsAsync()
+        : null;
+    if (permission && !permission.granted) {
       showAlert("İzin gerekli", camera ? "Kamera kullanmak için izin ver." : "Galeriden foto seçmek için izin ver.");
       return;
     }

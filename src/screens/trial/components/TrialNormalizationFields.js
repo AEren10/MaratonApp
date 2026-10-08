@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { useC } from "../../../contexts/ThemeContext";
-import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
+import { CONTROL, SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { MAX_PUBLISHER_NAME_LENGTH } from "../../../domain/trial/publisherSelection";
 import { TRIAL_DIFFICULTY_LEVELS } from "../trialDifficultyLevels";
 import { TrialEntryChip } from "./TrialEntryChip";
 import { TrialEntryRuleLabel } from "./TrialEntryRuleLabel";
@@ -30,7 +31,8 @@ function Level({ level, active, onPress }) {
 
 // YAYIN cipleri + SENCE NE KADAR ZORDU 2x2 izgarasi.
 export function TrialNormalizationFields({
-  difficultyLevel, onDifficultyChange, onPublisherChange, publisherId, publishers, enterDelay = 70,
+  difficultyLevel, onDifficultyChange, onPublisherChange, onPublisherNameChange,
+  publisherId, publisherName, publishers,
 }) {
   const C = useC();
   const pickPublisher = (id) => { H.select(); onPublisherChange(publisherId === id ? null : id); };
@@ -38,17 +40,35 @@ export function TrialNormalizationFields({
   const rows = [TRIAL_DIFFICULTY_LEVELS.slice(0, 2), TRIAL_DIFFICULTY_LEVELS.slice(2)];
   return (
     <>
-      {publishers.length ? (
-        <Animated.View style={styles.section}>
-          <TrialEntryRuleLabel>YAYIN</TrialEntryRuleLabel>
+      <Animated.View style={styles.section}>
+        <TrialEntryRuleLabel>YAYIN</TrialEntryRuleLabel>
+        {publishers.length ? (
           <View style={styles.chips}>
             {publishers.map((publisher) => (
               <TrialEntryChip key={publisher.id} label={publisher.name}
                 active={publisherId === publisher.id} onPress={() => pickPublisher(publisher.id)} />
             ))}
           </View>
-        </Animated.View>
-      ) : null}
+        ) : null}
+        <TextInput
+          accessibilityLabel="Yayın adı"
+          autoCapitalize="words"
+          autoCorrect={false}
+          clearButtonMode="while-editing"
+          maxLength={MAX_PUBLISHER_NAME_LENGTH}
+          onChangeText={onPublisherNameChange}
+          placeholder="Yayın adını yaz"
+          placeholderTextColor={C.text3}
+          returnKeyType="done"
+          selectionColor={C.accent}
+          value={publisherName}
+          style={[TYPOGRAPHY.inputMedium, styles.publisherInput, {
+            backgroundColor: C.void,
+            borderColor: publisherName.trim() ? C.selBorder : C.border,
+            color: C.text,
+          }]}
+        />
+      </Animated.View>
       <Animated.View style={styles.section}>
         <TrialEntryRuleLabel>SENCE NE KADAR ZORDU</TrialEntryRuleLabel>
         {rows.map((row, index) => (
@@ -70,6 +90,14 @@ export function TrialNormalizationFields({
 const styles = StyleSheet.create({
   section: { marginTop: STEP.s3 + 2 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s1 },
+  publisherInput: {
+    height: CONTROL.buttonTertiary,
+    borderRadius: SHAPE.button,
+    borderWidth: 1,
+    marginTop: STEP.s1,
+    paddingHorizontal: STEP.s2,
+    paddingVertical: 0,
+  },
   grid: { flexDirection: "row", gap: STEP.s1 },
   level: {
     flex: 1, minWidth: 0, height: 66, borderRadius: SHAPE.button, borderWidth: 1,

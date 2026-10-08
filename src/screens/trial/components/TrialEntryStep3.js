@@ -11,7 +11,7 @@ import { Press } from "../../../components/design/Press";
 
 export function TrialEntryStep3({ form, styles, onBack }) {
   const normalizedNet = Number(form.totalNet) * trialDifficultyMultiplier(form.difficultyLevel);
-  const publisherName = form.publishers?.find((p) => p.id === form.publisherId)?.name || null;
+  const publisherName = form.publisherLabel;
 
   const { subjectsMap } = useMemo(
     () => buildTrialSubjectScores(form.subjects, form.values, form.wrongPenalty),

@@ -1,18 +1,22 @@
 import { createContext, useContext, useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "./AuthContext";
-import { getProfile, updateProfile as updateProf } from "../supabase/profiles";
+import { completeOnboardingOnServer, updateProfile as updateProf } from "../supabase/profiles";
 import { updateExamConfig as syncExamConfig } from "../supabase/profiles";
 import { clearRouteWeeks } from "../supabase/routePlan";
 import { STORAGE_KEYS, userScopedKey } from "../constants/storageKeys";
-import { serverSetupDone } from "../domain/onboarding/serverSetupDone";
+import { serverExamChosen, serverGoalDone, serverSetupDone } from "../domain/onboarding/serverSetupDone";
 import * as appStorage from "../lib/storage/appStorage";
 import { rescheduleExamEveReminder } from "../lib/examDayPlanStore";
 import { useProfileSettleGate } from "../hooks/useProfileSettleGate";
+import { getProfileWithRetry } from "../lib/getProfileRetry";
+import { EVENTS } from "../constants/analytics";
+import { track } from "../lib/analytics";
 
 const ExamContext = createContext(null);
 
 const STORAGE_KEY = STORAGE_KEYS.EXAM_CONFIG;
 const SLIDES_KEY = STORAGE_KEYS.HAS_SEEN_ONBOARDING;
+const examConfigWriteQueues = new Map();
 
 function examConfigKey(userId) {
   return userScopedKey(STORAGE_KEY, userId);
@@ -97,10 +101,34 @@ async function retryPendingProfileSettingsSync(userId, local, isCancelled) {
   }
 }
 
+async function retryPendingOnboardingCompletion(userId, local, isCancelled) {
+  if (!userId || !local?.onboardingCompletionSyncPending) return;
+  try {
+    if (isCancelled()) return;
+    await completeOnboardingOnServer(userId);
+    if (isCancelled()) return;
+    await persistExamConfigPatch({
+      onboardingCompletionSyncPending: false,
+      onboardingServerConfirmed: true,
+    }, userId);
+  } catch {
+    // Sunucuya ulasilamadi: yerel tamamlanma korunur, sonraki acilista yeniden denenir.
+  }
+}
+
 async function persistExamConfigPatch(patch, userId = null) {
   const key = examConfigKey(userId);
-  const existing = await appStorage.getJson(key, {});
-  await appStorage.setJson(key, { ...existing, ...patch });
+  const previous = examConfigWriteQueues.get(key) || Promise.resolve();
+  const write = previous.catch(() => {}).then(async () => {
+    const existing = await appStorage.getJson(key, {});
+    await appStorage.setJson(key, { ...existing, ...patch });
+  });
+  examConfigWriteQueues.set(key, write);
+  try {
+    await write;
+  } finally {
+    if (examConfigWriteQueues.get(key) === write) examConfigWriteQueues.delete(key);
+  }
 }
 
 export function ExamProvider({ children }) {
@@ -130,7 +158,11 @@ export function ExamProvider({ children }) {
   // Profil okumasi hangi kullanici icin BITTI. Bitmeden kurulum yigini
   // acilirsa ikinci cihazdaki donen kullanici once Sinav Sec'i goruyordu.
   const [profileReadyFor, setProfileReadyFor] = useState(null);
+  const [profileLoadErrorFor, setProfileLoadErrorFor] = useState(null);
+  const [profileRetryNonce, setProfileRetryNonce] = useState(0);
+  const [localReadyFor, setLocalReadyFor] = useState(null);
   const dbLoadedFor = useRef(null);
+  const backgroundProfileRetry = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,13 +184,20 @@ export function ExamProvider({ children }) {
         setBaselineNet(d.baselineNet ?? null);
         if (d.dailyGoalSet || d.targetRanking) setDailyGoalSet(true);
         setLevelTestDone(!!d.levelTestDone || d.baselineNet != null);
-        setSetupCompleted(!!d.setupCompleted);
+        const completionPending = !!d.setupCompleted && !!d.onboardingCompletionSyncPending;
+        setSetupCompleted(!!d.onboardingServerConfirmed || completionPending);
         setSetupSkipped(!!d.setupSkipped);
       }
       setHasSeenSlides(seenRaw === "true");
     })
     .catch(() => {})
-    .finally(() => { clearTimeout(safety); if (!cancelled) setLoading(false); });
+    .finally(() => {
+      clearTimeout(safety);
+      if (!cancelled) {
+        setLocalReadyFor(userId);
+        setLoading(false);
+      }
+    });
     return () => { cancelled = true; };
   }, [storageKey, userId]);
 
@@ -166,6 +205,9 @@ export function ExamProvider({ children }) {
     if (!userId) {
       if (!session && !loading) {
         dbLoadedFor.current = null;
+        backgroundProfileRetry.current = false;
+        setProfileReadyFor(null);
+        setProfileLoadErrorFor(null);
         setExamType(null);
         setField(null);
         setExamDate(null);
@@ -184,20 +226,42 @@ export function ExamProvider({ children }) {
       }
       return;
     }
+    // Yerel yedek once uygulanir; aksi halde gec tamamlanan hydration,
+    // sunucunun onboarding_completed_at kararini sonradan ezebilir.
+    if (localReadyFor !== userId) return;
     if (dbLoadedFor.current === userId) return;
     dbLoadedFor.current = userId;
     setDbLoading(true);
+    const isBackgroundRetry = backgroundProfileRetry.current;
+    if (!isBackgroundRetry) setProfileLoadErrorFor(null);
 
     // Çıkış→giriş yarışı: A'nın profili logout'tan sonra resolve olursa
     // B'nin sınav tipi/hedef sıralaması A'nınkiyle eziliyor ve diske yazılıyor.
     // Effect session değişince yeniden çalıştığı için cleanup bunu keser.
     let cancelled = false;
     let finished = false;
+    let succeeded = false;
 
-    getProfile(userId).then(async (p) => {
+    getProfileWithRetry(userId).then(async (p) => {
       if (cancelled) return;
       const local = await appStorage.getJson(storageKey, {});
-      if (!p?.exam_type) {
+      if (cancelled) return;
+      const completionPending = !!local.setupCompleted && !!local.onboardingCompletionSyncPending;
+      const usingOfflineAppFallback = isBackgroundRetry && !!local.examType && (
+        !!local.onboardingServerConfirmed || completionPending || !!local.setupSkipped
+      );
+      if (usingOfflineAppFallback) {
+        const serverCompletionConfirmed = serverSetupDone(p);
+        await persistExamConfigPatch({ onboardingServerConfirmed: serverCompletionConfirmed }, userId)
+          .catch(() => {});
+        if (cancelled) return;
+        if (!completionPending) setSetupCompleted(serverCompletionConfirmed);
+        await retryPendingOnboardingCompletion(userId, local, () => cancelled);
+        succeeded = true;
+        return;
+      }
+      if (!serverExamChosen(p)) {
+        track(EVENTS.SETUP_PROFILE_EMPTY, { hasProfile: !!p, hasLocalExam: !!local?.examType, localSetupDone: !!local?.setupCompleted });
         if (local && !cancelled) {
           setExamType(local.examType);
           setField(local.field || null);
@@ -209,11 +273,20 @@ export function ExamProvider({ children }) {
           setTargetNetAYT(local.targetNetAYT ?? null);
           setBaselineNet(local.baselineNet ?? null);
           setLevelTestDone(!!local.levelTestDone || local.baselineNet != null);
-          setSetupCompleted(!!local.setupCompleted);
+          setSetupCompleted(completionPending);
           setSetupSkipped(!!local.setupSkipped);
         }
+        await persistExamConfigPatch({
+          setupCompleted: completionPending,
+          onboardingServerConfirmed: false,
+        }, userId).catch(() => {});
+        if (cancelled) return;
         await retryPendingNetSync(userId, local, () => cancelled);
+        if (cancelled) return;
         await retryPendingProfileSettingsSync(userId, local, () => cancelled);
+        if (cancelled) return;
+        await retryPendingOnboardingCompletion(userId, local, () => cancelled);
+        succeeded = true;
         return;
       }
       // Cozum sirasi: BEKLEYEN yerel yazim > sunucu > yerel yedek.
@@ -239,6 +312,7 @@ export function ExamProvider({ children }) {
       const examConfigPending = !!local.examConfigSyncPending && !!local.examType;
       const rankingPending = !!local.rankingSyncPending;
       const dailyGoalPending = !!local.dailyGoalSyncPending;
+      const serverCompletionConfirmed = serverSetupDone(p);
       const config = {
         examType: examConfigPending ? local.examType : p.exam_type,
         field: examConfigPending ? (local.field || null) : (p.field || null),
@@ -251,9 +325,9 @@ export function ExamProvider({ children }) {
         targetNetTYT: targetNetTYTValue,
         targetNetAYT: targetNetSecondValue,
         baselineNet: baselineNetValue,
-        dailyGoalSet: dailyGoalPending || !!p.daily_question_goal || !!p.target_ranking,
+        dailyGoalSet: dailyGoalPending || serverGoalDone(p),
         levelTestDone: !!local.levelTestDone || baselineNetValue != null,
-        setupCompleted: !!local.setupCompleted || serverSetupDone(p),
+        setupCompleted: completionPending || serverCompletionConfirmed,
       };
       setExamType(config.examType);
       setField(config.field);
@@ -268,8 +342,7 @@ export function ExamProvider({ children }) {
       setLevelTestDone(config.levelTestDone);
       setSetupCompleted(config.setupCompleted);
       setSetupSkipped(!!local.setupSkipped);
-      appStorage.setJson(storageKey, {
-        ...local,
+      await persistExamConfigPatch({
         examType: config.examType,
         field: config.field,
         examDate: config.examDate?.toISOString() || null,
@@ -281,7 +354,8 @@ export function ExamProvider({ children }) {
         dailyGoalSet: config.dailyGoalSet,
         levelTestDone: config.levelTestDone,
         setupCompleted: config.setupCompleted,
-      }).catch(() => {});
+        onboardingServerConfirmed: serverCompletionConfirmed,
+      }, userId).catch(() => {});
       // Sunucuda hic deger yoksa yerelden doldur (ilk kurulum / eski surum).
       const pending = {};
       if (p.target_net == null && local.targetNet != null) pending.target_net = Number(local.targetNet);
@@ -292,11 +366,29 @@ export function ExamProvider({ children }) {
         updateProf(userId, pending).catch(() => {});
       }
       // Bekleyen yazimlari yeniden dene. Basarili olursa bayrak dusuyor.
+      if (cancelled) return;
       await retryPendingNetSync(userId, local, () => cancelled);
+      if (cancelled) return;
       await retryPendingProfileSettingsSync(userId, local, () => cancelled);
-    }).catch(() => {}).finally(() => {
+      if (cancelled) return;
+      await retryPendingOnboardingCompletion(userId, local, () => cancelled);
+      succeeded = true;
+    }).catch((e) => {
+      track(EVENTS.SETUP_PROFILE_ERROR, { message: String(e?.message || e).slice(0, 120) });
+      if (!cancelled) {
+        dbLoadedFor.current = null;
+        setProfileLoadErrorFor(userId);
+      }
+    }).finally(() => {
       finished = true;
-      if (!cancelled) { setDbLoading(false); setProfileReadyFor(userId); }
+      if (!cancelled) {
+        setDbLoading(false);
+        if (succeeded) {
+          setProfileLoadErrorFor(null);
+          setProfileReadyFor(userId);
+        }
+        backgroundProfileRetry.current = false;
+      }
     });
 
     return () => {
@@ -305,7 +397,28 @@ export function ExamProvider({ children }) {
       // calisma yeniden okusun; yoksa profil hic uygulanmiyordu.
       if (!finished && dbLoadedFor.current === userId) dbLoadedFor.current = null;
     };
-  }, [loading, session, storageKey, userId]);
+  }, [loading, localReadyFor, profileRetryNonce, session, storageKey, userId]);
+
+  const retryProfileLoad = useCallback(() => {
+    if (!userId) return;
+    backgroundProfileRetry.current = false;
+    dbLoadedFor.current = null;
+    setProfileLoadErrorFor(null);
+    setProfileRetryNonce((value) => value + 1);
+  }, [userId]);
+
+  const retryProfileLoadInBackground = useCallback(() => {
+    if (!userId) return;
+    backgroundProfileRetry.current = true;
+    dbLoadedFor.current = null;
+    setProfileRetryNonce((value) => value + 1);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || profileLoadErrorFor !== userId) return undefined;
+    const timer = setTimeout(retryProfileLoadInBackground, 30_000);
+    return () => clearTimeout(timer);
+  }, [profileLoadErrorFor, profileRetryNonce, retryProfileLoadInBackground, userId]);
 
   const markSlidesAsSeen = useCallback(() => {
     setHasSeenSlides(true);
@@ -332,17 +445,12 @@ export function ExamProvider({ children }) {
       clearRouteWeeks(session.user.id, { exceptExamType: type }).catch(() => {});
     }
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(
-        storageKey,
-        {
-          ...existing,
-          examType: type,
-          field: selectedField || null,
-          examDate: date?.toISOString(),
-          examConfigSyncPending: false,
-        },
-      );
+      await persistExamConfigPatch({
+        examType: type,
+        field: selectedField || null,
+        examDate: date?.toISOString(),
+        examConfigSyncPending: false,
+      }, userId);
     } catch {}
     // Sinav gunu plani kayitliysa arife hatirlatmasi yeni tarihe tasinir.
     rescheduleExamEveReminder(session?.user?.id, date);
@@ -367,16 +475,16 @@ export function ExamProvider({ children }) {
       }
     }
     return { synced: false, offline: true };
-  }, [session, storageKey, targetRanking, targetDepartment, examType]);
+  }, [session, targetRanking, targetDepartment, examType, userId]);
 
   const updateGoal = useCallback(async (dailyQuestions) => {
     setDailyGoalSet(true);
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(
-        storageKey,
-        { ...existing, dailyGoalSet: true, dailyQuestionGoal: dailyQuestions, dailyGoalSyncPending: false },
-      );
+      await persistExamConfigPatch({
+        dailyGoalSet: true,
+        dailyQuestionGoal: dailyQuestions,
+        dailyGoalSyncPending: false,
+      }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
@@ -392,7 +500,7 @@ export function ExamProvider({ children }) {
       }
     }
     return { synced: false, offline: true };
-  }, [session, storageKey]);
+  }, [session, userId]);
 
   // Hedef net. Sunucu yazimi sessizce yutulMUYOR: basarisizsa yerelde kaliyor
   // ve bir sonraki profil okumasinda geri dolduruluyor (getProfile dalindaki
@@ -468,53 +576,49 @@ export function ExamProvider({ children }) {
   const markLevelTestDone = useCallback(async ({ skipped = false } = {}) => {
     setLevelTestDone(true);
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(
-        storageKey,
-        { ...existing, levelTestDone: true, levelTestSkipped: !!skipped },
-      );
+      await persistExamConfigPatch({ levelTestDone: true, levelTestSkipped: !!skipped }, userId);
     } catch {}
-  }, [storageKey]);
+  }, [userId]);
 
   const completeOnboarding = useCallback(async () => {
     setSetupCompleted(true);
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(storageKey, { ...existing, setupCompleted: true });
+      await persistExamConfigPatch({
+        setupCompleted: true,
+        onboardingCompletionSyncPending: true,
+      }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
-        const p = await getProfile(session.user.id).catch(() => null);
-        const currentStats = p?.gamification_stats || {};
-        await updateProf(session.user.id, {
-          gamification_stats: { ...currentStats, setup_completed: true },
-        });
-      } catch {}
+        await completeOnboardingOnServer(session.user.id);
+        await persistExamConfigPatch({
+          onboardingCompletionSyncPending: false,
+          onboardingServerConfirmed: true,
+        }, session.user.id);
+        return { synced: true };
+      } catch (error) {
+        return { synced: false, error };
+      }
     }
-  }, [session?.user?.id, storageKey]);
+    return { synced: false, offline: true };
+  }, [session?.user?.id, userId]);
 
   const skipSetup = useCallback(async () => {
     setSetupSkipped(true);
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(storageKey, { ...existing, setupSkipped: true });
+      await persistExamConfigPatch({ setupSkipped: true }, userId);
     } catch {}
-  }, [storageKey]);
+  }, [userId]);
 
   const updateRanking = useCallback(async (ranking, department) => {
     setTargetRanking(ranking);
     setTargetDepartment(department || null);
     try {
-      const existing = await appStorage.getJson(storageKey, {});
-      await appStorage.setJson(
-        storageKey,
-        {
-          ...existing,
-          targetRanking: ranking,
-          targetDepartment: department || null,
-          rankingSyncPending: false,
-        },
-      );
+      await persistExamConfigPatch({
+        targetRanking: ranking,
+        targetDepartment: department || null,
+        rankingSyncPending: false,
+      }, userId);
     } catch {}
     if (session?.user?.id) {
       try {
@@ -537,7 +641,7 @@ export function ExamProvider({ children }) {
       }
     }
     return { synced: false, offline: true };
-  }, [session, storageKey, examType, field, examDate]);
+  }, [session, examType, field, examDate, userId]);
 
   // Kurulumu ACIKCA bitirmis olmak baglayicidir.
   // setupCompleted tek basina yeterlidir; dailyGoalSet hedef ekraninda
@@ -554,12 +658,14 @@ export function ExamProvider({ children }) {
   }, [examDate]);
 
   const combinedLoading = loading;
-  const profileSettling = useProfileSettleGate({ userId, profileReadyFor, examType });
+  const profileSettling = useProfileSettleGate({ userId, profileReadyFor, profileLoadErrorFor });
+  const profileLoadFailed = !!userId && profileLoadErrorFor === userId;
 
   const value = useMemo(() => ({
     examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, loading: combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
+    profileLoadFailed, retryProfileLoad,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,
@@ -568,6 +674,7 @@ export function ExamProvider({ children }) {
   }), [examType, field, examDate, targetRanking, targetDepartment, targetNet,
     targetNetTYT, targetNetAYT, baselineNet,
     daysUntilExam, combinedLoading, onboardingDone, hasSeenSlides, profileSettling,
+    profileLoadFailed, retryProfileLoad,
     dailyGoalSet, levelTestDone, setupCompleted, setupSkipped,
     updateExamConfig, updateGoal, updateRanking, updateTargetNet, updateBaselineNet,
     markLevelTestDone, completeOnboarding, skipSetup,

@@ -109,7 +109,7 @@ Not: Net ve sıralama tahminleri senin girdiğin deneme sonuçlarına ve geçmi�
 
 Gizlilik: https://maratonapp.com/privacy
 Kullanım koşulları: https://maratonapp.com/terms
-Destek: destek@maratonapp.com
+Destek: destekmaraton@gmail.com
 ```
 
 2.059 karakter.
@@ -173,7 +173,7 @@ Reklam yok. Verilerini istediğin an indirebilir, hesabını uygulama içinden s
 Net ve sıralama tahminleri senin girdiğin sonuçlara dayanan yaklaşık hesaplardır; resmî sonuç yerine geçmez. Maraton, ÖSYM ya da MEB ile bağlantılı değildir.
 
 Gizlilik: https://maratonapp.com/privacy
-Destek: destek@maratonapp.com
+Destek: destekmaraton@gmail.com
 ```
 
 1.789 karakter.
@@ -183,7 +183,7 @@ Destek: destek@maratonapp.com
 | Alan | Değer |
 |---|---|
 | Kategori | Eğitim · Etiketler: Eğitim, Sınav hazırlığı, Verimlilik |
-| İletişim | `destek@maratonapp.com`, web sitesi, gizlilik URL'si |
+| İletişim | `destekmaraton@gmail.com`, web sitesi, gizlilik URL'si |
 | Hedef kitle | 13–15, 16–17, 18+ (**13 yaş altı işaretlenmez**; işaretlenirse Families politikası devreye girer) |
 | "Çocuklara hitap ediyor mu?" | Hayır |
 | Reklam | Hayır |
@@ -360,7 +360,7 @@ Apple'ın şartı dört öğe: **içerik filtresi + bildirme + engelleme + yayı
 | Filtre | Ad ve grup adı için küfür/uygunsuzluk filtresi bulunamadı (`src/validations`, `supabase/migrations` taraması) | Sunucuda `display_name` ve grup adı kontrolü (Türkçe kara liste) |
 | Bildirme | Profil fotoğrafı bildirimi var (`report_avatar`, 2 bildirimde otomatik kaldırma, `supabase/migrations/20261001150903_clde_avatar_reports.sql`) | **Ad** ve **grup adı** için bildir yok; Genel Lig ve grup üye satırında "Bildir" eksik |
 | Engelleme | Arkadaşlar ekranında var (`src/hooks/useFriends.js`) | Genel Lig ve grup üyesi satırından engelleme yok |
-| İletişim | Ayarlar > Yardım `destek@maratonapp.com` | `web/terms.html` içine "uygunsuz içeriğe sıfır tolerans; bildirimler 24 saatte incelenir; ihlalde hesap kapatılır" maddesi |
+| İletişim | Ayarlar > Yardım `destekmaraton@gmail.com` | `web/terms.html` içine "uygunsuz içeriğe sıfır tolerans; bildirimler 24 saatte incelenir; ihlalde hesap kapatılır" maddesi |
 
 **Lansman sabahı için iki yol:**
 - **(a) Hızlı ve güvenli:** v1'de Genel Lig sekmesini gizle. Arkadaş ve grup yalnız davet koduyla tanışılan kişileri gösterdiği için risk düşer. Kalan eksik: ad bildirme + terms maddesi.

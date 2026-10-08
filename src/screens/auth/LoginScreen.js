@@ -12,6 +12,7 @@ import { useExam } from "../../contexts/ExamContext";
 import { TYPOGRAPHY, STEP, GUTTER, NAV_ICON } from "../../themes/tokens";
 import { AuthInput } from "./components/AuthInput";
 import { SocialAuthButtons } from "./components/SocialAuthButtons";
+import { TermsCheckbox } from "./components/TermsCheckbox";
 import { useAlert } from "../../contexts/AlertContext";
 import * as H from "../../lib/haptics";
 import { loginSchema, validate } from "../../validations/auth";
@@ -28,6 +29,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [appleTermsAccepted, setAppleTermsAccepted] = useState(false);
   const [errors, setErrors] = useState({});
 
   const submit = async () => {
@@ -110,7 +112,18 @@ export default function LoginScreen() {
                   <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 2 }]}>VEYA</Text>
                   <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
                 </View>
-                <SocialAuthButtons />
+                <TermsCheckbox
+                  checked={appleTermsAccepted}
+                  onToggle={() => setAppleTermsAccepted((value) => !value)}
+                  onOpenTerms={() => navigation.navigate(SCREENS.TERMS)}
+                  onOpenPrivacy={() => navigation.navigate(SCREENS.PRIVACY)}
+                />
+                <View style={{ marginTop: STEP.s2 }}>
+                  <SocialAuthButtons
+                    termsAccepted={appleTermsAccepted}
+                    onTermsRequired={() => showAlert("Onay gerekli", "Apple ile devam etmek için Kullanım Şartları ve Gizlilik Politikası'nı onaylamalısın.")}
+                  />
+                </View>
               </>
             ) : null}
 

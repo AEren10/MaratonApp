@@ -83,7 +83,7 @@ export default function SettingsScreen() {
             <SettingsRow label="Gizlilik" onPress={vm.go(SCREENS.PRIVACY)} />
             <SettingsRow label="Kullanım koşulları" onPress={vm.go(SCREENS.TERMS)} />
             <SettingsRow label="Hakkında" onPress={vm.go(SCREENS.ABOUT)} />
-            <SettingsRow label="Yardım" hint="destek@maratonapp.com" onPress={vm.handleHelp} />
+            <SettingsRow label="Yardım" hint="destekmaraton@gmail.com" onPress={vm.handleHelp} />
           </SettingsGroup>
         </Animated.View>
 

@@ -26,7 +26,7 @@ function AppleIcon({ size = 18 }) {
   );
 }
 
-export function SocialAuthButtons() {
+export function SocialAuthButtons({ termsAccepted = false, onTermsRequired }) {
   const C = useC();
   const showAlert = useAlert();
   const { signInWithApple, signInWithGoogle, busy, googleAvailable } = useSocialAuth();
@@ -44,10 +44,14 @@ export function SocialAuthButtons() {
 
   const handleApple = async () => {
     try {
-      await signInWithApple();
+      await signInWithApple({ termsAccepted });
       H.success();
     } catch (err) {
       if (err.code === "ERR_REQUEST_CANCELED") return;
+      if (err.code === "TERMS_REQUIRED") {
+        onTermsRequired?.();
+        return;
+      }
       H.error();
       showAlert("Apple ile giriş başarısız", err.message ?? "Bir sorun oldu");
     }

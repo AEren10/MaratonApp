@@ -38,7 +38,9 @@ test("share card preview keeps controls outside the captured story card", () => 
 
 test("gallery save keeps write-only photo permission", () => {
   assert.match(storyShare, /MediaLibrary\.requestPermissionsAsync\(true\)/);
-  assert.match(storyShare, /return STORY_SHARE\.PERMISSION_DENIED/);
+  assert.match(storyShare, /platformVersion: Platform\.Version/);
+  assert.match(storyShare, /MediaLibrary\.Asset\.create\(localUri\)/);
+  assert.doesNotMatch(storyShare, /MediaLibrary\.saveToLibraryAsync/);
   assert.match(actions, /outcome === STORY_SHARE\.PERMISSION_DENIED/);
   assert.match(actions, /story_gallery_save_failed/);
 });

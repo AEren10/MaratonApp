@@ -24,7 +24,7 @@ Bu dosyanın düzeni:
 - [x] Widget App Group hedefi: `group.com.ahmeterensiranli.maraton`
 - [x] Widget extension bundle ID: `com.ahmeterensiranli.maraton.ExpoWidgetsTarget`
 - [x] Kullanılacak canlı domain: `maratonapp.com`
-- [x] Kullanılacak destek e-postası: `destek@maratonapp.com`
+- [x] Kullanılacak destek e-postası: `destekmaraton@gmail.com`
 - [x] Test durumu güncel: `npm test` 853/853 başarılı.
 - [x] Repo genel kontrolü: `npm run check` başarılı.
 - [x] Çözülmemiş merge conflict marker yok.
@@ -38,7 +38,7 @@ Bu dosyanın düzeni:
 - [x] `/support` sayfası hazırlandı.
 - [x] `/delete-account` için web login zorunlu olmadığı kararı netleştirildi.
 - [x] Hesap silme sayfası, uygulama içi silme yolunu ve destek e-postasına talep göndermeyi anlatacak şekilde planlandı.
-- [x] Destek adresi metinlerde `destek@maratonapp.com` olarak güncellendi.
+- [x] Destek adresi metinlerde `destekmaraton@gmail.com` olarak güncellendi.
 
 ## 3. Kimlikler ve platform eşleşmeleri
 
@@ -139,7 +139,7 @@ Bu dosyanın düzeni:
 - [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/support`
 - [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/apple-app-site-association`
 - [ ] Canlı sitede tekrar doğrula: `https://maratonapp.com/.well-known/assetlinks.json`
-- [ ] `destek@maratonapp.com` gelen/giden mail testi yap.
+- [ ] `destekmaraton@gmail.com` gelen/giden mail testi yap.
 - [ ] Footer veya sitedeki görünür linklerden legal sayfalara ulaşım tekrar kontrol et.
 
 ## 3. Apple / Google / Supabase kimlik kontrolleri
@@ -229,8 +229,8 @@ Final `.ipa` ve `.aab`, ilk sekiz madde bitmeden alınmayacak.
 Maraton, YKS öğrencileri için günlük çalışma planı, deneme takibi ve yanlış tekrar uygulamasıdır.
 
 Demo hesap:
-E-posta: [DEMO_EMAIL]
-Şifre: [DEMO_PASSWORD]
+E-posta: demo@gmail.com
+Şifre: demo12345
 
 Bu hesap gerçek kullanıcı değildir; App Review için örnek çalışma verisiyle hazırlanmıştır.
 
@@ -247,7 +247,7 @@ Kamera ve fotoğraf izinleri yalnızca yanlış soru fotoğrafı, avatar ve payl
 
 Version 1.0'da ücretli özellik, uygulama içi satın alma, abonelik veya kart ödeme bulunmamaktadır.
 
-Sosyal yüzey yalnızca davet koduyla tanışılan kişilerle sınırlıdır: Profil → Birlikte ekranında çalışma grupları (6 haneli davet koduyla katılım, haftalık soru sıralaması) ve arkadaşlar. Herkese açık lig, mesajlaşma ve anonim topluluk soru-cevap bu sürümde YOKTUR. Netler/deneme sonuçları diğer kullanıcılara gösterilmez. Uygunsuz profil fotoğrafı avatara dokunup "Bildir" ile bildirilebilir; kullanıcılar Arkadaşlar ekranından engellenebilir; kullanım koşullarında sıfır tolerans maddesi ve destek@maratonapp.com iletişim adresi bulunur. Premium akışları bu sürümde kapalıdır.
+Sosyal yüzey yalnızca davet koduyla tanışılan kişilerle sınırlıdır: Profil → Birlikte ekranında çalışma grupları (6 haneli davet koduyla katılım, haftalık soru sıralaması) ve arkadaşlar. Herkese açık lig, mesajlaşma ve anonim topluluk soru-cevap bu sürümde YOKTUR. Netler/deneme sonuçları diğer kullanıcılara gösterilmez. Uygunsuz profil fotoğrafı avatara dokunup "Bildir" ile bildirilebilir; kullanıcılar Arkadaşlar ekranından engellenebilir; kullanım koşullarında sıfır tolerans maddesi ve destekmaraton@gmail.com iletişim adresi bulunur. Premium akışları bu sürümde kapalıdır.
 
 Hesap silme: Profil → Ayarlar → Hesabı Sil.
 ```

@@ -28,11 +28,20 @@ export function netChartSeries(trials, types = [], limit = NET_CHART_LIMIT) {
   const allowed = new Set((types || []).map((t) => String(t).toUpperCase()));
   return (trials || [])
     .map((t) => ({ t, date: new Date(t?.date || t?.trial_date), net: forecastNetValue(t || {}) }))
-    .filter(({ t, date, net }) => net != null && Number.isFinite(date.getTime())
-      && (!allowed.size || allowed.has(String(t.trialType || t.exam_type || "").toUpperCase())))
-    .sort((a, b) => (a.date - b.date) || (createdTime(a.t) - createdTime(b.t)))
+    .filter(
+      ({ t, date, net }) =>
+        net != null &&
+        Number.isFinite(date.getTime()) &&
+        (!allowed.size || allowed.has(String(t.trialType || t.exam_type || "").toUpperCase())),
+    )
+    .sort((a, b) => a.date - b.date || createdTime(a.t) - createdTime(b.t))
     .slice(-limit)
-    .map(({ t, date, net }) => ({ trial: t, net, date, dateStr: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}` }));
+    .map(({ t, date, net }) => ({
+      trial: t,
+      net,
+      date,
+      dateStr: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}`,
+    }));
 }
 
 /**
@@ -41,8 +50,13 @@ export function netChartSeries(trials, types = [], limit = NET_CHART_LIMIT) {
  */
 export function routeXs(pastCount, futureCount, pastShare = PAST_SHARE) {
   const share = futureCount > 0 ? pastShare : 1;
-  const past = Array.from({ length: pastCount }, (_, i) => (pastCount > 1 ? (share * i) / (pastCount - 1) : 0));
-  const future = Array.from({ length: futureCount }, (_, j) => share + ((1 - share) * (j + 1)) / futureCount);
+  const past = Array.from({ length: pastCount }, (_, i) =>
+    pastCount > 1 ? (share * i) / (pastCount - 1) : 0,
+  );
+  const future = Array.from(
+    { length: futureCount },
+    (_, j) => share + ((1 - share) * (j + 1)) / futureCount,
+  );
   return [...past, ...future].map((x) => Math.round(x * 1e4) / 1e4);
 }
 
@@ -53,24 +67,42 @@ export function routeXs(pastCount, futureCount, pastShare = PAST_SHARE) {
 export function netChartProjection({ series, forecast, target }) {
   const lastNet = series[series.length - 1]?.net;
   const projected = forecast?.projected;
-  const plausible = Number.isFinite(projected) && projected > 0
-    && (!Number.isFinite(lastNet) || projected >= lastNet * 0.5);
+  const plausible =
+    Number.isFinite(projected) &&
+    projected > 0 &&
+    (!Number.isFinite(lastNet) || projected >= lastNet * 0.5);
   if (plausible) {
     return {
       mode: "forecast",
       projection: [projected],
-      band: { upper: [forecast.range?.high ?? projected], lower: [forecast.range?.low ?? projected] },
+      band: {
+        upper: [forecast.range?.high ?? projected],
+        lower: [forecast.range?.low ?? projected],
+      },
       endLabel: `TAHMİN ${Math.round(projected)}`,
       projectedNet: Math.round(projected),
     };
   }
   if (Number.isFinite(target) && target > 0) {
-    return { mode: "target", projection: [target], band: undefined, endLabel: `HEDEF ${Math.round(target)}`, projectedNet: null };
+    return {
+      mode: "target",
+      projection: [target],
+      band: undefined,
+      endLabel: `HEDEF ${Math.round(target)}`,
+      projectedNet: null,
+    };
   }
   return { mode: "none", projection: [], band: undefined, endLabel: null, projectedNet: null };
 }
 
-export function buildNetChart({ trials, types, forecast, target, minPoints = 2, limit = NET_CHART_LIMIT }) {
+export function buildNetChart({
+  trials,
+  types,
+  forecast,
+  target,
+  minPoints = 2,
+  limit = NET_CHART_LIMIT,
+}) {
   const series = netChartSeries(trials, types, limit);
   if (series.length < minPoints) return null;
   const proj = netChartProjection({ series, forecast, target });
