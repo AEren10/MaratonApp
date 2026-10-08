@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Icon, StatBlock } from "../../../components/design";
+import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, SHAPE } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Press } from "../../../components/design/Press";
+import { GoalSlider } from "../../onboarding/components/GoalSlider";
+import { GoalValueInput } from "./GoalValueInput";
 
 // Tasarim: "Hedef Duzenle" — eksi/artı 52x52 kutular + ortada buyuk sayi,
 // altinda min/su-an/max ile ilerleme cubugu.
@@ -11,10 +14,12 @@ import { Press } from "../../../components/design/Press";
 // `unit` ve `label` disaridan geliyor ki erisilebilirlik etiketi "hedef
 // net" demeye devam etmesin.
 export function GoalNetStepper({
-  value, min, max, netLabel, unit, label = "hedef neti", currentNet, currentLabel, onDec, onInc,
+  value, min, max, netLabel, unit, label = "hedef neti", currentNet, currentLabel,
+  onChange, onDec, onInc, step = 1,
 }) {
   const C = useC();
-  const pct = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  const [trackWidth, setTrackWidth] = useState(0);
+  const valueUnit = unit ?? `net · ${netLabel}`;
 
   return (
     <View style={styles.wrap}>
@@ -29,7 +34,10 @@ export function GoalNetStepper({
         </Press>
 
         <View style={styles.center}>
-          <StatBlock value={value} unit={unit ?? `net · ${netLabel}`} size="page" align="center" />
+          <GoalValueInput
+            value={value} unit={valueUnit} label={label}
+            min={min} max={max} step={step} onChange={onChange}
+          />
         </View>
 
         <Press haptic="none"
@@ -42,10 +50,13 @@ export function GoalNetStepper({
         </Press>
       </View>
 
-      <View style={styles.track}>
-        <View style={[styles.trackBg, { backgroundColor: C.elev }]}>
-          <View style={[styles.trackFill, { width: `${pct * 100}%`, backgroundColor: C.text }]} />
-        </View>
+      <View style={styles.track} onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}>
+        <GoalSlider
+          value={value} onChange={onChange} C={C} trackWidth={trackWidth}
+          min={min} max={max} step={step} accessibilityLabel={`${label} sürgüsü`}
+          fillColor={C.text} trackColor={C.elev}
+          thumbHalfSize={SHAPE.chip} thumbCornerRadius={SHAPE.chip}
+        />
         <View style={styles.rangeRow}>
           <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>{min}</Text>
           {currentNet != null ? (
@@ -69,7 +80,5 @@ const styles = StyleSheet.create({
   },
   center: { flex: 1, alignItems: "center" },
   track: { marginTop: STEP.s3 },
-  trackBg: { height: 6, borderRadius: 3, overflow: "hidden" },
-  trackFill: { height: 6, borderRadius: 3 },
   rangeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: STEP.s1 + 2 },
 });

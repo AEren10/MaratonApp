@@ -91,6 +91,10 @@ export function useGoalNetEditor() {
   const incAyt = useCallback(() => touch(() => setAytValue((v) => Math.min(aytMax, v + 1))), [aytMax]);
   const dec = useCallback(() => touch(() => setValue((v) => Math.max(TARGET_NET_MIN, v - 1))), []);
   const inc = useCallback(() => touch(() => setValue((v) => Math.min(TARGET_NET_MAX, v + 1))), []);
+  const changeTyt = useCallback((next) => { setNetTouched(true); setTytValue(next); }, []);
+  const changeAyt = useCallback((next) => { setNetTouched(true); setAytValue(next); }, []);
+  const changeNet = useCallback((next) => { setNetTouched(true); setValue(next); }, []);
+  const changeDaily = useCallback((next) => setDaily(next), []);
 
   const save = useCallback(async () => {
     setSaving(true);
@@ -118,10 +122,12 @@ export function useGoalNetEditor() {
   const cancel = useCallback(() => { navigation.goBack(); }, [navigation]);
 
   return {
-    isMulti, secondLabel, tytValue, decTyt, incTyt, aytValue, decAyt, incAyt,
+    isMulti, secondLabel, tytValue, decTyt, incTyt, changeTyt,
+    aytValue, decAyt, incAyt, changeAyt,
     aytMin, aytMax, value, dec, inc, save, cancel, saving, pendingNote, seeded,
+    changeNet,
     netLabel: examNetLabel(examType), currentNet, gapResult, examLabel, targetDepartment,
     daysUntilExam, min: TARGET_NET_MIN, max: TARGET_NET_MAX,
-    daily, decDaily, incDaily, dailyMin: DAILY_MIN, dailyMax: DAILY_MAX,
+    daily, decDaily, incDaily, changeDaily, dailyMin: DAILY_MIN, dailyMax: DAILY_MAX,
   };
 }

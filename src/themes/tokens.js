@@ -183,6 +183,7 @@ export const TYPOGRAPHY = {
   inputHeading:  { fontFamily: "Bricolage_400", fontSize: 22, letterSpacing: -0.5 },
   inputTopic:    { fontFamily: "Bricolage_400", fontSize: 16 },
   inputStat:     { fontFamily: "Bricolage_400", fontSize: 22, letterSpacing: -0.4, fontVariant: ["tabular-nums"] },
+  inputHeroNumber: { fontFamily: "Bricolage_400", fontSize: 66, letterSpacing: -2.5, fontVariant: ["tabular-nums"] },
 
   button:        { fontFamily: "Archivo_700", fontSize: 16, lineHeight: 20 },
   label: {
