@@ -10,6 +10,7 @@ import { addTrial } from "../../store/slices/trialSlice";
 import { formatDateISO } from "./trialEntryDates";
 import * as H from "../../lib/haptics";
 import { trialDifficultyMultiplier } from "../../domain/trial/trialModel";
+import { normalizePublisherSelection } from "../../domain/trial/publisherSelection";
 
 export async function submitTrialEntry({
   C,
@@ -26,6 +27,7 @@ export async function submitTrialEntry({
   onSaved,
   reward,
   publisherId,
+  publisherName,
   setSaving,
   showAlert,
   showPaywall,
@@ -86,6 +88,9 @@ export async function submitTrialEntry({
   const field = getFieldFromType(trialType);
   const durationValue = durationMinutes === "" || durationMinutes == null
     ? null : Number(durationMinutes);
+  const publisherSelection = normalizePublisherSelection({ publisherId, publisherName });
+  const effectivePublisherId = publisherSelection.publisherId;
+  const cleanedPublisherName = publisherSelection.publisherName;
 
   const parsed = trialEntrySchema.safeParse({
     name: trialName,
@@ -110,7 +115,8 @@ export async function submitTrialEntry({
     trialType,
     field,
     branchSubject,
-    publisherId,
+    publisherId: effectivePublisherId,
+    publisherNameSnapshot: cleanedPublisherName || null,
     difficultyLevel,
     difficultyMultiplier: trialDifficultyMultiplier(difficultyLevel),
     durationMinutes: durationValue,
@@ -130,7 +136,8 @@ export async function submitTrialEntry({
         branch_subject: branchSubject,
         total_net: netVal,
         mood,
-        publisher_id: publisherId,
+        publisher_id: effectivePublisherId,
+        publisher_name_snapshot: cleanedPublisherName || null,
         difficulty_level: difficultyLevel,
         duration_minutes: durationValue,
       },
@@ -170,7 +177,7 @@ export async function submitTrialEntry({
   track(EVENTS.TRIAL_ENTERED, { hasNet: true, trialType });
   track(EVENTS.TRIAL_NORMALIZED, {
     difficultyLevel,
-    hasPublisher: !!publisherId,
+    hasPublisher: !!effectivePublisherId || !!cleanedPublisherName,
     queued: result.queued,
   });
   reward("trial_entry", {
