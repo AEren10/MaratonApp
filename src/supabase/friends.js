@@ -72,6 +72,18 @@ export async function listIncomingRequests(userId) {
   }
 }
 
+// Yalniz sayi (rozet icin): satir cekmez.
+export async function countIncomingRequests(userId) {
+  assertUUID(userId, "userId");
+  const { count, error } = await supabase
+    .from("friendships")
+    .select("id", { count: "exact", head: true })
+    .eq("addressee_id", userId)
+    .eq("status", "pending");
+  if (error) throw error;
+  return count || 0;
+}
+
 export async function listOutgoingRequests(userId) {
   try {
     assertUUID(userId, "userId");

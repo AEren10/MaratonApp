@@ -18,6 +18,7 @@ import { fetchGlobalTop, fetchFriendsLeague } from "../../supabase/league";
 import { GroupsTab } from "./GroupsTab";
 import { SkeletonCard } from "../../components/common/SkeletonCard";
 import { LeaderSpotlight, LeaderTableHead } from "../../components/league/LeaderSpotlight";
+import { useIncomingRequestCount } from "../../hooks/useIncomingRequestCount";
 import * as H from "../../lib/haptics";
 
 const POLL_MS = 30000;
@@ -146,6 +147,7 @@ export default function LeagueScreen() {
   const C = useC();
   const { user } = useAuth();
   const blocked = useBlockedIds(user?.id);
+  const incoming = useIncomingRequestCount();
   const [tab, setTab] = useState(route.params?.tab || "groups");
 
   useEffect(() => {
@@ -341,6 +343,27 @@ export default function LeagueScreen() {
           </Pressable>
         ))}
       </View>
+
+      {/* Bekleyen istek her sekmede gorunur (eskiden yalniz Arkadas ekle
+          ekraninin icinde, tesadufen bulunuyordu). */}
+      {incoming > 0 ? (
+        <Pressable
+          onPress={() => { H.tap(); navigation.navigate(SCREENS.FRIENDS); }}
+          accessibilityRole="button"
+          style={{
+            flexDirection: "row", alignItems: "center", gap: SPACING.sm,
+            marginHorizontal: SPACING.lg, marginBottom: SPACING.md,
+            paddingHorizontal: SPACING.md, minHeight: 48, borderRadius: RADIUS.lg,
+            backgroundColor: C.accent + "14", borderWidth: 1, borderColor: C.accent + "40",
+          }}
+        >
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.accent }} />
+          <Text style={[TYPOGRAPHY.captionMedium, { color: C.text, flex: 1 }]}>
+            {incoming === 1 ? "1 yeni arkadaşlık isteği" : `${incoming} yeni arkadaşlık isteği`}
+          </Text>
+          <Icon name="chevR" size={14} color={C.text3} />
+        </Pressable>
+      ) : null}
 
       {tab === "groups" ? (
         <GroupsTab user={user} initialGroupCode={route.params?.groupCode} />

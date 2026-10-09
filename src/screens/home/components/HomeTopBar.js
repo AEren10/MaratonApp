@@ -10,6 +10,7 @@ import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
 import { SOCIAL_ENABLED } from "../../../constants/social";
 import { HomeStreakLine } from "./HomeStreakLine";
+import { useIncomingRequestCount } from "../../../hooks/useIncomingRequestCount";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -38,6 +39,7 @@ function heroDateTR() {
 export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
   const C = useC();
   const avatar = useMyAvatar();
+  const requests = useIncomingRequestCount();
   const dateHeading = useMemo(() => heroDateTR(), []);
 
   return (
@@ -59,9 +61,11 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
         {SOCIAL_ENABLED ? (
           <Pressable onPress={() => { H.tap(); onSocial?.(); }}
             accessibilityRole="button"
-            accessibilityLabel="Sosyal ve Gruplar"
+            accessibilityLabel={requests > 0 ? `Sosyal ve Gruplar, ${requests} yeni arkadaşlık isteği` : "Sosyal ve Gruplar"}
             style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
             <Icon name="users" size={NAV_ICON.action} color={C.text2} />
+            {/* Bekleyen arkadaslik istegi: kucuk kizil nokta. */}
+            {requests > 0 ? <View style={[s.dot, { backgroundColor: C.accent, borderColor: C.bg }]} /> : null}
           </Pressable>
         ) : null}
         <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
@@ -98,6 +102,7 @@ const s = StyleSheet.create({
     width: CONTROL.tapMin, height: CONTROL.tapMin, borderRadius: SHAPE.button, borderWidth: 1,
     alignItems: "center", justifyContent: "center",
   },
+  dot: { position: "absolute", top: 9, right: 9, width: 10, height: 10, borderRadius: 5, borderWidth: 2 },
   chip: {
     width: CONTROL.tapMin, height: CONTROL.tapMin, borderRadius: SHAPE.button, borderWidth: 1,
     alignItems: "center", justifyContent: "center",
