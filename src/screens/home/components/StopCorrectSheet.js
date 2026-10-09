@@ -24,7 +24,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   const title = stop?.topic || stop?.label || "";
 
   return (
-    <BottomSheet visible={Boolean(current)} onClose={onSkip} keyboard keyboardBehavior="height" style={s.sheet}>
+    <BottomSheet visible={Boolean(current)} onClose={onSkip} keyboard style={s.sheet}>
       <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`${total} SORU · ${title}`.toLocaleUpperCase("tr-TR")}</Text>
       <Text accessibilityRole="header" style={[TYPOGRAPHY.subheading, s.title, { color: C.text }]}>Kaç doğru?</Text>
       <Text style={[TYPOGRAPHY.body, { color: C.text3 }]}>
@@ -43,7 +43,7 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
           accessibilityLabel={`Doğru sayısı, ${total} sorudan`}
           style={[TYPOGRAPHY.inputStat, s.input, { color: C.text }]}
         />
-        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3 }]}>{`/ ${total}`}</Text>
+        <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text3 }]}>{`/ ${total} soru`}</Text>
       </View>
 
       <View style={s.actions}>

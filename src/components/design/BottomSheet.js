@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet } from "react-native";
+import { Keyboard, Modal, Platform, Pressable, StyleSheet } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Easing, Extrapolation, interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming,
@@ -30,7 +30,7 @@ function project(velocity, rate = 0.998) {
 // header: verilirse surukleme YALNIZ bu bolgeden -- icerik kaydirilabilir listeyse
 // tum panele baglanan surukleme listeyi kaydirmak yerine paneli kapatmaya calisir.
 export function BottomSheet({
-  visible, onClose, children, style, keyboard = false, keyboardBehavior = "padding", edge = false, header = null,
+  visible, onClose, children, style, keyboard = false, edge = false, header = null,
 }) {
   const C = useC();
   const insets = useSafeAreaInsets();
@@ -40,6 +40,22 @@ export function BottomSheet({
   const h = useSharedValue(OFF);
   const y = useSharedValue(OFF);
   const start = useSharedValue(0);
+  const kb = useSharedValue(0);
+
+  // Klavye: panel klavye yuksekligi kadar kalkar. KeyboardAvoidingView
+  // statusBarTranslucent Modal icinde boslugu yanlis olcup paneli ekranin
+  // tepesine itiyordu (iOS, "Kac dogru?"). Android'de pencere zaten yeniden
+  // boyutlaniyor; orada dokunulmaz.
+  useEffect(() => {
+    if (!keyboard || Platform.OS !== "ios") return undefined;
+    const show = Keyboard.addListener("keyboardWillShow", (e) => {
+      kb.set(withTiming(e.endCoordinates.height, { duration: e.duration || 250 }));
+    });
+    const hide = Keyboard.addListener("keyboardWillHide", (e) => {
+      kb.set(withTiming(0, { duration: e.duration || 250 }));
+    });
+    return () => { show.remove(); hide.remove(); };
+  }, [keyboard, kb]);
 
   useEffect(() => {
     if (visible) {
@@ -84,9 +100,11 @@ export function BottomSheet({
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(y.get(), [0, h.get()], [1, 0], Extrapolation.CLAMP),
   }));
+  // Klavye guvenli alanin ustunden baslar; panelin alt boslugu zaten onu iceriyor.
+  const bottomInset = edge ? 0 : insets.bottom;
+  const liftStyle = useAnimatedStyle(() => ({ paddingBottom: Math.max(0, kb.get() - bottomInset) }));
 
   if (!mounted) return null;
-  const Wrap = keyboard ? KeyboardAvoidingView : Animated.View;
   const panel = [s.sheet, edge ? null : { marginBottom: insets.bottom + STEP.s3 }, { backgroundColor: C.surface, borderColor: C.elev }];
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
@@ -94,11 +112,7 @@ export function BottomSheet({
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, backdropStyle]}>
           <Pressable style={s.fill} onPress={onClose} accessibilityLabel="Kapat" />
         </Animated.View>
-        <Wrap
-          style={[s.bottom, edge && s.edge]}
-          behavior={keyboard && Platform.OS === "ios" ? keyboardBehavior : undefined}
-          pointerEvents="box-none"
-        >
+        <Animated.View style={[s.bottom, edge && s.edge, liftStyle]} pointerEvents="box-none">
           {header ? (
             <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
               <GestureDetector gesture={pan}><Animated.View>{header}</Animated.View></GestureDetector>
@@ -111,7 +125,7 @@ export function BottomSheet({
               </Animated.View>
             </GestureDetector>
           )}
-        </Wrap>
+        </Animated.View>
       </GestureHandlerRootView>
     </Modal>
   );

@@ -11,6 +11,12 @@ test("dogru sayisi bekleyen calisma kaydinin insert yukune eklenir", () => {
   assert.doesNotMatch(completion, /value <= 0/);
 });
 
-test("dogru paneli iOS klavyesinden tek height davranisiyla kacinir", () => {
-  assert.match(sheet, /keyboard keyboardBehavior="height"/);
+const bottomSheet = readFileSync(new URL("../../src/components/design/BottomSheet.js", import.meta.url), "utf8");
+
+// KeyboardAvoidingView statusBarTranslucent Modal icinde paneli ekranin
+// tepesine itiyordu; panel klavye yuksekligini kendisi olcer.
+test("dogru paneli klavyeden BottomSheet'in kendi olcumuyle kacinir", () => {
+  assert.match(sheet, /<BottomSheet[^>]*\bkeyboard\b/);
+  assert.doesNotMatch(bottomSheet, /<KeyboardAvoidingView|import \{[^}]*KeyboardAvoidingView/);
+  assert.match(bottomSheet, /keyboardWillShow/);
 });
