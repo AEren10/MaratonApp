@@ -25,23 +25,33 @@
   c.append(brand);
 
   // Başlık + alt satır
+  // Zemin isigi: sol ustten yayilan kizil hale, sag altta daha silik ikinci (canli ama tek renk).
+  c.append(el('div', null, { position: 'absolute', inset: 0,
+    background: 'radial-gradient(circle at 12% 6%, rgba(229,52,63,.34), transparent 46%),'
+      + 'radial-gradient(circle at 92% 78%, rgba(229,52,63,.16), transparent 42%)' }));
+
   const tall = H / W > 2;
-  const headTop = tall ? 20 : 17;
-  const h1 = el('h1', null, { left: px(7.5), top: px(headTop), fontSize: px(12.6), whiteSpace: 'nowrap' },
+  // Alt satir (2 satira kadar) ile rota cizgisi arasinda bosluk kalsin
+  // (eskiden 'plani.' cizginin ustune biniyordu).
+  const headTop = tall ? 20 : 15;
+  const headSize = tall ? 12.6 : 11;
+  const subTop = headTop + headSize * 2 * 0.98 + 3;
+  const h1 = el('h1', null, { left: px(7.5), top: px(headTop), fontSize: px(headSize), whiteSpace: 'nowrap' },
     `${S.a}<em>${S.b}</em>`);
   c.append(h1);
   document.fonts.ready.then(() => {
     const max = 85 * u;
-    if (h1.offsetWidth > max) h1.style.fontSize = 12.6 * u * (max / h1.offsetWidth) + 'px';
+    if (h1.offsetWidth > max) h1.style.fontSize = headSize * u * (max / h1.offsetWidth) + 'px';
   });
-  c.append(el('p', 'sub', { left: px(7.5), top: px(headTop + 27.5), fontSize: px(3.9), width: px(80) }, S.sub));
+  c.append(el('p', 'sub', { left: px(7.5), top: px(subTop), fontSize: px(3.9), width: px(85) }, S.sub));
 
-  // Telefon
-  const phoneTop = tall ? 61 : 57;
-  const phoneW = 74, phoneL = (100 - phoneW) / 2, bez = 2.1;
+  // Telefon: alt satirin bitisi (2 satir) + rota cizgisi payi
+  const phoneTop = subTop + 2 * 3.9 * 1.4 + 9;
+  const phoneW = tall ? 74 : 66, phoneL = (100 - phoneW) / 2, bez = 2.1;
   const phone = el('div', 'phone', {
     left: px(phoneL), top: px(phoneTop), width: px(phoneW), height: px(phoneW * 2.17),
-    borderRadius: px(11.5), boxShadow: `0 0 0 ${px(0.5)} #2A2A31`,
+    borderRadius: px(11.5),
+    boxShadow: `0 0 0 ${px(0.5)} #2A2A31, 0 ${px(3)} ${px(14)} rgba(229,52,63,.22)`,
   });
   const screen = el('div', 'screen', {
     left: px(bez), top: px(bez), right: px(bez), bottom: px(bez), borderRadius: px(9.6),
