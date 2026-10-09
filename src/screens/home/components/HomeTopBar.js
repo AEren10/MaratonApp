@@ -10,7 +10,6 @@ import * as H from "../../../lib/haptics";
 import { useMyAvatar } from "../../../hooks/useMyAvatar";
 import { SOCIAL_ENABLED } from "../../../constants/social";
 import { HomeStreakLine } from "./HomeStreakLine";
-import { alpha } from "../../../themes/colorMix";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 5) return "İYİ GECELER";
@@ -38,13 +37,6 @@ function heroDateTR() {
 // Ana Sayfa ust bandi: bas harf kutusu, selam + ad, Structured tarzı hero tarih basligi ve aksiyonlar.
 export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
   const C = useC();
-  // Sag ust dugmeler duz gri kutuydu (9 Ekim): silik kizil zemin + kenar,
-  // ikon kizil ve ici hafif dolu -- sekme cubugundaki secili ikonla ayni dil.
-  const tint = (pressed) => ({
-    backgroundColor: alpha(C.accent, pressed ? 18 : 10),
-    borderColor: alpha(C.accent, 25),
-  });
-  const iconFill = alpha(C.accentBright, 18);
   const avatar = useMyAvatar();
   const dateHeading = useMemo(() => heroDateTR(), []);
 
@@ -68,15 +60,15 @@ export function HomeTopBar({ name, onProfile, onCalendar, onSocial }) {
           <Pressable onPress={() => { H.tap(); onSocial?.(); }}
             accessibilityRole="button"
             accessibilityLabel="Sosyal ve Gruplar"
-            style={({ pressed }) => [s.iconBtn, tint(pressed)]}>
-            <Icon name="users" size={NAV_ICON.action} color={C.accentBright} fill={iconFill} />
+            style={({ pressed }) => [s.iconBtn, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+            <Icon name="users" size={NAV_ICON.action} color={C.text2} />
           </Pressable>
         ) : null}
         <Pressable onPress={() => { H.tap(); onCalendar?.(); }}
           accessibilityRole="button"
           accessibilityLabel="Takvimi aç"
-          style={({ pressed }) => [s.chip, tint(pressed)]}>
-          <Icon name="calendar" size={NAV_ICON.action} color={C.accentBright} fill={iconFill} />
+          style={({ pressed }) => [s.chip, { backgroundColor: pressed ? C.elev : C.surface, borderColor: C.border }]}>
+          <Icon name="calendar" size={NAV_ICON.action} color={C.text2} />
         </Pressable>
       </View>
 
