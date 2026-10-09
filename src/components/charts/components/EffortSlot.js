@@ -12,12 +12,14 @@ export function EffortSlotDefs({ color, dot }) {
       <Pattern id={DOTS_ID} patternUnits="userSpaceOnUse" width={6} height={6}>
         <Circle cx={3} cy={3} r={0.9} fill={dot || color} />
       </Pattern>
-      <Pattern id={HATCH_ID} patternUnits="userSpaceOnUse" width={6} height={6}>
+      {/* "Dolacak alan" taramasi (9 Ekim, kullanici cizimi): silik kirmizi
+          egik cizgiler; yogunluk kutunun opakligiyla ayarlanir. */}
+      <Pattern id={HATCH_ID} patternUnits="userSpaceOnUse" width={7} height={7}>
         <Path
-          d="M-1,1 l2,-2 M0,6 l6,-6 M5,7 l2,-2"
-          stroke={color}
-          strokeWidth={1}
-          strokeOpacity={0.5}
+          d="M-1,1 l2,-2 M0,7 l7,-7 M6,8 l2,-2"
+          stroke={dot || color}
+          strokeWidth={1.2}
+          strokeLinecap="round"
         />
       </Pattern>
     </Defs>
@@ -55,9 +57,9 @@ export function EffortSlot({ x, y, width, height, radius, isToday, isFuture, C }
         strokeOpacity={isToday ? 0.6 : 0.4}
         strokeDasharray={isFuture ? "4 3" : undefined}
       />
-      {/* Nokta dokusu: bugun silik, gelecek daha da silik. */}
+      {/* Egik tarama: bugun silik, gelecek daha da silik. */}
       <Rect x={x} y={y} width={width} height={height} rx={radius}
-        fill={`url(#${DOTS_ID})`} opacity={isToday ? 0.45 : 0.2} />
+        fill={`url(#${HATCH_ID})`} opacity={isToday ? 0.4 : 0.2} />
     </G>
   );
 }
