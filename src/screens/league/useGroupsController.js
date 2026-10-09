@@ -115,8 +115,10 @@ export function useGroupsController({ user, initialGroupCode }) {
 
   const closeJoin = () => { setJoinOpen(false); setCodeError(null); };
 
-  const doLeave = (g) => {
-    handleGroupExit({ group: g, user, showAlert, setSelected, loadGroups });
+  // alertFn: grup Modal'inin icinden cagrilinca oradaki uyari (kokteki
+  // uyari acik Modal'in arkasinda kalir).
+  const doLeave = (g, alertFn) => {
+    handleGroupExit({ group: g, user, showAlert: alertFn || showAlert, setSelected, loadGroups });
   };
 
   const shareCode = (g) => {

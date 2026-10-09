@@ -15,6 +15,8 @@ import { GroupReportButton } from "./GroupReportButton";
 import { GroupWeekHero } from "./GroupWeekHero";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useBlockedIds } from "../../../lib/blockedUsers";
+import { AlertProvider } from "../../../contexts/AlertContext";
+import { AnchoredMenuProvider } from "../../../contexts/AnchoredMenuContext";
 
 export function GroupDetailPanel({
   visible,
@@ -25,6 +27,7 @@ export function GroupDetailPanel({
   onClose,
   onRetry,
   onShare,
+  onLeave,
 }) {
   const C = useC();
   const insets = useSafeAreaInsets();
@@ -40,6 +43,10 @@ export function GroupDetailPanel({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      {/* Menu ve uyari bu Modal'in ICINDE: uygulama kokundekiler iOS'ta acik
+          Modal'in arkasinda kaliyordu (uyeye dokununca menu, "..." calismiyordu). */}
+      <AlertProvider>
+      <AnchoredMenuProvider>
       <SafeAreaView edges={["bottom"]} style={[s.safe, { backgroundColor: C.bg }]}>
         <GlowBackground blobs={crimsonBlobs} />
         <View style={[s.topBar, { paddingTop: Math.max(insets.top, SPACING.xl) + SPACING.sm }]}>
@@ -52,7 +59,7 @@ export function GroupDetailPanel({
               {Number(group.member_count ?? group.memberCount ?? members.length) || members.length} üye · haftalık yarış
             </Text>
           </View>
-          <GroupReportButton group={group} />
+          <GroupReportButton group={group} onShare={onShare} onLeave={onLeave} />
         </View>
 
         <FlatList
@@ -91,6 +98,8 @@ export function GroupDetailPanel({
           ) : null}
         />
       </SafeAreaView>
+      </AnchoredMenuProvider>
+      </AlertProvider>
     </Modal>
   );
 }

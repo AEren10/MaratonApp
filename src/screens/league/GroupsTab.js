@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
@@ -17,6 +18,20 @@ export function GroupsTab({ user, initialGroupCode }) {
   const C = useC();
   const c = useGroupsController({ user, initialGroupCode });
   const [detailOpen, setDetailOpen] = useState(false);
+  const navigation = useNavigation();
+  const reopen = useRef(false);
+
+  // Gruptan bir sayfa acilinca (uyenin profili) Modal ustte kalip sayfayi
+  // ortuyordu: gecerken kapanir, geri donunce yeniden acilir.
+  useEffect(() => {
+    const offBlur = navigation.addListener("blur", () => {
+      setDetailOpen((open) => { if (open) reopen.current = true; return false; });
+    });
+    const offFocus = navigation.addListener("focus", () => {
+      if (reopen.current) { reopen.current = false; setDetailOpen(true); }
+    });
+    return () => { offBlur(); offFocus(); };
+  }, [navigation]);
 
   const openGroup = useCallback((group) => {
     c.setSelected(group);
@@ -84,6 +99,7 @@ export function GroupsTab({ user, initialGroupCode }) {
         onClose={() => setDetailOpen(false)}
         onRetry={c.loadBoard}
         onShare={c.shareCode}
+        onLeave={(alertFn) => c.doLeave(c.selected, alertFn)}
       />
       <GroupCodeModal
         visible={c.createOpen}

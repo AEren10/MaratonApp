@@ -13,7 +13,8 @@ const controllerSource = readFileSync(
 
 test("useGroupsController delegates doLeave to handleGroupExit", () => {
   assert.match(controllerSource, /import\s*\{\s*handleGroupExit\s*\}\s*from\s*["']\.\/groupExitHandler["']/);
-  assert.match(controllerSource, /handleGroupExit\(\{\s*group:\s*g,\s*user,\s*showAlert,\s*setSelected,\s*loadGroups\s*\}\)/);
+  // Grup Modal'inin icinden cagrilinca oradaki uyari kullanilir (alertFn).
+  assert.match(controllerSource, /handleGroupExit\(\{\s*group:\s*g,\s*user,\s*showAlert:\s*alertFn \|\| showAlert,\s*setSelected,\s*loadGroups\s*\}\)/);
 });
 
 test("groupExitHandler distinguishes sole admin from admin with members", () => {
