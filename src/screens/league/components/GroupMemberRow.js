@@ -4,6 +4,8 @@ import { TYPOGRAPHY, SPACING } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { ReportableAvatar } from "../../../components/common/ReportableAvatar";
 import { UserActionRow } from "../../../components/common/UserActionRow";
+import { Icon } from "../../../components/design/Icon";
+import { alpha } from "../../../themes/colorMix";
 
 function formatMinutes(value) {
   const minutes = Math.max(0, Number(value) || 0);
@@ -37,9 +39,13 @@ export const GroupMemberRow = React.memo(function GroupMemberRow({ item }) {
     <UserActionRow userId={item.user_id} name={item.name} image={item.avatar_url} you={isYou}
       style={[s.row, { borderBottomColor: C.line }]}>
       {/* Kutusuz satir (Ders analizi dili): sira duz rakam, ilk uc madalya renginde. */}
-      <Text style={[TYPOGRAPHY.tableValue, s.rank, { color: medalColor && weeklyQuestions > 0 ? medalColor : C.text3 }]}>
-        {rank || "-"}
-      </Text>
+      {rank === 1 && weeklyQuestions > 0 ? (
+        <View style={s.rank}><Icon name="crown" size={17} color={C.warn} fill={alpha(C.warn, 35)} /></View>
+      ) : (
+        <Text style={[TYPOGRAPHY.tableValue, s.rank, { color: medalColor && weeklyQuestions > 0 ? medalColor : C.text3 }]}>
+          {rank || "-"}
+        </Text>
+      )}
 
       <ReportableAvatar userId={item.user_id} name={item.name} image={item.avatar_url}
         size={36} color={isYou ? C.accent : undefined} you={isYou} />
@@ -77,7 +83,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     paddingVertical: SPACING.sm + 2,
   },
-  rank: { width: 24, textAlign: "center", marginRight: SPACING.sm, fontVariant: ["tabular-nums"] },
+  rank: { width: 24, textAlign: "center", alignItems: "center", marginRight: SPACING.sm, fontVariant: ["tabular-nums"] },
   nameCol: {
     flex: 1,
     marginLeft: SPACING.sm,

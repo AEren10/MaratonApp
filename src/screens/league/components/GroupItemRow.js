@@ -6,6 +6,10 @@ import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
 import { GrowBar } from "../../../components/design/GrowBar";
 import { GroupAvatarStack } from "./GroupAvatarStack";
+import { LinearGradient } from "expo-linear-gradient";
+import { Icon } from "../../../components/design/Icon";
+import { alpha } from "../../../themes/colorMix";
+import { SHAPE } from "../../../themes/tokens";
 
 // Grup satiri: ad + sira; uyelerin ust uste dizili fotograflari (kullanici
 // istegiyle geri, 4 Ekim); haftanin ortak hedef cizgisi.
@@ -42,25 +46,34 @@ export const GroupItemRow = React.memo(function GroupItemRow({
       accessibilityRole="button"
       accessibilityLabel={`${group.name} grubuna gir`}
       accessibilityHint="Grup odasını açar, basılı tutunca ayrılma seçeneği sunar"
-      style={[
-        s.row,
-        {
-          backgroundColor: isSelected ? C.void : "transparent",
-          borderBottomColor: C.line,
-          borderBottomWidth: isLast ? 0 : 1,
-        },
-      ]}
+      style={[s.row, { borderColor: isSelected ? alpha(C.accent, 50) : C.line }]}
     >
-      <View style={[s.badge, { backgroundColor: C.void, borderColor: C.line }]}>
-        <Text style={[s.initialText, { color: C.text }]}>{initial}</Text>
-      </View>
+      {/* Gri ortak panel yerine her grup kendi karti (9 Ekim): soldan silik
+          kizil isik, kizil harf rozeti, sagda sira (liderse tac). */}
+      <LinearGradient
+        colors={[alpha(C.accent, 12), "transparent"]}
+        start={{ x: 0, y: 0 }} end={{ x: 0.7, y: 0.6 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <LinearGradient colors={[C.accent, C.accentDeep || C.accent]} style={s.badge}>
+        <Text style={[s.initialText, { color: C.textOnFill || "#FFFFFF" }]}>{initial}</Text>
+      </LinearGradient>
 
       <View style={s.content}>
         <View style={s.titleRow}>
-          <Text style={[TYPOGRAPHY.bodySemiBold, s.title, { color: isSelected ? C.accent : C.text }]} numberOfLines={1}>
+          <Text style={[TYPOGRAPHY.bodySemiBold, s.title, { color: C.text }]} numberOfLines={1}>
             {group.name}
           </Text>
-          {userRank ? <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>{userRank}. sıradasın</Text> : null}
+          {userRank === 1 ? (
+            <View style={[s.pill, { backgroundColor: alpha(C.warn, 16) }]}>
+              <Icon name="crown" size={12} color={C.warn} fill={alpha(C.warn, 40)} />
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.warn }]}>Lider</Text>
+            </View>
+          ) : userRank ? (
+            <View style={[s.pill, { backgroundColor: C.surface }]}>
+              <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.text2 }]}>{userRank}. sıra</Text>
+            </View>
+          ) : null}
         </View>
         <GroupAvatarStack initial={initial} memberCount={memberCount || members.length} members={members} />
         <View style={s.weekRow}>
@@ -78,21 +91,23 @@ export const GroupItemRow = React.memo(function GroupItemRow({
 
 const s = StyleSheet.create({
   bar: { flex: 1 },
-  titleRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  pill: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: STEP.s1, paddingVertical: 2, borderRadius: SHAPE.chip },
   title: { flex: 1 },
   weekRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1, marginTop: STEP.s1 },
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
     minHeight: 52,
-    paddingHorizontal: STEP.s2,
-    paddingVertical: STEP.s2,
+    padding: STEP.s2,
+    borderRadius: SHAPE.card,
+    borderWidth: 1,
+    overflow: "hidden",
   },
   badge: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    borderWidth: 1,
+    width: 40,
+    height: 40,
+    borderRadius: SHAPE.iconBox || 12,
     alignItems: "center",
     justifyContent: "center",
     marginRight: STEP.s2,

@@ -4,6 +4,7 @@ import Animated, {
   Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming,
 } from "react-native-reanimated";
 import { ANIMATION } from "../../themes/tokens";
+import { alpha } from "../../themes/colorMix";
 
 const INSET = 4;
 // Duz ve yumusak kayis (kullanici: yayli/uzayan hareket kotu). Tasma yok.
@@ -36,7 +37,8 @@ export function TabIndicator({ index, slotWidth, C }) {
   return (
     <Animated.View
       pointerEvents="none"
-      style={[s.pill, { width: Math.max(0, slotWidth - INSET * 2), backgroundColor: C.elev, borderColor: C.border }, style]}
+      // Kizil tonlu hap (9 Ekim): gri hap yerine, ici dolu kirmizi ikonla tek dil.
+      style={[s.pill, { width: Math.max(0, slotWidth - INSET * 2), backgroundColor: alpha(C.accent, 14), borderColor: alpha(C.accent, 35) }, style]}
     />
   );
 }

@@ -31,7 +31,7 @@ test("league screen uses social league copy and visible relationship actions", (
   assert.match(league, /LİG/);
   assert.match(league, /Arkadaşlar/);
   assert.match(league, /Genel/);
-  assert.match(league, /SIRALAMA · SORU SAYISI/);
+  assert.match(league, /LeaderTableHead valueLabel="SORU"/);
   assert.match(league, /Arkadaşını davet et/);
   assert.match(league, /Yol arkadaşın/);
   assert.match(league, /SCREENS\.REFERRAL/);

@@ -74,7 +74,7 @@ export function GroupsTab({ user, initialGroupCode }) {
             <Text style={[TYPOGRAPHY.label, s.secLabel, { color: C.text3 }]}>
               GRUPLARIN ({c.groups.length})
             </Text>
-            <View style={[s.groupPanel, { backgroundColor: C.surface, borderColor: C.line }]}>
+            <View style={s.groupPanel}>
               {c.groups.map((g, idx) => (
                 <GroupItemRow
                   key={g.id}
@@ -147,10 +147,6 @@ const s = StyleSheet.create({
     borderWidth: 1,
   },
   secLabel: { letterSpacing: 1.2, marginTop: STEP.s1, marginBottom: STEP.s2 },
-  groupPanel: {
-    borderRadius: SHAPE.panel,
-    borderWidth: 1,
-    overflow: "hidden",
-    marginBottom: STEP.s2,
-  },
+  // Gri ortak panel kalkti: her grup kendi karti, aralarinda bosluk.
+  groupPanel: { gap: STEP.s1, marginBottom: STEP.s2 },
 });

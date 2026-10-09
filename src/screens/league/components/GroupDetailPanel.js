@@ -13,6 +13,7 @@ import { GroupMemberRow } from "./GroupMemberRow";
 import { GroupStreakRow } from "./GroupStreakRow";
 import { GroupReportButton } from "./GroupReportButton";
 import { GroupWeekHero } from "./GroupWeekHero";
+import { LeaderSpotlight, LeaderTableHead } from "../../../components/league/LeaderSpotlight";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useBlockedIds } from "../../../lib/blockedUsers";
 import { AlertProvider } from "../../../contexts/AlertContext";
@@ -36,6 +37,14 @@ export function GroupDetailPanel({
   // Engellenen uye listede gorunmez (Apple 1.2).
   const members = useMemo(() => (board?.list || []).filter((m) => !blocked.has(m.user_id)), [board, blocked]);
   const crimsonBlobs = useMemo(() => getCrimsonGlow(C), [C]);
+  // Grubun lideri: bu hafta en cok soru cozen (sira 1, en az 1 soru).
+  const leader = useMemo(() => {
+    const top = members.find((m) => Number(m.rank) === 1);
+    const q = Number(top?.weekly_questions ?? top?.questions ?? 0) || 0;
+    return top && q > 0 ? { ...top, q } : null;
+  }, [members]);
+  const me = members.find((m) => m.you);
+  const myQ = Number(me?.weekly_questions ?? me?.questions ?? 0) || 0;
   const renderMember = useCallback(({ item }) => <GroupMemberRow item={item} />, []);
   const keyExtractor = useCallback((item) => String(item.user_id), []);
 
@@ -72,12 +81,21 @@ export function GroupDetailPanel({
           ListHeaderComponent={(
             <View>
               <GroupWeekHero group={group} members={members} />
+              {/* Haftanin lideri sahnede: en cok soru cozen uye. */}
+              {leader ? (
+                <LeaderSpotlight
+                  leader={leader}
+                  value={leader.q}
+                  unit="SORU · BU HAFTA"
+                  caption={leader.you ? "Grubun lideri sensin."
+                    : me ? `Sen ${me.rank}. sıradasın · ${myQ} soru` : null}
+                />
+              ) : null}
               <GroupCodeCard group={group} onShare={onShare} />
               <GroupStreakRow groupId={group.id} />
               <GroupCompetitionBanner standing={standing} />
               <View style={s.memberHead}>
-                <Text style={[TYPOGRAPHY.label, { color: C.text3, letterSpacing: 1.2 }]}>HAFTALIK SIRALAMA</Text>
-                <Text style={[TYPOGRAPHY.micro, { color: C.muted }]}>Soru & Süre</Text>
+                <LeaderTableHead valueLabel="SORU · SÜRE" />
               </View>
               {boardError ? (
                 <View style={[s.boardError, { borderColor: C.border, backgroundColor: C.surface }]}>
@@ -130,13 +148,7 @@ const s = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.huge,
   },
-  memberHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.sm,
-  },
+  memberHead: { marginTop: SPACING.lg },
   gap: { height: 0 }, // satirlar kutusuz, ince alt cizgiyle ayriliyor
   boardError: {
     alignItems: "center",

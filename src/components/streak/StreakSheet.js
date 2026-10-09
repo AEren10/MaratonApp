@@ -10,6 +10,8 @@ import { getNextMilestone } from "../../lib/streakMilestones";
 import { ANIMATION, SHAPE, STEP, TYPOGRAPHY } from "../../themes/tokens";
 import { StreakDots } from "./StreakDots";
 import { LiveFlame } from "./LiveFlame";
+import { LinearGradient } from "expo-linear-gradient";
+import { alpha } from "../../themes/colorMix";
 
 const EASE = Easing.bezier(...ANIMATION.easing.easeOut);
 
@@ -29,7 +31,14 @@ export function StreakSheet({ visible, onClose, week }) {
   if (!week) return null;
 
   return (
-    <CenterCard visible={visible} onClose={onClose} style={s.sheet}>
+    <CenterCard visible={visible} onClose={onClose} style={[s.sheet, { borderColor: alpha(C.flame, 30) }]}>
+      {/* Duz gri yuzey yerine ustten sonen sicak alev isigi (9 Ekim). */}
+      <LinearGradient
+        colors={[alpha(C.flame, 20), alpha(C.flame, 5), "transparent"]}
+        locations={[0, 0.45, 0.8]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
       {/* Canli alev + sayi yan yana (kahverengi diskteki duz ikon bulaniktı).
           Alev acilista birkac kez yanip durur: surekli dongu yok (performans). */}
       <View style={s.hero}>
@@ -80,7 +89,7 @@ export function StreakSheet({ visible, onClose, week }) {
 }
 
 const s = StyleSheet.create({
-  sheet: { borderRadius: SHAPE.sheet, padding: STEP.s3, gap: STEP.s1 },
+  sheet: { borderRadius: SHAPE.sheet, padding: STEP.s3, gap: STEP.s1, overflow: "hidden" },
   hero: { alignItems: "center" },
   heroRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
   line: { marginTop: STEP.s2 },
