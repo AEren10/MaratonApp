@@ -3,6 +3,7 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 
 import { Icon } from "../../components/design";
 import { ANIMATION, TYPOGRAPHY } from "../../themes/tokens";
+import { alpha } from "../../themes/colorMix";
 import * as H from "../../lib/haptics";
 
 // Sekme dugmesi. Parmak degince (birakmadan) sekmenin arkasinda hafif bir
@@ -35,7 +36,15 @@ export function TabItem({ tab, active, onPress, onPressIn, onLongPress, C }) {
     >
       {!active ? <Animated.View pointerEvents="none" style={[s.glow, { backgroundColor: C.void }, glowStyle]} /> : null}
       <Animated.View style={iconStyle}>
-        <Icon name={tab.icon} size={21} color={tone} sw={active ? 2.1 : 1.7} />
+        {/* Secili sekmenin ikonu ici kirmizi dolu (9 Ekim, kullanici): kenar
+            parlak, ic yari saydam ayni ton. Cizgi ikonun (chart) dolu hali alan. */}
+        <Icon
+          name={active && FILLED[tab.icon] ? FILLED[tab.icon] : tab.icon}
+          size={21}
+          color={tone}
+          sw={active ? 2.1 : 1.7}
+          fill={active ? alpha(C.accentBright, 30) : "none"}
+        />
       </Animated.View>
       <Text numberOfLines={1} style={[TYPOGRAPHY.micro, s.label, { fontFamily: active ? "Archivo_600" : "Archivo_500", color: tone }]}>
         {tab.label}
@@ -43,6 +52,8 @@ export function TabItem({ tab, active, onPress, onPressIn, onLongPress, C }) {
     </Pressable>
   );
 }
+
+const FILLED = { chart: "chartArea" };
 
 const s = StyleSheet.create({
   item: { flex: 1, alignItems: "center", justifyContent: "center", gap: 3, minHeight: 56 },

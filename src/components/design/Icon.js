@@ -35,6 +35,9 @@ const ICONS = {
       <Path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
     </>
   ),
+  // Secili sekme icin dolu hali: cizginin alti alan (chart'in ici
+  // doldurulamaz, yalniz cizgi).
+  chartArea: <Path d="M4 17l5-5 5 3 7-7v13H4z" />,
   chart: (
     <>
       <Line x1="3" y1="21" x2="21" y2="21" />

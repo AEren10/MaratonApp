@@ -96,7 +96,8 @@ const WeekWidget = (props, environment) => {
     const isToday = i === todayIdx;
     const future = i > todayIdx;
     const h = hOf(v);
-    const fill = isToday ? accentBright : goal > 0 && v >= goal ? accent : accentDeep;
+    // Calisilan her gun ana renkte (9 Ekim): hedefi tutmayan gun koyu/soluk degil.
+    const fill = accent;
     const showValue = !compact && !future && (v > 0 || isToday);
     return (
       <VStack key={`b${i}`} spacing={2} modifiers={[frame({ width: colW, height: colH, alignment: "bottom" })]}>

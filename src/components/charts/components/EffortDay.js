@@ -32,13 +32,12 @@ export function EffortDay({
   // Cubuk SURE (dakika): soru girilmemis calisma da dolar.
   let barH = 0;
   let fill = C.track;
-  let met = false;
   if (day.minutes > 0) {
     barH = Math.max(4, bottom - yOf(day.minutes));
-    // TEK TON (renk sadelestirme, 4 Ekim): hedefi tutturan gun tam kirmizi,
-    // tutturamayan soluk kirmizi -- yesil/kirmizi yargisi yok, cezalandirmaz.
+    // TEK TON, TAM RENK (9 Ekim, kullanici): calisilan her gun -- gecmis de
+    // bugun de, hedefe ulasmasa da -- ana renkte. Eskiden hedefi tutmayan
+    // gun yari saydamdi ve "soluk" okunuyordu.
     fill = C.accent;
-    met = !(goal > 0) || day.minutes >= goal;
   }
 
   // Calisilmamis gun: yukselecek bir sey yok. Kutu zaten o gunun bos
@@ -79,7 +78,7 @@ export function EffortDay({
         height={barH}
         radius={radius}
         fill={fill}
-        fillOpacity={met ? 1 : 0.5}
+        fillOpacity={1}
       />
     </Fragment>
   );
