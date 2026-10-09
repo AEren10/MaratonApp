@@ -27,14 +27,16 @@ export function StreakSheet({ visible, onClose, week }) {
     if (!visible) { fill.set(0); return; }
     fill.set(reduced ? share : withDelay(250, withTiming(share, { duration: 700, easing: EASE })));
   }, [visible, share, reduced, fill]);
+  const isDark = C.scheme !== "light";
+  const flameText = isDark ? C.flame : "#C2410C";
   const fillStyle = useAnimatedStyle(() => ({ width: `${fill.get() * 100}%` }));
   if (!week) return null;
 
   return (
-    <CenterCard visible={visible} onClose={onClose} style={[s.sheet, { borderColor: alpha(C.flame, 30) }]}>
+    <CenterCard visible={visible} onClose={onClose} glow={false} style={[s.sheet, { borderColor: alpha(C.flame, isDark ? 30 : 22) }]}>
       {/* Duz gri yuzey yerine ustten sonen sicak alev isigi (9 Ekim). */}
       <LinearGradient
-        colors={[alpha(C.flame, 20), alpha(C.flame, 5), "transparent"]}
+        colors={[alpha(C.flame, isDark ? 20 : 12), alpha(C.flame, isDark ? 5 : 2), "transparent"]}
         locations={[0, 0.45, 0.8]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
@@ -46,7 +48,7 @@ export function StreakSheet({ visible, onClose, week }) {
           <LiveFlame size={64} animate={visible} cycles={3} />
           <CountUpText value={week.value} style={[TYPOGRAPHY.statHero, { color: C.text }]} />
         </View>
-        <Text style={[TYPOGRAPHY.label, { color: C.flame }]}>GÜN ÜST ÜSTE</Text>
+        <Text style={[TYPOGRAPHY.label, { color: flameText }]}>GÜN ÜST ÜSTE</Text>
         <Text style={[TYPOGRAPHY.body, s.center, s.line, { color: C.text2 }]}>{week.line}</Text>
       </View>
 
@@ -56,7 +58,7 @@ export function StreakSheet({ visible, onClose, week }) {
         <View style={s.block}>
           <View style={s.between}>
             <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>{`SIRADAKİ EŞİK · ${next.day} GÜN`}</Text>
-            <Text style={[TYPOGRAPHY.metaSemiBold, { color: C.flame }]}>{`${next.daysLeft} gün kaldı`}</Text>
+            <Text style={[TYPOGRAPHY.metaSemiBold, { color: flameText }]}>{`${next.daysLeft} gün kaldı`}</Text>
           </View>
           <View style={[s.track, { backgroundColor: C.track }]}>
             <Animated.View style={[s.fill, { backgroundColor: C.flame }, fillStyle]} />

@@ -12,17 +12,19 @@ import { TAB_ROOT_MAP } from "./tabJump";
 import { StackActions } from "@react-navigation/native";
 import { silentPop } from "./silentPop";
 
-// Ana Sayfa her basista KOKTEN acilir (Codex teshisi, 9 Ekim): grafikten
-// acilan Rota Home yigininda kaliyor, baska sekmeden donunce Rota
-// gorunuyordu; koke donus de saga kayan pop animasyonuyla oluyordu.
-// Once sessiz bayrak (animasyonsuz ekran secenekleri cizilsin), sonra pop.
-function homeToRoot(navigation, route, switchTab) {
-  silentPop.arm();
-  if (switchTab) navigation.navigate(route.name);
-  setTimeout(() => {
-    navigation.dispatch({ ...StackActions.popToTop(), target: route.state.key });
-    setTimeout(() => silentPop.disarm(), 400);
-  }, 80);
+// HER SEKME BASISTA KOKUNDEN ACILIR (9 Ekim; Codex teshisi + kullanici
+// videosu): sekmelerin yigininda acik kalan alt ekran (Rota, Calisma gecmisi,
+// Ayarlar) donuste gorunuyordu; koke donus saga kayan pop'la oluyordu.
+// Cikarken: yigin derinse once o sekmenin bayragi acilir (ekranlari
+// animasyonsuz cizilsin, dondurulmadan once), sonra gecis. Donerken: gecis
+// ve popToTop ayni anda -- eski ekran hic gorunmez, kayma olmaz.
+function isDeep(route) {
+  return Boolean(route?.state?.key && route.state.index > 0);
+}
+
+function popSilently(navigation, route) {
+  navigation.dispatch({ ...StackActions.popToTop(), target: route.state.key });
+  setTimeout(() => silentPop.disarm(route.name), 450);
 }
 
 // "+" paneli buyuk bir Modal; her sekme basisinda yeniden cizilmesin.
@@ -50,6 +52,12 @@ export function TabBar({ state, navigation }) {
   // (agir ekranda yuzlerce ms) beklemez. Gercek sekme gelince sifirlanir.
   const [pendingKey, setPendingKey] = useState(null);
   useEffect(() => { setPendingKey(null); }, [currentKey]);
+  // Sekmeye tab bar disindan donulduyse (bildirim, derin baglanti) bayrak acik
+  // kalmasin: o sekmede gecisler animasyonsuz kalirdi.
+  useEffect(() => {
+    const t = setTimeout(() => silentPop.disarm(currentKey), 600);
+    return () => clearTimeout(t);
+  }, [currentKey]);
   const shownKey = pendingKey || currentKey;
   const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === shownKey));
   const closeSheet = useCallback(() => setSheetOpen(false), []);
@@ -68,10 +76,13 @@ export function TabBar({ state, navigation }) {
       ? navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true })
       : { defaultPrevented: false };
     if (event.defaultPrevented) return;
-    const homeDeep = tab.key === SCREENS.HOME && route?.state?.key && route.state.index > 0;
-    if (homeDeep) {
-      if (!active) setPendingKey(tab.key);
-      homeToRoot(navigation, route, !active);
+    // Hedef sekmenin yigini derin: koke sessizce don.
+    if (isDeep(route)) {
+      const ready = silentPop.get(route.name);
+      silentPop.arm(route.name);
+      if (!active) { setPendingKey(tab.key); navigation.navigate(tab.key); }
+      if (ready) popSilently(navigation, route);
+      else requestAnimationFrame(() => requestAnimationFrame(() => popSilently(navigation, route)));
       return;
     }
     if (active) {
@@ -81,6 +92,13 @@ export function TabBar({ state, navigation }) {
     // Hap basildigi an kayar (iyimser secim); gecis HEMEN. 32ms gecikme
     // hizli basista siraya giriyordu ve iptal edilmiyordu (4 Ekim raporu).
     setPendingKey(tab.key);
+    const leaving = state.routes[state.index];
+    if (isDeep(leaving)) {
+      // Ayrilan sekme derin: ekranlari donmadan once animasyonsuz cizilsin.
+      silentPop.arm(leaving.name);
+      requestAnimationFrame(() => navigation.navigate(tab.key));
+      return;
+    }
     navigation.navigate(tab.key);
   };
 

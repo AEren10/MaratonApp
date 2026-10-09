@@ -79,7 +79,7 @@ const TAB_STACK_COMPONENTS = new Map(
 
     function TabStack() {
       // Sessiz geri acikken (silentPop) ekranlar animasyonsuz kapanir.
-      const silent = useSyncExternalStore(silentPop.subscribe, silentPop.get);
+      const silent = useSyncExternalStore(silentPop.subscribe, () => silentPop.get(root.name));
       return (
         <Stack.Navigator screenOptions={withSilent(screenOptions, silent)} screenLayout={DepthLayout}>
           <Stack.Screen name={rootScreenName} component={root.component} options={root.options} />

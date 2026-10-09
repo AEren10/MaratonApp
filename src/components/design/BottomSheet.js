@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, Modal, Platform, Pressable, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Easing, Extrapolation, interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming,
@@ -7,7 +7,9 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../../contexts/ThemeContext";
+import { alpha } from "../../themes/colorMix";
 import { ANIMATION, GUTTER, STEP } from "../../themes/tokens";
 
 // ALTTAN YUZEN PANEL -- elle yazilmis <Modal>'larin ortak iskeleti.
@@ -29,33 +31,16 @@ function project(velocity, rate = 0.998) {
 // edge: ekran kenarina yapisik (tam genislik, alt bosluk yok; guvenli alan cagirana ait).
 // header: verilirse surukleme YALNIZ bu bolgeden -- icerik kaydirilabilir listeyse
 // tum panele baglanan surukleme listeyi kaydirmak yerine paneli kapatmaya calisir.
-export function BottomSheet({
-  visible, onClose, children, style, keyboard = false, edge = false, header = null,
-}) {
+export function BottomSheet({ visible, onClose, children, style, keyboard = false, edge = false, header = null }) {
   const C = useC();
   const insets = useSafeAreaInsets();
+  const win = useWindowDimensions();
   const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(visible);
   const opened = useRef(false);
   const h = useSharedValue(OFF);
   const y = useSharedValue(OFF);
   const start = useSharedValue(0);
-  const kb = useSharedValue(0);
-
-  // Klavye: panel klavye yuksekligi kadar kalkar. KeyboardAvoidingView
-  // statusBarTranslucent Modal icinde boslugu yanlis olcup paneli ekranin
-  // tepesine itiyordu (iOS, "Kac dogru?"). Android'de pencere zaten yeniden
-  // boyutlaniyor; orada dokunulmaz.
-  useEffect(() => {
-    if (!keyboard || Platform.OS !== "ios") return undefined;
-    const show = Keyboard.addListener("keyboardWillShow", (e) => {
-      kb.set(withTiming(e.endCoordinates.height, { duration: e.duration || 250 }));
-    });
-    const hide = Keyboard.addListener("keyboardWillHide", (e) => {
-      kb.set(withTiming(0, { duration: e.duration || 250 }));
-    });
-    return () => { show.remove(); hide.remove(); };
-  }, [keyboard, kb]);
 
   useEffect(() => {
     if (visible) {
@@ -100,32 +85,40 @@ export function BottomSheet({
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(y.get(), [0, h.get()], [1, 0], Extrapolation.CLAMP),
   }));
-  // Klavye guvenli alanin ustunden baslar; panelin alt boslugu zaten onu iceriyor.
-  const bottomInset = edge ? 0 : insets.bottom;
-  const liftStyle = useAnimatedStyle(() => ({ paddingBottom: Math.max(0, kb.get() - bottomInset) }));
 
   if (!mounted) return null;
+  // Duz gri panel yerine ustten sonen silik kizil isik (9 Ekim, CenterCard ile ayni).
+  const glow = (
+    <LinearGradient pointerEvents="none" style={StyleSheet.absoluteFill}
+      colors={[alpha(C.accent, 12), alpha(C.accent, 3), "transparent"]} locations={[0, 0.4, 0.75]} />
+  );
+  const Wrap = keyboard ? KeyboardAvoidingView : Animated.View;
   const panel = [s.sheet, edge ? null : { marginBottom: insets.bottom + STEP.s3 }, { backgroundColor: C.surface, borderColor: C.elev }];
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <GestureHandlerRootView style={s.fill}>
+      {/* Kok acikca ekran boyunda (9 Ekim): iOS'ta panel Ana Sayfa'dan acilinca
+          ekranin TEPESINE oturuyordu ("Kac dogru?", durak tasima) -- Modal
+          kokunun boyu kisa geliyor, flex-end o kisa alanin altina yerlestiriyordu. */}
+      <GestureHandlerRootView style={[s.fill, { width: win.width, height: win.height }]}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, backdropStyle]}>
           <Pressable style={s.fill} onPress={onClose} accessibilityLabel="Kapat" />
         </Animated.View>
-        <Animated.View style={[s.bottom, edge && s.edge, liftStyle]} pointerEvents="box-none">
+        <Wrap style={[s.bottom, edge && s.edge]} behavior={keyboard && Platform.OS === "ios" ? "padding" : undefined} pointerEvents="box-none">
           {header ? (
             <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
+              {glow}
               <GestureDetector gesture={pan}><Animated.View>{header}</Animated.View></GestureDetector>
               {children}
             </Animated.View>
           ) : (
             <GestureDetector gesture={pan}>
               <Animated.View accessibilityViewIsModal onLayout={onLayout} style={[panel, style, sheetStyle]}>
+                {glow}
                 {children}
               </Animated.View>
             </GestureDetector>
           )}
-        </Animated.View>
+        </Wrap>
       </GestureHandlerRootView>
     </Modal>
   );
@@ -135,5 +128,5 @@ const s = StyleSheet.create({
   fill: { flex: 1 },
   bottom: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end", paddingHorizontal: GUTTER },
   edge: { paddingHorizontal: 0 },
-  sheet: { borderWidth: 1 },
+  sheet: { borderWidth: 1, overflow: "hidden" },
 });
