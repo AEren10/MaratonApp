@@ -11,6 +11,7 @@ import { RADIUS, SPACING, TYPOGRAPHY, NAV_ICON } from "../../themes/tokens";
 import { CompanionEffortCard } from "./components/CompanionEffortCard";
 import { RouteCompanionSkeleton } from "./components/RouteCompanionSkeleton";
 import { Press } from "../../components/design/Press";
+import { SCREENS } from "../../constants/screens";
 
 const PendingRow = memo(function PendingRow({ item, onRespond }) {
   const C = useC();
@@ -87,8 +88,13 @@ export default function RouteCompanionScreen() {
         <EmptyState icon="users" title="Şimdilik gösteremiyoruz"
           message="Yol arkadaşlığı verisi alınamadı." actionLabel="Tekrar dene" onAction={refresh} />
       ) : !dashboard && rows.length === 0 ? (
-        <EmptyState icon="users" title="Yan yana ilerlemek için"
-          message="Kabul edilmiş bir arkadaşınla yol arkadaşlığı kurduğunda haftalık emeğiniz burada görünür." />
+        <EmptyState
+          icon="users"
+          title="Birlikte hazırlandığın birini ekle"
+          message="Kütüphanedeki çalışma arkadaşının kodunu girip yol arkadaşlığı kurduğunda haftalık emeğiniz burada yan yana görünür."
+          actionLabel="Arkadaş Ekle"
+          onAction={() => navigation.navigate(SCREENS.FRIENDS)}
+        />
       ) : (
         <FlatList data={rows} renderItem={renderItem} keyExtractor={(row) => `${row.kind}-${row.item.id}`}
           ListHeaderComponent={header} contentContainerStyle={styles.content}

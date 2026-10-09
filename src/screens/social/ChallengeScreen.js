@@ -112,7 +112,7 @@ export default function ChallengeScreen() {
           {step === 0 && (
             <Animated.View style={{ gap: SPACING.md }}>
               <Text style={s.stepLabel}>Arkadaş Seç</Text>
-              {friends.length === 0 ? <EmptyState icon="users" title="Rakibini bul" message="Challenge başlatmak için arkadaş ekle" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
+              {friends.length === 0 ? <EmptyState icon="users" title="Birlikte hazırlandığın birini ekle" message="Challenge başlatmak için çalışma arkadaşının kodunu gir" actionLabel="Arkadaş Ekle" onAction={() => navigation.navigate(SCREENS.FRIENDS)} color="accent" /> : friends.map((f) => (
                 <Pressable key={f.id} onPress={() => { H.select(); setPick((p) => ({ ...p, friend: f })); setStep(1); }}
                   style={[s.optionRow, pick.friend?.id === f.id && { borderColor: C.accent }]}>
                   <Icon name="user" size={16} color={C.sec} />

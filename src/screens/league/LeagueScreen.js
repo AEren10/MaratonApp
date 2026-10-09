@@ -294,7 +294,16 @@ export default function LeagueScreen() {
       return <EmptyState icon="award" title="Sıralama yüklenemedi" message="Tekrar dene" color="accent" />;
     }
     if (tab === "friends") {
-      return <EmptyState icon="users" title="Rakibini bul, motivasyonunu katla" message="Arkadaşlarını ekle, haftalık soru sıralaması başlasın" actionLabel="Arkadaş Ekle" onAction={goAddFriend} color="accent" />;
+      return (
+        <EmptyState
+          icon="users"
+          title="Birlikte hazırlandığın birini ekle"
+          message="Kütüphanedeki çalışma arkadaşının kodunu gir; haftalık soru temposunda yan yana ilerleyin."
+          actionLabel="Arkadaş Ekle"
+          onAction={goAddFriend}
+          color="accent"
+        />
+      );
     }
     return <EmptyState icon="award" title="Henüz kimse yok" message="Bu haftanın sıralaması henüz oluşmadı" color="accent" />;
   }, [error, tab, goAddFriend]);

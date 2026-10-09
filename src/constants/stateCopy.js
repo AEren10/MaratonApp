@@ -53,6 +53,11 @@ export const EMPTY_COPY = {
     body: "Bir durak tamamladığında ya da deneme girdiğinde kart burada hazır olur.",
     primary: "Geri dön",
   },
+  friendsEmpty: {
+    title: "Birlikte hazırlandığın birini ekle.",
+    body: "Kütüphanedeki çalışma arkadaşının kodunu gir ya da ismini ara; haftalık soru ve deneme temposunda yan yana ilerleyin.",
+    primary: "Arkadaş ekle",
+  },
 
   streakZero: {
     title: "Seri henüz başlamadı.",

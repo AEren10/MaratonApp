@@ -171,8 +171,8 @@ export default function FriendsScreen() {
               {friends.length === 0 ? (
                 <EmptyState
                   icon="users"
-                  title="Rakiplerini ekle, birlikte yüksel"
-                  message="Yukarıdaki arama kutusundan arkadaşlarını bul"
+                  title="Birlikte hazırlandığın birini ekle"
+                  message="Kütüphanedeki çalışma arkadaşının kodunu gir ya da yukarıdan ismini ara; haftalık çalışma temposunda yan yana ilerleyin."
                   color="accent"
                 />
               ) : (
