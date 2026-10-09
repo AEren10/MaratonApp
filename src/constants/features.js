@@ -11,5 +11,7 @@
 // cizgisi ve duraklar | "glow" yalniz isilti (ust sol + asagida sag) | null kapali.
 export const FEATURES = Object.freeze({
   globalLeague: true,
-  homeBackdrop: null,
+  // 9 Ekim: geri acildi. Kapatildiktan sonra da sekme kasmasi surdu (suclu
+  // degildi); isilti tek PNG, GPU'da kopyalanir.
+  homeBackdrop: "glow",
 });

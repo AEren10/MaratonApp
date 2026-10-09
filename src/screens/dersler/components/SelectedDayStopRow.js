@@ -13,7 +13,8 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, showTime, onPress,
   const dotColor = subjectColorOf(C, log.subjectKey || log.subjectLabel);
   const habit = log.source === "habit";
   const name = log.topic || log.subjectLabel;
-  const meta = [log.topic ? log.subjectLabel : null, habit ? "Günlük rutin" : null].filter(Boolean).join(" · ");
+  const subjectLine = log.topic ? log.subjectLabel : null;
+  const habitLine = habit ? "Günlük rutin" : null;
 
   return (
     <Pressable onPress={onPress} disabled={!onPress} style={[s.row, (log.draft || isDraft) && s.draft]}>
@@ -28,7 +29,15 @@ export function SelectedDayStopRow({ log, isLast, isDraft, C, showTime, onPress,
 
       <View style={s.body}>
         <Text style={[TYPOGRAPHY.bodySemiBold, { color: isDone ? C.text3 : C.text }]} numberOfLines={1}>{name}</Text>
-        {meta ? <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>{meta}</Text> : null}
+        {/* Ders adi kendi renginde (biten durakta soluk): liste renksiz ve
+            ayirt edilmesi zordu. Ders rengi yalniz ders baglaminda. */}
+        {subjectLine || habitLine ? (
+          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]} numberOfLines={1}>
+            {subjectLine ? <Text style={{ color: isDone ? C.text3 : dotColor }}>{subjectLine}</Text> : null}
+            {subjectLine && habitLine ? " · " : null}
+            {habitLine}
+          </Text>
+        ) : null}
       </View>
 
       {isDone ? (

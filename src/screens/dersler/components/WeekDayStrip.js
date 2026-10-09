@@ -1,16 +1,20 @@
 import React, { useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { STEP, SHAPE } from "../../../themes/tokens";
+import { alpha } from "../../../themes/colorMix";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 
+// Sade serit (9 Ekim): yedi cerceveli kutu + kesikli gelecek gunler gurultuydu.
+// Yalniz secili gun kutulu ve kizil tonlu; bugun (secili degilken) ince
+// kizil cerceve; digerleri zeminsiz. Nokta: yesil bitti, gri bekleyen.
 function DayChip({ day, selected, onPress, C }) {
   const isSelected = selected;
   const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
 
-  const bg = isSelected ? C.elev : isPastDone ? C.surface : day.isFuture ? "transparent" : C.surface;
-  const border = isSelected ? C.selBorder : isPastDone ? C.border : day.isFuture ? C.line : C.elev;
-  const letterColor = isSelected ? C.selText : isPastDone ? C.text2 : C.text3;
+  const bg = isSelected ? alpha(C.accent, 14) : "transparent";
+  const border = isSelected ? alpha(C.accent, 55) : day.isToday ? alpha(C.accent, 30) : "transparent";
+  const letterColor = isSelected ? C.accentText : day.isToday ? C.text2 : C.text3;
   const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
   const dotColor = isSelected
     ? (day.active ? C.up : C.accent)
@@ -33,7 +37,6 @@ function DayChip({ day, selected, onPress, C }) {
         backgroundColor: bg,
         borderWidth: 1.5,
         borderColor: border,
-        borderStyle: day.isFuture && !isSelected ? "dashed" : "solid",
         alignItems: "center",
         justifyContent: "space-between",
         paddingBottom: 8,
@@ -75,29 +78,6 @@ export function WeekDayStrip({ days, selectedDate, onSelect, style }) {
           />
         ))}
       </View>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: STEP.s3, marginTop: STEP.s2 }}>
-        <Legend color={C.up} label="tamamlandı" C={C} />
-        <Legend color={C.text5} label="bekleyen" C={C} />
-        <Legend color="transparent" hollow label="boş gün" C={C} />
-      </View>
-    </View>
-  );
-}
-
-function Legend({ color, label, hollow, C }) {
-  return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-      <View
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: 4,
-          backgroundColor: hollow ? "transparent" : color,
-          borderWidth: hollow ? 1.5 : 0,
-          borderColor: C.border || C.line,
-        }}
-      />
-      <Text style={{ fontFamily: "Archivo_500", fontSize: 11.5, color: C.text3 }}>{label}</Text>
     </View>
   );
 }
