@@ -14,10 +14,12 @@ test("Apple auth refuses to open without explicit legal consent", () => {
   assert.match(buttons, /signInWithApple\(\{ termsAccepted \}\)/);
 });
 
-test("register and login Apple entry points both provide the consent state", () => {
+// Kayitta kutu zorunlu; giriste kutu yok, butonun altindaki bilgi satiri
+// onaydir (kullanici karari, 9 Ekim: "login'de neden sart kabul edeyim").
+test("register requires the checkbox; login shows a consent notice under Apple", () => {
   assert.match(register, /termsAccepted=\{agreed\}/);
-  assert.match(login, /const \[appleTermsAccepted, setAppleTermsAccepted\] = useState\(false\)/);
-  assert.match(login, /<TermsCheckbox[\s\S]{0,700}termsAccepted=\{appleTermsAccepted\}/);
+  assert.doesNotMatch(login, /TermsCheckbox/);
+  assert.match(login, /<SocialAuthButtons termsAccepted \/>[\s\S]{0,200}<TermsNotice/);
   assert.match(login, /SCREENS\.TERMS/);
   assert.match(login, /SCREENS\.PRIVACY/);
 });
