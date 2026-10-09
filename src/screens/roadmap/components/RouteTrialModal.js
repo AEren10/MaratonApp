@@ -62,7 +62,7 @@ export function RouteTrialModal({ visible, stop, onClose, onNavigateDetail }) {
   }, [trial?.subjects, C]);
 
   const handleGoDetail = useCallback(() => {
-    H.selection();
+    H.select();
     onClose?.();
     if (trial) onNavigateDetail?.(trial);
   }, [trial, onClose, onNavigateDetail]);

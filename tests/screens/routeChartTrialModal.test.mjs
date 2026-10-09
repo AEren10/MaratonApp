@@ -15,6 +15,10 @@ const modalSource = readFileSync(
   new URL("../../src/screens/roadmap/components/RouteTrialModal.js", import.meta.url),
   "utf8",
 );
+const roadmapSource = readFileSync(
+  new URL("../../src/screens/roadmap/RoadmapScreen.js", import.meta.url),
+  "utf8",
+);
 
 test("buildNetChart preserves trial object on each stop for interactive inspection", () => {
   const trialA = { id: "t1", date: "2026-06-17", trialType: "TYT", totalNet: 52, publisherNameSnapshot: "3D" };
@@ -48,4 +52,8 @@ test("RouteTrialModal renders publisher, formatted net, and navigation to trial 
   assert.match(modalSource, /getTrialPublisher/);
   assert.match(modalSource, /RouteTrialSubjects/);
   assert.match(modalSource, /Deneme Detayına Git/);
+  assert.match(modalSource, /H\.select\(\)/);
+  assert.doesNotMatch(modalSource, /H\.selection\(\)/);
+  assert.match(roadmapSource, /navigation\.navigate\(SCREENS\.TRIAL_DETAIL/);
+  assert.match(roadmapSource, /\{ trial, trialId: trial\?\.id, id: trial\?\.id \}/);
 });
