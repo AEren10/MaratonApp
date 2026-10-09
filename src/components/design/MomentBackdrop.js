@@ -69,6 +69,9 @@ export const MomentBackdrop = memo(function MomentBackdrop({ height, flip = fals
   const paths = useMemo(() => linePaths(width, h, flip), [width, h, flip]);
 
   if (variant === "glow") {
+    // Acik temada koyu kirmizi PNG resmi (glow-corner.png) beyaz uzerine
+    // oturunca kirli bir leke olusturuyordu (9 Ekim).
+    if (light) return null;
     const flipX = flip ? -1 : 1;
     // fadeTop (asagidaki ikinci isilti): kose asagida; dikeyde de aynalanir.
     const flipY = fadeTop ? -1 : 1;

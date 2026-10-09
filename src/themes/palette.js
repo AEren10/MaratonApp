@@ -22,10 +22,10 @@ export const SEEDS = {
   light: {
     // Acik zeminde parlak kizil "alarm" gibi bagiriyordu: koyu sarap tonu.
     accent: "#C42633",
-    bg: "#F6F6F8",      // Ferah, temiz neutral-light zemin (Apple/Linear standardi)
-    canvas: "#F6F6F8",
-    text: "#16120F",
-    up: "#10632E",      // AA: bg 6.84 / elev 7.38
+    bg: "#F2F2F7",      // Ferah, dinlendirici iOS neutral-light zemin (goz yoran bembeyaz parlama kalkti)
+    canvas: "#F2F2F7",
+    text: "#18181B",    // Zengin koyu charcoal/zinc-900 (asiri sert saf siyah #000 yerine gozu yormayan net tipografi)
+    up: "#16A34A",      // Canli zumrut yesili
   },
 };
 
@@ -46,29 +46,29 @@ const FIXED = {
   light: {
     // Notr modern gri basamaklar.
     // AA (bg / surface / elev): text2 7.64 / 8.24 · text3 4.68 / 5.05
-    text2: "#4E4E56",
-    text3: "#6E6E77",
-    text4: "#9C9CA4",
-    text5: "#D1D1D8",
+    text2: "#52525B",
+    text3: "#71717A",
+    text4: "#A1A1AA",
+    text5: "#D4D4D8",
     accentInk: "#FFFFFF",
-    accentBright: "#A81C27", // AA: bg 6.80 / elev 7.34
-    down: "#566B79",         // AA: bg 5.15 / elev 5.56 (kotu haber bagirmaz)
-    warn: "#92400E",         // AA: bg 6.57 / elev 7.09
-    danger: "#C4262F",       // AA: bg 5.31 / elev 5.73
+    accentBright: "#C42633",
+    down: "#64748B",
+    warn: "#D97706",         // Canli sicak kehribar / altin sarisi — camurlu kahverengi DEGIL
+    danger: "#DC2626",
   },
 };
 
-// Acik temada yuzey basamaklari: ferah notr zemin (#F6F6F8) uzerinde saf beyaz
-// kartlar (#FFFFFF), cok ince zarif kenarlik (#EAEAEF) ve mikro golge.
+// Acik temada yuzey basamaklari: ferah notr zemin (#F2F2F7) uzerinde saf beyaz
+// kartlar (#FFFFFF), cok ince zarif kenarlik (#EAEAEE) ve mikro golge.
 // Camurlu sari/kahve tonlar kalkti; kartlar ve girintiler temiz iOS standartlarinda.
 const LIGHT_SURFACES = {
   surface: "#FFFFFF",
   elev: "#FFFFFF",
-  border: "#E2E2EA",
-  line: "#EAEAEF",
-  track: "#E5E5EB",
-  void: "#EEEEF4",
-  sand: "#F2F0EB",
+  border: "#DFDFE6",
+  line: "#EAEAEE",
+  track: "#E4E4EB",
+  void: "#EAEAEE",
+  sand: "#F0EFEA",
 };
 
 // Tasarım dosyası 9 ders rengi tanımlıyor (--s-tur … --s-din). Müfredat ise
@@ -96,23 +96,23 @@ export const SUBJECT_COLORS = {
     inkilap: "#fda4af",  // LGS İnkılap Tarihi
   },
   light: {
-    // Kum kart ustunde yazi olarak da okunur (AA 4.6+): ton ayni, koyuluk artti.
-    // Tarih koyu temadaki gibi altin ailesinde; matematikle (yanik turuncu) karismasin.
-    turkce: "#275BAB",
-    matematik: "#944612",
-    fizik: "#0C657D",
-    kimya: "#A92A5E",
-    biyoloji: "#126B33",
-    tarih: "#6E5C0A",
-    cografya: "#474CCA",
-    felsefe: "#7A36C8",
-    din: "#436709",
-    edebiyat: "#923398",
-    ingilizce: "#0C657D",
-    ydt_ingilizce: "#0C657D",
-    fen: "#09675F",
-    sosyal: "#6B3DCF",
-    inkilap: "#9F3948",
+    // Kum kart ustunde yazi olarak da okunur: ton ayni, canlilik yuksek.
+    // Tarih ve matematik sicak ailelerde ancak kahverengiye kacmayan canli tonlar.
+    turkce: "#1D64C2",
+    matematik: "#D46B18",    // Sicak kayisi / terracotta-turuncu (koyu temadaki #E0A570 karsiligi, kahverengi DEGIL)
+    fizik: "#0891B2",
+    kimya: "#DB2777",
+    biyoloji: "#16A34A",
+    tarih: "#B48206",        // Canli altin sarisi / bal (koyu temadaki #D6C25A karsiligi, camurlu zeytin DEGIL)
+    cografya: "#7C3AED",
+    felsefe: "#8B5CF6",
+    din: "#78716C",          // Sicak tas gri (koyu temadaki #C8B8A6 karsiligi)
+    edebiyat: "#A21CAF",
+    ingilizce: "#0284C7",
+    ydt_ingilizce: "#0284C7",
+    fen: "#0D9488",
+    sosyal: "#7C3AED",
+    inkilap: "#E11D48",
   },
 };
 
@@ -188,12 +188,11 @@ export function buildPalette(scheme = "dark", overrides = {}) {
     edgeStrong: isDark ? surfaces.border : surfaces.line,
     edgeSoft: isDark ? surfaces.elev : surfaces.line,
 
-    // Seri alevi: turuncu. Kizil ana buton + rota cizgisine ait; seri
-    // (alev, takvimde calisilan gun, seri noktalari) kendi sicak tonunda.
-    // Acik temada koyulastirildi: zemin ustunde AA (>= 4.5).
-    flame: isDark ? "#FF8A3D" : "#9E3206",
+    // Seri alevi: canli ates turuncusu. Kizil ana buton + rota cizgisine ait;
+    // seri (alev, takvimde calisilan gun, seri noktalari) kendi canli sicak tonunda.
+    flame: isDark ? "#FF8A3D" : "#FF6B00",
     flameInk: isDark ? "#241307" : "#FFFFFF",
-    flameDeep: isDark ? "#6B3416" : "#EBC2A6",
+    flameDeep: isDark ? "#6B3416" : "#EA580C",
 
     // Rota / grafik türevleri
     proj: mix(accent, isDark ? 52 : 62, bg),

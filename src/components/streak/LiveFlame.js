@@ -65,8 +65,10 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase 
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: 0.4 + glow.get() * 0.5, transform: [{ scale: 0.9 + glow.get() * 0.18 }] }));
 
+  const isDark = C.scheme !== "light";
   const base = lit ? C.flame : C.text3;
-  const tip = lit ? C.warn : C.text3;
+  const tip = lit ? (isDark ? C.warn : "#FFB800") : C.text3;
+  const coreColor = lit ? (isDark ? C.warn : "#F59E0B") : C.text3;
   const box = { width: size, height: size };
 
   return (
@@ -76,7 +78,7 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase 
           <Svg width={size} height={size} viewBox="0 0 24 24">
             <Defs>
               <RadialGradient id="lfGlow" cx="50%" cy="62%" r="50%">
-                <Stop offset="0" stopColor={C.flame} stopOpacity={0.55} />
+                <Stop offset="0" stopColor={C.flame} stopOpacity={isDark ? 0.55 : 0.22} />
                 <Stop offset="1" stopColor={C.flame} stopOpacity={0} />
               </RadialGradient>
             </Defs>
@@ -98,7 +100,7 @@ export const LiveFlame = memo(function LiveFlame({ size = 56, lit = true, phase 
       {lit ? (
         <Animated.View style={[StyleSheet.absoluteFill, s.origin, coreStyle]}>
           <Svg width={size} height={size} viewBox="0 0 24 24">
-            <Path d={CORE} fill={C.warn} opacity={0.9} />
+            <Path d={CORE} fill={coreColor} opacity={0.95} />
           </Svg>
         </Animated.View>
       ) : null}

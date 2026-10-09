@@ -23,13 +23,11 @@ const TOP_LIGHT_DARK = 0.065;
 const SUBJECT_TINT_DARK = 0.14;
 const STATE_TINT_DARK = 0.12;
 
-// Açık tema sabitleri (Brief 22)
-// Beyazdan zemine inen yumuşak parlaklık, ekranın üst ~%45'inde söner.
-// Katman içeriğin ÜSTÜNDE: 0.55 beyaz başlık metnini griye çevirip kontrastı
-// ~2.8:1'e düşürüyordu (AA altı). 0.18'de metin ~10:1 kalıyor, ışık okunuyor.
-const TOP_LIGHT_LIGHT = 0.18;
-const SUBJECT_TINT_LIGHT = 0.10;
-const STATE_TINT_LIGHT = 0.08;
+// Açık tema sabitleri
+// Katman içeriğin ÜSTÜNDE olduğu için beyaz sis metin kontrastını düşürmemeli.
+const TOP_LIGHT_LIGHT = 0;
+const SUBJECT_TINT_LIGHT = 0.08;
+const STATE_TINT_LIGHT = 0.06;
 
 // Kaydirinca isik soner: 0 -> 180 px arasi opaklik 1 -> 0.35 (tamamen
 // kaybolmaz, ust kenar yine derin durur). scrollY yoksa (kaydirma bildirmeyen

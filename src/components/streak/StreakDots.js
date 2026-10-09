@@ -42,12 +42,13 @@ function Dot({ state, size, settle, flame }) {
 // flame: dolu gunun icinde kucuk alev (seri panelinde buyuk noktalar icin).
 export function StreakDots({ days = [], size = 10, settle = false, labels = true, flame = false }) {
   const C = useC();
+  const isDark = C.scheme !== "light";
   return (
     <View style={s.row} accessible accessibilityLabel={`Bu hafta ${days.filter((d) => d.state === "done").length} gün çalıştın`}>
       {days.map((d) => (
         <View key={d.key} style={s.col}>
           {labels ? (
-            <Text style={[TYPOGRAPHY.micro, { color: d.state === "today" ? C.flame : C.text3 }]}>{d.label}</Text>
+            <Text style={[TYPOGRAPHY.micro, { color: d.state === "today" ? (isDark ? C.flame : "#C2410C") : C.text3 }]}>{d.label}</Text>
           ) : null}
           <Dot state={d.state} size={size} settle={settle} flame={flame} />
         </View>
