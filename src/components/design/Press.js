@@ -58,6 +58,10 @@ export function Press({
       onPressOut={() => { to(1); if (dynamicStyle) setPressed(false); }}
       onPress={(e) => {
         if (disabled) return;
+        // Basis cogu zaman sayfa acar; ekran hemen dondurulur ve 130ms'lik
+        // geri buyume yarida kalir -- donuste satir %97'de takili kaliyordu
+        // (Program: "Geride kalan konular" saga kaymis gibi). Aninda 1.
+        scale.set(1);
         fire?.();
         onPress?.(e);
       }}
