@@ -1,3 +1,4 @@
+import { todayTR } from "../../lib/dateUtils.js";
 // DURAK TIKI -> CALISMA KAYDI (saf katman).
 //
 // NEDEN VAR
@@ -18,8 +19,15 @@
 // gibi gorunmuyor ama hedefe de sayilmiyor.
 
 /** Kayit durakla AYNI kimligi tasir: iki kez tiklemek iki kayit yaratmaz. */
-export function stopLogOperationId(stopId) {
-  return stopId ? `stop_log_${stopId}` : null;
+// Tarih tasimayan duraklar ("ai_suggestion", rota yokken "plan_ders_konu")
+// her gun ayni kimlikle geliyordu: ertesi gun tiklenince sunucu kaydi "zaten
+// var" sayip bugunun calismasini yazmiyor, tik geri alininca dunku kaydi
+// siliyordu (9 Ekim denetimi). Bunlarin kimligine gun eklenir.
+const undated = (id) => id === "ai_suggestion" || String(id).startsWith("plan_");
+
+export function stopLogOperationId(stopId, day = todayTR()) {
+  if (!stopId) return null;
+  return undated(stopId) ? `stop_log_${stopId}_${day}` : `stop_log_${stopId}`;
 }
 
 /**

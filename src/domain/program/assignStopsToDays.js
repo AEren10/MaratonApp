@@ -93,7 +93,11 @@ export function assignWeekStops(stops = [], schedule = null, {
     ? Math.round((new Date(`${String(examDate).slice(0, 10)}T12:00:00`) - new Date(`${monday}T12:00:00`)) / 86400000)
     : 99;
   const fromFirst = base.filter((d) => d >= firstIdx && d < examIdx);
-  const allowed = fromFirst.length ? fromFirst : base;
+  // Kalan gunlerde calisma gunu yoksa (or. Pzt-Cum calisan, Cumartesi kayit
+  // olan) duraklar GECMIS gunlere dusuyor ve "Bu haftadan kalan" / sonra borc
+  // gorunuyordu (9 Ekim denetimi): haftanin kalan gunlerine yerlesir.
+  const rest = [0, 1, 2, 3, 4, 5, 6].filter((d) => d >= firstIdx && d < examIdx && !blocked.has(d));
+  const allowed = fromFirst.length ? fromFirst : rest.length ? rest : base;
   if (allowed.length === 0) return days;
   const load = Array(7).fill(0);
   const cap = dayCapacity(schedule, rhythm);

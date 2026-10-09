@@ -6,6 +6,7 @@ import { useAppDispatch } from "../store/hooks";
 import { setTrials } from "../store/slices/trialSlice";
 import { setTodayLogs, setStreak, setFreezeCount, setLongestStreak, setFreezeResetAt, setLastStudyDate } from "../store/slices/studyLogSlice";
 import { effectiveStreak } from "../domain/streak/effectiveStreak";
+import { effectiveFreeze } from "../domain/streak/streakWeek";
 import { setGoals, saveGoalsToStorage } from "../store/slices/goalsSlice";
 import { setUserTasks } from "../store/slices/userTasksSlice";
 import { loadGamificationFromStorage, hydrateGamification, setRetentionData, setMaxStat } from "../store/slices/gamificationSlice";
@@ -122,7 +123,9 @@ async function loadAll(userId, dispatch) {
     const streakVal = effectiveStreak({
       current: streak.value.current_streak,
       lastStudyDate: streak.value.last_study_date,
-      freezeCount: streak.value.freeze_count,
+      // Joker yenilenmisse (freeze_reset_at gecti) sunucu gibi 1 say: ham
+      // freeze_count=0 ile joker kurtarabilecekken seri 0 gorunuyordu.
+      freezeCount: effectiveFreeze({ freezeCount: streak.value.freeze_count, freezeResetAt: streak.value.freeze_reset_at }),
     }, todayTR());
     dispatch(setStreak(streakVal));
     dispatch(setFreezeCount(streak.value.freeze_count ?? 0));
@@ -200,7 +203,7 @@ async function loadAll(userId, dispatch) {
 
   // studiedToday: seri-riski bildirimi bugün çalışmış kullanıcıya gitmesin.
   const streakToday = streak.status === "fulfilled" && streak.value
-    ? effectiveStreak({ current: streak.value.current_streak, lastStudyDate: streak.value.last_study_date, freezeCount: streak.value.freeze_count }, todayTR())
+    ? effectiveStreak({ current: streak.value.current_streak, lastStudyDate: streak.value.last_study_date, freezeCount: effectiveFreeze({ freezeCount: streak.value.freeze_count, freezeResetAt: streak.value.freeze_reset_at }) }, todayTR())
     : 0;
   loadNotifPrefsFromServer(userId).then(async (serverPrefs) => {
     const prefs = serverPrefs || await getNotifPrefs(userId);

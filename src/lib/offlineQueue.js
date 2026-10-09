@@ -409,6 +409,15 @@ async function flushQueueLocked() {
         processed += 1;
         if (!processedTypes.includes(item.type)) processedTypes.push(item.type);
       } catch (e) {
+        // Baglanti yok: deneme hakki harcanmaz (cevrimdisi ogrencinin kayitlari
+        // ~15 dk icinde dead-letter'a dusuyordu, 9 Ekim denetimi). Kalanlari da
+        // bosuna deneme; baglanti gelince hepsi sirayla gider.
+        if (isNetworkError(e)) {
+          remaining.push({ ...item, lastAttempt: Date.now() });
+          for (let j = i + 1; j < valid.length; j++) remaining.push(valid[j]);
+          failed += 1;
+          break;
+        }
         const bumped = { ...item, retryCount: (item.retryCount || 0) + 1, lastAttempt: Date.now() };
         if (isAuthError(e)) {
           remaining.push(bumped);
@@ -434,6 +443,11 @@ async function flushQueueLocked() {
     await writeQueue(remaining);
     return { processed, failed, types: processedTypes };
   } finally { _flushing = false; }
+}
+
+function isNetworkError(e) {
+  const msg = String(e?.message || e || "");
+  return /network request failed|failed to fetch|fetch failed|network error|timed? ?out|aborterror|ECONN|ENOTFOUND/i.test(msg);
 }
 
 export async function clearQueue() {
