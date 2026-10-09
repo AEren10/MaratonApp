@@ -43,3 +43,27 @@ için docs/DURUM.md ve store/appreview.md.
       kontrolü (avukata danışılacak).
 - [ ] Migration defteri: canlıda kayıt adı olmayan `friend_notifications`
       migration'ı (nesneleri canlıda var).
+
+## İlk güncelleme: eksik kullanıcı verileri (10 Ekim değerlendirmesi, öncelik sırasıyla)
+
+Rapor kodda ve canlı DB'de doğrulandı. Bunlar hata değil, yeni özellik.
+
+1. [ ] **Yanlış sebebi etiketi** -- `wrong_questions`'a alan (dikkatsizlik / bilgi eksiği /
+       süre yetmedi / soru kökünü yanlış okuma); yanlış eklerken tek dokunuş. Koçluk cümleleri
+       ("matematik yanlışlarının %70'i dikkatsizlik") bunun üstüne kurulur.
+2. [ ] **Sınıf durumu** (11. sınıf / 12. sınıf / mezun) -- kurulumda tek soru; rota haftalık
+       kapasitesi buna göre (12. sınıfta hafta içi okul saatleri).
+3. [ ] **Deneme puanı ve Türkiye sıralaması / yüzdelik** -- deneme girişinde isteğe bağlı iki alan.
+4. [ ] Kurulumda hedef bölüm (`profiles.target_department` var, sorulmuyor).
+5. [ ] Çalışma yöntemi (konu anlatımı / video / soru bankası) ve kaynak kitap; yanlışa çözüm fotoğrafı.
+6. [ ] Kurulumda mola günü sorusu (ders programındaki "boş gün" zaten var; kurulmazsa 7 gün varsayılıyor).
+7. [ ] Çevrimdışı silme: deneme ve çalışma kaydı silme kuyruğa alınsın (şimdi hata verip geri geliyor).
+
+Geçersiz çıkan iddialar (yapılmayacak): deneme taslağı zaten var; `adHocTasks` ölü kod; XP sunucu
+otoritesi bilinçli.
+
+## Denetimden kalan (9 Ekim)
+- [ ] Apple ile girişte hesap silinirken token iptali (5.1.1(v)) -- .p8 anahtarı + edge function. App Store öncesi.
+- [ ] Rota: sınava yakın haftalarda kapasite takvim haftasıyla hizalı değil (`scheduler.js`).
+- [ ] Haftalık/aylık özet geçmiş dönem durak sayısı 0 (`summary/activity.js` geçmiş haftaları görmüyor).
+- [ ] Aylık özette branş netleri TYT ile karışıyor (`monthNets.js`).
