@@ -1,8 +1,13 @@
 import { View, Text } from "react-native";
+import { useC } from "../../contexts/ThemeContext";
+import { alpha } from "../../themes/colorMix";
+import { SHAPE } from "../../themes/tokens";
 
-export function Chip({ children, color = "#8b5cf6", bg, style }) {
-  const background = bg ?? color + "1C";
-  const border = color + "40";
+export function Chip({ children, color, bg, style }) {
+  const C = useC();
+  const chipColor = color || C.accent;
+  const background = bg ?? alpha(chipColor, 12);
+  const border = alpha(chipColor, 28);
   return (
     <View
       style={[
@@ -13,7 +18,7 @@ export function Chip({ children, color = "#8b5cf6", bg, style }) {
           backgroundColor: background,
           borderWidth: 1,
           borderColor: border,
-          borderRadius: 999,
+          borderRadius: SHAPE.chip,
           paddingHorizontal: 10,
           paddingVertical: 5,
           alignSelf: "flex-start",
@@ -25,8 +30,8 @@ export function Chip({ children, color = "#8b5cf6", bg, style }) {
         <Text
           style={{
             fontFamily: "Archivo_600",
-            fontSize: 11,
-            color,
+            fontSize: 11.5,
+            color: chipColor,
             letterSpacing: 0.6,
           }}
         >

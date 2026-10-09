@@ -4,7 +4,7 @@ import { useColorScheme } from "react-native";
 import { buildPalette, ACCENT_PRESETS } from "../themes/palette";
 import { alpha } from "../themes/colorMix";
 import { TYPE, FONTS, TRACKING } from "../themes/typography";
-import { SPACING, RADIUS, ELEVATION, ANIMATION, SHADOW } from "../themes/tokens";
+import { SPACING, RADIUS, ELEVATION, ANIMATION, SHADOW, setRuntimeScheme } from "../themes/tokens";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import * as appStorage from "../lib/storage/appStorage";
 
@@ -47,6 +47,10 @@ export function ThemeProvider({ children }) {
   }, []);
 
   const scheme = pref === "system" ? (systemScheme === "light" ? "light" : "dark") : pref;
+
+  useEffect(() => {
+    setRuntimeScheme(scheme);
+  }, [scheme]);
 
   const setPref = useCallback((next) => {
     const value = VALID_PREFS.includes(next) ? next : "dark";

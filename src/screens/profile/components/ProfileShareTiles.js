@@ -121,7 +121,7 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   badge: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6 },
-  badgeText: { fontFamily: "Archivo_600", fontSize: 9.5, letterSpacing: 0.8 },
+  badgeText: { fontFamily: "Archivo_600", fontSize: 11.5, letterSpacing: 0.8 },
   bottomContent: { marginTop: STEP.s2 + 2 },
   titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 4 },
   title: { fontSize: 14.5, flex: 1 },

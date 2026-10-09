@@ -1,7 +1,11 @@
 import { View } from "react-native";
+import { useC } from "../../contexts/ThemeContext";
+import { alpha } from "../../themes/colorMix";
 import { Icon } from "./Icon";
 
-export function IconBox({ icon, color = "#8b5cf6", size = 38, rounded = 12, iconSize, style }) {
+export function IconBox({ icon, color, size = 38, rounded = 12, iconSize, style }) {
+  const C = useC();
+  const boxColor = color || C.accent;
   return (
     <View
       style={[
@@ -9,14 +13,14 @@ export function IconBox({ icon, color = "#8b5cf6", size = 38, rounded = 12, icon
           width: size,
           height: size,
           borderRadius: rounded,
-          backgroundColor: color + "22",
+          backgroundColor: alpha(boxColor, 14),
           alignItems: "center",
           justifyContent: "center",
         },
         style,
       ]}
     >
-      <Icon name={icon} size={iconSize ?? size * 0.5} color={color} />
+      <Icon name={icon} size={iconSize ?? size * 0.5} color={boxColor} />
     </View>
   );
 }

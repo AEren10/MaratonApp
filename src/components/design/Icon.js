@@ -1,4 +1,5 @@
 import Svg, { Path, Circle, Polyline, Line, Polygon, Rect, G } from "react-native-svg";
+import { C } from "../../themes/tokens";
 import { SUBJECT_GLYPHS } from "./subjectGlyphs";
 
 const ICONS = {
@@ -422,11 +423,12 @@ const ICONS = {
   ...SUBJECT_GLYPHS,
 };
 
-export function Icon({ name, size = 20, color = "#FFFFFF", sw = 1.5, fill = "none" }) {
+export function Icon({ name, size = 20, color, sw = 1.5, fill = "none" }) {
   const path = ICONS[name];
   if (!path) return null;
+  const strokeColor = color || C.text || "#ECE8E4";
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={strokeColor} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
       {path}
     </Svg>
   );

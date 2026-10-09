@@ -1,6 +1,9 @@
 import { Text } from "react-native";
+import { useC } from "../../contexts/ThemeContext";
 
-export function Stat({ children, size = 46, color = "#FFFFFF", style }) {
+export function Stat({ children, size = 46, color, style }) {
+  const C = useC();
+  const textColor = color || C.text;
   return (
     <Text
       style={[
@@ -9,7 +12,7 @@ export function Stat({ children, size = 46, color = "#FFFFFF", style }) {
           fontSize: size,
           lineHeight: size * 1.05,
           letterSpacing: -size * 0.025,
-          color,
+          color: textColor,
           includeFontPadding: false,
         },
         style,

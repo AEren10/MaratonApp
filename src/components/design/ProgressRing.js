@@ -8,17 +8,22 @@ import Animated, {
 } from "react-native-reanimated";
 import { useEffect } from "react";
 
+import { useC } from "../../contexts/ThemeContext";
+
 const AnimCircle = Animated.createAnimatedComponent(Circle);
 
 export function ProgressRing({
   size = 56,
   stroke = 6,
   value = 0,
-  color = "#8b5cf6",
-  trackColor = "rgba(21,22,26,0.08)",
+  color,
+  trackColor,
   children,
   animated = true,
 }) {
+  const C = useC();
+  const ringColor = color || C.accent;
+  const ringTrack = trackColor || C.track;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const clamped = Math.min(Math.max(value, 0), 1);
@@ -44,7 +49,7 @@ export function ProgressRing({
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke={trackColor}
+          stroke={ringTrack}
           strokeWidth={stroke}
           fill="none"
         />
@@ -52,7 +57,7 @@ export function ProgressRing({
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke={color}
+          stroke={ringColor}
           strokeWidth={stroke}
           fill="none"
           strokeLinecap="round"
