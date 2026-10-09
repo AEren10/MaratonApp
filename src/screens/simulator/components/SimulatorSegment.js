@@ -22,13 +22,13 @@ export const SimulatorSegment = memo(function SimulatorSegment({ activeTab, onSe
             onPress={() => onSelectTab(t.key)}
             style={[
               styles.tab,
-              active && { backgroundColor: C.surface, borderColor: C.elev },
+              active && { backgroundColor: C.surface, borderColor: C.border },
             ]}
           >
             <Text
               style={[
                 TYPOGRAPHY.captionMedium,
-                { color: active ? C.text : C.text3 },
+                { color: active ? C.text : C.text3, fontFamily: active ? "Archivo_600" : "Archivo_500" },
               ]}
             >
               {t.label}

@@ -2,23 +2,14 @@ import { memo, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
-import { buildPreferenceList } from "../../../domain/preference/preferenceEngine";
+import { classifyProgram } from "../../../domain/preference/preferenceEngine";
 import { PROGRAMS, PROGRAMS_DISCLAIMER } from "../../../data/programs";
 import { estimateRankDetails } from "../../../data/rankingTable";
 import { SHAPE, STEP, TYPOGRAPHY } from "../../../themes/tokens";
-import { NetInputStepper } from "./NetInputStepper";
+import { PreferenceSimulatorCockpit } from "./PreferenceSimulatorCockpit";
+import { PreferenceSearchBar } from "./PreferenceSearchBar";
 import { PreferenceProgramRow } from "./PreferenceProgramRow";
-
-const SCORE_TYPES = [
-  { key: "say", label: "SAY" }, { key: "ea", label: "EA" }, { key: "soz", label: "SÖZ" }, { key: "dil", label: "DİL" }, { key: "tyt", label: "TYT" },
-];
-
-const TAB_TONES = {
-  safe: { bg: "18", color: "up", border: "up" },
-  target: { bg: "18", color: "warn", border: "warn" },
-  reach: { bg: "18", color: "accentBright", border: "accent" },
-  blocked: { bg: "18", color: "danger", border: "danger" },
-};
+import { PreferenceFilterTabs, TAB_TONES } from "./PreferenceFilterTabs";
 
 export const PreferenceListSection = memo(function PreferenceListSection({
   initialTyt = 70,
@@ -29,7 +20,8 @@ export const PreferenceListSection = memo(function PreferenceListSection({
   const [tytNet, setTytNet] = useState(initialTyt);
   const [aytNet, setAytNet] = useState(initialAyt);
   const [scoreType, setScoreType] = useState(initialType);
-  const [filterTab, setFilterTab] = useState("safe");
+  const [filterTab, setFilterTab] = useState("all");
+  const [query, setQuery] = useState("");
 
   const rankDetails = useMemo(
     () => estimateRankDetails({ tytNet, aytNet, type: scoreType }),
@@ -41,90 +33,99 @@ export const PreferenceListSection = memo(function PreferenceListSection({
     [scoreType]
   );
 
-  const prefResult = useMemo(
-    () => buildPreferenceList(programsForType, rankDetails.rank, {
-      size: 30,
-      userNets: { tytNet, aytNet, type: scoreType },
-    }),
-    [programsForType, rankDetails.rank, tytNet, aytNet, scoreType]
-  );
+  const allClassified = useMemo(() => {
+    return programsForType
+      .map((p) => classifyProgram(p, rankDetails.rank, { tytNet, aytNet, type: scoreType }))
+      .filter(Boolean)
+      .sort((a, b) => (a.program.rank || 0) - (b.program.rank || 0));
+  }, [programsForType, rankDetails.rank, tytNet, aytNet, scoreType]);
 
-  const displayedList = useMemo(
-    () => (filterTab === "blocked" ? prefResult.blocked : prefResult.list.filter((x) => x.status === filterTab)),
-    [prefResult, filterTab]
-  );
+  const counts = useMemo(() => ({
+    all: allClassified.length,
+    safe: allClassified.filter((x) => x.status === "safe").length,
+    target: allClassified.filter((x) => x.status === "target").length,
+    reach: allClassified.filter((x) => x.status === "reach").length,
+    blocked: allClassified.filter((x) => x.status === "blocked").length,
+  }), [allClassified]);
+
+  const displayedList = useMemo(() => {
+    const q = query.trim().toLocaleLowerCase("tr");
+    return allClassified.filter((item) => {
+      const matchQuery = !q ||
+        item.program.name.toLocaleLowerCase("tr").includes(q) ||
+        (item.program.uni && item.program.uni.toLocaleLowerCase("tr").includes(q));
+      if (!matchQuery) return false;
+      if (filterTab === "all") return true;
+      return item.status === filterTab;
+    });
+  }, [allClassified, query, filterTab]);
 
   const tabs = [
-    { key: "safe", label: `Güvenli · ${prefResult.counts.safe}` },
-    { key: "target", label: `Hedef · ${prefResult.counts.target}` },
-    { key: "reach", label: `İddialı · ${prefResult.counts.reach}` },
-    ...(prefResult.blocked.length > 0 ? [{ key: "blocked", label: `Baraj · ${prefResult.blocked.length}` }] : []),
+    { key: "all", label: `Tümü · ${counts.all}` },
+    { key: "safe", label: `Güvenli · ${counts.safe}` },
+    { key: "target", label: `Hedef · ${counts.target}` },
+    { key: "reach", label: `İddialı · ${counts.reach}` },
+    ...(counts.blocked > 0 ? [{ key: "blocked", label: `Baraj · ${counts.blocked}` }] : []),
   ];
 
   return (
     <View style={s.wrap}>
-      <View style={s.typeRow}>
-        {SCORE_TYPES.map((t) => {
-          const act = scoreType === t.key;
-          return (
-            <Press
-              key={t.key}
-              haptic="tap"
-              onPress={() => setScoreType(t.key)}
-              style={[s.chip, { backgroundColor: act ? C.surface : C.void, borderColor: act ? C.accent : C.line }]}
-            >
-              <Text style={[TYPOGRAPHY.captionMedium, { color: act ? C.accentBright : C.text3 }]}>{t.label}</Text>
-            </Press>
-          );
-        })}
-      </View>
+      <PreferenceSimulatorCockpit
+        scoreType={scoreType}
+        onSelectScoreType={setScoreType}
+        rankDetails={rankDetails}
+        tytNet={tytNet}
+        onChangeTyt={setTytNet}
+        aytNet={aytNet}
+        onChangeAyt={setAytNet}
+        C={C}
+      />
 
-      <NetInputStepper label="TYT NETİ (120 Soru)" value={tytNet} onChange={setTytNet} max={120} />
-      {scoreType !== "tyt" ? (
-        <NetInputStepper label={`${scoreType.toUpperCase()} NETİ (80 Soru)`} value={aytNet} onChange={setAytNet} max={80} />
-      ) : null}
+      <PreferenceSearchBar query={query} onChangeQuery={setQuery} C={C} />
 
-      <View style={s.metricsRow}>
-        <View style={[s.metricCard, { backgroundColor: C.surface, borderColor: C.line }]}>
-          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>TAHMİNİ PUAN</Text>
-          <Text style={[TYPOGRAPHY.heading, s.heroNum, { color: C.text }]}>{rankDetails.scoreFormatted}</Text>
-        </View>
-        <View style={[s.metricCard, { backgroundColor: C.surface, borderColor: C.line }]}>
-          <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>TAHMİNİ SIRALAMA</Text>
-          <Text style={[TYPOGRAPHY.subheading, s.heroNum, { color: C.accentBright }]}>{rankDetails.rankBand}</Text>
-        </View>
-      </View>
+      <PreferenceFilterTabs
+        tabs={tabs}
+        filterTab={filterTab}
+        onSelectTab={setFilterTab}
+        C={C}
+      />
 
-      <View style={s.tabRow}>
-        {tabs.map((tab) => {
-          const act = filterTab === tab.key;
-          const tone = TAB_TONES[tab.key];
-          return (
-            <Press
-              key={tab.key}
-              haptic="tap"
-              onPress={() => setFilterTab(tab.key)}
-              style={[
-                s.filterChip,
-                { backgroundColor: act ? C[tone.color] + tone.bg : C.surface, borderColor: act ? C[tone.border] : C.line },
-              ]}
-            >
-              <Text style={[TYPOGRAPHY.micro, { color: act ? C[tone.color] : C.text3 }]}>{tab.label}</Text>
-            </Press>
-          );
-        })}
+      <View style={s.sectionHeader}>
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>
+          {query ? `ARAMA SONUÇLARI (${displayedList.length})` : `BÖLÜM LİSTESİ (${displayedList.length})`}
+        </Text>
       </View>
 
       <View style={s.list}>
-        {displayedList.map((item) => (
-          <PreferenceProgramRow
-            key={item.program.id}
-            item={item}
-            scoreType={scoreType}
-            tone={TAB_TONES[item.status] || TAB_TONES.safe}
-            C={C}
-          />
-        ))}
+        {displayedList.length > 0 ? (
+          displayedList.map((item) => (
+            <PreferenceProgramRow
+              key={item.program.id}
+              item={item}
+              scoreType={scoreType}
+              tone={TAB_TONES[item.status] || TAB_TONES.safe}
+              C={C}
+            />
+          ))
+        ) : (
+          <View style={[s.emptyBox, { backgroundColor: C.surface, borderColor: C.line }]}>
+            <Text style={[TYPOGRAPHY.bodyMedium, { color: C.text, textAlign: "center" }]}>
+              Eşleşen bölüm bulunamadı
+            </Text>
+            <Text style={[TYPOGRAPHY.meta, { color: C.text3, textAlign: "center", marginTop: 4 }]}>
+              {query ? `"${query}" aramanıza uygun bölüm listelenemedi.` : "Bu filtrede bölüm bulunmuyor."}
+            </Text>
+            {query || filterTab !== "all" ? (
+              <Press
+                haptic="tap"
+                onPress={() => { setQuery(""); setFilterTab("all"); }}
+                style={[s.resetBtn, { backgroundColor: C.void, borderColor: C.line }]}
+              >
+                <Text style={[TYPOGRAPHY.captionMedium, { color: C.accentBright }]}>Filtreleri Temizle</Text>
+              </Press>
+            ) : null}
+          </View>
+        )}
       </View>
 
       <Text style={[TYPOGRAPHY.micro, { color: C.text3, marginTop: STEP.s3, textAlign: "center" }]}>
@@ -136,12 +137,8 @@ export const PreferenceListSection = memo(function PreferenceListSection({
 
 const s = StyleSheet.create({
   wrap: { marginTop: STEP.s2 },
-  typeRow: { flexDirection: "row", gap: STEP.s1 },
-  chip: { flex: 1, height: 36, borderRadius: SHAPE.chip, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  metricsRow: { flexDirection: "row", gap: STEP.s2, marginTop: STEP.s3 },
-  metricCard: { flex: 1, padding: STEP.s2, borderRadius: SHAPE.panel, borderWidth: 1 },
-  heroNum: { marginTop: STEP.s1, fontVariant: ["tabular-nums"] },
-  tabRow: { flexDirection: "row", flexWrap: "wrap", gap: STEP.s1, marginTop: STEP.s3 },
-  filterChip: { paddingHorizontal: STEP.s2, height: 32, borderRadius: SHAPE.chip, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  list: { marginTop: STEP.s2, gap: STEP.s1 },
+  sectionHeader: { marginTop: STEP.s3, marginBottom: STEP.s1 },
+  list: { gap: STEP.s1 },
+  emptyBox: { padding: STEP.s3, borderRadius: SHAPE.panel, borderWidth: 1, alignItems: "center", gap: STEP.s1 },
+  resetBtn: { marginTop: STEP.s1, paddingHorizontal: STEP.s3, height: 36, borderRadius: SHAPE.chip, borderWidth: 1, alignItems: "center", justifyContent: "center" },
 });
