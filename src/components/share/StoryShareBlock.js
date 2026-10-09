@@ -18,14 +18,14 @@ const CARD_H = Math.round(CARD_W * (16 / 9));
 const STATUS_TEXTS = {
   placed: "Instagram'a aktarıldı",
   opened: "Instagram kamerası açıldı — basılı tutup yapıştır.",
-  tiktok_opened: "TikTok için hazırlandı — dilediğince paylaşabilirsin",
+  tiktok_opened: "Kart galeriye kaydedildi! TikTok açıldı — '+' > 'Yükle' ile hemen paylaşabilirsin.",
   copied: "Şeffaf etiket panoya kopyalandı",
   saved: "Galeriye kaydedildi",
   permission_denied: "İzin verilmedi.",
   failed: "İşlem tamamlanamadı, tekrar dener misin?",
 };
 
-export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
+export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC, style }) {
   const C = useC();
   const overlayRef = useRef(null);
   const fullCardRef = useRef(null);
@@ -54,7 +54,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
   if (s.loading || !s.selected) return null;
 
   return (
-    <View style={[st.wrap, { backgroundColor: C.surface, borderTopColor: C.line }]}>
+    <View style={[st.wrap, style]}>
       <View style={st.headerRow}>
         <Text style={[TYPOGRAPHY.label, { color: C.text2 }]}>HİKAYEDE PAYLAŞ</Text>
         <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>
@@ -65,7 +65,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
       <View style={st.grid}>
         {s.variants.map((v, i) => (
           <StoryGridCard
-            key={v.key}
+            key={`${v.key || v.kind}-${i}`}
             variant={v}
             photoUri={s.photo?.uri}
             active={i === s.selectedIndex}
@@ -124,7 +124,7 @@ export function StoryShareBlock({ moment = STORY_MOMENT.GENERIC }) {
 }
 
 const st = StyleSheet.create({
-  wrap: { borderTopWidth: 1, paddingTop: STEP.s3, paddingBottom: STEP.s5 },
+  wrap: { paddingTop: STEP.s2, paddingBottom: STEP.s4 },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",

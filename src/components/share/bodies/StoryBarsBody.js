@@ -62,7 +62,7 @@ export function StoryBarsBody({ data, p, visibility = {} }) {
         <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
           {showGoalLine ? (
             <G>
-              <Line x1={0} y1={goalY} x2={W - 24} y2={goalY} stroke="rgba(255,255,255,0.4)" strokeWidth={1.2} strokeDasharray="4 4" />
+              <Line x1={0} y1={goalY} x2={W - 24} y2={goalY} stroke={p.rule} strokeWidth={1.4} strokeDasharray="4 4" />
               <Path d={`M${W - 22},${goalY - 14} L${W - 8},${goalY - 7} L${W - 22},${goalY} Z`} fill={p.accent} />
               <Line x1={W - 22} y1={goalY - 14} x2={W - 22} y2={goalY + 4} stroke={p.accent} strokeWidth={2} />
             </G>
@@ -88,8 +88,8 @@ export function StoryBarsBody({ data, p, visibility = {} }) {
                   width={barW}
                   height={h}
                   rx={4}
-                  fill={isToday ? p.accent : (p.accent || "#E5343F")}
-                  fillOpacity={val > 0 ? 1 : 0.25}
+                  fill={val > 0 ? (isToday ? p.accent : (p.accent || "#E5343F")) : p.track}
+                  fillOpacity={1}
                 />
                 {d.questions > 0 && h >= 28 ? (
                   <SvgText x={x + barW / 2} y={barAreaH - 6} fill="#FFFFFF" fontSize={11} fontWeight="700" textAnchor="middle">

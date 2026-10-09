@@ -83,7 +83,7 @@ export function StoryMapBody({ data, p, visibility = {} }) {
             {chartData.pastPath ? (
               <Path d={chartData.pastPath} stroke={p.accent} strokeWidth={5.2} strokeLinecap="round" fill="none" />
             ) : null}
-            <Path d={chartData.futPath} stroke="rgba(255,255,255,0.45)" strokeWidth={3} strokeDasharray="5 5" strokeLinecap="round" fill="none" />
+            <Path d={chartData.futPath} stroke={p.rule} strokeWidth={3} strokeDasharray="5 5" strokeLinecap="round" fill="none" />
             {chartData.pts.map((pt, i) => (
               <Circle key={`pt-${i}`} cx={pt.x} cy={pt.y} r={5} fill={p.solid} />
             ))}

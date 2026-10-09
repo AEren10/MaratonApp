@@ -26,7 +26,7 @@ function ShareCardContent() {
         <View style={s.spacer} />
       </View>
 
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={s.content} style={{ flex: 1, backgroundColor: C.bg }} showsVerticalScrollIndicator={false}>
         <StoryShareBlock moment={params?.moment || STORY_MOMENT.GENERIC} />
       </ScrollView>
     </SafeAreaView>
@@ -60,5 +60,5 @@ const s = StyleSheet.create({
   },
   title: { fontFamily: "Bricolage_400", fontSize: 20 },
   spacer: { width: CONTROL.tapMin },
-  content: { flexGrow: 1, paddingBottom: STEP.s4 },
+  content: { flexGrow: 1, paddingBottom: 110 },
 });

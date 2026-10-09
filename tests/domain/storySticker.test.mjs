@@ -86,7 +86,18 @@ test("sablonlar foto zeminli etiket olarak hazirlanir", () => {
   assert.ok(list.every((v) => v.background === STORY_BG.FOTO));
 });
 
-test("anahtarlar benzersiz", () => {
+test("anahtarlar benzersiz (tam veri ve durust karti dahil)", () => {
   const list = buildStoryVariants(full);
   assert.equal(new Set(list.map((v) => v.key)).size, list.length);
+
+  const az = buildStoryVariants({ ...full, today: { questions: 12 } });
+  assert.equal(new Set(az.map((v) => v.key)).size, az.length);
+});
+
+test("durust karti asla 1'den fazla cikmaz (cift kart hatasi engellendi)", () => {
+  for (const moment of [STORY_MOMENT.GENERIC, STORY_MOMENT.SESSION, STORY_MOMENT.TRIAL, STORY_MOMENT.STREAK]) {
+    const list = buildStoryVariants({ ...full, today: { questions: 12 } }, moment);
+    const count = list.filter((v) => v.kind === STORY_KIND.DURUST).length;
+    assert.ok(count <= 1, `moment ${moment} icin durust sayisi: ${count}`);
+  }
 });

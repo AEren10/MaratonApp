@@ -22,7 +22,14 @@
         "NSCameraUsageDescription": "Yanlış soru fotoğrafı ve profil fotoğrafı çekmek için kamera erişimi gerekli.",
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserNotificationsUsageDescription": "Çalışma hatırlatmaları ve seri bildirimleri göndermek için bildirim izni gerekli.",
-        "CADisableMinimumFrameDurationOnPhone": true
+        "CADisableMinimumFrameDurationOnPhone": true,
+        "LSApplicationQueriesSchemes": [
+          "instagram",
+          "instagram-stories",
+          "tiktok",
+          "snssdk1233",
+          "snssdk1180"
+        ]
       }
     },
     "android": {

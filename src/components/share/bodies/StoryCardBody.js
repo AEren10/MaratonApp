@@ -78,7 +78,7 @@ export function StoryCardBody({ data, p, visibility = {} }) {
         <View style={s.barcodeRow}>
           <Svg width={160} height={18} viewBox="0 0 160 18">
             {[4, 12, 16, 26, 32, 36, 48, 54, 60, 72, 80, 88, 98, 106, 114, 126, 134, 142, 150].map((x, i) => (
-              <Line key={i} x1={x} y1={2} x2={x} y2={16} stroke="rgba(255,255,255,0.45)" strokeWidth={i % 3 === 0 ? 2.8 : 1.4} />
+              <Line key={i} x1={x} y1={2} x2={x} y2={16} stroke={p.solid} strokeWidth={i % 3 === 0 ? 2.8 : 1.4} />
             ))}
           </Svg>
           <Text style={[s.receiptNo, { color: p.dim }]}>#M-2026-STUDY</Text>
@@ -93,7 +93,7 @@ const s = StyleSheet.create({
   wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   head: { width: 330, gap: 4 },
   date: { fontFamily: "Archivo_600", fontSize: 12, letterSpacing: 1.2 },
-  dotsDivider: { letterSpacing: 2, fontSize: 11, opacity: 0.5, marginVertical: 4 },
+  dotsDivider: { letterSpacing: 2, fontSize: 11, marginVertical: 4 },
   body: { width: 330, gap: 10 },
   heroGroup: { gap: 2 },
   heroNum: { fontFamily: "Bricolage_400", fontSize: 84, lineHeight: 88, letterSpacing: -4 },

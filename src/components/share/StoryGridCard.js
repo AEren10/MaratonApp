@@ -60,7 +60,7 @@ export function StoryGridCard({
           height,
           borderColor: active ? C.accentBright || "#FFFFFF" : C.border,
           borderWidth: active ? 2.5 : 1,
-          opacity: active ? 1 : 0.72,
+          opacity: 1,
         },
       ]}
     >
@@ -80,15 +80,15 @@ export function StoryGridCard({
       </View>
 
       {/* Sol üst etiket rozeti */}
-      <View style={[s.tagBadge, { backgroundColor: active ? C.accent : "rgba(30,30,36,0.88)" }]}>
-        <Text style={[TYPOGRAPHY.micro, s.tagText, { color: active ? C.accentInk : C.text2 }]}>
+      <View style={[s.tagBadge, { backgroundColor: active ? C.accent : C.elev, borderColor: C.line, borderWidth: active ? 0 : 1 }]}>
+        <Text style={[TYPOGRAPHY.micro, s.tagText, { color: active ? C.accentInk : C.text }]}>
           {label}
         </Text>
       </View>
 
       {/* Ders kartı için dokunma ipucu */}
       {isDers ? (
-        <View style={[s.cyclePill, { backgroundColor: active ? C.accent : "rgba(22,22,29,0.92)" }]}>
+        <View style={[s.cyclePill, { backgroundColor: active ? C.accent : C.elev, borderColor: C.line, borderWidth: active ? 0 : 1 }]}>
           <Text style={[s.cycleText, { color: active ? C.accentInk : C.text }]}>
             {active ? "Ders değiştir ↺" : "Dokun · Dersler arası gez"}
           </Text>

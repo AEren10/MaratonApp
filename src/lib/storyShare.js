@@ -160,44 +160,50 @@ export async function copyStoryToClipboard(ref) {
   }
 }
 
-const TIKTOK_SCHEMES = ["snssdk1233://", "snssdk1180://", "tiktok://"];
+const TIKTOK_SCHEMES = [
+  "tiktok://",
+  "snssdk1233://",
+  "snssdk1180://",
+];
 
-/** TikTok paylasimi: etiketi panoya kopyalar ve sistem paylasim menusuyle TikTok'a aktarir. */
+/** TikTok paylasimi: karti yuksek cozunurluklu olarak galeriye kaydeder, panoya kopyalar ve dogrudan TikTok'u acar. */
 export async function shareStoryToTikTok(ref) {
   const base64 = await capture(ref, "base64");
   const tmpfile = await capture(ref, "tmpfile");
   if (!base64 && !tmpfile) return STORY_SHARE.FAILED;
 
+  // 1. Galeriye yuksek cozunurluklu kaydet (film rulosunun en basina oturur)
+  let saved = false;
+  if (tmpfile) {
+    try {
+      const res = await saveCapturedStoryToGallery({
+        uri: tmpfile,
+        platform: Platform.OS,
+        platformVersion: Platform.Version,
+        requestWritePermission: () => MediaLibrary.requestPermissionsAsync(true),
+        createAsset: (localUri) => MediaLibrary.Asset.create(localUri),
+      });
+      saved = res === STORY_SHARE.SAVED;
+    } catch {}
+  }
+
+  // 2. Panoya da kopyala (TikTok icinde metin veya sticker olarak da yapistirilabilmesi icin)
   if (base64) {
     try {
       await Clipboard.setImageAsync(base64);
     } catch {}
   }
 
-  if (tmpfile) {
-    try {
-      await Share.open({
-        url: tmpfile,
-        title: "Maraton Aktivite Paylaşımı",
-      });
-      return STORY_SHARE.TIKTOK_OPENED;
-    } catch (e) {
-      if (e?.message?.includes("User did not share") || e?.message?.includes("dismissed")) {
-        return STORY_SHARE.COPIED;
-      }
-    }
-  }
-
+  // 3. TikTok uygulamasini dogrudan ac (Share.open sistem menusu kaldirildi,
+  // cunku TikTok iOS eklentisi yetkisiz paylasimda 'Uzgunuz, bir sorun olustu' hatasi firlatir)
   let opened = false;
   for (const scheme of TIKTOK_SCHEMES) {
     try {
-      const can = await Linking.canOpenURL(scheme);
-      if (can) {
-        await Linking.openURL(scheme);
-        opened = true;
-        break;
-      }
+      await Linking.openURL(scheme);
+      opened = true;
+      break;
     } catch {}
   }
-  return opened ? STORY_SHARE.TIKTOK_OPENED : STORY_SHARE.COPIED;
+
+  return opened ? STORY_SHARE.TIKTOK_OPENED : (saved ? STORY_SHARE.SAVED : STORY_SHARE.FAILED);
 }

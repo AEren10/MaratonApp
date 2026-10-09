@@ -69,7 +69,7 @@ export function StoryNetBody({ data, p }) {
         {data.subjects?.length ? (
           <View style={s.subjGrid}>
             {data.subjects.slice(0, 4).map((n) => (
-              <View key={n.key} style={[s.subjPill, { backgroundColor: "rgba(255,255,255,0.08)", borderColor: p.rule }]}>
+              <View key={n.key} style={[s.subjPill, { backgroundColor: p.track, borderColor: p.rule }]}>
                 <Text style={[s.subjName, { color: p.mid }, p.shadow]} numberOfLines={1}>
                   {String(n.key).slice(0, 10)}
                 </Text>

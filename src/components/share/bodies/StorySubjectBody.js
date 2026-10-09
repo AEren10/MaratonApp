@@ -51,9 +51,6 @@ export function StorySubjectBody({ data, p }) {
           <Text style={[s.subjTitle, { color: p.accent }, p.shadow]}>
             {label.toLocaleUpperCase("tr")}
           </Text>
-          <View style={s.cycleTag}>
-            <Text style={[s.cycleTagText, { color: p.dim }]}>↺ Dokun · Dersler Arası Gez</Text>
-          </View>
         </View>
 
         <View style={s.heroRow}>
@@ -104,10 +101,8 @@ export function StorySubjectBody({ data, p }) {
 const s = StyleSheet.create({
   wrap: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", paddingHorizontal: 30 },
   head: { width: W, gap: 4, marginBottom: 12 },
-  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  titleRow: { flexDirection: "row", alignItems: "center" },
   subjTitle: { fontFamily: "Archivo_700", fontSize: 13, letterSpacing: 1.8 },
-  cycleTag: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.08)" },
-  cycleTagText: { fontFamily: "Archivo_600", fontSize: 9.5, letterSpacing: 0.6 },
   heroRow: { flexDirection: "row", alignItems: "baseline", gap: 8 },
   heroNum: { fontFamily: "Bricolage_400", fontSize: 52, lineHeight: 56, letterSpacing: -1.5 },
   heroUnit: { fontFamily: "Archivo_600", fontSize: 14, letterSpacing: 0.8 },
