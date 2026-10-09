@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../../components/design";
-import { BottomSheet } from "../../../components/design/BottomSheet";
+import { CenterCard } from "../../../components/design/CenterCard";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Icon } from "../../../components/design/Icon";
 import { Press } from "../../../components/design/Press";
 import { useC } from "../../../contexts/ThemeContext";
@@ -16,6 +17,9 @@ import * as H from "../../../lib/haptics";
 // KLAVYE YOK (9 Ekim): iOS'ta klavye acilinca panel ekranin tepesine
 // firliyordu (KeyboardAvoidingView de elle olcum de iki kat kaldirdi).
 // Sayi kaydirici ve -/+ ile secilir; "/ 20" artik "20 sorudan" diye okunur.
+// Klavyesiz BottomSheet de tepede acildi (kullanici, 9 Ekim): ekran ortasindaki
+// karta (CenterCard, seri paneliyle ayni) gecildi. CenterCard'in Modal'inda
+// gesture koku yok; kaydirici icin GestureHandlerRootView burada.
 export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   const C = useC();
   // Kapanis kaymasi surerken icerik bosalmasin: son durak gosterilir.
@@ -35,7 +39,8 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
   };
 
   return (
-    <BottomSheet visible={Boolean(current)} onClose={onSkip} style={s.sheet}>
+    <CenterCard visible={Boolean(current)} onClose={onSkip} style={s.sheet}>
+      <GestureHandlerRootView style={s.inner}>
       <Text style={[TYPOGRAPHY.label, { color: C.text3 }]} numberOfLines={1}>
         {title.toLocaleUpperCase("tr-TR")}
       </Text>
@@ -84,13 +89,15 @@ export function StopCorrectSheet({ stop: current, onAnswer, onSkip }) {
           <Button size="lg" fullWidth disabled={correctCount == null} onPress={() => onAnswer(correctCount)}>Kaydet</Button>
         </View>
       </View>
-    </BottomSheet>
+      </GestureHandlerRootView>
+    </CenterCard>
   );
 }
 
 const s = StyleSheet.create({
   fill: { flex: 1 },
-  sheet: { borderRadius: SHAPE.sheet, borderWidth: 1, padding: STEP.s3, gap: STEP.s1 },
+  sheet: { borderRadius: SHAPE.sheet, borderWidth: 1, padding: STEP.s3 },
+  inner: { gap: STEP.s1 },
   title: { marginTop: STEP.s1 / 2 },
   counter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: STEP.s2 },
   valueRow: { flexDirection: "row", alignItems: "baseline", gap: STEP.s1 },
