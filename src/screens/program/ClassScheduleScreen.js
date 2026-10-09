@@ -32,7 +32,7 @@ function ClassScheduleInner() {
 
   return (
     <SafeAreaView edges={["top"]} style={[s.safe, { backgroundColor: C.bg }]}>
-      <RouteHeader title="Haftalık ders programı" onBack={() => navigation.goBack()} />
+      <RouteHeader title="Haftalık ders programı" onBack={() => (navigation.canGoBack() ? navigation.goBack() : openProgram(navigation))} />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[TYPOGRAPHY.body, s.lede, { color: C.text3 }]}>
           Hangi gün hangi derse çalıştığını söyle, rota durakları o günlere düşsün.

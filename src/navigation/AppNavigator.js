@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -21,6 +21,7 @@ import { SCREENS } from "../constants/screens";
 import { ROOT_STACK } from "./routes";
 import { ROOT_ONLY, TAB_KEYS, TAB_STACKS } from "./tabAssignment";
 import { screenOptions } from "./screenOptions";
+import { silentPop, withSilent } from "./silentPop";
 import {
   screensByName,
   AUTH_STACK_SCREENS,
@@ -77,10 +78,15 @@ const TAB_STACK_COMPONENTS = new Map(
     }[root.name] || root.name;
 
     function TabStack() {
+      // Sessiz geri acikken (silentPop) ekranlar animasyonsuz kapanir.
+      const silent = useSyncExternalStore(silentPop.subscribe, silentPop.get);
       return (
-        <Stack.Navigator screenOptions={screenOptions} screenLayout={DepthLayout}>
+        <Stack.Navigator screenOptions={withSilent(screenOptions, silent)} screenLayout={DepthLayout}>
           <Stack.Screen name={rootScreenName} component={root.component} options={root.options} />
-          {inner.map(renderStackScreen)}
+          {inner.map((route) => (
+            <Stack.Screen key={route.name} name={route.name} component={route.component}
+              options={withSilent(route.options, silent)} />
+          ))}
         </Stack.Navigator>
       );
     }

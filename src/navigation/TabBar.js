@@ -9,6 +9,21 @@ import { TabIndicator } from "./tabBar/TabIndicator";
 import QuickAddSheet from "../screens/trial/QuickAddSheet";
 import { SCREENS } from "../constants/screens";
 import { TAB_ROOT_MAP } from "./tabJump";
+import { StackActions } from "@react-navigation/native";
+import { silentPop } from "./silentPop";
+
+// Ana Sayfa her basista KOKTEN acilir (Codex teshisi, 9 Ekim): grafikten
+// acilan Rota Home yigininda kaliyor, baska sekmeden donunce Rota
+// gorunuyordu; koke donus de saga kayan pop animasyonuyla oluyordu.
+// Once sessiz bayrak (animasyonsuz ekran secenekleri cizilsin), sonra pop.
+function homeToRoot(navigation, route, switchTab) {
+  silentPop.arm();
+  if (switchTab) navigation.navigate(route.name);
+  setTimeout(() => {
+    navigation.dispatch({ ...StackActions.popToTop(), target: route.state.key });
+    setTimeout(() => silentPop.disarm(), 400);
+  }, 80);
+}
 
 // "+" paneli buyuk bir Modal; her sekme basisinda yeniden cizilmesin.
 const QuickAdd = memo(QuickAddSheet);
@@ -53,6 +68,12 @@ export function TabBar({ state, navigation }) {
       ? navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true })
       : { defaultPrevented: false };
     if (event.defaultPrevented) return;
+    const homeDeep = tab.key === SCREENS.HOME && route?.state?.key && route.state.index > 0;
+    if (homeDeep) {
+      if (!active) setPendingKey(tab.key);
+      homeToRoot(navigation, route, !active);
+      return;
+    }
     if (active) {
       navigation.navigate(tab.key, { screen: TAB_ROOT_MAP[tab.key] || tab.key });
       return;

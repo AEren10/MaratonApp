@@ -32,7 +32,7 @@ export default function SubjectListScreen() {
 
   const handleBack = () => {
     if (navigation.canGoBack()) navigation.goBack();
-    else navigation.navigate(SCREENS.ANALYSIS);
+    else navigation.navigate(SCREENS.ANALYSIS, { screen: SCREENS.ANALYSIS_ROOT });
   };
 
   return (
