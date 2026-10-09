@@ -45,11 +45,9 @@ export function PeriodBarChart({ label, trailing, trailingTone = "up", bars = []
               ? Math.max(MIN_BAR, Math.round((val / max) * PLOT_HEIGHT))
               : MIN_BAR;
 
-            const barColor = bar.highlight
-              ? C.accentBright
-              : hasVal
-              ? C.accent
-              : C.track;
+            // Dolu her cubuk ANA renk (9 Ekim, kullanici): vurgulanan cubuk
+            // acik pembe (accentBright) gorunuyordu.
+            const barColor = hasVal ? C.accent : C.track;
 
             return (
               <View key={bar.key} style={styles.col}>

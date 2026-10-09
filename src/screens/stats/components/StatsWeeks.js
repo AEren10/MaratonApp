@@ -28,7 +28,7 @@ export const StatsWeeks = memo(function StatsWeeks({ C, weeks = [], bestWeekStar
                 s.bar,
                 {
                   height: h,
-                  backgroundColor: w.questions > 0 ? (best ? C.accentBright : C.accent) : C.track,
+                  backgroundColor: w.questions > 0 ? C.accent : C.track,
                 },
               ]}
             />

@@ -6,6 +6,7 @@ import { useC } from "../../../contexts/ThemeContext";
 import { STEP, TYPOGRAPHY } from "../../../themes/tokens";
 import { CHART_H, CHART_W } from "../../../components/charts/chartStyle";
 import { useRouteChartPos } from "./useRouteChartPos";
+import { RouteDotBeacon } from "./RouteDotBeacon";
 import { RouteEmptyChart } from "../../../components/charts/RouteEmptyChart";
 
 // Rota Detay grafigi: RouteLineChart + etiketler (NET, HEDEF, BUGUN, SINAV GUNU).
@@ -69,6 +70,11 @@ export function RouteDetailChart({ chart, target, examDateTag, onSelectStop, sel
               ]}
             />
           ) : null}
+
+          {/* Dokunulabilir oldugunu soyleyen halkalar (secim yokken). */}
+          {onSelectStop && selectedIndex == null ? pos.points.map((p, i) => (
+            <RouteDotBeacon key={`beacon-${i}`} x={p.x * k} y={p.y * k} color={C.accentBright} index={i} />
+          )) : null}
 
           {pos.points.map((p, i) => (
             <Pressable
