@@ -27,8 +27,10 @@ function Dot({ state, size, settle, flame }) {
     ? { backgroundColor: C.flame }
     : state === "today"
       ? { borderWidth: 1.5, borderColor: C.flame }
+      // Bos gecmis gun dolu gri degil: yeni hesapta hesap acilmadan onceki
+      // gunler "kacirdin" gibi okunuyordu. Kotu haber bagirmaz.
       : state === "missed"
-        ? { backgroundColor: C.track }
+        ? { borderWidth: 1, borderColor: C.track }
         : { borderWidth: 1, borderColor: C.text5 };
   return (
     <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center" }, look, style]}>

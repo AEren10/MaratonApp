@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Animated from "react-native-reanimated";
@@ -53,11 +53,12 @@ export default function RouteStopDetailScreen() {
               <RouteStopPlace prev={d.prev} next={d.next} />
             </Animated.View>
             <Animated.View>
+              {/* Sifir bilgi tasimaz: yeni hesapta "DEFTER 0" kutusu anlamsizdi. */}
               <RouteStatTiles
                 tiles={[
-                  { label: "SON ÇALIŞMA", value: studied ? `${Math.round(stop.neglectedDays || 0)} gün` : null },
-                  { label: "ÇÖZÜLEN", value: studied ? Math.round(stop.q) : null },
-                  { label: "DEFTER", value: d.notebook },
+                  { label: "SON ÇALIŞMA", value: studied ? lastStudyLabel(stop.neglectedDays) : null },
+                  { label: "ÇÖZÜLEN", value: studied ? `${Math.round(stop.q)} soru` : null },
+                  { label: "DEFTERDE", value: Number(d.notebook) > 0 ? `${d.notebook} yanlış` : null },
                 ]}
               />
             </Animated.View>
@@ -71,17 +72,22 @@ export default function RouteStopDetailScreen() {
                 })}
               />
             </Animated.View>
-            <Animated.View style={s.actions}>
-              {d.canStart ? (
-                <Button size="lg" fullWidth onPress={d.start}>Çalışmaya başla</Button>
-              ) : null}
-              {d.canPostpone ? (
-                <Button variant="outline" size="md" fullWidth loading={d.postponing} onPress={d.postpone}>
-                  Durağı erteleyeyim
-                </Button>
-              ) : null}
-            </Animated.View>
           </DepthScrollView>
+        ) : null}
+        {/* Sayfanin isi bu: eylem kaydirmanin sonunda kaybolmasin, hep altta. */}
+        {stop && (d.canStart || d.canPostpone) ? (
+          <View style={[s.footer, { backgroundColor: C.bg, borderTopColor: C.line }]}>
+            {d.canPostpone ? (
+              <Button variant="outline" size="lg" loading={d.postponing} onPress={d.postpone} style={s.postpone}>
+                Ertele
+              </Button>
+            ) : null}
+            {d.canStart ? (
+              <View style={s.fill}>
+                <Button size="lg" fullWidth onPress={d.start}>Çalışmaya başla</Button>
+              </View>
+            ) : null}
+          </View>
         ) : null}
       </RouteAccessGate>
     </SafeAreaView>
@@ -92,5 +98,15 @@ const s = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingBottom: STEP.s4 },
   linkSection: { paddingHorizontal: GUTTER, paddingTop: STEP.s3 },
-  actions: { paddingHorizontal: GUTTER, paddingTop: STEP.s4, gap: STEP.s2 },
+  footer: {
+    flexDirection: "row", gap: STEP.s1, paddingHorizontal: GUTTER, paddingVertical: STEP.s2,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  postpone: { paddingHorizontal: STEP.s3 },
+  fill: { flex: 1 },
 });
+
+function lastStudyLabel(days) {
+  const n = Math.round(Number(days) || 0);
+  return n <= 0 ? "Bugün" : n === 1 ? "Dün" : `${n} gün önce`;
+}

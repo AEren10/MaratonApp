@@ -28,16 +28,18 @@ export function RouteStopHero({ number, stop, color, subjectCompleted, part, whe
           </>
         ) : null}
       </View>
-      <View style={s.tileRow}>
-        <View style={[s.tile, { backgroundColor: C.surface, borderColor: C.elev }]}>
-          <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>{subjectCompleted}</Text>
-          <Text style={[TYPOGRAPHY.micro, s.tileText, { color: C.text3 }]}>
-            {subject} rotasında tamamlanan durak
-          </Text>
+      {/* Yeni hesapta "0 · tamamlanan durak" kutusu bos gurultuydu: ilk durak
+          bitince gorunur. */}
+      {Number(subjectCompleted) > 0 ? (
+        <View style={s.tileRow}>
+          <View style={[s.tile, { backgroundColor: C.surface, borderColor: C.elev }]}>
+            <Text style={[TYPOGRAPHY.statMedium, { color: C.text }]}>{subjectCompleted}</Text>
+            <Text style={[TYPOGRAPHY.micro, s.tileText, { color: C.text3 }]}>
+              {subject} rotasında tamamlanan durak
+            </Text>
+          </View>
         </View>
-        {/* "Bu haftanın ivmesi yükseldi" herkese ayni sabit cumleydi; veriye
-            bagli degildi, kaldirildi. */}
-      </View>
+      ) : null}
     </View>
   );
 }

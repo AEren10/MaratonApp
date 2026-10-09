@@ -30,17 +30,15 @@ export function StreakSheet({ visible, onClose, week }) {
 
   return (
     <CenterCard visible={visible} onClose={onClose} style={s.sheet}>
+      {/* Sayi ve birimi tek eksende: birim eskiden sayinin yaninda, tabanindan
+          kopuk duruyordu. Alev tek yumusak halkada. */}
       <View style={s.hero}>
-        <View style={[s.halo, { backgroundColor: alpha(C.flame, 10) }]}>
-          <View style={[s.ring, { backgroundColor: alpha(C.flame, 18), borderColor: alpha(C.flame, 45) }]}>
-            <Icon name="flame" size={30} color={C.flame} fill={C.flame} />
-          </View>
+        <View style={[s.halo, { backgroundColor: alpha(C.flame, 14) }]}>
+          <Icon name="flame" size={28} color={C.flame} fill={C.flame} />
         </View>
-        <View style={s.numberRow}>
-          <CountUpText value={week.value} style={[TYPOGRAPHY.statHero, { color: C.text }]} />
-          <Text style={[TYPOGRAPHY.statSideUnit, s.unit, { color: C.text2 }]}>gün üst üste</Text>
-        </View>
-        <Text style={[TYPOGRAPHY.body, s.center, { color: C.text2 }]}>{week.line}</Text>
+        <CountUpText value={week.value} style={[TYPOGRAPHY.statHero, s.number, { color: C.text }]} />
+        <Text style={[TYPOGRAPHY.label, { color: C.text3 }]}>GÜN ÜST ÜSTE</Text>
+        <Text style={[TYPOGRAPHY.body, s.center, s.line, { color: C.text2 }]}>{week.line}</Text>
       </View>
 
       <View style={s.week}><StreakDots days={week.days} size={26} flame /></View>
@@ -57,43 +55,37 @@ export function StreakSheet({ visible, onClose, week }) {
         </View>
       ) : null}
 
-      <View style={[s.stats, { borderTopColor: C.line }]}>
-        <View style={s.stat}>
-          <Text style={[TYPOGRAPHY.statSmall, { color: C.text }]}>{week.longest}</Text>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>en uzun seri</Text>
+      {/* Kutusuz alt bilgi: joker tek satir; en uzun seri yalniz bugunkunden
+          buyukse (esitken ustteki buyuk sayiyi tekrarliyordu). */}
+      <View style={[s.foot, { borderTopColor: C.line }]}>
+        <View style={s.jokerRow}>
+          <Icon name="shield" size={16} color={week.freeze > 0 ? C.up : C.text3} />
+          <Text style={[TYPOGRAPHY.caption, s.flex, { color: C.text2 }]}>{week.jokerLine}</Text>
         </View>
-        <View style={[s.divider, { backgroundColor: C.line }]} />
-        <View style={s.stat}>
-          <View style={s.jokerRow}>
-            <Icon name="shield" size={16} color={week.freeze > 0 ? C.up : C.text3} />
-            <Text style={[TYPOGRAPHY.bodySemiBold, { color: C.text }]}>{week.freeze > 0 ? "Hazır" : "Kullanıldı"}</Text>
-          </View>
-          <Text style={[TYPOGRAPHY.meta, { color: C.text3 }]}>joker</Text>
-        </View>
+        {week.longest > week.value ? (
+          <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>{`En uzun serin: ${week.longest} gün`}</Text>
+        ) : null}
+        <Text style={[TYPOGRAPHY.caption, { color: C.text3 }]}>
+          Bir durak ya da bir çalışma kaydı o günü sayar.
+        </Text>
       </View>
-      <Text style={[TYPOGRAPHY.caption, s.note, { color: C.text3 }]}>
-        {`${week.jokerLine} Bir durak ya da bir çalışma kaydı o günü sayar.`}
-      </Text>
     </CenterCard>
   );
 }
 
 const s = StyleSheet.create({
   sheet: { borderRadius: SHAPE.sheet, padding: STEP.s3, gap: STEP.s1 },
-  hero: { alignItems: "center", gap: STEP.s1 },
-  halo: { width: 92, height: 92, borderRadius: 46, alignItems: "center", justifyContent: "center" },
-  ring: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  numberRow: { flexDirection: "row", alignItems: "flex-end", gap: STEP.s1 },
-  unit: { paddingBottom: STEP.s2 },
+  hero: { alignItems: "center" },
+  halo: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center" },
+  number: { marginTop: STEP.s1 },
+  line: { marginTop: STEP.s2 },
   center: { textAlign: "center" },
   week: { flexDirection: "row", marginVertical: STEP.s3 },
   block: { gap: STEP.s1 },
   between: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   track: { height: 6, borderRadius: 3, overflow: "hidden" },
   fill: { position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 3 },
-  stats: { flexDirection: "row", alignItems: "center", marginTop: STEP.s3, paddingTop: STEP.s3, borderTopWidth: 1 },
-  stat: { flex: 1, alignItems: "center", gap: 2 },
-  divider: { width: 1, height: 36 },
-  jokerRow: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: 32 },
-  note: { marginTop: STEP.s2, textAlign: "center" },
+  foot: { marginTop: STEP.s3, paddingTop: STEP.s3, borderTopWidth: 1, gap: STEP.s1 },
+  jokerRow: { flexDirection: "row", alignItems: "center", gap: STEP.s1 },
+  flex: { flex: 1 },
 });
