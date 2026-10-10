@@ -7,7 +7,7 @@ DIR=$(cygpath -m "$PWD")
 declare -A SIZE=([ios]="1320,2868" [android]="1440,2560")
 for p in ios android; do
   mkdir -p out/$p
-  for s in 01 02 03 04 05 06 07 08; do
+  for s in 01 02 03 04 05 06; do
     "$EDGE" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
       --allow-file-access-from-files --virtual-time-budget=4000 \
       --window-size=${SIZE[$p]} --screenshot="$DIR/out/$p/$s.png" \

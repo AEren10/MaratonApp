@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "store/visuals/frames/screens.html"
+        ],
+        "createdAt": "2026-10-10T00:12:58.770Z",
+        "reason": "Store mock reproduces the app's own center FAB red glow (visible in user's real screenshots); not a new design choice"
+      }
+    ]
+  }
+}
