@@ -123,8 +123,8 @@ S.rota = () => {
 };
 
 S.analiz = () => {
-  const tyt=[[30,148],[76,140],[122,134],[168,118],[214,110],[260,96],[306,88],[340,78]];
-  const tur=[[24,66],[78,56],[132,52],[186,44],[240,38],[294,30],[334,24]];
+  const tyt=[[30,148],[76,130],[122,141],[168,114],[214,124],[260,96],[306,105],[340,78]];
+  const tur=[[24,64],[78,48],[132,58],[186,38],[240,47],[294,29],[334,24]];
   return `<div class="scr"><div class="glow"></div>${STATUS}
   <div class="pad bric" style="font-size:32px;margin-top:20px">Analiz</div>
   <div class="pad" style="margin-top:16px"><div class="seg"><div class="on">Tümü</div><div>TYT</div><div>AYT</div><div>Branş</div></div></div>
@@ -134,8 +134,8 @@ S.analiz = () => {
   ${[['70',44],['60',94],['50',144]].map(([t,y])=>`<text x="20" y="${y}" fill="#827F88" font-size="11" font-family="Archivo">${t}</text>`).join('')}
   <path d="${smooth(tyt.map(([x,y])=>[x+18,y]))}" fill="none" stroke="#E5343F" stroke-width="3" stroke-linecap="round"/>
   ${tyt.map(([x,y],i)=>`<circle cx="${x+18}" cy="${y}" r="${i===tyt.length-1?7:5}" fill="${i===tyt.length-1?'#E5343F':'#1C1C23'}" stroke="#E5343F" stroke-width="2.4"/>`).join('')}
-  <path d="${smooth([[200,176],[268,160],[336,150]])}" fill="none" stroke="#56C6D6" stroke-width="2.6" stroke-linecap="round"/>
-  ${[[200,176],[268,160],[336,150]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#1C1C23" stroke="#56C6D6" stroke-width="2.4"/>`).join('')}
+  <path d="${smooth([[200,172],[245,158],[290,167],[336,148]])}" fill="none" stroke="#56C6D6" stroke-width="2.6" stroke-linecap="round"/>
+  ${[[200,172],[245,158],[290,167],[336,148]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#1C1C23" stroke="#56C6D6" stroke-width="2.4"/>`).join('')}
   <text x="58" y="186" fill="#A3A0AB" font-size="11" font-family="Archivo" letter-spacing="1.5">1 EYL</text><text x="370" y="186" fill="#A3A0AB" font-size="11" font-family="Archivo" text-anchor="end" letter-spacing="1.5">11 EKİ</text></svg>
   <div class="pad label" style="margin-top:14px">DERS BAZLI TREND</div>
   <div class="pad" style="margin-top:12px"><div style="background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px">
@@ -148,7 +148,7 @@ S.analiz = () => {
 };
 
 S.mat = () => {
-  const p=[[40,180],[100,166],[160,150],[220,128],[280,104],[346,84]];
+  const p=[[40,180],[100,156],[160,167],[220,126],[280,138],[346,84]];
   return `<div class="scr"><div class="glow"></div>${STATUS}${BACK('Matematik','#E0A570')}
   <div class="pad" style="margin-top:26px"><div class="label">SON 6 DENEME</div><div class="row" style="gap:12px;align-items:flex-end;margin-top:4px"><span class="bric" style="font-size:64px;line-height:1">24,75</span><span style="color:var(--up);font:600 17px Archivo;margin-bottom:10px">+6,25 net</span></div>
   <div style="font:400 15px/1.55 Archivo;color:var(--text2);margin-top:12px">Son denemelerde yükselişte. Problemlerde doğruluğun %58'den %76'ya çıktı.</div></div>
