@@ -3,8 +3,8 @@
 // Yeni kullanici bildirimi (content_reports / avatar_reports) gelince
 // destekmaraton@gmail.com'a e-posta. Uygulama bildirene "24 saat icinde
 // incelenir" diyor (App Store 1.2); bildirimler yalniz tabloya dusuyordu.
-// Cagiran: Supabase Database Webhook (INSERT). Yalniz servis anahtariyla
-// gelen istek kabul edilir; giris yapmis bir kullanici e-posta yagdiramaz.
+// Cagiran: Supabase Database Webhook (INSERT). Servis anahtariyla gelen istek
+// dogrudan kabul edilir; digerlerinde satir veritabanindan dogrulanir.
 // Sirlar: RESEND_API_KEY (zorunlu), REPORT_EMAIL_TO (varsayilan destek adresi).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -29,15 +29,26 @@ async function nameOf(db: ReturnType<typeof createClient>, kind: string, id: str
 
 Deno.serve(async (req) => {
   const auth = req.headers.get("Authorization") ?? "";
-  if (!SERVICE_KEY || auth !== `Bearer ${SERVICE_KEY}`) return new Response("forbidden", { status: 403 });
+  const trusted = !!SERVICE_KEY && auth === `Bearer ${SERVICE_KEY}`;
   if (!RESEND_API_KEY) return new Response("RESEND_API_KEY missing", { status: 500 });
 
   const body = (await req.json().catch(() => ({}))) as Payload;
-  const rec = body.record ?? {};
+  let rec = body.record ?? {};
   if (body.type !== "INSERT" || !rec) return new Response("ignored", { status: 200 });
 
   const db = createClient(SUPABASE_URL, SERVICE_KEY);
   const avatar = body.table === "avatar_reports";
+  if (!trusted) {
+    // Webhook'un varsayilan basligi servis anahtari degil: yuke guvenme,
+    // satiri veritabanindan dogrula. Yalniz son 10 dakikada gercekten
+    // yazilmis bir bildirim e-posta uretir.
+    const { data } = await db.from(avatar ? "avatar_reports" : "content_reports").select("*")
+      .eq("reporter_id", rec.reporter_id ?? "").eq("target_id", rec.target_id ?? "")
+      .eq("created_at", rec.created_at ?? "").maybeSingle();
+    const row = data as Row | null;
+    if (!row || Date.now() - Date.parse(row.created_at ?? "") > 10 * 60 * 1000) return new Response("forbidden", { status: 403 });
+    rec = row;
+  }
   const kind = avatar ? "user" : rec.target_type ?? "content";
   const [targetName, reporterName] = await Promise.all([
     nameOf(db, kind, rec.target_id), nameOf(db, "user", rec.reporter_id),
