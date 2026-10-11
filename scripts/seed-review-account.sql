@@ -46,41 +46,41 @@ begin
   insert into study_logs(user_id,subject,topic,question_count,correct_count,duration_minutes,note,notes,study_date,created_at,client_operation_id)
   select uid,s,t,q,c,m,n,n,current_date-d,(current_date-d)+time '16:00'+(row_number() over ())*interval '1 minute',pfx||':study:'||lpad((row_number() over ())::text,2,'0')
   from (values
-   ('tyt_turkce','Paragraf',42,34,55,13,'Paragrafta hız iyi, dikkat hatası kaldı.'),
-   ('tyt_matematik','Problemler',36,25,70,13,'Yaş ve yüzde problemleri tekrar edildi.'),
+   ('turkce','Paragraf',42,34,55,13,'Paragrafta hız iyi, dikkat hatası kaldı.'),
+   ('matematik','Problemler',36,25,70,13,'Yaş ve yüzde problemleri tekrar edildi.'),
    ('ayt_matematik','Fonksiyonlar',30,22,65,12,'Bileşke fonksiyon soruları çözüldü.'),
-   ('tyt_fen','Hücre',22,17,40,12,'Biyoloji konu özeti + test.'),
+   ('biyoloji','Hücre',22,17,40,12,'Biyoloji konu özeti + test.'),
    ('ayt_fizik','Elektrik',24,17,50,11,'Eşdeğer direnç soruları.'),
-   ('tyt_sosyal','Tarih',28,21,45,10,'İnkılap tekrar testi.'),
-   ('tyt_matematik','Temel Kavramlar',40,31,60,10,'İşlem hataları not edildi.'),
+   ('tarih','Tarih',28,21,45,10,'İnkılap tekrar testi.'),
+   ('matematik','Temel Kavramlar',40,31,60,10,'İşlem hataları not edildi.'),
    ('ayt_kimya','Kimyasal Tepkimeler',26,20,55,9,'Denge sorularında gelişme var.'),
-   ('tyt_turkce','Dil Bilgisi',32,24,45,8,'Fiilimsi ve cümle türleri.'),
+   ('turkce','Dil Bilgisi',32,24,45,8,'Fiilimsi ve cümle türleri.'),
    ('ayt_biyoloji','Kalıtım',24,18,50,8,'Çaprazlama soruları tekrar.'),
    ('ayt_matematik','Türev',34,25,75,7,'Türev alma kuralları.'),
-   ('tyt_fen','Basınç',25,19,45,6,'Yanlışlar deftere aktarıldı.'),
-   ('tyt_matematik','Problemler',45,34,80,6,'Hız ve işçi problemleri.'),
-   ('tyt_turkce','Paragraf',40,33,50,5,'Süre tutarak çözüldü.'),
+   ('fizik','Basınç',25,19,45,6,'Yanlışlar deftere aktarıldı.'),
+   ('matematik','Problemler',45,34,80,6,'Hız ve işçi problemleri.'),
+   ('turkce','Paragraf',40,33,50,5,'Süre tutarak çözüldü.'),
    ('ayt_fizik','Manyetizma',22,15,55,5,'Konu tekrarı + test.'),
    ('ayt_matematik','Limit',30,23,60,4,'Belirsizlik soruları.'),
-   ('tyt_sosyal','Coğrafya',26,20,40,4,'İklim tipleri.'),
-   ('tyt_matematik','Üçgenler',38,28,70,3,'Açı-kenar bağıntıları.'),
+   ('cografya','Coğrafya',26,20,40,4,'İklim tipleri.'),
+   ('matematik','Üçgenler',38,28,70,3,'Açı-kenar bağıntıları.'),
    ('ayt_kimya','Organik Kimya',28,21,60,3,'Fonksiyonel gruplar.'),
-   ('tyt_turkce','Paragraf',44,37,55,2,'Yanlış sayısı düştü.'),
+   ('turkce','Paragraf',44,37,55,2,'Yanlış sayısı düştü.'),
    ('ayt_biyoloji','Sinir Sistemi',24,19,45,2,'Konu özeti çıkarıldı.'),
    ('ayt_matematik','İntegral',32,24,75,1,'Alan hesabı soruları.'),
-   ('tyt_fen','Kimyasal Türler',26,20,45,1,'Tekrar testi.'),
-   ('tyt_matematik','Problemler',40,32,65,0,'Karışım problemleri.')
+   ('kimya','Kimyasal Türler',26,20,45,1,'Tekrar testi.'),
+   ('matematik','Problemler',40,32,65,0,'Karışım problemleri.')
   ) as v(s,t,q,c,m,d,n);
 
   insert into wrong_questions(user_id,subject,topic,image_path,note,is_resolved,my_answer,correct_answer,next_review_at,interval_days,ease,topic_source,client_operation_id)
-  select uid,s,t,null,n,false,ma,ca,(current_date-d)+time '08:00',1+(row_number() over ())%3,2.5,'manual',pfx||':wrong:'||lpad((row_number() over ())::text,2,'0')
+  select uid,s,t,null,n,false,ma,ca,(current_date-d)+time '08:00',1+(row_number() over ())%3,2.5,'custom',pfx||':wrong:'||lpad((row_number() over ())::text,2,'0')
   from (values
-   ('tyt_matematik','Problemler','Yaş probleminde oranı ters kurmuşum.','B','D',5),
-   ('tyt_turkce','Paragraf','Ana düşünce sorusunda çeldiriciye gittim.','A','C',4),
+   ('matematik','Problemler','Yaş probleminde oranı ters kurmuşum.','B','D',5),
+   ('turkce','Paragraf','Ana düşünce sorusunda çeldiriciye gittim.','A','C',4),
    ('ayt_matematik','Fonksiyonlar','Tanım kümesini kontrol etmeden işlem yaptım.','E','B',3),
    ('ayt_fizik','Elektrik','Eşdeğer dirençte paralel-seri ayrımına dikkat.','C','A',2),
    ('ayt_kimya','Kimyasal Denge','Le Chatelier yorumunda sıcaklık etkisini karıştırdım.','D','E',1),
-   ('tyt_fen','Basınç','Sıvı basıncında derinlik dışındaki bilgiyi ele.','A','B',0)
+   ('fizik','Basınç','Sıvı basıncında derinlik dışındaki bilgiyi ele.','A','B',0)
   ) as v(s,t,n,ma,ca,d);
 
   insert into streaks(user_id,current_streak,longest_streak,last_study_date,updated_at) values(uid,14,14,current_date,now())
