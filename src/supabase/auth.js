@@ -161,6 +161,19 @@ export const signInWithGoogleToken = async ({ idToken }) => {
   return data;
 };
 
+// Kullanicinin bagli giris saglayicilari ("email", "apple", ...).
+export const getAuthProviders = async () => {
+  const { data } = await supabase.auth.getUser();
+  return (data?.user?.identities || []).map((identity) => identity.provider);
+};
+
+// Apple baglantisini Apple tarafinda iptal eder (apple-revoke edge function).
+export const revokeAppleToken = async (authorizationCode) => {
+  const { data, error } = await supabase.functions.invoke("apple-revoke", { body: { authorizationCode } });
+  if (error) throw error;
+  return !!data?.revoked;
+};
+
 export const deleteAccount = async () => {
   // Depolama temizliği önce ve istemciden — SQL tarafından storage.objects
   // silinemiyor (Supabase engelliyor), fonksiyon o yüzden patlıyordu.

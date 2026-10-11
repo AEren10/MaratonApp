@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { SCREENS } from "../../constants/screens";
 import * as H from "../../lib/haptics";
+import { revokeAppleLinkIfNeeded } from "../../lib/appleRevoke";
 
 // Ayarlar ekranindaki yikici aksiyonlar ve yardim. Ekran dosyasinda is
 // mantigi durmaz (AGENTS.md); uyari metinleri buraya tasindi.
@@ -33,7 +34,8 @@ export function useSettingsActions() {
 
   const deleteAccountNow = useCallback(() => {
     H.warn();
-    return deleteAccount()
+    return revokeAppleLinkIfNeeded()
+      .then(() => deleteAccount())
       .then((result) => {
         // Hesap silindi ama bazı dosyalar kalmış olabilir. Sessiz
         // geçmek gizlilik metnindeki "tümü silinir" ifadesiyle
