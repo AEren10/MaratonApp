@@ -186,6 +186,21 @@ S.gecmis = () => {
 
 const s = new URLSearchParams(location.search).get('s') || 'home';
 document.getElementById('root').innerHTML = S[s]();
+// Tanitim videosu (store/visuals/video) icin: grafikleri p=0..1 arasi cizer.
+window.applyProgress = (p) => {
+  document.querySelectorAll('#root svg').forEach((svg) => {
+    const w = svg.width.baseVal.value;
+    if (w < 100) return;
+    svg.querySelectorAll('path').forEach((el) => {
+      if (el.getAttribute('fill') === 'none' && !el.getAttribute('stroke-dasharray')) {
+        const L = el.getTotalLength();
+        el.style.strokeDasharray = L; el.style.strokeDashoffset = L * (1 - p);
+      } else el.style.opacity = Math.max(0, (p - 0.6) / 0.4);
+    });
+    svg.querySelectorAll('circle').forEach((el) => { el.style.opacity = (+el.getAttribute('cx') / w) <= p + 0.02 ? 1 : 0; });
+    svg.querySelectorAll('rect').forEach((el) => { el.style.transformBox = 'fill-box'; el.style.transformOrigin = 'bottom'; el.style.transform = `scaleY(${p})`; });
+  });
+};
 document.fonts.ready.then(() => { document.title = 'ready'; });
 </script>
 </body>

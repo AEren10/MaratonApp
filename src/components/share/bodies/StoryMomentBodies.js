@@ -10,7 +10,7 @@ export function StoryCountdownBody({ data, p }) {
     <View style={s.centerWrap}>
       <View style={s.cardBox}>
         <Text style={[s.countLabel, { color: p.accent }, p.shadow]}>
-          {(data.examLabel || "YKS 2026").toLocaleUpperCase("tr")}
+          {(data.examLabel || "YKS").toLocaleUpperCase("tr")}
         </Text>
         <View style={s.countRow}>
           <Text style={[s.countHero, isTripleDigit && s.countHeroTriple, { color: p.solid }, p.shadow]}>{data.daysToExam}</Text>

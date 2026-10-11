@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>compose</title>
+<style>
+  @font-face { font-family: Bricolage; src: url(/assets/fonts/Bricolage_400.ttf); }
+  @font-face { font-family: Unbounded; src: url(/assets/fonts/Unbounded_600.ttf); font-weight: 600; }
+  @font-face { font-family: Archivo; src: url(/assets/fonts/Archivo_500.ttf); font-weight: 500; }
+  html, body { margin: 0; background: #1C1C23; }
+  canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="886" height="1920"></canvas>
+<script>
+// Tuval uzerinde zaman cizelgesi: giris -> 6 sahne (baslik karti, ekran, grafik cizilir) -> kapanis.
+const W = 886, H = 1920, FPS = 30;
+const FRAMES = +new URLSearchParams(location.search).get('frames') || 28;
+const SCENES = [
+  { s: 'home', a: 'Her sabah', b: 'rotan hazır.' },
+  { s: 'rota', a: 'Netin nereye', b: 'gidiyor, gör.' },
+  { s: 'analiz', a: 'Denemelerin', b: 'tek ekranda.' },
+  { s: 'mat', a: 'Ders ders,', b: 'net net.' },
+  { s: 'mufredat', a: 'Konu konu', b: 'ilerle.' },
+  { s: 'gecmis', a: 'Her dakika', b: 'kayıtta.' },
+];
+const T = { intro: 1.6, card: 1.05, fade: 0.4, draw: 1.0, hold: 1.4, outro: 2.6 };
+const SCENE = T.card + T.fade + T.draw + T.hold;
+const TOTAL = T.intro + SCENES.length * SCENE + T.outro;
+
+const c = document.getElementById('c'), g = c.getContext('2d');
+const img = (src) => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = src; });
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const ease = (t) => 1 - Math.pow(1 - clamp(t), 3);
+
+function bg() {
+  g.globalAlpha = 1; g.fillStyle = '#1C1C23'; g.fillRect(0, 0, W, H);
+  const r = g.createRadialGradient(W * 0.85, H * 0.08, 0, W * 0.85, H * 0.08, W * 1.25);
+  r.addColorStop(0, 'rgba(229,52,63,.34)'); r.addColorStop(1, 'rgba(229,52,63,0)');
+  g.fillStyle = r; g.fillRect(0, 0, W, H);
+  const r2 = g.createRadialGradient(W * 0.1, H * 0.95, 0, W * 0.1, H * 0.95, W);
+  r2.addColorStop(0, 'rgba(229,52,63,.16)'); r2.addColorStop(1, 'rgba(229,52,63,0)');
+  g.fillStyle = r2; g.fillRect(0, 0, W, H);
+}
+function brand(mark, y, alpha, scale = 1) {
+  g.save(); g.globalAlpha = alpha; g.translate(W / 2, y); g.scale(scale, scale);
+  const mh = 150, mw = mark.width * (mh / mark.height);
+  g.drawImage(mark, -mw / 2, -mh, mw, mh);
+  g.fillStyle = '#ECE8E4'; g.font = '600 62px Unbounded'; g.textAlign = 'center'; g.letterSpacing = '4px';
+  g.fillText('MARATON', 0, 96);
+  g.restore();
+}
+function headline(a, b, alpha, dy, size = 104) {
+  g.save(); g.globalAlpha = alpha; g.textAlign = 'center'; g.letterSpacing = '-3px';
+  g.font = `400 ${size}px Bricolage`;
+  g.fillStyle = '#ECE8E4'; g.fillText(a, W / 2, H / 2 - 30 + dy);
+  g.fillStyle = '#E5343F'; g.fillText(b, W / 2, H / 2 - 30 + size * 1.04 + dy);
+  g.restore();
+}
+
+function draw(t, A) {
+  bg();
+  if (t < T.intro) {
+    const k = ease(t / 0.7), o = 1 - clamp((t - (T.intro - 0.3)) / 0.3);
+    brand(A.mark, H / 2 - 20, k * o, 0.94 + 0.06 * k);
+    return;
+  }
+  let u = t - T.intro;
+  const i = Math.floor(u / SCENE);
+  if (i < SCENES.length) {
+    u -= i * SCENE; const sc = SCENES[i], fr = A.frames[sc.s];
+    if (u < T.card) {
+      const k = ease(u / 0.45);
+      headline(sc.a, sc.b, k, 30 * (1 - k));
+      g.globalAlpha = 0.9 * k; g.fillStyle = '#A3A0AB'; g.font = '500 30px Archivo'; g.textAlign = 'center'; g.letterSpacing = '6px';
+      g.fillText(`${i + 1} / ${SCENES.length}`, W / 2, H / 2 - 190);
+      return;
+    }
+    const v = u - T.card, fade = clamp(v / T.fade);
+    if (fade < 1) headline(sc.a, sc.b, 1 - fade, -40 * fade);
+    const p = clamp((v - T.fade * 0.6) / T.draw);
+    const f = fr[Math.round(p * FRAMES)];
+    const z = 1 + 0.025 * clamp((v - T.fade) / (T.draw + T.hold));
+    g.save(); g.globalAlpha = ease(fade); g.translate(W / 2, H / 2); g.scale(z, z);
+    g.drawImage(f, -W / 2, -H / 2 + 24 * (1 - ease(fade)), W, H); g.restore();
+    return;
+  }
+  const o = t - (TOTAL - T.outro), k = ease(o / 0.6);
+  brand(A.mark, H / 2 - 150, k, 0.94 + 0.06 * k);
+  const k2 = ease((o - 0.35) / 0.6);
+  g.save(); g.globalAlpha = k2; g.textAlign = 'center'; g.letterSpacing = '-2px'; g.font = '400 84px Bricolage';
+  g.fillStyle = '#ECE8E4'; g.fillText('Her sabah', W / 2, H / 2 + 150 + 20 * (1 - k2));
+  g.fillStyle = '#E5343F'; g.fillText('rotan hazır.', W / 2, H / 2 + 240 + 20 * (1 - k2));
+  g.letterSpacing = '5px'; g.font = '500 30px Archivo'; g.fillStyle = '#B0ADB5';
+  g.fillText('YKS · LGS ÇALIŞMA PLANI', W / 2, H / 2 + 340);
+  g.restore();
+}
+
+(async () => {
+  await document.fonts.load('400 100px Bricolage'); await document.fonts.load('600 60px Unbounded'); await document.fonts.load('500 30px Archivo');
+  const A = { mark: await img('/assets/brand/mark.png'), frames: {} };
+  for (const sc of SCENES) A.frames[sc.s] = await Promise.all(Array.from({ length: FRAMES + 1 }, (_, f) => img(`/store/visuals/video/out/f/${sc.s}_${f}.jpg`)));
+
+  const still = new URLSearchParams(location.search).get('t');
+  if (still !== null) { draw(+still, A); document.title = 'done'; return; }
+
+  // Kare kare H.264 (WebCodecs) + elle yazilan duz MP4 kutulari: tam 30 fps,
+  // gercek zamana bagli degil, ffmpeg gerekmez.
+  const N = Math.round(TOTAL * FPS), samples = []; let avcC = null, err = null;
+  const enc = new VideoEncoder({
+    output: (chunk, meta) => {
+      if (meta?.decoderConfig?.description) avcC = new Uint8Array(meta.decoderConfig.description);
+      const d = new Uint8Array(chunk.byteLength); chunk.copyTo(d);
+      samples.push({ d, key: chunk.type === 'key', ts: chunk.timestamp });
+    },
+    error: (e) => { err = e; },
+  });
+  enc.configure({ codec: 'avc1.4D4028', width: W, height: H, bitrate: 11e6, framerate: FPS, avc: { format: 'avc' }, latencyMode: 'realtime' });
+  for (let n = 0; n < N; n++) {
+    draw(n / FPS, A);
+    const frame = new VideoFrame(c, { timestamp: Math.round(n * 1e6 / FPS), duration: Math.round(1e6 / FPS) });
+    enc.encode(frame, { keyFrame: n % FPS === 0 }); frame.close();
+    while (enc.encodeQueueSize > 3) await new Promise((r) => setTimeout(r, 4));
+  }
+  await enc.flush(); enc.close();
+  if (err) throw err;
+  const ordered = samples.every((x, k) => !k || x.ts > samples[k - 1].ts);
+
+  const u32 = (v) => [(v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255];
+  const u16 = (v) => [(v >> 8) & 255, v & 255];
+  const str = (t) => [...t].map((ch) => ch.charCodeAt(0));
+  const box = (type, ...parts) => { const body = parts.flatMap((x) => Array.from(x)); return [...u32(body.length + 8), ...str(type), ...body]; };
+  const zeros = (k) => new Array(k).fill(0);
+  const MATRIX = [...u32(0x10000), ...zeros(12), ...u32(0x10000), ...zeros(12), ...u32(0x40000000)];
+  const TS = 600, DELTA = TS / FPS, DUR = N * DELTA;
+  const ftyp = box('ftyp', str('isom'), u32(0x200), str('isomiso2avc1mp41'));
+  const keys = samples.map((x, k) => (x.key ? k + 1 : 0)).filter(Boolean);
+  const stbl = box('stbl',
+    box('stsd', u32(0), u32(1), box('avc1', zeros(6), u16(1), zeros(16), u16(W), u16(H), u32(0x480000), u32(0x480000), zeros(4), u16(1), zeros(32), u16(0x18), [255, 255], box('avcC', avcC))),
+    box('stts', u32(0), u32(1), u32(N), u32(DELTA)),
+    box('stss', u32(0), u32(keys.length), keys.flatMap(u32)),
+    box('stsc', u32(0), u32(1), u32(1), u32(N), u32(1)),
+    box('stsz', u32(0), u32(0), u32(N), samples.flatMap((x) => u32(x.d.length))),
+    box('stco', u32(0), u32(1), u32(ftyp.length + 8)));
+  const moov = box('moov',
+    box('mvhd', u32(0), u32(0), u32(0), u32(TS), u32(DUR), u32(0x10000), u16(0x100), zeros(10), MATRIX, zeros(24), u32(2)),
+    box('trak',
+      box('tkhd', u32(3), u32(0), u32(0), u32(1), u32(0), u32(DUR), zeros(8), u16(0), u16(0), u16(0), u16(0), MATRIX, u32(W << 16), u32(H << 16)),
+      box('mdia',
+        box('mdhd', u32(0), u32(0), u32(0), u32(TS), u32(DUR), u16(0x55c4), u16(0)),
+        box('hdlr', u32(0), u32(0), str('vide'), zeros(12), str('VideoHandler'), [0]),
+        box('minf', box('vmhd', u32(1), zeros(8)), box('dinf', box('dref', u32(0), u32(1), box('url ', u32(1)))), stbl))));
+  const size = samples.reduce((a, x) => a + x.d.length, 0);
+  const buf = new Uint8Array(ftyp.length + 8 + size + moov.length); let o = 0;
+  buf.set(ftyp, o); o += ftyp.length; buf.set([...u32(size + 8), ...str('mdat')], o); o += 8;
+  for (const x of samples) { buf.set(x.d, o); o += x.d.length; }
+  buf.set(moov, o);
+  let s = '';
+  for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+  window.__b64 = btoa(s);
+  window.__info = `H.264 ${W}x${H} · ${FPS} fps · ${N} kare · ${TOTAL.toFixed(1)} sn · ${(buf.length / 1e6).toFixed(1)} MB · sirali=${ordered} · anahtar=${keys.length}`;
+  document.title = 'done';
+})().catch((e) => { window.__info = 'HATA ' + e.message; window.__b64 = ''; document.title = 'done'; });
+</script></body></html>
