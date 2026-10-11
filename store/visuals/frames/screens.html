@@ -184,6 +184,24 @@ S.gecmis = () => {
   ${TAB('home')}</div>`;
 };
 
+S.defter = () => {
+  const thumb = (c) => `<div style="width:92px;height:74px;border-radius:14px;background:#E9E4DC;border:1.5px solid ${c};flex-shrink:0;padding:10px 9px;display:flex;flex-direction:column;gap:5px">${[100,82,94,40].map(w=>`<span style="height:3px;width:${w}%;border-radius:2px;background:#8A857E"></span>`).join('')}<div style="display:flex;gap:4px;margin-top:4px">${['A','B','C','D'].map((l,i)=>`<span style="width:13px;height:13px;border-radius:7px;border:1.3px solid ${i===2?'#E5343F':'#8A857E'};${i===2?'background:rgba(229,52,63,.25)':''}"></span>`).join('')}</div></div>`;
+  const seg3 = (c,n) => `<span style="display:inline-flex;gap:4px;margin-left:10px">${[0,1,2].map(i=>`<span style="width:14px;height:3px;border-radius:2px;background:${i<n?c:'#44444C'}"></span>`).join('')}</span>`;
+  const item = ([c,t,sub,n,note,lvl]) => `<div class="row" style="gap:14px;padding:14px 0;border-top:1px solid var(--line);align-items:flex-start">${thumb(c)}<div style="flex:1"><div class="bric" style="font-size:19px;letter-spacing:-.01em">${t}</div><div style="font:500 13px Archivo;color:var(--text3);margin-top:3px"><span style="color:${c}">${sub}</span> · ${n} soru</div><div style="font:400 12.5px Archivo;color:var(--text2);margin-top:4px">${note}</div><div class="row" style="margin-top:7px"><span style="font:600 10.5px Archivo;letter-spacing:.14em;color:#E0A93F;background:rgba(224,169,63,.14);padding:4px 8px;border-radius:5px">TEKRAR ZAMANI</span>${seg3(c,lvl)}</div></div><span style="color:var(--text3);margin-top:26px">›</span></div>`;
+  const chip = (on,dot,t,n) => `<span style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:7px;border:1px solid ${on?'#A3A0AB':'var(--line)'};background:${on?'var(--elev)':'transparent'};font:600 13px Archivo;color:${on?'var(--text)':'var(--text2)'}">${dot?`<span style="width:8px;height:8px;border-radius:4px;background:${dot}"></span>`:''}${t}<span style="color:var(--text3);font-weight:500">${n}</span></span>`;
+  return `<div class="scr"><div class="glow"></div>${STATUS}
+  <div class="pad row" style="gap:14px;margin-top:20px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B0ADB5" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg><span class="bric" style="font-size:32px">Defterim</span><span style="font:600 13px Archivo;color:var(--text2);border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:3px 8px">11</span></div>
+  <div class="pad" style="margin-top:16px"><div class="seg"><div class="on">Bekleyen · 11</div><div>Çözüldü</div><div>Tümü</div></div></div>
+  <div class="pad row" style="gap:8px;margin-top:14px">${chip(1,null,'Tümü',11)}${chip(0,'#E0A570','Matematik',5)}${chip(0,'#74A9E8','Türkçe',3)}${chip(0,'#56C6D6','Fizik',2)}</div>
+  <div class="pad" style="margin-top:14px"><div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px">
+    <div class="between"><span class="label">TEKRAR ZAMANI</span><span class="bric" style="font-size:24px">4</span></div>
+    <div style="font:400 13px/1.5 Archivo;color:var(--text2);margin-top:6px">Aralıklı tekrar: 1. gün, 3. gün, 7. gün. Bildiklerin uzar, bilemediklerin bir kademe geriler.</div>
+    <div style="margin-top:12px;height:48px;border-radius:12px;background:#CF2833;display:flex;align-items:center;justify-content:center;font:700 15.5px Archivo;color:#fff">Tekrara başla · 4 soru</div></div></div>
+  <div class="pad label" style="margin-top:18px">KONUYA GÖRE</div>
+  <div class="pad" style="margin-top:8px">${[['#E0A570','Problemler','Matematik',3,'Yaş probleminde oranı ters kurdum.',1],['#74A9E8','Paragraf','Türkçe',2,'Ana düşüncede çeldiriciye gittim.',2],['#56C6D6','Elektrik','Fizik',2,'Paralel-seri ayrımına dikkat.',1],['#E8A0C4','Kimyasal Denge','Kimya',1,'Sıcaklık etkisini karıştırdım.',2]].map(item).join('')}</div>
+  ${TAB('an')}</div>`;
+};
+
 const s = new URLSearchParams(location.search).get('s') || 'home';
 document.getElementById('root').innerHTML = S[s]();
 // Tanitim videosu (store/visuals/video) icin: grafikleri p=0..1 arasi cizer.

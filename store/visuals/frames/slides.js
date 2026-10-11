@@ -6,6 +6,7 @@ window.SLIDES = [
   { id: '04', shot: 'raw-mat.png', a: 'Ders ders,', b: 'net net.', sub: 'Nerede kaybettiğini, nerede yükseldiğini gör.', route: 'mid' },
   { id: '05', shot: 'raw-mufredat.png', a: 'Konu konu', b: 'ilerle.', sub: 'Müfredatta nerede olduğunu her an gör.', route: 'top' },
   { id: '06', shot: 'raw-gecmis.png', a: 'Her dakika', b: 'kayıtta.', sub: 'Pomodoro ya da serbest; emeğin birikir.', route: 'mid' },
+  { id: '07', shot: 'raw-defter.png', a: 'Yanlışın', b: 'unutulmasın.', sub: 'Fotoğrafla kaydet, zamanı gelince yeniden çöz.', route: 'top' },
 ];
 window.PLATFORMS = {
   ios: { w: 1320, h: 2868, device: 'ios' },
