@@ -4,8 +4,8 @@ set -e
 cd "$(dirname "$0")"
 EDGE="/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 DIR=$(cygpath -m "$PWD")
-declare -A SIZE=([ios]="1320,2868" [android]="1440,2560")
-for p in ios android; do
+declare -A SIZE=([ios]="1320,2868" [ios63]="1206,2622" [android]="1440,2560")
+for p in ios ios63 android; do
   mkdir -p out/$p
   for s in 01 02 03 04 05 06 07; do
     "$EDGE" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \

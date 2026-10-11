@@ -10,5 +10,6 @@ window.SLIDES = [
 ];
 window.PLATFORMS = {
   ios: { w: 1320, h: 2868, device: 'ios' },
+  ios63: { w: 1206, h: 2622, device: 'ios' },
   android: { w: 1440, h: 2560, device: 'android' },
 };
