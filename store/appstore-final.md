@@ -9,7 +9,7 @@ Karakter sayıları node ile doğrulandı.
 
 | Alan | Metin | Sayım |
 |---|---|---|
-| Ad | `Maraton: YKS LGS Deneme Takip` | 29 / 30 |
+| Ad | `Maraton: YKS LGS Deneme Takibi` | 30 / 30 |
 | Alt başlık | `TYT AYT ders çalışma programı` | 29 / 30 |
 | Anahtar kelimeler | `net,hesaplama,sıralama,puan,sayaç,pomodoro,yanlış,defteri,konu,sınav,soru,analiz,2027,plan` | 95 / 100 bayt |
 | Promosyon metni | `Her sabah rotan hazır. YKS ve LGS için günlük çalışma planı, deneme takibi, net grafiği ve yanlış defteri tek yerde.` | 116 / 170 |
@@ -53,7 +53,7 @@ Açıklama ve promosyon metni için `store/aso-2026-10.md` bölüm 4'teki İngil
 
 ## Görseller
 
-- Ekran görüntüleri: `store/visuals/frames/out/ios/01-06.png` (1320×2868, 6.9").
+- Ekran görüntüleri: `store/visuals/frames/out/ios63/` (1206×2622). App Store Connect'in varsayılan yuvası artık 6.1"/6.3"; 1320×2868 orada reddediliyor. Yüklenen sıra: 01, 02, 03, 04, 07, 05, 06.
 - Önizleme videosu: `store/visuals/video/out/maraton-tanitim-886x1920.mp4`
   (`node store/visuals/video/build.mjs` ile yeniden üretilir). Ses izi yok.
   Apple önizlemede uygulama içi görüntü ister; bu video demo ekranların canlandırması.
@@ -65,3 +65,23 @@ Açıklama ve promosyon metni için `store/aso-2026-10.md` bölüm 4'teki İngil
 Kelime çalışmasına göre en boş alan "yanlış defteri", en merak edilen "tahmini sıralama".
 İkisi de şu an karelerde yok. Bu iki ekranın gerçek görüntüsü gelince 7. ve 8. kare olarak eklenir;
 sıralama karesi 3. sıraya alınır (arama sonucunda ilk üç kare görünür).
+
+## App Store Connect durumu (11 Ekim 2026)
+
+"…Deneme Takip" adı Apple'da kullanımda çıktı; "…Deneme Takibi" kabul edildi.
+
+Girildi ve kaydedildi: ana dil Türkçe, ad, alt başlık, kategori (Eğitim + Verimlilik), promosyon metni,
+açıklama, anahtar kelimeler, destek/pazarlama URL'si, telif, 7 ekran görüntüsü, yaş derecelendirmesi (13+),
+fiyat (ücretsiz), kullanılabilirlik (yalnız Türkiye), gizlilik politikası URL'si, 10 gizlilik etiketi,
+inceleme notu (İngilizce), demo kullanıcı adı, build 14, "elle yayınla".
+
+Kaldı (hesap sahibinin yapması gerekenler):
+1. App Privacy → **Publish** (doğruluk beyanı).
+2. App Information → **Content Rights** (üçüncü taraf içerik beyanı).
+3. Sürüm sayfası → demo hesabın **şifresi** ve iletişim bilgisi (ad, telefon, e-posta).
+4. İnceleme notunda "Deleting the account also revokes the Sign in with Apple token" cümlesi var:
+   `APPLE_TEAM_ID` / `APPLE_KEY_ID` / `APPLE_PRIVATE_KEY` sırları girilmeden gönderilirse bu cümle silinmeli.
+5. `scripts/seed-review-account.sql` çalıştırılacak.
+6. **Add for Review**.
+
+İsteğe bağlı: English (U.K.) yerelleştirmesi (ikinci anahtar kelime alanı), önizleme videosu.
