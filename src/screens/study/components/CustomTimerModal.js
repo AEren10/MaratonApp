@@ -6,6 +6,7 @@ import { Press } from "../../../components/design/Press";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import { CustomTimerSection } from "./customTimer/CustomTimerSection";
 import { CustomTimerPreview } from "./customTimer/CustomTimerPreview";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 const FOCUS_PRESETS = [15, 20, 25, 30, 45, 60];
 const BREAK_PRESETS = [3, 5, 10, 15, 20];
@@ -33,6 +34,7 @@ export function CustomTimerModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <ModalFrame>
       <View style={[s.overlay, { backgroundColor: C.void + "D9" }]}>
         <View style={[s.sheet, { backgroundColor: C.bg, borderColor: C.line, paddingBottom: insets.bottom + STEP.s3 }]}>
           <View style={[s.handle, { backgroundColor: C.border }]} />
@@ -94,6 +96,7 @@ export function CustomTimerModal({
           </ScrollView>
         </View>
       </View>
+      </ModalFrame>
     </Modal>
   );
 }

@@ -15,6 +15,7 @@ import * as H from "../../../lib/haptics";
 import { ReorganizeTaskRow } from "./ReorganizeTaskRow";
 import { ReorganizeScheduleCard, ReorganizeClearButton } from "./ReorganizeActions";
 import { Press } from "../../../components/design/Press";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 export function ReorganizeDayModal({
   visible,
@@ -31,6 +32,7 @@ export function ReorganizeDayModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <ModalFrame>
       <View style={[s.overlay, { backgroundColor: C.void + "CC" }]}>
         <SafeAreaView edges={["bottom"]} style={[s.sheet, { backgroundColor: C.bg, borderColor: C.line }]}>
           <View style={[s.header, { borderBottomColor: C.line }]}>
@@ -109,6 +111,7 @@ export function ReorganizeDayModal({
           </View>
         </SafeAreaView>
       </View>
+      </ModalFrame>
     </Modal>
   );
 }

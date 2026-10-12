@@ -5,6 +5,7 @@ import { TYPOGRAPHY, SPACING, RADIUS } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { getSubjectByKey } from "../../themes/subjects";
 import { Press } from "../../components/design/Press";
+import { ModalFrame } from "../design/ModalFrame";
 
 const NudgeItem = React.memo(function NudgeItem({ nudge, onAction, C, styles }) {
   const PRIORITY_COLOR = { high: C.red, medium: C.amber, low: C.green };
@@ -44,6 +45,7 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <ModalFrame>
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={styles.handle} />
@@ -58,6 +60,7 @@ export function NudgeModal({ visible, nudges, onClose, onAction }) {
           <Button onPress={onClose} fullWidth>Tamam</Button>
         </Pressable>
       </Pressable>
+      </ModalFrame>
     </Modal>
   );
 }

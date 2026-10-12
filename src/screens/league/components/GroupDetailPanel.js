@@ -18,6 +18,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useBlockedIds } from "../../../lib/blockedUsers";
 import { AlertProvider } from "../../../contexts/AlertContext";
 import { AnchoredMenuProvider } from "../../../contexts/AnchoredMenuContext";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 export function GroupDetailPanel({
   visible,
@@ -52,6 +53,7 @@ export function GroupDetailPanel({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <ModalFrame>
       {/* Menu ve uyari bu Modal'in ICINDE: uygulama kokundekiler iOS'ta acik
           Modal'in arkasinda kaliyordu (uyeye dokununca menu, "..." calismiyordu). */}
       <AlertProvider>
@@ -118,6 +120,7 @@ export function GroupDetailPanel({
       </SafeAreaView>
       </AnchoredMenuProvider>
       </AlertProvider>
+      </ModalFrame>
     </Modal>
   );
 }

@@ -7,6 +7,7 @@ import { getSubjectByKey } from "../../../themes/subjects";
 import { DayTasks } from "./DayTasks";
 import { todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 function formatDayLabel(iso) {
   return new Date(iso).toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
@@ -47,6 +48,7 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
 
   return (
     <Modal visible={!!visible} transparent animationType="slide" onRequestClose={onClose}>
+      <ModalFrame>
       <Pressable style={s.backdrop} onPress={onClose}>
         <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={s.handle} />
@@ -113,6 +115,7 @@ export function DayDetailSheet({ day, data, calendarTasks = [], visible, onClose
           </ScrollView>
         </Pressable>
       </Pressable>
+      </ModalFrame>
     </Modal>
   );
 }

@@ -5,6 +5,7 @@ import { TYPOGRAPHY, SPACING, STEP, RADIUS } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 import { Press } from "../../../components/design/Press";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 export function GroupCodeModal({ visible, title, subtitle, placeholder, value, onChange, onSubmit, onClose, busy, cta, autoCap, maxLen, error }) {
   const C = useC();
@@ -19,6 +20,7 @@ export function GroupCodeModal({ visible, title, subtitle, placeholder, value, o
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+      <ModalFrame>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={s.flex}>
         <Pressable style={s.backdrop} onPress={onClose}>
           <Pressable accessibilityViewIsModal style={[s.dialog, { backgroundColor: C.surface, borderColor: C.border }]} onPress={(e) => e.stopPropagation()}>
@@ -72,6 +74,7 @@ export function GroupCodeModal({ visible, title, subtitle, placeholder, value, o
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
+      </ModalFrame>
     </Modal>
   );
 }

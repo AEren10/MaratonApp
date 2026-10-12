@@ -3,6 +3,7 @@ import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE, CONTROL } from "../../../themes/tokens";
 import { useC } from "../../../contexts/ThemeContext";
 import { Press } from "../../../components/design/Press";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 const TYPE_LABELS = {
   TYT: "TYT", AYT_SAY: "AYT SAY", AYT_EA: "AYT EA",
@@ -46,6 +47,7 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
   const C = useC();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <ModalFrame>
       <Press haptic="none" style={[styles.backdrop, { backgroundColor: C.scrim }]} onPress={onClose} accessibilityLabel="Kapat">
         <Press haptic="none" onPress={() => {}} style={[styles.sheet, { backgroundColor: C.surface, borderColor: C.border }]}>
           <View style={styles.head}>
@@ -75,6 +77,7 @@ export function TrialPickerModal({ visible, trials, selectedId, onSelect, onClos
           <View style={{ height: STEP.s4 }} />
         </Press>
       </Press>
+      </ModalFrame>
     </Modal>
   );
 }

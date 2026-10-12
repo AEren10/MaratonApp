@@ -8,6 +8,7 @@ import { TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from "../../themes/tokens";
 import { nextMondayReset } from "../../lib/streakFreeze";
 import { dateKey, todayTR } from "../../lib/dateUtils";
 import { Press } from "../../components/design/Press";
+import { ModalFrame } from "../design/ModalFrame";
 
 function dayLabel(offset) {
   const d = new Date();
@@ -84,6 +85,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
 
   return (
     <Modal visible={visible} transparent animationType={Platform.OS === "web" ? "none" : "slide"} onRequestClose={onClose}>
+      <ModalFrame>
       <Pressable style={s.backdrop} onPress={onClose}>
         <Pressable style={[s.sheet, { backgroundColor: C.surface }]} onPress={(e) => e.stopPropagation()}>
           <View style={[s.handle, { backgroundColor: C.border }]} />
@@ -144,6 +146,7 @@ export function StreakDetailSheet({ visible, onClose, streak, longestStreak, fre
           <Button onPress={onClose} fullWidth>Tamam</Button>
         </Pressable>
       </Pressable>
+      </ModalFrame>
     </Modal>
   );
 }

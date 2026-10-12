@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon } from "../../../components/design";
 import { TYPOGRAPHY, STEP, GUTTER, SHAPE } from "../../../themes/tokens";
 import * as H from "../../../lib/haptics";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, topics = [], C }) {
   const [query, setQuery] = useState("");
@@ -25,6 +26,7 @@ export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, top
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <ModalFrame>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[s.overlay, { backgroundColor: C.void + "CC" }]}
@@ -93,6 +95,7 @@ export function TopicPickerModal({ visible, onClose, onSelect, subjectLabel, top
           />
         </SafeAreaView>
       </KeyboardAvoidingView>
+      </ModalFrame>
     </Modal>
   );
 }

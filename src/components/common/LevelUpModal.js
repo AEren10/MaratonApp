@@ -7,6 +7,7 @@ import * as H from "../../lib/haptics";
 import { IconBox, Button } from "../design";
 import { TYPOGRAPHY, STEP, SHAPE, GUTTER } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
+import { ModalFrame } from "../design/ModalFrame";
 
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 const ENTER_MS = 420;
@@ -53,6 +54,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
 
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+      <ModalFrame>
       <Animated.View style={[s.overlay, { backgroundColor: C.scrim }, scrimStyle]}>
         <Animated.View style={[s.card, cardStyle]}>
           <Text style={s.eyebrow}>SEVİYE ATLADIN</Text>
@@ -71,6 +73,7 @@ export function LevelUpModal({ visible, level, title, onClose }) {
           </View>
         </Animated.View>
       </Animated.View>
+      </ModalFrame>
     </Modal>
   );
 }

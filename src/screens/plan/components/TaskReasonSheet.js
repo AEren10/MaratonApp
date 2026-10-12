@@ -7,6 +7,7 @@ import { TrendChart } from "../../../components/charts/TrendChart";
 import { TRIAL_TO_CURRICULUM } from "../../../domain/trial/trialKeyMap";
 import AssignmentInsightPanel from "./AssignmentInsightPanel";
 import { Press } from "../../../components/design/Press";
+import { ModalFrame } from "../../../components/design/ModalFrame";
 
 // Görev gerekçesi + son denemelerde bu dersin net trendi.
 function trialKeysForCurriculum(curriculumKey) {
@@ -36,6 +37,7 @@ export function TaskReasonSheet({ task, trials, onClose }) {
 
   return (
     <Modal visible={!!task} transparent animationType="slide" onRequestClose={onClose}>
+      <ModalFrame>
       <Pressable style={s.backdrop} onPress={onClose}>
         <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={s.handle} />
@@ -70,6 +72,7 @@ export function TaskReasonSheet({ task, trials, onClose }) {
           ) : null}
         </Pressable>
       </Pressable>
+      </ModalFrame>
     </Modal>
   );
 }

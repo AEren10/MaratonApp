@@ -7,6 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useC } from "../../contexts/ThemeContext";
 import { alpha } from "../../themes/colorMix";
 import { ANIMATION, GUTTER, SHAPE } from "../../themes/tokens";
+import { ModalFrame } from "./ModalFrame";
 
 const IN = { duration: 240, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
 const OUT = { duration: 160, easing: Easing.bezier(...ANIMATION.easing.easeOut) };
@@ -39,6 +40,7 @@ export function CenterCard({ visible, onClose, children, style, glow = true }) {
   if (!mounted) return null;
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+      <ModalFrame>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim }, backdrop]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" accessibilityLabel="Kapat" />
       </Animated.View>
@@ -51,6 +53,7 @@ export function CenterCard({ visible, onClose, children, style, glow = true }) {
           {children}
         </Animated.View>
       </Animated.View>
+      </ModalFrame>
     </Modal>
   );
 }

@@ -5,6 +5,7 @@ import { TYPOGRAPHY, STEP, SHAPE } from "../../themes/tokens";
 import { useC } from "../../contexts/ThemeContext";
 import { DialogAction } from "./appModal/DialogAction";
 import { Press } from "../../components/design/Press";
+import { ModalFrame } from "../design/ModalFrame";
 
 const WARNING_ICONS = ["alert", "warning", "alertTriangle"];
 
@@ -31,6 +32,7 @@ export function AppModal({ visible, onClose, title, message, actions = [], icon,
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+      <ModalFrame>
       <Pressable style={[styles.backdrop, { backgroundColor: C.scrim }]} onPress={onClose} accessibilityLabel="Kapat">
         <Pressable
           accessibilityViewIsModal
@@ -65,6 +67,7 @@ export function AppModal({ visible, onClose, title, message, actions = [], icon,
           </View>
         </Pressable>
       </Pressable>
+      </ModalFrame>
     </Modal>
   );
 }
