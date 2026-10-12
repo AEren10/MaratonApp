@@ -89,7 +89,7 @@ export const RouteLineChart = memo(function RouteLineChart({
   );
 
   return (
-    <View style={[{ width: "100%", aspectRatio: CHART_W / H, height, display: "flex" }, wide]} onLayout={onLayout} accessible accessibilityLabel={summary}>
+    <View style={[{ width: "100%", height, display: "flex" }, wide]} onLayout={onLayout} accessible accessibilityLabel={summary}>
       <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
         <Defs>
           <LinearGradient id="hglow" x1="0" y1="0" x2="0" y2="1">

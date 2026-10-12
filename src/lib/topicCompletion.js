@@ -64,12 +64,24 @@ export async function saveCompletedTopicsMap(userId, map) {
   emitRouteUpdated({ action: "known_topics_changed" });
 }
 
-export async function toggleTopicCompletion(userId, subjectKey, topicName, currentDone) {
-  const currentMap = await getCompletedTopicsMap(userId);
-  const k = makeTopicKey(subjectKey, topicName);
-  const nextMap = { ...currentMap, [k]: currentDone ? false : todayTR() };
-  await saveCompletedTopicsMap(userId, nextMap);
-  return nextMap;
+// Tikler SIRAYLA yazilir. Eskiden her tik haritayi sunucudan okuyup ustune
+// yaziyordu; pes pese iki tikte ikisi de ayni eski haritayi okuyor, sonra
+// yazan oncekinin tikini siliyordu ("5. konuyu tikleyince 2. kalkiyor").
+let toggleChain = Promise.resolve();
+
+export function toggleTopicCompletion(userId, subjectKey, topicName, currentDone) {
+  const run = async () => {
+    const base = store.loaded && store.userId === userId
+      ? store.map
+      : await getCompletedTopicsMap(userId);
+    const k = makeTopicKey(subjectKey, topicName);
+    const nextMap = { ...base, [k]: currentDone ? false : todayTR() };
+    await saveCompletedTopicsMap(userId, nextMap);
+    return nextMap;
+  };
+  const result = toggleChain.then(run, run);
+  toggleChain = result.catch(() => {});
+  return result;
 }
 
 /** Rota icin: kullanicinin tik haritasi (tek kopya, sunucudan). */

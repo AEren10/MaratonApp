@@ -21,7 +21,7 @@ export const HomeExamSeriesChart = React.memo(function HomeExamSeriesChart({ ser
           </View>
         ))}
       </View>
-      <View style={{ height: CHART_H - STEP.s3 }}>
+      <View style={{ height: CHART_H - STEP.s3 - STEP.s2 }}>
         <HeroMultiTrendChartSvg C={C} series={lines} />
       </View>
     </View>
@@ -29,7 +29,8 @@ export const HomeExamSeriesChart = React.memo(function HomeExamSeriesChart({ ser
 });
 
 const s = StyleSheet.create({
-  legend: { flexDirection: "row", gap: STEP.s2, height: STEP.s3, alignItems: "center" },
+  // Ust pay: kaydirici yukari tasiyor (-s2); efsane "0/160" satirina biniyordu.
+  legend: { flexDirection: "row", gap: STEP.s2, height: STEP.s3, marginTop: STEP.s2, alignItems: "center" },
   legendItem: { flexDirection: "row", alignItems: "center", gap: STEP.s1 / 2 },
   swatch: { width: STEP.s2, height: 3, borderRadius: 2 },
 });

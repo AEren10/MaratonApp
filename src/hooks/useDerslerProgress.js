@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { getTopicProgress } from "../supabase/topicProgress";
 import { captureError } from "../lib/errorReporting";
-import { getCompletedTopicsMap, isTopicDone } from "../lib/topicCompletion";
+import { getCompletedTopicsMap, isTopicDone, useKnownTopicsMap } from "../lib/topicCompletion";
 import { rowAccuracy } from "../domain/route/effectiveAccuracy";
 
 const EXPECTED_QUESTIONS = 30;
@@ -58,9 +58,15 @@ export function useDerslerProgress(activeSubjects) {
 
   useEffect(() => { loadProgress(); }, [loadProgress]);
 
+  // Tikler canli izlenir: Profil/Program sekmesi acik kalirken Mufredat'ta
+  // atilan tik, sekmeye donuldugunde sayilara yansir (eskiden yalniz ilk
+  // acilista okunuyordu, ilerleme "kaydedilmemis" gibi gorunuyordu).
+  const liveMap = useKnownTopicsMap(user?.id || "dev");
+  const effectiveMap = Object.keys(liveMap).length ? liveMap : completedMap;
+
   const dersler = useMemo(
-    () => buildDersler(activeSubjects, progressMap, completedMap),
-    [activeSubjects, progressMap, completedMap],
+    () => buildDersler(activeSubjects, progressMap, effectiveMap),
+    [activeSubjects, progressMap, effectiveMap],
   );
 
   const { totalDone, totalAll, focusSubject } = useMemo(() => {

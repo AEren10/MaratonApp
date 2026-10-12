@@ -1,4 +1,4 @@
-import { Modal, View, Text, ScrollView, StyleSheet } from "react-native";
+import { Modal, View, Text, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Button, Icon } from "../../design";
@@ -24,11 +24,15 @@ export function CompletionShell({
   closeLabel = "Ana sayfada kal",
 }) {
   const C = useC();
+  const win = useWindowDimensions();
   if (!visible) return null;
 
   return (
     <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
-      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* Kok acikca ekran boyunda: Modal kokunun boyu kisa gelince tam ekran
+          kabuk icerigi kadar kalip ekranin tepesine yapisiyordu (BottomSheet
+          ile ayni sorun, 9 Ekim). */}
+      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, width: win.width, minHeight: win.height, backgroundColor: C.bg }}>
         <Press haptic="none"
           onPress={onClose}
           hitSlop={16}

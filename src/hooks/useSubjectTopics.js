@@ -117,8 +117,11 @@ export function useSubjectTopics(subjectKey) {
       }));
 
       try {
+        // Yalniz bu konunun anahtari yazilir: sirada bekleyen baska tiklerin
+        // iyimser degerleri eski bir yanitla ezilmesin.
+        const key = makeTopicKey(subjectKey, name);
         const nextMap = await toggleTopicCompletion(userId, subjectKey, name, currentDone);
-        setCompletedMap(nextMap);
+        setCompletedMap((prev) => ({ ...prev, [key]: nextMap[key] }));
       } catch (e) {
         captureError(e, { context: "toggleTopic" });
         setCompletedMap((prev) => ({

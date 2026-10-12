@@ -89,7 +89,7 @@ export function HomeChartPager({ pages = [], onPressPage, onPageChange, initialP
         {visible.map((page, i) => (
           <Press haptic="none"
             key={page.key}
-            style={{ width: pageWidth }}
+            style={{ width: pageWidth, overflow: "hidden" }}
             onPress={() => onPressPage?.(page.key)}
             disabled={!onPressPage}
             accessibilityRole="button"
