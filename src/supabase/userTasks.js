@@ -37,6 +37,25 @@ export const getUserTasksByDate = async (userId, date) => {
   }
 };
 
+// Bir tarih araligindaki ek gorevlerin gun + ders ozeti (ders programi
+// ekraninda "bu haftanin duraklari" cipleri icin).
+export const getUserTaskSubjectsInRange = async (userId, from, to) => {
+  try {
+    const { data, error } = await supabase
+      .from("user_tasks")
+      .select("task_date, subject")
+      .eq("user_id", userId)
+      .gte("task_date", from)
+      .lte("task_date", to)
+      .neq("subject", "__calendar");
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    handleSupabaseError(e, "getUserTaskSubjectsInRange");
+    throw e;
+  }
+};
+
 export const getCalendarTasks = async (userId, subject = "__calendar") => {
   try {
     const { data, error } = await supabase

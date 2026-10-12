@@ -7,6 +7,7 @@ import { getTrialTypes } from "../../../domain/trial/trialTypes";
 import { DayTasks } from "./DayTasks";
 import { DaySlotRow } from "./DaySlotRow";
 import { DayPlannedStops } from "./DayPlannedStops";
+import DayScheduleSubjects from "../../program/components/DayScheduleSubjects";
 import { todayTR } from "../../../lib/dateUtils";
 import { Press } from "../../../components/design/Press";
 
@@ -107,7 +108,10 @@ export function DayDetails({ day, data, calendarTasks, onAddTask, onToggleTask, 
       ) : null}
 
       {day >= todayTR() ? (
-        <DayPlannedStops day={day} C={C} />
+        <>
+          <DayScheduleSubjects dateKey={day} style={{ marginTop: STEP.s3 }} />
+          <DayPlannedStops day={day} C={C} />
+        </>
       ) : null}
 
       {/* Eski serbest "gorev"ler yalniz varsa listelenir; yenisi eklenmez --

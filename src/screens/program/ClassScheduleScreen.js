@@ -9,6 +9,7 @@ import { SCREENS } from "../../constants/screens";
 import { useC } from "../../contexts/ThemeContext";
 import { weekdayIndex } from "../../domain/program/dayKeys";
 import { useClassScheduleEditor } from "../../hooks/useClassScheduleEditor";
+import { useWeekStopSubjects } from "../../hooks/useWeekStopSubjects";
 import { todayTR } from "../../lib/dateUtils";
 import { formatNumber } from "../../lib/format";
 import * as H from "../../lib/haptics";
@@ -22,6 +23,7 @@ function ClassScheduleInner() {
   const navigation = useNavigation();
   const editor = useClassScheduleEditor();
   const today = weekdayIndex(todayTR());
+  const weekStops = useWeekStopSubjects();
 
   const onSubmit = useCallback(async () => {
     await editor.submit();
@@ -49,10 +51,16 @@ function ClassScheduleInner() {
                 isLast={day.weekday === 6}
                 open={editor.open === day.weekday}
                 editor={editor}
+                weekStops={weekStops[day.weekday]}
               />
             ))}
           </View>
         )}
+        {weekStops.some((list) => list.length) ? (
+          <Text style={[TYPOGRAPHY.meta, s.legend, { color: C.text3 }]}>
+            Kesikli çipler bu haftanın o güne düşen durakları; programına yazılmaz.
+          </Text>
+        ) : null}
         <View style={[s.total, { backgroundColor: C.surface, borderColor: C.border }]}>
           <View style={[s.totalIcon, { backgroundColor: C.accent + "18", borderColor: C.accent + "30" }]}>
             <Icon name="clock" size={16} color={C.accent} />
@@ -92,6 +100,7 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: GUTTER, paddingBottom: STEP.s4 },
   lede: { marginTop: STEP.s3 },
   list: { marginTop: STEP.s4 },
+  legend: { marginTop: STEP.s2 },
   total: {
     flexDirection: "row",
     alignItems: "center",

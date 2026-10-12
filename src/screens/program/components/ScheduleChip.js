@@ -6,13 +6,21 @@ import { SHAPE, TYPOGRAPHY } from "../../../themes/tokens";
 import { Press } from "../../../components/design/Press";
 
 // Ders programi cipi. tone: "subject" (ders renginde tint zemin ve kenarlik),
-// "dashed" (Deneme günü / Boş gün), "plain" (secilmemis secenek: ders rengi
+// "ghost" (o gune dusen durak, kesikli ders tonu), "dashed" (Deneme günü / Boş gün), "plain" (secilmemis secenek: ders rengi
 // verilmisse silik ders tonunda -- duz gri secenekler cok soluktu, 12 Ekim).
 function ScheduleChip({ label, color, tone = "subject", onPress, selected }) {
   const C = useC();
   const chipColor = color || C.accent;
 
-  const look = tone === "dashed"
+  const look = tone === "ghost"
+    // Bu haftanin duragi: ogrencinin sectigi ders degil, o gune dusen is.
+    ? {
+        borderColor: chipColor + "66",
+        backgroundColor: "transparent",
+        borderStyle: "dashed",
+        color: chipColor + "CC",
+      }
+    : tone === "dashed"
     ? {
         borderColor: selected ? chipColor : C.border,
         backgroundColor: selected ? chipColor + "18" : "transparent",

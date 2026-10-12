@@ -18,6 +18,7 @@ import { DerslerSkeleton } from "../../dersler/components/DerslerSkeleton";
 import { WeekDayStrip } from "../../dersler/components/WeekDayStrip";
 import { SelectedDayPanel } from "../../dersler/components/SelectedDayPanel";
 import { ProgramWeekTrials } from "../components/ProgramWeekTrials";
+import DayScheduleSubjects from "../components/DayScheduleSubjects";
 import { ProgramRulesSection } from "../../dersler/components/ProgramRulesSection";
 import { ScheduleDiscoverCard } from "../components/ScheduleDiscoverCard";
 import { HabitDiscoverCard } from "../components/HabitDiscoverCard";
@@ -107,6 +108,8 @@ export function ProgramWeekView() {
       ) : null}
 
       <WeekDayStrip days={w.days} selectedDate={w.selectedDate} onSelect={w.setSelectedDate} />
+
+      <DayScheduleSubjects dateKey={w.selectedDate} style={{ marginTop: STEP.s3 }} />
 
       {w.selectedDay ? <SelectedDayPanel selectedDay={w.selectedDay} logs={dayItems} /> : null}
 

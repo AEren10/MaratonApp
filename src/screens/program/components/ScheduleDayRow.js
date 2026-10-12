@@ -19,10 +19,13 @@ function hoursLabel(day) {
   return `${formatNumber(day.minutes / 60, day.minutes % 60 ? 1 : 0)} sa`;
 }
 
-function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
+function ScheduleDayRow({ day, isToday, isLast, open, editor, weekStops = [] }) {
   const C = useC();
   const kindLabel = KIND_LABEL[day.kind];
   const dayColor = isToday ? C.accentBright : day.kind === DAY_KINDS.OFF ? C.text3 : C.text;
+  // Bu hafta o gune dusen duraklarin dersleri; ogrencinin sectikleri haric.
+  const chosen = new Set(day.subjects.map((key) => subjectPaletteKey(key)));
+  const extra = weekStops.filter((stop) => !chosen.has(stop.key));
 
   return (
     <View
@@ -50,19 +53,20 @@ function ScheduleDayRow({ day, isToday, isLast, open, editor }) {
         </View>
 
         <View style={s.chips}>
-          {kindLabel ? (
-            <ScheduleChip tone="dashed" label={kindLabel} />
-          ) : day.subjects.length > 0 ? (
-            day.subjects.map((key) => (
-              <ScheduleChip
-                key={key}
-                label={editor.displayLabelOf ? editor.displayLabelOf(key) : editor.labelOf(key)}
-                color={C.subjects?.[subjectPaletteKey(key)] || C.text}
-              />
-            ))
-          ) : (
+          {kindLabel ? <ScheduleChip tone="dashed" label={kindLabel} /> : null}
+          {!kindLabel ? day.subjects.map((key) => (
+            <ScheduleChip
+              key={key}
+              label={editor.displayLabelOf ? editor.displayLabelOf(key) : editor.labelOf(key)}
+              color={C.subjects?.[subjectPaletteKey(key)] || C.text}
+            />
+          )) : null}
+          {extra.map((stop) => (
+            <ScheduleChip key={`w-${stop.key}`} tone="ghost" label={stop.label} color={C.subjects?.[stop.key] || C.text2} />
+          ))}
+          {!kindLabel && day.subjects.length === 0 && extra.length === 0 ? (
             <Text style={[TYPOGRAPHY.micro, { color: C.text3 }]}>Ders seçilmedi</Text>
-          )}
+          ) : null}
         </View>
 
         <View style={s.endCol}>
