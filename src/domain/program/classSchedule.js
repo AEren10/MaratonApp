@@ -48,8 +48,16 @@ export function activeDayCount(schedule) {
   return (schedule || []).filter((d) => d.kind !== DAY_KINDS.OFF).length;
 }
 
-/** Duraklarin dusebilecegi gunler (Pzt=0). Program tanimsizsa haftanin tamami. */
+/**
+ * Duraklarin dusebilecegi gunler (Pzt=0). Program tanimsizsa haftanin tamami.
+ * Ogrenci en az bir gune ders ya da sure girdiyse YALNIZ o gunler: "Ders
+ * seçilmedi" gorunen gune durak dusuyor, ders programi ile Program ekrani
+ * birbirini tutmuyordu (12 Ekim). Hic ders/sure girilmemisse (yalniz deneme
+ * ya da bos gun isaretlenmisse) kalan calisma gunlerinin hepsi.
+ */
 export function studyWeekdays(schedule) {
   if (!isScheduleDefined(schedule)) return [0, 1, 2, 3, 4, 5, 6];
-  return schedule.filter((d) => d.kind === DAY_KINDS.STUDY).map((d) => d.weekday);
+  const study = schedule.filter((d) => d.kind === DAY_KINDS.STUDY);
+  const filled = study.filter((d) => d.subjects.length > 0 || d.minutes > 0);
+  return (filled.length ? filled : study).map((d) => d.weekday);
 }

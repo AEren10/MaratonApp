@@ -24,11 +24,14 @@ test("tanimli program: durak kendi dersinin gunune, bos/deneme gunune dusmez", (
   ]);
   assert.equal(weeklyHours(schedule), 9);
   assert.equal(activeDayCount(schedule), 6);
-  assert.deepEqual(studyWeekdays(schedule), [0, 1, 2, 3, 4]);
+  // 12 Ekim: ders/sure girilen gun varsa duraklar YALNIZ o gunlere duser;
+  // "Ders seçilmedi" gorunen gune durak dusmez.
+  assert.deepEqual(studyWeekdays(schedule), [0, 1]);
+  assert.deepEqual(studyWeekdays(normalizeSchedule([{ weekday: 6, kind: "off" }])), [0, 1, 2, 3, 4, 5]);
   const days = assignWeekStops([stop("ayt_fizik"), stop("tyt_matematik"), stop("tyt_kimya")], schedule);
   assert.equal(days[1][0].subject, "ayt_fizik");
   assert.equal(days[0][0].subject, "tyt_matematik");
-  assert.equal(days[5].length + days[6].length, 0);
+  assert.equal(days[2].length + days[3].length + days[4].length + days[5].length + days[6].length, 0);
 });
 
 test("ay plani: ay disi gunler sayilmaz, agirlik sirali", () => {

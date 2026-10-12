@@ -5,15 +5,15 @@ import { alpha } from "../../../themes/colorMix";
 import { useC } from "../../../contexts/ThemeContext";
 import * as H from "../../../lib/haptics";
 
-// Sade serit (9 Ekim): yedi cerceveli kutu + kesikli gelecek gunler gurultuydu.
-// Yalniz secili gun kutulu ve kizil tonlu; bugun (secili degilken) ince
-// kizil cerceve; digerleri zeminsiz. Nokta: yesil bitti, gri bekleyen.
+// Her gun ince kenarlikli bir kart (12 Ekim: kenarsiz gunler kart gibi
+// okunmuyordu). Secili gun kizil tonlu ve dolu; bugun (secili degilken) ince
+// kizil cerceve; digerleri notr cizgi. Nokta: yesil bitti, gri bekleyen.
 function DayChip({ day, selected, onPress, C }) {
   const isSelected = selected;
   const isPastDone = Boolean(day.active && !day.isFuture && !isSelected);
 
   const bg = isSelected ? alpha(C.accent, 14) : "transparent";
-  const border = isSelected ? alpha(C.accent, 55) : day.isToday ? alpha(C.accent, 30) : "transparent";
+  const border = isSelected ? alpha(C.accent, 55) : day.isToday ? alpha(C.accent, 30) : C.line;
   const letterColor = isSelected ? C.accentText : day.isToday ? C.text2 : C.text3;
   const numColor = isSelected ? C.text : isPastDone ? C.text : day.isFuture ? C.text3 : C.text2;
   const dotColor = isSelected
