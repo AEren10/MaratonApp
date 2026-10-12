@@ -81,7 +81,7 @@ export const StorySticker = forwardRef(function StorySticker({ variant, photoUri
 const s = StyleSheet.create({
   canvas: { width: STORY_WIDTH, height: STORY_HEIGHT, overflow: "hidden" },
   bodyWrap: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: STORY_WIDTH,
     height: STORY_HEIGHT,
     justifyContent: "center",

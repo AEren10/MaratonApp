@@ -74,7 +74,7 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   fill: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",

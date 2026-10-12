@@ -55,7 +55,7 @@ const s = StyleSheet.create({
   line: { marginTop: STEP.s2 + 2, fontSize: TYPOGRAPHY.bodyMedium.fontSize + 1 },
   lock: { marginTop: STEP.s3 + 6 },
   svg: { width: "100%", aspectRatio: 390 / 150 },
-  overlay: { ...StyleSheet.absoluteFillObject, alignItems: "center", justifyContent: "center", gap: STEP.s2 },
+  overlay: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center", gap: STEP.s2 },
   lockCopy: { maxWidth: 240, textAlign: "center" },
   lockBox: {
     width: STEP.s4, height: STEP.s4, borderRadius: SHAPE.iconBox - 1, borderWidth: 1,

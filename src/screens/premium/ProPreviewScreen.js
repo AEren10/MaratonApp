@@ -99,7 +99,7 @@ export default function ProPreviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({ fill: { ...StyleSheet.absoluteFillObject } });
+const styles = StyleSheet.create({ fill: { ...StyleSheet.absoluteFill } });
 
 function makeStyles(C) {
   return StyleSheet.create({

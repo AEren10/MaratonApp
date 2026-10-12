@@ -24,7 +24,7 @@ export function OnboardingCaption({ scene, compact, C }) {
 
 const s = StyleSheet.create({
   box: { minHeight: 188 },
-  inner: { ...StyleSheet.absoluteFillObject, gap: STEP.s1 },
+  inner: { ...StyleSheet.absoluteFill, gap: STEP.s1 },
   tag: { letterSpacing: 1.8 },
   title: {
     ...TYPOGRAPHY.heading,

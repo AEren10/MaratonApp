@@ -91,7 +91,7 @@ function makeStyles(C) {
       paddingTop: 0,
     },
     overlay: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       opacity: 0.78,
       borderRadius: RADIUS.xxl,
     },

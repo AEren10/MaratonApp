@@ -71,11 +71,11 @@ const s = StyleSheet.create({
     overflow: "hidden",
   },
   scene: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     paddingVertical: STEP.s3,
     justifyContent: "center",
   },
   sceneCompact: { paddingVertical: STEP.s2 + 4 },
-  taps: { ...StyleSheet.absoluteFillObject, flexDirection: "row" },
+  taps: { ...StyleSheet.absoluteFill, flexDirection: "row" },
   half: { flex: 1 },
 });

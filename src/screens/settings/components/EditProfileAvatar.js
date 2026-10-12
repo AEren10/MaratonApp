@@ -36,7 +36,7 @@ export function EditProfileAvatar({ name }) {
             <Text style={{ fontFamily: "Bricolage_400", fontSize: 34, color: C.text3 }}>{initialsOf(name)}</Text>
           )}
           {uploading ? (
-            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: C.scrim, alignItems: "center", justifyContent: "center" }]}>
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: C.scrim, alignItems: "center", justifyContent: "center" }]}>
               <ActivityIndicator color={C.textOnFill} />
             </View>
           ) : null}

@@ -126,7 +126,7 @@ export function BottomSheet({ visible, onClose, children, style, keyboard = fals
 
 const s = StyleSheet.create({
   fill: { flex: 1 },
-  bottom: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end", paddingHorizontal: GUTTER },
+  bottom: { ...StyleSheet.absoluteFill, justifyContent: "flex-end", paddingHorizontal: GUTTER },
   edge: { paddingHorizontal: 0 },
   sheet: { borderWidth: 1, overflow: "hidden" },
 });

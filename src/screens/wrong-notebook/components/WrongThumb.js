@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
   },
-  inner: { ...StyleSheet.absoluteFillObject, margin: STEP.s1 + 1, gap: 5 },
+  inner: { ...StyleSheet.absoluteFill, margin: STEP.s1 + 1, gap: 5 },
   line: { height: 4, borderRadius: 1 },
   figure: { flex: 1, borderRadius: SHAPE.chip },
   stripe: { position: "absolute", left: 0, top: 0, bottom: 0, width: 5, opacity: 0.85 },

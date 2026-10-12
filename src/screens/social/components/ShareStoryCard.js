@@ -37,7 +37,7 @@ export const ShareStoryCard = forwardRef(function ShareStoryCard(
         <LinearGradient
           colors={[C.surface, C.bg, C.surface]}
           locations={[0, 0.58, 1]}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
       )}
 
