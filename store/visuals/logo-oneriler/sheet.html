@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Maraton logo önerileri</title>
+<style>
+  @font-face { font-family: Unbounded; src: url(../../../assets/fonts/Unbounded_600.ttf); font-weight: 600; }
+  @font-face { font-family: Archivo; src: url(../../../assets/fonts/Archivo_500.ttf); font-weight: 500; }
+  @font-face { font-family: Bricolage; src: url(../../../assets/fonts/Bricolage_400.ttf); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1600px; background: #15151B; color: #ECE8E4; font-family: Archivo; padding: 56px 64px 64px; }
+  h1 { font: 400 44px Bricolage; letter-spacing: -.03em; }
+  .sub { color: #A3A0AB; font-size: 18px; margin-top: 8px; }
+  .row { display: grid; grid-template-columns: 250px 110px 250px 1fr; gap: 40px; align-items: center; padding: 34px 0; border-top: 1px solid #2E2E36; }
+  .row:first-of-type { margin-top: 36px; }
+  .tile { width: 220px; height: 220px; border-radius: 50px; background: radial-gradient(circle at 78% 12%, rgba(229,52,63,.38), transparent 58%), #1C1C23; border: 1px solid #3A3A42; display: flex; align-items: center; justify-content: center; }
+  .tile svg { width: 150px; height: 150px; }
+  .small { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .s60 { width: 60px; height: 60px; border-radius: 14px; background: #1C1C23; border: 1px solid #3A3A42; display: flex; align-items: center; justify-content: center; }
+  .s60 svg { width: 42px; height: 42px; }
+  .s32 { width: 32px; height: 32px; border-radius: 8px; background: #1C1C23; border: 1px solid #3A3A42; display: flex; align-items: center; justify-content: center; }
+  .s32 svg { width: 23px; height: 23px; }
+  .light { width: 220px; height: 220px; border-radius: 50px; background: #F4F1EC; display: flex; align-items: center; justify-content: center; }
+  .light svg { width: 150px; height: 150px; }
+  .info .lock { display: flex; align-items: center; gap: 18px; }
+  .info .lock svg { width: 56px; height: 56px; }
+  .info .lock span { font: 600 34px Unbounded; letter-spacing: .04em; }
+  .info b { display: block; font: 400 30px Bricolage; letter-spacing: -.02em; margin-top: 22px; }
+  .info p { color: #B0ADB5; font-size: 17px; line-height: 1.5; margin-top: 8px; max-width: 620px; }
+  .tag { display: inline-block; font-size: 13px; letter-spacing: .14em; color: #FF6A72; margin-top: 0; }
+</style></head>
+<body>
+<h1>Maraton — logo önerileri</h1>
+<div class="sub">Her satır: uygulama simgesi · küçük boyutlar (60 ve 32 px) · açık zeminde · yazıyla birlikte.</div>
+<div id="rows"></div>
+<script>
+const R = '#E5343F';
+// ink: koyu zeminde #F4F1EC, acik zeminde #1C1C23
+const MARKS = {
+  A: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 76 V30 L50 60 L80 30 V54" stroke="${ink}" stroke-width="12"/>
+    <circle cx="80" cy="76" r="7.5" fill="${R}"/></svg>`,
+  B: (ink) => `<svg viewBox="0 0 100 100" stroke-linejoin="round">
+    <path d="M12 76 L36 30 L60 76 Z" fill="${ink}" stroke="${ink}" stroke-width="9"/>
+    <path d="M40 76 L64 30 L88 76 Z" fill="${R}" stroke="${R}" stroke-width="9"/>
+    <path d="M40 76 L50 57 L60 76 Z" fill="#B3222C" stroke="#B3222C" stroke-width="2"/></svg>`,
+  C: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 76 V48 a15 15 0 0 1 30 0 V76 M50 48 a15 15 0 0 1 30 0 V58" stroke="${ink}" stroke-width="12"/>
+    <circle cx="80" cy="77" r="7.5" fill="${R}"/></svg>`,
+  D: (ink) => `<svg viewBox="0 0 100 100" stroke-linejoin="round">
+    <path d="M16 78 V26 H30 L50 53 L70 26 H84 V78 H70 V49 L50 75 L30 49 V78 Z" fill="${ink}"/>
+    <path d="M70 78 V49 L77 40 L84 26 V78 Z" fill="${R}"/>
+    <path d="M70 26 H84 V40 L70 49 Z" fill="${R}"/></svg>`,
+  E: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
+    <path d="M14 50 C34 50 40 22 58 28 S76 46 86 20" stroke="${R}" stroke-width="8"/>
+    <path d="M14 66 C34 66 40 38 58 44 S76 62 86 36" stroke="${ink}" stroke-width="8"/>
+    <path d="M14 82 C34 82 40 54 58 60 S76 78 86 52" stroke="${ink}" stroke-width="8" stroke-opacity=".45"/>
+    <circle cx="86" cy="20" r="7" fill="${R}" stroke="none"/></svg>`,
+};
+const TEXT = {
+  A: ['A · ROTA M', 'Tek çizgi M, sonunda durak', 'M harfi tek bir rota çizgisi gibi çizilir; son bacak yarım kalır ve kırmızı bir durakla biter. Uygulamadaki rota ve durak diliyle birebir aynı. Küçük boyutta en net okunan.'],
+  B: ['B · İKİ ZİRVE', 'İki tepe, biri kırmızı', 'Üst üste binen iki yuvarlak tepe hem M harfini hem "bugün ve hedef"i gösterir. Dolu şekil olduğu için simge olarak ağırlığı en yüksek olan; şimdiki logoya en yakın ama daha sade.'],
+  C: ['C · KÜÇÜK m', 'Yumuşak kemerler', 'Küçük harf m, iki kemer ve bir durak noktası. En sıcak ve en az "kurumsal" olanı; öğrenci uygulaması hissi verir. Harf olduğu hemen anlaşılır.'],
+  D: ['D · BLOK M', 'Kalın M, sağ bacak kırmızı', 'Köşeli, kalın bir M; sağ bacağı kırmızı. En güçlü ve en sportif duran. Rota fikrini taşımaz, sadece harf ve renk.'],
+  E: ['E · KULVAR', 'Harfsiz: yükselen üç kulvar', 'Koşu pistindeki kulvarlar gibi üç yükselen çizgi; en üstteki kırmızı ve varış noktasıyla biter. M harfi yok, "maraton" ve "yükselen net" fikri var.'],
+};
+document.getElementById('rows').innerHTML = Object.keys(MARKS).map((k) => `
+  <div class="row">
+    <div class="tile">${MARKS[k]('#F4F1EC')}</div>
+    <div class="small"><div class="s60">${MARKS[k]('#F4F1EC')}</div><div class="s32">${MARKS[k]('#F4F1EC')}</div></div>
+    <div class="light">${MARKS[k]('#1C1C23')}</div>
+    <div class="info">
+      <div class="lock">${MARKS[k]('#F4F1EC')}<span>MARATON</span></div>
+      <span class="tag" style="display:block;margin-top:22px">${TEXT[k][0]}</span>
+      <b style="margin-top:6px">${TEXT[k][1]}</b>
+      <p>${TEXT[k][2]}</p>
+    </div>
+  </div>`).join('');
+</script>
+</body></html>
