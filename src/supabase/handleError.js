@@ -2,20 +2,20 @@ import { captureError, addBreadcrumb } from "../lib/errorReporting";
 import { emitAuthError } from "../lib/authEvents";
 
 const SAFE_MESSAGES = {
-  "23505": "Bu kayit zaten mevcut.",
-  "23503": "Iliskili kayit bulunamadi.",
-  "42501": "Bu islemi yapmaya yetkiniz yok.",
-  "PGRST301": "Oturum suresi doldu, tekrar giris yapin.",
-  "AuthApiError": "Oturum hatasi, tekrar giris yapin.",
+  "23505": "Bu kayıt zaten mevcut.",
+  "23503": "İlişkili kayıt bulunamadı.",
+  "42501": "Bu işlemi yapmaya yetkin yok.",
+  "PGRST301": "Oturum süresi doldu, tekrar giriş yap.",
+  "AuthApiError": "Oturum hatası, tekrar giriş yap.",
 };
 
 function getSafeMessage(error) {
-  if (!error) return "Bilinmeyen hata olustu.";
+  if (!error) return "Bilinmeyen bir hata oluştu.";
   const code = error.code || error.status || "";
   if (SAFE_MESSAGES[code]) return SAFE_MESSAGES[code];
   if (error.message?.includes("JWT")) return SAFE_MESSAGES.PGRST301;
   if (error.message?.includes("duplicate")) return SAFE_MESSAGES["23505"];
-  return "Bir hata olustu. Lutfen tekrar deneyin.";
+  return "Bir hata oluştu. Lütfen tekrar dene.";
 }
 
 function isAuthError(error) {

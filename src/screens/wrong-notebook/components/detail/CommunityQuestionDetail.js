@@ -166,7 +166,7 @@ export function CommunityQuestionDetail() {
                   showAlert("Çözüldü", "Bu soru çözüldü olarak işaretlendi.");
                   navigation.goBack();
                 } catch (e) {
-                  showAlert("Hata", e.message || "Kaydedilemedi.");
+                  showAlert("Hata", userMessage(e, "Kaydedilemedi."));
                 } finally {
                   setResolving(false);
                 }
@@ -272,3 +272,4 @@ function makeStyles(C) {
   });
 }
 
+import { userMessage } from "../../../../lib/userMessage";

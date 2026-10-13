@@ -6,6 +6,7 @@ import { getProfile, updateProfile } from "../supabase/profiles";
 import { editProfileSchema } from "../validations/profile";
 import { validate } from "../validations/auth";
 import * as H from "../lib/haptics";
+import { userMessage } from "../lib/userMessage";
 
 // Is mantigi: profil yukleme + kaydetme + "herkese acik" tercihi.
 // Ekran dosyasi sadece bunu cagirir (AGENTS.md: is mantigi hook'ta yasar).
@@ -60,7 +61,7 @@ export function useEditProfileForm() {
       navigation.goBack();
     } catch (e) {
       H.error();
-      showAlert("Hata", e.message || "Profil güncellenemedi.");
+      showAlert("Hata", userMessage(e, "Profil güncellenemedi."));
     } finally {
       setSaving(false);
     }

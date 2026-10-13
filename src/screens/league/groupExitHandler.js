@@ -1,5 +1,6 @@
 import * as H from "../../lib/haptics";
 import { leaveGroup, deleteGroup, transferGroupAdmin, groupLeaderboard } from "../../supabase/groups";
+import { userMessage } from "../../lib/userMessage";
 
 export function handleGroupExit({ group, user, showAlert, setSelected, loadGroups }) {
   if (!group) return;
@@ -14,7 +15,7 @@ export function handleGroupExit({ group, user, showAlert, setSelected, loadGroup
       setSelected?.((prev) => (prev?.id === group.id ? null : prev));
       loadGroups?.();
     } catch (e) {
-      showAlert("Hata", e.message || "Gruptan ayrılınamadı.");
+      showAlert("Hata", userMessage(e, "Gruptan ayrılınamadı."));
     }
   };
 
@@ -26,7 +27,7 @@ export function handleGroupExit({ group, user, showAlert, setSelected, loadGroup
       await loadGroups?.();
       showAlert("Grup Kapatıldı", `"${group.name}" grubu kapatıldı.`);
     } catch (e) {
-      showAlert("Hata", e.message || "Grup kapatılamadı.");
+      showAlert("Hata", userMessage(e, "Grup kapatılamadı."));
     }
   };
 
@@ -43,7 +44,7 @@ export function handleGroupExit({ group, user, showAlert, setSelected, loadGroup
         `Yöneticilik "${targetMember.name}" adlı üyeye devredildi ve gruptan ayrıldın.`
       );
     } catch (e) {
-      showAlert("Hata", e.message || "Yöneticilik devredilemedi.");
+      showAlert("Hata", userMessage(e, "Yöneticilik devredilemedi."));
     }
   };
 

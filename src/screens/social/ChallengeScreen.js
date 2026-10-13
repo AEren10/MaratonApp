@@ -17,6 +17,7 @@ import { SCREENS } from "../../constants/screens";
 import { useAlert } from "../../contexts/AlertContext";
 import { usePremium } from "../../contexts/PremiumContext";
 import * as H from "../../lib/haptics";
+import { userMessage } from "../../lib/userMessage";
 
 const METRICS = [
   { key: "questions", label: "Soru Sayısı", icon: "hash", targets: [100, 250, 500] },
@@ -81,7 +82,7 @@ export default function ChallengeScreen() {
       H.success();
       showAlert(accept ? "Kabul edildi!" : "Reddedildi", accept ? "Challenge başladı, bol şans!" : "Challenge reddedildi.");
       load();
-    } catch (e) { showAlert("Hata", e.message || "İşlem başarısız."); }
+    } catch (e) { showAlert("Hata", userMessage(e, "İşlem başarısız.")); }
   }, [load, showAlert, user?.id]);
 
   const active = useMemo(() => challenges.filter((c) => c.status === "active" || c.status === "pending"), [challenges]);

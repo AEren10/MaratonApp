@@ -12,6 +12,7 @@ import * as H from "../../../lib/haptics";
 import { SCREENS } from "../../../constants/screens";
 import { appUrl } from "../../../navigation/routes";
 import { Press } from "../../../components/design/Press";
+import { userMessage } from "../../../lib/userMessage";
 
 export function FriendCodeCard({ onRequestSent, initialCode }) {
   const C = useC();
@@ -55,7 +56,7 @@ export function FriendCodeCard({ onRequestSent, initialCode }) {
       setCodeInput("");
       onRequestSent?.();
     } catch (e) {
-      showAlert("Hata", e.message || "Kod geçersiz veya istek gönderilemedi.");
+      showAlert("Hata", userMessage(e, "Kod geçersiz veya istek gönderilemedi."));
     }
     setCodeBusy(false);
   }, [codeInput, onRequestSent]);
