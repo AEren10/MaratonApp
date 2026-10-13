@@ -1,5 +1,7 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+
+import { onLaunchReveal } from "../lib/launchReveal";
 
 // Ekrana her DONUSTE artan sayac: grafik animasyonu bastan oynar (kullanici,
 // 3 Ekim). Ilk acilista artmaz. ANAHTAR YAPILMAZ (grafigi sokup kurmak sekme
@@ -9,6 +11,8 @@ import { useFocusEffect } from "@react-navigation/native";
 export function useReplayOnFocus() {
   const [tick, setTick] = useState(0);
   const first = useRef(true);
+  // Acilis perdesi kalkarken de bir kez: grafikler perde arkasinda bitmis olmasin.
+  useEffect(() => onLaunchReveal(() => setTick((t) => t + 1)), []);
   useFocusEffect(useCallback(() => {
     if (first.current) { first.current = false; return undefined; }
     // 360ms: tabbar hapinin kayisi (320ms) bitsin; cubuklar onunla yarismasin.

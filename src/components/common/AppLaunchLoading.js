@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import Animated, {
@@ -8,6 +8,7 @@ import Animated, {
 import { useC } from "../../contexts/ThemeContext";
 import { ANIMATION } from "../../themes/tokens";
 import { BrandMark } from "../design/BrandMark";
+import { emitLaunchReveal } from "../../lib/launchReveal";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -27,11 +28,11 @@ const DRAW_MS = 800;
 const GLOW_MS = 500;
 const BRAND_AT = 550;
 const BRAND_MS = 550;
-// Parlama bitince (1.3 sn) icerik yumusakca solar, sonra uygulama acilir:
-// sayfa animasyonun ortasinda "ucarak" gelmez. Toplam ~1.6 sn.
+// Parlama bitince (1.3 sn) PERDENIN TAMAMI solar ve altinda coktan kurulmus
+// uygulama gorunur (14 Ekim). Eskiden yalniz icerik soluyor, sonra perde
+// sokulup uygulama O AN kuruluyordu: bos zemin, bir kare takilma, sert gecis.
 const FADE_AT = DRAW_MS + GLOW_MS;
-const FADE_MS = 280;
-const TOTAL_MS = FADE_AT + FADE_MS;
+const FADE_MS = 360;
 const EASE = Easing.bezier(...ANIMATION.easing.easeOut);
 
 // Ilk acilista bir kez oynar; sonra (ornegin profil yuklenirken) son kare durgun gosterilir.
@@ -48,8 +49,9 @@ function Stop({ x, y, at, stroke, fill, instant }) {
 
 // ACILIS — imza an "durak tamamlandi": hat cizilir, duraklar oturur, varis
 // noktasi bir kez parlar; ardindan marka asagidan belirir. Iki hareket turu:
-// cizim + solma/olcek. Konfeti/ses yok. `onDone` yalniz animasyon BITINCE cagrilir.
-export function AppLaunchLoading({ onDone }) {
+// cizim + solma/olcek. Konfeti/ses yok. `onDone` animasyon bitip `ready`
+// (alttaki uygulama kuruldu) geldikten ve perde solduktan SONRA cagrilir.
+export function AppLaunchLoading({ onDone, ready = true }) {
   const C = useC();
   const reduced = useReducedMotion();
   const instant = played || reduced;
@@ -58,6 +60,7 @@ export function AppLaunchLoading({ onDone }) {
   const glow = useSharedValue(0);
   const brand = useSharedValue(instant ? 1 : 0);
   const out = useSharedValue(1);
+  const [animDone, setAnimDone] = useState(false);
 
   useEffect(() => {
     if (!instant) {
@@ -66,15 +69,22 @@ export function AppLaunchLoading({ onDone }) {
       brand.set(withDelay(BRAND_AT, withTiming(1, { duration: BRAND_MS, easing: EASE })));
     }
     if (!onDone) return undefined;
-    if (!instant) out.set(withDelay(FADE_AT, withTiming(0, { duration: FADE_MS, easing: EASE })));
-    const t = setTimeout(() => {
-      played = true;
-      onDone();
-    }, instant ? 250 : TOTAL_MS);
+    const t = setTimeout(() => setAnimDone(true), instant ? 250 : FADE_AT);
     return () => clearTimeout(t);
     // Yalniz ilk montajda: tekrar render animasyonu bastan baslatmamali.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!onDone || !animDone || !ready) return undefined;
+    played = true;
+    emitLaunchReveal();
+    if (instant) { onDone(); return undefined; }
+    out.set(withTiming(0, { duration: FADE_MS, easing: EASE }));
+    const t = setTimeout(onDone, FADE_MS);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animDone, ready]);
 
   const pathProps = useAnimatedProps(() => ({ strokeDashoffset: DASH * (1 - draw.get()) }));
   const glowProps = useAnimatedProps(() => ({
@@ -91,8 +101,8 @@ export function AppLaunchLoading({ onDone }) {
   const last = STOPS[STOPS.length - 1];
 
   return (
-    <View style={[s.fill, { backgroundColor: C.bg }]} accessible accessibilityLabel="Maraton açılıyor">
-      <Animated.View style={[s.center, outStyle]}>
+    <Animated.View style={[s.fill, { backgroundColor: C.bg }, outStyle]} accessible accessibilityLabel="Maraton açılıyor">
+      <View style={s.center}>
         <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
           <Path d={ROUTE} stroke={C.track} strokeWidth={2} strokeDasharray="2 6" strokeLinecap="round" fill="none" />
           <AnimatedPath
@@ -118,8 +128,8 @@ export function AppLaunchLoading({ onDone }) {
         <Animated.View style={[s.brand, brandStyle]}>
           <BrandMark width={46} word wordSize={17} color={C.text} />
         </Animated.View>
-      </Animated.View>
-    </View>
+      </View>
+    </Animated.View>
   );
 }
 

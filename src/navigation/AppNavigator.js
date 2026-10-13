@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef, markNavigationReady } from "./navigationRef";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { ActivityIndicator, AppState, Easing, View } from "react-native";
+import { ActivityIndicator, AppState, Easing, StyleSheet, View } from "react-native";
 import { ANIMATION } from "../themes/tokens";
 import { DepthLayout } from "./DepthLayout";
 
@@ -257,16 +257,29 @@ export default function AppNavigator() {
   // animasyon sonuna kadar oynar (introDone), sonra gecilir.
   const [introDone, setIntroDone] = useState(false);
   const finishIntro = useCallback(() => setIntroDone(true), []);
-  if (loading || examLoading || !introDone) return <AppLaunchLoading onDone={finishIntro} />;
-
-  let content;
+  // Uygulama acilis perdesinin ALTINDA kurulur (14 Ekim): perde kalktiginda
+  // ana sayfa yerlesmis ve verisi gelmis olur; perde solarak acilir.
+  const ready = !(loading || examLoading);
+  // Perde agacta HEP ayni sirada (ikinci cocuk) durur: yeri degisirse React
+  // onu sokup yeniden kurar ve animasyon bastan baslar.
   // Kurtarma modu HER ŞEYDEN ÖNCE gelir: oturum kurulmuş olsa bile kullanıcı
   // önce yeni şifresini belirlemeli. Sira: navigation/rootGate.
   const gate = resolveRootGate({
     recoveryMode, hasSeenSlides, hasSession: !!session, onboardingDone,
     profileSettling, profileLoadFailed,
   });
-  if (gate === ROOT_GATE.RECOVERY) {
+  // Profil hala yukleniyorsa perde kalkmaz: yoksa altindan yine yukleme
+  // ekrani cikar, ana sayfa sonra sert gelir.
+  const curtain = !ready || !introDone ? (
+    <View key="curtain" style={StyleSheet.absoluteFill}>
+      <AppLaunchLoading onDone={finishIntro} ready={ready && gate !== ROOT_GATE.PROFILE_LOADING} />
+    </View>
+  ) : null;
+
+  let content = null;
+  if (!ready) {
+    content = null;
+  } else if (gate === ROOT_GATE.RECOVERY) {
     content = <RecoveryStack />;
   } else if (gate === ROOT_GATE.SLIDES) {
     content = <SlidesStack />;
@@ -291,16 +304,24 @@ export default function AppNavigator() {
   }
 
   return (
-    <NavigationContainer
-      ref={navigationRef}
-      linking={linkingConfig}
-      onReady={() => {
-        markNavigationReady();
-        navigationTracker.ready(navigationRef.getCurrentRoute());
-      }}
-      onStateChange={() => navigationTracker.change(navigationRef.getCurrentRoute())}
-    >
-      {content}
-    </NavigationContainer>
+    <View style={styles.root}>
+      {ready ? (
+        <NavigationContainer
+          key="nav"
+          ref={navigationRef}
+          linking={linkingConfig}
+          onReady={() => {
+            markNavigationReady();
+            navigationTracker.ready(navigationRef.getCurrentRoute());
+          }}
+          onStateChange={() => navigationTracker.change(navigationRef.getCurrentRoute())}
+        >
+          {content}
+        </NavigationContainer>
+      ) : null}
+      {curtain}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1 } });
