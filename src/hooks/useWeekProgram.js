@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { getStudyLogs } from "../supabase/studyLogs";
 import { dateKey, startOfWeek, todayTR } from "../lib/dateUtils";
 import { getSubjectByKey } from "../themes/subjects";
+import { useRefreshOnFocus } from "./useRefreshOnFocus";
 
 const DAY_LETTERS = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
 const MONTHS_TR = [
@@ -53,18 +54,23 @@ export function useWeekProgram({ initialOffset = 0 } = {}) {
   const prevWeek = useCallback(() => setWeekOffset((o) => o - 1), []);
   const nextWeek = useCallback(() => setWeekOffset((o) => o + 1), []);
 
-  const load = useCallback(() => {
+  // silent: ekrana donuste tazeleme. Iskelet gosterilmez; ag hatasinda
+  // eldeki liste silinmez.
+  const load = useCallback((silent) => {
+    const quiet = silent === true;
     if (!user?.id || user.id === "dev") { setLoading(false); return Promise.resolve(); }
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
-    setLoading(true);
+    if (!quiet) setLoading(true);
     return getStudyLogs(user.id, { from: dateKey(weekStart), to: dateKey(weekEnd) })
       .then((rows) => setLogs(rows || []))
-      .catch(() => setLogs([]))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!quiet) setLogs([]); })
+      .finally(() => { if (!quiet) setLoading(false); });
   }, [user?.id, weekStart]);
 
   useEffect(() => { load(); }, [load]);
+  const refreshQuietly = useCallback(() => load(true), [load]);
+  useRefreshOnFocus(refreshQuietly);
 
   const days = useMemo(() => DAY_LETTERS.map((letter, i) => {
     const d = new Date(weekStart);

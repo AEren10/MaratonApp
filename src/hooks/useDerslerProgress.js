@@ -4,6 +4,7 @@ import { getTopicProgress } from "../supabase/topicProgress";
 import { captureError } from "../lib/errorReporting";
 import { getCompletedTopicsMap, isTopicDone, useKnownTopicsMap } from "../lib/topicCompletion";
 import { rowAccuracy } from "../domain/route/effectiveAccuracy";
+import { useRefreshOnFocus } from "./useRefreshOnFocus";
 
 const EXPECTED_QUESTIONS = 30;
 
@@ -57,6 +58,8 @@ export function useDerslerProgress(activeSubjects) {
   }, [user?.id]);
 
   useEffect(() => { loadProgress(); }, [loadProgress]);
+  // Calisma kaydi baska sekmede girildiyse konu ilerlemesi donuste tazelenir.
+  useRefreshOnFocus(loadProgress);
 
   // Tikler canli izlenir: Profil/Program sekmesi acik kalirken Mufredat'ta
   // atilan tik, sekmeye donuldugunde sayilara yansir (eskiden yalniz ilk
