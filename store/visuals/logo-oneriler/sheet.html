@@ -27,37 +27,44 @@
   .tag { display: inline-block; font-size: 13px; letter-spacing: .14em; color: #FF6A72; margin-top: 0; }
 </style></head>
 <body>
-<h1>Maraton — logo önerileri · 5. tur (yükseliş + M)</h1>
+<h1>Maraton — logo önerileri · 6. tur (yükseliş, harfsiz, yeni fikirler)</h1>
 <div class="sub">Her satır: uygulama simgesi · küçük boyutlar (60 ve 32 px) · açık zeminde · yazıyla birlikte.</div>
 <div id="rows"></div>
 <script>
 const R = '#E5343F';
 // ink: koyu zeminde #F4F1EC, acik zeminde #1C1C23
 const MARKS = {
-  Z1: (ink) => `<svg viewBox="0 0 100 100">
-    <rect x="15" y="40" width="20" height="42" rx="10" fill="${ink}"/>
-    <rect x="40" y="40" width="20" height="25" rx="10" fill="${ink}" fill-opacity=".6"/>
-    <rect x="65" y="16" width="20" height="66" rx="10" fill="${R}"/></svg>`,
-  Z2: (ink) => `<svg viewBox="0 0 100 100"><g transform="skewX(-12) translate(17 0)">
-    <rect x="13" y="42" width="19" height="40" rx="9.5" fill="${ink}"/>
-    <rect x="37" y="42" width="19" height="24" rx="9.5" fill="${ink}" fill-opacity=".6"/>
-    <rect x="61" y="16" width="19" height="66" rx="9.5" fill="${R}"/></g></svg>`,
-  Z3: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 78 V40 L50 66 L80 40" stroke="${ink}" stroke-width="13"/>
-    <path d="M80 78 V16" stroke="${R}" stroke-width="13"/></svg>`,
-  Z4: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 78 V58 a14 14 0 0 1 28 0 V78" stroke="${ink}" stroke-width="13"/>
-    <path d="M44 78 V40 a18 18 0 0 1 36 0 V78" stroke="${R}" stroke-width="13"/></svg>`,
-  Z5: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 80 L30 48 L48 68" stroke="${ink}" stroke-width="13"/>
-    <path d="M48 68 L70 20 L86 80" stroke="${R}" stroke-width="13"/></svg>`,
+  W1: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
+    <path d="M18 78 C40 74 52 62 60 48 S74 26 82 22" stroke="${ink}" stroke-opacity=".28" stroke-width="5"/>
+    <circle cx="18" cy="78" r="6" fill="${ink}" fill-opacity=".5"/>
+    <circle cx="38" cy="68" r="8" fill="${ink}" fill-opacity=".75"/>
+    <circle cx="59" cy="50" r="10.5" fill="${ink}"/>
+    <circle cx="80" cy="24" r="14" fill="${R}"/></svg>`,
+  W2: (ink) => `<svg viewBox="0 0 100 100">
+    <path d="M10 82 V66 a6 6 0 0 1 6 -6 H36 V82 Z" fill="${ink}" fill-opacity=".5"/>
+    <path d="M36 82 V48 a6 6 0 0 1 6 -6 H62 V82 Z" fill="${ink}"/>
+    <path d="M62 82 V26 a6 6 0 0 1 6 -6 H84 a6 6 0 0 1 6 6 V76 a6 6 0 0 1 -6 6 Z" fill="${R}"/></svg>`,
+  W3: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
+    <path d="M14 80 C42 80 44 58 54 48 S72 34 82 22" stroke="${ink}" stroke-width="19"/>
+    <path d="M18 80 C42 79 46 60 55 50 S70 37 77 28" stroke="#1C1C23" stroke-opacity="${ink === '#F4F1EC' ? .55 : 0}" stroke-width="2.5" stroke-dasharray="1 8"/>
+    <path d="M18 80 C42 79 46 60 55 50 S70 37 77 28" stroke="#F4F1EC" stroke-opacity="${ink === '#F4F1EC' ? 0 : .7}" stroke-width="2.5" stroke-dasharray="1 8"/>
+    <circle cx="82" cy="22" r="12" fill="${R}"/></svg>`,
+  W4: (ink) => `<svg viewBox="0 0 100 100">
+    <path d="M8 82 V64 a11 11 0 0 1 22 0 V82 Z" fill="${ink}" fill-opacity=".4"/>
+    <path d="M26 82 V52 a11 11 0 0 1 22 0 V82 Z" fill="${ink}" fill-opacity=".65"/>
+    <path d="M44 82 V40 a11 11 0 0 1 22 0 V82 Z" fill="${ink}"/>
+    <path d="M62 82 V27 a13 13 0 0 1 26 0 V82 Z" fill="${R}"/></svg>`,
+  W5: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
+    <path d="M22 82 A60 60 0 0 1 82 22" stroke="${R}" stroke-width="11"/>
+    <path d="M42 82 A40 40 0 0 1 82 42" stroke="${ink}" stroke-width="11"/>
+    <path d="M62 82 A20 20 0 0 1 82 62" stroke="${ink}" stroke-opacity=".5" stroke-width="11"/></svg>`,
 };
 const TEXT = {
-  Z1: ['1 · ÇUBUK M', 'Üç çubuk: iki bacak ve ortada asılı V', 'Çubukların yeri değişti: ortadaki kısa çubuk yukarıdan asılı duruyor ve M\'nin ortasındaki V\'yi oluşturuyor. Sağ bacak kırmızı ve daha uzun. Çubuk olarak da M olarak da okunuyor; harf bağırmıyor.'],
-  Z2: ['2 · EĞİK ÇUBUK M', 'Aynısı, ileri yaslanmış', 'Bir öncekinin eğik hali: M, yükseliş ve ileri hareket bir arada. Önceki turda önerdiğim eğik çubuklarla aynı duruş, içinde M ile.'],
-  Z3: ['3 · UZAYAN BACAK', 'Sağ bacağı yukarı uzayan M', 'Tek çizgi bir M; sağ bacağı kırmızı ve M\'nin üstüne taşıyor. Harf burada daha net, yükseliş tek hamleyle anlatılıyor.'],
-  Z4: ['4 · YÜKSELEN KEMERLİ m', 'İkinci kemer daha yüksek', 'Beğendiğin küçük m; ama ikinci kemer kırmızı ve daha yüksek. Yumuşak, sıcak, yükselişi de var. Harf olduğu belli.'],
-  Z5: ['5 · YÜKSELEN ZİRVELER', 'İkinci tepesi daha yüksek M', 'İki zirve fikrinin çizgi hali: M\'nin ikinci tepesi kırmızı ve daha yüksek. Rota grafiğine de benziyor. M orta derecede okunuyor.'],
+  W1: ['1 · BÜYÜYEN DURAKLAR', 'Yükselen yolda giderek büyüyen duraklar', 'Çubuk yerine uygulamanın kendi öğesi: duraklar. Dört durak bir yokuşu tırmanıyor, her biri öncekinden büyük, sonuncusu kırmızı. Yükseliş var, başka hiçbir uygulamanın simgesine benzemiyor.'],
+  W2: ['2 · BASAMAKLAR', 'Üç basamak, en üstteki kırmızı', 'Çubuklar birleşip merdivene dönüştü: "her gün bir adım daha". Dolu ve ağır bir simge. Düz çubuklardan daha az "sinyal göstergesi".'],
+  W3: ['3 · YÜKSELEN YOL', 'Kıvrılarak yükselen yol ve varış', 'Kalın bir yol şeridi, ortasında şerit çizgisi, sonunda varış noktası. Maratonun kendisi: yol. Yükseliş ve rota aynı şekilde.'],
+  W4: ['4 · YÜKSELEN KEMERLER', 'Dört adımda yükselen kemerler', 'Önceki turdan. Çubukların yumuşak hali; tek parça olduğu için küçük boyutta dağılmıyor.'],
+  W5: ['5 · VİRAJ', 'Pist virajı: üç kulvar', 'Koşu pistinin virajı; dış kulvar kırmızı. Yükselişten çok "pist ve tur" fikri. Dikkat: kablosuz bağlantı simgesini andırabilir.'],
 };
 document.getElementById('rows').innerHTML = Object.keys(MARKS).map((k) => `
   <div class="row">
