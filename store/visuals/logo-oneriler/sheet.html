@@ -27,44 +27,43 @@
   .tag { display: inline-block; font-size: 13px; letter-spacing: .14em; color: #FF6A72; margin-top: 0; }
 </style></head>
 <body>
-<h1>Maraton — logo önerileri · 2. tur (harfsiz)</h1>
+<h1>Maraton — logo önerileri · 3. tur (seçtiklerin + karışımlar)</h1>
 <div class="sub">Her satır: uygulama simgesi · küçük boyutlar (60 ve 32 px) · açık zeminde · yazıyla birlikte.</div>
 <div id="rows"></div>
 <script>
 const R = '#E5343F';
 // ink: koyu zeminde #F4F1EC, acik zeminde #1C1C23
+const DEEP = '#B3222C';
 const MARKS = {
-  F: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 72 L36 46 L52 62 L78 30" stroke="${ink}" stroke-width="12"/>
-    <circle cx="78" cy="30" r="13" fill="${R}"/><circle cx="78" cy="30" r="5" fill="${ink === '#F4F1EC' ? '#1C1C23' : '#F4F1EC'}"/></svg>`,
-  G: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
-    <path d="M22 58 C22 26 78 26 78 60" stroke="${ink}" stroke-width="11" stroke-linecap="butt"/>
-    <circle cx="22" cy="72" r="9" fill="none" stroke="${ink}" stroke-width="7"/>
-    <circle cx="78" cy="68" r="11" fill="${R}"/></svg>`,
-  H: (ink) => `<svg viewBox="0 0 100 100">
-    <rect x="14" y="54" width="15" height="28" rx="7.5" fill="${ink}" fill-opacity=".45"/>
-    <rect x="34" y="40" width="15" height="42" rx="7.5" fill="${ink}" fill-opacity=".7"/>
-    <rect x="54" y="48" width="15" height="34" rx="7.5" fill="${ink}"/>
-    <rect x="74" y="20" width="15" height="62" rx="7.5" fill="${R}"/></svg>`,
-  I: (ink) => `<svg viewBox="0 0 100 100" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M12 80 L46 26 Q50 20 54 26 L88 80 Z" fill="${ink}" stroke="${ink}" stroke-width="6"/>
-    <path d="M30 80 C44 72 36 60 50 54 S56 40 50 30" fill="none" stroke="${R}" stroke-width="7"/>
-    <circle cx="50" cy="28" r="7" fill="${R}"/></svg>`,
-  J: (ink) => `<svg viewBox="0 0 100 100" stroke-linejoin="round">
-    <path d="M14 78 L34 26 H52 L32 78 Z" fill="${ink}" stroke="${ink}" stroke-width="5"/>
-    <path d="M48 78 L68 26 H86 L66 78 Z" fill="${R}" stroke="${R}" stroke-width="5"/>
-    <path d="M34 26 H52 L66 78 H48 Z" fill="${ink}" fill-opacity=".55" stroke="none"/></svg>`,
-  K: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round">
-    <path d="M50 16 A34 34 0 1 0 84 50" stroke="${ink}" stroke-width="12"/>
-    <circle cx="80" cy="24" r="10" fill="${R}"/></svg>`,
+  B2: (ink) => `<svg viewBox="0 0 100 100" stroke-linejoin="round">
+    <path d="M10 78 L33 34 Q37 27 41 34 L64 78 Z" fill="${ink}" stroke="${ink}" stroke-width="8"/>
+    <path d="M38 78 L63 24 Q67 17 71 24 L92 78 Z" fill="${R}" stroke="${R}" stroke-width="8"/>
+    <path d="M38 78 L51 54 L64 78 Z" fill="${DEEP}" stroke="${DEEP}" stroke-width="3"/></svg>`,
+  C2: (ink) => `<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 78 V50 a16 16 0 0 1 32 0 V78" stroke="${ink}" stroke-width="14"/>
+    <path d="M50 50 a16 16 0 0 1 32 0 V56" stroke="${ink}" stroke-width="14"/>
+    <circle cx="82" cy="77" r="8.5" fill="${R}"/></svg>`,
+  H2: (ink) => `<svg viewBox="0 0 100 100">
+    <rect x="16" y="40" width="19" height="42" rx="9.5" fill="${ink}" fill-opacity=".55"/>
+    <rect x="40.5" y="54" width="19" height="28" rx="9.5" fill="${ink}"/>
+    <rect x="65" y="20" width="19" height="62" rx="9.5" fill="${R}"/></svg>`,
+  X1: (ink) => `<svg viewBox="0 0 100 100">
+    <path d="M14 82 V52 a15 15 0 0 1 30 0 V82 Z" fill="${ink}"/>
+    <path d="M35 82 V40 a15 15 0 0 1 30 0 V82 Z" fill="${ink}" fill-opacity=".6"/>
+    <path d="M56 82 V30 a15 15 0 0 1 30 0 V82 Z" fill="${R}"/></svg>`,
+  X2: (ink) => `<svg viewBox="0 0 100 100">
+    <rect x="12" y="56" width="13" height="26" rx="6.5" fill="${ink}" fill-opacity=".5"/>
+    <rect x="28.5" y="34" width="13" height="48" rx="6.5" fill="${ink}"/>
+    <rect x="45" y="50" width="13" height="32" rx="6.5" fill="${ink}" fill-opacity=".75"/>
+    <rect x="61.5" y="20" width="13" height="62" rx="6.5" fill="${R}"/>
+    <rect x="78" y="48" width="13" height="34" rx="6.5" fill="${R}" fill-opacity=".55"/></svg>`,
 };
 const TEXT = {
-  F: ['F · KIRIK ROTA', 'Yükselen rota, sonunda varış', 'Uygulamadaki rota grafiğinin kendisi: iki kırılmayla yükselen bir çizgi ve varış durağı. Dikkatli bakan içinde yatık bir M görür, ama ilk okunan şey "yükseliş".'],
-  G: ['G · İKİ DURAK', 'Başlangıç ve varış arasında yay', 'Boş halka başlangıç, dolu kırmızı nokta varış; aralarında tek bir yol. Harf yok. En sade ve en "rota" olanı.'],
-  H: ['H · ÇUBUKLAR', 'Haftalık çubuklar, sonuncusu kırmızı', 'Ana sayfadaki haftalık çalışma çubukları. İlerleme ve seri fikrini taşır; son çubuk hedefi geçmiş. Harf yok.'],
-  I: ['I · ZİRVE YOLU', 'Tek tepe, içinde kıvrılan yol', 'Bir zirve ve ona tırmanan kırmızı patika. "Hedefe giden yol" fikrini en doğrudan anlatan; dolu şekil olduğu için simgede ağır durur.'],
-  J: ['J · KURDELE', 'Katlanan şerit', 'İki kez katlanan bir şerit; ikinci kat kırmızı. Soyut ve geometrik. M çağrışımı çok hafif, daha çok bir "iz" ya da "kulvar" gibi okunur.'],
-  K: ['K · TUR', 'Açık halka ve işaret noktası', 'Pistte bir tur: tamamlanmak üzere olan halka ve varış noktası. Aynı zamanda ilerleme halkası ve zamanlayıcı. Harf yok, en az parçalı olan.'],
+  B2: ['İKİ ZİRVE · inceltilmiş', 'Yumuşak tepeli iki zirve', 'İlk turdaki 2 numara. Tepeler yuvarlatıldı, kırmızı zirve biraz daha yüksek: "bugün" ve "hedef". Kesişim koyu kırmızı.'],
+  C2: ['KÜÇÜK m · inceltilmiş', 'Daha dolgun kemerler', 'İlk turdaki 3 numara. Çizgi kalınlaştı, kemerler genişledi; küçük boyutta daha güçlü duruyor. Harf olduğu belli ama yumuşak.'],
+  H2: ['ÇUBUKLAR · inceltilmiş', 'Üç çubuk, sonuncusu hedefi geçmiş', 'İkinci turdaki 3 numara. Dört çubuk sinyal göstergesine benziyordu; üçe indi ve sıra düzensiz (orta, kısa, uzun) oldu. Ana sayfadaki haftalık çubuklarla aynı dil.'],
+  X1: ['KARIŞIM 1 · kemer çubuklar', 'Yükselen üç kemer', 'm\'nin kemerleri ile çubukların birleşimi: üst üste binen, giderek yükselen üç yuvarlak kemer. Harf net değil; tepeler, çubuklar ve yükseliş aynı şekilde.'],
+  X2: ['KARIŞIM 2 · iki zirveli çubuklar', 'Çubuklardan iki tepe', 'Beş çubuk iki zirve çiziyor; ikinci zirve kırmızı ve daha yüksek. İki zirve fikri ile haftalık çubuklar bir arada. M ancak arayan görür.'],
 };
 document.getElementById('rows').innerHTML = Object.keys(MARKS).map((k) => `
   <div class="row">
